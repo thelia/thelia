@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Helper\Table;
@@ -163,7 +162,6 @@ class ConfigCommand extends ContainerAwareCommand
 
         return 0;
     }
-
 
     private function setConfig(InputInterface $input, OutputInterface $output)
     {

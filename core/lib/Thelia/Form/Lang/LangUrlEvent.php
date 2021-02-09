@@ -21,7 +21,7 @@ use Thelia\Core\Event\ActionEvent;
  */
 class LangUrlEvent extends ActionEvent
 {
-    protected $url = array();
+    protected $url = [];
 
     public function addUrl($id, $url)
     {

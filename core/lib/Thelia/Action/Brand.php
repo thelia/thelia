@@ -51,9 +51,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
     /**
      * process update brand
      *
-     * @param BrandUpdateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function update(BrandUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -76,9 +74,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
     /**
      * Toggle Brand visibility
      *
-     * @param BrandToggleVisibilityEvent $event
      * @param string $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -96,9 +92,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
     /**
      * Change Brand SEO
      *
-     * @param UpdateSeoEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @return Object
      */
     public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -123,9 +117,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
     /**
      * Check if is a brand view and if brand_id is visible
      *
-     * @param ViewCheckEvent $event
      * @param string $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -142,7 +134,6 @@ class Brand extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param ViewCheckEvent $event
      * @throws NotFoundHttpException
      */
     public function viewBrandIdNotVisible(ViewCheckEvent $event)
@@ -155,18 +146,18 @@ class Brand extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::BRAND_CREATE     => array('create', 128),
-            TheliaEvents::BRAND_UPDATE     => array('update', 128),
-            TheliaEvents::BRAND_DELETE     => array('delete', 128),
+        return [
+            TheliaEvents::BRAND_CREATE     => ['create', 128],
+            TheliaEvents::BRAND_UPDATE     => ['update', 128],
+            TheliaEvents::BRAND_DELETE     => ['delete', 128],
 
-            TheliaEvents::BRAND_UPDATE_SEO => array('updateSeo', 128),
+            TheliaEvents::BRAND_UPDATE_SEO => ['updateSeo', 128],
 
-            TheliaEvents::BRAND_UPDATE_POSITION   => array('updatePosition', 128),
-            TheliaEvents::BRAND_TOGGLE_VISIBILITY => array('toggleVisibility', 128),
+            TheliaEvents::BRAND_UPDATE_POSITION   => ['updatePosition', 128],
+            TheliaEvents::BRAND_TOGGLE_VISIBILITY => ['toggleVisibility', 128],
 
-            TheliaEvents::VIEW_CHECK                => array('viewCheck', 128),
-            TheliaEvents::VIEW_BRAND_ID_NOT_VISIBLE => array('viewBrandIdNotVisible', 128),
-        );
+            TheliaEvents::VIEW_CHECK                => ['viewCheck', 128],
+            TheliaEvents::VIEW_BRAND_ID_NOT_VISIBLE => ['viewBrandIdNotVisible', 128],
+        ];
     }
 }

@@ -28,7 +28,6 @@ class CartCreateEvent extends ActionEvent
     }
 
     /**
-     * @param Cart $cart
      *
      * @return $this
      */

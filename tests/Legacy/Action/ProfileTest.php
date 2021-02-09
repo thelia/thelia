@@ -13,9 +13,9 @@
 namespace Thelia\Tests\Action;
 
 use Thelia\Action\Profile;
+use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Model\Profile as ProfileModel;
-use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Model\ProfileQuery;
 
 /**
@@ -64,7 +64,6 @@ class ProfileTest extends BaseAction
     }
 
     /**
-     * @param ProfileModel $profile
      * @depends testCreate
      * @return ProfileModel
      */
@@ -99,7 +98,6 @@ class ProfileTest extends BaseAction
     }
 
     /**
-     * @param ProfileModel $profile
      * @depends testUpdate
      */
     public function testUpdateResourceAccess(ProfileModel $profile)
@@ -107,9 +105,9 @@ class ProfileTest extends BaseAction
         $event = new ProfileEvent();
         $event
             ->setId($profile->getId())
-            ->setResourceAccess(array(
-                    'admin.address' => array(AccessManager::CREATE)
-                ))
+            ->setResourceAccess([
+                    'admin.address' => [AccessManager::CREATE]
+                ])
         ;
 
         $action = new Profile($this->getMockEventDispatcher());
@@ -121,7 +119,7 @@ class ProfileTest extends BaseAction
 
         $resources = $updatedProfile->getResources();
 
-        $this->assertEquals(1, count($resources));
+        $this->assertEquals(1, \count($resources));
 
         $resource = $resources->getFirst();
         $this->assertEquals('admin.address', $resource->getCode());

@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Core\Event\Payment;
 
 use Thelia\Core\Event\ActionEvent;
@@ -25,11 +24,10 @@ use Thelia\Module\PaymentModuleInterface;
 class BasePaymentEvent extends ActionEvent
 {
     /** @var AbstractPaymentModule */
-    protected $module = null;
+    protected $module;
 
     /**
      * BasePaymentEvent constructor.
-     * @param AbstractPaymentModule $module
      */
     public function __construct(AbstractPaymentModule $module)
     {

@@ -12,8 +12,8 @@
 
 namespace Thelia\Core\Event\Coupon;
 
-use Thelia\Core\Event\ActionEvent;
 use Thelia\Condition\ConditionCollection;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Coupon;
 
 /**
@@ -26,28 +26,28 @@ use Thelia\Model\Coupon;
 class CouponCreateOrUpdateEvent extends ActionEvent
 {
     /** @var ConditionCollection Array of ConditionInterface */
-    protected $conditions = null;
+    protected $conditions;
 
     /** @var string Coupon code (ex: XMAS) */
-    protected $code = null;
+    protected $code;
 
     /** @var string Coupon title (ex: Coupon for XMAS) */
-    protected $title = null;
+    protected $title;
 
     /** @var string Coupon short description */
-    protected $shortDescription = null;
+    protected $shortDescription;
 
     /** @var string Coupon description */
-    protected $description = null;
+    protected $description;
 
     /** @var bool if Coupon is enabled */
     protected $isEnabled = false;
 
     /** @var \DateTime Coupon start date */
-    protected $startDate = null;
+    protected $startDate;
 
     /** @var \DateTime Coupon expiration date */
-    protected $expirationDate = null;
+    protected $expirationDate;
 
     /** @var bool if Coupon is cumulative */
     protected $isCumulative = false;
@@ -59,7 +59,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     protected $amount = 0;
 
     /** @var array Effects ready to be serialized */
-    protected $effects = array();
+    protected $effects = [];
 
     /** @var int Max time a Coupon can be used (-1 = unlimited) */
     protected $maxUsage = -1;
@@ -68,13 +68,13 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     protected $isAvailableOnSpecialOffers = false;
 
     /** @var Coupon Coupon model */
-    protected $couponModel = null;
+    protected $couponModel;
 
     /** @var string Coupon Service id */
     protected $serviceId;
 
     /** @var string Language code ISO (ex: fr_FR) */
-    protected $locale = null;
+    protected $locale;
 
     /** @var array ID of Countries to which shipping is free */
     protected $freeShippingForCountries;

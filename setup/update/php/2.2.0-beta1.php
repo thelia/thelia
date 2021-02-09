@@ -20,7 +20,6 @@ $stmtGetFeatureProduct = $pdo->prepare($sqlGetFeatureProduct);
 $stmtGetFeatureProduct->execute([':feature_av_id' => NULL]);
 
 while ($featureProduct = $stmtGetFeatureProduct->fetch(PDO::FETCH_ASSOC)) {
-
     // Create new feature_av with the feature_id
     $sqlCreateFeatureAv = "INSERT INTO `feature_av` (feature_id, `position`) VALUES (:feature_id, :feature_position)";
     $stmtCreateFeatureAv = $pdo->prepare($sqlCreateFeatureAv);

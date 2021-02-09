@@ -4,7 +4,6 @@ namespace Carousel\Model;
 
 use Carousel\Model\Base\CarouselI18nQuery as BaseCarouselI18nQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'carousel_i18n' table.
  *
@@ -17,5 +16,4 @@ use Carousel\Model\Base\CarouselI18nQuery as BaseCarouselI18nQuery;
  */
 class CarouselI18nQuery extends BaseCarouselI18nQuery
 {
-
 } // CarouselI18nQuery

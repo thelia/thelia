@@ -17,8 +17,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Thelia\Core\Translation\Translator;
 use Thelia\Core\Archiver\ArchiverManager as SUT;
+use Thelia\Core\Translation\Translator;
 use Thelia\Tests\ContainerAwareTestCase;
 
 /**

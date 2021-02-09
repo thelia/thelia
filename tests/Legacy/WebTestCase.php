@@ -41,8 +41,6 @@ class WebTestCase extends TestCase
     protected static $kernel;
 
     /**
-     * @param  array                                $options
-     * @param  array                                $server
      * @return Client
      */
     protected static function createClient(array $options = [], array $server = [])

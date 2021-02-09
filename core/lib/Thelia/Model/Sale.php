@@ -7,11 +7,8 @@ use Thelia\Core\Event\Sale\SaleEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Sale as BaseSale;
 
-
 class Sale extends BaseSale
 {
-
-
     /**
      * The price offsets types, either amount or percentage
      */

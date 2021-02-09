@@ -150,13 +150,13 @@ class StartDate extends ConditionAbstract
      */
     protected function generateInputs()
     {
-        return array(
-            self::START_DATE => array(
+        return [
+            self::START_DATE => [
                 'availableOperators' => $this->availableOperators[self::START_DATE],
                 'value' => '',
                 'selectedOperator' => Operators::SUPERIOR_OR_EQUAL
-            )
-        );
+            ]
+        ];
     }
 
     /**

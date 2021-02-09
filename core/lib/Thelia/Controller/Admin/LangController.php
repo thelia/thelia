@@ -45,30 +45,30 @@ class LangController extends BaseAdminController
 {
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::VIEW)) {
             return $response;
         }
         return $this->renderDefault();
     }
 
-    public function renderDefault(array $param = array(), $status = 200)
+    public function renderDefault(array $param = [], $status = 200)
     {
-        $data = array();
+        $data = [];
         foreach (LangQuery::create()->find() as $lang) {
             $data[LangUrlForm::LANG_PREFIX.$lang->getId()] = $lang->getUrl();
         }
         $langUrlForm = $this->createForm(AdminForm::LANG_URL, FormType::class, $data);
         $this->getParserContext()->addForm($langUrlForm);
 
-        return $this->render('languages', array_merge($param, array(
+        return $this->render('languages', array_merge($param, [
             'lang_without_translation' => ConfigQuery::getDefaultLangWhenNoTranslationAvailable(),
             'one_domain_per_lang' => ConfigQuery::isMultiDomainActivated()
-        )), $status);
+        ]), $status);
     }
 
     public function updateAction($lang_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -76,7 +76,7 @@ class LangController extends BaseAdminController
 
         $lang = LangQuery::create()->findPk($lang_id);
 
-        $langForm = $this->createForm(AdminForm::LANG_UPDATE, FormType::class, array(
+        $langForm = $this->createForm(AdminForm::LANG_UPDATE, FormType::class, [
             'id' => $lang->getId(),
             'title' => $lang->getTitle(),
             'code' => $lang->getCode(),
@@ -87,18 +87,18 @@ class LangController extends BaseAdminController
             'decimal_separator' => $lang->getDecimalSeparator(),
             'thousands_separator' => $lang->getThousandsSeparator(),
             'decimals' => $lang->getDecimals(),
-        ));
+        ]);
 
         $this->getParserContext()->addForm($langForm);
 
-        return $this->render('ajax/language-update-modal', array(
+        return $this->render('ajax/language-update-modal', [
             'lang_id' => $lang_id
-        ));
+        ]);
     }
 
     public function processUpdateAction($lang_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -116,7 +116,7 @@ class LangController extends BaseAdminController
 
             if (false === $event->hasLang()) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', 'Lang'))
+                    $this->getTranslator()->trans("No %obj was updated.", ['%obj', 'Lang'])
                 );
             }
 
@@ -136,12 +136,12 @@ class LangController extends BaseAdminController
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
         } catch (\Exception $ex) {
-            $error_msg = $this->getTranslator()->trans("Failed to update language definition: %ex", array("%ex" => $ex->getMessage()));
+            $error_msg = $this->getTranslator()->trans("Failed to update language definition: %ex", ["%ex" => $ex->getMessage()]);
             Tlog::getInstance()->addError("Failed to update language definition", $ex->getMessage());
         }
 
         if (false !== $error_msg) {
-            $response = $this->renderDefault(array('error_message' => $error_msg));
+            $response = $this->renderDefault(['error_message' => $error_msg]);
         }
 
         return $response;
@@ -149,7 +149,6 @@ class LangController extends BaseAdminController
 
     /**
      * @param LangCreateEvent $event
-     * @param Form $form
      * @return LangCreateEvent
      */
     protected function hydrateEvent($event, Form $form)
@@ -193,7 +192,7 @@ class LangController extends BaseAdminController
 
     public function addAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::CREATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::CREATE)) {
             return $response;
         }
 
@@ -212,7 +211,7 @@ class LangController extends BaseAdminController
 
             if (false === $createEvent->hasLang()) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', 'Lang'))
+                    $this->getTranslator()->trans("No %obj was updated.", ['%obj', 'Lang'])
                 );
             }
 
@@ -241,7 +240,7 @@ class LangController extends BaseAdminController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')),
+                $this->getTranslator()->trans("%obj creation", ['%obj' => 'Lang']),
                 $error_msg,
                 $createForm,
                 $ex
@@ -256,7 +255,7 @@ class LangController extends BaseAdminController
 
     public function deleteAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::DELETE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::DELETE)) {
             return $response;
         }
 
@@ -278,9 +277,9 @@ class LangController extends BaseAdminController
         }
 
         if (false !== $error_msg) {
-            $response = $this->renderDefault(array(
+            $response = $this->renderDefault([
                 'error_message' => $error_msg
-            ));
+            ]);
         }
 
         return $response;
@@ -288,7 +287,7 @@ class LangController extends BaseAdminController
 
     public function defaultBehaviorAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -315,7 +314,7 @@ class LangController extends BaseAdminController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')),
+                $this->getTranslator()->trans("%obj creation", ['%obj' => 'Lang']),
                 $error_msg,
                 $behaviorForm,
                 $ex
@@ -330,7 +329,7 @@ class LangController extends BaseAdminController
 
     public function domainAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -362,7 +361,7 @@ class LangController extends BaseAdminController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')),
+                $this->getTranslator()->trans("%obj creation", ['%obj' => 'Lang']),
                 $error_msg,
                 $langUrlForm,
                 $ex
@@ -387,13 +386,13 @@ class LangController extends BaseAdminController
 
     private function domainActivation($activate)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
         ConfigQuery::create()
             ->filterByName('one_domain_foreach_lang')
-            ->update(array('Value' => $activate));
+            ->update(['Value' => $activate]);
 
         return $this->generateRedirectFromRoute('admin.configuration.languages');
     }
@@ -405,7 +404,7 @@ class LangController extends BaseAdminController
      */
     protected function toggleLangDispatch($eventName, $event)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -420,7 +419,7 @@ class LangController extends BaseAdminController
 
             if (false === $event->hasLang()) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', 'Lang'))
+                    $this->getTranslator()->trans("No %obj was updated.", ['%obj', 'Lang'])
                 );
             }
 
@@ -450,8 +449,7 @@ class LangController extends BaseAdminController
 
         if ($errorMessage !== null) {
             return $this->renderDefault(['error_message' => $errorMessage], 500);
-        } else {
+        }  
             return $this->generateRedirectFromRoute('admin.configuration.languages');
-        }
     }
 }

@@ -138,8 +138,8 @@ class SchemaCombinerTest extends TestCase
         $schemaCombiner = new SchemaCombiner(array_values($schemaDocuments));
 
         $this->assertEquals(
-            count($expectedDatabases),
-            count($schemaCombiner->getDatabases()),
+            \count($expectedDatabases),
+            \count($schemaCombiner->getDatabases()),
             'Unexpected number of combined databases.'
         );
 
@@ -303,7 +303,7 @@ class SchemaCombinerTest extends TestCase
             $tableElements = $databaseElement->getElementsByTagName('table');
 
             $this->assertEquals(
-                count($expectedTables),
+                \count($expectedTables),
                 $tableElements->length,
                 "Table count for database '{$database}' is incorrect."
             );

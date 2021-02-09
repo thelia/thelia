@@ -75,7 +75,7 @@ class CountryController extends AbstractCrudController
      */
     protected function hydrateObjectForm($object)
     {
-        $data = array(
+        $data = [
             'id' => $object->getId(),
             'locale' => $object->getLocale(),
             'visible' => $object->getVisible() ? true : false,
@@ -89,7 +89,7 @@ class CountryController extends AbstractCrudController
             'has_states' => $object->getHasStates() ? true : false,
             'need_zip_code' => $object->getNeedZipCode() ? true : false,
             'zip_code_format' => $object->getZipCodeFormat(),
-        );
+        ];
 
         return $this->createForm(AdminForm::COUNTRY_MODIFICATION, FormType::class, $data);
     }
@@ -166,7 +166,6 @@ class CountryController extends AbstractCrudController
     /**
      * Get the created object from an event.
      *
-     * @param unknown $createEvent
      * @return Country
      */
     protected function getObjectFromEvent($event)
@@ -214,12 +213,11 @@ class CountryController extends AbstractCrudController
     /**
      * Render the main list template
      *
-     * @param unknown $currentOrder, if any, null otherwise.
      * @return Response
      */
     protected function renderListTemplate($currentOrder)
     {
-        return $this->render("countries", array("display_country" => 20));
+        return $this->render("countries", ["display_country" => 20]);
     }
 
     /**
@@ -232,9 +230,9 @@ class CountryController extends AbstractCrudController
 
     protected function getEditionArgument()
     {
-        return array(
+        return [
             'country_id'  => $this->getRequest()->get('country_id', 0)
-        );
+        ];
     }
 
     /**
@@ -261,7 +259,7 @@ class CountryController extends AbstractCrudController
 
     public function toggleDefaultAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -291,7 +289,7 @@ class CountryController extends AbstractCrudController
 
     public function getDataAction($visible = true, $locale = null)
     {
-        $response = $this->checkAuth($this->resourceCode, array(), AccessManager::VIEW);
+        $response = $this->checkAuth($this->resourceCode, [], AccessManager::VIEW);
         if (null !== $response) {
             return $response;
         }

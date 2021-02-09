@@ -54,7 +54,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
             ModuleHookQuery::create()
                 ->filterByModuleId($module->getId())
-                ->update(array('ModuleActive' => ($module->getActivate() == BaseModule::IS_ACTIVATED)));
+                ->update(['ModuleActive' => ($module->getActivate() == BaseModule::IS_ACTIVATED)]);
         }
 
         return $event;
@@ -95,7 +95,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
             ->filterByHookId($hook_id)
             ->withColumn('MAX(ModuleHook.position)', 'maxPos')
             ->groupBy('ModuleHook.hook_id')
-            ->select(array('maxPos'))
+            ->select(['maxPos'])
             ->findOne();
 
         return \intval($result) + 1;
@@ -186,9 +186,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param UpdatePositionEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      *
      * @return UpdatePositionEvent $event
      */
@@ -206,7 +204,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
             $hook = $event->getHook();
             ModuleHookQuery::create()
                 ->filterByHookId($hook->getId())
-                ->update(array('HookActive' => $hook->getActivate()));
+                ->update(['HookActive' => $hook->getActivate()]);
             $this->cacheClear($dispatcher);
         }
     }
@@ -217,7 +215,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
             $hook = $event->getHook();
             ModuleHookQuery::create()
                 ->filterByHookId($hook->getId())
-                ->update(array('HookActive' => $hook->getActivate()));
+                ->update(['HookActive' => $hook->getActivate()]);
             $this->cacheClear($dispatcher);
         }
     }
@@ -234,19 +232,18 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::MODULE_HOOK_CREATE            => array('createModuleHook', 128),
-            TheliaEvents::MODULE_HOOK_UPDATE            => array('updateModuleHook', 128),
-            TheliaEvents::MODULE_HOOK_DELETE            => array('deleteModuleHook', 128),
-            TheliaEvents::MODULE_HOOK_UPDATE_POSITION   => array('updateModuleHookPosition', 128),
-            TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION => array('toggleModuleHookActivation', 128),
+        return [
+            TheliaEvents::MODULE_HOOK_CREATE            => ['createModuleHook', 128],
+            TheliaEvents::MODULE_HOOK_UPDATE            => ['updateModuleHook', 128],
+            TheliaEvents::MODULE_HOOK_DELETE            => ['deleteModuleHook', 128],
+            TheliaEvents::MODULE_HOOK_UPDATE_POSITION   => ['updateModuleHookPosition', 128],
+            TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION => ['toggleModuleHookActivation', 128],
 
-            TheliaEvents::MODULE_TOGGLE_ACTIVATION      => array('toggleModuleActivation', 64),
-            TheliaEvents::MODULE_DELETE                 => array('deleteModule', 64),
+            TheliaEvents::MODULE_TOGGLE_ACTIVATION      => ['toggleModuleActivation', 64],
+            TheliaEvents::MODULE_DELETE                 => ['deleteModule', 64],
 
-            TheliaEvents::HOOK_TOGGLE_ACTIVATION        => array('toggleHookActivation', 64),
-            TheliaEvents::HOOK_UPDATE                   => array('updateHook', 64),
-
-        );
+            TheliaEvents::HOOK_TOGGLE_ACTIVATION        => ['toggleHookActivation', 64],
+            TheliaEvents::HOOK_UPDATE                   => ['updateHook', 64],
+        ];
     }
 }

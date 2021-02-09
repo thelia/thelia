@@ -59,7 +59,6 @@ $path = str_replace(' ', '~', $path);
  * descriptions.
  *
  * @param $juploadPhpSupportClass The instance of the JUpload PHP class.
- * @param $file                   The array wich contains info about all uploaded files.
  */
 function handle_uploaded_files($juploadPhpSupportClass, $files)
 {
@@ -67,11 +66,9 @@ function handle_uploaded_files($juploadPhpSupportClass, $files)
 		"<P>We are in the 'handle_uploaded_files' callback function, in the index.php script. To avoid double coding, we "
 		. "just call the default behavior of the JUpload PHP class. Just replace this by your code...</P>"
 		. $juploadPhpSupportClass->defaultAfterUploadManagement();;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 //First: the applet parameters
 //
@@ -82,7 +79,7 @@ function handle_uploaded_files($juploadPhpSupportClass, $files)
 // You can use all applet parameters in this array.
 // see all details http://jupload.sourceforge.net/howto-customization.html
 //
-$appletParameters = array(
+$appletParameters = [
 	//Default value is ... maximum size for a file on the current FS. 2G is problably too much already.
 	'maxFileSize'           => $JAVAMaxSizeUpload . 'G',
 	//
@@ -107,7 +104,7 @@ $appletParameters = array(
 	'sendMD5Sum'            => 'false',
 	//
 	'debugLevel'            => 0 // 100 disables redirect after upload, so we keep it below. This still gives a lot of information, in case of problem.
-);
+];
 
 // for htaccess protected folders
 if ((isset($_SERVER['PHP_AUTH_USER']) && $_SERVER['PHP_AUTH_USER'] != '') && $_SERVER['PHP_AUTH_USER'] != '' && $_SERVER['PHP_AUTH_USER'] != '')
@@ -117,7 +114,7 @@ if ((isset($_SERVER['PHP_AUTH_USER']) && $_SERVER['PHP_AUTH_USER'] != '') && $_S
 
 //
 //Then: the jupload PHP class parameters
-$classParameters = array(
+$classParameters = [
 	//Files won't be stored on the server. Useful for first tests of the applet behavior ... and sourceforge demo site !
 	'demo_mode'     => false,
 	//
@@ -131,7 +128,7 @@ $classParameters = array(
 	//I work on windows. The default configuration is /var/tmp/jupload_test
 	'destdir'       => $path  //Where to store the files on the web
 	//'errormail' => 'me@my.domain.org',
-);
+];
 if ( ! empty($convert_spaces))
 {
 	$classParameters['convert_spaces'] = true;
@@ -141,7 +138,6 @@ if ( ! empty($convert_spaces))
 // Instantiate and initialize JUpload : integration of the applet in your web site.
 $juploadPhpSupportClass = new JUpload($appletParameters, $classParameters);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 //Then, a simple HTML page, for the demo
 //

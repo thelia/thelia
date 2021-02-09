@@ -16,15 +16,15 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Action\Lang;
+use Thelia\Core\Event\Lang\LangCreateEvent;
 use Thelia\Core\Event\Lang\LangDeleteEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\TheliaTemplateHelper;
-use Thelia\Model\LangQuery;
 use Thelia\Model\Lang as LangModel;
-use Thelia\Core\Event\Lang\LangCreateEvent;
+use Thelia\Model\LangQuery;
 use Thelia\Tests\ContainerAwareTestCase;
 
 /**
@@ -97,7 +97,6 @@ class LangTest extends ContainerAwareTestCase
     }
 
     /**
-     * @param LangModel $lang
      * @depends testCreate
      * @return LangModel
      */
@@ -148,7 +147,6 @@ class LangTest extends ContainerAwareTestCase
     }
 
     /**
-     * @param LangModel $lang
      * @depends testUpdate
      * @return LangModel
      */
@@ -171,7 +169,6 @@ class LangTest extends ContainerAwareTestCase
     }
 
     /**
-     * @param LangModel $lang
      * @depends testToggleDefault
      */
     public function testDelete(LangModel $lang)
@@ -210,7 +207,7 @@ class LangTest extends ContainerAwareTestCase
     {
         LangQuery::create()
             ->filterById(self::$defaultId)
-            ->update(array('ByDefault' => true));
+            ->update(['ByDefault' => true]);
     }
 
     protected function tearDown(): void

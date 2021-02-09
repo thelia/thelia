@@ -15,9 +15,9 @@ namespace TheliaSmarty\Template\Plugins;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Element\FlashMessage as FlashMessageBag;
+use Thelia\Core\Translation\Translator;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
-use Thelia\Core\Translation\Translator;
 
 /**
  * Plugin for smarty defining blocks allowing to get flash message
@@ -90,7 +90,6 @@ class FlashMessage extends AbstractSmartyPlugin
      * @param bool $repeat Control how many times
      *                                            the block is displayed
      *
-     * @return mixed
      */
     public function getFlashMessage($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {

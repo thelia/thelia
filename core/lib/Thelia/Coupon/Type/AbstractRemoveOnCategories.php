@@ -27,7 +27,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
 {
     const CATEGORIES_LIST = 'categories';
 
-    protected $category_list = array();
+    protected $category_list = [];
 
     /**
      * Set the value of specific coupon fields.
@@ -82,10 +82,10 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
             $perCustomerUsageCount
         );
 
-        $this->category_list = isset($effects[self::CATEGORIES_LIST]) ? $effects[self::CATEGORIES_LIST] : array();
+        $this->category_list = isset($effects[self::CATEGORIES_LIST]) ? $effects[self::CATEGORIES_LIST] : [];
 
         if (! \is_array($this->category_list)) {
-            $this->category_list = array($this->category_list);
+            $this->category_list = [$this->category_list];
         }
 
         $this->setFieldsValue($effects);
@@ -128,7 +128,6 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
     public function drawBaseBackOfficeInputs($templateName, $otherFields)
     {
         return $this->facade->getParser()->render($templateName, array_merge($otherFields, [
-
                 // The categories list field
                 'categories_field_name' => $this->makeCouponFieldName(self::CATEGORIES_LIST),
                 'categories_values'     => $this->category_list

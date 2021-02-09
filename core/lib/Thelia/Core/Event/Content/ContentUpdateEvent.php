@@ -35,7 +35,6 @@ class ContentUpdateEvent extends ContentCreateEvent
     }
 
     /**
-     * @param mixed $chapo
      *
      * @return $this
      */
@@ -47,7 +46,6 @@ class ContentUpdateEvent extends ContentCreateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getChapo()
     {
@@ -55,7 +53,6 @@ class ContentUpdateEvent extends ContentCreateEvent
     }
 
     /**
-     * @param mixed $content_id
      *
      * @return $this
      */
@@ -67,7 +64,6 @@ class ContentUpdateEvent extends ContentCreateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getContentId()
     {
@@ -75,7 +71,6 @@ class ContentUpdateEvent extends ContentCreateEvent
     }
 
     /**
-     * @param mixed $description
      *
      * @return $this
      */
@@ -87,7 +82,6 @@ class ContentUpdateEvent extends ContentCreateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getDescription()
     {
@@ -95,7 +89,6 @@ class ContentUpdateEvent extends ContentCreateEvent
     }
 
     /**
-     * @param mixed $postscriptum
      *
      * @return $this
      */
@@ -107,7 +100,6 @@ class ContentUpdateEvent extends ContentCreateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getPostscriptum()
     {

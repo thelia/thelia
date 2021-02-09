@@ -12,9 +12,9 @@
 
 namespace Thelia\Model\Tools;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\PropelQuery;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 
 trait PositionManagementTrait
@@ -88,10 +88,10 @@ trait PositionManagementTrait
         // Up or down ?
         if ($up === true) {
             // Find the object immediately before me
-            $search->filterByPosition(array('max' => $myPosition-1))->orderByPosition(Criteria::DESC);
+            $search->filterByPosition(['max' => $myPosition-1])->orderByPosition(Criteria::DESC);
         } else {
             // Find the object immediately after me
-            $search->filterByPosition(array('min' => $myPosition+1))->orderByPosition(Criteria::ASC);
+            $search->filterByPosition(['min' => $myPosition+1])->orderByPosition(Criteria::ASC);
         }
 
         $result = $search->findOne();
@@ -146,12 +146,12 @@ trait PositionManagementTrait
 
             if ($newPosition > $current_position) {
                 // The new position is after the current position -> we will offset + 1 all categories located between us and the new position
-                $search->filterByPosition(array('min' => 1+$current_position, 'max' => $newPosition));
+                $search->filterByPosition(['min' => 1+$current_position, 'max' => $newPosition]);
 
                 $delta = -1;
             } else {
                 // The new position is brefore the current position -> we will offset - 1 all categories located between us and the new position
-                $search->filterByPosition(array('min' => $newPosition, 'max' => $current_position - 1));
+                $search->filterByPosition(['min' => $newPosition, 'max' => $current_position - 1]);
 
                 $delta = 1;
             }
@@ -181,13 +181,13 @@ trait PositionManagementTrait
         }
     }
 
-    protected function reorderBeforeDelete($fields = array())
+    protected function reorderBeforeDelete($fields = [])
     {
         // Find DATABASE_NAME constant
         $mapClassName = self::TABLE_MAP;
 
-        $data = array();
-        $whereCriteria = array();
+        $data = [];
+        $whereCriteria = [];
 
         foreach ($fields as $field => $value) {
             $whereCriteria[] = $field . '=:' . $field;

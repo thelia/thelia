@@ -15,7 +15,6 @@ use Thelia\Form\BaseForm;
 
 class Carousel extends BaseCarousel implements FileModelInterface
 {
-
     public function preDelete(ConnectionInterface $con = null)
     {
         $carousel = new \Carousel\Carousel();
@@ -81,7 +80,6 @@ class Carousel extends BaseCarousel implements FileModelInterface
     }
 
     /**
-     * @param int $objectId the object ID
      *
      * @return string the URL to redirect to after update from the back-office
      */

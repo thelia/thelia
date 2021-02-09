@@ -42,7 +42,6 @@ use Thelia\Model\Event\AddressEvent;
  */
 class AddressController extends BaseFrontController
 {
-
     /**
      * Controller for generate modal containing update form
      * Check if request is a XmlHttpRequest and address owner is the current customer
@@ -51,10 +50,8 @@ class AddressController extends BaseFrontController
      */
     public function generateModalAction($address_id)
     {
-
         $this->checkAuth();
         $this->checkXmlHttpRequest();
-
     }
 
     /**
@@ -198,19 +195,18 @@ class AddressController extends BaseFrontController
             if ($this->getRequest()->isXmlHttpRequest()) {
                 return $this->jsonResponse(
                     json_encode(
-                        array(
+                        [
                             "success" => false,
                             "message" => $this->getTranslator()->trans(
                                 "Error during address deletion process",
                                 [],
                                 Front::MESSAGE_DOMAIN
                             )
-                        )
+                        ]
                     )
                 );
-            } else {
+            }  
                 return $this->generateRedirectFromRoute('default');
-            }
         }
 
         try {
@@ -224,10 +220,10 @@ class AddressController extends BaseFrontController
         // If Ajax Request
         if ($this->getRequest()->isXmlHttpRequest()) {
             if ($error_message) {
-                $response = $this->jsonResponse(json_encode(array(
+                $response = $this->jsonResponse(json_encode([
                     "success" => false,
                     "message" => $error_message
-                )));
+                ]));
             } else {
                 $response = $this->jsonResponse(
                     json_encode([
@@ -238,10 +234,8 @@ class AddressController extends BaseFrontController
             }
 
             return $response;
-
-        } else {
-            return $this->generateRedirectFromRoute('default', array('view'=>'account'));
-        }
+        }  
+            return $this->generateRedirectFromRoute('default', ['view'=>'account']);
     }
 
     public function makeAddressDefaultAction($addressId)
@@ -268,6 +262,6 @@ class AddressController extends BaseFrontController
             return $this->render("account");
         }
 
-        return $this->generateRedirectFromRoute('default', array('view'=>'account'));
+        return $this->generateRedirectFromRoute('default', ['view'=>'account']);
     }
 }

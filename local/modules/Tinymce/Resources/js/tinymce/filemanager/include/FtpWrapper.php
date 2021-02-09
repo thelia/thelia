@@ -72,17 +72,15 @@ class FtpWrapper
      * Forward the method call to FTP functions
      *
      * @param  string       $function
-     * @param  array        $arguments
-     * @return mixed
      * @throws FtpException When the function is not valid
      */
     public function __call($function, array $arguments)
     {
         $function = 'ftp_' . $function;
 
-        if (function_exists($function)) {
+        if (\function_exists($function)) {
             array_unshift($arguments, $this->conn);
-            return call_user_func_array($function, $arguments);
+            return \call_user_func_array($function, $arguments);
         }
 
         throw new FtpException("{$function} is not a valid FTP function");

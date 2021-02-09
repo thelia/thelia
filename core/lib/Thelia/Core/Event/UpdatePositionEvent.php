@@ -43,7 +43,6 @@ class UpdatePositionEvent extends ActionEvent
     protected $position;
 
     /**
-     * @var mixed
      * @deprecated since 2.3, will be removed in 2.5, because this variable is not used
      */
     protected $object;

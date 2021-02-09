@@ -42,6 +42,6 @@ class IntType extends BaseType
 
     public function getFormOptions()
     {
-        return array();
+        return [];
     }
 }

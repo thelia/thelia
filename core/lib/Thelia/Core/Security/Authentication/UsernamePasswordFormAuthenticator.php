@@ -13,11 +13,11 @@
 namespace Thelia\Core\Security\Authentication;
 
 use Symfony\Component\HttpFoundation\Request;
-use Thelia\Core\Security\Exception\CustomerNotConfirmedException;
-use Thelia\Core\Security\UserProvider\UserProviderInterface;
-use Thelia\Core\Security\Exception\WrongPasswordException;
-use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Symfony\Component\Validator\Exception\ValidatorException;
+use Thelia\Core\Security\Exception\CustomerNotConfirmedException;
+use Thelia\Core\Security\Exception\UsernameNotFoundException;
+use Thelia\Core\Security\Exception\WrongPasswordException;
+use Thelia\Core\Security\UserProvider\UserProviderInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
@@ -31,18 +31,18 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
 
     protected $baseLoginForm;
 
-    public function __construct(Request $request, BaseForm $loginForm, UserProviderInterface $userProvider, array $options = array())
+    public function __construct(Request $request, BaseForm $loginForm, UserProviderInterface $userProvider, array $options = [])
     {
         $this->request = $request;
         $this->baseLoginForm = $loginForm;
         $this->loginForm = $this->baseLoginForm->getForm();
         $this->userProvider = $userProvider;
 
-        $defaults = array(
+        $defaults = [
             'required_method' => 'POST',
             'username_field_name' => 'username',
             'password_field_name' => 'password'
-        );
+        ];
 
         $this->options = array_merge($defaults, $options);
     }

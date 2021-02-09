@@ -47,7 +47,7 @@ class Lang extends BaseLang
             try {
                 LangQuery::create()
                     ->filterByByDefault(1)
-                    ->update(array('ByDefault' => 0), $con);
+                    ->update(['ByDefault' => 0], $con);
 
                 $this
                     ->setVisible(1)

@@ -42,6 +42,6 @@ class TarBz2Archiver extends TarArchiver
 
     public function isAvailable()
     {
-        return parent::isAvailable() && extension_loaded('bz2');
+        return parent::isAvailable() && \extension_loaded('bz2');
     }
 }

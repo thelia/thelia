@@ -12,9 +12,9 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
+use Thelia\Core\Template\Loop\Sale;
 use Thelia\Model\SaleQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
-use Thelia\Core\Template\Loop\Sale;
 
 /**
  *

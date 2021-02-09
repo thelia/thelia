@@ -112,12 +112,12 @@ class StartDateTest extends TestCase
 
         $condition1 = new StartDate($stubFacade);
 
-        $operators = array(
+        $operators = [
             StartDate::START_DATE => 'petite licorne'
-        );
-        $values = array(
+        ];
+        $values = [
             StartDate::START_DATE => $this->startDate
-        );
+        ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -140,12 +140,12 @@ class StartDateTest extends TestCase
         $stubFacade = $this->generateFacadeStub();
 
         $condition1 = new StartDate($stubFacade);
-        $operators = array(
+        $operators = [
             StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             StartDate::START_DATE => 'petit poney'
-        );
+        ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -163,12 +163,12 @@ class StartDateTest extends TestCase
         $stubFacade = $this->generateFacadeStub();
 
         $condition1 = new StartDate($stubFacade);
-        $operators = array(
+        $operators = [
             StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             StartDate::START_DATE => $this->startDate
-        );
+        ];
 
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -192,12 +192,12 @@ class StartDateTest extends TestCase
 
         $condition1 = new StartDate($stubFacade);
 
-        $operators = array(
+        $operators = [
             StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             StartDate::START_DATE => time() + 2000
-        );
+        ];
 
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -215,12 +215,12 @@ class StartDateTest extends TestCase
 
         $condition1 = new StartDate($stubFacade);
 
-        $operators = array(
+        $operators = [
             StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             StartDate::START_DATE => $this->startDate
-        );
+        ];
 
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -285,34 +285,34 @@ class StartDateTest extends TestCase
         /** @var FacadeInterface $stubFacade */
         $condition1 = new StartDate($stubFacade);
 
-        $operators = array(
+        $operators = [
             StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             StartDate::START_DATE => $this->startDate
-        );
+        ];
 
         $condition1->setValidatorsFromForm($operators, $values);
 
         $actual = $condition1->getValidators();
 
-        $validators = array(
-            'inputs' => array(
-                StartDate::START_DATE => array(
-                    'availableOperators' => array(
+        $validators = [
+            'inputs' => [
+                StartDate::START_DATE => [
+                    'availableOperators' => [
                         '>=' => 'Price',
-                    ),
+                    ],
                     'value' => '',
                     'selectedOperator' => '>='
-                )
-            ),
-            'setOperators' => array(
+                ]
+            ],
+            'setOperators' => [
                 'start_date' => '>='
-            ),
-            'setValues' => array(
+            ],
+            'setValues' => [
                 'start_date' => $this->startDate
-            )
-        );
+            ]
+        ];
         $expected = $validators;
 
         $this->assertEquals($expected, $actual);

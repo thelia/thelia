@@ -17,12 +17,12 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Type\TypeCollection;
-use Thelia\Type;
-use Thelia\Model\TaxRuleQuery;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\TaxRule as TaxRuleModel;
+use Thelia\Model\TaxRuleQuery;
+use Thelia\Type;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -53,7 +53,7 @@ class TaxRule extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse'))
+                    new Type\EnumListType(['id', 'id_reverse', 'alpha', 'alpha_reverse'])
                 ),
                 'alpha'
             )
@@ -65,7 +65,7 @@ class TaxRule extends BaseI18nLoop implements PropelSearchLoopInterface
         $search = TaxRuleQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('TITLE', 'DESCRIPTION'));
+        $this->configureI18nProcessing($search, ['TITLE', 'DESCRIPTION']);
 
         $id = $this->getId();
 

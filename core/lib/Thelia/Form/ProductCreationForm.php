@@ -15,11 +15,11 @@ namespace Thelia\Form;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ProductQuery;
-use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class ProductCreationForm extends BaseForm
 {
@@ -31,72 +31,72 @@ class ProductCreationForm extends BaseForm
     protected function doBuildForm($change_mode)
     {
         $this->formBuilder
-            ->add("ref", TextType::class, array(
-                "constraints" => array(
+            ->add("ref", TextType::class, [
+                "constraints" => [
                     new NotBlank(),
                     new Callback([$this, "checkDuplicateRef"]),
-                ),
+                ],
                 "label"       => Translator::getInstance()->trans('Product reference *'),
-                "label_attr"  => array("for" => "ref"),
-            ))
-            ->add("title", TextType::class, array(
-                "constraints" => array(new NotBlank()),
+                "label_attr"  => ["for" => "ref"],
+            ])
+            ->add("title", TextType::class, [
+                "constraints" => [new NotBlank()],
                 "label" => Translator::getInstance()->trans('Product title'),
-                "label_attr" => array("for" => "title"),
-            ))
-            ->add("default_category", IntegerType::class, array(
-                "constraints" => array(new NotBlank()),
+                "label_attr" => ["for" => "title"],
+            ])
+            ->add("default_category", IntegerType::class, [
+                "constraints" => [new NotBlank()],
                 "label"       => Translator::getInstance()->trans("Default product category *"),
-                "label_attr"  => array("for" => "default_category_field"),
-            ))
-            ->add("locale", TextType::class, array(
-                "constraints" => array(new NotBlank()),
-            ))
-            ->add("visible", IntegerType::class, array(
+                "label_attr"  => ["for" => "default_category_field"],
+            ])
+            ->add("locale", TextType::class, [
+                "constraints" => [new NotBlank()],
+            ])
+            ->add("visible", IntegerType::class, [
                 "label"      => Translator::getInstance()->trans("This product is online"),
-                "label_attr" => array("for" => "visible_field"),
-            ))
-            ->add("virtual", IntegerType::class, array(
+                "label_attr" => ["for" => "visible_field"],
+            ])
+            ->add("virtual", IntegerType::class, [
                 "label"      => Translator::getInstance()->trans("This product does not have a physical presence"),
-                "label_attr" => array("for" => "virtual_field"),
-            ))
+                "label_attr" => ["for" => "virtual_field"],
+            ])
         ;
 
         if (! $change_mode) {
             $this->formBuilder
-                ->add("price", NumberType::class, array(
-                    "constraints" => array(new NotBlank()),
+                ->add("price", NumberType::class, [
+                    "constraints" => [new NotBlank()],
                     "label"      => Translator::getInstance()->trans("Product base price excluding taxes *"),
-                    "label_attr" => array("for" => "price_without_tax"),
-                ))
-                ->add("tax_price", NumberType::class, array(
+                    "label_attr" => ["for" => "price_without_tax"],
+                ])
+                ->add("tax_price", NumberType::class, [
                     "label"      => Translator::getInstance()->trans("Product base price with taxes"),
-                    "label_attr" => array("for" => "price_with_tax"),
-                ))
-                ->add("currency", IntegerType::class, array(
-                    "constraints" => array(new NotBlank()),
+                    "label_attr" => ["for" => "price_with_tax"],
+                ])
+                ->add("currency", IntegerType::class, [
+                    "constraints" => [new NotBlank()],
                     "label"      => Translator::getInstance()->trans("Price currency *"),
-                    "label_attr" => array("for" => "currency_field"),
-                ))
-                ->add("tax_rule", IntegerType::class, array(
-                    "constraints" => array(new NotBlank()),
+                    "label_attr" => ["for" => "currency_field"],
+                ])
+                ->add("tax_rule", IntegerType::class, [
+                    "constraints" => [new NotBlank()],
                     "label"      => Translator::getInstance()->trans("Tax rule for this product *"),
-                    "label_attr" => array("for" => "tax_rule_field"),
-                ))
-                ->add("weight", NumberType::class, array(
+                    "label_attr" => ["for" => "tax_rule_field"],
+                ])
+                ->add("weight", NumberType::class, [
                     "label"      => Translator::getInstance()->trans("Weight"),
-                    "label_attr" => array("for" => "weight_field"),
-                ))
-                ->add("quantity", NumberType::class, array(
+                    "label_attr" => ["for" => "weight_field"],
+                ])
+                ->add("quantity", NumberType::class, [
                     "label"      => Translator::getInstance()->trans("Stock"),
-                    "label_attr" => array("for" => "quantity_field"),
+                    "label_attr" => ["for" => "quantity_field"],
                     "required"   => false
-                ))
-                ->add("template_id", IntegerType::class, array(
+                ])
+                ->add("template_id", IntegerType::class, [
                     "label"      => Translator::getInstance()->trans("Template"),
-                    "label_attr" => array("for" => "template_field"),
+                    "label_attr" => ["for" => "template_field"],
                     "required"   => false
-                ))
+                ])
             ;
         }
     }
@@ -109,7 +109,7 @@ class ProductCreationForm extends BaseForm
             $context->addViolation(
                 Translator::getInstance()->trans(
                     "A product with reference %ref already exists. Please choose another reference.",
-                    array('%ref' => $value)
+                    ['%ref' => $value]
                 )
             );
         }

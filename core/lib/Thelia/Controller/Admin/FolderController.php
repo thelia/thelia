@@ -78,7 +78,7 @@ class FolderController extends AbstractSeoCrudController
         $this->hydrateSeoForm($object);
 
         // Prepare the data that will hydrate the form
-        $data = array(
+        $data = [
             'id'           => $object->getId(),
             'locale'       => $object->getLocale(),
             'title'        => $object->getTitle(),
@@ -87,7 +87,7 @@ class FolderController extends AbstractSeoCrudController
             'postscriptum' => $object->getPostscriptum(),
             'visible'      => $object->getVisible(),
             'parent'       => $object->getParent()
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(AdminForm::FOLDER_MODIFICATION, FormType::class, $data);
@@ -228,7 +228,6 @@ class FolderController extends AbstractSeoCrudController
     /**
      * Render the main list template
      *
-     * @param int $currentOrder, if any, null otherwise.
      * @return Response
      */
     protected function renderListTemplate($currentOrder)
@@ -238,11 +237,11 @@ class FolderController extends AbstractSeoCrudController
 
         return $this->render(
             'folders',
-            array(
+            [
                 'folder_order' => $currentOrder,
                 'content_order' => $content_order,
                 'parent' => $this->getRequest()->get('parent', 0)
-            )
+            ]
         );
     }
 
@@ -260,10 +259,10 @@ class FolderController extends AbstractSeoCrudController
             $request = $this->getRequest();
         }
 
-        return array(
+        return [
             'folder_id' => $request->get('folder_id', 0),
             'current_tab' => $request->get('current_tab', 'general')
-        );
+        ];
     }
 
     /**
@@ -277,9 +276,8 @@ class FolderController extends AbstractSeoCrudController
                 'admin.folders.default',
                 ['parent' => $updateEvent->getFolder()->getParent()]
             );
-        } else {
+        }  
             return null;
-        }
     }
 
     /**
@@ -309,15 +307,13 @@ class FolderController extends AbstractSeoCrudController
                 'admin.folders.default',
                 ['parent' => $folder->getParent()]
             );
-        } else {
+        }  
             return null;
-        }
     }
 
     /**
      * Redirect to the edition template
      *
-     * @param Request|null $request
      * @return Response
      */
     protected function redirectToEditionTemplate(Request $request = null)

@@ -31,7 +31,6 @@ class ModuleHookDeleteEvent extends ModuleHookEvent
     }
 
     /**
-     * @param mixed $module_hook_id
      * @return $this
      */
     public function setModuleHookId($module_hook_id)
@@ -42,7 +41,6 @@ class ModuleHookDeleteEvent extends ModuleHookEvent
     }
 
     /**
-     * @return mixed
      */
     public function getModuleHookId()
     {

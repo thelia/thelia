@@ -42,6 +42,6 @@ class AlphaNumStringType extends BaseType
 
     public function getFormOptions()
     {
-        return array();
+        return [];
     }
 }

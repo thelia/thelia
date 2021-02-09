@@ -12,9 +12,9 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
+use Thelia\Core\Template\Loop\Folder;
 use Thelia\Model\FolderQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
-use Thelia\Core\Template\Loop\Folder;
 
 /**
  *
@@ -30,7 +30,7 @@ class FolderTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return array();
+        return [];
     }
 
     public function testSearchById()
@@ -44,9 +44,9 @@ class FolderTest extends BaseLoopTestor
             $folder->save();
         }
 
-        $otherParameters = array(
+        $otherParameters = [
             "visible" => "*",
-        );
+        ];
 
         $this->baseTestSearchById($folder->getId(), $otherParameters);
     }

@@ -52,7 +52,6 @@ class ModuleConfig extends BaseLoop implements ArraySearchLoopInterface
     }
 
     /**
-     * @param LoopResult $loopResult
      *
      * @return LoopResult
      */

@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Coupon code can\'t be empty' => 'Coupon code can\'t be empty',
     'Delivery address does not belong to the current customer' => 'Delivery address does not belong to the current customer',
     'Delivery module cannot be use with selected delivery address' => 'Delivery module cannot be use with selected delivery address',
@@ -21,4 +21,4 @@ return array(
     'You should <a href="%sign">sign in</a> or <a href="%register">register</a> to use this coupon' => 'You should <a href="%sign">sign in</a> or <a href="%register">register</a> to use this coupon',
     'You\'re currently logged in. Please log out before requesting a new password.' => 'You\'re currently logged in. Please log out before requesting a new password.',
     'Your account is not yet confirmed check out your mailbox' => 'Your account is not yet confirmed check out your mailbox',
-);
+];

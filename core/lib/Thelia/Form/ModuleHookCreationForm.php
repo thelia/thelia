@@ -43,86 +43,86 @@ class ModuleHookCreationForm extends BaseForm
             ->add(
                 "module_id",
                 ChoiceType::class,
-                array(
+                [
                     "choices" => $this->getModuleChoices(),
-                    "constraints" => array(
+                    "constraints" => [
                         new NotBlank(),
-                    ),
+                    ],
                     "label" => $this->trans("Module"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "module_id",
                         "help" => $this->trans(
                             "Only hookable modules are displayed in this menu."
                         ),
-                    ),
-                )
+                    ],
+                ]
             )
             ->add(
                 "hook_id",
                 ChoiceType::class,
-                array(
+                [
                     "choices" => $this->getHookChoices(),
-                    "constraints" => array(
+                    "constraints" => [
                         new NotBlank(),
-                    ),
+                    ],
                     "label" => $this->trans("Hook"),
-                    "label_attr" => array("for" => "hook_id"),
-                )
+                    "label_attr" => ["for" => "hook_id"],
+                ]
             )
             ->add(
                 "classname",
                 TextType::class,
-                array(
-                    "constraints" => array(
+                [
+                    "constraints" => [
                         new NotBlank(),
-                    ),
+                    ],
                     "label" => $this->trans("Service ID"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "classname",
                         "help" => $this->trans(
                             "The service id that will handle the hook (defined in the config.xml file of the module)."
                         ),
-                    ),
-                )
+                    ],
+                ]
             )
             ->add(
                 "method",
                 TextType::class,
-                array(
+                [
                     "label" => $this->trans("Method Name"),
-                    "constraints" => array(
+                    "constraints" => [
                         new NotBlank(),
                         new Callback(
-                                    array($this, "verifyMethod")
+                                    [$this, "verifyMethod"]
                                 ),
-                    ),
-                    "label_attr" => array(
+                    ],
+                    "label_attr" => [
                         "for" => "method",
                         "help" => $this->trans(
                             "The method name that will handle the hook event."
                         ),
-                    ),
-                )
+                    ],
+                ]
             )
             ->add(
                 "templates",
                 TextType::class,
-                array(
+                [
                     "label" => $this->trans("Automatic rendered templates"),
-                    "constraints" => array(
+                    "constraints" => [
                         new Callback(
-                            array($this, "verifyTemplates")
+                            [$this, "verifyTemplates"]
                         ),
-                    ),
-                    "label_attr" => array(
+                    ],
+                    "label_attr" => [
                         "for" => "templates",
                         "help" => $this->trans(
                             "When using the %method% method you can automatically render or dump templates or add CSS and JS files (e.g.: render:mytemplate.html;js:assets/js/myjs.js)",
                             ["%method%" => BaseHook::INJECT_TEMPLATE_METHOD_NAME]
                         ),
-                    ),
+                    ],
                     "required" => false
-                )
+                ]
             )
         ;
     }
@@ -138,7 +138,7 @@ class ModuleHookCreationForm extends BaseForm
 
     protected function getModuleChoices()
     {
-        $choices = array();
+        $choices = [];
         $modules = ModuleQuery::getActivated();
 
         /** @var Module $module */
@@ -159,7 +159,7 @@ class ModuleHookCreationForm extends BaseForm
 
     protected function getHookChoices()
     {
-        $choices = array();
+        $choices = [];
         $hooks = HookQuery::create()
             ->filterByActivate(true, Criteria::EQUAL)
             ->joinWithI18n($this->translator->getLocale())
@@ -180,7 +180,6 @@ class ModuleHookCreationForm extends BaseForm
      * See RegisterListenersPass::isValidHookMethod for implementing this verification
      *
      * @param $value
-     * @param  ExecutionContextInterface $context
      * @return bool
      */
     public function verifyMethod($value, ExecutionContextInterface $context)
@@ -212,7 +211,6 @@ class ModuleHookCreationForm extends BaseForm
      * Check if method is the right one if we want to use automatic inserted templates .
      *
      * @param $value
-     * @param  ExecutionContextInterface $context
      *
      * @return bool
      */

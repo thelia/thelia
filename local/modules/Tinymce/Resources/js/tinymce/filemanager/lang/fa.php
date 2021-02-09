@@ -1,7 +1,6 @@
 <?php
 
-return array(
-
+return [
 	'Select' => 'انتخاب',
 	'Erase' => 'حذف',
 	'Open' => 'بازگشایی',
@@ -119,4 +118,4 @@ return array(
 	'GB' => "GB",
 	'TB' => "TB",
 	'total size' => "حجم کلی",
-);
+];

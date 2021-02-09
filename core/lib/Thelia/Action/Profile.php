@@ -29,9 +29,7 @@ use Thelia\Model\ResourceQuery;
 class Profile extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * @param ProfileEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function create(ProfileEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -53,9 +51,7 @@ class Profile extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param ProfileEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function update(ProfileEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -76,7 +72,6 @@ class Profile extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param ProfileEvent $event
      */
     public function updateResourceAccess(ProfileEvent $event)
     {
@@ -99,7 +94,6 @@ class Profile extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param ProfileEvent $event
      */
     public function updateModuleAccess(ProfileEvent $event)
     {
@@ -122,7 +116,6 @@ class Profile extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param ProfileEvent $event
      */
     public function delete(ProfileEvent $event)
     {
@@ -140,12 +133,12 @@ class Profile extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::PROFILE_CREATE                        => array("create", 128),
-            TheliaEvents::PROFILE_UPDATE                        => array("update", 128),
-            TheliaEvents::PROFILE_DELETE                        => array("delete", 128),
-            TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE        => array("updateResourceAccess", 128),
-            TheliaEvents::PROFILE_MODULE_ACCESS_UPDATE          => array("updateModuleAccess", 128),
-        );
+        return [
+            TheliaEvents::PROFILE_CREATE                        => ["create", 128],
+            TheliaEvents::PROFILE_UPDATE                        => ["update", 128],
+            TheliaEvents::PROFILE_DELETE                        => ["delete", 128],
+            TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE        => ["updateResourceAccess", 128],
+            TheliaEvents::PROFILE_MODULE_ACCESS_UPDATE          => ["updateModuleAccess", 128],
+        ];
     }
 }

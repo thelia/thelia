@@ -27,8 +27,8 @@ trait StandardI18nFieldsSearchTrait
     ];
     
     protected function getStandardI18nSearchFields()
-    {	
-        return self::$standardI18nSearchFields;	
+    {
+        return self::$standardI18nSearchFields;
     }
 
      /**
@@ -41,7 +41,7 @@ trait StandardI18nFieldsSearchTrait
     {
         $firstSearch = true;
         foreach (self::$standardI18nSearchFields as $searchInElement) {
-            if (!in_array($searchInElement, $searchIn, true)) {
+            if (!\in_array($searchInElement, $searchIn, true)) {
                 continue;
             }
 

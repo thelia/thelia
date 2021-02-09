@@ -13,7 +13,7 @@ class Address extends BaseAddress
     public function makeItDefault()
     {
         AddressQuery::create()->filterByCustomerId($this->getCustomerId())
-            ->update(array('IsDefault' => '0'));
+            ->update(['IsDefault' => '0']);
 
         $this->setIsDefault(1);
         $this->save();
@@ -21,7 +21,6 @@ class Address extends BaseAddress
 
     /**
      * Code to be run before deleting the object in database
-     * @param ConnectionInterface|null $con
      * @return boolean
      */
     public function preDelete(ConnectionInterface $con = null): bool

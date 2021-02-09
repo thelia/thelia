@@ -15,14 +15,14 @@ namespace TheliaSmarty\Template\Plugins;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\Security\Exception\AuthorizationException;
-use TheliaSmarty\Template\SmartyPluginDescriptor;
-use TheliaSmarty\Template\AbstractSmartyPlugin;
-use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Security\Exception\AuthenticationException;
+use Thelia\Core\Security\Exception\AuthorizationException;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Exception\OrderException;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ModuleQuery;
+use TheliaSmarty\Template\AbstractSmartyPlugin;
+use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 class Security extends AbstractSmartyPlugin
 {
@@ -98,7 +98,7 @@ class Security extends AbstractSmartyPlugin
     {
         $cart = $this->getSession()->getSessionCart($this->dispatcher);
         if ($cart===null || $cart->countCartItems() == 0) {
-            throw new OrderException('Cart must not be empty', OrderException::CART_EMPTY, array('empty' => 1));
+            throw new OrderException('Cart must not be empty', OrderException::CART_EMPTY, ['empty' => 1]);
         }
 
         return "";
@@ -116,7 +116,7 @@ class Security extends AbstractSmartyPlugin
         }
 
         if (null === $order || null == $checkAddress || null === $checkModule) {
-            throw new OrderException('Delivery must be defined', OrderException::UNDEFINED_DELIVERY, array('missing' => 1));
+            throw new OrderException('Delivery must be defined', OrderException::UNDEFINED_DELIVERY, ['missing' => 1]);
         }
 
         return "";
@@ -129,11 +129,11 @@ class Security extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor('function', 'check_auth', $this, 'checkAuthFunction'),
             new SmartyPluginDescriptor('function', 'check_cart_not_empty', $this, 'checkCartNotEmptyFunction'),
             new SmartyPluginDescriptor('function', 'check_valid_delivery', $this, 'checkValidDeliveryFunction'),
-        );
+        ];
     }
 
     /**

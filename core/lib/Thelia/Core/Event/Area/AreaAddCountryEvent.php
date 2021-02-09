@@ -33,7 +33,6 @@ class AreaAddCountryEvent extends AreaEvent
     }
 
     /**
-     * @param mixed $countryId
      *
      * @return $this
      */
@@ -45,7 +44,6 @@ class AreaAddCountryEvent extends AreaEvent
     }
 
     /**
-     * @return mixed
      */
     public function getCountryId()
     {

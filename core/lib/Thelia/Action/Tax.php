@@ -22,9 +22,7 @@ use Thelia\Model\TaxQuery;
 class Tax extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * @param TaxEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function create(TaxEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -45,9 +43,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param TaxEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function update(TaxEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -68,7 +64,6 @@ class Tax extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param TaxEvent $event
      */
     public function delete(TaxEvent $event)
     {
@@ -86,10 +81,10 @@ class Tax extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::TAX_CREATE            => array("create", 128),
-            TheliaEvents::TAX_UPDATE            => array("update", 128),
-            TheliaEvents::TAX_DELETE            => array("delete", 128),
-        );
+        return [
+            TheliaEvents::TAX_CREATE            => ["create", 128],
+            TheliaEvents::TAX_UPDATE            => ["update", 128],
+            TheliaEvents::TAX_DELETE            => ["delete", 128],
+        ];
     }
 }

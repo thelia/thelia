@@ -77,7 +77,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function setDeliveryAddress(OrderEvent $event)
     {
@@ -89,7 +88,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function setDeliveryModule(OrderEvent $event)
     {
@@ -110,7 +108,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function setPostage(OrderEvent $event)
     {
@@ -124,7 +121,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function setInvoiceAddress(OrderEvent $event)
     {
@@ -136,7 +132,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function setPaymentModule(OrderEvent $event)
     {
@@ -148,12 +143,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param ModelOrder $sessionOrder
-     * @param CurrencyModel $currency
-     * @param LangModel $lang
-     * @param CartModel $cart
-     * @param UserInterface $customer
      * @param bool $unusedArgument deprecated argument. Will be removed in 2.5
      * @param bool $useOrderDefinedAddresses if true, the delivery and invoice OrderAddresses will be used instead of creating new OrderAdresses using Order::getChoosenXXXAddress()
      * @return ModelOrder
@@ -383,9 +372,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
     /**
      * Create an order outside of the front-office context, e.g. manually from the back-office.
-     * @param OrderManualEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -408,11 +395,9 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param OrderEvent $event
      *
      * @throws \Thelia\Exception\TheliaProcessException
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -449,9 +434,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param OrderEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function orderBeforePayment(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -464,9 +447,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      * Clear the cart and the order in the customer session once the order is placed,
      * and the payment performed.
      *
-     * @param OrderEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function orderCartClear(/** @noinspection PhpUnusedParameterInspection */ OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -479,7 +460,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param OrderEvent $event
      *
      * @throws \Exception if the message cannot be loaded.
      */
@@ -496,7 +476,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param OrderEvent $event
      *
      * @throws \Exception if the message cannot be loaded.
      */
@@ -512,9 +491,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param OrderEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -547,9 +524,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      * Check if a stock update is required on order products for a given order status change, and compute if
      * the stock should be decreased or increased.
      *
-     * @param GetStockUpdateOperationOnOrderStatusChangeEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getStockUpdateOnOrderStatusChange(GetStockUpdateOperationOnOrderStatusChangeEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -607,7 +582,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * Update order products stock after an order status change
      *
-     * @param OrderModel $order
      * @param int $newStatus the new status ID
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
@@ -658,7 +632,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param OrderEvent $event
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function updateDeliveryRef(OrderEvent $event)
@@ -671,7 +644,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param OrderEvent $event
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function updateTransactionRef(OrderEvent $event)
@@ -684,7 +656,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param OrderAddressEvent $event
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function updateAddress(OrderAddressEvent $event)
@@ -716,7 +687,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             TheliaEvents::ORDER_SET_DELIVERY_ADDRESS => [ "setDeliveryAddress", 128 ],
             TheliaEvents::ORDER_SET_DELIVERY_MODULE => [ "setDeliveryModule", 128 ],
             TheliaEvents::ORDER_SET_POSTAGE => [ "setPostage", 128 ],
@@ -733,7 +704,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_UPDATE_ADDRESS => [ "updateAddress", 128 ],
             TheliaEvents::ORDER_CREATE_MANUAL => [ "createManual", 128 ],
             TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE => [ "getStockUpdateOnOrderStatusChange", 128 ],
-        );
+        ];
     }
 
     /**

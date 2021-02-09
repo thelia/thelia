@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     ' country ' => ' country ',
     ' migrated to ' => ' migrated to ',
     ' state ' => ' state ',
@@ -28,4 +28,4 @@ return array(
     'The migration will change the address, tax rules and shipping zones to match with the new system.' => 'The migration will change the address, tax rules and shipping zones to match with the new system.',
     'The update proccess has created new countries (even if it exists) and associated states.' => 'The update proccess has created new countries (even if it exists) and associated states.',
     'We added a \'default\' state with a blank name as a fallback. Customer will have the possibility to change it later.' => 'We added a \'default\' state with a blank name as a fallback. Customer will have the possibility to change it later.',
-);
+];

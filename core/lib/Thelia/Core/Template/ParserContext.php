@@ -33,8 +33,8 @@ class ParserContext implements \IteratorAggregate
     // Lifetime, in seconds, of form error data
     const FORM_ERROR_LIFETIME_SECONDS = 60;
 
-    private $formStore = array();
-    private $store = array();
+    private $formStore = [];
+    private $store = [];
 
     /** @var TheliaFormFactoryInterface */
     private $formFactory;
@@ -64,7 +64,6 @@ class ParserContext implements \IteratorAggregate
     /**
      * Set the current form
      *
-     * @param BaseForm $form
      * @return $this
      */
     public function pushCurrentForm(BaseForm $form)
@@ -109,7 +108,6 @@ class ParserContext implements \IteratorAggregate
     /**
      * Remove all objects in data, because they are probably not serializable
      *
-     * @param array $data
      * @return array
      */
     protected function cleanFormData(array $data)
@@ -253,7 +251,6 @@ class ParserContext implements \IteratorAggregate
     /**
      * Remove form from the saved form error information.
      *
-     * @param BaseForm $form
      * @return $this
      */
     public function clearForm(BaseForm $form)

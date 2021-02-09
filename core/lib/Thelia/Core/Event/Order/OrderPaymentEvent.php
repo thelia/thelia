@@ -47,7 +47,6 @@ class OrderPaymentEvent extends ActionEvent
     }
 
     /**
-     * @param Response $response
      *
      * @return $this
      */

@@ -12,8 +12,8 @@
 
 namespace Thelia\Install;
 
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CheckPermission
@@ -33,27 +33,27 @@ class CheckPermission extends BaseInstall
     const DIR_MEDIA =           'local/media';
 
     /** @var array Directory needed to be writable */
-    protected $directoriesToBeWritable = array(
+    protected $directoriesToBeWritable = [
         self::DIR_CONF,
         self::DIR_VAR,
         self::DIR_WEB,
         self::DIR_SESSION,
         self::DIR_MEDIA
-    );
+    ];
 
     /** @var array Minimum server configuration necessary */
-    protected $minServerConfigurationNecessary = array(
+    protected $minServerConfigurationNecessary = [
         'memory_limit' => 134217728,
         'post_max_size' => 20971520,
         'upload_max_filesize' => 2097152
-    );
+    ];
 
     protected $phpExpectedVerions = array(
         'min' => '5.6',
         'max' => '8.0'
     );
 
-    protected $extensions = array(
+    protected $extensions = [
         'curl',
         'fileinfo',
         'gd',
@@ -62,15 +62,15 @@ class CheckPermission extends BaseInstall
         'pdo_mysql',
         'dom',
         'zip'
-    );
+    ];
 
-    protected $validationMessages = array();
+    protected $validationMessages = [];
 
     /** @var bool If permissions are OK */
     protected $isValid = true;
 
     /** @var TranslatorInterface Translator Service */
-    protected $translator = null;
+    protected $translator;
 
     /**
      * Constructor
@@ -83,33 +83,33 @@ class CheckPermission extends BaseInstall
     {
         $this->translator = $translator;
 
-        $this->validationMessages['php_version'] =  array(
+        $this->validationMessages['php_version'] =  [
             'text' => $this->getI18nPhpVersionText(phpversion(), true),
             'hint' =>  $this->getI18nPhpVersionHint(),
             'status' => true
-        );
+        ];
 
         foreach ($this->directoriesToBeWritable as $directory) {
-            $this->validationMessages[$directory] =  array(
+            $this->validationMessages[$directory] =  [
                 'text' => '',
                 'hint' =>  '',
                 'status' => true
-            );
+            ];
         }
         foreach ($this->minServerConfigurationNecessary as $key => $value) {
-            $this->validationMessages[$key] =  array(
+            $this->validationMessages[$key] =  [
                 'text' => '',
                 'hint' =>  $this->getI18nConfigHint(),
                 'status' => true
-            );
+            ];
         }
 
         foreach ($this->extensions as $extension) {
-            $this->validationMessages[$extension] = array(
+            $this->validationMessages[$extension] = [
                 'text' => '',
                 'hint' => $this->getI18nExtensionHint(),
                 'status' => true,
-            );
+            ];
         }
 
         parent::__construct($verifyInstall);
@@ -153,7 +153,7 @@ class CheckPermission extends BaseInstall
 
         foreach ($this->extensions as $extension) {
             $this->validationMessages[$extension]['text'] = $this->getI18nExtensionText($extension, true);
-            if (false === extension_loaded($extension)) {
+            if (false === \extension_loaded($extension)) {
                 $this->isValid = false;
                 $this->validationMessages[$extension]['status'] = false;
                 $this->validationMessages[$extension]['text'] = $this->getI18nExtensionText($extension, false);
@@ -251,7 +251,6 @@ class CheckPermission extends BaseInstall
     /**
      * Get Translated hint about the PHP version requirement issue
      *
-     * @param string $expectedValue
      * @param string $currentValue
      * @param bool   $isValid
      *
@@ -311,7 +310,7 @@ class CheckPermission extends BaseInstall
     protected function returnBytes($val)
     {
         $val = trim($val);
-        $last = strtolower($val[strlen($val)-1]);
+        $last = strtolower($val[\strlen($val)-1]);
         // Do not add breaks in the switch below
         switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
@@ -339,7 +338,7 @@ class CheckPermission extends BaseInstall
     protected function formatBytes($bytes, $precision = 2)
     {
         $base = log($bytes) / log(1024);
-        $suffixes = array('', 'k', 'M', 'G', 'T');
+        $suffixes = ['', 'k', 'M', 'G', 'T'];
 
         return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
     }

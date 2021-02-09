@@ -76,16 +76,16 @@ class Translation extends BaseAction implements EventSubscriberInterface
         if ($walkMode == TranslationEvent::WALK_MODE_PHP) {
             $prefix = '\-\>[\s]*trans[\s]*\([\s]*';
 
-            $allowedExts = array('php');
+            $allowedExts = ['php'];
         } elseif ($walkMode == TranslationEvent::WALK_MODE_TEMPLATE) {
             $prefix = '\{intl(?:.*?)[\s]l=[\s]*';
 
-            $allowedExts = array('html', 'tpl', 'xml', 'txt');
+            $allowedExts = ['html', 'tpl', 'xml', 'txt'];
         } else {
             throw new \InvalidArgumentException(
                 Translator::getInstance()->trans(
                     'Invalid value for walkMode parameter: %value',
-                    array('%value' => $walkMode)
+                    ['%value' => $walkMode]
                 )
             );
         }
@@ -118,7 +118,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
                             Tlog::getInstance()->debug("Examining file $short_path\n");
 
-                            $matches = array();
+                            $matches = [];
 
                             if (preg_match_all(
                                 '/'.$prefix.'((?<![\\\\])[\'"])((?:.(?!(?<![\\\\])\1))*.?)*?\1/ms',
@@ -151,8 +151,8 @@ class Translation extends BaseAction implements EventSubscriberInterface
                                             continue;
                                         }
 
-                                        $strings[$hash] = array(
-                                            'files'   => array($short_path),
+                                        $strings[$hash] = [
+                                            'files'   => [$short_path],
                                             'text'  => $match,
                                             'translation' => Translator::getInstance()->trans(
                                                 $match,
@@ -183,7 +183,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                                                 false
                                             ),
                                             'dollar'  => strstr($match, '$') !== false
-                                        );
+                                        ];
                                     }
 
                                     $idx++;
@@ -207,7 +207,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
         $fs = new Filesystem();
 
         if (! $fs->exists($file) && true === $event->isCreateFileIfNotExists()) {
-            $dir = dirname($file);
+            $dir = \dirname($file);
 
             if (! $fs->exists($file)) {
                 $fs->mkdir($dir);
@@ -244,7 +244,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
             throw new \RuntimeException(
                 Translator::getInstance()->trans(
                     'Failed to open translation file %file. Please be sure that this file is writable by your Web server',
-                    array('%file' => $file)
+                    ['%file' => $file]
                 )
             );
         }
@@ -259,7 +259,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
         if (! $fs->exists($file)) {
             if (true === $event->isCreateFileIfNotExists()) {
-                $dir = dirname($file);
+                $dir = \dirname($file);
                 $fs->mkdir($dir);
 
                 $this->cacheClear($dispatcher);
@@ -267,7 +267,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                 throw new \RuntimeException(
                     Translator::getInstance()->trans(
                         'Failed to open translation file %file. Please be sure that this file is writable by your Web server',
-                        array('%file' => $file)
+                        ['%file' => $file]
                     )
                 );
             }
@@ -361,12 +361,12 @@ class Translation extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::TRANSLATION_GET_STRINGS => array('getTranslatableStrings', 128),
+        return [
+            TheliaEvents::TRANSLATION_GET_STRINGS => ['getTranslatableStrings', 128],
             TheliaEvents::TRANSLATION_WRITE_FILE => [
                 ['writeTranslationFile', 128],
                 ['writeFallbackFile', 128]
             ]
-        );
+        ];
     }
 }

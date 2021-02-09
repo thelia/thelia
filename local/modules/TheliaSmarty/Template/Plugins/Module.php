@@ -41,7 +41,6 @@ class Module extends AbstractSmartyPlugin
      * - countvar : this is the name of a template variable where the number of found modules includes will be assigned.
      *
      * @param array                     $params
-     * @param \Smarty_Internal_Template $parser
      * @internal param \Thelia\Core\Template\Smarty\Plugins\unknown $smarty
      *
      * @return string
@@ -100,8 +99,8 @@ class Module extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor('function', 'module_include', $this, 'theliaModule'),
-        );
+        ];
     }
 }

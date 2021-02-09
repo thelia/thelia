@@ -56,7 +56,6 @@ class CustomerTitleEvent extends ActionEvent
     }
 
     /**
-     * @param null|\Thelia\Model\CustomerTitle $customerTitle
      * @return $this
      */
     public function setCustomerTitle(CustomerTitle $customerTitle = null)

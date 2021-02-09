@@ -17,7 +17,7 @@ use Thelia\Model\Tax;
 
 class TaxEvent extends ActionEvent
 {
-    protected $tax = null;
+    protected $tax;
 
     protected $locale;
     protected $id;

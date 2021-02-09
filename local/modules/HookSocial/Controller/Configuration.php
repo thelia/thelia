@@ -28,16 +28,15 @@ class Configuration extends BaseAdminController
 {
     public function saveAction()
     {
-
-        if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), array('hooksocial'), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth([AdminResources::MODULE], ['hooksocial'], AccessManager::UPDATE)) {
             return $response;
         }
 
         $form = new \HookSocial\Form\Configuration($this->getRequest());
-        $resp = array(
+        $resp = [
             "error" =>  0,
             "message" => ""
-        );
+        ];
         $response=null;
 
         try {

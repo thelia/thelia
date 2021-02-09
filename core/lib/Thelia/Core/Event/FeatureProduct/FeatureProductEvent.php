@@ -20,7 +20,7 @@ use Thelia\Model\FeatureProduct;
  */
 class FeatureProductEvent extends ActionEvent
 {
-    protected $featureProduct = null;
+    protected $featureProduct;
 
     public function __construct(FeatureProduct $featureProduct = null)
     {

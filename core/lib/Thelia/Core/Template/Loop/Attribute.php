@@ -17,17 +17,17 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Model\AttributeQuery;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Attribute as AttributeModel;
-use Thelia\Model\Product as ProductModel;
-use Thelia\Type\TypeCollection;
-use Thelia\Type;
-use Thelia\Model\ProductQuery;
-use Thelia\Model\TemplateQuery;
+use Thelia\Model\AttributeQuery;
 use Thelia\Model\AttributeTemplateQuery;
 use Thelia\Model\Map\AttributeTemplateTableMap;
+use Thelia\Model\Product as ProductModel;
+use Thelia\Model\ProductQuery;
+use Thelia\Model\TemplateQuery;
+use Thelia\Type;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -66,7 +66,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
+                    new Type\EnumListType(['id', 'id_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse'])
                 ),
                 'manual'
             )
@@ -106,7 +106,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
             if ($products !== null) {
                 // Create template array
                 if ($template == null) {
-                    $template = array();
+                    $template = [];
                 }
 
                 /** @var ProductModel $product */

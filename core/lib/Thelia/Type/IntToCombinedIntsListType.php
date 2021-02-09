@@ -53,16 +53,15 @@ class IntToCombinedIntsListType extends BaseType
             foreach (explode(',', $values) as $intToCombinedInts) {
                 $parts = explode(':', $intToCombinedInts);
 
-                $return[trim($parts[0])] = array(
+                $return[trim($parts[0])] = [
                     "values"        =>  preg_split("#(&|\|)#", preg_replace('#[\(\)]#', '', $parts[1])),
                     "expression"    =>  $parts[1],
-                );
+                ];
             }
 
             return $return;
-        } else {
+        }  
             return null;
-        }
     }
 
     protected function checkLogicalFormat($string)
@@ -122,6 +121,6 @@ class IntToCombinedIntsListType extends BaseType
 
     public function getFormOptions()
     {
-        return array();
+        return [];
     }
 }

@@ -237,7 +237,6 @@ abstract class AbstractExport implements \Iterator
         return $this->data->getIterator()->valid();
     }
 
-
     /**
      * Get language
      *
@@ -285,7 +284,6 @@ abstract class AbstractExport implements \Iterator
     {
         return empty($this->data);
     }
-
 
     /**
      * Whether images has to be exported as data
@@ -345,7 +343,6 @@ abstract class AbstractExport implements \Iterator
         return $this;
     }
 
-
     /**
      * Whether documents has to be exported as data
      *
@@ -404,7 +401,6 @@ abstract class AbstractExport implements \Iterator
         return $this;
     }
 
-
     /**
      * Get range date
      *
@@ -438,7 +434,6 @@ abstract class AbstractExport implements \Iterator
     {
         return static::USE_RANGE_DATE;
     }
-
 
     /**
      * Get file name
@@ -481,7 +476,7 @@ abstract class AbstractExport implements \Iterator
             }
 
             $processedData[$fieldAlias] = null;
-            if (array_key_exists($fieldName, $data)) {
+            if (\array_key_exists($fieldName, $data)) {
                 $processedData[$fieldAlias] = $data[$fieldName];
             }
         }

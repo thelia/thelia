@@ -48,44 +48,43 @@ class ContactForm extends FirewallForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('name', TextType::class, array(
-                'constraints' => array(
+            ->add('name', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
-                ),
+                ],
                 'label' => Translator::getInstance()->trans('Full Name'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'name_contact',
-                ),
-            ))
-            ->add('email', EmailType::class, array(
-                'constraints' => array(
+                ],
+            ])
+            ->add('email', EmailType::class, [
+                'constraints' => [
                     new NotBlank(),
                     new Email(),
-                ),
+                ],
                 'label' => Translator::getInstance()->trans('Your Email Address'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'email_contact',
-                ),
-            ))
-            ->add('subject', TextType::class, array(
-                'constraints' => array(
+                ],
+            ])
+            ->add('subject', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
-                ),
+                ],
                 'label' => Translator::getInstance()->trans('Subject'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'subject_contact',
-                ),
-            ))
-            ->add('message', TextType::class, array(
-                'constraints' => array(
+                ],
+            ])
+            ->add('message', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
-                ),
+                ],
                 'label' => Translator::getInstance()->trans('Your Message'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'message_contact',
-                ),
-
-            ))
+                ],
+            ])
         ;
     }
 

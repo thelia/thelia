@@ -17,8 +17,8 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\ProfileQuery;
 use Thelia\Model\ModuleQuery;
+use Thelia\Model\ProfileQuery;
 
 /**
  * Class ProfileUpdateModuleAccessForm
@@ -32,37 +32,36 @@ class ProfileUpdateModuleAccessForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("id", HiddenType::class, array(
+            ->add("id", HiddenType::class, [
                 "required" => true,
-                "constraints" => array(
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        array($this, "verifyProfileId")
+                        [$this, "verifyProfileId"]
                     )
-                ),
-            ))
+                ],
+            ])
         ;
 
         foreach (ModuleQuery::create()->find() as $module) {
             $this->formBuilder->add(
                 self::MODULE_ACCESS_FIELD_PREFIX.':'.str_replace(".", ":", $module->getCode()),
                 ChoiceType::class,
-                array(
-                    "choices" => array(
+                [
+                    "choices" => [
                         AccessManager::VIEW => AccessManager::VIEW,
                         AccessManager::CREATE => AccessManager::CREATE,
                         AccessManager::UPDATE => AccessManager::UPDATE,
                         AccessManager::DELETE => AccessManager::DELETE,
-                    ),
-                    "attr" => array(
+                    ],
+                    "attr" => [
                         "tag" => "modules",
                         "module_code" => $module->getCode(),
-                    ),
+                    ],
                     "multiple" => true,
-                    "constraints" => array(
-
-                    ),
-                )
+                    "constraints" => [
+                    ],
+                ]
             );
         }
     }

@@ -39,7 +39,6 @@ class ModuleToggleActivationEvent extends ModuleEvent
      */
     protected $assume_deactivate;
 
-
     /**
      * @param int $module_id
      */
@@ -115,7 +114,6 @@ class ModuleToggleActivationEvent extends ModuleEvent
     }
 
     /**
-     * @param boolean $recursive
      * @return $this;
      */
     public function setAssumeDeactivate($assume_deactivate)

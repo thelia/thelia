@@ -34,7 +34,6 @@ class ContentDeleteEvent extends ContentEvent
     }
 
     /**
-     * @param mixed $content_id
      *
      * @return $this
      */
@@ -46,7 +45,6 @@ class ContentDeleteEvent extends ContentEvent
     }
 
     /**
-     * @return mixed
      */
     public function getContentId()
     {

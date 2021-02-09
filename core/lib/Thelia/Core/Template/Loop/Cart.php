@@ -18,9 +18,9 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\Cart as CartModel;
 use Thelia\Model\CartItem as CartItemModel;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Cart as CartModel;
 use Thelia\Type;
 
 /**
@@ -46,7 +46,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             new Argument(
                 'order',
                 new Type\TypeCollection(
-                    new Type\EnumListType(array('normal', 'reverse'))
+                    new Type\EnumListType(['normal', 'reverse'])
                 ),
                 'normal'
             )
@@ -59,7 +59,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
         $cart = $this->getCurrentRequest()->getSession()->getSessionCart($this->getDispatcher());
 
         if (null === $cart) {
-            return array();
+            return [];
         }
 
         $returnArray = iterator_to_array($cart->getCartItems());
@@ -78,7 +78,6 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     }
 
     /**
-     * @param LoopResult $loopResult
      * @return LoopResult
      * @throws \Propel\Runtime\Exception\PropelException
      */

@@ -22,7 +22,6 @@ use Thelia\Core\Hook\BaseHook;
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class HookManager extends BaseHook {
-
     public function onAdditionalPaymentInfo(HookRenderEvent $event)
     {
         $content = $this->render("order-placed.additional-payment-info.html", [

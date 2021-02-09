@@ -27,12 +27,12 @@ class FrontHook extends BaseHook
         $content = trim($this->render("main-footer-body.html"));
         if ("" != $content) {
             $event->add(
-                array(
+                [
                     "id" => "contact-footer-body",
                     "class" => "contact",
-                    "title" => $this->trans("Contact", array(), "hookcontact"),
+                    "title" => $this->trans("Contact", [], "hookcontact"),
                     "content" => $content
-                )
+                ]
             );
         }
     }

@@ -42,7 +42,7 @@ class ProductPricesImport extends AbstractImport
                     '%id' => $data['id']
                 ]
             );
-        } else {
+        }  
             $currency = null;
             if (isset($data['currency'])) {
                 $currency = CurrencyQuery::create()->findOneByCode($data['currency']);
@@ -81,8 +81,7 @@ class ProductPricesImport extends AbstractImport
 
             $price->save();
             $this->importedRows++;
-        }
-
+        
         return null;
     }
 }

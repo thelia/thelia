@@ -14,8 +14,8 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\LoopResult;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\AccessoryQuery;
 
 /**
@@ -81,8 +81,8 @@ class Accessory extends Product
 
         $accessories = $this->search($search);
 
-        $this->accessoryIdList = array(0);
-        $this->accessoryPosition = $this->accessoryId = array();
+        $this->accessoryIdList = [0];
+        $this->accessoryPosition = $this->accessoryId = [];
 
         foreach ($accessories as $accessory) {
             $accessoryProductId = $accessory->getAccessory();

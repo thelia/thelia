@@ -28,12 +28,12 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Event\ViewCheckEvent;
+use Thelia\Model\Content as ContentModel;
 use Thelia\Model\ContentDocumentQuery;
 use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentImageQuery;
 use Thelia\Model\ContentQuery;
-use Thelia\Model\Content as ContentModel;
 use Thelia\Model\Map\ContentTableMap;
 
 /**
@@ -59,9 +59,7 @@ class Content extends BaseAction implements EventSubscriberInterface
     /**
      * process update content
      *
-     * @param ContentUpdateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws PropelException
      * @throws \Exception
      */
@@ -95,9 +93,7 @@ class Content extends BaseAction implements EventSubscriberInterface
     /**
      * Change Content SEO
      *
-     * @param UpdateSeoEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @return Object
      */
     public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -175,7 +171,6 @@ class Content extends BaseAction implements EventSubscriberInterface
      *
      * associate a folder to a content if the association already does not exists
      *
-     * @param ContentAddFolderEvent $event
      */
     public function addFolder(ContentAddFolderEvent $event)
     {
@@ -210,9 +205,7 @@ class Content extends BaseAction implements EventSubscriberInterface
     /**
      * Check if is a content view and if content_id is visible
      *
-     * @param ViewCheckEvent $event
      * @param string $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -229,7 +222,6 @@ class Content extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param ViewCheckEvent $event
      * @throws NotFoundHttpException
      */
     public function viewContentIdNotVisible(ViewCheckEvent $event)
@@ -242,20 +234,20 @@ class Content extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::CONTENT_CREATE            => array('create', 128),
-            TheliaEvents::CONTENT_UPDATE            => array('update', 128),
-            TheliaEvents::CONTENT_DELETE            => array('delete', 128),
-            TheliaEvents::CONTENT_TOGGLE_VISIBILITY => array('toggleVisibility', 128),
+        return [
+            TheliaEvents::CONTENT_CREATE            => ['create', 128],
+            TheliaEvents::CONTENT_UPDATE            => ['update', 128],
+            TheliaEvents::CONTENT_DELETE            => ['delete', 128],
+            TheliaEvents::CONTENT_TOGGLE_VISIBILITY => ['toggleVisibility', 128],
 
-            TheliaEvents::CONTENT_UPDATE_POSITION   => array('updatePosition', 128),
-            TheliaEvents::CONTENT_UPDATE_SEO        => array('updateSeo', 128),
+            TheliaEvents::CONTENT_UPDATE_POSITION   => ['updatePosition', 128],
+            TheliaEvents::CONTENT_UPDATE_SEO        => ['updateSeo', 128],
 
-            TheliaEvents::CONTENT_ADD_FOLDER        => array('addFolder', 128),
-            TheliaEvents::CONTENT_REMOVE_FOLDER     => array('removeFolder', 128),
+            TheliaEvents::CONTENT_ADD_FOLDER        => ['addFolder', 128],
+            TheliaEvents::CONTENT_REMOVE_FOLDER     => ['removeFolder', 128],
 
-            TheliaEvents::VIEW_CHECK                    => array('viewCheck', 128),
-            TheliaEvents::VIEW_CONTENT_ID_NOT_VISIBLE   => array('viewContentIdNotVisible', 128),
-        );
+            TheliaEvents::VIEW_CHECK                    => ['viewCheck', 128],
+            TheliaEvents::VIEW_CONTENT_ID_NOT_VISIBLE   => ['viewContentIdNotVisible', 128],
+        ];
     }
 }

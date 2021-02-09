@@ -14,8 +14,8 @@ namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
 class ConfigModificationForm extends BaseForm
@@ -25,32 +25,32 @@ class ConfigModificationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("id", HiddenType::class, array(
-                    "constraints" => array(
+            ->add("id", HiddenType::class, [
+                    "constraints" => [
                         new GreaterThan(
-                            array('value' => 0)
+                            ['value' => 0]
                         ),
-                    ),
-            ))
-            ->add("name", TextType::class, array(
-                "constraints" => array(
+                    ],
+            ])
+            ->add("name", TextType::class, [
+                "constraints" => [
                     new NotBlank(),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans('Name'),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "name",
-                ),
-            ))
-            ->add("value", TextType::class, array(
+                ],
+            ])
+            ->add("value", TextType::class, [
                 "label" => Translator::getInstance()->trans('Value'),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "value",
-                ),
-            ))
-            ->add("hidden", HiddenType::class, array())
-            ->add("secured", HiddenType::class, array(
+                ],
+            ])
+            ->add("hidden", HiddenType::class, [])
+            ->add("secured", HiddenType::class, [
                 "label" => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin'),
-            ))
+            ])
          ;
 
         // Add standard description fields

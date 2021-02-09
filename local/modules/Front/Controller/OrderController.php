@@ -80,7 +80,7 @@ class OrderController extends BaseFrontController
                             Front::MESSAGE_DOMAIN
                         )
                     );
-                } elseif (count($deliveryModule) == 1) {
+                } elseif (\count($deliveryModule) == 1) {
                     return $this->registerVirtualProductDelivery($deliveryModule[0], $deliveryAddress);
                 }
             }
@@ -205,7 +205,6 @@ class OrderController extends BaseFrontController
             $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
 
             return $this->generateRedirectFromRoute("order.invoice");
-
         } catch (FormValidationException $e) {
             $message = $this->getTranslator()->trans(
                 "Please check your input: %s",
@@ -276,7 +275,6 @@ class OrderController extends BaseFrontController
             $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_PAYMENT_MODULE);
 
             return $this->generateRedirectFromRoute("order.payment.process");
-
         } catch (FormValidationException $e) {
             $message = $this->getTranslator()->trans(
                 "Please check your input: %s",
@@ -340,17 +338,15 @@ class OrderController extends BaseFrontController
             /* order has been placed */
             if ($orderEvent->hasResponse()) {
                 return $orderEvent->getResponse();
-            } else {
+            }  
                 return $this->generateRedirectFromRoute(
                     'order.placed',
                     [],
                     ['order_id' => $orderEvent->getPlacedOrder()->getId()]
                 );
-            }
-        } else {
+        }  
             /* order has not been placed */
             return $this->generateRedirectFromRoute('cart.view');
-        }
     }
 
     public function orderPlaced($order_id)
@@ -390,7 +386,6 @@ class OrderController extends BaseFrontController
 
         $this->getParserContext()->set("placed_order_id", $placedOrder->getId());
     }
-
 
     public function orderFailed($order_id, $message)
     {
@@ -447,7 +442,6 @@ class OrderController extends BaseFrontController
         return $order;
     }
 
-
     public function viewAction($order_id)
     {
         $this->checkOrderCustomer($order_id);
@@ -458,7 +452,6 @@ class OrderController extends BaseFrontController
     public function generateInvoicePdf($order_id)
     {
         $this->checkOrderCustomer($order_id);
-
 
         return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
     }
@@ -496,7 +489,6 @@ class OrderController extends BaseFrontController
         }
 
         throw new AccessDeniedHttpException();
-
     }
 
     private function checkOrderCustomer($order_id)
@@ -541,11 +533,11 @@ class OrderController extends BaseFrontController
         $countryId = $address->getCountryId();
         $stateId = $address->getStateId();
 
-        $args = array(
+        $args = [
             'country' => $countryId,
             'state' => $stateId,
             'address' => $session->getOrder()->getChoosenDeliveryAddress()
-        );
+        ];
 
         return $this->render('ajax/order-delivery-module-list', $args);
     }

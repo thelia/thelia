@@ -25,7 +25,6 @@ class FooEvent extends ActionEvent
     protected $bar;
 
     /**
-     * @return mixed
      */
     public function getBar()
     {
@@ -33,7 +32,6 @@ class FooEvent extends ActionEvent
     }
 
     /**
-     * @param  mixed $bar
      * @return $this
      */
     public function setBar($bar)
@@ -44,7 +42,6 @@ class FooEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getFoo()
     {
@@ -52,7 +49,6 @@ class FooEvent extends ActionEvent
     }
 
     /**
-     * @param  mixed $foo
      * @return $this
      */
     public function setFoo($foo)

@@ -144,10 +144,10 @@ class AttributeAvController extends AbstractCrudController
 
     protected function getViewArguments()
     {
-        return array(
+        return [
             'attribute_id' => $this->getRequest()->get('attribute_id'),
             'order' => $this->getCurrentListOrder()
-        );
+        ];
     }
 
     protected function renderListTemplate($currentOrder)

@@ -63,10 +63,10 @@ class ModuleActivateCommandTest extends ContainerAwareTestCase
 
             $command = $application->find("module:activate");
             $commandTester = new CommandTester($command);
-            $commandTester->execute(array(
+            $commandTester->execute([
                 "command" => $command->getName(),
                 "module" => $module->getCode(),
-            ));
+            ]);
 
             $activated = ModuleQuery::create()->findPk($module->getId())->getActivate();
 
@@ -94,16 +94,15 @@ class ModuleActivateCommandTest extends ContainerAwareTestCase
 
             $this->expectException(\RuntimeException::class);
             $this->expectExceptionMessage("module Letshopethismoduledoesnotexists not found");
-            $commandTester->execute(array(
+            $commandTester->execute([
                 "command" => $command->getName(),
                 "module" => "letshopethismoduledoesnotexists",
-            ));
+            ]);
         }
     }
 
     /**
      * Use this method to build the container with the services that you need.
-     * @param ContainerBuilder $container
      */
     protected function buildContainer(ContainerBuilder $container)
     {

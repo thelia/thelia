@@ -54,7 +54,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new product sale element, with or without combination
      *
-     * @param  ProductSaleElementCreateEvent $event
      * @throws \Exception
      */
     public function create(ProductSaleElementCreateEvent $event)
@@ -112,7 +111,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Update an existing product sale element
      *
-     * @param  ProductSaleElementUpdateEvent $event
      * @throws \Exception
      */
     public function update(ProductSaleElementUpdateEvent $event)
@@ -215,7 +213,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product sale element
      *
-     * @param  ProductSaleElementDeleteEvent $event
      * @throws \Exception
      */
     public function delete(ProductSaleElementDeleteEvent $event)
@@ -269,7 +266,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Generate combinations. All existing combinations for the product are deleted.
      *
-     * @param  ProductCombinationGenerationEvent $event
      * @throws \Exception
      */
     public function generateCombinations(ProductCombinationGenerationEvent $event)
@@ -347,7 +343,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Clone product's PSEs and associated datas
      *
-     * @param ProductCloneEvent $event
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function clonePSE(ProductCloneEvent $event)
@@ -395,8 +390,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param ProductCloneEvent $event
-     * @param ProductSaleElements $originalProductPSE
      * @param $currencyId
      * @return int
      * @throws \Propel\Runtime\Exception\PropelException
@@ -510,12 +503,12 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT    => array("create", 128),
-            TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT => array("update", 128),
-            TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT => array("delete", 128),
-            TheliaEvents::PRODUCT_COMBINATION_GENERATION      => array("generateCombinations", 128),
-            TheliaEvents::PSE_CLONE                           => array("clonePSE", 128)
-        );
+        return [
+            TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT    => ["create", 128],
+            TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT => ["update", 128],
+            TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT => ["delete", 128],
+            TheliaEvents::PRODUCT_COMBINATION_GENERATION      => ["generateCombinations", 128],
+            TheliaEvents::PSE_CLONE                           => ["clonePSE", 128]
+        ];
     }
 }

@@ -24,32 +24,32 @@ class AdminLogin extends BruteforceForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("username", TextType::class, array(
-                "constraints" => array(
+            ->add("username", TextType::class, [
+                "constraints" => [
                     new NotBlank(),
-                    new Length(array("min" => 3)),
-                ),
+                    new Length(["min" => 3]),
+                ],
                 "label" => Translator::getInstance()->trans("Username or e-mail address *"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "username",
-                ),
-            ))
-            ->add("password", PasswordType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("password", PasswordType::class, [
+                "constraints" => [
                     new NotBlank(),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("Password *"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "password",
-                ),
-            ))
-            ->add("remember_me", CheckboxType::class, array(
+                ],
+            ])
+            ->add("remember_me", CheckboxType::class, [
                     'value' => 'yes',
                     "label" => Translator::getInstance()->trans("Remember me ?"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "remember_me",
-                    ),
-            ))
+                    ],
+            ])
             ;
     }
 

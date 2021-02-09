@@ -60,7 +60,7 @@ class IntToCombinedStringsListType extends BaseType
             foreach (preg_split('/(?<!\\\),/', $values) as $intToCombinedStrings) {
                 $parts = preg_split('/(?<!\\\):/', $intToCombinedStrings);
 
-                $return[trim($parts[0])] = array(
+                $return[trim($parts[0])] = [
                     "values" =>  array_map(
                         function ($item) {
                             return trim(self::unescape($item));
@@ -75,15 +75,13 @@ class IntToCombinedStringsListType extends BaseType
                         )
                     ),
                     "expression" =>  trim(self::unescape($parts[1])),
-                );
+                ];
             }
 
             return $return;
-        } else {
+        }  
             return null;
-        }
     }
-
 
     /**
      * Escape a string to use it safely in an expression. abc:def => abc\:def.
@@ -168,6 +166,6 @@ class IntToCombinedStringsListType extends BaseType
 
     public function getFormOptions()
     {
-        return array();
+        return [];
     }
 }

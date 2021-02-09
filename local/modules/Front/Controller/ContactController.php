@@ -68,7 +68,6 @@ class ContactController extends BaseFrontController
             }
             
             return $this->generateRedirectFromRoute('contact.success');
-            
         } catch (FormValidationException $e) {
             $error_message = $e->getMessage();
         }

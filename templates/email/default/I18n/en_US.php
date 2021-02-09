@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '* Billing address' => '* Billing address',
     '* Delivery address' => '* Delivery address',
     '* Items ordered:' => '* Items ordered:',
@@ -81,4 +81,4 @@ return array(
     'Your password for %store' => 'Your password for %store',
     'Your password is <span style="font-family: courier, fixed; font-size: 120%">%pass</span>' => 'Your password is <span style="font-family: courier, fixed; font-size: 120%">%pass</span>',
     'Your subscriotion to %store newsletter' => 'Your subscriotion to %store newsletter',
-);
+];

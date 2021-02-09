@@ -19,7 +19,7 @@ use Thelia\Model\Accessory;
  */
 class AccessoryEvent extends ActionEvent
 {
-    public $accessory = null;
+    public $accessory;
 
     public function __construct(Accessory $accessory = null)
     {

@@ -26,16 +26,16 @@ use Thelia\Exception\TaxEngineException;
 use Thelia\Log\Tlog;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Currency as CurrencyModel;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\FeatureAvI18nTableMap;
 use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Map\SaleTableMap;
+use Thelia\Model\Product as ProductModel;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductQuery;
-use Thelia\Model\Product as ProductModel;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
@@ -216,7 +216,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * @param LoopResult $loopResult
      * @return LoopResult
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -226,13 +225,11 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         if (true === $complex) {
             return $this->parseComplexResults($loopResult);
-        } else {
+        }  
             return $this->parseSimpleResults($loopResult);
-        }
     }
 
     /**
-     * @param LoopResult $loopResult
      * @return LoopResult
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -314,7 +311,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * @param LoopResult $loopResult
      * @return LoopResult
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -371,7 +367,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      * @param  LoopResultRow $loopResultRow the current result row
      * @param  \Thelia\Model\Product $product
      * @param $defaultCategoryId
-     * @return mixed
      * @throws \Propel\Runtime\Exception\PropelException
      */
     private function associateValues($loopResultRow, $product, $defaultCategoryId)
@@ -410,8 +405,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * @param LoopResultRow $loopResultRow
-     * @param ProductModel $product
      * @param int $defaultCategoryId
      */
     private function findNextPrev(LoopResultRow $loopResultRow, ProductModel $product, $defaultCategoryId)
@@ -1074,7 +1067,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $search
             ->addJoinObject($salesJoin, 'SalePriceDisplay')
             ->addJoinCondition('SalePriceDisplay', '`SalePriceDisplay`.`active` = 1');
-
 
         // ... to get the DISPLAY_INITIAL_PRICE column !
         $search->withColumn('`SalePriceDisplay`.DISPLAY_INITIAL_PRICE', 'display_initial_price');

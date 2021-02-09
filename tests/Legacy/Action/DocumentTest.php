@@ -14,10 +14,10 @@ namespace Thelia\Tests\Action;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Action\Document;
 use Thelia\Core\Event\Document\DocumentEvent;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Files\FileManager;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;

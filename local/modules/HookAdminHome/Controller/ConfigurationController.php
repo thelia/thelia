@@ -1,6 +1,5 @@
 <?php
 
-
 namespace HookAdminHome\Controller;
 
 use HookAdminHome\HookAdminHome;
@@ -13,7 +12,6 @@ use Thelia\Tools\URL;
 
 class ConfigurationController extends BaseAdminController
 {
-
     public function editConfiguration()
     {
         if (null !== $response = $this->checkAuth(
@@ -53,7 +51,6 @@ class ConfigurationController extends BaseAdminController
             }
 
             return RedirectResponse::create(URL::getInstance()->absoluteUrl('/admin/module/HookAdminHome'));
-
         } catch (FormValidationException $e) {
             $error_message = $this->createStandardFormValidationErrorMessage($e);
         }
@@ -68,5 +65,4 @@ class ConfigurationController extends BaseAdminController
         }
         return $response;
     }
-
 }

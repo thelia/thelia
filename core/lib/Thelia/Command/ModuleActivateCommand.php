@@ -14,8 +14,8 @@ namespace Thelia\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ModuleQuery;
@@ -63,7 +63,6 @@ class ModuleActivateCommand extends BaseModuleGenerate
             throw new \RuntimeException(sprintf("module %s is already actived", $moduleCode));
         }
 
-
         try {
             $event = new ModuleToggleActivationEvent($module->getId());
             if ($input->getOption("with-dependencies")) {
@@ -83,11 +82,11 @@ class ModuleActivateCommand extends BaseModuleGenerate
 
         //impossible to change output class in CommandTester...
         if (method_exists($output, "renderBlock")) {
-            $output->renderBlock(array(
+            $output->renderBlock([
                 '',
                 sprintf("Activation succeed for module %s", $moduleCode),
                 ''
-            ), "bg=green;fg=black");
+            ], "bg=green;fg=black");
         }
 
         return 0;

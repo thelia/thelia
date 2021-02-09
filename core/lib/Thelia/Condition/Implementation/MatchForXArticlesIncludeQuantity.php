@@ -71,10 +71,10 @@ class MatchForXArticlesIncludeQuantity extends MatchForXArticles
 
         $toolTip = $this->translator->trans(
             'If cart item (include quantity) count is <strong>%operator%</strong> %quantity%',
-            array(
+            [
                 '%operator%' => $i18nOperator,
                 '%quantity%' => $this->values[self::CART_QUANTITY]
-            )
+            ]
         );
 
         return $toolTip;

@@ -50,8 +50,6 @@ class TokenProvider
     protected $tokenName;
 
     /**
-     * @param RequestStack $requestStack
-     * @param TranslatorInterface $translator
      * @param $tokenName
      */
     public function __construct(RequestStack $requestStack, TranslatorInterface $translator, $tokenName)
@@ -92,7 +90,8 @@ class TokenProvider
             throw new TokenAuthenticationException(
                 "Tried to check a token without assigning it before"
             );
-        } elseif ($this->token !== $entryValue) {
+        }
+        if ($this->token !== $entryValue) {
             throw new TokenAuthenticationException(
                 "Tried to validate an invalid token"
             );
@@ -136,7 +135,7 @@ class TokenProvider
      */
     protected static function getOpenSSLRandom($length = 40)
     {
-        if (!function_exists("openssl_random_pseudo_bytes")) {
+        if (!\function_exists("openssl_random_pseudo_bytes")) {
             return false;
         }
 

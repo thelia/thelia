@@ -16,5 +16,4 @@ use Thelia\Module\BaseModule;
 
 class HookProductsOffer extends BaseModule
 {
-
 }

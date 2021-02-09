@@ -19,9 +19,6 @@ class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
     /**
      * Check if a delivery module is suitable for the given country.
      *
-     * @param Country $country
-     * @param Module $module
-     * @param State|null $state
      *
      * @return null|AreaDeliveryModule
      * @throws \Propel\Runtime\Exception\PropelException

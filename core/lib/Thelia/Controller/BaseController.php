@@ -85,7 +85,7 @@ abstract class BaseController
      */
     protected function jsonResponse($jsonData, $status = 200)
     {
-        return new Response($jsonData, $status, array('content-type' => 'application/json'));
+        return new Response($jsonData, $status, ['content-type' => 'application/json']);
     }
 
     /**
@@ -100,14 +100,14 @@ abstract class BaseController
         return Response::create(
             $pdf,
             $status,
-            array(
+            [
                 'Content-type' => "application/pdf",
                 'Content-Disposition' =>sprintf(
                     '%s; filename=%s.pdf',
                     \boolval($browser) === false ? 'attachment' : 'inline',
                     $fileName
                 )
-            )
+            ]
         );
     }
 
@@ -227,7 +227,6 @@ abstract class BaseController
     /**
      * Get all errors that occurred in a form
      *
-     * @param  \Symfony\Component\Form\Form $form
      * @return string                       the error string
      */
     protected function getErrorMessages(Form $form)
@@ -281,9 +280,9 @@ abstract class BaseController
 
         $html = $this->renderRaw(
             $fileName,
-            array(
+            [
                 'order_id' => $order_id
-            ),
+            ],
             $this->getTemplateHelper()->getActivePdfTemplate()
         );
 
@@ -355,8 +354,6 @@ abstract class BaseController
 
     /**
      * @param $routeId
-     * @param array $urlParameters
-     * @param array $routeParameters
      * @param int $referenceType
      * @return string
      */
@@ -424,8 +421,6 @@ abstract class BaseController
      * create an instance of RedriectResponse for a given route id.
      *
      * @param $routeId
-     * @param  array $urlParameters
-     * @param  array $routeParameters
      * @param  int $referenceType
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -456,7 +451,7 @@ abstract class BaseController
      *
      * @see \Thelia\Controller\BaseController::getRouteFromRouter()
      */
-    protected function getRoute($routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_URL)
+    protected function getRoute($routeId, $parameters = [], $referenceType = Router::ABSOLUTE_URL)
     {
         return $this->getRouteFromRouter(
             $this->getCurrentRouter(),
@@ -484,7 +479,7 @@ abstract class BaseController
     protected function getRouteFromRouter(
         $routerName,
         $routeId,
-        $parameters = array(),
+        $parameters = [],
         $referenceType = Router::ABSOLUTE_URL
     ) {
         /** @var Router $router */
@@ -566,13 +561,11 @@ abstract class BaseController
     /**
      * @param $name
      * @param $type
-     * @param array $data
-     * @param array $options
      * @return BaseForm
      *
      * This method builds a thelia form with its name
      */
-    public function createForm($name, $type = "Symfony\Component\Form\Extension\Core\Type\FormType", array $data = array(), array $options = array())
+    public function createForm($name, $type = "Symfony\Component\Form\Extension\Core\Type\FormType", array $data = [], array $options = [])
     {
         if (empty($name)) {
             $name = static::EMPTY_FORM_NAME;
@@ -618,7 +611,7 @@ abstract class BaseController
      * @param  int                                  $status http code status
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    abstract protected function render($templateName, $args = array(), $status = 200);
+    abstract protected function render($templateName, $args = [], $status = 200);
 
     /**
      * Render the given template, and returns the result as a string.
@@ -629,5 +622,5 @@ abstract class BaseController
      *
      * @return string
      */
-    abstract protected function renderRaw($templateName, $args = array(), $templateDir = null);
+    abstract protected function renderRaw($templateName, $args = [], $templateDir = null);
 }

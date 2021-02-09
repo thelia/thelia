@@ -13,8 +13,8 @@
 namespace Thelia\Tests\Action;
 
 use Thelia\Action\Newsletter;
-use Thelia\Model\Newsletter as NewsletterModel;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
+use Thelia\Model\Newsletter as NewsletterModel;
 use Thelia\Model\NewsletterQuery;
 
 /**
@@ -69,7 +69,6 @@ class NewsletterTest extends BaseAction
     }
 
     /**
-     * @param NewsletterModel $newsletter
      * @depends testSubscribe
      * @return NewsletterModel
      */
@@ -98,9 +97,7 @@ class NewsletterTest extends BaseAction
     }
 
     /**
-     * @param NewsletterModel $newsletter
      * @depends testUpdate
-     * @param NewsletterModel $newsletter
      */
     public function testUnsubscribe(NewsletterModel $newsletter)
     {

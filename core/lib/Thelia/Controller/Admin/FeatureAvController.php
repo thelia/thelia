@@ -145,10 +145,10 @@ class FeatureAvController extends AbstractCrudController
 
     protected function getViewArguments()
     {
-        return array(
+        return [
             'feature_id' => $this->getRequest()->get('feature_id'),
             'order' => $this->getCurrentListOrder()
-        );
+        ];
     }
 
     protected function renderListTemplate($currentOrder)

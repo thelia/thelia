@@ -94,7 +94,6 @@ class CouponFactoryTest extends TestCase
      * Generate a valid Coupon model
      *
      * @param $facade
-     * @param ConditionFactory $conditionFactory
      * @return Coupon
      */
     public function generateCouponModel($facade, ConditionFactory $conditionFactory)
@@ -121,25 +120,25 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $coupon1->setExpirationDate($date->setTimestamp(strtotime("today + 3 months")));
 
         $condition1 = new MatchForTotalAmount($facade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($facade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
@@ -178,25 +177,25 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $couponManager = new RemoveXAmount($stubFacade);
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
@@ -251,25 +250,25 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $couponManager = new RemoveXAmount($stubFacade);
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
@@ -353,25 +352,25 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $couponManager = new RemoveXAmount($stubFacade);
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
@@ -420,25 +419,25 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $couponManager = new RemoveXAmount($stubFacade);
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
@@ -482,25 +481,25 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $couponManager = new RemoveXAmount($stubFacade);
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();

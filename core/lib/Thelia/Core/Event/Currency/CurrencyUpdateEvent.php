@@ -17,7 +17,6 @@ class CurrencyUpdateEvent extends CurrencyCreateEvent
     /** @var int */
     protected $is_default;
 
-
     /** @var int */
     protected $visible;
 

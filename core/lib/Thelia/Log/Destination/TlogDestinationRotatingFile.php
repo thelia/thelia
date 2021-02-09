@@ -13,8 +13,8 @@
 namespace Thelia\Log\Destination;
 
 use Symfony\Component\Finder\Finder;
-use Thelia\Log\TlogDestinationConfig;
 use Thelia\Core\Translation\Translator;
+use Thelia\Log\TlogDestinationConfig;
 
 class TlogDestinationRotatingFile extends TlogDestinationFile
 {
@@ -61,7 +61,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
             $finder = new Finder();
 
             $files = $finder
-                ->in(dirname($filePath))
+                ->in(\dirname($filePath))
                 ->files()
                 ->name(basename($filePath).'.*')
                 ->sortByModifiedTime();

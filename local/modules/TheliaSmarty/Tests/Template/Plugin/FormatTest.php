@@ -220,7 +220,6 @@ class FormatTest extends SmartyPluginTestCase
     }
 
     /**
-     * @param ContainerBuilder $container
      * @return \TheliaSmarty\Template\AbstractSmartyPlugin
      */
     protected function getPlugin(ContainerBuilder $container)

@@ -12,7 +12,6 @@
 
 namespace TheliaSmarty\Template;
 
-
 /**
  *
  * The class all Smarty Thelia plugin should extend
@@ -27,13 +26,12 @@ abstract class AbstractSmartyPlugin implements SmartyPluginInterface
     /**
      * Explode a comma separated list in a array, trimming all array elements
      *
-     * @param  mixed  $commaSeparatedValues
      * @return mixed:
      */
     protected function explode($commaSeparatedValues)
     {
         if (null === $commaSeparatedValues) {
-            return array();
+            return [];
         }
 
         $array = explode(',', $commaSeparatedValues);
@@ -47,7 +45,7 @@ abstract class AbstractSmartyPlugin implements SmartyPluginInterface
             return $array;
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -63,7 +61,7 @@ abstract class AbstractSmartyPlugin implements SmartyPluginInterface
     {
         $value = $this->getParam($params, $name, $default);
 
-        if (is_string($value)) {
+        if (\is_string($value)) {
             $value = strtolower(trim($value));
         }
         return $value;
@@ -79,7 +77,7 @@ abstract class AbstractSmartyPlugin implements SmartyPluginInterface
      */
     public function getParam($params, $name, $default = null)
     {
-        if (is_array($name)) {
+        if (\is_array($name)) {
             foreach ($name as $test) {
                 if (isset($params[$test])) {
                     return $params[$test];
@@ -103,7 +101,6 @@ abstract class AbstractSmartyPlugin implements SmartyPluginInterface
      *
      * @param string $functionName the method name
      * @param mixed[] $args the method arguments
-     * @return mixed
      *
      * @throws \BadMethodCallException if the method was not found in this class
      */

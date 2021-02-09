@@ -33,7 +33,6 @@ class Password
      * generate a Random password with defined length
      *
      * @param  int   $length
-     * @return mixed
      */
     public static function generateRandom($length = 8)
     {

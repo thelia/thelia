@@ -8,16 +8,13 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Thelia\Core\Event\Country\CountryEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\Base\Country as BaseCountry;
 use Thelia\Model\Map\CountryTableMap;
-use Thelia\Core\Translation\Translator;
 
 class Country extends BaseCountry
 {
-
-
     protected static $defaultCountry = null;
-
 
     /**
      * get a regex pattern according to the zip code format field
@@ -38,7 +35,6 @@ class Country extends BaseCountry
         if (empty($zipCodeFormat)) {
             return null;
         }
-
 
         $zipCodeRE = preg_replace("/\\s+/", ' ', $zipCodeFormat);
 
@@ -91,7 +87,7 @@ class Country extends BaseCountry
         try {
             CountryQuery::create()
                 ->filterByByDefault(1)
-                ->update(array('ByDefault' => 0), $con);
+                ->update(['ByDefault' => 0], $con);
 
             $this
                 ->setByDefault(1)

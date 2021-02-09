@@ -22,7 +22,7 @@ namespace Thelia\Condition;
 class SerializableCondition
 {
     /** @var string Condition Service id  */
-    public $conditionServiceId = null;
+    public $conditionServiceId;
 
     /** @var array Operators set by Admin for this Condition */
     public $operators = [];

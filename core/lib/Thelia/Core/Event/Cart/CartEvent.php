@@ -53,7 +53,6 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @param  CartItem $cartItem
      * @return CartEvent
      */
     public function setCartItem(CartItem $cartItem)
@@ -84,7 +83,6 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getCartItemId()
     {
@@ -92,7 +90,6 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $cartItemId
      * @return $this
      */
     public function setCartItemId($cartItemId)

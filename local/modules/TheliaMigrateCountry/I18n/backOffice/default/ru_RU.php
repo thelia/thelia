@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     ' country ' => ' страну ',
     ' migrated to ' => ' мигрировать в ',
     ' state ' => ' штат ',
@@ -28,4 +28,4 @@ return array(
     'The migration will change the address, tax rules and shipping zones to match with the new system.' => 'Миграция изменит адреса, налоговые правила и зоны доставки для соответствия с ново системой.',
     'The update process has created new countries (even if it exists) and associated states.' => 'Процес обновления создаст новые страны (даже если они существуют) и связаные штаты.',
     'We added a \'default\' state with a blank name as a fallback. Customer will have the possibility to change it later.' => 'Мы добавили \'стандартный\' штат с пустым именем как резерв. Клиент будет иметь возможность изменить его позже.',
-);
+];

@@ -13,9 +13,9 @@
 namespace Thelia\Form\ShippingZone;
 
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Thelia\Core\Translation\Translator;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 
 /**
@@ -48,20 +48,20 @@ class ShippingZoneAddArea extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('area_id', IntegerType::class, array(
-                'constraints' => array(
+            ->add('area_id', IntegerType::class, [
+                'constraints' => [
                     new NotBlank(),
-                    new GreaterThan(array('value' => 0)),
-                ),
-                'label_attr' => array('for' => 'shipping_area'),
+                    new GreaterThan(['value' => 0]),
+                ],
+                'label_attr' => ['for' => 'shipping_area'],
                 'label' => Translator::getInstance()->trans('Available shipping zones'),
-            ))
-            ->add('shipping_zone_id', IntegerType::class, array(
-                'constraints' => array(
+            ])
+            ->add('shipping_zone_id', IntegerType::class, [
+                'constraints' => [
                     new NotBlank(),
-                    new GreaterThan(array('value' => 0)),
-                ),
-            ))
+                    new GreaterThan(['value' => 0]),
+                ],
+            ])
         ;
     }
 

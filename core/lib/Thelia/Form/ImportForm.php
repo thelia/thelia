@@ -28,15 +28,15 @@ class ImportForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("file_upload", FileType::class, array(
+            ->add("file_upload", FileType::class, [
             "label" => $this->translator->trans("File to upload"),
             "label_attr" => ["for" => "file_to_upload"],
             "required" => true,
                 "constraints" => [
                     new Assert\NotNull
                 ]
-            ))
-            ->add("language", IntegerType::class, array(
+            ])
+            ->add("language", IntegerType::class, [
                 "label" => $this->translator->trans("Language"),
                 "label_attr" => ["for" => "language"],
                 "required" => true,
@@ -45,7 +45,7 @@ class ImportForm extends BaseForm
                             [$this, "checkLanguage"]
                     )
                 ]
-            ))
+            ])
         ;
     }
 

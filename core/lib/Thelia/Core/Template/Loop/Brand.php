@@ -23,8 +23,8 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\BrandQuery;
 use Thelia\Model\ProductQuery;
-use Thelia\Type\BooleanOrBothType;
 use Thelia\Type;
+use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -67,7 +67,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                 'order',
                 new TypeCollection(
                     new Type\EnumListType(
-                        array(
+                        [
                             'id',
                             'id-reverse',
                             'alpha',
@@ -81,7 +81,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                             'updated-reverse',
                             'visible',
                             'visible-reverse'
-                        )
+                        ]
                     )
                 ),
                 'alpha'
@@ -118,7 +118,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
         /* manage translations */
         $this->configureI18nProcessing(
             $search,
-            array(
+            [
                 'TITLE',
                 'CHAPO',
                 'DESCRIPTION',
@@ -126,7 +126,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                 'META_TITLE',
                 'META_DESCRIPTION',
                 'META_KEYWORDS'
-            )
+            ]
         );
 
         $id = $this->getId();

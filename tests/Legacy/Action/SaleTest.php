@@ -24,9 +24,9 @@ use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\Sale as SaleModel;
 use Thelia\Model\SaleQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
-use Thelia\Model\Sale as SaleModel;
 
 /**
  * Class SaleTest

@@ -20,57 +20,57 @@ class ImageEvent extends CachedFileEvent
     /**
      * @var string The absolute path of the cached image file
      */
-    protected $cache_filepath = null;
+    protected $cache_filepath;
 
     /**
      * @var string The absolute URL of the cached version of the original image (in the web space)
      */
-    protected $original_file_url = null;
+    protected $original_file_url;
 
     /**
      * @var string The absolute path of the cached version of the original image file
      */
-    protected $cache_original_filepath = null;
+    protected $cache_original_filepath;
 
     /**
      *  @var string The image category (i.e. the subdirectory in image cache)
      */
-    protected $category = null;
+    protected $category;
 
     /**
      * @var integer the required image width
      */
-    protected $width = null;
+    protected $width;
 
     /**
      * @var int the required image height
      */
-    protected $height = null;
+    protected $height;
 
     /**
      * @var string the resize mode, either crop, bands, none
      */
-    protected $resize_mode = null;
+    protected $resize_mode;
 
     /**
      * @var string the background color in RGB format (eg. #ff8000)
      */
-    protected $background_color = null;
+    protected $background_color;
 
     /**
      * @var array a list of effects (grayscale, negative, mirror...), applied in the specified order.
      */
-    protected $effects = array();
+    protected $effects = [];
 
     /**
      * @var int the rotation angle in degrees, none if zero or null
      */
-    protected $rotation = null;
+    protected $rotation;
 
     /**
      * @var int the quality of the result image, from 0 (!) to 100
      */
-    protected $quality = null;
+    protected $quality;
 
     /**
      * @var ImageInterface

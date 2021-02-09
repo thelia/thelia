@@ -15,14 +15,14 @@ namespace Thelia\Tests\Core\Template\Element;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\Security\SecurityContext;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
-use Thelia\Tools\URL;
 use Thelia\TaxEngine\TaxEngine;
+use Thelia\Tools\URL;
 
 /**
  *
@@ -84,12 +84,12 @@ abstract class BaseLoopTestor extends TestCase
 
         $stubRouterAdmin = $this->getMockBuilder('\Symfony\Component\Routing\Router')
             ->disableOriginalConstructor()
-            ->setMethods(array('getContext'))
+            ->setMethods(['getContext'])
             ->getMock();
 
         $stubRequestContext = $this->getMockBuilder('\Symfony\Component\Routing\RequestContext')
             ->disableOriginalConstructor()
-            ->setMethods(array('getHost'))
+            ->setMethods(['getHost'])
             ->getMock();
 
         $stubRequestContext->expects($this->any())
@@ -129,20 +129,20 @@ abstract class BaseLoopTestor extends TestCase
     {
         $method = $this->getMethod('exec');
         $page = 0;
-        $methodReturn = $method->invokeArgs($this->instance, array(&$page));
+        $methodReturn = $method->invokeArgs($this->instance, [&$page]);
 
         $this->assertInstanceOf('\Thelia\Core\Template\Element\LoopResult', $methodReturn);
     }
 
-    public function baseTestSearchById($id, $other_args = array())
+    public function baseTestSearchById($id, $other_args = [])
     {
         $this->instance->initializeArgs(array_merge(
             $this->getMandatoryArguments(),
-            array(
+            [
                 "type" => "foo",
                 "name" => "foo",
                 "id" => $id,
-            ),
+            ],
             $other_args
         ));
 
@@ -160,11 +160,11 @@ abstract class BaseLoopTestor extends TestCase
     {
         $this->instance->initializeArgs(array_merge(
             $this->getMandatoryArguments(),
-            array(
+            [
                 "type" => "foo",
                 "name" => "foo",
                 "limit" => $limit,
-            )
+            ]
         ));
 
         $dummy = null;

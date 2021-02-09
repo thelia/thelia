@@ -20,7 +20,7 @@ use Thelia\Model\Currency;
  */
 class CurrencyEvent extends ActionEvent
 {
-    protected $currency = null;
+    protected $currency;
 
     protected $currencyId;
 
@@ -46,7 +46,6 @@ class CurrencyEvent extends ActionEvent
     }
 
     /**
-     * @param Currency $currency
      * @return $this
      */
     public function setCurrency(Currency $currency)
@@ -57,7 +56,6 @@ class CurrencyEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getCurrencyId()
     {

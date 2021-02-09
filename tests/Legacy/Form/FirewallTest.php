@@ -56,7 +56,6 @@ class FirewallTest extends TestCase
         $requestStack->push($this->request);
         new Translator($requestStack);
 
-
         /**
          * Get an example form. We
          */

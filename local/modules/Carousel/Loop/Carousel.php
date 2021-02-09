@@ -21,10 +21,10 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Image;
+use Thelia\Log\Tlog;
 use Thelia\Type\EnumListType;
 use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
-use Thelia\Log\Tlog;
 
 /**
  * Class CarouselLoop
@@ -47,14 +47,14 @@ class Carousel extends Image
             new Argument(
                 'resize_mode',
                 new TypeCollection(
-                    new EnumType(array('crop', 'borders', 'none'))
+                    new EnumType(['crop', 'borders', 'none'])
                 ),
                 'none'
             ),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
+                    new EnumListType(['alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'])
                 ),
                 'manual'
             ),
@@ -66,7 +66,6 @@ class Carousel extends Image
     }
 
     /**
-     * @param LoopResult $loopResult
      *
      * @return LoopResult
      * @throws \Propel\Runtime\Exception\PropelException
@@ -115,15 +114,12 @@ class Carousel extends Image
                 case 'crop':
                     $resize_mode = \Thelia\Action\Image::EXACT_RATIO_WITH_CROP;
                     break;
-
                 case 'borders':
                     $resize_mode = \Thelia\Action\Image::EXACT_RATIO_WITH_BORDERS;
                     break;
-
                 case 'none':
                 default:
                     $resize_mode = \Thelia\Action\Image::KEEP_IMAGE_RATIO;
-
             }
 
             // Prepare tranformations
@@ -134,23 +130,23 @@ class Carousel extends Image
             $quality = $this->getQuality();
             $effects = $this->getEffects();
 
-            if (!is_null($width)) {
+            if (!\is_null($width)) {
                 $event->setWidth($width);
             }
-            if (!is_null($height)) {
+            if (!\is_null($height)) {
                 $event->setHeight($height);
             }
             $event->setResizeMode($resize_mode);
-            if (!is_null($rotation)) {
+            if (!\is_null($rotation)) {
                 $event->setRotation($rotation);
             }
-            if (!is_null($background_color)) {
+            if (!\is_null($background_color)) {
                 $event->setBackgroundColor($background_color);
             }
-            if (!is_null($quality)) {
+            if (!\is_null($quality)) {
                 $event->setQuality($quality);
             }
-            if (!is_null($effects)) {
+            if (!\is_null($effects)) {
                 $event->setEffects($effects);
             }
 
@@ -158,7 +154,6 @@ class Carousel extends Image
 
             // Dispatch image processing event
             $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
-
 
             if ($startDate) {
                 $startDate = $startDate->format('Y-m-d').'T'.$startDate->format('H:i');

@@ -49,12 +49,12 @@ class MatchForXArticlesTest extends TestCase
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::IN
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 5
-        );
+        ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -86,12 +86,12 @@ class MatchForXArticlesTest extends TestCase
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 'X'
-        );
+        ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -124,12 +124,12 @@ class MatchForXArticlesTest extends TestCase
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::INFERIOR
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 5
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -160,12 +160,12 @@ class MatchForXArticlesTest extends TestCase
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::INFERIOR
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 4,
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -196,12 +196,12 @@ class MatchForXArticlesTest extends TestCase
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::INFERIOR_OR_EQUAL,
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 5,
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -232,12 +232,12 @@ class MatchForXArticlesTest extends TestCase
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::INFERIOR_OR_EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 4
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -268,12 +268,12 @@ class MatchForXArticlesTest extends TestCase
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::INFERIOR_OR_EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 3
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -304,12 +304,12 @@ class MatchForXArticlesTest extends TestCase
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 4
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -340,12 +340,12 @@ class MatchForXArticlesTest extends TestCase
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 5
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -376,12 +376,12 @@ class MatchForXArticlesTest extends TestCase
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR_OR_EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 4
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -412,12 +412,12 @@ class MatchForXArticlesTest extends TestCase
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR_OR_EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 3
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -448,12 +448,12 @@ class MatchForXArticlesTest extends TestCase
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR_OR_EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 5
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -484,12 +484,12 @@ class MatchForXArticlesTest extends TestCase
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 3
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -520,12 +520,12 @@ class MatchForXArticlesTest extends TestCase
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 4
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -550,12 +550,12 @@ class MatchForXArticlesTest extends TestCase
             ->will($this->returnValue(new ConditionEvaluator()));
 
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 4
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $serializableRule = $condition1->getSerializableCondition();
@@ -641,12 +641,12 @@ class MatchForXArticlesTest extends TestCase
 
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 4
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $actual = $condition1->getToolTip();
@@ -666,37 +666,37 @@ class MatchForXArticlesTest extends TestCase
 
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForXArticles($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForXArticles::CART_QUANTITY => 4
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $actual = $condition1->getValidators();
 
-        $validators = array(
-            'inputs' => array(
-                MatchForXArticles::CART_QUANTITY => array(
-                    'availableOperators' => array(
+        $validators = [
+            'inputs' => [
+                MatchForXArticles::CART_QUANTITY => [
+                    'availableOperators' => [
                         '<' => 'Price',
                         '<=' => 'Price',
                         '==' => 'Price',
                         '>=' => 'Price',
                         '>' => 'Price'
-                    ),
+                    ],
                     'value' => '',
                     'selectedOperator' => ''
-                )
-            ),
-            'setOperators' => array(
+                ]
+            ],
+            'setOperators' => [
                 'quantity' => '>'
-            ),
-            'setValues' => array(
+            ],
+            'setValues' => [
                 'quantity' => 4
-            )
-        );
+            ]
+        ];
         $expected = $validators;
 
         $this->assertEquals($expected, $actual);

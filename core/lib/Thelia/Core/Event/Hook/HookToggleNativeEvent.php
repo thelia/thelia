@@ -27,7 +27,6 @@ class HookToggleNativeEvent extends HookEvent
     }
 
     /**
-     * @param mixed $hook_id
      */
     public function setHookId($hook_id)
     {
@@ -37,7 +36,6 @@ class HookToggleNativeEvent extends HookEvent
     }
 
     /**
-     * @return mixed
      */
     public function getHookId()
     {

@@ -33,7 +33,7 @@ use Thelia\Model\CurrencyQuery;
 class MatchForTotalAmountTest extends TestCase
 {
     /** @var FacadeInterface $stubTheliaAdapter */
-    protected $stubTheliaAdapter = null;
+    protected $stubTheliaAdapter;
 
     /**
      * Generate adapter stub
@@ -67,7 +67,7 @@ class MatchForTotalAmountTest extends TestCase
         $currency2->setCode('USD');
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue(array($currency1, $currency2)));
+            ->will($this->returnValue([$currency1, $currency2]));
 
         return $stubFacade;
     }
@@ -84,13 +84,13 @@ class MatchForTotalAmountTest extends TestCase
 
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::IN,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => '400',
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
 
         $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -114,13 +114,13 @@ class MatchForTotalAmountTest extends TestCase
 
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::INFERIOR
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => '400',
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
 
         $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -144,13 +144,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 'X',
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -174,13 +174,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400,
-            MatchForTotalAmount::CART_CURRENCY => 'FLA');
+            MatchForTotalAmount::CART_CURRENCY => 'FLA'];
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -203,13 +203,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -231,13 +231,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(400, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -259,13 +259,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(400, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR_OR_EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -287,13 +287,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR_OR_EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -315,13 +315,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(401, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR_OR_EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -343,13 +343,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(400, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -371,13 +371,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -399,13 +399,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(401, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR_OR_EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -427,13 +427,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(400, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR_OR_EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -455,13 +455,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR_OR_EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -483,13 +483,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(401, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -511,13 +511,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -539,13 +539,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(400, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -567,13 +567,13 @@ class MatchForTotalAmountTest extends TestCase
         $stubFacade = $this->generateAdapterStub(400.00, 'EUR');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'USD');
+            MatchForTotalAmount::CART_CURRENCY => 'USD'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -614,13 +614,13 @@ class MatchForTotalAmountTest extends TestCase
             ->will($this->returnValue($currencies));
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'UNK');
+            MatchForTotalAmount::CART_CURRENCY => 'UNK'];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -680,13 +680,13 @@ class MatchForTotalAmountTest extends TestCase
             ->will($this->returnValue($currencies));
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 'notfloat',
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -746,13 +746,13 @@ class MatchForTotalAmountTest extends TestCase
             ->will($this->returnValue($currencies));
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 0.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -825,7 +825,7 @@ class MatchForTotalAmountTest extends TestCase
         $currency2->setCode('USD');
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue(array($currency1, $currency2)));
+            ->will($this->returnValue([$currency1, $currency2]));
 
         return $stubFacade;
     }
@@ -860,13 +860,13 @@ class MatchForTotalAmountTest extends TestCase
 
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $actual = $condition1->getToolTip();
@@ -886,51 +886,51 @@ class MatchForTotalAmountTest extends TestCase
 
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $actual = $condition1->getValidators();
 
-        $validators = array(
-            'inputs' => array(
-                MatchForTotalAmount::CART_TOTAL => array(
-                    'availableOperators' => array(
+        $validators = [
+            'inputs' => [
+                MatchForTotalAmount::CART_TOTAL => [
+                    'availableOperators' => [
                         '<' => 'Price',
                         '<=' => 'Price',
                         '==' => 'Price',
                         '>=' => 'Price',
                         '>' => 'Price'
-                    ),
+                    ],
                     'availableValues' => '',
                     'value' => '',
                     'selectedOperator' => ''
-                ),
-                MatchForTotalAmount::CART_CURRENCY => array(
-                    'availableOperators' => array('==' => 'Price'),
-                    'availableValues' => array(
+                ],
+                MatchForTotalAmount::CART_CURRENCY => [
+                    'availableOperators' => ['==' => 'Price'],
+                    'availableValues' => [
                         'EUR' => '€',
                         'USD' => '$',
                         'GBP' => '£',
-                    ),
+                    ],
                     'value' => '',
                     'selectedOperator' => Operators::EQUAL
-                )
-            ),
-            'setOperators' => array(
+                ]
+            ],
+            'setOperators' => [
                 'price' => '==',
                 'currency' => '=='
-            ),
-            'setValues' => array(
+            ],
+            'setValues' => [
                 'price' => 400,
                 'currency' => 'EUR'
-            )
-        );
+            ]
+        ];
         $expected = $validators;
 
         $this->assertEquals($expected, $actual);

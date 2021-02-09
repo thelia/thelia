@@ -38,7 +38,6 @@ class Cache extends BaseAction implements EventSubscriberInterface
 
     /**
      * CacheListener constructor.
-     * @param AdapterInterface $adapter
      */
     public function __construct(AdapterInterface $adapter)
     {
@@ -87,10 +86,10 @@ class Cache extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             TheliaEvents::CACHE_CLEAR => ['cacheClear', 128],
             KernelEvents::TERMINATE => ['onTerminate', 128],
             ConsoleEvents::TERMINATE => ['onTerminate', 128]
-        );
+        ];
     }
 }

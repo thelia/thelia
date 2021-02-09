@@ -41,7 +41,7 @@ class TlogDestinationPopup extends AbstractTlogDestination
 
     public function getConfigs()
     {
-        return array(
+        return [
             new TlogDestinationConfig(
                 self::VAR_POPUP_TPL,
                 "Popup windows template",
@@ -63,7 +63,7 @@ class TlogDestinationPopup extends AbstractTlogDestination
                 self::VALEUR_POPUP_WIDTH_DEFAUT,
                 TlogDestinationConfig::TYPE_TEXTFIELD
             )
-        );
+        ];
     }
 
     public function write(&$res)
@@ -78,7 +78,7 @@ class TlogDestinationPopup extends AbstractTlogDestination
         $tpl = $this->getConfig(self::VAR_POPUP_TPL);
 
         $tpl = str_replace('#LOGTEXT', $content, $tpl);
-        $tpl = str_replace(array("\r\n", "\r", "\n"), '\\n', $tpl);
+        $tpl = str_replace(["\r\n", "\r", "\n"], '\\n', $tpl);
 
         $wop = sprintf(
             '<script>

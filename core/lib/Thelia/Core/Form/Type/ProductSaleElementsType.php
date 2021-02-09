@@ -29,7 +29,6 @@ class ProductSaleElementsType extends AbstractTheliaType
     protected $pseIdType;
 
     /**
-     * @param ProductIdType             $productIdType
      * @param ProductSaleElementsIdType $pseIdType
      *
      * The types are needed to load the validation groups
@@ -54,59 +53,57 @@ class ProductSaleElementsType extends AbstractTheliaType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add("reference", "text", array(
+            ->add("reference", "text", [
                 "required" => false,
-            ))
-            ->add("price", "number", array(
+            ])
+            ->add("price", "number", [
                 "required" => false,
-                "constraints" => array(
+                "constraints" => [
                     new GreaterThanOrEqual(["value" => 0]),
-                ),
-            ))
-            ->add("price_with_tax", "number", array(
+                ],
+            ])
+            ->add("price_with_tax", "number", [
                 "required" => false,
-                "constraints" => array(
+                "constraints" => [
                     new GreaterThanOrEqual(["value" => 0]),
-                ),
-            ))
-            ->add("weight", "number", array(
+                ],
+            ])
+            ->add("weight", "number", [
                 "required" => false,
-                "constraints" => array(
+                "constraints" => [
                     new GreaterThanOrEqual(["value" => 0]),
-                ),
-            ))
-            ->add("quantity", "number", array(
+                ],
+            ])
+            ->add("quantity", "number", [
                 "required" => false,
-                "constraints" => array(
+                "constraints" => [
                     new GreaterThanOrEqual(["value" => 0]),
-                ),
-            ))
-            ->add("sale_price", "number", array(
+                ],
+            ])
+            ->add("sale_price", "number", [
                 "required" => false,
-                "constraints" => array(
+                "constraints" => [
                     new GreaterThanOrEqual(["value" => 0]),
-                ),
-            ))
-            ->add("sale_price_with_tax", "number", array(
+                ],
+            ])
+            ->add("sale_price_with_tax", "number", [
                 "required" => false,
-                "constraints" => array(
+                "constraints" => [
                     new GreaterThanOrEqual(["value" => 0]),
-                ),
-            ))
-            ->add("ean_code", "text", array(
+                ],
+            ])
+            ->add("ean_code", "text", [
                 "required" => false,
-            ))
-            ->add("attribute_av", "collection", array(
+            ])
+            ->add("attribute_av", "collection", [
                 "type" => "attribute_av",
                 "required" => false,
                 "allow_add" => true,
-            ))
+            ])
             ->add("tax_rule_id", "tax_rule_id")
             ->add("currency_id", "currency_id")
             ->add("onsale", "checkbox")
@@ -115,14 +112,14 @@ class ProductSaleElementsType extends AbstractTheliaType
             ->add("use_exchange_rate", "checkbox")
 
             // Only on create
-            ->add("product_id", "product_id", array(
+            ->add("product_id", "product_id", [
                 "constraints" => $this->getConstraints($this->productIdType, "create"),
-            ))
+            ])
 
             // Only on update
-            ->add("id", "product_sale_elements_id", array(
+            ->add("id", "product_sale_elements_id", [
                 "constraints" => $this->getConstraints($this->pseIdType, "update"),
-            ))
+            ])
         ;
     }
 

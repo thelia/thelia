@@ -11,9 +11,9 @@
 /*************************************************************************************/
 namespace Thelia\Core\Form;
 
-use Thelia\Form\Exception\FormValidationException;
-use Thelia\Form\BaseForm;
 use Symfony\Component\Form\Form;
+use Thelia\Form\BaseForm;
+use Thelia\Form\Exception\FormValidationException;
 
 /**
  * Class TheliaFormValidator
@@ -35,7 +35,6 @@ interface TheliaFormValidatorInterface
     /**
      * Get all errors that occurred in a form
      *
-     * @param  \Symfony\Component\Form\Form $form
      * @return string                       the error string
      */
     public function getErrorMessages(Form $form);

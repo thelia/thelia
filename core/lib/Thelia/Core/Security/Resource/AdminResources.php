@@ -42,9 +42,8 @@ class AdminResources
         }
         if (self::$selfReflection->hasConstant($constantName)) {
             return self::$selfReflection->getConstant($constantName);
-        } else {
+        }  
             throw new ResourceException(sprintf('Resource `%s` not found', $constantName), ResourceException::RESOURCE_NOT_FOUND);
-        }
     }
 
     const SUPERADMINISTRATOR = "SUPERADMINISTRATOR";
@@ -169,10 +168,9 @@ class AdminResources
         if (isset($this->resources[$module])) {
             if (isset($this->resources[$module][$constantName])) {
                 return $this->resources[$module][$constantName];
-            } else {
+            }  
                 throw new ResourceException(sprintf('Resource `%s` not found', $module),
                     ResourceException::RESOURCE_NOT_FOUND);
-            }
         } else {
             throw new ResourceException(sprintf('Module `%s` not found', $module),
                 ResourceException::RESOURCE_NOT_FOUND);

@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -28,7 +27,6 @@ class Payment implements EventSubscriberInterface
     /**
      * Check if a module is valid
      *
-     * @param IsValidPaymentEvent $event
      */
     public function isValid(IsValidPaymentEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {

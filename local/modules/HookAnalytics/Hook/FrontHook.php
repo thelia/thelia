@@ -22,7 +22,6 @@ use Thelia\Core\Hook\BaseHook;
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class FrontHook extends BaseHook {
-
     public function onMainHeadBottom(HookRenderEvent $event)
     {
         $lang = $this->getRequest()->getSession()->get("thelia.current.lang");

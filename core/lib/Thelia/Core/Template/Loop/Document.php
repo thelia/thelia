@@ -12,23 +12,23 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Core\Template\Element\BaseI18nLoop;
-use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Template\Element\BaseI18nLoop;
+use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
+use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Type\BooleanOrBothType;
-use Thelia\Type\TypeCollection;
 use Thelia\Type\EnumListType;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Model\ConfigQuery;
-use Thelia\Core\Template\Element\LoopResultRow;
-use Thelia\Core\Template\Element\LoopResult;
-use Thelia\Log\Tlog;
+use Thelia\Type\TypeCollection;
 
 /**
  * The document loop
@@ -60,7 +60,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
     /**
      * @var array Possible standard document sources
      */
-    protected $possible_sources = array('category', 'product', 'folder', 'content', 'brand');
+    protected $possible_sources = ['category', 'product', 'folder', 'content', 'brand'];
 
     /**
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
@@ -74,7 +74,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
+                    new EnumListType(['alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'])
                 ),
                 'manual'
             ),

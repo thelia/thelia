@@ -26,12 +26,12 @@ class MailingSystemController extends BaseAdminController
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::VIEW)) {
             return $response;
         }
 
         // Hydrate the form abd pass it to the parser
-        $data = array(
+        $data = [
             'enabled'       => ConfigQuery::isSmtpEnable() ? true : false,
             'host'          => ConfigQuery::getSmtpHost(),
             'port'          => ConfigQuery::getSmtpPort(),
@@ -41,7 +41,7 @@ class MailingSystemController extends BaseAdminController
             'authmode'      => ConfigQuery::getSmtpAuthMode(),
             'timeout'       => ConfigQuery::getSmtpTimeout(),
             'sourceip'      => ConfigQuery::getSmtpSourceIp(),
-        );
+        ];
 
         // Setup the object form
         $form = $this->createForm(AdminForm::MAILING_SYSTEM_MODIFICATION, FormType::class, $data);
@@ -56,7 +56,7 @@ class MailingSystemController extends BaseAdminController
     public function updateAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -95,7 +95,7 @@ class MailingSystemController extends BaseAdminController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("mailing system modification", array()),
+                $this->getTranslator()->trans("mailing system modification", []),
                 $error_msg,
                 $form,
                 $ex
@@ -111,22 +111,22 @@ class MailingSystemController extends BaseAdminController
     public function testAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
         $contactEmail = ConfigQuery::read('store_email');
         $storeName = ConfigQuery::read('store_name', 'Thelia');
 
-        $json_data = array(
+        $json_data = [
             "success" => false,
             "message" => "",
-        );
+        ];
 
         if ($contactEmail) {
             $emailTest = $this->getRequest()->get("email", $contactEmail);
 
-            $message = $this->getTranslator()->trans("Email test from : %store%", array("%store%" => $storeName));
+            $message = $this->getTranslator()->trans("Email test from : %store%", ["%store%" => $storeName]);
 
             $htmlMessage = "<p>$message</p>";
 
@@ -141,7 +141,7 @@ class MailingSystemController extends BaseAdminController
             try {
                 $this->getMailer()->send($instance);
                 $json_data["success"] = true;
-                $json_data["message"] = $this->getTranslator()->trans("Your configuration seems to be ok. Checked out your mailbox : %email%", array("%email%" => $emailTest));
+                $json_data["message"] = $this->getTranslator()->trans("Your configuration seems to be ok. Checked out your mailbox : %email%", ["%email%" => $emailTest]);
             } catch (\Exception $ex) {
                 $json_data["message"] = $ex->getMessage();
             }

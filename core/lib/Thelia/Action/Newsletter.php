@@ -18,8 +18,8 @@ use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\NewsletterQuery;
 use Thelia\Model\Newsletter as NewsletterModel;
+use Thelia\Model\NewsletterQuery;
 
 /**
  * Class Newsletter
@@ -110,11 +110,11 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::NEWSLETTER_SUBSCRIBE => array('subscribe', 128),
-            TheliaEvents::NEWSLETTER_UPDATE => array('update', 128),
-            TheliaEvents::NEWSLETTER_UNSUBSCRIBE => array('unsubscribe', 128),
-            TheliaEvents::NEWSLETTER_CONFIRM_SUBSCRIPTION => array('confirmSubscription', 128)
-        );
+        return [
+            TheliaEvents::NEWSLETTER_SUBSCRIBE => ['subscribe', 128],
+            TheliaEvents::NEWSLETTER_UPDATE => ['update', 128],
+            TheliaEvents::NEWSLETTER_UNSUBSCRIBE => ['unsubscribe', 128],
+            TheliaEvents::NEWSLETTER_CONFIRM_SUBSCRIPTION => ['confirmSubscription', 128]
+        ];
     }
 }

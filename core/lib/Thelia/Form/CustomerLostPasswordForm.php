@@ -50,19 +50,19 @@ class CustomerLostPasswordForm extends FirewallForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("email", EmailType::class, array(
-                "constraints" => array(
+            ->add("email", EmailType::class, [
+                "constraints" => [
                     new NotBlank(),
                     new Email(),
                     new Callback(
-                            array($this, "verifyExistingEmail")
+                            [$this, "verifyExistingEmail"]
                         ),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("Please enter your email address"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "forgot-email",
-                ),
-            ));
+                ],
+            ]);
     }
 
     public function verifyExistingEmail($value, ExecutionContextInterface $context)

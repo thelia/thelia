@@ -98,7 +98,7 @@ class CustomerController extends AbstractCrudController
         $address = $object->getDefaultAddress();
 
         // Prepare the data that will hydrate the form
-        $data = array(
+        $data = [
                 'id'        => $object->getId(),
                 'firstname' => $object->getFirstname(),
                 'lastname'  => $object->getLastname(),
@@ -107,7 +107,7 @@ class CustomerController extends AbstractCrudController
                 'title'     => $object->getTitleId(),
                 'discount'  => $object->getDiscount(),
                 'reseller'  => $object->getReseller() ? true : false,
-        );
+        ];
 
         if ($address !== null) {
             $data['company']   = $address->getCompany();
@@ -193,21 +193,21 @@ class CustomerController extends AbstractCrudController
 
     protected function getEditionArguments()
     {
-        return array(
+        return [
                 'customer_id' => $this->getRequest()->get('customer_id', 0),
                 'page'        => $this->getRequest()->get('page', 1),
                 'page_order'  => $this->getRequest()->get('page_order', 1)
-        );
+        ];
     }
 
-    protected function renderListTemplate($currentOrder, $customParams = array())
+    protected function renderListTemplate($currentOrder, $customParams = [])
     {
         return $this->render(
             'customers',
-            array_merge(array(
+            array_merge([
                 'customer_order'   => $currentOrder,
                 'page'             => $this->getRequest()->get('page', 1)
-            ), $customParams)
+            ], $customParams)
         );
     }
 

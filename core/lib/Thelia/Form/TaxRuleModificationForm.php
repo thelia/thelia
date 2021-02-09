@@ -24,15 +24,15 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", HiddenType::class, array(
+            ->add("id", HiddenType::class, [
                     "required" => true,
-                    "constraints" => array(
+                    "constraints" => [
                         new Constraints\NotBlank(),
                         new Constraints\Callback(
-                                    array($this, "verifyTaxRuleId")
+                                    [$this, "verifyTaxRuleId"]
                         ),
-                    ),
-            ))
+                    ],
+            ])
         ;
     }
 

@@ -111,7 +111,7 @@ class MessageController extends AbstractCrudController
     protected function hydrateObjectForm($object)
     {
         // Prepare the data that will hydrate the form
-        $data = array(
+        $data = [
             'id'            => $object->getId(),
             'name'          => $object->getName(),
             'secured'       => $object->getSecured() ? true : false,
@@ -125,7 +125,7 @@ class MessageController extends AbstractCrudController
             'html_template_file_name' => $object->getHtmlTemplateFileName(),
             'text_layout_file_name'   => $object->getTextLayoutFileName(),
             'text_template_file_name' => $object->getTextTemplateFileName(),
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(AdminForm::MESSAGE_MODIFICATION, FormType::class, $data);
@@ -173,7 +173,7 @@ class MessageController extends AbstractCrudController
 
     protected function listDirectoryContent($requiredExtension)
     {
-        $list = array();
+        $list = [];
 
         $mailTemplate = $this->getTemplateHelper()->getActiveMailTemplate();
 
@@ -220,12 +220,12 @@ class MessageController extends AbstractCrudController
 
     protected function renderEditionTemplate()
     {
-        return $this->render('message-edit', array(
+        return $this->render('message-edit', [
             'message_id'         => $this->getRequest()->get('message_id'),
             'layout_list'        => $this->listDirectoryContent('tpl'),
             'html_template_list' =>  $this->listDirectoryContent('html'),
             'text_template_list' =>  $this->listDirectoryContent('txt'),
-        ));
+        ]);
     }
 
     protected function redirectToEditionTemplate()

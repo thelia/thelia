@@ -20,9 +20,9 @@ use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
+use Thelia\Model\Folder as FolderModel;
 use Thelia\Model\FolderQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
-use Thelia\Model\Folder as FolderModel;
 
 /**
  * Class FolderTest

@@ -71,13 +71,6 @@ class BaseFacade implements FacadeInterface
     /**
      * Constructor
      *
-     * @param SecurityContext $securityContext
-     * @param TaxEngine $taxEngine
-     * @param TranslatorInterface $translator
-     * @param ParserInterface $parser
-     * @param RequestStack $requestStack
-     * @param ConditionEvaluator $conditionEvaluator
-     * @param EventDispatcher $eventDispatcher
      */
     public function __construct(
         SecurityContext $securityContext,
@@ -341,7 +334,7 @@ class BaseFacade implements FacadeInterface
         $consumedCoupons = $this->getRequest()->getSession()->getConsumedCoupons();
 
         if (!isset($consumedCoupons) || !$consumedCoupons) {
-            $consumedCoupons = array();
+            $consumedCoupons = [];
         }
 
         if (!isset($consumedCoupons[$couponCode])) {

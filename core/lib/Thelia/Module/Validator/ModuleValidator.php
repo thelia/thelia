@@ -71,7 +71,6 @@ class ModuleValidator
     }
 
     /**
-     * @param mixed $modulePath
      */
     public function setModulePath($modulePath)
     {
@@ -79,7 +78,6 @@ class ModuleValidator
     }
 
     /**
-     * @return mixed
      */
     public function getModulePath()
     {
@@ -103,13 +101,11 @@ class ModuleValidator
     }
 
     /**
-     * @return mixed
      */
     public function getModuleVersion()
     {
         return $this->moduleVersion;
     }
-
 
     /**
      * @return array
@@ -439,7 +435,6 @@ class ModuleValidator
     }
 
     /**
-     * @param ModuleDefinition $moduleDefinition
      */
     protected function getModuleLanguages(ModuleDefinition $moduleDefinition)
     {
@@ -453,7 +448,6 @@ class ModuleValidator
     }
 
     /**
-     * @param ModuleDefinition $moduleDefinition
      */
     protected function getModuleDescriptives(ModuleDefinition $moduleDefinition)
     {
@@ -470,7 +464,6 @@ class ModuleValidator
     }
 
     /**
-     * @param ModuleDefinition $moduleDefinition
      */
     protected function getModuleDependencies(ModuleDefinition $moduleDefinition)
     {
@@ -487,7 +480,6 @@ class ModuleValidator
     }
 
     /**
-     * @param ModuleDefinition $moduleDefinition
      */
     protected function getModuleAuthors(ModuleDefinition $moduleDefinition)
     {

@@ -27,17 +27,15 @@ class GetStockUpdateOperationOnOrderStatusChangeEvent extends ActionEvent
     const DO_NOTHING = 0;
 
     /** @var Order */
-    protected $order = null;
+    protected $order;
 
     /** @var OrderStatus */
-    protected $newOrderStatus = null;
+    protected $newOrderStatus;
 
     protected $operation = self::DO_NOTHING;
 
     /**
      * StockUpdateOnOrderStatusChangeEvent constructor.
-     * @param Order $order
-     * @param OrderStatus $newOrderStatus
      */
     public function __construct(Order $order, OrderStatus $newOrderStatus)
     {

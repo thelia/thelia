@@ -20,7 +20,7 @@ class OrderException extends \RuntimeException
     public $cartRoute = "cart.view";
     public $orderDeliveryRoute = "order.delivery";
 
-    public $arguments = array();
+    public $arguments = [];
 
     const UNKNOWN_EXCEPTION = 0;
 
@@ -29,7 +29,7 @@ class OrderException extends \RuntimeException
     const UNDEFINED_DELIVERY = 200;
     const DELIVERY_MODULE_UNAVAILABLE = 201;
 
-    public function __construct($message, $code = null, $arguments = array(), $previous = null)
+    public function __construct($message, $code = null, $arguments = [], $previous = null)
     {
         if (\is_array($arguments)) {
             $this->arguments = $arguments;

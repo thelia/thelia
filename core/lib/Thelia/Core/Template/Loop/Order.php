@@ -70,7 +70,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 'customer',
                 new TypeCollection(
                     new Type\IntType(),
-                    new Type\EnumType(array('current', '*'))
+                    new Type\EnumType(['current', '*'])
                 ),
                 'current'
             ),
@@ -78,7 +78,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 'status',
                 new TypeCollection(
                     new Type\IntListType(),
-                    new Type\EnumType(array('*'))
+                    new Type\EnumType(['*'])
                 )
             ),
             Argument::createIntListTypeArgument('exclude_status'),
@@ -86,7 +86,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 'status_code',
                 new TypeCollection(
                     new Type\AnyListType(),
-                    new Type\EnumType(array('*'))
+                    new Type\EnumType(['*'])
                 )
             ),
             Argument::createAnyListTypeArgument('exclude_status_code'),
@@ -94,7 +94,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 'order',
                 new TypeCollection(
                     new Type\EnumListType(
-                        array(
+                        [
                             'id', 'id-reverse',
                             'reference', 'reference-reverse',
                             'create-date', 'create-date-reverse',
@@ -102,7 +102,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                             'company', 'company-reverse',
                             'customer-name', 'customer-name-reverse',
                             'status', 'status-reverse'
-                        )
+                        ]
                     )
                 ),
                 'create-date-reverse'
@@ -112,7 +112,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
 
     public function getSearchIn()
     {
-        return array(
+        return [
             'ref',
             'invoice_ref',
             'delivery_ref',
@@ -121,7 +121,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
             'customer_firstname',
             'customer_lastname',
             'customer_email',
-        );
+        ];
     }
 
     /**
@@ -315,7 +315,6 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
     }
 
     /**
-     * @param LoopResult $loopResult
      * @return LoopResult
      * @throws \Propel\Runtime\Exception\PropelException
      */

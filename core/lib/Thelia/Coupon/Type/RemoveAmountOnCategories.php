@@ -37,7 +37,7 @@ class RemoveAmountOnCategories extends AbstractRemoveOnCategories
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Fixed amount discount for selected categories', array());
+            ->trans('Fixed amount discount for selected categories', []);
     }
 
     /**
@@ -49,7 +49,7 @@ class RemoveAmountOnCategories extends AbstractRemoveOnCategories
             ->getTranslator()
             ->trans(
                 'This coupon subtracts the specified amount from the order total for each product which belongs to the selected categories. If the discount is greater than the total order, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
-                array()
+                []
             );
 
         return $toolTip;

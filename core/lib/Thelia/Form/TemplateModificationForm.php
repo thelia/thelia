@@ -24,13 +24,13 @@ class TemplateModificationForm extends TemplateCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", HiddenType::class, array(
-                    "constraints" => array(
+            ->add("id", HiddenType::class, [
+                    "constraints" => [
                         new GreaterThan(
-                            array('value' => 0)
+                            ['value' => 0]
                         ),
-                    ),
-            ))
+                    ],
+            ])
             ;
     }
 

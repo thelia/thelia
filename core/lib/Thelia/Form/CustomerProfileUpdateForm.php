@@ -66,7 +66,6 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
 
     /**
      * @param $value
-     * @param ExecutionContextInterface $context
      */
     public function verifyExistingEmail($value, ExecutionContextInterface $context)
     {

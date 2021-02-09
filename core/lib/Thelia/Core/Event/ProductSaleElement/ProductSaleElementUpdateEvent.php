@@ -60,7 +60,6 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * ProductSaleElementUpdateEvent constructor.
-     * @param Product $product
      * @param int $product_sale_element_id
      */
     public function __construct(Product $product, $product_sale_element_id)

@@ -43,8 +43,6 @@ class SessionMiddleware implements HttpKernelInterface
     protected static $session;
 
     /**
-     * @param HttpKernelInterface $app
-     * @param EventDispatcherInterface $eventDispatcherInterface
      * @param $cacheDir
      * @param $debug
      * @param $env

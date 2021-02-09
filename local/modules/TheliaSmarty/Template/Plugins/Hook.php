@@ -18,13 +18,13 @@ use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Core\Hook\Fragment;
 use Thelia\Core\Hook\FragmentBag;
-use Thelia\Log\Tlog;
-use TheliaSmarty\Template\AbstractSmartyPlugin;
-use TheliaSmarty\Template\SmartyPluginDescriptor;
-use TheliaSmarty\Template\Plugins\Module;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
+use Thelia\Log\Tlog;
 use Thelia\Model\ModuleQuery;
+use TheliaSmarty\Template\AbstractSmartyPlugin;
+use TheliaSmarty\Template\Plugins\Module;
+use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 /**
  * Plugin for smarty defining blocks and functions for using Hooks.
@@ -88,7 +88,7 @@ class Hook extends AbstractSmartyPlugin
     public function processHookFunction($params, &$smarty)
     {
         $hookName   = $this->getParam($params, 'name');
-        $module     = intval($this->getParam($params, 'module', 0));
+        $module     = \intval($this->getParam($params, 'module', 0));
         $moduleCode = $this->getParam($params, 'modulecode', "");
 
         $type = $smarty->getTemplateDefinition()->getType();
@@ -142,11 +142,11 @@ class Hook extends AbstractSmartyPlugin
     protected function moduleIncludeCompat($params, &$smarty)
     {
         $plugin = $this->getSmartyPluginModule();
-        $params = array(
+        $params = [
             "location" => $this->getParam($params, 'location', null),
             "module"   => $this->getParam($params, 'modulecode', null),
             "countvar" => $this->getParam($params, 'countvar', null)
-        );
+        ];
 
         return $plugin->theliaModule($params, $smarty);
     }
@@ -218,7 +218,7 @@ HTML;
     public function processHookBlock($params, $content, $smarty, &$repeat)
     {
         $hookName = $this->getParam($params, 'name');
-        $module   = intval($this->getParam($params, 'module', 0));
+        $module   = \intval($this->getParam($params, 'module', 0));
         // explicit definition of variable that can be returned
         $fields   = preg_replace(
             '|[^a-zA-Z0-9,\-_]|',
@@ -290,7 +290,7 @@ HTML;
 
         // first call
         if ($content === null) {
-            if (!array_key_exists($rel, $this->hookResults)) {
+            if (!\array_key_exists($rel, $this->hookResults)) {
                 $exception = new \InvalidArgumentException(
                     $this->translator->trans("Related hook name '%name' is not defined.", ['%name' => $rel])
                 );
@@ -321,7 +321,7 @@ HTML;
 
             // On first iteration, save variables that may be overwritten by this hook
             if (!isset($this->varstack[$rel])) {
-                $saved_vars = array();
+                $saved_vars = [];
 
                 $varlist = $fragment->getVars();
 
@@ -439,8 +439,8 @@ HTML;
             return true;
         }
 
-        return (is_string($this->hookResults[$hookName]) && '' === $this->hookResults[$hookName]
-            || !is_string($this->hookResults[$hookName]) && $this->hookResults[$hookName]->isEmpty()
+        return (\is_string($this->hookResults[$hookName]) && '' === $this->hookResults[$hookName]
+            || !\is_string($this->hookResults[$hookName]) && $this->hookResults[$hookName]->isEmpty()
         );
     }
 
@@ -454,12 +454,12 @@ HTML;
      */
     protected function getArgumentsFromParams($params)
     {
-        $args     = array();
-        $excludes = array("name", "before", "separator", "after", "fields");
+        $args     = [];
+        $excludes = ["name", "before", "separator", "after", "fields"];
 
-        if (is_array($params)) {
+        if (\is_array($params)) {
             foreach ($params as $key => $value) {
-                if (!in_array($key, $excludes)) {
+                if (!\in_array($key, $excludes)) {
                     $args[$key] = $value;
                 }
             }
@@ -475,13 +475,13 @@ HTML;
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor('function', 'hook', $this, 'processHookFunction'),
             new SmartyPluginDescriptor('block', 'hookblock', $this, 'processHookBlock'),
             new SmartyPluginDescriptor('block', 'forhook', $this, 'processForHookBlock'),
             new SmartyPluginDescriptor('block', 'elsehook', $this, 'elseHook'),
             new SmartyPluginDescriptor('block', 'ifhook', $this, 'ifHook'),
-        );
+        ];
     }
 
     /**

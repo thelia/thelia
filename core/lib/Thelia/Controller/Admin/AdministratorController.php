@@ -117,7 +117,7 @@ class AdministratorController extends AbstractCrudController
      */
     protected function hydrateObjectForm($object)
     {
-        $data = array(
+        $data = [
             'id'                => $object->getId(),
             'firstname'         => $object->getFirstname(),
             'lastname'          => $object->getLastname(),
@@ -125,7 +125,7 @@ class AdministratorController extends AbstractCrudController
             'profile'           => $object->getProfileId(),
             'locale'            => $object->getLocale(),
             'email'             => $object->getEmail()
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(AdminForm::ADMINISTRATOR_MODIFICATION, FormType::class, $data);
@@ -165,7 +165,7 @@ class AdministratorController extends AbstractCrudController
         // We always return to the feature edition form
         return $this->render(
             'administrators',
-            array()
+            []
         );
     }
 

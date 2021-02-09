@@ -2,6 +2,7 @@
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\MatchForEveryone;
 use Thelia\Condition\Implementation\MatchForTotalAmount;
@@ -10,13 +11,12 @@ use Thelia\Condition\Operators;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\Type\RemoveXAmount;
 use Thelia\Coupon\Type\RemoveXPercent;
+use Thelia\Model;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderAddress;
-use Thelia\Model;
 
 if (php_sapi_name() != 'cli') {
     throw new \Exception('this script can only be launched with cli sapi');
@@ -28,7 +28,7 @@ if (php_sapi_name() != 'cli') {
 // build or something wrong with the build itself."
 $bootstraped = false;
 $realTextMode = true;
-$localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT', 'de_DE');
+$localeList = ['fr_FR', 'en_US', 'es_ES', 'it_IT', 'de_DE'];
 $numberCategories = 20;
 $numberProducts = 20;
 $countryStateList = [];
@@ -296,14 +296,13 @@ try {
                 ->setCustomer($customer)
                 ->save()
             ;
-
         }
     }
 
     echo "Creating features\n";
 
     //features and features_av
-    $featureList = array();
+    $featureList = [];
     for ($i=0; $i<4; $i++) {
         $feature = new Thelia\Model\Feature();
         $feature->setVisible(1);
@@ -312,7 +311,7 @@ try {
 
         $feature->save();
         $featureId = $feature->getId();
-        $featureList[$featureId] = array();
+        $featureList[$featureId] = [];
 
         //hardcode chance to have no av
         if ($i === 1 || $i === 3) {
@@ -331,7 +330,7 @@ try {
     echo "Creating attributes\n";
 
     //attributes and attributes_av
-    $attributeList = array();
+    $attributeList = [];
     for ($i=0; $i<4; $i++) {
         $attribute = new Thelia\Model\Attribute();
         $attribute->setPosition($i);
@@ -339,7 +338,7 @@ try {
 
         $attribute->save();
         $attributeId = $attribute->getId();
-        $attributeList[$attributeId] = array();
+        $attributeList[$attributeId] = [];
 
         for ($j=0; $j<rand(1, 5); $j++) {
             $attributeAv = new Thelia\Model\AttributeAv();
@@ -355,7 +354,7 @@ try {
     echo "Creating templates\n";
 
     $template = new Thelia\Model\Template();
-    setI18n($template, array("Name" => 20));
+    setI18n($template, ["Name" => 20]);
     $template->save();
 
     foreach ($attributeList as $attributeId => $attributeAvId) {
@@ -379,7 +378,7 @@ try {
     echo "Creating folders and contents\n";
 
     //folders and contents
-    $contentIdList = array();
+    $contentIdList = [];
     for ($i=0; $i<4; $i++) {
         $folder = new Thelia\Model\Folder();
         $folder->setParent(0);
@@ -469,9 +468,9 @@ try {
     echo "Creating categories and products\n";
 
     //categories and products
-    $productIdList = array();
-    $virtualProductList = array();
-    $categoryIdList = array();
+    $productIdList = [];
+    $virtualProductList = [];
+    $categoryIdList = [];
     for ($i=1; $i<$numberCategories; $i++) {
         $category = createCategory($faker, 0, $i, $categoryIdList, $contentIdList);
 
@@ -490,7 +489,7 @@ try {
 
     foreach ($productIdList as $productId) {
         //add random accessories - or not
-        $alreadyPicked = array();
+        $alreadyPicked = [];
         for ($i=1; $i<rand(0, 4); $i++) {
             $accessory = new Thelia\Model\Accessory();
             do {
@@ -506,7 +505,7 @@ try {
         }
 
         //add random associated content
-        $alreadyPicked = array();
+        $alreadyPicked = [];
         for ($i=1; $i<rand(0, 3); $i++) {
             $productAssociatedContent = new Thelia\Model\ProductAssociatedContent();
             do {
@@ -558,11 +557,10 @@ try {
 
             //associate attributes - or not - to PSE
 
-            $alreadyPicked = array();
+            $alreadyPicked = [];
             $minAttrCount = $pse_count == 1 ? 0 : 1;
 
             for ($attrIdx=0; $attrIdx<rand($minAttrCount, count($attributeList)); $attrIdx++) {
-
                 $featureProduct = new Thelia\Model\AttributeCombination();
                 do {
                     $pick = array_rand($attributeList, 1);
@@ -720,7 +718,6 @@ try {
                 ->setEanCode($pse->getEanCode())
                 ->save($con);
         }
-
     }
 
     echo "Generating coupons fixtures\n";
@@ -730,7 +727,6 @@ try {
     echo "Generating sales\n";
 
     for($idx = 1; $idx <= 5; $idx++) {
-
         $sale = new \Thelia\Model\Sale();
 
         $start = new \DateTime();
@@ -768,9 +764,7 @@ try {
         $count = $faker->numberBetween(5, 20);
 
         foreach ($products as $product) {
-
             if ( --$count < 0) break;
-
             $saleProduct = new \Thelia\Model\SaleProduct();
 
             $saleProduct
@@ -785,7 +779,6 @@ try {
     $con->commit();
 
     echo "Successfully terminated.\n";
-
 } catch (Exception $e) {
     echo "error : ".$e->getMessage()."\n";
     if ($e->getPrevious()) echo "Cause: ".$e->getPrevious()->getMessage()."\n";
@@ -845,7 +838,7 @@ function createCategory($faker, $parent, $position, &$categoryIdList, $contentId
     $categoryIdList[] = $categoryId;
 
     //add random associated content
-    $alreadyPicked = array();
+    $alreadyPicked = [];
     for ($i=1; $i<rand(0, 3); $i++) {
         $categoryAssociatedContent = new Thelia\Model\CategoryAssociatedContent();
         do {
@@ -959,12 +952,11 @@ function getRealText($length, $locale = 'en_US') {
     return "$locale:$text";
 }
 
-function setI18n(&$object, $fields = array('Title' => 20, 'Chapo' => 30, 'Postscriptum' => 30, 'Description' => 50) )
+function setI18n(&$object, $fields = ['Title' => 20, 'Chapo' => 30, 'Postscriptum' => 30, 'Description' => 50] )
 {
     global $localeList, $localizedFaker;
 
     foreach ($localeList as $locale) {
-
         $object->setLocale($locale);
 
         foreach ($fields as $name => $length) {
@@ -999,34 +991,34 @@ Duis interdum lectus nulla, nec pellentesque sapien condimentum at. Suspendisse 
 Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentesque elit erat, lacinia sed semper ac, sagittis vel elit. Nam eu convallis est. Curabitur rhoncus odio vitae consectetur pellentesque. Nam vitae arcu nec ante scelerisque dignissim vel nec neque. Suspendisse augue nulla, mollis eget dui et, tempor facilisis erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ac diam ipsum. Donec convallis dui ultricies velit auctor, non lobortis nulla ultrices. Morbi vitae dignissim ante, sit amet lobortis tortor. Nunc dapibus condimentum augue, in molestie neque congue non.
 
 Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
-    $coupon1->setEffects(array(
+    $coupon1->setEffects([
         RemoveXAmount::AMOUNT_FIELD_NAME => 10.00,
-    ));
+    ]);
     $coupon1->setIsUsed(true);
     $coupon1->setIsEnabled(true);
     $date = new \DateTime();
     $coupon1->setExpirationDate($date->setTimestamp(strtotime("today + 3 months")));
 
     $condition1 = new MatchForTotalAmount($adapter);
-    $operators = array(
+    $operators = [
         MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
         MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-    );
-    $values = array(
+    ];
+    $values = [
         MatchForTotalAmount::CART_TOTAL => 40.00,
         MatchForTotalAmount::CART_CURRENCY => 'EUR'
-    );
+    ];
     $condition1->setValidatorsFromForm($operators, $values);
 
     $condition2 = new MatchForTotalAmount($adapter);
-    $operators = array(
+    $operators = [
         MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
         MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-    );
-    $values = array(
+    ];
+    $values = [
         MatchForTotalAmount::CART_TOTAL => 400.00,
         MatchForTotalAmount::CART_CURRENCY => 'EUR'
-    );
+    ];
     $condition2->setValidatorsFromForm($operators, $values);
 
     $conditions = new ConditionCollection();
@@ -1059,21 +1051,21 @@ Duis interdum lectus nulla, nec pellentesque sapien condimentum at. Suspendisse 
 Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentesque elit erat, lacinia sed semper ac, sagittis vel elit. Nam eu convallis est. Curabitur rhoncus odio vitae consectetur pellentesque. Nam vitae arcu nec ante scelerisque dignissim vel nec neque. Suspendisse augue nulla, mollis eget dui et, tempor facilisis erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ac diam ipsum. Donec convallis dui ultricies velit auctor, non lobortis nulla ultrices. Morbi vitae dignissim ante, sit amet lobortis tortor. Nunc dapibus condimentum augue, in molestie neque congue non.
 
 Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
-    $coupon2->setEffects(array(
+    $coupon2->setEffects([
         RemoveXPercent::INPUT_PERCENTAGE_NAME => 10.00
-    ));
+    ]);
     $coupon2->setIsUsed(true);
     $coupon2->setIsEnabled(true);
     $date = new \DateTime();
     $coupon2->setExpirationDate($date->setTimestamp(strtotime("today + 1 months")));
 
     $condition1 = new MatchForXArticles($adapter);
-    $operators = array(
+    $operators = [
         MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR,
-    );
-    $values = array(
+    ];
+    $values = [
         MatchForXArticles::CART_QUANTITY => 4,
-    );
+    ];
     $condition1->setValidatorsFromForm($operators, $values);
     $conditions = new ConditionCollection();
     $conditions[] = $condition1;
@@ -1105,17 +1097,17 @@ Duis interdum lectus nulla, nec pellentesque sapien condimentum at. Suspendisse 
 Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentesque elit erat, lacinia sed semper ac, sagittis vel elit. Nam eu convallis est. Curabitur rhoncus odio vitae consectetur pellentesque. Nam vitae arcu nec ante scelerisque dignissim vel nec neque. Suspendisse augue nulla, mollis eget dui et, tempor facilisis erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ac diam ipsum. Donec convallis dui ultricies velit auctor, non lobortis nulla ultrices. Morbi vitae dignissim ante, sit amet lobortis tortor. Nunc dapibus condimentum augue, in molestie neque congue non.
 
 Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
-    $coupon3->setEffects(array(
+    $coupon3->setEffects([
         RemoveXPercent::INPUT_PERCENTAGE_NAME => 10.00,
-    ));
+    ]);
     $coupon3->setIsUsed(false);
     $coupon3->setIsEnabled(false);
     $date = new \DateTime();
     $coupon3->setExpirationDate($date->setTimestamp(strtotime("today + 2 months")));
 
     $condition1 = new MatchForEveryone($adapter);
-    $operators = array();
-    $values = array();
+    $operators = [];
+    $values = [];
     $condition1->setValidatorsFromForm($operators, $values);
     $conditions = new ConditionCollection();
     $conditions[] = $condition1;

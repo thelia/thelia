@@ -22,16 +22,16 @@ class AdminLostPassword extends BruteforceForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("username_or_email", TextType::class, array(
-                "constraints" => array(
+            ->add("username_or_email", TextType::class, [
+                "constraints" => [
                     new NotBlank(),
-                    new Length(array("min" => 3)),
-                ),
+                    new Length(["min" => 3]),
+                ],
                 "label" => Translator::getInstance()->trans("Username or e-mail address *"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "username",
-                ),
-            ))
+                ],
+            ])
         ;
     }
 }

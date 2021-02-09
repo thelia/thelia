@@ -21,12 +21,12 @@ use Thelia\Core\Template\TemplateDefinition;
  */
 class ParserFallback implements ParserInterface
 {
-    public function render($realTemplateName, array $parameters = array(), $compressOutput = true)
+    public function render($realTemplateName, array $parameters = [], $compressOutput = true)
     {
         $this->throwException();
     }
 
-    public function renderString($templateText, array $parameters = array(), $compressOutput = true)
+    public function renderString($templateText, array $parameters = [], $compressOutput = true)
     {
         $this->throwException();
     }
@@ -44,7 +44,6 @@ class ParserFallback implements ParserInterface
     /**
      * Setup the parser with a template definition, which provides a template description.
      *
-     * @param TemplateDefinition $templateDefinition
      */
     public function setTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
     {
@@ -138,7 +137,6 @@ class ParserFallback implements ParserInterface
     /**
      * Set a new template definition, and save the current one
      *
-     * @param TemplateDefinition $templateDefinition
      * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
      * @throws \SmartyException
      */

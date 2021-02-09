@@ -60,11 +60,6 @@ class ViewListener implements EventSubscriberInterface
 
     /**
      * ViewListener constructor.
-     * @param ParserInterface $parser
-     * @param TemplateHelperInterface $templateHelper
-     * @param RequestStack $requestStack
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ChainRouterInterface $chainRouter
      */
     public function __construct(
         ParserInterface $parser,
@@ -85,7 +80,6 @@ class ViewListener implements EventSubscriberInterface
      *
      * The result is transform id needed into a Response object
      *
-     * @param ViewEvent $event
      */
     public function onKernelView(ViewEvent $event)
     {
@@ -169,11 +163,11 @@ class ViewListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::VIEW =>array(
-                array('onKernelView', 0),
-                array('beforeKernelView', 5)
-            )
-        );
+        return [
+            KernelEvents::VIEW =>[
+                ['onKernelView', 0],
+                ['beforeKernelView', 5]
+            ]
+        ];
     }
 }

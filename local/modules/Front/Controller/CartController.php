@@ -137,7 +137,7 @@ class CartController extends BaseFrontController
     protected function changeViewForAjax()
     {
         // If this is an ajax request, and if the template allow us to return an ajax result
-        if ($this->getRequest()->isXmlHttpRequest() && (0 === intval($this->getRequest()->get('no_ajax_check', 0)))) {
+        if ($this->getRequest()->isXmlHttpRequest() && (0 === \intval($this->getRequest()->get('no_ajax_check', 0)))) {
             $request = $this->getRequest();
 
             $view = $request->get('ajax-view', "includes/mini-cart");
@@ -156,7 +156,7 @@ class CartController extends BaseFrontController
         $deliveryId = $this->getRequest()->get("country");
         $cookieName = ConfigQuery::read('front_cart_country_cookie_name', 'fcccn');
         $cookieExpires = ConfigQuery::read('front_cart_country_cookie_expires', 2592000);
-        $cookieExpires = intval($cookieExpires) ?: 2592000;
+        $cookieExpires = \intval($cookieExpires) ?: 2592000;
 
         $cookie = new Cookie($cookieName, $deliveryId, time() + $cookieExpires, '/');
 
@@ -179,7 +179,6 @@ class CartController extends BaseFrontController
     /**
      * Find the good way to construct the cart form
      *
-     * @param  Request $request
      * @return CartAdd
      */
     private function getAddCartForm(Request $request)
@@ -191,10 +190,10 @@ class CartController extends BaseFrontController
             $cartAdd = $this->createForm(
                 FrontForm::CART_ADD,
                 FormType::class,
-                array(),
-                array(
+                [],
+                [
                     'csrf_protection'   => false,
-                )
+                ]
             );
         }
 

@@ -35,7 +35,6 @@ use Thelia\Model\OrderStatusQuery;
 class OrderStatus extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * @param OrderStatusCreateEvent $event
      */
     public function create(OrderStatusCreateEvent $event)
     {
@@ -43,7 +42,6 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param OrderStatusUpdateEvent $event
      */
     public function update(OrderStatusUpdateEvent $event)
     {
@@ -52,7 +50,6 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param OrderStatusDeleteEvent $event
      * @throws \Exception
      */
     public function delete(OrderStatusDeleteEvent $event)
@@ -83,17 +80,15 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             TheliaEvents::ORDER_STATUS_CREATE => ["create", 128],
             TheliaEvents::ORDER_STATUS_UPDATE => ["update", 128],
             TheliaEvents::ORDER_STATUS_DELETE => ["delete", 128],
             TheliaEvents::ORDER_STATUS_UPDATE_POSITION => ["updatePosition", 128]
-        );
+        ];
     }
 
     /**
-     * @param OrderStatusEvent $event
-     * @param OrderStatusModel $orderStatus
      */
     protected function createOrUpdate(OrderStatusEvent $event, OrderStatusModel $orderStatus)
     {
@@ -121,9 +116,7 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param UpdatePositionEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -131,7 +124,6 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param OrderStatusUpdateEvent $event
      * @return OrderStatusModel
      */
     protected function getOrderStatus(OrderStatusUpdateEvent $event)

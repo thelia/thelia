@@ -72,7 +72,6 @@ class SaleCheckActivationCommandTest extends ContainerAwareTestCase
             ->setActive(true)
             ->save();
 
-
         self::$activated = $otherSale->getId();
     }
 
@@ -103,7 +102,6 @@ class SaleCheckActivationCommandTest extends ContainerAwareTestCase
 
     /**
      * Use this method to build the container with the services that you need.
-     * @param ContainerBuilder $container
      */
     protected function buildContainer(ContainerBuilder $container)
     {

@@ -48,7 +48,6 @@ class File extends BaseAction implements EventSubscriberInterface
                     $originalProductFiles = ProductImageQuery::create()
                         ->findByProductId($originalProductId);
                     break;
-
                 case 'documents':
                     $originalProductFiles = ProductDocumentQuery::create()
                         ->findByProductId($originalProductId);
@@ -70,7 +69,6 @@ class File extends BaseAction implements EventSubscriberInterface
                             $fileName = $clonedProduct->getRef().'.'.$ext;
                             $clonedProductFile = new ProductImage();
                             break;
-
                         case 'documents':
                             $fileName = pathinfo($originalProductFile->getFile(), PATHINFO_FILENAME).'-'.$clonedProduct->getRef().'.'.$ext;
                             $clonedProductFile = new ProductDocument();
@@ -112,7 +110,6 @@ class File extends BaseAction implements EventSubscriberInterface
                             $originalProductFileI18ns = ProductImageI18nQuery::create()
                                 ->findById($originalProductFile->getId());
                             break;
-
                         case 'documents':
                             $dispatcher->dispatch($clonedProductCreateFileEvent,TheliaEvents::DOCUMENT_SAVE);
 
@@ -155,7 +152,6 @@ class File extends BaseAction implements EventSubscriberInterface
                 case 'images':
                     $dispatcher->dispatch($clonedProductUpdateFileEvent,TheliaEvents::IMAGE_UPDATE);
                     break;
-
                 case 'documents':
                     $dispatcher->dispatch($clonedProductUpdateFileEvent,TheliaEvents::DOCUMENT_UPDATE);
                     break;
@@ -168,8 +164,8 @@ class File extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::FILE_CLONE => array("cloneFile", 128)
-        );
+        return [
+            TheliaEvents::FILE_CLONE => ["cloneFile", 128]
+        ];
     }
 }

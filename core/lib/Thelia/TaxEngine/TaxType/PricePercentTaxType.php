@@ -12,10 +12,10 @@
 
 namespace Thelia\TaxEngine\TaxType;
 
-use Thelia\Type\FloatType;
 use Thelia\Core\Translation\Translator;
-use Thelia\TaxEngine\TaxTypeRequirementDefinition;
 use Thelia\TaxEngine\BaseTaxType;
+use Thelia\TaxEngine\TaxTypeRequirementDefinition;
+use Thelia\Type\FloatType;
 
 /**
  *
@@ -38,13 +38,13 @@ class PricePercentTaxType extends BaseTaxType
 
     public function getRequirementsDefinition()
     {
-        return array(
+        return [
             new TaxTypeRequirementDefinition(
                 'percent',
                 new FloatType(),
                 Translator::getInstance()->trans("Percent")
             )
-        );
+        ];
     }
 
     public function getTitle()

@@ -33,10 +33,10 @@ use TheliaSmarty\Template\SmartyParser;
 class GenerateSQLCommand extends ContainerAwareCommand
 {
     /** @var Translator $translator */
-    protected $translator = null;
+    protected $translator;
 
     /** @var SmartyParser $parser */
-    protected $parser = null;
+    protected $parser;
 
     /** @var \PDO */
     protected $con;
@@ -112,7 +112,6 @@ class GenerateSQLCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param InputInterface $input
      * @return array
      */
     protected function initLocales(InputInterface $input)
@@ -193,9 +192,10 @@ class GenerateSQLCommand extends ContainerAwareCommand
 
         if (empty($params["l"])) {
             throw new RuntimeException('Translation Error. Key is empty.');
-        } elseif (empty($params["locale"])) {
+        }
+        if (empty($params["locale"])) {
             throw new RuntimeException('Translation Error. Locale is empty.');
-        } else {
+        }  
             $inString = (0 !== \intval($params["in_string"]));
             $useDefault = (0 !== \intval($params["use_default"]));
 
@@ -216,8 +216,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
                     $translation = substr($translation, 1, -1);
                 }
             }
-        }
-
+        
         return $translation;
     }
 }

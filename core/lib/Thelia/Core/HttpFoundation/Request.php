@@ -31,7 +31,7 @@ class Request extends BaseRequest
     private $resolvedPathInfo;
 
     /** @var string */
-    protected $controllerType = null;
+    protected $controllerType;
 
     /**
      * @

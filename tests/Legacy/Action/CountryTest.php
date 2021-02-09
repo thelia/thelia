@@ -62,7 +62,6 @@ class CountryTest extends BaseAction
     }
 
     /**
-     * @param CountryModel $country
      * @depends testCreate
      * @return CountryModel
      */
@@ -99,7 +98,6 @@ class CountryTest extends BaseAction
     }
 
     /**
-     * @param CountryModel $country
      * @depends testUpdate
      */
     public function testDelete(CountryModel $country)

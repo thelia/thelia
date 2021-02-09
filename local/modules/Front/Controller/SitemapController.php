@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Front\Controller;
 
 use Doctrine\Common\Cache\FilesystemCache;
@@ -37,8 +36,6 @@ use Thelia\Model\LangQuery;
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class SitemapController extends BaseFrontController {
-
-
     /**
      * Folder name for sitemap cache
      */
@@ -66,7 +63,7 @@ class SitemapController extends BaseFrontController {
         }
         // specific content : product, category, cms
         $context = $request->query->get("context", "");
-        if (! in_array($context, array("", "catalog", "content")) ){
+        if (! \in_array($context, ["", "catalog", "content"]) ){
             $this->pageNotFound();
         }
 
@@ -77,7 +74,7 @@ class SitemapController extends BaseFrontController {
 
         $cacheDir = $this->getCacheDir();
         $cacheKey = self::SITEMAP_CACHE_KEY . $lang . $context;
-        $cacheExpire = intval(ConfigQuery::read("sitemap_ttl", '7200')) ?: 7200;
+        $cacheExpire = \intval(ConfigQuery::read("sitemap_ttl", '7200')) ?: 7200;
 
         $cacheDriver = new FilesystemCache($cacheDir);
         if (!($this->checkAdmin() && "" !== $flush)) {
@@ -109,7 +106,6 @@ class SitemapController extends BaseFrontController {
         return $response;
     }
 
-
     /**
      * get the cache directory for sitemap
      *
@@ -133,7 +129,6 @@ class SitemapController extends BaseFrontController {
         return $this->getSecurityContext()->hasAdminUser();
     }
 
-
     /**
      * Check if a lang is used
      *
@@ -148,5 +143,4 @@ class SitemapController extends BaseFrontController {
 
         return (null !== $lang);
     }
-
 }

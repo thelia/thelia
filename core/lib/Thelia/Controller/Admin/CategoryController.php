@@ -126,7 +126,7 @@ class CategoryController extends AbstractSeoCrudController
         $this->hydrateSeoForm($object);
 
         // The "General" tab form
-        $data = array(
+        $data = [
             'id'                    => $object->getId(),
             'locale'                => $object->getLocale(),
             'title'                 => $object->getTitle(),
@@ -136,7 +136,7 @@ class CategoryController extends AbstractSeoCrudController
             'visible'               => $object->getVisible(),
             'parent'                => $object->getParent(),
             'default_template_id'   => $object->getDefaultTemplateId()
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(AdminForm::CATEGORY_MODIFICATION, FormType::class, $data);
@@ -179,12 +179,12 @@ class CategoryController extends AbstractSeoCrudController
 
     protected function getEditionArguments()
     {
-        return array(
+        return [
                 'category_id' => $this->getRequest()->get('category_id', 0),
                 'folder_id' => $this->getRequest()->get('folder_id', 0),
                 'current_tab' => $this->getRequest()->get('current_tab', 'general'),
                 'page' => $this->getRequest()->get('page', 1)
-        );
+        ];
     }
 
     protected function renderListTemplate($currentOrder)
@@ -194,12 +194,12 @@ class CategoryController extends AbstractSeoCrudController
 
         return $this->render(
             'categories',
-            array(
+            [
                 'category_order' => $currentOrder,
                 'product_order' => $product_order,
                 'category_id' => $this->getRequest()->get('category_id', 0),
                 'page' => $this->getRequest()->get('page', 1)
-            )
+            ]
         );
     }
 
@@ -248,7 +248,7 @@ class CategoryController extends AbstractSeoCrudController
     public function setToggleVisibilityAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -312,7 +312,7 @@ class CategoryController extends AbstractSeoCrudController
 
     public function getAvailableRelatedContentAction($categoryId, $folderId)
     {
-        $result = array();
+        $result = [];
 
         $folders = FolderQuery::create()->filterById($folderId)->find();
 
@@ -329,7 +329,7 @@ class CategoryController extends AbstractSeoCrudController
 
             if ($list !== null) {
                 foreach ($list as $item) {
-                    $result[] = array('id' => $item->getId(), 'title' => $item->getTitle());
+                    $result[] = ['id' => $item->getId(), 'title' => $item->getTitle()];
                 }
             }
         }
@@ -340,7 +340,7 @@ class CategoryController extends AbstractSeoCrudController
     public function addRelatedContentAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -371,7 +371,7 @@ class CategoryController extends AbstractSeoCrudController
     public function addRelatedPictureAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -381,7 +381,7 @@ class CategoryController extends AbstractSeoCrudController
     public function deleteRelatedContentAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 

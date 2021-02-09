@@ -2,7 +2,6 @@
 
 $config = include 'config/config.php';
 
-
 //TODO switch to array
 extract($config, EXTR_OVERWRITE);
 
@@ -18,7 +17,6 @@ if ($_SESSION['RF']["verify"] != "RESPONSIVEfilemanager")
 
 include 'include/mime_type_lib.php';
 
-
 if (
 	strpos($_POST['path'], '/') === 0
     || strpos($_POST['path'], '../') !== false
@@ -30,7 +28,6 @@ if (
 	response(trans('wrong path'.AddErrorLocation()), 400)->send();
 	exit;
 }
-
 
 if (strpos($_POST['name'], '/') !== false)
 {
@@ -52,8 +49,6 @@ if ( ! in_array(fix_strtolower($info['extension']), $ext))
 	response(trans('wrong extension'.AddErrorLocation()), 400)->send();
 	exit;
 }
-
-
 
 $file_name  = $info['basename'];
 $file_ext   = $info['extension'];
@@ -139,7 +134,6 @@ if($ftp){
     }
 
     die();
-
 }
 else
 {

@@ -30,7 +30,6 @@ class StateCreateEvent extends StateEvent
     protected $country;
 
     /**
-     * @param mixed $isocode
      */
     public function setIsocode($isocode)
     {
@@ -40,7 +39,6 @@ class StateCreateEvent extends StateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getIsocode()
     {
@@ -48,7 +46,6 @@ class StateCreateEvent extends StateEvent
     }
 
     /**
-     * @param mixed $locale
      */
     public function setLocale($locale)
     {
@@ -58,7 +55,6 @@ class StateCreateEvent extends StateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getLocale()
     {
@@ -66,7 +62,6 @@ class StateCreateEvent extends StateEvent
     }
 
     /**
-     * @param mixed $title
      */
     public function setTitle($title)
     {
@@ -76,7 +71,6 @@ class StateCreateEvent extends StateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getTitle()
     {

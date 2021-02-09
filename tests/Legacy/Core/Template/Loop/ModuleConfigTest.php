@@ -84,13 +84,13 @@ class ModuleConfigTest extends BaseLoopTestor
         Cheque::setConfigValue('testI18N', 'test-value-i18n', 'fr_FR', true);
 
         $this->instance->initializeArgs(
-            array(
+            [
                 "type" => "foo",
                 "name" => "foo",
                 "module" => "cheque",
                 "variable" => "testI18N",
                 "locale" => "fr_FR"
-            )
+            ]
         )
         ;
 
@@ -110,12 +110,12 @@ class ModuleConfigTest extends BaseLoopTestor
         $this->expectException(\LogicException::class);
 
         $this->instance->initializeArgs(
-            array(
+            [
                 "type" => "foo",
                 "name" => "foo",
                 "module" => "tagapouet",
                 "variable" => "xdes"
-            )
+            ]
         )
         ;
 

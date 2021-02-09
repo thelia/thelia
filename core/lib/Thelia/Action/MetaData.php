@@ -66,10 +66,10 @@ class MetaData extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::META_DATA_CREATE => array('createOrUpdate', 128),
-            TheliaEvents::META_DATA_UPDATE => array('createOrUpdate', 128),
-            TheliaEvents::META_DATA_DELETE => array('delete', 128),
-        );
+        return [
+            TheliaEvents::META_DATA_CREATE => ['createOrUpdate', 128],
+            TheliaEvents::META_DATA_UPDATE => ['createOrUpdate', 128],
+            TheliaEvents::META_DATA_DELETE => ['delete', 128],
+        ];
     }
 }

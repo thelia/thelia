@@ -20,13 +20,13 @@ namespace Thelia\Core\Event\MetaData;
 class MetaDataDeleteEvent extends MetaDataEvent
 {
     /** @var string */
-    protected $metaKey = null;
+    protected $metaKey;
 
     /** @var string */
-    protected $elementKey = null;
+    protected $elementKey;
 
     /** @var int */
-    protected $elementId = null;
+    protected $elementId;
 
     /**
      * MetaDataDeleteEvent constructor.

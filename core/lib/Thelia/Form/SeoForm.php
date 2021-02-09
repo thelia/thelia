@@ -31,18 +31,18 @@ class SeoForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("id", HiddenType::class, array(
+            ->add("id", HiddenType::class, [
                 'required' => true,
-                "constraints" => array(
-                    new GreaterThan(array('value' => 0)),
-                ),
-            ))
-            ->add("locale", HiddenType::class, array(
+                "constraints" => [
+                    new GreaterThan(['value' => 0]),
+                ],
+            ])
+            ->add("locale", HiddenType::class, [
                 'required' => true,
-                "constraints" => array(
+                "constraints" => [
                     new NotBlank(),
-                ),
-            ))
+                ],
+            ])
         ;
 
         // Add SEO Fields

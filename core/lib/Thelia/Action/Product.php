@@ -86,7 +86,6 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new product entry
      *
-     * @param \Thelia\Core\Event\Product\ProductCreateEvent $event
      */
     public function create(ProductCreateEvent $event)
     {
@@ -125,7 +124,6 @@ class Product extends BaseAction implements EventSubscriberInterface
      *******************/
 
     /**
-     * @param ProductCloneEvent $event
      * @throws \Exception
      */
     public function cloneProduct(ProductCloneEvent $event)
@@ -335,7 +333,6 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Change a product
      *
-     * @param \Thelia\Core\Event\Product\ProductUpdateEvent $event
      * @throws PropelException
      * @throws \Exception
      */
@@ -383,10 +380,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param UpdateSeoEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
-     * @return mixed
      */
     public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -396,7 +390,6 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product entry
      *
-     * @param \Thelia\Core\Event\Product\ProductDeleteEvent $event
      * @throws \Exception
      */
     public function delete(ProductDeleteEvent $event)
@@ -443,7 +436,6 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Toggle product visibility. No form used here
      *
-     * @param ProductToggleVisibilityEvent $event
      */
     public function toggleVisibility(ProductToggleVisibilityEvent $event)
     {
@@ -460,9 +452,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param UpdatePositionEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -661,9 +651,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Changes accessry position, selecting absolute ou relative change.
      *
-     * @param UpdatePositionEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @return Object
      */
     public function updateAccessoryPosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -674,9 +662,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param UpdatePositionEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @return Object
      */
     public function updateContentPosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -687,7 +673,6 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Update the value of a product feature.
      *
-     * @param FeatureProductUpdateEvent $event
      */
     public function updateFeatureProductValue(FeatureProductUpdateEvent $event)
     {
@@ -790,7 +775,6 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product feature value
      *
-     * @param FeatureProductDeleteEvent $event
      */
     public function deleteFeatureProductValue(FeatureProductDeleteEvent $event)
     {
@@ -822,9 +806,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * When a feature is removed from a template, the products which are using this feature should be updated.
      *
-     * @param TemplateDeleteFeatureEvent $event
      * @param string $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function deleteTemplateFeature(TemplateDeleteFeatureEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -846,9 +828,7 @@ class Product extends BaseAction implements EventSubscriberInterface
      * When an attribute is removed from a template, the conbinations and PSE of products which are using this template
      * should be updated.
      *
-     * @param TemplateDeleteAttributeEvent $event
      * @param string $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function deleteTemplateAttribute(TemplateDeleteAttributeEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -879,9 +859,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Check if is a product view and if product_id is visible
      *
-     * @param ViewCheckEvent $event
      * @param string $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -898,7 +876,6 @@ class Product extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param ViewCheckEvent $event
      * @throws NotFoundHttpException
      */
     public function viewProductIdNotVisible(ViewCheckEvent $event)
@@ -911,41 +888,41 @@ class Product extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::PRODUCT_CREATE                    => array("create", 128),
-            TheliaEvents::PRODUCT_CLONE                     => array("cloneProduct", 128),
-            TheliaEvents::PRODUCT_UPDATE                    => array("update", 128),
-            TheliaEvents::PRODUCT_DELETE                    => array("delete", 128),
-            TheliaEvents::PRODUCT_TOGGLE_VISIBILITY         => array("toggleVisibility", 128),
+        return [
+            TheliaEvents::PRODUCT_CREATE                    => ["create", 128],
+            TheliaEvents::PRODUCT_CLONE                     => ["cloneProduct", 128],
+            TheliaEvents::PRODUCT_UPDATE                    => ["update", 128],
+            TheliaEvents::PRODUCT_DELETE                    => ["delete", 128],
+            TheliaEvents::PRODUCT_TOGGLE_VISIBILITY         => ["toggleVisibility", 128],
 
-            TheliaEvents::PRODUCT_UPDATE_POSITION           => array("updatePosition", 128),
-            TheliaEvents::PRODUCT_UPDATE_SEO                => array("updateSeo", 128),
+            TheliaEvents::PRODUCT_UPDATE_POSITION           => ["updatePosition", 128],
+            TheliaEvents::PRODUCT_UPDATE_SEO                => ["updateSeo", 128],
 
-            TheliaEvents::PRODUCT_ADD_CONTENT               => array("addContent", 128),
-            TheliaEvents::PRODUCT_REMOVE_CONTENT            => array("removeContent", 128),
-            TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION   => array("updateContentPosition", 128),
+            TheliaEvents::PRODUCT_ADD_CONTENT               => ["addContent", 128],
+            TheliaEvents::PRODUCT_REMOVE_CONTENT            => ["removeContent", 128],
+            TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION   => ["updateContentPosition", 128],
 
-            TheliaEvents::PRODUCT_ADD_ACCESSORY             => array("addAccessory", 128),
-            TheliaEvents::PRODUCT_REMOVE_ACCESSORY          => array("removeAccessory", 128),
-            TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION => array("updateAccessoryPosition", 128),
+            TheliaEvents::PRODUCT_ADD_ACCESSORY             => ["addAccessory", 128],
+            TheliaEvents::PRODUCT_REMOVE_ACCESSORY          => ["removeAccessory", 128],
+            TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION => ["updateAccessoryPosition", 128],
 
-            TheliaEvents::PRODUCT_ADD_CATEGORY              => array("addCategory", 128),
-            TheliaEvents::PRODUCT_REMOVE_CATEGORY           => array("removeCategory", 128),
+            TheliaEvents::PRODUCT_ADD_CATEGORY              => ["addCategory", 128],
+            TheliaEvents::PRODUCT_REMOVE_CATEGORY           => ["removeCategory", 128],
 
-            TheliaEvents::PRODUCT_SET_TEMPLATE              => array("setProductTemplate", 128),
+            TheliaEvents::PRODUCT_SET_TEMPLATE              => ["setProductTemplate", 128],
 
-            TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE      => array("updateFeatureProductValue", 128),
-            TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE      => array("deleteFeatureProductValue", 128),
-
-            TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE         => array("deleteTemplateAttribute", 128),
-            TheliaEvents::TEMPLATE_DELETE_FEATURE           => array("deleteTemplateFeature", 128),
+            TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE      => ["updateFeatureProductValue", 128],
+            TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE      => ["deleteFeatureProductValue", 128],
+            
+            TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE         => ["deleteTemplateAttribute", 128],
+            TheliaEvents::TEMPLATE_DELETE_FEATURE           => ["deleteTemplateFeature", 128],
 
             // Those two have to be executed before
-            TheliaEvents::IMAGE_DELETE                      => array("deleteImagePSEAssociations", 192),
-            TheliaEvents::DOCUMENT_DELETE                   => array("deleteDocumentPSEAssociations", 192),
+            TheliaEvents::IMAGE_DELETE                      => ["deleteImagePSEAssociations", 192],
+            TheliaEvents::DOCUMENT_DELETE                   => ["deleteDocumentPSEAssociations", 192],
 
-            TheliaEvents::VIEW_CHECK                        => array('viewCheck', 128),
-            TheliaEvents::VIEW_PRODUCT_ID_NOT_VISIBLE       => array('viewProductIdNotVisible', 128),
-        );
+            TheliaEvents::VIEW_CHECK                        => ['viewCheck', 128],
+            TheliaEvents::VIEW_PRODUCT_ID_NOT_VISIBLE       => ['viewProductIdNotVisible', 128],
+        ];
     }
 }

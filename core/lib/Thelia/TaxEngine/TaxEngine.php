@@ -28,11 +28,11 @@ use Thelia\Model\State;
  */
 class TaxEngine
 {
-    protected $taxCountry = null;
-    protected $taxState = null;
-    protected $typeList = null;
+    protected $taxCountry;
+    protected $taxState;
+    protected $typeList;
 
-    protected $taxTypesDirectories = array();
+    protected $taxTypesDirectories = [];
 
     /** @var RequestStack */
     protected $requestStack;
@@ -71,7 +71,7 @@ class TaxEngine
     public function getTaxTypeList()
     {
         if ($this->typeList === null) {
-            $this->typeList = array();
+            $this->typeList = [];
 
             foreach ($this->taxTypesDirectories as $namespace => $directory) {
                 try {

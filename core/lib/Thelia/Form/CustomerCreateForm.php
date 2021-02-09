@@ -18,9 +18,9 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
-use Thelia\Core\Translation\Translator;
 
 /**
  * Class CustomerCreateForm
@@ -41,71 +41,71 @@ class CustomerCreateForm extends AddressCreateForm
             // Add
             ->add("auto_login", IntegerType::class)
             // Add Email address
-            ->add("email", EmailType::class, array(
-                "constraints" => array(
+            ->add("email", EmailType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
                     new Constraints\Callback(
-                            array($this, "verifyExistingEmail", )
+                            [$this, "verifyExistingEmail", ]
                         ),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("Email Address"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "email",
-                ),
-            ))
+                ],
+            ])
             // Add Login Information
-            ->add("password", PasswordType::class, array(
-                "constraints" => array(
+            ->add("password", PasswordType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
-                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
-                ),
+                    new Constraints\Length(["min" => ConfigQuery::read("password.length", 4)]),
+                ],
                 "label" => Translator::getInstance()->trans("Password"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "password",
-                ),
-            ))
-            ->add("password_confirm", PasswordType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("password_confirm", PasswordType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
-                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
-                    new Constraints\Callback(array($this, "verifyPasswordField")),
-                ),
+                    new Constraints\Length(["min" => ConfigQuery::read("password.length", 4)]),
+                    new Constraints\Callback([$this, "verifyPasswordField"]),
+                ],
                 "label" => Translator::getInstance()->trans("Password confirmation"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "password_confirmation",
-                ),
-            ))
+                ],
+            ])
             // Add Newsletter
-            ->add("newsletter", CheckboxType::class, array(
+            ->add("newsletter", CheckboxType::class, [
                 "label" => Translator::getInstance()->trans('I would like to receive the newsletter or the latest news.'),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "newsletter",
-                ),
+                ],
                 "required" => false,
-            ))
-            ->add('lang_id', IntegerType::class, array(
+            ])
+            ->add('lang_id', IntegerType::class, [
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Preferred language'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'lang_id',
-                ),
-            ))
+                ],
+            ])
         ;
 
         //confirm email
         if (\intval(ConfigQuery::read("customer_confirm_email", 0))) {
-            $this->formBuilder->add("email_confirm", EmailType::class, array(
-                "constraints" => array(
+            $this->formBuilder->add("email_confirm", EmailType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
-                    new Constraints\Callback(array($this, "verifyEmailField")),
-                ),
+                    new Constraints\Callback([$this, "verifyEmailField"]),
+                ],
                 "label" => Translator::getInstance()->trans("Confirm Email Address"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "email_confirm",
-                ),
-            ));
+                ],
+            ]);
         }
     }
 

@@ -2,10 +2,10 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\Base\AttributeAv as BaseAttributeAv;
-use Thelia\Core\Event\Attribute\AttributeAvEvent;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Core\Event\Attribute\AttributeAvEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Base\AttributeAv as BaseAttributeAv;
 
 class AttributeAv extends BaseAttributeAv
 {

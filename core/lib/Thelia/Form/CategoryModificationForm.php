@@ -49,7 +49,7 @@ class CategoryModificationForm extends CategoryCreationForm
                 'id',
                 HiddenType::class,
                 [
-                    'constraints' => [ new GreaterThan(array('value' => 0)) ]
+                    'constraints' => [ new GreaterThan(['value' => 0]) ]
                 ]
             )
             ->add(

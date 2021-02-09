@@ -2,9 +2,9 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\Base\FeatureProductQuery as BaseFeatureProductQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Log\Tlog;
+use Thelia\Model\Base\FeatureProductQuery as BaseFeatureProductQuery;
 
 /**
  * Skeleton subclass for performing query and update operations on the 'feature_product' table.

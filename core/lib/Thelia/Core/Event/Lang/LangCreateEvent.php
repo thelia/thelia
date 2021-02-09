@@ -34,7 +34,6 @@ class LangCreateEvent extends LangEvent
     protected $visible;
 
     /**
-     * @param mixed $code
      *
      * @return $this
      */
@@ -46,7 +45,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @return mixed
      */
     public function getCode()
     {
@@ -54,7 +52,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @return mixed
      */
     public function getDateTimeFormat()
     {
@@ -62,7 +59,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @param mixed $date_time_format
      */
     public function setDateTimeFormat($date_time_format)
     {
@@ -70,9 +66,7 @@ class LangCreateEvent extends LangEvent
         return $this;
     }
 
-
     /**
-     * @param mixed $date_format
      *
      * @return $this
      */
@@ -84,7 +78,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @return mixed
      */
     public function getDateFormat()
     {
@@ -92,7 +85,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @param mixed $locale
      *
      * @return $this
      */
@@ -104,7 +96,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @return mixed
      */
     public function getLocale()
     {
@@ -112,7 +103,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @param mixed $time_format
      *
      * @return $this
      */
@@ -124,7 +114,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @return mixed
      */
     public function getTimeFormat()
     {
@@ -132,7 +121,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @param mixed $title
      *
      * @return $this
      */
@@ -144,7 +132,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @return mixed
      */
     public function getTitle()
     {
@@ -152,7 +139,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @param mixed $decimal_separator
      */
     public function setDecimalSeparator($decimal_separator)
     {
@@ -162,7 +148,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @return mixed
      */
     public function getDecimalSeparator()
     {
@@ -170,7 +155,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @param mixed $decimals
      */
     public function setDecimals($decimals)
     {
@@ -180,7 +164,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @return mixed
      */
     public function getDecimals()
     {
@@ -188,7 +171,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @param mixed $thousands_separator
      */
     public function setThousandsSeparator($thousands_separator)
     {
@@ -198,7 +180,6 @@ class LangCreateEvent extends LangEvent
     }
 
     /**
-     * @return mixed
      */
     public function getThousandsSeparator()
     {

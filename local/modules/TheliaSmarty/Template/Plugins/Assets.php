@@ -90,7 +90,7 @@ class Assets extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor('block', 'stylesheets', $this, 'blockStylesheets'),
             new SmartyPluginDescriptor('block', 'javascripts', $this, 'blockJavascripts'),
             new SmartyPluginDescriptor('block', 'images', $this, 'blockImages'),
@@ -101,6 +101,6 @@ class Assets extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'stylesheet', $this, 'functionStylesheet'),
 
             new SmartyPluginDescriptor('function', 'declare_assets', $this, 'declareAssets')
-        );
+        ];
     }
 }

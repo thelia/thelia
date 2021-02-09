@@ -70,6 +70,5 @@ class ProductPricesExport extends JsonFileAbstractExport
         $stmt->execute();
 
         return $this->getDataJsonCache($stmt, 'product_price');
-
     }
 }

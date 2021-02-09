@@ -28,7 +28,6 @@ class Translator extends BaseTranslator
     protected static $instance = null;
 
     /**
-     * @param RequestStack $requestStack
      */
     public function __construct(RequestStack $requestStack)
     {
@@ -66,7 +65,7 @@ class Translator extends BaseTranslator
 
     public function trans(
         ?string $id,
-        array $parameters = array(),
+        array $parameters = [],
         string $domain = null,
         string $locale = null,
         $returnDefaultIfNotAvailable = true,

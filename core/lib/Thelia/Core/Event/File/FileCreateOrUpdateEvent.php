@@ -26,19 +26,19 @@ use Thelia\Files\FileModelInterface;
 class FileCreateOrUpdateEvent extends ActionEvent
 {
     /** @var FileModelInterface model to save */
-    protected $model = array();
+    protected $model = [];
 
     /** @var FileModelInterface model to save */
-    protected $oldModel = array();
+    protected $oldModel = [];
 
     /** @var UploadedFile Document file to save */
-    protected $uploadedFile = null;
+    protected $uploadedFile;
 
     /** @var int Document parent id */
-    protected $parentId = null;
+    protected $parentId;
 
     /** @var string Parent name */
-    protected $parentName = null;
+    protected $parentName;
 
     /**
      * Constructor

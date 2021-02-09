@@ -46,7 +46,7 @@ class TlogDestinationHtml extends AbstractTlogDestination
 
     public function getConfigs()
     {
-        return array(
+        return [
             new TlogDestinationConfig(
                 self::VAR_STYLE,
                 "CSS of each log line",
@@ -54,7 +54,7 @@ class TlogDestinationHtml extends AbstractTlogDestination
                 self::VALEUR_STYLE_DEFAUT,
                 TlogDestinationConfig::TYPE_TEXTAREA
             )
-        );
+        ];
     }
 
     public function write(&$res)

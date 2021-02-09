@@ -104,22 +104,21 @@ class AdminUtilities extends AbstractSmartyPlugin
         */
 
         if ($this->securityContext->isGranted(
-            array("ADMIN"),
-            $resource === null ? array() : array($resource),
-            $module === null ? array() : array($module),
-            array($access)
+            ["ADMIN"],
+            $resource === null ? [] : [$resource],
+            $module === null ? [] : [$module],
+            [$access]
         )
         ) {
-            return $this->fetchSnippet($smarty, 'includes/admin-utilities-position-block', array(
-                    'admin_utilities_go_up_url'           => URL::getInstance()->absoluteUrl($path, array('mode' => 'up', $url_parameter => $id)),
+            return $this->fetchSnippet($smarty, 'includes/admin-utilities-position-block', [
+                    'admin_utilities_go_up_url'           => URL::getInstance()->absoluteUrl($path, ['mode' => 'up', $url_parameter => $id]),
                     'admin_utilities_in_place_edit_class' => $in_place_edit_class,
                     'admin_utilities_object_id'           => $id,
                     'admin_utilities_current_position'    => $position,
-                    'admin_utilities_go_down_url'         => URL::getInstance()->absoluteUrl($path, array('mode' => 'down', $url_parameter => $id))
-            ));
-        } else {
+                    'admin_utilities_go_down_url'         => URL::getInstance()->absoluteUrl($path, ['mode' => 'down', $url_parameter => $id])
+            ]);
+        }  
             return $position;
-        }
     }
 
     /**
@@ -161,11 +160,11 @@ class AdminUtilities extends AbstractSmartyPlugin
             $order_change = $order;
         }
 
-        return $this->fetchSnippet($smarty, 'includes/admin-utilities-sortable-column-header', array(
+        return $this->fetchSnippet($smarty, 'includes/admin-utilities-sortable-column-header', [
                 'admin_utilities_sort_direction' => $sort_direction,
-                'admin_utilities_sorting_url'    => URL::getInstance()->absoluteUrl($path, array($request_parameter_name => $order_change)),
+                'admin_utilities_sorting_url'    => URL::getInstance()->absoluteUrl($path, [$request_parameter_name => $order_change]),
                 'admin_utilities_header_text'    => $label
-        ));
+        ]);
     }
 
     /**
@@ -175,10 +174,10 @@ class AdminUtilities extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor('function', 'admin_sortable_header', $this, 'generateSortableColumnHeader'),
             new SmartyPluginDescriptor('function', 'admin_position_block', $this, 'generatePositionChangeBlock'),
             new SmartyPluginDescriptor('function', 'option_offset', $this, 'optionOffsetGenerator'),
-        );
+        ];
     }
 }

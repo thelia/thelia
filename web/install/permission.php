@@ -28,7 +28,7 @@ try {
 
         <p class="lead"><?php echo $trans->trans('Checking PHP version and permissions'); ?></p>
         <ul class="list-unstyled list-group">
-            <?php foreach ($validationMessage as $item => $data): ?>
+            <?php foreach ($validationMessage as $item => $data) { ?>
                 <li class="list-group-item <?php if ($data['status']) {
                     echo 'text-success';
                 } else {
@@ -39,7 +39,7 @@ try {
                         echo $data['hint'];
                     } ?>
                 </li>
-            <?php endforeach; ?>
+            <?php } ?>
         </ul>
 
     </div>

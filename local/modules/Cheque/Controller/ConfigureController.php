@@ -70,7 +70,6 @@ class ConfigureController extends BaseAdminController
 
             // Everything is OK.
             return new RedirectResponse(URL::getInstance()->absoluteUrl('/admin/module/Cheque'));
-
         } catch (FormValidationException $ex) {
             // Form cannot be validated. Create the error message using
             // the BaseAdminController helper method.
@@ -93,6 +92,6 @@ class ConfigureController extends BaseAdminController
 
         // Do not redirect at this point, or the error context will be lost.
         // Just redisplay the current template.
-        return $this->render('module-configure', array('module_code' => 'Cheque'));
+        return $this->render('module-configure', ['module_code' => 'Cheque']);
     }
 }

@@ -42,7 +42,7 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
             new Argument(
                 'template-type',
                 new Type\TypeCollection(
-                    new Type\EnumType(array(
+                    new Type\EnumType([
                         'front-office',
                         'front',
                         'back-office',
@@ -50,7 +50,7 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
                         'pdf',
                         'email',
                         'mail'
-                    ))
+                    ])
                 )
             )
         );

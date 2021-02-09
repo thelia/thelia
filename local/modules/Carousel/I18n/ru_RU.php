@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'A descriptive title' => 'Описательный заголовок',
     'A short description, used when a summary or an introduction is required' => 'Краткое описание, используется когда необходимо',
     'A short text, used when an additional or supplemental information is required.' => 'Краткий текст используемый, когда необходима дополнительной информации.',
@@ -18,4 +18,4 @@ return array(
     'Summary' => 'Краткое описание',
     'The detailed description.' => 'Детальное описание',
     'Title' => 'Заголовок',
-);
+];

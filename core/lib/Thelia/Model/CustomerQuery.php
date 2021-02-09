@@ -26,13 +26,13 @@ class CustomerQuery extends BaseCustomerQuery
     {
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
-        $stats = array();
+        $stats = [];
         for ($day=1; $day<=$numberOfDay; $day++) {
             $dayCustomers = self::create()
                         ->filterByCreatedAt(sprintf("%s-%s-%s 00:00:00", $year, $month, $day), Criteria::GREATER_EQUAL)
                         ->filterByCreatedAt(sprintf("%s-%s-%s 23:59:59", $year, $month, $day), Criteria::LESS_EQUAL)
                         ->count();
-            $stats[] = array($day-1, $dayCustomers);
+            $stats[] = [$day-1, $dayCustomers];
         }
 
         return $stats;

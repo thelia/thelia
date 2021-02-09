@@ -116,7 +116,6 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     }
 
     /**
-     * @return mixed
      */
     public function getCompany()
     {
@@ -180,7 +179,6 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     }
 
     /**
-     * @return mixed
      */
     public function getLangId()
     {
@@ -287,7 +285,6 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     }
 
     /**
-     * @param  mixed $emailUpdateAllowed
      * @return $this
      */
     public function setEmailUpdateAllowed($emailUpdateAllowed)
@@ -298,7 +295,6 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     }
 
     /**
-     * @return mixed
      */
     public function getEmailUpdateAllowed()
     {

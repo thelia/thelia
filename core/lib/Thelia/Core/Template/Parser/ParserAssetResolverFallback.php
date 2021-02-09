@@ -34,7 +34,6 @@ class ParserAssetResolverFallback implements AssetResolverInterface
      * @param bool $debug the debug mode
      * @param string $declaredAssetsDirectory if not null, this is the assets directory declared in the {declare_assets} function of a template.
      * @param mixed $sourceTemplateName A template name, of false. If provided, the assets will be searched in this template directory instead of the current one.
-     * @return mixed
      */
     public function resolveAssetURL(
         $source,
@@ -68,7 +67,6 @@ class ParserAssetResolverFallback implements AssetResolverInterface
     {
         throw new \RuntimeException('if you want to use a parser, please register one');
     }
-
 
     /**
      * Return an asset source file path, and the template in which it was found

@@ -227,7 +227,6 @@ class OrderAddressEvent extends ActionEvent
     }
 
     /**
-     * @param \Thelia\Model\OrderAddress $orderAddress
      */
     public function setOrderAddress(OrderAddress $orderAddress)
     {
@@ -235,7 +234,6 @@ class OrderAddressEvent extends ActionEvent
     }
 
     /**
-     * @param \Thelia\Model\Order $order
      */
     public function setOrder(Order $order)
     {

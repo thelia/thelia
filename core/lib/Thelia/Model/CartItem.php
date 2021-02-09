@@ -16,7 +16,6 @@ class CartItem extends BaseCartItem
     protected $dispatcher;
 
     /**
-     * @param EventDispatcherInterface $dispatcher
      */
     public function setDisptacher(EventDispatcherInterface $dispatcher)
     {
@@ -24,7 +23,6 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param ConnectionInterface|null $con
      * @return bool
      */
     public function preInsert(ConnectionInterface $con = null)
@@ -39,7 +37,6 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param ConnectionInterface|null $con
      * @return bool
      */
     public function preUpdate(ConnectionInterface $con = null)
@@ -54,7 +51,6 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param ConnectionInterface|null $con
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function postInsert(ConnectionInterface $con = null)
@@ -69,7 +65,6 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param ConnectionInterface|null $con
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function postUpdate(ConnectionInterface $con = null)
@@ -147,7 +142,6 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param ConnectionInterface|null $con
      * @param null $locale
      * @return Product
      * @throws \Propel\Runtime\Exception\PropelException
@@ -170,8 +164,6 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param Country $country
-     * @param State|null $state
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -181,8 +173,6 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param Country $country
-     * @param State|null $state
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -194,8 +184,6 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param Country $country
-     * @param State|null $state
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -208,8 +196,6 @@ class CartItem extends BaseCartItem
 
     /**
      * @since Version 2.3
-     * @param Country $country
-     * @param State|null $state
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -220,8 +206,6 @@ class CartItem extends BaseCartItem
 
     /**
      * @since Version 2.3
-     * @param Country $country
-     * @param State|null $state
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */

@@ -39,9 +39,6 @@ class Render extends AbstractSmartyPlugin
     protected $container;
 
     /**
-     * @param ControllerResolver $controllerResolver
-     * @param RequestStack $requestStack
-     * @param ContainerInterface $container
      */
     public function __construct(ControllerResolver $controllerResolver, RequestStack $requestStack, ContainerInterface $container)
     {
@@ -71,7 +68,7 @@ class Render extends AbstractSmartyPlugin
         //Todo check if this is needed
         $controllerParameters = $this->controllerResolver->getArguments($request, $controller);
 
-        $response = call_user_func_array($controller, []);
+        $response = \call_user_func_array($controller, []);
 
         $this->requestStack->pop();
 
@@ -125,7 +122,7 @@ class Render extends AbstractSmartyPlugin
      */
     protected function filterArrayStrParam($param)
     {
-        if (is_array($param)) {
+        if (\is_array($param)) {
             return $param;
         }
 
@@ -139,7 +136,6 @@ class Render extends AbstractSmartyPlugin
     }
 
     /**
-     * @param  array $params
      * @param $name
      * @param  null  $default
      * @return mixed
@@ -150,7 +146,7 @@ class Render extends AbstractSmartyPlugin
     {
         $param = $this->getParam($params, $name, $default);
 
-        if (array_key_exists($name, $params)) {
+        if (\array_key_exists($name, $params)) {
             unset($params[$name]);
         }
 
@@ -162,8 +158,8 @@ class Render extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor('function', 'render', $this, 'processRender'),
-        );
+        ];
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Aborted orders' => 'Aborted orders',
     'An error occurred while reading from JSON file' => 'An error occurred while reading from JSON file',
     'Average cart' => 'Average cart',
@@ -30,4 +30,4 @@ return array(
     'Today' => 'Today',
     'YYYY-MM' => 'YYYY-MM',
     'Yesterday sales' => 'Yesterday sales',
-);
+];

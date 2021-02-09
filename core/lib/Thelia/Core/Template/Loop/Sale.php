@@ -22,9 +22,9 @@ use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\SaleQuery;
-use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
+use Thelia\Type\TypeCollection;
 
 /**
  * Sale loop
@@ -62,7 +62,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                 'order',
                 new TypeCollection(
                     new Type\EnumListType(
-                        array(
+                        [
                             'id',
                             'id-reverse',
                             'alpha',
@@ -79,7 +79,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                             'created-reverse',
                             'updated',
                             'updated-reverse'
-                        )
+                        ]
                     )
                 ),
                 'start-date'
@@ -127,7 +127,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
         $search = SaleQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('TITLE', 'SALE_LABEL', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'));
+        $this->configureI18nProcessing($search, ['TITLE', 'SALE_LABEL', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM']);
 
         $id = $this->getId();
 
@@ -234,12 +234,10 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                     $priceOffsetType = 'A';
                     $priceOffsetSymbol = $this->getCurrentRequest()->getSession()->getCurrency()->getSymbol();
                     break;
-
                 case \Thelia\Model\Sale::OFFSET_TYPE_PERCENTAGE:
                     $priceOffsetType = 'P';
                     $priceOffsetSymbol = '%';
                     break;
-
                 default:
                     $priceOffsetType = $priceOffsetSymbol = '?';
             }

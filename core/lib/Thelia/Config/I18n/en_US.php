@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     ' content create form' => ' content creation form',
     ' note: only non-visible documents can be associated.' => ' note: only non-visible documents can be associated.',
     '"%param" parameter cannot be empty in loop type: %type, name: %name' => '"%param" parameter cannot be empty in loop type: %type, name: %name',
@@ -865,4 +865,4 @@ return array(
     'update form' => 'update form',
     'value table header' => 'value table header',
     'value table row' => 'value table row',
-);
+];

@@ -12,14 +12,14 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\ProductSaleElementsProductImageQuery;
-use Propel\Runtime\ActiveQuery\Criteria;
 
 /**
  * Class ProductSaleElementsImage
@@ -35,7 +35,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInterface
 {
     /**
-     * @param LoopResult $loopResult
      *
      * @return LoopResult
      */
@@ -129,7 +128,6 @@ class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInter
                         ->endUse()
                     ;
                     break;
-
                 case "position-reverse":
                     $query
                         ->useProductImageQuery()

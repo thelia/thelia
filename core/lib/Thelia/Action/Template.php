@@ -41,9 +41,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new template entry
      *
-     * @param \Thelia\Core\Event\Template\TemplateCreateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function create(TemplateCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -51,7 +49,6 @@ class Template extends BaseAction implements EventSubscriberInterface
         
         $template
 
-            
             ->setLocale($event->getLocale())
             ->setName($event->getTemplateName())
             
@@ -66,7 +63,6 @@ class Template extends BaseAction implements EventSubscriberInterface
      *
      * @param \Thelia\Core\Event\Template\TemplateCreateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function duplicate(TemplateDuplicateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -111,9 +107,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     /**
      * Change a product template
      *
-     * @param \Thelia\Core\Event\Template\TemplateUpdateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function update(TemplateUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -131,9 +125,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product template entry
      *
-     * @param \Thelia\Core\Event\Template\TemplateDeleteEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Exception
      */
     public function delete(TemplateDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -191,9 +183,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param UpdatePositionEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function updateAttributePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -203,9 +193,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param UpdatePositionEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function updateFeaturePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -268,20 +256,20 @@ class Template extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::TEMPLATE_CREATE          => array("create", 128),
-            TheliaEvents::TEMPLATE_UPDATE          => array("update", 128),
-            TheliaEvents::TEMPLATE_DELETE          => array("delete", 128),
-            TheliaEvents::TEMPLATE_DUPLICATE       => array("duplicate", 128),
+        return [
+            TheliaEvents::TEMPLATE_CREATE          => ["create", 128],
+            TheliaEvents::TEMPLATE_UPDATE          => ["update", 128],
+            TheliaEvents::TEMPLATE_DELETE          => ["delete", 128],
+            TheliaEvents::TEMPLATE_DUPLICATE       => ["duplicate", 128],
             
-            TheliaEvents::TEMPLATE_ADD_ATTRIBUTE    => array("addAttribute", 128),
-            TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE => array("deleteAttribute", 128),
+            TheliaEvents::TEMPLATE_ADD_ATTRIBUTE    => ["addAttribute", 128],
+            TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE => ["deleteAttribute", 128],
             
-            TheliaEvents::TEMPLATE_ADD_FEATURE    => array("addFeature", 128),
-            TheliaEvents::TEMPLATE_DELETE_FEATURE => array("deleteFeature", 128),
+            TheliaEvents::TEMPLATE_ADD_FEATURE    => ["addFeature", 128],
+            TheliaEvents::TEMPLATE_DELETE_FEATURE => ["deleteFeature", 128],
             
-            TheliaEvents::TEMPLATE_CHANGE_ATTRIBUTE_POSITION => array('updateAttributePosition', 128),
-            TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION   => array('updateFeaturePosition', 128),
-        );
+            TheliaEvents::TEMPLATE_CHANGE_ATTRIBUTE_POSITION => ['updateAttributePosition', 128],
+            TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION   => ['updateFeaturePosition', 128],
+        ];
     }
 }

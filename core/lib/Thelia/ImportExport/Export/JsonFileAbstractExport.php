@@ -106,7 +106,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
             }
 
             $processedData[$fieldAlias] = null;
-            if (array_key_exists($fieldName, $data)) {
+            if (\array_key_exists($fieldName, $data)) {
                 $processedData[$fieldAlias] = $data[$fieldName];
             }
         }

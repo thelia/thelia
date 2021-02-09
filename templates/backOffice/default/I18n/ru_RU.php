@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     ' (default)' => ' (по умолчанию)',
     '%count more...' => '%count еще...',
     '%count shipping zone(s) are attached to this module: %zones. Click here to change' => '%count зоны доставки прикреплены к этому модулю: %zones. Нажмите здесь, чтобы изменить',
@@ -1304,4 +1304,4 @@ return array(
     'version' => 'версия',
     'warning' => 'предупреждение',
     'you can combine taxes in tax rules and chose if they are applied one after the other or at the same time : it allows to apply taxes on an already taxed price or not.' => 'вы можете комбинировать налоги в налоговых правилах и выбирать как они будут применяться - один после другого или одновременно : это позволяет применять налоги на цену с налогом или без.',
-);
+];

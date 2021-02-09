@@ -3,17 +3,12 @@
 namespace Thelia\Model;
 
 use Thelia\Model\Base\TaxRule as BaseTaxRule;
-
 use Thelia\TaxEngine\Calculator;
 use Thelia\TaxEngine\OrderProductTaxCollection;
 
 class TaxRule extends BaseTaxRule
 {
-
-
     /**
-     * @param Product $product
-     * @param Country $country
      * @param $untaxedAmount
      * @param $untaxedPromoAmount
      * @param null    $askedLocale

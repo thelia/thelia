@@ -17,19 +17,19 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Cart\CartCreateEvent;
 use Thelia\Core\Event\Cart\CartDuplicationEvent;
+use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Cart\CartPersistEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
-use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
-use Thelia\Model\Currency as CurrencyModel;
-use Thelia\Model\CartItem;
 use Thelia\Model\Cart as CartModel;
+use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\Tools\ProductPriceTools;
@@ -73,9 +73,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * add an article in the current cart
      *
-     * @param \Thelia\Core\Event\Cart\CartEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function addItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -125,7 +123,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * Delete specify article present into cart
      *
-     * @param \Thelia\Core\Event\Cart\CartEvent $event
      */
     public function deleteItem(CartEvent $event)
     {
@@ -144,7 +141,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     /**
      * Clear the cart
-     * @param CartEvent $event
      */
     public function clear(CartEvent $event)
     {
@@ -159,9 +155,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * don't use Form here just test the Request.
      *
-     * @param \Thelia\Core\Event\Cart\CartEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function changeItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -194,8 +188,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * Refresh article's price
      *
-     * @param \Thelia\Model\Cart     $cart
-     * @param \Thelia\Model\Currency $currency
      */
     public function updateCartPrices(CartModel $cart, CurrencyModel $currency)
     {
@@ -227,8 +219,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * increase the quantity for an existing cartItem
      *
-     * @param EventDispatcherInterface $dispatcher
-     * @param CartItem $cartItem
      * @param float $quantity
      *
      * @throws \Exception
@@ -247,12 +237,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * try to attach a new item to an existing cart
      *
-     * @param EventDispatcherInterface $dispatcher
-     * @param \Thelia\Model\Cart       $cart
      * @param int                      $productId
-     * @param ProductSaleElements      $productSaleElements
      * @param float                    $quantity
-     * @param ProductPriceTools        $productPrices
      *
      * @return CartItem
      */
@@ -322,9 +308,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * Search if cart already exists in session. If not try to restore it from the cart cookie,
      * or duplicate an old one.
      *
-     * @param CartRestoreEvent $cartRestoreEvent
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function restoreCurrentCart(CartRestoreEvent $cartRestoreEvent, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -352,8 +336,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * if needed or create duplicate the current cart if the customer is not the same as customer already present in
      * the cart.
      *
-     * @param CartRestoreEvent $cartRestoreEvent
-     * @param EventDispatcherInterface $dispatcher
      * @return CartModel
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
@@ -375,9 +357,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * The cart token is saved in a cookie so we try to retrieve it. Then the customer is checked.
      *
-     * @param CartRestoreEvent $cartRestoreEvent
      * @param $cookieName
-     * @param EventDispatcherInterface $dispatcher
      * @return CartModel
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
@@ -436,7 +416,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param EventDispatcherInterface $dispatcher
      * @return CartModel
      */
     protected function dispatchNewCart(EventDispatcherInterface $dispatcher)
@@ -451,7 +430,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new, empty cart object, and assign it to the current customer, if any.
      *
-     * @param CartCreateEvent $cartCreateEvent
      */
     public function createEmptyCart(CartCreateEvent $cartCreateEvent)
     {
@@ -478,8 +456,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * Duplicate an existing Cart. If a customer ID is provided the created cart will be attached to this customer.
      *
-     * @param EventDispatcherInterface $dispatcher
-     * @param CartModel $cart
      * @param CustomerModel $customer
      * @return CartModel
      */
@@ -521,17 +497,17 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::CART_PERSIST => array("persistCart", 128),
-            TheliaEvents::CART_RESTORE_CURRENT => array("restoreCurrentCart", 128),
-            TheliaEvents::CART_CREATE_NEW => array("createEmptyCart", 128),
-            TheliaEvents::CART_ADDITEM => array("addItem", 128),
-            TheliaEvents::CART_FINDITEM => array("findCartItem", 128),
-            TheliaEvents::CART_DELETEITEM => array("deleteItem", 128),
-            TheliaEvents::CART_UPDATEITEM => array("changeItem", 128),
-            TheliaEvents::CART_CLEAR => array("clear", 128),
-            TheliaEvents::CHANGE_DEFAULT_CURRENCY => array("updateCart", 128),
-        );
+        return [
+            TheliaEvents::CART_PERSIST => ["persistCart", 128],
+            TheliaEvents::CART_RESTORE_CURRENT => ["restoreCurrentCart", 128],
+            TheliaEvents::CART_CREATE_NEW => ["createEmptyCart", 128],
+            TheliaEvents::CART_ADDITEM => ["addItem", 128],
+            TheliaEvents::CART_FINDITEM => ["findCartItem", 128],
+            TheliaEvents::CART_DELETEITEM => ["deleteItem", 128],
+            TheliaEvents::CART_UPDATEITEM => ["changeItem", 128],
+            TheliaEvents::CART_CLEAR => ["clear", 128],
+            TheliaEvents::CHANGE_DEFAULT_CURRENCY => ["updateCart", 128],
+        ];
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Brand\BrandImageModification;
@@ -12,13 +13,10 @@ use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\BrandImage as BaseBrandImage;
 use Thelia\Model\Breadcrumb\BrandBreadcrumbTrait;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
-use Thelia\Files\FileModelInterface;
-
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class BrandImage extends BaseBrandImage implements FileModelInterface, BreadcrumbInterface
 {
-
     use PositionManagementTrait;
     use BrandBreadcrumbTrait;
 
@@ -49,9 +47,9 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
-            array(
+            [
                 "brand_id" => $this->getBrandId(),
-            )
+            ]
         );
 
         return true;
@@ -109,7 +107,6 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
     }
 
     /**
-     * @param int $objectId the ID of the object
      *
      * @return string the URL to redirect to after update from the back-office
      */

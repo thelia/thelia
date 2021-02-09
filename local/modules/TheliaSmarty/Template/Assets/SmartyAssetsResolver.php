@@ -15,11 +15,11 @@ namespace TheliaSmarty\Template\Assets;
 use Thelia\Core\Template\Assets\AssetManagerInterface;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
 use Thelia\Core\Template\ParserInterface;
-use TheliaSmarty\Template\SmartyParser;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
+use TheliaSmarty\Template\SmartyParser;
 
 class SmartyAssetsResolver implements AssetResolverInterface
 {
@@ -62,7 +62,6 @@ class SmartyAssetsResolver implements AssetResolverInterface
      * @param bool $debug the debug mode
      * @param string $declaredAssetsDirectory if not null, this is the assets directory declared in the {declare_assets} function of a template.
      * @param mixed $sourceTemplateName A template name, of false. If provided, the assets will be searched in this template directory instead of the current one.
-     * @return mixed
      */
     public function resolveAssetURL($source, $file, $type, ParserInterface $parserInterface, $filters = [], $debug = false, $declaredAssetsDirectory = null, $sourceTemplateName = false)
     {
@@ -93,7 +92,6 @@ class SmartyAssetsResolver implements AssetResolverInterface
 
         return $url;
     }
-
 
     /**
      * Return an asset source file path.
@@ -225,7 +223,6 @@ class SmartyAssetsResolver implements AssetResolverInterface
         // Not found !
         return null;
     }
-
 
     /**
      * Be sure that the pat separator of a pathname is always the platform path separator.

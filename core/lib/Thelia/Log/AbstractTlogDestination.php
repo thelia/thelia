@@ -15,10 +15,10 @@ namespace Thelia\Log;
 abstract class AbstractTlogDestination
 {
     //Tableau de TlogDestinationConfig paramétrant la destination
-    protected $configs = array();
+    protected $configs = [];
 
     //Tableau des lignes de logs stockés avant utilisation par ecrire()
-    protected $logs = array();
+    protected $logs = [];
 
     public function __construct()
     {
@@ -72,7 +72,7 @@ abstract class AbstractTlogDestination
 
     protected function insertAfterBody(&$res, $logdata)
     {
-        $match = array();
+        $match = [];
 
         if (preg_match("/(<body[^>]*>)/i", $res, $match)) {
             $res = str_replace($match[0], $match[0] . "\n" . $logdata, $res);

@@ -66,14 +66,14 @@ class StateController extends AbstractCrudController
      */
     protected function hydrateObjectForm($object)
     {
-        $data = array(
+        $data = [
             'id' => $object->getId(),
             'locale' => $object->getLocale(),
             'visible' => $object->getVisible() ? true : false,
             'country_id' => $object->getCountryId(),
             'title' => $object->getTitle(),
             'isocode' => $object->getIsocode(),
-        );
+        ];
 
         return $this->createForm(AdminForm::STATE_MODIFICATION, FormType::class, $data);
     }
@@ -136,7 +136,6 @@ class StateController extends AbstractCrudController
     /**
      * Get the created object from an event.
      *
-     * @param unknown $createEvent
      */
     protected function getObjectFromEvent($event)
     {
@@ -188,11 +187,11 @@ class StateController extends AbstractCrudController
     {
         return $this->render(
             "states",
-            array(
+            [
                 'page' => $this->getRequest()->get('page', 1),
                 "page_limit" => $this->getRequest()->get('page_limit', 50),
                 'page_order' => $this->getRequest()->get('page_order', 1)
-            )
+            ]
         );
     }
 
@@ -206,11 +205,11 @@ class StateController extends AbstractCrudController
 
     protected function getEditionArgument()
     {
-        return array(
+        return [
             'state_id' => $this->getRequest()->get('state_id', 0),
             'page' => $this->getRequest()->get('page', 1),
             'page_order' => $this->getRequest()->get('page_order', 1)
-        );
+        ];
     }
 
     /**

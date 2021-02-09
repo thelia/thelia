@@ -12,8 +12,8 @@
 
 namespace Thelia\Command;
 
-use Propel\Runtime\Connection\ConnectionWrapper;
 use \Thelia\Model\Map\ProductTableMap;
+use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -47,16 +47,16 @@ class ReloadDatabaseCommand extends BaseModuleGenerate
         $connection = $connection->getWrappedConnection();
 
         $database = new Database($connection);
-        $output->writeln(array(
+        $output->writeln([
            '',
            '<info>starting reloaded database, please wait</info>'
-        ));
+        ]);
         $database->insertSql();
-        $output->writeln(array(
+        $output->writeln([
             '',
             '<info>Database reloaded with success</info>',
             ''
-        ));
+        ]);
 
         return 0;
     }

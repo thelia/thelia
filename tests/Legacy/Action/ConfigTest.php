@@ -66,7 +66,6 @@ class ConfigTest extends BaseAction
     }
 
     /**
-     * @param ConfigModel $config
      * @depends testCreate
      * @return ConfigModel
      */
@@ -94,7 +93,6 @@ class ConfigTest extends BaseAction
     }
 
     /**
-     * @param ConfigModel $config
      * @depends testSetValue
      * @return ConfigModel
      */
@@ -134,7 +132,6 @@ class ConfigTest extends BaseAction
     }
 
     /**
-     * @param ConfigModel $config
      * @depends testModify
      */
     public function testDelete(ConfigModel $config)

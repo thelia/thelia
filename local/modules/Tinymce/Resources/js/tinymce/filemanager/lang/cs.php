@@ -1,7 +1,6 @@
 <?php
 
-return array(
-
+return [
 	'Select' => 'Vybrat',
 	'Erase' => 'Smazat',
 	'Open' => 'Otevřít',
@@ -120,4 +119,4 @@ return array(
 	'GB' => "GB",
 	'TB' => "TB",
 	'total size' => "Celková velikost",
-);
+];

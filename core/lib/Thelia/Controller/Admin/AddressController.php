@@ -44,7 +44,7 @@ class AddressController extends AbstractCrudController
 
     public function useAddressAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -102,7 +102,7 @@ class AddressController extends AbstractCrudController
      */
     protected function createFormDataArray($object)
     {
-        return array(
+        return [
             "label" => $object->getLabel(),
             "title" => $object->getTitleId(),
             "firstname" => $object->getFirstname(),
@@ -117,7 +117,7 @@ class AddressController extends AbstractCrudController
             "cellphone" => $object->getCellphone(),
             "phone" => $object->getPhone(),
             "company" => $object->getCompany()
-        );
+        ];
     }
 
     /**
@@ -204,7 +204,6 @@ class AddressController extends AbstractCrudController
     /**
      * Get the created object from an event.
      *
-     * @param unknown $createEvent
      */
     protected function getObjectFromEvent($event)
     {
@@ -242,7 +241,6 @@ class AddressController extends AbstractCrudController
     /**
      * Render the main list template
      *
-     * @param unknown $currentOrder, if any, null otherwise.
      */
     protected function renderListTemplate($currentOrder)
     {
@@ -255,11 +253,11 @@ class AddressController extends AbstractCrudController
      */
     protected function renderEditionTemplate()
     {
-        return $this->render('customer-edit', array(
+        return $this->render('customer-edit', [
             "address_id"  => $this->getRequest()->get('address_id'),
             "page"        => $this->getRequest()->get('page'),
             "customer_id" => $this->getCustomerId()
-        ));
+        ]);
     }
 
     /**
@@ -316,8 +314,7 @@ class AddressController extends AbstractCrudController
     {
         if (null !== $address = $this->getExistingObject()) {
             return $address->getCustomerId();
-        } else {
+        }  
             return $this->getRequest()->get('customer_id', 0);
-        }
     }
 }

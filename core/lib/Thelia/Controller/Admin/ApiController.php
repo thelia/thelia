@@ -67,7 +67,6 @@ class ApiController extends BaseAdminController
     }
 
     /**
-     * @param  Api                                        $api
      * @return \Symfony\Component\HttpFoundation\Response
      */
     private function retrieveSecureKey(Api $api)
@@ -117,7 +116,7 @@ class ApiController extends BaseAdminController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("%obj creation", array('%obj' => 'Api')),
+                $this->getTranslator()->trans("%obj creation", ['%obj' => 'Api']),
                 $error_msg,
                 $form,
                 $e

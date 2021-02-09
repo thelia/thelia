@@ -119,7 +119,8 @@ while (1) {
     $rep = readStdin(true);
     if ($rep == 'y') {
         break;
-    } elseif ($rep == 'n') {
+    }
+    if ($rep == 'n') {
         cliOutput("Update aborted", 'warning');
         exit(0);
     }
@@ -133,7 +134,8 @@ while (1) {
     if ($rep == 'y') {
         $backup = true;
         break;
-    } elseif ($rep == 'n') {
+    }
+    if ($rep == 'n') {
         $backup = false;
         break;
     }
@@ -162,8 +164,6 @@ try {
     $updateError = $ex;
 }
 
-
-
 foreach ($update->getMessages() as $message) {
     cliOutput($message[0], $message[1]);
 }
@@ -175,7 +175,6 @@ if (null === $updateError) {
         cliOutput($update->getPostInstructions());
         cliOutput('===================================');
     }
-
 } else {
     cliOutput(sprintf('Sorry, an unexpected error has occured : %s', $updateError->getMessage()), 'error');
     print $updateError->getTraceAsString() . PHP_EOL;
@@ -198,16 +197,16 @@ if (null === $updateError) {
                         $update->getBackupFile()
                     ), 'error');
                     exit(5);
-                } else {
+                }  
                     cliOutput("Database successfully restore.");
                     exit(5);
-                }
+                
                 break;
-            } elseif ($rep == 'n') {
+            }
+            if ($rep == 'n') {
                 exit(0);
             }
         }
-
     }
 }
 
@@ -238,7 +237,6 @@ if (true === $hasDeleteError) {
 
 cliOutput("Update process finished.", 'info');
 exit(0);
-
 
 /***************************************************
  * Utils

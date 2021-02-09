@@ -17,8 +17,8 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Form\BaseForm;
 use Thelia\Core\Translation\Translator;
+use Thelia\Form\BaseForm;
 
 /**
  * Class AreaPostageForm
@@ -50,20 +50,20 @@ class AreaPostageForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('area_id', IntegerType::class, array(
-                'constraints' => array(
-                    new GreaterThan(array('value' => 0)),
+            ->add('area_id', IntegerType::class, [
+                'constraints' => [
+                    new GreaterThan(['value' => 0]),
                     new NotBlank(),
-                ),
-            ))
-            ->add('postage', NumberType::class, array(
-                'constraints' => array(
-                    new GreaterThanOrEqual(array('value' => 0)),
+                ],
+            ])
+            ->add('postage', NumberType::class, [
+                'constraints' => [
+                    new GreaterThanOrEqual(['value' => 0]),
                     new NotBlank(),
-                ),
-                'label_attr' => array('for' => 'area_postage'),
+                ],
+                'label_attr' => ['for' => 'area_postage'],
                 'label' => Translator::getInstance()->trans('Postage'),
-            ))
+            ])
         ;
     }
 

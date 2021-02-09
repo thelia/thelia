@@ -83,7 +83,7 @@ class HookController extends AbstractCrudController
             $newHooks      = [];
             $existingHooks = [];
             foreach ($hooks as $hook) {
-                if (array_key_exists($hook["code"], $allHooks)) {
+                if (\array_key_exists($hook["code"], $allHooks)) {
                     $existingHooks[] = $hook["code"];
                 } else {
                     $newHooks[] = $hook;

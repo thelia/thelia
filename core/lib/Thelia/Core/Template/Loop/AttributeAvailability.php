@@ -18,14 +18,14 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Model\AttributeAvQuery;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\AttributeAv as AttributeAvModel;
+use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\Map\AttributeCombinationTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
-use Thelia\Type\TypeCollection;
 use Thelia\Type;
+use Thelia\Type\TypeCollection;
 
 /**
  * AttributeAvailability loop
@@ -59,7 +59,7 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
+                    new Type\EnumListType(['id', 'id_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse'])
                 ),
                 'manual'
             )

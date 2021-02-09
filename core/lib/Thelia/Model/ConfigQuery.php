@@ -16,7 +16,7 @@ use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
  */
 class ConfigQuery extends BaseConfigQuery
 {
-    protected static $cache = array();
+    protected static $cache = [];
 
     /**
      *
@@ -26,11 +26,10 @@ class ConfigQuery extends BaseConfigQuery
      *
      * @param $search
      * @param  null  $default
-     * @return mixed
      */
     public static function read($search, $default = null)
     {
-        if (array_key_exists($search, self::$cache)) {
+        if (\array_key_exists($search, self::$cache)) {
             return self::$cache[$search];
         }
 
@@ -66,13 +65,13 @@ class ConfigQuery extends BaseConfigQuery
     public static function resetCache($key = null)
     {
         if ($key) {
-            if (array_key_exists($key, self::$cache)) {
+            if (\array_key_exists($key, self::$cache)) {
                 unset(self::$cache[$key]);
 
                 return true;
             }
         }
-        self::$cache = array();
+        self::$cache = [];
 
         return true;
     }

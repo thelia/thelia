@@ -115,32 +115,32 @@ class RemoveXAmountTest extends TestCase
 
         $coupon->set(
             $stubFacade, 'XMAS', 'XMAS Coupon', 'Coupon for Springbreak removing 10€ if you have a cart between 40.00€ and 400.00€ (excluded)',
-            $description, array('amount' => 10.00), true, true, true, true, 254, $date->setTimestamp(strtotime("today + 3 months")),
+            $description, ['amount' => 10.00], true, true, true, true, 254, $date->setTimestamp(strtotime("today + 3 months")),
             new ObjectCollection(),
             new ObjectCollection(),
             false
         );
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();

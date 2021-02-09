@@ -145,7 +145,7 @@ class SecurityContext
 
             $resource = strtolower($resource);
 
-            if (!array_key_exists($resource, $userPermissions)) {
+            if (!\array_key_exists($resource, $userPermissions)) {
                 return false;
             }
 
@@ -161,13 +161,13 @@ class SecurityContext
                 continue;
             }
 
-            if (!array_key_exists('module', $userPermissions)) {
+            if (!\array_key_exists('module', $userPermissions)) {
                 return false;
             }
 
             $module = strtolower($module);
 
-            if (!array_key_exists($module, $userPermissions['module'])) {
+            if (!\array_key_exists($module, $userPermissions['module'])) {
                 return false;
             }
 
@@ -193,15 +193,13 @@ class SecurityContext
 
         if (null === $user) {
             return false;
-        } else {
+        }  
             return $this->isUserGranted($roles, $resources, $modules, $accesses, $user);
-        }
     }
 
     /**
      * look if a user has the required role.
      *
-     * @param array $roles
      * @return null|UserInterface
      */
     public function checkRole(array $roles)

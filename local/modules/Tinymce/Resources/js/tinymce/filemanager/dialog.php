@@ -21,7 +21,6 @@ $_SESSION['RF']["verify"] = "RESPONSIVEfilemanager";
 if(isset($_POST['submit'])){
 	include 'upload.php';
 }else{
-
 $lang = $config['default_language'];
 $languages = include 'lang/languages.php';
 if (isset($_GET['lang']))
@@ -105,7 +104,6 @@ if (($ftp && !$ftp->isDir($ftp_base_folder.$upload_dir.$rfm_subfolder.$subdir)) 
 	$rfm_subfolder = "";
 }
 
-
 if (trim($rfm_subfolder) == "")
 {
 	$cur_dir			= $upload_dir.$subdir;
@@ -123,8 +121,8 @@ else
 
 if($ftp){
 	$cur_dir = $ftp_base_folder.$cur_dir;
-	$cur_path = str_replace(array('/..','..'),'',$cur_dir);
-	$thumbs_path = str_replace(array('/..','..'),'',$ftp_base_folder.$ftp_thumbs_dir.$rfm_subfolder);
+	$cur_path = str_replace(['/..','..'],'',$cur_dir);
+	$thumbs_path = str_replace(['/..','..'],'',$ftp_base_folder.$ftp_thumbs_dir.$rfm_subfolder);
 	$parent = $ftp_base_folder.$parent;
 }
 
@@ -208,7 +206,6 @@ if (isset($_GET["sort_by"]))
 	$sort_by = $_SESSION['RF']['sort_by'] = fix_get_params($_GET["sort_by"]);
 } else $sort_by = $_SESSION['RF']['sort_by'];
 
-
 if (!isset($_SESSION['RF']['descending']))
 {
 	$_SESSION['RF']['descending'] = TRUE;
@@ -221,7 +218,7 @@ if (isset($_GET["descending"]))
 	$descending = $_SESSION['RF']['descending'];
 }
 
-$boolarray = Array(false => 'false', true => 'true');
+$boolarray = [false => 'false', true => 'true'];
 
 $return_relative_url = isset($_GET['relative_url']) && $_GET['relative_url'] == "1" ? true : false;
 
@@ -264,7 +261,7 @@ elseif($type_param==0 && $_GET['field_id']=='') $apply = 'apply_none';
 elseif($type_param==3) $apply = 'apply_video';
 else $apply = 'apply';
 
-$get_params = array(
+$get_params = [
 	'editor'    => $editor,
 	'type'      => $type_param,
 	'lang'      => $lang,
@@ -274,7 +271,7 @@ $get_params = array(
 	'field_id'  => $field_id,
 	'relative_url' => $return_relative_url,
 	'akey' 		=> (isset($_GET['akey']) && $_GET['akey'] != '' ? $_GET['akey'] : 'key')
-);
+];
 if(isset($_GET['CKEditorFuncNum'])){
 	$get_params['CKEditorFuncNum'] = $_GET['CKEditorFuncNum'];
 	$get_params['CKEditor'] = (isset($_GET['CKEditor'])? $_GET['CKEditor'] : '');
@@ -418,7 +415,7 @@ $get_params = http_build_query($get_params);
 	<input type="hidden" id="file_number_limit_js" value="<?php echo $file_number_limit_js;?>" />
 	<input type="hidden" id="sort_by" value="<?php echo $sort_by;?>" />
 	<input type="hidden" id="descending" value="<?php echo $descending?1:0;?>" />
-	<input type="hidden" id="current_url" value="<?php echo str_replace(array('&filter='.$filter,'&sort_by='.$sort_by,'&descending='.intval($descending)),array(''),$base_url.$_SERVER['REQUEST_URI']);?>" />
+	<input type="hidden" id="current_url" value="<?php echo str_replace(['&filter='.$filter,'&sort_by='.$sort_by,'&descending='.intval($descending)],[''],$base_url.$_SERVER['REQUEST_URI']);?>" />
 	<input type="hidden" id="lang_show_url" value="<?php echo trans('Show_url');?>" />
 	<input type="hidden" id="copy_cut_files_allowed" value="<?php if($copy_cut_files) echo 1; else echo 0;?>" />
 	<input type="hidden" id="copy_cut_dirs_allowed" value="<?php if($copy_cut_dirs) echo 1; else echo 0;?>" />
@@ -547,7 +544,7 @@ if($ftp){
 $n_files= count($files);
 
 //php sorting
-$sorted=array();
+$sorted=[];
 //$current_folder=array();
 //$prev_folder=array();
 $current_files_number = 0;
@@ -564,17 +561,15 @@ foreach($files as $k=>$file){
 			$current_folders_number++;
 			$file_ext=trans('Type_dir');
 		}
-		$sorted[$k]=array(
+		$sorted[$k]=[
 			'file'=>$file['name'],
 			'file_lcase'=>strtolower($file['name']),
 			'date'=>$date,
 			'size'=>$size,
 			'permissions' => $file['permissions'],
 			'extension'=>strtolower($file_ext)
-		);
+		];
 	}else{
-
-
 		if($file!="." && $file!=".."){
 			if(is_dir($current_path.$rfm_subfolder.$subdir.$file)){
 				$date=filemtime($current_path.$rfm_subfolder.$subdir. $file);
@@ -585,14 +580,14 @@ foreach($files as $k=>$file){
 					$size=0;
 				}
 				$file_ext=trans('Type_dir');
-				$sorted[$k]=array(
+				$sorted[$k]=[
 					'file'=>$file,
 					'file_lcase'=>strtolower($file),
 					'date'=>$date,
 					'size'=>$size,
 					'permissions' =>'',
 					'extension'=>strtolower($file_ext)
-				);
+				];
 				if($show_folder_size){
 					$sorted[$k]['nfiles'] = $nfiles;
 					$sorted[$k]['nfolders'] = $nfolders;
@@ -603,19 +598,18 @@ foreach($files as $k=>$file){
 				$date=filemtime($file_path);
 				$size=filesize($file_path);
 				$file_ext = substr(strrchr($file,'.'),1);
-				$sorted[$k]=array(
+				$sorted[$k]=[
 					'file'=>$file,
 					'file_lcase'=>strtolower($file),
 					'date'=>$date,
 					'size'=>$size,
 					'permissions' =>'',
 					'extension'=>strtolower($file_ext)
-				);
+				];
 			}
 		}
 	}
 }
-
 
 // Should lazy loading be enabled
 $lazy_loading_enabled= ($lazy_loading_file_number_threshold == 0 || $lazy_loading_file_number_threshold != -1 && $n_files > $lazy_loading_file_number_threshold) ? true : false;
@@ -653,7 +647,7 @@ if(!$descending){
 }
 
 if($subdir!=""){
-	$sorted = array_merge(array(array('file'=>'..')),$sorted);
+	$sorted = array_merge([['file'=>'..']],$sorted);
 }
 $files=$sorted;
 
@@ -808,8 +802,7 @@ $files=$sorted;
 		<!--ul class="thumbnails ff-items"-->
 		<ul class="grid cs-style-2 <?php echo "list-view".$view;?>" id="main-item-container">
 		<?php
-		$jplayer_ext=array("mp4","flv","webmv","webma","webm","m4a","m4v","ogv","oga","mp3","midi","mid","ogg","wav");
-
+		$jplayer_ext=["mp4","flv","webmv","webma","webm","m4a","m4v","ogv","oga","mp3","midi","mid","ogg","wav"];
 
 		foreach ($files as $file_array) {
 			$file=$file_array['file'];
@@ -900,14 +893,12 @@ $files=$sorted;
 			<?php
 			}
 
-
-			$files_prevent_duplicate = array();
+			$files_prevent_duplicate = [];
 			foreach ($files as $nu=>$file_array) {
 				$file=$file_array['file'];
 
 				if($file == '.' || $file == '..' || $file_array['extension']==trans('Type_dir') || in_array($file, $hidden_files) || !in_array(fix_strtolower($file_array['extension']), $ext) || ($filter!='' && $n_files>$file_number_limit_js && stripos($file,$filter)===false))
 					continue;
-
 				$filename=substr($file, 0, '-' . (strlen($file_array['extension']) + 1));
 				if(!$ftp){
 					$file_path=$current_path.$rfm_subfolder.$subdir.$file;
@@ -952,7 +943,6 @@ $files=$sorted;
 						$mini_src = $src_thumb = $config['ftp_base_url'].$ftp_thumbs_dir.$subdir. $file;
 						$creation_thumb_path = "/".$config['ftp_base_folder'].$ftp_thumbs_dir.$subdir. $file;
 					}else{
-
 						$creation_thumb_path = $mini_src = $src_thumb = $thumbs_path.$subdir. $file;
 
 						if(!file_exists($src_thumb) ){
@@ -1066,7 +1056,7 @@ $files=$sorted;
 					<a class="tip-right modalAV <?php if($is_audio){ echo "audio"; }else{ echo "video"; } ?>"
 					title="<?php echo trans('Preview')?>" data-url="ajax_calls.php?action=media_preview&title=<?php echo $filename;?>&file=<?php echo $rfm_subfolder.$subdir.$file;?>"
 					href="javascript:void('');" ><i class=" icon-eye-open"></i></a>
-					<?php }elseif(in_array($file_array['extension'],array('dwg', 'dxf', 'hpgl', 'plt', 'spl', 'step', 'stp', 'iges', 'igs', 'sat', 'cgm', 'svg'))){ ?>
+					<?php }elseif(in_array($file_array['extension'],['dwg', 'dxf', 'hpgl', 'plt', 'spl', 'step', 'stp', 'iges', 'igs', 'sat', 'cgm', 'svg'])){ ?>
 					<a class="tip-right file-preview-btn" title="<?php echo trans('Preview')?>" data-url="ajax_calls.php?action=cad_preview&title=<?php echo $filename;?>&file=<?php echo $rfm_subfolder.$subdir.$file;?>"
 					href="javascript:void('');" ><i class=" icon-eye-open"></i></a>
 					<?php }elseif($preview_text_files && in_array($file_array['extension'],$previewable_text_file_exts)){ ?>
@@ -1106,9 +1096,9 @@ $files=$sorted;
 <script>
 	var files_prevent_duplicate = new Array();
 	<?php
-	foreach ($files_prevent_duplicate as $key => $value): ?>
+	foreach ($files_prevent_duplicate as $key => $value) { ?>
 		files_prevent_duplicate[<?php echo $key;?>] = '<?php echo $value;?>';
-	<?php endforeach;?>
+	<?php }?>
 </script>
 
 	<!-- lightbox div start -->

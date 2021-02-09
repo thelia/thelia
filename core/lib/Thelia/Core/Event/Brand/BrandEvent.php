@@ -34,7 +34,6 @@ class BrandEvent extends ActionEvent
     }
 
     /**
-     * @param  \Thelia\Model\Brand $brand
      * @return BrandEvent
      */
     public function setBrand(Brand $brand)

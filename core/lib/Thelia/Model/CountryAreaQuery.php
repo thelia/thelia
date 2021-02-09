@@ -26,7 +26,7 @@ class CountryAreaQuery extends BaseCountryAreaQuery
                 ->filterByStateId($state->getId())
                 ->find();
 
-            if (count($countryAreaList) > 0) {
+            if (\count($countryAreaList) > 0) {
                 return $countryAreaList;
             }
         }

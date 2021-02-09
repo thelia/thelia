@@ -12,9 +12,9 @@
 
 namespace Thelia\Log\Destination;
 
+use Thelia\Core\Translation\Translator;
 use Thelia\Log\AbstractTlogDestination;
 use Thelia\Log\TlogDestinationConfig;
-use Thelia\Core\Translation\Translator;
 
 class TlogDestinationFile extends AbstractTlogDestination
 {
@@ -65,7 +65,7 @@ class TlogDestinationFile extends AbstractTlogDestination
     {
         if (! empty($filePath)) {
             if (! is_file($filePath)) {
-                $dir = dirname($filePath);
+                $dir = \dirname($filePath);
                 if (! is_dir($dir)) {
                     mkdir($dir, 0777, true);
                 }
@@ -97,7 +97,7 @@ class TlogDestinationFile extends AbstractTlogDestination
 
     public function getConfigs()
     {
-        return array(
+        return [
             new TlogDestinationConfig(
                 self::VAR_PATH_FILE,
                 'Absolute file path',
@@ -112,7 +112,7 @@ class TlogDestinationFile extends AbstractTlogDestination
                 self::VALEUR_MODE_DEFAULT,
                 TlogDestinationConfig::TYPE_TEXTFIELD
             )
-        );
+        ];
     }
 
     public function add($texte)

@@ -20,7 +20,7 @@ namespace Thelia\Core\Template\Element;
 class FlashMessage implements \Iterator
 {
     private $position;
-    protected $collection = array();
+    protected $collection = [];
 
     public function __construct()
     {

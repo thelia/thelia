@@ -25,7 +25,7 @@ use Thelia\Tools\URL;
  */
 class RewritingRetrieverTest extends TestCase
 {
-    protected $container = null;
+    protected $container;
 
     public function setUp(): void
     {
@@ -33,12 +33,12 @@ class RewritingRetrieverTest extends TestCase
 
         $stubRouterAdmin = $this->getMockBuilder('\Symfony\Component\Routing\Router')
             ->disableOriginalConstructor()
-            ->setMethods(array('getContext'))
+            ->setMethods(['getContext'])
             ->getMock();
 
         $stubRequestContext = $this->getMockBuilder('\Symfony\Component\Routing\RequestContext')
             ->disableOriginalConstructor()
-            ->setMethods(array('getHost'))
+            ->setMethods(['getHost'])
             ->getMock();
 
         $stubRequestContext->expects($this->any())
@@ -92,7 +92,7 @@ class RewritingRetrieverTest extends TestCase
         $retriever->loadViewUrl('view', 'fr_FR', 1);
 
         $this->assertEquals(URL::getInstance()->absoluteUrl('foo.html'), $retriever->rewrittenUrl);
-        $this->assertEquals(URL::getInstance()->viewUrl('view', array('lang' => 'fr_FR', 'view_id' => 1)), $retriever->url);
+        $this->assertEquals(URL::getInstance()->viewUrl('view', ['lang' => 'fr_FR', 'view_id' => 1]), $retriever->url);
     }
 
     public function testLoadSpecificUrl()
@@ -103,7 +103,7 @@ class RewritingRetrieverTest extends TestCase
         $retrieverQuery = $this->createMock('\Thelia\Model\RewritingUrlQuery');
         $retrieverQuery->expects($this->any())
             ->method('getSpecificUrlQuery')
-            ->with('view', 'fr_FR', 1, array('foo0' => 'bar0', 'foo1' => 'bar1'))
+            ->with('view', 'fr_FR', 1, ['foo0' => 'bar0', 'foo1' => 'bar1'])
             ->will($this->returnValue($searchResult));
 
         $retriever = new RewritingRetriever();
@@ -111,9 +111,9 @@ class RewritingRetrieverTest extends TestCase
         $rewritingUrlQuery = $this->getProperty('rewritingUrlQuery');
         $rewritingUrlQuery->setValue($retriever, $retrieverQuery);
 
-        $retriever->loadSpecificUrl('view', 'fr_FR', 1, array('foo0' => 'bar0', 'foo1' => 'bar1'));
+        $retriever->loadSpecificUrl('view', 'fr_FR', 1, ['foo0' => 'bar0', 'foo1' => 'bar1']);
 
         $this->assertEquals('foo.html', $retriever->rewrittenUrl);
-        $this->assertEquals(URL::getInstance()->viewUrl('view', array('foo0' => 'bar0', 'foo1' => 'bar1', 'lang' => 'fr_FR', 'view_id' => 1)), $retriever->url);
+        $this->assertEquals(URL::getInstance()->viewUrl('view', ['foo0' => 'bar0', 'foo1' => 'bar1', 'lang' => 'fr_FR', 'view_id' => 1]), $retriever->url);
     }
 }

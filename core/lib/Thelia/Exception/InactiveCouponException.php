@@ -22,7 +22,6 @@ use Thelia\Log\Tlog;
  */
 class InactiveCouponException extends \RuntimeException
 {
-
     public function __construct($couponCode)
     {
         $message = Translator::getInstance()->trans('Coupon code %code is disabled.', ['%code' => $couponCode ]);

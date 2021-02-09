@@ -20,7 +20,6 @@ $now = (new \DateTime())->format('Y-m-d H:i:s');
 
 $pdo->prepare($sql)->execute([ $lastOrderId, $now, $now ]);
 
-
 // Add ignored_module_hook.created_at if not exist
 $ignoredModuleHookCreatedAtColumnExitSql = "SHOW COLUMNS FROM `ignored_module_hook` LIKE 'created_at'";
 if (0 === count($pdo->query($ignoredModuleHookCreatedAtColumnExitSql)->fetchAll())) {
@@ -34,5 +33,4 @@ if (0 === count($pdo->query($ignoredModuleHookUpdatedAtColumnExitSql)->fetchAll(
     $addIgnoredModuleHookUpdatedAtColumnSql = "ALTER TABLE `ignored_module_hook` ADD `updated_at` DATETIME NOT NULL;";
     $pdo->query($addIgnoredModuleHookUpdatedAtColumnSql);
 }
-
 

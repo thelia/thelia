@@ -25,18 +25,18 @@ class AdministratorModificationForm extends AdministratorCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", HiddenType::class, array(
+            ->add("id", HiddenType::class, [
                 "required" => true,
-                "constraints" => array(
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                                array($this, "verifyAdministratorId")
+                                [$this, "verifyAdministratorId"]
                     ),
-                ),
-                "attr" => array(
+                ],
+                "attr" => [
                     "id" => "administrator_update_id",
-                ),
-            ))
+                ],
+            ])
         ;
 
         $this->formBuilder->get('password')->setRequired(false);

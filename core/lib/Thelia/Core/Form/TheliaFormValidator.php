@@ -65,7 +65,7 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
                 }
 
                 return $form;
-            } else {
+            }  
                 $errorMessage = null;
                 if ($form->get("error_message")->getData() != null) {
                     $errorMessage = $form->get("error_message")->getData();
@@ -79,8 +79,7 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
                 }
                 $aBaseForm->setError(true);
                 throw new FormValidationException($errorMessage);
-            }
-        } else {
+        }  
             throw new FormValidationException(
                 sprintf(
                     $this->translator->trans(
@@ -89,13 +88,11 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
                     $expectedMethod
                 )
             );
-        }
     }
 
     /**
      * Get all errors that occurred in a form
      *
-     * @param  \Symfony\Component\Form\Form $form
      * @return string                       the error string
      */
     public function getErrorMessages(Form $form)

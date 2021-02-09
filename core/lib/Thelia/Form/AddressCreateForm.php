@@ -50,138 +50,138 @@ class AddressCreateForm extends FirewallForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("label", TextType::class, array(
-                    "constraints" => array(
+            ->add("label", TextType::class, [
+                    "constraints" => [
                         new NotBlank(),
-                    ),
+                    ],
                     "label" => Translator::getInstance()->trans("Address label"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "address_label",
-                    ),
-                ))
-            ->add("title", TextType::class, array(
-                    "constraints" => array(
+                    ],
+                ])
+            ->add("title", TextType::class, [
+                    "constraints" => [
                         new Constraints\NotBlank(),
-                    ),
+                    ],
                     "label" => Translator::getInstance()->trans("Title"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "title",
-                    ),
-                ))
-            ->add("firstname", TextType::class, array(
-                    "constraints" => array(
+                    ],
+                ])
+            ->add("firstname", TextType::class, [
+                    "constraints" => [
                         new Constraints\NotBlank(),
-                    ),
+                    ],
                     "label" => Translator::getInstance()->trans("First Name"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "firstname",
-                    ),
-                ))
-            ->add("lastname", TextType::class, array(
-                    "constraints" => array(
+                    ],
+                ])
+            ->add("lastname", TextType::class, [
+                    "constraints" => [
                         new Constraints\NotBlank(),
-                    ),
+                    ],
                     "label" => Translator::getInstance()->trans("Last Name"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "lastname",
-                    ),
-                ))
-            ->add("company", TextType::class, array(
+                    ],
+                ])
+            ->add("company", TextType::class, [
                     "label" => Translator::getInstance()->trans("Company Name"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "company",
-                    ),
+                    ],
                     "required" => false,
-                ))
-            ->add("address1", TextType::class, array(
-                    "constraints" => array(
+                ])
+            ->add("address1", TextType::class, [
+                    "constraints" => [
                         new Constraints\NotBlank(),
-                    ),
+                    ],
                     "label" => Translator::getInstance()->trans("Street Address"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "address1",
-                    ),
-                ))
-            ->add("address2", TextType::class, array(
+                    ],
+                ])
+            ->add("address2", TextType::class, [
                     "label" => Translator::getInstance()->trans("Address Line 2"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "address2",
-                    ),
+                    ],
                     "required" => false,
-                ))
-            ->add("address3", TextType::class, array(
+                ])
+            ->add("address3", TextType::class, [
                     "label" => Translator::getInstance()->trans("Address Line 3"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "address3",
-                    ),
+                    ],
                     "required" => false,
-                ))
-            ->add("city", TextType::class, array(
-                    "constraints" => array(
+                ])
+            ->add("city", TextType::class, [
+                    "constraints" => [
                         new Constraints\NotBlank(),
-                    ),
+                    ],
                     "label" => Translator::getInstance()->trans("City"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "city",
-                    ),
-                ))
-            ->add("zipcode", TextType::class, array(
-                    "constraints" => array(
+                    ],
+                ])
+            ->add("zipcode", TextType::class, [
+                    "constraints" => [
                         new Constraints\NotBlank(),
                         new Constraints\Callback(
-                                array($this, "verifyZipCode")
+                                [$this, "verifyZipCode"]
                         ),
-                    ),
+                    ],
                     "label" => Translator::getInstance()->trans("Zip code"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "zipcode",
-                    ),
-                ))
-            ->add("country", TextType::class, array(
-                    "constraints" => array(
+                    ],
+                ])
+            ->add("country", TextType::class, [
+                    "constraints" => [
                         new Constraints\NotBlank(),
-                    ),
+                    ],
                     "label" => Translator::getInstance()->trans("Country"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "country",
-                    ),
-                ))
-            ->add("state", TextType::class, array(
+                    ],
+                ])
+            ->add("state", TextType::class, [
                 "required" => false,
-                "constraints" => array(
+                "constraints" => [
                     new Constraints\Callback(
-                            array($this, "verifyState")
+                            [$this, "verifyState"]
                      ),
-                ),
+                ],
 
                 "label" => Translator::getInstance()->trans("State *"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "state",
-                ),
-            ))
+                ],
+            ])
             // Phone
-            ->add("phone", TextType::class, array(
+            ->add("phone", TextType::class, [
                     "label" => Translator::getInstance()->trans("Phone"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "phone",
-                    ),
+                    ],
                     "required" => false,
-                ))
-            ->add("cellphone", TextType::class, array(
+                ])
+            ->add("cellphone", TextType::class, [
                     "label" => Translator::getInstance()->trans("Cellphone"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "cellphone",
-                    ),
+                    ],
                     "required" => false,
-                ))
+                ])
             // Default address
-            ->add("is_default", CheckboxType::class, array(
+            ->add("is_default", CheckboxType::class, [
                     "label" => Translator::getInstance()->trans("Make this address as my primary address"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "default_address",
-                    ),
+                    ],
                     "required" => false,
-                ))
+                ])
         ;
     }
 

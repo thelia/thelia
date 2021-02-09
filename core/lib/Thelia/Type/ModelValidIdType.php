@@ -23,7 +23,7 @@ use Thelia\Exception\TypeException;
  */
 class ModelValidIdType extends BaseType
 {
-    protected $expectedModelActiveRecordQuery = null;
+    protected $expectedModelActiveRecordQuery;
 
     /**
      * @param $expectedModelActiveRecord
@@ -76,13 +76,13 @@ class ModelValidIdType extends BaseType
             }
         }
 
-        $choices = array();
+        $choices = [];
         foreach ($query->find() as $item) {
             $choices[$item->getId()] = method_exists($item, "getTitle") ? $item->getTitle() : $item->getId();
         }
 
-        return array(
+        return [
             "choices" => $choices,
-        );
+        ];
     }
 }

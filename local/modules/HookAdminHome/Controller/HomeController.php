@@ -37,7 +37,7 @@ class HomeController extends BaseAdminController
 
     public function loadStatsAjaxAction()
     {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::VIEW)) {
             return $response;
         }
 
@@ -134,7 +134,7 @@ class HomeController extends BaseAdminController
         /* cancelled orders */
         $data->series[] = $cancelledOrderSeries = new \stdClass();
         $cancelledOrderSeries->color = self::testHexColor('cancelled_orders_color', '#d9534f');
-        $cancelledOrderSeries->data = OrderQuery::getMonthlyOrdersStats($month, $year, array(5));
+        $cancelledOrderSeries->data = OrderQuery::getMonthlyOrdersStats($month, $year, [5]);
         $cancelledOrderSeries->valueFormat = "%d";
 
         return $data;
@@ -151,6 +151,4 @@ class HomeController extends BaseAdminController
 
         return preg_match('/^#[a-f0-9]{6}$/i', $hexColor) ? $hexColor : $default;
     }
-
-
 }

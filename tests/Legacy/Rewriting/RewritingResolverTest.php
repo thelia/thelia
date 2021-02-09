@@ -13,9 +13,9 @@
 namespace Thelia\Tests\Rewriting;
 
 use PHPUnit\Framework\TestCase;
+use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Model\RewritingArgument;
 use Thelia\Rewriting\RewritingResolver;
-use Propel\Runtime\Collection\ObjectCollection;
 
 /**
  *
@@ -54,11 +54,11 @@ class RewritingResolverTest extends TestCase
 
     public function testGetOtherParameters()
     {
-        $rewritingArguments = array(
-            array('Parameter' => 'foo0', 'Value' => 'bar0'),
-            array('Parameter' => 'foo1', 'Value' => 'bar1'),
-            array('Parameter' => 'foo2', 'Value' => 'bar2'),
-        );
+        $rewritingArguments = [
+            ['Parameter' => 'foo0', 'Value' => 'bar0'],
+            ['Parameter' => 'foo1', 'Value' => 'bar1'],
+            ['Parameter' => 'foo2', 'Value' => 'bar2'],
+        ];
         $searchResult = new ObjectCollection();
         $searchResult->setModel('\Thelia\Model\RewritingArgument');
         $searchResult->fromArray($rewritingArguments);
@@ -71,11 +71,11 @@ class RewritingResolverTest extends TestCase
         $method = $this->getMethod('getOtherParameters');
         $actual = $method->invoke($resolver);
 
-        $expected = array(
+        $expected = [
             'foo0' => 'bar0',
             'foo1' => 'bar1',
             'foo2' => 'bar2',
-        );
+        ];
 
         $this->assertEquals($expected, $actual);
     }
@@ -134,6 +134,6 @@ class RewritingResolverTest extends TestCase
         $this->assertEquals('view', $resolver->view);
         $this->assertEquals('viewId', $resolver->viewId);
         $this->assertEquals('locale', $resolver->locale);
-        $this->assertEquals(array('foo0' => 'bar0', 'foo1' => 'bar1', 'foo2' => 'bar2'), $resolver->otherParameters);
+        $this->assertEquals(['foo0' => 'bar0', 'foo1' => 'bar1', 'foo2' => 'bar2'], $resolver->otherParameters);
     }
 }

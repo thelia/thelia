@@ -67,9 +67,9 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         $response = Response::create(
             $this->parser->render(
                 'general_error.html',
-                array(
+                [
                     "error_message" => $message
-                )
+                ]
             ),
             403
         );
@@ -107,8 +107,8 @@ class HttpException extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             KernelEvents::EXCEPTION => ["checkHttpException", 128],
-        );
+        ];
     }
 }

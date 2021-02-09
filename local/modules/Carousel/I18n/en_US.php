@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'A descriptive title' => 'A descriptive title',
     'A short description, used when a summary or an introduction is required' => 'A short description, used when a summary or an introduction is required',
     'A short text, used when an additional or supplemental information is required.' => 'A short text, used when an additional or supplemental information is required.',
@@ -19,4 +19,4 @@ return array(
     'The detailed description.' => 'The detailed description.',
     'Title' => 'Title',
     'YYYY-MM-DD' => 'AAAA-MM-JJ',
-);
+];

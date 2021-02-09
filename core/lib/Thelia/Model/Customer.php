@@ -3,18 +3,17 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Propel;
+use Thelia\Core\Event\Customer\CustomerEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\Role\Role;
+use Thelia\Core\Security\User\UserInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\Base\Customer as BaseCustomer;
 use Thelia\Model\Exception\InvalidArgumentException;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Security\User\UserInterface;
-use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Runtime\Propel;
 use Thelia\Model\Map\CustomerTableMap;
-use Thelia\Core\Security\Role\Role;
-use Thelia\Core\Event\Customer\CustomerEvent;
-use Thelia\Core\Translation\Translator;
-
 
 /**
  * Skeleton subclass for representing a row from the 'customer' table.
@@ -315,7 +314,7 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function getRoles()
     {
-        return array(new Role('CUSTOMER'));
+        return [new Role('CUSTOMER')];
     }
 
     /**

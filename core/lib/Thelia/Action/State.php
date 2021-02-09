@@ -73,7 +73,6 @@ class State extends BaseAction implements EventSubscriberInterface
     /**
      * Toggle State visibility
      *
-     * @param StateToggleVisibilityEvent $event
      */
     public function toggleVisibility(StateToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -93,11 +92,11 @@ class State extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::STATE_CREATE => array('create', 128),
-            TheliaEvents::STATE_UPDATE => array('update', 128),
-            TheliaEvents::STATE_DELETE => array('delete', 128),
-            TheliaEvents::STATE_TOGGLE_VISIBILITY => array('toggleVisibility', 128)
-        );
+        return [
+            TheliaEvents::STATE_CREATE => ['create', 128],
+            TheliaEvents::STATE_UPDATE => ['update', 128],
+            TheliaEvents::STATE_DELETE => ['delete', 128],
+            TheliaEvents::STATE_TOGGLE_VISIBILITY => ['toggleVisibility', 128]
+        ];
     }
 }

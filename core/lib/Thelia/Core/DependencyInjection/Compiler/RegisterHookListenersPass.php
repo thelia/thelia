@@ -16,8 +16,8 @@ use Propel\Runtime\Propel;
 use ReflectionException;
 use ReflectionMethod;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Thelia\Core\Hook\BaseHook;
@@ -28,8 +28,8 @@ use Thelia\Model\Base\IgnoredModuleHookQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
-use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleHook;
+use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
 
 /**
@@ -52,7 +52,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
         // We have to check if Propel is initialized before registering hooks
         $managers = Propel::getServiceContainer()->getConnectionManagers();
-        if (! array_key_exists('TheliaMain', $managers)) {
+        if (! \array_key_exists('TheliaMain', $managers)) {
             return;
         }
 
@@ -88,7 +88,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
             $moduleCode = null;
             $module = null;
-            if (array_key_exists('module', $properties)) {
+            if (\array_key_exists('module', $properties)) {
                 $moduleProperty = $properties['module'];
 
                 if ($moduleProperty instanceof Definition) {
@@ -219,13 +219,11 @@ class RegisterHookListenersPass implements CompilerPassInterface
         }
     }
 
-
     /**
      * First the new hooks are positioning next to the last module hook.
      * Next, if the module, hook and module hook is active, a new listener is
      * added to the service definition.
      *
-     * @param ContainerBuilder $container
      * @param Definition $definition The service definition
      */
     protected function addHooksMethodCall(ContainerBuilder $container, Definition $definition)
@@ -304,10 +302,10 @@ class RegisterHookListenersPass implements CompilerPassInterface
                             ->getDefinition($moduleHook->getClassname())
                             ->addMethodCall(
                                 'addTemplate',
-                                array(
+                                [
                                     $moduleHookEventName,
                                     $moduleHook->getTemplates()
-                                )
+                                ]
                             )
                         ;
                     }
@@ -315,7 +313,6 @@ class RegisterHookListenersPass implements CompilerPassInterface
             }
         }
     }
-
 
     /**
      * get the hook type according to the type attribute of the hook tag
@@ -330,11 +327,11 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
         if (null !== $name && \is_string($name)) {
             $name = preg_replace("[^a-z]", "", strtolower(trim($name)));
-            if (\in_array($name, array('bo', 'back', 'backoffice'))) {
+            if (\in_array($name, ['bo', 'back', 'backoffice'])) {
                 $type = TemplateDefinition::BACK_OFFICE;
-            } elseif (\in_array($name, array('email'))) {
+            } elseif (\in_array($name, ['email'])) {
                 $type = TemplateDefinition::EMAIL;
-            } elseif (\in_array($name, array('pdf'))) {
+            } elseif (\in_array($name, ['pdf'])) {
                 $type = TemplateDefinition::PDF;
             }
         }
@@ -409,7 +406,6 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
     /**
      * @param $event
-     * @return mixed
      */
     protected function getMethodName($event)
     {
@@ -417,21 +413,20 @@ class RegisterHookListenersPass implements CompilerPassInterface
             if (!empty($event['templates'])) {
                 $event['method'] = BaseHook::INJECT_TEMPLATE_METHOD_NAME;
                 return $event;
-            } else {
+            }  
                 $callback = function ($matches) {
                     return strtoupper($matches[0]);
                 };
                 $event['method'] = 'on' . preg_replace_callback(
-                    array(
+                    [
                         '/(?<=\b)[a-z]/i',
                         '/[^a-z0-9]/i',
-                    ),
+                    ],
                     $callback,
                     $event['event']
                 );
                 $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
                 return $event;
-            }
         }
 
         return $event;

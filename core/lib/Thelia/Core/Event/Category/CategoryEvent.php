@@ -12,15 +12,15 @@
 
 namespace Thelia\Core\Event\Category;
 
-use Thelia\Model\Category;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Category;
 
 /**
  * @deprecated since 2.4, please use \Thelia\Model\Event\CategoryEvent
  */
 class CategoryEvent extends ActionEvent
 {
-    public $category = null;
+    public $category;
 
     public function __construct(Category $category = null)
     {

@@ -39,13 +39,13 @@ class Update
 
     const INSTRUCTION_DIR = 'update/instruction/';
 
-    protected $version = null;
+    protected $version;
 
     /** @var bool */
-    protected $usePropel = null;
+    protected $usePropel;
 
     /** @var null|Tlog */
-    protected $logger = null;
+    protected $logger;
 
     /** @var array log messages */
     protected $logs = [];
@@ -57,10 +57,10 @@ class Update
     protected $updatedVersions = [];
 
     /** @var PDO  */
-    protected $connection = null;
+    protected $connection;
 
     /** @var string|null  */
-    protected $backupFile = null;
+    protected $backupFile;
 
     /** @var string */
     protected $backupDir = 'local/backup/';
@@ -127,7 +127,7 @@ class Update
      */
     protected function getEnvParameters()
     {
-        $parameters = array();
+        $parameters = [];
         foreach ($_SERVER as $key => $value) {
             if (0 === strpos($key, 'SYMFONY__')) {
                 $parameters[strtolower(str_replace('__', '.', substr($key, 9)))] = $value;
@@ -149,7 +149,7 @@ class Update
 
     public function process()
     {
-        $this->updatedVersions = array();
+        $this->updatedVersions = [];
 
         $currentVersion = $this->getCurrentVersion();
         $this->log('debug', "start update process");
@@ -414,7 +414,6 @@ class Update
         throw new \Exception('Impossible to calculate the database size');
     }
 
-
     /**
      * Checks whether it is possible to make a data base backup
      *
@@ -569,7 +568,6 @@ class Update
     }
 
     /**
-     * @param Translator $translator
      * @return $this
      */
     public function setTranslator(Translator $translator)

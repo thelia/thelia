@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace TheliaMigrateCountry\Events;
 
 use Thelia\Core\Event\ActionEvent;
@@ -48,7 +47,6 @@ class MigrateCountryEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getCountry()
     {
@@ -56,7 +54,6 @@ class MigrateCountryEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $country
      */
     public function setCountry($country)
     {

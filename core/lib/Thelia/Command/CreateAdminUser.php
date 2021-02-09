@@ -83,11 +83,11 @@ class CreateAdminUser extends ContainerAwareCommand
 
         $admin->save();
 
-        $output->writeln(array(
+        $output->writeln([
                 "",
                 "<info>User ".$admin->getLogin()." successfully created.</info>",
                 ""
-            ));
+            ]);
 
         return 0;
     }
@@ -121,8 +121,6 @@ class CreateAdminUser extends ContainerAwareCommand
     /**
      * Ask to user all needed information
      *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
      * @return array
      */
     protected function getAdminInfo(InputInterface $input, OutputInterface $output)
@@ -161,7 +159,6 @@ class CreateAdminUser extends ContainerAwareCommand
     {
         return sprintf("<info>%s</info>", $text);
     }
-
 
     protected function enterLogin(QuestionHelper $helper, InputInterface $input, OutputInterface $output)
     {

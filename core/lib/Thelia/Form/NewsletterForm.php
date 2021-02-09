@@ -51,31 +51,31 @@ class NewsletterForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('email', EmailType::class, array(
-                'constraints' => array(
+            ->add('email', EmailType::class, [
+                'constraints' => [
                     new NotBlank(),
                     new Email(),
                     new Callback(
-                            array($this, "verifyExistingEmail")
+                            [$this, "verifyExistingEmail"]
                         ),
-                ),
+                ],
                 'label' => Translator::getInstance()->trans('Email address'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'email_newsletter',
-                ),
-            ))
-            ->add('firstname', TextType::class, array(
+                ],
+            ])
+            ->add('firstname', TextType::class, [
                 'label' => Translator::getInstance()->trans('Firstname'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'firstname_newsletter',
-                ),
-            ))
-            ->add('lastname', TextType::class, array(
+                ],
+            ])
+            ->add('lastname', TextType::class, [
                 'label' => Translator::getInstance()->trans('Lastname'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'lastname_newsletter',
-                ),
-            ));
+                ],
+            ]);
     }
 
     public function verifyExistingEmail($value, ExecutionContextInterface $context)

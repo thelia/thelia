@@ -75,7 +75,6 @@ abstract class BaseCachedFile extends BaseAction
      * If no directory is specified, the whole cache is cleared.
      * Only files are deleted, directories will remain.
      *
-     * @param CachedFileEvent $event
      */
     public function clearCache(CachedFileEvent $event)
     {
@@ -139,9 +138,8 @@ abstract class BaseCachedFile extends BaseAction
         // Keep original safe name if no tranformations are applied
         if ($forceOriginalFile || $hashed_options == null) {
             return sprintf("%s/%s", $path, $safe_filename);
-        } else {
+        }  
             return sprintf("%s/%s-%s", $path, $hashed_options, $safe_filename);
-        }
     }
 
     /**

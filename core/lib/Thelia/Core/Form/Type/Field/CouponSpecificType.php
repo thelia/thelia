@@ -22,5 +22,4 @@ use Thelia\Model\CouponQuery;
  */
 class CouponSpecificType extends AbstractType
 {
-
 }

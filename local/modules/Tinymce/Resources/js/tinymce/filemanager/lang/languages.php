@@ -1,7 +1,6 @@
 <?php
 
-return array(
-
+return [
 	'az_AZ' => 'Azərbaycan dili',
 	'bg_BG' => 'български език',
 	'ca' => 'Català, valencià',
@@ -37,4 +36,4 @@ return array(
 	'zh_CN' => '中文 (Zhōngwén), 汉语, 漢語',
 
 	// source: http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
-);
+];

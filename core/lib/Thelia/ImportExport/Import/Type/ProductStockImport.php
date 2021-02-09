@@ -38,7 +38,7 @@ class ProductStockImport extends AbstractImport
                     '%id' => $data['id']
                 ]
             );
-        } else {
+        }  
             $pse->setQuantity($data['stock']);
 
             if (isset($data['ean']) && !empty($data['ean'])) {
@@ -47,8 +47,7 @@ class ProductStockImport extends AbstractImport
 
             $pse->save();
             $this->importedRows++;
-        }
-
+        
         return null;
     }
 }

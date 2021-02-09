@@ -10,10 +10,10 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-use Thelia\Core\Thelia;
+use Symfony\Component\Dotenv\Dotenv;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpKernel\HttpCache\HttpCache;
-use Symfony\Component\Dotenv\Dotenv;
+use Thelia\Core\Thelia;
 
 $env = 'dev';
 require __DIR__ . '/../vendor/autoload.php';
@@ -23,10 +23,10 @@ if (file_exists(THELIA_ROOT.'.env')) {
 }
 
 // List of allowed IP
-$trustedIp = array(
+$trustedIp = [
   '::1',
   '127.0.0.1',
-);
+];
 
 $request = Request::createFromGlobals();
 

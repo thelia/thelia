@@ -70,7 +70,8 @@
         "thelia/store-seo-module": "~1.2.0",
         "symfony/mime": "5.2.*",
         "zircote/swagger-php": "3.1.*",
-        "symfony/framework-bundle": "5.2.*"
+        "symfony/framework-bundle": "5.2.*",
+        "friendsofphp/php-cs-fixer": "^2.18"
     },
     "require-dev": {
         "fzaninotto/faker": "1.5.*",
@@ -81,6 +82,12 @@
         "symfony/phpunit-bridge": "^5.2"
     },
     "scripts": {
+        "cs-diff": [
+            "./bin/php-cs-fixer fix --dry-run --stop-on-violation --diff"
+        ],
+        "cs": [
+            "./bin/php-cs-fixer fix"
+        ],
         "test-unit": [
             "./bin/phpunit --configuration phpunit.xml.dist --testsuit unit"
         ],
@@ -96,6 +103,7 @@
             "@test-legacy"
         ],
         "ci": [
+            "@cs-diff",
             "@test"
         ]
     },

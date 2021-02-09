@@ -112,7 +112,7 @@ class CurrencyController extends AbstractCrudController
     protected function hydrateObjectForm($object)
     {
         // Prepare the data that will hydrate the form
-        $data = array(
+        $data = [
                 'id'     => $object->getId(),
                 'name'   => $object->getName(),
                 'locale' => $object->getLocale(),
@@ -120,7 +120,7 @@ class CurrencyController extends AbstractCrudController
                 'symbol' => $object->getSymbol(),
                 'format' => $object->getFormat(),
                 'rate'   => $object->getRate()
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(AdminForm::CURRENCY_MODIFICATION, FormType::class, $data);
@@ -163,12 +163,12 @@ class CurrencyController extends AbstractCrudController
 
     protected function renderListTemplate($currentOrder)
     {
-        return $this->render('currencies', array('order' => $currentOrder));
+        return $this->render('currencies', ['order' => $currentOrder]);
     }
 
     protected function renderEditionTemplate()
     {
-        return $this->render('currency-edit', array('currency_id' => $this->getRequest()->get('currency_id')));
+        return $this->render('currency-edit', ['currency_id' => $this->getRequest()->get('currency_id')]);
     }
 
     protected function redirectToEditionTemplate()
@@ -192,7 +192,7 @@ class CurrencyController extends AbstractCrudController
     public function updateRatesAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -220,7 +220,7 @@ class CurrencyController extends AbstractCrudController
     public function setDefaultAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -245,7 +245,7 @@ class CurrencyController extends AbstractCrudController
     public function setVisibleAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 

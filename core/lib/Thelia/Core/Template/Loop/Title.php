@@ -17,10 +17,10 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Model\CustomerTitleQuery;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\CustomerTitle as CustomerTitleModel;
+use Thelia\Model\CustomerTitleQuery;
 
 /**
  *
@@ -53,7 +53,7 @@ class Title extends BaseI18nLoop implements PropelSearchLoopInterface
         $search = CustomerTitleQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('SHORT', 'LONG'));
+        $this->configureI18nProcessing($search, ['SHORT', 'LONG']);
 
         $id = $this->getId();
 

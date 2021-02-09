@@ -110,16 +110,16 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::DOCUMENT_PROCESS => array("processDocument", 128),
+        return [
+            TheliaEvents::DOCUMENT_PROCESS => ["processDocument", 128],
 
             // Implemented in parent class BaseCachedFile
-            TheliaEvents::DOCUMENT_CLEAR_CACHE => array("clearCache", 128),
-            TheliaEvents::DOCUMENT_DELETE => array("deleteFile", 128),
-            TheliaEvents::DOCUMENT_SAVE => array("saveFile", 128),
-            TheliaEvents::DOCUMENT_UPDATE => array("updateFile", 128),
-            TheliaEvents::DOCUMENT_UPDATE_POSITION => array("updatePosition", 128),
-            TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
-        );
+            TheliaEvents::DOCUMENT_CLEAR_CACHE => ["clearCache", 128],
+            TheliaEvents::DOCUMENT_DELETE => ["deleteFile", 128],
+            TheliaEvents::DOCUMENT_SAVE => ["saveFile", 128],
+            TheliaEvents::DOCUMENT_UPDATE => ["updateFile", 128],
+            TheliaEvents::DOCUMENT_UPDATE_POSITION => ["updatePosition", 128],
+            TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY => ["toggleVisibility", 128],
+        ];
     }
 }

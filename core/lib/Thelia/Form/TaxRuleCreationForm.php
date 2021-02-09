@@ -22,12 +22,12 @@ class TaxRuleCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("locale", HiddenType::class, array(
-                "constraints" => array(new NotBlank()),
-            ))
+            ->add("locale", HiddenType::class, [
+                "constraints" => [new NotBlank()],
+            ])
         ;
 
-        $this->addStandardDescFields(array('postscriptum', 'chapo', 'locale'));
+        $this->addStandardDescFields(['postscriptum', 'chapo', 'locale']);
     }
 
     public function getName()

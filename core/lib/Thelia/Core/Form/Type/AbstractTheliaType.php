@@ -26,7 +26,6 @@ abstract class AbstractTheliaType extends AbstractType
 {
     /**
      * @param $groups
-     * @param  array $constraints
      * @return array
      *
      * Replaces validation groups in constraints
@@ -46,7 +45,6 @@ abstract class AbstractTheliaType extends AbstractType
     }
 
     /**
-     * @param  AbstractType $type
      * @param  string       $groups
      * @return array
      *
@@ -63,7 +61,7 @@ abstract class AbstractTheliaType extends AbstractType
         $options = $nullResolver->resolve();
 
         if (!isset($options["constraints"])) {
-            $options["constraints"] = array();
+            $options["constraints"] = [];
         }
 
         /**

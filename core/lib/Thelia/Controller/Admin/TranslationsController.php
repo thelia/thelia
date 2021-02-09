@@ -80,19 +80,18 @@ class TranslationsController extends BaseAdminController
 
         $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
 
-        $templateArguments = array(
+        $templateArguments = [
                 'item_to_translate'             => $itemToTranslate,
                 'item_name'                     => $itemName,
                 'module_part'                   => $modulePart,
                 'view_missing_traductions_only' => $this->getRequest()->get('view_missing_traductions_only'),
                 'max_input_vars_warning'        => false,
-        );
+        ];
 
         // Find the i18n directory, and the directory to examine.
 
         if (! empty($itemName) || $itemToTranslate == 'co' || $itemToTranslate == 'in' || $itemToTranslate == 'wi') {
             switch ($itemToTranslate) {
-
                 // Module core
                 case 'mo':
                     $module = $this->getModule($itemName);
@@ -176,7 +175,6 @@ class TranslationsController extends BaseAdminController
                     $templateArguments['has_admin_includes'] = $hasAdminIncludes;
 
                     break;
-
                 // Thelia Core
                 case 'co':
                     $directory = THELIA_LIB;
@@ -184,7 +182,6 @@ class TranslationsController extends BaseAdminController
                     $i18nDirectory = THELIA_LIB . 'Config' . DS . 'I18n';
                     $walkMode = TranslationEvent::WALK_MODE_PHP;
                     break;
-
                 // Thelia Install
                 case 'in':
                     $directory = THELIA_SETUP_DIRECTORY;
@@ -194,7 +191,6 @@ class TranslationsController extends BaseAdminController
                     // resources not loaded by default
                     $this->loadTranslation($i18nDirectory, $domain);
                     break;
-
                 // Thelia Install wizard
                 case 'wi':
                     $directory = THELIA_SETUP_WIZARD_DIRECTORY;
@@ -204,22 +200,18 @@ class TranslationsController extends BaseAdminController
                     // resources not loaded by default
                     $this->loadTranslation($i18nDirectory, $domain);
                     break;
-
                 // Front-office template
                 case 'fo':
                     $template = new TemplateDefinition($itemName, TemplateDefinition::FRONT_OFFICE);
                     break;
-
                 // Back-office template
                 case 'bo':
                     $template = new TemplateDefinition($itemName, TemplateDefinition::BACK_OFFICE);
                     break;
-
                 // PDF templates
                 case 'pf':
                     $template = new TemplateDefinition($itemName, TemplateDefinition::PDF);
                     break;
-
                 // Email templates
                 case 'ma':
                     $template = new TemplateDefinition($itemName, TemplateDefinition::EMAIL);
@@ -247,7 +239,7 @@ class TranslationsController extends BaseAdminController
                     $save_mode = $this->getRequest()->get('save_mode', false);
 
                     if ($save_mode !== false) {
-                        $texts = $this->getRequest()->get('text', array());
+                        $texts = $this->getRequest()->get('text', []);
 
                         if (! empty($texts)) {
                             $event = TranslationEvent::createWriteFileEvent(
@@ -270,9 +262,8 @@ class TranslationsController extends BaseAdminController
                                     "admin.configuration.translations",
                                     $templateArguments
                                 );
-                            } else {
+                            }  
                                 return $this->generateRedirect(URL::getInstance()->adminViewUrl('configuration'));
-                            }
                         }
                     }
                 }
@@ -317,14 +308,14 @@ class TranslationsController extends BaseAdminController
             return is_writable($dir);
         }
 
-        $parentDir = dirname($dir);
+        $parentDir = \dirname($dir);
 
         return file_exists($parentDir) && is_writable($parentDir);
     }
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::TRANSLATIONS, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::TRANSLATIONS, [], AccessManager::VIEW)) {
             return $response;
         }
         return $this->renderTemplate();
@@ -332,7 +323,7 @@ class TranslationsController extends BaseAdminController
 
     public function updateAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
         }
         return $this->renderTemplate();

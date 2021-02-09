@@ -31,7 +31,6 @@ class HookToggleActivationEvent extends HookEvent
     }
 
     /**
-     * @param mixed $hook_id
      * @return $this
      */
     public function setHookId($hook_id)
@@ -42,7 +41,6 @@ class HookToggleActivationEvent extends HookEvent
     }
 
     /**
-     * @return mixed
      */
     public function getHookId()
     {

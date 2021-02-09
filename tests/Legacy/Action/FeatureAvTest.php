@@ -69,7 +69,6 @@ class FeatureAvTest extends BaseAction
     }
 
     /**
-     * @param FeatureAvModel $featureAv
      * @depends testCreate
      * @return FeatureAvModel
      */
@@ -100,7 +99,6 @@ class FeatureAvTest extends BaseAction
     }
 
     /**
-     * @param FeatureAvModel $featureAv
      * @depends testUpdate
      */
     public function testDelete(FeatureAvModel $featureAv)

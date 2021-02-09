@@ -13,9 +13,9 @@
 namespace Thelia\Core\Template;
 
 use Symfony\Component\Filesystem\Filesystem;
-use Thelia\Model\ConfigQuery;
-use Thelia\Log\Tlog;
 use Thelia\Core\Translation\Translator;
+use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
 
 interface TemplateHelperInterface
 {
@@ -27,7 +27,6 @@ interface TemplateHelperInterface
     /**
      * Check if a template definition is the current active template
      *
-     * @param  TemplateDefinition $tplDefinition
      * @return bool               true is the given template is the active template
      */
     public function isActive(TemplateDefinition $tplDefinition);

@@ -14,13 +14,13 @@ namespace Thelia\Tests\Action;
 
 use Thelia\Action\Hook;
 use Thelia\Core\Event\Hook\HookCreateAllEvent;
+use Thelia\Core\Event\Hook\HookCreateEvent;
 use Thelia\Core\Event\Hook\HookDeactivationEvent;
 use Thelia\Core\Event\Hook\HookDeleteEvent;
 use Thelia\Core\Event\Hook\HookToggleActivationEvent;
 use Thelia\Core\Event\Hook\HookUpdateEvent;
-use Thelia\Model\Hook as HookModel;
-use Thelia\Core\Event\Hook\HookCreateEvent;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Model\Hook as HookModel;
 use Thelia\Model\LangQuery;
 
 /**
@@ -110,7 +110,6 @@ class HookTest extends BaseAction
     }
 
     /**
-     * @param HookModel $hook
      * @depends testCreate
      */
     public function testCreateDuplicate(HookModel $hook)
@@ -135,7 +134,6 @@ class HookTest extends BaseAction
     }
 
     /**
-     * @param HookModel $hook
      * @depends testCreate
      * @return HookModel
      */
@@ -152,7 +150,6 @@ class HookTest extends BaseAction
     }
 
     /**
-     * @param HookModel $hook
      * @depends testDeactivation
      * @return HookModel
      */
@@ -169,7 +166,6 @@ class HookTest extends BaseAction
     }
 
     /**
-     * @param HookModel $hook
      * @depends testToggleActivation
      * @return HookModel
      */
@@ -208,7 +204,6 @@ class HookTest extends BaseAction
     }
 
     /**
-     * @param HookModel $hook
      * @depends testUpdate
      */
     public function testDelete(HookModel $hook)

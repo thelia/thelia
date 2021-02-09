@@ -81,7 +81,7 @@ class CategoryQuery extends BaseCategoryQuery
 
         $result = [];
 
-        if (is_array($categoryId)) {
+        if (\is_array($categoryId)) {
             foreach ($categoryId as $categorySingleId) {
                 $result = array_merge($result, self::findAllChildId($categorySingleId, $depth, $currentPos));
             }

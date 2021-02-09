@@ -23,13 +23,13 @@ class FeatureModificationForm extends FeatureCreationForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("id", HiddenType::class, array(
-                    "constraints" => array(
+            ->add("id", HiddenType::class, [
+                    "constraints" => [
                         new GreaterThan(
-                            array('value' => 0)
+                            ['value' => 0]
                         ),
-                    ),
-            ))
+                    ],
+            ])
         ;
 
         // Add standard description fields

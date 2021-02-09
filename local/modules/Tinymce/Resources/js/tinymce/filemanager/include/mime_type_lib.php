@@ -15,7 +15,6 @@
  * php mime_type_lib.php
  ********************************/
 
-
 /* REMOVE ME TO TEST
 echo "magicfile: " . ini_get( 'mime_magic.magicfile' ) . "\n";
 
@@ -30,7 +29,7 @@ else
 	echo "Did not find mime_content_type function\n";
 REMOVE ME TO TEST */
 
-$mime_types = array(
+$mime_types = [
 	'ai'      => 'application/postscript',
 	'aif'     => 'audio/x-aiff',
 	'aifc'    => 'audio/x-aiff',
@@ -242,7 +241,7 @@ $mime_types = array(
 	'pptm'     => 'application/vnd.ms-powerpoint.presentation.macroEnabled.12',
 	'potm'     => 'application/vnd.ms-powerpoint.template.macroEnabled.12',
 	'ppsm'     => 'application/vnd.ms-powerpoint.slideshow.macroEnabled.12',
-);
+];
 
 if ( ! function_exists('get_extension_from_mime'))
 {
@@ -273,7 +272,7 @@ if ( ! function_exists('get_file_mime_type'))
 			{
 				if (true === $debug)
 				{
-					return array( 'mime_type' => $mime_type, 'method' => 'fileinfo' );
+					return [ 'mime_type' => $mime_type, 'method' => 'fileinfo' ];
 				}
 
 				return $mime_type;
@@ -288,7 +287,7 @@ if ( ! function_exists('get_file_mime_type'))
 			{
 				if (true === $debug)
 				{
-					return array( 'mime_type' => $mime_type, 'method' => 'mime_content_type' );
+					return [ 'mime_type' => $mime_type, 'method' => 'mime_content_type' ];
 				}
 
 				return $mime_type;
@@ -304,7 +303,7 @@ if ( ! function_exists('get_file_mime_type'))
 		{
 			if (true === $debug)
 			{
-				return array( 'mime_type' => $mime_types[ $ext ], 'method' => 'from_array' );
+				return [ 'mime_type' => $mime_types[ $ext ], 'method' => 'from_array' ];
 			}
 
 			return $mime_types[ $ext ];
@@ -312,13 +311,12 @@ if ( ! function_exists('get_file_mime_type'))
 
 		if (true === $debug)
 		{
-			return array( 'mime_type' => 'application/octet-stream', 'method' => 'last_resort' );
+			return [ 'mime_type' => 'application/octet-stream', 'method' => 'last_resort' ];
 		}
 
 		return 'application/octet-stream';
 	}
 }
-
 
 /********************
  * The following code can be used to test the function.
@@ -332,7 +330,6 @@ if ( ! function_exists('get_file_mime_type'))
  * Run the code with this command:
  * php mime_type_lib.php
  ********************/
-
 
 /* REMOVE ME TO TEST
 echo get_file_mime_type( 'test.txt' ) . "\n";

@@ -12,8 +12,8 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 use Thelia\Core\Template\Loop\FeatureValue;
+use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
  *
@@ -29,6 +29,6 @@ class FeatureValueTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return array('product' => 1, 'feature' => 1);
+        return ['product' => 1, 'feature' => 1];
     }
 }

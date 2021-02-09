@@ -26,7 +26,6 @@ use Thelia\Model\Map\TaxRuleCountryTableMap;
 use TheliaMigrateCountry\Events\MigrateCountryEvent;
 use TheliaMigrateCountry\Events\MigrateCountryEvents;
 
-
 /**
  * Class MigrateController
  * @package TheliaMigrateCountry\Controller
@@ -38,7 +37,7 @@ class MigrateController extends BaseAdminController
 
     public function migrateSystemAction()
     {
-        $response = $this->checkAuth(AdminResources::COUNTRY, array(), AccessManager::UPDATE);
+        $response = $this->checkAuth(AdminResources::COUNTRY, [], AccessManager::UPDATE);
         if (null !== $response) {
             return $response;
         }
@@ -80,14 +79,14 @@ class MigrateController extends BaseAdminController
             'countries-migrate',
             [
                 'countriesMigrated' => $migratedCountries,
-                'showForm' => count($dataForm) != 0
+                'showForm' => \count($dataForm) != 0
             ]
         );
     }
 
     public function doMigrateSystemAction()
     {
-        $response = $this->checkAuth(AdminResources::COUNTRY, array(), AccessManager::UPDATE);
+        $response = $this->checkAuth(AdminResources::COUNTRY, [], AccessManager::UPDATE);
         if (null !== $response) {
             return $response;
         }
@@ -102,7 +101,6 @@ class MigrateController extends BaseAdminController
             $data = $form->getData();
 
             foreach ($data['migrations'] as $migration) {
-
                 if (!$migration['migrate']) {
                     continue;
                 }
@@ -147,7 +145,6 @@ class MigrateController extends BaseAdminController
                     $message,
                     $changeEvent->getCountry()
                 );
-
             }
 
             return $this->generateSuccessRedirect($changeForm);

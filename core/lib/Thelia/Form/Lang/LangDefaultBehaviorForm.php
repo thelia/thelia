@@ -14,8 +14,8 @@ namespace Thelia\Form\Lang;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Form\BaseForm;
 use Thelia\Core\Translation\Translator;
+use Thelia\Form\BaseForm;
 
 /**
  * Class LangDefaultBehaviorForm
@@ -47,19 +47,19 @@ class LangDefaultBehaviorForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('behavior', ChoiceType::class, array(
-                'choices' => array(
+            ->add('behavior', ChoiceType::class, [
+                'choices' => [
                     0 => Translator::getInstance()->trans("Strictly use the requested language"),
                     1 => Translator::getInstance()->trans("Replace by the default language"),
-                ),
-                'constraints' => array(
+                ],
+                'constraints' => [
                     new NotBlank(),
-                ),
+                ],
                 'label' => Translator::getInstance()->trans("If a translation is missing or incomplete :"),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'defaultBehavior-form',
-                ),
-            ));
+                ],
+            ]);
     }
 
     /**

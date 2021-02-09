@@ -4,7 +4,6 @@ namespace Carousel\Model;
 
 use Carousel\Model\Base\CarouselQuery as BaseCarouselQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'carousel' table.
  *

@@ -15,8 +15,8 @@ namespace Thelia\Form;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Thelia\Model\ConfigQuery;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
 
 /**
@@ -31,37 +31,37 @@ class CustomerPasswordUpdateForm extends BaseForm
         $this->formBuilder
 
             // Login Information
-            ->add("password_old", PasswordType::class, array(
-                    "constraints" => array(
+            ->add("password_old", PasswordType::class, [
+                    "constraints" => [
                         new Constraints\NotBlank(),
-                        new Constraints\Callback(array($this, "verifyCurrentPasswordField")),
-                    ),
+                        new Constraints\Callback([$this, "verifyCurrentPasswordField"]),
+                    ],
                     "label" => Translator::getInstance()->trans("Current Password"),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "password_old",
-                    ),
-                ))
-            ->add("password", PasswordType::class, array(
-                "constraints" => array(
+                    ],
+                ])
+            ->add("password", PasswordType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
-                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
-                ),
+                    new Constraints\Length(["min" => ConfigQuery::read("password.length", 4)]),
+                ],
                 "label" => Translator::getInstance()->trans("New Password"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "password",
-                ),
-            ))
-            ->add("password_confirm", PasswordType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("password_confirm", PasswordType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
-                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
-                    new Constraints\Callback(array($this, "verifyPasswordField")),
-                ),
+                    new Constraints\Length(["min" => ConfigQuery::read("password.length", 4)]),
+                    new Constraints\Callback([$this, "verifyPasswordField"]),
+                ],
                 "label" => Translator::getInstance()->trans('Password confirmation'),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "password_confirmation",
-                ),
-            ));
+                ],
+            ]);
     }
 
     public function verifyCurrentPasswordField($value, ExecutionContextInterface $context)

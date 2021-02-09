@@ -59,35 +59,27 @@ class ConditionEvaluator
             case Operators::DIFFERENT:
                 // !=
                 return ($v1 != $v2);
-
             case Operators::SUPERIOR:
                 // >
                 return ($v1 > $v2);
-
             case Operators::SUPERIOR_OR_EQUAL:
                 // >=
                 return ($v1 >= $v2);
-
             case Operators::INFERIOR:
                 // <
                 return ($v1 < $v2);
-
             case Operators::INFERIOR_OR_EQUAL:
                 // <=
                 return ($v1 <= $v2);
-
             case Operators::EQUAL:
                 // ==
                 return ($v1 == $v2);
-
             case Operators::IN:
                 // in
                 return (\in_array($v1, $v2));
-
             case Operators::OUT:
                 // not in
                 return (!\in_array($v1, $v2));
-
             default:
                 throw new \Exception('Unrecognized operator ' . $o);
         }

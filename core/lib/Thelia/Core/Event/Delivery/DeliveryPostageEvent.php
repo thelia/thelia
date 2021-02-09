@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Core\Event\Delivery;
 
 use Thelia\Core\Event\ActionEvent;
@@ -31,35 +30,35 @@ use Thelia\Module\BaseModuleInterface;
 class DeliveryPostageEvent extends ActionEvent
 {
     /** @var BaseModuleInterface */
-    protected $module = null;
+    protected $module;
 
     /** @var Cart */
-    protected $cart = null;
+    protected $cart;
 
     /** @var Address */
-    protected $address = null;
+    protected $address;
 
     /** @var Country */
-    protected $country = null;
+    protected $country;
 
     /** @var State */
-    protected $state = null;
+    protected $state;
 
     /** @var bool */
     protected $validModule = false;
 
     /** @var OrderPostage|null */
-    protected $postage = null;
+    protected $postage;
 
     /**
      * @var \DateTime|null
      */
-    protected $deliveryDate = null;
+    protected $deliveryDate;
 
     /**
      * @var string
      */
-    protected $deliveryMode = null;
+    protected $deliveryMode;
 
     /** @var array */
     protected $additionalData = [];
@@ -67,8 +66,6 @@ class DeliveryPostageEvent extends ActionEvent
     /**
      * DeliveryPostageEvent constructor.
      * @param $module
-     * @param Cart $cart
-     * @param Address|null $address
      * @param Country $country
      * @param State $state
      */
@@ -252,7 +249,6 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getDeliveryMode()
     {
@@ -260,14 +256,13 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $deliveryMode
      *
      * @return DeliveryPostageEvent
      * @throws \Exception
      */
     public function setDeliveryMode($deliveryMode)
     {
-        if (!in_array($deliveryMode, ['delivery', 'pickup', 'localPickup'])) {
+        if (!\in_array($deliveryMode, ['delivery', 'pickup', 'localPickup'])) {
             throw new \Exception(Translator::getInstance()->trans('A delivery module can only be of type "delivery", "pickup" or "localPickup".'));
         }
 

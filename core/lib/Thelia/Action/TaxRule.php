@@ -17,15 +17,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\TaxRule as TaxRuleModel;
 use Thelia\Model\TaxRuleCountry;
 use Thelia\Model\TaxRuleCountryQuery;
-use Thelia\Model\TaxRule as TaxRuleModel;
 use Thelia\Model\TaxRuleQuery;
 
 class TaxRule extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * @param TaxRuleEvent $event
      */
     public function create(TaxRuleEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -43,7 +42,6 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param TaxRuleEvent $event
      */
     public function update(TaxRuleEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -60,7 +58,6 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param TaxRuleEvent $event
      */
     public function updateTaxes(TaxRuleEvent $event)
     {
@@ -158,7 +155,6 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param TaxRuleEvent $event
      */
     public function delete(TaxRuleEvent $event)
     {
@@ -172,14 +168,13 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param TaxRuleEvent $event
      */
     public function setDefault(TaxRuleEvent $event)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
-            TaxRuleQuery::create()->update(array(
+            TaxRuleQuery::create()->update([
                 "IsDefault" => 0
-            ));
+            ]);
 
             $taxRule->setIsDefault(1)->save();
 
@@ -192,12 +187,12 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::TAX_RULE_CREATE            => array("create", 128),
-            TheliaEvents::TAX_RULE_UPDATE            => array("update", 128),
-            TheliaEvents::TAX_RULE_TAXES_UPDATE      => array("updateTaxes", 128),
-            TheliaEvents::TAX_RULE_DELETE            => array("delete", 128),
-            TheliaEvents::TAX_RULE_SET_DEFAULT       => array("setDefault", 128),
-        );
+        return [
+            TheliaEvents::TAX_RULE_CREATE            => ["create", 128],
+            TheliaEvents::TAX_RULE_UPDATE            => ["update", 128],
+            TheliaEvents::TAX_RULE_TAXES_UPDATE      => ["updateTaxes", 128],
+            TheliaEvents::TAX_RULE_DELETE            => ["delete", 128],
+            TheliaEvents::TAX_RULE_SET_DEFAULT       => ["setDefault", 128],
+        ];
     }
 }

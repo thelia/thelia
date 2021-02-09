@@ -34,7 +34,7 @@ class TheliaLoop extends AbstractSmartyPlugin
     /** @var PropelModelPager[] */
     protected static $pagination = null;
 
-    protected $loopDefinition = array();
+    protected $loopDefinition = [];
 
     /**
      * @var ContainerInterface
@@ -57,9 +57,9 @@ class TheliaLoop extends AbstractSmartyPlugin
     protected $translator;
 
     /** @var LoopResult[]  */
-    protected $loopstack = array();
+    protected $loopstack = [];
 
-    protected $varstack = array();
+    protected $varstack = [];
 
     /** @var bool */
     protected $isDebugActive;
@@ -69,13 +69,6 @@ class TheliaLoop extends AbstractSmartyPlugin
 
     /**
      * TheliaLoop constructor.
-     * @param ContainerInterface $container
-     * @param RequestStack $requestStack
-     * @param EventDispatcher $eventDispatcher
-     * @param SecurityContext $securityContext
-     * @param TranslatorInterface $translator
-     * @param bool $kernelDebug
-     * @param array $theliaParserLoops
      */
     public function __construct(
         ContainerInterface $container,
@@ -104,13 +97,12 @@ class TheliaLoop extends AbstractSmartyPlugin
      */
     public static function getPagination($loopName)
     {
-        if (array_key_exists($loopName, self::$pagination)) {
+        if (\array_key_exists($loopName, self::$pagination)) {
             return self::$pagination[$loopName];
-        } else {
+        }  
             throw new \InvalidArgumentException(
                 Translator::getInstance()->trans("No pagination currently defined for loop name '%name'", ['%name' => $loopName ])
             );
-        }
     }
 
     /**
@@ -182,7 +174,7 @@ class TheliaLoop extends AbstractSmartyPlugin
 
         if ($content === null) {
             // Check if a loop with the same name exists in the current scope, and abort if it's the case.
-            if (array_key_exists($name, $this->varstack)) {
+            if (\array_key_exists($name, $this->varstack)) {
                 throw new \InvalidArgumentException(
                     $this->translator->trans("A loop named '%name' already exists in the current scope.", ['%name' => $name])
                 );
@@ -198,7 +190,6 @@ class TheliaLoop extends AbstractSmartyPlugin
                 $loopResults = clone($loop->exec(self::$pagination[$name]));
 
                 $loopResults->rewind();
-
             } catch (ElementNotFoundException $ex) {
                 // If loop is not found, when in development mode, rethrow the exception to make it visible
                 if ($this->isDebugActive) {
@@ -229,7 +220,7 @@ class TheliaLoop extends AbstractSmartyPlugin
 
             // On first iteration, save variables that may be overwritten by this loop
             if (! isset($this->varstack[$name])) {
-                $saved_vars = array();
+                $saved_vars = [];
 
                 $varlist = $loopResultRow->getVars();
 
@@ -338,10 +329,10 @@ class TheliaLoop extends AbstractSmartyPlugin
             return '';
         }
 
-        $startPage          = intval($this->getParam($params, 'start-page', 1));
-        $displayedPageCount = intval($this->getParam($params, 'limit', 10));
+        $startPage          = \intval($this->getParam($params, 'start-page', 1));
+        $displayedPageCount = \intval($this->getParam($params, 'limit', 10));
 
-        if (intval($displayedPageCount) == 0) {
+        if (\intval($displayedPageCount) == 0) {
             $displayedPageCount = PHP_INT_MAX;
         }
 
@@ -487,7 +478,6 @@ class TheliaLoop extends AbstractSmartyPlugin
      *  "myLoop" => "My\Own\Loop"
      * );
      *
-     * @param  array                     $loopDefinition
      * @throws \InvalidArgumentException if loop name already exists
      */
     public function setLoopList(array $loopDefinition)
@@ -508,7 +498,7 @@ class TheliaLoop extends AbstractSmartyPlugin
             $classParts = explode('\\', $className);
             $name = strtolower(strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', end($classParts))));
         }
-        if (array_key_exists($name, $this->loopDefinition)) {
+        if (\array_key_exists($name, $this->loopDefinition)) {
             throw new \InvalidArgumentException(
                 $this->translator->trans("The loop name '%name' is already defined in %className class", [
                     '%name' => $name,
@@ -527,13 +517,12 @@ class TheliaLoop extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
-
+        return [
             new SmartyPluginDescriptor('function', 'count', $this, 'theliaCount'),
             new SmartyPluginDescriptor('block', 'loop', $this, 'theliaLoop'),
             new SmartyPluginDescriptor('block', 'elseloop', $this, 'theliaElseloop'),
             new SmartyPluginDescriptor('block', 'ifloop', $this, 'theliaIfLoop'),
             new SmartyPluginDescriptor('block', 'pageloop', $this, 'theliaPageLoop'),
-        );
+        ];
     }
 }

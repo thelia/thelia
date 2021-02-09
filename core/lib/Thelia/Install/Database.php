@@ -70,7 +70,7 @@ class Database
             $this->connection->query(sprintf("use `%s`", $dbName));
         }
 
-        $sql = array();
+        $sql = [];
 
         if (null === $extraSqlFiles) {
             $sql = array_merge(
@@ -102,7 +102,7 @@ class Database
      * @throws \RuntimeException|\PDOException if something goes wrong.
      * @return \PDOStatement
      */
-    public function execute($sql, $args = array())
+    public function execute($sql, $args = [])
     {
         $stmt = $this->connection->prepare($sql);
 
@@ -138,7 +138,7 @@ class Database
             $stored = str_replace($m[1][$k], ";\n", $stored);
             $sql = str_replace($v, $stored, $sql);
         }
-        $query = array();
+        $query = [];
 
         $tab = explode(";\n", $sql);
         $size = \count($tab);
@@ -163,7 +163,7 @@ class Database
 
         // get all of the tables
         if ($tables == '*') {
-            $tables = array();
+            $tables = [];
             $result = $this->connection->prepare('SHOW TABLES');
             $result->execute();
             while ($row = $result->fetch(PDO::FETCH_NUM)) {
@@ -229,7 +229,6 @@ class Database
         //save filename
         $this->writeFilename($filename, $data);
     }
-
 
     /**
      * Restore a file in the current db

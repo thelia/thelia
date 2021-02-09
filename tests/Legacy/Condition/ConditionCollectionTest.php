@@ -87,13 +87,13 @@ class ConditionCollectionTest extends TestCase
         $stubFacade = $this->generateFacadeStub();
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $collection = new ConditionCollection();
@@ -124,23 +124,23 @@ class ConditionCollectionTest extends TestCase
         $stubFacade = $this->generateFacadeStub();
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators1 = array(
+        $operators1 = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values1 = array(
+        ];
+        $values1 = [
             MatchForTotalAmount::CART_TOTAL => 400,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition1->setValidatorsFromForm($operators1, $values1);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
-        $operators2 = array(
+        $operators2 = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values2 = array(
+        ];
+        $values2 = [
             MatchForTotalAmount::CART_TOTAL => 600,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR');
+            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
         $condition2->setValidatorsFromForm($operators2, $values2);
 
         $collection = new ConditionCollection();

@@ -88,12 +88,12 @@ class AdminUpdatePasswordCommand extends ContainerAwareCommand
 
         $this->getDispatcher()->dispatch($event, TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD);
 
-        $output->writeln(array(
+        $output->writeln([
             '',
             sprintf('<info>admin %s password updated</info>', $login),
             sprintf('<info>new password is : %s</info>', $password),
             ''
-        ));
+        ]);
 
         return 0;
     }

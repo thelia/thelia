@@ -22,7 +22,7 @@ use Thelia\Model\MetaData;
  */
 class MetaDataEvent extends ActionEvent
 {
-    protected $metaData = null;
+    protected $metaData;
 
     public function __construct(MetaData $metaData = null)
     {

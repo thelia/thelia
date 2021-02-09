@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Coupon code can\'t be empty' => 'Код купона не может быть пустым',
     'Delivery address does not belong to the current customer' => 'Адрес доставки не пренадлежит текущему клиенту',
     'Delivery module cannot be use with selected delivery address' => 'Модуль доставки не может быть использован с текущим адресом доставки',
@@ -22,4 +22,4 @@ return array(
     'You should <a href="%sign">sign in</a> or <a href="%register">register</a> to use this coupon' => 'Вы должны <a href="%sign">войти</a> или <a href="%register">зарегистрироваться</a> что использовать этот купон',
     'You\'re currently logged in. Please log out before requesting a new password.' => 'Вы сейчас авторизированы. Пожалуйста выйдите перед запросом нового пароля.',
     'Your subscription to our newsletter has been canceled.' => 'Ваша подписка на рассылку была отменена',
-);
+];

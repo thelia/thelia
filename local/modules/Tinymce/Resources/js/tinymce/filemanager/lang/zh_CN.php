@@ -1,7 +1,6 @@
 <?php
 
-return array(
-
+return [
 	'Select' => '选择',
 	'Erase' => '删除',
 	'Open' => '打开',
@@ -120,4 +119,4 @@ return array(
 	'GB' => "GB",
 	'TB' => "TB",
 	'total size' => "Total size",
-);
+];

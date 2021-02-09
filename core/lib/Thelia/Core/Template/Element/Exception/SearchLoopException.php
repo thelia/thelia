@@ -16,7 +16,7 @@ class SearchLoopException extends \RuntimeException
 {
     const UNKNOWN_EXCEPTION = 0;
 
-    public function __construct($message, $code = null, $arguments = array(), $previous = null)
+    public function __construct($message, $code = null, $arguments = [], $previous = null)
     {
         if (\is_array($arguments)) {
             $this->arguments = $arguments;

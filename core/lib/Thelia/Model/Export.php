@@ -6,13 +6,11 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\AbstractExport;
 use Thelia\Model\Base\Export as BaseExport;
-
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class Export extends BaseExport
 {
     use PositionManagementTrait;
-
 
     /**
      * @var \Thelia\ImportExport\Export\AbstractExport

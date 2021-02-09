@@ -42,9 +42,6 @@ class Cache extends AbstractSmartyPlugin
 
     /**
      * Cache constructor.
-     * @param AdapterInterface $esiFragmentRenderer
-     * @param RequestStack $requestStack
-     * @param TaxEngine $taxEngine
      * @param $kernelDebug
      */
     public function __construct(AdapterInterface $esiFragmentRenderer, RequestStack $requestStack, TaxEngine $taxEngine, $kernelDebug)
@@ -101,7 +98,6 @@ class Cache extends AbstractSmartyPlugin
     }
 
     /**
-     * @param array $params
      * @return string
      */
     protected function generateKey(array $params)
@@ -137,8 +133,8 @@ class Cache extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor('block', 'cache', $this, 'cache')
-        );
+        ];
     }
 }

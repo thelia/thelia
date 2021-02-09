@@ -4,13 +4,11 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Base\ExportCategory as BaseExportCategory;
-
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class ExportCategory extends BaseExportCategory
 {
     use PositionManagementTrait;
-
 
     /**
      * {@inheritDoc}

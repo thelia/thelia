@@ -24,8 +24,8 @@ use Thelia\Tools\URL;
  */
 class TestCaseWithURLToolSetup extends TestCase
 {
-    private $container = null;
-    private $dispatcher = null;
+    private $container;
+    private $dispatcher;
 
     public function __construct()
     {

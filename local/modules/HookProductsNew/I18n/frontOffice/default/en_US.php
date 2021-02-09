@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '+ View All' => '+ View All',
     'Latest' => 'Latest',
-);
+];

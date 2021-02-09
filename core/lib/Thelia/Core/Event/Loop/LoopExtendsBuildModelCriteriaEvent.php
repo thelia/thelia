@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Core\Event\Loop;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -28,7 +27,6 @@ class LoopExtendsBuildModelCriteriaEvent extends LoopExtendsEvent
 
     /**
      * LoopExtendsBuildModelCriteria constructor.
-     * @param ModelCriteria $modelCriteria
      */
     public function __construct(BaseLoop $loop, ModelCriteria $modelCriteria)
     {

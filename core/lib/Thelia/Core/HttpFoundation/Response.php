@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
-
 /**
  * extends Thelia\Core\HttpFoundation\Response for adding some helpers
  *

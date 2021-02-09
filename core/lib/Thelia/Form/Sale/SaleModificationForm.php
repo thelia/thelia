@@ -148,7 +148,7 @@ class SaleModificationForm extends SaleCreationForm
                 'allow_add'    => true,
                 'allow_delete' => true,
                 'entry_options'      => [
-                    'constraints' => array(new NotBlank()),
+                    'constraints' => [new NotBlank()],
                 ],
 
                 'label'        => Translator::getInstance()->trans('Product price offset for each currency'),
@@ -210,14 +210,13 @@ class SaleModificationForm extends SaleCreationForm
         )
         ;
         // Add standard description fields, excluding title and locale, which are already defined
-        $this->addStandardDescFields(array('title', 'locale'));
+        $this->addStandardDescFields(['title', 'locale']);
     }
 
     /**
      * Validate a date entered with the current edition Language date format.
      *
      * @param string                    $value
-     * @param ExecutionContextInterface $context
      */
     public function checkDate($value, ExecutionContextInterface $context)
     {

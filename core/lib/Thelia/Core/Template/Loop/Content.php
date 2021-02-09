@@ -19,16 +19,16 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\Content as ContentModel;
 use Thelia\Model\ContentFolderQuery;
+use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Map\ContentTableMap;
-use Thelia\Model\ContentQuery;
-use Thelia\Model\Content as ContentModel;
-use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -79,7 +79,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 'order',
                 new TypeCollection(
                     new Type\EnumListType(
-                        array(
+                        [
                             'id', 'id_reverse',
                             'alpha', 'alpha-reverse', 'alpha_reverse',
                             'manual', 'manual_reverse',
@@ -89,7 +89,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                             'created', 'created_reverse',
                             'updated', 'updated_reverse',
                             'position', 'position_reverse'
-                        )
+                        ]
                     )
                 ),
                 'alpha'
@@ -125,7 +125,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $search = ContentQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS'));
+        $this->configureI18nProcessing($search, ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS']);
 
         $id = $this->getId();
 
@@ -332,8 +332,6 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * @param LoopResultRow $loopResultRow
-     * @param ContentModel $content
      * @param int $defaultFolderId
      */
     private function findNextPrev(LoopResultRow $loopResultRow, ContentModel $content, $defaultFolderId)

@@ -28,7 +28,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
     const ATTRIBUTES_AV_LIST = 'attribute_avs';
     const ATTRIBUTE          = 'attribute_id';
 
-    public $attributeAvList = array();
+    public $attributeAvList = [];
     public $attribute = 0;
 
     /**
@@ -83,10 +83,10 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
             $perCustomerUsageCount
         );
 
-        $this->attributeAvList = isset($effects[self::ATTRIBUTES_AV_LIST]) ? $effects[self::ATTRIBUTES_AV_LIST] : array();
+        $this->attributeAvList = isset($effects[self::ATTRIBUTES_AV_LIST]) ? $effects[self::ATTRIBUTES_AV_LIST] : [];
 
         if (! \is_array($this->attributeAvList)) {
-            $this->attributeAvList = array($this->attributeAvList);
+            $this->attributeAvList = [$this->attributeAvList];
         }
 
         $this->attribute = isset($effects[self::ATTRIBUTE]) ? $effects[self::ATTRIBUTE] : 0;
@@ -142,7 +142,6 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
     public function drawBaseBackOfficeInputs($templateName, $otherFields)
     {
         return $this->facade->getParser()->render($templateName, array_merge($otherFields, [
-
             // The attributes list field
             'attribute_field_name' => $this->makeCouponFieldName(self::ATTRIBUTE),
             'attribute_value'      => $this->attribute,

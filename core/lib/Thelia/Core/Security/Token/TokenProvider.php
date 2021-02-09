@@ -32,10 +32,10 @@ class TokenProvider
             $data = ["", "", ""];
         }
 
-        return array(
+        return [
             'username' => $data[0],
             'token'    => $data[1],
             'serial'   => $data[2]
-        );
+        ];
     }
 }

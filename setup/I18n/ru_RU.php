@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '"Remember me" cookie expiration time, in seconds, for administration users' => 'Время жизни cookie "Запомнить меня" в секундах, для админов',
     '"Remember me" cookie expiration time, in seconds, for customer users' => 'Время жизни cookie "Запомнить меня" в секундах, для клиентов',
     '"Remember me" cookie name for administration users' => 'Имя cookie "Запомнить меня" для админов',
@@ -1446,4 +1446,4 @@ return array(
     'tinymce wysiwyg editor' => 'WYSIWYG редактор TinyMCE',
     'Đồng' => 'Донг',
     'Гривна' => 'Гривна',
-);
+];

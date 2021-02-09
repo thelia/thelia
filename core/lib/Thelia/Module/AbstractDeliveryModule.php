@@ -32,8 +32,6 @@ abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModu
 
     /**
      * Return the first area that matches the given  country for the given module
-     * @param Country $country
-     * @param BaseModule $module
      * @return Area|null
      */
     public function getAreaForCountry(Country $country)

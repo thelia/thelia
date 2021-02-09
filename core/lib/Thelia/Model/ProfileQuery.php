@@ -19,9 +19,9 @@ class ProfileQuery extends BaseProfileQuery
 {
     public static function getProfileList()
     {
-        $profileList = array(
+        $profileList = [
             0 => AdminResources::SUPERADMINISTRATOR,
-        );
+        ];
         foreach (ProfileQuery::create()->find() as $profile) {
             $profileList[$profile->getId()] = $profile->getCode();
         }

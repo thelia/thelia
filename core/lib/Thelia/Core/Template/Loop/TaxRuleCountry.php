@@ -20,10 +20,10 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Map\TaxTableMap;
+use Thelia\Model\TaxRuleCountry as TaxRuleCountryModel;
 use Thelia\Model\TaxRuleCountryQuery;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
-use Thelia\Model\TaxRuleCountry as TaxRuleCountryModel;
 
 /**
  *
@@ -59,7 +59,7 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'ask',
                 new TypeCollection(
-                    new Type\EnumType(array('taxes', 'countries'))
+                    new Type\EnumType(['taxes', 'countries'])
                 ),
                 'taxes'
             ),
@@ -91,7 +91,7 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
         /* manage tax translation */
         $this->configureI18nProcessing(
             $search,
-            array('TITLE', 'DESCRIPTION'),
+            ['TITLE', 'DESCRIPTION'],
             TaxTableMap::TABLE_NAME,
             'TAX_ID'
         );

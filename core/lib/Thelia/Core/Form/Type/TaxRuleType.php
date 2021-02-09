@@ -12,8 +12,8 @@
 
 namespace Thelia\Core\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Count;
 use Thelia\Core\Form\Type\Field\TaxRuleIdType;
 
@@ -45,36 +45,36 @@ class TaxRuleType extends AbstractTheliaType
     {
         $builder
             ->add("default", "checkbox")
-            ->add("country", "collection", array(
+            ->add("country", "collection", [
                 "type" => "country_id",
                 "allow_add" => true,
                 "allow_delete" => true,
                 "cascade_validation" => "true",
-                "constraints" => array(
+                "constraints" => [
                     new Count(["min" => 1]),
-                ),
-            ))
-            ->add("tax", "collection", array(
+                ],
+            ])
+            ->add("tax", "collection", [
                 "type" => "tax_id",
                 "allow_add" => true,
                 "allow_delete" => true,
                 "cascade_validation" => "true",
-                "constraints" => array(
+                "constraints" => [
                     new Count(["min" => 1]),
-                ),
-            ))
-            ->add("i18n", "collection", array(
+                ],
+            ])
+            ->add("i18n", "collection", [
                 "type" => "tax_rule_i18n",
                 "required" => true,
                 "allow_add" => true,
                 "cascade_validation" => true,
-                "constraints" => array(
+                "constraints" => [
                     new Count(["min" => 1]),
-                ),
-            ))
-            ->add("id", "tax_rule_id", array(
+                ],
+            ])
+            ->add("id", "tax_rule_id", [
                 "constraints" => $this->getConstraints($this->taxRuleIdType, "update"),
-            ))
+            ])
         ;
     }
 

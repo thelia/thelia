@@ -58,9 +58,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomerCreateOrUpdateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function create(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -99,9 +97,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomerCreateOrUpdateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function modify(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -120,9 +116,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomerCreateOrUpdateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function updateProfile(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -171,7 +165,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomerEvent $event
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function delete(CustomerEvent $event)
@@ -186,9 +179,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomerModel $customer
-     * @param CustomerCreateOrUpdateEvent $event
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Propel\Runtime\Exception\PropelException
      */
     private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher)
@@ -244,7 +234,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
     /**
      * Perform user logout. The user is redirected to the provided view, if any.
      *
-     * @param ActionEvent $event
      */
     public function logout(/** @noinspection PhpUnusedParameterInspection */ ActionEvent $event)
     {
@@ -252,7 +241,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param LostPasswordEvent $event
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function lostPassword(LostPasswordEvent $event)
@@ -274,15 +262,15 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::CUSTOMER_CREATEACCOUNT    => array('create', 128),
-            TheliaEvents::CUSTOMER_UPDATEACCOUNT    => array('modify', 128),
-            TheliaEvents::CUSTOMER_UPDATEPROFILE     => array('updateProfile', 128),
-            TheliaEvents::CUSTOMER_LOGOUT           => array('logout', 128),
-            TheliaEvents::CUSTOMER_LOGIN            => array('login', 128),
-            TheliaEvents::CUSTOMER_DELETEACCOUNT    => array('delete', 128),
-            TheliaEvents::LOST_PASSWORD             => array('lostPassword', 128),
-            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL => array('customerConfirmationEmail', 128)
-        );
+        return [
+            TheliaEvents::CUSTOMER_CREATEACCOUNT    => ['create', 128],
+            TheliaEvents::CUSTOMER_UPDATEACCOUNT    => ['modify', 128],
+            TheliaEvents::CUSTOMER_UPDATEPROFILE     => ['updateProfile', 128],
+            TheliaEvents::CUSTOMER_LOGOUT           => ['logout', 128],
+            TheliaEvents::CUSTOMER_LOGIN            => ['login', 128],
+            TheliaEvents::CUSTOMER_DELETEACCOUNT    => ['delete', 128],
+            TheliaEvents::LOST_PASSWORD             => ['lostPassword', 128],
+            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL => ['customerConfirmationEmail', 128]
+        ];
     }
 }

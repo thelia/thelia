@@ -78,7 +78,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 'order',
                 new TypeCollection(
                     new Type\EnumListType(
-                        array(
+                        [
                             'id', 'id_reverse',
                             'ref', 'ref_reverse',
                             'quantity', 'quantity_reverse',
@@ -88,7 +88,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                             'created', 'created_reverse',
                             'updated', 'updated_reverse',
                             'random'
-                        )
+                        ]
                     )
                 ),
                 'random'

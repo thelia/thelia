@@ -12,8 +12,8 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 use Thelia\Core\Template\Loop\AttributeCombination;
+use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
  *
@@ -29,6 +29,6 @@ class AttributeCombinationTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return array('product_sale_elements' => 1);
+        return ['product_sale_elements' => 1];
     }
 }

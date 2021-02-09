@@ -30,7 +30,7 @@ class MessageSendSampleForm extends BaseForm
                 "recipient_email",
                 EmailType::class,
                 [
-                    "constraints" => array(new NotBlank()),
+                    "constraints" => [new NotBlank()],
                     "label" => Translator::getInstance()->trans('Send test e-mail to:'),
                     "attr" => [
                         'placeholder' => Translator::getInstance()->trans('Recipient e-mail address')

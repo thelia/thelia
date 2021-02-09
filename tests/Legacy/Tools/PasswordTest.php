@@ -27,7 +27,7 @@ class PasswordTest extends TestCase
         $length = 8;
         $password = Password::generateRandom($length);
 
-        $this->assertEquals($length, strlen($password));
+        $this->assertEquals($length, \strlen($password));
     }
 
     public function testGenerateHexaRandom()
@@ -35,6 +35,6 @@ class PasswordTest extends TestCase
         $length = 8;
         $password = Password::generateHexaRandom($length);
 
-        $this->assertEquals($length, strlen($password));
+        $this->assertEquals($length, \strlen($password));
     }
 }

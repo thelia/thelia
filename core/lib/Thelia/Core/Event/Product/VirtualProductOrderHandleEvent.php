@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Core\Event\Product;
 
 use Thelia\Core\Event\ActionEvent;
@@ -86,7 +85,6 @@ class VirtualProductOrderHandleEvent extends ActionEvent
 
         return $this;
     }
-
 
     /**
      * @return int

@@ -48,11 +48,11 @@ class Esi extends AbstractSmartyPlugin
             return;
         }
 
-        $response = $this->esiFragmentRender->render($path, $this->requestStack->getCurrentRequest(), array(
+        $response = $this->esiFragmentRender->render($path, $this->requestStack->getCurrentRequest(), [
             'alt' => $alt,
             'ignore_errors' => $ignore_errors,
             'comment' => $comment
-        ));
+        ]);
 
         if (!$response->isSuccessful()) {
             return null;
@@ -66,8 +66,8 @@ class Esi extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor('function', 'render_esi', $this, 'renderEsi')
-        );
+        ];
     }
 }

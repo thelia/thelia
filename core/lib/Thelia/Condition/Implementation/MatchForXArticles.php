@@ -33,15 +33,15 @@ class MatchForXArticles extends ConditionAbstract
      */
     public function __construct(FacadeInterface $facade)
     {
-        $this->availableOperators = array(
-            self::CART_QUANTITY => array(
+        $this->availableOperators = [
+            self::CART_QUANTITY => [
                 Operators::INFERIOR,
                 Operators::INFERIOR_OR_EQUAL,
                 Operators::EQUAL,
                 Operators::SUPERIOR_OR_EQUAL,
                 Operators::SUPERIOR
-            )
-        );
+            ]
+        ];
 
         parent::__construct($facade);
     }
@@ -133,10 +133,10 @@ class MatchForXArticles extends ConditionAbstract
 
         $toolTip = $this->translator->trans(
             'If cart item count is <strong>%operator%</strong> %quantity%',
-            array(
+            [
                 '%operator%' => $i18nOperator,
                 '%quantity%' => $this->values[self::CART_QUANTITY]
-            )
+            ]
         );
 
         return $toolTip;
@@ -147,13 +147,13 @@ class MatchForXArticles extends ConditionAbstract
      */
     protected function generateInputs()
     {
-        return array(
-            self::CART_QUANTITY => array(
+        return [
+            self::CART_QUANTITY => [
                 'availableOperators' => $this->availableOperators[self::CART_QUANTITY],
                 'value' => '',
                 'selectedOperator' => ''
-            )
-        );
+            ]
+        ];
     }
 
     /**

@@ -263,7 +263,6 @@ class AddressCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * @param \Thelia\Model\Customer $customer
      */
     public function setCustomer(Customer $customer)
     {
@@ -279,7 +278,6 @@ class AddressCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * @param \Thelia\Model\Address $address
      */
     public function setAddress(Address $address)
     {

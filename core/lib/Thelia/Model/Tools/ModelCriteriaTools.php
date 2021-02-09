@@ -27,7 +27,6 @@ use Thelia\Model\LangQuery;
 class ModelCriteriaTools
 {
     /**
-     * @param ModelCriteria $search
      * @param               $requestedLocale
      * @param array $columns
      * @param null $foreignTable
@@ -164,7 +163,7 @@ class ModelCriteriaTools
     public static function getBackEndI18n(
         ModelCriteria &$search,
         $requestedLocale,
-        $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
+        $columns = ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
         $foreignTable = null,
         $foreignKey = 'ID',
         $localeAlias = null
@@ -215,13 +214,11 @@ class ModelCriteriaTools
         }
     }
 
-
     /**
      * Bild query to retrieve I18n
      *
      * @param bool $backendContext
      * @param int $requestedLangId
-     * @param ModelCriteria $search
      * @param string $currentLocale
      * @param array $columns
      * @param string $foreignTable

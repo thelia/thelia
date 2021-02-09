@@ -134,10 +134,6 @@ class ExportHandler
     /**
      * Export
      *
-     * @param \Thelia\Model\Export                         $export
-     * @param \Thelia\Core\Serializer\SerializerInterface  $serializer
-     * @param null|\Thelia\Core\Archiver\ArchiverInterface $archiver
-     * @param null|\Thelia\Model\Lang                      $language
      * @param boolean                                      $includeImages
      * @param boolean                                      $includeDocuments
      * @param null|array                                   $rangeDate
@@ -245,7 +241,7 @@ class ExportHandler
         $filePath = THELIA_CACHE_DIR . 'export' . DS . $filename;
 
         $fileSystem = new Filesystem;
-        $fileSystem->mkdir(dirname($filePath));
+        $fileSystem->mkdir(\dirname($filePath));
 
         $file = new \SplFileObject($filePath, 'w+b');
 
@@ -275,7 +271,6 @@ class ExportHandler
      * Add images to archive
      *
      * @param \Thelia\ImportExport\Export\AbstractExport $export   An export instance
-     * @param \Thelia\Core\Archiver\ArchiverInterface    $archiver
      */
     protected function processExportImages(AbstractExport $export, ArchiverInterface $archiver)
     {
@@ -288,7 +283,6 @@ class ExportHandler
      * Add documents to archive
      *
      * @param \Thelia\ImportExport\Export\AbstractExport $export   An export instance
-     * @param \Thelia\Core\Archiver\ArchiverInterface    $archiver
      */
     protected function processExportDocuments(AbstractExport $export, ArchiverInterface $archiver)
     {

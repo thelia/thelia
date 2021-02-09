@@ -75,16 +75,16 @@ class Form extends AbstractSmartyPlugin
     /** @var  ParserInterface $parser */
     protected $parser;
 
-    protected $formDefinition = array();
+    protected $formDefinition = [];
 
     /** @var array|TheliaFormFactoryInterface */
-    protected $formFactory = array();
+    protected $formFactory = [];
 
     /** @var array The form collection stack */
-    protected $formCollectionStack = array();
+    protected $formCollectionStack = [];
 
     /** @var array Counts collection loop in page */
-    protected $formCollectionCount = array();
+    protected $formCollectionCount = [];
 
     public function __construct(
         TheliaFormFactoryInterface $formFactory,
@@ -99,7 +99,7 @@ class Form extends AbstractSmartyPlugin
     public function setFormDefinition($formDefinition)
     {
         foreach ($formDefinition as $name => $className) {
-            if (array_key_exists($name, $this->formDefinition)) {
+            if (\array_key_exists($name, $this->formDefinition)) {
                 throw new \InvalidArgumentException(
                     sprintf("%s form name already exists for %s class", $name, $className)
                 );
@@ -192,7 +192,7 @@ class Form extends AbstractSmartyPlugin
             $this->assignFieldErrorVars($template, $errors);
         }
 
-        $attr = array();
+        $attr = [];
 
         foreach ($fieldVars["attr"] as $key => $value) {
             $attr[] = sprintf('%s="%s"', $key, $value);
@@ -281,11 +281,11 @@ class Form extends AbstractSmartyPlugin
             switch ($formFieldView->vars['type']) {
                 case "choice":
                     if (!isset($formFieldView->vars['options']['choices']) ||
-                        !is_array($formFieldView->vars['options']['choices'])
+                        !\is_array($formFieldView->vars['options']['choices'])
                     ) {
                         // throw new FIXME
                     }
-                    $choices = array();
+                    $choices = [];
                     foreach ($formFieldView->vars['options']['choices'] as $value => $choice) {
                         $choices[] = new ChoiceView($value, $value, $choice);
                     }
@@ -315,8 +315,8 @@ class Form extends AbstractSmartyPlugin
         // We (may) have a collection
         if ($key !== null) {
             // Force array
-            if (!is_array($value)) {
-                $value = array();
+            if (!\is_array($value)) {
+                $value = [];
             }
 
             // If the field is not found, use an empty value
@@ -338,7 +338,7 @@ class Form extends AbstractSmartyPlugin
                 $val,
                 $formFieldType,
                 $formFieldView->vars,
-                count($formFieldView->children)
+                \count($formFieldView->children)
             );
         } else {
             $this->assignFieldValues(
@@ -434,7 +434,6 @@ class Form extends AbstractSmartyPlugin
 
     /**
      * @param $params
-     * @param \Smarty_Internal_Template $template
      * @return string
      * @throws \Exception
      * @throws \SmartyException
@@ -447,7 +446,6 @@ class Form extends AbstractSmartyPlugin
 
     /**
      * @param $params
-     * @param \Smarty_Internal_Template $template
      * @return string
      * @throws \Exception
      * @throws \SmartyException
@@ -513,13 +511,13 @@ class Form extends AbstractSmartyPlugin
             // We have to exclude the fields for which value is defined in the template.
             if ($baseFormInstance->isTemplateDefinedHiddenField($row)
                 ||
-                in_array($row->vars['name'], $exclude)
+                \in_array($row->vars['name'], $exclude)
             ) {
                 continue;
             }
 
             if ($this->isHidden($row) && $row->isRendered() === false) {
-                $attributeList = array();
+                $attributeList = [];
                 if (isset($row->vars["attr"])) {
                     foreach ($row->vars["attr"] as $attrKey => $attrValue) {
                         $attributeList[] = sprintf($attrFormat, $attrKey, $attrValue);
@@ -609,14 +607,14 @@ class Form extends AbstractSmartyPlugin
             throw new \InvalidArgumentException("'tag' parameter is missing");
         }
 
-        $viewList = array();
+        $viewList = [];
         foreach ($instance->getView() as $view) {
             if (isset($view->vars['attr']['tag']) && $tag == $view->vars['attr']['tag']) {
                 $fieldData = $instance->getForm()->all()[$view->vars['name']];
-                $viewList[] = array(
+                $viewList[] = [
                     'view' => $view,
                     'config' => $fieldData->getConfig(),
-                );
+                ];
             }
         }
 
@@ -679,7 +677,7 @@ class Form extends AbstractSmartyPlugin
                 sprintf(
                     "form parameter in form_field block must be an instance of " .
                     "\Thelia\Form\BaseForm, instance of %s found",
-                    get_class($instance)
+                    \get_class($instance)
                 )
             );
         }
@@ -731,7 +729,7 @@ class Form extends AbstractSmartyPlugin
                     "%s parameter must be an instance of " .
                     "\Symfony\Component\Form\Form, instance of %s found",
                     $name,
-                    is_object($sfForm) ? get_class($sfForm) : gettype($sfForm)
+                    \is_object($sfForm) ? \get_class($sfForm) : \gettype($sfForm)
                 )
             );
         }
@@ -742,7 +740,6 @@ class Form extends AbstractSmartyPlugin
     /**
      * @param $params
      * @param $content
-     * @param \Smarty_Internal_Template $template
      * @param $repeat
      * @return mixed
      *
@@ -819,7 +816,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param BaseForm $form
      * @param SymfonyForm $field
      * @return string
      *
@@ -827,7 +823,7 @@ class Form extends AbstractSmartyPlugin
      */
     protected function getFormStackHash(BaseForm $form, SymfonyForm $field = null)
     {
-        $build = get_class($form) . ":" . $form->getType();
+        $build = \get_class($form) . ":" . $form->getType();
 
         if (null !== $field) {
             $build .= ":" . $this->buildFieldName($field);
@@ -838,7 +834,6 @@ class Form extends AbstractSmartyPlugin
 
     /**
      * @param $collection
-     * @param BaseForm $form
      * @return SymfonyForm
      *
      * Extract the collection object from the form
@@ -903,7 +898,6 @@ class Form extends AbstractSmartyPlugin
     /**
      * @param $params
      * @param $content
-     * @param \Smarty_Internal_Template $template
      * @param $repeat
      * @return string
      *
@@ -936,8 +930,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param FormView $formView
-     * @param SymfonyForm $formField
      * @return array
      */
     protected function findCollectionFieldFormView(FormView $formView, SymfonyForm $formField)
@@ -951,7 +943,6 @@ class Form extends AbstractSmartyPlugin
             }
 
             $formFieldParentList[] = $formField->getConfig()->getName();
-
         } while (null !== $formField = $formField->getParent());
 
         $formFieldParentList = array_reverse($formFieldParentList);
@@ -964,13 +955,11 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param FormInterface $form
-     * @param array $tree
      * @return string
      *
      * Tail recursive method that builds the field full name
      */
-    protected function buildFieldName(FormInterface $form, array &$tree = array())
+    protected function buildFieldName(FormInterface $form, array &$tree = [])
     {
         $config = $form->getConfig();
         $parent = $form->getParent();
@@ -999,7 +988,6 @@ class Form extends AbstractSmartyPlugin
 
     /**
      * @param $params
-     * @param \Smarty_Internal_Template $template
      * @return mixed
      *
      * Counts collection entries
@@ -1019,8 +1007,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param BaseForm $form
-     * @param SymfonyForm $collection
      * @param SymfonyForm $row
      * @return string
      *
@@ -1038,7 +1024,7 @@ class Form extends AbstractSmartyPlugin
             $this->formCollectionCount[$hash] = [
                 "count" => 0,
                 "limit" => 0,
-                "total_count" => count($this->formCollectionStack[$hash]),
+                "total_count" => \count($this->formCollectionStack[$hash]),
             ];
         }
 
@@ -1050,7 +1036,7 @@ class Form extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor("block", "form", $this, "generateForm"),
             new SmartyPluginDescriptor("block", "form_field", $this, "renderFormField"),
             new SmartyPluginDescriptor("block", "form_tagged_fields", $this, "renderTaggedFormFields"),
@@ -1063,6 +1049,6 @@ class Form extends AbstractSmartyPlugin
             new SmartyPluginDescriptor("block", "form_collection", $this, "renderFormCollection"),
             new SmartyPluginDescriptor("block", "form_collection_field", $this, "renderFormCollectionField"),
             new SmartyPluginDescriptor("function", "form_collection_count", $this, "formCollectionCount"),
-        );
+        ];
     }
 }

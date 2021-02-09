@@ -26,14 +26,14 @@ use Thelia\Core\HttpFoundation\Request as TheliaRequest;
  */
 class HttpCache extends BaseHttpCache implements HttpKernelInterface
 {
-    public function __construct(HttpKernelInterface $kernel, $options = array())
+    public function __construct(HttpKernelInterface $kernel, $options = [])
     {
         parent::__construct(
             $kernel,
             new Store($kernel->getCacheDir().'/http_cache'),
             new Esi(),
             array_merge(
-                array('debug' => $kernel->isDebug()),
+                ['debug' => $kernel->isDebug()],
                 $options
             )
         );

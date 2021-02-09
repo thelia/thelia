@@ -19,13 +19,13 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\NewsletterTableMap;
-use Thelia\Type\TypeCollection;
 use Thelia\Type;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -71,7 +71,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                 'order',
                 new TypeCollection(
                     new Type\EnumListType(
-                        array(
+                        [
                             'id',
                             'id_reverse',
                             'reference',
@@ -86,7 +86,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                             'order_amount_reverse',
                             'registration_date',
                             'registration_date_reverse'
-                        )
+                        ]
                     )
                 ),
                 'lastname'
@@ -97,12 +97,12 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
 
     public function getSearchIn()
     {
-        return array(
+        return [
             "ref",
             "firstname",
             "lastname",
             "email",
-        );
+        ];
     }
 
     /**
@@ -165,9 +165,8 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             $currentCustomer = $this->securityContext->getCustomerUser();
             if ($currentCustomer === null) {
                 return null;
-            } else {
+            }  
                 $search->filterById($currentCustomer->getId(), Criteria::EQUAL);
-            }
         }
 
         $id = $this->getId();

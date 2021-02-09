@@ -12,7 +12,6 @@
 
 namespace Thelia\Core\Event\Hook;
 
-
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -24,7 +23,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class BaseHookRenderEvent extends Event
 {
     /** @var  string $code the code of the hook */
-    protected $code = null;
+    protected $code;
 
     /** @var  array $arguments an array of arguments passed to the template engine function */
     protected $arguments = [];
@@ -117,7 +116,7 @@ class BaseHookRenderEvent extends Event
      */
     public function getArgument($key, $default = null)
     {
-        return array_key_exists($key, $this->arguments) ? $this->arguments[$key] : $default;
+        return \array_key_exists($key, $this->arguments) ? $this->arguments[$key] : $default;
     }
 
     /**
@@ -128,9 +127,8 @@ class BaseHookRenderEvent extends Event
      */
     public function hasArgument($key)
     {
-        return array_key_exists($key, $this->arguments);
+        return \array_key_exists($key, $this->arguments);
     }
-
 
     /**
      * Return a template variable value. An exception is thorwn if the variable is not defined.

@@ -74,7 +74,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     /** @var  CouponManager */
     protected $couponManager;
 
-    private static $dataAccessCache = array();
+    private static $dataAccessCache = [];
 
     public function __construct(
         RequestStack $requestStack,
@@ -256,7 +256,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         return '';
     }
 
-
     /**
      * Provides access to an attribute of the current currency
      *
@@ -273,7 +272,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 "Currency",
                 $params,
                 CurrencyQuery::create()->filterByPrimaryKey($currency->getId()),
-                array("NAME")
+                ["NAME"]
             );
         }
 
@@ -312,7 +311,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     public function cartDataAccess($params, $smarty)
     {
         /** @var Country $taxCountry */
-        if (array_key_exists('currentCountry', self::$dataAccessCache)) {
+        if (\array_key_exists('currentCountry', self::$dataAccessCache)) {
             $taxCountry = self::$dataAccessCache['currentCountry'];
         } else {
             $taxCountry = $this->taxEngine->getDeliveryCountry();
@@ -320,7 +319,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         }
 
         /** @var State $taxState */
-        if (array_key_exists('currentState', self::$dataAccessCache)) {
+        if (\array_key_exists('currentState', self::$dataAccessCache)) {
             $taxState = self::$dataAccessCache['currentState'];
         } else {
             $taxState = $this->taxEngine->getDeliveryState();
@@ -384,13 +383,13 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         /** @var Order $order */
         $order = $this->getSession()->getOrder();
-        $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
+        $attribute = $this->getNormalizedParam($params, ['attribute', 'attrib', 'attr']);
 
         switch ($attribute) {
             case 'has_coupons':
-                return count($this->couponManager->getCouponsKept()) > 0;
+                return \count($this->couponManager->getCouponsKept()) > 0;
             case 'coupon_count':
-                return count($this->couponManager->getCouponsKept());
+                return \count($this->couponManager->getCouponsKept());
             case 'coupon_list':
                 $orderCoupons = [];
                 /** @var CouponInterface $coupon */
@@ -416,7 +415,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         /** @var Order $order */
         $order = $this->getSession()->getOrder();
-        $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
+        $attribute = $this->getNormalizedParam($params, ['attribute', 'attrib', 'attr']);
         switch ($attribute) {
             case 'untaxed_postage':
                 return $order->getUntaxedPostage();
@@ -499,7 +498,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                     $default,
                     $locale
                 );
-        } else {
+        }  
             Tlog::getInstance()->addWarning(
                 sprintf(
                     "Module code '%s' not found in module-config Smarty function",
@@ -508,8 +507,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             );
 
             $value = $default;
-        }
-
+        
         return $value;
     }
 
@@ -523,23 +521,23 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      */
     public function statsAccess($params, $smarty)
     {
-        if (false === array_key_exists("key", $params)) {
+        if (false === \array_key_exists("key", $params)) {
             throw new \InvalidArgumentException(sprintf("missing key attribute in stats access function"));
         }
-        if (false === array_key_exists("startDate", $params) || $params['startDate'] === '') {
+        if (false === \array_key_exists("startDate", $params) || $params['startDate'] === '') {
             throw new \InvalidArgumentException(sprintf("missing startDate attribute in stats access function"));
         }
-        if (false === array_key_exists("endDate", $params) || $params['endDate'] === '') {
+        if (false === \array_key_exists("endDate", $params) || $params['endDate'] === '') {
             throw new \InvalidArgumentException(sprintf("missing endDate attribute in stats access function"));
         }
 
-        if (false !== array_key_exists("includeShipping", $params) && $params['includeShipping'] == 'false') {
+        if (false !== \array_key_exists("includeShipping", $params) && $params['includeShipping'] == 'false') {
             $includeShipping = false;
         } else {
             $includeShipping = true;
         }
 
-        if (false !== array_key_exists("withTaxes", $params) && $params['withTaxes'] == 'false') {
+        if (false !== \array_key_exists("withTaxes", $params) && $params['withTaxes'] == 'false') {
             $withTaxes = false;
         } else {
             $withTaxes = true;
@@ -650,7 +648,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
         $out = null;
 
-        if (array_key_exists($cacheKey, self::$dataAccessCache)) {
+        if (\array_key_exists($cacheKey, self::$dataAccessCache)) {
             return self::$dataAccessCache[$cacheKey];
         }
 
@@ -670,19 +668,17 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             $smarty->assign($params['out'], $out);
 
             return $out !== null ? true : false;
-        } else {
-            if (is_array($out)) {
+        }  
+            if (\is_array($out)) {
                 throw new \InvalidArgumentException('The argument "out" is required if the meta value is an array');
             }
 
             return $out;
-        }
     }
 
     /**
      * @param               $objectLabel
      * @param               $params
-     * @param ModelCriteria $search
      * @param array         $columns
      * @param null          $foreignTable
      * @param string        $foreignKey
@@ -693,14 +689,14 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $objectLabel,
         $params,
         ModelCriteria $search,
-        $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
+        $columns = ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
         $foreignTable = null,
         $foreignKey = 'ID'
     ) {
-        if (array_key_exists('data_' . $objectLabel, self::$dataAccessCache)) {
+        if (\array_key_exists('data_' . $objectLabel, self::$dataAccessCache)) {
             $data = self::$dataAccessCache['data_' . $objectLabel];
         } else {
-            $lang = $this->getNormalizedParam($params, array('lang'));
+            $lang = $this->getNormalizedParam($params, ['lang']);
             if ($lang === null) {
                 $lang = $this->getSession()->getLang()->getId();
             }
@@ -722,16 +718,15 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         }
 
         if ($data !== null) {
-            $noGetterData = array();
+            $noGetterData = [];
 
             foreach ($columns as $column) {
                 $noGetterData[$column] = $data->getVirtualColumn('i18n_' . $column);
             }
 
             return $this->dataAccess($objectLabel, $params, $data, $noGetterData);
-        } else {
+        }  
             throw new NotFoundHttpException();
-        }
     }
 
     /**
@@ -743,14 +738,14 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      * @return string
      * @throws \InvalidArgumentException
      */
-    protected function dataAccess($objectLabel, $params, $data, $noGetterData = array())
+    protected function dataAccess($objectLabel, $params, $data, $noGetterData = [])
     {
-        $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
+        $attribute = $this->getNormalizedParam($params, ['attribute', 'attrib', 'attr']);
 
         if (!empty($attribute)) {
             if (null != $data) {
                 $keyAttribute = strtoupper($attribute);
-                if (array_key_exists($keyAttribute, $noGetterData)) {
+                if (\array_key_exists($keyAttribute, $noGetterData)) {
                     return $noGetterData[$keyAttribute];
                 }
 
@@ -759,11 +754,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                     $return = $data->$getter();
 
                     if ($return instanceof \DateTime) {
-                        if (array_key_exists("format", $params)) {
+                        if (\array_key_exists("format", $params)) {
                             $format = $params["format"];
                         } else {
                             $format = DateTimeFormat::getInstance($this->getRequest())->getFormat(
-                                array_key_exists("output", $params) ? $params["output"] : null
+                                \array_key_exists("output", $params) ? $params["output"] : null
                             );
                         }
 
@@ -806,7 +801,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      *
      * @param array $params
      * @param string $content
-     * @param \Smarty_Internal_Template $template
      * @param boolean $repeat
      * @return string|null
      */
@@ -815,8 +809,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $type = $this->getParam($params, 'type', null);
         $allowedTypes = ['favicon', 'logo', 'banner'];
 
-
-        if ($type !== null && in_array($type, $allowedTypes)) {
+        if ($type !== null && \in_array($type, $allowedTypes)) {
             switch ($type) {
                 case 'favicon':
                     $configKey = 'favicon_file';
@@ -841,7 +834,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             }
 
             $uploadDir .= DS . 'store';
-
 
             $imageFileName = ConfigQuery::read($configKey);
 
@@ -878,17 +870,14 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             $event->setSourceFilepath($imageSourcePath)
                 ->setCacheSubdirectory('store');
 
-
             if (!$skipImageTransform) {
                 switch ($this->getParam($params, 'resize_mode', null)) {
                     case 'crop':
                         $resize_mode = \Thelia\Action\Image::EXACT_RATIO_WITH_CROP;
                         break;
-
                     case 'borders':
                         $resize_mode = \Thelia\Action\Image::EXACT_RATIO_WITH_BORDERS;
                         break;
-
                     case 'none':
                     default:
                         $resize_mode = \Thelia\Action\Image::KEEP_IMAGE_RATIO;
@@ -899,14 +888,14 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 $height = $this->getParam($params, 'height', null);
                 $rotation = $this->getParam($params, 'rotation', null);
 
-                if (!is_null($width)) {
+                if (!\is_null($width)) {
                     $event->setWidth($width);
                 }
-                if (!is_null($height)) {
+                if (!\is_null($height)) {
                     $event->setHeight($height);
                 }
                 $event->setResizeMode($resize_mode);
-                if (!is_null($rotation)) {
+                if (!\is_null($rotation)) {
                     $event->setRotation($rotation);
                 }
             }
@@ -922,9 +911,8 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
         if (isset($content)) {
             return $content;
-        } else {
+        }  
             return null;
-        }
     }
 
     /**
@@ -932,7 +920,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor('function', 'admin', $this, 'adminDataAccess'),
             new SmartyPluginDescriptor('function', 'customer', $this, 'customerDataAccess'),
             new SmartyPluginDescriptor('function', 'product', $this, 'productDataAccess'),
@@ -952,7 +940,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'coupon', $this, 'couponDataAccess'),
 
             new SmartyPluginDescriptor('block', 'local_media', $this, 'storeMediaDataAccess'),
-        );
+        ];
     }
 
     /**

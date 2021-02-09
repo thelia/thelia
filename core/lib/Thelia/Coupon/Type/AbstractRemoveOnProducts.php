@@ -28,7 +28,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
     const PRODUCTS_LIST = 'products';
 
     public $category_id  = 0;
-    public $product_list = array();
+    public $product_list = [];
 
     /**
      * Set the value of specific coupon fields.
@@ -83,10 +83,10 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
             $perCustomerUsageCount
         );
 
-        $this->product_list = isset($effects[self::PRODUCTS_LIST]) ? $effects[self::PRODUCTS_LIST] : array();
+        $this->product_list = isset($effects[self::PRODUCTS_LIST]) ? $effects[self::PRODUCTS_LIST] : [];
 
         if (! \is_array($this->product_list)) {
-            $this->product_list = array($this->product_list);
+            $this->product_list = [$this->product_list];
         }
 
         $this->category_id = isset($effects[self::CATEGORY_ID]) ? $effects[self::CATEGORY_ID] : 0;
@@ -125,7 +125,6 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
     public function drawBaseBackOfficeInputs($templateName, $otherFields)
     {
         return $this->facade->getParser()->render($templateName, array_merge($otherFields, [
-
             // The category ID field
             'category_id_field_name' => $this->makeCouponFieldName(self::CATEGORY_ID),
             'category_id_value'     => $this->category_id,

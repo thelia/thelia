@@ -31,103 +31,103 @@ class AdministratorCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("login", TextType::class, array(
-                "constraints" => array(
+            ->add("login", TextType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                            array($this, "verifyExistingLogin")),
-                ),
+                            [$this, "verifyExistingLogin"]),
+                ],
                 "label" => $this->translator->trans("Login name"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "login",
                     'help' => $this->translator->trans("This is the name used on the login screen")
-                ),
-            ))
-            ->add("email", EmailType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("email", EmailType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
                     new Constraints\Callback(
-                            array($this, "verifyExistingEmail")
+                            [$this, "verifyExistingEmail"]
                         ),
-                ),
+                ],
                 "label" => $this->translator->trans("Email address"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "email",
                     'help' => $this->translator->trans("Please enter a valid email address")
-                ),
+                ],
                 'attr'        => [
                     'placeholder' => $this->translator->trans('Administrator email address'),
                 ]
-            ))
-            ->add("firstname", TextType::class, array(
-                "constraints" => array(
+            ])
+            ->add("firstname", TextType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
-                ),
+                ],
                 "label" => $this->translator->trans("First Name"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "firstname",
-                ),
-            ))
-            ->add("lastname", TextType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("lastname", TextType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
-                ),
+                ],
                 "label" => $this->translator->trans("Last Name"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "lastname",
-                ),
-            ))
-            ->add("password", PasswordType::class, array(
-                "constraints" => array(),
+                ],
+            ])
+            ->add("password", PasswordType::class, [
+                "constraints" => [],
                 "label" => $this->translator->trans("Password"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "password",
-                ),
-            ))
-            ->add("password_confirm", PasswordType::class, array(
-                "constraints" => array(
-                    new Constraints\Callback(array($this, "verifyPasswordField")),
-                ),
+                ],
+            ])
+            ->add("password_confirm", PasswordType::class, [
+                "constraints" => [
+                    new Constraints\Callback([$this, "verifyPasswordField"]),
+                ],
                 "label" => $this->translator->trans('Password confirmation'),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "password_confirmation",
-                ),
-            ))
+                ],
+            ])
             ->add(
                 'profile',
                 ChoiceType::class,
-                array(
+                [
                     "choices" => ProfileQuery::getProfileList(),
-                    "constraints" => array(
+                    "constraints" => [
                         new Constraints\NotBlank(),
-                    ),
+                    ],
                     "label" => $this->translator->trans('Profile'),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "profile",
-                    ),
-                )
+                    ],
+                ]
             )
             ->add(
                 'locale',
                 ChoiceType::class,
-                array(
+                [
                     "choices" => $this->getLocaleList(),
-                    "constraints" => array(
+                    "constraints" => [
                         new Constraints\NotBlank(),
-                    ),
+                    ],
                     "label" => $this->translator->trans('Preferred locale'),
-                    "label_attr" => array(
+                    "label_attr" => [
                         "for" => "locale",
-                    ),
-                )
+                    ],
+                ]
             )
         ;
     }
 
     protected function getLocaleList()
     {
-        $locales = array();
+        $locales = [];
 
         $list = LangQuery::create()->find();
 

@@ -41,6 +41,6 @@ class AnyListType extends BaseType
 
     public function getFormOptions()
     {
-        return array();
+        return [];
     }
 }

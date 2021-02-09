@@ -47,49 +47,49 @@ abstract class CouponAbstract implements CouponInterface
     const AMOUNT_FIELD_NAME = 'amount';
 
     /** @var  FacadeInterface Provide necessary value from Thelia */
-    protected $facade = null;
+    protected $facade;
 
     /** @var Translator Service Translator */
-    protected $translator = null;
+    protected $translator;
 
     /** @var ConditionOrganizerInterface  */
-    protected $organizer = null;
+    protected $organizer;
 
     /** @var ConditionCollection Array of ConditionInterface */
-    protected $conditions = null;
+    protected $conditions;
 
     /** @var ConditionEvaluator Condition validator */
-    protected $conditionEvaluator = null;
+    protected $conditionEvaluator;
 
     /** @var string Service Id  */
-    protected $serviceId = null;
+    protected $serviceId;
 
     /** @var float Amount that will be removed from the Checkout (Coupon Effect)  */
     protected $amount = 0;
 
     /** @var array Get the Coupon effects params */
-    protected $effects = array('amount' => 0);
+    protected $effects = ['amount' => 0];
 
     /** @var string Coupon code (ex: XMAS) */
-    protected $code = null;
+    protected $code;
 
     /** @var string Coupon title (ex: Coupon for XMAS) */
-    protected $title = null;
+    protected $title;
 
     /** @var string Coupon short description */
-    protected $shortDescription = null;
+    protected $shortDescription;
 
     /** @var string Coupon description */
-    protected $description = null;
+    protected $description;
 
     /** @var bool if Coupon is enabled */
     protected $isEnabled = false;
 
     /** @var \DateTime Coupon start date */
-    protected $startDate = null;
+    protected $startDate;
 
     /** @var \DateTime Coupon expiration date */
-    protected $expirationDate = null;
+    protected $expirationDate;
 
     /** @var bool if Coupon is cumulative */
     protected $isCumulative = false;
@@ -432,7 +432,6 @@ abstract class CouponAbstract implements CouponInterface
      *
      * @param  string                    $fieldName
      * @param  string                    $fieldValue
-     * @return mixed
      * @throws \InvalidArgumentException if the field value is not valid.
      */
     protected function checkCouponFieldValue(/** @noinspection PhpUnusedParameterInspection */ $fieldName, $fieldValue)
@@ -459,11 +458,11 @@ abstract class CouponAbstract implements CouponInterface
                 $fieldName,
                 $couponSpecificData[$fieldName]
             );
-        } elseif (null !== $defaultValue) {
-            return $defaultValue;
-        } else {
-            throw new \InvalidArgumentException(sprintf("The coupon field name %s was not found in the coupon form", $fieldName));
         }
+        if (null !== $defaultValue) {
+            return $defaultValue;
+        }  
+            throw new \InvalidArgumentException(sprintf("The coupon field name %s was not found in the coupon form", $fieldName));
     }
 
     /**

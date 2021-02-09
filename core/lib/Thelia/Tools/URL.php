@@ -12,23 +12,23 @@
 
 namespace Thelia\Tools;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\UrlValidator;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Rewriting\RewritingRetriever;
-use Thelia\Core\HttpFoundation\Request;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class URL
 {
     /** @var RewritingResolver $resolver */
-    protected $resolver = null;
+    protected $resolver;
 
     /** @var RewritingRetriever $retriever */
-    protected $retriever = null;
+    protected $retriever;
 
     /** @var  RequestContext $requestContext */
     protected $requestContext;
@@ -39,7 +39,7 @@ class URL
     protected static $instance = null;
 
     /** @var string $baseUrlScheme a cache for the base URL scheme  */
-    private $baseUrlScheme = null;
+    private $baseUrlScheme;
 
     public function __construct(RouterInterface $router = null)
     {
@@ -57,7 +57,6 @@ class URL
     }
 
     /**
-     * @param RequestContext $requestContext
      * @since Version 2.2
      */
     public function setRequestContext(RequestContext $requestContext)
@@ -155,7 +154,7 @@ class URL
             // If only a path is requested, be sure to remove the script name (index.php or index_dev.php), if any.
             if ($path_only == self::PATH_TO_FILE) {
                 if (substr($base_url, -3) == 'php') {
-                    $base_url = dirname($base_url);
+                    $base_url = \dirname($base_url);
                 }
             }
 
@@ -205,7 +204,7 @@ class URL
      *
      * @return string The generated URL
      */
-    public function adminViewUrl($viewName, array $parameters = array())
+    public function adminViewUrl($viewName, array $parameters = [])
     {
         $path = sprintf("%s/admin/%s", $this->getIndexPage(), $viewName);
 
@@ -220,7 +219,7 @@ class URL
      *
      * @return string The generated URL
      */
-    public function viewUrl($viewName, array $parameters = array())
+    public function viewUrl($viewName, array $parameters = [])
     {
         $path = sprintf("?view=%s", $viewName);
 
@@ -241,7 +240,7 @@ class URL
         if (ConfigQuery::isRewritingEnable()) {
             $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
         } else {
-            $allParametersWithoutView = array();
+            $allParametersWithoutView = [];
             $allParametersWithoutView['lang'] = $viewLocale;
             if (null !== $viewId) {
                 $allParametersWithoutView[$view . '_id'] = $viewId;
@@ -256,7 +255,6 @@ class URL
     /**
      * Retrieve a rewritten URL from the current GET parameters
      *
-     * @param Request $request
      *
      * @return RewritingRetriever You can access $url and $rewrittenUrl properties or use toString method
      */
@@ -311,9 +309,9 @@ class URL
 
     protected function sanitize($string, $force_lowercase = true, $alphabetic_only = false)
     {
-        static $strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]",
+        static $strip = ["~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]",
                  "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
-                 "â€”", "â€“", ",", "<", ".", ">", "/", "?");
+                 "â€”", "â€“", ",", "<", ".", ">", "/", "?"];
 
         $clean = trim(str_replace($strip, "", strip_tags($string)));
 
@@ -322,7 +320,7 @@ class URL
         $clean = ($alphabetic_only) ? preg_replace("/[^a-zA-Z0-9]/", "", $clean) : $clean ;
 
         return ($force_lowercase) ?
-             (function_exists('mb_strtolower')) ?
+             (\function_exists('mb_strtolower')) ?
                  mb_strtolower($clean, 'UTF-8') :
              strtolower($clean) :
              $clean;
@@ -338,7 +336,6 @@ class URL
     /**
      * Get the locale code from the lang attribute in URL.
      *
-     * @param Request $request
      * @return null|string
      */
     private function getViewLocale(Request $request)

@@ -10,9 +10,9 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-use Thelia\Core\Thelia;
-use Thelia\Core\HttpFoundation\Request;
 use Symfony\Component\Dotenv\Dotenv;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Thelia;
 
 $env = 'prod';
 $loader = require __DIR__ . '/../vendor/autoload.php';

@@ -12,9 +12,9 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
+use Thelia\Core\Template\Loop\Brand;
 use Thelia\Model\BrandQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
-use Thelia\Core\Template\Loop\Brand;
 
 /**
  *
@@ -30,7 +30,7 @@ class BrandTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return array();
+        return [];
     }
 
     public function testSearchById()
@@ -43,9 +43,9 @@ class BrandTest extends BaseLoopTestor
             $brand->save();
         }
 
-        $otherParameters = array(
+        $otherParameters = [
             "visible" => "*",
-        );
+        ];
 
         $this->baseTestSearchById($brand->getId(), $otherParameters);
     }

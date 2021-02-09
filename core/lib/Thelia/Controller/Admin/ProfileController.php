@@ -104,13 +104,13 @@ class ProfileController extends AbstractCrudController
      */
     protected function hydrateObjectForm($object)
     {
-        $data = array(
+        $data = [
             'id'           => $object->getId(),
             'locale'       => $object->getLocale(),
             'title'        => $object->getTitle(),
             'description'  => $object->getDescription(),
             'code'         => $object->getCode(),
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(AdminForm::PROFILE_MODIFICATION, FormType::class, $data);
@@ -122,9 +122,9 @@ class ProfileController extends AbstractCrudController
      */
     protected function hydrateResourceUpdateForm($object)
     {
-        $data = array(
+        $data = [
             'id'           => $object->getId(),
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(AdminForm::PROFILE_UPDATE_RESOURCE_ACCESS, FormType::class, $data);
@@ -136,9 +136,9 @@ class ProfileController extends AbstractCrudController
      */
     protected function hydrateModuleUpdateForm($object)
     {
-        $data = array(
+        $data = [
             'id'           => $object->getId(),
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(AdminForm::PROFILE_UPDATE_MODULE_ACCESS, FormType::class, $data);
@@ -186,9 +186,9 @@ class ProfileController extends AbstractCrudController
 
     protected function getRouteArguments($profile_id = null)
     {
-        return array(
+        return [
             'profile_id' => $profile_id === null ? $this->getRequest()->get('profile_id') : $profile_id,
-        );
+        ];
     }
 
     protected function renderListTemplate($currentOrder)
@@ -196,7 +196,7 @@ class ProfileController extends AbstractCrudController
         // We always return to the feature edition form
         return $this->render(
             'profiles',
-            array()
+            []
         );
     }
 
@@ -238,7 +238,7 @@ class ProfileController extends AbstractCrudController
 
     public function updateAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -279,7 +279,7 @@ class ProfileController extends AbstractCrudController
 
     protected function getResourceAccess($formData)
     {
-        $requirements = array();
+        $requirements = [];
         foreach ($formData as $data => $value) {
             if (!strstr($data, ':')) {
                 continue;
@@ -301,7 +301,7 @@ class ProfileController extends AbstractCrudController
 
     protected function getModuleAccess($formData)
     {
-        $requirements = array();
+        $requirements = [];
         foreach ($formData as $data => $value) {
             if (!strstr($data, ':')) {
                 continue;
@@ -324,7 +324,7 @@ class ProfileController extends AbstractCrudController
     public function processUpdateResourceAccess()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -344,7 +344,7 @@ class ProfileController extends AbstractCrudController
 
             if (! $this->eventContainsObject($changeEvent)) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName))
+                    $this->getTranslator()->trans("No %obj was updated.", ['%obj', $this->objectName])
                 );
             }
 
@@ -365,9 +365,8 @@ class ProfileController extends AbstractCrudController
 
             if ($response == null) {
                 return $this->redirectToEditionTemplate();
-            } else {
+            }  
                 return $response;
-            }
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -376,7 +375,7 @@ class ProfileController extends AbstractCrudController
             $error_msg = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext($this->getTranslator()->trans("%obj modification", array('%obj' => 'taxrule')), $error_msg, $changeForm, $ex);
+        $this->setupFormErrorContext($this->getTranslator()->trans("%obj modification", ['%obj' => 'taxrule']), $error_msg, $changeForm, $ex);
 
         // At this point, the form has errors, and should be redisplayed.
         return $this->renderEditionTemplate();
@@ -385,7 +384,7 @@ class ProfileController extends AbstractCrudController
     public function processUpdateModuleAccess()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -405,7 +404,7 @@ class ProfileController extends AbstractCrudController
 
             if (! $this->eventContainsObject($changeEvent)) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName))
+                    $this->getTranslator()->trans("No %obj was updated.", ['%obj', $this->objectName])
                 );
             }
 
@@ -426,9 +425,8 @@ class ProfileController extends AbstractCrudController
 
             if ($response == null) {
                 return $this->redirectToEditionTemplate();
-            } else {
+            }  
                 return $response;
-            }
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -437,7 +435,7 @@ class ProfileController extends AbstractCrudController
             $error_msg = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext($this->getTranslator()->trans("%obj modification", array('%obj' => 'taxrule')), $error_msg, $changeForm, $ex);
+        $this->setupFormErrorContext($this->getTranslator()->trans("%obj modification", ['%obj' => 'taxrule']), $error_msg, $changeForm, $ex);
 
         // At this point, the form has errors, and should be redisplayed.
         return $this->renderEditionTemplate();

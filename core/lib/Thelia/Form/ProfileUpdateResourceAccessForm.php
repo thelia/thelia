@@ -32,37 +32,36 @@ class ProfileUpdateResourceAccessForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("id", HiddenType::class, array(
+            ->add("id", HiddenType::class, [
                 "required" => true,
-                "constraints" => array(
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        array($this, "verifyProfileId")
+                        [$this, "verifyProfileId"]
                     ),
-                ),
-            ))
+                ],
+            ])
         ;
 
         foreach (ResourceQuery::create()->find() as $resource) {
             $this->formBuilder->add(
                 self::RESOURCE_ACCESS_FIELD_PREFIX.':'.str_replace(".", ":", $resource->getCode()),
                 ChoiceType::class,
-                array(
-                    "choices" => array(
+                [
+                    "choices" => [
                         AccessManager::VIEW => AccessManager::VIEW,
                         AccessManager::CREATE => AccessManager::CREATE,
                         AccessManager::UPDATE => AccessManager::UPDATE,
                         AccessManager::DELETE => AccessManager::DELETE,
-                    ),
-                    "attr" => array(
+                    ],
+                    "attr" => [
                         "tag" => "resources",
                         "resource_code" => $resource->getCode(),
-                    ),
+                    ],
                     "multiple" => true,
-                    "constraints" => array(
-
-                    ),
-                )
+                    "constraints" => [
+                    ],
+                ]
             );
         }
     }

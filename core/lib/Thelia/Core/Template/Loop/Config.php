@@ -19,11 +19,11 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\Config as ConfigModel;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\BooleanOrBothType;
-use Thelia\Type\TypeCollection;
 use Thelia\Type\EnumListType;
-use Thelia\Model\Config as ConfigModel;
+use Thelia\Type\TypeCollection;
 
 /**
  * Config loop, to access configuration variables
@@ -64,12 +64,12 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
                 'order',
                 new TypeCollection(
                     new EnumListType(
-                        array(
+                        [
                             'id', 'id_reverse',
                             'name', 'name_reverse',
                             'title', 'title_reverse',
                             'value', 'value_reverse',
-                        )
+                        ]
                     )
                 ),
                 'name'
@@ -118,21 +118,18 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
                 case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-
                 case 'name':
                      $search->orderByName(Criteria::ASC);
                     break;
                 case 'name_reverse':
                      $search->orderByName(Criteria::DESC);
                     break;
-
                 case 'title':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case 'title_reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-
                 case 'value':
                     $search->orderByValue(Criteria::ASC);
                     break;

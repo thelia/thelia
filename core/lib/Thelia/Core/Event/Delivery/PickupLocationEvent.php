@@ -69,16 +69,12 @@ class PickupLocationEvent extends ActionEvent
     /**
      * PickupLocationEvent constructor.
      *
-     * @param Address|null $addressModel
      * @param integer|null $radius
      * @param integer|null $maxRelays
      * @param string|null $address
      * @param string|null $city
      * @param string|null $zipCode
      * @param integer|null $orderWeight
-     * @param State|null $state
-     * @param Country|null $country
-     * @param array|null $moduleIds
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function __construct(

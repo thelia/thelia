@@ -16,15 +16,15 @@ use Thelia\Core\Event\ActionEvent;
 
 class MailingSystemEvent extends ActionEvent
 {
-    protected $enabled = null;
-    protected $host = null;
-    protected $port = null;
-    protected $encryption = null;
-    protected $username = null;
-    protected $password = null;
-    protected $authMode = null;
-    protected $timeout = null;
-    protected $sourceIp = null;
+    protected $enabled;
+    protected $host;
+    protected $port;
+    protected $encryption;
+    protected $username;
+    protected $password;
+    protected $authMode;
+    protected $timeout;
+    protected $sourceIp;
 
     /**
      * @param null $authMode

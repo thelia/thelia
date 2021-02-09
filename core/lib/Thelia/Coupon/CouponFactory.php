@@ -15,10 +15,10 @@ namespace Thelia\Coupon;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Coupon\Type\CouponInterface;
-use Thelia\Exception\CouponNotReleaseException;
-use Thelia\Exception\InactiveCouponException;
 use Thelia\Exception\CouponExpiredException;
+use Thelia\Exception\CouponNotReleaseException;
 use Thelia\Exception\CouponNoUsageLeftException;
+use Thelia\Exception\InactiveCouponException;
 use Thelia\Exception\InvalidConditionException;
 use Thelia\Exception\UnmatchableConditionException;
 use Thelia\Model\Coupon;
@@ -44,9 +44,6 @@ class CouponFactory
     /**
      * Constructor
      *
-     * @param ContainerInterface $container
-     * @param FacadeInterface $facade
-     * @param ConditionFactory $conditionFactory
      */
     public function __construct(
         ContainerInterface $container,

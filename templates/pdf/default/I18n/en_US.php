@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Combination ref : ' => 'Combination ref : ',
     'Customer Number' => 'Customer Number',
     'DELIVERY' => 'DELIVERY',
@@ -30,4 +30,4 @@ return array(
     'Unit. price' => 'Unit. price',
     'page' => 'page',
     'product' => 'product',
-);
+];

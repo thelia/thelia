@@ -68,7 +68,6 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @return mixed
      */
     public function getNative()
     {
@@ -87,7 +86,6 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @return mixed
      */
     public function getTitle()
     {
@@ -106,7 +104,6 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @return mixed
      */
     public function getType()
     {
@@ -125,7 +122,6 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @return mixed
      */
     public function getActive()
     {
@@ -144,7 +140,6 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @return mixed
      */
     public function getCode()
     {

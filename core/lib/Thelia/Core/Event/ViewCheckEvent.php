@@ -26,7 +26,6 @@ class ViewCheckEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getView()
     {
@@ -34,7 +33,6 @@ class ViewCheckEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $view
      *
      * @return $this
      */
@@ -46,7 +44,6 @@ class ViewCheckEvent extends ActionEvent
     }
 
      /**
-     * @return mixed
      */
     public function getViewId()
     {
@@ -54,7 +51,6 @@ class ViewCheckEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $view_id
      *
      * @return $this
      */

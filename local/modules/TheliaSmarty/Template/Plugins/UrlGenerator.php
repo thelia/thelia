@@ -15,16 +15,16 @@ namespace TheliaSmarty\Template\Plugins;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
-use TheliaSmarty\Template\SmartyParser;
-use TheliaSmarty\Template\SmartyPluginDescriptor;
-use TheliaSmarty\Template\AbstractSmartyPlugin;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\LangQuery;
+use Thelia\Model\RewritingUrlQuery;
 use Thelia\Tools\TokenProvider;
 use Thelia\Tools\URL;
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Model\RewritingUrlQuery;
-use Thelia\Model\LangQuery;
-use Thelia\Model\ConfigQuery;
+use TheliaSmarty\Template\AbstractSmartyPlugin;
+use TheliaSmarty\Template\SmartyParser;
+use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 class UrlGenerator extends AbstractSmartyPlugin
 {
@@ -38,8 +38,6 @@ class UrlGenerator extends AbstractSmartyPlugin
     private $container;
 
     /**
-     * @param RequestStack       $requestStack
-     * @param TokenProvider      $tokenProvider
      * @param ContainerInterface $container         Needed to get all router.
      */
     public function __construct(RequestStack $requestStack, TokenProvider $tokenProvider, ContainerInterface $container)
@@ -133,7 +131,7 @@ class UrlGenerator extends AbstractSmartyPlugin
             $viewId = $view === null ? null : $request->query->get($view . '_id', null);
 
             if (null !== $requestedLangCodeOrLocale) {
-                if (strlen($requestedLangCodeOrLocale) > 2) {
+                if (\strlen($requestedLangCodeOrLocale) > 2) {
                     $lang = LangQuery::create()->findOneByLocale($requestedLangCodeOrLocale);
                 } else {
                     $lang = LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
@@ -153,7 +151,6 @@ class UrlGenerator extends AbstractSmartyPlugin
                     }
                     $url = rtrim($lang->getUrl(), "/").$request->getBaseUrl().$path;
                 }
-
             }
         }
         return $this->applyNoAmpAndTarget($params, $url);
@@ -212,7 +209,6 @@ class UrlGenerator extends AbstractSmartyPlugin
         return $this->generateViewUrlFunction($params, true);
     }
 
-
     public function navigateToUrlFunction($params, &$smarty)
     {
         $to = $this->getParam($params, 'to', null);
@@ -233,7 +229,7 @@ class UrlGenerator extends AbstractSmartyPlugin
         // the view name (without .html)
         $view   = $this->getParam($params, 'view');
 
-        $args = $this->getArgsFromParam($params, array('view', 'noamp', 'target', 'base_url'));
+        $args = $this->getArgsFromParam($params, ['view', 'noamp', 'target', 'base_url']);
 
         $url = $forAdmin ? URL::getInstance()->adminViewUrl($view, $args) : URL::getInstance()->viewUrl($view, $args);
 
@@ -247,12 +243,12 @@ class UrlGenerator extends AbstractSmartyPlugin
       * @param array $exclude Smarty function exclude params
       * @return array the parameters array (either emply, of valued)
       */
-    private function getArgsFromParam($params, $exclude = array())
+    private function getArgsFromParam($params, $exclude = [])
     {
-        $pairs = array();
+        $pairs = [];
 
         foreach ($params as $name => $value) {
-            if (in_array($name, $exclude)) {
+            if (\in_array($name, $exclude)) {
                 continue;
             }
 
@@ -327,14 +323,14 @@ class UrlGenerator extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor('function', 'url', $this, 'generateUrlFunction'),
             new SmartyPluginDescriptor('function', 'token_url', $this, 'generateUrlWithToken'),
             new SmartyPluginDescriptor('function', 'viewurl', $this, 'generateFrontViewUrlFunction'),
             new SmartyPluginDescriptor('function', 'admin_viewurl', $this, 'generateAdminViewUrlFunction'),
             new SmartyPluginDescriptor('function', 'navigate', $this, 'navigateToUrlFunction'),
             new SmartyPluginDescriptor('function', 'set_previous_url', $this, 'setPreviousUrlFunction')
-        );
+        ];
     }
 
     /**
@@ -342,12 +338,12 @@ class UrlGenerator extends AbstractSmartyPlugin
      */
     protected function getNavigateToValues()
     {
-        return array(
+        return [
             "current"       => "getCurrentUrl",
             "previous"      => "getPreviousUrl",
             "catalog_last"  => "getCatalogLastUrl",
             "index"         => "getIndexUrl",
-        );
+        ];
     }
 
     protected function getNavigateToMethod($to)
@@ -358,7 +354,7 @@ class UrlGenerator extends AbstractSmartyPlugin
 
         $navigateToValues = $this->getNavigateToValues();
 
-        if (!array_key_exists($to, $navigateToValues)) {
+        if (!\array_key_exists($to, $navigateToValues)) {
             throw new \InvalidArgumentException(
                 sprintf("Incorrect value `%s` for parameter `to` in `navigate` substitution.", $to)
             );

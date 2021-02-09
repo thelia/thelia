@@ -96,7 +96,7 @@ class CSVSerializer extends AbstractSerializer
 
         foreach ($data as &$value) {
             if (\is_array($value)) {
-                $value = gettype($value);
+                $value = \gettype($value);
             }
         }
 

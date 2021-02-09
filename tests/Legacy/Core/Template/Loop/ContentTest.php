@@ -12,9 +12,9 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
+use Thelia\Core\Template\Loop\Content;
 use Thelia\Model\ContentQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
-use Thelia\Core\Template\Loop\Content;
 
 /**
  *
@@ -30,7 +30,7 @@ class ContentTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return array();
+        return [];
     }
 
     public function testSearchById()
@@ -43,9 +43,9 @@ class ContentTest extends BaseLoopTestor
             $content->save();
         }
 
-        $otherParameters = array(
+        $otherParameters = [
             "visible" => "*",
-        );
+        ];
 
         $this->baseTestSearchById($content->getId(), $otherParameters);
     }

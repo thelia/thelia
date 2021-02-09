@@ -13,8 +13,8 @@
 namespace Thelia\Core\HttpKernel\Fragment;
 
 use Symfony\Component\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer as SymfonyInlineFragmentRenderer;
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 
 /**
  * @author Fabien Potencier <gilles@thelia.net>
@@ -23,7 +23,6 @@ class InlineFragmentRenderer extends SymfonyInlineFragmentRenderer
 {
     /**
      * @param string $uri
-     * @param Request $request
      * @return Request
      */
     protected function createSubRequest($uri, Request $request)
@@ -46,7 +45,7 @@ class InlineFragmentRenderer extends SymfonyInlineFragmentRenderer
 
         $server['REMOTE_ADDR'] = '127.0.0.1';
 
-        $subRequest = TheliaRequest::create($uri, 'get', array(), $cookies, array(), $server);
+        $subRequest = TheliaRequest::create($uri, 'get', [], $cookies, [], $server);
         if ($request->headers->has('Surrogate-Capability')) {
             $subRequest->headers->set('Surrogate-Capability', $request->headers->get('Surrogate-Capability'));
         }

@@ -21,17 +21,16 @@ use Thelia\Core\Hook\BaseHook;
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class FrontHook extends BaseHook {
-
     public function onMainFooterBody(HookRenderBlockEvent $event)
     {
         $content = trim($this->render("main-footer-body.html"));
         if ("" != $content){
-            $event->add(array(
+            $event->add([
                 "id" => "newsletter-footer-body",
                 "class" => "newsletter",
-                "title" => $this->trans("Newsletter", array(), "hooknewsletter"),
+                "title" => $this->trans("Newsletter", [], "hooknewsletter"),
                 "content" => $content
-            ));
+            ]);
         }
     }
 } 

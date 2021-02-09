@@ -23,7 +23,7 @@ class TemplateEvent extends ActionEvent
     /**
      * @var Template
      */
-    protected $template = null;
+    protected $template;
 
     public function __construct(Template $template = null)
     {

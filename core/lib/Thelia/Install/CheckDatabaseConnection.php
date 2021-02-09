@@ -27,30 +27,30 @@ use Thelia\Core\Translation\Translator;
  */
 class CheckDatabaseConnection extends BaseInstall
 {
-    protected $validationMessages = array();
+    protected $validationMessages = [];
 
     /** @var bool If permissions are OK */
     protected $isValid = true;
 
     /** @var TranslatorInterface Translator Service */
-    protected $translator = null;
+    protected $translator;
 
     /** @var string Database host information  */
-    protected $host = null;
+    protected $host;
 
     /** @var string Database user information  */
-    protected $user = null;
+    protected $user;
 
     /** @var string Database password information  */
-    protected $password = null;
+    protected $password;
 
     /** @var int Database port information  */
-    protected $port = null;
+    protected $port;
 
     /**
      * @var \PDO instance
      */
-    protected $connection = null;
+    protected $connection;
 
     /**
      * Constructor

@@ -14,14 +14,14 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\FolderQuery;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
-use Thelia\Core\Template\Element\BaseI18nLoop;
 
 /**
  *
@@ -51,7 +51,7 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
             Argument::createIntTypeArgument('folder', null, true),
             Argument::createIntTypeArgument('depth', PHP_INT_MAX),
             Argument::createBooleanOrBothTypeArgument('visible', true, false),
-            Argument::createIntListTypeArgument('exclude', array())
+            Argument::createIntListTypeArgument('exclude', [])
         );
     }
 
@@ -64,9 +64,9 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
 
         $search = FolderQuery::create();
 
-        $this->configureI18nProcessing($search, array(
+        $this->configureI18nProcessing($search, [
                     'TITLE'
-                ));
+                ]);
 
         $search->filterByParent($parent);
 
@@ -83,7 +83,7 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
         $results = $search->find();
 
         foreach ($results as $result) {
-            $resultsList[] = array(
+            $resultsList[] = [
                 "ID" => $result->getId(),
                 "TITLE" => $result->getVirtualColumn('i18n_TITLE'),
                 "PARENT" => $result->getParent(),
@@ -91,7 +91,7 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
                 "VISIBLE" => $result->getVisible() ? "1" : "0",
                 "LEVEL" => $level,
                 'CHILD_COUNT' => $result->countChild(),
-            );
+            ];
 
             $this->buildFolderTree($result->getId(), $visible, 1 + $level, $maxLevel, $exclude, $resultsList);
         }
@@ -119,7 +119,7 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
         $visible = $this->getVisible();
         $exclude = $this->getExclude();
 
-        $resultsList = array();
+        $resultsList = [];
 
         $this->buildFolderTree($id, $visible, 0, $depth, $exclude, $resultsList);
 

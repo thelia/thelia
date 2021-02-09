@@ -97,7 +97,6 @@ class CustomerController extends BaseFrontController
                 $this->dispatch(TheliaEvents::LOST_PASSWORD, $event);
 
                 return $this->generateSuccessRedirect($passwordLost);
-
             } catch (FormValidationException $e) {
                 $message = $this->getTranslator()->trans(
                     "Please check your input: %s",
@@ -252,7 +251,7 @@ class CustomerController extends BaseFrontController
         /** @var Customer $customer */
         $customer   = $this->getSecurityContext()->getCustomerUser();
         $newsletter = NewsletterQuery::create()->findOneByEmail($customer->getEmail());
-        $data       = array(
+        $data       = [
             'id'            => $customer->getId(),
             'title'         => $customer->getTitleId(),
             'firstname'     => $customer->getFirstName(),
@@ -261,7 +260,7 @@ class CustomerController extends BaseFrontController
             'email_confirm' => $customer->getEmail(),
             'lang_id'       => $customer->getLangId(),
             'newsletter'    => $newsletter instanceof Newsletter ? !$newsletter->getUnsubscribed() : false,
-        );
+        ];
 
         $customerProfileUpdateForm = $this->createForm(FrontForm::CUSTOMER_PROFILE_UPDATE, FormType::class, $data);
 
@@ -285,7 +284,6 @@ class CustomerController extends BaseFrontController
                 $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFILE, $customerChangeEvent);
 
                 return $this->generateSuccessRedirect($customerPasswordUpdateForm);
-
             } catch (FormValidationException $e) {
                 $message = $this->getTranslator()->trans(
                     "Please check your input: %s",
@@ -341,7 +339,7 @@ class CustomerController extends BaseFrontController
                 $customerChangeEvent->setCustomer($customer);
 
                 $customerChangeEvent->setEmailUpdateAllowed(
-                    (intval(ConfigQuery::read('customer_change_email', 0))) ? true : false
+                    (\intval(ConfigQuery::read('customer_change_email', 0))) ? true : false
                 );
 
                 $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFILE, $customerChangeEvent);
@@ -377,7 +375,6 @@ class CustomerController extends BaseFrontController
                 $this->processLogin($updatedCustomer);
 
                 return $this->generateSuccessRedirect($customerProfileUpdateForm);
-
             } catch (FormValidationException $e) {
                 $message = $this->getTranslator()->trans(
                     "Please check your input: %s",
@@ -434,7 +431,7 @@ class CustomerController extends BaseFrontController
                         "customer.create.process",
                         ["email" => $form->get("email")->getData()]
                     );
-                } else {
+                }  
                     try {
                         $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
 
@@ -443,7 +440,7 @@ class CustomerController extends BaseFrontController
 
                         $this->processLogin($customer);
 
-                        if (intval($form->get('remember_me')->getData()) > 0) {
+                        if (\intval($form->get('remember_me')->getData()) > 0) {
                             // If a remember me field if present and set in the form, create
                             // the cookie thant store "remember me" information
                             $this->createRememberMeCookie(
@@ -454,7 +451,6 @@ class CustomerController extends BaseFrontController
                         }
 
                         return $this->generateSuccessRedirect($customerLoginForm);
-
                     } catch (UsernameNotFoundException $e) {
                         $message = $this->getTranslator()->trans(
                             "Wrong email or password. Please try again",
@@ -487,8 +483,6 @@ class CustomerController extends BaseFrontController
                             Front::MESSAGE_DOMAIN
                         );
                     }
-
-                }
             } catch (FormValidationException $e) {
                 $message = $this->getTranslator()->trans(
                     "Please check your input: %s",
@@ -562,7 +556,6 @@ class CustomerController extends BaseFrontController
     /**
      * Dispatch event for customer login action
      *
-     * @param Customer $customer
      */
     protected function processLogin(Customer $customer)
     {
@@ -600,7 +593,6 @@ class CustomerController extends BaseFrontController
 
         return $customerCreateEvent;
     }
-
 
     protected function getRememberMeCookieName()
     {

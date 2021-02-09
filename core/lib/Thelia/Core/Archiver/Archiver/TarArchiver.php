@@ -72,6 +72,5 @@ class TarArchiver extends AbstractArchiver
 
     public function save()
     {
-
     }
 }

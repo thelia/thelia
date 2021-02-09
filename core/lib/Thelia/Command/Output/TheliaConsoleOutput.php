@@ -19,7 +19,7 @@ class TheliaConsoleOutput extends ConsoleOutput
     public function renderBlock(array $messages, $style = "info")
     {
         $strlen = function ($string) {
-            if (!function_exists('mb_strlen')) {
+            if (!\function_exists('mb_strlen')) {
                 return \strlen($string);
             }
 
@@ -33,7 +33,7 @@ class TheliaConsoleOutput extends ConsoleOutput
         foreach ($messages as $message) {
             $length = ($strlen($message) > $length) ? $strlen($message) : $length;
         }
-        $output = array();
+        $output = [];
         foreach ($messages as $message) {
             $output[] = "<" . $style . ">" . "  " . $message . str_repeat(' ', $length - $strlen($message)) . "  </" . $style . ">";
         }

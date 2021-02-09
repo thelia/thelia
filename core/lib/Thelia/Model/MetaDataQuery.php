@@ -53,7 +53,7 @@ class MetaDataQuery extends BaseMetaDataQuery
      */
     public static function getAllVal($elementKey, $elementId)
     {
-        $out = array();
+        $out = [];
 
         if (\is_int($elementId)) {
             $datas = self::create()

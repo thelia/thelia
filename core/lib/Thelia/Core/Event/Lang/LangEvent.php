@@ -34,7 +34,6 @@ class LangEvent extends ActionEvent
     }
 
     /**
-     * @param \Thelia\Model\Lang $lang
      */
     public function setLang(Lang $lang)
     {

@@ -35,7 +35,6 @@ class FolderUpdateEvent extends FolderCreateEvent
     }
 
     /**
-     * @param mixed $chapo
      * @return $this
      */
     public function setChapo($chapo)
@@ -46,7 +45,6 @@ class FolderUpdateEvent extends FolderCreateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getChapo()
     {
@@ -54,7 +52,6 @@ class FolderUpdateEvent extends FolderCreateEvent
     }
 
     /**
-     * @param mixed $description
      * @return $this
      */
     public function setDescription($description)
@@ -65,7 +62,6 @@ class FolderUpdateEvent extends FolderCreateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getDescription()
     {
@@ -73,7 +69,6 @@ class FolderUpdateEvent extends FolderCreateEvent
     }
 
     /**
-     * @param mixed $folder_id
      * @return $this
      */
     public function setFolderId($folder_id)
@@ -84,7 +79,6 @@ class FolderUpdateEvent extends FolderCreateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getFolderId()
     {
@@ -92,7 +86,6 @@ class FolderUpdateEvent extends FolderCreateEvent
     }
 
     /**
-     * @param mixed $postscriptum
      * @return $this
      */
     public function setPostscriptum($postscriptum)
@@ -103,7 +96,6 @@ class FolderUpdateEvent extends FolderCreateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getPostscriptum()
     {

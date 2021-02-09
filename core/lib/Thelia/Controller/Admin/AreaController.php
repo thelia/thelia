@@ -76,10 +76,10 @@ class AreaController extends AbstractCrudController
      */
     protected function hydrateObjectForm($object)
     {
-        $data = array(
+        $data = [
             'area_id' => $object->getId(),
             'name' => $object->getName()
-        );
+        ];
 
         return $this->createForm(AdminForm::AREA_MODIFICATION, FormType::class, $data);
     }
@@ -102,7 +102,6 @@ class AreaController extends AbstractCrudController
      * Creates the update event with the provided form data
      *
      * @param array $formData
-     * @return AreaEvent
      */
     protected function getUpdateEvent($formData): AreaEvent
     {
@@ -124,7 +123,6 @@ class AreaController extends AbstractCrudController
     /**
      * Creates the delete event with the provided form data
      *
-     * @return AreaEvent
      */
     protected function getDeleteEvent(): AreaEvent
     {
@@ -165,7 +163,6 @@ class AreaController extends AbstractCrudController
     /**
      * Render the main list template
      *
-     * @param string|null $currentOrder, if any, null otherwise.
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function renderListTemplate($currentOrder)
@@ -180,9 +177,9 @@ class AreaController extends AbstractCrudController
     {
         return $this->render(
             'shipping-configuration-edit',
-            array(
+            [
             'area_id' => $this->getAreaId()
-            )
+            ]
         );
     }
 
@@ -214,7 +211,7 @@ class AreaController extends AbstractCrudController
     public function addCountry()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -255,7 +252,7 @@ class AreaController extends AbstractCrudController
         }
 
         $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)),
+            $this->getTranslator()->trans("%obj modification", ['%obj' => $this->objectName]),
             $error_msg,
             $areaCountryForm
         );
@@ -270,7 +267,7 @@ class AreaController extends AbstractCrudController
     public function removeCountries()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -336,7 +333,7 @@ class AreaController extends AbstractCrudController
     public function removeCountry()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 

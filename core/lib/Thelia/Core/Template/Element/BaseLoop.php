@@ -54,7 +54,7 @@ use Thelia\Type\TypeCollection;
 abstract class BaseLoop implements BaseLoopInterface
 {
     /** @var String|null The loop name  */
-    protected $loopName = null;
+    protected $loopName;
 
     /** @var array|null array of loop definitions (class => id) */
     protected static $loopDefinitions = null;
@@ -86,7 +86,7 @@ abstract class BaseLoop implements BaseLoopInterface
     protected $versionable = false;
 
     /** @var Translator  */
-    protected $translator = null;
+    protected $translator;
 
     private static $cacheLoopResult = [];
     private static $cacheLoopPagination = [];
@@ -105,12 +105,6 @@ abstract class BaseLoop implements BaseLoopInterface
     /**
      * Create a new Loop
      *
-     * @param ContainerInterface $container
-     * @param RequestStack $requestStack
-     * @param EventDispatcher $eventDispatcher
-     * @param SecurityContext $securityContext
-     * @param TranslatorInterface $translator
-     * @param array $theliaParserLoops
      */
     public function __construct(
         ContainerInterface $container,
@@ -370,9 +364,8 @@ abstract class BaseLoop implements BaseLoopInterface
 
         if ($this->getArgValue('page') !== null) {
             return $this->searchWithPagination($search, $pagination);
-        } else {
+        }  
             return $this->searchWithOffset($search);
-        }
     }
 
     protected function setupSearchContext(ModelCriteria $search)
@@ -427,13 +420,11 @@ abstract class BaseLoop implements BaseLoopInterface
             $firstItem = ($pageNum - 1) * $limit + 1;
 
             return \array_slice($search, $firstItem, $firstItem + $limit, false);
-        } else {
+        }  
             return \array_slice($search, $offset, $limit, false);
-        }
     }
 
     /**
-     * @param ModelCriteria $search
      *
      * @return ObjectCollection
      */
@@ -451,7 +442,6 @@ abstract class BaseLoop implements BaseLoopInterface
     }
 
     /**
-     * @param ModelCriteria    $search
      * @param PropelModelPager|null $pagination
      *
      * @return array|PropelModelPager
@@ -465,9 +455,8 @@ abstract class BaseLoop implements BaseLoopInterface
 
         if ($page > $pagination->getLastPage()) {
             return [];
-        } else {
+        }  
             return $pagination;
-        }
     }
 
     public function count()
@@ -633,7 +622,6 @@ abstract class BaseLoop implements BaseLoopInterface
     }
 
     /**
-     * @param LoopResult $loopResult
      *
      * @return LoopResult
      */
@@ -667,7 +655,6 @@ abstract class BaseLoop implements BaseLoopInterface
 
     /**
      * Use this method in order to add fields in sub-classes
-     * @param LoopResultRow $loopResultRow
      * @param object|array $item
      *
      */
@@ -748,7 +735,6 @@ abstract class BaseLoop implements BaseLoopInterface
     /**
      * Dispatch an event to extend the ParseResults
      *
-     * @param LoopResult $loopResult
      * @return LoopResult
      */
     protected function extendsParseResults(LoopResult $loopResult)

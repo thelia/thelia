@@ -22,9 +22,9 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Coupon\Type\CouponInterface;
-use Thelia\Model\CouponModule;
 use Thelia\Model\Coupon as MCoupon;
 use Thelia\Model\CouponCountry;
+use Thelia\Model\CouponModule;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\Map\CouponTableMap;
 use Thelia\Type\EnumListType;
@@ -61,7 +61,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 'order',
                 new TypeCollection(
                     new EnumListType(
-                        array(
+                        [
                         'id', 'id-reverse',
                         'code', 'code-reverse',
                         'title', 'title-reverse',
@@ -70,7 +70,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                         'expiration-date', 'expiration-date-reverse',
                         'days-left', 'days-left-reverse',
                         'usages-left', 'usages-left-reverse'
-                        )
+                        ]
                     )
                 ),
                 'code'
@@ -83,7 +83,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
         $search = CouponQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('TITLE', 'DESCRIPTION', 'SHORT_DESCRIPTION'));
+        $this->configureI18nProcessing($search, ['TITLE', 'DESCRIPTION', 'SHORT_DESCRIPTION']);
 
         $id = $this->getId();
         $isEnabled = $this->getIsEnabled();
@@ -124,49 +124,42 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 case 'id-reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-
                 case 'code':
                     $search->orderByCode(Criteria::ASC);
                     break;
                 case 'code-reverse':
                     $search->orderByCode(Criteria::DESC);
                     break;
-
                 case 'title':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case 'title-reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-
                 case 'enabled':
                     $search->orderByIsEnabled(Criteria::ASC);
                     break;
                 case 'enabled-reverse':
                     $search->orderByIsEnabled(Criteria::DESC);
                     break;
-
                 case 'start-date':
                     $search->orderByStartDate(Criteria::ASC);
                     break;
                 case 'start-date-reverse':
                     $search->orderByStartDate(Criteria::DESC);
                     break;
-
                 case 'expiration-date':
                     $search->orderByExpirationDate(Criteria::ASC);
                     break;
                 case 'expiration-date-reverse':
                     $search->orderByExpirationDate(Criteria::DESC);
                     break;
-
                 case 'usages-left':
                     $search->orderByMaxUsage(Criteria::ASC);
                     break;
                 case 'usages-left-reverse':
                     $search->orderByMaxUsage(Criteria::DESC);
                     break;
-
                 case 'days-left':
                     $search->addAscendingOrderByColumn('days_left');
                     break;
@@ -180,7 +173,6 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @param LoopResult $loopResult
      * @return LoopResult
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -217,13 +209,13 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 $coupon->getPerCustomerUsageCount()
             );
 
-            $cleanedConditions = array();
+            $cleanedConditions = [];
             /** @var ConditionInterface $condition */
             foreach ($conditions as $condition) {
-                $temp = array(
+                $temp = [
                     'toolTip' => $condition->getToolTip(),
                     'summary' => $condition->getSummary()
-                );
+                ];
                 $cleanedConditions[] = $temp;
             }
 

@@ -16,8 +16,8 @@ use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\CategoryQuery;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
@@ -60,14 +60,14 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
         $visible = $this->getVisible();
         $depth = $this->getDepth();
 
-        $results = array();
+        $results = [];
 
-        $ids = array();
+        $ids = [];
 
         do {
             $search = CategoryQuery::create();
 
-            $this->configureI18nProcessing($search, array('TITLE'));
+            $this->configureI18nProcessing($search, ['TITLE']);
 
             $search->filterById($currentId);
 
@@ -78,13 +78,13 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
             $category = $search->findOne();
 
             if ($category != null) {
-                $results[] = array(
+                $results[] = [
                     "ID" => $category->getId(),
                     "TITLE" => $category->getVirtualColumn('i18n_TITLE'),
                     "PARENT" => $category->getParent(),
                     "URL" => $category->getUrl($this->locale),
                     "LOCALE" => $this->locale,
-                );
+                ];
 
                 $currentId = $category->getParent();
 

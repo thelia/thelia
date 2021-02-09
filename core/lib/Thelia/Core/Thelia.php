@@ -280,12 +280,12 @@ class Thelia extends Kernel
                 if ($templateDirContent->isDir() && ! $templateDirContent->isDot()) {
                     $parser->addMethodCall(
                         'addTemplateDirectory',
-                        array(
+                        [
                             $templateType,
                             $templateDirContent->getFilename(),
                             $templateDirContent->getPathName(),
                             $code
-                        )
+                        ]
                     );
                 }
             }
@@ -298,7 +298,6 @@ class Thelia extends Kernel
      * Load some configuration
      * Initialize all plugins
      *
-     * @param ContainerBuilder $container
      * @throws \Exception
      */
     protected function loadConfiguration(ContainerBuilder $container)
@@ -337,7 +336,7 @@ class Thelia extends Kernel
         if (\defined("THELIA_INSTALL_MODE") === false) {
             $modules = ModuleQuery::getActivated();
 
-            $translationDirs = array();
+            $translationDirs = [];
 
             /** @var Module $module */
             foreach ($modules as $module) {
@@ -347,7 +346,7 @@ class Thelia extends Kernel
 
                     $definition = new Definition();
                     $definition->setClass($module->getFullNamespace());
-                    $definition->addMethodCall("setContainer", array(new Reference('service_container')));
+                    $definition->addMethodCall("setContainer", [new Reference('service_container')]);
                     $definition->setPublic(true);
 
                     $container->setDefinition(
@@ -355,7 +354,7 @@ class Thelia extends Kernel
                         $definition
                     );
 
-                    $compilers = \call_user_func(array($module->getFullNamespace(), 'getCompilers'));
+                    $compilers = \call_user_func([$module->getFullNamespace(), 'getCompilers']);
 
                     foreach ($compilers as $compiler) {
                         if (\is_array($compiler)) {
@@ -431,8 +430,6 @@ class Thelia extends Kernel
     }
 
     /**
-     * @param Module $module
-     * @param array $translationDirs
      * @param TemplateHelperInterface $templateHelper
      */
     private function loadModuleTranslationDirectories(Module $module, array &$translationDirs, $templateHelper)
@@ -511,7 +508,7 @@ class Thelia extends Kernel
                 foreach ($finder as $file) {
                     list($locale, $format) = explode('.', $file->getBaseName(), 2);
 
-                    $translator->addMethodCall('addResource', array($format, (string) $file, $locale, $domain));
+                    $translator->addMethodCall('addResource', [$format, (string) $file, $locale, $domain]);
                 }
             } catch (\InvalidArgumentException $ex) {
                 // Ignore missing I18n directories
@@ -526,7 +523,6 @@ class Thelia extends Kernel
      *
      * All param must be change in Config table
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request
      */
 
     /**
@@ -601,7 +597,7 @@ class Thelia extends Kernel
         $parameters["kernel.runtime_environment"] = $this->environment;
 
         $parameters["thelia.root_dir"] = THELIA_ROOT;
-        $parameters["thelia.core_dir"] = dirname(__DIR__); // This class is in core/lib/Thelia/Core.
+        $parameters["thelia.core_dir"] = \dirname(__DIR__); // This class is in core/lib/Thelia/Core.
         $parameters["thelia.module_dir"] = THELIA_MODULE_DIR;
 
         return $parameters;
@@ -616,10 +612,10 @@ class Thelia extends Kernel
      */
     public function registerBundles()
     {
-        $bundles = array(
+        $bundles = [
             /* TheliaBundle contain all the dependency injection description */
             new Bundle\TheliaBundle(),
-        );
+        ];
 
         /**
          * OTHER CORE BUNDLE CAN BE DECLARE HERE AND INITIALIZE WITH SPECIFIC CONFIGURATION

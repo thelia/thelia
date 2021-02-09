@@ -826,7 +826,7 @@ class CouponController extends BaseAdminController
      */
     protected function getForm($action, $coupon)
     {
-        $data = array();
+        $data = [];
 
         if (null !== $coupon) {
             $data["code"] = $coupon->getCode();

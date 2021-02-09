@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '%nb Item' => '%nb élément',
     '%nb Items' => '%nb éléments',
     '+' => '+',
@@ -269,4 +269,4 @@ return array(
     'per page' => 'par page',
     'update' => 'mettre à jour',
     'with:' => 'avec :',
-);
+];

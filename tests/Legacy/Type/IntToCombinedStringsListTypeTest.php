@@ -36,39 +36,38 @@ class IntToCombinedStringsListTypeTest extends TestCase
         $type = new IntToCombinedStringsListType();
         $this->assertEquals(
             $type->getFormattedValue('1: foo & bar | (fooo &baar), 4: *, 67: (foooo & baaar)'),
-            array(
-                1 => array(
-                    "values" => array('foo', 'bar', 'fooo', 'baar'),
+            [
+                1 => [
+                    "values" => ['foo', 'bar', 'fooo', 'baar'],
                     "expression" => 'foo & bar | (fooo &baar)',
-                ),
-                4 => array(
-                    "values" => array('*'),
+                ],
+                4 => [
+                    "values" => ['*'],
                     "expression" => '*',
-                ),
-                67 => array(
-                    "values" => array('foooo', 'baaar'),
+                ],
+                67 => [
+                    "values" => ['foooo', 'baaar'],
                     "expression" => '(foooo & baaar)',
-                ),
-            )
+                ],
+            ]
         );
 
         $this->assertEquals(
             $type->getFormattedValue('9:royal \:enfield,10:500\, continental\, gt,11:(abc & def\&ghi\|ttt)'),
-            array(
-                9 => array(
-                    "values" => array('royal :enfield'),
+            [
+                9 => [
+                    "values" => ['royal :enfield'],
                     "expression" => 'royal :enfield',
-                ),
-                10 => array(
-                    "values" => array('500, continental, gt'),
+                ],
+                10 => [
+                    "values" => ['500, continental, gt'],
                     "expression" => '500, continental, gt',
-                ),
-                11 => array(
-                    "values" => array('abc', 'def&ghi|ttt'),
+                ],
+                11 => [
+                    "values" => ['abc', 'def&ghi|ttt'],
                     "expression" => '(abc & def&ghi|ttt)',
-                ),
-
-            )
+                ],
+            ]
         );
 
         $this->assertNull($type->getFormattedValue('foo'));
@@ -89,5 +88,4 @@ class IntToCombinedStringsListTypeTest extends TestCase
             'def&ghi|jkl,mno(pqr)stu:vwx'
         );
     }
-
 }

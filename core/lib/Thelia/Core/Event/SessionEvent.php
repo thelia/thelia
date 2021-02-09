@@ -75,7 +75,6 @@ class SessionEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getSession()
     {

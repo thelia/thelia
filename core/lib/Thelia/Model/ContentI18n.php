@@ -11,7 +11,6 @@ class ContentI18n extends BaseContentI18n
     use I18nTimestampableTrait;
 
     /**
-     * @param ConnectionInterface|null $con
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function postInsert(ConnectionInterface $con = null)

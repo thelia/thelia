@@ -33,7 +33,6 @@ use Thelia\Tools\URL;
  */
 class ConfigurationController extends BaseAdminController
 {
-
     public function uploadImage()
     {
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, ['carousel'], AccessManager::CREATE)) {
@@ -69,7 +68,6 @@ class ConfigurationController extends BaseAdminController
             }
 
             $response =  $this->redirectToConfigurationPage();
-
         } catch (FormValidationException $e) {
             $error_message = $this->createStandardFormValidationErrorMessage($e);
         }
@@ -144,7 +142,6 @@ class ConfigurationController extends BaseAdminController
             }
 
             $response =  $this->redirectToConfigurationPage();
-
         } catch (FormValidationException $e) {
             $error_message = $this->createStandardFormValidationErrorMessage($e);
         }
@@ -160,7 +157,6 @@ class ConfigurationController extends BaseAdminController
         }
 
         return $response;
-
     }
 
     public function deleteAction()

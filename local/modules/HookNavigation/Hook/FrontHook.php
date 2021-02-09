@@ -32,12 +32,12 @@ class FrontHook extends BaseHook
 
         $content = trim($this->render('main-footer-body.html', ['bodyFolderId' => $bodyConfig]));
         if ('' != $content) {
-            $event->add(array(
+            $event->add([
                 'id' => 'navigation-footer-body',
                 'class' => 'links',
-                'title' => $this->trans('Latest articles', array(), HookNavigation::MESSAGE_DOMAIN),
+                'title' => $this->trans('Latest articles', [], HookNavigation::MESSAGE_DOMAIN),
                 'content' => $content,
-            ));
+            ]);
         }
     }
 

@@ -33,7 +33,6 @@ class CustomerNotConfirmedException extends AuthenticationException
     }
 
     /**
-     * @param Customer $user
      * @return $this
      */
     public function setUser(Customer $user)

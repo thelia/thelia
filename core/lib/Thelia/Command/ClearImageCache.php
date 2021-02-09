@@ -12,12 +12,12 @@
 
 namespace Thelia\Command;
 
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Core\Event\Image\ImageEvent;
-use Thelia\Core\HttpFoundation\Request;
-use Symfony\Component\Console\Input\InputArgument;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
 
 class ClearImageCache extends ContainerAwareCommand
 {

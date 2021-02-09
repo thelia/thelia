@@ -110,7 +110,6 @@ abstract class AbstractImport implements \Iterator
     /**
      * Set file
      *
-     * @param \Symfony\Component\HttpFoundation\File\File $file
      *
      * @return $this Return $this, allow chaining
      */

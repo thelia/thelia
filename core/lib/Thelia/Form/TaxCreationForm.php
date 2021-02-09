@@ -50,8 +50,8 @@ class TaxCreationForm extends BaseForm
 
         $types = $taxEngine->getTaxTypeList();
 
-        $typeList = array();
-        $requirementList = array();
+        $typeList = [];
+        $requirementList = [];
 
         foreach ($types as $classname) {
             $instance = new $classname();
@@ -116,7 +116,7 @@ class TaxCreationForm extends BaseForm
             }
         }
 
-        $this->addStandardDescFields(array('postscriptum', 'chapo', 'locale'));
+        $this->addStandardDescFields(['postscriptum', 'chapo', 'locale']);
     }
 
     public function checkRequirementField($value, ExecutionContextInterface $context)

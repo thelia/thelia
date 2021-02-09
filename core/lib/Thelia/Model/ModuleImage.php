@@ -12,18 +12,15 @@ use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\ModuleImageModification;
 use Thelia\Model\Base\ModuleImage as BaseModuleImage;
-
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class ModuleImage extends BaseModuleImage implements FileModelInterface
 {
-
     use PositionManagementTrait;
 
     /**
      * Get the form instance used to change this object information
      *
-     * @param Request $request
      * @return BaseForm the form
      */
     public function getUpdateFormInstance(Request $request)

@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '\'%type\' loop class should extends Thelia\Core\Template\Element\BaseLoop' => '\'%type\' класс цикла должен расширять Thelia\Core\Template\Element\BaseLoop',
     'A loop named \'%name\' already exists in the current scope.' => 'Цикл с именем \'%name\' уже существует в текущей области видимости.',
     'Loop type \'%type\' is not defined.' => 'Тип цикла \'%type\' не определен.',
@@ -17,4 +17,4 @@ return array(
     'Related loop name \'%name\'\' is not defined.' => 'Связанное имя цикла \'%name\'\' не определено.',
     'Template file %file cannot be found.' => 'Файл шаблона %file не найден.',
     'The loop name \'%name\' is already defined in %className class' => 'Имя цикла \'%name\' уже определен в классе %className',
-);
+];

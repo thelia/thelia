@@ -31,7 +31,6 @@ class AdminHook extends BaseHook
         }
 
         $event->add($this->render('hook-admin-home-config.html'));
-
     }
 
     public function blockStatisticsJs(HookRenderEvent $event)

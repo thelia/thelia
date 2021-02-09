@@ -112,7 +112,6 @@ if ($context == "install") { ?>
 <?php
 
 // Update
-
 } else { ?>
 <div class="update">
     <div id="wrapper" class="container">

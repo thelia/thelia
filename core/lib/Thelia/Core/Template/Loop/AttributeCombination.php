@@ -67,7 +67,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
         /* manage attribute translations */
         $this->configureI18nProcessing(
             $search,
-            array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
+            ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
             AttributeTableMap::TABLE_NAME,
             'ATTRIBUTE_ID'
         );
@@ -75,7 +75,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
         /* manage attributeAv translations */
         $this->configureI18nProcessing(
             $search,
-            array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
+            ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
             AttributeAvTableMap::TABLE_NAME,
             'ATTRIBUTE_AV_ID'
         );
@@ -134,7 +134,6 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
     }
 
     /**
-     * @param AttributeCombinationQuery $search
      * @param string $order Criteria::ASC|Criteria::DESC
      * @return AttributeCombinationQuery
      */

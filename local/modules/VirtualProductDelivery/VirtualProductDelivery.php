@@ -33,9 +33,7 @@ class VirtualProductDelivery extends AbstractDeliveryModuleWithState
     /**
      * The module is valid if the cart contains only virtual products.
      *
-     * @param Country $country
      *
-     * @param State|null $state
      * @return bool true if there is only virtual products in cart elsewhere false
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -64,7 +62,6 @@ class VirtualProductDelivery extends AbstractDeliveryModuleWithState
     {
         return true;
     }
-
 
     public function postActivation(ConnectionInterface $con = null)
     {

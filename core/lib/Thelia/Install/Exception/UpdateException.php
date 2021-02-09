@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Install\Exception;
 
 /**
@@ -21,7 +20,7 @@ namespace Thelia\Install\Exception;
 class UpdateException extends \RuntimeException
 {
     /** @var string the version that has failed  */
-    protected $version = null;
+    protected $version;
 
     /**
      * @return string

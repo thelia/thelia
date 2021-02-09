@@ -13,8 +13,8 @@
 namespace TheliaSmarty\Tests\Template\Plugin;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use TheliaSmarty\Template\Plugins\Render;
 use Thelia\Core\Controller\ControllerResolver;
+use TheliaSmarty\Template\Plugins\Render;
 
 /**
  * Class RenderTest

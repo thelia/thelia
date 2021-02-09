@@ -14,10 +14,10 @@ namespace Thelia\Tests\Action;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Action\Image;
 use Thelia\Core\Event\Image\ImageEvent;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Files\FileManager;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
@@ -294,7 +294,7 @@ class ImageTest extends TestCaseWithURLToolSetup
             $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-4.png");
             $event->setCacheSubdirectory("tests");
 
-            $event->setEffects(array("grayscale", "vertical_flip", "horizontal_flip", 'colorize:#00ff00', 'gamma: 0.2'));
+            $event->setEffects(["grayscale", "vertical_flip", "horizontal_flip", 'colorize:#00ff00', 'gamma: 0.2']);
 
             $image = new Image($this->getFileManager());
 

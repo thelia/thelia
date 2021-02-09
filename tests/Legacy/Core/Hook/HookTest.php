@@ -31,7 +31,6 @@ class HookTest extends WebTestCase
      * get the content of the test page with our test template and test module.
      * the content is used by all other test functions and saved under cache/test/hook.html
      *
-     * @return mixed
      */
     public function testHome()
     {

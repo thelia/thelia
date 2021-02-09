@@ -15,8 +15,8 @@ namespace Thelia\Tests\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
-use Thelia\Core\Application;
 use Thelia\Command\ModuleGenerateCommand;
+use Thelia\Core\Application;
 
 /**
  * test the module:generate command
@@ -68,10 +68,10 @@ class ModuleGenerateCommandTest extends BaseCommandTest
     {
         $tester = $this->commandTester;
 
-        $tester->execute(array(
+        $tester->execute([
            "command" => $this->command->getName(),
             "name" => "test"
-        ));
+        ]);
 
         $fs = new Filesystem();
 
@@ -86,10 +86,10 @@ class ModuleGenerateCommandTest extends BaseCommandTest
         $tester = $this->commandTester;
 
         $this->expectException(\RuntimeException::class);
-        $tester->execute(array(
+        $tester->execute([
             "command" => $this->command->getName(),
             "name" => "test"
-        ));
+        ]);
     }
 
     /**
@@ -107,11 +107,11 @@ class ModuleGenerateCommandTest extends BaseCommandTest
         ;
         $fs->remove($configFile);
 
-        $tester->execute(array(
+        $tester->execute([
             "command" => $this->command->getName(),
             "name" => "test",
             "--force" => ""
-        ));
+        ]);
 
         $this->assertTrue($fs->exists($configFile));
     }
@@ -121,9 +121,9 @@ class ModuleGenerateCommandTest extends BaseCommandTest
         $tester = $this->commandTester;
 
         $this->expectException(\RuntimeException::class);
-        $tester->execute(array(
+        $tester->execute([
            "command" => $this->command->getName(),
             "name" => "thelia"
-        ));
+        ]);
     }
 }

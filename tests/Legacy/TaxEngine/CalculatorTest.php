@@ -16,11 +16,11 @@ use PHPUnit\Framework\TestCase;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\FeatureProductQuery;
+use Thelia\Model\Lang;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Tax;
-use Thelia\Model\Lang;
-use Thelia\Model\FeatureProductQuery;
 use Thelia\TaxEngine\Calculator;
 
 /**
@@ -174,25 +174,25 @@ class CalculatorTest extends TestCase
 
         $tax = new Tax();
         $tax->setType('\Thelia\TaxEngine\TaxType\PricePercentTaxType')
-            ->setRequirements(array('percent' => 10))
+            ->setRequirements(['percent' => 10])
             ->setVirtualColumn('taxRuleCountryPosition', 1);
         $taxRulesCollection->append($tax);
 
         $tax = new Tax();
         $tax->setType('\Thelia\TaxEngine\TaxType\PricePercentTaxType')
-            ->setRequirements(array('percent' => 8))
+            ->setRequirements(['percent' => 8])
             ->setVirtualColumn('taxRuleCountryPosition', 1);
         $taxRulesCollection->append($tax);
 
         $tax = new Tax();
         $tax->setType('\Thelia\TaxEngine\TaxType\FixAmountTaxType')
-            ->setRequirements(array('amount' => 5))
+            ->setRequirements(['amount' => 5])
             ->setVirtualColumn('taxRuleCountryPosition', 2);
         $taxRulesCollection->append($tax);
 
         $tax = new Tax();
         $tax->setType('\Thelia\TaxEngine\TaxType\PricePercentTaxType')
-            ->setRequirements(array('percent' => 1))
+            ->setRequirements(['percent' => 1])
             ->setVirtualColumn('taxRuleCountryPosition', 3);
         $taxRulesCollection->append($tax);
 
@@ -230,25 +230,25 @@ class CalculatorTest extends TestCase
 
         $tax = new Tax();
         $tax->setType('\Thelia\TaxEngine\TaxType\PricePercentTaxType')
-            ->setRequirements(array('percent' => 10))
+            ->setRequirements(['percent' => 10])
             ->setVirtualColumn('taxRuleCountryPosition', 1);
         $taxRulesCollection->append($tax);
 
         $tax = new Tax();
         $tax->setType('\Thelia\TaxEngine\TaxType\PricePercentTaxType')
-            ->setRequirements(array('percent' => 8))
+            ->setRequirements(['percent' => 8])
             ->setVirtualColumn('taxRuleCountryPosition', 1);
         $taxRulesCollection->append($tax);
 
         $tax = new Tax();
         $tax->setType('\Thelia\TaxEngine\TaxType\FixAmountTaxType')
-            ->setRequirements(array('amount' => 5))
+            ->setRequirements(['amount' => 5])
             ->setVirtualColumn('taxRuleCountryPosition', 2);
         $taxRulesCollection->append($tax);
 
         $tax = new Tax();
         $tax->setType('\Thelia\TaxEngine\TaxType\PricePercentTaxType')
-            ->setRequirements(array('percent' => 1))
+            ->setRequirements(['percent' => 1])
             ->setVirtualColumn('taxRuleCountryPosition', 3);
         $taxRulesCollection->append($tax);
 

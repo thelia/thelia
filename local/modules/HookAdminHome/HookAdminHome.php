@@ -34,13 +34,13 @@ class HookAdminHome extends BaseModule
 
     public function getHooks()
     {
-        return array(
-            array(
+        return [
+            [
                 "type" => TemplateDefinition::BACK_OFFICE,
                 "code" => "hook_home_stats",
                 "title" => "Hook Home Stats",
                 "description" => "Hook to change default stats",
-            )
-        );
+            ]
+        ];
     }
 }

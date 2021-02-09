@@ -26,31 +26,31 @@ class FeatureCreationForm extends BaseForm
             ->add(
                 "title",
                 TextType::class,
-                array(
-                "constraints" => array(
+                [
+                "constraints" => [
                     new NotBlank(),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("Title *"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "title",
-                ), )
+                ], ]
             )
             ->add(
                 "locale",
                 TextType::class,
-                array(
-                "constraints" => array(
+                [
+                "constraints" => [
                     new NotBlank(),
-                ), )
+                ], ]
             )
             ->add(
                 "add_to_all",
                 CheckboxType::class,
-                array(
+                [
                 "label" => Translator::getInstance()->trans("Add to all product templates"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "add_to_all",
-                ), )
+                ], ]
             )
         ;
     }

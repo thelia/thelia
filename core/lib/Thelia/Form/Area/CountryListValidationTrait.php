@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Form\Area;
 
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
