@@ -121,7 +121,7 @@ class HookTest extends WebTestCase
     {
         $this->assertStringContains($content, ":: main.content-top ::");
         $this->assertStringContains($content, ":: request : GET / HTTP/1.1");
-        $this->assertRegExp('/:: session : [a-f0-9]{40,} ::/', $content);
+        $this->assertMatchesRegularExpression('/:: session : [a-f0-9]{40,} ::/', $content);
         $this->assertStringContains($content, ":: cart : not null ::");
         $this->assertStringContains($content, ":: order : not null ::");
         $this->assertStringContains($content, ":: currency : 1 ::");
@@ -153,8 +153,8 @@ class HookTest extends WebTestCase
      */
     public function testBaseHookAddCSS($content)
     {
-        $this->assertRegExp('/<link\\s+rel="stylesheet"\\s+type="text\\/css"\\s+href="http:\\/\\/localhost\\/assets\\/frontOffice\\/hooktest\\/HookTest\\/assets\\/css\\/.*\\.css"\\s*\\/>/', $content);
-        $this->assertRegExp('/<link\\s+rel="stylesheet"\\s+type="text\\/css"\\s+href="http:\\/\\/localhost\\/assets\\/frontOffice\\/hooktest\\/HookTest\\/assets\\/css\\/.*\\.css"\\s+media="print"\\s*\\/>/', $content);
+        $this->assertMatchesRegularExpression('/<link\\s+rel="stylesheet"\\s+type="text\\/css"\\s+href="http:\\/\\/localhost\\/assets\\/frontOffice\\/hooktest\\/HookTest\\/assets\\/css\\/.*\\.css"\\s*\\/>/', $content);
+        $this->assertMatchesRegularExpression('/<link\\s+rel="stylesheet"\\s+type="text\\/css"\\s+href="http:\\/\\/localhost\\/assets\\/frontOffice\\/hooktest\\/HookTest\\/assets\\/css\\/.*\\.css"\\s+media="print"\\s*\\/>/', $content);
     }
 
     /**
@@ -163,7 +163,7 @@ class HookTest extends WebTestCase
      */
     public function testBaseHookAddJS($content)
     {
-        $this->assertRegExp('/<script\\s+type="text\\/javascript"\\s+src="http:\\/\\/localhost\\/assets\\/frontOffice\\/hooktest\\/HookTest\\/assets\\/js\\/.*\\.js"\\s*>/', $content);
+        $this->assertMatchesRegularExpression('/<script\\s+type="text\\/javascript"\\s+src="http:\\/\\/localhost\\/assets\\/frontOffice\\/hooktest\\/HookTest\\/assets\\/js\\/.*\\.js"\\s*>/', $content);
     }
 
     /**
