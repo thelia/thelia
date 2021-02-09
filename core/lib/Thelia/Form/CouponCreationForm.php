@@ -66,14 +66,14 @@ class CouponCreationForm extends BaseForm
 
         /** @var \Thelia\Model\Country $item */
         foreach ($list as $item) {
-            $countries[$item->getId()] = $item->getTitle();
+            $countries[$item->getTitle()] = $item->getId();
         }
 
         asort($countries);
 
         $countries[0] = Translator::getInstance()->trans("All countries");
 
-        $modules = [0 => '   '];
+        $modules = ['   ' => 0];
 
         $list = ModuleQuery::create()->filterByActivate(BaseModule::IS_ACTIVATED)->filterByType(BaseModule::DELIVERY_MODULE_TYPE)->find();
 
@@ -84,7 +84,7 @@ class CouponCreationForm extends BaseForm
 
         asort($modules);
 
-        $modules[0] = Translator::getInstance()->trans("All shipping methods");
+        $modules[Translator::getInstance()->trans("All shipping methods")] = 0;
 
         $this->formBuilder
             ->add(
@@ -214,8 +214,8 @@ class CouponCreationForm extends BaseForm
                     'multiple' => false,
                     'required' => true,
                     'choices'  => [
-                        1 => Translator::getInstance()->trans('Per customer'),
-                        0 => Translator::getInstance()->trans('Overall'),
+                        Translator::getInstance()->trans('Per customer') => 1,
+                        Translator::getInstance()->trans('Overall') => 0
                     ]
                 ]
             )

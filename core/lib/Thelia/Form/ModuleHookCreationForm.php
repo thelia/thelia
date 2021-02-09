@@ -148,7 +148,7 @@ class ModuleHookCreationForm extends BaseForm
                 ||
                 IgnoredModuleHookQuery::create()->filterByModuleId($module->getId())->count() > 0
             ) {
-                $choices[$module->getId()] = $module->getTitle();
+                $choices[$module->getTitle()] = $module->getId();
             }
         }
 
@@ -168,7 +168,7 @@ class ModuleHookCreationForm extends BaseForm
 
         /** @var Hook $hook */
         foreach ($hooks as $hook) {
-            $choices[$hook->getId()] = $hook->getTitle().' (code '.$hook->getCode().')';
+            $choices[$hook->getTitle().' (code '.$hook->getCode().')'] = $hook->getId();
         }
 
         return $choices;

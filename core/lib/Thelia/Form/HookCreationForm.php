@@ -51,10 +51,10 @@ class HookCreationForm extends BaseForm
             ])
             ->add("type", ChoiceType::class, [
                 "choices" => [
-                    TemplateDefinition::FRONT_OFFICE => Translator::getInstance()->trans("Front Office"),
-                    TemplateDefinition::BACK_OFFICE => Translator::getInstance()->trans("Back Office"),
-                    TemplateDefinition::EMAIL => Translator::getInstance()->trans("email"),
-                    TemplateDefinition::PDF => Translator::getInstance()->trans("pdf"),
+                    Translator::getInstance()->trans("Front Office") => TemplateDefinition::FRONT_OFFICE,
+                    Translator::getInstance()->trans("Back Office") => TemplateDefinition::BACK_OFFICE,
+                    Translator::getInstance()->trans("email") => TemplateDefinition::EMAIL,
+                    Translator::getInstance()->trans("pdf") => TemplateDefinition::PDF,
                 ],
                 "constraints" => [
                     new NotBlank(),

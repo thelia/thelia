@@ -126,8 +126,8 @@ class SaleModificationForm extends SaleCreationForm
             [
                 'constraints' => [ new NotBlank() ],
                 'choices'     => [
-                    Sale::OFFSET_TYPE_AMOUNT     => Translator::getInstance()->trans('Constant amount'),
-                    Sale::OFFSET_TYPE_PERCENTAGE => Translator::getInstance()->trans('Percentage'),
+                    Translator::getInstance()->trans('Constant amount') => Sale::OFFSET_TYPE_AMOUNT,
+                    Translator::getInstance()->trans('Percentage') => Sale::OFFSET_TYPE_PERCENTAGE
                 ],
                 'required'    => true,
                 'label'       => Translator::getInstance()->trans('Discount type'),
