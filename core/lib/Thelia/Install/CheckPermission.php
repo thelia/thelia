@@ -195,43 +195,16 @@ class CheckPermission extends BaseInstall
      */
     protected function getI18nDirectoryText($directory, $isValid)
     {
-        if ($this->translator !== null) {
-            if ($isValid) {
-                $sentence = 'The directory %directory% is writable';
-            } else {
-                $sentence = 'The directory %directory% is not writable';
-            }
+        $sentence = $isValid ? 'The directory %directory% is writable' : 'The directory %directory% is not writable';
 
-            $translatedText = $this->translator->trans(
-                $sentence,
-                array(
-                    '%directory%' => $directory
-                )
-            );
-        } else {
-            $translatedText = sprintf('The directory %s should be writable', $directory);
-        }
-
-        return $translatedText;
+        return $this->formatString($sentence, ['%directory%' => $directory]);
     }
 
     protected function getI18nExtensionText($extension, $isValid)
     {
-        if ($isValid) {
-            $sentence = '%extension% php extension is loaded.';
-        } else {
-            $sentence = '%extension% php extension is not loaded.';
-        }
+        $sentence = $isValid ? '%extension% php extension is loaded.' : '%extension% php extension is not loaded.';
 
-        if ($this->translator !== null) {
-            $translatedText = $this->translator->trans($sentence, array(
-                '%extension%' => $extension
-            ));
-        } else {
-            $translatedText = $sentence;
-        }
-
-        return $translatedText;
+        return $this->formatString($sentence, ['%extension%' => $extension]);
     }
 
     /**
@@ -247,42 +220,22 @@ class CheckPermission extends BaseInstall
      */
     protected function getI18nConfigText($key, $expectedValue, $currentValue, $isValid)
     {
-        if ($isValid) {
-            $sentence = 'The PHP "%key%" configuration value (currently %currentValue%) is correct (%expectedValue% required).';
-        } else {
-            $sentence = 'The PHP "%key%" configuration value (currently %currentValue%) is below minimal requirements to run Thelia2 (%expectedValue% required).';
-        }
+        $sentence = $isValid ? 'The PHP "%key%" configuration value (currently %currentValue%) is correct (%expectedValue% required).'
+            : 'The PHP "%key%" configuration value (currently %currentValue%) is below minimal requirements to run Thelia2 (%expectedValue% required).';
 
-        if ($this->translator !== null) {
-            $translatedText = $this->translator->trans(
-                $sentence,
-                array(
-                    '%key%' => $key,
-                    '%expectedValue%' => $expectedValue,
-                    '%currentValue%' => $currentValue,
-                ),
-                'install-wizard'
-            );
-        } else {
-            $translatedText = $sentence;
-        }
-
-        return $translatedText;
+        return $this->formatString(
+            $sentence,
+            [
+                '%key%' => $key,
+                '%expectedValue%' => $expectedValue,
+                '%currentValue%' => $currentValue
+            ]
+        );
     }
 
     protected function getI18nExtensionHint()
     {
-        $sentence = 'This PHP extension should be installed and loaded.';
-        if ($this->translator !== null) {
-
-            $translatedText = $this->translator->trans(
-                $sentence
-            );
-        } else {
-            $translatedText = $sentence;
-        }
-
-        return $translatedText;
+        return $this->formatString('This PHP extension should be installed and loaded.');
     }
 
     /**
@@ -292,17 +245,7 @@ class CheckPermission extends BaseInstall
      */
     protected function getI18nConfigHint()
     {
-        $sentence = 'Change this value in the php.ini configuration file.';
-        if ($this->translator !== null) {
-
-            $translatedText = $this->translator->trans(
-                $sentence
-            );
-        } else {
-            $translatedText = $sentence;
-        }
-
-        return $translatedText;
+        return $this->formatString("Change this value in the php.ini configuration file.", []);
     }
 
     /**
@@ -316,26 +259,17 @@ class CheckPermission extends BaseInstall
      */
     protected function getI18nPhpVersionText($currentValue, $isValid)
     {
-        if ($this->translator !== null) {
-            if ($isValid) {
-                $sentence = 'PHP version %currentValue% matches the version required (> %minExpectedValue% < %maxExpectedValue%).';
-            } else {
-                $sentence = 'The installer detected PHP version %currentValue%, but Thelia 2 requires PHP between %minExpectedValue% and %maxExpectedValue%.';
-            }
+        $sentence = $isValid ? 'PHP version %currentValue% matches the version required (> %minExpectedValue% < %maxExpectedValue%).'
+            : 'The installer detected PHP version %currentValue%, but Thelia 2 requires PHP between %minExpectedValue% and %maxExpectedValue%.';
 
-            $translatedText = $this->translator->trans(
-                $sentence,
-                array(
-                    '%minExpectedValue%' => $this->phpExpectedVerions['min'],
-                    '%maxExpectedValue%' => $this->phpExpectedVerions['max'],
-                    '%currentValue%' => $currentValue,
-                )
-            );
-        } else {
-            $translatedText = sprintf('Thelia requires PHP between %s and %s (%s currently).', $this->phpExpectedVerions['min'], $this->phpExpectedVerions['max'], $currentValue);
-        }
-
-        return $translatedText;
+        return $this->formatString(
+            $sentence,
+            [
+                '%minExpectedValue%' => $this->phpExpectedVerions['min'],
+                '%maxExpectedValue%' => $this->phpExpectedVerions['max'],
+                '%currentValue%' => $currentValue,
+            ]
+        );
     }
 
     /**
@@ -345,18 +279,7 @@ class CheckPermission extends BaseInstall
      */
     protected function getI18nPhpVersionHint()
     {
-        $sentence = 'You should change the installed PHP version to continue Thelia 2 installation.';
-        if ($this->translator !== null) {
-
-            $translatedText = $this->translator->trans(
-                $sentence,
-                array()
-            );
-        } else {
-            $translatedText = $sentence;
-        }
-
-        return $translatedText;
+        return $this->formatString("You should change the installed PHP version to continue Thelia 2 installation.", []);
     }
 
     /**
@@ -419,5 +342,18 @@ class CheckPermission extends BaseInstall
         $suffixes = array('', 'k', 'M', 'G', 'T');
 
         return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
+    }
+
+    protected function formatString($string, $parameters = [])
+    {
+        if ($this->translator !== null) {
+            return $this->translator->trans(
+                $string,
+                $parameters,
+                'install-wizard'
+            );
+        }
+
+        return strtr($string, $parameters);
     }
 }
