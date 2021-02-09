@@ -44,7 +44,6 @@ use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Form\TheliaFormFactoryInterface;
 use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Template\Element\BaseLoopInterface;
@@ -568,9 +567,9 @@ class Thelia extends Kernel
     {
         if (\defined('THELIA_ROOT')) {
             return THELIA_CACHE_DIR . $this->environment;
-        } else {
-            return parent::getCacheDir();
         }
+
+        return parent::getCacheDir();
     }
 
     /**
@@ -584,9 +583,9 @@ class Thelia extends Kernel
     {
         if (\defined('THELIA_ROOT')) {
             return THELIA_LOG_DIR;
-        } else {
-            return parent::getLogDir();
         }
+
+        return parent::getLogDir();
     }
 
     /**

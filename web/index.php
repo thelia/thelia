@@ -15,7 +15,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Symfony\Component\Dotenv\Dotenv;
 
 $env = 'prod';
-$loader = require __DIR__ . '/../core/vendor/autoload.php';
+$loader = require __DIR__ . '/../vendor/autoload.php';
 
 if (file_exists(THELIA_ROOT.'.env')) {
     (new Dotenv())->load(THELIA_ROOT.'.env');

@@ -27,8 +27,7 @@ use Symfony\Component\Translation\Translator;
 class CheckPermission extends BaseInstall
 {
     const DIR_CONF =            'local/config';
-    const DIR_LOG  =            'log';
-    const DIR_CACHE =           'cache';
+    const DIR_VAR  =            'var';
     const DIR_WEB =             'web';
     const DIR_SESSION =         'local/session';
     const DIR_MEDIA =           'local/media';
@@ -36,8 +35,7 @@ class CheckPermission extends BaseInstall
     /** @var array Directory needed to be writable */
     protected $directoriesToBeWritable = array(
         self::DIR_CONF,
-        self::DIR_LOG,
-        self::DIR_CACHE,
+        self::DIR_VAR,
         self::DIR_WEB,
         self::DIR_SESSION,
         self::DIR_MEDIA

@@ -31,7 +31,7 @@ class TlogDestinationFile extends AbstractTlogDestination
 
     public function __construct()
     {
-        $this->path_defaut = "log" . DS . self::TLOG_DEFAULT_NAME;
+        $this->path_defaut = THELIA_LOG_DIR . self::TLOG_DEFAULT_NAME;
         parent::__construct();
     }
 
