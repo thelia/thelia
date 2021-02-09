@@ -83,6 +83,15 @@ if (!file_exists(getTheliaDatabaseConfigFile($env))) {
             return parent::getCacheDir();
         }
 
+        public function getLogDir()
+        {
+            if (\defined('THELIA_ROOT')) {
+                return THELIA_LOG_DIR;
+            } else {
+                return parent::getLogDir();
+            }
+        }
+
         public function registerBundles(): array
         {
             return [
@@ -92,14 +101,13 @@ if (!file_exists(getTheliaDatabaseConfigFile($env))) {
 
         public function registerContainerConfiguration(LoaderInterface $loader)
         {
-            // TODO: Implement registerContainerConfiguration() method.
+
         }
     };
 
     $application = new Application($kernel);
     $application->run($input, new TheliaConsoleOutput());
 
-    echo 'test';
     exit;
 }
 
