@@ -12,6 +12,7 @@
 
 namespace HookAdminHome;
 
+use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Module\BaseModule;
 
@@ -42,5 +43,17 @@ class HookAdminHome extends BaseModule
                 "description" => "Hook to change default stats",
             ]
         ];
+    }
+
+    /**
+     * Defines how services are loaded in your modules
+     *
+     */
+    public static function configureServices(ServicesConfigurator $servicesConfigurator)
+    {
+        $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
+            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
+            ->autowire(true)
+            ->autoconfigure(true);
     }
 }

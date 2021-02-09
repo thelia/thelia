@@ -10,9 +10,6 @@ use Thelia\Model\ModuleQuery;
 return function(ContainerConfigurator $configurator) {
     $serviceConfigurator = $configurator->services();
 
-    $serviceConfigurator->set(ServiceValueResolver::class)
-        ->tag('controller.argument_value_resolver', ['priority' => 50]);
-
     $serviceConfigurator->defaults()
         ->autowire(false)
         ->autoconfigure(false)

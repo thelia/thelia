@@ -4,6 +4,7 @@ namespace HookAdminHome\Controller;
 
 use HookAdminHome\HookAdminHome;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\Annotation\Route;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -12,6 +13,9 @@ use Thelia\Tools\URL;
 
 class ConfigurationController extends BaseAdminController
 {
+    /**
+     * @Route("/admin/module/HookAdminHome/configure", name="admin.home.config", methods={"POST"})
+     */
     public function editConfiguration()
     {
         if (null !== $response = $this->checkAuth(

@@ -3,6 +3,7 @@
 namespace HookAdminHome\Form;
 
 use HookAdminHome\HookAdminHome;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
@@ -13,7 +14,7 @@ class Configuration extends BaseForm
     {
         $this->formBuilder->add(
             "enabled-news",
-            "checkbox",
+            CheckboxType::class,
             [
                 "label" => "Enabled News",
                 "label_attr" => [
@@ -31,7 +32,7 @@ class Configuration extends BaseForm
 
         $this->formBuilder->add(
             "enabled-info",
-            "checkbox",
+            CheckboxType::class,
             [
                 "label" => "Enabled Info",
                 "label_attr" => [
@@ -49,7 +50,7 @@ class Configuration extends BaseForm
 
         $this->formBuilder->add(
             "enabled-stats",
-            "checkbox",
+            CheckboxType::class,
             [
                 "label" => "Enabled default Home Stats",
                 "label_attr" => [
@@ -67,7 +68,7 @@ class Configuration extends BaseForm
 
         $this->formBuilder->add(
             "enabled-sales",
-            "checkbox",
+            CheckboxType::class,
             [
                 "label" => "Enabled Sales Statistics",
                 "label_attr" => [

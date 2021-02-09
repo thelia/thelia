@@ -14,6 +14,7 @@ namespace HookAdminHome\Controller;
 
 use HookAdminHome\HookAdminHome;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Routing\Annotation\Route;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Model\ConfigQuery;
@@ -35,16 +36,16 @@ class HomeController extends BaseAdminController
 
     const RESOURCE_CODE = "admin.home";
 
-    public function loadStatsAjaxAction()
+    /**
+     * @Route("/admin/home/stats", name="admin.home.stats")
+     */
+    public function loadStatsAjaxAction(AdapterInterface $cacheAdapter)
     {
         if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::VIEW)) {
             return $response;
         }
 
         $cacheExpire = ConfigQuery::getAdminCacheHomeStatsTTL();
-
-        /** @var AdapterInterface $cacheAdapter */
-        $cacheAdapter = $this->container->get('thelia.cache');
 
         $month = (int) $this->getRequest()->query->get('month', date('m'));
         $year = (int) $this->getRequest()->query->get('year', date('Y'));
@@ -72,6 +73,13 @@ class HomeController extends BaseAdminController
         return $this->jsonResponse($cacheItem->get());
     }
 
+    /**
+     * @Route(
+     *     "/admin/home/month-sales-block/{month}/{year}",
+     *     name="admin.home.month.sales.block",
+     *     requirements={"month"="\d+", "year"="\d+"}
+     *   )
+     */
     public function blockMonthSalesStatistics($month, $year)
     {
         $baseDate = sprintf("%04d-%02d", $year, $month);
