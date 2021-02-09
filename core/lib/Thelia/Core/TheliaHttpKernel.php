@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -37,9 +39,10 @@ class TheliaHttpKernel extends HttpKernel
         EventDispatcherInterface $dispatcher,
         ContainerInterface $container,
         ControllerResolverInterface $controllerResolver,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        ArgumentResolverInterface $argumentResolver
     ) {
-        parent::__construct($dispatcher, $controllerResolver, $requestStack);
+        parent::__construct($dispatcher, $controllerResolver, $requestStack, $argumentResolver);
         $container->get('thelia.url.manager');
         $this->container = $container;
     }

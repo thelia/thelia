@@ -200,9 +200,36 @@
 
         <service id="argument_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver">
             <argument type="service" id="argument_metadata_factory" />
-            <argument /> <!-- argument value resolvers -->
+            <argument type="collection" /> <!-- argument value resolvers -->
+        </service>
+        <service id="Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface" alias="argument_resolver"/>
+
+        <service id="argument_resolver.request_attribute" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver">
+          <tag name="controller.argument_value_resolver" priority="100" />
         </service>
 
+        <service id="argument_resolver.request" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver">
+          <tag name="controller.argument_value_resolver" priority="50" />
+        </service>
+
+        <service id="argument_resolver.session" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver">
+          <tag name="controller.argument_value_resolver" priority="50" />
+        </service>
+
+        <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
+          <tag name="controller.argument_value_resolver" priority="-50" />
+          <argument />
+        </service>
+
+<!--       Todo check is these resolver is needed-->
+        <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
+          <tag name="controller.argument_value_resolver" priority="-100" />
+        </service>
+
+        <service id="argument_resolver.variadic" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver">
+          <tag name="controller.argument_value_resolver" priority="-150" />
+        </service>
+<!--      end todo-->
         <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel" public="true">
             <factory service="stack_factory" method="resolve" />
             <argument type="service" id="base_http_kernel" />

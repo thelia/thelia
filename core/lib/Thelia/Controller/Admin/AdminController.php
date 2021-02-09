@@ -14,6 +14,7 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\URL;
@@ -26,7 +27,7 @@ class AdminController extends BaseAdminController
      * @Route("/admin", name="admin")
      * @Route("/admin/home", name="admin_home")
      */
-    public function indexAction(TaxEngine $taxEngine)
+    public function indexAction()
     {
         if (!$this->getSecurityContext()->hasAdminUser()) {
             return new RedirectResponse(URL::getInstance()->absoluteUrl($this->getRoute("admin.login")));
