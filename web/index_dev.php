@@ -16,7 +16,7 @@ use Thelia\Core\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\Dotenv\Dotenv;
 
 $env = 'dev';
-require __DIR__ . '/../core/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 if (file_exists(THELIA_ROOT.'.env')) {
     (new Dotenv())->load(THELIA_ROOT.'.env');

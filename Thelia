@@ -1,5 +1,5 @@
 #!/usr/bin/env php
 <?php
 
-$bootstrapFile = __DIR__ . "/core/vendor/autoload.php";
+$bootstrapFile = __DIR__ . "/vendor/autoload.php";
 include __DIR__ . "/core/Thelia";

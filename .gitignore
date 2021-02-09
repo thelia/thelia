@@ -4,10 +4,7 @@ local/config/build
 local/config/database.yml
 local/config/database.yml.sample.save
 local/config/key
-core/vendor
 local/config/runtime-conf.xml
-cache/*
-log/*
 bin/*
 local/session/*
 coverage
@@ -36,7 +33,10 @@ web/.htaccess
 local/I18n/*.php
 .docker/mysql-data/*
 !.docker/mysql-data/.gitkeep
+/vendor/
+/var/
 .env
+
 # Ignore everything in the "modules" directory, except the "default modules"
 local/modules/*
 !local/modules/Cheque/

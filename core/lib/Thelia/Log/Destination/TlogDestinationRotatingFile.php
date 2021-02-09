@@ -29,7 +29,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
 
     public function __construct($maxFileSize = self::MAX_FILE_SIZE_KB_DEFAULT)
     {
-        $this->path_defaut = "log" . DS . self::TLOG_DEFAULT_NAME;
+        $this->path_defaut = THELIA_LOG_DIR . self::TLOG_DEFAULT_NAME;
 
         $this->setConfig(self::VAR_MAX_FILE_SIZE_KB, $maxFileSize, false);
 
