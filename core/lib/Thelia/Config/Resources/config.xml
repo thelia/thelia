@@ -196,6 +196,13 @@
 
         <service id="base_http_kernel" alias="Thelia\Core\TheliaHttpKernel" public="true"/>
 
+        <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory" />
+
+        <service id="argument_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver">
+            <argument type="service" id="argument_metadata_factory" />
+            <argument /> <!-- argument value resolvers -->
+        </service>
+
         <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel" public="true">
             <factory service="stack_factory" method="resolve" />
             <argument type="service" id="base_http_kernel" />

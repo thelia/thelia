@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Thelia\Core\Archiver\ArchiverManager;
 
 /**
- * Class RegisterArchiverPass
+ * Class RegisterArchiverPass$container
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */

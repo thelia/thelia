@@ -38,9 +38,11 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\FormExtensionInterface;
+use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Condition\Implementation\ConditionInterface;
+use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
@@ -314,7 +316,9 @@ class Thelia extends Kernel
             BaseLoopInterface::class => "thelia.loop",
             ContainerAwareInterface::class => "thelia.command",
             CouponInterface::class => "thelia.coupon.addCoupon",
-            ConditionInterface::class => "thelia.coupon.addCondition"
+            ConditionInterface::class => "thelia.coupon.addCondition",
+            ControllerInterface::class => "controller.service_arguments",
+            ArgumentValueResolverInterface::class => "controller.argument_value_resolver"
         ];
 
         foreach ($autoconfiguredInterfaces as $interfaceClass => $tag) {

@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass;
+use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
 use Thelia\Core\DependencyInjection\Compiler\CurrencyConverterProviderPass;
 use Thelia\Core\DependencyInjection\Compiler\FallbackParserPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
@@ -57,6 +59,8 @@ class TheliaBundle extends Bundle
         $container
             ->addCompilerPass(new FallbackParserPass())
             ->addCompilerPass(new TranslatorPass())
+            ->addCompilerPass(new ControllerArgumentValueResolverPass())
+            ->addCompilerPass(new RegisterControllerArgumentLocatorsPass())
             ->addCompilerPass(new RegisterHookListenersPass(), PassConfig::TYPE_AFTER_REMOVING)
             ->addCompilerPass(new RegisterRouterPass())
             ->addCompilerPass(new RegisterCouponPass())
