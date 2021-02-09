@@ -49,7 +49,7 @@ use Thelia\Tools\URL;
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 
-abstract class BaseController
+abstract class BaseController implements ControllerInterface
 {
     use ContainerAwareTrait;
 

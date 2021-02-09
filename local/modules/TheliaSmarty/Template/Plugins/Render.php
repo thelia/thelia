@@ -65,8 +65,6 @@ class Render extends AbstractSmartyPlugin
         $this->requestStack->push($request);
 
         $controller = $this->controllerResolver->getController($request);
-        //Todo check if this is needed
-        $controllerParameters = $this->controllerResolver->getArguments($request, $controller);
 
         $response = \call_user_func_array($controller, []);
 

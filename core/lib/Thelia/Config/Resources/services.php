@@ -2,12 +2,16 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver;
 use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
 return function(ContainerConfigurator $configurator) {
     $serviceConfigurator = $configurator->services();
+
+    $serviceConfigurator->set(ServiceValueResolver::class)
+        ->tag('controller.argument_value_resolver', ['priority' => 50]);
 
     $serviceConfigurator->defaults()
         ->autowire(false)

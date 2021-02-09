@@ -34,8 +34,13 @@ class AnnotationRouter extends BaseRouter
             ->filterByActivate(true)
             ->find();
 
+        $coreControllerPath = THELIA_LIB.'Controller';
+        $routes->addCollection(
+            $loader->load($coreControllerPath, "annotation")
+        );
+
         foreach ($modules as $module) {
-            $moduleControllerPath = $module->getAbsoluteConfigPath().'/../Controller';
+            $moduleControllerPath = $module->getAbsoluteConfigPath().DS.'..'.DS.'Controller';
 
             if (!is_dir($moduleControllerPath)) {
                 continue;
