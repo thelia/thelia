@@ -28,7 +28,7 @@ class CategoryModificationForm extends CategoryCreationForm
         );
 
         // Create countries and shipping modules list
-        $templateList = [0 => '   '];
+        $templateList = ['   ' => 0];
 
         $list = TemplateQuery::create()->find();
 
@@ -37,7 +37,7 @@ class CategoryModificationForm extends CategoryCreationForm
 
         /** @var \Thelia\Model\Template $item */
         foreach ($list as $item) {
-            $templateList[$item->getId()] = $item->setLocale($locale)->getName();
+            $templateList[$item->setLocale($locale)->getName()] = $item->getId();
         }
 
         asort($templateList);

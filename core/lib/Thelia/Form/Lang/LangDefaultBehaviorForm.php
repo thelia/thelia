@@ -49,8 +49,8 @@ class LangDefaultBehaviorForm extends BaseForm
         $this->formBuilder
             ->add('behavior', ChoiceType::class, [
                 'choices' => [
-                    0 => Translator::getInstance()->trans("Strictly use the requested language"),
-                    1 => Translator::getInstance()->trans("Replace by the default language"),
+                    Translator::getInstance()->trans("Strictly use the requested language") => 0,
+                    Translator::getInstance()->trans("Replace by the default language") => 1,
                 ],
                 'constraints' => [
                     new NotBlank(),

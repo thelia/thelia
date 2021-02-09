@@ -26,15 +26,15 @@ class SystemLogConfigurationForm extends BaseForm
         $this->formBuilder
             ->add("level", ChoiceType::class, [
                 'choices' => [
-                    Tlog::MUET      => Translator::getInstance()->trans("Disabled"),
-                    Tlog::DEBUG     => Translator::getInstance()->trans("Debug"),
-                    Tlog::INFO      => Translator::getInstance()->trans("Information"),
-                    Tlog::NOTICE    => Translator::getInstance()->trans("Notices"),
-                    Tlog::WARNING   => Translator::getInstance()->trans("Warnings"),
-                    Tlog::ERROR     => Translator::getInstance()->trans("Errors"),
-                    Tlog::CRITICAL  => Translator::getInstance()->trans("Critical"),
-                    Tlog::ALERT     => Translator::getInstance()->trans("Alerts"),
-                    Tlog::EMERGENCY => Translator::getInstance()->trans("Emergency"),
+                    Translator::getInstance()->trans("Disabled") => Tlog::MUET,
+                    Translator::getInstance()->trans("Debug") => Tlog::DEBUG,
+                    Translator::getInstance()->trans("Information") => Tlog::INFO,
+                    Translator::getInstance()->trans("Notices") => Tlog::NOTICE,
+                    Translator::getInstance()->trans("Warnings") => Tlog::WARNING,
+                    Translator::getInstance()->trans("Errors") => Tlog::ERROR,
+                    Translator::getInstance()->trans("Critical") => Tlog::CRITICAL,
+                    Translator::getInstance()->trans("Alerts") => Tlog::ALERT,
+                    Translator::getInstance()->trans("Emergency") => Tlog::EMERGENCY,
                 ],
 
                 "label" => Translator::getInstance()->trans('Log level *'),
