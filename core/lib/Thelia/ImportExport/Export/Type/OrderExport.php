@@ -161,8 +161,8 @@ class OrderExport extends JsonFileAbstractExport
 
         $stmt = $con->prepare($query);
         $stmt->bindValue('locale', $locale);
-        $stmt->bindValue('start', $this->rangeDate['start']->format('Y-m-d'));
-        $stmt->bindValue('end', $this->rangeDate['end']->format('Y-m-d'));
+        $stmt->bindValue('start', $this->rangeDate['start']->format('Y-m-d H:i:s'));
+        $stmt->bindValue('end', $this->rangeDate['end']->format('Y-m-d H:i:s'));
         $stmt->execute();
 
         $filename = THELIA_CACHE_DIR . '/export/' . 'order.json';

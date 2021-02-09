@@ -182,11 +182,15 @@ class ExportHandler
             );
         }
         if ($rangeDate['end'] && !($rangeDate['end'] instanceof \DateTime)) {
+            // To get the last day of selected month, go to the first day of next month and substract 1 day
             $rangeDate['end'] = \DateTime::createFromFormat(
                 'Y-m-d H:i:s',
-                $rangeDate['end']['year'] . '-' . (\intval($rangeDate['end']['month']) + 1) . '-0 23:59:59'
-            );
+                $rangeDate['end']['year'] . '-' . $rangeDate['end']['month'] . '-1 23:59:59'
+            )
+            ->add(new \DateInterval('P1M'))
+            ->sub(new \DateInterval('P1D'));
         }
+
         $instance->setRangeDate($rangeDate);
 
         // Process export
