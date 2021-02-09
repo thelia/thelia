@@ -74,7 +74,8 @@ class BaseAdminController extends BaseController
             if (! empty($template)) {
                 // If we have a view in the URL, render this view
                 return $this->render($template);
-            } elseif (null != $view = $this->getRequest()->get('view')) {
+            }
+            if (null != $view = $this->getRequest()->get('view')) {
                 return $this->render($view);
             }
         } catch (\Exception $ex) {
@@ -127,9 +128,9 @@ class BaseAdminController extends BaseController
 
         return $this->render(
             'general_error',
-            array(
+            [
                 "error_message" => $message
-            ),
+            ],
             $status
         );
     }
@@ -145,11 +146,11 @@ class BaseAdminController extends BaseController
      */
     protected function checkAuth($resources, $modules, $accesses)
     {
-        $resources = \is_array($resources) ? $resources : array($resources);
-        $modules = \is_array($modules) ? $modules : array($modules);
-        $accesses = \is_array($accesses) ? $accesses : array($accesses);
+        $resources = \is_array($resources) ? $resources : [$resources];
+        $modules = \is_array($modules) ? $modules : [$modules];
+        $accesses = \is_array($accesses) ? $accesses : [$accesses];
 
-        if ($this->getSecurityContext()->isGranted(array("ADMIN"), $resources, $modules, $accesses)) {
+        if ($this->getSecurityContext()->isGranted(["ADMIN"], $resources, $modules, $accesses)) {
             // Okay !
              return null;
         }
@@ -167,9 +168,9 @@ class BaseAdminController extends BaseController
     {
         return $this->getTranslator()->trans(
             "Please check your input: %error",
-            array(
+            [
                 '%error' => $exception->getMessage()
-            )
+            ]
         );
     }
 
@@ -188,11 +189,11 @@ class BaseAdminController extends BaseController
             Tlog::getInstance()->error(
                 $this->getTranslator()->trans(
                     "Error during %action process : %error. Exception was %exc",
-                    array(
+                    [
                         '%action' => $action,
                         '%error'  => $error_message,
                         '%exc'    => $exception != null ? $exception->getMessage() : 'no exception'
-                    )
+                    ]
                 )
             );
 
@@ -236,7 +237,7 @@ class BaseAdminController extends BaseController
      *
      * @return Response A Response instance
      */
-    protected function forward($controller, array $path = array(), array $query = array())
+    protected function forward($controller, array $path = [], array $query = [])
     {
         $path['_controller'] = $controller;
         $subRequest = $this->container->get('request_stack')->getCurrentRequest()->duplicate($query, null, $path);
@@ -305,7 +306,6 @@ class BaseAdminController extends BaseController
         return LangQuery::create()->findOneByLocale($locale)->getUrl();
     }
 
-
     /**
      * Return the current list order identifier for a given object name,
      * updating in using the current request.
@@ -346,7 +346,7 @@ class BaseAdminController extends BaseController
      * @param  int                                  $status       http code status
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    protected function render($templateName, $args = array(), $status = 200)
+    protected function render($templateName, $args = [], $status = 200)
     {
         $response = $this->renderRaw($templateName, $args);
 
@@ -366,7 +366,7 @@ class BaseAdminController extends BaseController
      *
      * @return string|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    protected function renderRaw($templateName, $args = array(), $templateDir = null)
+    protected function renderRaw($templateName, $args = [], $templateDir = null)
     {
         // Add the template standard extension
         $templateName .= '.html';
@@ -378,11 +378,11 @@ class BaseAdminController extends BaseController
         $edition_currency = $this->getCurrentEditionCurrency();
 
         // Prepare common template variables
-        $args = array_merge($args, array(
+        $args = array_merge($args, [
             'edit_language_id'     => $edition_language->getId(),
             'edit_language_locale' => $edition_language->getLocale(),
             'edit_currency_id'     => $edition_currency->getId(),
-        ));
+        ]);
 
         // Update the current edition language & currency in session
         $this->getSession()

@@ -70,25 +70,25 @@ try {
     /* 10% tax */
     $tax10p = new \Thelia\Model\Tax();
     $tax10p->setType('PricePercentTaxType')
-        ->setRequirements(array('percent' => 10))
+        ->setRequirements(['percent' => 10])
         ->save();
 
     /* 8% tax */
     $tax8p = new \Thelia\Model\Tax();
     $tax8p->setType('PricePercentTaxType')
-        ->setRequirements(array('percent' => 8))
+        ->setRequirements(['percent' => 8])
         ->save();
 
     /* fix 5 tax */
     $tax5 = new \Thelia\Model\Tax();
     $tax5->setType('FixAmountTaxType')
-        ->setRequirements(array('amount' => 5))
+        ->setRequirements(['amount' => 5])
         ->save();
 
     /* 1% tax */
     $tax1p = new \Thelia\Model\Tax();
     $tax1p->setType('PricePercentTaxType')
-        ->setRequirements(array('percent' => 1))
+        ->setRequirements(['percent' => 1])
         ->save();
 
     /* tax rule */
@@ -130,7 +130,6 @@ try {
     }
 
     $con->commit();
-
 } catch (Exception $e) {
     echo "error : ".$e->getMessage()."\n";
     $con->rollBack();

@@ -73,14 +73,14 @@ class MatchForTotalAmount extends ConditionAbstract
 
         $this->isCurrencyValid($values[self::CART_CURRENCY]);
 
-        $this->operators = array(
+        $this->operators = [
             self::CART_TOTAL => $operators[self::CART_TOTAL],
             self::CART_CURRENCY => $operators[self::CART_CURRENCY],
-        );
-        $this->values = array(
+        ];
+        $this->values = [
             self::CART_TOTAL => $values[self::CART_TOTAL],
             self::CART_CURRENCY => $values[self::CART_CURRENCY],
-        );
+        ];
 
         return $this;
     }
@@ -149,11 +149,11 @@ class MatchForTotalAmount extends ConditionAbstract
 
         $toolTip = $this->translator->trans(
             'If cart total amount is <strong>%operator%</strong> %amount% %currency%',
-            array(
+            [
                 '%operator%' => $i18nOperator,
                 '%amount%' => $this->values[self::CART_TOTAL],
                 '%currency%' => $this->values[self::CART_CURRENCY]
-            )
+            ]
         );
 
         return $toolTip;
@@ -173,20 +173,20 @@ class MatchForTotalAmount extends ConditionAbstract
             $cleanedCurrencies[$currency->getCode()] = $currency->getSymbol();
         }
 
-        return array(
-            self::CART_TOTAL => array(
+        return [
+            self::CART_TOTAL => [
                 'availableOperators' => $this->availableOperators[self::CART_TOTAL],
                 'availableValues' => '',
                 'value' => '',
                 'selectedOperator' => ''
-            ),
-            self::CART_CURRENCY => array(
+            ],
+            self::CART_CURRENCY => [
                 'availableOperators' => $this->availableOperators[self::CART_CURRENCY],
                 'availableValues' => $cleanedCurrencies,
                 'value' => '',
                 'selectedOperator' => Operators::EQUAL
-            )
-        );
+            ]
+        ];
     }
 
     /**

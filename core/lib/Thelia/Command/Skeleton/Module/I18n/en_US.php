@@ -1,4 +1,4 @@
 <?php
-return array(
+return [
     // 'an english string' => 'The displayed english string',
-);
+];

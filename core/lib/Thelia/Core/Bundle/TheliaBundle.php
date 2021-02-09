@@ -13,21 +13,21 @@
 namespace Thelia\Core\Bundle;
 
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Thelia\Core\DependencyInjection\Compiler\CurrencyConverterProviderPass;
 use Thelia\Core\DependencyInjection\Compiler\FallbackParserPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterAssetFilterPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterCommandPass;
+use Thelia\Core\DependencyInjection\Compiler\RegisterCouponConditionPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterCouponPass;
-use Thelia\Core\DependencyInjection\Compiler\RegisterLoopPass;
-use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterFormExtensionPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterHookListenersPass;
+use Thelia\Core\DependencyInjection\Compiler\RegisterLoopPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass;
-use Thelia\Core\DependencyInjection\Compiler\RegisterCouponConditionPass;
+use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\DependencyInjection\Compiler\StackPass;
 use Thelia\Core\DependencyInjection\Compiler\TranslatorPass;
 
@@ -48,7 +48,6 @@ class TheliaBundle extends Bundle
      *
      * Construct the depency injection builder
      *
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      */
 
     public function build(ContainerBuilder $container)

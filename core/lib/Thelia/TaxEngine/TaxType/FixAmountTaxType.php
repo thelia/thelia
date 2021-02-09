@@ -12,10 +12,10 @@
 
 namespace Thelia\TaxEngine\TaxType;
 
-use Thelia\Type\FloatType;
 use Thelia\Core\Translation\Translator;
 use Thelia\TaxEngine\BaseTaxType;
 use Thelia\TaxEngine\TaxTypeRequirementDefinition;
+use Thelia\Type\FloatType;
 
 /**
  *
@@ -38,13 +38,13 @@ class FixAmountTaxType extends BaseTaxType
 
     public function getRequirementsDefinition()
     {
-        return array(
+        return [
             new TaxTypeRequirementDefinition(
                 'amount',
                 new FloatType(),
                 Translator::getInstance()->trans("Amount")
             )
-        );
+        ];
     }
 
     public function getTitle()

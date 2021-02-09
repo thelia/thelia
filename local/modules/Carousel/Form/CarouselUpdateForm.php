@@ -195,7 +195,6 @@ class CarouselUpdateForm extends BaseForm
                     'label' => $this->translator->trans('End date', [], Carousel::DOMAIN_NAME),
                     'widget' => "single_text",
                     'required' => false,
-
                 ]
             )->add(
                 'postscriptum' . $id,

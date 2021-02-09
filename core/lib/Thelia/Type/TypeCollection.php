@@ -21,7 +21,7 @@ namespace Thelia\Type;
 class TypeCollection implements \Iterator
 {
     private $position;
-    protected $types = array();
+    protected $types = [];
 
     public function __construct()
     {
@@ -36,7 +36,6 @@ class TypeCollection implements \Iterator
     }
 
     /**
-     * @param TypeInterface $type
      *
      * @return TypeCollection
      */

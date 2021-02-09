@@ -22,7 +22,7 @@ class LoopException extends \RuntimeException
     const MULTIPLE_SEARCH_INTERFACE = 400;
     const SEARCH_INTERFACE_NOT_FOUND = 404;
 
-    public function __construct($message, $code = null, $arguments = array(), $previous = null)
+    public function __construct($message, $code = null, $arguments = [], $previous = null)
     {
         if (\is_array($arguments)) {
             $this->arguments = $arguments;

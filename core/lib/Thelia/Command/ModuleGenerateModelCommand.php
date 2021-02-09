@@ -90,10 +90,10 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
         $command = $this->getApplication()->find("module:generate:sql");
 
         $command->run(
-            new ArrayInput(array(
+            new ArrayInput([
                 "command" => $command->getName(),
                 "name" => $this->module
-            )),
+            ]),
             $output
         );
     }

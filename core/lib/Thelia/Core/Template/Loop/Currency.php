@@ -17,12 +17,12 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Model\CurrencyQuery;
-use Thelia\Type\TypeCollection;
-use Thelia\Type\EnumListType;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Currency as CurrencyModel;
+use Thelia\Model\CurrencyQuery;
+use Thelia\Type\EnumListType;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -58,7 +58,7 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
                 'order',
                 new TypeCollection(
                     new EnumListType(
-                        array(
+                        [
                             'id', 'id_reverse',
                             'name', 'name_reverse',
                             'code', 'code_reverse',
@@ -66,7 +66,7 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
                             'rate', 'rate_reverse',
                             'visible', 'visible_reverse',
                             'is_default', 'is_default_reverse',
-                            'manual', 'manual_reverse')
+                            'manual', 'manual_reverse']
                     )
                 ),
                 'manual'
@@ -79,7 +79,7 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
         $search = CurrencyQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('NAME'));
+        $this->configureI18nProcessing($search, ['NAME']);
 
         if (null !== $id = $this->getId()) {
             $search->filterById($id, Criteria::IN);
@@ -107,49 +107,42 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
                 case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-
                 case 'name':
                     $search->addAscendingOrderByColumn('i18n_NAME');
                     break;
                 case 'name_reverse':
                     $search->addDescendingOrderByColumn('i18n_NAME');
                     break;
-
                 case 'code':
                     $search->orderByCode(Criteria::ASC);
                     break;
                 case 'code_reverse':
                     $search->orderByCode(Criteria::DESC);
                     break;
-
                 case 'symbol':
                     $search->orderBySymbol(Criteria::ASC);
                     break;
                 case 'symbol_reverse':
                     $search->orderBySymbol(Criteria::DESC);
                     break;
-
                 case 'rate':
                     $search->orderByRate(Criteria::ASC);
                     break;
                 case 'rate_reverse':
                     $search->orderByRate(Criteria::DESC);
                     break;
-
                 case 'visible':
                     $search->orderByVisible(Criteria::ASC);
                     break;
                 case 'visible_reverse':
                     $search->orderByVisible(Criteria::DESC);
                     break;
-
                 case 'is_default':
                     $search->orderByByDefault(Criteria::ASC);
                     break;
                 case 'is_default_reverse':
                     $search->orderByByDefault(Criteria::DESC);
                     break;
-
                 case 'manual':
                     $search->orderByPosition(Criteria::ASC);
                     break;

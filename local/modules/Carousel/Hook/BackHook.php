@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Carousel\Hook;
 
 use Carousel\Carousel;
@@ -26,13 +25,11 @@ use Thelia\Tools\URL;
  */
 class BackHook extends BaseHook
 {
-
     /**
      * Add a new entry in the admin tools menu
      *
      * should add to event a fragment with fields : id,class,url,title
      *
-     * @param HookRenderBlockEvent $event
      */
     public function onMainTopMenuTools(HookRenderBlockEvent $event)
     {

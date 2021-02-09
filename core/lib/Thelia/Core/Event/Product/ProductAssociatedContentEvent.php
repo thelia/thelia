@@ -12,15 +12,15 @@
 
 namespace Thelia\Core\Event\Product;
 
-use Thelia\Model\ProductAssociatedContent;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\ProductAssociatedContent;
 
 /**
  * @deprecated since 2.4, please use \Thelia\Model\Event\ProductAssociatedContent
  */
 class ProductAssociatedContentEvent extends ActionEvent
 {
-    public $content = null;
+    public $content;
 
     public function __construct(ProductAssociatedContent $content = null)
     {

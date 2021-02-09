@@ -23,46 +23,46 @@ use Thelia\Model\Order;
 class OrderEvent extends ActionEvent
 {
     /** @var Order */
-    protected $order = null;
+    protected $order;
 
     /** @var Order */
-    protected $placedOrder = null;
+    protected $placedOrder;
 
     /** @var null|int */
-    protected $invoiceAddress = null;
+    protected $invoiceAddress;
 
     /** @var null|int */
-    protected $deliveryAddress = null;
+    protected $deliveryAddress;
 
     /** @var null|int */
-    protected $deliveryModule = null;
+    protected $deliveryModule;
 
     /** @var null|int */
-    protected $paymentModule = null;
+    protected $paymentModule;
 
     /** @var null|float */
-    protected $postage = null;
+    protected $postage;
 
     /** @var float */
     protected $postageTax = 0.0;
 
     /** @var null|string */
-    protected $postageTaxRuleTitle = null;
+    protected $postageTaxRuleTitle;
 
     /** @var null|string */
-    protected $ref = null;
+    protected $ref;
 
     /** @var null|int */
-    protected $status = null;
+    protected $status;
 
     /** @var null|string */
-    protected $deliveryRef = null;
+    protected $deliveryRef;
 
     /** @var null|int */
-    protected $cartItemId = null;
+    protected $cartItemId;
 
     /** @var null|string  */
-    protected $transactionRef = null;
+    protected $transactionRef;
 
     /**
      * @var Response
@@ -70,7 +70,6 @@ class OrderEvent extends ActionEvent
     protected $response;
 
     /**
-     * @param Order $order
      */
     public function __construct(Order $order)
     {
@@ -78,7 +77,6 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param Order $order
      * @return $this
      */
     public function setOrder(Order $order)
@@ -108,7 +106,6 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param Order $order
      * @return $this
      */
     public function setPlacedOrder(Order $order)

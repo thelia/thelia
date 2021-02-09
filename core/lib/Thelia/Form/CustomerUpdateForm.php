@@ -39,167 +39,167 @@ class CustomerUpdateForm extends BaseForm
                 'update_logged_in_user',
                 IntegerType::class// In a front office context, update the in-memory logged-in user data
             )
-            ->add("company", TextType::class, array(
+            ->add("company", TextType::class, [
                 "label" => Translator::getInstance()->trans("Company"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "company",
-                ),
+                ],
                 "required" => false,
-            ))
-            ->add("firstname", TextType::class, array(
-                "constraints" => array(
+            ])
+            ->add("firstname", TextType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("First Name"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "firstname",
-                ),
-            ))
-            ->add("lastname", TextType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("lastname", TextType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("Last Name"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "lastname",
-                ),
-            ))
-            ->add("email", EmailType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("email", EmailType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("Email address"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "email",
-                ),
-            ))
-            ->add("email_confirm", EmailType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("email_confirm", EmailType::class, [
+                "constraints" => [
                     new Constraints\Email(),
-                    new Constraints\Callback(array($this, "verifyEmailField")),
-                ),
+                    new Constraints\Callback([$this, "verifyEmailField"]),
+                ],
                 "label" => Translator::getInstance()->trans("Confirm Email address"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "email_confirm",
-                ),
-            ))
-            ->add("password", TextType::class, array(
+                ],
+            ])
+            ->add("password", TextType::class, [
                 "label" => Translator::getInstance()->trans("Password"),
                 "required" => false,
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "password",
                     "help" => Translator::getInstance()->trans('Leave blank to keep current customer password')
-                ),
-            ))
-            ->add("address1", TextType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("address1", TextType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
-                ),
-                "label_attr" => array(
+                ],
+                "label_attr" => [
                     "for" => "address",
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("Street Address "),
-            ))
-            ->add("address2", TextType::class, array(
+            ])
+            ->add("address2", TextType::class, [
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Address Line 2"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "address2",
-                ),
-            ))
-            ->add("address3", TextType::class, array(
+                ],
+            ])
+            ->add("address3", TextType::class, [
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Address Line 3"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "address3",
-                ),
-            ))
-            ->add("phone", TextType::class, array(
+                ],
+            ])
+            ->add("phone", TextType::class, [
                 "label" => Translator::getInstance()->trans("Phone"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "phone",
-                ),
+                ],
                 "required" => false,
-            ))
-            ->add("cellphone", TextType::class, array(
+            ])
+            ->add("cellphone", TextType::class, [
                 "label" => Translator::getInstance()->trans("Cellphone"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "cellphone",
-                ),
+                ],
                 "required" => false,
-            ))
-            ->add("zipcode", TextType::class, array(
-                "constraints" => array(
+            ])
+            ->add("zipcode", TextType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                            array($this, "verifyZipCode")),
-                    ),
+                            [$this, "verifyZipCode"]),
+                    ],
                 "label" => Translator::getInstance()->trans("Zip code"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "zipcode",
-                ),
-            ))
-            ->add("city", TextType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("city", TextType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("City"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "city",
-                ),
-            ))
-            ->add("country", TextType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("country", TextType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("Country"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "country",
-                ),
-            ))
-            ->add("state", TextType::class, array(
+                ],
+            ])
+            ->add("state", TextType::class, [
                 "required" => false,
-                "constraints" => array(
+                "constraints" => [
                     new Constraints\Callback(
-                            array($this, "verifyState")
+                            [$this, "verifyState"]
                         ),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("State *"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "state",
-                ),
-            ))
-            ->add("title", TextType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("title", TextType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("Title"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "title",
-                ),
-            ))
-            ->add('discount', TextType::class, array(
+                ],
+            ])
+            ->add('discount', TextType::class, [
                 'required' => false,
                 'label' => Translator::getInstance()->trans('permanent discount (in percent)'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'discount',
-                ),
-            ))
-            ->add('reseller', CheckboxType::class, array(
+                ],
+            ])
+            ->add('reseller', CheckboxType::class, [
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Reseller'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'reseller',
-                ),
-            ))
-            ->add('lang_id', IntegerType::class, array(
+                ],
+            ])
+            ->add('lang_id', IntegerType::class, [
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Preferred language'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'lang_id',
-                ),
-            ))
+                ],
+            ])
         ;
     }
 

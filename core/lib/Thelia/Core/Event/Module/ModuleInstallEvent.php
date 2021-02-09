@@ -40,7 +40,6 @@ class ModuleInstallEvent extends ActionEvent
     }
 
     /**
-     * @param \Thelia\Model\Module $module
      *
      * @return $this
      */

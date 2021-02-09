@@ -18,10 +18,10 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Model\LangQuery;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-use Thelia\Type\TypeCollection;
+use Thelia\Model\LangQuery;
 use Thelia\Type;
+use Thelia\Type\TypeCollection;
 use TheliaSmarty\Template\Plugins\TheliaLoop;
 
 /**

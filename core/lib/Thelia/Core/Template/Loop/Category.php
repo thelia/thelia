@@ -19,14 +19,14 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\Category as CategoryModel;
 use Thelia\Model\CategoryQuery;
-use Thelia\Type\TypeCollection;
+use Thelia\Model\ProductQuery;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
-use Thelia\Model\ProductQuery;
-use Thelia\Model\Category as CategoryModel;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -134,7 +134,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
         $search = CategoryQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS'));
+        $this->configureI18nProcessing($search, ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS']);
 
         $id = $this->getId();
 

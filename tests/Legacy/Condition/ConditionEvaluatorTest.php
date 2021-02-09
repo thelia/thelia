@@ -13,9 +13,9 @@
 namespace Thelia\Tests\Condition;
 
 use PHPUnit\Framework\TestCase;
+use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
-use Thelia\Condition\ConditionCollection;
 
 /**
  * Unit Test ConditionEvaluator Class
@@ -59,10 +59,10 @@ class ConditionEvaluatorTest extends TestCase
         $actual = $conditionEvaluator->variableOpComparison(1, Operators::SUPERIOR_OR_EQUAL, 0);
         $this->assertEquals($expected, $actual);
 
-        $actual = $conditionEvaluator->variableOpComparison(1, Operators::IN, array(1, 2, 3));
+        $actual = $conditionEvaluator->variableOpComparison(1, Operators::IN, [1, 2, 3]);
         $this->assertEquals($expected, $actual);
 
-        $actual = $conditionEvaluator->variableOpComparison(1, Operators::OUT, array(0, 2, 3));
+        $actual = $conditionEvaluator->variableOpComparison(1, Operators::OUT, [0, 2, 3]);
         $this->assertEquals($expected, $actual);
     }
 
@@ -93,10 +93,10 @@ class ConditionEvaluatorTest extends TestCase
         $actual = $conditionEvaluator->variableOpComparison(3, Operators::SUPERIOR_OR_EQUAL, 4);
         $this->assertEquals($expected, $actual);
 
-        $actual = $conditionEvaluator->variableOpComparison(0, Operators::IN, array(1, 2, 3));
+        $actual = $conditionEvaluator->variableOpComparison(0, Operators::IN, [1, 2, 3]);
         $this->assertEquals($expected, $actual);
 
-        $actual = $conditionEvaluator->variableOpComparison(2, Operators::OUT, array(0, 2, 3));
+        $actual = $conditionEvaluator->variableOpComparison(2, Operators::OUT, [0, 2, 3]);
         $this->assertEquals($expected, $actual);
     }
 

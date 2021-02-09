@@ -8,7 +8,6 @@
  * @package Filemanager
  */
 class Response {
-
 	const HTTP_CONTINUE = 100;
 	const HTTP_SWITCHING_PROTOCOLS = 101;
 	const HTTP_PROCESSING = 102;            // RFC2518
@@ -81,7 +80,7 @@ class Response {
 	 *
 	 * @var array
 	 */
-	public static $statusTexts = array(
+	public static $statusTexts = [
 		100 => 'Continue',
 		101 => 'Switching Protocols',
 		102 => 'Processing',            // RFC2518
@@ -142,7 +141,7 @@ class Response {
 		508 => 'Loop Detected',                                               // RFC5842
 		510 => 'Not Extended',                                                // RFC2774
 		511 => 'Network Authentication Required',                             // RFC6585
-	);
+	];
 
 	/**
 	 * @var  string
@@ -172,11 +171,10 @@ class Response {
 	/**
 	 * Construct the response
 	 *
-	 * @param  mixed  $content
 	 * @param  int    $statusCode
 	 * @param  array  $headers
 	 */
-	public function __construct($content = '', $statusCode = 200, $headers = array())
+	public function __construct($content = '', $statusCode = 200, $headers = [])
 	{
 		$this->setContent($content);
 		$this->setStatusCode($statusCode);
@@ -187,14 +185,13 @@ class Response {
 	/**
 	 * Set the content on the response.
 	 *
-	 * @param  mixed  $content
 	 * @return $this
 	 */
 	public function setContent($content)
 	{
 		if ($content instanceof ArrayObject || is_array($content))
 		{
-			$this->headers['Content-Type'] = array('application/json');
+			$this->headers['Content-Type'] = ['application/json'];
 
 			$content = json_encode($content);
 		}
@@ -285,11 +282,11 @@ class Response {
 	{
 		if (empty($this->headers[$key]))
 		{
-			$this->headers[$key] = array();
+			$this->headers[$key] = [];
 		}
 		if ($replace)
 		{
-			$this->headers[$key] = array($value);
+			$this->headers[$key] = [$value];
 		}
 		else
 		{

@@ -31,7 +31,7 @@ class ConfigStoreController extends BaseAdminController
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::STORE, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::STORE, [], AccessManager::VIEW)) {
             return $response;
         }
 
@@ -68,7 +68,7 @@ class ConfigStoreController extends BaseAdminController
 
     public function saveAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::STORE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::STORE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -105,7 +105,7 @@ class ConfigStoreController extends BaseAdminController
 
             // Update store
             foreach ($data as $name => $value) {
-                if (!array_key_exists($name, $storeMediaList) && !$configStoreForm->isTemplateDefinedHiddenFieldName($name)) {
+                if (!\array_key_exists($name, $storeMediaList) && !$configStoreForm->isTemplateDefinedHiddenFieldName($name)) {
                     ConfigQuery::write($name, $value, false);
                 }
             }

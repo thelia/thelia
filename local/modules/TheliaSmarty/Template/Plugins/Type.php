@@ -13,8 +13,8 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use Thelia\Core\Template\Smarty\Plugins\an;
-use TheliaSmarty\Template\SmartyPluginDescriptor;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
+use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 class Type extends AbstractSmartyPlugin
 {
@@ -40,8 +40,8 @@ class Type extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor('modifier', 'assertType', $this, 'assertTypeModifier'),
-        );
+        ];
     }
 }

@@ -43,11 +43,11 @@ class RequestTest extends TestCase
                 "test=fu"
             ));
 
-        $result = $request->getUriAddingParameters(array("foo" => "bar"));
+        $result = $request->getUriAddingParameters(["foo" => "bar"]);
 
         $this->assertEquals("http://localhost/?foo=bar", $result);
 
-        $result = $request->getUriAddingParameters(array("foo" => "bar"));
+        $result = $request->getUriAddingParameters(["foo" => "bar"]);
 
         $this->assertEquals("http://localhost/?test=fu&foo=bar", $result);
     }

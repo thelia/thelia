@@ -233,7 +233,6 @@ class Session extends BaseSession
         return $this;
     }
 
-
     /**
      * Return the cart stored in the current session
      *
@@ -288,7 +287,6 @@ class Session extends BaseSession
     /**
      * Clear the current session cart, and store a new, empty one in the session.
      *
-     * @param EventDispatcherInterface $dispatcher
      */
     public function clearSessionCart(EventDispatcherInterface $dispatcher)
     {
@@ -383,7 +381,7 @@ class Session extends BaseSession
      */
     public function getConsumedCoupons()
     {
-        return $this->get('thelia.consumed_coupons', array());
+        return $this->get('thelia.consumed_coupons', []);
     }
 
     /**
@@ -400,7 +398,6 @@ class Session extends BaseSession
      * Save errored forms information
      *
      * @param array $formInformation
-     * @return mixed
      */
     public function setFormErrorInformation($formInformation)
     {

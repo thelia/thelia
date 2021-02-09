@@ -39,18 +39,18 @@ class VarDumper extends AbstractSmartyPlugin
             throw new \Exception('The smarty function "dump" is available only in debug mode.');
         }
 
-        if (!function_exists('dump')) {
+        if (!\function_exists('dump')) {
             throw new \Exception('The function "dump" was no available. Check that this project has the package symfony/var-dumper in the composer.json file,'
             . ' and that you have installed dev dependencies : composer.phar install --dev');
         }
 
         ob_start();
         foreach ($params as $name => $param) {
-            $type = gettype($param);
+            $type = \gettype($param);
             echo '<div class="sf-dump" style="background-color: #1b1b1b;color: #FFFFFF;padding-left: 5px;">'
                 . $name
                 . ' : '
-                . ($type === 'object' ? get_class($param) : $type)
+                . ($type === 'object' ? \get_class($param) : $type)
                 . '</div>';
             dump($param);
         }
@@ -65,8 +65,8 @@ class VarDumper extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor('function', 'dump', $this, 'dump')
-        );
+        ];
     }
 }

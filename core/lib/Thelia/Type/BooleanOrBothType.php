@@ -48,6 +48,6 @@ class BooleanOrBothType extends BaseType
 
     public function getFormOptions()
     {
-        return array();
+        return [];
     }
 }

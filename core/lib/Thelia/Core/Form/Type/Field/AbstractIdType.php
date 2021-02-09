@@ -32,10 +32,10 @@ abstract class AbstractIdType extends AbstractType
     {
         $resolver->setDefaults([
             "required" => true,
-            "constraints" => array(
+            "constraints" => [
                 new NotBlank(),
                 new Callback([$this, "checkId"]),
-            ),
+            ],
             "cascade_validation" => true,
         ]);
     }

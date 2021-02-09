@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Tools;
 
 use Thelia\Core\HttpFoundation\Request;

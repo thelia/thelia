@@ -17,26 +17,23 @@ use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 
-
 /**
  * Class Configuration
  * @package HookSocial\Controller
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class Configuration extends BaseAdminController {
-
     public function saveAction()
     {
-
-        if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), array('hookanalytics'), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth([AdminResources::MODULE], ['hookanalytics'], AccessManager::UPDATE)) {
             return $response;
         }
 
         $form = new \HookAnalytics\Form\Configuration($this->getRequest());
-        $resp = array(
+        $resp = [
             "error" =>  0,
             "message" => ""
-        );
+        ];
         $response=null;
         $lang = $this->getSession()->get("thelia.admin.edition.lang");
         try {
@@ -52,5 +49,4 @@ class Configuration extends BaseAdminController {
 
         return JsonResponse::create($resp);
     }
-
-} 
+}

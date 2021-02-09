@@ -29,7 +29,6 @@ class Delivery implements EventSubscriberInterface
     /**
      * Get postage from module using the classical module functions
      *
-     * @param DeliveryPostageEvent $event
      */
     public function getPostage(DeliveryPostageEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {

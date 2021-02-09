@@ -13,17 +13,14 @@ use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Map\OrderProductTableMap;
 use Thelia\Model\Map\OrderProductTaxTableMap;
-
 use Thelia\TaxEngine\Calculator;
 
 class Order extends BaseOrder
 {
-
-
     /** @var int|null  */
-    protected $choosenDeliveryAddress = null;
+    protected $choosenDeliveryAddress;
     /** @var int|null  */
-    protected $choosenInvoiceAddress = null;
+    protected $choosenInvoiceAddress;
 
     protected $disableVersioning = false;
 
@@ -58,9 +55,8 @@ class Order extends BaseOrder
     {
         if ($this->isVersioningDisable()) {
             return false;
-        } else {
+        }  
             return parent::isVersioningNecessary($con);
-        }
     }
 
     /**
@@ -105,7 +101,6 @@ class Order extends BaseOrder
     }
 
     /**
-     * @param ConnectionInterface|null $con
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function postInsert(ConnectionInterface $con = null)
@@ -502,7 +497,6 @@ class Order extends BaseOrder
      * Check if stock was decreased at stock creation for this order.
      * TODO : we definitely have to store modules in an order_modules table juste like order_product and other order related information.
      *
-     * @param EventDispatcherInterface $dispatcher
      * @return bool true if the stock was decreased at order creation, false otherwise
      */
     public function isStockManagedOnOrderCreation(EventDispatcherInterface $dispatcher)

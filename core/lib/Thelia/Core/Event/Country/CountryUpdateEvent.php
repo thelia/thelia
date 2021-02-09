@@ -76,7 +76,6 @@ class CountryUpdateEvent extends CountryCreateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getDescription()
     {
@@ -95,7 +94,6 @@ class CountryUpdateEvent extends CountryCreateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getPostscriptum()
     {

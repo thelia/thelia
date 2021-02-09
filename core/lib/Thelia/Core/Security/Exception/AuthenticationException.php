@@ -30,7 +30,6 @@ class AuthenticationException extends \Exception
     /**
      * Set the login template name
      *
-     * @param string $loginPath the login template name
      */
     public function setLoginTemplate($loginTemplate)
     {

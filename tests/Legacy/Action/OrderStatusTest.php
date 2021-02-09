@@ -18,9 +18,9 @@ use Thelia\Core\Event\OrderStatus\OrderStatusCreateEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusDeleteEvent;
 use Thelia\Core\Event\OrderStatus\OrderStatusUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Model\OrderStatus as OrderStatusModel;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
-use Thelia\Model\OrderStatus as OrderStatusModel;
 
 /**
  * Class OrderStatusTest
@@ -30,7 +30,6 @@ use Thelia\Model\OrderStatus as OrderStatusModel;
 class OrderStatusTest extends TestCaseWithURLToolSetup
 {
     /**
-     * @param OrderStatusModel $orderStatus
      * @return OrderStatusUpdateEvent
      */
     public function getUpdateEvent(OrderStatusModel $orderStatus)

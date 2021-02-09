@@ -82,7 +82,6 @@ class SessionController extends BaseAdminController
         return $this->render("lost-password");
     }
 
-
     public function passwordCreateRequestAction()
     {
         if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (null !== $response = $this->checkAdminLoggedIn())) {
@@ -279,7 +278,7 @@ class SessionController extends BaseAdminController
 
             $message = $this->getTranslator()->trans(
                 "Unable to process your request. Please try again (%err).",
-                array("%err" => $ex->getMessage())
+                ["%err" => $ex->getMessage()]
             );
         }
 
@@ -292,7 +291,6 @@ class SessionController extends BaseAdminController
     /**
      * Save user locale preference in session.
      *
-     * @param UserInterface $user
      */
     protected function applyUserLocale(UserInterface $user)
     {

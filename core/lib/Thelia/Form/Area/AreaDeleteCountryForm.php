@@ -43,7 +43,7 @@ class AreaDeleteCountryForm extends BaseForm
                     'required' => true,
 
                     'constraints' => [
-                        new GreaterThan(array('value' => 0)),
+                        new GreaterThan(['value' => 0]),
                         new NotBlank(),
                     ]
                 ]
@@ -70,7 +70,6 @@ class AreaDeleteCountryForm extends BaseForm
             )
         ;
     }
-
 
     /**
      * @return string the name of you form. This name must be unique

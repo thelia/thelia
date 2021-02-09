@@ -13,8 +13,8 @@
 namespace Thelia\Core\Template\Element;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Template\Loop\Argument\Argument;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\Tools\ModelCriteriaTools;
 
 /**
@@ -57,7 +57,7 @@ abstract class BaseI18nLoop extends BaseLoop
      */
     protected function configureI18nProcessing(
         ModelCriteria $search,
-        $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
+        $columns = ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
         $foreignTable = null,
         $foreignKey = 'ID',
         $forceReturn = false
@@ -75,7 +75,6 @@ abstract class BaseI18nLoop extends BaseLoop
             $this->getForceReturn()
         );
     }
-
 
     /**
      * Add the search clause for an I18N column, taking care of the back/front context, as default_locale_i18n is

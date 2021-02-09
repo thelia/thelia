@@ -20,7 +20,7 @@ namespace Thelia\Core\Template\Loop\Argument;
 
 class ArgumentCollection implements \Iterator
 {
-    private $arguments = array();
+    private $arguments = [];
 
     public function __construct()
     {
@@ -54,7 +54,6 @@ class ArgumentCollection implements \Iterator
     }
 
     /**
-     * @param array $argumentList
      * @param       $force
      *
      * @return ArgumentCollection
@@ -69,7 +68,6 @@ class ArgumentCollection implements \Iterator
     }
 
     /**
-     * @param Argument $argument
      * @param          $force
      *
      * @return ArgumentCollection
@@ -180,7 +178,7 @@ class ArgumentCollection implements \Iterator
     {
         $arguments = $this->arguments;
 
-        if (array_key_exists('name', $arguments)) {
+        if (\array_key_exists('name', $arguments)) {
             unset($arguments['name']);
         }
 

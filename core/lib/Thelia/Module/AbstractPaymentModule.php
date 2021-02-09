@@ -43,12 +43,12 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
 
         $renderedTemplate = $parser->render(
             "order-payment-gateway.html",
-            array(
+            [
                 "order_id"          => $order->getId(),
                 "cart_count"        => $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems()->count(),
                 "gateway_url"       => $gateway_url,
                 "payment_form_data" => $form_data
-            )
+            ]
         );
 
         return Response::create($renderedTemplate);
@@ -67,7 +67,7 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
         return URL::getInstance()->absoluteUrl(
             $frontOfficeRouter->generate(
                 "order.placed",
-                array("order_id" => $order_id),
+                ["order_id" => $order_id],
                 Router::ABSOLUTE_URL
             )
         );
@@ -88,10 +88,10 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
         return URL::getInstance()->absoluteUrl(
             $frontOfficeRouter->generate(
                 "order.failed",
-                array(
+                [
                     "order_id" => $order_id,
                     "message" => $message
-                ),
+                ],
                 Router::ABSOLUTE_URL
             )
         );

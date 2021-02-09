@@ -31,8 +31,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Form\Lang\LangUrlEvent;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Event\LangEvent;
-use Thelia\Model\LangQuery;
 use Thelia\Model\Lang as LangModel;
+use Thelia\Model\LangQuery;
 
 /**
  * Class Lang
@@ -54,15 +54,12 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param LangUpdateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function update(LangUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getId())) {
-
             $lang->setTitle($event->getTitle())
                 ->setLocale($event->getLocale())
                 ->setCode($event->getCode())
@@ -79,15 +76,12 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param LangToggleDefaultEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function toggleDefault(LangToggleDefaultEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
-
             $lang->toggleDefault();
 
             $event->setLang($lang);
@@ -95,7 +89,6 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param LangToggleActiveEvent $event
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function toggleActive(LangToggleActiveEvent $event)
@@ -120,7 +113,6 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param LangToggleVisibleEvent $event
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function toggleVisible(LangToggleVisibleEvent $event)
@@ -145,9 +137,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param LangCreateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function create(LangCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -170,9 +160,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param LangDeleteEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function delete(LangDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -205,7 +193,6 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param LangDefaultBehaviorEvent $event
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -213,11 +200,10 @@ class Lang extends BaseAction implements EventSubscriberInterface
     {
         ConfigQuery::create()
             ->filterByName('default_lang_without_translation')
-            ->update(array('Value' => $event->getDefaultBehavior()));
+            ->update(['Value' => $event->getDefaultBehavior()]);
     }
 
     /**
-     * @param LangUrlEvent $event
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -226,7 +212,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
         foreach ($event->getUrl() as $id => $url) {
             LangQuery::create()
                 ->filterById($id)
-                ->update(array('Url' => $url));
+                ->update(['Url' => $url]);
         }
     }
 
@@ -241,7 +227,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
             $unknownFlagPath = $adminTemplate->getTemplateFilePath($unknownFlag);
 
             // Check if the country flag exists
-            $countryFlag = rtrim(dirname($unknownFlagPath), DS).DS.$event->getLang()->getCode().'.png';
+            $countryFlag = rtrim(\dirname($unknownFlagPath), DS).DS.$event->getLang()->getCode().'.png';
 
             if (! file_exists($countryFlag)) {
                 $fs = new Filesystem();
@@ -252,7 +238,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
             throw new \RuntimeException(
                 Translator::getInstance()->trans(
                     "The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.",
-                    array("%file" => $unknownFlag)
+                    ["%file" => $unknownFlag]
                 ),
                 0,
                 $ex
@@ -265,17 +251,17 @@ class Lang extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::LANG_UPDATE => array('update', 128),
-            TheliaEvents::LANG_TOGGLEDEFAULT => array('toggleDefault', 128),
-            TheliaEvents::LANG_TOGGLEACTIVE => array('toggleActive', 128),
-            TheliaEvents::LANG_TOGGLEVISIBLE => array('toggleVisible', 128),
-            TheliaEvents::LANG_CREATE => array('create', 128),
-            TheliaEvents::LANG_DELETE => array('delete', 128),
-            TheliaEvents::LANG_DEFAULTBEHAVIOR => array('defaultBehavior', 128),
-            TheliaEvents::LANG_URL => array('langUrl', 128),
-            LangEvent::POST_INSERT => array('fixMissingFlag', 128),
-            LangEvent::POST_UPDATE => array('fixMissingFlag', 128)
-        );
+        return [
+            TheliaEvents::LANG_UPDATE => ['update', 128],
+            TheliaEvents::LANG_TOGGLEDEFAULT => ['toggleDefault', 128],
+            TheliaEvents::LANG_TOGGLEACTIVE => ['toggleActive', 128],
+            TheliaEvents::LANG_TOGGLEVISIBLE => ['toggleVisible', 128],
+            TheliaEvents::LANG_CREATE => ['create', 128],
+            TheliaEvents::LANG_DELETE => ['delete', 128],
+            TheliaEvents::LANG_DEFAULTBEHAVIOR => ['defaultBehavior', 128],
+            TheliaEvents::LANG_URL => ['langUrl', 128],
+            LangEvent::POST_INSERT => ['fixMissingFlag', 128],
+            LangEvent::POST_UPDATE => ['fixMissingFlag', 128]
+        ];
     }
 }

@@ -16,5 +16,4 @@ use Thelia\Module\BaseModule;
 
 class HookSearch extends BaseModule
 {
-
 }

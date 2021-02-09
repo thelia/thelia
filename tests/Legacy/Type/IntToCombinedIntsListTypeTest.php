@@ -34,20 +34,20 @@ class IntToCombinedIntsListTypeTest extends TestCase
         $type = new IntToCombinedIntsListType();
         $this->assertEquals(
             $type->getFormattedValue('1: 2 & 5 | (6 &7), 4: *, 67: (1 & 9)'),
-            array(
-                1 => array(
-                    "values" => array(2, 5, 6, 7),
+            [
+                1 => [
+                    "values" => [2, 5, 6, 7],
                     "expression" => '2&5|(6&7)',
-                ),
-                4 => array(
-                    "values" => array('*'),
+                ],
+                4 => [
+                    "values" => ['*'],
                     "expression" => '*',
-                ),
-                67 => array(
-                    "values" => array(1, 9),
+                ],
+                67 => [
+                    "values" => [1, 9],
                     "expression" => '(1&9)',
-                ),
-            )
+                ],
+            ]
         );
         $this->assertNull($type->getFormattedValue('foo'));
     }

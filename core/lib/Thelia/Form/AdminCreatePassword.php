@@ -23,30 +23,30 @@ class AdminCreatePassword extends BruteforceForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("password", PasswordType::class, array(
-                "constraints" => array(),
+            ->add("password", PasswordType::class, [
+                "constraints" => [],
                 "label" => $this->translator->trans("Password"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "password",
-                ),
+                ],
                 "attr" => [
                     'placeholder' => Translator::getInstance()->trans('Enter the new password')
                 ]
-            ))
-            ->add("password_confirm", PasswordType::class, array(
-                "constraints" => array(
+            ])
+            ->add("password_confirm", PasswordType::class, [
+                "constraints" => [
                     new Callback(
-                        array($this, "verifyPasswordField")
+                        [$this, "verifyPasswordField"]
                     ),
-                ),
+                ],
                 "label" => $this->translator->trans('Password confirmation'),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "password_confirmation",
-                ),
+                ],
                 "attr" => [
                     'placeholder' => Translator::getInstance()->trans('Enter the new password again')
                 ]
-            ))
+            ])
         ;
     }
 

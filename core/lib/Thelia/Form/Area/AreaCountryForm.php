@@ -41,7 +41,7 @@ class AreaCountryForm extends BaseForm
                 HiddenType::class,
                 [
                     'constraints' => [
-                        new GreaterThan(array('value' => 0)),
+                        new GreaterThan(['value' => 0]),
                         new NotBlank(),
                     ]
                 ]

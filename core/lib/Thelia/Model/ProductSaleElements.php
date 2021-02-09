@@ -52,7 +52,6 @@ class ProductSaleElements extends BaseProductSaleElements
     }
 
     /**
-     * @param Country $country
      * @param string $virtualColumnName
      * @param int $discount
      * @return int
@@ -66,7 +65,6 @@ class ProductSaleElements extends BaseProductSaleElements
     }
 
     /**
-     * @param Country $country
      * @param string $virtualColumnName
      * @param int $discount
      * @return int
@@ -87,7 +85,6 @@ class ProductSaleElements extends BaseProductSaleElements
      *      the currency or when the `from_default_currency` flag is set to `true`
      * - set directly in the product price when `from_default_currency` is set to `false`
      *
-     * @param Currency $currency
      * @param int $discount
      * @return ProductPriceTools
      * @throws \RuntimeException

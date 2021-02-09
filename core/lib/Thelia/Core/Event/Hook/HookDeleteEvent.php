@@ -31,7 +31,6 @@ class HookDeleteEvent extends HookEvent
     }
 
     /**
-     * @param mixed $hook_id
      * @return $this
      */
     public function setHookId($hook_id)

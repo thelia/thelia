@@ -38,7 +38,7 @@ interface ParserInterface
      * @throws \Exception
      * @throws \SmartyException
      */
-    public function render($realTemplateName, array $parameters = array(), $compressOutput = true);
+    public function render($realTemplateName, array $parameters = [], $compressOutput = true);
 
     /**
      * Return a rendered template text
@@ -50,7 +50,7 @@ interface ParserInterface
      * @throws \Exception
      * @throws \SmartyException
      */
-    public function renderString($templateText, array $parameters = array(), $compressOutput = true);
+    public function renderString($templateText, array $parameters = [], $compressOutput = true);
 
     /**
      * @return int the HTTP status of the response
@@ -76,7 +76,6 @@ interface ParserInterface
     /**
      * Set a new template definition, and save the current one
      *
-     * @param TemplateDefinition $templateDefinition
      * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
      * @throws \SmartyException
      */
@@ -92,7 +91,6 @@ interface ParserInterface
     /**
      * Setup the parser with a template definition, which provides a template description.
      *
-     * @param TemplateDefinition $templateDefinition
      * @param  bool $fallbackToDefaultTemplate if true, also search files in hte "default" template.
      */
     public function setTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false);

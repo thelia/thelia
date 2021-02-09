@@ -12,9 +12,9 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
+use Thelia\Core\Template\Loop\Category;
 use Thelia\Model\CategoryQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
-use Thelia\Core\Template\Loop\Category;
 
 /**
  *
@@ -30,7 +30,7 @@ class CategoryTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return array();
+        return [];
     }
 
     public function testSearchById()
@@ -44,9 +44,9 @@ class CategoryTest extends BaseLoopTestor
             $category->save();
         }
 
-        $otherParameters = array(
+        $otherParameters = [
             "visible" => "*",
-        );
+        ];
 
         $this->baseTestSearchById($category->getId(), $otherParameters);
     }

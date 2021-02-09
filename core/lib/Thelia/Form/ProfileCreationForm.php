@@ -31,22 +31,22 @@ class ProfileCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("locale", TextType::class, array(
-                "constraints" => array(new NotBlank()),
-            ))
-            ->add("code", TextType::class, array(
-                "constraints" => array(
+            ->add("locale", TextType::class, [
+                "constraints" => [new NotBlank()],
+            ])
+            ->add("code", TextType::class, [
+                "constraints" => [
                     new NotBlank(),
                     new Constraints\Callback(
-                        array($this, "verifyCode")
+                        [$this, "verifyCode"]
                     ),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("Profile Code"),
-                "label_attr" => array("for" => "profile_code_fiels"),
-            ))
+                "label_attr" => ["for" => "profile_code_fiels"],
+            ])
         ;
 
-        $this->addStandardDescFields(array('locale'));
+        $this->addStandardDescFields(['locale']);
     }
 
     public function getName()

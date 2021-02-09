@@ -12,8 +12,8 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 use Thelia\Core\Template\Loop\FeatureAvailability;
+use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
  *
@@ -29,6 +29,6 @@ class FeatureAvailabilityTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return array();
+        return [];
     }
 }

@@ -24,8 +24,8 @@ use Thelia\Tools\URL;
  */
 class RewritingRetriever
 {
-    protected $search = null;
-    protected $rewritingUrlQuery = null;
+    protected $search;
+    protected $rewritingUrlQuery;
 
     public $url;
     public $rewrittenUrl;
@@ -48,7 +48,7 @@ class RewritingRetriever
     {
         $this->search = $this->rewritingUrlQuery->getViewUrlQuery($view, $viewLocale, $viewId);
 
-        $allParametersWithoutView = array();
+        $allParametersWithoutView = [];
         if (null !== $viewLocale) {
             $allParametersWithoutView['lang'] = $viewLocale;
         }
@@ -71,7 +71,7 @@ class RewritingRetriever
      * @param null  $viewId
      * @param array $viewOtherParameters
      */
-    public function loadSpecificUrl($view, $viewLocale, $viewId = null, $viewOtherParameters = array())
+    public function loadSpecificUrl($view, $viewLocale, $viewId = null, $viewOtherParameters = [])
     {
         if (empty($viewOtherParameters)) {
             $this->loadViewUrl($view, $viewLocale, $viewId);
@@ -95,7 +95,6 @@ class RewritingRetriever
     }
 
     /**
-     * @return mixed
      */
     public function toString()
     {

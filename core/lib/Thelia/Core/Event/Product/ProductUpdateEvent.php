@@ -99,7 +99,6 @@ class ProductUpdateEvent extends ProductCreateEvent
     }
 
     /**
-     * @param mixed $virtual_document_id
      *
      * @return $this
      */
@@ -111,7 +110,6 @@ class ProductUpdateEvent extends ProductCreateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getVirtualDocumentId()
     {

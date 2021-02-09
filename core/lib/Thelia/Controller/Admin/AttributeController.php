@@ -131,14 +131,14 @@ class AttributeController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
-        $data = array(
+        $data = [
             'id'           => $object->getId(),
             'locale'       => $object->getLocale(),
             'title'        => $object->getTitle(),
             'chapo'        => $object->getChapo(),
             'description'  => $object->getDescription(),
             'postscriptum' => $object->getPostscriptum()
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(AdminForm::ATTRIBUTE_MODIFICATION, FormType::class, $data);
@@ -181,17 +181,17 @@ class AttributeController extends AbstractCrudController
 
     protected function renderListTemplate($currentOrder)
     {
-        return $this->render('attributes', array('order' => $currentOrder));
+        return $this->render('attributes', ['order' => $currentOrder]);
     }
 
     protected function renderEditionTemplate()
     {
         return $this->render(
             'attribute-edit',
-            array(
+            [
                 'attribute_id' => $this->getRequest()->get('attribute_id'),
                 'attributeav_order' => $this->getAttributeAvListOrder()
-            )
+            ]
         );
     }
 
@@ -231,7 +231,7 @@ class AttributeController extends AbstractCrudController
     protected function addRemoveFromAllTemplates($eventType)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 

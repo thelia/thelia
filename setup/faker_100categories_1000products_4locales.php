@@ -184,9 +184,9 @@ try {
     $con->rollBack();
 }
 
-function setI18n($faker, &$object, $fields = array('Title' => 20, 'Description' => 50) )
+function setI18n($faker, &$object, $fields = ['Title' => 20, 'Description' => 50] )
 {
-    $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT', 'de_DE');
+    $localeList = ['fr_FR', 'en_US', 'es_ES', 'it_IT', 'de_DE'];
 
     foreach ($localeList as $locale) {
         $object->setLocale($locale);

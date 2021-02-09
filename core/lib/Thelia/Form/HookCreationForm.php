@@ -34,59 +34,59 @@ class HookCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("code", TextType::class, array(
-                "constraints" => array(
+            ->add("code", TextType::class, [
+                "constraints" => [
                     new NotBlank(),
-                    new Callback(array($this, "checkCodeUnicity")),
-                ),
+                    new Callback([$this, "checkCodeUnicity"]),
+                ],
                 "label" => Translator::getInstance()->trans("Hook code"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "code",
-                ),
-            ))
-            ->add("locale", HiddenType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("locale", HiddenType::class, [
+                "constraints" => [
                     new NotBlank(),
-                ),
-            ))
-            ->add("type", ChoiceType::class, array(
-                "choices" => array(
+                ],
+            ])
+            ->add("type", ChoiceType::class, [
+                "choices" => [
                     TemplateDefinition::FRONT_OFFICE => Translator::getInstance()->trans("Front Office"),
                     TemplateDefinition::BACK_OFFICE => Translator::getInstance()->trans("Back Office"),
                     TemplateDefinition::EMAIL => Translator::getInstance()->trans("email"),
                     TemplateDefinition::PDF => Translator::getInstance()->trans("pdf"),
-                ),
-                "constraints" => array(
+                ],
+                "constraints" => [
                     new NotBlank(),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("Type"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "type",
-                ),
-            ))
-            ->add("native", HiddenType::class, array(
+                ],
+            ])
+            ->add("native", HiddenType::class, [
                 "label" => Translator::getInstance()->trans("Native"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "native",
                     "help" => Translator::getInstance()->trans("Core hook of Thelia."),
-                ),
-            ))
-            ->add("active", CheckboxType::class, array(
+                ],
+            ])
+            ->add("active", CheckboxType::class, [
                 "label" => Translator::getInstance()->trans("Active"),
                 "required" => false,
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "active",
-                ),
-            ))
-            ->add("title", TextType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("title", TextType::class, [
+                "constraints" => [
                     new NotBlank(),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("Hook title"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "title",
-                ),
-            ))
+                ],
+            ])
         ;
     }
 
@@ -104,7 +104,7 @@ class HookCreationForm extends BaseForm
             $context->addViolation(
                 Translator::getInstance()->trans(
                     "A Hook with code %name already exists. Please choose another code.",
-                    array('%name' => $code)
+                    ['%name' => $code]
                 )
             );
         }

@@ -24,7 +24,7 @@ class EnumTypeTest extends TestCase
 {
     public function testEnumType()
     {
-        $enumType = new EnumType(array("cat", "dog"));
+        $enumType = new EnumType(["cat", "dog"]);
         $this->assertTrue($enumType->isValid('cat'));
         $this->assertTrue($enumType->isValid('dog'));
         $this->assertFalse($enumType->isValid('monkey'));

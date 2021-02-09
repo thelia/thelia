@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace TheliaMigrateCountry\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
@@ -33,13 +32,13 @@ class CountryStateMigrationType extends AbstractTheliaType
         $resolver->setDefaults(
             [
                 "cascade_validation" => true,
-                "constraints" => array(
+                "constraints" => [
                     new Callback([
-                        "methods" => array(
+                        "methods" => [
                             [$this, "checkStateId"],
-                        ),
+                        ],
                     ]),
-                ),
+                ],
             ]
         );
     }
@@ -68,7 +67,6 @@ class CountryStateMigrationType extends AbstractTheliaType
 
     public function checkStateId($value, ExecutionContextInterface $context)
     {
-
         if ($value['migrate']) {
             if (null !== $state = StateQuery::create()->findPk($value['new_state'])) {
                 if ($state->getCountryId() !== $value['new_country']) {
@@ -91,15 +89,12 @@ class CountryStateMigrationType extends AbstractTheliaType
                 );
             }
         }
-
     }
 
     private function getRowData(ExecutionContextInterface $context)
     {
         $propertyPath = $context->getPropertyPath();
         $data = $this->getRowData($context);
-
-
     }
 
     /**

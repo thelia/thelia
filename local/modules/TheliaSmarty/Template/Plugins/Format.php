@@ -15,17 +15,17 @@ namespace TheliaSmarty\Template\Plugins;
 use CommerceGuys\Addressing\Model\Address;
 use IntlDateFormatter;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Tools\AddressFormat;
-use Symfony\Component\HttpFoundation\RequestStack;
-use TheliaSmarty\Template\AbstractSmartyPlugin;
-use TheliaSmarty\Template\Exception\SmartyPluginException;
-use TheliaSmarty\Template\SmartyPluginDescriptor;
 use Thelia\Tools\DateTimeFormat;
 use Thelia\Tools\MoneyFormat;
 use Thelia\Tools\NumberFormat;
+use TheliaSmarty\Template\AbstractSmartyPlugin;
+use TheliaSmarty\Template\Exception\SmartyPluginException;
+use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 /**
  *
@@ -82,11 +82,10 @@ class Format extends AbstractSmartyPlugin
             if ($timestamp === false) {
                 // No timestamp => error
                 throw new SmartyPluginException("Either date or timestamp is a mandatory parameter in format_date function");
-            } else {
+            }  
                 $date = new \DateTime();
                 $date->setTimestamp($timestamp);
-            }
-        } elseif (is_array($date)) {
+        } elseif (\is_array($date)) {
             $keys = array_keys($date);
 
             $isDate = $this->arrayContains(static::$dateKeys, $keys);
@@ -136,7 +135,7 @@ class Format extends AbstractSmartyPlugin
             $localizedDate = $formatter->format($date);
         } else {
             // for backward compatibility
-            if (function_exists('setlocale')) {
+            if (\function_exists('setlocale')) {
                 // Save the current locale
                 $systemLocale = setlocale(LC_TIME, 0);
                 setlocale(LC_TIME, $locale);
@@ -234,7 +233,6 @@ class Format extends AbstractSmartyPlugin
         );
     }
 
-
     /**
      * return two-dimensional arrays in string
      *
@@ -255,7 +253,7 @@ class Format extends AbstractSmartyPlugin
         $values = $this->getParam($params, "values", null);
         $separators = $this->getParam($params, "separators", [' : ', ' / ', ' | ']);
 
-        if (!is_array($values)) {
+        if (!\is_array($values)) {
             return $output;
         }
 
@@ -266,7 +264,7 @@ class Format extends AbstractSmartyPlugin
 
             $output .= $key . $separators[0];
 
-            if (!is_array($value)) {
+            if (!\is_array($value)) {
                 $output .= $value;
                 continue;
             }
@@ -279,7 +277,7 @@ class Format extends AbstractSmartyPlugin
     protected function arrayContains(array $expected, array $hayStack)
     {
         foreach ($expected as $value) {
-            if (!in_array($value, $hayStack)) {
+            if (!\in_array($value, $hayStack)) {
                 return false;
             }
         }
@@ -481,13 +479,13 @@ class Format extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor("function", "format_date", $this, "formatDate"),
             new SmartyPluginDescriptor("function", "format_number", $this, "formatNumber"),
             new SmartyPluginDescriptor("function", "format_money", $this, "formatMoney"),
             new SmartyPluginDescriptor("function", "format_array_2d", $this, "formatTwoDimensionalArray"),
             new SmartyPluginDescriptor("function", "format_address", $this, "formatAddress"),
-        );
+        ];
     }
 
     /**

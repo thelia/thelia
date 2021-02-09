@@ -86,7 +86,6 @@ class CategoryTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * @param CategoryModel $category
      * @depends testCreate
      * @return CategoryModel
      */
@@ -155,7 +154,6 @@ class CategoryTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * @param CategoryModel $category
      * @depends testRemoveTemplate
      */
     public function testDelete(CategoryModel $category)

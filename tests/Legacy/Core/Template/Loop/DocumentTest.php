@@ -12,12 +12,12 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 use Thelia\Core\Template\Loop\Document;
-use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\CategoryDocumentQuery;
 use Thelia\Model\ContentDocumentQuery;
 use Thelia\Model\FolderDocumentQuery;
+use Thelia\Model\ProductDocumentQuery;
+use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
  *
@@ -33,34 +33,34 @@ class DocumentTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return array('source' => 'product', 'id' => 1);
+        return ['source' => 'product', 'id' => 1];
     }
 
     public function testSearchByProductId()
     {
         $document = ProductDocumentQuery::create()->findOne();
 
-        $this->baseTestSearchById($document->getId(), array('source' => 'product'));
+        $this->baseTestSearchById($document->getId(), ['source' => 'product']);
     }
 
     public function testSearchByFolderId()
     {
         $document = FolderDocumentQuery::create()->findOne();
 
-        $this->baseTestSearchById($document->getId(), array('source' => 'folder'));
+        $this->baseTestSearchById($document->getId(), ['source' => 'folder']);
     }
 
     public function testSearchByContentId()
     {
         $document = ContentDocumentQuery::create()->findOne();
 
-        $this->baseTestSearchById($document->getId(), array('source' => 'content'));
+        $this->baseTestSearchById($document->getId(), ['source' => 'content']);
     }
 
     public function testSearchByCategoryId()
     {
         $document = CategoryDocumentQuery::create()->findOne();
 
-        $this->baseTestSearchById($document->getId(), array('source' => 'category'));
+        $this->baseTestSearchById($document->getId(), ['source' => 'category']);
     }
 }

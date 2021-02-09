@@ -62,7 +62,6 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $content
      * @return $this
      */
     public function setContent($content)
@@ -73,7 +72,6 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getContent()
     {
@@ -98,7 +96,6 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $encoding
      * @return $this
      */
     public function setEncoding($encoding)
@@ -109,7 +106,6 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getEncoding()
     {
@@ -117,7 +113,6 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $format
      * @return $this
      */
     public function setFormat($format)
@@ -128,7 +123,6 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getFormat()
     {
@@ -136,7 +130,6 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $lang
      * @return $this
      */
     public function setLang($lang)
@@ -147,7 +140,6 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getLang()
     {
@@ -174,7 +166,6 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $orientation
      * @return $this
      */
     public function setOrientation($orientation)
@@ -185,7 +176,6 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getOrientation()
     {
@@ -193,7 +183,6 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $unicode
      * @return $this
      */
     public function setUnicode($unicode)
@@ -204,7 +193,6 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getUnicode()
     {
@@ -212,7 +200,6 @@ class PdfEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getFontName()
     {

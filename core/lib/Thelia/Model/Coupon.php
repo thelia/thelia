@@ -28,7 +28,6 @@ use Thelia\Model\Base\Coupon as BaseCoupon;
 use Thelia\Model\Exception\InvalidArgumentException;
 use Thelia\Model\Map\CouponTableMap;
 
-
 /**
  * Used to provide an effect (mostly a discount)
  * at the end of the Customer checkout tunnel
@@ -42,8 +41,6 @@ class Coupon extends BaseCoupon
 {
     // Define the value of an unlimited coupon usage.
     const UNLIMITED_COUPON_USE = -1;
-
-
 
     /**
      * Create or Update this Coupon

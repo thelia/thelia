@@ -10,12 +10,11 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Core\Event\Product;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\OrderProduct;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class VirtualProductOrderDownloadResponseEvent
@@ -31,7 +30,6 @@ class VirtualProductOrderDownloadResponseEvent extends ActionEvent
     protected $response;
 
     /**
-     * @param OrderProduct $orderProduct
      */
     public function __construct(OrderProduct $orderProduct)
     {
@@ -47,7 +45,6 @@ class VirtualProductOrderDownloadResponseEvent extends ActionEvent
     }
 
     /**
-     * @param OrderProduct $orderProduct
      * @return $this
      */
     public function setOrderProduct(OrderProduct $orderProduct)
@@ -66,7 +63,6 @@ class VirtualProductOrderDownloadResponseEvent extends ActionEvent
     }
 
     /**
-     * @param Response $response
      * @return $this
      */
     public function setResponse(Response $response)

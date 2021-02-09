@@ -68,7 +68,7 @@ class ForSomeCustomers extends ConditionAbstract
 
         // Be sure that the value is an array, make one if required
         if (! \is_array($values[self::CUSTOMERS_LIST])) {
-            $values[self::CUSTOMERS_LIST] = array($values[self::CUSTOMERS_LIST]);
+            $values[self::CUSTOMERS_LIST] = [$values[self::CUSTOMERS_LIST]];
         }
 
         // Check that at least one product is selected
@@ -164,13 +164,13 @@ class ForSomeCustomers extends ConditionAbstract
      */
     protected function generateInputs()
     {
-        return array(
-            self::CUSTOMERS_LIST => array(
+        return [
+            self::CUSTOMERS_LIST => [
                 'availableOperators' => $this->availableOperators[self::CUSTOMERS_LIST],
                 'value' => '',
                 'selectedOperator' => Operators::IN
-            )
-        );
+            ]
+        ];
     }
 
     /**
@@ -183,7 +183,7 @@ class ForSomeCustomers extends ConditionAbstract
             [
                 'operatorSelectHtml'   => $this->drawBackOfficeInputOperators(self::CUSTOMERS_LIST),
                 'customers_field_name' => self::CUSTOMERS_LIST,
-                'values'               => isset($this->values[self::CUSTOMERS_LIST]) ? $this->values[self::CUSTOMERS_LIST] : array()
+                'values'               => isset($this->values[self::CUSTOMERS_LIST]) ? $this->values[self::CUSTOMERS_LIST] : []
             ]
         );
     }

@@ -13,8 +13,8 @@
 namespace Thelia\Core\Security\Authentication;
 
 use Symfony\Component\HttpFoundation\Request;
-use Thelia\Form\CustomerLogin;
 use Thelia\Core\Security\UserProvider\CustomerUserProvider;
+use Thelia\Form\CustomerLogin;
 
 class CustomerUsernamePasswordFormAuthenticator extends UsernamePasswordFormAuthenticator
 {
@@ -24,9 +24,9 @@ class CustomerUsernamePasswordFormAuthenticator extends UsernamePasswordFormAuth
             $request,
             $loginForm,
             new CustomerUserProvider(),
-            array(
+            [
                 'username_field_name' => 'email'
-            )
+            ]
         );
     }
 }

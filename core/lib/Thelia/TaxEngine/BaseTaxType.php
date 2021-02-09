@@ -27,7 +27,7 @@ abstract class BaseTaxType
      *
      * @var array
      */
-    protected $requirements = array();
+    protected $requirements = [];
 
     /**
      * For a price percent tax type, return the percentage (e.g. 20 for 20%) of the product price
@@ -67,7 +67,7 @@ abstract class BaseTaxType
      */
     public function getRequirementsDefinition()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -100,7 +100,7 @@ abstract class BaseTaxType
         foreach ($requirements as $requirement) {
             $requirementName = $requirement->getName();
 
-            if (! array_key_exists($requirementName, $requirementsValues)) {
+            if (! \array_key_exists($requirementName, $requirementsValues)) {
                 throw new TaxEngineException('Cannot load requirements : requirement value for `' . $requirementName . '` not found', TaxEngineException::TAX_TYPE_REQUIREMENT_NOT_FOUND);
             }
 
@@ -121,7 +121,7 @@ abstract class BaseTaxType
 
     public function getRequirement($key)
     {
-        if (!array_key_exists($key, $this->requirements)) {
+        if (!\array_key_exists($key, $this->requirements)) {
             throw new TaxEngineException('Requirement value for `' . $key . '` does not exists in BaseTaxType::$requirements', TaxEngineException::UNDEFINED_REQUIREMENT_VALUE);
         }
 

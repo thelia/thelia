@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '"Remember me" cookie expiration time, in seconds, for administration users' => '"Remember me" cookie expiration time, in seconds, for administration users',
     '"Remember me" cookie expiration time, in seconds, for customer users' => '"Remember me" cookie expiration time, in seconds, for customer users',
     '"Remember me" cookie name for administration users' => '"Remember me" cookie name for administration users',
@@ -1473,4 +1473,4 @@ return array(
     'French 10% VAT (France only)' => 'French 10% VAT (France only)',
     'French 20% VAT  for all European countries (metropolitan only)' => 'French 20% VAT  for all European countries (metropolitan only)',
     'French 10% VAT (for metropolitan France only)' => 'French 10% VAT (for metropolitan France only)',
-);
+];

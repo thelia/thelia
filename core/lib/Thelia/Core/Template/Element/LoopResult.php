@@ -18,9 +18,9 @@ use Propel\Runtime\Util\PropelModelPager;
 class LoopResult implements \Iterator, \JsonSerializable
 {
     private $position;
-    protected $collection = array();
+    protected $collection = [];
 
-    public $resultsCollection = null;
+    public $resultsCollection;
 
     protected $versioned = false;
     protected $timestamped = false;
@@ -114,11 +114,11 @@ class LoopResult implements \Iterator, \JsonSerializable
     {
         if ($this->resultsCollection instanceof ObjectCollection || $this->resultsCollection instanceof PropelModelPager) {
             return $this->resultsCollection->count();
-        } elseif (\is_array($this->resultsCollection)) {
-            return \count($this->resultsCollection);
-        } else {
-            return 0;
         }
+        if (\is_array($this->resultsCollection)) {
+            return \count($this->resultsCollection);
+        }  
+            return 0;
     }
 
     public function getResultDataCollection()
@@ -184,19 +184,19 @@ class LoopResult implements \Iterator, \JsonSerializable
 
     protected function getTimestampOutputs()
     {
-        return array(
-            array('CREATE_DATE', 'getCreatedAt'),
-            array('UPDATE_DATE', 'getUpdatedAt'),
-        );
+        return [
+            ['CREATE_DATE', 'getCreatedAt'],
+            ['UPDATE_DATE', 'getUpdatedAt'],
+        ];
     }
 
     protected function getVersionOutputs()
     {
-        return array(
-            array('VERSION', 'getVersion'),
-            array('VERSION_DATE', 'getVersionCreatedAt'),
-            array('VERSION_AUTHOR', 'getVersionCreatedBy'),
-        );
+        return [
+            ['VERSION', 'getVersion'],
+            ['VERSION_DATE', 'getVersionCreatedAt'],
+            ['VERSION_AUTHOR', 'getVersionCreatedBy'],
+        ];
     }
 
     /**

@@ -107,7 +107,7 @@ class BaseFrontController extends BaseController
      * @param  int                                  $status       http code status
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    protected function render($templateName, $args = array(), $status = 200)
+    protected function render($templateName, $args = [], $status = 200)
     {
         return Response::create($this->renderRaw($templateName, $args), $status);
     }
@@ -121,7 +121,7 @@ class BaseFrontController extends BaseController
      *
      * @return string
      */
-    protected function renderRaw($templateName, $args = array(), $templateDir = null)
+    protected function renderRaw($templateName, $args = [], $templateDir = null)
     {
         // Add the template standard extension
         $templateName .= '.html';

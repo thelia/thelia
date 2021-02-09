@@ -23,7 +23,7 @@ namespace Thelia\Exception;
  */
 class TheliaProcessException extends \RuntimeException
 {
-    public $data = null;
+    public $data;
 
     const UNKNOWN_EXCEPTION = 0;
 

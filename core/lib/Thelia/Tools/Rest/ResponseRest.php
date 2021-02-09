@@ -11,11 +11,11 @@
 /*************************************************************************************/
 namespace Thelia\Tools\Rest;
 
-use Thelia\Core\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Symfony\Component\Serializer\Serializer;
+use Thelia\Core\HttpFoundation\Response;
 
 /**
  * Class ResponseRest Create a serialized Response
@@ -42,7 +42,7 @@ class ResponseRest extends Response
      *
      * @api
     */
-    public function __construct($data = null, $format = 'json', $status = 200, $headers = array())
+    public function __construct($data = null, $format = 'json', $status = 200, $headers = [])
     {
         parent::__construct('', $status, $headers);
 
@@ -89,8 +89,8 @@ class ResponseRest extends Response
      */
     protected function getSerializer()
     {
-        $encoders = array(new XmlEncoder(), new JsonEncoder());
-        $normalizers = array(new GetSetMethodNormalizer());
+        $encoders = [new XmlEncoder(), new JsonEncoder()];
+        $normalizers = [new GetSetMethodNormalizer()];
 
         return new Serializer($normalizers, $encoders);
     }

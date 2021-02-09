@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Cheque instructions' => 'Cheque instructions',
     'Cheque instructions configuration' => 'Cheque instructions configuration',
     'Cheque is payable to: ' => 'Cheque is payable to: ',
@@ -8,4 +8,4 @@ return array(
     'Payment instruction' => 'Payment instruction',
     'Please enter here the payment by cheque instructions' => 'Please enter here the payment by cheque instructions',
     'The name to which the cheque shoud be payable to.' => 'The name to which the cheque shoud be payable to.',
-);
+];

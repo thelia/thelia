@@ -3,24 +3,22 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\CategoryImageModification;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\CategoryImage as BaseCategoryImage;
-use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\CatalogBreadcrumbTrait;
-use Thelia\Files\FileModelInterface;
-
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, FileModelInterface
 {
-
     use PositionManagementTrait;
     use CatalogBreadcrumbTrait;
 
@@ -69,9 +67,9 @@ class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, Fi
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
-            array(
+            [
                 "category_id" => $this->getCategoryId(),
-            )
+            ]
         );
 
         return true;
@@ -119,7 +117,6 @@ class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, Fi
     }
 
     /**
-     * @param int $objectId the ID of the object
      *
      * @return string the URL to redirect to after update from the back-office
      */

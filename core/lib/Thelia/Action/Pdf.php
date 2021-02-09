@@ -49,8 +49,8 @@ class Pdf extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::GENERATE_PDF => array("generatePdf", 128)
-        );
+        return [
+            TheliaEvents::GENERATE_PDF => ["generatePdf", 128]
+        ];
     }
 }

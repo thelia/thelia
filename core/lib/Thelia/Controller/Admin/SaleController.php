@@ -256,7 +256,6 @@ class SaleController extends AbstractCrudController
     /**
      * Render the main list template
      *
-     * @param string $currentOrder, if any, null otherwise.
      *
      * @return Response
      */

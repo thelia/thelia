@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -25,7 +24,6 @@ use Thelia\Model\StateQuery;
  */
 trait AddressCountryValidationTrait
 {
-
     public function verifyZipCode($value, ExecutionContextInterface $context)
     {
         $data = $context->getRoot()->getData();

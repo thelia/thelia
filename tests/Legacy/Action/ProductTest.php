@@ -36,12 +36,14 @@ use Thelia\Model\Accessory;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\BrandQuery;
+use Thelia\Model\Category;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Content;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\FeatureProduct;
 use Thelia\Model\FeatureProductQuery;
+use Thelia\Model\Product as ProductModel;
 use Thelia\Model\ProductAssociatedContent;
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\ProductCategory;
@@ -53,7 +55,6 @@ use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
-use Thelia\Model\Product as ProductModel;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsProductDocument;
 use Thelia\Model\ProductSaleElementsProductDocumentQuery;
@@ -64,7 +65,6 @@ use Thelia\Model\RewritingUrlQuery;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Model\TemplateQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
-use Thelia\Model\Category;
 
 /**
  * Class ProductTest
@@ -117,7 +117,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $productSaleElements = $createdProduct->getProductSaleElementss();
 
-        $this->assertEquals(1, count($productSaleElements));
+        $this->assertEquals(1, \count($productSaleElements));
 
         $defaultProductSaleElement = $productSaleElements->getFirst();
 
@@ -183,7 +183,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $productSaleElements = $createdProduct->getProductSaleElementss();
 
-        $this->assertEquals(1, count($productSaleElements));
+        $this->assertEquals(1, \count($productSaleElements));
 
         $defaultProductSaleElement = $productSaleElements->getFirst();
 
@@ -202,7 +202,6 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * @param ProductModel $product
      * @depends testCreate
      * @return ProductModel
      */
@@ -241,7 +240,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals($defaultCategory, $updatedProduct->getDefaultCategoryId());
 
         $PSE = $updatedProduct->getProductSaleElementss();
-        $this->assertEquals(1, count($PSE));
+        $this->assertEquals(1, \count($PSE));
 
         /** @var ProductSaleElements $defaultPSE */
         $defaultPSE = $product->getDefaultSaleElements();
@@ -251,7 +250,6 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * @param ProductModel $product
      * @depends testUpdate
      * @return ProductModel
      */
@@ -275,7 +273,6 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * @param ProductModel $product
      * @depends testToggleVisibility
      * @return ProductModel
      */
@@ -283,7 +280,7 @@ class ProductTest extends TestCaseWithURLToolSetup
     {
         $contents = $product->getProductAssociatedContents();
 
-        $this->assertEquals(0, count($contents));
+        $this->assertEquals(0, \count($contents));
 
         /** @var Content $content */
         $content = ContentQuery::create()->addAscendingOrderByColumn('RAND()')->findOne();
@@ -295,13 +292,12 @@ class ProductTest extends TestCaseWithURLToolSetup
         $product->clearProductAssociatedContents();
         $newContents = $product->getProductAssociatedContents();
 
-        $this->assertEquals(1, count($newContents));
+        $this->assertEquals(1, \count($newContents));
 
         return $product;
     }
 
     /**
-     * @param ProductModel $product
      * @depends testAddContent
      * @return ProductModel
      */
@@ -310,7 +306,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $product->clearProductAssociatedContents();
         $contents = $product->getProductAssociatedContents();
 
-        $this->assertEquals(1, count($contents));
+        $this->assertEquals(1, \count($contents));
 
         $content = $contents->getFirst();
 
@@ -321,13 +317,12 @@ class ProductTest extends TestCaseWithURLToolSetup
         $product->clearProductAssociatedContents();
         $deletedContent = $product->getProductAssociatedContents();
 
-        $this->assertEquals(0, count($deletedContent));
+        $this->assertEquals(0, \count($deletedContent));
 
         return $product;
     }
 
     /**
-     * @param ProductModel $product
      * @depends testRemoveContent
      * @return array
      */
@@ -335,7 +330,7 @@ class ProductTest extends TestCaseWithURLToolSetup
     {
         $categories = $product->getProductCategories();
 
-        $this->assertEquals(1, count($categories));
+        $this->assertEquals(1, \count($categories));
 
         $defaultCategory = $categories->getFirst();
 
@@ -354,12 +349,12 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $newCategories = $product->getProductCategories();
 
-        $this->assertEquals(2, count($newCategories));
+        $this->assertEquals(2, \count($newCategories));
 
-        return array(
+        return [
             'product' => $product,
             'category' => $category
-        );
+        ];
     }
 
     /**
@@ -377,7 +372,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $product->clearProductCategories();
 
-        $this->assertEquals(2, count($product->getProductCategories()));
+        $this->assertEquals(2, \count($product->getProductCategories()));
 
         $event = new ProductDeleteCategoryEvent($product, $category->getId());
 
@@ -386,13 +381,12 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $product->clearProductCategories();
 
-        $this->assertEquals(1, count($product->getProductCategories()));
+        $this->assertEquals(1, \count($product->getProductCategories()));
 
         return $product;
     }
 
     /**
-     * @param ProductModel $product
      * @depends testRemoveCategory
      * @return ProductModel
      */
@@ -420,14 +414,13 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * @param ProductModel $product
      * @depends testAddAccessory
      * @return ProductModel
      */
     public function testRemoveAccessory(ProductModel $product)
     {
         $accessories = AccessoryQuery::create()->filterByProductId($product->getId())->find();
-        $this->assertEquals(1, count($accessories));
+        $this->assertEquals(1, \count($accessories));
 
         $currentAccessory = $accessories->getFirst();
         $event = new ProductDeleteAccessoryEvent($product, $currentAccessory->getAccessory());
@@ -441,7 +434,6 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * @param ProductModel $product
      * @depends testRemoveAccessory
      * @return ProductModel
      */
@@ -455,7 +447,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $currencyId = CurrencyQuery::create()->select('id')->addAscendingOrderByColumn('RAND()')->findOne();
 
         $oldProductSaleElements = $product->getDefaultSaleElements();
-        $this->assertEquals("Thelia\Model\ProductSaleElements", get_class($oldProductSaleElements), "There is no default pse for this product");
+        $this->assertEquals("Thelia\Model\ProductSaleElements", \get_class($oldProductSaleElements), "There is no default pse for this product");
 
         $event = new ProductSetTemplateEvent($product, $templateId, $currencyId);
 
@@ -468,7 +460,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $productSaleElements = $updatedProduct->getProductSaleElementss();
 
-        $this->assertEquals(1, count($productSaleElements), "after setting a new template, only 1 product_sale_elements must be present");
+        $this->assertEquals(1, \count($productSaleElements), "after setting a new template, only 1 product_sale_elements must be present");
 
         /** @var \Thelia\Model\ProductSaleElements $newProductSaleElements */
         $newProductSaleElements = $productSaleElements->getFirst();
@@ -490,7 +482,6 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * @param ProductModel $product
      * @depends testSetProductTemplate
      */
     public function testDelete(ProductModel $product)
@@ -567,7 +558,6 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testCreateClone
-     * @param ProductCloneEvent $event
      * @return ProductCloneEvent
      */
     public function testUpdateClone(ProductCloneEvent $event)
@@ -599,7 +589,7 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->filterById($cloneProduct->getId())
             ->count();
 
-        $this->assertEquals(count($originalProductI18ns), $cloneProductI18ns, 'There must be the same quantity of I18ns');
+        $this->assertEquals(\count($originalProductI18ns), $cloneProductI18ns, 'There must be the same quantity of I18ns');
 
         // Check each I18n
         /** @var ProductI18n $originalProductI18n */
@@ -655,7 +645,6 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testUpdateClone
-     * @param ProductCloneEvent $event
      * @return ProductCloneEvent
      */
     public function testCloneFeatureCombination(ProductCloneEvent $event)
@@ -678,7 +667,7 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->filterByProductId($event->getClonedProduct()->getId())
             ->count();
 
-        $this->assertEquals(count($originalProductFeatures), $cloneProductFeatures, 'There must be the same quantity of features');
+        $this->assertEquals(\count($originalProductFeatures), $cloneProductFeatures, 'There must be the same quantity of features');
 
         // Check clone product's features
         /** @var FeatureProduct $originalProductFeature */
@@ -717,7 +706,6 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testCloneFeatureCombination
-     * @param ProductCloneEvent $event
      * @return ProductCloneEvent
      */
     public function testCloneAssociatedContent(ProductCloneEvent $event)
@@ -738,7 +726,7 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->filterByProductId($event->getClonedProduct()->getId())
             ->count();
 
-        $this->assertEquals(count($originalProductAssocConts), $cloneProductAssocConts, 'There must be the same quantity of associated contents');
+        $this->assertEquals(\count($originalProductAssocConts), $cloneProductAssocConts, 'There must be the same quantity of associated contents');
 
         // Check clone product's associated contents
         /** @var ProductAssociatedContent $originalProductAssocCont */
@@ -764,7 +752,6 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testCloneAssociatedContent
-     * @param ProductCloneEvent $event
      * @return ProductCloneEvent
      */
     public function testCloneAccessories(ProductCloneEvent $event)
@@ -785,7 +772,7 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->filterByProductId($event->getClonedProduct()->getId())
             ->count();
 
-        $this->assertEquals(count($originalProductAccessoryList), $cloneProductAccessoryList, 'There must be the same quantity of accessories');
+        $this->assertEquals(\count($originalProductAccessoryList), $cloneProductAccessoryList, 'There must be the same quantity of accessories');
 
         // Check clone product's accessories
         /** @var Accessory $originalProductAccessory */
@@ -812,7 +799,6 @@ class ProductTest extends TestCaseWithURLToolSetup
     /**
      * @covers \Thelia\Action\File::cloneFile
      * @depends testCloneAccessories
-     * @param ProductCloneEvent $event
      * @return ProductCloneEvent
      */
     public function testCloneFile(ProductCloneEvent $event)
@@ -839,10 +825,9 @@ class ProductTest extends TestCaseWithURLToolSetup
                         ->filterByProductId($cloneProduct->getId())
                         ->count();
 
-                    $this->assertEquals(count($originalProductFiles), $cloneProductFiles, 'There must be the same quantity of images');
+                    $this->assertEquals(\count($originalProductFiles), $cloneProductFiles, 'There must be the same quantity of images');
 
                     break;
-
                 case 'documents':
                     $originalProductFiles = ProductDocumentQuery::create()
                         ->findByProductId($originalProductId);
@@ -851,7 +836,7 @@ class ProductTest extends TestCaseWithURLToolSetup
                         ->filterByProductId($cloneProduct->getId())
                         ->count();
 
-                    $this->assertEquals(count($originalProductFiles), $cloneProductFiles, 'There must be the same quantity of documents');
+                    $this->assertEquals(\count($originalProductFiles), $cloneProductFiles, 'There must be the same quantity of documents');
 
                     break;
             }
@@ -895,7 +880,6 @@ class ProductTest extends TestCaseWithURLToolSetup
                         $this->assertEquals($originalProductFile->getPosition(), $cloneProductFile->getPosition(), 'ProductImage\'s position must be equal');
 
                         break;
-
                     case 'documents':
                         // Get cloned ProductDocument
                         $cloneProductFile = ProductDocumentQuery::create()
@@ -930,7 +914,6 @@ class ProductTest extends TestCaseWithURLToolSetup
     /**
      * @covers Thelia\Action\ProductSaleElement::createClonePSE
      * @depends testCloneFile
-     * @param ProductCloneEvent $event
      * @return ProductCloneEvent
      */
     public function testCreateClonePSE(ProductCloneEvent $event)
@@ -991,7 +974,6 @@ class ProductTest extends TestCaseWithURLToolSetup
     /**
      * @covers \Thelia\Action\ProductSaleElement::updateClonePSE
      * @depends testCreateClonePSE
-     * @param array $params
      * @return array
      */
     public function testUpdateClonePSE(array $params)
@@ -1060,7 +1042,6 @@ class ProductTest extends TestCaseWithURLToolSetup
     /**
      * @covers \Thelia\Action\ProductSaleElement::clonePSEAssociatedFiles
      * @depends testUpdateClonePSE
-     * @param array $params
      */
     public function testClonePSEAssociatedFiles(array $params)
     {
@@ -1089,7 +1070,7 @@ class ProductTest extends TestCaseWithURLToolSetup
                     $clonePSEImages = ProductSaleElementsProductImageQuery::create()
                         ->findByProductSaleElementsId($clonePSEId);
 
-                    $this->assertEquals(count($originalPSEImages), count($clonePSEImages), 'There must be the same quantity of PSE product image');
+                    $this->assertEquals(\count($originalPSEImages), \count($clonePSEImages), 'There must be the same quantity of PSE product image');
 
                     /** @var ProductSaleElementsProductImage $clonePSEImage */
                     foreach ($clonePSEImages as $clonePSEImage) {
@@ -1105,7 +1086,6 @@ class ProductTest extends TestCaseWithURLToolSetup
                         $this->assertEquals($clonePSEId, $clonePSEImage->getProductSaleElementsId(), 'PSE ID must be equal');
                     }
                     break;
-
                 case 'documents';
                     $originalPSEFiles = ProductSaleElementsProductDocumentQuery::create()
                         ->findByProductSaleElementsId($originalPSE->getId());
@@ -1120,7 +1100,7 @@ class ProductTest extends TestCaseWithURLToolSetup
                     $clonePSEDocuments = ProductSaleElementsProductDocumentQuery::create()
                         ->findByProductSaleElementsId($clonePSEId);
 
-                    $this->assertEquals(count($originalPSEDocuments), count($clonePSEDocuments), 'There must be the same quantity of PSE product document');
+                    $this->assertEquals(\count($originalPSEDocuments), \count($clonePSEDocuments), 'There must be the same quantity of PSE product document');
 
                     /** @var ProductSaleElementsProductDocument $clonePSEDocument */
                     foreach ($clonePSEDocuments as $clonePSEDocument) {

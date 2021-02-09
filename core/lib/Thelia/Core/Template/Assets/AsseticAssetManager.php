@@ -29,7 +29,7 @@ class AsseticAssetManager implements AssetManagerInterface
 {
     protected $debugMode;
 
-    protected $source_file_extensions = array('less', 'js', 'coffee', 'html', 'tpl', 'htm', 'xml');
+    protected $source_file_extensions = ['less', 'js', 'coffee', 'html', 'tpl', 'htm', 'xml'];
 
     protected $assetFilters = [];
 
@@ -63,7 +63,6 @@ class AsseticAssetManager implements AssetManagerInterface
     /**
      * Check if a file is a source asset file
      *
-     * @param \SplFileInfo $fileInfo
      *
      * @return bool
      */
@@ -76,7 +75,6 @@ class AsseticAssetManager implements AssetManagerInterface
      * Recursively copy assets from the source directory to the destination
      * directory in the web space, omitting source files.
      *
-     * @param  Filesystem        $fs
      * @param  string            $from_directory the source
      * @param  string            $to_directory   the destination
      * @throws \RuntimeException if a problem occurs.
@@ -214,11 +212,10 @@ class AsseticAssetManager implements AssetManagerInterface
 
                 throw new \InvalidArgumentException("Unsupported Assetic filter: '$filter_name'");
                 break;
-
                 filterFound:
             }
         } else {
-            $filter_list = array();
+            $filter_list = [];
         }
 
         return $filter_list;
@@ -249,9 +246,9 @@ class AsseticAssetManager implements AssetManagerInterface
         );
 
         $assetName = basename($assetSource);
-        $inputDirectory = realpath(dirname($assetSource));
+        $inputDirectory = realpath(\dirname($assetSource));
 
-        $assetFileDirectoryInAssetDirectory = trim(str_replace(array($assetDirectoryBase, $assetName), '', $assetSource), DS);
+        $assetFileDirectoryInAssetDirectory = trim(str_replace([$assetDirectoryBase, $assetName], '', $assetSource), DS);
 
         $am = new AssetManager();
         $fm = new FilterManager();

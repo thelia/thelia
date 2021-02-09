@@ -53,7 +53,7 @@ class BrandModificationForm extends BrandCreationForm
         ;
 
         // Add standard description fields, excluding title and locale, which are already defined
-        $this->addStandardDescFields(array('title', 'locale'));
+        $this->addStandardDescFields(['title', 'locale']);
     }
 
     public function getName()

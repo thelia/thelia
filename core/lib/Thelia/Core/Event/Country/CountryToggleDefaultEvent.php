@@ -31,7 +31,6 @@ class CountryToggleDefaultEvent extends CountryEvent
     }
 
     /**
-     * @return mixed
      */
     public function getCountryId()
     {

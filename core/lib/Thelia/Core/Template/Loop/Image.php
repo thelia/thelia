@@ -12,25 +12,25 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Core\Template\Element\BaseI18nLoop;
-use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Template\Element\BaseI18nLoop;
+use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
+use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImage;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Type\BooleanOrBothType;
-use Thelia\Type\TypeCollection;
 use Thelia\Type\EnumListType;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Model\ConfigQuery;
-use Thelia\Core\Template\Element\LoopResultRow;
-use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Type\EnumType;
-use Thelia\Log\Tlog;
+use Thelia\Type\TypeCollection;
 
 /**
  * The image loop
@@ -69,7 +69,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     /**
      * @var array Possible standard image sources
      */
-    protected $possible_sources = array('category', 'product', 'folder', 'content', 'module', 'brand');
+    protected $possible_sources = ['category', 'product', 'folder', 'content', 'module', 'brand'];
 
     /**
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
@@ -83,7 +83,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
+                    new EnumListType(['alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'])
                 ),
                 'manual'
             ),
@@ -95,7 +95,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'resize_mode',
                 new TypeCollection(
-                    new EnumType(array('crop', 'borders', 'none'))
+                    new EnumType(['crop', 'borders', 'none'])
                 ),
                 'none'
             ),
@@ -288,11 +288,9 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             case 'crop':
                 $resizeMode = \Thelia\Action\Image::EXACT_RATIO_WITH_CROP;
                 break;
-
             case 'borders':
                 $resizeMode = \Thelia\Action\Image::EXACT_RATIO_WITH_BORDERS;
                 break;
-
             case 'none':
             default:
                 $resizeMode = \Thelia\Action\Image::KEEP_IMAGE_RATIO;
@@ -369,7 +367,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("IMAGE_PATH", $event->getCacheFilepath())
                     ->set("PROCESSING_ERROR", false)
                 ;
-
 
                 if ($this->getBase64()) {
                     $loopResultRow->set("IMAGE_BASE64", $this->toBase64($event->getCacheFilepath()));

@@ -144,7 +144,6 @@ class HookCleanCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param OutputInterface $output
      * @throws \Exception
      */
     protected function clearCache(OutputInterface $output)

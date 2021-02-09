@@ -16,12 +16,12 @@ use http\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Action\Currency;
+use Thelia\Core\Event\Currency\CurrencyCreateEvent;
 use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
 use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
 use Thelia\CurrencyConverter\CurrencyConverter;
 use Thelia\CurrencyConverter\Provider\ECBProvider;
 use Thelia\Model\Currency as CurrencyModel;
-use Thelia\Core\Event\Currency\CurrencyCreateEvent;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Tests\ContainerAwareTestCase;
 
@@ -72,7 +72,6 @@ class CurrencyTest extends ContainerAwareTestCase
     }
 
     /**
-     * @param CurrencyModel $currency
      * @depends testCreate
      * @return CurrencyModel
      */
@@ -106,7 +105,6 @@ class CurrencyTest extends ContainerAwareTestCase
     }
 
     /**
-     * @param CurrencyModel $currency
      * @depends testUpdate
      * @return CurrencyModel
      */
@@ -130,7 +128,6 @@ class CurrencyTest extends ContainerAwareTestCase
     }
 
     /**
-     * @param CurrencyModel $currency
      * @depends testSetDefault
      */
     public function testDelete(CurrencyModel $currency)
@@ -155,7 +152,7 @@ class CurrencyTest extends ContainerAwareTestCase
         CurrencyQuery::create()
             ->addAscendingOrderByColumn('RAND()')
             ->limit(1)
-            ->update(array('ByDefault' => true));
+            ->update(['ByDefault' => true]);
 
         $currency = CurrencyQuery::create()->findOneByByDefault(1);
 
@@ -173,7 +170,7 @@ class CurrencyTest extends ContainerAwareTestCase
         CurrencyQuery::create()
             ->addAscendingOrderByColumn('RAND()')
             ->limit(1)
-            ->update(array('ByDefault' => true));
+            ->update(['ByDefault' => true]);
     }
 
     /**

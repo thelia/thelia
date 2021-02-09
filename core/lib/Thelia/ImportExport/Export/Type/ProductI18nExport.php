@@ -55,13 +55,12 @@ class ProductI18nExport extends JsonFileAbstractExport
     }
 
     /**
-     * @param array $data
      * @return array
      */
     public function beforeSerialize(array $data)
     {
         foreach ($data as $idx => &$value) {
-            if (in_array($idx, $this->idxStripHtml) && !empty($value)) {
+            if (\in_array($idx, $this->idxStripHtml) && !empty($value)) {
                 $value = strip_tags($value);
 
                 $value = html_entity_decode($value, ENT_QUOTES, 'UTF-8');

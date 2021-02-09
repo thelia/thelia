@@ -104,7 +104,7 @@ class ConfigController extends AbstractCrudController
     protected function hydrateObjectForm($object)
     {
         // Prepare the data that will hydrate the form
-        $data = array(
+        $data = [
             'id'           => $object->getId(),
             'name'         => $object->getName(),
             'value'        => $object->getValue(),
@@ -115,7 +115,7 @@ class ConfigController extends AbstractCrudController
             'chapo'        => $object->getChapo(),
             'description'  => $object->getDescription(),
             'postscriptum' => $object->getPostscriptum()
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(AdminForm::CONFIG_MODIFICATION, FormType::class, $data);
@@ -158,19 +158,19 @@ class ConfigController extends AbstractCrudController
 
     protected function renderListTemplate($currentOrder)
     {
-        return $this->render('variables', array('order' => $currentOrder));
+        return $this->render('variables', ['order' => $currentOrder]);
     }
 
     protected function renderEditionTemplate()
     {
-        return $this->render('variable-edit', array('variable_id' => $this->getRequest()->get('variable_id')));
+        return $this->render('variable-edit', ['variable_id' => $this->getRequest()->get('variable_id')]);
     }
 
     protected function redirectToEditionTemplate()
     {
         return $this->generateRedirectFromRoute(
             "admin.configuration.variables.update",
-            array('variable_id' => $this->getRequest()->get('variable_id'))
+            ['variable_id' => $this->getRequest()->get('variable_id')]
         );
     }
 
@@ -187,11 +187,11 @@ class ConfigController extends AbstractCrudController
     public function changeValuesAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
-        $variables = $this->getRequest()->get('variable', array());
+        $variables = $this->getRequest()->get('variable', []);
 
         // Process all changed variables
         foreach ($variables as $id => $value) {

@@ -42,7 +42,6 @@ class UpdateSeoEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getObjectId()
     {
@@ -156,7 +155,6 @@ class UpdateSeoEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $object
      */
     public function setObject($object)
     {
@@ -166,7 +164,6 @@ class UpdateSeoEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getObject()
     {

@@ -26,57 +26,57 @@ class MailingSystemModificationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("enabled", CheckboxType::class, array(
+            ->add("enabled", CheckboxType::class, [
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Enable remote SMTP use"),
-                "label_attr" => array("for" => "enabled_field"),
-            ))
-            ->add("host", TextType::class, array(
+                "label_attr" => ["for" => "enabled_field"],
+            ])
+            ->add("host", TextType::class, [
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Host"),
-                "label_attr" => array("for" => "host_field"),
-            ))
-            ->add("port", TextType::class, array(
+                "label_attr" => ["for" => "host_field"],
+            ])
+            ->add("port", TextType::class, [
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Port"),
-                "label_attr" => array("for" => "port_field"),
-            ))
-            ->add("encryption", TextType::class, array(
+                "label_attr" => ["for" => "port_field"],
+            ])
+            ->add("encryption", TextType::class, [
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Encryption"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "encryption_field",
                     "help" => Translator::getInstance()->trans("ssl, tls or empty"),
-                ),
-            ))
-            ->add("username", TextType::class, array(
+                ],
+            ])
+            ->add("username", TextType::class, [
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Username"),
-                "label_attr" => array("for" => "username_field"),
-            ))
-            ->add("password", TextType::class, array(
+                "label_attr" => ["for" => "username_field"],
+            ])
+            ->add("password", TextType::class, [
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Password"),
-                "label_attr" => array("for" => "password_field"),
-            ))
-            ->add("authmode", TextType::class, array(
+                "label_attr" => ["for" => "password_field"],
+            ])
+            ->add("authmode", TextType::class, [
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Auth mode"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "authmode_field",
                     "help" => Translator::getInstance()->trans("plain, login, cram-md5 or empty"),
-                ),
-            ))
-            ->add("timeout", TextType::class, array(
+                ],
+            ])
+            ->add("timeout", TextType::class, [
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Timeout"),
-                "label_attr" => array("for" => "timeout_field"),
-            ))
-            ->add("sourceip", TextType::class, array(
+                "label_attr" => ["for" => "timeout_field"],
+            ])
+            ->add("sourceip", TextType::class, [
                 "required" => false,
                 "label" => Translator::getInstance()->trans("Source IP"),
-                "label_attr" => array("for" => "sourceip_field"),
-            ))
+                "label_attr" => ["for" => "sourceip_field"],
+            ])
         ;
     }
 

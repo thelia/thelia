@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     ' content create form' => 'Formulaire de création de contenu',
     ' note: only non-visible documents can be associated.' => 'remarque : seuls ces modules. les documents non visibles peuvent être associés.',
     '"%param" parameter cannot be empty in loop type: %type, name: %name' => 'Le paramètre "%param" ne peut être vide dans la boucle type: %type, nom: %name ',
@@ -865,4 +865,4 @@ return array(
     'update form' => 'Formulaire de modification',
     'value table header' => 'colonne tableau valeur',
     'value table row' => 'ligne tableau valeurs',
-);
+];

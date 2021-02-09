@@ -41,7 +41,7 @@ class RemoveAmountOnProducts extends AbstractRemoveOnProducts
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Fixed amount discount for selected products', array());
+            ->trans('Fixed amount discount for selected products', []);
     }
 
     /**
@@ -53,7 +53,7 @@ class RemoveAmountOnProducts extends AbstractRemoveOnProducts
             ->getTranslator()
             ->trans(
                 'This coupon subtracts the specified amount from the order total for each selected product. If the discount is greater than the total order, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
-                array()
+                []
             );
 
         return $toolTip;

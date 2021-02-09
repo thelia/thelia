@@ -35,7 +35,6 @@ trait FileDownloaderAwareTrait
     }
 
     /**
-     * @param  FileDownloaderInterface $fileDownloader
      * @return $this
      */
     public function setFileDownloader(FileDownloaderInterface $fileDownloader)

@@ -41,7 +41,6 @@ class TheliaFormEvent extends Event
     }
 
     /**
-     * @param BaseForm $form
      * @return $this
      */
     public function setForm(BaseForm $form)

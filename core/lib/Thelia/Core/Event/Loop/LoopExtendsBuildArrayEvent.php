@@ -53,7 +53,6 @@ class LoopExtendsBuildArrayEvent extends LoopExtendsEvent
     /**
      * Set build array results
      *
-     * @param array $array
      *
      * @return $this Return $this, allow chaining
      */

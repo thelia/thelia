@@ -107,7 +107,6 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Hydrate the update form for this object, before passing it to the update template
      *
-     * @param mixed $object
      * @return BaseForm
      */
     abstract protected function hydrateObjectForm($object);
@@ -115,7 +114,6 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Creates the creation event with the provided form data
      *
-     * @param mixed $formData
      * @return \Thelia\Core\Event\ActionEvent
      */
     abstract protected function getCreationEvent($formData);
@@ -123,7 +121,6 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Creates the update event with the provided form data
      *
-     * @param mixed $formData
      * @return \Thelia\Core\Event\ActionEvent
      */
     abstract protected function getUpdateEvent($formData);
@@ -137,7 +134,6 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param mixed $event
      */
     protected function eventContainsObject($event)
     {
@@ -152,7 +148,6 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Get the created object from an event.
      *
-     * @param mixed $event
      */
     protected function getObjectFromEvent($event)
     {
@@ -185,7 +180,6 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Render the main list template
      *
-     * @param mixed $currentOrder, if any, null otherwise.
      * @return \Thelia\Core\HttpFoundation\Response
      */
     abstract protected function renderListTemplate($currentOrder);
@@ -286,9 +280,8 @@ abstract class AbstractCrudController extends BaseAdminController
     {
         if (null !== $this->moduleCode) {
             return [$this->moduleCode];
-        } else {
+        }  
             return [];
-        }
     }
 
     /**
@@ -383,9 +376,8 @@ abstract class AbstractCrudController extends BaseAdminController
 
                 // Redirect to the success URL
                 return $this->generateRedirect($successUrl);
-            } else {
+            }  
                 return $response;
-            }
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -502,9 +494,8 @@ abstract class AbstractCrudController extends BaseAdminController
 
                 // Redirect to the success URL
                 return $this->generateSuccessRedirect($changeForm);
-            } else {
+            }  
                 return $response;
-            }
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -562,9 +553,8 @@ abstract class AbstractCrudController extends BaseAdminController
 
         if ($response == null) {
             return $this->redirectToListTemplate();
-        } else {
+        }  
             return $response;
-        }
     }
 
     protected function genericUpdatePositionAction($object, $eventName, $doFinalRedirect = true)
@@ -665,16 +655,14 @@ abstract class AbstractCrudController extends BaseAdminController
 
             if ($response == null) {
                 return $this->redirectToListTemplate();
-            } else {
+            }  
                 return $response;
-            }
         } catch (\Exception $e) {
             return $this->renderAfterDeleteError($e);
         }
     }
 
     /**
-     * @param \Exception $e
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function renderAfterDeleteError(\Exception $e)

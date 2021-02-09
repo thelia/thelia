@@ -10,13 +10,10 @@ use Thelia\Model\Base\OrderProduct as BaseOrderProduct;
 
 class OrderProduct extends BaseOrderProduct
 {
-
-
     /** @var int */
     protected $cartItemId;
 
     /**
-     * @param mixed $cartItemId
      * @return $this
      */
     public function setCartItemId($cartItemId)
@@ -27,7 +24,6 @@ class OrderProduct extends BaseOrderProduct
     }
 
     /**
-     * @return mixed
      */
     public function getCartItemId()
     {
@@ -50,7 +46,6 @@ class OrderProduct extends BaseOrderProduct
                 (new OrderProductEvent($this->getOrder(), null))
                     ->setCartItemId($this->cartItemId),
                 TheliaEvents::ORDER_PRODUCT_BEFORE_CREATE
-
             );
         }
 
@@ -73,7 +68,6 @@ class OrderProduct extends BaseOrderProduct
                 (new OrderProductEvent($this->getOrder(), $this->getId()))
                     ->setCartItemId($this->cartItemId),
                 TheliaEvents::ORDER_PRODUCT_AFTER_CREATE
-
             );
         }
     }

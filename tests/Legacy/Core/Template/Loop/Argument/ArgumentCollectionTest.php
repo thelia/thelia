@@ -14,8 +14,8 @@ namespace Thelia\Tests\Core\Template\Loop\Argument;
 
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
 

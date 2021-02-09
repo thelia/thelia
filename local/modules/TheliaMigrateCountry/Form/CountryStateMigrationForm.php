@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace TheliaMigrateCountry\Form;
 
 use Symfony\Component\Validator\Constraints\Count;
@@ -24,7 +23,6 @@ use Thelia\Form\BaseForm;
  */
 class CountryStateMigrationForm extends BaseForm
 {
-
     /**
      * @inheritdocs
      */
@@ -39,9 +37,9 @@ class CountryStateMigrationForm extends BaseForm
                     "allow_add" => true,
                     "required" => true,
                     "cascade_validation" => true,
-                    "constraints" => array(
+                    "constraints" => [
                         new Count(["min" => 1]),
-                    ),
+                    ],
                 ]
             )
         ;

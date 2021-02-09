@@ -110,14 +110,14 @@ class ModuleController extends AbstractCrudController
     protected function hydrateObjectForm($object)
     {
         $object->setLocale($this->getCurrentEditionLocale());
-        $data = array(
+        $data = [
             'id'           => $object->getId(),
             'locale'       => $object->getLocale(),
             'title'        => $object->getTitle(),
             'chapo'        => $object->getChapo(),
             'description'  => $object->getDescription(),
             'postscriptum' => $object->getPostscriptum(),
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(AdminForm::MODULE_MODIFICATION, FormType::class, $data);
@@ -160,17 +160,17 @@ class ModuleController extends AbstractCrudController
 
     protected function getViewArguments()
     {
-        return array();
+        return [];
     }
 
     protected function getRouteArguments($module_id = null)
     {
         $request = $this->getRequest();
 
-        return array(
+        return [
             'module_id' => $module_id === null ? $request->get('module_id') : $module_id,
             'current_tab' => $request->get('current_tab', 'general'),
-        );
+        ];
     }
 
     protected function renderListTemplate($currentOrder)
@@ -178,10 +178,10 @@ class ModuleController extends AbstractCrudController
         // We always return to the feature edition form
         return $this->render(
             'modules',
-            array(
+            [
                 'module_order'  => $currentOrder,
                 'module_errors' => $this->moduleErrors
-            )
+            ]
         );
     }
 
@@ -207,7 +207,7 @@ class ModuleController extends AbstractCrudController
 
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) {
             return $response;
         }
 
@@ -231,20 +231,20 @@ class ModuleController extends AbstractCrudController
             throw new \InvalidArgumentException(sprintf("Module `%s` does not exists", $module_code));
         }
 
-        if (null !== $response = $this->checkAuth(array(), $module_code, AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth([], $module_code, AccessManager::VIEW)) {
             return $response;
         }
         return $this->render(
             "module-configure",
-            array(
+            [
                 "module_code" => $module_code,
-            )
+            ]
         );
     }
 
     public function toggleActivationAction($module_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::UPDATE)) {
             return $response;
         }
         $message = null;
@@ -254,7 +254,7 @@ class ModuleController extends AbstractCrudController
 
             if (null === $event->getModule()) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj' => 'Module'))
+                    $this->getTranslator()->trans("No %obj was updated.", ['%obj' => 'Module'])
                 );
             }
         } catch (\Exception $e) {
@@ -265,9 +265,9 @@ class ModuleController extends AbstractCrudController
 
         if ($this->getRequest()->isXmlHttpRequest()) {
             if ($message) {
-                $response = $this->jsonResponse(json_encode(array(
+                $response = $this->jsonResponse(json_encode([
                     "error" => $message
-                )), 500);
+                ]), 500);
             } else {
                 $response = $this->nullResponse();
             }
@@ -280,7 +280,7 @@ class ModuleController extends AbstractCrudController
 
     public function deleteAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::DELETE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::DELETE)) {
             return $response;
         }
 
@@ -301,7 +301,7 @@ class ModuleController extends AbstractCrudController
 
             if ($deleteEvent->hasModule() === false) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj' => 'Module'))
+                    $this->getTranslator()->trans("No %obj was updated.", ['%obj' => 'Module'])
                 );
             }
         } catch (\Exception $e) {
@@ -311,9 +311,9 @@ class ModuleController extends AbstractCrudController
         }
 
         if (false !== $message) {
-            $response = $this->render("modules", array(
+            $response = $this->render("modules", [
                 "error_message" => $message
-            ));
+            ]);
         } else {
             $response = $this->generateRedirectFromRoute('admin.module');
         }
@@ -323,7 +323,7 @@ class ModuleController extends AbstractCrudController
 
     public function installAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::CREATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::CREATE)) {
             return $response;
         }
 
@@ -358,11 +358,10 @@ class ModuleController extends AbstractCrudController
                 );
 
                 return $this->generateRedirectFromRoute('admin.module');
-            } else {
+            }  
                 $message = $this->getTranslator()->trans(
                     "Sorry, an error occured."
                 );
-            }
         } catch (FormValidationException $e) {
             $message = $e->getMessage();
         } catch (\Exception $e) {
@@ -382,7 +381,7 @@ class ModuleController extends AbstractCrudController
 
     public function informationAction($module_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) {
             return $response;
         }
 
@@ -422,7 +421,7 @@ class ModuleController extends AbstractCrudController
 
     public function documentationAction($module_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::VIEW)) {
             return $response;
         }
 

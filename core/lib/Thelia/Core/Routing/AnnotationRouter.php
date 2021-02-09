@@ -24,7 +24,6 @@ class AnnotationRouter extends BaseRouter
         $this->setOptions([]);
     }
 
-
     public function getRouteCollection()
     {
         $loader = new AnnotationDirectoryLoader($this->fileLocator, new AnnotatedRouteControllerLoader(new AnnotationReader()));

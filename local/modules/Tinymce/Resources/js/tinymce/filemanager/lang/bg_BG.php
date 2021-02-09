@@ -1,7 +1,6 @@
 <?php
 
-return array(
-
+return [
 	'Select' => 'Избери',
 	'Erase' => 'Изтрий',
 	'Open' => 'Отваряне',
@@ -120,4 +119,4 @@ return array(
 	'GB' => "GB",
 	'TB' => "TB",
 	'total size' => "Общ размер",
-);
+];

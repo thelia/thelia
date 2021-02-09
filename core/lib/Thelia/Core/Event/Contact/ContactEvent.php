@@ -119,5 +119,4 @@ class ContactEvent extends ActionEvent
         $this->name = $name;
         return $this;
     }
-
 }

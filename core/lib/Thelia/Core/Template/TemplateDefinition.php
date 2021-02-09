@@ -37,15 +37,15 @@ class TemplateDefinition
     /** @var string the prefix for translation domain name */
     protected $translationDomainPrefix;
 
-    protected static $standardTemplatesSubdirs = array(
+    protected static $standardTemplatesSubdirs = [
         self::FRONT_OFFICE => self::FRONT_OFFICE_SUBDIR,
         self::BACK_OFFICE  => self::BACK_OFFICE_SUBDIR,
         self::PDF          => self::PDF_SUBDIR,
         self::EMAIL        => self::EMAIL_SUBDIR,
-    );
+    ];
 
     /**  @var array|null the parent list cache */
-    protected $parentList = null;
+    protected $parentList;
 
     /**
      * TemplateDefinition constructor.

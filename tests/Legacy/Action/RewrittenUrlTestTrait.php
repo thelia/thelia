@@ -15,9 +15,9 @@ namespace Thelia\Tests\Action;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Exception\UrlRewritingException;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\RewritingUrlQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Rewriting\RewritingResolver;
 
 /**

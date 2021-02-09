@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Core\Event\Loop;
 
 use Thelia\Core\Template\Element\BaseLoop;
@@ -27,7 +26,6 @@ class LoopExtendsInitializeArgsEvent extends LoopExtendsEvent
 
     /**
      * LoopExtendsInitializeArgs constructor.
-     * @param array $loopParameters
      */
     public function __construct(BaseLoop $loop, array $loopParameters)
     {

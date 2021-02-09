@@ -6,7 +6,6 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\Base\Module as BaseModule;
-
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Module\BaseModuleInterface;
 use Thelia\Module\DeliveryModuleInterface;
@@ -111,7 +110,6 @@ class Module extends BaseModule
     {
         return $this->getTranslationDomain(). '.pdf.' . $templateName;
     }
-
 
     public function getAbsoluteEmailTemplatePath($subdir)
     {
@@ -279,9 +277,9 @@ class Module extends BaseModule
         $instance = $this->getModuleInstance($container);
 
         if (
-            !in_array("Thelia\Module\DeliveryModuleInterface", class_implements($instance))
+            !\in_array("Thelia\Module\DeliveryModuleInterface", class_implements($instance))
                 &&
-            !in_array("Thelia\Module\DeliveryModuleWithStateInterface", class_implements($instance))
+            !\in_array("Thelia\Module\DeliveryModuleWithStateInterface", class_implements($instance))
         ) {
             throw new \InvalidArgumentException(sprintf('Module "%s" is not a delivery module', $this->getCode()));
         }

@@ -48,7 +48,6 @@ $updateError = null;
             </div>
 
         <?php } else {
-
             $continue = true;
 
             // Backup
@@ -195,9 +194,7 @@ $updateError = null;
 
                  </div><?php
                 include("footer.php");
-
                 } else {
-
                     $finder = new Finder();
                     $fs = new Filesystem();
                     $hasDeleteError = false;

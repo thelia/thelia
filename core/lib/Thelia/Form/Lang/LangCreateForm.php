@@ -14,8 +14,8 @@ namespace Thelia\Form\Lang;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Form\BaseForm;
 use Thelia\Core\Translation\Translator;
+use Thelia\Form\BaseForm;
 
 /**
  * Class LangCreateForm
@@ -47,85 +47,85 @@ class LangCreateForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('title', TextType::class, array(
-                'constraints' => array(
+            ->add('title', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
-                ),
+                ],
                 'label' => Translator::getInstance()->trans('Language name'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'title_lang',
-                ),
-            ))
-            ->add('code', TextType::class, array(
-                'constraints' => array(
+                ],
+            ])
+            ->add('code', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
-                ),
+                ],
                 'label' => Translator::getInstance()->trans('ISO 639-1 Code'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'code_lang',
-                ),
-            ))
-            ->add('locale', TextType::class, array(
-                'constraints' => array(
+                ],
+            ])
+            ->add('locale', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
-                ),
+                ],
                 'label' => Translator::getInstance()->trans('language locale'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'locale_lang',
-                ),
-            ))
-            ->add('date_time_format', TextType::class, array(
-                'constraints' => array(
+                ],
+            ])
+            ->add('date_time_format', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
-                ),
+                ],
                 'label' => Translator::getInstance()->trans('date/time format'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'date_time_format',
-                ),
-            ))
-            ->add('date_format', TextType::class, array(
-                'constraints' => array(
+                ],
+            ])
+            ->add('date_format', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
-                ),
+                ],
                 'label' => Translator::getInstance()->trans('date format'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'date_lang',
-                ),
-            ))
-            ->add('time_format', TextType::class, array(
-                'constraints' => array(
+                ],
+            ])
+            ->add('time_format', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
-                ),
+                ],
                 'label' => Translator::getInstance()->trans('time format'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'time_lang',
-                ),
-            ))
-            ->add('decimal_separator', TextType::class, array(
-                'constraints' => array(
+                ],
+            ])
+            ->add('decimal_separator', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
-                ),
+                ],
                 'label' => Translator::getInstance()->trans('decimal separator'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'decimal_separator',
-                ),
-            ))
-            ->add('thousands_separator', TextType::class, array(
+                ],
+            ])
+            ->add('thousands_separator', TextType::class, [
                 'trim' => false,
                 'label' => Translator::getInstance()->trans('thousands separator'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'thousands_separator',
-                ),
-            ))
-            ->add('decimals', TextType::class, array(
-                'constraints' => array(
+                ],
+            ])
+            ->add('decimals', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
-                ),
+                ],
                 'label' => Translator::getInstance()->trans('Decimal places'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'decimals',
-                ),
-            ))
+                ],
+            ])
         ;
     }
 

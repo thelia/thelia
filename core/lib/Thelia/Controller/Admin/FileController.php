@@ -71,15 +71,14 @@ class FileController extends BaseAdminController
         $parentId,
         $parentType,
         $objectType,
-        $validMimeTypes = array(),
-        $extBlackList = array()
+        $validMimeTypes = [],
+        $extBlackList = []
     ) {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) {
             return $response;
         }
 
         $this->checkXmlHttpRequest();
-
 
         if ($this->getRequest()->isMethod('POST')) {
             /** @var UploadedFile $fileBeingUploaded */
@@ -97,7 +96,7 @@ class FileController extends BaseAdminController
                 return new ResponseRest($e->getMessage(), 'text', $e->getCode());
             }
 
-            return new ResponseRest(array('status' => true, 'message' => ''));
+            return new ResponseRest(['status' => true, 'message' => '']);
         }
 
         return new Response('', 404);
@@ -121,8 +120,8 @@ class FileController extends BaseAdminController
         $parentId,
         $parentType,
         $objectType,
-        $validMimeTypes = array(),
-        $extBlackList = array()
+        $validMimeTypes = [],
+        $extBlackList = []
     ) {
         @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 2.6. Please use the process method File present in the same class.', E_USER_DEPRECATED);
 
@@ -147,8 +146,8 @@ class FileController extends BaseAdminController
         $parentId,
         $parentType,
         $objectType,
-        $validMimeTypes = array(),
-        $extBlackList = array()
+        $validMimeTypes = [],
+        $extBlackList = []
     ) {
         $fileManager = $this->getFileManager();
 
@@ -157,7 +156,7 @@ class FileController extends BaseAdminController
             $message = $this->getTranslator()
                 ->trans(
                     'File is too large, please retry with a file having a size less than %size%.',
-                    array('%size%' => ini_get('upload_max_filesize')),
+                    ['%size%' => ini_get('upload_max_filesize')],
                     'core'
                 );
 
@@ -246,11 +245,11 @@ class FileController extends BaseAdminController
             AccessManager::UPDATE,
             $this->getTranslator()->trans(
                 'Saving %obj% for %parentName% parent id %parentId%',
-                array(
+                [
                     '%parentName%' => $fileCreateOrUpdateEvent->getParentName(),
                     '%parentId%' => $fileCreateOrUpdateEvent->getParentId(),
                     '%obj%' => $objectType
-                )
+                ]
             )
         );
 
@@ -308,7 +307,7 @@ class FileController extends BaseAdminController
      */
     public function getImageListAjaxAction($parentId, $parentType)
     {
-        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
         $successUrl = $this->getRequest()->get('successUrl');
@@ -332,9 +331,9 @@ class FileController extends BaseAdminController
      */
     public function getDocumentListAjaxAction($parentId, $parentType)
     {
-        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
-        $args = array('documentType' => $parentType, 'parentId' => $parentId);
+        $args = ['documentType' => $parentType, 'parentId' => $parentId];
 
         return $this->render('includes/document-upload-list-ajax', $args);
     }
@@ -349,7 +348,7 @@ class FileController extends BaseAdminController
      */
     public function getImageFormAjaxAction($parentId, $parentType)
     {
-        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
         $successUrl = $this->getRequest()->get('successUrl');
 
@@ -372,9 +371,9 @@ class FileController extends BaseAdminController
      */
     public function getDocumentFormAjaxAction($parentId, $parentType)
     {
-        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
-        $args = array('documentType' => $parentType, 'parentId' => $parentId);
+        $args = ['documentType' => $parentType, 'parentId' => $parentId];
 
         return $this->render('includes/document-upload-form', $args);
     }
@@ -389,7 +388,7 @@ class FileController extends BaseAdminController
      */
     public function viewImageAction($imageId, $parentType)
     {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) {
             return $response;
         }
         $fileManager = $this->getFileManager();
@@ -399,7 +398,7 @@ class FileController extends BaseAdminController
 
         $redirectUrl = $image->getRedirectionUrl();
 
-        return $this->render('image-edit', array(
+        return $this->render('image-edit', [
             'imageId' => $imageId,
             'imageType' => $parentType,
             'redirectUrl' => $redirectUrl,
@@ -410,7 +409,7 @@ class FileController extends BaseAdminController
                 'images',
                 $this->getCurrentEditionLocale()
             )
-        ));
+        ]);
     }
 
     /**
@@ -423,7 +422,7 @@ class FileController extends BaseAdminController
      */
     public function viewDocumentAction($documentId, $parentType)
     {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -434,7 +433,7 @@ class FileController extends BaseAdminController
 
         $redirectUrl = $document->getRedirectionUrl();
 
-        return $this->render('document-edit', array(
+        return $this->render('document-edit', [
             'documentId' => $documentId,
             'documentType' => $parentType,
             'redirectUrl' => $redirectUrl,
@@ -445,7 +444,7 @@ class FileController extends BaseAdminController
                 'documents',
                 $this->getCurrentEditionLocale()
             )
-        ));
+        ]);
     }
 
     /**
@@ -482,22 +481,22 @@ class FileController extends BaseAdminController
 
             $event = new FileCreateOrUpdateEvent(null);
 
-            if (array_key_exists('visible', $data)) {
+            if (\array_key_exists('visible', $data)) {
                 $file->setVisible($data['visible'] ? 1 : 0);
             }
 
             $file->setLocale($data['locale']);
 
-            if (array_key_exists('title', $data)) {
+            if (\array_key_exists('title', $data)) {
                 $file->setTitle($data['title']);
             }
-            if (array_key_exists('chapo', $data)) {
+            if (\array_key_exists('chapo', $data)) {
                 $file->setChapo($data['chapo']);
             }
-            if (array_key_exists('description', $data)) {
+            if (\array_key_exists('description', $data)) {
                 $file->setDescription($data['description']);
             }
-            if (array_key_exists('postscriptum', $data)) {
+            if (\array_key_exists('postscriptum', $data)) {
                 $file->setPostscriptum($data['postscriptum']);
             }
 
@@ -542,9 +541,8 @@ class FileController extends BaseAdminController
                 return $this->generateRedirect(
                     URL::getInstance()->absoluteUrl($file->getRedirectionUrl(), ['current_tab' => $tab])
                 );
-            } else {
+            }  
                 return $this->generateSuccessRedirect($fileUpdateForm);
-            }
         } catch (FormValidationException $e) {
             $message = sprintf('Please check your input: %s', $e->getMessage());
         } catch (PropelException $e) {
@@ -576,7 +574,7 @@ class FileController extends BaseAdminController
      */
     public function updateImageAction($imageId, $parentType)
     {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -584,14 +582,13 @@ class FileController extends BaseAdminController
 
         if ($imageInstance instanceof \Symfony\Component\HttpFoundation\Response) {
             return $imageInstance;
-        } else {
-            return $this->render('image-edit', array(
+        }  
+            return $this->render('image-edit', [
                 'imageId' => $imageId,
                 'imageType' => $parentType,
                 'redirectUrl' => $imageInstance->getRedirectionUrl(),
                 'formId' => $imageInstance->getUpdateFormId()
-            ));
-        }
+            ]);
     }
 
     /**
@@ -604,7 +601,7 @@ class FileController extends BaseAdminController
      */
     public function updateDocumentAction($documentId, $parentType)
     {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -612,14 +609,13 @@ class FileController extends BaseAdminController
 
         if ($documentInstance instanceof \Symfony\Component\HttpFoundation\Response) {
             return $documentInstance;
-        } else {
-            return $this->render('document-edit', array(
+        }  
+            return $this->render('document-edit', [
                 'documentId' => $documentId,
                 'documentType' => $parentType,
                 'redirectUrl' => $documentInstance->getRedirectionUrl(),
                 'formId' => $documentInstance->getUpdateFormId()
-            ));
-        }
+            ]);
     }
 
     /**
@@ -636,7 +632,7 @@ class FileController extends BaseAdminController
     {
         $message = null;
 
-        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
         $fileManager = $this->getFileManager();
@@ -660,23 +656,23 @@ class FileController extends BaseAdminController
                 AccessManager::UPDATE,
                 $this->getTranslator()->trans(
                     'Deleting %obj% for %id% with parent id %parentId%',
-                    array(
+                    [
                         '%obj%' => $objectType,
                         '%id%' => $fileDeleteEvent->getFileToDelete()->getId(),
                         '%parentId%' => $fileDeleteEvent->getFileToDelete()->getParentId(),
-                    )
+                    ]
                 ),
                 $fileDeleteEvent->getFileToDelete()->getId()
             );
         } catch (\Exception $e) {
             $message = $this->getTranslator()->trans(
                 'Fail to delete  %obj% for %id% with parent id %parentId% (Exception : %e%)',
-                array(
+                [
                     '%obj%' => $objectType,
                     '%id%' => $fileDeleteEvent->getFileToDelete()->getId(),
                     '%parentId%' => $fileDeleteEvent->getFileToDelete()->getParentId(),
                     '%e%' => $e->getMessage()
-                )
+                ]
             );
 
             $this->adminLogAppend(
@@ -730,7 +726,7 @@ class FileController extends BaseAdminController
 
         $position = $this->getRequest()->request->get('position');
 
-        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
         $fileManager = $this->getFileManager();
@@ -771,7 +767,7 @@ class FileController extends BaseAdminController
 
     public function updateImageTitleAction($imageId, $parentType)
     {
-        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -816,7 +812,7 @@ class FileController extends BaseAdminController
 
         //$position = $this->getRequest()->request->get('position');
 
-        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), array(), AccessManager::UPDATE);
+        $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE);
         $this->checkXmlHttpRequest();
 
         $fileManager = $this->getFileManager();

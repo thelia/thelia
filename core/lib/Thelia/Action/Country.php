@@ -89,9 +89,7 @@ class Country extends BaseAction implements EventSubscriberInterface
     /**
      * Toggle Country visibility
      *
-     * @param CountryToggleVisibilityEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function toggleVisibility(CountryToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -110,12 +108,12 @@ class Country extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::COUNTRY_CREATE            => array('create', 128),
-            TheliaEvents::COUNTRY_UPDATE            => array('update', 128),
-            TheliaEvents::COUNTRY_DELETE            => array('delete', 128),
-            TheliaEvents::COUNTRY_TOGGLE_DEFAULT    => array('toggleDefault', 128),
-            TheliaEvents::COUNTRY_TOGGLE_VISIBILITY => array('toggleVisibility', 128)
-        );
+        return [
+            TheliaEvents::COUNTRY_CREATE            => ['create', 128],
+            TheliaEvents::COUNTRY_UPDATE            => ['update', 128],
+            TheliaEvents::COUNTRY_DELETE            => ['delete', 128],
+            TheliaEvents::COUNTRY_TOGGLE_DEFAULT    => ['toggleDefault', 128],
+            TheliaEvents::COUNTRY_TOGGLE_VISIBILITY => ['toggleVisibility', 128]
+        ];
     }
 }

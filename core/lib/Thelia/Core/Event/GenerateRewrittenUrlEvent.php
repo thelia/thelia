@@ -19,7 +19,7 @@ namespace Thelia\Core\Event;
  */
 class GenerateRewrittenUrlEvent extends ActionEvent
 {
-    /** @var mixed */
+    /**  */
     protected $object;
 
     /** @var string local */
@@ -58,7 +58,6 @@ class GenerateRewrittenUrlEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getObject()
     {
@@ -66,7 +65,6 @@ class GenerateRewrittenUrlEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $object
      * @return $this
      */
     public function setObject($object)

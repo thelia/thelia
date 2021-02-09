@@ -31,34 +31,34 @@ class OrderPayment extends FirewallForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("invoice-address", IntegerType::class, array(
+            ->add("invoice-address", IntegerType::class, [
                 "required" => true,
-                "constraints" => array(
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                            array($this, "verifyInvoiceAddress")
+                            [$this, "verifyInvoiceAddress"]
                     ),
-                ),
-            ))
-            ->add("payment-module", IntegerType::class, array(
+                ],
+            ])
+            ->add("payment-module", IntegerType::class, [
                 "required" => true,
-                "constraints" => array(
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                            array($this, "verifyPaymentModule")
+                            [$this, "verifyPaymentModule"]
                     )
-                ),
-            ))
+                ],
+            ])
             // Add terms & conditions
-            ->add("agreed", CheckboxType::class, array(
-                "constraints" => array(
-                    new Constraints\IsTrue(array("message" => Translator::getInstance()->trans("Please accept the Terms and conditions in order to register."))),
-                ),
+            ->add("agreed", CheckboxType::class, [
+                "constraints" => [
+                    new Constraints\IsTrue(["message" => Translator::getInstance()->trans("Please accept the Terms and conditions in order to register.")]),
+                ],
                 "label" => "Agreed",
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "agreed",
-                ),
-            ));
+                ],
+            ]);
     }
 
     public function verifyInvoiceAddress($value, ExecutionContextInterface $context)

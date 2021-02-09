@@ -32,50 +32,50 @@ class CustomerLogin extends BruteforceForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("email", EmailType::class, array(
-                "constraints" => array(
+            ->add("email", EmailType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
-                    new Constraints\Callback(array($this, "verifyExistingEmail")),
-                ),
+                    new Constraints\Callback([$this, "verifyExistingEmail"]),
+                ],
                 "label" => Translator::getInstance()->trans("Please enter your email address"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "email",
-                ),
-            ))
-            ->add("account", ChoiceType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("account", ChoiceType::class, [
+                "constraints" => [
                     new Constraints\Callback(
-                            array($this, "verifyAccount")),
-                    ),
-                "choices" => array(
+                            [$this, "verifyAccount"]),
+                    ],
+                "choices" => [
                     Translator::getInstance()->trans("No, I am a new customer.") => 0,
                     Translator::getInstance()->trans("Yes, I have a password :") => 1,
-                ),
-                "label_attr" => array(
+                ],
+                "label_attr" => [
                     "for" => "account",
-                ),
+                ],
                 "data" => 0,
-            ))
-            ->add("password", PasswordType::class, array(
-                "constraints" => array(
-                    new Constraints\NotBlank(array(
-                        'groups' => array('existing_customer'),
-                    )),
-                ),
+            ])
+            ->add("password", PasswordType::class, [
+                "constraints" => [
+                    new Constraints\NotBlank([
+                        'groups' => ['existing_customer'],
+                    ]),
+                ],
                 "label" => Translator::getInstance()->trans("Please enter your password"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "password",
-                ),
+                ],
                 "required"    => false,
-            ))
-            ->add("remember_me", CheckboxType::class, array(
+            ])
+            ->add("remember_me", CheckboxType::class, [
                 'value' => 'yes',
                 "label" => Translator::getInstance()->trans("Remember me ?"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "remember_me",
-                ),
-            ))
+                ],
+            ])
         ;
     }
 
@@ -90,7 +90,7 @@ class CustomerLogin extends BruteforceForm
                 $context->getViolations()->add(new ConstraintViolation(
                     Translator::getInstance()->trans('This value should not be blank.'),
                     'account_password',
-                    array(),
+                    [],
                     $context->getRoot(),
                     'children[password].data',
                     'propertyPath'

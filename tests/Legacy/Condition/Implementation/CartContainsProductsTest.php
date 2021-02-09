@@ -138,12 +138,12 @@ class CartContainsProductsTest extends TestCase
         $stubFacade = $this->generateFacadeStub();
 
         $condition1 = new CartContainsProducts($stubFacade);
-        $operators = array(
+        $operators = [
             CartContainsProducts::PRODUCTS_LIST => Operators::INFERIOR_OR_EQUAL
-        );
-        $values = array(
-            CartContainsProducts::PRODUCTS_LIST => array()
-        );
+        ];
+        $values = [
+            CartContainsProducts::PRODUCTS_LIST => []
+        ];
         $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -166,12 +166,12 @@ class CartContainsProductsTest extends TestCase
         $stubFacade = $this->generateFacadeStub();
 
         $condition1 = new CartContainsProducts($stubFacade);
-        $operators = array(
+        $operators = [
             CartContainsProducts::PRODUCTS_LIST => Operators::IN
-        );
-        $values = array(
-            CartContainsProducts::PRODUCTS_LIST => array()
-        );
+        ];
+        $values = [
+            CartContainsProducts::PRODUCTS_LIST => []
+        ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -189,12 +189,12 @@ class CartContainsProductsTest extends TestCase
         $stubFacade = $this->generateFacadeStub();
 
         $condition1 = new CartContainsProducts($stubFacade);
-        $operators = array(
+        $operators = [
             CartContainsProducts::PRODUCTS_LIST => Operators::IN
-        );
-        $values = array(
-            CartContainsProducts::PRODUCTS_LIST => array(10, 20)
-        );
+        ];
+        $values = [
+            CartContainsProducts::PRODUCTS_LIST => [10, 20]
+        ];
 
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -218,12 +218,12 @@ class CartContainsProductsTest extends TestCase
 
         $condition1 = new CartContainsProducts($stubFacade);
 
-        $operators = array(
+        $operators = [
             CartContainsProducts::PRODUCTS_LIST => Operators::IN
-        );
-        $values = array(
-            CartContainsProducts::PRODUCTS_LIST => array(50, 60)
-        );
+        ];
+        $values = [
+            CartContainsProducts::PRODUCTS_LIST => [50, 60]
+        ];
 
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -241,12 +241,12 @@ class CartContainsProductsTest extends TestCase
 
         $condition1 = new CartContainsProducts($stubFacade);
 
-        $operators = array(
+        $operators = [
             CartContainsProducts::PRODUCTS_LIST => Operators::IN
-        );
-        $values = array(
-            CartContainsProducts::PRODUCTS_LIST => array(50, 60)
-        );
+        ];
+        $values = [
+            CartContainsProducts::PRODUCTS_LIST => [50, 60]
+        ];
 
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -311,35 +311,35 @@ class CartContainsProductsTest extends TestCase
         /** @var FacadeInterface $stubFacade */
         $condition1 = new CartContainsProducts($stubFacade);
 
-        $operators = array(
+        $operators = [
             CartContainsProducts::PRODUCTS_LIST => Operators::IN
-        );
-        $values = array(
-            CartContainsProducts::PRODUCTS_LIST => array(50, 60)
-        );
+        ];
+        $values = [
+            CartContainsProducts::PRODUCTS_LIST => [50, 60]
+        ];
 
         $condition1->setValidatorsFromForm($operators, $values);
 
         $actual = $condition1->getValidators();
 
-        $validators = array(
-            'inputs' => array(
-                CartContainsProducts::PRODUCTS_LIST => array(
-                    'availableOperators' => array(
+        $validators = [
+            'inputs' => [
+                CartContainsProducts::PRODUCTS_LIST => [
+                    'availableOperators' => [
                         'in' => 'Price',
                         'out' => 'Price',
-                    ),
+                    ],
                     'value' => '',
                     'selectedOperator' => 'in'
-                )
-            ),
-            'setOperators' => array(
+                ]
+            ],
+            'setOperators' => [
                 'products' => 'in'
-            ),
-            'setValues' => array(
-                'products' => array(50, 60)
-            )
-        );
+            ],
+            'setValues' => [
+                'products' => [50, 60]
+            ]
+        ];
         $expected = $validators;
 
         $this->assertEquals($expected, $actual);

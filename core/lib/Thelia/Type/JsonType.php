@@ -44,6 +44,6 @@ class JsonType extends BaseType
 
     public function getFormOptions()
     {
-        return array();
+        return [];
     }
 }

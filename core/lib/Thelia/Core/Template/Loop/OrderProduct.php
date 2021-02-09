@@ -62,7 +62,6 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
             ->withColumn('SUM(`opt`.PROMO_AMOUNT)', 'TOTAL_PROMO_TAX')
             ->groupById();
 
-
         // new join to get the product id if it exists
         $pseJoin = new Join(
             OrderProductTableMap::COL_PRODUCT_SALE_ELEMENTS_ID,
@@ -103,7 +102,6 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @param LoopResult $loopResult
      * @return LoopResult
      * @throws \Propel\Runtime\Exception\PropelException
      */

@@ -27,7 +27,7 @@ class HookRenderEvent extends BaseHookRenderEvent
     public function __construct($code, array $arguments = [], array $templateVariables = [])
     {
         parent::__construct($code, $arguments, $templateVariables);
-        $this->fragments = array();
+        $this->fragments = [];
     }
 
     /**

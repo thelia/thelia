@@ -29,7 +29,7 @@ class FragmentBag implements Iterator
     public function __construct()
     {
         $this->position  = 0;
-        $this->fragments = array();
+        $this->fragments = [];
     }
 
     /**
@@ -96,7 +96,7 @@ class FragmentBag implements Iterator
     public function clear()
     {
         $this->position  = 0;
-        $this->fragments = array();
+        $this->fragments = [];
     }
 
     public function isEmpty()

@@ -34,7 +34,6 @@ class ContentEvent extends ActionEvent
     }
 
     /**
-     * @param \Thelia\Model\Content $content
      */
     public function setContent(Content $content)
     {

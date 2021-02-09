@@ -15,8 +15,8 @@ namespace Thelia\Tests\Controller;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Controller\Admin\ProductController;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Controller\Front\DefaultController;
+use Thelia\Core\HttpFoundation\Request;
 
 /**
  * Class DefaultControllerTest
@@ -40,7 +40,6 @@ class DefaultControllerTest extends ControllerTestBase
         );
 
         $this->getController()->noAction($request);
-
 
         $this->assertEquals($request->attributes->get('_view'), 'foo');
     }

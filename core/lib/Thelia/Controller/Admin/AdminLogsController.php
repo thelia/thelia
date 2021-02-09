@@ -21,7 +21,7 @@ class AdminLogsController extends BaseAdminController
 {
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ADMIN_LOG, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::ADMIN_LOG, [], AccessManager::VIEW)) {
             return $response;
         }
 
@@ -31,17 +31,17 @@ class AdminLogsController extends BaseAdminController
 
     public function loadLoggerAjaxAction()
     {
-        $entries = array();
+        $entries = [];
 
         /** @var AdminLog $entry */
         foreach (AdminLogQuery::getEntries(
-            $this->getRequest()->request->get('admins', array()),
+            $this->getRequest()->request->get('admins', []),
             $this->getRequest()->request->get('fromDate', null),
             $this->getRequest()->request->get('toDate', null),
-            array_merge($this->getRequest()->request->get('resources', array()), $this->getRequest()->request->get('modules', array())),
+            array_merge($this->getRequest()->request->get('resources', []), $this->getRequest()->request->get('modules', [])),
             null
         ) as $entry) {
-            $entries[] = array(
+            $entries[] = [
                 "head" => sprintf(
                     "%s|%s|%s:%s%s",
                     date('Y-m-d H:i:s', $entry->getCreatedAt()->getTimestamp()),
@@ -51,14 +51,14 @@ class AdminLogsController extends BaseAdminController
                     (null !== $entry->getResourceId()) ? ":" . $entry->getResourceId() : ""
                 ),
                 "data" => $entry->getMessage(),
-            );
+            ];
         }
 
         return $this->render(
             'ajax/logger',
-            array(
+            [
                 'entries' => $entries,
-            )
+            ]
         );
     }
 }

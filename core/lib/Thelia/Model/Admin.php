@@ -2,12 +2,11 @@
 
 namespace Thelia\Model;
 
-use Thelia\Core\Security\User\UserInterface;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Security\Role\Role;
+use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Security\User\UserPermissionsTrait;
 use Thelia\Model\Base\Admin as BaseAdmin;
-use Propel\Runtime\Connection\ConnectionInterface;
-
 
 /**
  * Skeleton subclass for representing a row from the 'admin' table.
@@ -22,7 +21,6 @@ use Propel\Runtime\Connection\ConnectionInterface;
  */
 class Admin extends BaseAdmin implements UserInterface
 {
-
     use UserPermissionsTrait;
 
     /**
@@ -83,7 +81,7 @@ class Admin extends BaseAdmin implements UserInterface
      */
     public function getRoles()
     {
-        return array(new Role('ADMIN'));
+        return [new Role('ADMIN')];
     }
 
     /**

@@ -2,11 +2,11 @@
 
 namespace Thelia\Model;
 
-use Propel\Runtime\Exception\PropelException;
-use Thelia\Model\Base\Currency as BaseCurrency;
-use Thelia\Core\Event\TheliaEvents;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\Currency\CurrencyEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Base\Currency as BaseCurrency;
 
 class Currency extends BaseCurrency
 {

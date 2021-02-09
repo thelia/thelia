@@ -22,7 +22,7 @@ use Thelia\Model\OrderProductTax;
 class OrderProductTaxCollection implements \Iterator
 {
     private $position;
-    protected $taxes = array();
+    protected $taxes = [];
 
     public function __construct()
     {
@@ -37,7 +37,6 @@ class OrderProductTaxCollection implements \Iterator
     }
 
     /**
-     * @param OrderProductTax $tax
      *
      * @return OrderProductTaxCollection
      */

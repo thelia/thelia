@@ -2,24 +2,21 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Propel;
+use Thelia\Core\Event\Product\ProductEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Product as BaseProduct;
+use Thelia\Model\Map\ProductTableMap;
+use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
 use Thelia\TaxEngine\Calculator;
-use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Product\ProductEvent;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Propel;
-use Thelia\Model\Map\ProductTableMap;
-
-use Thelia\Model\Tools\PositionManagementTrait;
 
 class Product extends BaseProduct implements FileModelParentInterface
 {
-
-
     use PositionManagementTrait;
 
     use UrlRewritingTrait;
@@ -190,7 +187,6 @@ class Product extends BaseProduct implements FileModelParentInterface
     /**
      * Create a basic product sale element attached to this product.
      *
-     * @param ConnectionInterface $con
      * @param float $weight
      * @param float $basePrice
      * @param float $salePrice

@@ -211,9 +211,9 @@ class ConfigStoreForm extends BaseForm
                 [
                     'required' => false,
                     'constraints' => [
-                        new Constraints\Image(array(
+                        new Constraints\Image([
                             'mimeTypes' => ['image/png', 'image/x-icon']
-                        ))
+                        ])
                     ],
                     'label' => $tr->trans('Favicon image'),
                     'label_attr' => [

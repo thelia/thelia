@@ -23,8 +23,8 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\OrderStatus\OrderStatusModificationForm;
-use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusQuery;
 
 /**
  * Class OrderStatusController
@@ -287,8 +287,7 @@ class OrderStatusController extends AbstractCrudController
             return $this->generateRedirectFromRoute(
                 'admin.order-status.default'
             );
-        } else {
+        }  
             return null;
-        }
     }
 }

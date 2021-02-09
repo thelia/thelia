@@ -17,9 +17,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Thelia\Tools\URL;
-use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\HttpKernel\Exception\RedirectException as ExceptionRedirectException;
+use Thelia\Core\Security\Exception\AuthenticationException;
+use Thelia\Tools\URL;
 
 /**
  * Class RedirectException
@@ -47,7 +47,7 @@ class RedirectException extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::EXCEPTION => array("checkRedirectException", 128),
+            KernelEvents::EXCEPTION => ["checkRedirectException", 128],
         ];
     }
 }

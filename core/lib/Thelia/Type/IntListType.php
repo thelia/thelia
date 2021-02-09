@@ -48,6 +48,6 @@ class IntListType extends BaseType
 
     public function getFormOptions()
     {
-        return array();
+        return [];
     }
 }

@@ -13,12 +13,10 @@ use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\BrandDocument as BaseBrandDocument;
 use Thelia\Model\Breadcrumb\BrandBreadcrumbTrait;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
-
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, FileModelInterface
 {
-
     use PositionManagementTrait;
     use BrandBreadcrumbTrait;
 
@@ -49,9 +47,9 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
-            array(
+            [
                 "brand_id" => $this->getBrandId(),
-            )
+            ]
         );
 
         return true;
@@ -109,7 +107,6 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
     }
 
     /**
-     * @param int $objectId the ID of the object
      *
      * @return string the URL to redirect to after update from the back-office
      */

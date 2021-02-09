@@ -12,11 +12,14 @@
 
 namespace Thelia\Action;
 
+use Imagine\Gd\Imagine;
+use Imagine\Gmagick\Imagine as GmagickImagine;
 use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\Palette\RGB;
 use Imagine\Image\Point;
+use Imagine\Imagick\Imagine as ImagickImagine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Image\ImageEvent;
@@ -25,9 +28,6 @@ use Thelia\Exception\ImageException;
 use Thelia\Files\FileManager;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
-use Imagine\Imagick\Imagine as ImagickImagine;
-use Imagine\Gmagick\Imagine as GmagickImagine;
-use Imagine\Gd\Imagine;
 
 /**
  *
@@ -87,9 +87,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      *
      * This method updates the cache_file_path and file_url attributes of the event
      *
-     * @param ImageEvent $event
      * @param string $eventName
-     * @param EventDispatcherInterface $dispatcher
      *
      * @throws \Thelia\Exception\ImageException
      * @throws \InvalidArgumentException
@@ -180,26 +178,21 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                         $params = explode(':', $effect);
 
                         switch ($params[0]) {
-
                             case 'greyscale':
                             case 'grayscale':
                                 $image->effects()->grayscale();
                                 break;
-
                             case 'negative':
                                 $image->effects()->negative();
                                 break;
-
                             case 'horizontal_flip':
                             case 'hflip':
                                 $image->flipHorizontally();
                                 break;
-
                             case 'vertical_flip':
                             case 'vflip':
                                 $image->flipVertically();
                                 break;
-
                             case 'gamma':
                                 // Syntax: gamma:value. Exemple: gamma:0.7
                                 if (isset($params[1])) {
@@ -208,7 +201,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                                     $image->effects()->gamma($gamma);
                                 }
                                 break;
-
                             case 'colorize':
                                 // Syntax: colorize:couleur. Exemple: colorize:#ff00cc
                                 if (isset($params[1])) {
@@ -217,7 +209,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                                     $image->effects()->colorize($the_color);
                                 }
                                 break;
-
                             case 'blur':
                                 if (isset($params[1])) {
                                     $blur_level = \intval($params[1]);
@@ -241,7 +232,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                     $image->save(
                         $cacheFilePath,
-                        array('quality' => $quality)
+                        ['quality' => $quality]
                     );
                 } else {
                     throw new ImageException(sprintf("Source file %s cannot be opened.", basename($source_file)));
@@ -374,7 +365,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                 return $imagine->create($canvas, $bg_color)
                     ->paste($image, new Point($border_width, $border_height));
-            } elseif ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
+            }
+            if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
                 $image->crop(
                     new Point($delta_x, $delta_y),
                     new Box($dest_width, $dest_height)
@@ -398,11 +390,9 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             case 'imagick':
                 $image = new ImagickImagine();
                 break;
-
             case 'gmagick':
                 $image = new GmagickImagine();
                 break;
-
             case 'gd':
             default:
                 $image = new Imagine();
@@ -416,16 +406,16 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::IMAGE_PROCESS => array("processImage", 128),
+        return [
+            TheliaEvents::IMAGE_PROCESS => ["processImage", 128],
 
             // Implemented in parent class BaseCachedFile
-            TheliaEvents::IMAGE_CLEAR_CACHE => array("clearCache", 128),
-            TheliaEvents::IMAGE_DELETE => array("deleteFile", 128),
-            TheliaEvents::IMAGE_SAVE => array("saveFile", 128),
-            TheliaEvents::IMAGE_UPDATE => array("updateFile", 128),
-            TheliaEvents::IMAGE_UPDATE_POSITION => array("updatePosition", 128),
-            TheliaEvents::IMAGE_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
-        );
+            TheliaEvents::IMAGE_CLEAR_CACHE => ["clearCache", 128],
+            TheliaEvents::IMAGE_DELETE => ["deleteFile", 128],
+            TheliaEvents::IMAGE_SAVE => ["saveFile", 128],
+            TheliaEvents::IMAGE_UPDATE => ["updateFile", 128],
+            TheliaEvents::IMAGE_UPDATE_POSITION => ["updatePosition", 128],
+            TheliaEvents::IMAGE_TOGGLE_VISIBILITY => ["toggleVisibility", 128],
+        ];
     }
 }

@@ -29,15 +29,15 @@ class ProductModificationForm extends ProductCreationForm
         parent::doBuildForm(true);
 
         $this->formBuilder
-            ->add("id", IntegerType::class, array(
+            ->add("id", IntegerType::class, [
                     "label"       => Translator::getInstance()->trans("Prodcut ID *"),
-                    "label_attr"  => array("for" => "product_id_field"),
-                    "constraints" => array(new GreaterThan(array('value' => 0))),
-            ))
-            ->add("template_id", IntegerType::class, array(
+                    "label_attr"  => ["for" => "product_id_field"],
+                    "constraints" => [new GreaterThan(['value' => 0])],
+            ])
+            ->add("template_id", IntegerType::class, [
                     "label"       => Translator::getInstance()->trans("Product template"),
-                    "label_attr"  => array("for" => "product_template_field"),
-            ))
+                    "label_attr"  => ["for" => "product_template_field"],
+            ])
             ->add("brand_id", IntegerType::class, [
                 'constraints' => [ new NotBlank() ],
                 'required'    => true,
@@ -47,14 +47,14 @@ class ProductModificationForm extends ProductCreationForm
                     'help' => Translator::getInstance()->trans("Select the product brand, or supplier."),
                 ],
             ])
-            ->add("virtual_document_id", IntegerType::class, array(
+            ->add("virtual_document_id", IntegerType::class, [
                 "label"      => Translator::getInstance()->trans("Virtual document"),
-                "label_attr" => array("for" => "virtual_document_id_field"),
-            ))
+                "label_attr" => ["for" => "virtual_document_id_field"],
+            ])
         ;
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class
-        $this->addStandardDescFields(array('title', 'locale'));
+        $this->addStandardDescFields(['title', 'locale']);
     }
 
     public function checkDuplicateRef($value, ExecutionContextInterface $context)
@@ -69,7 +69,7 @@ class ProductModificationForm extends ProductCreationForm
             $context->addViolation(
                 Translator::getInstance()->trans(
                     "A product with reference %ref already exists. Please choose another reference.",
-                    array('%ref' => $value)
+                    ['%ref' => $value]
                 )
             );
         }

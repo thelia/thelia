@@ -22,31 +22,31 @@ class ContentCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("title", TextType::class, array(
-                "constraints" => array(
+            ->add("title", TextType::class, [
+                "constraints" => [
                     new NotBlank(),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans('Content title *'),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "title",
-                ),
-            ))
-            ->add("default_folder", IntegerType::class, array(
+                ],
+            ])
+            ->add("default_folder", IntegerType::class, [
                 "label" => Translator::getInstance()->trans("Default folder *"),
-                "constraints" => array(
+                "constraints" => [
                     new NotBlank(),
-                ),
-                "label_attr" => array("for" => "default_folder"),
-            ))
-            ->add("locale", TextType::class, array(
-                "constraints" => array(
+                ],
+                "label_attr" => ["for" => "default_folder"],
+            ])
+            ->add("locale", TextType::class, [
+                "constraints" => [
                     new NotBlank(),
-                ),
-            ))
-            ->add("visible", IntegerType::class, array(
+                ],
+            ])
+            ->add("visible", IntegerType::class, [
                 "label" => Translator::getInstance()->trans("This content is online."),
-                "label_attr" => array("for" => "visible_create"),
-            ))
+                "label_attr" => ["for" => "visible_create"],
+            ])
             ;
     }
 

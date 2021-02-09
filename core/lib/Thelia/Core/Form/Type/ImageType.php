@@ -24,12 +24,12 @@ class ImageType extends AbstractTheliaType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add("i18n", "collection", array(
+            ->add("i18n", "collection", [
                 "type" => "standard_fields",
                 "allow_add" => true,
                 "allow_delete" => true,
                 "cascade_validation" => true,
-            ))
+            ])
         ;
     }
 

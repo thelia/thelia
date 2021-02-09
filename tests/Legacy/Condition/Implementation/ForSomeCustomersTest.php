@@ -77,12 +77,12 @@ class ForSomeCustomersTest extends TestCase
         $stubFacade = $this->generateFacadeStub();
 
         $condition1 = new ForSomeCustomers($stubFacade);
-        $operators = array(
+        $operators = [
             ForSomeCustomers::CUSTOMERS_LIST => Operators::INFERIOR_OR_EQUAL
-        );
-        $values = array(
-            ForSomeCustomers::CUSTOMERS_LIST => array()
-        );
+        ];
+        $values = [
+            ForSomeCustomers::CUSTOMERS_LIST => []
+        ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -105,12 +105,12 @@ class ForSomeCustomersTest extends TestCase
         $stubFacade = $this->generateFacadeStub();
 
         $condition1 = new ForSomeCustomers($stubFacade);
-        $operators = array(
+        $operators = [
             ForSomeCustomers::CUSTOMERS_LIST => Operators::IN
-        );
-        $values = array(
-            ForSomeCustomers::CUSTOMERS_LIST => array()
-        );
+        ];
+        $values = [
+            ForSomeCustomers::CUSTOMERS_LIST => []
+        ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -128,12 +128,12 @@ class ForSomeCustomersTest extends TestCase
         $stubFacade = $this->generateFacadeStub();
 
         $condition1 = new ForSomeCustomers($stubFacade);
-        $operators = array(
+        $operators = [
             ForSomeCustomers::CUSTOMERS_LIST => Operators::IN
-        );
-        $values = array(
-            ForSomeCustomers::CUSTOMERS_LIST => array(10, 20)
-        );
+        ];
+        $values = [
+            ForSomeCustomers::CUSTOMERS_LIST => [10, 20]
+        ];
 
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -157,12 +157,12 @@ class ForSomeCustomersTest extends TestCase
 
         $condition1 = new ForSomeCustomers($stubFacade);
 
-        $operators = array(
+        $operators = [
             ForSomeCustomers::CUSTOMERS_LIST => Operators::IN
-        );
-        $values = array(
-            ForSomeCustomers::CUSTOMERS_LIST => array(50, 60)
-        );
+        ];
+        $values = [
+            ForSomeCustomers::CUSTOMERS_LIST => [50, 60]
+        ];
 
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -180,12 +180,12 @@ class ForSomeCustomersTest extends TestCase
 
         $condition1 = new ForSomeCustomers($stubFacade);
 
-        $operators = array(
+        $operators = [
             ForSomeCustomers::CUSTOMERS_LIST => Operators::IN
-        );
-        $values = array(
-            ForSomeCustomers::CUSTOMERS_LIST => array(50, 60)
-        );
+        ];
+        $values = [
+            ForSomeCustomers::CUSTOMERS_LIST => [50, 60]
+        ];
 
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -250,35 +250,35 @@ class ForSomeCustomersTest extends TestCase
         /** @var FacadeInterface $stubFacade */
         $condition1 = new ForSomeCustomers($stubFacade);
 
-        $operators = array(
+        $operators = [
             ForSomeCustomers::CUSTOMERS_LIST => Operators::IN
-        );
-        $values = array(
-            ForSomeCustomers::CUSTOMERS_LIST => array(50, 60)
-        );
+        ];
+        $values = [
+            ForSomeCustomers::CUSTOMERS_LIST => [50, 60]
+        ];
 
         $condition1->setValidatorsFromForm($operators, $values);
 
         $actual = $condition1->getValidators();
 
-        $validators = array(
-            'inputs' => array(
-                ForSomeCustomers::CUSTOMERS_LIST => array(
-                    'availableOperators' => array(
+        $validators = [
+            'inputs' => [
+                ForSomeCustomers::CUSTOMERS_LIST => [
+                    'availableOperators' => [
                         'in' => 'Price',
                         'out' => 'Price',
-                    ),
+                    ],
                     'value' => '',
                     'selectedOperator' => 'in'
-                )
-            ),
-            'setOperators' => array(
+                ]
+            ],
+            'setOperators' => [
                 'customers' => 'in'
-            ),
-            'setValues' => array(
-                'customers' => array(50, 60)
-            )
-        );
+            ],
+            'setValues' => [
+                'customers' => [50, 60]
+            ]
+        ];
         $expected = $validators;
 
         $this->assertEquals($expected, $actual);

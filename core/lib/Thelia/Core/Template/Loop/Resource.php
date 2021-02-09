@@ -18,11 +18,11 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\Resource as ResourceModel;
 use Thelia\Model\ResourceQuery;
 use Thelia\Type;
-use Thelia\Model\Resource as ResourceModel;
 use Thelia\Type\TypeCollection;
 
 /**
@@ -127,7 +127,6 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @param LoopResult $loopResult
      * @return LoopResult
      * @throws \Propel\Runtime\Exception\PropelException
      */

@@ -36,7 +36,6 @@ interface BaseModuleInterface
      */
     public function update($currentVersion, $newVersion, ConnectionInterface $con = null);
 
-
     /**
      * This method is called just before the deletion of the module, giving the module an opportunity
      * to delete its data.
@@ -59,7 +58,6 @@ interface BaseModuleInterface
      * @param Module $moduleModel the module
      */
     public function deActivate($moduleModel = null);
-
 
     /**
      * This method is called before the module activation, and may prevent it by returning false.
@@ -91,7 +89,6 @@ interface BaseModuleInterface
      * @param ConnectionInterface $con
      */
     public function postDeactivation(ConnectionInterface $con = null);
-
 
     /**
      * Sets a module titles for various languages
@@ -205,21 +202,18 @@ interface BaseModuleInterface
     /**
      * Called on Thelia container configurator to allow module to add their configuration
      *
-     * @param ContainerConfigurator $containerConfigurator
      */
     public static function configureContainer(ContainerConfigurator $containerConfigurator);
 
     /**
      * Called on Thelia services configurator to allow module to add their configuration
      *
-     * @param ServicesConfigurator $servicesConfigurator
      */
     public static function configureServices(ServicesConfigurator $servicesConfigurator);
 
     /**
      * Allow modules to add their configuration to the container
      *
-     * @param ContainerBuilder $containerBuilder
      */
     public static function loadConfiguration(ContainerBuilder $containerBuilder);
 

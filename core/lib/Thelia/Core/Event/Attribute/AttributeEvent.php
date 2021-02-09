@@ -20,7 +20,7 @@ use Thelia\Model\Attribute;
  */
 class AttributeEvent extends ActionEvent
 {
-    protected $attribute = null;
+    protected $attribute;
 
     public function __construct(Attribute $attribute = null)
     {

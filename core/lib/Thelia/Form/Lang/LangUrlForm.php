@@ -52,17 +52,16 @@ class LangUrlForm extends BaseForm
             $this->formBuilder->add(
                 self::LANG_PREFIX.$lang->getId(),
                 TextType::class,
-                array(
-                    'constraints' => array(
+                [
+                    'constraints' => [
                         new NotBlank(),
-                    ),
-                    "attr" => array(
+                    ],
+                    "attr" => [
                         "tag" => "url",
                         "url_id" => $lang->getId(),
                         "url_title" => $lang->getTitle(),
-                    ),
-
-                )
+                    ],
+                ]
             );
         }
     }

@@ -40,7 +40,6 @@ abstract class AbstractAdminResourcesCompiler implements CompilerPassInterface
 
     /**
      * Allow module to add resources in AdminResources Service
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      */
     public function process(\Symfony\Component\DependencyInjection\ContainerBuilder $container)
     {

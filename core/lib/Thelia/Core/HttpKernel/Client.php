@@ -12,9 +12,9 @@
 
 namespace Thelia\Core\HttpKernel;
 
+use Symfony\Component\BrowserKit\Request as DomRequest;
 use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Thelia\Core\HttpFoundation\Request;
-use Symfony\Component\BrowserKit\Request as DomRequest;
 
 /**
  * Class Client

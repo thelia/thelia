@@ -21,10 +21,9 @@ use Thelia\Model\Order;
 class OrderProductEvent extends OrderEvent
 {
     /** @var int */
-    protected $id = null;
+    protected $id;
 
     /**
-     * @param Order $order
      * @param int $id order product id
      */
     public function __construct(Order $order, $id)

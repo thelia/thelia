@@ -32,7 +32,6 @@ use Thelia\Tools\URL;
  */
 class RewritingRouterTest extends TestCase
 {
-
     public static function setUpBeforeClass(): void
     {
         $url = new URL();

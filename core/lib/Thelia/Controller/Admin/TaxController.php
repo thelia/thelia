@@ -93,13 +93,13 @@ class TaxController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
-        $data = array(
+        $data = [
             'id'           => $object->getId(),
             'locale'       => $object->getLocale(),
             'title'        => $object->getTitle(),
             'description'  => $object->getDescription(),
             'type'         => Tax::escapeTypeName($object->getType()),
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(
@@ -146,21 +146,21 @@ class TaxController extends AbstractCrudController
 
     protected function getViewArguments()
     {
-        return array();
+        return [];
     }
 
     protected function getRouteArguments($tax_id = null)
     {
-        return array(
+        return [
             'tax_id' => $tax_id === null ? $this->getRequest()->get('tax_id') : $tax_id,
-        );
+        ];
     }
 
     protected function renderListTemplate($currentOrder)
     {
         return $this->render(
             'taxes-rules',
-            array()
+            []
         );
     }
 
@@ -201,7 +201,7 @@ class TaxController extends AbstractCrudController
 
     protected function getRequirements($type, $formData)
     {
-        $requirements = array();
+        $requirements = [];
         foreach ($formData as $data => $value) {
             if (!strstr($data, ':')) {
                 continue;

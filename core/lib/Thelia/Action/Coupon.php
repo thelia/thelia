@@ -85,7 +85,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon
       * @param $eventName
-      * @param EventDispatcherInterface $dispatcher
      */
     public function create(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -99,7 +98,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function update(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -131,7 +129,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon condition
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function updateCondition(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -143,16 +140,14 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     /**
      * Clear all coupons in session.
      *
-     * @param Event $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function clearAllCoupons(Event $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         // Tell coupons to clear any data they may have stored
         $this->couponManager->clear();
 
-        $this->getSession()->setConsumedCoupons(array());
+        $this->getSession()->setConsumedCoupons([]);
 
         $this->updateOrderDiscount($event, $eventName, $dispatcher);
     }
@@ -162,7 +157,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      *
      * @param CouponConsumeEvent $event Event consuming Coupon
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function consume(CouponConsumeEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -215,7 +209,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      *
      * @param CouponModel               $coupon Model to save
      * @param CouponCreateOrUpdateEvent $event  Event containing data
-     * @param EventDispatcherInterface $dispatcher
      */
     protected function createOrUpdate(CouponModel $coupon, CouponCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher)
     {
@@ -260,7 +253,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      *
      * @param CouponModel               $coupon Model to save
      * @param CouponCreateOrUpdateEvent $event  Event containing data
-     * @param EventDispatcherInterface $dispatcher
      */
     protected function createOrUpdateCondition(CouponModel $coupon, CouponCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher)
     {
@@ -276,7 +268,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function testFreePostage(OrderEvent $event)
     {
@@ -292,11 +283,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\Order\OrderEvent $event
      *
      * @throws \Exception if something goes wrong.
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function afterOrder(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -381,9 +370,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * Cancels order coupons usage when order is canceled or refunded,
      * or use canceled coupons again if the order is no longer canceled or refunded
      *
-     * @param OrderEvent $event
      * @param string $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -434,21 +421,21 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::COUPON_CREATE => array("create", 128),
-            TheliaEvents::COUPON_UPDATE => array("update", 128),
-            TheliaEvents::COUPON_DELETE => array("delete", 128),
-            TheliaEvents::COUPON_CONSUME => array("consume", 128),
-            TheliaEvents::COUPON_CLEAR_ALL => array("clearAllCoupons", 128),
-            TheliaEvents::COUPON_CONDITION_UPDATE => array("updateCondition", 128),
-            TheliaEvents::ORDER_SET_POSTAGE => array("testFreePostage", 132),
-            TheliaEvents::ORDER_BEFORE_PAYMENT => array("afterOrder", 128),
-            TheliaEvents::ORDER_UPDATE_STATUS => array("orderStatusChange", 10),
-            TheliaEvents::CART_ADDITEM => array("updateOrderDiscount", 10),
-            TheliaEvents::CART_UPDATEITEM => array("updateOrderDiscount", 10),
-            TheliaEvents::CART_DELETEITEM => array("updateOrderDiscount", 10),
-            TheliaEvents::CUSTOMER_LOGIN => array("updateOrderDiscount", 10)
-        );
+        return [
+            TheliaEvents::COUPON_CREATE => ["create", 128],
+            TheliaEvents::COUPON_UPDATE => ["update", 128],
+            TheliaEvents::COUPON_DELETE => ["delete", 128],
+            TheliaEvents::COUPON_CONSUME => ["consume", 128],
+            TheliaEvents::COUPON_CLEAR_ALL => ["clearAllCoupons", 128],
+            TheliaEvents::COUPON_CONDITION_UPDATE => ["updateCondition", 128],
+            TheliaEvents::ORDER_SET_POSTAGE => ["testFreePostage", 132],
+            TheliaEvents::ORDER_BEFORE_PAYMENT => ["afterOrder", 128],
+            TheliaEvents::ORDER_UPDATE_STATUS => ["orderStatusChange", 10],
+            TheliaEvents::CART_ADDITEM => ["updateOrderDiscount", 10],
+            TheliaEvents::CART_UPDATEITEM => ["updateOrderDiscount", 10],
+            TheliaEvents::CART_DELETEITEM => ["updateOrderDiscount", 10],
+            TheliaEvents::CUSTOMER_LOGIN => ["updateOrderDiscount", 10]
+        ];
     }
 
     /**

@@ -120,9 +120,7 @@ class Cart extends BaseCart
      *
      * /!\ The postage amount is not available so it's the total with or without discount an without postage
      *
-     * @param  Country      $country
      * @param bool $withDiscount
-     * @param  State|null   $state
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -147,8 +145,6 @@ class Cart extends BaseCart
 
     /**
      * @param bool $withDiscount
-     * @param Country|null $country
-     * @param State|null $state
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      * @see getTaxedAmount same as this method but the amount is without taxes

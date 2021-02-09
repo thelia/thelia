@@ -44,7 +44,6 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
     protected $timestampable = true;
 
     /**
-     * @param LoopResult $loopResult
      * @return LoopResult
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -90,7 +89,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
         /** @var \Thelia\Model\ImportQuery|\Thelia\Model\ExportQUery $query */
         $query = $this->getQueryModel();
 
-        $this->configureI18nProcessing($query, array('TITLE', 'DESCRIPTION'));
+        $this->configureI18nProcessing($query, ['TITLE', 'DESCRIPTION']);
 
         if (null !== $ids = $this->getId()) {
             $query->filterById($ids);

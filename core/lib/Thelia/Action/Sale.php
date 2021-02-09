@@ -26,9 +26,9 @@ use Thelia\Core\Event\Sale\SaleDeleteEvent;
 use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\Country as CountryModel;
 use Thelia\Model\Map\SaleTableMap;
+use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Sale as SaleModel;
@@ -55,7 +55,6 @@ class Sale extends BaseAction implements EventSubscriberInterface
      * @param int                 $offsetType           the offset type, see SaleModel::OFFSET_* constants
      * @param Calculator          $taxCalculator        the tax calculator
      * @param array               $saleOffsetByCurrency an array of price offset for each currency (currency ID => offset_amount)
-     * @param ConnectionInterface $con
      * @throws PropelException
      */
     protected function updateProductSaleElementsPrices($pseList, $promoStatus, $offsetType, Calculator $taxCalculator, $saleOffsetByCurrency, ConnectionInterface $con)
@@ -85,11 +84,9 @@ class Sale extends BaseAction implements EventSubscriberInterface
                         case SaleModel::OFFSET_TYPE_AMOUNT:
                             $promoPrice = max(0, $priceWithTax - $offset);
                             break;
-
                         case SaleModel::OFFSET_TYPE_PERCENTAGE:
                             $promoPrice = $priceWithTax * (1 - $offset / 100);
                             break;
-
                         default:
                             $promoPrice = $priceWithTax;
                     }
@@ -108,7 +105,6 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Update the promo status of the sale's selected products and combinations
      *
-     * @param  ProductSaleStatusUpdateEvent              $event
      * @throws \RuntimeException
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
@@ -190,7 +186,6 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new Sale
      *
-     * @param SaleCreateEvent $event
      */
     public function create(SaleCreateEvent $event)
     {
@@ -209,9 +204,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Process update sale
      *
-     * @param  SaleUpdateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws PropelException
      */
     public function update(SaleUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -311,9 +304,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Toggle Sale activity
      *
-     * @param SaleToggleActivityEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function toggleActivity(SaleToggleActivityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -347,9 +338,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a sale
      *
-     * @param  SaleDeleteEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function delete(SaleDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -386,7 +375,6 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Clear all sales
      *
-     * @param  SaleClearStatusEvent $event
      * @throws \Exception
      */
     public function clearStatus(/** @noinspection PhpUnusedParameterInspection */ SaleClearStatusEvent $event)
@@ -418,9 +406,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
      * This method check the activation and deactivation dates of sales, and perform
      * the required action depending on the current date.
      *
-     * @param  SaleActiveStatusCheckEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function checkSaleActivation(SaleActiveStatusCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -478,18 +464,18 @@ class Sale extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::SALE_CREATE     => array('create', 128),
-            TheliaEvents::SALE_UPDATE     => array('update', 128),
-            TheliaEvents::SALE_DELETE     => array('delete', 128),
+        return [
+            TheliaEvents::SALE_CREATE     => ['create', 128],
+            TheliaEvents::SALE_UPDATE     => ['update', 128],
+            TheliaEvents::SALE_DELETE     => ['delete', 128],
 
-            TheliaEvents::SALE_TOGGLE_ACTIVITY => array('toggleActivity', 128),
+            TheliaEvents::SALE_TOGGLE_ACTIVITY => ['toggleActivity', 128],
 
-            TheliaEvents::SALE_CLEAR_SALE_STATUS => array('clearStatus', 128),
+            TheliaEvents::SALE_CLEAR_SALE_STATUS => ['clearStatus', 128],
 
-            TheliaEvents::UPDATE_PRODUCT_SALE_STATUS => array('updateProductsSaleStatus', 128),
+            TheliaEvents::UPDATE_PRODUCT_SALE_STATUS => ['updateProductsSaleStatus', 128],
 
-            TheliaEvents::CHECK_SALE_ACTIVATION_EVENT => array('checkSaleActivation', 128),
-        );
+            TheliaEvents::CHECK_SALE_ACTIVATION_EVENT => ['checkSaleActivation', 128],
+        ];
     }
 }

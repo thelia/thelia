@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Add responsive class to images' => 'Добавить адаптивный класс к изображениям',
     'Custom CSS available in the editor' => 'Пользовательский CSS доступный в редакторе',
     'Enter CSS or LESS code. You may also customize the editor.less file in the plugin template directory.' => 'Введите CSS или LESS код. Вы так же можете настроить файл editor.less file в директории шаблона плагина.',
@@ -13,4 +13,4 @@ return array(
     'Show the TinyMCE menu bar' => 'Показывать панель меню TinyMCE',
     'This is a sample text editor, to view actual configuration.' => 'Это пример редактора с актуальной конфигурацией.',
     'Tinymce configuration' => 'Конфигурация Tinymce',
-);
+];

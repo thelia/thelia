@@ -13,18 +13,20 @@
 namespace Thelia\Core\DependencyInjection\Loader;
 
 use Propel\Runtime\Propel;
+use SimpleXMLElement;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ReferenceConfigurator;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ReferenceConfigurator;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Thelia\Core\Thelia;
 use Thelia\Log\Tlog;
 use Thelia\Model\Export;
@@ -39,8 +41,6 @@ use Thelia\Model\Map\ExportCategoryTableMap;
 use Thelia\Model\Map\ExportTableMap;
 use Thelia\Model\Map\ImportCategoryTableMap;
 use Thelia\Model\Map\ImportTableMap;
-use Symfony\Component\ExpressionLanguage\Expression;
-use SimpleXMLElement;
 
 /**
  *
@@ -123,7 +123,7 @@ class XmlFileLoader extends FileLoader
         try {
             $commandConfig = $this->container->getParameter("command.definition");
         } catch (ParameterNotFoundException $e) {
-            $commandConfig = array();
+            $commandConfig = [];
         }
 
         foreach ($commands as $command) {
@@ -136,7 +136,6 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses parameters
      *
-     * @param SimpleXMLElement $xml
      */
     protected function parseParameters(SimpleXMLElement $xml)
     {
@@ -151,7 +150,6 @@ class XmlFileLoader extends FileLoader
      *
      * parse Loops property
      *
-     * @param SimpleXMLElement $xml
      */
     protected function parseLoops(SimpleXMLElement $xml)
     {
@@ -161,7 +159,7 @@ class XmlFileLoader extends FileLoader
         try {
             $loopConfig = $this->container->getParameter("Thelia.parser.loops");
         } catch (ParameterNotFoundException $e) {
-            $loopConfig = array();
+            $loopConfig = [];
         }
 
         foreach ($loops as $loop) {
@@ -180,7 +178,7 @@ class XmlFileLoader extends FileLoader
         try {
             $formConfig = $this->container->getParameter("Thelia.parser.forms");
         } catch (ParameterNotFoundException $e) {
-            $formConfig = array();
+            $formConfig = [];
         }
 
         foreach ($forms as $form) {
@@ -193,7 +191,6 @@ class XmlFileLoader extends FileLoader
     /**
      * parse Filters property
      *
-     * @param SimpleXMLElement $xml
      */
     protected function parseFilters(SimpleXMLElement $xml)
     {
@@ -203,7 +200,7 @@ class XmlFileLoader extends FileLoader
         try {
             $filterConfig = $this->container->getParameter("Thelia.parser.filters");
         } catch (ParameterNotFoundException $e) {
-            $filterConfig = array();
+            $filterConfig = [];
         }
 
         foreach ($filters as $filter) {
@@ -216,7 +213,6 @@ class XmlFileLoader extends FileLoader
     /**
      * parse BaseParams property
      *
-     * @param SimpleXMLElement $xml
      */
     protected function parseTemplateDirectives(SimpleXMLElement $xml)
     {
@@ -226,7 +222,7 @@ class XmlFileLoader extends FileLoader
         try {
             $baseParamConfig = $this->container->getParameter("Thelia.parser.templateDirectives");
         } catch (ParameterNotFoundException $e) {
-            $baseParamConfig = array();
+            $baseParamConfig = [];
         }
 
         foreach ($baseParams as $baseParam) {
@@ -239,7 +235,6 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses multiple definitions
      *
-     * @param SimpleXMLElement $xml
      * @param string           $file
      */
     protected function parseDefinitions(SimpleXMLElement $xml, $file)
@@ -263,7 +258,6 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses multiple definitions
      *
-     * @param SimpleXMLElement $xml
      * @param string           $file
      * @param string           $type
      */
@@ -324,7 +318,7 @@ class XmlFileLoader extends FileLoader
             $definition = new Definition();
         }
 
-        foreach (array('class', 'shared', 'scope', 'public', 'factory', 'synthetic', 'abstract') as $key) {
+        foreach (['class', 'shared', 'scope', 'public', 'factory', 'synthetic', 'abstract'] as $key) {
             if (isset($service[$key])) {
                 $method = 'set'.str_replace('-', '', $key);
                 $definition->$method((string) $this->getAttributeAsPhp($service, $key));
@@ -351,7 +345,7 @@ class XmlFileLoader extends FileLoader
                     $class = (string) $service->configurator['class'];
                 }
 
-                $definition->setConfigurator(array($class, (string) $service->configurator['method']));
+                $definition->setConfigurator([$class, (string) $service->configurator['method']]);
             }
         }
 
@@ -360,7 +354,7 @@ class XmlFileLoader extends FileLoader
         }
 
         foreach ($service->tag as $tag) {
-            $parameters = array();
+            $parameters = [];
             foreach ($tag->attributes() as $name => $value) {
                 if ('name' === $name) {
                     continue;
@@ -637,7 +631,7 @@ class XmlFileLoader extends FileLoader
     protected function parseFile($file)
     {
         try {
-            $dom = XmlUtils::loadFile($file, array($this, 'validateSchema'));
+            $dom = XmlUtils::loadFile($file, [$this, 'validateSchema']);
         } catch (\InvalidArgumentException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
@@ -648,7 +642,6 @@ class XmlFileLoader extends FileLoader
     /**
      * Validates a documents XML schema.
      *
-     * @param \DOMDocument $dom
      *
      * @return Boolean
      *
@@ -656,9 +649,9 @@ class XmlFileLoader extends FileLoader
      */
     public function validateSchema(\DOMDocument $dom)
     {
-        $schemaLocations = array('http://thelia.net/schema/dic/config' => str_replace('\\', '/', __DIR__.'/schema/dic/config/thelia-1.0.xsd'));
+        $schemaLocations = ['http://thelia.net/schema/dic/config' => str_replace('\\', '/', __DIR__.'/schema/dic/config/thelia-1.0.xsd')];
 
-        $tmpfiles = array();
+        $tmpfiles = [];
         $imports = '';
         foreach ($schemaLocations as $namespace => $location) {
             $parts = explode('/', $location);
@@ -714,14 +707,13 @@ EOF
     /**
      * Returns arguments as valid PHP types.
      *
-     * @param SimpleXMLElement $xml
      * @param $name
      * @param bool $lowercase
      * @return array
      */
     private function getArgumentsAsPhp(SimpleXMLElement $xml, $name, $lowercase = true)
     {
-        $arguments = array();
+        $arguments = [];
         foreach ($xml->$name as $arg) {
             if (isset($arg['name'])) {
                 $arg['key'] = (string) $arg['name'];
@@ -766,7 +758,7 @@ EOF
                     $arguments[$key] = (string) $arg;
                     break;
                 case 'constant':
-                    $arguments[$key] = constant((string) $arg);
+                    $arguments[$key] = \constant((string) $arg);
                     break;
                 default:
                     $arguments[$key] = XmlUtils::phpize($arg);
@@ -804,9 +796,7 @@ EOF
     /**
      * Converts an attribute as a PHP type.
      *
-     * @param SimpleXMLElement $xml
      * @param $name
-     * @return mixed
      */
     public function getAttributeAsPhp(SimpleXMLElement $xml, $name)
     {

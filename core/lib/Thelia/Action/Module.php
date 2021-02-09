@@ -158,13 +158,10 @@ class Module extends BaseAction implements EventSubscriberInterface
         return true;
     }
 
-
     /**
      * Get dependencies of the current module and activate it if needed
      *
-     * @param ModuleToggleActivationEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function recursiveActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -186,9 +183,7 @@ class Module extends BaseAction implements EventSubscriberInterface
     /**
      * Get modules having current module in dependence and deactivate it if needed
      *
-     * @param ModuleToggleActivationEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function recursiveDeactivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -295,9 +290,7 @@ class Module extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param ModuleEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function update(ModuleEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -317,9 +310,7 @@ class Module extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\Module\ModuleInstallEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      *
      * @throws \Exception
      * @throws \Symfony\Component\Filesystem\Exception\IOException
@@ -394,7 +385,6 @@ class Module extends BaseAction implements EventSubscriberInterface
     /**
      * Call the payment method of the payment module of the given order
      *
-     * @param OrderPaymentEvent $event
      *
      * @throws \RuntimeException if no payment module can be found.
      */
@@ -427,9 +417,7 @@ class Module extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param UpdatePositionEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {

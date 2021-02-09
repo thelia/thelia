@@ -14,15 +14,15 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\CategoryQuery;
-use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
-use Thelia\Core\Template\Element\BaseI18nLoop;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -55,11 +55,11 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
             Argument::createIntTypeArgument('depth', PHP_INT_MAX),
             Argument::createBooleanTypeArgument('need_count_child', false),
             Argument::createBooleanOrBothTypeArgument('visible', true, false),
-            Argument::createIntListTypeArgument('exclude', array()),
+            Argument::createIntListTypeArgument('exclude', []),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('position', 'position_reverse', 'id', 'id_reverse', 'alpha', 'alpha_reverse'))
+                    new Type\EnumListType(['position', 'position_reverse', 'id', 'id_reverse', 'alpha', 'alpha_reverse'])
                 ),
                 'position'
             )
@@ -74,7 +74,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
         }
 
         $search = CategoryQuery::create();
-        $this->configureI18nProcessing($search, array('TITLE'));
+        $this->configureI18nProcessing($search, ['TITLE']);
 
         $search->filterByParent($parent);
 
@@ -116,7 +116,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
         $needCountChild = $this->getNeedCountChild();
 
         foreach ($results as $result) {
-            $row = array(
+            $row = [
                 "ID" => $result->getId(),
                 "TITLE" => $result->getVirtualColumn('i18n_TITLE'),
                 "PARENT" => $result->getParent(),
@@ -124,7 +124,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
                 "VISIBLE" => $result->getVisible() ? "1" : "0",
                 "LEVEL" => $level,
                 'PREV_LEVEL' => $previousLevel,
-            );
+            ];
 
             if ($needCountChild) {
                 $row['CHILD_COUNT'] = $result->countChild();
@@ -158,7 +158,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
         $visible = $this->getVisible();
         $exclude = $this->getExclude();
 
-        $resultsList = array();
+        $resultsList = [];
 
         $this->buildCategoryTree($id, $visible, 0, 0, $depth, $exclude, $resultsList);
 

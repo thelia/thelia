@@ -20,7 +20,7 @@ use Thelia\Model\Config;
  */
 class ConfigEvent extends ActionEvent
 {
-    protected $config = null;
+    protected $config;
 
     public function __construct(Config $config = null)
     {

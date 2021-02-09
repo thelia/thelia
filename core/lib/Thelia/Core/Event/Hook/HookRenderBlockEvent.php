@@ -53,7 +53,6 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
     /**
      * Add a new fragment
      *
-     * @param  \Thelia\Core\Hook\Fragment $fragment
      * @return $this
      */
     public function addFragment(Fragment $fragment)
@@ -85,7 +84,6 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
     }
 
     /**
-     * @param array $fields
      */
     public function setFields(array $fields)
     {

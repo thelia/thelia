@@ -24,7 +24,7 @@ class EnumListTypeTest extends TestCase
 {
     public function testEnumListType()
     {
-        $enumListType = new EnumListType(array("cat", "dog", "frog"));
+        $enumListType = new EnumListType(["cat", "dog", "frog"]);
         $this->assertTrue($enumListType->isValid('cat'));
         $this->assertTrue($enumListType->isValid('cat,dog'));
         $this->assertFalse($enumListType->isValid('potato'));
@@ -33,8 +33,8 @@ class EnumListTypeTest extends TestCase
 
     public function testFormatEnumListType()
     {
-        $enumListType = new EnumListType(array("cat", "dog", "frog"));
-        $this->assertTrue(is_array($enumListType->getFormattedValue('cat,dog')));
+        $enumListType = new EnumListType(["cat", "dog", "frog"]);
+        $this->assertTrue(\is_array($enumListType->getFormattedValue('cat,dog')));
         $this->assertNull($enumListType->getFormattedValue('cat,monkey'));
     }
 }

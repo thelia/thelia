@@ -17,19 +17,19 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\Feature as FeatureModel;
 use Thelia\Model\FeatureI18nQuery;
 use Thelia\Model\FeatureQuery;
+use Thelia\Model\FeatureTemplateQuery;
+use Thelia\Model\Map\FeatureTemplateTableMap;
 use Thelia\Model\Product as ProductModel;
 use Thelia\Model\ProductQuery;
-use Thelia\Type\TypeCollection;
+use Thelia\Model\TemplateQuery;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
-use Thelia\Model\FeatureTemplateQuery;
-use Thelia\Model\TemplateQuery;
-use Thelia\Model\Map\FeatureTemplateTableMap;
-use Thelia\Model\Feature as FeatureModel;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -71,7 +71,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha-reverse', 'manual', 'manual_reverse'))
+                    new Type\EnumListType(['id', 'id_reverse', 'alpha', 'alpha-reverse', 'manual', 'manual_reverse'])
                 ),
                 'manual'
             ),
@@ -229,7 +229,6 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @param LoopResult $loopResult
      * @return LoopResult
      * @throws \Propel\Runtime\Exception\PropelException
      */

@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Tests\Tools\Version;
 
 use PHPUnit\Framework\TestCase;

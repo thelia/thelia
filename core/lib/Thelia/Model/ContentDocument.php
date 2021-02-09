@@ -15,12 +15,10 @@ use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\ContentDocument as BaseContentDocument;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\FolderBreadcrumbTrait;
-
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class ContentDocument extends BaseContentDocument implements BreadcrumbInterface, FileModelInterface
 {
-
     use PositionManagementTrait;
     use FolderBreadcrumbTrait;
 
@@ -69,9 +67,9 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
-            array(
+            [
                 "content_id" => $this->getContentId(),
-            )
+            ]
         );
 
         return true;
@@ -119,7 +117,6 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
     }
 
     /**
-     * @param int $objectId the ID of the object
      *
      * @return string the URL to redirect to after update from the back-office
      */

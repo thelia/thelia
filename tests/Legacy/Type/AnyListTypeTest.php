@@ -35,7 +35,7 @@ class AnyListTypeTest extends TestCase
 
         $anyListFormat = $anyListType->getFormattedValue('string_1,string_2,string_3');
 
-        $this->assertTrue(is_array($anyListFormat));
+        $this->assertTrue(\is_array($anyListFormat));
         $this->assertCount(3, $anyListFormat);
         $this->assertEquals($anyListFormat[1], 'string_2');
     }
@@ -54,7 +54,7 @@ class AnyListTypeTest extends TestCase
 
         $result = $anyListType->getFormattedValue('foo');
 
-        $this->assertTrue(is_array($result));
+        $this->assertTrue(\is_array($result));
         $this->assertCount(1, $result);
         $this->assertEquals('foo', $result[0]);
     }

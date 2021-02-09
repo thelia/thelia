@@ -73,7 +73,6 @@ class ModuleDeleteEvent extends ModuleEvent
     }
 
     /**
-     * @param boolean $recursive
      * @return $this;
      */
     public function setAssumeDelete($assume_delete)

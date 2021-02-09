@@ -14,14 +14,14 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Model\AttributeQuery;
-use Thelia\Model\Attribute as AttributeModel;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Attribute\AttributeUpdateEvent;
 use Thelia\Core\Event\Attribute\AttributeCreateEvent;
 use Thelia\Core\Event\Attribute\AttributeDeleteEvent;
-use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\Attribute\AttributeEvent;
+use Thelia\Core\Event\Attribute\AttributeUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Model\Attribute as AttributeModel;
+use Thelia\Model\AttributeQuery;
 use Thelia\Model\AttributeTemplate;
 use Thelia\Model\AttributeTemplateQuery;
 use Thelia\Model\TemplateQuery;
@@ -31,9 +31,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new attribute entry
      *
-     * @param AttributeCreateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function create(AttributeCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -56,9 +54,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     /**
      * Change a product attribute
      *
-     * @param AttributeUpdateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function update(AttributeUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -79,9 +75,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product attribute entry
      *
-     * @param AttributeDeleteEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function delete(AttributeDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -97,9 +91,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param UpdatePositionEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -139,15 +131,14 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::ATTRIBUTE_CREATE          => array("create", 128),
-            TheliaEvents::ATTRIBUTE_UPDATE          => array("update", 128),
-            TheliaEvents::ATTRIBUTE_DELETE          => array("delete", 128),
-            TheliaEvents::ATTRIBUTE_UPDATE_POSITION => array("updatePosition", 128),
+        return [
+            TheliaEvents::ATTRIBUTE_CREATE          => ["create", 128],
+            TheliaEvents::ATTRIBUTE_UPDATE          => ["update", 128],
+            TheliaEvents::ATTRIBUTE_DELETE          => ["delete", 128],
+            TheliaEvents::ATTRIBUTE_UPDATE_POSITION => ["updatePosition", 128],
 
-            TheliaEvents::ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES => array("removeFromAllTemplates", 128),
-            TheliaEvents::ATTRIBUTE_ADD_TO_ALL_TEMPLATES      => array("addToAllTemplates", 128),
-
-        );
+            TheliaEvents::ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES => ["removeFromAllTemplates", 128],
+            TheliaEvents::ATTRIBUTE_ADD_TO_ALL_TEMPLATES      => ["addToAllTemplates", 128],
+        ];
     }
 }

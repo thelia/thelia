@@ -32,25 +32,25 @@ class OrderController extends BaseAdminController
 {
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::VIEW)) {
             return $response;
         }
-        return $this->render("orders", array(
+        return $this->render("orders", [
                 "display_order" => 20,
                 "orders_order"   => $this->getListOrderFromSession("orders", "orders_order", "create-date-reverse")
-            ));
+            ]);
     }
 
     public function viewAction($order_id)
     {
-        return $this->render("order-edit", array(
+        return $this->render("order-edit", [
             "order_id" => $order_id
-        ));
+        ]);
     }
 
     public function updateStatus($order_id = null)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -81,7 +81,7 @@ class OrderController extends BaseAdminController
             $message = $e->getMessage();
         }
 
-        $params = array();
+        $params = [];
 
         if ($message) {
             $params["update_status_error_message"] = $message;
@@ -109,7 +109,7 @@ class OrderController extends BaseAdminController
 
     public function updateDeliveryRef($order_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -132,7 +132,7 @@ class OrderController extends BaseAdminController
             $message = $e->getMessage();
         }
 
-        $params = array();
+        $params = [];
 
         if ($message) {
             $params["update_status_error_message"] = $message;
@@ -149,7 +149,7 @@ class OrderController extends BaseAdminController
 
     public function updateAddress($order_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -195,7 +195,7 @@ class OrderController extends BaseAdminController
             $message = $e->getMessage();
         }
 
-        $params = array();
+        $params = [];
 
         if ($message) {
             $params["update_status_error_message"] = $message;
@@ -212,7 +212,7 @@ class OrderController extends BaseAdminController
 
     public function generateInvoicePdf($order_id, $browser)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) {
             return $response;
         }
         return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'), $browser == 0);
@@ -220,7 +220,7 @@ class OrderController extends BaseAdminController
 
     public function generateDeliveryPdf($order_id, $browser)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, [], AccessManager::UPDATE)) {
             return $response;
         }
         return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'), $browser == 0);

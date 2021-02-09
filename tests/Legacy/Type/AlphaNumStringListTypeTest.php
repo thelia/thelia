@@ -32,12 +32,12 @@ class AlphaNumStringListTypeTest extends TestCase
     public function testFormatAlphaNumStringListType()
     {
         $type = new AlphaNumStringListType();
-        $this->assertTrue(is_array($type->getFormattedValue('FOO1,FOO_2,FOO-3')));
+        $this->assertTrue(\is_array($type->getFormattedValue('FOO1,FOO_2,FOO-3')));
         $this->assertNull($type->getFormattedValue('5€'));
 
         $result = $type->getFormattedValue('FOO');
 
-        $this->assertTrue(is_array($result));
+        $this->assertTrue(\is_array($result));
         $this->assertCount(1, $result);
     }
 }

@@ -2,13 +2,11 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\Base\FeatureTemplate as BaseFeatureTemplate;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Model\Base\FeatureTemplate as BaseFeatureTemplate;
 
 class FeatureTemplate extends BaseFeatureTemplate
 {
-
-
     use \Thelia\Model\Tools\PositionManagementTrait;
 
     /**

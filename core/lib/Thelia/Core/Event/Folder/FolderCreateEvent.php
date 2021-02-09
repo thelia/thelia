@@ -25,7 +25,6 @@ class FolderCreateEvent extends FolderEvent
     protected $visible;
 
     /**
-     * @param mixed $locale
      *
      * @return $this
      */
@@ -37,7 +36,6 @@ class FolderCreateEvent extends FolderEvent
     }
 
     /**
-     * @return mixed
      */
     public function getLocale()
     {
@@ -45,7 +43,6 @@ class FolderCreateEvent extends FolderEvent
     }
 
     /**
-     * @param mixed $parent
      *
      *
      * @return $this
@@ -58,7 +55,6 @@ class FolderCreateEvent extends FolderEvent
     }
 
     /**
-     * @return mixed
      */
     public function getParent()
     {
@@ -66,7 +62,6 @@ class FolderCreateEvent extends FolderEvent
     }
 
     /**
-     * @param mixed $title
      *
      * @return $this
      */
@@ -78,7 +73,6 @@ class FolderCreateEvent extends FolderEvent
     }
 
     /**
-     * @return mixed
      */
     public function getTitle()
     {
@@ -86,7 +80,6 @@ class FolderCreateEvent extends FolderEvent
     }
 
     /**
-     * @param mixed $visible
      *
      * @return $this
      */
@@ -98,7 +91,6 @@ class FolderCreateEvent extends FolderEvent
     }
 
     /**
-     * @return mixed
      */
     public function getVisible()
     {

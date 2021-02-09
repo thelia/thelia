@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Customer Number' => 'Номер клиента',
     'DELIVERY' => 'ДОСТАВКА',
     'Delivery address' => 'Адрес доставки',
@@ -26,4 +26,4 @@ return array(
     'Unit. price' => 'Цена ед.',
     'page' => 'страница',
     'product' => 'товар',
-);
+];

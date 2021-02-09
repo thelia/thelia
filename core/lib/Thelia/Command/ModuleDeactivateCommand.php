@@ -15,8 +15,8 @@ namespace Thelia\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Thelia\Action\Module;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
@@ -73,7 +73,6 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
             throw new \RuntimeException(sprintf("module %s is already deactivated", $moduleCode));
         }
 
-
         try {
             $event = new ModuleToggleActivationEvent($module->getId());
 
@@ -95,11 +94,11 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
 
         //impossible to change output class in CommandTester...
         if (method_exists($output, "renderBlock")) {
-            $output->renderBlock(array(
+            $output->renderBlock([
                 '',
                 sprintf("Deactivation succeed for module %s", $moduleCode),
                 ''
-            ), "bg=green;fg=black");
+            ], "bg=green;fg=black");
         }
 
         return 0;

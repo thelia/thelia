@@ -11,11 +11,11 @@ use Propel\Runtime\Propel;
 use Symfony\Component\ClassLoader\ClassLoader;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Console\Application as SymfonyConsoleApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Application as SymfonyConsoleApplication;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
@@ -246,7 +246,6 @@ class PropelInitService
             $this->getPropelInitFile(),
             $this->debug
         );
-
 
         if ($propelInitCache->isFresh()) {
             return;

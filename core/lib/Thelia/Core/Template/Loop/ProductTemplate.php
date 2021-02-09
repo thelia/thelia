@@ -17,10 +17,10 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Model\TemplateQuery;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Template as TemplateModel;
+use Thelia\Model\TemplateQuery;
 
 /**
  *
@@ -55,7 +55,7 @@ class ProductTemplate extends BaseI18nLoop implements PropelSearchLoopInterface
         $search = TemplateQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('NAME'));
+        $this->configureI18nProcessing($search, ['NAME']);
 
         $id = $this->getId();
 

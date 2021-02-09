@@ -11,9 +11,9 @@
 /*************************************************************************************/
 namespace Thelia\Log;
 
-use Thelia\Model\ConfigQuery;
 use Psr\Log\LoggerInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ConfigQuery;
 
 /**
  *
@@ -45,7 +45,7 @@ class Tlog implements LoggerInterface
     const EMERGENCY             = 800;
     const MUET                  = PHP_INT_MAX;
 
-    protected $levels = array(
+    protected $levels = [
         100 => "DEBUG",
         200 => "INFO",
         300 => "NOTICE",
@@ -54,7 +54,7 @@ class Tlog implements LoggerInterface
         600 => "CRITICAL",
         700 => "ALERT",
         800 => "EMERGENCY"
-    );
+    ];
 
     // default values
     const DEFAULT_LEVEL         = self::ERROR;
@@ -74,12 +74,12 @@ class Tlog implements LoggerInterface
      *
      * @var array containing class of destination handler
      */
-    protected $destinations = array();
+    protected $destinations = [];
 
     protected $mode_back_office = false;
     protected $level = self::MUET;
     protected $prefix = "";
-    protected $files = array();
+    protected $files = [];
     protected $all_files = false;
     protected $show_redirect = false;
 
@@ -88,7 +88,7 @@ class Tlog implements LoggerInterface
     protected $done = false;
 
     // directories where are the Destinations Files
-    public $dir_destinations = array();
+    public $dir_destinations = [];
 
     /**
      *
@@ -136,10 +136,10 @@ class Tlog implements LoggerInterface
     {;
         $this->setLevel(ConfigQuery::read(self::VAR_LEVEL, self::DEFAULT_LEVEL));
 
-        $this->dir_destinations = array(
+        $this->dir_destinations = [
                 __DIR__.DS.'Destination',
                 THELIA_LOCAL_DIR.'tlog'.DS.'destinations'
-        );
+        ];
 
         $this->setPrefix(ConfigQuery::read(self::VAR_PREFIXE, self::DEFAUT_PREFIXE));
         $this->setFiles(ConfigQuery::read(self::VAR_FILES, self::DEFAUT_FILES));
@@ -148,7 +148,7 @@ class Tlog implements LoggerInterface
         $this->setShowRedirect(ConfigQuery::read(self::VAR_SHOW_REDIRECT, self::DEFAUT_SHOW_REDIRECT));
 
         // Au cas ou il y aurait un exit() quelque part dans le code.
-        register_shutdown_function(array($this, 'writeOnExit'));
+        register_shutdown_function([$this, 'writeOnExit']);
     }
 
     // Configuration
@@ -161,7 +161,7 @@ class Tlog implements LoggerInterface
     public function setDestinations($destinations)
     {
         if (! empty($destinations)) {
-            $this->destinations = array();
+            $this->destinations = [];
 
             $classes_destinations = explode(';', $destinations);
 
@@ -253,10 +253,9 @@ class Tlog implements LoggerInterface
      * Detailed debug information.
      *
      * @param  string $message
-     * @param  array  $context
      * @return null
      */
-    public function debug($message, array $context = array())
+    public function debug($message, array $context = [])
     {
         $this->log(self::DEBUG, $message, $context);
     }
@@ -283,10 +282,9 @@ class Tlog implements LoggerInterface
      * Example: User logs in, SQL logs.
      *
      * @param  string $message
-     * @param  array  $context
      * @return null
      */
-    public function info($message, array $context = array())
+    public function info($message, array $context = [])
     {
         $this->log(self::INFO, $message, $context);
     }
@@ -311,10 +309,9 @@ class Tlog implements LoggerInterface
      * Normal but significant events.
      *
      * @param  string $message
-     * @param  array  $context
      * @return null
      */
-    public function notice($message, array $context = array())
+    public function notice($message, array $context = [])
     {
         $this->log(self::NOTICE, $message, $context);
     }
@@ -342,10 +339,9 @@ class Tlog implements LoggerInterface
      * that are not necessarily wrong.
      *
      * @param  string $message
-     * @param  array  $context
      * @return null
      */
-    public function warning($message, array $context = array())
+    public function warning($message, array $context = [])
     {
         $this->log(self::WARNING, $message, $context);
     }
@@ -371,10 +367,9 @@ class Tlog implements LoggerInterface
      * be logged and monitored.
      *
      * @param  string $message
-     * @param  array  $context
      * @return null
      */
-    public function error($message, array $context = array())
+    public function error($message, array $context = [])
     {
         $this->log(self::ERROR, $message, $context);
     }
@@ -399,7 +394,7 @@ class Tlog implements LoggerInterface
      *
      * @see error()
      */
-    public function err($message, array $context = array())
+    public function err($message, array $context = [])
     {
         $this->error($message, $context);
     }
@@ -410,10 +405,9 @@ class Tlog implements LoggerInterface
      * Example: Application component unavailable, unexpected exception.
      *
      * @param  string $message
-     * @param  array  $context
      * @return null
      */
-    public function critical($message, array $context = array())
+    public function critical($message, array $context = [])
     {
         $this->log(self::CRITICAL, $message, $context);
     }
@@ -438,7 +432,7 @@ class Tlog implements LoggerInterface
      *
      * @see critical()
      */
-    public function crit($message, array $context = array())
+    public function crit($message, array $context = [])
     {
         $this->critical($message, $context);
     }
@@ -450,10 +444,9 @@ class Tlog implements LoggerInterface
      * trigger the SMS alerts and wake you up.
      *
      * @param  string $message
-     * @param  array  $context
      * @return null
      */
-    public function alert($message, array $context = array())
+    public function alert($message, array $context = [])
     {
         $this->log(self::ALERT, $message, $context);
     }
@@ -478,10 +471,9 @@ class Tlog implements LoggerInterface
      * System is unusable.
      *
      * @param  string $message
-     * @param  array  $context
      * @return null
      */
-    public function emergency($message, array $context = array())
+    public function emergency($message, array $context = [])
     {
         $this->log(self::EMERGENCY, $message, $context);
     }
@@ -505,14 +497,12 @@ class Tlog implements LoggerInterface
     /**
      * Logs with an arbitrary level.
      *
-     * @param  mixed  $level
      * @param  string $message
-     * @param  array  $context
      * @return null
      */
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = [])
     {
-        if ($this->level > $level || array_key_exists($level, $this->levels) === false) {
+        if ($this->level > $level || \array_key_exists($level, $this->levels) === false) {
             return;
         }
 
@@ -562,15 +552,14 @@ class Tlog implements LoggerInterface
 <html>
 <head><title>".Translator::getInstance()->trans('Redirecting ...')."</title></head>
 <body>
-<a href=\"$url\">".Translator::getInstance()->trans('Redirecting to %url', array('%url' => $url))."</a>
+<a href=\"$url\">".Translator::getInstance()->trans('Redirecting to %url', ['%url' => $url])."</a>
 </body>
 </html>
 ";
 
             return true;
-        } else {
+        }  
             return false;
-        }
     }
 
     /**
@@ -611,9 +600,9 @@ class Tlog implements LoggerInterface
 
     private function findOrigin()
     {
-        $origin = array();
+        $origin = [];
 
-        if (function_exists('debug_backtrace')) {
+        if (\function_exists('debug_backtrace')) {
             $trace = debug_backtrace();
             $prevHop = null;
             // make a downsearch to identify the caller
@@ -650,10 +639,10 @@ class Tlog implements LoggerInterface
         return $origin;
     }
 
-    protected function interpolate($message, array $context = array())
+    protected function interpolate($message, array $context = [])
     {
         // build a replacement array with braces around the context keys
-        $replace = array();
+        $replace = [];
         foreach ($context as $key => $val) {
             $replace['{' . $key . '}'] = $val;
         }
@@ -662,7 +651,7 @@ class Tlog implements LoggerInterface
         return strtr($message, $replace);
     }
 
-    private function out($level, $message, array $context = array())
+    private function out($level, $message, array $context = [])
     {
         $text = '';
 
@@ -685,8 +674,8 @@ class Tlog implements LoggerInterface
             $line = $origin['line'];
 
             $prefix = str_replace(
-                array("#INDEX", "#LEVEL", "#FILE", "#FUNCTION", "#LINE", "#DATE", "#HOUR"),
-                array(1+$this->linecount, $level, $file, $function, $line, date("Y-m-d"), date("G:i:s")),
+                ["#INDEX", "#LEVEL", "#FILE", "#FUNCTION", "#LINE", "#DATE", "#HOUR"],
+                [1+$this->linecount, $level, $file, $function, $line, date("Y-m-d"), date("G:i:s")],
                 $this->prefix
             );
 

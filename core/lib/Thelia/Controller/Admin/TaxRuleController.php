@@ -120,12 +120,12 @@ class TaxRuleController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
-        $data = array(
+        $data = [
             'id'           => $object->getId(),
             'locale'       => $object->getLocale(),
             'title'        => $object->getTitle(),
             'description'  => $object->getDescription(),
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(AdminForm::TAX_RULE_MODIFICATION, FormType::class, $data);
@@ -137,9 +137,9 @@ class TaxRuleController extends AbstractCrudController
      */
     protected function hydrateTaxUpdateForm($object)
     {
-        $data = array(
+        $data = [
             'id'           => $object->getId(),
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(AdminForm::TAX_RULE_TAX_LIST_UPDATE, FormType::class, $data);
@@ -182,18 +182,18 @@ class TaxRuleController extends AbstractCrudController
 
     protected function getViewArguments($country = null, $tab = null, $state = null)
     {
-        return array(
+        return [
             'tab' => $tab === null ? $this->getRequest()->get('tab', 'data') : $tab,
             'country' => $country === null ? $this->getRequest()->get('country', CountryQuery::create()->findOneByByDefault(1)->getId()) : $country,
             'state' => $state,
-        );
+        ];
     }
 
     protected function getRouteArguments($tax_rule_id = null)
     {
-        return array(
+        return [
             'tax_rule_id' => $tax_rule_id === null ? $this->getRequest()->get('tax_rule_id') : $tax_rule_id,
-        );
+        ];
     }
 
     protected function renderListTemplate($currentOrder)
@@ -201,7 +201,7 @@ class TaxRuleController extends AbstractCrudController
         // We always return to the feature edition form
         return $this->render(
             'taxes-rules',
-            array()
+            []
         );
     }
 
@@ -242,7 +242,7 @@ class TaxRuleController extends AbstractCrudController
 
     public function updateAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -261,7 +261,7 @@ class TaxRuleController extends AbstractCrudController
 
     public function setDefaultAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -281,7 +281,7 @@ class TaxRuleController extends AbstractCrudController
     public function processUpdateTaxesAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -308,7 +308,7 @@ class TaxRuleController extends AbstractCrudController
 
             if (! $this->eventContainsObject($changeEvent)) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName))
+                    $this->getTranslator()->trans("No %obj was updated.", ['%obj', $this->objectName])
                 );
             }
 
@@ -341,14 +341,13 @@ class TaxRuleController extends AbstractCrudController
             $error_msg = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext($this->getTranslator()->trans("%obj modification", array('%obj' => 'taxrule')), $error_msg, $changeForm, $ex);
+        $this->setupFormErrorContext($this->getTranslator()->trans("%obj modification", ['%obj' => 'taxrule']), $error_msg, $changeForm, $ex);
 
         // At this point, the form has errors, and should be redisplayed.
         $responseData["message"] = $error_msg;
 
         return $this->jsonResponse(json_encode($responseData));
     }
-
 
     /**
      * @return Response

@@ -33,7 +33,6 @@ class RegisterRouterPass implements CompilerPassInterface
     /**
      * You can modify the container here before it is dumped to PHP code.
      *
-     * @param ContainerBuilder $container
      *
      * @api
      */
@@ -50,7 +49,7 @@ class RegisterRouterPass implements CompilerPassInterface
             $router = $container->getDefinition($id);
             $router->addMethodCall("setOption", ["cache_dir", THELIA_CACHE_DIR . $container->getParameter("kernel.environment") . DS . "routing" . DS . $id]);
 
-            $chainRouter->addMethodCall("add", array(new Reference($id), $priority));
+            $chainRouter->addMethodCall("add", [new Reference($id), $priority]);
         }
         if (\defined("THELIA_INSTALL_MODE") === false) {
             $modules = ModuleQuery::getActivated();
@@ -63,20 +62,20 @@ class RegisterRouterPass implements CompilerPassInterface
                 if (file_exists($routingConfigFilePath)) {
                     $definition = new Definition(
                         $container->getParameter("router.class"),
-                        array(
+                        [
                             new Reference("router.module.xmlLoader"),
                             $routingConfigFilePath,
-                            array(
+                            [
                                 "cache_dir" => $container->getParameter("kernel.cache_dir"),
                                 "debug" => $container->getParameter("kernel.debug")
-                            ),
+                            ],
                             new Reference("request.context")
-                        )
+                        ]
                     );
 
                     $container->setDefinition("router.".$moduleBaseDir, $definition);
 
-                    $chainRouter->addMethodCall("add", array(new Reference("router.".$moduleBaseDir), 150 + $module->getPosition()));
+                    $chainRouter->addMethodCall("add", [new Reference("router.".$moduleBaseDir), 150 + $module->getPosition()]);
                 }
             }
         }

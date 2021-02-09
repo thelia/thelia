@@ -14,29 +14,26 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Model\FeatureAvQuery;
-use Thelia\Model\FeatureAv as FeatureAvModel;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
 use Thelia\Core\Event\Feature\FeatureAvCreateEvent;
 use Thelia\Core\Event\Feature\FeatureAvDeleteEvent;
+use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Model\FeatureAv as FeatureAvModel;
+use Thelia\Model\FeatureAvQuery;
 
 class FeatureAv extends BaseAction implements EventSubscriberInterface
 {
     /**
      * Create a new feature entry
      *
-     * @param FeatureAvCreateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function create(FeatureAvCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $feature = new FeatureAvModel();
 
         $feature
-
 
             ->setFeatureId($event->getFeatureId())
             ->setLocale($event->getLocale())
@@ -51,15 +48,12 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
     /**
      * Change a product feature
      *
-     * @param FeatureAvUpdateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function update(FeatureAvUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $feature = FeatureAvQuery::create()->findPk($event->getFeatureAvId())) {
             $feature
-
 
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
@@ -76,9 +70,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product feature entry
      *
-     * @param FeatureAvDeleteEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function delete(FeatureAvDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -95,9 +87,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param UpdatePositionEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -109,11 +99,11 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::FEATURE_AV_CREATE          => array("create", 128),
-            TheliaEvents::FEATURE_AV_UPDATE          => array("update", 128),
-            TheliaEvents::FEATURE_AV_DELETE          => array("delete", 128),
-            TheliaEvents::FEATURE_AV_UPDATE_POSITION => array("updatePosition", 128),
-        );
+        return [
+            TheliaEvents::FEATURE_AV_CREATE          => ["create", 128],
+            TheliaEvents::FEATURE_AV_UPDATE          => ["update", 128],
+            TheliaEvents::FEATURE_AV_DELETE          => ["delete", 128],
+            TheliaEvents::FEATURE_AV_UPDATE_POSITION => ["updatePosition", 128],
+        ];
     }
 }

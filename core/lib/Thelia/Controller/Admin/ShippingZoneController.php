@@ -32,15 +32,15 @@ class ShippingZoneController extends BaseAdminController
 
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::VIEW)) {
             return $response;
         }
-        return $this->render("shipping-zones", array("display_shipping_zone" => 20));
+        return $this->render("shipping-zones", ["display_shipping_zone" => 20]);
     }
 
     public function updateAction($delivery_module_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::VIEW)) {
             return $response;
         }
 
@@ -55,7 +55,7 @@ class ShippingZoneController extends BaseAdminController
      */
     public function addArea()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -84,7 +84,7 @@ class ShippingZoneController extends BaseAdminController
         }
 
         $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)),
+            $this->getTranslator()->trans("%obj modification", ['%obj' => $this->objectName]),
             $error_msg,
             $shippingAreaForm
         );
@@ -95,7 +95,7 @@ class ShippingZoneController extends BaseAdminController
 
     public function removeArea()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -123,7 +123,7 @@ class ShippingZoneController extends BaseAdminController
         }
 
         $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)),
+            $this->getTranslator()->trans("%obj modification", ['%obj' => $this->objectName]),
             $error_msg,
             $shippingAreaForm
         );

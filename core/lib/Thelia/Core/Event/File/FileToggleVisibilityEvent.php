@@ -25,7 +25,6 @@ class FileToggleVisibilityEvent extends ToggleVisibilityEvent
     protected $query;
 
     /**
-     * @param ModelCriteria $query
      * @param               $object_id
      */
     public function __construct(ModelCriteria $query, $object_id)
@@ -36,7 +35,6 @@ class FileToggleVisibilityEvent extends ToggleVisibilityEvent
     }
 
     /**
-     * @param ModelCriteria $query
      */
     public function setQuery(ModelCriteria $query)
     {

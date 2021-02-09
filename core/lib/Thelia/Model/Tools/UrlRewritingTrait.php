@@ -19,12 +19,12 @@ use Thelia\Core\Event\Order\OrderProductEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\UrlRewritingException;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\RewritingArgumentQuery;
-use Thelia\Model\RewritingUrlQuery;
 use Thelia\Model\RewritingUrl;
+use Thelia\Model\RewritingUrlQuery;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
-use Thelia\Model\ConfigQuery;
 
 /**
  * A trait for managing Rewritten URLs from model classes
@@ -55,7 +55,6 @@ trait UrlRewritingTrait
      *
      * @param string $locale a valid locale (e.g. en_US)
      * @param ConnectionInterface|null $con
-     * @return string
      * @throws PropelException
      */
     public function generateRewrittenUrl(string $locale, ConnectionInterface $con): string
@@ -143,9 +142,9 @@ trait UrlRewritingTrait
         RewritingUrlQuery::create()
             ->filterByView($this->getRewrittenUrlViewName())
             ->filterByViewId($this->getId())
-            ->update(array(
+            ->update([
                 "View" => ConfigQuery::getObsoleteRewrittenUrlView()
-            ));
+            ]);
     }
 
     /**

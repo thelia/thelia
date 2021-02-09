@@ -96,7 +96,6 @@ if (isset($_GET['action']))
 						return;
 					}
 				}else{
-
 					unlink($path);
 					if (file_exists($path_thumb)){
 						unlink($path_thumb);
@@ -133,7 +132,6 @@ if (isset($_GET['action']))
 			break;
 		case 'delete_folder':
 			if ($delete_folders){
-
 				if($ftp){
 					deleteDir($path,$ftp,$config);
 					deleteDir($path_thumb,$ftp,$config);
@@ -162,7 +160,6 @@ if (isset($_GET['action']))
 		case 'create_folder':
 			if ($create_folders)
 			{
-
 				$name = fix_filename($_POST['name'],$config);
 				$path .= $name;
 				$path_thumb .= $name;
@@ -202,7 +199,7 @@ if (isset($_GET['action']))
 			}
 
 			if (!isset($editable_text_file_exts) || !is_array($editable_text_file_exts)){
-				$editable_text_file_exts = array();
+				$editable_text_file_exts = [];
 			}
 
 			// check if user supplied extension
@@ -249,13 +246,12 @@ if (isset($_GET['action']))
 				if (@file_put_contents($path.$name, $content) === FALSE) {
 					response(trans('File_Save_Error').AddErrorLocation())->send();
 					exit;
-				} else {
+				}  
 					if (is_function_callable('chmod') !== FALSE){
 						chmod($path.$name, 0644);
 					}
 					response(trans('File_Save_OK'))->send();
 					exit;
-				}
 			}
 
 			break;
@@ -332,7 +328,6 @@ if (isset($_GET['action']))
 				}
 			}
 			break;
-
 		case 'paste_clipboard':
 			if ( ! isset($_SESSION['RF']['clipboard_action'], $_SESSION['RF']['clipboard']['path'])
 				|| $_SESSION['RF']['clipboard_action'] == ''
@@ -344,7 +339,6 @@ if (isset($_GET['action']))
 
 			$action = $_SESSION['RF']['clipboard_action'];
 			$data = $_SESSION['RF']['clipboard'];
-
 
 			if($ftp){
 				if($_POST['path']!=""){
@@ -393,7 +387,6 @@ if (isset($_GET['action']))
 						@$ftp->put(DIRECTORY_SEPARATOR.$path_thumb, $tmp, FTP_BINARY);
 						unlink($tmp);
 					}
-
 				} elseif ($action == 'cut') {
 					$ftp->rename($data['path'], DIRECTORY_SEPARATOR.$path);
 					if(url_exists($data['path_thumb'])){
@@ -441,7 +434,7 @@ if (isset($_GET['action']))
 		case 'chmod':
 			$mode = $_POST['new_mode'];
 			$rec_option = $_POST['is_recursive'];
-			$valid_options = array('none', 'files', 'folders', 'both');
+			$valid_options = ['none', 'files', 'folders', 'both'];
 			$chmod_perm = ($_POST['folder'] ? $chmod_dirs : $chmod_files);
 
 			// check perm
@@ -509,10 +502,9 @@ if (isset($_GET['action']))
 				if (@file_put_contents($path, $content) === FALSE) {
 					response(trans('File_Save_Error').AddErrorLocation())->send();
 					exit;
-				} else {
+				}  
 					response(trans('File_Save_OK'))->send();
 					exit;
-				}
 			}
 
 			break;

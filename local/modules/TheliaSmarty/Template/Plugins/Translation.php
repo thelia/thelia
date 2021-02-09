@@ -14,8 +14,8 @@ namespace TheliaSmarty\Template\Plugins;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Translation\Translator;
-use TheliaSmarty\Template\SmartyPluginDescriptor;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
+use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 class Translation extends AbstractSmartyPlugin
 {
@@ -23,8 +23,7 @@ class Translation extends AbstractSmartyPlugin
     protected $translator;
 
     protected $defaultTranslationDomain = '';
-    protected $defaultLocale = null;
-
+    protected $defaultLocale;
 
     protected $protectedParams = [
         'l',
@@ -43,7 +42,6 @@ class Translation extends AbstractSmartyPlugin
     /**
      * Set the default translation domain
      *
-     * @param array $params
      */
     public function setDefaultTranslationDomain(array $params)
     {
@@ -53,7 +51,6 @@ class Translation extends AbstractSmartyPlugin
     /**
      * Set the default locale
      *
-     * @param array $params
      */
     public function setDefaultLocale(array $params)
     {
@@ -63,8 +60,6 @@ class Translation extends AbstractSmartyPlugin
     /**
      * Process translate function
      *
-     * @param array $params
-     * @return string
      */
     public function translate(array $params): string
     {
@@ -73,7 +68,7 @@ class Translation extends AbstractSmartyPlugin
         $variables = [];
 
         foreach ($params as $name => $value) {
-            if (!in_array($name, $this->protectedParams)) {
+            if (!\in_array($name, $this->protectedParams)) {
                 $variables["%$name"] = $value;
             }
         }
@@ -111,10 +106,10 @@ class Translation extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor('function', 'intl', $this, 'translate'),
             new SmartyPluginDescriptor('function', 'default_translation_domain', $this, 'setDefaultTranslationDomain'),
             new SmartyPluginDescriptor('function', 'default_locale', $this, 'setDefaultLocale'),
-        );
+        ];
     }
 }

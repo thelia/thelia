@@ -62,25 +62,25 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $coupon1->setExpirationDate($date->setTimestamp(strtotime("today + 3 months")));
 
         $condition1 = new MatchForTotalAmount($facade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($facade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
@@ -140,7 +140,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue(array($coupon1, $coupon2)));
+            ->will($this->returnValue([$coupon1, $coupon2]));
         $stubFacade->expects($this->any())
             ->method('getCheckoutPostagePrice')
             ->will($this->returnValue(8.30));
@@ -208,7 +208,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue(array($coupon1, $coupon2)));
+            ->will($this->returnValue([$coupon1, $coupon2]));
         $stubFacade->expects($this->any())
             ->method('getCheckoutPostagePrice')
             ->will($this->returnValue(8.30));
@@ -271,7 +271,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue(array($coupon1, $coupon2)));
+            ->will($this->returnValue([$coupon1, $coupon2]));
 
         $couponManager = new CouponManager($stubContainer);
         $couponManager->addAvailableCoupon($coupon1);
@@ -297,7 +297,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue(array()));
+            ->will($this->returnValue([]));
 
         $conditions = new ConditionCollection();
         $stubConditionFactory = $this->getMockBuilder('\Thelia\Condition\ConditionFactory')
@@ -324,7 +324,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $couponManager->addAvailableCoupon($coupon1);
         $couponManager->addAvailableCoupon($coupon2);
         $actual = $couponManager->getAvailableCoupons();
-        $expected = array($coupon1, $coupon2);
+        $expected = [$coupon1, $coupon2];
 
         $this->assertEquals($expected, $actual);
     }
@@ -341,25 +341,25 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $stubContainer = $this->createMock('\Symfony\Component\DependencyInjection\Container');
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
@@ -368,7 +368,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue(array()));
+            ->will($this->returnValue([]));
 
         $stubContainer->expects($this->any())
             ->method('get')
@@ -378,7 +378,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $couponManager->addAvailableCondition($condition1);
         $couponManager->addAvailableCondition($condition2);
         $actual = $couponManager->getAvailableConditions();
-        $expected = array($condition1, $condition2);
+        $expected = [$condition1, $condition2];
 
         $this->assertEquals($expected, $actual);
     }
@@ -401,7 +401,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             '',
             '',
             '',
-            array('amount' => 21.00),
+            ['amount' => 21.00],
             true,
             true,
             true,
@@ -414,25 +414,25 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         );
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
@@ -442,7 +442,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue(array($coupon)));
+            ->will($this->returnValue([$coupon]));
 
         $stubContainer->expects($this->any())
             ->method('get')
@@ -484,7 +484,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             '',
             '',
             '',
-            array('amount' => 21.00),
+            ['amount' => 21.00],
             true,
             true,
             true,
@@ -497,25 +497,25 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         );
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
@@ -525,7 +525,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue(array($coupon)));
+            ->will($this->returnValue([$coupon]));
 
         $stubContainer->expects($this->any())
             ->method('get')
@@ -567,7 +567,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             '',
             '',
             '',
-            array('amount' => 21.00),
+            ['amount' => 21.00],
             true,
             true,
             true,
@@ -580,25 +580,25 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         );
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
@@ -608,7 +608,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue(array($coupon)));
+            ->will($this->returnValue([$coupon]));
 
         $stubContainer->expects($this->any())
             ->method('get')
@@ -653,7 +653,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             '',
             '',
             '',
-            array('amount' => 21.00),
+            ['amount' => 21.00],
             true,
             true,
             true,
@@ -666,25 +666,25 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         );
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
@@ -694,7 +694,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue(array($coupon)));
+            ->will($this->returnValue([$coupon]));
 
         $stubContainer->expects($this->any())
             ->method('get')

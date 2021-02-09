@@ -3,18 +3,18 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\FolderImageModification;
 use Thelia\Model\Base\FolderImage as BaseFolderImage;
-use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\FolderBreadcrumbTrait;
-use Thelia\Files\FileModelInterface;
 
 class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileModelInterface
 {
@@ -66,9 +66,9 @@ class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileMo
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
-            array(
+            [
                 "folder_id" => $this->getFolderId(),
-            )
+            ]
         );
 
         return true;
@@ -116,7 +116,6 @@ class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileMo
     }
 
     /**
-     * @param  int    $objectId the ID of the parent object
      * @return string the URL to redirect to after update from the back-office
      */
     public function getRedirectionUrl()

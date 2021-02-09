@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Add an image to the carousel' => 'Добавить изображение в карусель',
     'Add this image to the carousel' => 'Добавить это изображение в карусель',
     'Carousel image' => 'Изображение карусели',
@@ -11,4 +11,4 @@ return array(
     'Remove this image' => 'Удалить это изображение',
     'Your carousel contains no image. Please add one using the form above.' => 'Ваша карусель не содержит изображений. Пожалуйста, добавьте одно используя форму ниже.',
     'Position' => 'Позиция',
-);
+];

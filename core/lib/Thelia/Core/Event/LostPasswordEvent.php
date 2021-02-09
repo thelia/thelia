@@ -27,7 +27,6 @@ class LostPasswordEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getEmail()
     {

@@ -47,7 +47,6 @@ final class TheliaEvents
     
     // -- END ADDRESS EVENTS ---------------------------------------------------------
 
-
     // -- ADMIN EVENTS ---------------------------------------------------------
     /**
      * Sent before the logout of the administrator.
@@ -60,7 +59,6 @@ final class TheliaEvents
 
     // -- END ADMIN EVENTS --------------------------------------------------------
 
-
     // -- AREA EVENTS ---------------------------------------------------------
 
     const AREA_CREATE = 'action.createArea';
@@ -72,7 +70,6 @@ final class TheliaEvents
     const AREA_ADD_COUNTRY = 'action.area.addCountry';
     
     // -- END AREA EVENTS ---------------------------------------------------------
-
 
     // -- CATEGORIES EVENTS -----------------------------------------------
 
@@ -91,7 +88,6 @@ final class TheliaEvents
     const VIEW_CATEGORY_ID_NOT_VISIBLE = "action.viewCategoryIdNotVisible";
     // -- END CATEGORIES EVENTS -----------------------------------------------
 
-
     // -- CONTENT EVENTS -----------------------------------------------
 
     const CONTENT_CREATE            = "action.createContent";
@@ -108,7 +104,6 @@ final class TheliaEvents
     const VIEW_CONTENT_ID_NOT_VISIBLE = "action.viewContentIdNotVisible";
     // -- END CONTENT EVENTS ---------------------------------------------------------
 
-
     // -- COUNTRY EVENTS -----------------------------------------------
 
     const COUNTRY_CREATE            = "action.state.create";
@@ -119,7 +114,6 @@ final class TheliaEvents
     const COUNTRY_TOGGLE_VISIBILITY = "action.state.toggleVisibility";
     // -- END COUNTRY EVENTS ---------------------------------------------------------
 
-
     // -- STATE EVENTS -----------------------------------------------
 
     const STATE_CREATE            = "action.createState";
@@ -128,8 +122,6 @@ final class TheliaEvents
     
     const STATE_TOGGLE_VISIBILITY = "action.toggleCountryVisibility";
     // -- END STATE EVENTS ---------------------------------------------------------
-
-
 
     // -- CUSTOMER EVENTS ---------------------------------------------------------
     /**
@@ -169,9 +161,7 @@ final class TheliaEvents
 
     // -- END CUSTOMER EVENTS ---------------------------------------------------------
 
-
     // -- FOLDER EVENTS -----------------------------------------------
-
 
     const FOLDER_CREATE            = "action.createFolder";
     const FOLDER_UPDATE            = "action.updateFolder";
@@ -183,7 +173,6 @@ final class TheliaEvents
 
     const VIEW_FOLDER_ID_NOT_VISIBLE = "action.viewFolderIdNotVisible";
     // -- END FOLDER EVENTS ---------------------------------------------------------
-
 
     // -- PRODUCT EVENTS -----------------------------------------------
 
@@ -223,7 +212,6 @@ final class TheliaEvents
     const VIEW_PRODUCT_ID_NOT_VISIBLE = "action.viewProductIdNotVisible";
     // -- END PRODUCT EVENTS ---------------------------------------------------------
 
-
     // -- CLONE EVENTS ------------------------------------------------------------
 
     const PRODUCT_CLONE = "action.cloneProduct";
@@ -231,7 +219,6 @@ final class TheliaEvents
     const PSE_CLONE = "action.clonePSE";
 
     // -- END CLONE EVENTS ------------------------------------------------------------
-
 
     // -- SHIPPING ZONE MANAGEMENT
 

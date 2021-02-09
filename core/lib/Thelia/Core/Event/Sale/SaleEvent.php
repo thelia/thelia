@@ -34,7 +34,6 @@ class SaleEvent extends ActionEvent
     }
 
     /**
-     * @param  \Thelia\Model\Sale $sale
      * @return SaleEvent
      */
     public function setSale(Sale $sale)

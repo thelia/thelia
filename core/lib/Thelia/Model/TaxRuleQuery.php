@@ -23,9 +23,6 @@ class TaxRuleQuery extends BaseTaxRuleQuery
     protected static $caches = [];
 
     /**
-     * @param TaxRule $taxRule
-     * @param Country|null $country
-     * @param State|null $state
      * @return array|mixed|\Propel\Runtime\ActiveRecord\ActiveRecordInterface[]|\Propel\Runtime\Collection\ObjectCollection|Tax[]
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -38,7 +35,7 @@ class TaxRuleQuery extends BaseTaxRuleQuery
             ($state !== null) ? $state->getId() : 0
         );
 
-        if (array_key_exists($key, self::$caches)) {
+        if (\array_key_exists($key, self::$caches)) {
             return self::$caches[$key];
         }
 

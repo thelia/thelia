@@ -62,7 +62,6 @@ interface FileModelInterface
     public function getUploadDir();
 
     /**
-     * @param int $objectId the object ID
      *
      * @return string the URL to redirect to after update from the back-office
      */
@@ -78,14 +77,12 @@ interface FileModelInterface
     /**
      * Save the model object.
      *
-     * @return mixed
      */
     public function save();
 
     /**
      * Delete the model object.
      *
-     * @return mixed
      */
     public function delete();
 
@@ -106,7 +103,6 @@ interface FileModelInterface
     /**
      * Get the current title
      *
-     * @param  string             $title the title in the current locale
      * @return FileModelInterface
      */
     public function getTitle();

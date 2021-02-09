@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>' => '<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>',
     'Administrator email :' => 'Administrator email :',
     'Administrator login :' => 'Administrator login :',
@@ -75,4 +75,4 @@ return array(
     'or' => 'or',
     'update to version %version' => 'update to version %version',
     'website url :' => 'Shop URL :',
-);
+];

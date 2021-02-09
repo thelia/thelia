@@ -17,10 +17,10 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Model\OrderProductTaxQuery;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\OrderProductTax as OrderProductTaxModel;
+use Thelia\Model\OrderProductTaxQuery;
 
 /**
  *

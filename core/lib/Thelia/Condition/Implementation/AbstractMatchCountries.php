@@ -64,7 +64,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
 
         // Be sure that the value is an array, make one if required
         if (! \is_array($values[self::COUNTRIES_LIST])) {
-            $values[self::COUNTRIES_LIST] = array($values[self::COUNTRIES_LIST]);
+            $values[self::COUNTRIES_LIST] = [$values[self::COUNTRIES_LIST]];
         }
 
         // Check that at least one category is selected
@@ -128,13 +128,13 @@ abstract class AbstractMatchCountries extends ConditionAbstract
      */
     protected function generateInputs()
     {
-        return array(
-            self::COUNTRIES_LIST => array(
+        return [
+            self::COUNTRIES_LIST => [
                 'availableOperators' => $this->availableOperators[self::COUNTRIES_LIST],
                 'value' => '',
                 'selectedOperator' => Operators::IN
-            )
-        );
+            ]
+        ];
     }
 
     /**
@@ -147,7 +147,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
             [
                 'operatorSelectHtml'   => $this->drawBackOfficeInputOperators(self::COUNTRIES_LIST),
                 'countries_field_name' => self::COUNTRIES_LIST,
-                'values'               => isset($this->values[self::COUNTRIES_LIST]) ? $this->values[self::COUNTRIES_LIST] : array(),
+                'values'               => isset($this->values[self::COUNTRIES_LIST]) ? $this->values[self::COUNTRIES_LIST] : [],
                 'countryLabel'         => $this->getFormLabel()
             ]
         );

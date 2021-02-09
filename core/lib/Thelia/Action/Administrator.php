@@ -38,9 +38,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param AdministratorEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function create(AdministratorEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -62,9 +60,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param AdministratorEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function update(AdministratorEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -89,7 +85,6 @@ class Administrator extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param AdministratorEvent $event
      */
     public function delete(AdministratorEvent $event)
     {
@@ -142,12 +137,12 @@ class Administrator extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::ADMINISTRATOR_CREATE                        => array('create', 128),
-            TheliaEvents::ADMINISTRATOR_UPDATE                        => array('update', 128),
-            TheliaEvents::ADMINISTRATOR_DELETE                        => array('delete', 128),
-            TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD                => array('updatePassword', 128),
-            TheliaEvents::ADMINISTRATOR_CREATEPASSWORD                => array('createPassword', 128)
-        );
+        return [
+            TheliaEvents::ADMINISTRATOR_CREATE                        => ['create', 128],
+            TheliaEvents::ADMINISTRATOR_UPDATE                        => ['update', 128],
+            TheliaEvents::ADMINISTRATOR_DELETE                        => ['delete', 128],
+            TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD                => ['updatePassword', 128],
+            TheliaEvents::ADMINISTRATOR_CREATEPASSWORD                => ['createPassword', 128]
+        ];
     }
 }

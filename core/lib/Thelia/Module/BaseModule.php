@@ -68,11 +68,11 @@ class BaseModule implements BaseModuleInterface
 
     protected $reflected;
 
-    protected $dispatcher = null;
-    protected $request = null;
+    protected $dispatcher;
+    protected $request;
 
     // Do no use this attribute directly, use getModuleModel() instead.
-    private $moduleModel = null;
+    private $moduleModel;
 
     /**
      * @param Module $moduleModel
@@ -353,7 +353,6 @@ class BaseModule implements BaseModuleInterface
         return $this->moduleModel;
     }
 
-
     /**
      * Module A may use static method from module B, thus we have to cache
      * a couple (module code => module id).
@@ -476,7 +475,7 @@ class BaseModule implements BaseModuleInterface
      */
     public static function getCompilers()
     {
-        return array();
+        return [];
     }
 
     public static function configureContainer(ContainerConfigurator $containerConfigurator)
@@ -557,7 +556,7 @@ class BaseModule implements BaseModuleInterface
      */
     public function getHooks()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -580,7 +579,7 @@ class BaseModule implements BaseModuleInterface
             foreach ($moduleHooks as $hook) {
                 $isValid = \is_array($hook) &&
                     isset($hook["type"]) &&
-                    array_key_exists($hook["type"], $allowedTypes) &&
+                    \array_key_exists($hook["type"], $allowedTypes) &&
                     isset($hook["code"]) &&
                     \is_string($hook["code"]) &&
                     !empty($hook["code"])
@@ -706,7 +705,7 @@ class BaseModule implements BaseModuleInterface
 
         $locales = array_unique($locales);
 
-        $data = array();
+        $data = [];
 
         foreach ($locales as $locale) {
             $data[$locale] = [
@@ -721,9 +720,9 @@ class BaseModule implements BaseModuleInterface
 
     protected function getHookI18nInfo(array $hook, $defaultLocale)
     {
-        $titles = array();
-        $descriptions = array();
-        $chapos = array();
+        $titles = [];
+        $descriptions = [];
+        $chapos = [];
 
         /**
          * Get the defined titles
@@ -751,7 +750,7 @@ class BaseModule implements BaseModuleInterface
 
     protected function extractI18nValues($data, $defaultLocale)
     {
-        $returnData = array();
+        $returnData = [];
 
         if (\is_array($data)) {
             foreach ($data as $key => $value) {
@@ -772,7 +771,7 @@ class BaseModule implements BaseModuleInterface
     {
         $value = null;
 
-        if (array_key_exists($key, $array)) {
+        if (\array_key_exists($key, $array)) {
             $value = $array[$key];
 
             unset($array[$key]);

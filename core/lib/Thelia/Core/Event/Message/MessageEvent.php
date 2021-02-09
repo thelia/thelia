@@ -20,7 +20,7 @@ use Thelia\Model\Message;
  */
 class MessageEvent extends ActionEvent
 {
-    protected $message = null;
+    protected $message;
 
     public function __construct(Message $message = null)
     {

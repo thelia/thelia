@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace VirtualProductDelivery\Events;
 
 use Thelia\Core\Event\ActionEvent;

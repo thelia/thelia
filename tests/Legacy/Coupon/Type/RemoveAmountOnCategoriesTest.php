@@ -187,7 +187,7 @@ class RemoveAmountOnCategoriesTest extends TestCase
             'TEST Coupon',
             'This is a test coupon title',
             'This is a test coupon description',
-            array('amount' => 10.00, 'categories' => [10, 20]),
+            ['amount' => 10.00, 'categories' => [10, 20]],
             true,
             true,
             true,
@@ -200,25 +200,25 @@ class RemoveAmountOnCategoriesTest extends TestCase
         );
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
@@ -258,7 +258,7 @@ class RemoveAmountOnCategoriesTest extends TestCase
             'TEST Coupon',
             'This is a test coupon title',
             'This is a test coupon description',
-            array('amount' => 10.00, 'categories' => [10, 20]),
+            ['amount' => 10.00, 'categories' => [10, 20]],
             true,
             true,
             true,
@@ -289,7 +289,7 @@ class RemoveAmountOnCategoriesTest extends TestCase
             'TEST Coupon',
             'This is a test coupon title',
             'This is a test coupon description',
-            array('amount' => 10.00, 'categories' => [10, 20]),
+            ['amount' => 10.00, 'categories' => [10, 20]],
             true,
             true,
             true,

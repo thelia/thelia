@@ -56,7 +56,6 @@ class AdministratorUpdatePasswordEvent extends ActionEvent
     }
 
     /**
-     * @param \Thelia\Model\Admin $admin
      */
     public function setAdmin(Admin $admin)
     {

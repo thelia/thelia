@@ -42,7 +42,7 @@ class RemovePercentageOnAttributeValues extends AbstractRemoveOnAttributeValues
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Percentage discount for selected attribute values', array());
+            ->trans('Percentage discount for selected attribute values', []);
     }
 
     /**
@@ -54,7 +54,7 @@ class RemovePercentageOnAttributeValues extends AbstractRemoveOnAttributeValues
             ->getTranslator()
             ->trans(
                 'This coupon subtracts from the order total the specified percentage of each product price which uses the selected attribute values. If the discount is greater than the total order, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
-                array()
+                []
             );
 
         return $toolTip;

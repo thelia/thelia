@@ -17,12 +17,12 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\Map\FeatureAvTableMap;
-use Thelia\Type\TypeCollection;
 use Thelia\Type;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -61,7 +61,7 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
+                    new Type\EnumListType(['alpha', 'alpha_reverse', 'manual', 'manual_reverse'])
                 ),
                 'manual'
             ),
@@ -76,7 +76,7 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
          // manage featureAv translations
         $this->configureI18nProcessing(
             $search,
-            array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
+            ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
             FeatureAvTableMap::TABLE_NAME,
             'FEATURE_AV_ID',
             true

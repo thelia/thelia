@@ -39,7 +39,7 @@ class ProductCloneForm extends BaseForm
                     new Callback([$this, 'checkRefDifferent'])
                 ],
                 'label' => $this->translator->trans('Product reference (must be unique)'),
-                'label_attr'  => array('for' => 'newRef')
+                'label_attr'  => ['for' => 'newRef']
             ])
         ;
     }

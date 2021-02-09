@@ -111,7 +111,6 @@ try {
     $fs->remove(THELIA_ROOT . '/cache/dev');
     $fs->remove(THELIA_ROOT . '/cache/install');
 
-
     $request = \Thelia\Core\HttpFoundation\Request::createFromGlobals();
     $_SESSION['install']['step'] = $step;
 

@@ -91,7 +91,6 @@ class MailerFactory
     }
 
     /**
-     * @param \Swift_Mime_Message $message
      * @param null $failedRecipients
      * @return int number of recipients who were accepted for delivery.
      */

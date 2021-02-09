@@ -49,10 +49,10 @@ class ModuleDeactivateCommandTest extends ContainerAwareTestCase
 
             $command = $application->find("module:deactivate");
             $commandTester = new CommandTester($command);
-            $commandTester->execute(array(
+            $commandTester->execute([
                 "command" => $command->getName(),
                 "module" => $module->getCode(),
-            ));
+            ]);
 
             $deactivated = ModuleQuery::create()->findPk($module->getId())->getActivate();
 
@@ -80,10 +80,10 @@ class ModuleDeactivateCommandTest extends ContainerAwareTestCase
 
             $this->expectException(\RuntimeException::class);
             $this->expectExceptionMessage("module Letshopethismoduledoesnotexists not found");
-            $commandTester->execute(array(
+            $commandTester->execute([
                 "command" => $command->getName(),
                 "module" => "letshopethismoduledoesnotexists",
-            ));
+            ]);
 
             $out = true;
         }

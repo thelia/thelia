@@ -102,10 +102,10 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::CUSTOMER_TITLE_CREATE => array("create"),
-            TheliaEvents::CUSTOMER_TITLE_UPDATE => array("update"),
-            TheliaEvents::CUSTOMER_TITLE_DELETE => array("delete"),
-        );
+        return [
+            TheliaEvents::CUSTOMER_TITLE_CREATE => ["create"],
+            TheliaEvents::CUSTOMER_TITLE_UPDATE => ["update"],
+            TheliaEvents::CUSTOMER_TITLE_DELETE => ["delete"],
+        ];
     }
 }

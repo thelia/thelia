@@ -31,7 +31,6 @@ if($ftp){
 	$thumb_base = $ftp_base_folder.$ftp_thumbs_dir;
 	$path_pos  = strpos($storeFolder,$source_base);
 	$thumb_pos = strpos($storeFolderThumb,$thumb_base);
-
 }else{
 	$source_base = $current_path;
 	$thumb_base = $thumbs_base_path;
@@ -70,7 +69,6 @@ while ($cycle && $i < $max_cycles)
 	$path = fix_dirname($path).'/';
 }
 
-
 if ( ! empty($_FILES) || isset($_POST['url']))
 {
 	if(isset($_POST['url'])){
@@ -78,12 +76,12 @@ if ( ! empty($_FILES) || isset($_POST['url']))
 		$handle = fopen($temp, "w");
 		fwrite($handle, file_get_contents($_POST['url']));
 		fclose($handle);
-		$_FILES['file']= array(
+		$_FILES['file']= [
 			'name' => basename($_POST['url']),
 			'tmp_name' => $temp,
 			'size' => filesize($temp),
 			'type' => explode(".", strtolower($temp))
-		);
+		];
 	}
 
 	$info = pathinfo($_FILES['file']['name']);
@@ -175,7 +173,6 @@ if ( ! empty($_FILES) || isset($_POST['url']))
 			}
 			else
 			{
-
 				// TODO something with this long function baaaah...
 				if( !$ftp && ! new_thumbnails_creation($targetPath,$targetFile,$_FILES['file']['name'],$current_path,$relative_image_creation,$relative_path_from_current_pos,$relative_image_creation_name_to_prepend,$relative_image_creation_name_to_append,$relative_image_creation_width,$relative_image_creation_height,$relative_image_creation_option,$fixed_image_creation,$fixed_path_from_filemanager,$fixed_image_creation_name_to_prepend,$fixed_image_creation_to_append,$fixed_image_creation_width,$fixed_image_creation_height,$fixed_image_creation_option))
 				{
@@ -244,7 +241,6 @@ if ( ! empty($_FILES) || isset($_POST['url']))
 		}
 
 		if($ftp){
-
 			$ftp->put($targetPath. $_FILES['file']['name'], $targetFile, FTP_BINARY);
 			unlink($targetFile);
 			if ($is_img)
@@ -271,13 +267,13 @@ else // no files to upload
 // redirect
 if (isset($_POST['submit']))
 {
-	$query = http_build_query(array(
+	$query = http_build_query([
 		'type'	  	=> $_POST['type'],
 		'lang'	  	=> $_POST['lang'],
 		'popup'			=> $_POST['popup'],
 		'field_id'  => $_POST['field_id'],
 		'fldr'	  	=> $_POST['fldr'],
-	));
+	]);
 
 	header("location: dialog.php?" . $query);
 }

@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Email address' => 'Адрес email',
     'Forgot your Password?' => 'Забыли пароль?',
     'Log In!' => 'Вход',
@@ -10,4 +10,4 @@ return array(
     'Register' => 'Регистрация',
     'Register!' => 'Регистрация',
     'Sign In' => 'Войти',
-);
+];

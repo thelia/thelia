@@ -20,9 +20,9 @@ namespace Thelia\Type;
 
 class EnumListType extends BaseType
 {
-    protected $values = array();
+    protected $values = [];
 
-    public function __construct($values = array())
+    public function __construct($values = [])
     {
         if (\is_array($values)) {
             $this->values = $values;
@@ -84,6 +84,6 @@ class EnumListType extends BaseType
 
     public function getFormOptions()
     {
-        return array();
+        return [];
     }
 }

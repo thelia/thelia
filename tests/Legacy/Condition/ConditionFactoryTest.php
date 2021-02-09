@@ -13,13 +13,13 @@
 namespace Thelia\Tests\Condition;
 
 use PHPUnit\Framework\TestCase;
+use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\MatchForEveryone;
 use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Condition\ConditionCollection;
 use Thelia\Model\CurrencyQuery;
 
 /**
@@ -70,14 +70,14 @@ class ConditionFactoryTest extends TestCase
             ->will($this->returnValue(true));
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $conditionFactory = new ConditionFactory(
@@ -130,17 +130,17 @@ class ConditionFactoryTest extends TestCase
 
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValueMap(array('unset.service', false)));
+            ->will($this->returnValueMap(['unset.service', false]));
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $conditionFactory = new ConditionFactory(
@@ -194,25 +194,25 @@ class ConditionFactoryTest extends TestCase
             ->will($this->returnValue(true));
 
         $condition1 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition2->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
@@ -272,14 +272,14 @@ class ConditionFactoryTest extends TestCase
             ->method('has')
             ->will($this->returnValue(true));
 
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();
@@ -335,14 +335,14 @@ class ConditionFactoryTest extends TestCase
             ->method('has')
             ->will($this->returnValue(false));
 
-        $operators = array(
+        $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
             MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
-        );
-        $values = array(
+        ];
+        $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
             MatchForTotalAmount::CART_CURRENCY => 'EUR'
-        );
+        ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $conditions = new ConditionCollection();

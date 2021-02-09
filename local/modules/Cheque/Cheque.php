@@ -48,7 +48,7 @@ class Cheque extends AbstractPaymentModule
         $database = new Database($con);
 
         // Insert email message
-        $database->insertSql(null, array(__DIR__ . "/Config/setup.sql"));
+        $database->insertSql(null, [__DIR__ . "/Config/setup.sql"]);
     }
 
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)

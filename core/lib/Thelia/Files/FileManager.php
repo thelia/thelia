@@ -28,7 +28,7 @@ use Thelia\Exception\ImageException;
  */
 class FileManager
 {
-    protected $supportedFileModels = array();
+    protected $supportedFileModels = [];
 
     /**
      * Create a new FileManager instance.
@@ -261,7 +261,7 @@ class FileManager
     {
         $isValid = false;
 
-        $allowedType = array('image/jpeg' , 'image/png' ,'image/gif');
+        $allowedType = ['image/jpeg' , 'image/png' ,'image/gif'];
 
         if (\in_array($mimeType, $allowedType)) {
             $isValid = true;

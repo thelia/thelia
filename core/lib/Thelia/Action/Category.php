@@ -16,23 +16,23 @@ use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Thelia\Core\Event\Category\CategoryAddContentEvent;
+use Thelia\Core\Event\Category\CategoryCreateEvent;
+use Thelia\Core\Event\Category\CategoryDeleteContentEvent;
+use Thelia\Core\Event\Category\CategoryDeleteEvent;
+use Thelia\Core\Event\Category\CategoryToggleVisibilityEvent;
+use Thelia\Core\Event\Category\CategoryUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
+use Thelia\Core\Event\ViewCheckEvent;
+use Thelia\Model\Category as CategoryModel;
+use Thelia\Model\CategoryAssociatedContent;
+use Thelia\Model\CategoryAssociatedContentQuery;
 use Thelia\Model\CategoryDocumentQuery;
 use Thelia\Model\CategoryImageQuery;
 use Thelia\Model\CategoryQuery;
-use Thelia\Model\Category as CategoryModel;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Category\CategoryUpdateEvent;
-use Thelia\Core\Event\Category\CategoryCreateEvent;
-use Thelia\Core\Event\Category\CategoryDeleteEvent;
-use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\Category\CategoryToggleVisibilityEvent;
-use Thelia\Core\Event\Category\CategoryAddContentEvent;
-use Thelia\Core\Event\Category\CategoryDeleteContentEvent;
-use Thelia\Core\Event\ViewCheckEvent;
-use Thelia\Model\CategoryAssociatedContent;
-use Thelia\Model\CategoryAssociatedContentQuery;
 use Thelia\Model\Map\CategoryTableMap;
 
 class Category extends BaseAction implements EventSubscriberInterface
@@ -40,9 +40,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new category entry
      *
-     * @param \Thelia\Core\Event\Category\CategoryCreateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function create(CategoryCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -63,9 +61,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * Change a category
      *
-     * @param \Thelia\Core\Event\Category\CategoryUpdateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function update(CategoryUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -90,9 +86,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * Change a Category SEO
      *
-     * @param UpdateSeoEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @return Object
      */
     public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -103,9 +97,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a category entry
      *
-     * @param \Thelia\Core\Event\Category\CategoryDeleteEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Exception
      */
     public function delete(CategoryDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -151,9 +143,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * Toggle category visibility. No form used here
      *
-     * @param CategoryToggleVisibilityEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function toggleVisibility(CategoryToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -170,9 +160,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param UpdatePositionEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -210,9 +198,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * Check if is a category view and if category_id is visible
      *
-     * @param ViewCheckEvent $event
      * @param string $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -229,7 +215,6 @@ class Category extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param ViewCheckEvent $event
      * @throws NotFoundHttpException
      */
     public function viewcategoryIdNotVisible(ViewCheckEvent $event)
@@ -242,20 +227,20 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::CATEGORY_CREATE            => array("create", 128),
-            TheliaEvents::CATEGORY_UPDATE            => array("update", 128),
-            TheliaEvents::CATEGORY_DELETE            => array("delete", 128),
-            TheliaEvents::CATEGORY_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
+        return [
+            TheliaEvents::CATEGORY_CREATE            => ["create", 128],
+            TheliaEvents::CATEGORY_UPDATE            => ["update", 128],
+            TheliaEvents::CATEGORY_DELETE            => ["delete", 128],
+            TheliaEvents::CATEGORY_TOGGLE_VISIBILITY => ["toggleVisibility", 128],
 
-            TheliaEvents::CATEGORY_UPDATE_POSITION   => array("updatePosition", 128),
-            TheliaEvents::CATEGORY_UPDATE_SEO        => array("updateSeo", 128),
+            TheliaEvents::CATEGORY_UPDATE_POSITION   => ["updatePosition", 128],
+            TheliaEvents::CATEGORY_UPDATE_SEO        => ["updateSeo", 128],
 
-            TheliaEvents::CATEGORY_ADD_CONTENT       => array("addContent", 128),
-            TheliaEvents::CATEGORY_REMOVE_CONTENT    => array("removeContent", 128),
+            TheliaEvents::CATEGORY_ADD_CONTENT       => ["addContent", 128],
+            TheliaEvents::CATEGORY_REMOVE_CONTENT    => ["removeContent", 128],
 
-            TheliaEvents::VIEW_CHECK                    => array('viewCheck', 128),
-            TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE  => array('viewcategoryIdNotVisible', 128),
-        );
+            TheliaEvents::VIEW_CHECK                    => ['viewCheck', 128],
+            TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE  => ['viewcategoryIdNotVisible', 128],
+        ];
     }
 }

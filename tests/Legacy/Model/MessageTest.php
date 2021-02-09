@@ -139,7 +139,7 @@ class MessageTest extends TestCase
 
         $this->assertEquals("The subject", $instance->getSubject());
         $this->assertEquals("The TEXT content", $instance->getBody());
-        $this->assertEquals(0, count($instance->getChildren()));
+        $this->assertEquals(0, \count($instance->getChildren()));
     }
 
     /**
@@ -198,7 +198,7 @@ class MessageTest extends TestCase
 
         $this->assertEquals("The subject", $instance->getSubject());
         $this->assertEquals("TEXT Layout 3: The <TEXT> & content :-) <>", $instance->getBody());
-        $this->assertEquals(0, count($instance->getChildren()));
+        $this->assertEquals(0, \count($instance->getChildren()));
     }
 
     /**

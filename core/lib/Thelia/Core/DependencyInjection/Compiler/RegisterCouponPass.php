@@ -46,9 +46,9 @@ class RegisterCouponPass implements CompilerPassInterface
         foreach ($services as $id => $rule) {
             $couponManager->addMethodCall(
                 'addAvailableCoupon',
-                array(
+                [
                     new Reference($id)
-                )
+                ]
             );
         }
     }

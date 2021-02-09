@@ -52,6 +52,6 @@ class FloatToFloatArrayType extends BaseType
 
     public function getFormOptions()
     {
-        return array();
+        return [];
     }
 }

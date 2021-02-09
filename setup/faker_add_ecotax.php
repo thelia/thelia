@@ -146,7 +146,6 @@ try {
     $con->commit();
 
     echo "Successfully terminated.\n";
-
 } catch (Exception $e) {
     echo "error : ".$e->getMessage()."\n";
     $con->rollBack();

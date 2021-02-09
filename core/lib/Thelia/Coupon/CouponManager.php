@@ -18,11 +18,11 @@ use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Exception\UnmatchableConditionException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
-use Thelia\Model\CouponModule;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponCustomerCount;
 use Thelia\Model\CouponCustomerCountQuery;
+use Thelia\Model\CouponModule;
 use Thelia\Model\Order;
 
 /**
@@ -35,13 +35,13 @@ use Thelia\Model\Order;
 class CouponManager
 {
     /** @var FacadeInterface Provides necessary value from Thelia */
-    protected $facade = null;
+    protected $facade;
 
     /** @var array Available Coupons (Services) */
-    protected $availableCoupons = array();
+    protected $availableCoupons = [];
 
     /** @var array Available Conditions (Services) */
-    protected $availableConditions = array();
+    protected $availableConditions = [];
 
     /**
      * @var Request
@@ -224,7 +224,7 @@ class CouponManager
      */
     protected function sortCoupons(array $coupons)
     {
-        $couponsKept = array();
+        $couponsKept = [];
 
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
@@ -238,21 +238,21 @@ class CouponManager
                             $couponsKept[] = $coupon;
                         } else {
                             // Reset Coupons, add last
-                            $couponsKept = array($coupon);
+                            $couponsKept = [$coupon];
                         }
                     } else {
                         // Reset Coupons, add last
-                        $couponsKept = array($coupon);
+                        $couponsKept = [$coupon];
                     }
                 } else {
                     // Reset Coupons, add last
-                    $couponsKept = array($coupon);
+                    $couponsKept = [$coupon];
                 }
             }
         }
 
         $coupons = $couponsKept;
-        $couponsKept = array();
+        $couponsKept = [];
 
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
@@ -354,7 +354,7 @@ class CouponManager
     {
         if ($coupon->isUsageUnlimited()) {
             return true;
-        } else {
+        }  
             try {
                 $usageLeft = $coupon->getUsagesLeft($customerId);
 
@@ -388,34 +388,31 @@ class CouponManager
                         ;
 
                         return $usageLeft - $newCount;
-                    } else {
+                    }  
                         $coupon->setMaxUsage(--$usageLeft);
 
                         $coupon->save();
 
                         return $usageLeft;
-                    }
                 }
             } catch (\Exception $ex) {
                 // Just log the problem.
                 Tlog::getInstance()->addError(sprintf("Failed to decrement coupon %s: %s", $coupon->getCode(), $ex->getMessage()));
             }
-        }
-
+        
         return false;
     }
 
     /**
      * Add a coupon usage, for the case the related order is canceled.
      *
-     * @param Coupon $coupon
      * @param int $customerId
      */
     public function incrementQuantity(Coupon $coupon, $customerId = null)
     {
         if ($coupon->isUsageUnlimited()) {
             return true;
-        } else {
+        }  
             try {
                 $usageLeft = $coupon->getUsagesLeft($customerId);
 
@@ -452,8 +449,7 @@ class CouponManager
                 // Just log the problem.
                 Tlog::getInstance()->addError(sprintf("Failed to increment coupon %s: %s", $coupon->getCode(), $ex->getMessage()));
             }
-        }
-
+        
         return false;
     }
 }

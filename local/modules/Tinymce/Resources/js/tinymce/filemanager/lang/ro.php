@@ -1,7 +1,6 @@
 <?php
 
-return array(
-
+return [
 	'Select' => 'Selectează',
 	'Erase' => 'Șterge',
 	'Open' => 'Deschide',
@@ -120,4 +119,4 @@ return array(
 	'GB' => "GB",
 	'TB' => "TB",
 	'total size' => "Dimensiune totată",
-);
+];

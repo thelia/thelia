@@ -53,9 +53,6 @@ class ParamInitMiddleware implements HttpKernelInterface
     protected $eventDispatcher;
 
     /**
-     * @param HttpKernelInterface $app
-     * @param Translator $translator
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(HttpKernelInterface $app, Translator $translator, EventDispatcherInterface $eventDispatcher)
     {
@@ -96,7 +93,6 @@ class ParamInitMiddleware implements HttpKernelInterface
     }
 
     /**
-     * @param  TheliaRequest $request
      * @return null|\Thelia\Model\Lang
      */
     protected function detectLang(TheliaRequest $request)
@@ -130,19 +126,17 @@ class ParamInitMiddleware implements HttpKernelInterface
                     // if lang domain is different from current domain, redirect to the proper one
                     if (rtrim($domainUrl, "/") != $request->getSchemeAndHttpHost()) {
                         return new RedirectResponse($domainUrl, 301);
-                    } else {
+                    }  
                         //the user is currently on the proper domain, nothing to change
                         return null;
-                    }
                 }
 
                 Tlog::getInstance()->warning("The domain URL for language ".$lang->getTitle()." (id ".$lang->getId().") is not defined.");
 
                 return Lang::getDefaultLanguage();
-            } else {
+            }  
                 // one domain for all languages, the lang has to be set into session
                 return $lang;
-            }
         }
 
         // Next, check if lang is defined in the current session. If not we have to set one.

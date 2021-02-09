@@ -25,8 +25,6 @@ class BaseAction
     /**
      * Changes object position, selecting absolute ou relative change.
      *
-     * @param ModelCriteria       $query
-     * @param UpdatePositionEvent $event
      * @param EventDispatcherInterface $dispatcher
      *
      * @return null
@@ -51,9 +49,6 @@ class BaseAction
     }
 
     /**
-     * @param ModelCriteria $query
-     * @param UpdatePositionEvent $event
-     * @param EventDispatcherInterface|null $dispatcher
      *
      * @since 2.3
      */
@@ -79,8 +74,6 @@ class BaseAction
     /**
      * Changes SEO Fields for an object.
      *
-     * @param ModelCriteria  $query
-     * @param UpdateSeoEvent $event
      * @param EventDispatcherInterface $dispatcher
      *
      * @return mixed                   an SEOxxx object
@@ -113,11 +106,8 @@ class BaseAction
     /**
      * Toggle visibility for an object
      *
-     * @param ModelCriteria               $query
-     * @param ToggleVisibilityEvent $event
      * @param EventDispatcherInterface $dispatcher
      *
-     * @return mixed
      */
     public function genericToggleVisibility(ModelCriteria $query, ToggleVisibilityEvent $event, EventDispatcherInterface $dispatcher = null)
     {

@@ -43,7 +43,6 @@ class ModuleDescriptorValidator
     }
 
     /**
-     * @return mixed
      */
     public function getModuleVersion()
     {

@@ -26,9 +26,7 @@ class Config extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new configuration entry
      *
-     * @param \Thelia\Core\Event\Config\ConfigCreateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function create(ConfigCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -49,9 +47,7 @@ class Config extends BaseAction implements EventSubscriberInterface
     /**
      * Change a configuration entry value
      *
-     * @param \Thelia\Core\Event\Config\ConfigUpdateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function setValue(ConfigUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -67,9 +63,7 @@ class Config extends BaseAction implements EventSubscriberInterface
     /**
      * Change a configuration entry
      *
-     * @param \Thelia\Core\Event\Config\ConfigUpdateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function modify(ConfigUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -93,9 +87,7 @@ class Config extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a configuration entry
      *
-     * @param \Thelia\Core\Event\Config\ConfigDeleteEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function delete(ConfigDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -113,16 +105,16 @@ class Config extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-                TheliaEvents::CONFIG_CREATE => array(
+        return [
+                TheliaEvents::CONFIG_CREATE => [
                     "create", 128
-                ), TheliaEvents::CONFIG_SETVALUE => array(
+                ], TheliaEvents::CONFIG_SETVALUE => [
                     "setValue", 128
-                ), TheliaEvents::CONFIG_UPDATE => array(
+                ], TheliaEvents::CONFIG_UPDATE => [
                     "modify", 128
-                ), TheliaEvents::CONFIG_DELETE => array(
+                ], TheliaEvents::CONFIG_DELETE => [
                     "delete", 128
-                ),
-        );
+                ],
+        ];
     }
 }

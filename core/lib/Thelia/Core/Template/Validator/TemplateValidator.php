@@ -55,13 +55,11 @@ class TemplateValidator
     }
 
     /**
-     * @return mixed
      */
     public function getTemplateVersion()
     {
         return $this->templateVersion;
     }
-
 
     /**
      * @return array

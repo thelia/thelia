@@ -12,15 +12,15 @@
 
 namespace Thelia\TaxEngine\TaxType;
 
-use Thelia\Model\FeatureProductQuery;
-use Thelia\Model\Product;
-use Thelia\Type\FloatType;
-use Thelia\Type\ModelValidIdType;
 use Thelia\Core\Translation\Translator;
+use Thelia\Log\Tlog;
+use Thelia\Model\FeatureProductQuery;
+use Thelia\Model\LangQuery;
+use Thelia\Model\Product;
 use Thelia\TaxEngine\BaseTaxType;
 use Thelia\TaxEngine\TaxTypeRequirementDefinition;
-use Thelia\Model\LangQuery;
-use Thelia\Log\Tlog;
+use Thelia\Type\FloatType;
+use Thelia\Type\ModelValidIdType;
 
 /**
  *
@@ -67,7 +67,7 @@ class FeatureFixAmountTaxType extends BaseTaxType
 
     public function getRequirementsDefinition()
     {
-        return array(
+        return [
             new TaxTypeRequirementDefinition(
                 'feature',
                 new ModelValidIdType('Feature'),
@@ -78,7 +78,7 @@ class FeatureFixAmountTaxType extends BaseTaxType
                 new ModelValidIdType('Lang'),
                 Translator::getInstance()->trans('Language')
             ),
-        );
+        ];
     }
 
     public function getTitle()

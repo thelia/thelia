@@ -92,7 +92,7 @@ if(isset($_GET['action']))
 				|| strpos($_POST['path'], './') === 0
 				|| (strpos($_POST['url'], 'http://s3.amazonaws.com/feather') !== 0 && strpos($_POST['url'], 'https://s3.amazonaws.com/feather') !== 0)
 				|| $_POST['name'] != fix_filename($_POST['name'], $config)
-				|| ! in_array(strtolower($info['extension']), array( 'jpg', 'jpeg', 'png' ))
+				|| ! in_array(strtolower($info['extension']), [ 'jpg', 'jpeg', 'png' ])
 			)
 			{
 				response(trans('wrong data').AddErrorLocation())->send();
@@ -110,7 +110,6 @@ if(isset($_GET['action']))
 				exit;
 			}
 			if($ftp){
-
 				$temp = tempnam('/tmp','RF');
 				unlink($temp);
 				$temp .=".".substr(strrchr($_POST['url'],'.'),1);
@@ -123,7 +122,6 @@ if(isset($_GET['action']))
 
 				unlink($temp);
 			}else{
-
 				file_put_contents($current_path . $_POST['path'] . $_POST['name'],$image_data);
 				create_img($current_path . $_POST['path'] . $_POST['name'], $thumbs_base_path.$_POST['path'].$_POST['name'], 122, 91);
 				// TODO something with this function cause its blowing my mind
@@ -150,9 +148,9 @@ if(isset($_GET['action']))
 			}
 			break;
 		case 'extract':
-			if (	strpos($_POST['path'], '/') === 0 
+			if (	strpos($_POST['path'], '/') === 0
 				|| strpos($_POST['path'], '../') !== false 
-				|| strpos($_POST['path'], '..\\') !== false 
+				|| strpos($_POST['path'], '..\\') !== false
 				|| strpos($_POST['path'], './') === 0)
 			{
 				response(trans('wrong path'.AddErrorLocation()))->send();
@@ -233,25 +231,22 @@ if(isset($_GET['action']))
 					}
 
 					break;
-
 				case "gz":
 					// No resulting size pre-control available
 					$p = new PharData($path);
 					$p->decompress(); // creates files.tar
 
 					break;
-
 				case "tar":
 					// No resulting size pre-control available
 					// unarchive from the tar
 					$phar = new PharData($path);
 					$phar->decompressFiles();
-					$files = array();
+					$files = [];
 					check_files_extensions_on_phar($phar, $files, '', $ext);
 					$phar->extractTo($base_folder, $files, true);
 
 					break;
-
 				default:
 					response(trans('Zip_Invalid').AddErrorLocation())->send();
 					exit;
@@ -262,7 +257,6 @@ if(isset($_GET['action']))
 				$ftp->putAll($base_folder, "/".$ftp_base_folder . $upload_dir . fix_dirname($_POST['path']), FTP_BINARY);
 				deleteDir($base_folder);
 			}
-
 
 			break;
 		case 'media_preview':
@@ -321,7 +315,7 @@ if(isset($_GET['action']))
 				</div>
 				</div>
 			</div>
-			<?php if(in_array(strtolower($info['extension']), $ext_music)): ?>
+			<?php if(in_array(strtolower($info['extension']), $ext_music)) { ?>
 
 				<script type="text/javascript">
 					$(document).ready(function(){
@@ -345,7 +339,7 @@ if(isset($_GET['action']))
 					});
 				</script>
 
-			<?php elseif(in_array(strtolower($info['extension']), $ext_video)):	?>
+			<?php } elseif (in_array(strtolower($info['extension']), $ext_video)){	?>
 
 				<script type="text/javascript">
 				$(document).ready(function(){
@@ -369,7 +363,7 @@ if(isset($_GET['action']))
 				});
 			</script>
 
-			<?php endif;
+			<?php }
 
 			$content = ob_get_clean();
 
@@ -497,9 +491,7 @@ if(isset($_GET['action']))
 				$info .= (($perms & 0x0001) ?
 				            (($perms & 0x0200) ? 't' : 'x' ) :
 				            (($perms & 0x0200) ? 'T' : '-'));
-
 			}
-
 
 			$ret = '<div id="files_permission_start">
 			<form id="chmod_form">
@@ -591,9 +583,8 @@ if(isset($_GET['action']))
 				{
 					response(trans('Lang_Not_Found').AddErrorLocation())->send();
 					exit;
-				}else{
-					$_SESSION['RF']['language'] = $choosen_lang;
 				}
+					$_SESSION['RF']['language'] = $choosen_lang;
 			}
 
 			break;
@@ -658,7 +649,7 @@ if(isset($_GET['action']))
 
 			if ( ! isset($allowed_file_exts) || ! is_array($allowed_file_exts))
 			{
-				$allowed_file_exts = array();
+				$allowed_file_exts = [];
 			}
 
 			if ( ! in_array($info['extension'], $allowed_file_exts)
@@ -686,7 +677,6 @@ if(isset($_GET['action']))
 					} else {
 						$ret .= '<pre class="no-prettify">'.$data.'</pre>';
 					}
-
 				}
 				elseif ($preview_mode == 'google' || $preview_mode == 'viewerjs') {
 					if($ftp){

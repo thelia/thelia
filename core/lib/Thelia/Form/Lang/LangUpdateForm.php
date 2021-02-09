@@ -28,12 +28,12 @@ class LangUpdateForm extends LangCreateForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add('id', HiddenType::class, array(
-                'constraints' => array(
+            ->add('id', HiddenType::class, [
+                'constraints' => [
                     new NotBlank(),
-                    new GreaterThan(array('value' => 0)),
-                ),
-            ));
+                    new GreaterThan(['value' => 0]),
+                ],
+            ]);
     }
 
     public function getName()

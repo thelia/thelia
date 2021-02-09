@@ -9,14 +9,11 @@ use Thelia\Core\Event\Folder\FolderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Folder as BaseFolder;
-
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
 
 class Folder extends BaseFolder implements FileModelParentInterface
 {
-
-
     use PositionManagementTrait;
 
     use UrlRewritingTrait;
@@ -40,15 +37,12 @@ class Folder extends BaseFolder implements FileModelParentInterface
     /**
      * count all products for current category and sub categories
      *
-     * @param bool|string $contentVisibility: true (default) to count only visible products, false to count only hidden
-     *                    products, or * to count all products.
      * @return int
      */
     public function countAllContents($contentVisibility = true)
     {
         $children = FolderQuery::findAllChild($this->getId());
         array_push($children, $this);
-
 
         $query = ContentQuery::create()->filterByFolder(new ObjectCollection($children), Criteria::IN);
 
@@ -62,7 +56,6 @@ class Folder extends BaseFolder implements FileModelParentInterface
     /**
      * Get the root folder
      * @param  int   $folderId
-     * @return mixed
      */
     public function getRoot($folderId)
     {
@@ -106,9 +99,9 @@ class Folder extends BaseFolder implements FileModelParentInterface
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
-            array(
+            [
                 "parent" => $this->getParent(),
-            )
+            ]
         );
 
         return true;

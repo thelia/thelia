@@ -33,11 +33,11 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
     protected $module;
     protected $moduleDirectory;
 
-    protected $reservedKeyWords = array(
+    protected $reservedKeyWords = [
          'thelia'
-     );
+     ];
 
-    protected $neededDirectories = array(
+    protected $neededDirectories = [
          'Config',
          'Model',
          'Loop',
@@ -47,7 +47,7 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
          'I18n',
          'templates',
          'Hook',
-     );
+     ];
 
     protected function verifyExistingModule()
     {

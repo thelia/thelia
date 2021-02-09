@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Core\Event\Payment;
 
 use Thelia\Module\PaymentModuleInterface;
@@ -23,11 +22,10 @@ use Thelia\Module\PaymentModuleInterface;
 class ManageStockOnCreationEvent extends BasePaymentEvent
 {
     /** @var bool|null */
-    protected $manageStock = null;
+    protected $manageStock;
 
     /**
      * ManageStockOnCreationEvent constructor.
-     * @param bool|null $manageStock
      */
     public function __construct(PaymentModuleInterface $module)
     {

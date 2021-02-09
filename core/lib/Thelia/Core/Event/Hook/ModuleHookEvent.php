@@ -22,7 +22,7 @@ use Thelia\Model\ModuleHook;
  */
 class ModuleHookEvent extends ActionEvent
 {
-    public $moduleHook = null;
+    public $moduleHook;
 
     public function __construct(ModuleHook $moduleModuleHook = null)
     {

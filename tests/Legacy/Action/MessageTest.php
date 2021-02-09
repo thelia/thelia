@@ -13,10 +13,10 @@
 namespace Thelia\Tests\Action;
 
 use Thelia\Action\Message;
+use Thelia\Core\Event\Message\MessageCreateEvent;
 use Thelia\Core\Event\Message\MessageDeleteEvent;
 use Thelia\Core\Event\Message\MessageUpdateEvent;
 use Thelia\Model\Message as MessageModel;
-use Thelia\Core\Event\Message\MessageCreateEvent;
 use Thelia\Model\MessageQuery;
 
 /**
@@ -60,7 +60,6 @@ class MessageTest extends BaseAction
     }
 
     /**
-     * @param MessageModel $message
      * @depends testCreate
      * @return MessageModel
      */
@@ -103,7 +102,6 @@ class MessageTest extends BaseAction
     }
 
     /**
-     * @param MessageModel $message
      * @depends testModify
      */
     public function testDelete(MessageModel $message)

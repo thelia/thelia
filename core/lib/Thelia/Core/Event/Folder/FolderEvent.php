@@ -34,7 +34,6 @@ class FolderEvent extends ActionEvent
     }
 
     /**
-     * @param \Thelia\Model\Folder $folder
      */
     public function setFolder(Folder $folder)
     {

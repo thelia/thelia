@@ -21,7 +21,7 @@ class Fragment
 {
     protected $data;
 
-    public function __construct($data = array())
+    public function __construct($data = [])
     {
         if (!\is_array($data)) {
             throw new \InvalidArgumentException("'data' argument must be an array");
@@ -38,7 +38,7 @@ class Fragment
 
     public function get($key)
     {
-        if (array_key_exists($key, $this->data)) {
+        if (\array_key_exists($key, $this->data)) {
             return $this->data[$key];
         }
 
@@ -69,7 +69,7 @@ class Fragment
         $data = [];
 
         foreach ($fields as $field) {
-            $data[$field] = (array_key_exists($field, $this->data)) ? $this->data[$field] : $default;
+            $data[$field] = (\array_key_exists($field, $this->data)) ? $this->data[$field] : $default;
         }
 
         $this->data = $data;

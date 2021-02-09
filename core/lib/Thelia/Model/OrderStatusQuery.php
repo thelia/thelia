@@ -141,11 +141,9 @@ class OrderStatusQuery extends BaseOrderStatusQuery
                     case OrderStatus::CODE_PAID:
                         $match = $status->isPaid(false);
                         break;
-
                     case OrderStatus::CODE_PROCESSING:
                         $match = $status->isProcessing(false);
                         break;
-
                     case OrderStatus::CODE_SENT:
                         $match = $status->isSent(false);
                         break;
@@ -155,7 +153,6 @@ class OrderStatusQuery extends BaseOrderStatusQuery
                     case OrderStatus::CODE_REFUNDED:
                         $match = $status->isRefunded(false);
                         break;
-
                     default:
                         throw new InvalidArgumentException("Status code '$statusCode' is not a valid value.");
                 }

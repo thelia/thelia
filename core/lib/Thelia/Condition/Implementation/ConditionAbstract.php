@@ -19,8 +19,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionOperatorException;
 use Thelia\Exception\InvalidConditionValueException;
-use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Currency;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Type\FloatType;
 
 /**
@@ -39,10 +39,10 @@ abstract class ConditionAbstract implements ConditionInterface
     protected $validators = [];
 
     /** @var  FacadeInterface Provide necessary value from Thelia */
-    protected $facade = null;
+    protected $facade;
 
     /** @var Translator Service Translator */
-    protected $translator = null;
+    protected $translator;
 
     /** @var array Operators set by Admin in BackOffice */
     protected $operators = [];
@@ -51,7 +51,7 @@ abstract class ConditionAbstract implements ConditionInterface
     protected $values = [];
 
     /** @var ConditionEvaluator Conditions validator */
-    protected $conditionValidator = null;
+    protected $conditionValidator;
 
     /**
      * Constructor

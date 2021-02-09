@@ -19,7 +19,6 @@ class UpdateFilePositionEvent extends UpdatePositionEvent
     protected $query;
 
     /**
-     * @param ModelCriteria $query
      * @param               $object_id
      * @param null          $mode
      * @param null          $position
@@ -32,7 +31,6 @@ class UpdateFilePositionEvent extends UpdatePositionEvent
     }
 
     /**
-     * @param ModelCriteria $query
      */
     public function setQuery(ModelCriteria $query)
     {

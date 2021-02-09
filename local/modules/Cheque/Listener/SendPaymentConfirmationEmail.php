@@ -55,9 +55,7 @@ class SendPaymentConfirmationEmail extends BaseAction implements EventSubscriber
     public function sendConfirmationEmail(OrderEvent $event)
     {
         if ($event->getOrder()->getPaymentModuleId() === Cheque::getModuleId()) {
-
             if ($event->getOrder()->isPaid()) {
-
                 $order = $event->getOrder();
 
                 $this->mailer->sendEmailToCustomer(
@@ -77,9 +75,8 @@ class SendPaymentConfirmationEmail extends BaseAction implements EventSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::ORDER_UPDATE_STATUS => array("sendConfirmationEmail", 128)
-        );
+        return [
+            TheliaEvents::ORDER_UPDATE_STATUS => ["sendConfirmationEmail", 128]
+        ];
     }
-
 }

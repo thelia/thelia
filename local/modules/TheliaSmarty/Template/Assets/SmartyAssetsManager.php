@@ -15,10 +15,10 @@ namespace TheliaSmarty\Template\Assets;
 use Thelia\Core\Template\Assets\AssetManagerInterface;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Exception\TheliaProcessException;
-use TheliaSmarty\Template\SmartyParser;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Log\Tlog;
+use TheliaSmarty\Template\SmartyParser;
 
 class SmartyAssetsManager
 {
@@ -52,7 +52,6 @@ class SmartyAssetsManager
         $this->assetsManager = $assetsManager;
         $this->assetsResolver = $assetsResolver;
     }
-
 
     /**
      * Prepare current template assets
@@ -212,7 +211,6 @@ class SmartyAssetsManager
      * @param $assetType
      * @param $params
      * @param $content
-     * @param \Smarty_Internal_Template $template
      * @param $repeat
      * @return null
      * @throws \Exception

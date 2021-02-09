@@ -34,24 +34,24 @@ class CustomerTitleI18nType extends AbstractTheliaType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add("locale", "text", array(
+            ->add("locale", "text", [
                 "required" => true,
-                "constraints" => array(
+                "constraints" => [
                     new NotBlank(),
-                ),
-            ))
-            ->add("short", "text", array(
+                ],
+            ])
+            ->add("short", "text", [
                 "required" => false,
-                "constraints" => array(
+                "constraints" => [
                     new Length(["max" => 10]),
-                ),
-            ))
-            ->add("long", "text", array(
+                ],
+            ])
+            ->add("long", "text", [
                 "required" => false,
-                "constraints" => array(
+                "constraints" => [
                     new Length(["max" => 45]),
-                ),
-            ))
+                ],
+            ])
         ;
     }
 

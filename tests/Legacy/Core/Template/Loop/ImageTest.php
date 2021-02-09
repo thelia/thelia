@@ -12,12 +12,12 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 use Thelia\Core\Template\Loop\Image;
-use Thelia\Model\ProductImageQuery;
 use Thelia\Model\CategoryImageQuery;
 use Thelia\Model\ContentImageQuery;
 use Thelia\Model\FolderImageQuery;
+use Thelia\Model\ProductImageQuery;
+use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
  *
@@ -33,34 +33,34 @@ class ImageTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return array('source' => 'product', 'id' => 1);
+        return ['source' => 'product', 'id' => 1];
     }
 
     public function testSearchByProductId()
     {
         $image = ProductImageQuery::create()->findOne();
 
-        $this->baseTestSearchById($image->getId(), array('source' => 'product'));
+        $this->baseTestSearchById($image->getId(), ['source' => 'product']);
     }
 
     public function testSearchByFolderId()
     {
         $image = FolderImageQuery::create()->findOne();
 
-        $this->baseTestSearchById($image->getId(), array('source' => 'folder'));
+        $this->baseTestSearchById($image->getId(), ['source' => 'folder']);
     }
 
     public function testSearchByContentId()
     {
         $image = ContentImageQuery::create()->findOne();
 
-        $this->baseTestSearchById($image->getId(), array('source' => 'content'));
+        $this->baseTestSearchById($image->getId(), ['source' => 'content']);
     }
 
     public function testSearchByCategoryId()
     {
         $image = CategoryImageQuery::create()->findOne();
 
-        $this->baseTestSearchById($image->getId(), array('source' => 'category'));
+        $this->baseTestSearchById($image->getId(), ['source' => 'category']);
     }
 }

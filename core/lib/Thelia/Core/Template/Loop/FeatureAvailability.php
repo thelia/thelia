@@ -17,15 +17,15 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\FeatureAv;
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\Map\FeatureAvTableMap;
 use Thelia\Model\Map\FeatureProductTableMap;
-use Thelia\Type\TypeCollection;
 use Thelia\Type;
+use Thelia\Type\TypeCollection;
 
 /**
  * FeatureAvailability loop
@@ -57,7 +57,7 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha-reverse', 'alpha_reverse', 'manual', 'manual_reverse'))
+                    new Type\EnumListType(['id', 'id_reverse', 'alpha', 'alpha-reverse', 'alpha_reverse', 'manual', 'manual_reverse'])
                 ),
                 'manual'
             )

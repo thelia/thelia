@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Add responsive class to images' => 'Add responsive class to images',
     'Custom CSS available in the editor' => 'Custom CSS available in the editor',
     'Enter CSS or LESS code. You may also customize the editor.less file in the plugin template directory.' => 'Enter CSS or LESS code. You may also customize the editor.less file in the plugin template directory.',
@@ -12,4 +12,4 @@ return array(
     'Show the TinyMCE menu bar' => 'Show the TinyMCE menu bar',
     'This is a sample text editor, to view actual configuration.' => 'This is a sample text editor, to view actual configuration.',
     'Tinymce configuration' => 'Tinymce configuration',
-);
+];

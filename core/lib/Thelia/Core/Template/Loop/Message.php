@@ -19,9 +19,9 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\Message as MessageModel;
 use Thelia\Model\MessageQuery;
 use Thelia\Type\BooleanOrBothType;
-use Thelia\Model\Message as MessageModel;
 
 /**
  * Message loop, to access messageuration variables
@@ -71,12 +71,12 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $this->configureI18nProcessing(
             $search,
-            array(
+            [
                 'TITLE',
                 'SUBJECT',
                 'TEXT_MESSAGE',
                 'HTML_MESSAGE'
-            )
+            ]
         );
 
         if (! \is_null($id)) {

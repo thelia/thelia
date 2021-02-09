@@ -30,13 +30,13 @@ class ProfileModificationForm extends ProfileCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", HiddenType::class, array(
+            ->add("id", HiddenType::class, [
                 "required" => true,
-                "constraints" => array(
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback([$this, "verifyProfileId"]),
-                ),
-            ))
+                ],
+            ])
         ;
 
         $this->formBuilder->remove("code");

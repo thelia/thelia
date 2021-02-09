@@ -31,7 +31,6 @@ class ShippingZoneAddAreaEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $area_id
      *
      * @return $this
      */
@@ -43,7 +42,6 @@ class ShippingZoneAddAreaEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getAreaId()
     {
@@ -51,7 +49,6 @@ class ShippingZoneAddAreaEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $shipping_zone_id
      *
      * @return $this
      */
@@ -63,7 +60,6 @@ class ShippingZoneAddAreaEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getShippingZoneId()
     {

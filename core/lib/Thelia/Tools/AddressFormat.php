@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Tools;
 
 use CommerceGuys\Addressing\Address;
@@ -50,11 +49,9 @@ class AddressFormat
         return self::$instance;
     }
 
-
     /**
      * Format an address
      *
-     * @param AddressInterface $address
      * @param null $locale
      * @param bool $html
      * @param string $htmlTag
@@ -103,7 +100,6 @@ class AddressFormat
     /**
      * Format an address to a postal label
      *
-     * @param AddressInterface $address
      * @param null $locale
      * @param null $originCountry
      * @param array $options
@@ -176,7 +172,6 @@ class AddressFormat
             ->withGivenName($address->getFirstname())
             ->withFamilyName($address->getLastname())
         ;
-
 
         if ($country->getHasStates() && \intval($address->getStateId()) !== 0) {
             $addressModel = $addressModel->withAdministrativeArea(

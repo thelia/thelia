@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Front\Controller;
 
 use Doctrine\Common\Cache\FilesystemCache;
@@ -18,9 +17,9 @@ use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Model\BrandQuery;
-use Thelia\Model\FolderQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\FolderQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 
@@ -34,8 +33,6 @@ use Thelia\Model\LangQuery;
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class FeedController extends BaseFrontController {
-
-
     /**
      * Folder name for feeds cache
      */
@@ -45,7 +42,6 @@ class FeedController extends BaseFrontController {
      * Key prefix for feed cache
      */
     const FEED_CACHE_KEY = "feed";
-
 
     /**
      * render the RSS feed
@@ -59,14 +55,13 @@ class FeedController extends BaseFrontController {
      */
     public function generateAction($context, $lang, $id)
     {
-
         /** @var Request $request */
         $request = $this->getRequest();
 
         // context
         if ("" === $context){
             $context = "catalog";
-        } else if (! in_array($context, array("catalog", "content", "brand")) ){
+        } else if (! \in_array($context, ["catalog", "content", "brand"]) ){
             $this->pageNotFound();
         }
 
@@ -103,7 +98,7 @@ class FeedController extends BaseFrontController {
 
         $cacheDir = $this->getCacheDir();
         $cacheKey = self::FEED_CACHE_KEY . $lang . $context . $id;
-        $cacheExpire = intval(ConfigQuery::read("feed_ttl", '7200')) ?: 7200;
+        $cacheExpire = \intval(ConfigQuery::read("feed_ttl", '7200')) ?: 7200;
 
         $cacheDriver = new FilesystemCache($cacheDir);
         if (!($this->checkAdmin() && "" !== $flush)){
@@ -117,11 +112,11 @@ class FeedController extends BaseFrontController {
             // render the view
             $cacheContent = $this->renderRaw(
                 "feed",
-                array(
+                [
                     "_context_" => $context,
                     "_lang_"    => $lang,
                     "_id_"      => $id
-                )
+                ]
             );
             // save cache
             $cacheDriver->save($cacheKey, $cacheContent, $cacheExpire);
@@ -133,7 +128,6 @@ class FeedController extends BaseFrontController {
 
         return $response;
     }
-
 
     /**
      * get the cache directory for feeds
@@ -158,7 +152,6 @@ class FeedController extends BaseFrontController {
         return $this->getSecurityContext()->hasAdminUser();
     }
 
-
     /**
      * Check if a lang is used
      *
@@ -173,7 +166,6 @@ class FeedController extends BaseFrontController {
 
         return (null !== $lang);
     }
-
 
     /**
      * Check if the element exists and is visible

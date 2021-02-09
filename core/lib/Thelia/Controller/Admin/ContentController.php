@@ -59,7 +59,7 @@ class ContentController extends AbstractSeoCrudController
     public function addAdditionalFolderAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -89,7 +89,7 @@ class ContentController extends AbstractSeoCrudController
     public function removeAdditionalFolderAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -139,7 +139,7 @@ class ContentController extends AbstractSeoCrudController
         $this->hydrateSeoForm($object);
 
         // Prepare the data that will hydrate the form
-        $data = array(
+        $data = [
             'id'           => $object->getId(),
             'locale'       => $object->getLocale(),
             'title'        => $object->getTitle(),
@@ -147,7 +147,7 @@ class ContentController extends AbstractSeoCrudController
             'description'  => $object->getDescription(),
             'postscriptum' => $object->getPostscriptum(),
             'visible'      => $object->getVisible()
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(AdminForm::CONTENT_MODIFICATION, FormType::class, $data);
@@ -295,20 +295,20 @@ class ContentController extends AbstractSeoCrudController
 
         return $this->render(
             'folders',
-            array(
+            [
                 'content_order' => $currentOrder,
                 'parent' => $this->getFolderId()
-            )
+            ]
         );
     }
 
     protected function getEditionArguments()
     {
-        return array(
+        return [
             'content_id' => $this->getRequest()->get('content_id', 0),
             'current_tab' => $this->getRequest()->get('current_tab', 'general'),
             'folder_id' => $this->getFolderId(),
-        );
+        ];
     }
 
     /**
@@ -353,9 +353,8 @@ class ContentController extends AbstractSeoCrudController
                 'admin.folders.default',
                 ['parent' => $this->getFolderId()]
             );
-        } else {
+        }  
             return null;
-        }
     }
 
     /**
@@ -384,9 +383,8 @@ class ContentController extends AbstractSeoCrudController
                 'admin.folders.default',
                 ['parent' => $event->getReferrerId()]
             );
-        } else {
+        }  
             return null;
-        }
     }
 
     /**

@@ -56,7 +56,6 @@ class SendMail implements EventSubscriberInterface
     /**
      * Send email to notify customer that files for virtual products are available
      *
-     * @param OrderEvent $event
      * @throws \Exception
      */
     public function sendEmail(OrderEvent $event)
@@ -91,7 +90,6 @@ class SendMail implements EventSubscriberInterface
         }
     }
 
-
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
@@ -114,9 +112,9 @@ class SendMail implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::ORDER_UPDATE_STATUS => array("updateStatus", 128),
-            VirtualProductDeliveryEvents::ORDER_VIRTUAL_FILES_AVAILABLE => array("sendEmail", 128)
-        );
+        return [
+            TheliaEvents::ORDER_UPDATE_STATUS => ["updateStatus", 128],
+            VirtualProductDeliveryEvents::ORDER_VIRTUAL_FILES_AVAILABLE => ["sendEmail", 128]
+        ];
     }
 }

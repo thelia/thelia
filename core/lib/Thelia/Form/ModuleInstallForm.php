@@ -30,9 +30,9 @@ use Thelia\Module\Validator\ModuleValidator;
 class ModuleInstallForm extends BaseForm
 {
     /** @var ModuleDefinition */
-    protected $moduleDefinition = null;
+    protected $moduleDefinition;
 
-    protected $modulePath = null;
+    protected $modulePath;
 
     protected function buildForm()
     {
@@ -66,8 +66,6 @@ class ModuleInstallForm extends BaseForm
     /**
      * Check module validity
      *
-     * @param UploadedFile              $file
-     * @param ExecutionContextInterface $context
      */
     public function checkModuleValidity(UploadedFile $file, ExecutionContextInterface $context)
     {
@@ -121,7 +119,6 @@ class ModuleInstallForm extends BaseForm
     /**
      * Unzip a module file.
      *
-     * @param UploadedFile $file
      *
      * @return string|bool the path where the module has been extracted or false if an error has occured
      */

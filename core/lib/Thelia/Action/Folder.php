@@ -25,10 +25,10 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Event\ViewCheckEvent;
+use Thelia\Model\Folder as FolderModel;
 use Thelia\Model\FolderDocumentQuery;
 use Thelia\Model\FolderImageQuery;
 use Thelia\Model\FolderQuery;
-use Thelia\Model\Folder as FolderModel;
 use Thelia\Model\Map\FolderTableMap;
 
 /**
@@ -59,9 +59,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
     /**
      * Change Folder SEO
      *
-     * @param UpdateSeoEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @return Object
      */
     public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -138,7 +136,6 @@ class Folder extends BaseAction implements EventSubscriberInterface
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $folder = FolderQuery::create()->findPk($event->getObjectId())) {
-
             switch ($event->getMode()) {
                 case UpdatePositionEvent::POSITION_ABSOLUTE:
                     $folder->changeAbsolutePosition($event->getPosition());
@@ -156,9 +153,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
     /**
      * Check if is a folder view and if folder_id is visible
      *
-     * @param ViewCheckEvent $event
      * @param string $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -175,7 +170,6 @@ class Folder extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param ViewCheckEvent $event
      * @throws NotFoundHttpException
      */
     public function viewFolderIdNotVisible(ViewCheckEvent $event)
@@ -188,17 +182,17 @@ class Folder extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::FOLDER_CREATE            => array("create", 128),
-            TheliaEvents::FOLDER_UPDATE            => array("update", 128),
-            TheliaEvents::FOLDER_DELETE            => array("delete", 128),
-            TheliaEvents::FOLDER_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
+        return [
+            TheliaEvents::FOLDER_CREATE            => ["create", 128],
+            TheliaEvents::FOLDER_UPDATE            => ["update", 128],
+            TheliaEvents::FOLDER_DELETE            => ["delete", 128],
+            TheliaEvents::FOLDER_TOGGLE_VISIBILITY => ["toggleVisibility", 128],
 
-            TheliaEvents::FOLDER_UPDATE_POSITION   => array("updatePosition", 128),
-            TheliaEvents::FOLDER_UPDATE_SEO        => array('updateSeo', 128),
+            TheliaEvents::FOLDER_UPDATE_POSITION   => ["updatePosition", 128],
+            TheliaEvents::FOLDER_UPDATE_SEO        => ['updateSeo', 128],
 
-            TheliaEvents::VIEW_CHECK                    => array('viewCheck', 128),
-            TheliaEvents::VIEW_FOLDER_ID_NOT_VISIBLE    => array('viewFolderIdNotVisible', 128),
-        );
+            TheliaEvents::VIEW_CHECK                    => ['viewCheck', 128],
+            TheliaEvents::VIEW_FOLDER_ID_NOT_VISIBLE    => ['viewFolderIdNotVisible', 128],
+        ];
     }
 }

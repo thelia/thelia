@@ -41,52 +41,52 @@ class InstallStep3Form extends BaseForm
             ->add(
                 'host',
                 TextType::class,
-                array(
-                    'constraints' => array(
+                [
+                    'constraints' => [
                         new NotBlank(),
-                    ),
-                )
+                    ],
+                ]
             )
             ->add(
                 'user',
                 TextType::class,
-                array(
-                    'constraints' => array(
+                [
+                    'constraints' => [
                         new NotBlank(),
-                    ),
-                )
+                    ],
+                ]
             )
             ->add(
                 'password',
                 TextType::class,
-                array(
-                    'constraints' => array(
+                [
+                    'constraints' => [
                         new NotBlank(),
-                    ),
-                )
+                    ],
+                ]
             )
             ->add(
                 'port',
                 TextType::class,
-                array(
-                    'constraints' => array(
+                [
+                    'constraints' => [
                         new NotBlank(),
                         new GreaterThan(
-                            array(
+                            [
                                 'value' => 0,
-                            )
+                            ]
                         ),
-                    ),
-                )
+                    ],
+                ]
             )
             ->add(
                 'locale',
                 HiddenType::class,
-                array(
-                    'constraints' => array(
+                [
+                    'constraints' => [
                         new NotBlank(),
-                    ),
-                )
+                    ],
+                ]
             );
     }
 

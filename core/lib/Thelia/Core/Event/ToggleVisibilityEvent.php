@@ -36,7 +36,6 @@ class ToggleVisibilityEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $object
      *
      * @return $this
      */
@@ -48,7 +47,6 @@ class ToggleVisibilityEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getObject()
     {

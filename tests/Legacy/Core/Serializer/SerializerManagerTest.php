@@ -19,8 +19,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\Translation\Translator;
 use Thelia\Core\Serializer\SerializerManager as SUT;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\Exception\InvalidArgumentException;
 
 /**

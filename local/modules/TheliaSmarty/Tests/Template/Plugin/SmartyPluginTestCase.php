@@ -118,7 +118,6 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
     }
 
     /**
-     * @param ContainerBuilder $container
      * @return \TheliaSmarty\Template\AbstractSmartyPlugin
      */
     abstract protected function getPlugin(ContainerBuilder $container);

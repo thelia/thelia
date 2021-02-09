@@ -29,14 +29,14 @@ class ModuleHookModificationForm extends ModuleHookCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", HiddenType::class, array("constraints" => array(new GreaterThan(array('value' => 0)))))
-            ->add("active", CheckboxType::class, array(
+            ->add("id", HiddenType::class, ["constraints" => [new GreaterThan(['value' => 0])]])
+            ->add("active", CheckboxType::class, [
                 "label" => Translator::getInstance()->trans("Active"),
                 "required" => false,
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "active",
-                ),
-            ))
+                ],
+            ])
         ;
     }
 

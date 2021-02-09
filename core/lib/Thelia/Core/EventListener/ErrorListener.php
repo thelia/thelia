@@ -127,7 +127,7 @@ class ErrorListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             KernelEvents::EXCEPTION => [
                 ["logException", 0],
                 ["handleException", 0],
@@ -136,6 +136,6 @@ class ErrorListener implements EventSubscriberInterface
             TheliaKernelEvents::THELIA_HANDLE_ERROR => [
                 ["defaultErrorFallback", 0],
             ],
-        );
+        ];
     }
 }

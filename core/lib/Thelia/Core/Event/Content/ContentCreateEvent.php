@@ -25,7 +25,6 @@ class ContentCreateEvent extends ContentEvent
     protected $visible;
 
     /**
-     * @param mixed $locale
      *
      * @return $this
      */
@@ -37,7 +36,6 @@ class ContentCreateEvent extends ContentEvent
     }
 
     /**
-     * @return mixed
      */
     public function getLocale()
     {
@@ -45,7 +43,6 @@ class ContentCreateEvent extends ContentEvent
     }
 
     /**
-     * @param mixed $default_folder
      *
      * @return $this
      */
@@ -57,7 +54,6 @@ class ContentCreateEvent extends ContentEvent
     }
 
     /**
-     * @return mixed
      */
     public function getDefaultFolder()
     {
@@ -65,7 +61,6 @@ class ContentCreateEvent extends ContentEvent
     }
 
     /**
-     * @param mixed $visible
      *
      * @return $this
      */
@@ -77,7 +72,6 @@ class ContentCreateEvent extends ContentEvent
     }
 
     /**
-     * @return mixed
      */
     public function getVisible()
     {
@@ -85,7 +79,6 @@ class ContentCreateEvent extends ContentEvent
     }
 
     /**
-     * @param mixed $title
      *
      * @return $this
      */
@@ -97,7 +90,6 @@ class ContentCreateEvent extends ContentEvent
     }
 
     /**
-     * @return mixed
      */
     public function getTitle()
     {

@@ -93,7 +93,7 @@ class LessDotPhpFilter extends LessphpFilter implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::CACHE_CLEAR => array("clearCacheDir", 128),
+            TheliaEvents::CACHE_CLEAR => ["clearCacheDir", 128],
         ];
     }
 }

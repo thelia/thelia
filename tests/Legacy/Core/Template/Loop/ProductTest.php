@@ -12,10 +12,10 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Template\Loop\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
-use Thelia\Core\Template\Loop\Product;
-use Propel\Runtime\ActiveQuery\Criteria;
 
 /**
  *
@@ -31,7 +31,7 @@ class ProductTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return array();
+        return [];
     }
 
     public function testSearchById()
@@ -52,9 +52,9 @@ class ProductTest extends BaseLoopTestor
             $product->save();
         }
 
-        $otherParameters = array(
+        $otherParameters = [
             "visible" => "*",
-        );
+        ];
 
         $this->baseTestSearchById($product->getId(), $otherParameters);
     }
@@ -71,10 +71,10 @@ class ProductTest extends BaseLoopTestor
             $product->save();
         }
 
-        $otherParameters = array(
+        $otherParameters = [
             "visible" => "*",
             "complex" => 1
-        );
+        ];
 
         $this->baseTestSearchById($product->getId(), $otherParameters);
     }

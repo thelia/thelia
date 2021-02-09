@@ -13,10 +13,10 @@
 namespace Thelia\Tests\Action;
 
 use Thelia\Action\Feature;
+use Thelia\Core\Event\Feature\FeatureCreateEvent;
 use Thelia\Core\Event\Feature\FeatureDeleteEvent;
 use Thelia\Core\Event\Feature\FeatureUpdateEvent;
 use Thelia\Model\Feature as FeatureModel;
-use Thelia\Core\Event\Feature\FeatureCreateEvent;
 
 /**
  * Class FeatureTest
@@ -48,7 +48,6 @@ class FeatureTest extends BaseAction
     }
 
     /**
-     * @param FeatureModel $feature
      * @depends testCreate
      * @return FeatureModel
      */
@@ -80,7 +79,6 @@ class FeatureTest extends BaseAction
     }
 
     /**
-     * @param FeatureModel $feature
      * @depends testUpdate
      */
     public function testDelete(FeatureModel $feature)

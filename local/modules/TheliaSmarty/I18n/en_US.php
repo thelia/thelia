@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '\'%type\' loop class should extends Thelia\Core\Template\Element\BaseLoop' => '\'%type\' loop class should extends Thelia\Core\Template\Element\BaseLoop',
     'A loop named \'%name\' already exists in the current scope.' => 'A loop named \'%name\' already exists in the current scope.',
     'Loop type \'%type\' is not defined.' => 'Loop type \'%type\' is not defined.',
@@ -18,4 +18,4 @@ return array(
     'Related loop name \'%name\'\' is not defined.' => 'Related loop name \'%name\'\' is not defined.',
     'Template file %file cannot be found.' => 'Template file %file cannot be found.',
     'The loop name \'%name\' is already defined in %className class' => 'The loop name \'%name\' is already defined in %className class',
-);
+];

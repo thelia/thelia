@@ -34,19 +34,15 @@ class JsonResponse extends BaseJsonResponse
             case AccessManager::VIEW:
                 $errorMessage = "You don't have the right to view this content";
                 break;
-
             case AccessManager::UPDATE:
                 $errorMessage = "You don't have the right to edit this content";
                 break;
-
             case AccessManager::CREATE:
                 $errorMessage = "You don't have the right to create this content";
                 break;
-
             case AccessManager::DELETE:
                 $errorMessage = "You don't have the right to delete this content";
                 break;
-
             default:
                 $errorMessage = "You don't have the right to do this";
         }

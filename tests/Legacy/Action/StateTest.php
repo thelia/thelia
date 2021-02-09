@@ -60,7 +60,6 @@ class StateTest extends BaseAction
     }
 
     /**
-     * @param StateModel $state
      * @depends testCreate
      * @return StateModel
      */
@@ -92,7 +91,6 @@ class StateTest extends BaseAction
     }
 
     /**
-     * @param StateModel $state
      * @depends testUpdate
      */
     public function testDelete(StateModel $state)

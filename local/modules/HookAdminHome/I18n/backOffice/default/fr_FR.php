@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'Aborted orders' => 'Paniers abandonnés',
     'An error occurred while reading from JSON file' => 'Désolé, une erreur s\'est produite pendant la récupération des données.',
     'Average cart' => 'Panier moyen',
@@ -31,4 +31,4 @@ return array(
     'YYYY-MM' => 'MM/YYYY',
     'Yesterday sales' => 'Ventes de la veille',
     'Loading Tweeter feed...' => 'Chargement du fil Tweeter...',
-);
+];

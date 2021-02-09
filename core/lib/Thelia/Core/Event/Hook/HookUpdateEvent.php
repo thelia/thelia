@@ -53,7 +53,6 @@ class HookUpdateEvent extends HookCreateEvent
     }
 
     /**
-     * @param mixed $block
      */
     public function setBlock($block)
     {
@@ -63,7 +62,6 @@ class HookUpdateEvent extends HookCreateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getBlock()
     {
@@ -71,7 +69,6 @@ class HookUpdateEvent extends HookCreateEvent
     }
 
     /**
-     * @param mixed $by_module
      */
     public function setByModule($by_module)
     {
@@ -81,7 +78,6 @@ class HookUpdateEvent extends HookCreateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getByModule()
     {
@@ -89,7 +85,6 @@ class HookUpdateEvent extends HookCreateEvent
     }
 
     /**
-     * @param mixed $chapo
      */
     public function setChapo($chapo)
     {
@@ -99,7 +94,6 @@ class HookUpdateEvent extends HookCreateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getChapo()
     {
@@ -107,7 +101,6 @@ class HookUpdateEvent extends HookCreateEvent
     }
 
     /**
-     * @param mixed $description
      */
     public function setDescription($description)
     {
@@ -117,7 +110,6 @@ class HookUpdateEvent extends HookCreateEvent
     }
 
     /**
-     * @return mixed
      */
     public function getDescription()
     {

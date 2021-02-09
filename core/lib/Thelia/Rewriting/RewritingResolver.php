@@ -24,8 +24,8 @@ use Thelia\Model\RewritingUrlQuery;
  */
 class RewritingResolver
 {
-    protected $search = null;
-    protected $rewritingUrlQuery = null;
+    protected $search;
+    protected $rewritingUrlQuery;
 
     public $view;
     public $viewId;
@@ -68,7 +68,7 @@ class RewritingResolver
             throw new UrlRewritingException('RESOLVER NULL SEARCH', UrlRewritingException::RESOLVER_NULL_SEARCH);
         }
 
-        $otherParameters = array();
+        $otherParameters = [];
         foreach ($this->search as $result) {
             $parameter = $result->getParameter();
             $value = $result->getValue();

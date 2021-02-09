@@ -17,12 +17,12 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Model\AddressQuery;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Address as AddressModel;
-use Thelia\Type\TypeCollection;
+use Thelia\Model\AddressQuery;
 use Thelia\Type;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -53,14 +53,14 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
                 'id',
                 new TypeCollection(
                     new Type\IntListType(),
-                    new Type\EnumType(array('*', 'any'))
+                    new Type\EnumType(['*', 'any'])
                 )
             ),
             new Argument(
                 'customer',
                 new TypeCollection(
                     new Type\IntType(),
-                    new Type\EnumType(array('current'))
+                    new Type\EnumType(['current'])
                 ),
                 'current'
             ),
@@ -69,7 +69,7 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
                 'exclude',
                 new TypeCollection(
                     new Type\IntListType(),
-                    new Type\EnumType(array('none'))
+                    new Type\EnumType(['none'])
                 )
             )
         );
@@ -81,7 +81,7 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
 
         $id = $this->getId();
 
-        if (null !== $id && !\in_array($id, array('*', 'any'))) {
+        if (null !== $id && !\in_array($id, ['*', 'any'])) {
             $search->filterById($id, Criteria::IN);
         }
 
@@ -91,9 +91,8 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
             $currentCustomer = $this->securityContext->getCustomerUser();
             if ($currentCustomer === null) {
                 return null;
-            } else {
+            }  
                 $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
-            }
         } else {
             $search->filterByCustomerId($customer, Criteria::EQUAL);
         }

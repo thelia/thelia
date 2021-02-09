@@ -22,7 +22,7 @@ use Thelia\Exception\TypeException;
  */
 class ModelType extends BaseType
 {
-    protected $expectedModelActiveRecord = null;
+    protected $expectedModelActiveRecord;
 
     /**
      * @param $expectedModelActiveRecord
@@ -61,6 +61,6 @@ class ModelType extends BaseType
 
     public function getFormOptions()
     {
-        return array();
+        return [];
     }
 }

@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace VirtualProductDelivery\EventListeners;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -23,8 +22,8 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\MetaDataQuery;
 use Thelia\Model\MetaData as MetaDataModel;
+use Thelia\Model\MetaDataQuery;
 use Thelia\Model\ProductDocumentQuery;
 use VirtualProductDelivery\VirtualProductDelivery;
 
@@ -35,7 +34,6 @@ use VirtualProductDelivery\VirtualProductDelivery;
  */
 class VirtualProductEvents implements EventSubscriberInterface
 {
-
     public function handleOrder(VirtualProductOrderHandleEvent $event)
     {
         $documentId = MetaDataQuery::getVal(
@@ -50,7 +48,6 @@ class VirtualProductEvents implements EventSubscriberInterface
                 $event->setPath($productDocument->getFile());
             }
         }
-
     }
 
     public function download(VirtualProductOrderDownloadResponseEvent $event)
@@ -83,11 +80,8 @@ class VirtualProductEvents implements EventSubscriberInterface
             $response = new BinaryFileResponse($path);
             $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT);
             $event->setResponse($response);
-
         }
     }
-
-
 
     /**
      * Returns an array of event names this subscriber wants to listen to.

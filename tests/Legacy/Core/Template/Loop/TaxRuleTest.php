@@ -12,9 +12,9 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 use Thelia\Core\Template\Loop\TaxRule;
 use Thelia\Model\TaxRuleQuery;
+use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
  *
@@ -30,7 +30,7 @@ class TaxRuleTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return array();
+        return [];
     }
 
     public function testSearchById()
@@ -42,6 +42,6 @@ class TaxRuleTest extends BaseLoopTestor
             $tr->save();
         }
 
-        $this->baseTestSearchById($tr->getId(), array('force_return' => true));
+        $this->baseTestSearchById($tr->getId(), ['force_return' => true]);
     }
 }

@@ -154,15 +154,14 @@ class Hook extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::HOOK_CREATE            => array('create', 128),
-            TheliaEvents::HOOK_UPDATE            => array('update', 128),
-            TheliaEvents::HOOK_DELETE            => array('delete', 128),
-            TheliaEvents::HOOK_TOGGLE_ACTIVATION => array('toggleActivation', 128),
-            TheliaEvents::HOOK_TOGGLE_NATIVE     => array('toggleNative', 128),
-            TheliaEvents::HOOK_CREATE_ALL        => array('createAll', 128),
-            TheliaEvents::HOOK_DEACTIVATION      => array('deactivation', 128),
-
-        );
+        return [
+            TheliaEvents::HOOK_CREATE            => ['create', 128],
+            TheliaEvents::HOOK_UPDATE            => ['update', 128],
+            TheliaEvents::HOOK_DELETE            => ['delete', 128],
+            TheliaEvents::HOOK_TOGGLE_ACTIVATION => ['toggleActivation', 128],
+            TheliaEvents::HOOK_TOGGLE_NATIVE     => ['toggleNative', 128],
+            TheliaEvents::HOOK_CREATE_ALL        => ['createAll', 128],
+            TheliaEvents::HOOK_DEACTIVATION      => ['deactivation', 128],
+        ];
     }
 }

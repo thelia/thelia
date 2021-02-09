@@ -5,20 +5,17 @@ namespace Thelia\Model;
 use phpDocumentor\Reflection\Types\Parent_;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Collection\ObjectCollection;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\Category\CategoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Category as BaseCategory;
-use Thelia\Core\Event\TheliaEvents;
-use Propel\Runtime\Connection\ConnectionInterface;
-
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
 
 class Category extends BaseCategory implements FileModelParentInterface
 {
-
-
     use PositionManagementTrait;
 
     use UrlRewritingTrait;
@@ -45,8 +42,6 @@ class Category extends BaseCategory implements FileModelParentInterface
      *
      * /!\ the number of queries is exponential, use it with caution
      *
-     * @param bool|string $productVisibility: true (default) to count only visible products, false to count only hidden
-     *                    products, or * to count all products.
      * @return int
      */
     public function countAllProducts($productVisibility = true)
@@ -84,7 +79,6 @@ class Category extends BaseCategory implements FileModelParentInterface
     /**
      * Get the root category
      * @param  int   $categoryId
-     * @return mixed
      */
     public function getRoot($categoryId)
     {
@@ -151,9 +145,9 @@ class Category extends BaseCategory implements FileModelParentInterface
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
-            array(
+            [
                 "parent" => $this->getParent(),
-            )
+            ]
         );
         $this->deleteProducts($con);
 

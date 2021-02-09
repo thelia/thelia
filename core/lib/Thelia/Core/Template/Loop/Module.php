@@ -19,8 +19,8 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
@@ -132,7 +132,6 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->addJoinCondition('profile_module', 'profile_module.PROFILE_ID=?', $profile, null, \PDO::PARAM_INT)
                 ->withColumn('profile_module.access', 'access');
         }
-
 
         $area = $this->getArea();
 
@@ -332,7 +331,6 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 $hookable = ($moduleHookCount > 0);
 
                 $loopResultRow->set("HOOKABLE", $hookable ? 1 : 0);
-
 
                 if (null !== $this->getProfile()) {
                     $accessValue = $module->getVirtualColumn('access');

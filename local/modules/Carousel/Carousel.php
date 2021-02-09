@@ -35,7 +35,7 @@ class Carousel extends BaseModule
         if (! self::getConfigValue('is_initialized', false)) {
             $database = new Database($con);
 
-            $database->insertSql(null, array(__DIR__ . '/Config/thelia.sql'));
+            $database->insertSql(null, [__DIR__ . '/Config/thelia.sql']);
 
             self::setConfigValue('is_initialized', true);
         }
@@ -47,7 +47,7 @@ class Carousel extends BaseModule
     {
         $database = new Database($con);
 
-        $database->insertSql(null, array(__DIR__ . '/Config/sql/destroy.sql'));
+        $database->insertSql(null, [__DIR__ . '/Config/sql/destroy.sql']);
     }
 
     public function getUploadDir()
@@ -111,7 +111,6 @@ class Carousel extends BaseModule
     /**
      * Defines how services are loaded in your modules
      *
-     * @param ServicesConfigurator $servicesConfigurator
      */
     public static function configureServices(ServicesConfigurator $servicesConfigurator)
     {

@@ -21,12 +21,12 @@ class TheliaType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'type'              => false,
             'options'           => false,
-        ));
+        ]);
 
-        $resolver->setAllowedValues('type', array('text', 'choice'));
+        $resolver->setAllowedValues('type', ['text', 'choice']);
     }
 
     /**
@@ -34,10 +34,10 @@ class TheliaType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars = array_replace($view->vars, array(
+        $view->vars = array_replace($view->vars, [
             'type'              => $options['type'],
             'options'           => $options['options'],
-        ));
+        ]);
     }
 
     public function getParent()

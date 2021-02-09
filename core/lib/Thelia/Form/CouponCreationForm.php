@@ -254,7 +254,6 @@ class CouponCreationForm extends BaseForm
      * Check coupon code unicity
      *
      * @param string                    $value
-     * @param ExecutionContextInterface $context
      */
     public function checkDuplicateCouponCode($value, ExecutionContextInterface $context)
     {
@@ -289,7 +288,6 @@ class CouponCreationForm extends BaseForm
      * Validate a date entered with the default Language date format.
      *
      * @param string                    $value
-     * @param ExecutionContextInterface $context
      */
     public function checkLocalizedDate($value, ExecutionContextInterface $context)
     {
@@ -310,7 +308,6 @@ class CouponCreationForm extends BaseForm
 
     /**
      * @param $value
-     * @param ExecutionContextInterface $context
      */
     public function checkConsistencyDates($value, ExecutionContextInterface $context)
     {

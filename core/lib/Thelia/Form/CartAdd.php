@@ -17,12 +17,12 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Thelia\Form\Exception\StockNotFoundException;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\Exception\ProductNotFoundException;
-use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Form\Exception\StockNotFoundException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductQuery;
-use Thelia\Core\Translation\Translator;
+use Thelia\Model\ProductSaleElementsQuery;
 
 /**
  * Class CartAdd
@@ -54,37 +54,36 @@ class CartAdd extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("product", TextType::class, array(
-                "constraints" => array(
+            ->add("product", TextType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback([$this, "checkProduct"]),
-                ),
+                ],
                 "label" => "product",
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "cart_product",
-                ),
-            ))
-            ->add("product_sale_elements_id", TextType::class, array(
-                "constraints" => array(
+                ],
+            ])
+            ->add("product_sale_elements_id", TextType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback([$this, "checkStockAvailability"]),
-                ),
+                ],
                 "required" => true,
-
-            ))
-            ->add("quantity", NumberType::class, array(
-                "constraints" => array(
+            ])
+            ->add("quantity", NumberType::class, [
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback([$this, "checkStock"]),
-                    new Constraints\GreaterThanOrEqual(array(
+                    new Constraints\GreaterThanOrEqual([
                         "value" => 0,
-                    )),
-                ),
+                    ]),
+                ],
                 "label" => Translator::getInstance()->trans("Quantity"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "quantity",
-                ),
-            ))
+                ],
+            ])
             ->add("append", IntegerType::class)
             ->add("newness", IntegerType::class)
         ;

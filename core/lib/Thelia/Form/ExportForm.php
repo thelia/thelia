@@ -63,11 +63,11 @@ class ExportForm extends BaseForm
                     ],
                 ]
             )
-            ->add("do_compress", CheckboxType::class, array(
+            ->add("do_compress", CheckboxType::class, [
                 "label" => $this->translator->trans("Do compress"),
                 "label_attr" => ["for" => "do_compress"],
                 "required" => false,
-            ))
+            ])
             // Todo: use list
             ->add(
                 'archiver',
@@ -80,17 +80,17 @@ class ExportForm extends BaseForm
                     ],
                 ]
             )
-            ->add("images", CheckboxType::class, array(
+            ->add("images", CheckboxType::class, [
                 "label" => $this->translator->trans("Include images"),
                 "label_attr" => ["for" => "with_images"],
                 "required" => false,
-            ))
-            ->add("documents", CheckboxType::class, array(
+            ])
+            ->add("documents", CheckboxType::class, [
                 "label" => $this->translator->trans("Include documents"),
                 "label_attr" => ["for" => "with_documents"],
                 "required" => false,
-            ))
-            ->add("range_date_start", DateType::class, array(
+            ])
+            ->add("range_date_start", DateType::class, [
                 "label" => $this->translator->trans("Range date Start"),
                 "label_attr" => ["for" => "for_range_date_start"],
                 "required" => false,
@@ -98,8 +98,8 @@ class ExportForm extends BaseForm
                 'input' => 'array',
                 'widget' => 'choice',
                 'format' => 'yyyy-MM-d',
-            ))
-            ->add("range_date_end", DateType::class, array(
+            ])
+            ->add("range_date_end", DateType::class, [
                 "label" => $this->translator->trans("Range date End"),
                 "label_attr" => ["for" => "for_range_date_end"],
                 "required" => false,
@@ -107,7 +107,7 @@ class ExportForm extends BaseForm
                 'input' => 'array',
                 'widget' => 'choice',
                 'format' => 'yyyy-MM-d',
-            ));
+            ]);
     }
 
     public function checkLanguage($value, ExecutionContextInterface $context)

@@ -42,6 +42,6 @@ class TarGzArchiver extends TarArchiver
 
     public function isAvailable()
     {
-        return parent::isAvailable() && extension_loaded('zlib');
+        return parent::isAvailable() && \extension_loaded('zlib');
     }
 }

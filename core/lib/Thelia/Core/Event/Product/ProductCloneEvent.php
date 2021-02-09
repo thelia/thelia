@@ -26,7 +26,7 @@ class ProductCloneEvent extends ActionEvent
     /** @var  Product */
     protected $clonedProduct;
     /** @var array */
-    protected $types = array('images', 'documents');
+    protected $types = ['images', 'documents'];
 
     /**
      * ProductCloneEvent constructor.

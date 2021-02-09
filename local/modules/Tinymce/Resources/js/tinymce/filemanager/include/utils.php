@@ -17,7 +17,7 @@ if ( ! function_exists('response'))
 	*
 	* @return \Response|\Illuminate\Http\Response
 	*/
-	function response($content = '', $statusCode = 200, $headers = array())
+	function response($content = '', $statusCode = 200, $headers = [])
 	{
 		$responseClass = class_exists('Illuminate\Http\Response') ? '\Illuminate\Http\Response' : 'Response';
 
@@ -65,7 +65,6 @@ if ( ! function_exists('trans'))
 			response(trans('Lang_Not_Found').AddErrorLocation())->send();
 			exit;
 		}
-
 	}
 	if(file_exists('lang/' . $lang . '.php')){
 		$lang_vars = include 'lang/' . $lang . '.php';
@@ -75,7 +74,7 @@ if ( ! function_exists('trans'))
 
 	if ( ! is_array($lang_vars))
 	{
-		$lang_vars = array();
+		$lang_vars = [];
 	}
 	/**
 	* Translate language variable
@@ -102,15 +101,12 @@ if ( ! function_exists('trans'))
 function deleteDir($dir,$ftp = null, $config = null)
 {
 	if($ftp){
-
 		try{
 			$ftp->rmdir($dir);
 			return true;
-
 		}catch(FtpClient\FtpException $e){
 			return null;
 		}
-
 	}else{
 		if ( ! file_exists($dir))
 		{
@@ -155,7 +151,6 @@ function duplicate_file( $old_path, $name, $ftp = null, $config = null )
 			$ftp->put("/".$new_path, $tmp, FTP_BINARY);
 			unlink($tmp);
 			return true;
-
 		}catch(FtpClient\FtpException $e){
 			return null;
 		}
@@ -172,13 +167,11 @@ function duplicate_file( $old_path, $name, $ftp = null, $config = null )
 	}
 }
 
-
 /**
 * Rename file
 *
 * @param  string  $old_path         File to rename
 * @param  string  $name             New file name without extension
-* @param  bool    $transliteration
 *
 * @return bool
 */
@@ -207,12 +200,10 @@ function rename_file($old_path, $name, $ftp = null, $config = null)
 	}
 }
 
-
 function url_exists($url){
     if (!$fp = curl_init($url)) return false;
     return true;
 }
-
 
 function tempdir() {
     $tempfile=tempnam(sys_get_temp_dir(),'');
@@ -221,13 +212,11 @@ function tempdir() {
     if (is_dir($tempfile)) { return $tempfile; }
 }
 
-
 /**
 * Rename directory
 *
 * @param  string  $old_path         Directory to rename
 * @param  string  $name             New directory name
-* @param  bool    $transliteration
 *
 * @return bool
 */
@@ -294,7 +283,7 @@ function ftp_con($config){
 * @return bool
 * @throws \Exception
 */
-function create_img($imgfile, $imgthumb, $newwidth, $newheight = null, $option = "crop", $ftp=false,$config = array())
+function create_img($imgfile, $imgthumb, $newwidth, $newheight = null, $option = "crop", $ftp=false,$config = [])
 {
 	$result = false;
 	if($ftp ){
@@ -341,7 +330,7 @@ function create_img($imgfile, $imgthumb, $newwidth, $newheight = null, $option =
 */
 function makeSize($size)
 {
-	$units = array( 'B', 'KB', 'MB', 'GB', 'TB' );
+	$units = [ 'B', 'KB', 'MB', 'GB', 'TB' ];
 	$u = 0;
 	while ((round($size / 1024) > 0) && ($u < 4))
 	{
@@ -390,7 +379,7 @@ function folder_info($path,$count_hidden=true)
 		}
 	}
 
-	return array($total_size,$files_count,$folders_count);
+	return [$total_size,$files_count,$folders_count];
 }
 /**
 * Get number of files in a directory
@@ -545,9 +534,6 @@ function fix_get_params($str)
 * Cleanup filename
 *
 * @param  string  $str
-* @param  bool    $transliteration
-* @param  bool    $convert_spaces
-* @param  string  $replace_with
 * @param  bool    $is_folder
 *
 * @return string
@@ -577,7 +563,7 @@ function fix_filename($str, $config, $is_folder = false)
 		$str = preg_replace("/[^a-zA-Z0-9\.\[\]_| -]/", '', $str);
 	}
 
-	$str = str_replace(array( '"', "'", "/", "\\" ), "", $str);
+	$str = str_replace([ '"', "'", "/", "\\" ], "", $str);
 	$str = strip_tags($str);
 
 	// Empty or incorrectly transliterated filename.
@@ -616,10 +602,8 @@ function fix_strtoupper($str)
 	{
 		return mb_strtoupper($str);
 	}
-	else
-	{
+	
 		return strtoupper($str);
-	}
 }
 
 /**
@@ -635,10 +619,8 @@ function fix_strtolower($str)
 	{
 		return mb_strtolower($str);
 	}
-	else
-	{
+	
 		return strtolower($str);
-	}
 }
 
 function fix_path($path, $config)
@@ -650,10 +632,8 @@ function fix_path($path, $config)
 	{
 		return $tmp_path . DIRECTORY_SEPARATOR . $str;
 	}
-	else
-	{
+	
 		return $str;
-	}
 }
 
 /**
@@ -710,15 +690,11 @@ function image_check_memory_usage($img, $max_breedte, $max_hoogte)
 		{
 			return false;
 		}
-		else
-		{
+		
 			return true;
-		}
 	}
-	else
-	{
+	
 		return false;
-	}
 }
 
 /**
@@ -810,7 +786,6 @@ function new_thumbnails_creation($targetPath, $targetFile, $name, $current_path,
 	return $all_ok;
 }
 
-
 /**
 * Get a remote file, using whichever mechanism is enabled
 *
@@ -822,12 +797,12 @@ function get_file_by_url($url)
 {
 	if (ini_get('allow_url_fopen'))
 	{
-		$arrContextOptions=array(
-		    "ssl"=>array(
+		$arrContextOptions=[
+		    "ssl"=>[
 		        "verify_peer"=>false,
 		        "verify_peer_name"=>false,
-		    ),
-		);
+		    ],
+		];
 		return file_get_contents($url, false, stream_context_create($arrContextOptions));
 	}
 	if ( ! function_exists('curl_version'))
@@ -879,7 +854,7 @@ function is_really_writable($dir)
 
 		return true;
 	}
-	elseif ( ! is_file($dir) || ($fp = @fopen($dir, 'ab')) === false)
+	if ( ! is_file($dir) || ($fp = @fopen($dir, 'ab')) === false)
 	{
 		return false;
 	}
@@ -956,9 +931,6 @@ function rcopy($source, $destination, $is_rec = false)
 		}
 	}
 }
-
-
-
 
 /**
 * recursivly renames everything
@@ -1149,7 +1121,6 @@ function is_php($version = '5.0.0')
 
 /**
 * Return the caller location if set in config.php
-* @param  string  $version
 *
 * @return  bool
 */

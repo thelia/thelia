@@ -15,7 +15,6 @@ class AdminLog extends BaseAdminLog
      * @param string $resource
      * @param string $action
      * @param string $message
-     * @param Request       $request
      * @param UserInterface $adminUser
      * @param bool          $withRequestContent
      * @param int           $resourceId
@@ -44,7 +43,7 @@ class AdminLog extends BaseAdminLog
         try {
             $log->save();
         } catch (\Exception $ex) {
-            Tlog::getInstance()->err("Failed to insert new entry in AdminLog: {ex}", array('ex' => $ex));
+            Tlog::getInstance()->err("Failed to insert new entry in AdminLog: {ex}", ['ex' => $ex]);
         }
     }
 }

@@ -16,10 +16,10 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Thelia\Action\Cache;
-use Thelia\Core\Application;
-use Thelia\Command\CacheClear;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Action\Cache;
+use Thelia\Command\CacheClear;
+use Thelia\Core\Application;
 use Thelia\Tests\ContainerAwareTestCase;
 
 /**
@@ -69,10 +69,10 @@ class CacheClearTest extends ContainerAwareTestCase
 
         $command = $application->find("cache:clear");
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array(
+        $commandTester->execute([
             "command" => $command->getName(),
             "--env" => "test"
-        ));
+        ]);
 
         $fs = new Filesystem();
 
@@ -100,15 +100,14 @@ class CacheClearTest extends ContainerAwareTestCase
         $commandTester = new CommandTester($command);
 
         $this->expectException(\RuntimeException::class);
-        $commandTester->execute(array(
+        $commandTester->execute([
             "command" => $command->getName(),
             "--env" => "test"
-        ));
+        ]);
     }
 
     /**
      * Use this method to build the container with the services that you need.
-     * @param ContainerBuilder $container
      */
     protected function buildContainer(ContainerBuilder $container)
     {

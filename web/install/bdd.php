@@ -15,7 +15,6 @@ include("header.php");
 
 try {
     if (isset($_POST['host']) && isset($_POST['username'])  && isset($_POST['password']) && isset($_POST['port'])){
-
         $_SESSION['install']['host'] = $_POST['host'];
         $_SESSION['install']['username'] = $_POST['username'];
         $_SESSION['install']['password'] = $_POST['password'];
@@ -34,7 +33,6 @@ try {
         }
     }
     elseif($_SESSION['install']['step'] >=3) {
-
         $checkConnection = new \Thelia\Install\CheckDatabaseConnection($_SESSION['install']['host'], $_SESSION['install']['username'], $_SESSION['install']['password'], $_SESSION['install']['port']);
     }
     else {
@@ -53,7 +51,7 @@ try {
                     <?php echo $trans->trans('The SQL server contains multiple databases.'); ?><br/>
                     <?php echo $trans->trans('Select below the one you want to use.'); ?>
                 </p>
-                <?php foreach($databases as $database): ?>
+                <?php foreach($databases as $database) { ?>
                     <?php if ($database['SCHEMA_NAME'] == 'information_schema') continue; ?>
                     <?php
                         $connection->exec(sprintf('use %s', $database['SCHEMA_NAME']));
@@ -75,7 +73,7 @@ try {
                         <?php echo $database['SCHEMA_NAME']; ?>
                     </label>
                 </div>
-                <?php endforeach; ?>
+                <?php } ?>
                 <?php
                     $connection->exec('use information_schema');
 

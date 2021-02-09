@@ -2,10 +2,10 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\Base\Accessory as BaseAccessory;
-use Thelia\Core\Event\TheliaEvents;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\AccessoryEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Base\Accessory as BaseAccessory;
 
 class Accessory extends BaseAccessory
 {

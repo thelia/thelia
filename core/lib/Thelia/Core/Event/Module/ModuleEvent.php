@@ -35,7 +35,6 @@ class ModuleEvent extends ActionEvent
     protected $postscriptum;
 
     /**
-     * @param mixed $chapo
      */
     public function setChapo($chapo)
     {
@@ -43,7 +42,6 @@ class ModuleEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getChapo()
     {
@@ -51,7 +49,6 @@ class ModuleEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $description
      */
     public function setDescription($description)
     {
@@ -59,7 +56,6 @@ class ModuleEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getDescription()
     {
@@ -67,7 +63,6 @@ class ModuleEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $id
      */
     public function setId($id)
     {
@@ -75,7 +70,6 @@ class ModuleEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getId()
     {
@@ -83,7 +77,6 @@ class ModuleEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $locale
      */
     public function setLocale($locale)
     {
@@ -91,7 +84,6 @@ class ModuleEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getLocale()
     {
@@ -99,7 +91,6 @@ class ModuleEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $postscriptum
      */
     public function setPostscriptum($postscriptum)
     {
@@ -107,7 +98,6 @@ class ModuleEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getPostscriptum()
     {
@@ -115,7 +105,6 @@ class ModuleEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $title
      */
     public function setTitle($title)
     {
@@ -123,7 +112,6 @@ class ModuleEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getTitle()
     {
@@ -136,7 +124,6 @@ class ModuleEvent extends ActionEvent
     }
 
     /**
-     * @param \Thelia\Model\Module $module
      *
      * @return $this
      */

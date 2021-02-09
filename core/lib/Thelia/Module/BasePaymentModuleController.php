@@ -29,7 +29,7 @@ use Thelia\Model\OrderStatusQuery;
  */
 abstract class BasePaymentModuleController extends BaseFrontController
 {
-    protected $log = null;
+    protected $log;
 
     /**
      * Return a module identifier used to calculate the name of the log file,
@@ -84,7 +84,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
                 $this->getLog()->addInfo(
                     $this->getTranslator()->trans(
                         "Processing confirmation of order ref. %ref, ID %id",
-                        array('%ref' => $order->getRef(), '%id' => $order->getId())
+                        ['%ref' => $order->getRef(), '%id' => $order->getId()]
                     )
                 );
 
@@ -97,7 +97,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
                 $this->getLog()->addInfo(
                     $this->getTranslator()->trans(
                         "Order ref. %ref, ID %id has been successfully paid.",
-                        array('%ref' => $order->getRef(), '%id' => $order->getId())
+                        ['%ref' => $order->getRef(), '%id' => $order->getId()]
                     )
                 );
             }
@@ -105,11 +105,11 @@ abstract class BasePaymentModuleController extends BaseFrontController
             $this->getLog()->addError(
                 $this->getTranslator()->trans(
                     "Error occured while processing order ref. %ref, ID %id: %err",
-                    array(
+                    [
                         '%err' => $ex->getMessage(),
                         '%ref' => !isset($order) ? "?" : $order->getRef(),
                         '%id' => !isset($order) ? "?" : $order->getId()
-                    )
+                    ]
                 )
             );
 
@@ -178,7 +178,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
                 $this->getLog()->addInfo(
                     $this->getTranslator()->trans(
                         "Processing cancelation of payment for order ref. %ref",
-                        array('%ref' => $order->getRef())
+                        ['%ref' => $order->getRef()]
                     )
                 );
 
@@ -191,7 +191,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
                 $this->getLog()->addInfo(
                     $this->getTranslator()->trans(
                         "Order ref. %ref is now unpaid.",
-                        array('%ref' => $order->getRef())
+                        ['%ref' => $order->getRef()]
                     )
                 );
             }
@@ -199,11 +199,11 @@ abstract class BasePaymentModuleController extends BaseFrontController
             $this->getLog()->addError(
                 $this->getTranslator()->trans(
                     "Error occurred while cancelling order ref. %ref, ID %id: %err",
-                    array(
+                    [
                         '%err' => $ex->getMessage(),
                         '%ref' => !isset($order) ? "?" : $order->getRef(),
                         '%id' => !isset($order) ? "?" : $order->getId()
-                    )
+                    ]
                 )
             );
 
@@ -221,7 +221,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
     {
         if (null == $order = OrderQuery::create()->findPk($orderId)) {
             $this->getLog()->addError(
-                $this->getTranslator()->trans("Unknown order ID:  %id", array('%id' => $orderId))
+                $this->getTranslator()->trans("Unknown order ID:  %id", ['%id' => $orderId])
             );
         }
 

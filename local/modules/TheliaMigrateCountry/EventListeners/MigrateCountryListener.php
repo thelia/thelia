@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace TheliaMigrateCountry\EventListeners;
 
 use Propel\Runtime\Exception\PropelException;
@@ -33,7 +32,6 @@ use TheliaMigrateCountry\Events\MigrateCountryEvents;
  */
 class MigrateCountryListener implements EventSubscriberInterface
 {
-
     public function migrateCountry(MigrateCountryEvent $event)
     {
         $counter = [];
@@ -51,7 +49,6 @@ class MigrateCountryListener implements EventSubscriberInterface
         $this->setCountriesVisibility($event);
 
         $event->setCounter($counter);
-
     }
 
     protected function migrateAddress(MigrateCountryEvent $event)

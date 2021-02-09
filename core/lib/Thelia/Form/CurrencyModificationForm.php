@@ -22,7 +22,7 @@ class CurrencyModificationForm extends CurrencyCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", HiddenType::class, array("constraints" => array(new GreaterThan(array('value' => 0)))))
+            ->add("id", HiddenType::class, ["constraints" => [new GreaterThan(['value' => 0])]])
         ;
     }
 

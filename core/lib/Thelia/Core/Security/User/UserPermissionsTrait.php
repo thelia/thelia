@@ -42,7 +42,7 @@ trait UserPermissionsTrait
             ->filterByProfileId($profileId)
             ->find();
 
-        $userPermissions = array();
+        $userPermissions = [];
         foreach ($userResourcePermissionsQuery as $userResourcePermission) {
             $userPermissions[$userResourcePermission->getVirtualColumn('code')] = new AccessManager($userResourcePermission->getAccess());
         }

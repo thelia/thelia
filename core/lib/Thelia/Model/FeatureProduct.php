@@ -2,11 +2,11 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\Base\FeatureProduct as BaseFeatureProduct;
-use Thelia\Core\Event\TheliaEvents;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\FeatureProduct\FeatureProductEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Log\Tlog;
+use Thelia\Model\Base\FeatureProduct as BaseFeatureProduct;
 
 class FeatureProduct extends BaseFeatureProduct
 {

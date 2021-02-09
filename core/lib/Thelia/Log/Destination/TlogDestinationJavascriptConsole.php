@@ -31,7 +31,7 @@ class TlogDestinationJavascriptConsole extends AbstractTlogDestination
         $content = '<script>try {'."\n";
 
         foreach ($this->logs as $line) {
-            $content .= "console.log('".str_replace("'", "\\'", str_replace(array("\r\n", "\r", "\n"), '\\n', $line))."');\n";
+            $content .= "console.log('".str_replace("'", "\\'", str_replace(["\r\n", "\r", "\n"], '\\n', $line))."');\n";
         }
 
         $content .= '} catch (ex) { alert("Les logs Thelia ne peuvent être affichés dans la console javascript:" + ex); }</script>'."\n";

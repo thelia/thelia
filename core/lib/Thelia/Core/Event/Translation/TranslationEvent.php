@@ -85,7 +85,6 @@ class TranslationEvent extends ActionEvent
         return $event;
     }
 
-
     /**
      * @return string
      */

@@ -24,13 +24,13 @@ use Thelia\Core\Event\ActionEvent;
 class CouponConsumeEvent extends ActionEvent
 {
     /** @var string Coupon code */
-    protected $code = null;
+    protected $code;
 
     /** @var float Total discount given by this coupon */
     protected $discount = 0;
 
     /** @var bool If Coupon is valid or if Customer meets coupon conditions */
-    protected $isValid = null;
+    protected $isValid;
 
     /** @var bool true if coupon offers free shipping  */
     protected $freeShipping = false;

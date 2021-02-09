@@ -41,9 +41,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new currencyuration entry
      *
-     * @param \Thelia\Core\Event\Currency\CurrencyCreateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function create(CurrencyCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -69,15 +67,12 @@ class Currency extends BaseAction implements EventSubscriberInterface
     /**
      * Change a currency
      *
-     * @param \Thelia\Core\Event\Currency\CurrencyUpdateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function update(CurrencyUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
             $currency
-
 
                 ->setLocale($event->getLocale())
                 ->setName($event->getCurrencyName())
@@ -95,15 +90,13 @@ class Currency extends BaseAction implements EventSubscriberInterface
     /**
      * Set the default currency
      *
-     * @param CurrencyUpdateEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function setDefault(CurrencyUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
             // Reset default status
-            CurrencyQuery::create()->filterByByDefault(true)->update(array('ByDefault' => false));
+            CurrencyQuery::create()->filterByByDefault(true)->update(['ByDefault' => false]);
 
             $currency
 
@@ -124,7 +117,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param CurrencyUpdateEvent $event
      */
     public function setVisible(CurrencyUpdateEvent $event)
     {
@@ -138,9 +130,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a currencyuration entry
      *
-     * @param \Thelia\Core\Event\Currency\CurrencyDeleteEvent $event
      * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function delete(CurrencyDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -192,9 +182,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param UpdatePositionEvent $event
      * @param string $eventName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -206,14 +194,14 @@ class Currency extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::CURRENCY_CREATE          => array("create", 128),
-            TheliaEvents::CURRENCY_UPDATE          => array("update", 128),
-            TheliaEvents::CURRENCY_DELETE          => array("delete", 128),
-            TheliaEvents::CURRENCY_SET_DEFAULT     => array("setDefault", 128),
-            TheliaEvents::CURRENCY_SET_VISIBLE     => array("setVisible", 128),
-            TheliaEvents::CURRENCY_UPDATE_RATES    => array("updateRates", 128),
-            TheliaEvents::CURRENCY_UPDATE_POSITION => array("updatePosition", 128)
-        );
+        return [
+            TheliaEvents::CURRENCY_CREATE          => ["create", 128],
+            TheliaEvents::CURRENCY_UPDATE          => ["update", 128],
+            TheliaEvents::CURRENCY_DELETE          => ["delete", 128],
+            TheliaEvents::CURRENCY_SET_DEFAULT     => ["setDefault", 128],
+            TheliaEvents::CURRENCY_SET_VISIBLE     => ["setVisible", 128],
+            TheliaEvents::CURRENCY_UPDATE_RATES    => ["updateRates", 128],
+            TheliaEvents::CURRENCY_UPDATE_POSITION => ["updatePosition", 128]
+        ];
     }
 }

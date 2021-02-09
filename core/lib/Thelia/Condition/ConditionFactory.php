@@ -26,19 +26,18 @@ use Thelia\Coupon\FacadeInterface;
 class ConditionFactory
 {
     /** @var ContainerInterface Service Container */
-    protected $container = null;
+    protected $container;
 
     /** @var  FacadeInterface Provide necessary value from Thelia */
     protected $adapter;
 
     /** @var array ConditionCollection to process*/
-    protected $conditions = null;
+    protected $conditions;
 
     /**
      * Constructor
      *
      * @param ContainerInterface $container Service container
-     * @param FacadeInterface $facade
      */
     public function __construct(
         ContainerInterface $container,

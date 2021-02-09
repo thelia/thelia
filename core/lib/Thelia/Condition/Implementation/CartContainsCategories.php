@@ -69,7 +69,7 @@ class CartContainsCategories extends ConditionAbstract
 
         // Be sure that the value is an array, make one if required
         if (! \is_array($values[self::CATEGORIES_LIST])) {
-            $values[self::CATEGORIES_LIST] = array($values[self::CATEGORIES_LIST]);
+            $values[self::CATEGORIES_LIST] = [$values[self::CATEGORIES_LIST]];
         }
 
         // Check that at least one category is selected
@@ -174,13 +174,13 @@ class CartContainsCategories extends ConditionAbstract
      */
     protected function generateInputs()
     {
-        return array(
-            self::CATEGORIES_LIST => array(
+        return [
+            self::CATEGORIES_LIST => [
                 'availableOperators' => $this->availableOperators[self::CATEGORIES_LIST],
                 'value' => '',
                 'selectedOperator' => Operators::IN
-            )
-        );
+            ]
+        ];
     }
 
     /**
@@ -193,7 +193,7 @@ class CartContainsCategories extends ConditionAbstract
             [
                 'operatorSelectHtml'    => $this->drawBackOfficeInputOperators(self::CATEGORIES_LIST),
                 'categories_field_name' => self::CATEGORIES_LIST,
-                'values'                => isset($this->values[self::CATEGORIES_LIST]) ? $this->values[self::CATEGORIES_LIST] : array()
+                'values'                => isset($this->values[self::CATEGORIES_LIST]) ? $this->values[self::CATEGORIES_LIST] : []
             ]
         );
     }

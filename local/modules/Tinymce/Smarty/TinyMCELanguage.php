@@ -68,8 +68,8 @@ class TinyMCELanguage extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor('function', 'tinymce_lang', $this, 'guessTinyMCELanguage'),
-        );
+        ];
     }
 }

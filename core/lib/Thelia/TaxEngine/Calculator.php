@@ -55,9 +55,6 @@ class Calculator
     }
 
     /**
-     * @param Cart $cart
-     * @param Country $country
-     * @param State|null $state
      *
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
@@ -68,15 +65,11 @@ class Calculator
     }
 
     /**
-     * @param Cart $cart
-     * @param Country $country
-     * @param State|null $state
      *
      * @return float|int
      * @throws \Propel\Runtime\Exception\PropelException
      */
     /**
-     * @param Order $order
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -86,7 +79,6 @@ class Calculator
     }
 
     /**
-     * @param Order $order
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -111,20 +103,17 @@ class Calculator
                 }
             }
 
-            if (0 === $orderTaxfactorCount = count($orderTaxFactors)) {
+            if (0 === $orderTaxfactorCount = \count($orderTaxFactors)) {
                 return 1;
             }
 
-            $orderTaxFactor = array_sum($orderTaxFactors) / count($orderTaxFactors);
+            $orderTaxFactor = array_sum($orderTaxFactors) / \count($orderTaxFactors);
         }
 
         return $orderTaxFactor;
     }
 
     /**
-     * @param Cart $cart
-     * @param Country $country
-     * @param State|null $state
      *
      * @return float
      * @throws \Propel\Runtime\Exception\PropelException
@@ -153,16 +142,13 @@ class Calculator
                 }
             }
 
-            $cartFactor = array_sum($cartTaxFactors) / count($cartTaxFactors);
+            $cartFactor = array_sum($cartTaxFactors) / \count($cartTaxFactors);
         }
 
         return $cartFactor;
     }
 
     /**
-     * @param Product $product
-     * @param Country $country
-     * @param State|null $state
      * @return $this
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -185,10 +171,6 @@ class Calculator
     }
 
     /**
-     * @param TaxRule $taxRule
-     * @param Country $country
-     * @param Product $product
-     * @param State|null $state
      * @return $this
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -214,8 +196,6 @@ class Calculator
     }
 
     /**
-     * @param TaxRule $taxRule
-     * @param Product $product
      * @return $this
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -239,9 +219,6 @@ class Calculator
     }
 
     /**
-     * @param TaxRule $taxRule
-     * @param Country $country
-     * @param State|null $state
      * @return $this
      * @throws \Propel\Runtime\Exception\PropelException
      * @since 2.4

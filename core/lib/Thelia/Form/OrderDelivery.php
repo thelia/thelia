@@ -30,24 +30,24 @@ class OrderDelivery extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("delivery-address", IntegerType::class, array(
+            ->add("delivery-address", IntegerType::class, [
                 "required" => true,
-                "constraints" => array(
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                            array($this, "verifyDeliveryAddress")
+                            [$this, "verifyDeliveryAddress"]
                     ),
-                ),
-            ))
-            ->add("delivery-module", IntegerType::class, array(
+                ],
+            ])
+            ->add("delivery-module", IntegerType::class, [
                 "required" => true,
-                "constraints" => array(
+                "constraints" => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                            array($this, "verifyDeliveryModule")
+                            [$this, "verifyDeliveryModule"]
                     ),
-                ),
-            ));
+                ],
+            ]);
     }
 
     public function verifyDeliveryAddress($value, ExecutionContextInterface $context)

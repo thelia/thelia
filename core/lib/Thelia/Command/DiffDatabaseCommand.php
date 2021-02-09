@@ -2,13 +2,13 @@
 
 namespace Thelia\Command;
 
+use Propel\Generator\Command\MigrationDiffCommand as PropelMigrationDiffCommand;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Propel\Generator\Command\MigrationDiffCommand as PropelMigrationDiffCommand;
 use Thelia\Core\PropelInitService;
 
 /**

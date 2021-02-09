@@ -15,9 +15,9 @@ namespace Thelia\Condition\Implementation;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;
-use Thelia\Model\ProductQuery;
 use Thelia\Model\CartItem;
 use Thelia\Model\Product;
+use Thelia\Model\ProductQuery;
 
 /**
  * Check a Checkout against its Product number
@@ -69,7 +69,7 @@ class CartContainsProducts extends ConditionAbstract
 
         // Be sure that the value is an array, make one if required
         if (! \is_array($values[self::PRODUCTS_LIST])) {
-            $values[self::PRODUCTS_LIST] = array($values[self::PRODUCTS_LIST]);
+            $values[self::PRODUCTS_LIST] = [$values[self::PRODUCTS_LIST]];
         }
 
         // Check that at least one product is selected
@@ -169,13 +169,13 @@ class CartContainsProducts extends ConditionAbstract
      */
     protected function generateInputs()
     {
-        return array(
-            self::PRODUCTS_LIST => array(
+        return [
+            self::PRODUCTS_LIST => [
                 'availableOperators' => $this->availableOperators[self::PRODUCTS_LIST],
                 'value' => '',
                 'selectedOperator' => Operators::IN
-            )
-        );
+            ]
+        ];
     }
 
     /**
@@ -188,7 +188,7 @@ class CartContainsProducts extends ConditionAbstract
             [
                 'operatorSelectHtml'    => $this->drawBackOfficeInputOperators(self::PRODUCTS_LIST),
                 'products_field_name' => self::PRODUCTS_LIST,
-                'values'                => isset($this->values[self::PRODUCTS_LIST]) ? $this->values[self::PRODUCTS_LIST] : array()
+                'values'                => isset($this->values[self::PRODUCTS_LIST]) ? $this->values[self::PRODUCTS_LIST] : []
             ]
         );
     }

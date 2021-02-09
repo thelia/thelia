@@ -39,7 +39,6 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
     protected $timestampable = true;
 
     /**
-     * @param LoopResult $loopResult
      * @return LoopResult
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -73,7 +72,7 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
         /** @var ImportCategoryQuery|ExportCategoryQuery $query */
         $query = $this->getQueryModel();
 
-        $this->configureI18nProcessing($query, array('TITLE'));
+        $this->configureI18nProcessing($query, ['TITLE']);
 
         if (null !== $ids = $this->getId()) {
             $query->filterById($ids, Criteria::IN);

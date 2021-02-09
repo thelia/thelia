@@ -31,7 +31,7 @@ class OrderQuery extends BaseOrderQuery
     {
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
-        $stats = array();
+        $stats = [];
         for ($day=1; $day<=$numberOfDay; $day++) {
             $dayAmount = self::getSaleStats(
                 new \DateTime(sprintf('%s-%s-%s', $year, $month, $day)),
@@ -39,7 +39,7 @@ class OrderQuery extends BaseOrderQuery
                 $includeShipping,
                 $withTaxes
             );
-            $stats[] = array($day-1, $dayAmount);
+            $stats[] = [$day-1, $dayAmount];
         }
 
         return $stats;
@@ -49,7 +49,7 @@ class OrderQuery extends BaseOrderQuery
     {
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
-        $stats = array();
+        $stats = [];
         for ($day=1; $day<=$numberOfDay; $day++) {
             $dayOrdersQuery = self::create()
                 ->filterByInvoiceDate(sprintf("%s-%s-%s 00:00:00", $year, $month, $day), Criteria::GREATER_EQUAL)
@@ -58,7 +58,7 @@ class OrderQuery extends BaseOrderQuery
                 $dayOrdersQuery->filterByStatusId($status, Criteria::IN);
             }
             $dayOrders = $dayOrdersQuery->count();
-            $stats[] = array($day-1, $dayOrders);
+            $stats[] = [$day-1, $dayOrders];
         }
 
         return $stats;
@@ -74,7 +74,7 @@ class OrderQuery extends BaseOrderQuery
     {
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
-        $stats = array();
+        $stats = [];
         for ($day=1; $day<=$numberOfDay; $day++) {
             $dayOrdersQuery = self::create()
                 ->filterByCreatedAt(sprintf("%s-%s-%s 00:00:00", $year, $month, $day), Criteria::GREATER_EQUAL)
@@ -91,15 +91,13 @@ class OrderQuery extends BaseOrderQuery
             $dayOrdersQuery->where('ISNULL(`other_order`.`ID`)');
 
             $dayOrders = $dayOrdersQuery->count();
-            $stats[] = array($day-1, $dayOrders);
+            $stats[] = [$day-1, $dayOrders];
         }
 
         return $stats;
     }
 
     /**
-     * @param \DateTime $startDate
-     * @param \DateTime $endDate
      * @param bool $includeShipping
      * @param bool $withTaxes
      *
@@ -108,7 +106,7 @@ class OrderQuery extends BaseOrderQuery
      */
     public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping, $withTaxes = true)
     {
-        $amount = floatval(
+        $amount = \floatval(
             self::baseSaleStats($startDate, $endDate, 'o')
                 ->innerJoinOrderProduct()
                 ->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE,`order_product`.PRICE)))", 'TOTAL')
@@ -117,7 +115,7 @@ class OrderQuery extends BaseOrderQuery
         );
 
         if ($withTaxes) {
-            $amount += floatval(
+            $amount += \floatval(
                 self::baseSaleStats($startDate, $endDate, 'o')
                     ->useOrderProductQuery()
                         ->useOrderProductTaxQuery()
@@ -129,7 +127,7 @@ class OrderQuery extends BaseOrderQuery
             );
         }
 
-        $amount -= floatval(
+        $amount -= \floatval(
             self::baseSaleStats($startDate, $endDate)
                 ->withColumn("SUM(`order`.discount)", 'DISCOUNT')
                 ->select('DISCOUNT')
@@ -137,7 +135,7 @@ class OrderQuery extends BaseOrderQuery
         );
 
         if ($includeShipping) {
-            $amount += floatval(
+            $amount += \floatval(
                 self::baseSaleStats($startDate, $endDate)
                     ->withColumn("SUM(`order`.postage)", 'POSTAGE')
                     ->select('POSTAGE')
@@ -149,8 +147,6 @@ class OrderQuery extends BaseOrderQuery
     }
 
     /**
-     * @param \DateTime $startDate
-     * @param \DateTime $endDate
      * @param string $modelAlias
      * @return OrderQuery
      */
@@ -163,10 +159,7 @@ class OrderQuery extends BaseOrderQuery
             ->filterByStatusId(OrderStatusQuery::getPaidStatusIdList(), Criteria::IN);
     }
 
-
     /**
-     * @param \DateTime $startDate
-     * @param \DateTime $endDate
      * @param int[]     $status
      *
      * @return int

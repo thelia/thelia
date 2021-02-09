@@ -33,7 +33,6 @@ class CountryCreateEvent extends CountryEvent
     protected $area;
 
     /**
-     * @param mixed $isoAlpha2
      */
     public function setIsoAlpha2($isoAlpha2)
     {
@@ -43,7 +42,6 @@ class CountryCreateEvent extends CountryEvent
     }
 
     /**
-     * @return mixed
      */
     public function getIsoAlpha2()
     {
@@ -51,7 +49,6 @@ class CountryCreateEvent extends CountryEvent
     }
 
     /**
-     * @param mixed $isoAlpha3
      */
     public function setIsoAlpha3($isoAlpha3)
     {
@@ -61,7 +58,6 @@ class CountryCreateEvent extends CountryEvent
     }
 
     /**
-     * @return mixed
      */
     public function getIsoAlpha3()
     {
@@ -69,7 +65,6 @@ class CountryCreateEvent extends CountryEvent
     }
 
     /**
-     * @param mixed $isocode
      */
     public function setIsocode($isocode)
     {
@@ -79,7 +74,6 @@ class CountryCreateEvent extends CountryEvent
     }
 
     /**
-     * @return mixed
      */
     public function getIsocode()
     {
@@ -87,7 +81,6 @@ class CountryCreateEvent extends CountryEvent
     }
 
     /**
-     * @param mixed $locale
      */
     public function setLocale($locale)
     {
@@ -97,7 +90,6 @@ class CountryCreateEvent extends CountryEvent
     }
 
     /**
-     * @return mixed
      */
     public function getLocale()
     {
@@ -105,7 +97,6 @@ class CountryCreateEvent extends CountryEvent
     }
 
     /**
-     * @param mixed $title
      */
     public function setTitle($title)
     {
@@ -115,7 +106,6 @@ class CountryCreateEvent extends CountryEvent
     }
 
     /**
-     * @return mixed
      */
     public function getTitle()
     {

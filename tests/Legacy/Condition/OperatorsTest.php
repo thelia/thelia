@@ -33,7 +33,7 @@ class OperatorsTest extends TestCase
 
         $stubTranslator->expects($this->any())
             ->method('trans')
-            ->will($this->returnCallback((array($this, 'callbackI18n'))));
+            ->will($this->returnCallback(([$this, 'callbackI18n'])));
 
         $actual = Operators::getI18n($stubTranslator, Operators::INFERIOR);
         $expected = 'Less than';
@@ -74,7 +74,7 @@ class OperatorsTest extends TestCase
 
     public function callbackI18n()
     {
-        $args = func_get_args();
+        $args = \func_get_args();
 
         return $args[0];
     }

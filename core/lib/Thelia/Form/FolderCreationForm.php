@@ -22,32 +22,32 @@ class FolderCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("title", TextType::class, array(
-                "constraints" => array(
+            ->add("title", TextType::class, [
+                "constraints" => [
                     new NotBlank(),
-                ),
+                ],
                 "label" => Translator::getInstance()->trans("Folder title *"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "title",
-                ),
-            ))
-            ->add("parent", TextType::class, array(
+                ],
+            ])
+            ->add("parent", TextType::class, [
                 "label" => Translator::getInstance()->trans("Parent folder *"),
-                "constraints" => array(
+                "constraints" => [
                     new NotBlank(),
-                ),
-                "label_attr" => array("for" => "parent_create"),
-            ))
-            ->add("locale", TextType::class, array(
-                "constraints" => array(
+                ],
+                "label_attr" => ["for" => "parent_create"],
+            ])
+            ->add("locale", TextType::class, [
+                "constraints" => [
                     new NotBlank(),
-                ),
-                "label_attr" => array("for" => "locale_create"),
-            ))
-            ->add("visible", IntegerType::class, array(
+                ],
+                "label_attr" => ["for" => "locale_create"],
+            ])
+            ->add("visible", IntegerType::class, [
                 "label" => Translator::getInstance()->trans("This folder is online."),
-                "label_attr" => array("for" => "visible_create"),
-            ))
+                "label_attr" => ["for" => "visible_create"],
+            ])
         ;
     }
 

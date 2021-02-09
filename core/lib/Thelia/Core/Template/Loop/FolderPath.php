@@ -52,14 +52,14 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
         $visible = $this->getVisible();
         $depth = $this->getDepth();
     
-        $results = array();
+        $results = [];
 
-        $ids = array();
+        $ids = [];
 
         do {
             $search = FolderQuery::create();
     
-            $this->configureI18nProcessing($search, array('TITLE'));
+            $this->configureI18nProcessing($search, ['TITLE']);
     
             $search->filterById($currentId);
             
@@ -70,12 +70,12 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
             $folder = $search->findOne();
 
             if ($folder != null) {
-                $results[] = array(
+                $results[] = [
                     "ID" => $folder->getId(),
                     "TITLE" => $folder->getVirtualColumn('i18n_TITLE'),
                     "URL" => $folder->getUrl($this->locale),
                     "LOCALE" => $this->locale,
-                );
+                ];
     
                 $currentId = $folder->getParent();
 

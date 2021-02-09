@@ -157,9 +157,6 @@ class ImportHandler
     /**
      * Import
      *
-     * @param \Thelia\Model\Import                        $import
-     * @param \Symfony\Component\HttpFoundation\File\File $file
-     * @param null|\Thelia\Model\Lang                     $language
      *
      * @return \Thelia\Core\Event\ImportEvent
      */
@@ -250,8 +247,6 @@ class ImportHandler
     /**
      * Extract archive
      *
-     * @param \Symfony\Component\HttpFoundation\File\File $file
-     * @param \Thelia\Core\Archiver\ArchiverInterface     $archiver
      *
      * @return \Symfony\Component\HttpFoundation\File\File First file in unarchiver
      */
@@ -259,7 +254,7 @@ class ImportHandler
     {
         $archiver->open($file->getPathname());
 
-        $extractpath = dirname($archiver->getArchivePath()) . DS . uniqid();
+        $extractpath = \dirname($archiver->getArchivePath()) . DS . uniqid();
 
         $archiver->extract($extractpath);
 

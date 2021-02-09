@@ -119,7 +119,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      *
      * @api
      */
-    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
+    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH)
     {
         throw new RouteNotFoundException();
     }
@@ -239,16 +239,15 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                 $this->manageLocale($rewrittenUrlData, $request);
             }
 
-
             foreach ($rewrittenUrlData->otherParameters as $parameter => $value) {
                 $request->query->set($parameter, $value);
             }
 
-            return array(
+            return [
                 '_controller' => 'Thelia\\Controller\\Front\\DefaultController::noAction',
                 '_route' => 'rewrite',
                 '_rewritten' => true,
-            );
+            ];
         }
         throw new ResourceNotFoundException();
     }

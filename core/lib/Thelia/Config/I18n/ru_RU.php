@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     ' content create form' => ' форма создания содержимого',
     ' note: only non-visible documents can be associated.' => ' Примечание: только не видимые документы могут быть связаны.',
     '"%param" parameter cannot be empty in loop type: %type, name: %name' => 'параметр «%param» не может быть пустым в цикле типа: тип %, имя: %name',
@@ -826,4 +826,4 @@ return array(
     'update form' => 'форма обновления',
     'value table header' => 'заголовок таблицы значения',
     'value table row' => 'строка таблицы значения',
-);
+];

@@ -31,7 +31,7 @@ class JsonTypeTest extends TestCase
     public function testFormatJsonType()
     {
         $jsonType = new JsonType();
-        $this->assertTrue(is_array($jsonType->getFormattedValue('{"k0":"v0","k1":"v1","k2":"v2"}')));
+        $this->assertTrue(\is_array($jsonType->getFormattedValue('{"k0":"v0","k1":"v1","k2":"v2"}')));
         $this->assertNull($jsonType->getFormattedValue('foo'));
     }
 }

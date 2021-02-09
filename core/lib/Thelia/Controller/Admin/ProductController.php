@@ -115,9 +115,9 @@ class ProductController extends AbstractSeoCrudController
     {
         return $this->render(
             'ajax/product-attributes-tab',
-            array(
+            [
                 'product_id' => $this->getRequest()->get('product_id', 0),
-            )
+            ]
         );
     }
 
@@ -128,11 +128,11 @@ class ProductController extends AbstractSeoCrudController
     {
         return $this->render(
             'ajax/product-related-tab',
-            array(
+            [
                     'product_id'             => $this->getRequest()->get('product_id', 0),
                     'folder_id'              => $this->getRequest()->get('folder_id', 0),
                     'accessory_category_id'  => $this->getRequest()->get('accessory_category_id', 0)
-            )
+            ]
         );
     }
 
@@ -207,7 +207,6 @@ class ProductController extends AbstractSeoCrudController
 
     /**
      * @param  ProductEvent $event
-     * @return mixed
      */
     protected function eventContainsObject($event)
     {
@@ -240,7 +239,7 @@ class ProductController extends AbstractSeoCrudController
     protected function appendValue(&$array, $key, $value)
     {
         if (! isset($array[$key])) {
-            $array[$key] = array();
+            $array[$key] = [];
         }
 
         $array[$key][] = $value;
@@ -261,10 +260,10 @@ class ProductController extends AbstractSeoCrudController
         $currentCurrency = $this->getCurrentEditionCurrency();
 
         // Common parts
-        $defaultPseData = $combinationPseData = array(
+        $defaultPseData = $combinationPseData = [
             "product_id"  => $object->getId(),
             "tax_rule"    => $object->getTaxRuleId()
-        );
+        ];
 
         /** @var ProductSaleElements $saleElement */
         foreach ($saleElements as $saleElement) {
@@ -296,7 +295,7 @@ class ProductController extends AbstractSeoCrudController
             // If this PSE has no combination -> this is the default one
             // affect it to the thelia.admin.product_sale_element.update form
             if ($isDefaultPse) {
-                $defaultPseData = array(
+                $defaultPseData = [
                     "product_sale_element_id" => $saleElement->getId(),
                     "reference"               => $saleElement->getRef(),
                     "price"                   => $this->formatPrice($productPrice->getPrice()),
@@ -311,7 +310,7 @@ class ProductController extends AbstractSeoCrudController
                     "isnew"                   => $saleElement->getNewness() > 0 ? 1 : 0,
                     "isdefault"               => $saleElement->getIsDefault() > 0 ? 1 : 0,
                     "ean_code"                => $saleElement->getEanCode()
-                );
+                ];
             } else {
                 if ($saleElement->getIsDefault()) {
                     $combinationPseData['default_pse']       = $saleElement->getId();
@@ -344,7 +343,7 @@ class ProductController extends AbstractSeoCrudController
         $this->hydrateSeoForm($object);
 
         // The "General" tab form
-        $data = array(
+        $data = [
             'id'               => $object->getId(),
             'ref'              => $object->getRef(),
             'locale'           => $object->getLocale(),
@@ -356,10 +355,10 @@ class ProductController extends AbstractSeoCrudController
             'virtual'          => $object->getVirtual(),
             'default_category' => $object->getDefaultCategoryId(),
             'brand_id'         => $object->getBrandId()
-        );
+        ];
 
         // Virtual document
-        if (array_key_exists("product_sale_element_id", $defaultPseData)) {
+        if (\array_key_exists("product_sale_element_id", $defaultPseData)) {
             $virtualDocumentId = \intval(MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $defaultPseData['product_sale_element_id']));
             if ($virtualDocumentId) {
                 $data["virtual_document_id"] = $virtualDocumentId;
@@ -393,7 +392,6 @@ class ProductController extends AbstractSeoCrudController
 
     /**
      * @param  Product $object
-     * @return mixed
      */
     protected function getObjectLabel($object)
     {
@@ -402,7 +400,6 @@ class ProductController extends AbstractSeoCrudController
 
     /**
      * @param  Product $object
-     * @return mixed
      */
     protected function getObjectId($object)
     {
@@ -411,14 +408,14 @@ class ProductController extends AbstractSeoCrudController
 
     protected function getEditionArguments()
     {
-        return array(
+        return [
                 'category_id'           => $this->getCategoryId(),
                 'product_id'            => $this->getRequest()->get('product_id', 0),
                 'folder_id'             => $this->getRequest()->get('folder_id', 0),
                 'accessory_category_id' => $this->getRequest()->get('accessory_category_id', 0),
                 'current_tab'           => $this->getRequest()->get('current_tab', 'general'),
                 'page'                  => $this->getRequest()->get('page', 1)
-        );
+        ];
     }
 
     protected function getCategoryId()
@@ -443,11 +440,11 @@ class ProductController extends AbstractSeoCrudController
 
         return $this->render(
             'categories',
-            array(
+            [
                 'product_order' => $currentOrder,
                 'category_id' => $this->getCategoryId(),
                 'page' => $this->getRequest()->get('page', 1)
-            )
+            ]
         );
     }
 
@@ -478,7 +475,7 @@ class ProductController extends AbstractSeoCrudController
     public function setToggleVisibilityAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -510,7 +507,6 @@ class ProductController extends AbstractSeoCrudController
             ['category_id' => $this->getCategoryId()]
         );
     }
-
 
     /**
      * @param ProductUpdateEvent $updateEvent
@@ -553,7 +549,7 @@ class ProductController extends AbstractSeoCrudController
      */
     public function getVirtualDocumentListAjaxAction($productId, $pseId)
     {
-        $this->checkAuth(AdminResources::PRODUCT, array(), AccessManager::VIEW);
+        $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::VIEW);
         $this->checkXmlHttpRequest();
 
         $selectedId = \intval(MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $pseId));
@@ -586,7 +582,7 @@ class ProductController extends AbstractSeoCrudController
 
     public function getAvailableRelatedContentAction($productId, $folderId)
     {
-        $result = array();
+        $result = [];
 
         $folders = FolderQuery::create()->filterById($folderId)->find();
 
@@ -601,7 +597,7 @@ class ProductController extends AbstractSeoCrudController
             if ($list !== null) {
                 /** @var Content $item */
                 foreach ($list as $item) {
-                    $result[] = array('id' => $item->getId(), 'title' => $item->getTitle());
+                    $result[] = ['id' => $item->getId(), 'title' => $item->getTitle()];
                 }
             }
         }
@@ -612,7 +608,7 @@ class ProductController extends AbstractSeoCrudController
     public function addRelatedContentAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -638,7 +634,7 @@ class ProductController extends AbstractSeoCrudController
     public function deleteRelatedContentAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -665,7 +661,7 @@ class ProductController extends AbstractSeoCrudController
 
     public function getAvailableAccessoriesAction($productId, $categoryId)
     {
-        $result = array();
+        $result = [];
 
         $categories = CategoryQuery::create()->filterById($categoryId)->find();
 
@@ -680,7 +676,7 @@ class ProductController extends AbstractSeoCrudController
             if ($list !== null) {
                 /** @var Product $item */
                 foreach ($list as $item) {
-                    $result[] = array('id' => $item->getId(), 'title' => $item->getTitle());
+                    $result[] = ['id' => $item->getId(), 'title' => $item->getTitle()];
                 }
             }
         }
@@ -691,7 +687,7 @@ class ProductController extends AbstractSeoCrudController
     public function addAccessoryAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -717,7 +713,7 @@ class ProductController extends AbstractSeoCrudController
     public function deleteAccessoryAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -775,7 +771,7 @@ class ProductController extends AbstractSeoCrudController
     public function setProductTemplateAction($productId)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -814,10 +810,10 @@ class ProductController extends AbstractSeoCrudController
                     ->filterByFeatureTemplate($featureTemplate)
                     ->find();
 
-                $updatedFeatures = array();
+                $updatedFeatures = [];
 
                 // Update all features values, starting with feature av. values
-                $featureValues = $this->getRequest()->get('feature_value', array());
+                $featureValues = $this->getRequest()->get('feature_value', []);
 
                 foreach ($featureValues as $featureId => $featureValueList) {
                     // Delete all features av. for this feature.
@@ -836,7 +832,7 @@ class ProductController extends AbstractSeoCrudController
                 }
 
                 // Update then features text values
-                $featureTextValues = $this->getRequest()->get('feature_text_value', array());
+                $featureTextValues = $this->getRequest()->get('feature_text_value', []);
 
                 foreach ($featureTextValues as $featureId => $featureValue) {
                     // Check if a FeatureProduct exists for this product and this feature (for another lang)
@@ -883,7 +879,7 @@ class ProductController extends AbstractSeoCrudController
     public function addAdditionalCategoryAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -909,7 +905,7 @@ class ProductController extends AbstractSeoCrudController
     public function deleteAdditionalCategoryAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -936,7 +932,7 @@ class ProductController extends AbstractSeoCrudController
 
     public function getAttributeValuesAction(/** @noinspection PhpUnusedParameterInspection */ $productId, $attributeId)
     {
-        $result = array();
+        $result = [];
 
         // Get attribute for this product
         $attribute = AttributeQuery::create()->findPk($attributeId);
@@ -951,7 +947,7 @@ class ProductController extends AbstractSeoCrudController
             if ($values !== null) {
                 /** @var AttributeAv $value */
                 foreach ($values as $value) {
-                    $result[] = array('id' => $value->getId(), 'title' => $value->getTitle());
+                    $result[] = ['id' => $value->getId(), 'title' => $value->getTitle()];
                 }
             }
         }
@@ -961,7 +957,7 @@ class ProductController extends AbstractSeoCrudController
 
     public function addAttributeValueToCombinationAction(/** @noinspection PhpUnusedParameterInspection */ $productId, $attributeAvId, $combination)
     {
-        $result = array();
+        $result = [];
 
         // Get attribute for this product
         $attributeAv = AttributeAvQuery::create()->joinWithI18n($this->getCurrentEditionLocale())->findPk($attributeAvId);
@@ -983,7 +979,7 @@ class ProductController extends AbstractSeoCrudController
                     if ($attrAv->getId() == $attributeAv->getId()) {
                         $result['error'] = $this->getTranslator()->trans(
                             'A value for attribute "%name" is already present in the combination',
-                            array('%name' => $attribute->getTitle() . " : " . $attributeAv->getTitle())
+                            ['%name' => $attribute->getTitle() . " : " . $attributeAv->getTitle()]
                         );
 
                         $addIt = false;
@@ -993,12 +989,12 @@ class ProductController extends AbstractSeoCrudController
                         ->joinWithI18n($this->getCurrentEditionLocale())
                         ->findPk($attributeAv->getAttributeId());
 
-                    $result[] = array('id' => $attrAv->getId(), 'title' => $subAttribute->getTitle() . " : " . $attrAv->getTitle());
+                    $result[] = ['id' => $attrAv->getId(), 'title' => $subAttribute->getTitle() . " : " . $attrAv->getTitle()];
                 }
             }
 
             if ($addIt) {
-                $result[] = array('id' => $attributeAv->getId(), 'title' => $attribute->getTitle() . " : " . $attributeAv->getTitle());
+                $result[] = ['id' => $attributeAv->getId(), 'title' => $attribute->getTitle() . " : " . $attributeAv->getTitle()];
             }
         }
 
@@ -1011,13 +1007,13 @@ class ProductController extends AbstractSeoCrudController
     public function addProductSaleElementAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
         $event = new ProductSaleElementCreateEvent(
             $this->getExistingObject(),
-            $this->getRequest()->get('combination_attributes', array()),
+            $this->getRequest()->get('combination_attributes', []),
             $this->getCurrentEditionCurrency()->getId()
         );
 
@@ -1037,7 +1033,7 @@ class ProductController extends AbstractSeoCrudController
     public function deleteProductSaleElementAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -1110,7 +1106,7 @@ class ProductController extends AbstractSeoCrudController
     protected function processProductSaleElementUpdate($changeForm)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -1123,11 +1119,11 @@ class ProductController extends AbstractSeoCrudController
 
             if (\is_array($data['product_sale_element_id'])) {
                 // Common fields
-                $tmp_data = array(
+                $tmp_data = [
                     'tax_rule'          => $data['tax_rule'],
                     'currency'          => $data['currency'],
                     'use_exchange_rate' => $data['use_exchange_rate'],
-                );
+                ];
 
                 $count = \count($data['product_sale_element_id']);
 
@@ -1222,7 +1218,7 @@ class ProductController extends AbstractSeoCrudController
     public function buildCombinationsAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -1240,13 +1236,13 @@ class ProductController extends AbstractSeoCrudController
             //
             // First, create an array of attributes_av ID in the form $attributes_av_list[$attribute_id] = array of attributes_av ID
             // from the list of attribute_id:attributes_av ID from the form.
-            $combinations = $attributes_av_list = $tmp = array();
+            $combinations = $attributes_av_list = $tmp = [];
 
             foreach ($data['attribute_av'] as $item) {
                 list($attribute_id, $attribute_av_id) = explode(':', $item);
 
                 if (! isset($attributes_av_list[$attribute_id])) {
-                    $attributes_av_list[$attribute_id] = array();
+                    $attributes_av_list[$attribute_id] = [];
                 }
 
                 $attributes_av_list[$attribute_id][] = $attribute_av_id;
@@ -1334,7 +1330,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        return new JsonResponse(array('result' => $this->formatPrice($return_price)));
+        return new JsonResponse(['result' => $this->formatPrice($return_price)]);
     }
 
     /**
@@ -1372,7 +1368,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        return new JsonResponse(array('result' => $this->formatPrice($return_price)));
+        return new JsonResponse(['result' => $this->formatPrice($return_price)]);
     }
 
     /**
@@ -1413,12 +1409,12 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        return new JsonResponse(array(
+        return new JsonResponse([
             'price_with_tax'         => $this->formatPrice($price_with_tax),
             'price_without_tax'      => $this->formatPrice($price_without_tax),
             'sale_price_with_tax'    => $this->formatPrice($sale_price_with_tax),
             'sale_price_without_tax' => $this->formatPrice($sale_price_without_tax)
-        ));
+        ]);
     }
 
     /**
@@ -1426,7 +1422,6 @@ class ProductController extends AbstractSeoCrudController
      *
      * @param $price
      * @param $price_type
-     * @param  Product $product
      * @param  bool    $convert
      * @return string
      */
@@ -1654,17 +1649,14 @@ class ProductController extends AbstractSeoCrudController
                 $modalTitle = $this->getTranslator()->trans("Associate images");
                 $data = $this->getPSEImages($pse);
                 break;
-
             case "document":
                 $modalTitle = $this->getTranslator()->trans("Associate documents");
                 $data = $this->getPSEDocuments($pse);
                 break;
-
             case "virtual":
                 $modalTitle = $this->getTranslator()->trans("Select the virtual document");
                 $data = $this->getPSEVirtualDocument($pse);
                 break;
-
             case null:
             default:
                 $modalTitle = $this->getTranslator()->trans("Unsupported type");
@@ -1872,7 +1864,7 @@ class ProductController extends AbstractSeoCrudController
 
             return $this->generateRedirectFromRoute(
                 'admin.products.update',
-                array('product_id' => $productCloneEvent->getClonedProduct()->getId())
+                ['product_id' => $productCloneEvent->getClonedProduct()->getId()]
             );
         } catch (FormValidationException $e) {
             $this->setupFormErrorContext(
@@ -1903,10 +1895,9 @@ class ProductController extends AbstractSeoCrudController
     {
         $search = '%'.$this->getRequest()->query->get('q').'%';
 
-        $resultArray = array();
+        $resultArray = [];
 
         $categoriesI18n = CategoryI18nQuery::create()->filterByTitle($search, Criteria::LIKE)->limit(100);
-
 
         /** @var \Thelia\Model\CategoryI18n $categoryI18n */
         foreach ($categoriesI18n as $categoryI18n) {
@@ -1925,10 +1916,9 @@ class ProductController extends AbstractSeoCrudController
     {
         $search = '%'.$this->getRequest()->query->get('q').'%';
 
-        $resultArray = array();
+        $resultArray = [];
 
         $productsI18nQuery = ProductI18nQuery::create()->filterByTitle($search, Criteria::LIKE);
-
 
         $category_id = $this->getRequest()->query->get('category_id');
         if($category_id != null){

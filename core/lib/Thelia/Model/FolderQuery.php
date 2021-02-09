@@ -39,7 +39,7 @@ class FolderQuery extends BaseFolderQuery
      */
     public static function findAllChild($folderId, $depth = 0, $currentPosition = 0)
     {
-        $result = array();
+        $result = [];
 
         if (\is_array($folderId)) {
             foreach ($folderId as $folderSingleId) {

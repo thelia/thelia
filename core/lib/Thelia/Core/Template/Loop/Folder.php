@@ -19,13 +19,13 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
-use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
+use Thelia\Type\TypeCollection;
 
 /**
  * Class Folder
@@ -252,7 +252,6 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                 ->set("META_KEYWORDS", $folder->getVirtualColumn('i18n_META_KEYWORDS'))
                 ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
                 ->set("POSITION", $folder->getPosition());
-
 
             if ($needCountChild) {
                 $loopResultRow->set("CHILD_COUNT", $folder->countChild());

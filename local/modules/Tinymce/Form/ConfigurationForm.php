@@ -51,7 +51,7 @@ class ConfigurationForm extends BaseForm
                 'checkbox',
                 [
                     'required' => false,
-                    'data'     =>intval(Tinymce::getConfigValue('show_menu_bar', 0)) != 0,
+                    'data'     =>\intval(Tinymce::getConfigValue('show_menu_bar', 0)) != 0,
                     'label'    => $this->translator->trans('Show the TinyMCE menu bar', [], Tinymce::MODULE_DOMAIN),
                 ]
             )
@@ -60,7 +60,7 @@ class ConfigurationForm extends BaseForm
                 'checkbox',
                 [
                     'required'   => false,
-                    'data'       => intval(Tinymce::getConfigValue('force_pasting_as_text', 0)) != 0,
+                    'data'       => \intval(Tinymce::getConfigValue('force_pasting_as_text', 0)) != 0,
                     'label'      => $this->translator->trans('Force pasting as text', [], Tinymce::MODULE_DOMAIN),
                     'label_attr' => [
                         'help' => $this->translator->trans('If checked, all pasted data will be converted as plain text, removing tags and styles.', [], Tinymce::MODULE_DOMAIN)
@@ -72,7 +72,7 @@ class ConfigurationForm extends BaseForm
                 'checkbox',
                 [
                     'required'   => false,
-                    'data'       => intval(Tinymce::getConfigValue('set_images_as_responsive', 1)) != 0,
+                    'data'       => \intval(Tinymce::getConfigValue('set_images_as_responsive', 1)) != 0,
                     'label'      => $this->translator->trans('Add responsive class to images', [], Tinymce::MODULE_DOMAIN),
                     'label_attr' => [
                         'help' => $this->translator->trans('If checked, the "img-responsive" class is added by default to inserted images', [], Tinymce::MODULE_DOMAIN)
@@ -123,7 +123,7 @@ class ConfigurationForm extends BaseForm
 
     public function getFieldsKeys()
     {
-        return array(
+        return [
             'product_summary',
             'product_conclusion',
             'brand_summary',
@@ -134,7 +134,7 @@ class ConfigurationForm extends BaseForm
             'folder_conclusion',
             'category_summary',
             'category_conclusion',
-        );
+        ];
     }
 
     protected function addConfigField($key)
@@ -142,12 +142,12 @@ class ConfigurationForm extends BaseForm
         $this->formBuilder->add(
             $key,
             "checkbox",
-            array(
+            [
                 "label_attr" => [],
                 "required" => false,
-                "constraints" => array(),
-                "data" => intval(Tinymce::getConfigValue($key, 0)) != 0,
-            )
+                "constraints" => [],
+                "data" => \intval(Tinymce::getConfigValue($key, 0)) != 0,
+            ]
         );
     }
 

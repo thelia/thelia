@@ -32,7 +32,6 @@ class CurrencyChangeEvent extends CurrencyEvent
     }
 
     /**
-     * @param Request $request
      * @return $this
      */
     public function setRequest(Request $request)

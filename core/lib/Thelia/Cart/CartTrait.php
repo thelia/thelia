@@ -13,14 +13,14 @@
 namespace Thelia\Cart;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Cart\CartEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Model\CartQuery;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\Cart as CartModel;
+use Thelia\Model\CartQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
-use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Cart\CartEvent;
 
 /**
  * managed cart

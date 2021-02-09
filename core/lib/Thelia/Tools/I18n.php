@@ -47,7 +47,7 @@ class I18n
         return \DateTime::createFromFormat($currentDateFormat, $date);
     }
 
-    public static function forceI18nRetrieving($askedLocale, $modelName, $id, $needed = array('Title'))
+    public static function forceI18nRetrieving($askedLocale, $modelName, $id, $needed = ['Title'])
     {
         $i18nQueryClass = sprintf("\\Thelia\\Model\\%sI18nQuery", $modelName);
         $i18nClass = sprintf("\\Thelia\\Model\\%sI18n", $modelName);
@@ -75,9 +75,8 @@ class I18n
                 $method = sprintf('set%s', $need);
                 if (method_exists($i18n, $method)) {
                     $i18n->$method('DEFAULT ' . strtoupper($need));
-                } else {
+                }  
                     // @todo throw sg ?
-                }
             }
         }
 
@@ -127,7 +126,7 @@ class I18n
         $len = \strlen($str);
 
         for ($i = 0; $i < $len; ++$i) {
-            $return .= "CHAR(".ord($str[$i])."),";
+            $return .= "CHAR(".\ord($str[$i])."),";
         }
 
         if ($i > 0) {

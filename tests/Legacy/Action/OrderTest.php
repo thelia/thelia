@@ -162,7 +162,7 @@ class OrderTest extends BaseAction
             ->save();
 
         /* add 3 items */
-        $productList = array();
+        $productList = [];
         for ($i = 0; $i < 3; $i++) {
             $pse = ProductSaleElementsQuery::create()
                 ->filterByProduct(
@@ -279,7 +279,7 @@ class OrderTest extends BaseAction
         $this->orderEvent->getOrder()->setPaymentModuleId($paymentModule->getId());
 
         /* memorize current stocks */
-        $itemsStock = array();
+        $itemsStock = [];
         foreach ($this->cartItems as $index => $cartItem) {
             $itemsStock[$index] = $cartItem->getProductSaleElements()->getQuantity();
         }
@@ -385,7 +385,6 @@ class OrderTest extends BaseAction
                 );
             }
 
-
             /* check tax */
             $orderProductTaxList = $orderProduct->getOrderProductTaxes();
             foreach ($cartItem->getProduct()->getTaxRule()->getTaxDetail($cartItem->getProduct(), $validDeliveryAddress->getCountry(), $cartItem->getPrice(), $cartItem->getPromoPrice()) as $index => $tax) {
@@ -400,7 +399,6 @@ class OrderTest extends BaseAction
 
     /**
      * @depends testCreate
-     * @param OrderModel $order
      * @return OrderModel
      */
     public function testCreateManual(OrderModel $order)
@@ -478,7 +476,6 @@ class OrderTest extends BaseAction
 
         /* check lang */
         $this->assertEquals($this->requestStack->getCurrentRequest()->getSession()->getLang()->getId(), $placedOrder->getLangId(), 'lang does not  match');
-
 
         // without address duplication
         $copyOrder = $order->copy();
@@ -586,7 +583,6 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      *
-     * @param OrderModel $order
      */
     public function testModelUpdateStatusPaidWithHelpers(OrderModel $order)
     {
@@ -605,7 +601,6 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      *
-     * @param OrderModel $order
      */
     public function testModelUpdateStatusNotPaidWithHelpers(OrderModel $order)
     {
@@ -624,7 +619,6 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      *
-     * @param OrderModel $order
      */
     public function testModelUpdateStatusProcessedWithHelpers(OrderModel $order)
     {
@@ -643,7 +637,6 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      *
-     * @param OrderModel $order
      */
     public function testModelUpdateStatusSentWithHelpers(OrderModel $order)
     {
@@ -662,7 +655,6 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      *
-     * @param OrderModel $order
      */
     public function testModelUpdateStatusCanceledWithHelpers(OrderModel $order)
     {
@@ -681,7 +673,6 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      *
-     * @param OrderModel $order
      */
     public function testUpdateTransactionRef(OrderModel $order)
     {
@@ -704,7 +695,6 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      *
-     * @param OrderModel $order
      */
     public function testUpdateDeliveryRef(OrderModel $order)
     {
@@ -727,7 +717,6 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      *
-     * @param OrderModel $order
      */
     public function testUpdateAddress(OrderModel $order)
     {

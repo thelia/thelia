@@ -30,7 +30,7 @@ class HookTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return array("backend_context" => 1);
+        return ["backend_context" => 1];
     }
 
     public function testSearchByHookId()

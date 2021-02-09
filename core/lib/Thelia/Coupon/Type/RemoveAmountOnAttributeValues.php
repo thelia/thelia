@@ -36,7 +36,7 @@ class RemoveAmountOnAttributeValues extends AbstractRemoveOnAttributeValues
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Fixed amount discount for selected attribute values', array());
+            ->trans('Fixed amount discount for selected attribute values', []);
     }
 
     /**
@@ -48,7 +48,7 @@ class RemoveAmountOnAttributeValues extends AbstractRemoveOnAttributeValues
             ->getTranslator()
             ->trans(
                 'This coupon subtracts the specified amount from the order total for each product which uses the selected attribute values. If the discount is greater than the total order, the customer will only pay the shipping, or nothing if the coupon also provides free shipping.',
-                array()
+                []
             );
 
         return $toolTip;

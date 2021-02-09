@@ -115,7 +115,7 @@ cillum dolore {function name={intl l="test"}} eu fugiat nulla pariatur. Excepteu
 proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 EOT;
 
-        $functions = self::$smartyParserHelper->getFunctionsDefinition($content, array("hook"));
+        $functions = self::$smartyParserHelper->getFunctionsDefinition($content, ["hook"]);
 
         $this->assertCount(1, $functions);
 

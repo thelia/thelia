@@ -24,19 +24,19 @@ class AccessManager
     const UPDATE = 'UPDATE';
     const DELETE = 'DELETE';
 
-    protected $accessGranted = array(
+    protected $accessGranted = [
         self::VIEW      =>  false,
         self::CREATE    =>  false,
         self::UPDATE    =>  false,
         self::DELETE    =>  false,
-    );
+    ];
 
-    protected static $accessPows = array(
+    protected static $accessPows = [
         self::VIEW      =>  3,
         self::CREATE    =>  2,
         self::UPDATE    =>  1,
         self::DELETE    =>  0,
-    );
+    ];
 
     protected $accessValue;
 
@@ -49,7 +49,7 @@ class AccessManager
 
     public function can($type)
     {
-        if (!array_key_exists($type, $this->accessGranted)) {
+        if (!\array_key_exists($type, $this->accessGranted)) {
             return false;
         }
 
@@ -65,7 +65,7 @@ class AccessManager
     {
         $this->accessValue = 0;
         foreach ($accesses as $access) {
-            if (array_key_exists($access, self::$accessPows)) {
+            if (\array_key_exists($access, self::$accessPows)) {
                 $this->accessValue += pow(2, self::$accessPows[$access]);
             }
         }

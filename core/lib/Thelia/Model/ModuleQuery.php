@@ -53,7 +53,6 @@ class ModuleQuery extends BaseModuleQuery
             ->filterById($id);
     }
 
-
     /**
      *
      * if the container is provided, this method will found the module in the container. Reflection is used instead.

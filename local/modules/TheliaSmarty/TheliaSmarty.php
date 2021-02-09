@@ -37,7 +37,6 @@ class TheliaSmarty extends BaseModule
     /**
      * Defines how services are loaded in your modules
      *
-     * @param ServicesConfigurator $servicesConfigurator
      */
     public static function configureServices(ServicesConfigurator $servicesConfigurator)
     {

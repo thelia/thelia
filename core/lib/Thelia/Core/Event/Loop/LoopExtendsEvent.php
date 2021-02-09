@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Core\Event\Loop;
 
 use Thelia\Core\Event\ActionEvent;
@@ -24,7 +23,7 @@ use Thelia\Core\Template\Element\BaseLoop;
 class LoopExtendsEvent extends ActionEvent
 {
     /** @var BaseLoop|null $loop */
-    protected $loop = null;
+    protected $loop;
 
     /**
      * LoopExtendsEvent constructor.

@@ -11,8 +11,8 @@
 /*************************************************************************************/
 namespace Thelia\Core\Template\Loop\Argument;
 
-use Thelia\Type\TypeCollection;
 use Thelia\Type;
+use Thelia\Type\TypeCollection;
 
 /**
  *

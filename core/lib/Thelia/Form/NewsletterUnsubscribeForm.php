@@ -30,17 +30,17 @@ class NewsletterUnsubscribeForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('email', EmailType::class, array(
-                'constraints' => array(
+            ->add('email', EmailType::class, [
+                'constraints' => [
                     new NotBlank(),
                     new Email(),
-                    new Callback(array($this, "verifyExistingEmail")),
-                ),
+                    new Callback([$this, "verifyExistingEmail"]),
+                ],
                 'label' => Translator::getInstance()->trans('Email address'),
-                'label_attr' => array(
+                'label_attr' => [
                     'for' => 'email_newsletter',
-                ),
-            ))
+                ],
+            ])
         ;
     }
 

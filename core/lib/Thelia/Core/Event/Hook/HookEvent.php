@@ -22,7 +22,7 @@ use Thelia\Model\Hook;
  */
 class HookEvent extends ActionEvent
 {
-    public $hook = null;
+    public $hook;
 
     public function __construct(Hook $hook = null)
     {

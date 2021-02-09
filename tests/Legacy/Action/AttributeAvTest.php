@@ -16,8 +16,8 @@ use Thelia\Action\AttributeAv;
 use Thelia\Core\Event\Attribute\AttributeAvCreateEvent;
 use Thelia\Core\Event\Attribute\AttributeAvDeleteEvent;
 use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
-use Thelia\Model\AttributeQuery;
 use Thelia\Model\AttributeAv as AttributeAvModel;
+use Thelia\Model\AttributeQuery;
 
 /**
  * Class AttributeAvTest
@@ -55,7 +55,6 @@ class AttributeAvTest extends BaseAction
     }
 
     /**
-     * @param AttributeAvModel $attributeAv
      * @depends testCreate
      * @return AttributeAvModel
      */
@@ -87,7 +86,6 @@ class AttributeAvTest extends BaseAction
     }
 
     /**
-     * @param AttributeAvModel $attributeAv
      * @depends testUpdate
      */
     public function testDelete(AttributeAvModel $attributeAv)

@@ -28,7 +28,7 @@ class SystemLogController extends BaseAdminController
 {
     protected function renderTemplate()
     {
-        $destinations = array();
+        $destinations = [];
 
         $destination_directories = Tlog::getInstance()->getDestinationsDirectories();
 
@@ -40,11 +40,11 @@ class SystemLogController extends BaseAdminController
 
         return $this->render(
             'system-logs',
-            array(
+            [
                 'ip_address' => $this->getRequest()->getClientIp(),
                 'destinations' => $destinations,
                 'active_destinations' => $active_destinations
-            )
+            ]
         );
     }
 
@@ -56,7 +56,7 @@ class SystemLogController extends BaseAdminController
                     continue;
                 }
 
-                $matches = array();
+                $matches = [];
 
                 if (preg_match("/([^\.]+)\.php/", $fileInfo->getFilename(), $matches)) {
                     $classname = $matches[1];
@@ -78,18 +78,18 @@ class SystemLogController extends BaseAdminController
      */
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, [], AccessManager::VIEW)) {
             return $response;
         }
 
         // Hydrate the general configuration form
-        $systemLogForm = $this->createForm(AdminForm::SYSTEM_LOG_CONFIGURATION, FormType::class, array(
+        $systemLogForm = $this->createForm(AdminForm::SYSTEM_LOG_CONFIGURATION, FormType::class, [
             'level'             => ConfigQuery::read(Tlog::VAR_LEVEL, Tlog::DEFAULT_LEVEL),
             'format'            => ConfigQuery::read(Tlog::VAR_PREFIXE, Tlog::DEFAUT_PREFIXE),
             'show_redirections' => ConfigQuery::read(Tlog::VAR_SHOW_REDIRECT, Tlog::DEFAUT_SHOW_REDIRECT),
             'files'             => ConfigQuery::read(Tlog::VAR_FILES, Tlog::DEFAUT_FILES),
             'ip_addresses'      => ConfigQuery::read(Tlog::VAR_IP, Tlog::DEFAUT_IP),
-        ));
+        ]);
 
         $this->getParserContext()->addForm($systemLogForm);
 
@@ -98,7 +98,7 @@ class SystemLogController extends BaseAdminController
 
     public function saveAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -121,7 +121,7 @@ class SystemLogController extends BaseAdminController
             $destinations = $this->getRequest()->get('destinations');
             $configs = $this->getRequest()->get('config');
 
-            $active_destinations = array();
+            $active_destinations = [];
 
             foreach ($destinations as $classname => $destination) {
                 if (isset($destination['active'])) {

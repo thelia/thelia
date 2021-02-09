@@ -8,7 +8,6 @@ use Symfony\Component\Serializer\Serializer;
 use Thelia\Core\Translation\Translator;
 
 class PickupLocation  {
-
     /** OPENING HOURS ARRAY KEYS */
     const MONDAY_OPENING_HOURS_KEY = '0';
     const TUESDAY_OPENING_HOURS_KEY = '1';
@@ -19,19 +18,19 @@ class PickupLocation  {
     const SUNDAY_OPENING_HOURS_KEY = '6';
 
     /** @var string */
-    protected $id = null;
+    protected $id;
 
     /** @var float */
-    protected $latitude = null;
+    protected $latitude;
 
     /** @var float */
-    protected $longitude = null;
+    protected $longitude;
 
     /** @var string */
-    protected $title = null;
+    protected $title;
 
     /** @var integer */
-    protected $moduleId = null;
+    protected $moduleId;
 
     /** @var array */
     protected $openingHours = [
@@ -47,7 +46,7 @@ class PickupLocation  {
     /**
      * @var PickupLocationAddress
      */
-    protected $address = null;
+    protected $address;
 
     public function __construct() {
         $this->serializer = new Serializer([new ObjectNormalizer()], [new JsonEncoder()]);
@@ -171,7 +170,7 @@ class PickupLocation  {
      */
     public function setOpeningHours($day, $hours)
     {
-        if (!array_key_exists($day, $this->openingHours)) {
+        if (!\array_key_exists($day, $this->openingHours)) {
             throw new \Exception(Translator::getInstance()->trans('Tried to set the opening hours for a non existant day in the array. Please use the constants defined in the PickupLocation class.'));
         }
 

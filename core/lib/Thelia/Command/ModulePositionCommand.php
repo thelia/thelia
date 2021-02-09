@@ -14,6 +14,7 @@ namespace Thelia\Command;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,7 +22,6 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\ModuleQuery;
-use Symfony\Component\Console\Helper\QuestionHelper;
 
 /**
  * Class ModulePositionCommand

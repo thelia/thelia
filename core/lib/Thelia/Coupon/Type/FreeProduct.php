@@ -79,7 +79,7 @@ class FreeProduct extends AbstractRemoveOnProducts
     {
         $cartItemIdList =  $this->facade->getRequest()->getSession()->get(
             $this->getSessionVarName(),
-            array()
+            []
         );
 
         if (isset($cartItemIdList[$product->getId()])) {
@@ -87,7 +87,8 @@ class FreeProduct extends AbstractRemoveOnProducts
 
             if ($cartItemId == self::ADD_TO_CART_IN_PROCESS) {
                 return self::ADD_TO_CART_IN_PROCESS;
-            } elseif (null !== $cartItem = CartItemQuery::create()->findPk($cartItemId)) {
+            }
+            if (null !== $cartItem = CartItemQuery::create()->findPk($cartItemId)) {
                 return $cartItem;
             }
         } else {
@@ -118,11 +119,11 @@ class FreeProduct extends AbstractRemoveOnProducts
     {
         $cartItemIdList = $this->facade->getRequest()->getSession()->get(
             $this->getSessionVarName(),
-            array()
+            []
         );
 
         if (! \is_array($cartItemIdList)) {
-            $cartItemIdList = array();
+            $cartItemIdList = [];
         }
 
         $cartItemIdList[$product->getId()] = $cartItemId;
@@ -142,7 +143,7 @@ class FreeProduct extends AbstractRemoveOnProducts
     {
         return $this->facade->getRequest()->getSession()->get(
             $this->getSessionVarName(),
-            array()
+            []
         );
     }
 
@@ -287,7 +288,7 @@ class FreeProduct extends AbstractRemoveOnProducts
     {
         return $this->facade
             ->getTranslator()
-            ->trans('Free product when buying one or more selected products', array());
+            ->trans('Free product when buying one or more selected products', []);
     }
 
     /**
@@ -299,7 +300,7 @@ class FreeProduct extends AbstractRemoveOnProducts
             ->getTranslator()
             ->trans(
                 'This coupon adds a free product to the cart if one of the selected products is in the cart.',
-                array()
+                []
             );
 
         return $toolTip;

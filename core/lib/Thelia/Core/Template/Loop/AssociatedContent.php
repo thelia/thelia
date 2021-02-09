@@ -14,10 +14,10 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\LoopResult;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Model\ProductAssociatedContentQuery;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\CategoryAssociatedContentQuery;
+use Thelia\Model\ProductAssociatedContentQuery;
 
 /**
  *
@@ -121,9 +121,9 @@ class AssociatedContent extends Content
 
         $associatedContents = $this->search($search);
 
-        $associatedContentIdList = array(0);
+        $associatedContentIdList = [0];
 
-        $this->contentPosition = $this->contentId = array();
+        $this->contentPosition = $this->contentId = [];
 
         foreach ($associatedContents as $associatedContent) {
             $associatedContentId = $associatedContent->getContentId();

@@ -31,31 +31,31 @@ class HookModificationForm extends HookCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", HiddenType::class, array("constraints" => array(new GreaterThan(array('value' => 0)))))
-            ->add("by_module", CheckboxType::class, array(
+            ->add("id", HiddenType::class, ["constraints" => [new GreaterThan(['value' => 0])]])
+            ->add("by_module", CheckboxType::class, [
                 "label" => Translator::getInstance()->trans("By Module"),
                 "required" => false,
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "by_module",
                     "help" => Translator::getInstance()->trans(
                         "This hook is specific to a module (delivery/payment modules)."
                     ),
-                ),
-            ))
-            ->add("block", CheckboxType::class, array(
+                ],
+            ])
+            ->add("block", CheckboxType::class, [
                 "label" => Translator::getInstance()->trans("Hook block"),
                 "required" => false,
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "block",
                     "help" => Translator::getInstance()->trans(
                         "If checked, this hook will be used by a hook block. If not, by hook function."
                     ),
-                ),
-            ))
+                ],
+            ])
         ;
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class
-        $this->addStandardDescFields(array('title', 'postscriptum', 'locale'));
+        $this->addStandardDescFields(['title', 'postscriptum', 'locale']);
     }
 
     public function getName()

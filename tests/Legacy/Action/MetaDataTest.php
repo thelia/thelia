@@ -12,11 +12,11 @@
 
 namespace Thelia\Tests\Action;
 
+use Thelia\Action\MetaData;
+use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
 use Thelia\Core\Event\MetaData\MetaDataDeleteEvent;
 use Thelia\Model\MetaDataQuery;
 use Thelia\Model\Product;
-use Thelia\Action\MetaData;
-use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
 use Thelia\Model\ProductQuery;
 
 /**
@@ -41,7 +41,7 @@ class MetaDataTest extends BaseAction
         $event = new MetaDataCreateOrUpdateEvent();
         $event
             ->setMetaKey('test')
-            ->setElementKey(get_class($product))
+            ->setElementKey(\get_class($product))
             ->setElementId($product->getId())
             ->setValue('test');
 
@@ -55,7 +55,7 @@ class MetaDataTest extends BaseAction
         $this->assertFalse($created->isNew());
 
         $this->assertEquals('test', $created->getMetaKey());
-        $this->assertEquals(get_class($product), $created->getElementKey());
+        $this->assertEquals(\get_class($product), $created->getElementKey());
         $this->assertEquals($product->getId(), $created->getElementId());
         $this->assertEquals('test', $created->getValue());
         $this->assertEquals(false, $created->getIsSerialized());
@@ -64,9 +64,9 @@ class MetaDataTest extends BaseAction
         $event = new MetaDataCreateOrUpdateEvent();
         $event
             ->setMetaKey('test2')
-            ->setElementKey(get_class($product))
+            ->setElementKey(\get_class($product))
             ->setElementId($product->getId())
-            ->setValue(array("fr_FR" => "bonjour", "en_US" => "Hello"));
+            ->setValue(["fr_FR" => "bonjour", "en_US" => "Hello"]);
         $action = new MetaData();
         $action->createOrUpdate($event);
 
@@ -77,23 +77,22 @@ class MetaDataTest extends BaseAction
         $this->assertFalse($created->isNew());
 
         $this->assertEquals('test2', $created->getMetaKey());
-        $this->assertEquals(get_class($product), $created->getElementKey());
+        $this->assertEquals(\get_class($product), $created->getElementKey());
         $this->assertEquals($product->getId(), $created->getElementId());
-        $this->assertEquals(array("fr_FR" => "bonjour", "en_US" => "Hello"), $created->getValue());
+        $this->assertEquals(["fr_FR" => "bonjour", "en_US" => "Hello"], $created->getValue());
         $this->assertEquals(true, $created->getIsSerialized());
 
         return $product;
     }
 
     /**
-     * @param Product $product
      * @depends testCreate
      * @return Product
      */
     public function testRead(Product $product)
     {
         $metaDatas = MetaDataQuery::create()
-            ->filterByElementKey(get_class($product))
+            ->filterByElementKey(\get_class($product))
             ->filterByElementId($product->getId())
             ->find();
 
@@ -101,28 +100,27 @@ class MetaDataTest extends BaseAction
 
         $metaData = MetaDataQuery::create()
             ->filterByMetaKey('test')
-            ->filterByElementKey(get_class($product))
+            ->filterByElementKey(\get_class($product))
             ->filterByElementId($product->getId())
             ->findOne();
 
         $this->assertNotNull($metaData);
         $this->assertEquals('test', $metaData->getMetaKey());
-        $this->assertEquals(get_class($product), $metaData->getElementKey());
+        $this->assertEquals(\get_class($product), $metaData->getElementKey());
         $this->assertEquals($product->getId(), $metaData->getElementId());
         $this->assertEquals('test', $metaData->getValue());
 
         $this->assertEquals(false, $metaData->getIsSerialized());
 
-        $datas = MetaDataQuery::getAllVal(get_class($product), $product->getId());
-        $this->assertEquals(count($datas), 2);
+        $datas = MetaDataQuery::getAllVal(\get_class($product), $product->getId());
+        $this->assertEquals(\count($datas), 2);
         $this->assertEquals($datas['test'], 'test');
-        $this->assertEquals($datas['test2'], array("fr_FR" => "bonjour", "en_US" => "Hello"));
+        $this->assertEquals($datas['test2'], ["fr_FR" => "bonjour", "en_US" => "Hello"]);
 
         return $product;
     }
 
     /**
-     * @param Product $product
      * @depends testRead
      * @return Product
      */
@@ -130,7 +128,7 @@ class MetaDataTest extends BaseAction
     {
         $metaData = MetaDataQuery::create()
             ->filterByMetaKey('test')
-            ->filterByElementKey(get_class($product))
+            ->filterByElementKey(\get_class($product))
             ->filterByElementId($product->getId())
             ->findOne();
 
@@ -141,7 +139,7 @@ class MetaDataTest extends BaseAction
             ->setMetaKey($metaData->getMetaKey())
             ->setElementKey($metaData->getElementKey())
             ->setElementId($metaData->getElementId())
-            ->setValue(array("fr_FR" => "bonjour", "en_US" => "Hello"));
+            ->setValue(["fr_FR" => "bonjour", "en_US" => "Hello"]);
 
         $action = new MetaData();
         $action->createOrUpdate($event);
@@ -153,16 +151,15 @@ class MetaDataTest extends BaseAction
         $this->assertFalse($updated->isNew());
 
         $this->assertEquals('test', $updated->getMetaKey());
-        $this->assertEquals(get_class($product), $updated->getElementKey());
+        $this->assertEquals(\get_class($product), $updated->getElementKey());
         $this->assertEquals($product->getId(), $updated->getElementId());
-        $this->assertEquals(array("fr_FR" => "bonjour", "en_US" => "Hello"), $updated->getValue());
+        $this->assertEquals(["fr_FR" => "bonjour", "en_US" => "Hello"], $updated->getValue());
         $this->assertEquals(true, $updated->getIsSerialized());
 
         return $product;
     }
 
     /**
-     * @param Product $product
      * @depends testUpdate
      * @return Product
      */
@@ -170,13 +167,13 @@ class MetaDataTest extends BaseAction
     {
         $metaData = MetaDataQuery::create()
             ->filterByMetaKey('test')
-            ->filterByElementKey(get_class($product))
+            ->filterByElementKey(\get_class($product))
             ->filterByElementId($product->getId())
             ->findOne();
 
         $this->assertNotNull($metaData);
 
-        $event = new MetaDataDeleteEvent('test', get_class($product), $product->getId());
+        $event = new MetaDataDeleteEvent('test', \get_class($product), $product->getId());
 
         $action = new MetaData();
         $action->delete($event);

@@ -12,8 +12,8 @@
 
 namespace Thelia\Core\Event\Customer;
 
-use Thelia\Model\Customer;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Customer;
 
 /**
  * @deprecated since 2.4, please use \Thelia\Model\Event\CustomerEvent
@@ -21,7 +21,7 @@ use Thelia\Core\Event\ActionEvent;
 class CustomerEvent extends ActionEvent
 {
     /** @var null|Customer */
-    public $customer = null;
+    public $customer;
 
     public function __construct(Customer $customer = null)
     {
@@ -29,7 +29,6 @@ class CustomerEvent extends ActionEvent
     }
 
     /**
-     * @param Customer $customer
      * @return $this
      */
     public function setCustomer(Customer $customer)

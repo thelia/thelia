@@ -12,9 +12,9 @@
 
 namespace Thelia\Core\Form;
 
-use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Component\Form\FormFactoryBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Form\BaseForm;
@@ -67,17 +67,13 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
     }
 
     /**
-     * @param  string                $name
      * @param  string                $type
-     * @param  array                 $data
-     * @param  array                 $options
-     * @return BaseForm
      */
     public function createForm(
         string $name,
         $type = "Symfony\Component\Form\Extension\Core\Type\FormType",
-        array $data = array(),
-        array $options = array()
+        array $data = [],
+        array $options = []
     ): BaseForm {
         $formClass = null;
         if (isset($this->formDefinition[$name])) {

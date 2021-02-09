@@ -65,7 +65,7 @@ class ModuleManagement
                 $this->updateModule($file, $container);
             } catch (\Exception $ex) {
                 // Guess module code
-                $moduleCode = basename(dirname(dirname($file)));
+                $moduleCode = basename(\dirname(\dirname($file)));
 
                 $errors[$moduleCode] = $ex;
             }
@@ -98,7 +98,7 @@ class ModuleManagement
 
         $content = $descriptorValidator->getDescriptor($file->getRealPath());
         $reflected = new \ReflectionClass((string)$content->fullnamespace);
-        $code = basename(dirname($reflected->getFileName()));
+        $code = basename(\dirname($reflected->getFileName()));
         $version = (string)$content->version;
         $mandatory = \intval($content->mandatory);
         $hidden = \intval($content->hidden);
@@ -200,11 +200,11 @@ class ModuleManagement
             $reflected->implementsInterface('Thelia\Module\DeliveryModuleWithStateInterface')
         ) {
             return BaseModule::DELIVERY_MODULE_TYPE;
-        } elseif ($reflected->implementsInterface('Thelia\Module\PaymentModuleInterface')) {
-            return BaseModule::PAYMENT_MODULE_TYPE;
-        } else {
-            return BaseModule::CLASSIC_MODULE_TYPE;
         }
+        if ($reflected->implementsInterface('Thelia\Module\PaymentModuleInterface')) {
+            return BaseModule::PAYMENT_MODULE_TYPE;
+        }  
+            return BaseModule::CLASSIC_MODULE_TYPE;
     }
 
     private function saveDescription(Module $module, \SimpleXMLElement $content, ConnectionInterface $con)

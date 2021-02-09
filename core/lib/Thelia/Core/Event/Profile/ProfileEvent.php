@@ -17,16 +17,16 @@ use Thelia\Model\Profile;
 
 class ProfileEvent extends ActionEvent
 {
-    protected $profile = null;
-    protected $id = null;
-    protected $locale = null;
-    protected $code = null;
-    protected $title = null;
-    protected $chapo = null;
-    protected $description = null;
-    protected $postscriptum = null;
-    protected $resourceAccess = null;
-    protected $moduleAccess = null;
+    protected $profile;
+    protected $id;
+    protected $locale;
+    protected $code;
+    protected $title;
+    protected $chapo;
+    protected $description;
+    protected $postscriptum;
+    protected $resourceAccess;
+    protected $moduleAccess;
 
     public function __construct(Profile $profile = null)
     {

@@ -69,7 +69,7 @@ class FtpClient implements Countable
      */
     public function __construct($connection = null)
     {
-        if (!extension_loaded('ftp')) {
+        if (!\extension_loaded('ftp')) {
             throw new FtpException('FTP extension is not loaded!');
         }
 
@@ -97,8 +97,6 @@ class FtpClient implements Countable
      * The connection is automaticaly passed to the FTP PHP functions.
      *
      * @param  string       $method
-     * @param  array        $arguments
-     * @return mixed
      * @throws FtpException When the function is not valid
      */
     public function __call($method, array $arguments)
@@ -280,8 +278,8 @@ class FtpClient implements Countable
             throw new FtpException('Unable to list directory');
         }
 
-        $result  = array();
-        $dir_len = strlen($directory);
+        $result  = [];
+        $dir_len = \strlen($directory);
 
         // if it's the current
         if (false !== ($kdot = array_search('.', $files))) {
@@ -306,11 +304,10 @@ class FtpClient implements Countable
 
         // utils for recursion
         $flatten = function (array $arr) use (&$flatten) {
-
             $flat = [];
 
             foreach ($arr as $k => $v) {
-                if (is_array($v)) {
+                if (\is_array($v)) {
                     $flat = array_merge($flat, $flatten($v));
                 } else {
                     $flat[] = $v;
@@ -335,7 +332,6 @@ class FtpClient implements Countable
                 foreach ($items as $item) {
                     $result[] = $item;
                 }
-
             } else {
                 $result[] = $file;
             }
@@ -371,7 +367,6 @@ class FtpClient implements Countable
         $parts  = explode('/', $directory);
 
         foreach ($parts as $part) {
-
             if (!@$this->ftp->chdir($part)) {
                 $result = $this->ftp->mkdir($part);
                 $this->ftp->chdir($part);
@@ -610,15 +605,11 @@ class FtpClient implements Countable
 
         // do this for each file in the directory
         while ($file = $d->read()) {
-
             // to prevent an infinite loop
             if ($file != "." && $file != "..") {
-
                 // do the following if it is a directory
                 if (is_dir($source_directory.'/'.$file)) {
-
                     if (!$this->isDir($target_directory.'/'.$file)) {
-
                         // create directories that do not yet exist
                         $this->ftp->mkdir($target_directory.'/'.$file);
                     }
@@ -629,7 +620,6 @@ class FtpClient implements Countable
                         $mode
                     );
                 } else {
-
                     // put the files
                     $this->ftp->put(
                         $target_directory.'/'.$file, $source_directory.'/'.$file,
@@ -660,14 +650,13 @@ class FtpClient implements Countable
         }
 
         $list  = $this->ftp->rawlist($directory);
-        $items = array();
+        $items = [];
 
         if (!$list) {
             return $items;
         }
 
         if (false == $recursive) {
-
             foreach ($list as $path => $item) {
                 $chunks = preg_split("/\s+/", $item);
 
@@ -679,13 +668,12 @@ class FtpClient implements Countable
                 $path = $directory.'/'.$chunks[8];
 
                 if (isset($chunks[9])) {
-                    $nbChunks = count($chunks);
+                    $nbChunks = \count($chunks);
 
                     for ($i = 9; $i < $nbChunks; $i++) {
                         $path .= ' '.$chunks[$i];
                     }
                 }
-
 
                 if (substr($path, 0, 2) == './') {
                     $path = substr($path, 2);
@@ -700,17 +688,14 @@ class FtpClient implements Countable
         $path = '';
 
         foreach ($list as $item) {
-            $len = strlen($item);
+            $len = \strlen($item);
 
             if (!$len
-
             // "."
             || ($item[$len-1] == '.' && $item[$len-2] == ' '
-
             // ".."
             or $item[$len-1] == '.' && $item[$len-2] == '.' && $item[$len-3] == ' ')
             ){
-
                 continue;
             }
 
@@ -724,7 +709,7 @@ class FtpClient implements Countable
             $path = $directory.'/'.$chunks[8];
 
             if (isset($chunks[9])) {
-                $nbChunks = count($chunks);
+                $nbChunks = \count($chunks);
 
                 for ($i = 9; $i < $nbChunks; $i++) {
                     $path .= ' '.$chunks[$i];
@@ -755,12 +740,11 @@ class FtpClient implements Countable
      * @see FtpClient::rawlist()
      * @see FtpClient::scanDir()
      * @see FtpClient::dirSize()
-     * @param  array $rawlist
      * @return array
      */
     public function parseRawList(array $rawlist)
     {
-        $items = array();
+        $items = [];
         $path  = '';
 
         foreach ($rawlist as $key => $child) {
@@ -770,8 +754,8 @@ class FtpClient implements Countable
                 continue;
             }
 
-            if (count($chunks) === 1) {
-                $len = strlen($chunks[0]);
+            if (\count($chunks) === 1) {
+                $len = \strlen($chunks[0]);
 
                 if ($len && $chunks[0][$len-1] == ':') {
                     $path = substr($chunks[0], 0, -1);
@@ -808,7 +792,7 @@ class FtpClient implements Countable
             }
 
             // if the key is not the path, behavior of ftp_rawlist() PHP function
-            if (is_int($key) || false === strpos($key, $item['name'])) {
+            if (\is_int($key) || false === strpos($key, $item['name'])) {
                 array_splice($chunks, 0, 8);
 
                 $key = $item['type'].'#'
@@ -816,16 +800,13 @@ class FtpClient implements Countable
                     .implode(" ", $chunks);
 
                 if ($item['type'] == 'link') {
-
                     // get the first part of 'link#the-link.ext -> /path/of/the/source.ext'
                     $exp = explode(' ->', $key);
                     $key = rtrim($exp[0]);
                 }
 
                 $items[$key] = $item;
-
             } else {
-
                 // the key is the path, behavior of FtpClient::rawlist() method()
                 $items[$key] = $item;
             }
@@ -845,9 +826,9 @@ class FtpClient implements Countable
 	 */
     public function rawToType($permission)
     {
-        if (!is_string($permission)) {
+        if (!\is_string($permission)) {
             throw new FtpException('The "$permission" argument must be a string, "'
-            .gettype($permission).'" given.');
+            .\gettype($permission).'" given.');
         }
 
         if (empty($permission[0])) {
@@ -857,13 +838,10 @@ class FtpClient implements Countable
         switch ($permission[0]) {
             case '-':
                 return 'file';
-
             case 'd':
                 return 'directory';
-
             case 'l':
                 return 'link';
-
             default:
                 return 'unknown';
         }
@@ -872,7 +850,6 @@ class FtpClient implements Countable
     /**
      * Set the wrapper which forward the PHP FTP functions to use in FtpClient instance.
      * 
-     * @param  FtpWrapper $wrapper
      * @return FtpClient
      */
     protected function setWrapper(FtpWrapper $wrapper)

@@ -101,11 +101,11 @@ class TemplateController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
-        $data = array(
+        $data = [
             'id'      => $object->getId(),
             'locale'  => $object->getLocale(),
             'name'    => $object->getName()
-        );
+        ];
 
         // Setup the object form
         return $this->createForm(AdminForm::TEMPLATE_MODIFICATION, FormType::class, $data);
@@ -148,16 +148,16 @@ class TemplateController extends AbstractCrudController
 
     protected function renderListTemplate($currentOrder)
     {
-        return $this->render('templates', array('order' => $currentOrder));
+        return $this->render('templates', ['order' => $currentOrder]);
     }
 
     protected function renderEditionTemplate()
     {
         return $this->render(
             'template-edit',
-            array(
+            [
                     'template_id' => $this->getRequest()->get('template_id'),
-            )
+            ]
         );
     }
     
@@ -206,7 +206,7 @@ class TemplateController extends AbstractCrudController
     public function duplicateAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::CREATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::CREATE)) {
             return $response;
         }
         
@@ -234,7 +234,7 @@ class TemplateController extends AbstractCrudController
     {
         return $this->render(
             'ajax/template-feature-list',
-            array('template_id' => $this->getRequest()->get('template_id'))
+            ['template_id' => $this->getRequest()->get('template_id')]
         );
     }
 
@@ -242,14 +242,14 @@ class TemplateController extends AbstractCrudController
     {
         return $this->render(
             'ajax/template-attribute-list',
-            array('template_id' => $this->getRequest()->get('template_id'))
+            ['template_id' => $this->getRequest()->get('template_id')]
         );
     }
 
     public function addAttributeAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -275,7 +275,7 @@ class TemplateController extends AbstractCrudController
     public function deleteAttributeAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -312,7 +312,7 @@ class TemplateController extends AbstractCrudController
     public function addFeatureAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -338,7 +338,7 @@ class TemplateController extends AbstractCrudController
     public function deleteFeatureAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
             return $response;
         }
 

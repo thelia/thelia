@@ -3,12 +3,10 @@
 namespace Thelia\Model;
 
 use Thelia\Model\Base\OrderStatus as BaseOrderStatus;
-
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class OrderStatus extends BaseOrderStatus
 {
-
     use PositionManagementTrait;
 
     const CODE_NOT_PAID = "not_paid";
@@ -31,9 +29,8 @@ class OrderStatus extends BaseOrderStatus
         //return $this->hasStatusHelper(OrderStatus::CODE_NOT_PAID);
         if ($exact) {
             return $this->hasStatusHelper(OrderStatus::CODE_NOT_PAID);
-        } else {
+        }  
             return ! $this->isPaid(false);
-        }
     }
 
     /**
@@ -116,8 +113,7 @@ class OrderStatus extends BaseOrderStatus
     {
         if (\is_array($statusCode)) {
             return \in_array($this->getCode(), $statusCode);
-        } else {
+        }  
             return $this->getCode() == $statusCode;
-        }
     }
 }

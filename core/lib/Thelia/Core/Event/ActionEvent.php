@@ -25,7 +25,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 abstract class ActionEvent extends Event
 {
-    protected $parameters = array();
+    protected $parameters = [];
 
     public function __set($name, $value)
     {
@@ -34,7 +34,7 @@ abstract class ActionEvent extends Event
 
     public function __get($name)
     {
-        if (array_key_exists($name, $this->parameters)) {
+        if (\array_key_exists($name, $this->parameters)) {
             return $this->parameters[$name];
         }
 

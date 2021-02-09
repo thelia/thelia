@@ -38,15 +38,15 @@ class StateCreationForm extends BaseForm
                     'label' => $this->translator->trans('State title')
                 ]
             )
-            ->add("country_id", "country_id", array(
-                "constraints" => array(
+            ->add("country_id", "country_id", [
+                "constraints" => [
                     new NotBlank(),
-                ),
+                ],
                 "label" => $this->translator->trans("Country"),
-                "label_attr" => array(
+                "label_attr" => [
                     "for" => "country",
-                ),
-            ))
+                ],
+            ])
             ->add(
                 'locale',
                 HiddenType::class,

@@ -10,7 +10,6 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Core\Event\Payment;
 
 use Thelia\Model\Cart;
@@ -24,22 +23,20 @@ use Thelia\Module\AbstractPaymentModule;
 class IsValidPaymentEvent extends BasePaymentEvent
 {
     /** @var Cart */
-    protected $cart = null;
+    protected $cart;
 
     /** @var bool */
     protected $validModule = false;
 
     /** @var float */
-    protected $minimumAmount = null;
+    protected $minimumAmount;
 
     /** @var float */
-    protected $maximumAmount = null;
+    protected $maximumAmount;
 
     /**
      * IsValidPaymentEvent constructor.
      *
-     * @param AbstractPaymentModule $module
-     * @param Cart $cart
      */
     public function __construct(AbstractPaymentModule $module, Cart $cart)
     {

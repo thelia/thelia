@@ -28,7 +28,7 @@ use Thelia\Model\Currency;
 class MatchForEveryoneTest extends TestCase
 {
     /** @var FacadeInterface $stubTheliaAdapter */
-    protected $stubTheliaAdapter = null;
+    protected $stubTheliaAdapter;
 
     /**
      * Generate adapter stub
@@ -74,7 +74,7 @@ class MatchForEveryoneTest extends TestCase
         $currency2->setCode('USD');
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue(array($currency1, $currency2)));
+            ->will($this->returnValue([$currency1, $currency2]));
 
         return $stubFacade;
     }
@@ -91,8 +91,8 @@ class MatchForEveryoneTest extends TestCase
 
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForEveryone($stubFacade);
-        $operators = array();
-        $values = array();
+        $operators = [];
+        $values = [];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
@@ -170,14 +170,14 @@ class MatchForEveryoneTest extends TestCase
 
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForEveryone($stubFacade);
-        $actual1 = $condition1->setValidatorsFromForm(array(), array());
+        $actual1 = $condition1->setValidatorsFromForm([], []);
         $expected1 = $condition1;
         $actual2 = $condition1->getValidators();
 
-        $validators = array();
-        $validators['inputs'] = array();
-        $validators['setOperators'] = array();
-        $validators['setValues'] = array();
+        $validators = [];
+        $validators['inputs'] = [];
+        $validators['setOperators'] = [];
+        $validators['setValues'] = [];
         $expected2 = $validators;
 
         $this->assertEquals($expected1, $actual1);

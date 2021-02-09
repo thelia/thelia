@@ -51,7 +51,6 @@ class CouponDeleteEvent extends ActionEvent
     }
 
     /**
-     * @return mixed
      */
     public function getCouponId()
     {
@@ -59,7 +58,6 @@ class CouponDeleteEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $couponId
      * @return $this
      */
     public function setCouponId($couponId)

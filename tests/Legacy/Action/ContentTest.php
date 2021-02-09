@@ -22,13 +22,13 @@ use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Model\Content as ContentModel;
 use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\Folder;
 use Thelia\Model\FolderQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
-use Thelia\Model\Content as ContentModel;
 
 /**
  * Class ContentTest
@@ -285,7 +285,6 @@ class ContentTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * @param ContentFolder $association
      * @depends testAddFolderToContent
      */
     public function testRemoveFolder(ContentFolder $association)

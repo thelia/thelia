@@ -40,7 +40,7 @@ class TemplateDescriptor
     protected $version;
 
     /** @var TemplateDefinition */
-    protected $parent = null;
+    protected $parent;
 
     /** @var string */
     protected $documentation;

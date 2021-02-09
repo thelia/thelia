@@ -48,9 +48,9 @@ class RegisterCouponConditionPass implements CompilerPassInterface
         foreach ($services as $id => $condition) {
             $couponManager->addMethodCall(
                 'addAvailableCondition',
-                array(
+                [
                     new Reference($id)
-                )
+                ]
             );
         }
     }

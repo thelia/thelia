@@ -145,7 +145,7 @@ class RoutesConfigTest extends ContainerAwareTestCase
 
                     $id = $node->getAttribute('id');
 
-                    $this->assertFalse(in_array($id, $existingIds), "Duplicate route id '$id'.");
+                    $this->assertFalse(\in_array($id, $existingIds), "Duplicate route id '$id'.");
 
                     $existingIds[] = $id;
                 }
@@ -177,7 +177,7 @@ class RoutesConfigTest extends ContainerAwareTestCase
                     }
 
                     // check for path collision, then method collision
-                    $pathsCollide = in_array($route->getPath(), array_keys($existingPaths));
+                    $pathsCollide = \in_array($route->getPath(), array_keys($existingPaths));
 
                     if ($pathsCollide) {
                         $methodsIntersection = array_intersect($routeMethods, $existingPaths[$route->getPath()]);

@@ -3,23 +3,21 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Files\FileModelInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\ProductImageModification;
 use Thelia\Model\Base\ProductImage as BaseProductImage;
-use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\CatalogBreadcrumbTrait;
-use Thelia\Files\FileModelInterface;
-
 use Thelia\Model\Tools\PositionManagementTrait;
 
 class ProductImage extends BaseProductImage implements BreadcrumbInterface, FileModelInterface
 {
-
     use PositionManagementTrait;
     use CatalogBreadcrumbTrait;
 
@@ -68,9 +66,9 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
-            array(
+            [
                 "product_id" => $this->getProductId(),
-            )
+            ]
         );
 
         return true;
@@ -118,7 +116,6 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
     }
 
     /**
-     * @param int $objectId the ID of the object
      *
      * @return string the URL to redirect to after update from the back-office
      */

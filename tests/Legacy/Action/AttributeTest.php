@@ -13,10 +13,10 @@
 namespace Thelia\Tests\Action;
 
 use Thelia\Action\Attribute;
+use Thelia\Core\Event\Attribute\AttributeCreateEvent;
 use Thelia\Core\Event\Attribute\AttributeDeleteEvent;
 use Thelia\Core\Event\Attribute\AttributeUpdateEvent;
 use Thelia\Model\Attribute as AttributeModel;
-use Thelia\Core\Event\Attribute\AttributeCreateEvent;
 
 /**
  * Class AttributeTest
@@ -46,7 +46,6 @@ class AttributeTest extends BaseAction
     }
 
     /**
-     * @param AttributeModel $attribute
      * @depends testCreateSimple
      * @return AttributeModel
      */
@@ -77,7 +76,6 @@ class AttributeTest extends BaseAction
     }
 
     /**
-     * @param AttributeModel $attribute
      * @depends testUpdate
      */
     public function testDelete(AttributeModel $attribute)

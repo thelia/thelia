@@ -17,7 +17,7 @@ use Thelia\Model\TaxRule;
 
 class TaxRuleEvent extends ActionEvent
 {
-    protected $taxRule = null;
+    protected $taxRule;
 
     protected $locale;
     protected $id;

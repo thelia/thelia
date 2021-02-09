@@ -3,22 +3,21 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\ContentImageModification;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\ContentImage as BaseContentImage;
-use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\FolderBreadcrumbTrait;
-use Thelia\Files\FileModelInterface;
 
 class ContentImage extends BaseContentImage implements BreadcrumbInterface, FileModelInterface
 {
-
     use \Thelia\Model\Tools\PositionManagementTrait;
     use FolderBreadcrumbTrait;
 
@@ -67,9 +66,9 @@ class ContentImage extends BaseContentImage implements BreadcrumbInterface, File
         parent::preDelete($con);
 
         $this->reorderBeforeDelete(
-            array(
+            [
                 "content_id" => $this->getContentId(),
-            )
+            ]
         );
 
         return true;
@@ -117,7 +116,6 @@ class ContentImage extends BaseContentImage implements BreadcrumbInterface, File
     }
 
     /**
-     * @param int $objectId the ID of the object
      *
      * @return string the URL to redirect to after update from the back-office
      */

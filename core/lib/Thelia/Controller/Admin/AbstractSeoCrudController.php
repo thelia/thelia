@@ -119,20 +119,19 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     /**
      * Hydrate the SEO form for this object, before passing it to the update template
      *
-     * @param mixed $object
      */
     protected function hydrateSeoForm($object)
     {
         // The "SEO" tab form
         $locale = $object->getLocale();
-        $data = array(
+        $data = [
             'id'               => $object->getId(),
             'locale'           => $locale,
             'url'              => $object->getRewrittenUrl($locale),
             'meta_title'       => $object->getMetaTitle(),
             'meta_description' => $object->getMetaDescription(),
             'meta_keywords'     => $object->getMetaKeywords()
-        );
+        ];
 
         $seoForm = $this->createForm(AdminForm::SEO, FormType::class, $data);
         $this->getParserContext()->addForm($seoForm);
@@ -187,9 +186,8 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
 
                 // Redirect to the success URL
                 return $this->generateSuccessRedirect($updateSeoForm);
-            } else {
+            }  
                 return $response;
-            }
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -209,7 +207,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("%obj SEO modification", array('%obj' => $this->objectName)),
+                $this->getTranslator()->trans("%obj SEO modification", ['%obj' => $this->objectName]),
                 $error_msg,
                 $updateSeoForm,
                 $ex

@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     '%nb Item' => '%nb',
     '%nb Items' => '%nb',
     '+' => '+',
@@ -260,4 +260,4 @@ return array(
     'per page' => 'на странице',
     'update' => 'обновить',
     'with:' => 'с:',
-);
+];

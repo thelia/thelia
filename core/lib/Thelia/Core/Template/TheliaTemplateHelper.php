@@ -35,7 +35,6 @@ class TheliaTemplateHelper implements TemplateHelperInterface
     /**
      * Check if a template definition is the current active template
      *
-     * @param  TemplateDefinition $tplDefinition
      * @return bool               true is the given template is the active template
      */
     public function isActive(TemplateDefinition $tplDefinition)
@@ -97,12 +96,12 @@ class TheliaTemplateHelper implements TemplateHelperInterface
      */
     public function getStandardTemplateDefinitions()
     {
-        return array(
+        return [
             $this->getActiveFrontTemplate(),
             $this->getActiveAdminTemplate(),
             $this->getActivePdfTemplate(),
             $this->getActiveMailTemplate(),
-        );
+        ];
     }
 
     /**
@@ -114,7 +113,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface
      */
     public function getList($templateType, $base = THELIA_TEMPLATE_DIR)
     {
-        $list = $exclude = array();
+        $list = $exclude = [];
 
         $tplIterator = TemplateDefinition::getStandardTemplatesSubdirsIterator();
 

@@ -13,8 +13,8 @@
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\RequestContext;
@@ -82,7 +82,6 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
     /**
      * For init an Request, if your command has need an Request
-     * @param Lang|null $lang
      * @since 2.3
      */
     protected function initRequest(Lang $lang = null)
@@ -102,7 +101,6 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
     }
 
     /**
-     * @param Lang|null $lang
      * @return string
      * @since 2.3
      */

@@ -18,9 +18,9 @@ use Thelia\Core\Event\Hook\ModuleHookDeleteEvent;
 use Thelia\Core\Event\Hook\ModuleHookToggleActivationEvent;
 use Thelia\Core\Event\Hook\ModuleHookUpdateEvent;
 use Thelia\Model\Hook as HookModel;
+use Thelia\Model\HookQuery;
 use Thelia\Model\Module as ModuleModel;
 use Thelia\Model\ModuleHook as ModuleHookModel;
-use Thelia\Model\HookQuery;
 use Thelia\Model\ModuleQuery;
 
 /**
@@ -73,7 +73,6 @@ class ModuleHookTest extends BaseAction
     }
 
     /**
-     * @param ModuleHookModel $moduleHook
      * @depends testCreate
      * @return ModuleHookModel
      */
@@ -92,7 +91,6 @@ class ModuleHookTest extends BaseAction
     }
 
     /**
-     * @param ModuleHookModel $moduleHook
      * @depends testToggleActivation
      * @return ModuleHookModel
      */
@@ -119,7 +117,6 @@ class ModuleHookTest extends BaseAction
     }
 
     /**
-     * @param ModuleHookModel $moduleHook
      * @depends testUpdate
      * @return ModuleHookModel
      */
