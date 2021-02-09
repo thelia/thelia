@@ -16,7 +16,6 @@
   <testsuites>
     <testsuite name="Thelia">
       <directory>tests/Legacy</directory>
-      <directory>local/modules/*/Tests</directory>
     </testsuite>
   </testsuites>
 </phpunit>
