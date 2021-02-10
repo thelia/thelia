@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\URL;
 
@@ -24,12 +25,12 @@ class AdminController extends BaseAdminController
     const RESOURCE_CODE = "admin.home";
 
     /**
-     * @Route("/admin", name="admin")
+     * @Route("/admin", name="admin", defaults={"not-logged": 1})
      * @Route("/admin/home", name="admin_home")
      */
-    public function indexAction()
+    public function indexAction(SecurityContext $securityContext)
     {
-        if (!$this->getSecurityContext()->hasAdminUser()) {
+        if (!$securityContext->hasAdminUser()) {
             return new RedirectResponse(URL::getInstance()->absoluteUrl($this->getRoute("admin.login")));
         }
 

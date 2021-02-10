@@ -43,26 +43,6 @@ class BaseAdminController extends BaseController
     protected $currentRouter = "router.admin";
 
     /**
-     * Helper to append a message to the admin log.
-     *
-     * @param string $resource
-     * @param string $action
-     * @param string $message
-     */
-    public function adminLogAppend($resource, $action, $message, $resourceId = null)
-    {
-        AdminLog::append(
-            $resource,
-            $action,
-            $message,
-            $this->getRequest(),
-            $this->getSecurityContext()->getAdminUser(),
-            true,
-            $resourceId
-        );
-    }
-
-    /**
      * This method process the rendering of view called from an admin page
      *
      * @param  string   $template the template name
@@ -91,6 +71,26 @@ class BaseAdminController extends BaseController
     public function getControllerType()
     {
         return self::CONTROLLER_TYPE;
+    }
+
+    /**
+     * Helper to append a message to the admin log.
+     *
+     * @param string $resource
+     * @param string $action
+     * @param string $message
+     */
+    protected function adminLogAppend($resource, $action, $message, $resourceId = null)
+    {
+        AdminLog::append(
+            $resource,
+            $action,
+            $message,
+            $this->getRequest(),
+            $this->getSecurityContext()->getAdminUser(),
+            true,
+            $resourceId
+        );
     }
 
     /**
@@ -351,7 +351,7 @@ class BaseAdminController extends BaseController
         $response = $this->renderRaw($templateName, $args);
 
         if (!$response instanceof \Symfony\Component\HttpFoundation\Response) {
-            $response = Response::create($response, $status);
+            $response = new Response($response, $status);
         }
 
         return $response;
@@ -396,7 +396,7 @@ class BaseAdminController extends BaseController
         } catch (AuthenticationException $ex) {
             // User is not authenticated, and templates requires authentication -> redirect to login page
             // We user login_tpl as a path, not a template.
-            $content = RedirectResponse::create(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
+            $content = new RedirectResponse(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
         } catch (AuthorizationException $ex) {
             // User is not allowed to perform the required action. Return the error page instead of the requested page.
             $content = $this->errorPage($this->getTranslator()->trans("Sorry, you are not allowed to perform this action."), 403);
