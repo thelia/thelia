@@ -108,6 +108,8 @@ try {
 
     createProduct($faker, $categories, $brands, $contents, $template, $color, $material, $con);
 
+    $sales = createSales($faker, $con);
+
     createCustomer($faker, $con);
 
     // set some config key
@@ -461,6 +463,71 @@ function createCategories($faker, $templateId, $con)
     echo "categories created successfully\n";
 
     return $categories;
+}
+
+function createSales($faker, $con)
+{
+    echo "start creating sales\n";
+    $sales = [];
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/sales.csv', "r")) !== FALSE) {
+        $row=0;
+        $start = new \DateTime();
+        $end = new \DateTime();
+        $currencies = \Thelia\Model\CurrencyQuery::create()->find();
+
+        $products = \Thelia\Model\ProductQuery::create()->find();
+
+        while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
+            $row++;
+            if($row==1) continue;
+            $sale = new \Thelia\Model\Sale();
+            $sale
+                ->setActive(0)
+                ->setStartDate($start->setTimestamp(strtotime("today - 1 month")))
+                ->setEndDate($end->setTimestamp(strtotime("today + 1 month")))
+                ->setPriceOffsetType($data[2])
+                ->setDisplayInitialPrice(true)
+                ->setLocale('fr_FR')
+                ->setTitle(trim($data[0]))
+                ->setChapo($faker->text(20))
+                ->setDescription($faker->text(100))
+                ->setLocale('en_US')
+                ->setTitle(trim($data[1]))
+                ->setChapo($faker->text(20))
+                ->setDescription($faker->text(100))
+                ->save($con);
+
+            foreach($currencies as $currency) {
+                $saleOffset = new \Thelia\Model\SaleOffsetCurrency();
+
+                $saleOffset
+                    ->setCurrencyId($currency->getId())
+                    ->setSaleId($sale->getId())
+                    ->setPriceOffsetValue($data[3])
+                    ->save()
+                ;
+            }
+
+            $count = 5;
+            foreach ($products as $product) {
+                if ( --$count < 0) break;
+                $saleProduct = new \Thelia\Model\SaleProduct();
+
+                $saleProduct
+                    ->setSaleId($sale->getId())
+                    ->setProductId($product->getId())
+                    ->setAttributeAvId(null)
+                    ->save();
+                ;
+            }
+
+            $sales[trim($data[1])] = $sale;
+        }
+        fclose($handle);
+    }
+    echo "sales created successfully\n";
+
+    return $sales;
 }
 
 function createFolders($faker, $con)
