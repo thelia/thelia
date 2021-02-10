@@ -25,6 +25,7 @@ use Thelia\Core\Event\Hook\HookUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\Definition\AdminForm;
@@ -245,7 +246,7 @@ class HookController extends AbstractCrudController
      *
      * @return \Thelia\Form\HookModificationForm
      */
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
             'id'          => $object->getId(),

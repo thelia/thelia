@@ -24,6 +24,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Sale\SaleModificationForm;
 use Thelia\Model\Sale;
@@ -72,7 +73,7 @@ class SaleController extends AbstractCrudController
      * @param  Sale                 $sale
      * @return SaleModificationForm
      */
-    protected function hydrateObjectForm($sale)
+    protected function hydrateObjectForm(ParserContext $parserContext, $sale)
     {
         // Find all categories of the selected products
         $saleProducts = $sale->getSaleProductList();

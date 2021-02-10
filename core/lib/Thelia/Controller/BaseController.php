@@ -116,6 +116,8 @@ abstract class BaseController implements ControllerInterface
      *
      * @param string $eventName a TheliaEvent name, as defined in TheliaEvents class
      * @param ActionEvent|null $event the action event, or null (a DefaultActionEvent will be dispatched)
+     *
+     * @deprecated since Thelia 2.5, use autowiring instead.
      */
     protected function dispatch(string $eventName, Event $event = null)
     {
@@ -128,8 +130,9 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * Return the event dispatcher,
-     *
      * @return EventDispatcher
+     *
+     * @deprecated since Thelia 2.5, use autowiring instead.
      */
     public function getDispatcher()
     {
@@ -140,6 +143,8 @@ abstract class BaseController implements ControllerInterface
      * return the Translator
      *
      * @return Translator
+     *
+     * @deprecated since Thelia 2.5, use autowiring instead.
      */
     public function getTranslator()
     {
@@ -153,6 +158,8 @@ abstract class BaseController implements ControllerInterface
      * Return the parser context,
      *
      * @return ParserContext
+     *
+     * @deprecated since Thelia 2.5, use autowiring instead.
      */
     protected function getParserContext()
     {
@@ -163,6 +170,8 @@ abstract class BaseController implements ControllerInterface
      * Return the security context, by default in admin mode.
      *
      * @return \Thelia\Core\Security\SecurityContext
+     *
+     * @deprecated since Thelia 2.5, use autowiring instead.
      */
     protected function getSecurityContext()
     {
@@ -171,6 +180,8 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * @return \Thelia\Core\HttpFoundation\Request
+     *
+     * @deprecated since Thelia 2.5, use autowiring instead.
      */
     protected function getRequest()
     {
@@ -181,6 +192,8 @@ abstract class BaseController implements ControllerInterface
      * Returns the session from the current request
      *
      * @return \Thelia\Core\HttpFoundation\Session\Session
+     *
+     * @deprecated since Thelia 2.5, use autowiring instead.
      */
     protected function getSession()
     {
@@ -189,6 +202,8 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * @return \Thelia\Tools\TokenProvider
+     *
+     * @deprecated since Thelia 2.5, use autowiring instead.
      */
     protected function getTokenProvider()
     {
@@ -201,6 +216,8 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * @return \Thelia\Core\Template\TemplateHelperInterface
+     *
+     * @deprecated since Thelia 2.5, use autowiring instead.
      */
     protected function getTemplateHelper()
     {
@@ -214,6 +231,8 @@ abstract class BaseController implements ControllerInterface
     /**
      * @since 2.3
      * @return \Thelia\Core\Security\Resource\AdminResources
+     *
+     * @deprecated since Thelia 2.5, use autowiring instead.
      */
     protected function getAdminResources()
     {
@@ -542,6 +561,8 @@ abstract class BaseController implements ControllerInterface
      * return an instance of \Swift_Mailer with good Transporter configured.
      *
      * @return MailerFactory
+     *
+     * @deprecated since Thelia 2.5, use autowiring instead.
      */
     public function getMailer()
     {
@@ -576,6 +597,8 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * @return \Thelia\Core\Form\TheliaFormFactoryInterface
+     *
+     * @deprecated since Thelia 2.5, use autowiring instead.
      */
     protected function getTheliaFormFactory()
     {

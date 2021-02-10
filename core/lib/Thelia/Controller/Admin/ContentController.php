@@ -24,6 +24,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Content;
 use Thelia\Model\ContentQuery;
@@ -133,10 +134,10 @@ class ContentController extends AbstractSeoCrudController
      * @param  Content                              $object
      * @return \Thelia\Form\ContentModificationForm
      */
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         // Hydrate the "SEO" tab form
-        $this->hydrateSeoForm($object);
+        $this->hydrateSeoForm($parserContext, $object);
 
         // Prepare the data that will hydrate the form
         $data = [

@@ -18,6 +18,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ProfileUpdateModuleAccessForm;
@@ -102,7 +103,7 @@ class ProfileController extends AbstractCrudController
      * @param Profile $object
      * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
             'id'           => $object->getId(),
@@ -236,7 +237,7 @@ class ProfileController extends AbstractCrudController
         return $this->generateRedirectFromRoute("admin.configuration.profiles.list");
     }
 
-    public function updateAction()
+    public function updateAction(ParserContext $parserContext)
     {
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
@@ -250,11 +251,11 @@ class ProfileController extends AbstractCrudController
             $moduleAccessForm = $this->hydrateModuleUpdateForm($object);
 
             // Pass it to the parser
-            $this->getParserContext()->addForm($resourceAccessForm);
-            $this->getParserContext()->addForm($moduleAccessForm);
+            $parserContext->addForm($resourceAccessForm);
+            $parserContext->addForm($moduleAccessForm);
         }
 
-        return parent::updateAction();
+        return parent::updateAction($parserContext);
     }
 
     protected function getUpdateResourceAccessEvent($formData)

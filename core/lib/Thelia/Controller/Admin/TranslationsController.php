@@ -13,11 +13,15 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Finder\Finder;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Translation\TranslationEvent;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -31,25 +35,25 @@ use Thelia\Tools\URL;
 class TranslationsController extends BaseAdminController
 {
     /**
-     * @param  string                    $itemName the modume code
-     * @return Module                    the module object
-     * @throws \InvalidArgumentException if module was not found
+     * @param TranslatorInterface $translator
+     * @param string
+     * @return Module
      */
-    protected function getModule($itemName)
+    protected function getModule(TranslatorInterface $translator, string $moduleCode): Module
     {
-        if (null !== $module = ModuleQuery::create()->findPk($itemName)) {
+        if (null !== $module = ModuleQuery::create()->findPk($moduleCode)) {
             return $module;
         }
 
         throw new \InvalidArgumentException(
-            $this->getTranslator()->trans("No module found for code '%item'", ['%item' => $itemName])
+            $translator->trans("No module found for code '%item'", ['%item' => $moduleCode])
         );
     }
 
-    protected function getModuleTemplateNames(Module $module, $templateType)
+    protected function getModuleTemplateNames(TemplateHelperInterface  $templateHelper, Module $module, $templateType): array
     {
         $templates =
-            $this->getTemplateHelper()->getList(
+            $templateHelper->getList(
                 $templateType,
                 $module->getAbsoluteTemplateBasePath()
             );
@@ -63,17 +67,21 @@ class TranslationsController extends BaseAdminController
         return $names;
     }
 
-    protected function renderTemplate()
-    {
+    protected function renderTemplate(
+        Request $request,
+        TemplateHelperInterface $templateHelper,
+        EventDispatcherInterface  $eventDispatcher,
+        TranslatorInterface $translator
+    ) {
         // Get related strings, if all input data are here
-        $itemToTranslate = $this->getRequest()->get('item_to_translate');
+        $itemToTranslate = $request->get('item_to_translate');
 
-        $itemName = $this->getRequest()->get('item_name', '');
+        $itemName = $request->get('item_name', '');
+
+        $modulePart = false;
 
         if ($itemToTranslate == 'mo' && ! empty($itemName)) {
-            $modulePart = $this->getRequest()->get('module_part', '');
-        } else {
-            $modulePart = false;
+            $modulePart = $request->get('module_part', '');
         }
 
         $template = $directory = $i18nDirectory = false;
@@ -84,7 +92,7 @@ class TranslationsController extends BaseAdminController
                 'item_to_translate'             => $itemToTranslate,
                 'item_name'                     => $itemName,
                 'module_part'                   => $modulePart,
-                'view_missing_traductions_only' => $this->getRequest()->get('view_missing_traductions_only'),
+                'view_missing_traductions_only' => $request->get('view_missing_traductions_only'),
                 'max_input_vars_warning'        => false,
         ];
 
@@ -94,7 +102,7 @@ class TranslationsController extends BaseAdminController
             switch ($itemToTranslate) {
                 // Module core
                 case 'mo':
-                    $module = $this->getModule($itemName);
+                    $module = $this->getModule($translator, $itemName);
 
                     if ($modulePart == 'core') {
                         $directory = $module->getAbsoluteBaseDir();
@@ -147,16 +155,16 @@ class TranslationsController extends BaseAdminController
 
                     // List front and back office templates defined by this module
                     $templateArguments['back_office_templates'] =
-                        implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::BACK_OFFICE));
+                        implode(',', $this->getModuleTemplateNames($templateHelper, $module, TemplateDefinition::BACK_OFFICE));
 
                     $templateArguments['front_office_templates'] =
-                        implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::FRONT_OFFICE));
+                        implode(',', $this->getModuleTemplateNames($templateHelper, $module, TemplateDefinition::FRONT_OFFICE));
 
                     $templateArguments['email_templates'] =
-                        implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::EMAIL));
+                        implode(',', $this->getModuleTemplateNames($templateHelper, $module, TemplateDefinition::EMAIL));
 
                     $templateArguments['pdf_templates'] =
-                        implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::PDF));
+                        implode(',', $this->getModuleTemplateNames($templateHelper, $module, TemplateDefinition::PDF));
 
                     // Check if we have admin-include files
                     try {
@@ -227,7 +235,7 @@ class TranslationsController extends BaseAdminController
 
                 // Load translations files if this template is not the current template
                 // as it is not loaded in Thelia.php
-                if (! $this->getTemplateHelper()->isActive($template)) {
+                if (! $templateHelper->isActive($template)) {
                     $this->loadTranslation($i18nDirectory, $domain);
                 }
             }
@@ -236,26 +244,26 @@ class TranslationsController extends BaseAdminController
             if ($directory && ! empty($domain)) {
                 // Save the string set, if the form was submitted
                 if ($i18nDirectory) {
-                    $save_mode = $this->getRequest()->get('save_mode', false);
+                    $save_mode = $request->get('save_mode', false);
 
                     if ($save_mode !== false) {
-                        $texts = $this->getRequest()->get('text', []);
+                        $texts = $request->get('text', []);
 
                         if (! empty($texts)) {
                             $event = TranslationEvent::createWriteFileEvent(
                                 sprintf("%s".DS."%s.php", $i18nDirectory, $this->getCurrentEditionLocale()),
                                 $texts,
-                                $this->getRequest()->get('translation', []),
+                                $request->get('translation', []),
                                 true
                             );
 
                             $event
                                 ->setDomain($domain)
                                 ->setLocale($this->getCurrentEditionLocale())
-                                ->setCustomFallbackStrings($this->getRequest()->get('translation_custom', []))
-                                ->setGlobalFallbackStrings($this->getRequest()->get('translation_global', []));
+                                ->setCustomFallbackStrings($request->get('translation_custom', []))
+                                ->setGlobalFallbackStrings($request->get('translation_global', []));
 
-                            $this->getDispatcher()->dispatch($event, TheliaEvents::TRANSLATION_WRITE_FILE);
+                            $eventDispatcher->dispatch($event, TheliaEvents::TRANSLATION_WRITE_FILE);
 
                             if ($save_mode == 'stay') {
                                 return $this->generateRedirectFromRoute(
@@ -276,7 +284,7 @@ class TranslationsController extends BaseAdminController
                     $domain
                 );
 
-                $this->getDispatcher()->dispatch($event, TheliaEvents::TRANSLATION_GET_STRINGS);
+                $eventDispatcher->dispatch($event, TheliaEvents::TRANSLATION_GET_STRINGS);
 
                 // Estimate number of fields, and compare to php ini max_input_vars
                 $stringsCount = $event->getTranslatableStringCount() * 4 + 6;
@@ -313,20 +321,30 @@ class TranslationsController extends BaseAdminController
         return file_exists($parentDir) && is_writable($parentDir);
     }
 
-    public function defaultAction()
+    public function defaultAction(
+        Request $request,
+        TemplateHelperInterface $templateHelper,
+        EventDispatcherInterface  $eventDispatcher,
+        TranslatorInterface $translator
+    )
     {
         if (null !== $response = $this->checkAuth(AdminResources::TRANSLATIONS, [], AccessManager::VIEW)) {
             return $response;
         }
-        return $this->renderTemplate();
+        return $this->renderTemplate($request, $templateHelper, $eventDispatcher, $translator);
     }
 
-    public function updateAction()
+    public function updateAction(
+        Request $request,
+        TemplateHelperInterface $templateHelper,
+        EventDispatcherInterface  $eventDispatcher,
+        TranslatorInterface $translator
+    )
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
         }
-        return $this->renderTemplate();
+        return $this->renderTemplate($request, $templateHelper, $eventDispatcher, $translator);
     }
 
     private function loadTranslation($directory, $domain)

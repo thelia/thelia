@@ -14,6 +14,7 @@ namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
 use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
@@ -38,11 +39,13 @@ use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\JsonResponse;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Document;
 use Thelia\Core\Template\Loop\Image;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
@@ -249,7 +252,7 @@ class ProductController extends AbstractSeoCrudController
      * @param  Product                 $object
      * @return ProductModificationForm
      */
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         // Find product's sale elements
         $saleElements = ProductSaleElementsQuery::create()
@@ -334,13 +337,13 @@ class ProductController extends AbstractSeoCrudController
         }
 
         $defaultPseForm = $this->createForm(AdminForm::PRODUCT_DEFAULT_SALE_ELEMENT_UPDATE, FormType::class, $defaultPseData);
-        $this->getParserContext()->addForm($defaultPseForm);
+        $parserContext->addForm($defaultPseForm);
 
         $combinationPseForm = $this->createForm(AdminForm::PRODUCT_SALE_ELEMENT_UPDATE, FormType::class, $combinationPseData);
-        $this->getParserContext()->addForm($combinationPseForm);
+        $parserContext->addForm($combinationPseForm);
 
         // Hydrate the "SEO" tab form
-        $this->hydrateSeoForm($object);
+        $this->hydrateSeoForm($parserContext, $object);
 
         // The "General" tab form
         $data = [
@@ -472,7 +475,9 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Online status toggle product
      */
-    public function setToggleVisibilityAction()
+    public function setToggleVisibilityAction(
+        EventDispatcherInterface $eventDispatcher
+    )
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -482,7 +487,7 @@ class ProductController extends AbstractSeoCrudController
         $event = new ProductToggleVisibilityEvent($this->getExistingObject());
 
         try {
-            $this->dispatch(TheliaEvents::PRODUCT_TOGGLE_VISIBILITY, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::PRODUCT_TOGGLE_VISIBILITY);
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
@@ -739,11 +744,16 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Update accessory position
      */
-    public function updateAccessoryPositionAction()
+    public function updateAccessoryPositionAction(
+        Request $request,
+        EventDispatcherInterface $eventDispatcher
+    )
     {
-        $accessory = AccessoryQuery::create()->findPk($this->getRequest()->get('accessory_id', null));
+        $accessory = AccessoryQuery::create()->findPk($request->get('accessory_id', null));
 
         return $this->genericUpdatePositionAction(
+            $request,
+            $eventDispatcher,
             $accessory,
             TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION
         );
@@ -752,11 +762,16 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Update related content position
      */
-    public function updateContentPositionAction()
+    public function updateContentPositionAction(
+        Request $request,
+        EventDispatcherInterface $eventDispatcher
+    )
     {
-        $content = ProductAssociatedContentQuery::create()->findPk($this->getRequest()->get('content_id', null));
+        $content = ProductAssociatedContentQuery::create()->findPk($request->get('content_id', null));
 
         return $this->genericUpdatePositionAction(
+            $request,
+            $eventDispatcher,
             $content,
             TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION
         );

@@ -22,6 +22,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Feature;
 use Thelia\Model\FeatureQuery;
@@ -129,7 +130,7 @@ class FeatureController extends AbstractCrudController
         return $event->hasFeature();
     }
 
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
             'id'           => $object->getId(),

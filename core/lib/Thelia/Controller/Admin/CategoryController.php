@@ -14,6 +14,7 @@ namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Category\CategoryAddContentEvent;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteContentEvent;
@@ -24,6 +25,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Category;
 use Thelia\Model\CategoryAssociatedContentQuery;
@@ -120,10 +122,10 @@ class CategoryController extends AbstractSeoCrudController
      * @param \Thelia\Model\Category $object
      * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         // Hydrate the "SEO" tab form
-        $this->hydrateSeoForm($object);
+        $this->hydrateSeoForm($parserContext, $object);
 
         // The "General" tab form
         $data = [
@@ -245,7 +247,9 @@ class CategoryController extends AbstractSeoCrudController
     /**
      * Online status toggle category
      */
-    public function setToggleVisibilityAction()
+    public function setToggleVisibilityAction(
+        EventDispatcherInterface $eventDispatcher
+    )
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -255,7 +259,7 @@ class CategoryController extends AbstractSeoCrudController
         $event = new CategoryToggleVisibilityEvent($this->getExistingObject());
 
         try {
-            $this->dispatch(TheliaEvents::CATEGORY_TOGGLE_VISIBILITY, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::CATEGORY_TOGGLE_VISIBILITY);
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
