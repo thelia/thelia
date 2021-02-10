@@ -36,7 +36,7 @@ class SessionListener implements EventSubscriberInterface
         );
         $storage->setSaveHandler(
             new NativeFileSessionHandler(
-                ConfigQuery::read("session_config.save_path", THELIA_ROOT . '/local/session/')
+                ConfigQuery::read("session_config.save_path", THELIA_SESSION_DIR)
             )
         );
         $event->setSession($this->getSession($storage));
