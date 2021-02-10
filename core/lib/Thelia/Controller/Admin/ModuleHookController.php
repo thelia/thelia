@@ -25,6 +25,7 @@ use Thelia\Core\Hook\BaseHook;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\ModuleHookModificationForm;
 use Thelia\Model\IgnoredModuleHook;
@@ -123,7 +124,7 @@ class ModuleHookController extends AbstractCrudController
      * @param ModuleHook $object
      * @return ModuleHookModificationForm
      */
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
             'id'        => $object->getId(),

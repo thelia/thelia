@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Admin;
 use Thelia\Model\AdminQuery;
@@ -115,7 +116,7 @@ class AdministratorController extends AbstractCrudController
      *
      * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
             'id'                => $object->getId(),

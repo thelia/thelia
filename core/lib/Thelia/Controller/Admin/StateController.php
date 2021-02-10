@@ -19,6 +19,7 @@ use Thelia\Core\Event\State\StateToggleVisibilityEvent;
 use Thelia\Core\Event\State\StateUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\StateQuery;
 
@@ -64,7 +65,7 @@ class StateController extends AbstractCrudController
      *
      * @param \Thelia\Model\State $object
      */
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
             'id' => $object->getId(),

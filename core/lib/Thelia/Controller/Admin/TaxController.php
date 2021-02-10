@@ -17,6 +17,7 @@ use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Tax;
 use Thelia\Model\TaxQuery;
@@ -91,7 +92,7 @@ class TaxController extends AbstractCrudController
         return $event->hasTax();
     }
 
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
             'id'           => $object->getId(),

@@ -21,6 +21,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\OrderStatus\OrderStatusModificationForm;
 use Thelia\Model\OrderStatus;
@@ -71,7 +72,7 @@ class OrderStatusController extends AbstractCrudController
      * @param  OrderStatus                 $object
      * @return OrderStatusModificationForm $object
      */
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         // Prepare the data that will hydrate the form
         $data = [

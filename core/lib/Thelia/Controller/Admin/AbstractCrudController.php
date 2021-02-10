@@ -15,14 +15,19 @@ namespace Thelia\Controller\Admin;
 use Propel\Runtime\Event\ActiveRecordEvent;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Tools\TokenProvider;
 
 /**
  * An abstract CRUD controller for Thelia ADMIN, to manage basic CRUD operations on a givent object.
@@ -109,7 +114,7 @@ abstract class AbstractCrudController extends BaseAdminController
      *
      * @return BaseForm
      */
-    abstract protected function hydrateObjectForm($object);
+    abstract protected function hydrateObjectForm(ParserContext $parserContext, $object);
 
     /**
      * Creates the creation event with the provided form data
@@ -312,10 +317,14 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Create a new object
      *
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param TranslatorInterface $translator
      * @return \Thelia\Core\HttpFoundation\Response the response
      */
-    public function createAction()
-    {
+    public function createAction(
+        EventDispatcherInterface $eventDispatcher,
+        TranslatorInterface $translator
+    ) {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::CREATE)) {
             return $response;
@@ -343,12 +352,12 @@ abstract class AbstractCrudController extends BaseAdminController
             }
 
             // Dispatch Create Event
-            $this->dispatch($this->createEventIdentifier, $createEvent);
+            $eventDispatcher->dispatch($createEvent, $this->createEventIdentifier);
 
             // Check if object exist
             if (! $this->eventContainsObject($createEvent)) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was created.", ['%obj' => $this->objectName])
+                    $translator->trans("No %obj was created.", ['%obj' => $this->objectName])
                 );
             }
 
@@ -388,7 +397,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("%obj creation", ['%obj' => $this->objectName]),
+                $translator->trans("%obj creation", ['%obj' => $this->objectName]),
                 $error_msg,
                 $creationForm,
                 $ex
@@ -404,7 +413,9 @@ abstract class AbstractCrudController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response the response
      */
-    public function updateAction()
+    public function updateAction(
+        ParserContext $parserContext
+    )
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
@@ -414,10 +425,10 @@ abstract class AbstractCrudController extends BaseAdminController
         // Load object if exist
         if (null !== $object = $this->getExistingObject()) {
             // Hydrate the form abd pass it to the parser
-            $changeForm = $this->hydrateObjectForm($object);
+            $changeForm = $this->hydrateObjectForm($parserContext, $object);
 
             // Pass it to the parser
-            $this->getParserContext()->addForm($changeForm);
+            $parserContext->addForm($changeForm);
         }
 
         // Render the edition template.
@@ -429,7 +440,11 @@ abstract class AbstractCrudController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response the response
      */
-    public function processUpdateAction()
+    public function processUpdateAction(
+        Request $request,
+        EventDispatcherInterface $eventDispatcher,
+        TranslatorInterface $translator
+    )
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
@@ -440,7 +455,7 @@ abstract class AbstractCrudController extends BaseAdminController
         $error_msg = false;
 
         // Create the Form from the request
-        $changeForm = $this->getUpdateForm($this->getRequest());
+        $changeForm = $this->getUpdateForm();
 
         try {
             // Check the form against constraints violations
@@ -458,12 +473,12 @@ abstract class AbstractCrudController extends BaseAdminController
             }
 
             // Dispatch Update Event
-            $this->dispatch($this->updateEventIdentifier, $changeEvent);
+            $eventDispatcher->dispatch($changeEvent, $this->updateEventIdentifier);
 
             // Check if object exist
             if (! $this->eventContainsObject($changeEvent)) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", ['%obj' => $this->objectName])
+                    $translator->trans("No %obj was updated.", ['%obj' => $this->objectName])
                 );
             }
 
@@ -488,8 +503,8 @@ abstract class AbstractCrudController extends BaseAdminController
             if ($response == null) {
                 // If we have to stay on the same page, do not redirect to the successUrl,
                 // just redirect to the edit page again.
-                if ($this->getRequest()->get('save_mode') == 'stay') {
-                    return $this->redirectToEditionTemplate($this->getRequest());
+                if ($request->get('save_mode') == 'stay') {
+                    return $this->redirectToEditionTemplate($request);
                 }
 
                 // Redirect to the success URL
@@ -507,7 +522,7 @@ abstract class AbstractCrudController extends BaseAdminController
         if (false !== $error_msg) {
             // At this point, the form has errors, and should be redisplayed.
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("%obj modification", ['%obj' => $this->objectName]),
+                $translator->trans("%obj modification", ['%obj' => $this->objectName]),
                 $error_msg,
                 $changeForm,
                 $ex
@@ -519,9 +534,14 @@ abstract class AbstractCrudController extends BaseAdminController
 
     /**
      * Update object position (only for objects whichsupport that)
-     *
+     * @param Request $request
+     * @param EventDispatcherInterface $eventDispatcher
+     * @return mixed|string|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|Response|null
      */
-    public function updatePositionAction()
+    public function updatePositionAction(
+        Request $request,
+        EventDispatcherInterface $eventDispatcher
+    )
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
@@ -529,7 +549,7 @@ abstract class AbstractCrudController extends BaseAdminController
         }
 
         try {
-            $mode = $this->getRequest()->get('mode', null);
+            $mode = $request->get('mode', null);
 
             if ($mode == 'up') {
                 $mode = UpdatePositionEvent::POSITION_UP;
@@ -539,11 +559,11 @@ abstract class AbstractCrudController extends BaseAdminController
                 $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
             }
 
-            $position = $this->getRequest()->get('position', null);
+            $position = $request->get('position', null);
 
             $event = $this->createUpdatePositionEvent($mode, $position);
 
-            $this->dispatch($this->changePositionEventIdentifier, $event);
+            $eventDispatcher->dispatch($event, $this->changePositionEventIdentifier);
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
@@ -557,7 +577,7 @@ abstract class AbstractCrudController extends BaseAdminController
             return $response;
     }
 
-    protected function genericUpdatePositionAction($object, $eventName, $doFinalRedirect = true)
+    protected function genericUpdatePositionAction(Request $request, EventDispatcherInterface $eventDispatcher, $object, $eventName, $doFinalRedirect = true)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
@@ -566,7 +586,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
         if ($object != null) {
             try {
-                $mode = $this->getRequest()->get('mode', null);
+                $mode = $request->get('mode', null);
 
                 if ($mode == 'up') {
                     $mode = UpdatePositionEvent::POSITION_UP;
@@ -576,11 +596,11 @@ abstract class AbstractCrudController extends BaseAdminController
                     $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
                 }
 
-                $position = $this->getRequest()->get('position', null);
+                $position = $request->get('position', null);
 
                 $event = new UpdatePositionEvent($object->getId(), $mode, $position);
 
-                $this->dispatch($eventName, $event);
+                $eventDispatcher->dispatch($event, $eventName);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -590,22 +610,26 @@ abstract class AbstractCrudController extends BaseAdminController
         if ($doFinalRedirect) {
             return $this->redirectToEditionTemplate();
         }
+
+        return null;
     }
 
     /**
      * Online status toggle (only for object which support it)
      */
-    public function setToggleVisibilityAction()
+    public function setToggleVisibilityAction(
+        EventDispatcherInterface $eventDispatcher
+    )
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
             return $response;
         }
 
-        $changeEvent = $this->createToggleVisibilityEvent($this->getRequest());
+        $changeEvent = $this->createToggleVisibilityEvent();
 
         try {
-            $this->dispatch($this->visibilityToggleEventIdentifier, $changeEvent);
+            $eventDispatcher->dispatch($changeEvent, $this->visibilityToggleEventIdentifier);
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
@@ -619,7 +643,12 @@ abstract class AbstractCrudController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response the response
      */
-    public function deleteAction()
+    public function deleteAction(
+        Request $request,
+        TokenProvider $tokenProvider,
+        EventDispatcherInterface $eventDispatcher,
+        ParserContext $parserContext
+    )
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::DELETE)) {
@@ -628,14 +657,14 @@ abstract class AbstractCrudController extends BaseAdminController
 
         try {
             // Check token
-            $this->getTokenProvider()->checkToken(
-                $this->getRequest()->query->get("_token")
+            $tokenProvider->checkToken(
+                $request->query->get("_token")
             );
 
             // Get the currency id, and dispatch the delete request
             $deleteEvent = $this->getDeleteEvent();
 
-            $this->dispatch($this->deleteEventIdentifier, $deleteEvent);
+            $eventDispatcher->dispatch($deleteEvent, $this->deleteEventIdentifier);
 
             if (null !== $deletedObject = $this->getObjectFromEvent($deleteEvent)) {
                 $this->adminLogAppend(
@@ -658,14 +687,14 @@ abstract class AbstractCrudController extends BaseAdminController
             }
                 return $response;
         } catch (\Exception $e) {
-            return $this->renderAfterDeleteError($e);
+            return $this->renderAfterDeleteError($parserContext,$e);
         }
     }
 
     /**
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    protected function renderAfterDeleteError(\Exception $e)
+    protected function renderAfterDeleteError(ParserContext $parserContext, \Exception $e)
     {
         $errorMessage = sprintf(
             "Unable to delete '%s'. Error message: %s",
@@ -673,7 +702,7 @@ abstract class AbstractCrudController extends BaseAdminController
             $e->getMessage()
         );
 
-        $this->getParserContext()
+        $parserContext
             ->setGeneralError($errorMessage)
         ;
 
@@ -683,6 +712,8 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * @return \Thelia\Core\HttpFoundation\Request
      * @since 2.3
+     *
+     * @deprecated since Thelia 2.5, use autowiring instead.
      */
     protected function getRequest()
     {

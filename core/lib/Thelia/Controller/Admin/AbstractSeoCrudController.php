@@ -13,9 +13,13 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\UpdateSeoEvent;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Template\ParserContext;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 
@@ -120,7 +124,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      * Hydrate the SEO form for this object, before passing it to the update template
      *
      */
-    protected function hydrateSeoForm($object)
+    protected function hydrateSeoForm(ParserContext $parserContext, $object)
     {
         // The "SEO" tab form
         $locale = $object->getLocale();
@@ -134,10 +138,10 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         ];
 
         $seoForm = $this->createForm(AdminForm::SEO, FormType::class, $data);
-        $this->getParserContext()->addForm($seoForm);
+        $parserContext->addForm($seoForm);
 
         // URL based on the language
-        $this->getParserContext()->set('url_language', $this->getUrlLanguage($locale));
+        $parserContext->set('url_language', $this->getUrlLanguage($locale));
     }
 
     /**
@@ -145,7 +149,11 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      *
      * @return \Thelia\Core\HttpFoundation\Response the response
      */
-    public function processUpdateSeoAction()
+    public function processUpdateSeoAction(
+        Request $request,
+        ParserContext $parserContext,
+        EventDispatcherInterface $eventDispatcher
+    )
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
@@ -156,10 +164,10 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         $error_msg = false;
 
         // Create the Form from the request
-        $updateSeoForm = $this->getUpdateSeoForm($this->getRequest());
+        $updateSeoForm = $this->getUpdateSeoForm();
 
         // Pass the object id to the request
-        $this->getRequest()->attributes->set($this->objectName . '_id', $this->getRequest()->get('current_id'));
+        $request->attributes->set($this->objectName . '_id', $request->get('current_id'));
 
         try {
             // Check the form against constraints violations
@@ -172,7 +180,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             $updateSeoEvent = $this->getUpdateSeoEvent($data);
 
             // Dispatch Update SEO Event
-            $this->dispatch($this->updateSeoEventIdentifier, $updateSeoEvent);
+            $eventDispatcher->dispatch($updateSeoEvent, $this->updateSeoEventIdentifier);
 
             // Execute additional Action
             $response = $this->performAdditionalUpdateSeoAction($updateSeoEvent);
@@ -180,8 +188,8 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             if ($response == null) {
                 // If we have to stay on the same page, do not redirect to the successUrl,
                 // just redirect to the edit page again.
-                if ($this->getRequest()->get('save_mode') == 'stay') {
-                    return $this->redirectToEditionTemplate($this->getRequest());
+                if ($request->get('save_mode') == 'stay') {
+                    return $this->redirectToEditionTemplate($request);
                 }
 
                 // Redirect to the success URL
@@ -190,7 +198,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
                 return $response;
         } catch (FormValidationException $ex) {
             // Form cannot be validated
-            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+            $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
             /*} catch (\Exception $ex) {
                 // Any other error
                 $error_msg = $ex->getMessage();*/
@@ -199,16 +207,16 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         // Load object if exist
         if (null !== $object = $this->getExistingObject()) {
             // Hydrate the form abd pass it to the parser
-            $changeForm = $this->hydrateObjectForm($object);
+            $changeForm = $this->hydrateObjectForm($parserContext, $object);
 
             // Pass it to the parser
-            $this->getParserContext()->addForm($changeForm);
+            $parserContext->addForm($changeForm);
         }
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("%obj SEO modification", ['%obj' => $this->objectName]),
-                $error_msg,
+                Translator::getInstance()->trans("%obj SEO modification", ['%obj' => $this->objectName]),
+                $errorMessage,
                 $updateSeoForm,
                 $ex
             );

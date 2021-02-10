@@ -13,15 +13,19 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Exception\CustomerException;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 use Thelia\Tools\Password;
+use Thelia\Tools\TokenProvider;
 
 /**
  * Class CustomerController
@@ -92,7 +96,7 @@ class CustomerController extends AbstractCrudController
      * @param Customer $object
      * @return \Thelia\Form\BaseForm
      */
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         // Get default adress of the customer
         $address = $object->getDefaultAddress();
@@ -234,13 +238,23 @@ class CustomerController extends AbstractCrudController
         );
     }
 
-    public function deleteAction()
+    public function deleteAction(
+        Request $request,
+        TokenProvider $tokenProvider,
+        EventDispatcherInterface $eventDispatcher,
+        ParserContext $parserContext
+    )
     {
         $errorMsg = "No error.";
         $removalError = false;
 
         try {
-            parent::deleteAction();
+            parent::deleteAction(
+                 $request,
+                 $tokenProvider,
+                 $eventDispatcher,
+                 $parserContext
+            );
         } catch (CustomerException $e) {
             $errorMsg = $e->getMessage();
 

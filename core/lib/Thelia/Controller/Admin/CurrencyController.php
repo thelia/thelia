@@ -21,6 +21,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
@@ -109,7 +110,7 @@ class CurrencyController extends AbstractCrudController
         return $event->hasCurrency();
     }
 
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         // Prepare the data that will hydrate the form
         $data = [

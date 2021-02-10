@@ -22,6 +22,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Folder;
@@ -72,10 +73,10 @@ class FolderController extends AbstractSeoCrudController
      * @param \Thelia\Model\Folder $object
      * @return BaseForm
      */
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         // Hydrate the "SEO" tab form
-        $this->hydrateSeoForm($object);
+        $this->hydrateSeoForm($parserContext, $object);
 
         // Prepare the data that will hydrate the form
         $data = [

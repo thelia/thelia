@@ -18,6 +18,7 @@ use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\AttributeAv;
 use Thelia\Model\AttributeAvQuery;
@@ -102,7 +103,7 @@ class AttributeAvController extends AbstractCrudController
         return $event->hasAttributeAv();
     }
 
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         throw new \LogicException("Attribute Av. modification is not yet implemented");
     }

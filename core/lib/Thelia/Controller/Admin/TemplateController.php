@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Template\TemplateAddAttributeEvent;
 use Thelia\Core\Event\Template\TemplateAddFeatureEvent;
 use Thelia\Core\Event\Template\TemplateCreateEvent;
@@ -25,6 +26,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\AttributeTemplateQuery;
 use Thelia\Model\FeatureTemplateQuery;
@@ -99,7 +101,7 @@ class TemplateController extends AbstractCrudController
         return $event->hasTemplate();
     }
 
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
             'id'      => $object->getId(),
@@ -294,16 +296,21 @@ class TemplateController extends AbstractCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function updateAttributePositionAction()
+    public function updateAttributePositionAction(
+        Request $request,
+        EventDispatcherInterface $eventDispatcher
+    )
     {
         // Find attribute_template
         $attributeTemplate = AttributeTemplateQuery::create()
-            ->filterByTemplateId($this->getRequest()->get('template_id', null))
-            ->filterByAttributeId($this->getRequest()->get('attribute_id', null))
+            ->filterByTemplateId($request->get('template_id', null))
+            ->filterByAttributeId($request->get('attribute_id', null))
             ->findOne()
         ;
 
         return $this->genericUpdatePositionAction(
+            $request,
+            $eventDispatcher,
             $attributeTemplate,
             TheliaEvents::TEMPLATE_CHANGE_ATTRIBUTE_POSITION
         );
@@ -357,16 +364,21 @@ class TemplateController extends AbstractCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function updateFeaturePositionAction()
+    public function updateFeaturePositionAction(
+        Request $request,
+        EventDispatcherInterface $eventDispatcher
+    )
     {
         // Find feature_template
         $featureTemplate = FeatureTemplateQuery::create()
-            ->filterByTemplateId($this->getRequest()->get('template_id', null))
-            ->filterByFeatureId($this->getRequest()->get('feature_id', null))
+            ->filterByTemplateId($request->get('template_id', null))
+            ->filterByFeatureId($request->get('feature_id', null))
             ->findOne()
         ;
 
         return $this->genericUpdatePositionAction(
+            $request,
+            $eventDispatcher,
             $featureTemplate,
             TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION
         );

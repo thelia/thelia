@@ -22,6 +22,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\ConfigQuery;
@@ -108,7 +109,7 @@ class MessageController extends AbstractCrudController
         return $event->hasMessage();
     }
 
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         // Prepare the data that will hydrate the form
         $data = [

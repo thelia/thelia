@@ -17,6 +17,8 @@ use Michelf\MarkdownExtra;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleEvent;
 use Thelia\Core\Event\Module\ModuleInstallEvent;
@@ -24,8 +26,11 @@ use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\JsonResponse;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
+use Thelia\Core\Translation\Translator;
 use Thelia\Exception\InvalidModuleException;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
@@ -34,6 +39,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
+use Thelia\Tools\TokenProvider;
 
 /**
  * Class ModuleController
@@ -107,7 +113,7 @@ class ModuleController extends AbstractCrudController
         return $event->hasModule();
     }
 
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $object->setLocale($this->getCurrentEditionLocale());
         $data = [
@@ -278,7 +284,12 @@ class ModuleController extends AbstractCrudController
         return $response;
     }
 
-    public function deleteAction()
+    public function deleteAction(
+        Request $request,
+        TokenProvider $tokenProvider,
+        EventDispatcherInterface $eventDispatcher,
+        ParserContext $parserContext
+    )
     {
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::DELETE)) {
             return $response;
@@ -287,21 +298,21 @@ class ModuleController extends AbstractCrudController
         $message = false;
 
         try {
-            $this->getTokenProvider()->checkToken(
-                $this->getRequest()->query->get("_token")
+            $tokenProvider->checkToken(
+                $request->query->get("_token")
             );
 
-            $module_id = $this->getRequest()->get('module_id');
+            $module_id = $request->get('module_id');
 
             $deleteEvent = new ModuleDeleteEvent($module_id);
 
-            $deleteEvent->setDeleteData('1' == $this->getRequest()->get('delete-module-data', '0'));
+            $deleteEvent->setDeleteData('1' == $request->get('delete-module-data', '0'));
 
-            $this->dispatch(TheliaEvents::MODULE_DELETE, $deleteEvent);
+            $eventDispatcher->dispatch($deleteEvent,TheliaEvents::MODULE_DELETE);
 
             if ($deleteEvent->hasModule() === false) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", ['%obj' => 'Module'])
+                    Translator::getInstance()->trans("No %obj was updated.", ['%obj' => 'Module'])
                 );
             }
         } catch (\Exception $e) {
