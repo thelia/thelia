@@ -102,12 +102,12 @@ class SmartyParser extends Smarty implements ParserInterface
 
         // Configure basic Smarty parameters
 
-        $compile_dir = THELIA_ROOT . 'cache'. DS . $kernelEnvironment . DS . 'smarty' . DS . 'compile';
+        $compile_dir = THELIA_CACHE_DIR . DS . $kernelEnvironment . DS . 'smarty' . DS . 'compile';
         if (! is_dir($compile_dir)) {
             @mkdir($compile_dir, 0777, true);
         }
 
-        $cache_dir = THELIA_ROOT . 'cache'. DS . $kernelEnvironment . DS . 'smarty' . DS . 'cache';
+        $cache_dir = THELIA_CACHE_DIR . DS . $kernelEnvironment . DS . 'smarty' . DS . 'cache';
         if (! is_dir($cache_dir)) {
             @mkdir($cache_dir, 0777, true);
         }

@@ -61,6 +61,11 @@ if (!defined('THELIA_LOG_DIR')) {
     define('THELIA_LOG_DIR', THELIA_ROOT . 'var' . DS . 'log' . DS);
 }
 
+
+if (!defined('THELIA_SESSION_DIR')) {
+    define('THELIA_SESSION_DIR', THELIA_ROOT . 'var' . DS . 'session' . DS);
+}
+
 if (!defined('THELIA_TEMPLATE_DIR')) {
     define('THELIA_TEMPLATE_DIR', THELIA_ROOT . 'templates' . DS);
 }

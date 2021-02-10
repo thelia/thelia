@@ -29,7 +29,7 @@ class CheckPermission extends BaseInstall
     const DIR_CONF =            'local/config';
     const DIR_VAR  =            'var';
     const DIR_WEB =             'web';
-    const DIR_SESSION =         'local/session';
+    const DIR_SESSION =         'var/session';
     const DIR_MEDIA =           'local/media';
 
     /** @var array Directory needed to be writable */
