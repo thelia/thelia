@@ -1,6 +1,14 @@
+@import "../fontawesome/fontawesome";
+@import "../fontawesome/solid";
+@import "../fontawesome/brands";
+
 @font-face {
     font-family: 'thelia';
     src: url('../fonts/thelia/thelia.eot');
+}
+@font-face {
+    font-family: 'rezland';
+    src: url('../fonts/REZ.ttf');
 }
 @font-face {
     font-family: 'thelia';
@@ -10,7 +18,6 @@
 }
 
 [class^="icon-"], [class*=" icon-"] {
-    position: absolute;
     top: 3px;
     display: inline-block;
     font-family: 'thelia';
@@ -20,6 +27,29 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-size: 25px;
+}
+
+#follow-us {
+    .fa-twitter {
+        color: rgb(29, 161, 242);
+        &:hover {
+            color: rgb(83, 157, 203);
+        }
+    }
+
+    .fa-facebook-f {
+        color: #3b5998;
+        &:hover {
+            color: #5672ad;
+        }
+    }
+
+    .fa-github {
+        color: #171515;
+        &:hover {
+            color: #5c5c5c;
+        }
+    }
 }
 
 .icon-catalog:before {

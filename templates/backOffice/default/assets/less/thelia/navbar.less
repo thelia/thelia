@@ -5,16 +5,11 @@
 
 // COMMON STYLES
 // -------------
-@media (min-width: @screen-lg){
-    .sidebar {
-        z-index: 1;
-        position: absolute;
-        width: 250px;
-        margin-top: 52px;
-    }
-}
+
 
 .sidebar {
+    margin-top: 100px;
+
     .sidebar-nav.navbar-collapse {
         padding-right: 0;
         padding-left: 0;
@@ -28,11 +23,21 @@
         .menu-links();
     }
 
+    .glyphicon-menu-collapse {
+        .transition(transform 0.3s ease-in-out);
+    }
+
     .active {
         .caret {
             .rotate(-180deg);
         }
+
+        .glyphicon-menu-collapse {
+            .rotate(90deg);
+        }
     }
+
+
 
     .sidebar-search {
 
@@ -60,7 +65,7 @@
                 border-radius: 1px;
                 height: 1px;
                 width: 15px;
-                background: white;
+                background: #222;
                 position: absolute;
                 top: 8px;
                 right: 0px;
@@ -107,22 +112,68 @@
         }
 
     }
+
+    .navbar-brand {
+        font-family: 'rezland', serif;
+        background-color: white;
+        color: @brand-primary;
+        font-size: 4em;
+        padding-top: 23px;
+        > span {
+            color: #888;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 10px;
+            margin-top: 16px;
+        }
+    }
+    #side-menu {
+        .glyphicon {
+            top: 5px;
+            font-size: 20px;
+            &.glyphicon-menu-collapse {
+                font-weight: lighter;
+                font-size: 13px;
+                float: right;
+                top: 6px;
+            }
+        }
+    }
 }
 
-.navbar-brand {
-    padding-top: 10px;
-    padding-bottom: 10px;
-
-    > img {
-        vertical-align: top;
+@media (min-width: @screen-lg){
+    .sidebar {
+        z-index: 1;
+        position: absolute;
+        width: 250px;
+        margin-top: -8px;
     }
+    .navbar-default {
+        .navbar-brand {
+            background-color: @brand-primary;
+            color: white;
+            font-size: 4em;
+            padding-top: 20px;
+            padding-left: 65px;
+            width: 251px;
+            height: 53px;
+            &:hover,
+            &:focus {
+                color: whitesmoke;
+                background-color: #ce7b00;
+                transition: transform 0.3s ease-in-out;
 
-    > span {
-        color: #888;
-        font-size: 11px;
-        font-weight: bold;
-        display: inline-block;
-        margin-left: 10px;
-        margin-top: 16px;
+            }
+        }
     }
+}
+
+.navbar-top {
+    position: fixed;
+    background-color: white;
+    border-color: whitesmoke;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 5px 5px -5px rgba(0,0,0,.1);
 }

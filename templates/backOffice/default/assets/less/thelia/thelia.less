@@ -31,14 +31,14 @@
 
 .navbar-static-top {
     margin: 0;
-    z-index: 1;
+    z-index: 1000;
 }
 
 #page-wrapper {
     padding: 0 15px 10px 15px;
     min-height: 568px;
     background-color: #f5f5f5;
-    
+
     @media (min-width: @screen-lg){
         position: inherit;
         margin: 0 0 0 250px;
@@ -49,16 +49,16 @@
 
 .navbar-top-links {
     margin-right: 0;
-
+    position: relative;
     > li {
         display: inline-block;
-        
+
         > a,
         > button {
             font-weight: normal;
             padding: 15px;
             min-height: 50px;
-            color: @navbar-default-link-color;
+            color: #222;
             .transition(all 0.3s ease-in-out);
 
             &,
@@ -74,7 +74,7 @@
             }
         }
     }
-    
+
     .dropdown-menu {
         padding-top: 0;
         padding-bottom: 0;
@@ -101,14 +101,27 @@
 // Bootstrap Adjustements ------------------------------------------------------
 
 .footer {
-  background: none repeat scroll 0 0 transparent;
-  border: medium none;
-  box-shadow: none;
-  color: #7D756A;
-  margin-bottom: 0;
-  padding: 35px 15px 15px;
-  text-align: left;
+    background: none repeat scroll 0 0 transparent;
+    border: medium none;
+    box-shadow: none;
+    color: #7D756A;
+    margin-bottom: 0;
+    padding: 35px 15px 15px;
+    text-align: left;
 }
+
+#wrapper {
+    .footer {
+        padding: 35px 30px 15px;
+        text-align: left;
+        margin-left: 251px;
+        background-color: white;
+        box-shadow: 1px 0 20px rgba(0,0,0,.1);
+    }
+}
+
+
+
 
 // -- Top bar -----------------------------------------------------------------
 
@@ -521,7 +534,7 @@ table {
         .btn-area-config {
             margin: 5px 0;
         }
-        
+
         .btn-group {
             white-space: nowrap; // prevent buttons from wrapping when in tight spaces (e.g., the table on the tests page)
             > .btn {
@@ -651,11 +664,11 @@ footer {
     a:visited {
         text-decoration: none;
     }
-    
+
     a[href]:after {
         content: "";
     }
-    
+
     abbr[title]:after {
         content: "";
     }
