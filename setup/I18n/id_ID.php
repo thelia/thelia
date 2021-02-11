@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '"Remember me" cookie expiration time, in seconds, for administration users' => '"Ingatkan saya" waktu kedaluwarsa kuki, secepatnya, untuk pengguna bagian administrasi',
     '"Remember me" cookie expiration time, in seconds, for customer users' => '"Ingatkan saya" waktu kedaluwarsa kuki, secepatnya, untuk pelanggan',

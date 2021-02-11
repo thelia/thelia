@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace TheliaSmarty\Template\Plugins;
 
@@ -117,7 +117,7 @@ class AdminUtilities extends AbstractSmartyPlugin
                     'admin_utilities_current_position'    => $position,
                     'admin_utilities_go_down_url'         => URL::getInstance()->absoluteUrl($path, ['mode' => 'down', $url_parameter => $id])
             ]);
-        }  
+        }
             return $position;
     }
 

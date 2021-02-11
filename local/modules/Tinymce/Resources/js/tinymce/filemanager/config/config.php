@@ -1,5 +1,14 @@
 <?php
-//if (session_id() == '') session_start();
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 mb_internal_encoding('UTF-8');
 mb_http_output('UTF-8');

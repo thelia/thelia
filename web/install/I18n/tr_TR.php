@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>' => '<p><strong>Özür dilerim, beklenmeyen bir hata oluştu</strong>: %err</p> <p>Hata ayrıntıları:</p> <p>%details</p>',
     'Administrator login :' => 'Yönetici girişi:',

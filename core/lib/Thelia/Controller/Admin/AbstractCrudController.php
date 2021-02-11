@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\Controller\Admin;
 
@@ -280,7 +280,7 @@ abstract class AbstractCrudController extends BaseAdminController
     {
         if (null !== $this->moduleCode) {
             return [$this->moduleCode];
-        }  
+        }
             return [];
     }
 
@@ -376,7 +376,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
                 // Redirect to the success URL
                 return $this->generateRedirect($successUrl);
-            }  
+            }
                 return $response;
         } catch (FormValidationException $ex) {
             // Form cannot be validated
@@ -494,7 +494,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
                 // Redirect to the success URL
                 return $this->generateSuccessRedirect($changeForm);
-            }  
+            }
                 return $response;
         } catch (FormValidationException $ex) {
             // Form cannot be validated
@@ -553,7 +553,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
         if ($response == null) {
             return $this->redirectToListTemplate();
-        }  
+        }
             return $response;
     }
 
@@ -655,7 +655,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             if ($response == null) {
                 return $this->redirectToListTemplate();
-            }  
+            }
                 return $response;
         } catch (\Exception $e) {
             return $this->renderAfterDeleteError($e);

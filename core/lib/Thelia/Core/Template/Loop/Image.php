@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\Core\Template\Loop;
 
@@ -420,8 +420,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
         return $loopResult;
     }
-    
-    private function toBase64($path) 
+
+    private function toBase64($path)
     {
         $imgData = base64_encode(file_get_contents($path));
         return $src = 'data: '.mime_content_type($path).';base64,'.$imgData;

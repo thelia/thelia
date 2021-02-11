@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>' => '<p><strong>متاسفانه خطایی رخ داد</strong>: %err</p><p>جزییات خطا: </p><p>%details</p>',
     'Administrator login :' => 'ورود مدیریت:',

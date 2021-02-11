@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\Core\Template\Loop;
 
@@ -51,22 +51,22 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
         $originalId = $currentId = $this->getFolder();
         $visible = $this->getVisible();
         $depth = $this->getDepth();
-    
+
         $results = [];
 
         $ids = [];
 
         do {
             $search = FolderQuery::create();
-    
+
             $this->configureI18nProcessing($search, ['TITLE']);
-    
+
             $search->filterById($currentId);
-            
+
             if ($visible !== BooleanOrBothType::ANY) {
                 $search->filterByVisible($visible);
             }
-    
+
             $folder = $search->findOne();
 
             if ($folder != null) {
@@ -76,7 +76,7 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
                     "URL" => $folder->getUrl($this->locale),
                     "LOCALE" => $this->locale,
                 ];
-    
+
                 $currentId = $folder->getParent();
 
                 if ($currentId > 0) {

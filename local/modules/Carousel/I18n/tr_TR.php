@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     'A descriptive title' => 'Açıklayıcı bir başlık',
     'A short description, used when a summary or an introduction is required' => 'Bir Özeti veya giriş gerekli olduğunda kullanılan kısa bir açıklama',

@@ -1,5 +1,15 @@
 <?php
-# ========================================================================#
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 #
 #  This work is licensed under the Creative Commons Attribution 3.0 Unported
 #  License. To view a copy of this license,

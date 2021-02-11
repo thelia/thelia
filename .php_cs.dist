@@ -16,6 +16,18 @@ return (new PhpCsFixer\Config)
         '@Symfony' => false,
         'yoda_style' => false,
         'no_superfluous_phpdoc_tags' => true,
+        'header_comment' => [
+            'header' => implode("\n", [
+                'This file is part of the Thelia package.',
+                'http://www.thelia.net',
+                '',
+                '(c) OpenStudio <info@thelia.net>',
+                '',
+                'For the full copyright and license information, please view the LICENSE',
+                'file that was distributed with this source code.'
+            ])
+        ],
+        'no_empty_comment' => true,
         'single_line_throw' => false,
         'declare_strict_types' => false,
         'array_syntax' => ['syntax' => 'short'],

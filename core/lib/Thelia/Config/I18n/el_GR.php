@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '"%param" parameter cannot be empty in loop type: %type, name: %name' => 'η παράμετρος "%param" δεν μπορεί να είναι κενή στο βρόχο τύπο: %type, name:%name',
     '"%param" parameter is missing in loop type: %type, name: %name' => 'η παράμετρος "%param" δεν υπάρχει στο βρόχο τύπος: %type, όνομα: %name',

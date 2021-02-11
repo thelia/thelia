@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace TheliaSmarty\Template\Plugins;
 
@@ -82,7 +82,7 @@ class Format extends AbstractSmartyPlugin
             if ($timestamp === false) {
                 // No timestamp => error
                 throw new SmartyPluginException("Either date or timestamp is a mandatory parameter in format_date function");
-            }  
+            }
                 $date = new \DateTime();
                 $date->setTimestamp($timestamp);
         } elseif (\is_array($date)) {
@@ -391,7 +391,7 @@ class Format extends AbstractSmartyPlugin
         $htmlTag = $this->getParam($params, "html_tag", "p");
         $originCountry = $this->getParam($params, "origin_country", null);
         $locale = $this->getParam($params, "locale", $this->getSession()->getLang()->getLocale());
-        
+
         // extract html attributes
         $htmlAttributes = [];
         foreach ($params as $k => $v) {

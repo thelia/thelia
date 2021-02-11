@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\Command;
 
@@ -195,7 +195,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
         }
         if (empty($params["locale"])) {
             throw new RuntimeException('Translation Error. Locale is empty.');
-        }  
+        }
             $inString = (0 !== \intval($params["in_string"]));
             $useDefault = (0 !== \intval($params["use_default"]));
 
@@ -216,7 +216,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
                     $translation = substr($translation, 1, -1);
                 }
             }
-        
+
         return $translation;
     }
 }

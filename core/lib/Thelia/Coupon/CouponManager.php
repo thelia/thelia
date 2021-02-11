@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\Coupon;
 
@@ -354,7 +354,7 @@ class CouponManager
     {
         if ($coupon->isUsageUnlimited()) {
             return true;
-        }  
+        }
             try {
                 $usageLeft = $coupon->getUsagesLeft($customerId);
 
@@ -388,7 +388,7 @@ class CouponManager
                         ;
 
                         return $usageLeft - $newCount;
-                    }  
+                    }
                         $coupon->setMaxUsage(--$usageLeft);
 
                         $coupon->save();
@@ -399,7 +399,7 @@ class CouponManager
                 // Just log the problem.
                 Tlog::getInstance()->addError(sprintf("Failed to decrement coupon %s: %s", $coupon->getCode(), $ex->getMessage()));
             }
-        
+
         return false;
     }
 
@@ -412,7 +412,7 @@ class CouponManager
     {
         if ($coupon->isUsageUnlimited()) {
             return true;
-        }  
+        }
             try {
                 $usageLeft = $coupon->getUsagesLeft($customerId);
 
@@ -449,7 +449,7 @@ class CouponManager
                 // Just log the problem.
                 Tlog::getInstance()->addError(sprintf("Failed to increment coupon %s: %s", $coupon->getCode(), $ex->getMessage()));
             }
-        
+
         return false;
     }
 }

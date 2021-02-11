@@ -1,14 +1,15 @@
 <?php
+
 /*
- * This file is part of the `nicolab/php-ftp-client` package.
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
  *
- * (c) Nicolas Tallefourtane <dev@nicolab.net>
+ * (c) OpenStudio <info@thelia.net>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright Nicolas Tallefourtane http://nicolab.net
  */
+
 namespace FtpClient;
 
 /**

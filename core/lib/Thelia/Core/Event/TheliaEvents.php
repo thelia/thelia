@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\Core\Event;
 
@@ -39,12 +39,12 @@ final class TheliaEvents
     const ADDRESS_CREATE = "action.createAddress";
     const ADDRESS_UPDATE = "action.updateAddress";
     const ADDRESS_DELETE = "action.deleteAddress";
-    
+
     /**
      * sent when an address is tag as default
      */
     const ADDRESS_DEFAULT = "action.defaultAddress";
-    
+
     // -- END ADDRESS EVENTS ---------------------------------------------------------
 
     // -- ADMIN EVENTS ---------------------------------------------------------
@@ -68,7 +68,7 @@ final class TheliaEvents
     const AREA_REMOVE_COUNTRY = 'action.area.removeCountry';
     const AREA_POSTAGE_UPDATE = 'action.area.postageUpdate';
     const AREA_ADD_COUNTRY = 'action.area.addCountry';
-    
+
     // -- END AREA EVENTS ---------------------------------------------------------
 
     // -- CATEGORIES EVENTS -----------------------------------------------
@@ -93,7 +93,7 @@ final class TheliaEvents
     const CONTENT_CREATE            = "action.createContent";
     const CONTENT_UPDATE            = "action.updateContent";
     const CONTENT_DELETE            = "action.deleteContent";
-    
+
     const CONTENT_TOGGLE_VISIBILITY = "action.toggleContentVisibility";
     const CONTENT_UPDATE_POSITION   = "action.updateContentPosition";
     const CONTENT_UPDATE_SEO        = "action.updateContentSeo";
@@ -109,7 +109,7 @@ final class TheliaEvents
     const COUNTRY_CREATE            = "action.state.create";
     const COUNTRY_UPDATE            = "action.state.update";
     const COUNTRY_DELETE            = "action.state.delete";
-    
+
     const COUNTRY_TOGGLE_DEFAULT = "action.toggleCountryDefault";
     const COUNTRY_TOGGLE_VISIBILITY = "action.state.toggleVisibility";
     // -- END COUNTRY EVENTS ---------------------------------------------------------
@@ -119,7 +119,7 @@ final class TheliaEvents
     const STATE_CREATE            = "action.createState";
     const STATE_UPDATE            = "action.updateState";
     const STATE_DELETE            = "action.deleteState";
-    
+
     const STATE_TOGGLE_VISIBILITY = "action.toggleCountryVisibility";
     // -- END STATE EVENTS ---------------------------------------------------------
 
@@ -153,7 +153,7 @@ final class TheliaEvents
      * sent when a customer need a new password
      */
     const LOST_PASSWORD = "action.lostPassword";
-    
+
     /**
      * Send the account ccreation confirmation email
      */
@@ -166,7 +166,7 @@ final class TheliaEvents
     const FOLDER_CREATE            = "action.createFolder";
     const FOLDER_UPDATE            = "action.updateFolder";
     const FOLDER_DELETE            = "action.deleteFolder";
-    
+
     const FOLDER_TOGGLE_VISIBILITY = "action.toggleFolderVisibility";
     const FOLDER_UPDATE_POSITION   = "action.updateFolderPosition";
     const FOLDER_UPDATE_SEO        = "action.updateFolderSeo";
@@ -179,7 +179,7 @@ final class TheliaEvents
     const PRODUCT_CREATE            = "action.createProduct";
     const PRODUCT_UPDATE            = "action.updateProduct";
     const PRODUCT_DELETE            = "action.deleteProduct";
-    
+
     const PRODUCT_TOGGLE_VISIBILITY = "action.toggleProductVisibility";
     const PRODUCT_UPDATE_POSITION   = "action.updateProductPosition";
     const PRODUCT_UPDATE_SEO        = "action.updateProductSeo";
@@ -435,13 +435,13 @@ final class TheliaEvents
     const CONFIG_SETVALUE = "action.setConfigValue";
     const CONFIG_UPDATE   = "action.updateConfig";
     const CONFIG_DELETE   = "action.deleteConfig";
-    
+
     // -- Messages management ---------------------------------------------
 
     const MESSAGE_CREATE   = "action.createMessage";
     const MESSAGE_UPDATE   = "action.updateMessage";
     const MESSAGE_DELETE   = "action.deleteMessage";
-    
+
     // -- Currencies management ---------------------------------------------
 
     const CURRENCY_CREATE          = "action.createCurrency";
@@ -451,7 +451,7 @@ final class TheliaEvents
     const CURRENCY_SET_VISIBLE     = "action.setVisibleCurrency";
     const CURRENCY_UPDATE_RATES    = "action.updateCurrencyRates";
     const CURRENCY_UPDATE_POSITION = "action.updateCurrencyPosition";
-    
+
     const CHANGE_DEFAULT_CURRENCY = 'action.changeDefaultCurrency';
 
     // -- Tax management ---------------------------------------------
@@ -530,7 +530,7 @@ final class TheliaEvents
     const ATTRIBUTE_AV_UPDATE          = "action.updateAttributeAv";
     const ATTRIBUTE_AV_DELETE          = "action.deleteAttributeAv";
     const ATTRIBUTE_AV_UPDATE_POSITION = "action.updateAttributeAvPosition";
-    
+
     // -- Features values management ----------------------------------------
 
     const FEATURE_AV_CREATE          = "action.createFeatureAv";

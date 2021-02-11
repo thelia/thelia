@@ -102,7 +102,7 @@ $appletParameters = [
 	//This value should be set to false (or the line commented), for big files, as md5 calculation
 	//may be long  (Note this must be string and *not* boolean true/false)
 	'sendMD5Sum'            => 'false',
-	//
+	
 	'debugLevel'            => 0 // 100 disables redirect after upload, so we keep it below. This still gives a lot of information, in case of problem.
 ];
 

@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\Action;
 
@@ -913,7 +913,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE      => ["updateFeatureProductValue", 128],
             TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE      => ["deleteFeatureProductValue", 128],
-            
+
             TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE         => ["deleteTemplateAttribute", 128],
             TheliaEvents::TEMPLATE_DELETE_FEATURE           => ["deleteTemplateFeature", 128],
 

@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\Core\Stack;
 
@@ -126,7 +126,7 @@ class ParamInitMiddleware implements HttpKernelInterface
                     // if lang domain is different from current domain, redirect to the proper one
                     if (rtrim($domainUrl, "/") != $request->getSchemeAndHttpHost()) {
                         return new RedirectResponse($domainUrl, 301);
-                    }  
+                    }
                         //the user is currently on the proper domain, nothing to change
                         return null;
                 }
@@ -134,7 +134,7 @@ class ParamInitMiddleware implements HttpKernelInterface
                 Tlog::getInstance()->warning("The domain URL for language ".$lang->getTitle()." (id ".$lang->getId().") is not defined.");
 
                 return Lang::getDefaultLanguage();
-            }  
+            }
                 // one domain for all languages, the lang has to be set into session
                 return $lang;
         }

@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\Core\Template\Loop;
 
@@ -125,7 +125,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
-    
+
         $this->addStandardI18nSearch($search, $searchTerm, $searchCriteria, $searchIn);
     }
 
@@ -150,7 +150,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
         } else {
             $positionOrderAllowed = false;
         }
-    
+
         $excludeParent = $this->getExcludeParent();
 
         if (!\is_null($excludeParent)) {
@@ -206,7 +206,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             ;
         }
         $templateIdList = $this->getTemplateId();
-    
+
         if (!\is_null($templateIdList)) {
             $search->filterByDefaultTemplateId($templateIdList, Criteria::IN);
         }

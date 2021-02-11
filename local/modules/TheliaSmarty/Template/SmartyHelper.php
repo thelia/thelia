@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace TheliaSmarty\Template;
 
@@ -80,7 +80,7 @@ class SmartyHelper implements ParserHelperInterface
                     $hasName = $inFunction = (!\in_array($name, $skipFunctions) && (0 === \count($functions) || \in_array($name, $functions)));
                     $buffer  = "";
                     continue;
-                }  
+                }
                     // skip {
                     if (\in_array($char, ["/", "$", "#", "'", "\""])) {
                         $inFunction = false;

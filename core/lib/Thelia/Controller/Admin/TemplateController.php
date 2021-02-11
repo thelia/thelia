@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\Controller\Admin;
 
@@ -160,7 +160,7 @@ class TemplateController extends AbstractCrudController
             ]
         );
     }
-    
+
     /**
      * @param Request $request
      * @param int $id
@@ -209,15 +209,15 @@ class TemplateController extends AbstractCrudController
         if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::CREATE)) {
             return $response;
         }
-        
+
         $template_id = \intval($this->getRequest()->get('template_id'));
-        
+
         if ($template_id > 0) {
             try {
                 $event = new TemplateDuplicateEvent($template_id, $this->getCurrentEditionLocale());
-                
+
                 $this->dispatch(TheliaEvents::TEMPLATE_DUPLICATE, $event);
-    
+
                 if ($event->hasTemplate()) {
                     $template_id = $event->getTemplate()->getId();
                 }
@@ -226,7 +226,7 @@ class TemplateController extends AbstractCrudController
                 return $this->errorPage($ex);
             }
         }
-        
+
         return $this->redirectToEditionTemplate(null, $template_id);
     }
 

@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\ImportExport\Export\Type;
 
@@ -36,10 +36,10 @@ class MailingExport extends JsonFileAbstractExport
     protected function getData()
     {
         $con = Propel::getConnection();
-        $query = 'SELECT 
+        $query = 'SELECT
                         newsletter.id as "newsletter_id",
-                        newsletter.email as "newsletter_email", 
-                        newsletter.firstname as "newsletter_firstname", 
+                        newsletter.email as "newsletter_email",
+                        newsletter.firstname as "newsletter_firstname",
                         newsletter.lastname as "newsletter_lastname",
                         newsletter.locale as "newsletter_locale"
                     FROM newsletter

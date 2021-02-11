@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace TheliaSmarty\Template\Plugins;
 
@@ -183,7 +183,7 @@ class Hook extends AbstractSmartyPlugin
 
         return <<<HTML
 <div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">
-{$hookName} 
+{$hookName}
  <a onclick="this.parentNode.querySelector('.hook-details').style.display = 'block'">Show details</a>
 <div class="hook-details" style="display: none; cursor: pointer;">
 {$content}

@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '"Remember me" cookie expiration time, in seconds, for administration users' => '"Zapamiętaj mnie" czas ważności ciastka (cookie) w sekundach dla administratorów',
     '"Remember me" cookie expiration time, in seconds, for customer users' => '"Zapamiętaj mnie" czas ważności ciastka (cookie) w sekundach, dla zalogowanych klientów',

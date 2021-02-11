@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 if (php_sapi_name() != 'cli') {
     throw new \Exception('this script can only be launched with cli sapi');
 }

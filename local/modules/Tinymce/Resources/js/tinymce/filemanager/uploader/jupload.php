@@ -1,55 +1,13 @@
 <?php
 
-/**
- * This class manage upload, with use of the JUpload applet. It's both a sample to show how to use the applet, and
- * a class you can use directly into your own application.
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
  *
- * Recommandation: Don't update its code !
+ * (c) OpenStudio <info@thelia.net>
  *
- * By doing this, you'll be able to reuse directly any update coming from the JUpload project, instead of reporting your
- * modifications into any new version of this class. This guarantees you that your project can use the last version of
- * JUpload, without any code modification. We work so that the applet behavior remains unchanged, but from time to time,
- * a change can appear.
- *
- * Sample:
- * - See the index.php samples, in the same folder.
- *
- * Notes:
- * - maxChunkSize: this class use a default maxChunkSize of 500K (or less, depending on the script max size). This allows
- * upload of FILES OF ANY SIZE on quite all ISP hosting. If it's too big for you (the max upload size of your ISP is less
- * than 500K), or if you want no chunk at all, you can, of course, override this default value.
- *
- *
- *
- * Parameters:
- * - $appletparams contains a map for applet parameters: key is the applet parameter name. The value is the value to transmit
- * 		to the applet. See the applet documentation for information on all applet parameters.
- * - $classparams contains the parameter specific for the JUpload class below. Here are the main class parameters:
- * 		- demo_mode. Files are uploaded to the server, but not stored on its hard drive. That is: you can simulate the global
- * 		behavior, but won't consume hard drive space. This mode is used on sourceforge web site.
- *
- *
- * Output generated for uploaded files:
- * - $files is an array of array. This can be managed by (a) the function given in the callbackAfterUploadManagement class
- * 		parameter, or (b) within the page whose URL is given in the afterUploadURL applet parameter, or (c) you can Extend the
- * 		class and redeclare defaultAfterUploadManagement() to your needs.
- * 	See the defaultAfterUploadManagement() for a sample on howto manage this array.
- *
- *   This array contains:
- *     - One entry per file. Each entry is an array, that contains all files properties, stored as $key=>$value.
- * 		The available keys are:
- * 		  - name: the filename, as it is now stored on the system.
- * 		  - size: the file size
- * 		  - path: the absolute path, where the file has been stored.
- * 			- fullName: the canonical file name (i.e. including the absolute path)
- * 		  - md5sum: the md5sum of the file, if further control is needed.
- * 			- mimetype: the calculated mime type of the file
- * 		  - If the formData applet parameter is used: all attributes (key and value) uploaded by the applet, are put here,
- * 			repeated for each file.
- *
- * 		Note: if you are using a callback function (i.e. callbackAfterUploadManagement) and you do not see a global 'object' you
- * 					are expecting then it might have been destroyed by PHP - c.f. http://bugs.php.net/bug.php?id=39693
- *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 class JUpload {
