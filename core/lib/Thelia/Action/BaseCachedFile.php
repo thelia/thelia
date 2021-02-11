@@ -1,14 +1,15 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Action;
 
 use Propel\Runtime\Propel;
@@ -138,7 +139,7 @@ abstract class BaseCachedFile extends BaseAction
         // Keep original safe name if no tranformations are applied
         if ($forceOriginalFile || $hashed_options == null) {
             return sprintf("%s/%s", $path, $safe_filename);
-        }  
+        }
             return sprintf("%s/%s-%s", $path, $hashed_options, $safe_filename);
     }
 

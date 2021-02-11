@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\Action;
 
@@ -46,18 +46,18 @@ class Template extends BaseAction implements EventSubscriberInterface
     public function create(TemplateCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $template = new TemplateModel();
-        
+
         $template
 
             ->setLocale($event->getLocale())
             ->setName($event->getTemplateName())
-            
+
             ->save()
         ;
-        
+
         $event->setTemplate($template);
     }
-    
+
     /**
      * Dupliucate an existing template entry
      *
@@ -68,20 +68,20 @@ class Template extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $source = TemplateQuery::create()->findPk($event->getSourceTemplateId())) {
             $source->setLocale($event->getLocale());
-            
+
             $createEvent = new TemplateCreateEvent();
             $createEvent
                 ->setLocale($event->getLocale())
                 ->setTemplateName(
                     Translator::getInstance()->trans("Copy of %tpl", ["%tpl" => $source->getName() ])
                 );
-            
+
             $dispatcher->dispatch($createEvent,TheliaEvents::TEMPLATE_CREATE);
-            
+
             $clone = $createEvent->getTemplate();
-            
+
             $attrList = AttributeTemplateQuery::create()->findByTemplateId($source->getId());
-            
+
             /** @var  $feat AttributeTemplate */
             foreach ($attrList as $feat) {
                 $dispatcher->dispatch(
@@ -89,9 +89,9 @@ class Template extends BaseAction implements EventSubscriberInterface
                     TheliaEvents::TEMPLATE_ADD_ATTRIBUTE
                 );
             }
-            
+
             $featList = FeatureTemplateQuery::create()->findByTemplateId($source->getId());
-            
+
             /** @var  $feat FeatureTemplate */
             foreach ($featList as $feat) {
                 $dispatcher->dispatch(
@@ -99,11 +99,11 @@ class Template extends BaseAction implements EventSubscriberInterface
                     TheliaEvents::TEMPLATE_ADD_FEATURE
                 );
             }
-            
+
             $event->setTemplate($clone);
         }
     }
-    
+
     /**
      * Change a product template
      *
@@ -117,11 +117,11 @@ class Template extends BaseAction implements EventSubscriberInterface
                 ->setLocale($event->getLocale())
                 ->setName($event->getTemplateName())
                 ->save();
-            
+
             $event->setTemplate($template);
         }
     }
-    
+
     /**
      * Delete a product template entry
      *
@@ -133,37 +133,37 @@ class Template extends BaseAction implements EventSubscriberInterface
         if (null !== ($template = TemplateQuery::create()->findPk($event->getTemplateId()))) {
             // Check if template is used by a product
             $productCount = ProductQuery::create()->findByTemplateId($template->getId())->count();
-            
+
             if ($productCount <= 0) {
                 $con = Propel::getWriteConnection(TemplateTableMap::DATABASE_NAME);
                 $con->beginTransaction();
-                
+
                 try {
                     $template
 
                         ->delete($con);
-                    
+
                     // We have to also delete any reference of this template in category tables
                     // We can't use a FK here, as the DefaultTemplateId column may be NULL
                     // so let's take care of this.
                     CategoryQuery::create()
                         ->filterByDefaultTemplateId($event->getTemplateId())
                         ->update([ 'DefaultTemplateId' => null], $con);
-                    
+
                     $con->commit();
                 } catch (\Exception $ex) {
                     $con->rollback();
-                    
+
                     throw $ex;
                 }
             }
-            
+
             $event->setTemplate($template);
-            
+
             $event->setProductCount($productCount);
         }
     }
-    
+
     public function addAttribute(TemplateAddAttributeEvent $event)
     {
         if (null === AttributeTemplateQuery::create()
@@ -171,7 +171,7 @@ class Template extends BaseAction implements EventSubscriberInterface
                 ->filterByTemplate($event->getTemplate())
                 ->findOne()) {
             $attributeTemplate = new AttributeTemplate();
-            
+
             $attributeTemplate
                 ->setAttributeId($event->getAttributeId())
                 ->setTemplate($event->getTemplate())
@@ -179,7 +179,7 @@ class Template extends BaseAction implements EventSubscriberInterface
             ;
         }
     }
-    
+
     /**
      * Changes position, selecting absolute ou relative change.
      *
@@ -189,7 +189,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     {
         $this->genericUpdatePosition(AttributeTemplateQuery::create(), $event, $dispatcher);
     }
-    
+
     /**
      * Changes position, selecting absolute ou relative change.
      *
@@ -199,14 +199,14 @@ class Template extends BaseAction implements EventSubscriberInterface
     {
         $this->genericUpdatePosition(FeatureTemplateQuery::create(), $event, $dispatcher);
     }
-    
+
     public function deleteAttribute(TemplateDeleteAttributeEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $attributeTemplate = AttributeTemplateQuery::create()
             ->filterByAttributeId($event->getAttributeId())
             ->filterByTemplate($event->getTemplate())->findOne()
         ;
-        
+
         if ($attributeTemplate !== null) {
             $attributeTemplate
 
@@ -216,7 +216,7 @@ class Template extends BaseAction implements EventSubscriberInterface
             $event->stopPropagation();
         }
     }
-    
+
     public function addFeature(TemplateAddFeatureEvent $event)
     {
         if (null === FeatureTemplateQuery::create()
@@ -225,7 +225,7 @@ class Template extends BaseAction implements EventSubscriberInterface
                 ->findOne()
         ) {
             $featureTemplate = new FeatureTemplate();
-            
+
             $featureTemplate
                 ->setFeatureId($event->getFeatureId())
                 ->setTemplate($event->getTemplate())
@@ -233,14 +233,14 @@ class Template extends BaseAction implements EventSubscriberInterface
             ;
         }
     }
-    
+
     public function deleteFeature(TemplateDeleteFeatureEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $featureTemplate = FeatureTemplateQuery::create()
             ->filterByFeatureId($event->getFeatureId())
             ->filterByTemplate($event->getTemplate())->findOne()
         ;
-        
+
         if ($featureTemplate !== null) {
             $featureTemplate
 
@@ -250,7 +250,7 @@ class Template extends BaseAction implements EventSubscriberInterface
             $event->stopPropagation();
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -261,13 +261,13 @@ class Template extends BaseAction implements EventSubscriberInterface
             TheliaEvents::TEMPLATE_UPDATE          => ["update", 128],
             TheliaEvents::TEMPLATE_DELETE          => ["delete", 128],
             TheliaEvents::TEMPLATE_DUPLICATE       => ["duplicate", 128],
-            
+
             TheliaEvents::TEMPLATE_ADD_ATTRIBUTE    => ["addAttribute", 128],
             TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE => ["deleteAttribute", 128],
-            
+
             TheliaEvents::TEMPLATE_ADD_FEATURE    => ["addFeature", 128],
             TheliaEvents::TEMPLATE_DELETE_FEATURE => ["deleteFeature", 128],
-            
+
             TheliaEvents::TEMPLATE_CHANGE_ATTRIBUTE_POSITION => ['updateAttributePosition', 128],
             TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION   => ['updateFeaturePosition', 128],
         ];

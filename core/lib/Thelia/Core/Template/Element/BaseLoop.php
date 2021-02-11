@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\Core\Template\Element;
 
@@ -364,7 +364,7 @@ abstract class BaseLoop implements BaseLoopInterface
 
         if ($this->getArgValue('page') !== null) {
             return $this->searchWithPagination($search, $pagination);
-        }  
+        }
             return $this->searchWithOffset($search);
     }
 
@@ -420,7 +420,7 @@ abstract class BaseLoop implements BaseLoopInterface
             $firstItem = ($pageNum - 1) * $limit + 1;
 
             return \array_slice($search, $firstItem, $firstItem + $limit, false);
-        }  
+        }
             return \array_slice($search, $offset, $limit, false);
     }
 
@@ -455,7 +455,7 @@ abstract class BaseLoop implements BaseLoopInterface
 
         if ($page > $pagination->getLastPage()) {
             return [];
-        }  
+        }
             return $pagination;
     }
 

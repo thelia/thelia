@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     'Country %id migrated to country (ID %country) and state (ID %state) (address: %address, tax rules: %tax, shipping zones: %zone)' => 'Страна %id мигрирована в страну (ID %country) и штат (ID %state) (адрес: %address, налоговые правила: %tax, зоны доставки: %zone)',
     'Country migration' => 'Миграция стран',

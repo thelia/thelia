@@ -1,19 +1,14 @@
 <?php
 
-/********************************
- * The following commented code can be uncommented if you wish
- * to quickly find information about your system's MIME setup.
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
  *
- * Simply remove the "REMOVE ME TO TEST" lines below to have
- * the code run when this file runs.
+ * (c) OpenStudio <info@thelia.net>
  *
- * In addition to these tests, you'll find some commented code
- * at the bottom of the file that can be used to test the
- * function.
- *
- * Run the code with this command:
- * php mime_type_lib.php
- ********************************/
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 /* REMOVE ME TO TEST
 echo "magicfile: " . ini_get( 'mime_magic.magicfile' ) . "\n";

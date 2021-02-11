@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     'Add responsive class to images' => 'Добавить адаптивный класс к изображениям',
     'Custom CSS available in the editor' => 'Пользовательский CSS доступный в редакторе',

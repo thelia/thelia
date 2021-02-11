@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\Tests\Tools;
 
@@ -62,12 +62,12 @@ class FileDownloaderTest extends TestCase
         $this->expectException(\Thelia\Exception\FileNotFoundException::class);
         $this->downloader->download("https://github.com/foo/bar/baz", "baz");
     }
-    
+
     public function testFileDownloadSuccess()
     {
         $this->downloader->download("https://github.com/", "php://temp");
     }
-    
+
     public function testFileDownloadSuccessWithRedirect()
     {
         $this->downloader->download("https://github.com/", "php://temp");

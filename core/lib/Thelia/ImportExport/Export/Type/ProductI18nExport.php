@@ -1,12 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\ImportExport\Export\Type;
 
@@ -37,7 +39,7 @@ class ProductI18nExport extends JsonFileAbstractExport
 
         $con = Propel::getConnection();
 
-        $query = 'SELECT 
+        $query = 'SELECT
                         product.ref as product_ref,
                         product_i18n.title as "product_i18n_TITLE",
                         product_i18n.chapo as "product_i18n_CHAPO",

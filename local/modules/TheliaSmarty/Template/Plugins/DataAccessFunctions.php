@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace TheliaSmarty\Template\Plugins;
 
@@ -498,7 +498,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                     $default,
                     $locale
                 );
-        }  
+        }
             Tlog::getInstance()->addWarning(
                 sprintf(
                     "Module code '%s' not found in module-config Smarty function",
@@ -507,7 +507,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             );
 
             $value = $default;
-        
+
         return $value;
     }
 
@@ -668,7 +668,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             $smarty->assign($params['out'], $out);
 
             return $out !== null ? true : false;
-        }  
+        }
             if (\is_array($out)) {
                 throw new \InvalidArgumentException('The argument "out" is required if the meta value is an array');
             }
@@ -725,7 +725,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             }
 
             return $this->dataAccess($objectLabel, $params, $data, $noGetterData);
-        }  
+        }
             throw new NotFoundHttpException();
     }
 
@@ -911,7 +911,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
         if (isset($content)) {
             return $content;
-        }  
+        }
             return null;
     }
 

@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\ImportExport\Export\Type;
 
@@ -51,15 +51,15 @@ class CustomerExport extends JsonFileAbstractExport
         $locale = $this->language->getLocale();
 
         $con = Propel::getConnection();
-        $query = 'SELECT 
-                        customer.ref as "customer_ref", 
-                        customer_title_i18n.long as "customer_title_i18n_long", 
-                        customer.firstname as "customer_firstname", 
-                        customer.lastname as "customer_lastname", 
-                        customer.email as "customer_email", 
+        $query = 'SELECT
+                        customer.ref as "customer_ref",
+                        customer_title_i18n.long as "customer_title_i18n_long",
+                        customer.firstname as "customer_firstname",
+                        customer.lastname as "customer_lastname",
+                        customer.email as "customer_email",
                         customer.discount as "customer_discount",
                         address.company as "address_company",
-                        address.address1 as "address_address1", 
+                        address.address1 as "address_address1",
                         address.address2 as "address_address2",
                         address.address3 as "address_address3",
                         address.zipcode as "address_zipcode",

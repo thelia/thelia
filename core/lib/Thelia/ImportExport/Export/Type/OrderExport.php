@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\ImportExport\Export\Type;
 
@@ -85,8 +85,8 @@ class OrderExport extends JsonFileAbstractExport
                 (order_total_taxed_price - order_total_price) as order_total_tax,
                 (order_total_taxed_price + order_postage - order_discount) as order_total_with_taxes_shipping_discount
             FROM (
-                SELECT 
-                    `order`.ref as "order_ref", 
+                SELECT
+                    `order`.ref as "order_ref",
                     `order`.created_at as "order_created_at",
                     customer.ref as "customer_ref",
                     ROUND(`order`.discount, 2) as order_discount,
@@ -94,18 +94,18 @@ class OrderExport extends JsonFileAbstractExport
                     ROUND(`order`.postage, 2) as order_postage,
                     `order`.postage_tax as "order_postage_tax",
                     ROUND(`order`.postage_tax_rule_title,2) as "order_postage_tax_rule_title",
-                    SUM(ROUND(order_product.quantity * IF(order_product.was_in_promo = 1, order_product.promo_price, order_product.price), 2) ) as order_total_price, 
+                    SUM(ROUND(order_product.quantity * IF(order_product.was_in_promo = 1, order_product.promo_price, order_product.price), 2) ) as order_total_price,
                     SUM(
                         ROUND(
                             order_product.quantity * (
                                 IF(order_product.was_in_promo = 1, order_product.promo_price, order_product.price)
                                 +
                                 (
-                                    SELECT 
+                                    SELECT
                                         COALESCE(SUM(IF(order_product.was_in_promo, order_product_tax.promo_amount, order_product_tax.amount)), 0)
-                                    FROM    
+                                    FROM
                                         order_product_tax
-                                    WHERE 
+                                    WHERE
                                         order_product_tax.order_product_id = order_product.id
                                 )
                             ), 2

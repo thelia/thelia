@@ -1,14 +1,14 @@
 <?php
-/*************************************************************************************/
-/*      This file is part of the Thelia package.                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : dev@thelia.net                                                       */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      For the full copyright and license information, please view the LICENSE.txt  */
-/*      file that was distributed with this source code.                             */
-/*************************************************************************************/
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Thelia\Controller\Admin;
 
@@ -541,7 +541,7 @@ class FileController extends BaseAdminController
                 return $this->generateRedirect(
                     URL::getInstance()->absoluteUrl($file->getRedirectionUrl(), ['current_tab' => $tab])
                 );
-            }  
+            }
                 return $this->generateSuccessRedirect($fileUpdateForm);
         } catch (FormValidationException $e) {
             $message = sprintf('Please check your input: %s', $e->getMessage());
@@ -582,7 +582,7 @@ class FileController extends BaseAdminController
 
         if ($imageInstance instanceof \Symfony\Component\HttpFoundation\Response) {
             return $imageInstance;
-        }  
+        }
             return $this->render('image-edit', [
                 'imageId' => $imageId,
                 'imageType' => $parentType,
@@ -609,7 +609,7 @@ class FileController extends BaseAdminController
 
         if ($documentInstance instanceof \Symfony\Component\HttpFoundation\Response) {
             return $documentInstance;
-        }  
+        }
             return $this->render('document-edit', [
                 'documentId' => $documentId,
                 'documentType' => $parentType,
