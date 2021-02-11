@@ -41,9 +41,13 @@ class AreaTest extends BaseAction
         return $area;
     }
 
+    /**
+     * @depends testCreate
+     * @return AreaModel
+     */
     public function testAddCountry(AreaModel $area)
     {
-        $this->markTestSkipped('Area country doesn\' work like this');
+        $this->markTestSkipped('Area country doesn\'t work like this anymore');
 
         $country = CountryQuery::create()->findOne();
 
@@ -68,7 +72,7 @@ class AreaTest extends BaseAction
      */
     public function testRemoveCountry(AreaModel $area)
     {
-        $this->markTestSkipped('Area country doesn\' work like this');
+        $this->markTestSkipped('Area country doesn\'t work like this anymore');
 
         $country = CountryQuery::create()
             ->useCountryAreaQuery()
