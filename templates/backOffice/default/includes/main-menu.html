@@ -6,7 +6,7 @@
                 <div class="input-group">
                     <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}" value="{if isset($smarty.get.search_term)}{trim($smarty.get.search_term)}{/if}">
                     <span class="input-group-btn">
-                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+                        <button type="submit" class="form-control btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
                     </span>
                 </div>
             </form>
@@ -15,7 +15,10 @@
     </li>
 
     <li class="{if $admin_current_location == 'home'}active{/if}" id="home_menu">
-        <a href="{url path='/admin/home'}" title="{intl l="Home"}"><span class="icon-home"></span> <span class="item-text">{intl l="Home"}</span></a>
+        <a href="{url path='/admin/home'}" title="{intl l="Home"}">
+            <span class="glyphicon glyphicon-home"></span>
+            <span class="item-text">{intl l="Home"}</span>
+        </a>
     </li>
 
     {loop name="menu-auth-customer" type="auth" role="ADMIN" resource="admin.customer" access="VIEW"}
@@ -24,8 +27,9 @@
                 <li class="{if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
 
                     <a title="{intl l="Customers"}" href="#collapse-customer" {if $admin_current_location == 'customer'}class="open"{/if}>
-                        <span class="icon-customers"></span>
-                        <span class="item-text">{intl l="Customers"} <span class="caret"></span></span>
+                        <span class="glyphicon glyphicon-user"></span>
+                        <span class="item-text">{intl l="Customers"}</span>
+                        <span class="glyphicon glyphicon-chevron-right glyphicon-menu-collapse"></span>
                     </a>
 
                     <ul id="collapse-customer" class="collapse {if $admin_current_location == 'customer'}in{/if}" role="menu">
@@ -48,7 +52,7 @@
         {elsehook rel="main.top-menu-customer"}
             <li class="{if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
                 <a href="{url path='/admin/customers'}" title="{intl l="Customers"}">
-                    <span class="icon-customers"></span>
+                    <span class="glyphicon glyphicon-user"></span>
                     <span class="item-text">{intl l="Customers"}</span>
                 </a>
             </li>
@@ -59,8 +63,9 @@
     <li class="{if $admin_current_location == 'order'}active{/if}" id="orders_menu">
 
         <a title="{intl l="Orders"}" href="#collapse-orders" {if $admin_current_location == 'order'}class="open"{/if}>
-            <span class="icon-orders"></span>
-            <span class="item-text">{intl l="Orders"} <span class="caret"></span></span>
+            <span class="glyphicon glyphicon-shopping-cart"></span>
+            <span class="item-text">{intl l="Orders"}</span>
+            <span class="glyphicon glyphicon-chevron-right glyphicon-menu-collapse"></span>
         </a>
 
         <ul id="collapse-orders" class="collapse {if $admin_current_location == 'order'}in{/if}" role="menu">
@@ -68,7 +73,7 @@
             <li role="menuitem">
                 <a class="clearfix" href="{url path='admin/orders'}">
                     <span class="pull-left">{intl l="All orders"}</span>
-                    <span class="label label-default pull-right">{count type="order" customer="*" backend_context="1"}</span>
+                    <span class="label label-lg label-default pull-right">{count type="order" customer="*" backend_context="1"}</span>
                 </a>
             </li>
 
@@ -78,7 +83,7 @@
                 <li role="menuitem">
                     <a class="clearfix" data-target="{url path="admin/orders/$LABEL"}" href="{url path="admin/orders" status={$ID}}">
                         <span class="pull-left">{$TITLE}</span>
-                        <span class="label pull-right" style="background-color: {$COLOR};">{$count}</span>
+                        <span class="label label-lg pull-right" style="background-color: {$COLOR};">{$count}</span>
                     </a>
                 </li>
                 {/if}
@@ -102,8 +107,9 @@
             <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
 
                 <a title="{intl l="Catalog"}" href="#collapse-catalog" {if $admin_current_location == 'catalog'}class="open"{/if}>
-                    <span class="icon-catalog"></span>
-                    <span class="item-text">{intl l="Catalog"} <span class="caret"></span></span>
+                    <span class="glyphicon glyphicon-book"></span>
+                    <span class="item-text">{intl l="Catalog"}</span>
+                    <span class="glyphicon glyphicon-chevron-right glyphicon-menu-collapse"></span>
                 </a>
 
                 <ul id="collapse-catalog" class="collapse {if $admin_current_location == 'catalog'}in{/if}" role="menu">
@@ -126,7 +132,7 @@
         {elsehook rel="main.top-menu-catalog"}
             <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
                 <a title="{intl l="Catalog"}" href="{url path='/admin/catalog'}">
-                    <span class="icon-catalog"></span>
+                    <span class="glyphicon glyphicon-book"></span>
                     <span class="item-text">{intl l="Catalog"}</span>
                 </a>
             </li>
@@ -139,8 +145,9 @@
                 <li class="{if $admin_current_location == 'content'}active{/if}" id="contents_menu">
 
                     <a title="{intl l="Folders"}" href="#collapse-content" {if $admin_current_location == 'content'}class="open"{/if}>
-                        <span class="icon-records"></span>
-                        <span class="item-text">{intl l="Folders"} <span class="caret"></span></span>
+                        <span class=" glyphicon glyphicon-folder-open"></span>
+                        <span class="item-text">{intl l="Folders"}</span>
+                        <span class="glyphicon glyphicon-chevron-right glyphicon-menu-collapse"></span>
                     </a>
 
                     <ul id="collapse-content" class="collapse {if $admin_current_location == 'content'}in{/if}" role="menu">
@@ -163,7 +170,7 @@
         {elsehook rel="main.top-menu-content"}
             <li class="{if $admin_current_location == 'folder'}active{/if}" id="contents_menu">
                 <a title="{intl l="Folders"}" href="{url path='/admin/folders'}">
-                    <span class="icon-records"></span>
+                    <span class="glyphicon glyphicon-folder-open "></span>
                     <span class="item-text">{intl l="Folders"}</span>
                 </a>
             </li>
@@ -173,8 +180,9 @@
     {loop name="menu-auth-tools" type="auth" role="ADMIN" resource="admin.tools" access="VIEW"}
         <li class="{if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
             <a title="{intl l="Tools"}" href="#collapse-tools" {if $admin_current_location == 'tools'}class="open"{/if}>
-                <span class="icon-tools"></span>
-                <span class="item-text">{intl l="Tools"} <span class="caret"></span></span>
+                <span class="glyphicon glyphicon-wrench"></span>
+                <span class="item-text">{intl l="Tools"}</span>
+                <span class="glyphicon glyphicon-chevron-right glyphicon-menu-collapse"></span>
             </a>
 
             <ul id="collapse-tools" class="collapse {if $admin_current_location == 'tools'}in{/if}" role="menu">
@@ -216,8 +224,9 @@
             {hookblock name="main.top-menu-modules" fields="id,class,url,title"}
             <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
                 <a title="{intl l="Modules"}" href="#collapse-modules" {if $admin_current_location == 'modules'}class="open"{/if}>
-                    <span class="icon-modules"></span>
-                    <span class="item-text">{intl l="Modules"}<span class="caret"></span></span>
+                    <span class="glyphicon glyphicon-flash"></span>
+                    <span class="item-text">{intl l="Modules"}</span>
+                    <span class="glyphicon glyphicon-chevron-right glyphicon-menu-collapse"></span>
                 </a>
 
                 <ul id="collapse-modules" class="collapse {if $admin_current_location == 'modules'}in{/if}" role="menu">
@@ -240,7 +249,7 @@
         {elsehook rel="main.top-menu-modules"}
             <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
                 <a title="{intl l="Modules"}" href="{url path='/admin/modules'}">
-                    <span class="icon-modules"></span>
+                    <span class="glyphicon glyphicon-flash"></span>
                     <span class="item-text">{intl l="Modules"}</span>
                 </a>
             </li>
@@ -252,8 +261,9 @@
             {hookblock name="main.top-menu-configuration" fields="id,class,url,title"}
                 <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
                     <a title="{intl l="Configuration"}" href="#collapse-configuration" {if $admin_current_location == 'configuration'}class="open"{/if}>
-                        <span class="icon-configuration"></span>
-                        <span class="item-text">{intl l="Configuration"}<span class="caret"></span></span>
+                        <span class="glyphicon glyphicon-cog"></span>
+                        <span class="item-text">{intl l="Configuration"}</span>
+                        <span class="glyphicon glyphicon-chevron-right glyphicon-menu-collapse"></span>
                     </a>
 
                     <ul id="collapse-configuration" class="collapse {if $admin_current_location == 'configuration'}in{/if}" role="menu">
@@ -271,7 +281,7 @@
         {elsehook rel="main.top-menu-configuration"}
             <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
                 <a title="{intl l="Configuration"}" href="{url path='/admin/configuration'}">
-                    <span class="icon-configuration"></span>
+                    <span class="glyphicon glyphicon-cog"></span>
                     <span class="item-text">{intl l="Configuration"}</span>
                 </a>
             </li>
