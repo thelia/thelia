@@ -29,7 +29,7 @@ use Thelia\Core\PropelInitService;
  */
 class ModuleGenerateSqlCommand extends BaseModuleGenerate
 {
-    public function configure()
+    public function configure(): void
     {
         $this
             ->setName('module:generate:sql')

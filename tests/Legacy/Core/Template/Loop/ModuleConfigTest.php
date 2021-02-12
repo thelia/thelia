@@ -33,7 +33,7 @@ class ModuleConfigTest extends BaseLoopTestor
         ];
     }
 
-    public function testGetVariable()
+    public function testGetVariable(): void
     {
         Cheque::setConfigValue('test', 'test-value', null, true);
 
@@ -55,7 +55,7 @@ class ModuleConfigTest extends BaseLoopTestor
         $this->assertEquals('test-value', $substitutions['VALUE']);
     }
 
-    public function testGetVariableWithDefault()
+    public function testGetVariableWithDefault(): void
     {
         $this->instance->initializeArgs([
                 'type' => 'module-config',
@@ -76,7 +76,7 @@ class ModuleConfigTest extends BaseLoopTestor
         $this->assertEquals('a default value', $substitutions['VALUE']);
     }
 
-    public function testGetI18nVariable()
+    public function testGetI18nVariable(): void
     {
         Cheque::setConfigValue('testI18N', 'test-value-i18n', 'fr_FR', true);
 
@@ -102,7 +102,7 @@ class ModuleConfigTest extends BaseLoopTestor
         $this->assertEquals('test-value-i18n', $substitutions['VALUE']);
     }
 
-    public function testNonExistentModule()
+    public function testNonExistentModule(): void
     {
         $this->expectException(\LogicException::class);
 

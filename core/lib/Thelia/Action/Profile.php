@@ -31,7 +31,7 @@ class Profile extends BaseAction implements EventSubscriberInterface
     /**
      * @param $eventName
      */
-    public function create(ProfileEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(ProfileEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $profile = new ProfileModel();
 
@@ -53,7 +53,7 @@ class Profile extends BaseAction implements EventSubscriberInterface
     /**
      * @param $eventName
      */
-    public function update(ProfileEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(ProfileEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
             $profile
@@ -71,7 +71,7 @@ class Profile extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updateResourceAccess(ProfileEvent $event)
+    public function updateResourceAccess(ProfileEvent $event): void
     {
         if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
             ProfileResourceQuery::create()->filterByProfileId($event->getId())->delete();
@@ -91,7 +91,7 @@ class Profile extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updateModuleAccess(ProfileEvent $event)
+    public function updateModuleAccess(ProfileEvent $event): void
     {
         if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
             ProfileModuleQuery::create()->filterByProfileId($event->getId())->delete();
@@ -111,7 +111,7 @@ class Profile extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function delete(ProfileEvent $event)
+    public function delete(ProfileEvent $event): void
     {
         if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
             $profile

@@ -30,7 +30,7 @@ class TlogTest extends TestCase
         self::$logger->setFiles('*');
     }
 
-    public function testDebugWithDebugLevel()
+    public function testDebugWithDebugLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::DEBUG);
@@ -40,7 +40,7 @@ class TlogTest extends TestCase
         $logger->debug('foo');
     }
 
-    public function testDebugWithoutDebugLevel()
+    public function testDebugWithoutDebugLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);
@@ -49,7 +49,7 @@ class TlogTest extends TestCase
         $logger->debug('foo');
     }
 
-    public function testDebugWithInfoLevel()
+    public function testDebugWithInfoLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::INFO);
@@ -59,7 +59,7 @@ class TlogTest extends TestCase
         $logger->info('foo');
     }
 
-    public function testDebugWithoutInfoLevel()
+    public function testDebugWithoutInfoLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);
@@ -68,7 +68,7 @@ class TlogTest extends TestCase
         $logger->info('foo');
     }
 
-    public function testDebugWithNoticeLevel()
+    public function testDebugWithNoticeLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::NOTICE);
@@ -78,7 +78,7 @@ class TlogTest extends TestCase
         $logger->notice('foo');
     }
 
-    public function testDebugWithoutNoticeLevel()
+    public function testDebugWithoutNoticeLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);
@@ -87,7 +87,7 @@ class TlogTest extends TestCase
         $logger->notice('foo');
     }
 
-    public function testWarningWithWarningLevel()
+    public function testWarningWithWarningLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::WARNING);
@@ -97,7 +97,7 @@ class TlogTest extends TestCase
         $logger->warning('foo');
     }
 
-    public function testWarningWithoutWarningLevel()
+    public function testWarningWithoutWarningLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);
@@ -106,7 +106,7 @@ class TlogTest extends TestCase
         $logger->warning('foo');
     }
 
-    public function testErrorWithErrorLevel()
+    public function testErrorWithErrorLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::ERROR);
@@ -116,7 +116,7 @@ class TlogTest extends TestCase
         $logger->error('foo');
     }
 
-    public function testErrorWithoutErrorLevel()
+    public function testErrorWithoutErrorLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);
@@ -125,7 +125,7 @@ class TlogTest extends TestCase
         $logger->error('foo');
     }
 
-    public function testErrorWithCriticalLevel()
+    public function testErrorWithCriticalLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::CRITICAL);
@@ -135,7 +135,7 @@ class TlogTest extends TestCase
         $logger->critical('foo');
     }
 
-    public function testErrorWithoutCriticalLevel()
+    public function testErrorWithoutCriticalLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);
@@ -144,7 +144,7 @@ class TlogTest extends TestCase
         $logger->critical('foo');
     }
 
-    public function testErrorWithAlertLevel()
+    public function testErrorWithAlertLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::ALERT);
@@ -154,7 +154,7 @@ class TlogTest extends TestCase
         $logger->alert('foo');
     }
 
-    public function testErrorWithoutAlertLevel()
+    public function testErrorWithoutAlertLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);
@@ -163,7 +163,7 @@ class TlogTest extends TestCase
         $logger->alert('foo');
     }
 
-    public function testErrorWithEmergencyLevel()
+    public function testErrorWithEmergencyLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::EMERGENCY);
@@ -173,7 +173,7 @@ class TlogTest extends TestCase
         $logger->emergency('foo');
     }
 
-    public function testErrorWithoutEmergencyLevel()
+    public function testErrorWithoutEmergencyLevel(): void
     {
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);

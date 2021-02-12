@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 class RegisterCommandPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         try {
             $commands = $container->getParameter('command.definition');

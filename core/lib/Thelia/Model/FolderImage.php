@@ -34,7 +34,7 @@ class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileMo
      *
      * @param FolderImageQuery $query
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByFolder($this->getFolder());
     }

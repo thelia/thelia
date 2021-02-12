@@ -35,12 +35,12 @@ use Thelia\Model\OrderStatusQuery;
  */
 class OrderStatus extends BaseAction implements EventSubscriberInterface
 {
-    public function create(OrderStatusCreateEvent $event)
+    public function create(OrderStatusCreateEvent $event): void
     {
         $this->createOrUpdate($event, new OrderStatusModel());
     }
 
-    public function update(OrderStatusUpdateEvent $event)
+    public function update(OrderStatusUpdateEvent $event): void
     {
         $orderStatus = $this->getOrderStatus($event);
         $this->createOrUpdate($event, $orderStatus);
@@ -49,7 +49,7 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
     /**
      * @throws \Exception
      */
-    public function delete(OrderStatusDeleteEvent $event)
+    public function delete(OrderStatusDeleteEvent $event): void
     {
         $orderStatus = $this->getOrderStatus($event);
 
@@ -85,7 +85,7 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
         ];
     }
 
-    protected function createOrUpdate(OrderStatusEvent $event, OrderStatusModel $orderStatus)
+    protected function createOrUpdate(OrderStatusEvent $event, OrderStatusModel $orderStatus): void
     {
         $orderStatus
             ->setCode(!$orderStatus->getProtectedStatus() ? $event->getCode() : $orderStatus->getCode())
@@ -113,7 +113,7 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition(OrderStatusQuery::create(), $event, $dispatcher);
     }

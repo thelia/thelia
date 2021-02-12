@@ -26,12 +26,12 @@ class SmartyHelperTest extends \PHPUnit\Framework\TestCase
      */
     protected static $smartyParserHelper;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$smartyParserHelper = new SmartyHelper();
     }
 
-    public function testFunctionsDefinition()
+    public function testFunctionsDefinition(): void
     {
         $content = <<<EOT
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
@@ -52,7 +52,7 @@ EOT;
         $this->assertEquals('test', $functions[0]['attributes']['name']);
     }
 
-    public function testfunctionsDefinitionVar()
+    public function testfunctionsDefinitionVar(): void
     {
         $content = <<<'EOT'
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
@@ -80,7 +80,7 @@ EOT;
         $this->assertEquals('{$test}', $functions[1]['attributes']['name']);
     }
 
-    public function testfunctionsDefinitionInnerFunction()
+    public function testfunctionsDefinitionInnerFunction(): void
     {
         $content = <<<'EOT'
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
@@ -104,7 +104,7 @@ EOT;
         }
     }
 
-    public function testfunctionsDefinitionSpecificFunction()
+    public function testfunctionsDefinitionSpecificFunction(): void
     {
         $content = <<<'EOT'
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod

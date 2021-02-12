@@ -35,7 +35,7 @@ use Thelia\Model\ProductImageQuery;
  */
 class File extends BaseAction implements EventSubscriberInterface
 {
-    public function cloneFile(ProductCloneEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function cloneFile(ProductCloneEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $originalProductId = $event->getOriginalProduct()->getId();
         $clonedProduct = $event->getClonedProduct();
@@ -135,7 +135,7 @@ class File extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function cloneFileI18n($originalProductFileI18ns, $clonedProductFile, $type, ProductCloneEvent $event, EventDispatcherInterface $dispatcher)
+    public function cloneFileI18n($originalProductFileI18ns, $clonedProductFile, $type, ProductCloneEvent $event, EventDispatcherInterface $dispatcher): void
     {
         // Set clone files I18n
         /** @var ProductDocumentI18n $originalProductFileI18n */

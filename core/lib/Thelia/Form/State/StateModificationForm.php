@@ -25,7 +25,7 @@ class StateModificationForm extends StateCreationForm
 {
     use StandardDescriptionFieldsTrait;
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         parent::buildForm();
 

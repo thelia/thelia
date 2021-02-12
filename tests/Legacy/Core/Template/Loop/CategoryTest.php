@@ -30,7 +30,7 @@ class CategoryTest extends BaseLoopTestor
         return [];
     }
 
-    public function testSearchById()
+    public function testSearchById(): void
     {
         $category = CategoryQuery::create()->findOne();
         if (null === $category) {
@@ -48,7 +48,7 @@ class CategoryTest extends BaseLoopTestor
         $this->baseTestSearchById($category->getId(), $otherParameters);
     }
 
-    public function testSearchLimit()
+    public function testSearchLimit(): void
     {
         $this->baseTestSearchWithLimit(3);
     }

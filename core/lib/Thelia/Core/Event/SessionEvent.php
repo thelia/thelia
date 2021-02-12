@@ -68,7 +68,7 @@ class SessionEvent extends ActionEvent
     /**
      * @param mixed $session
      */
-    public function setSession(SessionInterface $session)
+    public function setSession(SessionInterface $session): void
     {
         $this->session = $session;
     }

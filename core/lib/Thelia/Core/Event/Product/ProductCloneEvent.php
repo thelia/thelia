@@ -56,7 +56,7 @@ class ProductCloneEvent extends ActionEvent
     /**
      * @param string $ref
      */
-    public function setRef($ref)
+    public function setRef($ref): void
     {
         $this->ref = $ref;
     }
@@ -72,7 +72,7 @@ class ProductCloneEvent extends ActionEvent
     /**
      * @param string $lang the locale (such as fr_FR)
      */
-    public function setLang($lang)
+    public function setLang($lang): void
     {
         $this->lang = $lang;
     }
@@ -88,7 +88,7 @@ class ProductCloneEvent extends ActionEvent
     /**
      * @param Product $originalProduct
      */
-    public function setOriginalProduct($originalProduct)
+    public function setOriginalProduct($originalProduct): void
     {
         $this->originalProduct = $originalProduct;
     }
@@ -104,7 +104,7 @@ class ProductCloneEvent extends ActionEvent
     /**
      * @param Product $clonedProduct
      */
-    public function setClonedProduct($clonedProduct)
+    public function setClonedProduct($clonedProduct): void
     {
         $this->clonedProduct = $clonedProduct;
     }

@@ -193,7 +193,7 @@ class CartController extends BaseFrontController
     /**
      * @throws PropelException
      */
-    protected function afterModifyCart()
+    protected function afterModifyCart(): void
     {
         /* recalculate postage amount */
         $order = $this->getSession()->getOrder();

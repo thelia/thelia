@@ -20,14 +20,14 @@ use Thelia\Type\AlphaNumStringListType;
  */
 class AlphaNumStringListTypeTest extends TestCase
 {
-    public function testAlphaNumStringListType()
+    public function testAlphaNumStringListType(): void
     {
         $type = new AlphaNumStringListType();
         $this->assertTrue($type->isValid('FOO1,FOO_2,FOO-3'));
         $this->assertFalse($type->isValid('FOO.1,FOO$_2,FOO-3'));
     }
 
-    public function testFormatAlphaNumStringListType()
+    public function testFormatAlphaNumStringListType(): void
     {
         $type = new AlphaNumStringListType();
         $this->assertIsArray($type->getFormattedValue('FOO1,FOO_2,FOO-3'));

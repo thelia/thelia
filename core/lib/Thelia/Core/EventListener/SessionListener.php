@@ -29,7 +29,7 @@ use Thelia\Model\ConfigQuery;
  */
 class SessionListener implements EventSubscriberInterface
 {
-    public function prodSession(SessionEvent $event)
+    public function prodSession(SessionEvent $event): void
     {
         $storage = new NativeSessionStorage(
             ['cookie_lifetime' => ConfigQuery::read('session_config.lifetime', 0)]
@@ -42,7 +42,7 @@ class SessionListener implements EventSubscriberInterface
         $event->setSession($this->getSession($storage));
     }
 
-    public function testSession(SessionEvent $event)
+    public function testSession(SessionEvent $event): void
     {
         if ($event->getEnv() == 'test') {
             $storage = new MockFileSessionStorage($event->getCacheDir().DS.'sessions');

@@ -34,7 +34,7 @@ class ContentImage extends BaseContentImage implements BreadcrumbInterface, File
      *
      * @param ContentImageQuery $query
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByContent($this->getContent());
     }

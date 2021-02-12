@@ -22,7 +22,7 @@ use Thelia\Core\Hook\BaseHook;
  */
 class FrontHook extends BaseHook
 {
-    public function onMainFooterBody(HookRenderBlockEvent $event)
+    public function onMainFooterBody(HookRenderBlockEvent $event): void
     {
         $content = trim($this->render('main-footer-body.html'));
         if ('' != $content) {

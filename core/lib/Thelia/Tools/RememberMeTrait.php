@@ -38,7 +38,7 @@ trait RememberMeTrait
     /**
      * Create the remember me cookie for the given user.
      */
-    protected function createRememberMeCookie(UserInterface $user, $cookieName, $cookieExpiration)
+    protected function createRememberMeCookie(UserInterface $user, $cookieName, $cookieExpiration): void
     {
         $ctp = new CookieTokenProvider();
 
@@ -52,7 +52,7 @@ trait RememberMeTrait
     /**
      * Clear the remember me cookie.
      */
-    protected function clearRememberMeCookie($cookieName)
+    protected function clearRememberMeCookie($cookieName): void
     {
         $ctp = new CookieTokenProvider();
 

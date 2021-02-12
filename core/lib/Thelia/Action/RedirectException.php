@@ -27,7 +27,7 @@ use Thelia\Tools\URL;
  */
 class RedirectException extends BaseAction implements EventSubscriberInterface
 {
-    public function checkRedirectException(ExceptionEvent $event)
+    public function checkRedirectException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
         if ($exception instanceof ExceptionRedirectException) {

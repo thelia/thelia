@@ -89,7 +89,7 @@ class SessionTest extends TestCase
             ->method('dispatch')
             ->willReturn(
                 $this->returnCallback(
-                    function ($type, $event) {
+                    function ($type, $event): void {
                         if ($type == TheliaEvents::CART_RESTORE_CURRENT) {
                             $this->cartAction->restoreCurrentCart($event, null, $this->dispatcher);
                         } else {
@@ -101,7 +101,7 @@ class SessionTest extends TestCase
             );
     }
 
-    public function testGetCartWithoutExistingCartAndNoDispatcher()
+    public function testGetCartWithoutExistingCartAndNoDispatcher(): void
     {
         $session = $this->session;
 
@@ -109,7 +109,7 @@ class SessionTest extends TestCase
         $session->getSessionCart();
     }
 
-    public function testGetCartWithoutExistingCartAndDeprecatedMethod()
+    public function testGetCartWithoutExistingCartAndDeprecatedMethod(): void
     {
         $session = $this->session;
 
@@ -117,7 +117,7 @@ class SessionTest extends TestCase
         @$session->getSessionCart();
     }
 
-    public function testGetCartUnableToCreateCart()
+    public function testGetCartUnableToCreateCart(): void
     {
         $session = $this->session;
 
@@ -125,7 +125,7 @@ class SessionTest extends TestCase
         $session->getSessionCart($this->dispatcherNull);
     }
 
-    public function testGetCartWithoutExistingCartNoCustomer()
+    public function testGetCartWithoutExistingCartNoCustomer(): void
     {
         $this->markTestSkipped('Mocked dispatcher don\'t work');
         $session = $this->session;
@@ -136,7 +136,7 @@ class SessionTest extends TestCase
         $this->assertInstanceOf("\Thelia\Model\Cart", $cart, '$cart must be an instance of Thelia\Model\Cart');
     }
 
-    public function testGetCartWithExistingCustomerButNoCart()
+    public function testGetCartWithExistingCustomerButNoCart(): void
     {
         $this->markTestSkipped('Mocked dispatcher don\'t work');
 
@@ -158,7 +158,7 @@ class SessionTest extends TestCase
         $this->assertInstanceOf("\Thelia\Model\Cart", $cart, '$cart must be an instance of Thelia\Model\Cart');
     }
 
-    public function testGetCartWithExistingCartAndCustomerButWithoutReferenceToCustomerInCart()
+    public function testGetCartWithExistingCartAndCustomerButWithoutReferenceToCustomerInCart(): void
     {
         $this->markTestSkipped('Mocked dispatcher don\'t work');
 
@@ -186,7 +186,7 @@ class SessionTest extends TestCase
         $this->assertInstanceOf("\Thelia\Model\Cart", $cart, '$cart must be an instance of Thelia\Model\Cart');
     }
 
-    public function testGetCartWithExistingCartAndCustomerAndReferencesEachOther()
+    public function testGetCartWithExistingCartAndCustomerAndReferencesEachOther(): void
     {
         $this->markTestSkipped('Mocked dispatcher don\'t work');
 
@@ -214,7 +214,7 @@ class SessionTest extends TestCase
         $this->assertInstanceOf("\Thelia\Model\Cart", $cart, '$cart must be an instance of Thelia\Model\Cart');
     }
 
-    public function testSetCurrency()
+    public function testSetCurrency(): void
     {
         $session = new Session(new MockArraySessionStorage());
 
@@ -223,19 +223,19 @@ class SessionTest extends TestCase
         $this->assertEquals($currentCurrency->getId(), $session->getCurrency()->getId());
     }
 
-    public function testGetCurrencyWithParameterForceDefault()
+    public function testGetCurrencyWithParameterForceDefault(): void
     {
         $session = new Session(new MockArraySessionStorage());
         $this->assertNull($session->getCurrency(false));
     }
 
-    public function testGetCurrency()
+    public function testGetCurrency(): void
     {
         $session = new Session(new MockArraySessionStorage());
         $this->assertInstanceOf('Thelia\Model\Currency', $session->getCurrency());
     }
 
-    public function testGetAdminEditionCurrencyWithCurrencyInSession()
+    public function testGetAdminEditionCurrencyWithCurrencyInSession(): void
     {
         $session = new Session(new MockArraySessionStorage());
         $currentCurrency = (new Currency())->setId(99);
@@ -243,7 +243,7 @@ class SessionTest extends TestCase
         $this->assertEquals($currentCurrency->getId(), $session->getAdminEditionCurrency()->getId());
     }
 
-    public function testGetAdminEditionCurrencyWithNoCurrencyInSession()
+    public function testGetAdminEditionCurrencyWithNoCurrencyInSession(): void
     {
         $session = new Session(new MockArraySessionStorage());
         $this->assertInstanceOf('Thelia\Model\Currency', $session->getAdminEditionCurrency());

@@ -57,7 +57,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    public function create(ProductSaleElementCreateEvent $event)
+    public function create(ProductSaleElementCreateEvent $event): void
     {
         $con = Propel::getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
 
@@ -114,7 +114,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    public function update(ProductSaleElementUpdateEvent $event)
+    public function update(ProductSaleElementUpdateEvent $event): void
     {
         $salesElement = ProductSaleElementsQuery::create()->findPk($event->getProductSaleElementId());
 
@@ -216,7 +216,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    public function delete(ProductSaleElementDeleteEvent $event)
+    public function delete(ProductSaleElementDeleteEvent $event): void
     {
         if (null !== $pse = ProductSaleElementsQuery::create()->findPk($event->getProductSaleElementId())) {
             $product = $pse->getProduct();
@@ -269,7 +269,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    public function generateCombinations(ProductCombinationGenerationEvent $event)
+    public function generateCombinations(ProductCombinationGenerationEvent $event): void
     {
         $con = Propel::getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
 
@@ -321,7 +321,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    protected function createCombination(ConnectionInterface $con, ProductSaleElements $salesElement, $combinationAttributes)
+    protected function createCombination(ConnectionInterface $con, ProductSaleElements $salesElement, $combinationAttributes): void
     {
         foreach ($combinationAttributes as $attributeAvId) {
             $attributeAv = AttributeAvQuery::create()->findPk($attributeAvId);
@@ -347,7 +347,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function clonePSE(ProductCloneEvent $event)
+    public function clonePSE(ProductCloneEvent $event): void
     {
         $clonedProduct = $event->getClonedProduct();
 
@@ -411,7 +411,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         return $clonedProductCreatePSEEvent->getProductSaleElement()->getId();
     }
 
-    public function updateClonePSE(ProductCloneEvent $event, $clonedProductPSEId, ProductSaleElements $originalProductPSE, $key)
+    public function updateClonePSE(ProductCloneEvent $event, $clonedProductPSEId, ProductSaleElements $originalProductPSE, $key): void
     {
         $originalProductPSEPrice = ProductPriceQuery::create()
             ->findOneByProductSaleElementsId($originalProductPSE->getId());
@@ -444,7 +444,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function clonePSEAssociatedFiles($clonedProductId, $clonedProductPSEId, $originalProductPSEFiles, $type)
+    public function clonePSEAssociatedFiles($clonedProductId, $clonedProductPSEId, $originalProductPSEFiles, $type): void
     {
         /** @var ProductSaleElementsDocument|ProductSaleElementsImage $originalProductPSEFile */
         foreach ($originalProductPSEFiles as $originalProductPSEFile) {

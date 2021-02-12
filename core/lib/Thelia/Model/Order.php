@@ -117,7 +117,7 @@ class Order extends BaseOrder
     /**
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function postInsert(ConnectionInterface $con = null)
+    public function postInsert(ConnectionInterface $con = null): void
     {
         parent::postInsert($con);
 
@@ -349,7 +349,7 @@ class Order extends BaseOrder
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function setNotPaid()
+    public function setNotPaid(): void
     {
         $this->setStatusHelper(OrderStatus::CODE_NOT_PAID);
     }
@@ -373,7 +373,7 @@ class Order extends BaseOrder
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function setPaid()
+    public function setPaid(): void
     {
         $this->setStatusHelper(OrderStatus::CODE_PAID);
     }
@@ -397,7 +397,7 @@ class Order extends BaseOrder
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function setProcessing()
+    public function setProcessing(): void
     {
         $this->setStatusHelper(OrderStatus::CODE_PROCESSING);
     }
@@ -421,7 +421,7 @@ class Order extends BaseOrder
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function setSent()
+    public function setSent(): void
     {
         $this->setStatusHelper(OrderStatus::CODE_SENT);
     }
@@ -445,7 +445,7 @@ class Order extends BaseOrder
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function setCancelled()
+    public function setCancelled(): void
     {
         $this->setStatusHelper(OrderStatus::CODE_CANCELED);
     }
@@ -469,7 +469,7 @@ class Order extends BaseOrder
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function setRefunded()
+    public function setRefunded(): void
     {
         $this->setStatusHelper(OrderStatus::CODE_REFUNDED);
     }
@@ -495,7 +495,7 @@ class Order extends BaseOrder
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function setStatusHelper($statusCode)
+    public function setStatusHelper($statusCode): void
     {
         if (null !== $ordeStatus = OrderStatusQuery::create()->findOneByCode($statusCode)) {
             $this->setOrderStatus($ordeStatus)->save();

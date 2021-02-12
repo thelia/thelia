@@ -48,7 +48,7 @@ class TheliaBundle extends Bundle
     /**
      * Construct the depency injection builder.
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 

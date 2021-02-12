@@ -29,7 +29,7 @@ class BackHook extends BaseHook
      *
      * should add to event a fragment with fields : id,class,url,title
      */
-    public function onMainTopMenuTools(HookRenderBlockEvent $event)
+    public function onMainTopMenuTools(HookRenderBlockEvent $event): void
     {
         $event->add(
             [

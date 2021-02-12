@@ -20,7 +20,7 @@ use Thelia\Type\IntType;
  */
 class IntTypeTest extends TestCase
 {
-    public function testIntType()
+    public function testIntType(): void
     {
         $intType = new IntType();
         $this->assertTrue($intType->isValid('1'));

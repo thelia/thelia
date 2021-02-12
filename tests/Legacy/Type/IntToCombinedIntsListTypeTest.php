@@ -20,14 +20,14 @@ use Thelia\Type\IntToCombinedIntsListType;
  */
 class IntToCombinedIntsListTypeTest extends TestCase
 {
-    public function testIntToCombinedIntsListType()
+    public function testIntToCombinedIntsListType(): void
     {
         $type = new IntToCombinedIntsListType();
         $this->assertTrue($type->isValid('1: 2 & 5 | (6 &7), 4: *, 67: (1 & 9)'));
         $this->assertFalse($type->isValid('1,2,3'));
     }
 
-    public function testFormatJsonType()
+    public function testFormatJsonType(): void
     {
         $type = new IntToCombinedIntsListType();
         $this->assertEquals(

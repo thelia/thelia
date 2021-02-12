@@ -227,12 +227,12 @@ class OrderAddressEvent extends ActionEvent
         return $this->zipcode;
     }
 
-    public function setOrderAddress(OrderAddress $orderAddress)
+    public function setOrderAddress(OrderAddress $orderAddress): void
     {
         $this->orderAddress = $orderAddress;
     }
 
-    public function setOrder(Order $order)
+    public function setOrder(Order $order): void
     {
         $this->order = $order;
     }

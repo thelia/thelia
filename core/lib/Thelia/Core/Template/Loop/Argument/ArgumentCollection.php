@@ -140,7 +140,7 @@ class ArgumentCollection implements \Iterator
      *
      * @return void any returned value is ignored
      */
-    public function next()
+    public function next(): void
     {
         next($this->arguments);
     }
@@ -180,7 +180,7 @@ class ArgumentCollection implements \Iterator
      *
      * @return void any returned value is ignored
      */
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->arguments);
     }

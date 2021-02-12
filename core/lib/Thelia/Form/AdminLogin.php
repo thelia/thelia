@@ -21,7 +21,7 @@ use Thelia\Core\Translation\Translator;
 
 class AdminLogin extends BruteforceForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('username', TextType::class, [

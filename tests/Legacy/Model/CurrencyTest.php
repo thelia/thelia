@@ -23,7 +23,7 @@ use Thelia\Model\CurrencyQuery;
  */
 class CurrencyTest extends TestCase
 {
-    public function testGetDefaultCurrency()
+    public function testGetDefaultCurrency(): void
     {
         $expectedCurrency = CurrencyQuery::create()->findOneByByDefault(true);
         $actualCurrency = Currency::getDefaultCurrency();

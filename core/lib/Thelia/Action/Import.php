@@ -57,7 +57,7 @@ class Import extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function importChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher)
+    public function importChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->handler->getImport($updatePositionEvent->getObjectId(), true);
         $this->genericUpdatePosition(new ImportQuery(), $updatePositionEvent, $dispatcher);
@@ -68,7 +68,7 @@ class Import extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function importCategoryChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher)
+    public function importCategoryChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->handler->getCategory($updatePositionEvent->getObjectId(), true);
         $this->genericUpdatePosition(new ImportCategoryQuery(), $updatePositionEvent, $dispatcher);

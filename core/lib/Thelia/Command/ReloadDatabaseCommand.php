@@ -26,7 +26,7 @@ use Thelia\Model\Map\ProductTableMap;
  */
 class ReloadDatabaseCommand extends BaseModuleGenerate
 {
-    public function configure()
+    public function configure(): void
     {
         $this
             ->setName('thelia:dev:reloadDB')

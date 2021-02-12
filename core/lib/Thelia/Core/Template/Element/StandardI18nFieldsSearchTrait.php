@@ -34,7 +34,7 @@ trait StandardI18nFieldsSearchTrait
      * @param $searchCriteria
      * @param string[] $searchIn
      */
-    protected function addStandardI18nSearch(&$search, $searchTerm, $searchCriteria, $searchIn = ['title', 'chapo', 'description', 'postscriptum'])
+    protected function addStandardI18nSearch(&$search, $searchTerm, $searchCriteria, $searchIn = ['title', 'chapo', 'description', 'postscriptum']): void
     {
         $firstSearch = true;
         foreach (self::$standardI18nSearchFields as $searchInElement) {

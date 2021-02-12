@@ -170,7 +170,7 @@ class Product extends BaseProduct implements FileModelParentInterface
      *
      * @throws \Exception
      */
-    public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight, $baseQuantity = 0)
+    public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight, $baseQuantity = 0): void
     {
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
 
@@ -255,7 +255,7 @@ class Product extends BaseProduct implements FileModelParentInterface
      *
      * @deprecated since 2.3, and will be removed in 2.4
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         // Find products in the same category
         $products = ProductCategoryQuery::create()
@@ -299,7 +299,7 @@ class Product extends BaseProduct implements FileModelParentInterface
     /**
      * {@inheritDoc}
      */
-    public function postDelete(ConnectionInterface $con = null)
+    public function postDelete(ConnectionInterface $con = null): void
     {
         parent::postDelete($con);
 
@@ -326,7 +326,7 @@ class Product extends BaseProduct implements FileModelParentInterface
         return parent::getPosition();
     }
 
-    public function postSave(ConnectionInterface $con = null)
+    public function postSave(ConnectionInterface $con = null): void
     {
         // For BC, will be removed in 2.4
         if (!$this->isNew()) {
@@ -350,7 +350,7 @@ class Product extends BaseProduct implements FileModelParentInterface
      * @param ProductCategory $productCategory
      *                                         {@inheritdoc}
      */
-    protected function doAddProductCategory($productCategory)
+    protected function doAddProductCategory($productCategory): void
     {
         parent::doAddProductCategory($productCategory);
 

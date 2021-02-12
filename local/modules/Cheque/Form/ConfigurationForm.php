@@ -29,7 +29,7 @@ class ConfigurationForm extends BaseForm
         return Translator::getInstance()->trans($str, $params, Cheque::MESSAGE_DOMAIN);
     }
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(

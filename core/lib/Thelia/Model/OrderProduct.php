@@ -62,7 +62,7 @@ class OrderProduct extends BaseOrderProduct
     /**
      * {@inheritDoc}
      */
-    public function postInsert(ConnectionInterface $con = null)
+    public function postInsert(ConnectionInterface $con = null): void
     {
         parent::postInsert($con);
 

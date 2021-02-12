@@ -19,7 +19,7 @@ class TemplateModificationForm extends TemplateCreationForm
 {
     use StandardDescriptionFieldsTrait;
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         parent::buildForm();
 

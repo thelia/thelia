@@ -80,7 +80,7 @@ class BaseModule implements BaseModuleInterface
      * @throws \Propel\Runtime\Exception\PropelException
      * @throws \Throwable
      */
-    public function activate($moduleModel = null)
+    public function activate($moduleModel = null): void
     {
         if (null === $moduleModel) {
             $moduleModel = $this->getModuleModel();
@@ -117,7 +117,7 @@ class BaseModule implements BaseModuleInterface
         }
     }
 
-    public function deActivate($moduleModel = null)
+    public function deActivate($moduleModel = null): void
     {
         if (null === $moduleModel) {
             $moduleModel = $this->getModuleModel();
@@ -159,7 +159,7 @@ class BaseModule implements BaseModuleInterface
         return null !== $this->request;
     }
 
-    public function setRequest(Request $request)
+    public function setRequest(Request $request): void
     {
         $this->request = $request;
     }
@@ -188,7 +188,7 @@ class BaseModule implements BaseModuleInterface
         return null !== $this->dispatcher;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
@@ -215,7 +215,7 @@ class BaseModule implements BaseModuleInterface
     /**
      * {@inheritdoc}
      */
-    public function setTitle(Module $module, $titles)
+    public function setTitle(Module $module, $titles): void
     {
         if (\is_array($titles)) {
             foreach ($titles as $locale => $title) {
@@ -251,7 +251,7 @@ class BaseModule implements BaseModuleInterface
     /**
      * {@inheritdoc}
      */
-    public static function setConfigValue($variableName, $variableValue, $valueLocale = null, $createIfNotExists = true)
+    public static function setConfigValue($variableName, $variableValue, $valueLocale = null, $createIfNotExists = true): void
     {
         ModuleConfigQuery::create()
             ->setConfigValue(self::getModuleId(), $variableName, $variableValue, $valueLocale, $createIfNotExists);
@@ -260,7 +260,7 @@ class BaseModule implements BaseModuleInterface
     /**
      * {@inheritdoc}
      */
-    public function deployImageFolder(Module $module, $folderPath, ConnectionInterface $con = null)
+    public function deployImageFolder(Module $module, $folderPath, ConnectionInterface $con = null): void
     {
         try {
             $directoryBrowser = new \DirectoryIterator($folderPath);
@@ -482,17 +482,17 @@ class BaseModule implements BaseModuleInterface
         return [];
     }
 
-    public static function configureContainer(ContainerConfigurator $containerConfigurator)
+    public static function configureContainer(ContainerConfigurator $containerConfigurator): void
     {
         // Override this method to configure the container for your module
     }
 
-    public static function configureServices(ServicesConfigurator $servicesConfigurator)
+    public static function configureServices(ServicesConfigurator $servicesConfigurator): void
     {
         // Override this method to configure the services for your module
     }
 
-    public static function loadConfiguration(ContainerBuilder $containerBuilder)
+    public static function loadConfiguration(ContainerBuilder $containerBuilder): void
     {
         // Override this method load more configuration for your module
     }
@@ -500,7 +500,7 @@ class BaseModule implements BaseModuleInterface
     /**
      * {@inheritdoc}
      */
-    public function install(ConnectionInterface $con = null)
+    public function install(ConnectionInterface $con = null): void
     {
         // Override this method to do something useful.
     }
@@ -508,7 +508,7 @@ class BaseModule implements BaseModuleInterface
     /**
      * {@inheritdoc}
      */
-    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
     {
         // Override this method to do something useful.
     }
@@ -525,7 +525,7 @@ class BaseModule implements BaseModuleInterface
     /**
      * {@inheritdoc}
      */
-    public function postActivation(ConnectionInterface $con = null)
+    public function postActivation(ConnectionInterface $con = null): void
     {
         // Override this method to do something useful.
     }
@@ -542,7 +542,7 @@ class BaseModule implements BaseModuleInterface
     /**
      * {@inheritdoc}
      */
-    public function postDeactivation(ConnectionInterface $con = null)
+    public function postDeactivation(ConnectionInterface $con = null): void
     {
         // Override this method to do something useful.
     }
@@ -550,7 +550,7 @@ class BaseModule implements BaseModuleInterface
     /**
      * {@inheritdoc}
      */
-    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
+    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false): void
     {
         // Override this method to do something useful.
     }
@@ -566,7 +566,7 @@ class BaseModule implements BaseModuleInterface
     /**
      * {@inheritdoc}
      */
-    public function registerHooks()
+    public function registerHooks(): void
     {
         $moduleHooks = $this->getHooks();
 
@@ -808,7 +808,7 @@ class BaseModule implements BaseModuleInterface
      * Add core translations of the module to use in `preActivation` and `postActivation`
      * when the module is not yest activated and translations are not available.
      */
-    private function initializeCoreI18n()
+    private function initializeCoreI18n(): void
     {
         if ($this->hasContainer()) {
             /** @var Translator $translator */

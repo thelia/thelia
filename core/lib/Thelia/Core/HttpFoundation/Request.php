@@ -45,7 +45,7 @@ class Request extends BaseRequest
         array $files = [],
         array $server = [],
         $content = null
-    ) {
+    ): void {
         parent::initialize($query, $request, $attributes, $cookies, $files, $server, $content);
 
         $this->resolvedPathInfo = null;
@@ -119,7 +119,7 @@ class Request extends BaseRequest
     /**
      * @param string $controllerType
      */
-    public function setControllerType($controllerType)
+    public function setControllerType($controllerType): void
     {
         $this->controllerType = $controllerType;
     }

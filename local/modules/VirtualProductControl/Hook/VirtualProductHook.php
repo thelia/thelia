@@ -37,7 +37,7 @@ class VirtualProductHook extends BaseHook
         $this->securityContext = $securityContext;
     }
 
-    public function onMainBeforeContent(HookRenderEvent $event)
+    public function onMainBeforeContent(HookRenderEvent $event): void
     {
         if ($this->securityContext->isGranted(
             ['ADMIN'],

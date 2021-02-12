@@ -45,7 +45,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
     /**
      * @param string $url the fully qualified CDN URL that will be used to create doucments URL
      */
-    public function setCdnBaseUrl($url)
+    public function setCdnBaseUrl($url): void
     {
         $this->cdnBaseUrl = $url;
     }
@@ -277,7 +277,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
      * @param string $source       the module code or ParserInterface::TEMPLATE_ASSETS_KEY
      * @param array  $pathList     the pathList that will be updated
      */
-    protected function getPossibleAssetSources($directories, $templateName, $source, &$pathList)
+    protected function getPossibleAssetSources($directories, $templateName, $source, &$pathList): void
     {
         if ($source !== ParserInterface::TEMPLATE_ASSETS_KEY) {
             // We're in a module.

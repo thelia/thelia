@@ -43,7 +43,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function create(CurrencyCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(CurrencyCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $currency = new CurrencyModel();
 
@@ -69,7 +69,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function update(CurrencyUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(CurrencyUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
             $currency
@@ -92,7 +92,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function setDefault(CurrencyUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function setDefault(CurrencyUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
             // Reset default status
@@ -116,7 +116,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function setVisible(CurrencyUpdateEvent $event)
+    public function setVisible(CurrencyUpdateEvent $event): void
     {
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
             if (!$currency->getByDefault()) {
@@ -130,7 +130,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function delete(CurrencyDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(CurrencyDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== ($currency = CurrencyQuery::create()->findPk($event->getCurrencyId()))) {
             if ($currency->getByDefault()) {
@@ -148,7 +148,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updateRates(CurrencyUpdateRateEvent $event)
+    public function updateRates(CurrencyUpdateRateEvent $event): void
     {
         if (null === $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(true)) {
             throw new \RuntimeException('Unable to find a default currency, please define a default currency.');
@@ -182,7 +182,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
      *
      * @param string $eventName
      */
-    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition(CurrencyQuery::create(), $event, $dispatcher);
     }

@@ -62,7 +62,7 @@ class VirtualProductDelivery extends AbstractDeliveryModuleWithState
         return true;
     }
 
-    public function postActivation(ConnectionInterface $con = null)
+    public function postActivation(ConnectionInterface $con = null): void
     {
         // create new message
         if (null === MessageQuery::create()->findOneByName('mail_virtualproduct')) {

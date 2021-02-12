@@ -42,7 +42,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
     /** @var array */
     protected $locales;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('generate:sql')
@@ -93,7 +93,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
         return 0;
     }
 
-    protected function init(InputInterface $input)
+    protected function init(InputInterface $input): void
     {
         $this->initRequest();
 
@@ -164,7 +164,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
      *
      * @throws \SmartyException
      */
-    protected function initParser()
+    protected function initParser(): void
     {
         $this->parser->unregisterPlugin('function', 'intl');
         $this->parser->registerPlugin('function', 'intl', [$this, 'translate']);

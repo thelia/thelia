@@ -23,7 +23,7 @@ use Thelia\Core\Translation\Translator;
 
 class ProductCombinationGenerationForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
         ->add('product_id', IntegerType::class, [
@@ -81,7 +81,7 @@ class ProductCombinationGenerationForm extends BaseForm
         ;
     }
 
-    public function checkAttributeAv($value, ExecutionContextInterface $context)
+    public function checkAttributeAv($value, ExecutionContextInterface $context): void
     {
         if (empty($value)) {
             $context->addViolation(

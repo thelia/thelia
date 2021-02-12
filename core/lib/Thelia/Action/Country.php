@@ -30,7 +30,7 @@ use Thelia\Model\CountryQuery;
  */
 class Country extends BaseAction implements EventSubscriberInterface
 {
-    public function create(CountryCreateEvent $event)
+    public function create(CountryCreateEvent $event): void
     {
         $country = new CountryModel();
 
@@ -47,7 +47,7 @@ class Country extends BaseAction implements EventSubscriberInterface
         $event->setCountry($country);
     }
 
-    public function update(CountryUpdateEvent $event)
+    public function update(CountryUpdateEvent $event): void
     {
         if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
             $country
@@ -68,7 +68,7 @@ class Country extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function delete(CountryDeleteEvent $event)
+    public function delete(CountryDeleteEvent $event): void
     {
         if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
             $country->delete();
@@ -77,7 +77,7 @@ class Country extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function toggleDefault(CountryToggleDefaultEvent $event)
+    public function toggleDefault(CountryToggleDefaultEvent $event): void
     {
         if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
             $country->toggleDefault();
@@ -91,7 +91,7 @@ class Country extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function toggleVisibility(CountryToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function toggleVisibility(CountryToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $country = $event->getCountry();
 

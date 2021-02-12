@@ -30,7 +30,7 @@ class ProductControllerTest extends ControllerTestBase
     /**
      * Use this method to build the container with the services that you need.
      */
-    protected function buildContainer(ContainerBuilder $container)
+    protected function buildContainer(ContainerBuilder $container): void
     {
         $parser = $this->getMockBuilder('Thelia\\Core\\Template\\ParserInterface')
             ->disableOriginalConstructor()
@@ -50,7 +50,7 @@ class ProductControllerTest extends ControllerTestBase
         return $controller;
     }
 
-    public function testAssociatePSEImage()
+    public function testAssociatePSEImage(): void
     {
         /**
          * Get a product sale elements which has a related product image.
@@ -97,7 +97,7 @@ class ProductControllerTest extends ControllerTestBase
         $this->assertFalse($isAssociated === $isNowAssociated);
     }
 
-    public function testAssociatePSEDocument()
+    public function testAssociatePSEDocument(): void
     {
         /**
          * Get a product sale elements which has a related product image.

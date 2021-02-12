@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class CartAddTest extends TestCase
 {
-    public function testSimpleAddingToCart()
+    public function testSimpleAddingToCart(): void
     {
     }
 }

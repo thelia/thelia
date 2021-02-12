@@ -70,7 +70,7 @@ class BrandTest extends TestCaseWithURLToolSetup
         return $event->getBrand();
     }
 
-    public function testCreateBrand()
+    public function testCreateBrand(): void
     {
         $event = new BrandCreateEvent();
         $event
@@ -89,7 +89,7 @@ class BrandTest extends TestCaseWithURLToolSetup
         $this->assertEquals('test create brand', $createdBrand->getTitle());
     }
 
-    public function testUpdateBrand()
+    public function testUpdateBrand(): void
     {
         $brand = $this->getRandomBrand();
 
@@ -116,7 +116,7 @@ class BrandTest extends TestCaseWithURLToolSetup
         $this->assertEquals('test update brand postscriptum', $updatedBrand->getPostscriptum());
     }
 
-    public function testDeleteBrand()
+    public function testDeleteBrand(): void
     {
         $brand = $this->getRandomBrand();
 
@@ -131,7 +131,7 @@ class BrandTest extends TestCaseWithURLToolSetup
         $this->assertTrue($deletedBrand->isDeleted());
     }
 
-    public function testBrandToggleVisibility()
+    public function testBrandToggleVisibility(): void
     {
         $brand = $this->getRandomBrand();
 
@@ -148,7 +148,7 @@ class BrandTest extends TestCaseWithURLToolSetup
         $this->assertEquals(!$visibility, $updatedBrand->getVisible());
     }
 
-    public function testUpdatePositionUp()
+    public function testUpdatePositionUp(): void
     {
         $this->resetBrandPosition();
 
@@ -172,7 +172,7 @@ class BrandTest extends TestCaseWithURLToolSetup
         $this->assertEquals($newPosition, $updatedBrand->getPosition(), sprintf('new position is %d, new position expected is %d for brand %d', $newPosition, $updatedBrand->getPosition(), $updatedBrand->getId()));
     }
 
-    public function testUpdatePositionDown()
+    public function testUpdatePositionDown(): void
     {
         $this->resetBrandPosition();
 
@@ -196,7 +196,7 @@ class BrandTest extends TestCaseWithURLToolSetup
         $this->assertEquals($newPosition, $updatedBrand->getPosition(), sprintf('new position is %d, new position expected is %d for brand %d', $newPosition, $updatedBrand->getPosition(), $updatedBrand->getId()));
     }
 
-    public function testUpdatePositionWithSpecificPosition()
+    public function testUpdatePositionWithSpecificPosition(): void
     {
         $this->resetBrandPosition();
 
@@ -221,7 +221,7 @@ class BrandTest extends TestCaseWithURLToolSetup
     /**
      * Reorder brand to have proper position.
      */
-    protected function resetBrandPosition()
+    protected function resetBrandPosition(): void
     {
         $brands = BrandQuery::create()->find();
         $counter = 1;

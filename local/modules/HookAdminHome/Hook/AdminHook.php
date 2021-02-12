@@ -24,7 +24,7 @@ use Thelia\Core\Hook\BaseHook;
  */
 class AdminHook extends BaseHook
 {
-    public function blockStatistics(HookRenderEvent $event)
+    public function blockStatistics(HookRenderEvent $event): void
     {
         if (1 == HookAdminHome::getConfigValue(HookAdminHome::ACTIVATE_STATS, 1)) {
             $event->add($this->render('block-statistics.html'));
@@ -33,14 +33,14 @@ class AdminHook extends BaseHook
         $event->add($this->render('hook-admin-home-config.html'));
     }
 
-    public function blockStatisticsJs(HookRenderEvent $event)
+    public function blockStatisticsJs(HookRenderEvent $event): void
     {
         if (1 == HookAdminHome::getConfigValue(HookAdminHome::ACTIVATE_STATS, 1)) {
             $event->add($this->render('block-statistics-js.html'));
         }
     }
 
-    public function blockSalesStatistics(HookRenderBlockEvent $event)
+    public function blockSalesStatistics(HookRenderBlockEvent $event): void
     {
         if (1 == HookAdminHome::getConfigValue(HookAdminHome::ACTIVATE_SALES, 1)) {
             $content = trim($this->render('block-sales-statistics.html'));
@@ -54,7 +54,7 @@ class AdminHook extends BaseHook
         }
     }
 
-    public function blockNews(HookRenderBlockEvent $event)
+    public function blockNews(HookRenderBlockEvent $event): void
     {
         if (1 == HookAdminHome::getConfigValue(HookAdminHome::ACTIVATE_NEWS, 1)) {
             $content = trim($this->render('block-news.html'));
@@ -68,7 +68,7 @@ class AdminHook extends BaseHook
         }
     }
 
-    public function blockTheliaInformation(HookRenderBlockEvent $event)
+    public function blockTheliaInformation(HookRenderBlockEvent $event): void
     {
         if (1 == HookAdminHome::getConfigValue(HookAdminHome::ACTIVATE_INFO, 1)) {
             $content = trim($this->render('block-thelia-information.html'));

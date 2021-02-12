@@ -22,7 +22,7 @@ use Thelia\Core\Translation\Translator;
  */
 class OperatorsTest extends TestCase
 {
-    public function testOperatorI18n()
+    public function testOperatorI18n(): void
     {
         /** @var Translator $stubTranslator */
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')

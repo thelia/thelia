@@ -94,7 +94,7 @@ class StateTest extends BaseAction
     /**
      * @depends testUpdate
      */
-    public function testDelete(StateModel $state)
+    public function testDelete(StateModel $state): void
     {
         $event = new StateDeleteEvent($state->getId());
 

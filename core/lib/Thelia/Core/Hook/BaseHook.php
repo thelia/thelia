@@ -87,7 +87,7 @@ abstract class BaseHook
      *
      * @param string $code
      */
-    public function insertTemplate(HookRenderEvent $event, $code)
+    public function insertTemplate(HookRenderEvent $event, $code): void
     {
         if (\array_key_exists($code, $this->templates)) {
             $templates = explode(';', $this->templates[$code]);
@@ -236,7 +236,7 @@ abstract class BaseHook
     /**
      * @param \Thelia\Module\BaseModule $module
      */
-    public function setModule($module)
+    public function setModule($module): void
     {
         $this->module = $module;
     }
@@ -249,7 +249,7 @@ abstract class BaseHook
         return $this->module;
     }
 
-    public function setParser(ParserInterface $parser)
+    public function setParser(ParserInterface $parser): void
     {
         $this->parser = $parser;
     }
@@ -403,7 +403,7 @@ abstract class BaseHook
      * @param string $value    list of the template to render or add.
      *                         eg: 'render:mytemplate.html;css:assets/css/mycss.css;js:assets/js/myjs.js'
      */
-    public function addTemplate($hookCode, $value)
+    public function addTemplate($hookCode, $value): void
     {
         if (\array_key_exists($hookCode, $this->templates)) {
             throw new \InvalidArgumentException(sprintf("The hook '%s' is already used in this class.", $hookCode));

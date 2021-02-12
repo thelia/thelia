@@ -82,7 +82,7 @@ class Country extends BaseCountry
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function toggleDefault()
+    public function toggleDefault(): void
     {
         if ($this->getId() === null) {
             throw new \RuntimeException('impossible to just uncheck default country, choose a new one');

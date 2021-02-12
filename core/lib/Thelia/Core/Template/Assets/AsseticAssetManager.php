@@ -80,7 +80,7 @@ class AsseticAssetManager implements AssetManagerInterface
      *
      * @throws \RuntimeException if a problem occurs
      */
-    protected function copyAssets(Filesystem $fs, $from_directory, $to_directory)
+    protected function copyAssets(Filesystem $fs, $from_directory, $to_directory): void
     {
         Tlog::getInstance()->addDebug("Copying assets from $from_directory to $to_directory");
 
@@ -147,7 +147,7 @@ class AsseticAssetManager implements AssetManagerInterface
      *
      * @throws \RuntimeException if something goes wrong
      */
-    public function prepareAssets($sourceAssetsDirectory, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey)
+    public function prepareAssets($sourceAssetsDirectory, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey): void
     {
         // Compute the absolute path of the output directory
         $to_directory = $this->getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey);
@@ -314,7 +314,7 @@ class AsseticAssetManager implements AssetManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function registerAssetFilter($filterIdentifier, $filter)
+    public function registerAssetFilter($filterIdentifier, $filter): void
     {
         $this->assetFilters[$filterIdentifier] = $filter;
     }

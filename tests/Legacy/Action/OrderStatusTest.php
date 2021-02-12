@@ -66,7 +66,7 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
      *
      * @covers \Thelia\Action\OrderStatus::create
      */
-    public function testCreateOrderStatus()
+    public function testCreateOrderStatus(): void
     {
         OrderStatusQuery::create()->filterByCode(['order_status_test', 'order_status_test2'], Criteria::IN)->delete();
 
@@ -94,7 +94,7 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
      *
      * @covers \Thelia\Action\OrderStatus::update
      */
-    public function testUpdateOrderStatusProtected()
+    public function testUpdateOrderStatusProtected(): void
     {
         if (null !== $find = OrderStatusQuery::create()->findOneByCode('paid_force_update')) {
             $find->setCode('paid')->save();
@@ -125,7 +125,7 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
      * @covers \Thelia\Action\OrderStatus::update
      * @depends testCreateOrderStatus
      */
-    public function testUpdateOrderStatusNotProtected()
+    public function testUpdateOrderStatusNotProtected(): void
     {
         $event = $this->getUpdateEvent(OrderStatusQuery::create()->findOneByCode('order_status_test'));
 
@@ -148,7 +148,7 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
      * @covers \Thelia\Action\OrderStatus::delete
      * @depends testUpdateOrderStatusNotProtected
      */
-    public function testDeleteOrderStatus()
+    public function testDeleteOrderStatus(): void
     {
         $orderStatus = OrderStatusQuery::create()->findOneByCode('order_status_test2');
 
@@ -168,7 +168,7 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
      * @covers \Thelia\Action\OrderStatus::delete
      * @depends testUpdateOrderStatusProtected
      */
-    public function testDeleteOrderStatusProtected()
+    public function testDeleteOrderStatusProtected(): void
     {
         $orderStatus = OrderStatusQuery::create()->findOneByCode('paid');
 
@@ -189,7 +189,7 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
      * @covers \Thelia\Action\OrderStatus::delete
      * @depends testUpdateOrderStatusNotProtected
      */
-    public function testDeleteOrderStatusWithOrders()
+    public function testDeleteOrderStatusWithOrders(): void
     {
         $orderStatus = OrderStatusQuery::create()->findOneByCode('paid');
 
@@ -209,7 +209,7 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
      *
      * @covers \Thelia\Action\OrderStatus::updatePosition
      */
-    public function testUpdatePositionUp()
+    public function testUpdatePositionUp(): void
     {
         $orderStatus = OrderStatusQuery::create()
             ->filterByPosition(2)

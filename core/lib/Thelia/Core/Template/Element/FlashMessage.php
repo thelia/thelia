@@ -28,7 +28,7 @@ class FlashMessage implements \Iterator
         $this->collection = [];
     }
 
-    public function add($type, $messages)
+    public function add($type, $messages): void
     {
         foreach ($messages as $message) {
             $this->collection[] = [
@@ -38,7 +38,7 @@ class FlashMessage implements \Iterator
         }
     }
 
-    public function addAll($all)
+    public function addAll($all): void
     {
         foreach ($all as $type => $messages) {
             $this->add($type, $messages);
@@ -76,7 +76,7 @@ class FlashMessage implements \Iterator
      *
      * @return void any returned value is ignored
      */
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
@@ -116,7 +116,7 @@ class FlashMessage implements \Iterator
      *
      * @return void any returned value is ignored
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }

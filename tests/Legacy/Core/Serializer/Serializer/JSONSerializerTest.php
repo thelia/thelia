@@ -38,31 +38,31 @@ class JSONSerializerTest extends TestCase
         $this->sut = new SUT();
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertIsString($this->sut->getId());
         $this->assertEquals('thelia.json', $this->sut->getId());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertIsString($this->sut->getName());
         $this->assertEquals('JSON', $this->sut->getName());
     }
 
-    public function testGetExtension()
+    public function testGetExtension(): void
     {
         $this->assertIsString($this->sut->getExtension());
         $this->assertEquals('json', $this->sut->getExtension());
     }
 
-    public function testGetMimeType()
+    public function testGetMimeType(): void
     {
         $this->assertIsString($this->sut->getMimeType());
         $this->assertEquals('application/json', $this->sut->getMimeType());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $stdClass = new \stdClass();
         $stdClass->key = 'value';
@@ -93,7 +93,7 @@ class JSONSerializerTest extends TestCase
         }
     }
 
-    public function testSeparator()
+    public function testSeparator(): void
     {
         $this->assertIsString($this->sut->separator());
         $this->assertEquals(','.PHP_EOL, $this->sut->separator());

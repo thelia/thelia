@@ -32,7 +32,7 @@ use TheliaMigrateCountry\Events\MigrateCountryEvents;
  */
 class MigrateCountryListener implements EventSubscriberInterface
 {
-    public function migrateCountry(MigrateCountryEvent $event)
+    public function migrateCountry(MigrateCountryEvent $event): void
     {
         $counter = [];
 
@@ -120,7 +120,7 @@ class MigrateCountryListener implements EventSubscriberInterface
         }
     }
 
-    private function setCountriesVisibility(MigrateCountryEvent $event)
+    private function setCountriesVisibility(MigrateCountryEvent $event): void
     {
         $oldCountry = CountryQuery::create()->findPk($event->getCountry());
 

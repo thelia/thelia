@@ -44,7 +44,7 @@ class Cache extends BaseAction implements EventSubscriberInterface
         $this->adapter = $adapter;
     }
 
-    public function cacheClear(CacheEvent $event)
+    public function cacheClear(CacheEvent $event): void
     {
         if (!$event->isOnKernelTerminate()) {
             $this->execCacheClear($event);
@@ -65,14 +65,14 @@ class Cache extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function onTerminate()
+    public function onTerminate(): void
     {
         foreach ($this->onTerminateCacheClearEvents as $cacheEvent) {
             $this->execCacheClear($cacheEvent);
         }
     }
 
-    protected function execCacheClear(CacheEvent $event)
+    protected function execCacheClear(CacheEvent $event): void
     {
         $this->adapter->clear();
 

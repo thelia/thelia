@@ -24,7 +24,7 @@ use Thelia\Model\StateQuery;
  */
 trait CountryListValidationTrait
 {
-    public function verifyCountryList($value, ExecutionContextInterface $context)
+    public function verifyCountryList($value, ExecutionContextInterface $context): void
     {
         $countryList = \is_array($value) ? $value : [$value];
 

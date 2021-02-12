@@ -50,7 +50,7 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
      *
      * @return void any returned value is ignored
      */
-    public function next()
+    public function next(): void
     {
         next($this->conditions);
     }
@@ -95,7 +95,7 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
      *
      * @return void any returned value is ignored
      */
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->conditions);
     }
@@ -160,7 +160,7 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
      *
      * @return void
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (\is_null($offset)) {
             $this->conditions[] = $value;
@@ -180,7 +180,7 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
      *
      * @return void
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->conditions[$offset]);
     }

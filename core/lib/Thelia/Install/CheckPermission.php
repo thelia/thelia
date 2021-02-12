@@ -338,7 +338,7 @@ class CheckPermission extends BaseInstall
         $base = log($bytes) / log(1024);
         $suffixes = ['', 'k', 'M', 'G', 'T'];
 
-        return round(pow(1024, $base - floor($base)), $precision).$suffixes[floor($base)];
+        return round(1024 ** ($base - floor($base)), $precision).$suffixes[floor($base)];
     }
 
     protected function formatString($string, $parameters = [])

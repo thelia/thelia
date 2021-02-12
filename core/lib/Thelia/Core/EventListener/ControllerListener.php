@@ -34,7 +34,7 @@ class ControllerListener implements EventSubscriberInterface
         $this->securityContext = $securityContext;
     }
 
-    public function adminFirewall(ControllerEvent $event)
+    public function adminFirewall(ControllerEvent $event): void
     {
         $controller = $event->getController();
         //check if an admin is logged in

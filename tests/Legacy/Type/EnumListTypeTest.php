@@ -20,7 +20,7 @@ use Thelia\Type\EnumListType;
  */
 class EnumListTypeTest extends TestCase
 {
-    public function testEnumListType()
+    public function testEnumListType(): void
     {
         $enumListType = new EnumListType(['cat', 'dog', 'frog']);
         $this->assertTrue($enumListType->isValid('cat'));
@@ -29,7 +29,7 @@ class EnumListTypeTest extends TestCase
         $this->assertFalse($enumListType->isValid('cat,monkey'));
     }
 
-    public function testFormatEnumListType()
+    public function testFormatEnumListType(): void
     {
         $enumListType = new EnumListType(['cat', 'dog', 'frog']);
         $this->assertIsArray($enumListType->getFormattedValue('cat,dog'));

@@ -101,7 +101,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         return \intval($result) + 1;
     }
 
-    public function createModuleHook(ModuleHookCreateEvent $event)
+    public function createModuleHook(ModuleHookCreateEvent $event): void
     {
         $moduleHook = new ModuleHookModel();
 
@@ -127,7 +127,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         $event->setModuleHook($moduleHook);
     }
 
-    public function updateModuleHook(ModuleHookUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updateModuleHook(ModuleHookUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $moduleHook = ModuleHookQuery::create()->findPk($event->getModuleHookId())) {
             // todo: test if classname and method exists
@@ -147,7 +147,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function deleteModuleHook(ModuleHookDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function deleteModuleHook(ModuleHookDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $moduleHook = ModuleHookQuery::create()->findPk($event->getModuleHookId())) {
             $moduleHook->delete();
@@ -198,7 +198,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         return $event;
     }
 
-    public function updateHook(HookUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updateHook(HookUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if ($event->hasHook()) {
             $hook = $event->getHook();
@@ -209,7 +209,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function toggleHookActivation(HookToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function toggleHookActivation(HookToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if ($event->hasHook()) {
             $hook = $event->getHook();
@@ -220,7 +220,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    protected function cacheClear(EventDispatcherInterface $dispatcher)
+    protected function cacheClear(EventDispatcherInterface $dispatcher): void
     {
         $cacheEvent = new CacheEvent($this->cacheDir);
 

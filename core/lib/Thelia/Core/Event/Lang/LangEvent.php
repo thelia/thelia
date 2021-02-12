@@ -34,7 +34,7 @@ class LangEvent extends ActionEvent
         $this->lang = $lang;
     }
 
-    public function setLang(Lang $lang)
+    public function setLang(Lang $lang): void
     {
         $this->lang = $lang;
     }

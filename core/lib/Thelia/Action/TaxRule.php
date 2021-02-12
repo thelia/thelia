@@ -24,7 +24,7 @@ use Thelia\Model\TaxRuleQuery;
 
 class TaxRule extends BaseAction implements EventSubscriberInterface
 {
-    public function create(TaxRuleEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(TaxRuleEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $taxRule = new TaxRuleModel();
 
@@ -39,7 +39,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
         $event->setTaxRule($taxRule)->setId($taxRule->getId());
     }
 
-    public function update(TaxRuleEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(TaxRuleEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
             $taxRule
@@ -53,7 +53,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updateTaxes(TaxRuleEvent $event)
+    public function updateTaxes(TaxRuleEvent $event): void
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
             $taxList = $this->getArrayFromJson($event->getTaxList());
@@ -148,7 +148,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
         return $obj;
     }
 
-    public function delete(TaxRuleEvent $event)
+    public function delete(TaxRuleEvent $event): void
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
             $taxRule
@@ -159,7 +159,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function setDefault(TaxRuleEvent $event)
+    public function setDefault(TaxRuleEvent $event): void
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
             TaxRuleQuery::create()->update([

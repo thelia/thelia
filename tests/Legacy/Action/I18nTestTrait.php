@@ -31,7 +31,7 @@ trait I18nTestTrait
      * @param array $fields     list of field to populate
      * @param array $localeList list of locale to use populate the object
      */
-    protected function setI18n(&$object, $fields = ['Title'], $localeList = null)
+    protected function setI18n(&$object, $fields = ['Title'], $localeList = null): void
     {
         if (null === $localeList) {
             if (null === self::$localeList) {

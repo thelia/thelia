@@ -25,7 +25,7 @@ abstract class ActionEvent extends Event
 {
     protected $parameters = [];
 
-    public function __set($name, $value)
+    public function __set($name, $value): void
     {
         $this->parameters[$name] = $value;
     }
@@ -39,7 +39,7 @@ abstract class ActionEvent extends Event
         return null;
     }
 
-    public function bindForm(Form $form)
+    public function bindForm(Form $form): void
     {
         $fields = $form->getIterator();
 

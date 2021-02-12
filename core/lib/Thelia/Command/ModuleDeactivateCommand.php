@@ -33,7 +33,7 @@ use Thelia\Module\BaseModule;
  */
 class ModuleDeactivateCommand extends BaseModuleGenerate
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('module:deactivate')

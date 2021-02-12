@@ -23,28 +23,28 @@ use TheliaSmarty\Template\Plugins\Render;
  */
 class RenderTest extends SmartyPluginTestCase
 {
-    public function testRenderWithoutParams()
+    public function testRenderWithoutParams(): void
     {
         $data = $this->render('test.html');
 
         $this->assertEquals('Hello, world!', $data);
     }
 
-    public function testRenderWithParams()
+    public function testRenderWithParams(): void
     {
         $data = $this->render('testParams.html');
 
         $this->assertEquals('Hello, world!', $data);
     }
 
-    public function testMethodParameter()
+    public function testMethodParameter(): void
     {
         $data = $this->render('testMethod.html');
 
         $this->assertEquals('PUT', $data);
     }
 
-    public function testQueryArrayParamater()
+    public function testQueryArrayParamater(): void
     {
         $this->smarty->assign('query', ['foo' => 'bar']);
         $data = $this->render('testQueryArray.html');
@@ -52,14 +52,14 @@ class RenderTest extends SmartyPluginTestCase
         $this->assertEquals('bar', $data);
     }
 
-    public function testQueryStringParamater()
+    public function testQueryStringParamater(): void
     {
         $data = $this->render('testQueryString.html');
 
         $this->assertEquals('bar', $data);
     }
 
-    public function testRequestParamater()
+    public function testRequestParamater(): void
     {
         $data = $this->render('testRequest.html');
 

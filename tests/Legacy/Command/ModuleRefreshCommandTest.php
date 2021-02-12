@@ -37,7 +37,7 @@ class ModuleRefreshCommandTest extends TestCase
     /**
      * Test ModuleRefreshCommand.
      */
-    public function testModuleRefreshCommand()
+    public function testModuleRefreshCommand(): void
     {
         $moduleManagement = new ModuleManagement($this->getContainer());
         $moduleManagement->updateModules($this->getContainer());

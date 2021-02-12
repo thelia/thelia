@@ -56,7 +56,7 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
     /**
      * @throws \Exception
      */
-    public function next()
+    public function next(): void
     {
         $this->data->getIterator()->next();
         if (!$this->valid() && !$this->data->isLastPage()) {
@@ -68,7 +68,7 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
     /**
      * @throws \Exception
      */
-    public function rewind()
+    public function rewind(): void
     {
         if ($this->data === null) {
             $data = $this->getData();

@@ -86,7 +86,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new product entry.
      */
-    public function create(ProductCreateEvent $event)
+    public function create(ProductCreateEvent $event): void
     {
         $defaultTaxRuleId = null;
         if (null !== $defaultTaxRule = TaxRuleQuery::create()->findOneByIsDefault(true)) {
@@ -125,7 +125,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * @throws \Exception
      */
-    public function cloneProduct(ProductCloneEvent $event)
+    public function cloneProduct(ProductCloneEvent $event): void
     {
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
         $con->beginTransaction();
@@ -174,7 +174,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function createClone(ProductCloneEvent $event, ProductI18n $originalProductDefaultI18n, ProductPrice $originalProductDefaultPrice)
+    public function createClone(ProductCloneEvent $event, ProductI18n $originalProductDefaultI18n, ProductPrice $originalProductDefaultPrice): void
     {
         // Build event and dispatch creation of the clone product
         $createCloneEvent = new ProductCreateEvent();
@@ -195,7 +195,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         $event->setClonedProduct($createCloneEvent->getProduct());
     }
 
-    public function updateClone(ProductCloneEvent $event, ProductPrice $originalProductDefaultPrice)
+    public function updateClone(ProductCloneEvent $event, ProductPrice $originalProductDefaultPrice): void
     {
         // Get original product's I18ns
         $originalProductI18ns = ProductI18nQuery::create()
@@ -247,7 +247,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         $this->eventDispatcher->dispatch($clonedProductUpdateTemplateEvent, TheliaEvents::PRODUCT_SET_TEMPLATE);
     }
 
-    public function cloneFeatureCombination(ProductCloneEvent $event)
+    public function cloneFeatureCombination(ProductCloneEvent $event): void
     {
         // Get original product FeatureProduct list
         $originalProductFeatureList = FeatureProductQuery::create()
@@ -281,7 +281,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function cloneAssociatedContent(ProductCloneEvent $event)
+    public function cloneAssociatedContent(ProductCloneEvent $event): void
     {
         // Get original product associated contents
         $originalProductAssocConts = ProductAssociatedContentQuery::create()
@@ -295,7 +295,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function cloneAccessories(ProductCloneEvent $event)
+    public function cloneAccessories(ProductCloneEvent $event): void
     {
         // Get original product accessories
         $originalProductAccessoryList = AccessoryQuery::create()
@@ -309,7 +309,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function cloneAdditionalCategories(ProductCloneEvent $event)
+    public function cloneAdditionalCategories(ProductCloneEvent $event): void
     {
         // Get original product additional categories
         $originalProductAdditionalCategoryList = ProductCategoryQuery::create()
@@ -335,7 +335,7 @@ class Product extends BaseAction implements EventSubscriberInterface
      * @throws PropelException
      * @throws \Exception
      */
-    public function update(ProductUpdateEvent $event)
+    public function update(ProductUpdateEvent $event): void
     {
         if (null !== $product = ProductQuery::create()->findPk($event->getProductId())) {
             $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
@@ -391,7 +391,7 @@ class Product extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    public function delete(ProductDeleteEvent $event)
+    public function delete(ProductDeleteEvent $event): void
     {
         if (null !== $product = ProductQuery::create()->findPk($event->getProductId())) {
             $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
@@ -435,7 +435,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Toggle product visibility. No form used here.
      */
-    public function toggleVisibility(ProductToggleVisibilityEvent $event)
+    public function toggleVisibility(ProductToggleVisibilityEvent $event): void
     {
         $product = $event->getProduct();
 
@@ -452,7 +452,7 @@ class Product extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdateDelegatePosition(
             ProductCategoryQuery::create()
@@ -463,7 +463,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         );
     }
 
-    public function addContent(ProductAddContentEvent $event)
+    public function addContent(ProductAddContentEvent $event): void
     {
         if (ProductAssociatedContentQuery::create()
             ->filterByContentId($event->getContentId())
@@ -478,7 +478,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function removeContent(ProductDeleteContentEvent $event)
+    public function removeContent(ProductDeleteContentEvent $event): void
     {
         $content = ProductAssociatedContentQuery::create()
             ->filterByContentId($event->getContentId())
@@ -492,7 +492,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function addCategory(ProductAddCategoryEvent $event)
+    public function addCategory(ProductAddCategoryEvent $event): void
     {
         if (ProductCategoryQuery::create()
             ->filterByProduct($event->getProduct())
@@ -509,7 +509,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function removeCategory(ProductDeleteCategoryEvent $event)
+    public function removeCategory(ProductDeleteCategoryEvent $event): void
     {
         $productCategory = ProductCategoryQuery::create()
             ->filterByProduct($event->getProduct())
@@ -521,7 +521,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function addAccessory(ProductAddAccessoryEvent $event)
+    public function addAccessory(ProductAddAccessoryEvent $event): void
     {
         if (AccessoryQuery::create()
             ->filterByAccessory($event->getAccessoryId())
@@ -536,7 +536,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function removeAccessory(ProductDeleteAccessoryEvent $event)
+    public function removeAccessory(ProductDeleteAccessoryEvent $event): void
     {
         $accessory = AccessoryQuery::create()
             ->filterByAccessory($event->getAccessoryId())
@@ -550,7 +550,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function setProductTemplate(ProductSetTemplateEvent $event)
+    public function setProductTemplate(ProductSetTemplateEvent $event): void
     {
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
 
@@ -673,7 +673,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Update the value of a product feature.
      */
-    public function updateFeatureProductValue(FeatureProductUpdateEvent $event)
+    public function updateFeatureProductValue(FeatureProductUpdateEvent $event): void
     {
         // Prepare the FeatureAv's ID
         $featureAvId = $event->getFeatureValue();
@@ -775,7 +775,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product feature value.
      */
-    public function deleteFeatureProductValue(FeatureProductDeleteEvent $event)
+    public function deleteFeatureProductValue(FeatureProductDeleteEvent $event): void
     {
         FeatureProductQuery::create()
             ->filterByProductId($event->getProductId())
@@ -784,7 +784,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         ;
     }
 
-    public function deleteImagePSEAssociations(FileDeleteEvent $event)
+    public function deleteImagePSEAssociations(FileDeleteEvent $event): void
     {
         $model = $event->getFileToDelete();
 
@@ -793,7 +793,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function deleteDocumentPSEAssociations(FileDeleteEvent $event)
+    public function deleteDocumentPSEAssociations(FileDeleteEvent $event): void
     {
         $model = $event->getFileToDelete();
 
@@ -807,7 +807,7 @@ class Product extends BaseAction implements EventSubscriberInterface
      *
      * @param string $eventName
      */
-    public function deleteTemplateFeature(TemplateDeleteFeatureEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function deleteTemplateFeature(TemplateDeleteFeatureEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         // Detete the removed feature in all products which are using this template
         $products = ProductQuery::create()
@@ -829,7 +829,7 @@ class Product extends BaseAction implements EventSubscriberInterface
      *
      * @param string $eventName
      */
-    public function deleteTemplateAttribute(TemplateDeleteAttributeEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function deleteTemplateAttribute(TemplateDeleteAttributeEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         // Detete the removed attribute in all products which are using this template
         $pseToDelete = ProductSaleElementsQuery::create()
@@ -860,7 +860,7 @@ class Product extends BaseAction implements EventSubscriberInterface
      *
      * @param string $eventName
      */
-    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if ($event->getView() == 'product') {
             $product = ProductQuery::create()
@@ -877,7 +877,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * @throws NotFoundHttpException
      */
-    public function viewProductIdNotVisible(ViewCheckEvent $event)
+    public function viewProductIdNotVisible(ViewCheckEvent $event): void
     {
         throw new NotFoundHttpException();
     }

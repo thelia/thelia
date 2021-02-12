@@ -43,7 +43,7 @@ class Template extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function create(TemplateCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(TemplateCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $template = new TemplateModel();
 
@@ -64,7 +64,7 @@ class Template extends BaseAction implements EventSubscriberInterface
      * @param \Thelia\Core\Event\Template\TemplateCreateEvent $event
      * @param $eventName
      */
-    public function duplicate(TemplateDuplicateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function duplicate(TemplateDuplicateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $source = TemplateQuery::create()->findPk($event->getSourceTemplateId())) {
             $source->setLocale($event->getLocale());
@@ -109,7 +109,7 @@ class Template extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function update(TemplateUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(TemplateUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $template = TemplateQuery::create()->findPk($event->getTemplateId())) {
             $template
@@ -129,7 +129,7 @@ class Template extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    public function delete(TemplateDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(TemplateDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== ($template = TemplateQuery::create()->findPk($event->getTemplateId()))) {
             // Check if template is used by a product
@@ -165,7 +165,7 @@ class Template extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function addAttribute(TemplateAddAttributeEvent $event)
+    public function addAttribute(TemplateAddAttributeEvent $event): void
     {
         if (null === AttributeTemplateQuery::create()
                 ->filterByAttributeId($event->getAttributeId())
@@ -186,7 +186,7 @@ class Template extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function updateAttributePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updateAttributePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition(AttributeTemplateQuery::create(), $event, $dispatcher);
     }
@@ -196,12 +196,12 @@ class Template extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function updateFeaturePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updateFeaturePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition(FeatureTemplateQuery::create(), $event, $dispatcher);
     }
 
-    public function deleteAttribute(TemplateDeleteAttributeEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function deleteAttribute(TemplateDeleteAttributeEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $attributeTemplate = AttributeTemplateQuery::create()
             ->filterByAttributeId($event->getAttributeId())
@@ -218,7 +218,7 @@ class Template extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function addFeature(TemplateAddFeatureEvent $event)
+    public function addFeature(TemplateAddFeatureEvent $event): void
     {
         if (null === FeatureTemplateQuery::create()
                 ->filterByFeatureId($event->getFeatureId())
@@ -235,7 +235,7 @@ class Template extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function deleteFeature(TemplateDeleteFeatureEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function deleteFeature(TemplateDeleteFeatureEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $featureTemplate = FeatureTemplateQuery::create()
             ->filterByFeatureId($event->getFeatureId())

@@ -46,7 +46,7 @@ class CouponCreationForm extends BaseForm
      *
      * @return void
      */
-    protected function buildForm()
+    protected function buildForm(): void
     {
         // Create countries and shipping modules list
         $countries = [0 => '   '];
@@ -228,7 +228,7 @@ class CouponCreationForm extends BaseForm
             )
         ;
 
-        $this->formBuilder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+        $this->formBuilder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
             $data = $event->getData();
 
             if (isset($data['coupon_specific'])) {
@@ -244,7 +244,7 @@ class CouponCreationForm extends BaseForm
      *
      * @param string $value
      */
-    public function checkDuplicateCouponCode($value, ExecutionContextInterface $context)
+    public function checkDuplicateCouponCode($value, ExecutionContextInterface $context): void
     {
         $exists = CouponQuery::create()->filterByCode($value)->count() > 0;
 
@@ -258,7 +258,7 @@ class CouponCreationForm extends BaseForm
         }
     }
 
-    public function checkCouponCodeChangedAndDoesntExists($value, ExecutionContextInterface $context)
+    public function checkCouponCodeChangedAndDoesntExists($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 
@@ -280,7 +280,7 @@ class CouponCreationForm extends BaseForm
      *
      * @param string $value
      */
-    public function checkLocalizedDate($value, ExecutionContextInterface $context)
+    public function checkLocalizedDate($value, ExecutionContextInterface $context): void
     {
         $format = LangQuery::create()->findOneByByDefault(true)->getDatetimeFormat();
 
@@ -300,7 +300,7 @@ class CouponCreationForm extends BaseForm
     /**
      * @param $value
      */
-    public function checkConsistencyDates($value, ExecutionContextInterface $context)
+    public function checkConsistencyDates($value, ExecutionContextInterface $context): void
     {
         if (null === $startDate = $this->getForm()->get('startDate')->getData()) {
             return;

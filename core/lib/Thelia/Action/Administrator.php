@@ -40,7 +40,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
     /**
      * @param $eventName
      */
-    public function create(AdministratorEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(AdministratorEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $administrator = new AdminModel();
 
@@ -62,7 +62,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
     /**
      * @param $eventName
      */
-    public function update(AdministratorEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(AdministratorEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $administrator = AdminQuery::create()->findPk($event->getId())) {
             $administrator
@@ -84,7 +84,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function delete(AdministratorEvent $event)
+    public function delete(AdministratorEvent $event): void
     {
         if (null !== $administrator = AdminQuery::create()->findPk($event->getId())) {
             $administrator
@@ -95,7 +95,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updatePassword(AdministratorUpdatePasswordEvent $event)
+    public function updatePassword(AdministratorUpdatePasswordEvent $event): void
     {
         $admin = $event->getAdmin();
 
@@ -105,7 +105,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
             ->save();
     }
 
-    public function createPassword(AdministratorEvent $event)
+    public function createPassword(AdministratorEvent $event): void
     {
         $admin = $event->getAdministrator();
 

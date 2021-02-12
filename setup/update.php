@@ -261,7 +261,7 @@ function joinPaths()
     return $path;
 }
 
-function cliOutput($message, $type = null)
+function cliOutput($message, $type = null): void
 {
     switch ($type) {
         case 'success':

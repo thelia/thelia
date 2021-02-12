@@ -26,7 +26,7 @@ use Thelia\Model\Lang;
  */
 class SaleCreationForm extends BaseForm
 {
-    protected function doBuildForm($titleFieldHelpLabel)
+    protected function doBuildForm($titleFieldHelpLabel): void
     {
         $this->formBuilder->add(
             'title',
@@ -70,7 +70,7 @@ class SaleCreationForm extends BaseForm
         );
     }
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->doBuildForm(
             Translator::getInstance()->trans(

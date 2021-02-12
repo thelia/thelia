@@ -102,7 +102,7 @@ class TokenProvider
         return true;
     }
 
-    protected function refreshToken()
+    protected function refreshToken(): void
     {
         $this->token = null;
         $this->assignToken();
@@ -152,8 +152,8 @@ class TokenProvider
      */
     protected static function getComplexRandom()
     {
-        $firstValue = (float) (mt_rand(1, 0xFFFF) * rand(1, 0x10001));
-        $secondValues = (float) (rand(1, 0xFFFF) * mt_rand(1, 0x10001));
+        $firstValue = (float) (random_int(1, 0xFFFF) * random_int(1, 0x10001));
+        $secondValues = (float) (random_int(1, 0xFFFF) * random_int(1, 0x10001));
 
         return microtime().ceil($firstValue / $secondValues).uniqid();
     }

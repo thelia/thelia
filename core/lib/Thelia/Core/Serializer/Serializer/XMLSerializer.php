@@ -98,7 +98,7 @@ class XMLSerializer extends AbstractSerializer
         return $this;
     }
 
-    public function prepareFile(\SplFileObject $fileObject)
+    public function prepareFile(\SplFileObject $fileObject): void
     {
         $this->xmlDataStart = null;
 
@@ -123,7 +123,7 @@ class XMLSerializer extends AbstractSerializer
         return PHP_EOL;
     }
 
-    public function finalizeFile(\SplFileObject $fileObject)
+    public function finalizeFile(\SplFileObject $fileObject): void
     {
         $fileObject->fwrite(PHP_EOL.'</'.$this->rootNodeName.'>');
     }

@@ -55,7 +55,7 @@ class FileDownloader implements FileDownloaderInterface
      *
      * Downloads the file $url in $pathToStore
      */
-    public function download($url, $pathToStore)
+    public function download($url, $pathToStore): void
     {
         if (!URL::checkUrl($url)) {
             /*

@@ -25,7 +25,7 @@ class CreateAdminUser extends ContainerAwareCommand
     /**
      * Configure the command.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('admin:create')

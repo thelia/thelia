@@ -35,7 +35,7 @@ class ProductDocument extends BaseProductDocument implements BreadcrumbInterface
      *
      * @param ProductDocumentQuery $query
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByProduct($this->getProduct());
     }

@@ -27,7 +27,7 @@ class MessageModificationForm extends BaseForm
         return 'thelia_message_modification';
     }
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('id', HiddenType::class, [

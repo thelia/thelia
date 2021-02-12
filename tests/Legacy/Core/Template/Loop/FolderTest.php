@@ -30,7 +30,7 @@ class FolderTest extends BaseLoopTestor
         return [];
     }
 
-    public function testSearchById()
+    public function testSearchById(): void
     {
         $folder = FolderQuery::create()->findOne();
         if (null === $folder) {
@@ -48,7 +48,7 @@ class FolderTest extends BaseLoopTestor
         $this->baseTestSearchById($folder->getId(), $otherParameters);
     }
 
-    public function testSearchLimit()
+    public function testSearchLimit(): void
     {
         $this->baseTestSearchWithLimit(3);
     }

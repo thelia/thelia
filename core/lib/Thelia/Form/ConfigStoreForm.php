@@ -22,7 +22,7 @@ use Thelia\Model\ConfigQuery;
 
 class ConfigStoreForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $tr = Translator::getInstance();
 
@@ -253,7 +253,7 @@ class ConfigStoreForm extends BaseForm
             );
     }
 
-    public function checkEmailList($value, ExecutionContextInterface $context)
+    public function checkEmailList($value, ExecutionContextInterface $context): void
     {
         $list = preg_split('/[,;]/', $value);
 

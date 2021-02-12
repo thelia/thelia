@@ -199,7 +199,7 @@ class OrderTest extends BaseAction
         return $cart;
     }
 
-    public function testSetDeliveryAddress()
+    public function testSetDeliveryAddress(): void
     {
         //$validAddressId = AddressQuery::create()->findOneByCustomerId($this->customer->getId());
 
@@ -213,7 +213,7 @@ class OrderTest extends BaseAction
         );
     }
 
-    public function testSetinvoiceAddress()
+    public function testSetinvoiceAddress(): void
     {
         $this->orderEvent->setInvoiceAddress(654);
 
@@ -225,7 +225,7 @@ class OrderTest extends BaseAction
         );
     }
 
-    public function testSetDeliveryModule()
+    public function testSetDeliveryModule(): void
     {
         $this->orderEvent->setDeliveryModule(123);
 
@@ -237,7 +237,7 @@ class OrderTest extends BaseAction
         );
     }
 
-    public function testSetPaymentModule()
+    public function testSetPaymentModule(): void
     {
         $this->orderEvent->setPaymentModule(456);
 
@@ -512,7 +512,7 @@ class OrderTest extends BaseAction
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function testUpdateStatus(OrderModel $order)
+    public function testUpdateStatus(OrderModel $order): void
     {
         // Set Status to "not paid"
         $newStatusId = OrderStatusQuery::getNotPaidStatus()->getId();
@@ -584,7 +584,7 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      */
-    public function testModelUpdateStatusPaidWithHelpers(OrderModel $order)
+    public function testModelUpdateStatusPaidWithHelpers(OrderModel $order): void
     {
         $order->setPaid();
 
@@ -601,7 +601,7 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      */
-    public function testModelUpdateStatusNotPaidWithHelpers(OrderModel $order)
+    public function testModelUpdateStatusNotPaidWithHelpers(OrderModel $order): void
     {
         $order->setNotPaid();
 
@@ -618,7 +618,7 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      */
-    public function testModelUpdateStatusProcessedWithHelpers(OrderModel $order)
+    public function testModelUpdateStatusProcessedWithHelpers(OrderModel $order): void
     {
         $order->setProcessing();
 
@@ -635,7 +635,7 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      */
-    public function testModelUpdateStatusSentWithHelpers(OrderModel $order)
+    public function testModelUpdateStatusSentWithHelpers(OrderModel $order): void
     {
         $order->setSent();
 
@@ -652,7 +652,7 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      */
-    public function testModelUpdateStatusCanceledWithHelpers(OrderModel $order)
+    public function testModelUpdateStatusCanceledWithHelpers(OrderModel $order): void
     {
         $order->setCancelled();
 
@@ -669,7 +669,7 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      */
-    public function testUpdateTransactionRef(OrderModel $order)
+    public function testUpdateTransactionRef(OrderModel $order): void
     {
         $transactionRef = uniqid('TRANSREF');
         $this->orderEvent->setTransactionRef($transactionRef);
@@ -690,7 +690,7 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      */
-    public function testUpdateDeliveryRef(OrderModel $order)
+    public function testUpdateDeliveryRef(OrderModel $order): void
     {
         $deliveryRef = uniqid('DELREF');
         $this->orderEvent->setDeliveryRef($deliveryRef);
@@ -711,7 +711,7 @@ class OrderTest extends BaseAction
     /**
      * @depends testCreate
      */
-    public function testUpdateAddress(OrderModel $order)
+    public function testUpdateAddress(OrderModel $order): void
     {
         $orderAddress = OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId());
         $title = $orderAddress->getCustomerTitleId() == 3 ? 1 : 3;

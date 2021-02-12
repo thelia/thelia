@@ -75,7 +75,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
      */
-    public function testInValidBackOfficeInputOperator()
+    public function testInValidBackOfficeInputOperator(): void
     {
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
@@ -104,7 +104,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
      */
-    public function testInValidBackOfficeInputOperator2()
+    public function testInValidBackOfficeInputOperator2(): void
     {
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
@@ -133,7 +133,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
      */
-    public function testInValidBackOfficeInputValue()
+    public function testInValidBackOfficeInputValue(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
@@ -162,7 +162,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
      */
-    public function testInValidBackOfficeInputValue2()
+    public function testInValidBackOfficeInputValue2(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
@@ -190,7 +190,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
-    public function testMatchingConditionInferior()
+    public function testMatchingConditionInferior(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
@@ -217,7 +217,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
-    public function testNotMatchingConditionInferior()
+    public function testNotMatchingConditionInferior(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(400, 'EUR');
@@ -244,7 +244,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
-    public function testMatchingConditionInferiorEquals()
+    public function testMatchingConditionInferiorEquals(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(400, 'EUR');
@@ -271,7 +271,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
-    public function testMatchingConditionInferiorEquals2()
+    public function testMatchingConditionInferiorEquals2(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
@@ -298,7 +298,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
-    public function testNotMatchingConditionInferiorEquals()
+    public function testNotMatchingConditionInferiorEquals(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(401, 'EUR');
@@ -325,7 +325,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
-    public function testMatchingConditionEqual()
+    public function testMatchingConditionEqual(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(400, 'EUR');
@@ -352,7 +352,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
-    public function testNotMatchingConditionEqual()
+    public function testNotMatchingConditionEqual(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
@@ -379,7 +379,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
-    public function testMatchingConditionSuperiorEquals()
+    public function testMatchingConditionSuperiorEquals(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(401, 'EUR');
@@ -406,7 +406,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
-    public function testMatchingConditionSuperiorEquals2()
+    public function testMatchingConditionSuperiorEquals2(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(400, 'EUR');
@@ -433,7 +433,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
-    public function testNotMatchingConditionSuperiorEquals()
+    public function testNotMatchingConditionSuperiorEquals(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
@@ -460,7 +460,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
-    public function testMatchingConditionSuperior()
+    public function testMatchingConditionSuperior(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(401, 'EUR');
@@ -487,7 +487,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
-    public function testNotMatchingConditionSuperior()
+    public function testNotMatchingConditionSuperior(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(399, 'EUR');
@@ -514,7 +514,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
-    public function testMatchingConditionCurrency()
+    public function testMatchingConditionCurrency(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(400, 'EUR');
@@ -541,7 +541,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
-    public function testNotMatchingConditionCurrency()
+    public function testNotMatchingConditionCurrency(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateAdapterStub(400.00, 'EUR');
@@ -568,7 +568,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\ConditionAbstract::isCurrencyValid
      */
-    public function testUnknownCurrencyCode()
+    public function testUnknownCurrencyCode(): void
     {
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
@@ -633,7 +633,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\ConditionAbstract::isPriceValid
      */
-    public function testInvalidCurrencyValue()
+    public function testInvalidCurrencyValue(): void
     {
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
@@ -698,7 +698,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\ConditionAbstract::isPriceValid
      */
-    public function testPriceAsZero()
+    public function testPriceAsZero(): void
     {
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
@@ -812,7 +812,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::getName
      */
-    public function testGetName()
+    public function testGetName(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Cart total amount');
 
@@ -829,7 +829,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::getToolTip
      */
-    public function testGetToolTip()
+    public function testGetToolTip(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'If cart total amount is <strong>%operator%</strong> %amount% %currency%');
 
@@ -854,7 +854,7 @@ class MatchForTotalAmountTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::generateInputs
      */
-    public function testGetValidator()
+    public function testGetValidator(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Price');
 

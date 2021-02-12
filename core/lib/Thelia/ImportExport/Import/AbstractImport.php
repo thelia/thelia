@@ -58,12 +58,12 @@ abstract class AbstractImport implements \Iterator
         return key($this->data);
     }
 
-    public function next()
+    public function next(): void
     {
         next($this->data);
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->data);
     }

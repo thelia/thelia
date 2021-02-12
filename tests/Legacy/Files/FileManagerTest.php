@@ -74,7 +74,7 @@ class FileManagerTest extends TestCase
         $this->container->set('thelia.file_manager', $this->fileManager);
     }
 
-    public function testGetFileTypeIdentifier()
+    public function testGetFileTypeIdentifier(): void
     {
         $obj = $this->fileManager->getModelInstance('document', 'product');
         $this->assertInstanceOf('Thelia\\Model\\ProductDocument', $obj);
@@ -107,25 +107,25 @@ class FileManagerTest extends TestCase
         $this->assertInstanceOf('Thelia\\Model\\BrandImage', $obj);
     }
 
-    public function testGetFileTypeIdentifierWrongType()
+    public function testGetFileTypeIdentifierWrongType(): void
     {
         $this->expectException(\Thelia\Exception\FileException::class);
         $this->fileManager->getModelInstance('docment', 'product');
     }
 
-    public function testGetFileTypeIdentifierWrongObject()
+    public function testGetFileTypeIdentifierWrongObject(): void
     {
         $this->expectException(\Thelia\Exception\FileException::class);
         $this->fileManager->getModelInstance('document', 'poney');
     }
 
-    public function testGetFileTypeIdentifierWrongTypeAndObject()
+    public function testGetFileTypeIdentifierWrongTypeAndObject(): void
     {
         $this->expectException(\Thelia\Exception\FileException::class);
         $this->fileManager->getModelInstance('licorne', 'poney');
     }
 
-    public function testAddFileModel()
+    public function testAddFileModel(): void
     {
         $this->fileManager->addFileModel('licorne', 'poney', 'Thelia\\Model\\ProductDocument');
 
@@ -134,7 +134,7 @@ class FileManagerTest extends TestCase
         $this->assertInstanceOf('Thelia\\Model\\ProductDocument', $obj);
     }
 
-    public function addFileModelWrongClassTest()
+    public function addFileModelWrongClassTest(): void
     {
         $this->fileManager->addFileModel('licorne', 'poney', 'Thelia\\Model\\Product');
 
@@ -142,7 +142,7 @@ class FileManagerTest extends TestCase
         $this->fileManager->getModelInstance('licorne', 'poney');
     }
 
-    public function dotTestImageUpload($model, $type)
+    public function dotTestImageUpload($model, $type): void
     {
         $old_file = $model->getFile();
 
@@ -182,7 +182,7 @@ class FileManagerTest extends TestCase
         $model->setFile($old_file)->save();
     }
 
-    public function dotTestDocumentUpload($model, $type)
+    public function dotTestDocumentUpload($model, $type): void
     {
         $old_file = $model->getFile();
 
@@ -222,7 +222,7 @@ class FileManagerTest extends TestCase
         $model->setFile($old_file)->save();
     }
 
-    public function testCopyUploadedFileProductImage()
+    public function testCopyUploadedFileProductImage(): void
     {
         $this->dotTestImageUpload(
             ProductImageQuery::create()->findOne(),
@@ -230,7 +230,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testCopyUploadedFileCategoryImage()
+    public function testCopyUploadedFileCategoryImage(): void
     {
         $this->dotTestImageUpload(
             CategoryImageQuery::create()->findOne(),
@@ -238,7 +238,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testCopyUploadedFileContentImage()
+    public function testCopyUploadedFileContentImage(): void
     {
         $this->dotTestImageUpload(
             ContentImageQuery::create()->findOne(),
@@ -246,7 +246,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testCopyUploadedFileFolderImage()
+    public function testCopyUploadedFileFolderImage(): void
     {
         $this->dotTestImageUpload(
             FolderImageQuery::create()->findOne(),
@@ -254,7 +254,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testCopyUploadedFileBrandImage()
+    public function testCopyUploadedFileBrandImage(): void
     {
         $this->dotTestImageUpload(
             BrandImageQuery::create()->findOne(),
@@ -262,7 +262,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testCopyUploadedFileProductDocument()
+    public function testCopyUploadedFileProductDocument(): void
     {
         $this->dotTestDocumentUpload(
             ProductDocumentQuery::create()->findOne(),
@@ -270,7 +270,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testCopyUploadedFileCategoryDocument()
+    public function testCopyUploadedFileCategoryDocument(): void
     {
         $this->dotTestDocumentUpload(
             CategoryDocumentQuery::create()->findOne(),
@@ -278,7 +278,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testCopyUploadedFileContentDocument()
+    public function testCopyUploadedFileContentDocument(): void
     {
         $this->dotTestDocumentUpload(
             ContentDocumentQuery::create()->findOne(),
@@ -286,7 +286,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testCopyUploadedFileFolderDocument()
+    public function testCopyUploadedFileFolderDocument(): void
     {
         $this->dotTestDocumentUpload(
             FolderDocumentQuery::create()->findOne(),
@@ -294,7 +294,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testCopyUploadedFileBrandDocument()
+    public function testCopyUploadedFileBrandDocument(): void
     {
         $this->dotTestDocumentUpload(
             BrandDocumentQuery::create()->findOne(),
@@ -302,7 +302,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testSanitizeFileName()
+    public function testSanitizeFileName(): void
     {
         $file = $this->fileManager->sanitizeFileName("C:\\../test/\\..file/%ù^name \t\n\r²&²:.txt");
 
@@ -313,7 +313,7 @@ class FileManagerTest extends TestCase
         $this->assertEquals('etcpasswd', $file);
     }
 
-    public function doTestDeleteFile($model, $modelParent, $type, $obj)
+    public function doTestDeleteFile($model, $modelParent, $type, $obj): void
     {
         $targetFile = THELIA_LOCAL_DIR.'media'.DS.$type.DS.$obj.DS.'original-'.$model->getId().'.txt';
 
@@ -330,7 +330,7 @@ class FileManagerTest extends TestCase
         $this->assertFileDoesNotExist($targetFile);
     }
 
-    public function testDeleteFileProductDocument()
+    public function testDeleteFileProductDocument(): void
     {
         $this->doTestDeleteFile(
             new ProductDocument(),
@@ -340,7 +340,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testDeleteFileProductImage()
+    public function testDeleteFileProductImage(): void
     {
         $this->doTestDeleteFile(
             new ProductImage(),
@@ -350,7 +350,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testDeleteFileCategoryDocument()
+    public function testDeleteFileCategoryDocument(): void
     {
         $this->doTestDeleteFile(
             new CategoryDocument(),
@@ -360,7 +360,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testDeleteFileCategoryImage()
+    public function testDeleteFileCategoryImage(): void
     {
         $this->doTestDeleteFile(
             new CategoryImage(),
@@ -370,7 +370,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testDeleteFileFolderDocument()
+    public function testDeleteFileFolderDocument(): void
     {
         $this->doTestDeleteFile(
             new FolderDocument(),
@@ -380,7 +380,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testDeleteFileFolderImage()
+    public function testDeleteFileFolderImage(): void
     {
         $this->doTestDeleteFile(
             new FolderImage(),
@@ -390,7 +390,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testDeleteFileContentDocument()
+    public function testDeleteFileContentDocument(): void
     {
         $this->doTestDeleteFile(
             new ContentDocument(),
@@ -400,7 +400,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testDeleteFileContentImage()
+    public function testDeleteFileContentImage(): void
     {
         $this->doTestDeleteFile(
             new ContentImage(),
@@ -410,7 +410,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testDeleteFileBrandDocument()
+    public function testDeleteFileBrandDocument(): void
     {
         $this->doTestDeleteFile(
             new BrandDocument(),
@@ -420,7 +420,7 @@ class FileManagerTest extends TestCase
         );
     }
 
-    public function testDeleteFileBrandImage()
+    public function testDeleteFileBrandImage(): void
     {
         $this->doTestDeleteFile(
             new BrandImage(),

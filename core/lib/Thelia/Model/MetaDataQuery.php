@@ -83,7 +83,7 @@ class MetaDataQuery extends BaseMetaDataQuery
      * @param string $elementKey the element Key : product, category, ...
      * @param int    $elementId  the element id
      */
-    public static function setVal($metaKey, $elementKey, $elementId, $value)
+    public static function setVal($metaKey, $elementKey, $elementId, $value): void
     {
         $data = self::create()
             ->filterByMetaKey($metaKey)

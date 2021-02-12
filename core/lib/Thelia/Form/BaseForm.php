@@ -191,7 +191,7 @@ abstract class BaseForm implements FormInterface
         $this->form = $this->formBuilder->getForm();
     }
 
-    protected function initFormWithRequest($type, $data, $options)
+    protected function initFormWithRequest($type, $data, $options): void
     {
         $this->validatorBuilder = Validation::createValidatorBuilder();
 

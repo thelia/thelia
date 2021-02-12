@@ -83,7 +83,7 @@ abstract class AbstractArchiver implements ArchiverInterface
         return $this;
     }
 
-    public function extract($toPath = null)
+    public function extract($toPath = null): void
     {
         $this->archive->extractTo($toPath);
     }

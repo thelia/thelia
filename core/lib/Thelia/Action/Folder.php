@@ -38,7 +38,7 @@ use Thelia\Model\Map\FolderTableMap;
  */
 class Folder extends BaseAction implements EventSubscriberInterface
 {
-    public function update(FolderUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(FolderUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $folder = FolderQuery::create()->findPk($event->getFolderId())) {
             $folder
@@ -67,7 +67,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
         return $this->genericUpdateSeo(FolderQuery::create(), $event, $dispatcher);
     }
 
-    public function delete(FolderDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(FolderDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $folder = FolderQuery::create()->findPk($event->getFolderId())) {
             $con = Propel::getWriteConnection(FolderTableMap::DATABASE_NAME);
@@ -107,7 +107,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function create(FolderCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(FolderCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $folder = new FolderModel();
 
@@ -121,7 +121,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
         $event->setFolder($folder);
     }
 
-    public function toggleVisibility(FolderToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function toggleVisibility(FolderToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $folder = $event->getFolder();
 
@@ -133,7 +133,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
         $event->setFolder($folder);
     }
 
-    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $folder = FolderQuery::create()->findPk($event->getObjectId())) {
             switch ($event->getMode()) {
@@ -155,7 +155,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
      *
      * @param string $eventName
      */
-    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if ($event->getView() == 'folder') {
             $folder = FolderQuery::create()
@@ -172,7 +172,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
     /**
      * @throws NotFoundHttpException
      */
-    public function viewFolderIdNotVisible(ViewCheckEvent $event)
+    public function viewFolderIdNotVisible(ViewCheckEvent $event): void
     {
         throw new NotFoundHttpException();
     }

@@ -46,7 +46,7 @@ class ConfigQuery extends BaseConfigQuery
         return self::$cache[$search];
     }
 
-    public static function write($configName, $value, $secured = null, $hidden = null)
+    public static function write($configName, $value, $secured = null, $hidden = null): void
     {
         $config = self::create()->findOneByName($configName);
 
@@ -231,52 +231,52 @@ class ConfigQuery extends BaseConfigQuery
         return self::read('smtp.sourceip');
     }
 
-    public static function enableSmtp()
+    public static function enableSmtp(): void
     {
         self::write('smtp.enabled', 1, 1, 1);
     }
 
-    public static function disableSmtp()
+    public static function disableSmtp(): void
     {
         self::write('smtp.enabled', 0, 1, 1);
     }
 
-    public static function setSmtpHost($value)
+    public static function setSmtpHost($value): void
     {
         self::write('smtp.host', $value, 1, 1);
     }
 
-    public static function setSmtpPort($value)
+    public static function setSmtpPort($value): void
     {
         self::write('smtp.port', $value, 1, 1);
     }
 
-    public static function setSmtpEncryption($value)
+    public static function setSmtpEncryption($value): void
     {
         self::write('smtp.encryption', $value, 1, 1);
     }
 
-    public static function setSmtpUsername($value)
+    public static function setSmtpUsername($value): void
     {
         self::write('smtp.username', $value, 1, 1);
     }
 
-    public static function setSmtpPassword($value)
+    public static function setSmtpPassword($value): void
     {
         self::write('smtp.password', $value, 1, 1);
     }
 
-    public static function setSmtpAuthMode($value)
+    public static function setSmtpAuthMode($value): void
     {
         self::write('smtp.authmode', $value, 1, 1);
     }
 
-    public static function setSmtpTimeout($value)
+    public static function setSmtpTimeout($value): void
     {
         self::write('smtp.timeout', $value, 1, 1);
     }
 
-    public static function setSmtpSourceIp($value)
+    public static function setSmtpSourceIp($value): void
     {
         self::write('smtp.sourceip', $value, 1, 1);
     }
@@ -301,7 +301,7 @@ class ConfigQuery extends BaseConfigQuery
     /**
      * @param bool $v
      */
-    public static function setShowingErrorMessage($v)
+    public static function setShowingErrorMessage($v): void
     {
         static::write('error_message.show', (int) (@(bool) $v));
     }
@@ -311,7 +311,7 @@ class ConfigQuery extends BaseConfigQuery
         return static::read('error_message.page_name');
     }
 
-    public static function setErrorMessagePageName($v)
+    public static function setErrorMessagePageName($v): void
     {
         static::write('error_message.page_name', $v);
     }

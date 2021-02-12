@@ -136,7 +136,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         return $createdProduct;
     }
 
-    public function testCreateWithOptionalParametersAction()
+    public function testCreateWithOptionalParametersAction(): void
     {
         $event = new ProductCreateEvent();
         /** @var Category $defaultCategory */
@@ -492,7 +492,7 @@ class ProductTest extends TestCaseWithURLToolSetup
     /**
      * @depends testSetProductTemplate
      */
-    public function testDelete(ProductModel $product)
+    public function testDelete(ProductModel $product): void
     {
         $event = new ProductDeleteEvent($product->getId());
 
@@ -1060,7 +1060,7 @@ class ProductTest extends TestCaseWithURLToolSetup
      * @covers \Thelia\Action\ProductSaleElement::clonePSEAssociatedFiles
      * @depends testUpdateClonePSE
      */
-    public function testClonePSEAssociatedFiles(array $params)
+    public function testClonePSEAssociatedFiles(array $params): void
     {
         /** @var ProductCloneEvent $event */
         $event = $params['event'];

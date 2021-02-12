@@ -75,7 +75,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $this->securityContext = $securityContext;
     }
 
-    public function setDeliveryAddress(OrderEvent $event)
+    public function setDeliveryAddress(OrderEvent $event): void
     {
         $order = $event->getOrder();
 
@@ -84,7 +84,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setOrder($order);
     }
 
-    public function setDeliveryModule(OrderEvent $event)
+    public function setDeliveryModule(OrderEvent $event): void
     {
         $order = $event->getOrder();
 
@@ -102,7 +102,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setOrder($order);
     }
 
-    public function setPostage(OrderEvent $event)
+    public function setPostage(OrderEvent $event): void
     {
         $order = $event->getOrder();
 
@@ -113,7 +113,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setOrder($order);
     }
 
-    public function setInvoiceAddress(OrderEvent $event)
+    public function setInvoiceAddress(OrderEvent $event): void
     {
         $order = $event->getOrder();
 
@@ -122,7 +122,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setOrder($order);
     }
 
-    public function setPaymentModule(OrderEvent $event)
+    public function setPaymentModule(OrderEvent $event): void
     {
         $order = $event->getOrder();
 
@@ -369,7 +369,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function createManual(OrderManualEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function createManual(OrderManualEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $event->setPlacedOrder(
             $this->createOrder(
@@ -395,7 +395,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function create(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $session = $this->getSession();
 
@@ -430,7 +430,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * @param $eventName
      */
-    public function orderBeforePayment(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function orderBeforePayment(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $dispatcher->dispatch(clone $event, TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL);
 
@@ -443,7 +443,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function orderCartClear(/* @noinspection PhpUnusedParameterInspection */ OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function orderCartClear(/* @noinspection PhpUnusedParameterInspection */ OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         // Empty cart and clear current order
         $session = $this->getSession();
@@ -456,7 +456,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * @throws \Exception if the message cannot be loaded
      */
-    public function sendConfirmationEmail(OrderEvent $event)
+    public function sendConfirmationEmail(OrderEvent $event): void
     {
         $this->mailer->sendEmailToCustomer(
             'order_confirmation',
@@ -471,7 +471,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * @throws \Exception if the message cannot be loaded
      */
-    public function sendNotificationEmail(OrderEvent $event)
+    public function sendNotificationEmail(OrderEvent $event): void
     {
         $this->mailer->sendEmailToShopManagers(
             'order_notification',
@@ -488,7 +488,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function updateStatus(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updateStatus(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $order = $event->getOrder();
         $newStatus = $event->getStatus();
@@ -521,7 +521,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getStockUpdateOnOrderStatusChange(GetStockUpdateOperationOnOrderStatusChangeEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function getStockUpdateOnOrderStatusChange(GetStockUpdateOperationOnOrderStatusChangeEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         // The order
         $order = $event->getOrder();
@@ -581,7 +581,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    protected function updateQuantity(ModelOrder $order, $newStatus, EventDispatcherInterface $dispatcher)
+    protected function updateQuantity(ModelOrder $order, $newStatus, EventDispatcherInterface $dispatcher): void
     {
         if ($newStatus !== $order->getStatusId()) {
             if (null !== $newStatusModel = OrderStatusQuery::create()->findPk($newStatus)) {
@@ -629,7 +629,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function updateDeliveryRef(OrderEvent $event)
+    public function updateDeliveryRef(OrderEvent $event): void
     {
         $order = $event->getOrder();
 
@@ -641,7 +641,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function updateTransactionRef(OrderEvent $event)
+    public function updateTransactionRef(OrderEvent $event): void
     {
         $order = $event->getOrder();
 
@@ -653,7 +653,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function updateAddress(OrderAddressEvent $event)
+    public function updateAddress(OrderAddressEvent $event): void
     {
         $orderAddress = $event->getOrderAddress();
 

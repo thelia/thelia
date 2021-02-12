@@ -57,7 +57,7 @@ class ConfigCommandTest extends BaseCommandTest
         }
     }
 
-    public function testArguments()
+    public function testArguments(): void
     {
         $tester = $this->commandTester;
 
@@ -79,7 +79,7 @@ class ConfigCommandTest extends BaseCommandTest
         }
     }
 
-    public function testList()
+    public function testList(): void
     {
         $tester = $this->commandTester;
 
@@ -102,7 +102,7 @@ class ConfigCommandTest extends BaseCommandTest
         }
     }
 
-    public function testGetSetDelete()
+    public function testGetSetDelete(): void
     {
         $tester = $this->commandTester;
 
@@ -176,7 +176,7 @@ class ConfigCommandTest extends BaseCommandTest
         );
     }
 
-    public static function clearTest()
+    public static function clearTest(): void
     {
         ConfigQuery::create()
             ->filterByName(self::PREFIX_NAME.'%', Criteria::LIKE)
@@ -192,7 +192,7 @@ class ConfigCommandTest extends BaseCommandTest
         );
     }
 
-    protected function assertVariableEqual($name, $value, $secured = 0, $hidden = 1)
+    protected function assertVariableEqual($name, $value, $secured = 0, $hidden = 1): void
     {
         $var = ConfigQuery::create()->findOneByName($name);
 
@@ -228,12 +228,12 @@ class ConfigCommandTest extends BaseCommandTest
         );
     }
 
-    protected function assertStringContains($data, $needle, $message = '')
+    protected function assertStringContains($data, $needle, $message = ''): void
     {
         $this->assertTrue((false !== strpos($data, $needle)), $message);
     }
 
-    protected function assertStringNotContains($data, $needle, $message = '')
+    protected function assertStringNotContains($data, $needle, $message = ''): void
     {
         $this->assertTrue((false === strpos($data, $needle)), $message);
     }

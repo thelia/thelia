@@ -27,7 +27,7 @@ use Thelia\Model\CurrencyQuery;
  */
 class UpdateCurrenciesRates extends ContainerAwareCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('currency:update-rates')

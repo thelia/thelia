@@ -48,7 +48,7 @@ class Brand extends BaseBrand implements FileModelParentInterface
     /**
      * {@inheritDoc}
      */
-    public function postDelete(ConnectionInterface $con = null)
+    public function postDelete(ConnectionInterface $con = null): void
     {
         parent::postDelete($con);
 

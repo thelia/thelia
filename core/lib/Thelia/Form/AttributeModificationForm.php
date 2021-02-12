@@ -19,7 +19,7 @@ class AttributeModificationForm extends AttributeCreationForm
 {
     use StandardDescriptionFieldsTrait;
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('id', HiddenType::class, [

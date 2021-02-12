@@ -57,7 +57,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
      *
      * @throws PropelException
      */
-    protected function updateProductSaleElementsPrices($pseList, $promoStatus, $offsetType, Calculator $taxCalculator, $saleOffsetByCurrency, ConnectionInterface $con)
+    protected function updateProductSaleElementsPrices($pseList, $promoStatus, $offsetType, Calculator $taxCalculator, $saleOffsetByCurrency, ConnectionInterface $con): void
     {
         /** @var ProductSaleElements $pse */
         foreach ($pseList as $pse) {
@@ -110,7 +110,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function updateProductsSaleStatus(ProductSaleStatusUpdateEvent $event)
+    public function updateProductsSaleStatus(ProductSaleStatusUpdateEvent $event): void
     {
         $taxCalculator = new Calculator();
 
@@ -187,7 +187,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new Sale.
      */
-    public function create(SaleCreateEvent $event)
+    public function create(SaleCreateEvent $event): void
     {
         $sale = new SaleModel();
 
@@ -208,7 +208,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
      *
      * @throws PropelException
      */
-    public function update(SaleUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(SaleUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $sale = SaleQuery::create()->findPk($event->getSaleId())) {
             $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
@@ -309,7 +309,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function toggleActivity(SaleToggleActivityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function toggleActivity(SaleToggleActivityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $sale = $event->getSale();
 
@@ -344,7 +344,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function delete(SaleDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(SaleDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $sale = SaleQuery::create()->findPk($event->getSaleId())) {
             $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
@@ -380,7 +380,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    public function clearStatus(/* @noinspection PhpUnusedParameterInspection */ SaleClearStatusEvent $event)
+    public function clearStatus(/* @noinspection PhpUnusedParameterInspection */ SaleClearStatusEvent $event): void
     {
         $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
         $con->beginTransaction();
@@ -413,7 +413,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function checkSaleActivation(SaleActiveStatusCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function checkSaleActivation(SaleActiveStatusCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
         $con->beginTransaction();

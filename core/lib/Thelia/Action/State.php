@@ -29,7 +29,7 @@ use Thelia\Model\StateQuery;
  */
 class State extends BaseAction implements EventSubscriberInterface
 {
-    public function create(StateCreateEvent $event)
+    public function create(StateCreateEvent $event): void
     {
         $state = new StateModel();
 
@@ -45,7 +45,7 @@ class State extends BaseAction implements EventSubscriberInterface
         $event->setState($state);
     }
 
-    public function update(StateUpdateEvent $event)
+    public function update(StateUpdateEvent $event): void
     {
         if (null !== $state = StateQuery::create()->findPk($event->getStateId())) {
             $state
@@ -61,7 +61,7 @@ class State extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function delete(StateDeleteEvent $event)
+    public function delete(StateDeleteEvent $event): void
     {
         if (null !== $state = StateQuery::create()->findPk($event->getStateId())) {
             $state->delete();
@@ -73,7 +73,7 @@ class State extends BaseAction implements EventSubscriberInterface
     /**
      * Toggle State visibility.
      */
-    public function toggleVisibility(StateToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function toggleVisibility(StateToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $state = $event->getState();
 

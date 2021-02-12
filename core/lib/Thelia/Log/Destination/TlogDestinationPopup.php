@@ -66,7 +66,7 @@ class TlogDestinationPopup extends AbstractTlogDestination
         ];
     }
 
-    public function write(&$res)
+    public function write(&$res): void
     {
         $content = '';
         $count = 1;

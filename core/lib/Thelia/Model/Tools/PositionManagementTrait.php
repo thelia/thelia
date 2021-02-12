@@ -33,7 +33,7 @@ trait PositionManagementTrait
      *
      * @param $query ModelCriteria
      */
-    protected function addCriteriaToPositionQuery(ModelCriteria $query)
+    protected function addCriteriaToPositionQuery(ModelCriteria $query): void
     {
         // Add required criteria here...
     }
@@ -57,7 +57,7 @@ trait PositionManagementTrait
     /**
      * Move up a object.
      */
-    public function movePositionUp()
+    public function movePositionUp(): void
     {
         $this->movePositionUpOrDown(true);
     }
@@ -65,7 +65,7 @@ trait PositionManagementTrait
     /**
      * Move down a object.
      */
-    public function movePositionDown()
+    public function movePositionDown(): void
     {
         $this->movePositionUpOrDown(false);
     }
@@ -75,7 +75,7 @@ trait PositionManagementTrait
      *
      * @param bool $up the exchange mode: go up (POSITION_UP) or go down (POSITION_DOWN)
      */
-    protected function movePositionUpOrDown($up = true)
+    protected function movePositionUpOrDown($up = true): void
     {
         // The current position of the object
         $myPosition = $this->getPosition();
@@ -133,7 +133,7 @@ trait PositionManagementTrait
      *
      * @param newPosition
      */
-    public function changeAbsolutePosition($newPosition)
+    public function changeAbsolutePosition($newPosition): void
     {
         // The current position
         $current_position = $this->getPosition();
@@ -181,7 +181,7 @@ trait PositionManagementTrait
         }
     }
 
-    protected function reorderBeforeDelete($fields = [])
+    protected function reorderBeforeDelete($fields = []): void
     {
         // Find DATABASE_NAME constant
         $mapClassName = self::TABLE_MAP;

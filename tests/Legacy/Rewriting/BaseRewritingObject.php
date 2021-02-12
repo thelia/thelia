@@ -31,7 +31,7 @@ abstract class BaseRewritingObject extends TestCase
     /**
      * @covers \Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
      */
-    public function testSimpleFrenchRewrittenUrl()
+    public function testSimpleFrenchRewrittenUrl(): void
     {
         /** @var UrlRewritingTrait $object */
         $object = $this->getObject();
@@ -55,7 +55,7 @@ abstract class BaseRewritingObject extends TestCase
     /**
      * @covers \Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
      */
-    public function testSimpleEnglishRewrittenUrl()
+    public function testSimpleEnglishRewrittenUrl(): void
     {
         /** @var UrlRewritingTrait $object */
         $object = $this->getObject();
@@ -78,7 +78,7 @@ abstract class BaseRewritingObject extends TestCase
     /**
      * @covers \Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
      */
-    public function testRewrittenWithoutTitle()
+    public function testRewrittenWithoutTitle(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Impossible to create an url if title is null');
@@ -93,7 +93,7 @@ abstract class BaseRewritingObject extends TestCase
     /**
      * @covers \Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
      */
-    public function testOnNotSavedObject()
+    public function testOnNotSavedObject(): void
     {
         /** @var UrlRewritingTrait $object */
         $object = $this->getObject();

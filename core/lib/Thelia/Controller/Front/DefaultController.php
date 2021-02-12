@@ -37,7 +37,7 @@ class DefaultController extends BaseFrontController
      *
      * @throw RedirectException if a redirection to the rewritted URL shoud be done.
      */
-    public function noAction(Request $request)
+    public function noAction(Request $request): void
     {
         $view = null;
 

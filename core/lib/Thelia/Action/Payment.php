@@ -27,7 +27,7 @@ class Payment implements EventSubscriberInterface
     /**
      * Check if a module is valid.
      */
-    public function isValid(IsValidPaymentEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function isValid(IsValidPaymentEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $module = $event->getModule();
 

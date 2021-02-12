@@ -42,7 +42,7 @@ class Content extends BaseContent implements FileModelParentInterface
      *
      * @deprecated since 2.3, and will be removed in 2.4
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $contents = ContentFolderQuery::create()
             ->filterByFolderId($this->getDefaultFolderId())
@@ -159,7 +159,7 @@ class Content extends BaseContent implements FileModelParentInterface
         return $this;
     }
 
-    public function postDelete(ConnectionInterface $con = null)
+    public function postDelete(ConnectionInterface $con = null): void
     {
         parent::postDelete($con);
 
@@ -186,7 +186,7 @@ class Content extends BaseContent implements FileModelParentInterface
         return parent::getPosition();
     }
 
-    public function postSave(ConnectionInterface $con = null)
+    public function postSave(ConnectionInterface $con = null): void
     {
         // For BC, will be removed in 2.4
         if (!$this->isNew()) {
@@ -210,7 +210,7 @@ class Content extends BaseContent implements FileModelParentInterface
      * @param ContentFolder $contentFolder
      *                                     {@inheritdoc}
      */
-    protected function doAddContentFolder($contentFolder)
+    protected function doAddContentFolder($contentFolder): void
     {
         parent::doAddContentFolder($contentFolder);
 

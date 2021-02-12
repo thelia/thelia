@@ -36,7 +36,7 @@ use Thelia\Tools\Password;
  */
 class AdminUpdatePasswordCommand extends ContainerAwareCommand
 {
-    protected function init()
+    protected function init(): void
     {
         $container = $this->getContainer();
 
@@ -51,7 +51,7 @@ class AdminUpdatePasswordCommand extends ContainerAwareCommand
     /**
      * Configures the current command.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('admin:updatePassword')

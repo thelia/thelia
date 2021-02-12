@@ -64,7 +64,7 @@ class OrderPostage
     /**
      * @param float $amount
      */
-    public function setAmount($amount)
+    public function setAmount($amount): void
     {
         $this->amount = $amount;
     }
@@ -80,7 +80,7 @@ class OrderPostage
     /**
      * @param float $amountTax
      */
-    public function setAmountTax($amountTax)
+    public function setAmountTax($amountTax): void
     {
         // We have to round the postage tax to prevent small delta amounts in tax calculations.
         $this->amountTax = round($amountTax, 2);
@@ -97,7 +97,7 @@ class OrderPostage
     /**
      * @param string $taxRuleTitle
      */
-    public function setTaxRuleTitle($taxRuleTitle)
+    public function setTaxRuleTitle($taxRuleTitle): void
     {
         $this->taxRuleTitle = $taxRuleTitle;
     }

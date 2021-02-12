@@ -23,7 +23,7 @@ use Thelia\Core\Event\PdfEvent;
  */
 class PdfTest extends TestCase
 {
-    public function testGeneratePdf()
+    public function testGeneratePdf(): void
     {
         $event = new PdfEvent('test content');
 

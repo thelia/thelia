@@ -29,7 +29,7 @@ class TlogDestinationHtml extends AbstractTlogDestination
         parent::__construct();
     }
 
-    public function configure()
+    public function configure(): void
     {
         $this->style = $this->getConfig(self::VAR_STYLE);
     }
@@ -57,7 +57,7 @@ class TlogDestinationHtml extends AbstractTlogDestination
         ];
     }
 
-    public function write(&$res)
+    public function write(&$res): void
     {
         $block = sprintf('<pre class="tlog-trace" style="%s">%s</pre>', $this->style, htmlspecialchars(implode("\n", $this->logs)));
 

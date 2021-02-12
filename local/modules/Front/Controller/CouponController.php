@@ -35,7 +35,7 @@ class CouponController extends BaseFrontController
     /**
      * Clear all coupons.
      */
-    public function clearAllCouponsAction()
+    public function clearAllCouponsAction(): void
     {
         // Dispatch Event to the Action
         $this->getDispatcher()->dispatch(TheliaEvents::COUPON_CLEAR_ALL);

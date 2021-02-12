@@ -48,7 +48,7 @@ class SystemLogController extends BaseAdminController
         );
     }
 
-    protected function loadDefinedDestinations($directory, &$destinations)
+    protected function loadDefinedDestinations($directory, &$destinations): void
     {
         try {
             foreach (new \DirectoryIterator($directory) as $fileInfo) {

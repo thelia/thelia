@@ -137,7 +137,7 @@ class TemplateValidator
     /**
      * @param TemplateDescriptor $templateDescriptor
      */
-    protected function checkVersion($templateDescriptor)
+    protected function checkVersion($templateDescriptor): void
     {
         if ($templateDescriptor->getTheliaVersion()) {
             if (!Version::test(Thelia::THELIA_VERSION, $templateDescriptor->getTheliaVersion(), false, '>=')) {

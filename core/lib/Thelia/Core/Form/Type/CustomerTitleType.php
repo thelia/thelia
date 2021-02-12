@@ -33,7 +33,7 @@ class CustomerTitleType extends AbstractTheliaType
         $this->customerTitleIdType = $customerTitleIdType;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('i18n', 'collection', [

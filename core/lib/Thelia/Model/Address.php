@@ -20,7 +20,7 @@ class Address extends BaseAddress
     /**
      * put the the current address as default one.
      */
-    public function makeItDefault()
+    public function makeItDefault(): void
     {
         AddressQuery::create()->filterByCustomerId($this->getCustomerId())
             ->update(['IsDefault' => '0']);

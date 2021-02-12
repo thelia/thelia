@@ -30,7 +30,7 @@ class BrandTest extends BaseLoopTestor
         return [];
     }
 
-    public function testSearchById()
+    public function testSearchById(): void
     {
         $brand = BrandQuery::create()->findOne();
         if (null === $brand) {
@@ -47,7 +47,7 @@ class BrandTest extends BaseLoopTestor
         $this->baseTestSearchById($brand->getId(), $otherParameters);
     }
 
-    public function testSearchLimit()
+    public function testSearchLimit(): void
     {
         $this->baseTestSearchWithLimit(3);
     }

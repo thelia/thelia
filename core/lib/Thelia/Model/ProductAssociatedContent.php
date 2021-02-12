@@ -22,7 +22,7 @@ class ProductAssociatedContent extends BaseProductAssociatedContent
     /**
      * Calculate next position relative to our product.
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByProductId($this->getProductId());
     }

@@ -130,7 +130,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
     /**
      * Documentevent is empty, mandatory parameters not specified.
      */
-    public function testProcessEmptyDocumentEvent()
+    public function testProcessEmptyDocumentEvent(): void
     {
         $event = new DocumentEvent($this->request);
 
@@ -143,7 +143,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
     /**
      * Try to process a non-existent file.
      */
-    public function testProcessNonExistentDocument()
+    public function testProcessNonExistentDocument(): void
     {
         $event = new DocumentEvent($this->request);
 
@@ -159,7 +159,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
     /**
      * Try to process a file outside of the cache.
      */
-    public function testProcessDocumentOutsideValidPath()
+    public function testProcessDocumentOutsideValidPath(): void
     {
         $event = new DocumentEvent($this->request);
 
@@ -175,7 +175,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
     /**
      * No operation done on source file -> copie !
      */
-    public function testProcessDocumentCopy()
+    public function testProcessDocumentCopy(): void
     {
         $event = new DocumentEvent($this->request);
 
@@ -206,7 +206,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
     /**
      * No operation done on source file -> link !
      */
-    public function testProcessDocumentSymlink()
+    public function testProcessDocumentSymlink(): void
     {
         $event = new DocumentEvent($this->request);
 
@@ -234,7 +234,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
         $this->assertFileExists(THELIA_WEB_DIR."/$imgdir/tests/test-document-2.txt");
     }
 
-    public function testClearTestsCache()
+    public function testClearTestsCache(): void
     {
         $anExceptionWasThrown = false;
 
@@ -253,7 +253,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
         $this->assertFalse($anExceptionWasThrown);
     }
 
-    public function testClearWholeCache()
+    public function testClearWholeCache(): void
     {
         $anExceptionWasThrown = false;
 
@@ -273,7 +273,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
     /**
      * Try to clear directory ouside of the cache.
      */
-    public function testClearUnallowedPathCache()
+    public function testClearUnallowedPathCache(): void
     {
         $event = new DocumentEvent($this->request);
 

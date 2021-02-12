@@ -40,7 +40,7 @@ class RewritingRetriever
      * @param      $viewLocale
      * @param null $viewId
      */
-    public function loadViewUrl($view, $viewLocale = null, $viewId = null)
+    public function loadViewUrl($view, $viewLocale = null, $viewId = null): void
     {
         $this->search = $this->rewritingUrlQuery->getViewUrlQuery($view, $viewLocale, $viewId);
 
@@ -67,7 +67,7 @@ class RewritingRetriever
      * @param null  $viewId
      * @param array $viewOtherParameters
      */
-    public function loadSpecificUrl($view, $viewLocale, $viewId = null, $viewOtherParameters = [])
+    public function loadSpecificUrl($view, $viewLocale, $viewId = null, $viewOtherParameters = []): void
     {
         if (empty($viewOtherParameters)) {
             $this->loadViewUrl($view, $viewLocale, $viewId);

@@ -23,22 +23,22 @@ use Thelia\Core\Template\TemplateDefinition;
  */
 class ParserFallback implements ParserInterface
 {
-    public function render($realTemplateName, array $parameters = [], $compressOutput = true)
+    public function render($realTemplateName, array $parameters = [], $compressOutput = true): void
     {
         $this->throwException();
     }
 
-    public function renderString($templateText, array $parameters = [], $compressOutput = true)
+    public function renderString($templateText, array $parameters = [], $compressOutput = true): void
     {
         $this->throwException();
     }
 
-    public function getStatus()
+    public function getStatus(): void
     {
         $this->throwException();
     }
 
-    public function setStatus($status)
+    public function setStatus($status): void
     {
         $this->throwException();
     }
@@ -46,7 +46,7 @@ class ParserFallback implements ParserInterface
     /**
      * Setup the parser with a template definition, which provides a template description.
      */
-    public function setTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
+    public function setTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): void
     {
         $this->throwException();
     }
@@ -83,7 +83,7 @@ class ParserFallback implements ParserInterface
      * @param string $key               ???
      * @param bool   $unshift           ??? Etienne ?
      */
-    public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false)
+    public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false): void
     {
         $this->throwException();
     }
@@ -108,7 +108,7 @@ class ParserFallback implements ParserInterface
      * @param string $variable the variable name
      * @param mixed  $value    the value of the variable
      */
-    public function assign($variable, $value = null)
+    public function assign($variable, $value = null): void
     {
         $this->throwException();
     }
@@ -121,7 +121,7 @@ class ParserFallback implements ParserInterface
         $this->throwException();
     }
 
-    private function throwException()
+    private function throwException(): void
     {
         throw new \RuntimeException('if you want to use a parser, please register one');
     }
@@ -143,7 +143,7 @@ class ParserFallback implements ParserInterface
      *
      * @throws \SmartyException
      */
-    public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
+    public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): void
     {
         $this->throwException();
     }
@@ -153,7 +153,7 @@ class ParserFallback implements ParserInterface
      *
      * @throws \SmartyException
      */
-    public function popTemplateDefinition()
+    public function popTemplateDefinition(): void
     {
         $this->throwException();
     }

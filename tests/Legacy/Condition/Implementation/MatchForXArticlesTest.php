@@ -31,7 +31,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::setValidators
      */
-    public function testInValidBackOfficeInputOperator()
+    public function testInValidBackOfficeInputOperator(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
@@ -69,7 +69,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::setValidators
      */
-    public function testInValidBackOfficeInputValue()
+    public function testInValidBackOfficeInputValue(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
@@ -106,7 +106,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
-    public function testMatchingRuleInferior()
+    public function testMatchingRuleInferior(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
@@ -141,7 +141,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
-    public function testNotMatchingRuleInferior()
+    public function testNotMatchingRuleInferior(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
@@ -176,7 +176,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
-    public function testMatchingRuleInferiorEquals()
+    public function testMatchingRuleInferiorEquals(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
@@ -211,7 +211,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
-    public function testMatchingRuleInferiorEquals2()
+    public function testMatchingRuleInferiorEquals2(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
@@ -246,7 +246,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
-    public function testNotMatchingRuleInferiorEquals()
+    public function testNotMatchingRuleInferiorEquals(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
@@ -281,7 +281,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
-    public function testMatchingRuleEqual()
+    public function testMatchingRuleEqual(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
@@ -316,7 +316,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
-    public function testNotMatchingRuleEqual()
+    public function testNotMatchingRuleEqual(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
@@ -351,7 +351,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
-    public function testMatchingRuleSuperiorEquals()
+    public function testMatchingRuleSuperiorEquals(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
@@ -386,7 +386,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
-    public function testMatchingRuleSuperiorEquals2()
+    public function testMatchingRuleSuperiorEquals2(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
@@ -421,7 +421,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
-    public function testNotMatchingRuleSuperiorEquals()
+    public function testNotMatchingRuleSuperiorEquals(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
@@ -456,7 +456,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
-    public function testMatchingRuleSuperior()
+    public function testMatchingRuleSuperior(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
@@ -491,7 +491,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
-    public function testNotMatchingRuleSuperior()
+    public function testNotMatchingRuleSuperior(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
@@ -521,7 +521,7 @@ class MatchForXArticlesTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testGetSerializableRule()
+    public function testGetSerializableRule(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
@@ -602,7 +602,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::getName
      */
-    public function testGetName()
+    public function testGetName(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Number of articles in cart');
 
@@ -619,7 +619,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::getToolTip
      */
-    public function testGetToolTip()
+    public function testGetToolTip(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'If cart products quantity is <strong>superior to</strong> 4');
 
@@ -643,7 +643,7 @@ class MatchForXArticlesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForXArticles::generateInputs
      */
-    public function testGetValidator()
+    public function testGetValidator(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Price');
 

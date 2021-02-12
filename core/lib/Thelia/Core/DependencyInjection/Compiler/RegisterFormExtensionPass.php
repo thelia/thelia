@@ -28,7 +28,7 @@ class RegisterFormExtensionPass implements CompilerPassInterface
      *
      * @api
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('thelia.form_factory_builder')) {
             return;

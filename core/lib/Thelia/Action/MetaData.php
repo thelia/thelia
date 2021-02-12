@@ -26,7 +26,7 @@ use Thelia\Model\MetaDataQuery;
  */
 class MetaData extends BaseAction implements EventSubscriberInterface
 {
-    public function createOrUpdate(MetaDataCreateOrUpdateEvent $event)
+    public function createOrUpdate(MetaDataCreateOrUpdateEvent $event): void
     {
         $metaData = MetaDataQuery::create()
             ->filterByMetaKey($event->getMetaKey())
@@ -48,7 +48,7 @@ class MetaData extends BaseAction implements EventSubscriberInterface
         $event->setMetaData($metaData);
     }
 
-    public function delete(MetaDataDeleteEvent $event)
+    public function delete(MetaDataDeleteEvent $event): void
     {
         $metaData = MetaDataQuery::create()
             ->filterByMetaKey($event->getMetaKey())

@@ -136,7 +136,7 @@ class ConfigTest extends BaseAction
     /**
      * @depends testModify
      */
-    public function testDelete(ConfigModel $config)
+    public function testDelete(ConfigModel $config): void
     {
         $event = new ConfigDeleteEvent($config->getId());
 

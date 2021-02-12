@@ -25,7 +25,7 @@ use Thelia\Core\Hook\BaseHook;
  */
 class FrontHook extends BaseHook
 {
-    public function onMainFooterBody(HookRenderBlockEvent $event)
+    public function onMainFooterBody(HookRenderBlockEvent $event): void
     {
         $bodyConfig = HookNavigation::getConfigValue(HookNavigationConfigValue::FOOTER_BODY_FOLDER_ID);
 
@@ -40,7 +40,7 @@ class FrontHook extends BaseHook
         }
     }
 
-    public function onMainFooterBottom(HookRenderEvent $event)
+    public function onMainFooterBottom(HookRenderEvent $event): void
     {
         $bottomConfig = HookNavigation::getConfigValue(HookNavigationConfigValue::FOOTER_BOTTOM_FOLDER_ID);
 

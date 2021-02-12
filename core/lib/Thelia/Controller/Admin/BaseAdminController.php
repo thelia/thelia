@@ -81,7 +81,7 @@ class BaseAdminController extends BaseController
      * @param string $action
      * @param string $message
      */
-    protected function adminLogAppend($resource, $action, $message, $resourceId = null)
+    protected function adminLogAppend($resource, $action, $message, $resourceId = null): void
     {
         AdminLog::append(
             $resource,
@@ -183,7 +183,7 @@ class BaseAdminController extends BaseController
      * @param string     $error_message the error message
      * @param \Exception $exception     the exception or null if no exception
      */
-    protected function setupFormErrorContext($action, $error_message, BaseForm $form = null, \Exception $exception = null)
+    protected function setupFormErrorContext($action, $error_message, BaseForm $form = null, \Exception $exception = null): void
     {
         if ($error_message !== false) {
             // Log the error message

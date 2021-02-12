@@ -31,12 +31,12 @@ class TlogDestinationText extends AbstractTlogDestination
         return 'Display logs in raw text format, on top of generated pages.';
     }
 
-    public function add($texte)
+    public function add($texte): void
     {
         echo trim($texte)."\n";
     }
 
-    public function write(&$res)
+    public function write(&$res): void
     {
         // Rien
     }

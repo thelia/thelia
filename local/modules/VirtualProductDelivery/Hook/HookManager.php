@@ -22,7 +22,7 @@ use Thelia\Core\Hook\BaseHook;
  */
 class HookManager extends BaseHook
 {
-    public function onAccountOrderAfterProducts(HookRenderEvent $event)
+    public function onAccountOrderAfterProducts(HookRenderEvent $event): void
     {
         $orderId = $event->getArgument('order');
 

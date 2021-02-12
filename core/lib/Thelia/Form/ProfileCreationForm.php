@@ -28,7 +28,7 @@ class ProfileCreationForm extends BaseForm
 {
     use StandardDescriptionFieldsTrait;
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('locale', TextType::class, [
@@ -54,7 +54,7 @@ class ProfileCreationForm extends BaseForm
         return 'thelia_profile_creation';
     }
 
-    public function verifyCode($value, ExecutionContextInterface $context)
+    public function verifyCode($value, ExecutionContextInterface $context): void
     {
         /* check unicity */
         $profile = ProfileQuery::create()

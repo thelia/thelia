@@ -125,7 +125,7 @@ class MailerFactory
      * @param Customer $customer
      * @param array    $messageParameters an array of (name => value) parameters that will be available in the message
      */
-    public function sendEmailToCustomer($messageCode, $customer, $messageParameters = [])
+    public function sendEmailToCustomer($messageCode, $customer, $messageParameters = []): void
     {
         // Always add the customer ID to the parameters
         $messageParameters['customer_id'] = $customer->getId();
@@ -146,7 +146,7 @@ class MailerFactory
      * @param array  $messageParameters an array of (name => value) parameters that will be available in the message
      * @param array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      */
-    public function sendEmailToShopManagers($messageCode, $messageParameters = [], $replyTo = [])
+    public function sendEmailToShopManagers($messageCode, $messageParameters = [], $replyTo = []): void
     {
         $storeName = ConfigQuery::getStoreName();
 
@@ -183,7 +183,7 @@ class MailerFactory
      * @param array  $bcc               Bcc addresses. An array of (email-address => name) [optional]
      * @param array  $replyTo           Reply to addresses. An array of (email-address => name) [optional]
      */
-    public function sendEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [], $replyTo = [])
+    public function sendEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null, $cc = [], $bcc = [], $replyTo = []): void
     {
         $store_email = ConfigQuery::getStoreEmail();
 
@@ -348,7 +348,7 @@ class MailerFactory
      * @param array          $bcc      Bcc addresses. An array of (email-address => name) [optional]
      * @param array          $replyTo  Reply to addresses. An array of (email-address => name) [optional]
      */
-    protected function setupMessageHeaders($instance, $from, $to, $cc = [], $bcc = [], $replyTo = [])
+    protected function setupMessageHeaders($instance, $from, $to, $cc = [], $bcc = [], $replyTo = []): void
     {
         // Add from addresses
         foreach ($from as $address => $name) {

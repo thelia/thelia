@@ -21,7 +21,7 @@ use Thelia\Core\HttpFoundation\Request;
 
 class ClearImageCache extends ContainerAwareCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('image-cache:clear')

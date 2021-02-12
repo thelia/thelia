@@ -27,7 +27,7 @@ use Thelia\Model\Lang;
  */
 class BrandCreationForm extends BaseForm
 {
-    protected function doBuilForm($titleFieldHelpLabel)
+    protected function doBuilForm($titleFieldHelpLabel): void
     {
         $this->formBuilder->add(
             'title',
@@ -67,7 +67,7 @@ class BrandCreationForm extends BaseForm
         );
     }
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->doBuilForm(
             Translator::getInstance()->trans(

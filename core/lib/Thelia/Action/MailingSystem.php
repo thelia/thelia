@@ -19,7 +19,7 @@ use Thelia\Model\ConfigQuery;
 
 class MailingSystem extends BaseAction implements EventSubscriberInterface
 {
-    public function update(MailingSystemEvent $event)
+    public function update(MailingSystemEvent $event): void
     {
         if ($event->getEnabled()) {
             ConfigQuery::enableSmtp();

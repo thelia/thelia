@@ -89,7 +89,7 @@ class AttributeAvTest extends BaseAction
     /**
      * @depends testUpdate
      */
-    public function testDelete(AttributeAvModel $attributeAv)
+    public function testDelete(AttributeAvModel $attributeAv): void
     {
         $event = new AttributeAvDeleteEvent($attributeAv->getId());
 

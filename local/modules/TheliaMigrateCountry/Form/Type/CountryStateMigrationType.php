@@ -27,7 +27,7 @@ use Thelia\Model\StateQuery;
  */
 class CountryStateMigrationType extends AbstractTheliaType
 {
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -43,7 +43,7 @@ class CountryStateMigrationType extends AbstractTheliaType
         );
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('migrate', 'checkbox')
@@ -65,7 +65,7 @@ class CountryStateMigrationType extends AbstractTheliaType
         ;
     }
 
-    public function checkStateId($value, ExecutionContextInterface $context)
+    public function checkStateId($value, ExecutionContextInterface $context): void
     {
         if ($value['migrate']) {
             if (null !== $state = StateQuery::create()->findPk($value['new_state'])) {
@@ -91,7 +91,7 @@ class CountryStateMigrationType extends AbstractTheliaType
         }
     }
 
-    private function getRowData(ExecutionContextInterface $context)
+    private function getRowData(ExecutionContextInterface $context): void
     {
         $propertyPath = $context->getPropertyPath();
         $data = $this->getRowData($context);

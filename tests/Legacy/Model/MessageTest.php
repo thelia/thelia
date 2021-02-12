@@ -102,7 +102,7 @@ class MessageTest extends TestCase
     /**
      * Create message with HTML and TEXT body from message HTMl and TEXT fields.
      */
-    public function testMessageWithTextAndHtmlBody()
+    public function testMessageWithTextAndHtmlBody(): void
     {
         $message = new ModelMessage();
 
@@ -124,7 +124,7 @@ class MessageTest extends TestCase
     /**
      * Create message with TEXT body only from message HTMl and TEXT fields.
      */
-    public function testMessageWithTextOnlyBody()
+    public function testMessageWithTextOnlyBody(): void
     {
         $message = new ModelMessage();
 
@@ -146,7 +146,7 @@ class MessageTest extends TestCase
      * Create message with HTML and TEXT body from message HTMl and TEXT fields
      * using a text and a html layout.
      */
-    public function testMessageWithTextAndHtmlBodyAndTextAndHtmlLayout()
+    public function testMessageWithTextAndHtmlBodyAndTextAndHtmlLayout(): void
     {
         $message = new ModelMessage();
 
@@ -177,7 +177,7 @@ class MessageTest extends TestCase
      * Create message with TEXT only body from message HTMl and TEXT fields
      * using a text only layout.
      */
-    public function testMessageWithTextOnlyBodyAndTextOnlyLayout()
+    public function testMessageWithTextOnlyBodyAndTextOnlyLayout(): void
     {
         $message = new ModelMessage();
 
@@ -205,7 +205,7 @@ class MessageTest extends TestCase
      * Create message with TEXT and HTML body from message HTMl and TEXT fields
      * using a text only layout.
      */
-    public function testMessageWithTextAndHtmlBodyAndTextOnlyLayout()
+    public function testMessageWithTextAndHtmlBodyAndTextOnlyLayout(): void
     {
         $message = new ModelMessage();
 
@@ -234,7 +234,7 @@ class MessageTest extends TestCase
      * Create message with HTML and TEXT body from template HTMl and TEXT fields
      * using a text and a html layout.
      */
-    public function testMessageWithTextAndHtmlBodyAndTextAndHtmlLayoutAndTextAndHtmlTemplate()
+    public function testMessageWithTextAndHtmlBodyAndTextAndHtmlLayoutAndTextAndHtmlTemplate(): void
     {
         $message = new ModelMessage();
 
@@ -273,7 +273,7 @@ class MessageTest extends TestCase
      * Create message with HTML and TEXT body from template HTMl and TEXT fields
      * using a text and a html layout.
      */
-    public function testMessageWithTextAndHtmlBodyAndTextAndHtmlLayoutAndTextAndHtmlTemplateWichExtendsLayout()
+    public function testMessageWithTextAndHtmlBodyAndTextAndHtmlLayoutAndTextAndHtmlTemplateWichExtendsLayout(): void
     {
         $message = new ModelMessage();
 
@@ -312,7 +312,7 @@ class MessageTest extends TestCase
      * Create message with HTML and TEXT body from template HTMl and TEXT fields
      * using a text and a html layout.
      */
-    public function testMessageWithTextAndHtmlBodyAndTextAndHtmlExtendableLayout()
+    public function testMessageWithTextAndHtmlBodyAndTextAndHtmlExtendableLayout(): void
     {
         $message = new ModelMessage();
 

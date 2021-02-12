@@ -30,7 +30,7 @@ abstract class BaseType implements TypeInterface
 
     abstract public function getFormOptions();
 
-    public function verifyForm($value, ExecutionContextInterface $context)
+    public function verifyForm($value, ExecutionContextInterface $context): void
     {
         if (!$this->isValid($value)) {
             $context->addViolation(

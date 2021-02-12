@@ -105,7 +105,7 @@ class AreaTest extends BaseAction
     /**
      * @depends testRemoveCountry
      */
-    public function testDelete(AreaModel $area)
+    public function testDelete(AreaModel $area): void
     {
         $area->delete();
 

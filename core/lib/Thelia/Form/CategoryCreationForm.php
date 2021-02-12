@@ -20,7 +20,7 @@ use Thelia\Model\Lang;
 
 class CategoryCreationForm extends BaseForm
 {
-    protected function doBuilForm($titleHelpText)
+    protected function doBuilForm($titleHelpText): void
     {
         $this->formBuilder
             ->add(
@@ -63,7 +63,7 @@ class CategoryCreationForm extends BaseForm
         ;
     }
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->doBuilForm(
             $this->translator->trans(

@@ -51,7 +51,7 @@ class TaxEngine
      * @param string $namespace                the namespace of the classes in the directory
      * @param string $path_to_tax_type_classes the path to the directory
      */
-    public function addTaxTypeDirectory($namespace, $path_to_tax_type_classes)
+    public function addTaxTypeDirectory($namespace, $path_to_tax_type_classes): void
     {
         $this->taxTypesDirectories[$namespace] = $path_to_tax_type_classes;
     }
@@ -61,7 +61,7 @@ class TaxEngine
      *
      * @param unknown $fullyQualifiedclassName the fully qualified classname, su chas MyTaxes\Taxes\MyTaxType
      */
-    public function addTaxType($fullyQualifiedclassName)
+    public function addTaxType($fullyQualifiedclassName): void
     {
         $this->typeList[] = $fullyQualifiedclassName;
     }

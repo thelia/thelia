@@ -126,7 +126,7 @@ class Tlog implements LoggerInterface
     /**
      * initialize default configuration.
      */
-    protected function init()
+    protected function init(): void
     {
         $this->setLevel(ConfigQuery::read(self::VAR_LEVEL, self::DEFAULT_LEVEL));
 
@@ -259,7 +259,7 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addDebug($arg1, $arg2, $arg3);
      */
-    public function addDebug()
+    public function addDebug(): void
     {
         $args = \func_get_args();
 
@@ -287,7 +287,7 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addInfo($arg1, $arg2, $arg3);
      */
-    public function addInfo()
+    public function addInfo(): void
     {
         $args = \func_get_args();
 
@@ -313,7 +313,7 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addNotice($arg1, $arg2, $arg3);
      */
-    public function addNotice()
+    public function addNotice(): void
     {
         $args = \func_get_args();
 
@@ -342,7 +342,7 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addWarning($arg1, $arg2, $arg3);
      */
-    public function addWarning()
+    public function addWarning(): void
     {
         $args = \func_get_args();
 
@@ -369,7 +369,7 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addError($arg1, $arg2, $arg3);
      */
-    public function addError()
+    public function addError(): void
     {
         $args = \func_get_args();
 
@@ -381,7 +381,7 @@ class Tlog implements LoggerInterface
     /**
      * @see error()
      */
-    public function err($message, array $context = [])
+    public function err($message, array $context = []): void
     {
         $this->error($message, $context);
     }
@@ -405,7 +405,7 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addCritical($arg1, $arg2, $arg3);
      */
-    public function addCritical()
+    public function addCritical(): void
     {
         $args = \func_get_args();
 
@@ -417,7 +417,7 @@ class Tlog implements LoggerInterface
     /**
      * @see critical()
      */
-    public function crit($message, array $context = [])
+    public function crit($message, array $context = []): void
     {
         $this->critical($message, $context);
     }
@@ -442,7 +442,7 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addAlert($arg1, $arg2, $arg3);
      */
-    public function addAlert()
+    public function addAlert(): void
     {
         $args = \func_get_args();
 
@@ -468,7 +468,7 @@ class Tlog implements LoggerInterface
      *
      * ex : Tlog::getInstance()->addEmergency($arg1, $arg2, $arg3);
      */
-    public function addEmergency()
+    public function addEmergency(): void
     {
         $args = \func_get_args();
 
@@ -500,7 +500,7 @@ class Tlog implements LoggerInterface
      *
      * @return void
      */
-    public function write(&$res)
+    public function write(&$res): void
     {
         $this->done = true;
 
@@ -517,7 +517,7 @@ class Tlog implements LoggerInterface
     /**
      * @see write()
      */
-    public function writeOnExit()
+    public function writeOnExit(): void
     {
         // Si les infos de debug n'ont pas été ecrites, le faire maintenant
         if ($this->done === false) {
@@ -636,7 +636,7 @@ class Tlog implements LoggerInterface
         return strtr($message, $replace);
     }
 
-    private function out($level, $message, array $context = [])
+    private function out($level, $message, array $context = []): void
     {
         $text = '';
 
@@ -678,7 +678,7 @@ class Tlog implements LoggerInterface
      * @param type  $destinations
      * @param array $actives      array containing classes instanceof AbstractTlogDestination
      */
-    protected function loadDestinations(&$destinations, array $actives = null)
+    protected function loadDestinations(&$destinations, array $actives = null): void
     {
         foreach ($actives as $active) {
             if (class_exists($active)) {

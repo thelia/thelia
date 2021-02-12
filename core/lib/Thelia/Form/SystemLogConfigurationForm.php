@@ -21,7 +21,7 @@ use Thelia\Log\Tlog;
 
 class SystemLogConfigurationForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('level', ChoiceType::class, [

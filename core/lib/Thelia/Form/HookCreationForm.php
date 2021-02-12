@@ -31,7 +31,7 @@ use Thelia\Model\HookQuery;
  */
 class HookCreationForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('code', TextType::class, [
@@ -90,7 +90,7 @@ class HookCreationForm extends BaseForm
         ;
     }
 
-    public function checkCodeUnicity($code, ExecutionContextInterface $context)
+    public function checkCodeUnicity($code, ExecutionContextInterface $context): void
     {
         $type = $context->getRoot()->getData()['type'];
 

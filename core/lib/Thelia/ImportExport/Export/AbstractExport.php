@@ -159,7 +159,7 @@ abstract class AbstractExport implements \Iterator
     /**
      * @throws \Exception
      */
-    public function next()
+    public function next(): void
     {
         if ($this->dataIsJSONFile) {
             $this->data->next();
@@ -177,7 +177,7 @@ abstract class AbstractExport implements \Iterator
     /**
      * @throws \Exception
      */
-    public function rewind()
+    public function rewind(): void
     {
         // Since it's first method call on traversable, we get raw data here
         // but we do not permit to go back

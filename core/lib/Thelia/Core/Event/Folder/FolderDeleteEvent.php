@@ -35,7 +35,7 @@ class FolderDeleteEvent extends FolderEvent
     /**
      * @param int $folder_id
      */
-    public function setFolderId($folder_id)
+    public function setFolderId($folder_id): void
     {
         $this->folder_id = $folder_id;
     }

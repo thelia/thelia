@@ -24,7 +24,7 @@ use Thelia\Model\TaxQuery;
  */
 class TaxModificationForm extends TaxCreationForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         parent::buildForm();
 
@@ -46,7 +46,7 @@ class TaxModificationForm extends TaxCreationForm
         return 'thelia_tax_modification';
     }
 
-    public function verifyTaxId($value, ExecutionContextInterface $context)
+    public function verifyTaxId($value, ExecutionContextInterface $context): void
     {
         $tax = TaxQuery::create()
             ->findPk($value);

@@ -35,7 +35,7 @@ class LoopResult implements \Iterator, \JsonSerializable
     /**
      * @param bool $countable
      */
-    public function setCountable($countable = true)
+    public function setCountable($countable = true): void
     {
         $this->countable = true === $countable;
     }
@@ -43,7 +43,7 @@ class LoopResult implements \Iterator, \JsonSerializable
     /**
      * @param bool $timestamped
      */
-    public function setTimestamped($timestamped = true)
+    public function setTimestamped($timestamped = true): void
     {
         $this->timestamped = true === $timestamped;
     }
@@ -51,7 +51,7 @@ class LoopResult implements \Iterator, \JsonSerializable
     /**
      * @param bool $versioned
      */
-    public function setVersioned($versioned = true)
+    public function setVersioned($versioned = true): void
     {
         $this->versioned = true === $versioned;
     }
@@ -61,7 +61,7 @@ class LoopResult implements \Iterator, \JsonSerializable
         return \count($this->collection) == 0;
     }
 
-    public function addRow(LoopResultRow $row)
+    public function addRow(LoopResultRow $row): void
     {
         if (true === $this->versioned) {
             foreach ($this->getVersionOutputs() as $output) {
@@ -84,7 +84,7 @@ class LoopResult implements \Iterator, \JsonSerializable
     /**
      * @param int $key
      */
-    public function remove($key)
+    public function remove($key): void
     {
         if (isset($this->collection[$key])) {
             unset($this->collection[$key]);
@@ -94,7 +94,7 @@ class LoopResult implements \Iterator, \JsonSerializable
     /**
      * Adjust the collection once all results have been added.
      */
-    public function finalizeRows()
+    public function finalizeRows(): void
     {
         // Fix rows LOOP_TOTAL if parseResults() did not added all resultsCollection items to the collection array
         // see https://github.com/thelia/thelia/issues/2337
@@ -148,7 +148,7 @@ class LoopResult implements \Iterator, \JsonSerializable
      *
      * @return void any returned value is ignored
      */
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
@@ -188,7 +188,7 @@ class LoopResult implements \Iterator, \JsonSerializable
      *
      * @return void any returned value is ignored
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }

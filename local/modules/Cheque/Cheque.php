@@ -22,7 +22,7 @@ class Cheque extends AbstractPaymentModule
 {
     public const MESSAGE_DOMAIN = 'Cheque';
 
-    public function pay(Order $order)
+    public function pay(Order $order): void
     {
         // Nothing special to to.
     }
@@ -40,7 +40,7 @@ class Cheque extends AbstractPaymentModule
         return $this->getCurrentOrderTotalAmount() > 0;
     }
 
-    public function postActivation(ConnectionInterface $con = null)
+    public function postActivation(ConnectionInterface $con = null): void
     {
         $database = new Database($con);
 
@@ -48,7 +48,7 @@ class Cheque extends AbstractPaymentModule
         $database->insertSql(null, [__DIR__.'/Config/setup.sql']);
     }
 
-    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
+    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false): void
     {
         // Delete our message
         if (null !== $message = MessageQuery::create()->findOneByName('order_confirmation_cheque')) {

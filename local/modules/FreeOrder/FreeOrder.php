@@ -25,7 +25,7 @@ class FreeOrder extends AbstractPaymentModule
         return round($this->getCurrentOrderTotalAmount(), 4) == 0;
     }
 
-    public function pay(Order $order)
+    public function pay(Order $order): void
     {
         $event = new OrderEvent($order);
         $event->setStatus(OrderStatusQuery::getPaidStatus()->getId());

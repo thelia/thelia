@@ -138,7 +138,7 @@ trait UrlRewritingTrait
     /**
      * Mark the current URL as obseolete.
      */
-    public function markRewrittenUrlObsolete()
+    public function markRewrittenUrlObsolete(): void
     {
         RewritingUrlQuery::create()
             ->filterByView($this->getRewrittenUrlViewName())

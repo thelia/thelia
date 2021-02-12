@@ -26,7 +26,7 @@ class StandardFieldsType extends AbstractType
     use StandardDescriptionFieldsTrait;
     protected $formBuilder;
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->formBuilder = $builder;
         $this->addStandardDescFields();

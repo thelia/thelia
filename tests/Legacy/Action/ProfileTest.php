@@ -99,7 +99,7 @@ class ProfileTest extends BaseAction
     /**
      * @depends testUpdate
      */
-    public function testUpdateResourceAccess(ProfileModel $profile)
+    public function testUpdateResourceAccess(ProfileModel $profile): void
     {
         $event = new ProfileEvent();
         $event

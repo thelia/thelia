@@ -95,7 +95,7 @@ class RemoveXAmountTest extends TestCase
      * @covers \Thelia\Coupon\Type\RemoveXAmount::getExpirationDate
      * @covers \Thelia\Coupon\Type\RemoveXAmount::setConditions
      */
-    public function testSet()
+    public function testSet(): void
     {
         $stubFacade = $this->generateFacadeStub();
 
@@ -112,7 +112,7 @@ class RemoveXAmountTest extends TestCase
     Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.';
 
         $coupon->set(
-            $stubFacade, 'XMAS', 'XMAS Coupon', 'Coupon for Springbreak removing 10€ if you have a cart between 40.00€ and 400.00€ (excluded)',
+            $stubFacade, 'XMAS', 'XMAS Coupon', "Coupon for Springbreak removing 10€ if you have a cart between 40.00€\u{a0}and 400.00€ (excluded)",
             $description, ['amount' => 10.00], true, true, true, true, 254, $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
@@ -148,7 +148,7 @@ class RemoveXAmountTest extends TestCase
 
         $this->assertEquals('XMAS', $coupon->getCode());
         $this->assertEquals('XMAS Coupon', $coupon->getTitle());
-        $this->assertEquals('Coupon for Springbreak removing 10€ if you have a cart between 40.00€ and 400.00€ (excluded)', $coupon->getShortDescription());
+        $this->assertEquals("Coupon for Springbreak removing 10€ if you have a cart between 40.00€\u{a0}and 400.00€ (excluded)", $coupon->getShortDescription());
         $this->assertEquals($description, $coupon->getDescription());
         $this->assertEquals(true, $coupon->isCumulative());
         $this->assertEquals(true, $coupon->isRemovingPostage());
@@ -164,7 +164,7 @@ class RemoveXAmountTest extends TestCase
     /**
      * @covers \Thelia\Coupon\Type\RemoveXAmount::getName
      */
-    public function testGetName()
+    public function testGetName(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Remove X amount to total cart');
 
@@ -179,7 +179,7 @@ class RemoveXAmountTest extends TestCase
     /**
      * @covers \Thelia\Coupon\Type\RemoveXAmount::getToolTip
      */
-    public function testGetToolTip()
+    public function testGetToolTip(): void
     {
         $tooltip = 'This coupon will remove the entered amount to the customer total checkout. If the discount is superior to the total checkout price the customer will only pay the postage. Unless if the coupon is set to remove postage too.';
         $stubFacade = $this->generateFacadeStub(399, 'EUR', $tooltip);

@@ -34,7 +34,7 @@ class ModuleInstallForm extends BaseForm
 
     protected $modulePath;
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(
@@ -66,7 +66,7 @@ class ModuleInstallForm extends BaseForm
     /**
      * Check module validity.
      */
-    public function checkModuleValidity(UploadedFile $file, ExecutionContextInterface $context)
+    public function checkModuleValidity(UploadedFile $file, ExecutionContextInterface $context): void
     {
         $modulePath = $this->unzipModule($file);
 

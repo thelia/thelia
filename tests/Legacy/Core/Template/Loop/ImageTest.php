@@ -33,28 +33,28 @@ class ImageTest extends BaseLoopTestor
         return ['source' => 'product', 'id' => 1];
     }
 
-    public function testSearchByProductId()
+    public function testSearchByProductId(): void
     {
         $image = ProductImageQuery::create()->findOne();
 
         $this->baseTestSearchById($image->getId(), ['source' => 'product']);
     }
 
-    public function testSearchByFolderId()
+    public function testSearchByFolderId(): void
     {
         $image = FolderImageQuery::create()->findOne();
 
         $this->baseTestSearchById($image->getId(), ['source' => 'folder']);
     }
 
-    public function testSearchByContentId()
+    public function testSearchByContentId(): void
     {
         $image = ContentImageQuery::create()->findOne();
 
         $this->baseTestSearchById($image->getId(), ['source' => 'content']);
     }
 
-    public function testSearchByCategoryId()
+    public function testSearchByCategoryId(): void
     {
         $image = CategoryImageQuery::create()->findOne();
 

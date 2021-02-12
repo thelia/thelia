@@ -27,7 +27,7 @@ class BrandModificationForm extends BrandCreationForm
 {
     use StandardDescriptionFieldsTrait;
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->doBuilForm(
             Translator::getInstance()->trans('The brand name or title')

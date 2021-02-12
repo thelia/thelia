@@ -71,7 +71,7 @@ class SchemaCombinerTest extends TestCase
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
-    public function testOutputTypesAreCorrect(array $schemaFiles)
+    public function testOutputTypesAreCorrect(array $schemaFiles): void
     {
         $schemaDocuments = $this->loadFixtureFiles($schemaFiles);
         $schemaCombiner = new SchemaCombiner(array_values($schemaDocuments));
@@ -120,7 +120,7 @@ class SchemaCombinerTest extends TestCase
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
-    public function testCombinedSchemasAreValid(array $schemaFiles)
+    public function testCombinedSchemasAreValid(array $schemaFiles): void
     {
         $schemaDocuments = $this->loadFixtureFiles($schemaFiles);
         $schemaCombiner = new SchemaCombiner(array_values($schemaDocuments));
@@ -137,7 +137,7 @@ class SchemaCombinerTest extends TestCase
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
-    public function testOneGlobalSchemaPerDatabaseIsProduced(array $schemaFiles, array $expectedDatabases)
+    public function testOneGlobalSchemaPerDatabaseIsProduced(array $schemaFiles, array $expectedDatabases): void
     {
         $schemaDocuments = $this->loadFixtureFiles($schemaFiles);
         $schemaCombiner = new SchemaCombiner(array_values($schemaDocuments));
@@ -161,7 +161,7 @@ class SchemaCombinerTest extends TestCase
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
-    public function testCombinedSchemasContainOnlyOneDatabaseElement(array $schemaFiles)
+    public function testCombinedSchemasContainOnlyOneDatabaseElement(array $schemaFiles): void
     {
         $schemaDocuments = $this->loadFixtureFiles($schemaFiles);
         $schemaCombiner = new SchemaCombiner(array_values($schemaDocuments));
@@ -182,7 +182,7 @@ class SchemaCombinerTest extends TestCase
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
-    public function testDatabaseElementsAreCorrectlyNamed(array $schemaFiles)
+    public function testDatabaseElementsAreCorrectlyNamed(array $schemaFiles): void
     {
         $schemaDocuments = $this->loadFixtureFiles($schemaFiles);
         $schemaCombiner = new SchemaCombiner(array_values($schemaDocuments));
@@ -204,7 +204,7 @@ class SchemaCombinerTest extends TestCase
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
-    public function testDatabaseElementsHaveIdentifierQuotingActive(array $schemaFiles)
+    public function testDatabaseElementsHaveIdentifierQuotingActive(array $schemaFiles): void
     {
         $schemaDocuments = $this->loadFixtureFiles($schemaFiles);
         $schemaCombiner = new SchemaCombiner(array_values($schemaDocuments));
@@ -226,7 +226,7 @@ class SchemaCombinerTest extends TestCase
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
-    public function testDatabaseElementsHaveNoTablePrefixAttribute(array $schemaFiles)
+    public function testDatabaseElementsHaveNoTablePrefixAttribute(array $schemaFiles): void
     {
         $schemaDocuments = $this->loadFixtureFiles($schemaFiles);
         $schemaCombiner = new SchemaCombiner(array_values($schemaDocuments));
@@ -248,7 +248,7 @@ class SchemaCombinerTest extends TestCase
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
-    public function testDatabaseElementsHaveNoInheritableAttributes(array $schemaFiles)
+    public function testDatabaseElementsHaveNoInheritableAttributes(array $schemaFiles): void
     {
         $schemaDocuments = $this->loadFixtureFiles($schemaFiles);
         $schemaCombiner = new SchemaCombiner(array_values($schemaDocuments));
@@ -272,7 +272,7 @@ class SchemaCombinerTest extends TestCase
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
-    public function testDatabaseElementsHaveNoExternalSchemaElements(array $schemaFiles)
+    public function testDatabaseElementsHaveNoExternalSchemaElements(array $schemaFiles): void
     {
         $schemaDocuments = $this->loadFixtureFiles($schemaFiles);
         $schemaCombiner = new SchemaCombiner(array_values($schemaDocuments));
@@ -293,7 +293,7 @@ class SchemaCombinerTest extends TestCase
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
-    public function testExpectedTableElementsAreGenerated(array $schemaFiles, array $expectedDatabases)
+    public function testExpectedTableElementsAreGenerated(array $schemaFiles, array $expectedDatabases): void
     {
         $schemaDocuments = $this->loadFixtureFiles($schemaFiles);
         $schemaCombiner = new SchemaCombiner(array_values($schemaDocuments));
@@ -344,7 +344,7 @@ class SchemaCombinerTest extends TestCase
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
-    public function testInheritableDatabaseAttributesAreInheritedOnTables(array $schemaFiles, array $expectedDatabases)
+    public function testInheritableDatabaseAttributesAreInheritedOnTables(array $schemaFiles, array $expectedDatabases): void
     {
         $schemaDocuments = $this->loadFixtureFiles($schemaFiles);
         $schemaCombiner = new SchemaCombiner(array_values($schemaDocuments));
@@ -394,7 +394,7 @@ class SchemaCombinerTest extends TestCase
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
-    public function testTableElementsContentIsPreserved(array $schemaFiles, array $expectedDatabases)
+    public function testTableElementsContentIsPreserved(array $schemaFiles, array $expectedDatabases): void
     {
         $schemaDocuments = $this->loadFixtureFiles($schemaFiles);
         $schemaCombiner = new SchemaCombiner(array_values($schemaDocuments));

@@ -87,7 +87,7 @@ class Thelia extends Kernel
         return file_exists(THELIA_CONF_DIR.'database.yml');
     }
 
-    protected function checkMySQLConfigurations(ConnectionInterface $con)
+    protected function checkMySQLConfigurations(ConnectionInterface $con): void
     {
         // TODO : add cache for this test
         /** @var PDODataFetcher $result */
@@ -167,7 +167,7 @@ class Thelia extends Kernel
         return '\Thelia\Core\DependencyInjection\TheliaContainer';
     }
 
-    protected function initializeContainer()
+    protected function initializeContainer(): void
     {
         // initialize Propel, building its cache if necessary
         $this->propelSchemaLocator = new SchemaLocator(
@@ -196,7 +196,7 @@ class Thelia extends Kernel
      *
      * @throws \Exception
      */
-    public function boot()
+    public function boot(): void
     {
         parent::boot();
 
@@ -253,7 +253,7 @@ class Thelia extends Kernel
      * @param Definition $parser the parser
      * @param Module     $module the Module
      */
-    protected function addStandardModuleTemplatesToParserEnvironment($parser, $module)
+    protected function addStandardModuleTemplatesToParserEnvironment($parser, $module): void
     {
         $stdTpls = TemplateDefinition::getStandardTemplatesSubdirsIterator();
 
@@ -270,7 +270,7 @@ class Thelia extends Kernel
      * @param string     $templateType       the template type (one of the TemplateDefinition type constants)
      * @param string     $templateSubdirName the template subdirectory name (one of the TemplateDefinition::XXX_SUBDIR constants)
      */
-    protected function addModuleTemplateToParserEnvironment($parser, $module, $templateType, $templateSubdirName)
+    protected function addModuleTemplateToParserEnvironment($parser, $module, $templateType, $templateSubdirName): void
     {
         // Get template path
         $templateDirectory = $module->getAbsoluteTemplateDirectoryPath($templateSubdirName);
@@ -305,7 +305,7 @@ class Thelia extends Kernel
      *
      * @throws \Exception
      */
-    protected function loadConfiguration(ContainerBuilder $container)
+    protected function loadConfiguration(ContainerBuilder $container): void
     {
         $fileLocator = new FileLocator(__DIR__.'/../Config/Resources');
         $phpLoader = new PhpFileLoader($container, $fileLocator);
@@ -440,7 +440,7 @@ class Thelia extends Kernel
     /**
      * @param TemplateHelperInterface $templateHelper
      */
-    private function loadModuleTranslationDirectories(Module $module, array &$translationDirs, $templateHelper)
+    private function loadModuleTranslationDirectories(Module $module, array &$translationDirs, $templateHelper): void
     {
         // Core module translation
         if (is_dir($dir = $module->getAbsoluteI18nPath())) {
@@ -501,7 +501,7 @@ class Thelia extends Kernel
         }
     }
 
-    private function loadTranslation(ContainerBuilder $container, array $dirs)
+    private function loadTranslation(ContainerBuilder $container, array $dirs): void
     {
         $translator = $container->getDefinition(Translator::class);
 
@@ -642,7 +642,7 @@ class Thelia extends Kernel
      *
      * @api
      */
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         // Nothing is load here but it's possible to load container configuration here.
         // exemple in sf2 : $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');

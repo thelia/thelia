@@ -59,7 +59,7 @@ class ErrorListener implements EventSubscriberInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function defaultErrorFallback(ExceptionEvent $event)
+    public function defaultErrorFallback(ExceptionEvent $event): void
     {
         $this->parser->assign('status_code', 500);
         $this->parser->assign('exception_message', $event->getThrowable()->getMessage());
@@ -80,7 +80,7 @@ class ErrorListener implements EventSubscriberInterface
         $event->setResponse($response);
     }
 
-    public function handleException(ExceptionEvent $event)
+    public function handleException(ExceptionEvent $event): void
     {
         if ('prod' === $this->env && ConfigQuery::isShowingErrorMessage()) {
             $this->eventDispatcher
@@ -92,7 +92,7 @@ class ErrorListener implements EventSubscriberInterface
         }
     }
 
-    public function logException(ExceptionEvent $event)
+    public function logException(ExceptionEvent $event): void
     {
         // Log exception in the Thelia log
         $exception = $event->getThrowable();
@@ -111,7 +111,7 @@ class ErrorListener implements EventSubscriberInterface
         Tlog::getInstance()->error($logMessage);
     }
 
-    public function authenticationException(ExceptionEvent $event)
+    public function authenticationException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
         if ($exception instanceof AuthenticationException) {

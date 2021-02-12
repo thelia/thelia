@@ -306,7 +306,7 @@ class AreaController extends AbstractCrudController
         return $this->renderEditionTemplate();
     }
 
-    protected function removeOneCountryFromArea(Area $area, $countryId, $stateId)
+    protected function removeOneCountryFromArea(Area $area, $countryId, $stateId): void
     {
         if (\intval($stateId) === 0) {
             $stateId = null;

@@ -35,7 +35,7 @@ class CategoryDocument extends BaseCategoryDocument implements BreadcrumbInterfa
      *
      * @param CategoryDocumentQuery $query
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByCategory($this->getCategory());
     }

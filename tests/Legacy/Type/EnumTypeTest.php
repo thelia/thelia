@@ -20,7 +20,7 @@ use Thelia\Type\EnumType;
  */
 class EnumTypeTest extends TestCase
 {
-    public function testEnumType()
+    public function testEnumType(): void
     {
         $enumType = new EnumType(['cat', 'dog']);
         $this->assertTrue($enumType->isValid('cat'));

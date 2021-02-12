@@ -26,7 +26,7 @@ class Module extends BaseModule
 
     public const ADMIN_INCLUDES_DIRECTORY_NAME = 'AdminIncludes';
 
-    public function postSave(ConnectionInterface $con = null)
+    public function postSave(ConnectionInterface $con = null): void
     {
         ModuleQuery::resetActivated();
 
@@ -332,7 +332,7 @@ class Module extends BaseModule
      *
      * @param ModuleQuery $query
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByType($this->getType());
     }

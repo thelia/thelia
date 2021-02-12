@@ -44,7 +44,7 @@ class Lang extends BaseLang
         return self::$defaultLanguage;
     }
 
-    public function toggleDefault()
+    public function toggleDefault(): void
     {
         if ($this->getId() === null) {
             throw new \RuntimeException('impossible to just uncheck default language, choose a new one');

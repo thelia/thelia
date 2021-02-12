@@ -35,7 +35,7 @@ class TaxCreationForm extends BaseForm
 
     protected static $typeList = [];
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         if (!$this->container) {
             throw new \LogicException(
@@ -119,7 +119,7 @@ class TaxCreationForm extends BaseForm
         $this->addStandardDescFields(['postscriptum', 'chapo', 'locale']);
     }
 
-    public function checkRequirementField($value, ExecutionContextInterface $context)
+    public function checkRequirementField($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
         $type = $data['type'];

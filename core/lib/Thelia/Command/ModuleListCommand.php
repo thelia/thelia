@@ -26,7 +26,7 @@ use Thelia\Module\BaseModule;
  */
 class ModuleListCommand extends ContainerAwareCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('module:list')

@@ -26,19 +26,19 @@ use Thelia\Model\Map\CustomerTitleTableMap;
  */
 class CustomerTitle extends BaseAction implements EventSubscriberInterface
 {
-    public function create(CustomerTitleEvent $event)
+    public function create(CustomerTitleEvent $event): void
     {
         $this->createOrUpdate($event, new CustomerTitleModel());
     }
 
-    public function update(CustomerTitleEvent $event)
+    public function update(CustomerTitleEvent $event): void
     {
         $this->checkCustomerTitle($event);
 
         $this->createOrUpdate($event, $event->getCustomerTitle());
     }
 
-    public function delete(CustomerTitleEvent $event)
+    public function delete(CustomerTitleEvent $event): void
     {
         $this->checkCustomerTitle($event);
 
@@ -58,7 +58,7 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
         $event->setCustomerTitle(null);
     }
 
-    protected function checkCustomerTitle(CustomerTitleEvent $event)
+    protected function checkCustomerTitle(CustomerTitleEvent $event): void
     {
         if (null === $event->getCustomerTitle()) {
             throw new \LogicException(
@@ -67,7 +67,7 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    protected function createOrUpdate(CustomerTitleEvent $event, CustomerTitleModel $customerTitle)
+    protected function createOrUpdate(CustomerTitleEvent $event, CustomerTitleModel $customerTitle): void
     {
         $con = Propel::getConnection(CustomerTitleTableMap::DATABASE_NAME);
         $con->beginTransaction();

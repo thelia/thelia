@@ -28,7 +28,7 @@ class Message extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function create(MessageCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(MessageCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $message = new MessageModel();
 
@@ -50,7 +50,7 @@ class Message extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function modify(MessageUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function modify(MessageUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $message = MessageQuery::create()->findPk($event->getMessageId())) {
             $message
@@ -82,7 +82,7 @@ class Message extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function delete(MessageDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(MessageDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== ($message = MessageQuery::create()->findPk($event->getMessageId()))) {
             $message

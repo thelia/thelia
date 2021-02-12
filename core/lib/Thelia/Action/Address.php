@@ -29,35 +29,35 @@ use Thelia\Model\Map\AddressTableMap;
  */
 class Address extends BaseAction implements EventSubscriberInterface
 {
-    public function create(AddressCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(AddressCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $address = new AddressModel();
         $address->setCustomer($event->getCustomer());
         $this->createOrUpdate($address, $event, $dispatcher);
     }
 
-    public function update(AddressCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(AddressCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $addressModel = $event->getAddress();
 
         $this->createOrUpdate($addressModel, $event, $dispatcher);
     }
 
-    public function delete(AddressEvent $event)
+    public function delete(AddressEvent $event): void
     {
         $address = $event->getModel();
 
         $address->delete();
     }
 
-    public function useDefault(AddressEvent $event)
+    public function useDefault(AddressEvent $event): void
     {
         $address = $event->getModel();
 
         $address->makeItDefault();
     }
 
-    protected function createOrUpdate(AddressModel $addressModel, AddressCreateOrUpdateEvent $event, $dispatcher)
+    protected function createOrUpdate(AddressModel $addressModel, AddressCreateOrUpdateEvent $event, $dispatcher): void
     {
         $con = Propel::getWriteConnection(AddressTableMap::DATABASE_NAME);
         $con->beginTransaction();

@@ -127,7 +127,7 @@ class UrlGenerator extends AbstractSmartyPlugin
             );
 
             $request = $this->getRequest();
-            $requestedLangCodeOrLocale = $params['lang'];
+            $requestedLangCodeOrLocale = $params['lang'] ?? null;
             $view = $request->attributes->get('_view', null);
             $viewId = $view === null ? null : $request->query->get($view.'_id', null);
 
@@ -180,7 +180,7 @@ class UrlGenerator extends AbstractSmartyPlugin
 
         $path = strtr($path, $placeholder);
         $keys = array_keys($placeholder);
-        array_walk($keys, function (&$item, $key) {
+        array_walk($keys, function (&$item, $key): void {
             $item = str_replace('%', '', $item);
         });
 
@@ -310,7 +310,7 @@ class UrlGenerator extends AbstractSmartyPlugin
      * @param array                     $params
      * @param \Smarty_Internal_Template $smarty
      */
-    public function setPreviousUrlFunction($params, &$smarty)
+    public function setPreviousUrlFunction($params, &$smarty): void
     {
         $ignore_current = $this->getParam($params, 'ignore_current', false);
 

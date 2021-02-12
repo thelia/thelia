@@ -46,7 +46,7 @@ class CalculatorTest extends TestCase
         return $property;
     }
 
-    public function testLoadEmptyProductException()
+    public function testLoadEmptyProductException(): void
     {
         $calculator = new Calculator();
 
@@ -55,7 +55,7 @@ class CalculatorTest extends TestCase
         $calculator->load(new Product(), CountryQuery::create()->findOne());
     }
 
-    public function testLoadEmptyCountryException()
+    public function testLoadEmptyCountryException(): void
     {
         $calculator = new Calculator();
 
@@ -64,7 +64,7 @@ class CalculatorTest extends TestCase
         $calculator->load(ProductQuery::create()->findOne(), new Country());
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $productQuery = ProductQuery::create()->findOne();
         $countryQuery = CountryQuery::create()->findOneById(64);
@@ -96,7 +96,7 @@ class CalculatorTest extends TestCase
         );
     }
 
-    public function testGetTaxedPriceBadTaxRulesCollection()
+    public function testGetTaxedPriceBadTaxRulesCollection(): void
     {
         $calculator = new Calculator();
 
@@ -105,7 +105,7 @@ class CalculatorTest extends TestCase
         $calculator->getTaxedPrice(500);
     }
 
-    public function testGetTaxedPriceBadAmount()
+    public function testGetTaxedPriceBadAmount(): void
     {
         $taxRulesCollection = new ObjectCollection();
 
@@ -127,7 +127,7 @@ class CalculatorTest extends TestCase
         $calculator->getTaxedPrice('foo');
     }
 
-    public function testGetUntaxedPriceAndGetTaxAmountFromTaxedPriceWithNoProductLoaded()
+    public function testGetUntaxedPriceAndGetTaxAmountFromTaxedPriceWithNoProductLoaded(): void
     {
         $taxRulesCollection = new ObjectCollection();
         $taxRulesCollection->setModel('\Thelia\Model\Tax');
@@ -142,7 +142,7 @@ class CalculatorTest extends TestCase
         $calculator->getTaxAmountFromTaxedPrice(600.95);
     }
 
-    public function testGetUntaxedPriceAndGetTaxAmountFromTaxedPriceWithEmptyTaxRuleCollection()
+    public function testGetUntaxedPriceAndGetTaxAmountFromTaxedPriceWithEmptyTaxRuleCollection(): void
     {
         $taxRulesCollection = new ObjectCollection();
         $taxRulesCollection->setModel('\Thelia\Model\Tax');
@@ -165,7 +165,7 @@ class CalculatorTest extends TestCase
         $calculator->getTaxAmountFromTaxedPrice(600.95);
     }
 
-    public function testGetTaxedPriceAndGetTaxAmountFromUntaxedPrice()
+    public function testGetTaxedPriceAndGetTaxAmountFromUntaxedPrice(): void
     {
         $taxRulesCollection = new ObjectCollection();
         $taxRulesCollection->setModel('\Thelia\Model\Tax');
@@ -221,7 +221,7 @@ class CalculatorTest extends TestCase
         $this->assertEquals(600.95, $taxedPrice);
     }
 
-    public function testGetUntaxedPriceAndGetTaxAmountFromTaxedPrice()
+    public function testGetUntaxedPriceAndGetTaxAmountFromTaxedPrice(): void
     {
         $taxRulesCollection = new ObjectCollection();
         $taxRulesCollection->setModel('\Thelia\Model\Tax');
@@ -277,7 +277,7 @@ class CalculatorTest extends TestCase
         $this->assertEquals(500, $untaxedPrice);
     }
 
-    public function testGetFeatureFixAmountTaxTypeTaxedPrice()
+    public function testGetFeatureFixAmountTaxTypeTaxedPrice(): void
     {
         $defaultLang = Lang::getDefaultLanguage();
 

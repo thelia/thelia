@@ -29,7 +29,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function create(FeatureAvCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(FeatureAvCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $feature = new FeatureAvModel();
 
@@ -50,7 +50,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function update(FeatureAvUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(FeatureAvUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $feature = FeatureAvQuery::create()->findPk($event->getFeatureAvId())) {
             $feature
@@ -72,7 +72,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function delete(FeatureAvDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(FeatureAvDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== ($feature = FeatureAvQuery::create()->findPk($event->getFeatureAvId()))) {
             $feature
@@ -89,7 +89,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition(FeatureAvQuery::create(), $event, $dispatcher);
     }

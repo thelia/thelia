@@ -68,7 +68,7 @@ class SaleTest extends TestCaseWithURLToolSetup
         return $event->getSale();
     }
 
-    public function testCreateSale()
+    public function testCreateSale(): void
     {
         $event = new SaleCreateEvent();
         $event
@@ -87,7 +87,7 @@ class SaleTest extends TestCaseWithURLToolSetup
         $this->assertEquals('test create sale label', $createdSale->getSaleLabel());
     }
 
-    public function testUpdateSale()
+    public function testUpdateSale(): void
     {
         $sale = $this->getRandomSale();
 
@@ -127,7 +127,7 @@ class SaleTest extends TestCaseWithURLToolSetup
         $this->assertEquals('test create sale label', $updatedSale->getSaleLabel());
     }
 
-    public function testUpdatePseSale()
+    public function testUpdatePseSale(): void
     {
         $sale = $this->getRandomSale();
 
@@ -168,7 +168,7 @@ class SaleTest extends TestCaseWithURLToolSetup
         $this->assertEquals('test create sale label', $updatedSale->getSaleLabel());
     }
 
-    public function testDeleteSale()
+    public function testDeleteSale(): void
     {
         $sale = $this->getRandomSale();
 
@@ -183,7 +183,7 @@ class SaleTest extends TestCaseWithURLToolSetup
         $this->assertTrue($deletedSale->isDeleted());
     }
 
-    public function testSaleToggleVisibility()
+    public function testSaleToggleVisibility(): void
     {
         $sale = $this->getRandomSale();
 
@@ -200,7 +200,7 @@ class SaleTest extends TestCaseWithURLToolSetup
         $this->assertEquals(!$visibility, $updatedSale->getActive());
     }
 
-    public function testClearAllSales()
+    public function testClearAllSales(): void
     {
         $anExceptionWasThrown = false;
 

@@ -32,7 +32,7 @@ class ExportForm extends BaseForm
         return 'thelia_export';
     }
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             // Todo: use list
@@ -111,7 +111,7 @@ class ExportForm extends BaseForm
             ]);
     }
 
-    public function checkLanguage($value, ExecutionContextInterface $context)
+    public function checkLanguage($value, ExecutionContextInterface $context): void
     {
         if (null === LangQuery::create()->findPk($value)) {
             $context->addViolation(

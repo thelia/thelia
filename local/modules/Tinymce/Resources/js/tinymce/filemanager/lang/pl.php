@@ -28,7 +28,7 @@ return [
     'New_Folder' => 'Nowy folder',
     'Folder_Created' => 'Folder został utworzony poprawnie',
     'Existing_Folder' => 'Istniejący folder',
-    'Confirm_Folder_del' => 'Czy jesteś pewien, że chcesz usunąć folder i wszystko co znajduje się w nim?',
+    'Confirm_Folder_del' => "Czy jesteś pewien, że chcesz usunąć folder i wszystko co znajduje się\u{a0}w nim?",
     'Return_Files_List' => 'Powrót do listy plików',
     'Preview' => 'Podgląd',
     'Download' => 'Pobierz',

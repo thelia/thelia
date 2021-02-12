@@ -57,7 +57,7 @@ class Export extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function exportChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher)
+    public function exportChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->handler->getExport($updatePositionEvent->getObjectId(), true);
         $this->genericUpdatePosition(new ExportQuery(), $updatePositionEvent, $dispatcher);
@@ -68,7 +68,7 @@ class Export extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function exportCategoryChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher)
+    public function exportCategoryChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->handler->getCategory($updatePositionEvent->getObjectId(), true);
         $this->genericUpdatePosition(new ExportCategoryQuery(), $updatePositionEvent, $dispatcher);

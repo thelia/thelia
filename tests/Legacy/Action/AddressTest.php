@@ -27,7 +27,7 @@ use Thelia\Model\CustomerQuery;
  */
 class AddressTest extends BaseAction
 {
-    public function testCreatedAddress()
+    public function testCreatedAddress(): void
     {
         $customer = CustomerQuery::create()->findOne();
 
@@ -72,7 +72,7 @@ class AddressTest extends BaseAction
         $this->assertEquals($AddressCreateOrUpdateEvent->getCompany(), $createdAddress->getCompany());
     }
 
-    public function testUpdatedAddress()
+    public function testUpdatedAddress(): void
     {
         $customer = CustomerQuery::create()->findOne();
         $address = $customer->getAddresses()->getFirst();
@@ -120,7 +120,7 @@ class AddressTest extends BaseAction
     /**
      * Bug found in Thelia 2.0.2.
      */
-    public function testUpdateDefaultAddress()
+    public function testUpdateDefaultAddress(): void
     {
         /*
          * Disable propel cache in order to get a new instance of the

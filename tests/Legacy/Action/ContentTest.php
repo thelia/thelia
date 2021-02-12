@@ -77,7 +77,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         return $event->getContent();
     }
 
-    public function testCreateContent()
+    public function testCreateContent(): void
     {
         $folder = $this->getRandomFolder();
 
@@ -100,7 +100,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         $this->assertEquals($folder->getId(), $createdContent->getDefaultFolderId());
     }
 
-    public function testUpdateContent()
+    public function testUpdateContent(): void
     {
         $content = $this->getRandomContent();
         $folder = $this->getRandomFolder();
@@ -130,7 +130,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         $this->assertEquals($folder->getId(), $updatedContent->getDefaultFolderId());
     }
 
-    public function testDeleteContent()
+    public function testDeleteContent(): void
     {
         $content = $this->getRandomContent();
 
@@ -145,7 +145,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         $this->assertTrue($deletedContent->isDeleted());
     }
 
-    public function testContentToggleVisibility()
+    public function testContentToggleVisibility(): void
     {
         $content = $this->getRandomContent();
 
@@ -162,7 +162,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         $this->assertEquals(!$visibility, $updatedContent->getVisible());
     }
 
-    public function testUpdatePositionUp()
+    public function testUpdatePositionUp(): void
     {
         $contentFolderQuery = ContentFolderQuery::create()
             ->filterByFolder($this->getFolderForPositionTest())
@@ -193,7 +193,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         $this->assertEquals($newPosition, $updatedContent->getPosition(), sprintf('new position is %d, new position expected is %d for content %d', $newPosition, $updatedContent->getPosition(), $updatedContent->getContentId()));
     }
 
-    public function testUpdatePositionDown()
+    public function testUpdatePositionDown(): void
     {
         $contentFolderQuery = ContentFolderQuery::create()
             ->filterByFolder($this->getFolderForPositionTest())
@@ -224,7 +224,7 @@ class ContentTest extends TestCaseWithURLToolSetup
         $this->assertEquals($newPosition, $updatedContent->getPosition(), sprintf('new position is %d, new position expected is %d for content %d', $newPosition, $updatedContent->getPosition(), $updatedContent->getContentId()));
     }
 
-    public function testUpdatePositionWithSpecificPosition()
+    public function testUpdatePositionWithSpecificPosition(): void
     {
         $contentFolderQuery = ContentFolderQuery::create()
             ->filterByFolder($this->getFolderForPositionTest())
@@ -286,7 +286,7 @@ class ContentTest extends TestCaseWithURLToolSetup
     /**
      * @depends testAddFolderToContent
      */
-    public function testRemoveFolder(ContentFolder $association)
+    public function testRemoveFolder(ContentFolder $association): void
     {
         $event = new ContentRemoveFolderEvent($association->getContent(), $association->getFolder()->getId());
 

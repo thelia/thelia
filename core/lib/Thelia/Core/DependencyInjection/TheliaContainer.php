@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class TheliaContainer extends Container
 {
-    public function set(string $id, ?object $service)
+    public function set(string $id, ?object $service): void
     {
         if ($id === 'request'
             && php_sapi_name() === 'cli'

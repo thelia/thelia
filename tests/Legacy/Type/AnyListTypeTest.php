@@ -22,13 +22,13 @@ use Thelia\Type\AnyListType;
  */
 class AnyListTypeTest extends TestCase
 {
-    public function testAnyListType()
+    public function testAnyListType(): void
     {
         $AnyListType = new AnyListType();
         $this->assertTrue($AnyListType->isValid('string'));
     }
 
-    public function testFormatAnyListType()
+    public function testFormatAnyListType(): void
     {
         $anyListType = new AnyListType();
 
@@ -39,7 +39,7 @@ class AnyListTypeTest extends TestCase
         $this->assertEquals($anyListFormat[1], 'string_2');
     }
 
-    public function testEmptyAnyListType()
+    public function testEmptyAnyListType(): void
     {
         $anyListType = new AnyListType();
 
@@ -47,7 +47,7 @@ class AnyListTypeTest extends TestCase
         $this->assertNull($anyListType->getFormattedValue(''));
     }
 
-    public function testSimpleStringAnyListType()
+    public function testSimpleStringAnyListType(): void
     {
         $anyListType = new AnyListType();
 

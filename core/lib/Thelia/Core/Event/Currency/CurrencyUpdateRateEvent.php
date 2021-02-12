@@ -21,7 +21,7 @@ class CurrencyUpdateRateEvent extends ActionEvent
     /**
      * @param int $currencyId
      */
-    public function addUndefinedRate($currencyId)
+    public function addUndefinedRate($currencyId): void
     {
         $this->undefinedRates[] = $currencyId;
     }

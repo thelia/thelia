@@ -41,7 +41,7 @@ class SendMail implements EventSubscriberInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function updateStatus(OrderEvent $event)
+    public function updateStatus(OrderEvent $event): void
     {
         $order = $event->getOrder();
 
@@ -58,7 +58,7 @@ class SendMail implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    public function sendEmail(OrderEvent $event)
+    public function sendEmail(OrderEvent $event): void
     {
         $order = $event->getOrder();
 

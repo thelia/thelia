@@ -36,7 +36,7 @@ class ContentAddFolderEvent extends ContentEvent
     /**
      * @param int $folderId
      */
-    public function setFolderId($folderId)
+    public function setFolderId($folderId): void
     {
         $this->folderId = $folderId;
     }

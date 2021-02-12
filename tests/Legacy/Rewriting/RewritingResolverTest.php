@@ -40,7 +40,7 @@ class RewritingResolverTest extends TestCase
         return $property;
     }
 
-    public function testGetOtherParametersException()
+    public function testGetOtherParametersException(): void
     {
         $resolver = new RewritingResolver();
 
@@ -50,7 +50,7 @@ class RewritingResolverTest extends TestCase
         $method->invoke($resolver);
     }
 
-    public function testGetOtherParameters()
+    public function testGetOtherParameters(): void
     {
         $rewritingArguments = [
             ['Parameter' => 'foo0', 'Value' => 'bar0'],
@@ -78,7 +78,7 @@ class RewritingResolverTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testLoadException()
+    public function testLoadException(): void
     {
         $collection = new ObjectCollection();
         $collection->setModel('\Thelia\Model\RewritingArgument');
@@ -99,7 +99,7 @@ class RewritingResolverTest extends TestCase
         $resolver->load('foo.html');
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $collection = new ObjectCollection();
         $collection->setModel('\Thelia\Model\RewritingArgument');

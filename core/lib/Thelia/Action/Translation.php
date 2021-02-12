@@ -37,7 +37,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
         $this->container = $container;
     }
 
-    public function getTranslatableStrings(TranslationEvent $event)
+    public function getTranslatableStrings(TranslationEvent $event): void
     {
         $stringCount = $this->walkDir(
             $event->getDirectory(),
@@ -203,7 +203,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
         return $numTexts;
     }
 
-    public function writeTranslationFile(TranslationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function writeTranslationFile(TranslationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $file = $event->getTranslationFilePath();
 
@@ -253,7 +253,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function writeFallbackFile(TranslationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function writeFallbackFile(TranslationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $file = THELIA_LOCAL_DIR.'I18n'.DS.$event->getLocale().'.php';
 
@@ -350,7 +350,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
         return ltrim($path, '/');
     }
 
-    protected function cacheClear(EventDispatcherInterface $dispatcher)
+    protected function cacheClear(EventDispatcherInterface $dispatcher): void
     {
         $cacheEvent = new CacheEvent(
             $this->container->getParameter('kernel.cache_dir')

@@ -25,7 +25,7 @@ class CartItem extends BaseCartItem
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    public function setDisptacher(EventDispatcherInterface $dispatcher)
+    public function setDisptacher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
@@ -63,7 +63,7 @@ class CartItem extends BaseCartItem
     /**
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function postInsert(ConnectionInterface $con = null)
+    public function postInsert(ConnectionInterface $con = null): void
     {
         parent::postInsert($con);
 
@@ -77,7 +77,7 @@ class CartItem extends BaseCartItem
     /**
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function postUpdate(ConnectionInterface $con = null)
+    public function postUpdate(ConnectionInterface $con = null): void
     {
         parent::postUpdate($con);
 

@@ -75,7 +75,7 @@ class RemoveAmountOnProductsTest extends TestCase
         return $stubFacade;
     }
 
-    public function generateMatchingCart(MockObject $stubFacade, $count)
+    public function generateMatchingCart(MockObject $stubFacade, $count): void
     {
         $product1 = new Product();
         $product1->setId(10);
@@ -134,7 +134,7 @@ class RemoveAmountOnProductsTest extends TestCase
             ->will($this->returnValue($cartStub));
     }
 
-    public function generateNoMatchingCart(MockObject $stubFacade)
+    public function generateNoMatchingCart(MockObject $stubFacade): void
     {
         $product2 = new Product();
         $product2->setId(30);
@@ -165,7 +165,7 @@ class RemoveAmountOnProductsTest extends TestCase
             ->will($this->returnValue($cartStub));
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $stubFacade = $this->generateFacadeStub();
 
@@ -232,7 +232,7 @@ class RemoveAmountOnProductsTest extends TestCase
         $this->assertEquals($date, $coupon->getExpirationDate());
     }
 
-    public function testMatchOne()
+    public function testMatchOne(): void
     {
         $stubFacade = $this->generateFacadeStub();
 
@@ -263,7 +263,7 @@ class RemoveAmountOnProductsTest extends TestCase
         $this->assertEquals(10.00, $coupon->exec());
     }
 
-    public function testMatchSeveral()
+    public function testMatchSeveral(): void
     {
         $stubFacade = $this->generateFacadeStub();
 
@@ -294,7 +294,7 @@ class RemoveAmountOnProductsTest extends TestCase
         $this->assertEquals(30.00, $coupon->exec());
     }
 
-    public function testNoMatch()
+    public function testNoMatch(): void
     {
         $stubFacade = $this->generateFacadeStub();
 
@@ -325,7 +325,7 @@ class RemoveAmountOnProductsTest extends TestCase
         $this->assertEquals(0.00, $coupon->exec());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Coupon test name');
 
@@ -337,7 +337,7 @@ class RemoveAmountOnProductsTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testGetToolTip()
+    public function testGetToolTip(): void
     {
         $tooltip = 'Coupon test tooltip';
         $stubFacade = $this->generateFacadeStub(399, 'EUR', $tooltip);

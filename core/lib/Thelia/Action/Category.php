@@ -42,7 +42,7 @@ class Category extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function create(CategoryCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(CategoryCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $category = new CategoryModel();
 
@@ -63,7 +63,7 @@ class Category extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function update(CategoryUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(CategoryUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
             $category
@@ -102,7 +102,7 @@ class Category extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    public function delete(CategoryDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(CategoryDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
             $con = Propel::getWriteConnection(CategoryTableMap::DATABASE_NAME);
@@ -147,7 +147,7 @@ class Category extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function toggleVisibility(CategoryToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function toggleVisibility(CategoryToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $category = $event->getCategory();
 
@@ -164,12 +164,12 @@ class Category extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition(CategoryQuery::create(), $event, $dispatcher);
     }
 
-    public function addContent(CategoryAddContentEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function addContent(CategoryAddContentEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (CategoryAssociatedContentQuery::create()
             ->filterByContentId($event->getContentId())
@@ -184,7 +184,7 @@ class Category extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function removeContent(CategoryDeleteContentEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function removeContent(CategoryDeleteContentEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $content = CategoryAssociatedContentQuery::create()
             ->filterByContentId($event->getContentId())
@@ -202,7 +202,7 @@ class Category extends BaseAction implements EventSubscriberInterface
      *
      * @param string $eventName
      */
-    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if ($event->getView() == 'category') {
             $category = CategoryQuery::create()
@@ -219,7 +219,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * @throws NotFoundHttpException
      */
-    public function viewcategoryIdNotVisible(ViewCheckEvent $event)
+    public function viewcategoryIdNotVisible(ViewCheckEvent $event): void
     {
         throw new NotFoundHttpException();
     }

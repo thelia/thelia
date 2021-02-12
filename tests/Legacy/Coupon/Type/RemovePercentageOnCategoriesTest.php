@@ -85,7 +85,7 @@ class RemovePercentageOnCategoriesTest extends TestCase
         return $stubFacade;
     }
 
-    public function generateMatchingCart(MockObject $stubFacade)
+    public function generateMatchingCart(MockObject $stubFacade): void
     {
         $category1 = new Category();
         $category1->setId(10);
@@ -166,7 +166,7 @@ class RemovePercentageOnCategoriesTest extends TestCase
             ->will($this->returnValue($cartStub));
     }
 
-    public function generateNoMatchingCart(MockObject $stubFacade)
+    public function generateNoMatchingCart(MockObject $stubFacade): void
     {
         $category3 = new Category();
         $category3->setId(30);
@@ -211,7 +211,7 @@ class RemovePercentageOnCategoriesTest extends TestCase
             ->will($this->returnValue($cartStub));
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $stubFacade = $this->generateFacadeStub();
 
@@ -278,7 +278,7 @@ class RemovePercentageOnCategoriesTest extends TestCase
         $this->assertEquals($date, $coupon->getExpirationDate());
     }
 
-    public function testMatch()
+    public function testMatch(): void
     {
         $stubFacade = $this->generateFacadeStub();
 
@@ -309,7 +309,7 @@ class RemovePercentageOnCategoriesTest extends TestCase
         $this->assertEquals(10.00, $coupon->exec());
     }
 
-    public function testNoMatch()
+    public function testNoMatch(): void
     {
         $stubFacade = $this->generateFacadeStub();
 
@@ -343,7 +343,7 @@ class RemovePercentageOnCategoriesTest extends TestCase
     /**
      * @covers \Thelia\Coupon\Type\RemoveXAmount::getName
      */
-    public function testGetName()
+    public function testGetName(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Coupon test name');
 
@@ -358,7 +358,7 @@ class RemovePercentageOnCategoriesTest extends TestCase
     /**
      * @covers \Thelia\Coupon\Type\RemoveXAmount::getToolTip
      */
-    public function testGetToolTip()
+    public function testGetToolTip(): void
     {
         $tooltip = 'Coupon test tooltip';
         $stubFacade = $this->generateFacadeStub(399, 'EUR', $tooltip);

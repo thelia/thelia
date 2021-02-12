@@ -22,7 +22,7 @@ use Thelia\Core\Hook\BaseHook;
  */
 class HookManager extends BaseHook
 {
-    public function onAdditionalPaymentInfo(HookRenderEvent $event)
+    public function onAdditionalPaymentInfo(HookRenderEvent $event): void
     {
         $content = $this->render('order-placed.additional-payment-info.html', [
             'placed_order_id' => $event->getArgument('placed_order_id'),

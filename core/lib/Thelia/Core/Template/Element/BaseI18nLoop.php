@@ -81,7 +81,7 @@ abstract class BaseI18nLoop extends BaseLoop
      * @param string        $searchCriteria the search criteria, such as Criterial::LIKE, Criteria::EQUAL, etc
      * @param string        $searchTerm     the searched term
      */
-    public function addSearchInI18nColumn($search, $columnName, $searchCriteria, $searchTerm)
+    public function addSearchInI18nColumn($search, $columnName, $searchCriteria, $searchTerm): void
     {
         if (!$this->getBackendContext()) {
             $search->where(

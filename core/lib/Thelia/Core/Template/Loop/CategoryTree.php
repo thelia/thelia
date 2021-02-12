@@ -66,7 +66,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
     }
 
     // changement de rubrique
-    protected function buildCategoryTree($parent, $visible, $level, $previousLevel, $maxLevel, $exclude, &$resultsList)
+    protected function buildCategoryTree($parent, $visible, $level, $previousLevel, $maxLevel, $exclude, &$resultsList): void
     {
         if ($level > $maxLevel) {
             return;

@@ -93,7 +93,7 @@ class FileManager
      * @param string $parentType              the parent type, such as Product, Category, etc
      * @param string $fullyQualifiedClassName the fully qualified class name
      */
-    public function addFileModel($fileType, $parentType, $fullyQualifiedClassName)
+    public function addFileModel($fileType, $parentType, $fullyQualifiedClassName): void
     {
         $this->supportedFileModels[$this->getFileTypeIdentifier($fileType, $parentType)] = $fullyQualifiedClassName;
     }
@@ -220,7 +220,7 @@ class FileManager
      *
      * @param FileModelInterface $model File being deleted
      */
-    public function deleteFile(FileModelInterface $model)
+    public function deleteFile(FileModelInterface $model): void
     {
         $url = $model->getUploadDir().DS.$model->getFile();
 

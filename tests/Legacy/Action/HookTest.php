@@ -74,7 +74,7 @@ class HookTest extends BaseAction
         return $createdHook;
     }
 
-    public function createAll(HookCreateAllEvent $event)
+    public function createAll(HookCreateAllEvent $event): void
     {
         $event = new HookCreateAllEvent();
         $event
@@ -112,7 +112,7 @@ class HookTest extends BaseAction
     /**
      * @depends testCreate
      */
-    public function testCreateDuplicate(HookModel $hook)
+    public function testCreateDuplicate(HookModel $hook): void
     {
         $event = new HookCreateEvent();
         $event
@@ -209,7 +209,7 @@ class HookTest extends BaseAction
     /**
      * @depends testUpdate
      */
-    public function testDelete(HookModel $hook)
+    public function testDelete(HookModel $hook): void
     {
         $event = new HookDeleteEvent($hook->getId());
 

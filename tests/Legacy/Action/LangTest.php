@@ -173,7 +173,7 @@ class LangTest extends ContainerAwareTestCase
     /**
      * @depends testToggleDefault
      */
-    public function testDelete(LangModel $lang)
+    public function testDelete(LangModel $lang): void
     {
         $lang->setByDefault(0)
             ->save();
@@ -192,7 +192,7 @@ class LangTest extends ContainerAwareTestCase
         $this->assertTrue($deletedLang->isDeleted());
     }
 
-    public function testDeleteDefault()
+    public function testDeleteDefault(): void
     {
         $lang = LangQuery::create()->findOneByByDefault(1);
 
@@ -222,7 +222,7 @@ class LangTest extends ContainerAwareTestCase
      * @param containerBuilder $container
      *                                    Use this method to build the container with the services that you need
      */
-    protected function buildContainer(ContainerBuilder $container)
+    protected function buildContainer(ContainerBuilder $container): void
     {
         // TODO: Implement buildContainer() method.
     }

@@ -33,7 +33,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function create(FeatureCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(FeatureCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $feature = new FeatureModel();
 
@@ -58,7 +58,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function update(FeatureUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(FeatureUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $feature = FeatureQuery::create()->findPk($event->getFeatureId())) {
             $feature
@@ -80,7 +80,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function delete(FeatureDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(FeatureDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== ($feature = FeatureQuery::create()->findPk($event->getFeatureId()))) {
             $feature
@@ -97,12 +97,12 @@ class Feature extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition(FeatureQuery::create(), $event, $dispatcher);
     }
 
-    protected function doAddToAllTemplates(FeatureModel $feature)
+    protected function doAddToAllTemplates(FeatureModel $feature): void
     {
         $templates = TemplateQuery::create()->find();
 
@@ -119,12 +119,12 @@ class Feature extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function addToAllTemplates(FeatureEvent $event)
+    public function addToAllTemplates(FeatureEvent $event): void
     {
         $this->doAddToAllTemplates($event->getFeature());
     }
 
-    public function removeFromAllTemplates(FeatureEvent $event)
+    public function removeFromAllTemplates(FeatureEvent $event): void
     {
         // Delete this feature from all product templates
         FeatureTemplateQuery::create()->filterByFeature($event->getFeature())->delete();

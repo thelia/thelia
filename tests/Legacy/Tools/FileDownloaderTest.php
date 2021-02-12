@@ -49,25 +49,25 @@ class FileDownloaderTest extends TestCase
         );
     }
 
-    public function testFileDownloadInvalidURL()
+    public function testFileDownloadInvalidURL(): void
     {
         $this->expectException(\Thelia\Exception\HttpUrlException::class);
         $this->expectExceptionMessage('Tried to download a file, but the URL was not valid: foo');
         $this->downloader->download('foo', 'bar');
     }
 
-    public function testFileDownloadNonExistingFile()
+    public function testFileDownloadNonExistingFile(): void
     {
         $this->expectException(\Thelia\Exception\FileNotFoundException::class);
         $this->downloader->download('https://github.com/foo/bar/baz', 'baz');
     }
 
-    public function testFileDownloadSuccess()
+    public function testFileDownloadSuccess(): void
     {
         $this->downloader->download('https://github.com/', 'php://temp');
     }
 
-    public function testFileDownloadSuccessWithRedirect()
+    public function testFileDownloadSuccessWithRedirect(): void
     {
         $this->downloader->download('https://github.com/', 'php://temp');
     }

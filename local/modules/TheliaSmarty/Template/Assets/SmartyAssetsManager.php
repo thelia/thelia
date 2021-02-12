@@ -59,7 +59,7 @@ class SmartyAssetsManager
      * @param string                    $assets_directory the assets directory in the template
      * @param \Smarty_Internal_Template $smarty           the smarty parser
      */
-    public function prepareAssets($assets_directory, \Smarty_Internal_Template $smarty)
+    public function prepareAssets($assets_directory, \Smarty_Internal_Template $smarty): void
     {
         // Be sure to use the proper path separator
         if (DS != '/') {
@@ -86,7 +86,7 @@ class SmartyAssetsManager
         TemplateDefinition $templateDefinition,
         $assets_directory,
         SmartyParser $smartyParser
-    ) {
+    ): void {
         // Get the registered template directories for the current template type
         $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
 

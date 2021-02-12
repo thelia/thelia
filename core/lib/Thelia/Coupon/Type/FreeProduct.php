@@ -45,7 +45,7 @@ class FreeProduct extends AbstractRemoveOnProducts
     /**
      * {@inheritdoc}
      */
-    public function setFieldsValue($effects)
+    public function setFieldsValue($effects): void
     {
         $this->offeredProductId = $effects[self::OFFERED_PRODUCT_ID];
         $this->offeredCategoryId = $effects[self::OFFERED_CATEGORY_ID];
@@ -115,7 +115,7 @@ class FreeProduct extends AbstractRemoveOnProducts
      * @param Product  $product    the product in the cart which triggered the discount
      * @param bool|int $cartItemId the cart item ID which contains the free product, or just true if the free product is not yet added
      */
-    protected function setRelatedCartItem($product, $cartItemId)
+    protected function setRelatedCartItem($product, $cartItemId): void
     {
         $cartItemIdList = $this->facade->getRequest()->getSession()->get(
             $this->getSessionVarName(),
@@ -323,7 +323,7 @@ class FreeProduct extends AbstractRemoveOnProducts
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): void
     {
         // Clear the session variable when the coupon is cleared.
         $this->clearFreeProductsCartItemIds();

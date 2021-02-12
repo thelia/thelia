@@ -43,7 +43,7 @@ class ModuleQuery extends BaseModuleQuery
         return self::$activated;
     }
 
-    public static function resetActivated()
+    public static function resetActivated(): void
     {
         self::$activated = null;
     }

@@ -32,7 +32,7 @@ class FormatTest extends SmartyPluginTestCase
     /** @var RequestStack */
     protected $requestStack;
 
-    public function testFormatTwoDimensionalArray()
+    public function testFormatTwoDimensionalArray(): void
     {
         $requestStack = new RequestStack();
         $requestStack->push(new Request());
@@ -52,7 +52,7 @@ class FormatTest extends SmartyPluginTestCase
         );
     }
 
-    public function testFormatMoneyNotForceCurrency()
+    public function testFormatMoneyNotForceCurrency(): void
     {
         // new format_money method, thelia >= 2.3
         $data = $this->render('testFormatMoney.html', [
@@ -62,7 +62,7 @@ class FormatTest extends SmartyPluginTestCase
         $this->assertEquals('10.00 €', $data);
     }
 
-    public function testFormatMoneyForceCurrency()
+    public function testFormatMoneyForceCurrency(): void
     {
         /*** Test for EUR ***/
 
@@ -125,7 +125,7 @@ class FormatTest extends SmartyPluginTestCase
         $this->assertEquals($currency->getSymbol().'10.00', $data);
     }
 
-    public function testFormatAddress()
+    public function testFormatAddress(): void
     {
         // Test for address in France
         $countryFR = CountryQuery::create()->filterByIsoalpha2('FR')->findOne();

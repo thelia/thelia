@@ -31,7 +31,7 @@ class OrderUpdateAddress extends BaseForm
 {
     use AddressCountryValidationTrait;
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('id', IntegerType::class, [
@@ -173,7 +173,7 @@ class OrderUpdateAddress extends BaseForm
         return 'thelia_order_address_update';
     }
 
-    public function verifyId($value, ExecutionContextInterface $context)
+    public function verifyId($value, ExecutionContextInterface $context): void
     {
         $address = OrderAddressQuery::create()
             ->findPk($value);
@@ -183,7 +183,7 @@ class OrderUpdateAddress extends BaseForm
         }
     }
 
-    public function verifyTitle($value, ExecutionContextInterface $context)
+    public function verifyTitle($value, ExecutionContextInterface $context): void
     {
         $address = CustomerTitleQuery::create()
             ->findPk($value);
@@ -193,7 +193,7 @@ class OrderUpdateAddress extends BaseForm
         }
     }
 
-    public function verifyCountry($value, ExecutionContextInterface $context)
+    public function verifyCountry($value, ExecutionContextInterface $context): void
     {
         $address = CountryQuery::create()
             ->findPk($value);

@@ -34,7 +34,7 @@ class LangDefaultBehaviorEvent extends ActionEvent
     /**
      * @param int $defaultBehavior
      */
-    public function setDefaultBehavior($defaultBehavior)
+    public function setDefaultBehavior($defaultBehavior): void
     {
         $this->defaultBehavior = $defaultBehavior;
     }

@@ -113,7 +113,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     /**
      * Imageevent is empty, mandatory parameters not specified.
      */
-    public function testProcessEmptyImageEvent()
+    public function testProcessEmptyImageEvent(): void
     {
         $event = new ImageEvent();
 
@@ -126,7 +126,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     /**
      * Try to process a non-existent file.
      */
-    public function testProcessNonExistentImage()
+    public function testProcessNonExistentImage(): void
     {
         $event = new ImageEvent();
 
@@ -142,7 +142,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     /**
      * Try to process a file outside of the cache.
      */
-    public function testProcessImageOutsideValidPath()
+    public function testProcessImageOutsideValidPath(): void
     {
         $event = new ImageEvent();
 
@@ -158,7 +158,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     /**
      * No operation done on source file -> copie !
      */
-    public function testProcessImageWithoutAnyTransformationsCopy()
+    public function testProcessImageWithoutAnyTransformationsCopy(): void
     {
         $event = new ImageEvent();
 
@@ -189,7 +189,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     /**
      * No operation done on source file -> copie !
      */
-    public function testProcessImageWithoutAnyTransformationsSymlink()
+    public function testProcessImageWithoutAnyTransformationsSymlink(): void
     {
         $event = new ImageEvent();
 
@@ -220,7 +220,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     /**
      * Resize image with bands width > height.
      */
-    public function testProcessImageResizeHorizWithBands()
+    public function testProcessImageResizeHorizWithBands(): void
     {
         $anExceptionWasThrown = false;
 
@@ -248,7 +248,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     /**
      * Resize image with bands height > width.
      */
-    public function testProcessImageResizeVertWithBands()
+    public function testProcessImageResizeVertWithBands(): void
     {
         $anExceptionWasThrown = false;
 
@@ -276,7 +276,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     /**
      * Apply all transformations.
      */
-    public function testProcessImageWithTransformations()
+    public function testProcessImageWithTransformations(): void
     {
         $anExceptionWasThrown = false;
 
@@ -301,7 +301,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     /**
      * Resize image with crop width > height.
      */
-    public function testProcessImageResizeHorizWithCrop()
+    public function testProcessImageResizeHorizWithCrop(): void
     {
         $anExceptionWasThrown = false;
 
@@ -329,7 +329,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     /**
      * Resize image with crop height > width.
      */
-    public function testProcessImageResizeVertWithCrop()
+    public function testProcessImageResizeVertWithCrop(): void
     {
         $anExceptionWasThrown = false;
 
@@ -357,7 +357,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     /**
      * Resize image keeping image ration.
      */
-    public function testProcessImageResizeHorizKeepRatio()
+    public function testProcessImageResizeHorizKeepRatio(): void
     {
         $anExceptionWasThrown = false;
 
@@ -383,7 +383,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     /**
      * Resize image with crop height > width.
      */
-    public function testProcessImageResizeVertKeepRatio()
+    public function testProcessImageResizeVertKeepRatio(): void
     {
         $anExceptionWasThrown = false;
 
@@ -406,7 +406,7 @@ class ImageTest extends TestCaseWithURLToolSetup
         $this->assertFalse($anExceptionWasThrown);
     }
 
-    public function testClearTestsCache()
+    public function testClearTestsCache(): void
     {
         $anExceptionWasThrown = false;
 
@@ -425,7 +425,7 @@ class ImageTest extends TestCaseWithURLToolSetup
         $this->assertFalse($anExceptionWasThrown);
     }
 
-    public function testClearWholeCache()
+    public function testClearWholeCache(): void
     {
         $anExceptionWasThrown = false;
 
@@ -445,7 +445,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     /**
      * Try to clear directory ouside of the cache.
      */
-    public function testClearUnallowedPathCache()
+    public function testClearUnallowedPathCache(): void
     {
         $event = new ImageEvent();
 

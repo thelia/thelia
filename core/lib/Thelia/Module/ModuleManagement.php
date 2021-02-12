@@ -46,7 +46,7 @@ class ModuleManagement
         $this->baseModuleDir = THELIA_MODULE_DIR;
     }
 
-    public function updateModules(ContainerInterface $container)
+    public function updateModules(ContainerInterface $container): void
     {
         $finder = new Finder();
 
@@ -64,7 +64,7 @@ class ModuleManagement
                 $this->updateModule($file, $container);
             } catch (\Exception $ex) {
                 // Guess module code
-                $moduleCode = basename(\dirname(\dirname($file)));
+                $moduleCode = basename(\dirname($file, 2));
 
                 $errors[$moduleCode] = $ex;
             }
@@ -183,7 +183,7 @@ class ModuleManagement
         return $this->descriptorValidator;
     }
 
-    protected function cacheClear()
+    protected function cacheClear(): void
     {
         $cacheEvent = new CacheEvent(
             $this->container->getParameter('kernel.cache_dir')
@@ -208,7 +208,7 @@ class ModuleManagement
         return BaseModule::CLASSIC_MODULE_TYPE;
     }
 
-    private function saveDescription(Module $module, \SimpleXMLElement $content, ConnectionInterface $con)
+    private function saveDescription(Module $module, \SimpleXMLElement $content, ConnectionInterface $con): void
     {
         foreach ($content->descriptive as $description) {
             $locale = (string) $description->attributes()->locale;

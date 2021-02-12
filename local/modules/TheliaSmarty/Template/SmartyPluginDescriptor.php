@@ -47,7 +47,7 @@ class SmartyPluginDescriptor
         $this->method = $method;
     }
 
-    public function setType($type)
+    public function setType($type): void
     {
         $this->type = $type;
     }
@@ -57,7 +57,7 @@ class SmartyPluginDescriptor
         return $this->type;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -67,7 +67,7 @@ class SmartyPluginDescriptor
         return $this->name;
     }
 
-    public function setClass($class)
+    public function setClass($class): void
     {
         $this->class = $class;
     }
@@ -77,7 +77,7 @@ class SmartyPluginDescriptor
         return $this->class;
     }
 
-    public function setMethod($method)
+    public function setMethod($method): void
     {
         $this->method = $method;
     }

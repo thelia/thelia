@@ -22,7 +22,7 @@ use Tinymce\Tinymce;
  */
 class ConfigurationForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(
@@ -125,7 +125,7 @@ class ConfigurationForm extends BaseForm
         ];
     }
 
-    protected function addConfigField($key)
+    protected function addConfigField($key): void
     {
         $this->formBuilder->add(
             $key,

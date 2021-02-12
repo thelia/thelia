@@ -61,7 +61,7 @@ class RequestListener implements EventSubscriberInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function registerValidatorTranslator(RequestEvent $event)
+    public function registerValidatorTranslator(RequestEvent $event): void
     {
         /** @var \Thelia\Core\HttpFoundation\Request $request */
         $request = $event->getRequest();
@@ -84,7 +84,7 @@ class RequestListener implements EventSubscriberInterface
         );
     }
 
-    public function rememberMeLoader(RequestEvent $event)
+    public function rememberMeLoader(RequestEvent $event): void
     {
         /** @var \Thelia\Core\HttpFoundation\Request $request */
         $request = $event->getRequest();
@@ -103,7 +103,7 @@ class RequestListener implements EventSubscriberInterface
         }
     }
 
-    public function jsonBody(RequestEvent $event)
+    public function jsonBody(RequestEvent $event): void
     {
         $request = $event->getRequest();
         if (!\count($request->request->all()) && \in_array($request->getMethod(), ['POST', 'PUT', 'PATCH', 'DELETE'])) {
@@ -132,7 +132,7 @@ class RequestListener implements EventSubscriberInterface
         }
     }
 
-    protected function getRememberMeCustomer(Request $request, Session $session, EventDispatcherInterface $dispatcher)
+    protected function getRememberMeCustomer(Request $request, Session $session, EventDispatcherInterface $dispatcher): void
     {
         // try to get the remember me cookie
         $cookieCustomerName = ConfigQuery::read('customer_remember_me_cookie_name', 'crmcn');
@@ -167,7 +167,7 @@ class RequestListener implements EventSubscriberInterface
      * @param $request
      * @param $session
      */
-    protected function getRememberMeAdmin(Request $request, Session $session)
+    protected function getRememberMeAdmin(Request $request, Session $session): void
     {
         // try to get the remember me cookie
         $cookieAdminName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
@@ -198,7 +198,7 @@ class RequestListener implements EventSubscriberInterface
         }
     }
 
-    protected function applyUserLocale(UserInterface $user, Session $session)
+    protected function applyUserLocale(UserInterface $user, Session $session): void
     {
         // Set the current language according to locale preference
         $locale = $user->getLocale();
@@ -219,7 +219,7 @@ class RequestListener implements EventSubscriberInterface
      *
      * If the value of _previous_url is "dont-save", the current referrer is not saved.
      */
-    public function registerPreviousUrl(TerminateEvent $event)
+    public function registerPreviousUrl(TerminateEvent $event): void
     {
         $request = $event->getRequest();
 
@@ -272,7 +272,7 @@ class RequestListener implements EventSubscriberInterface
         }
     }
 
-    public function checkCurrency(RequestEvent $event)
+    public function checkCurrency(RequestEvent $event): void
     {
         /** @var Request $request */
         $request = $event->getRequest();

@@ -21,7 +21,7 @@ class FTPClient
     {
     }
 
-    private function logMessage($message)
+    private function logMessage($message): void
     {
         $this->messageArray[] = $message;
     }

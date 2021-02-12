@@ -139,7 +139,7 @@ class UpdatePositionEvent extends ActionEvent
     /**
      * @param int|null $referrerId
      */
-    public function setReferrerId($referrerId)
+    public function setReferrerId($referrerId): void
     {
         $this->referrerId = $referrerId;
     }

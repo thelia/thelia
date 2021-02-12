@@ -55,7 +55,7 @@ class Module extends BaseAction implements EventSubscriberInterface
         $this->container = $container;
     }
 
-    public function toggleActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function toggleActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
             $moduleInstance = $module->createInstance();
@@ -75,7 +75,7 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function checkToggleActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function checkToggleActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (true === $event->isNoCheck()) {
             return;
@@ -166,7 +166,7 @@ class Module extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function recursiveActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function recursiveActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
             $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
@@ -188,7 +188,7 @@ class Module extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function recursiveDeactivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function recursiveDeactivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
             $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
@@ -205,7 +205,7 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function delete(ModuleDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(ModuleDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
         $con->beginTransaction();
@@ -295,7 +295,7 @@ class Module extends BaseAction implements EventSubscriberInterface
     /**
      * @param $eventName
      */
-    public function update(ModuleEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(ModuleEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getId())) {
             $module
@@ -319,7 +319,7 @@ class Module extends BaseAction implements EventSubscriberInterface
      * @throws \Symfony\Component\Filesystem\Exception\IOException
      * @throws \Exception
      */
-    public function install(ModuleInstallEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function install(ModuleInstallEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $moduleDefinition = $event->getModuleDefinition();
 
@@ -390,7 +390,7 @@ class Module extends BaseAction implements EventSubscriberInterface
      *
      * @throws \RuntimeException if no payment module can be found
      */
-    public function pay(OrderPaymentEvent $event)
+    public function pay(OrderPaymentEvent $event): void
     {
         $order = $event->getOrder();
 
@@ -421,14 +421,14 @@ class Module extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition(ModuleQuery::create(), $event, $dispatcher);
 
         $this->cacheClear($dispatcher);
     }
 
-    protected function cacheClear(EventDispatcherInterface $dispatcher)
+    protected function cacheClear(EventDispatcherInterface $dispatcher): void
     {
         $cacheEvent = new CacheEvent(
             $this->container->getParameter('kernel.cache_dir')

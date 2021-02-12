@@ -125,7 +125,7 @@ class Version extends TestCase
     /**
      * @dataProvider compareProvider
      */
-    public function testCompare($version, $expression, $result, $strict = false, $message = null)
+    public function testCompare($version, $expression, $result, $strict = false, $message = null): void
     {
         if (null === $message) {
             $message = sprintf(
@@ -142,7 +142,7 @@ class Version extends TestCase
     /**
      * @dataProvider ParseProvider
      */
-    public function testParse($version, $expected)
+    public function testParse($version, $expected): void
     {
         $message = sprintf(
             "=====\n\tVersion: %s\n\t expected: %s\n======\n",
@@ -155,7 +155,7 @@ class Version extends TestCase
     /**
      * @dataProvider exceptionParseProvider
      */
-    public function testExceptionParse($version)
+    public function testExceptionParse($version): void
     {
         $this->expectException(\InvalidArgumentException::class);
         Tester::parse($version);

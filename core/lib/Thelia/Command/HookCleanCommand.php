@@ -34,7 +34,7 @@ use Thelia\Model\ModuleQuery;
  */
 class HookCleanCommand extends ContainerAwareCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('hook:clean')
@@ -123,7 +123,7 @@ class HookCleanCommand extends ContainerAwareCommand
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    protected function deleteHooks($module)
+    protected function deleteHooks($module): void
     {
         $query = ModuleHookQuery::create();
         if (null !== $module) {
@@ -147,7 +147,7 @@ class HookCleanCommand extends ContainerAwareCommand
     /**
      * @throws \Exception
      */
-    protected function clearCache(OutputInterface $output)
+    protected function clearCache(OutputInterface $output): void
     {
         try {
             $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');

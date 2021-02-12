@@ -29,7 +29,7 @@ class StackPass implements CompilerPassInterface
      *
      * @api
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition(Builder::class)) {
             return;
@@ -48,7 +48,7 @@ class StackPass implements CompilerPassInterface
         }
     }
 
-    protected function addMiddlewares(Definition $stackFactory, $stackMiddlewares)
+    protected function addMiddlewares(Definition $stackFactory, $stackMiddlewares): void
     {
         krsort($stackMiddlewares);
 

@@ -32,7 +32,7 @@ class ConditionFactoryTest extends TestCase
     /**
      * Check the Rules serialization module.
      */
-    public function testBuild()
+    public function testBuild(): void
     {
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
@@ -95,7 +95,7 @@ class ConditionFactoryTest extends TestCase
     /**
      * Check the Rules serialization module.
      */
-    public function testBuildFail()
+    public function testBuildFail(): void
     {
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
@@ -156,7 +156,7 @@ class ConditionFactoryTest extends TestCase
     /**
      * Check the Rules serialization module.
      */
-    public function testRuleSerialisation()
+    public function testRuleSerialisation(): void
     {
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
@@ -234,7 +234,7 @@ class ConditionFactoryTest extends TestCase
     /**
      * Check the getInputs method.
      */
-    public function testGetInputs()
+    public function testGetInputs(): void
     {
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
@@ -297,7 +297,7 @@ class ConditionFactoryTest extends TestCase
     /**
      * Check the getInputs method.
      */
-    public function testGetInputsFalse()
+    public function testGetInputsFalse(): void
     {
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
@@ -362,7 +362,7 @@ class ConditionFactoryTest extends TestCase
      *
      * @covers \Thelia\Condition\ConditionFactory::serializeConditionCollection
      */
-    public function testSerializeConditionCollectionEmpty()
+    public function testSerializeConditionCollectionEmpty(): void
     {
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
              ->disableOriginalConstructor()

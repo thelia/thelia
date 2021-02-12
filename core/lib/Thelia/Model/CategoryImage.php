@@ -35,7 +35,7 @@ class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, Fi
      *
      * @param CategoryImageQuery $query
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByCategory($this->getCategory());
     }

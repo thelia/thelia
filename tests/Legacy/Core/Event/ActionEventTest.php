@@ -49,7 +49,7 @@ class ActionEventTest extends TestCase
         self::$form = $formBuilder->getForm();
     }
 
-    public function testBindForm()
+    public function testBindForm(): void
     {
         $form = self::$form;
 

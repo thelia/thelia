@@ -19,7 +19,7 @@ use TheliaSmarty\Template\Plugins\TheliaLoop;
 
 class LoopListCommand extends ContainerAwareCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('loop:list')

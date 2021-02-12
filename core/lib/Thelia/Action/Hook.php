@@ -41,7 +41,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
         $this->cacheDir = $kernelCacheDir;
     }
 
-    public function create(HookCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(HookCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $hook = new HookModel();
 
@@ -59,7 +59,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
         $this->cacheClear($dispatcher);
     }
 
-    public function update(HookUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(HookUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
             $hook
@@ -80,7 +80,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function delete(HookDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(HookDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
             $hook->delete();
@@ -90,7 +90,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function createAll(HookCreateAllEvent $event)
+    public function createAll(HookCreateAllEvent $event): void
     {
         $hook = new HookModel();
 
@@ -110,7 +110,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
         $event->setHook($hook);
     }
 
-    public function deactivation(HookDeactivationEvent $event)
+    public function deactivation(HookDeactivationEvent $event): void
     {
         if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
             $hook
@@ -120,7 +120,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function toggleNative(HookToggleNativeEvent $event)
+    public function toggleNative(HookToggleNativeEvent $event): void
     {
         if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
             $hook
@@ -130,7 +130,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function toggleActivation(HookToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function toggleActivation(HookToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
             $hook
@@ -142,7 +142,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    protected function cacheClear(EventDispatcherInterface $dispatcher)
+    protected function cacheClear(EventDispatcherInterface $dispatcher): void
     {
         $cacheEvent = new CacheEvent($this->cacheDir);
 

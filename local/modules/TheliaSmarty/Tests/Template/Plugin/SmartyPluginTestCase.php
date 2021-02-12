@@ -41,7 +41,7 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
      * @param containerBuilder $container
      *                                    Use this method to build the container with the services that you need
      */
-    protected function buildContainer(ContainerBuilder $container)
+    protected function buildContainer(ContainerBuilder $container): void
     {
         /** @var Request $request */
         $request = $container->get('request_stack')->getCurrentRequest();

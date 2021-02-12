@@ -58,26 +58,26 @@ class AccessManager
 
     public static function getMaxAccessValue()
     {
-        return pow(2, current(\array_slice(self::$accessPows, -1, 1, true))) - 1;
+        return 2 ** current(\array_slice(self::$accessPows, -1, 1, true)) - 1;
     }
 
-    public function build($accesses)
+    public function build($accesses): void
     {
         $this->accessValue = 0;
         foreach ($accesses as $access) {
             if (\array_key_exists($access, self::$accessPows)) {
-                $this->accessValue += pow(2, self::$accessPows[$access]);
+                $this->accessValue += 2 ** self::$accessPows[$access];
             }
         }
 
         $this->fillGrantedAccess();
     }
 
-    protected function fillGrantedAccess()
+    protected function fillGrantedAccess(): void
     {
         $accessValue = $this->accessValue;
         foreach (self::$accessPows as $type => $value) {
-            $pow = pow(2, $value);
+            $pow = 2 ** $value;
             if ($accessValue >= $pow) {
                 $accessValue -= $pow;
                 $this->accessGranted[$type] = true;

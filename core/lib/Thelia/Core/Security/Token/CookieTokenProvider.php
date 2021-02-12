@@ -27,7 +27,7 @@ class CookieTokenProvider
         return null;
     }
 
-    public function createCookie(UserInterface $user, $cookieName, $cookieExpires)
+    public function createCookie(UserInterface $user, $cookieName, $cookieExpires): void
     {
         $tokenProvider = new TokenProvider();
 
@@ -36,7 +36,7 @@ class CookieTokenProvider
         setcookie($cookieName, $key, time() + $cookieExpires, '/');
     }
 
-    public function clearCookie($cookieName)
+    public function clearCookie($cookieName): void
     {
         setcookie($cookieName, '', time() - 3600, '/');
     }

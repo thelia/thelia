@@ -105,7 +105,7 @@ class MessageTest extends BaseAction
     /**
      * @depends testModify
      */
-    public function testDelete(MessageModel $message)
+    public function testDelete(MessageModel $message): void
     {
         $event = new MessageDeleteEvent($message->getId());
 

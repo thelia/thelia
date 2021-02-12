@@ -24,7 +24,7 @@ class ContentModificationForm extends ContentCreationForm
 {
     use StandardDescriptionFieldsTrait;
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         parent::buildForm();
 

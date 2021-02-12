@@ -272,7 +272,7 @@ class ExportHandler
      *
      * @param \Thelia\ImportExport\Export\AbstractExport $export An export instance
      */
-    protected function processExportImages(AbstractExport $export, ArchiverInterface $archiver)
+    protected function processExportImages(AbstractExport $export, ArchiverInterface $archiver): void
     {
         foreach ($export->getImagesPaths() as $imagePath) {
             $archiver->add($imagePath);
@@ -284,7 +284,7 @@ class ExportHandler
      *
      * @param \Thelia\ImportExport\Export\AbstractExport $export An export instance
      */
-    protected function processExportDocuments(AbstractExport $export, ArchiverInterface $archiver)
+    protected function processExportDocuments(AbstractExport $export, ArchiverInterface $archiver): void
     {
         foreach ($export->getDocumentsPaths() as $documentPath) {
             $archiver->add($documentPath);

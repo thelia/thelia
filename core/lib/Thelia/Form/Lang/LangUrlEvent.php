@@ -23,7 +23,7 @@ class LangUrlEvent extends ActionEvent
 {
     protected $url = [];
 
-    public function addUrl($id, $url)
+    public function addUrl($id, $url): void
     {
         $this->url[$id] = $url;
     }

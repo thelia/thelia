@@ -34,7 +34,7 @@ class RegisterCouponConditionPass implements CompilerPassInterface
      *
      * @api
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition(CouponManager::class)) {
             return;

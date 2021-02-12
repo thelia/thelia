@@ -15,6 +15,7 @@ return (new PhpCsFixer\Config)
     ->setRules([
         '@Symfony' => true,
         '@PHP71Migration' => true,
+        '@PHP71Migration:risky' => true,
         '@PHPUnit75Migration:risky' => true,
         'yoda_style' => false,
         'no_superfluous_phpdoc_tags' => true,

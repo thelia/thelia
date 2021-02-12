@@ -203,7 +203,7 @@ class CustomerUpdateForm extends BaseForm
         ;
     }
 
-    public function verifyEmailField($value, ExecutionContextInterface $context)
+    public function verifyEmailField($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 

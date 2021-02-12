@@ -30,7 +30,7 @@ class CategoryDeleteContentEvent extends CategoryEvent
         return $this->content_id;
     }
 
-    public function setContentId($content_id)
+    public function setContentId($content_id): void
     {
         $this->content_id = $content_id;
     }

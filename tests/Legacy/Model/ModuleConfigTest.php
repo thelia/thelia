@@ -23,7 +23,7 @@ use Thelia\Model\ModuleConfigQuery;
  */
 class ModuleConfigTest extends TestCase
 {
-    public function testGetWithDefault()
+    public function testGetWithDefault(): void
     {
         $moduleModel = ModuleQuery::create()->findOne();
 
@@ -40,7 +40,7 @@ class ModuleConfigTest extends TestCase
         $moduleConfig->deleteConfigValue($moduleModel->getId(), 'test-name');
     }
 
-    public function testSetNoLocale()
+    public function testSetNoLocale(): void
     {
         $moduleModel = ModuleQuery::create()->findOne();
 
@@ -59,7 +59,7 @@ class ModuleConfigTest extends TestCase
         $moduleConfig->deleteConfigValue($moduleModel->getId(), 'test-name-1');
     }
 
-    public function testSetLocale()
+    public function testSetLocale(): void
     {
         $moduleModel = ModuleQuery::create()->findOne();
 
@@ -89,14 +89,14 @@ class ModuleConfigTest extends TestCase
         $moduleConfig->deleteConfigValue($moduleModel->getId(), 'test-name-2');
     }
 
-    public function testDeleteNotFound()
+    public function testDeleteNotFound(): void
     {
         $moduleModel = ModuleQuery::create()->findOne();
 
         ModuleConfigQuery::create()->deleteConfigValue($moduleModel->getId(), 'do-not-exists');
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $moduleModel = ModuleQuery::create()->findOne();
 
@@ -111,7 +111,7 @@ class ModuleConfigTest extends TestCase
         $this->assertNull($val1);
     }
 
-    public function testSetNotExists()
+    public function testSetNotExists(): void
     {
         $moduleModel = ModuleQuery::create()->findOne();
 

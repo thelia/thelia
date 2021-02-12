@@ -69,7 +69,7 @@ class TarArchiver extends AbstractArchiver
         return $this;
     }
 
-    public function save()
+    public function save(): void
     {
     }
 }

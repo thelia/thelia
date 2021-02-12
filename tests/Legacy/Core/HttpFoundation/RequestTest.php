@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
  */
 class RequestTest extends TestCase
 {
-    public function testGetUriAddingParameters()
+    public function testGetUriAddingParameters(): void
     {
         $request = $this->createMock(
             "Thelia\Core\HttpFoundation\Request"

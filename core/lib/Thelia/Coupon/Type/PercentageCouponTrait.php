@@ -37,7 +37,7 @@ trait PercentageCouponTrait
     /**
      * {@inheritdoc}
      */
-    public function setFieldsValue($effects)
+    public function setFieldsValue($effects): void
     {
         $this->percentage = $effects[$this->getPercentageFieldName()];
     }

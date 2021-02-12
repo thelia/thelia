@@ -28,7 +28,7 @@ class SeoForm extends BaseForm
     /**
      * {@inheritdoc}
      */
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('id', HiddenType::class, [

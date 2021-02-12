@@ -25,7 +25,7 @@ class CountryStateMigrationForm extends BaseForm
     /**
      * {@inheritDoc}
      */
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(

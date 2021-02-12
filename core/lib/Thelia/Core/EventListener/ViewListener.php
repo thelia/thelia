@@ -76,7 +76,7 @@ class ViewListener implements EventSubscriberInterface
      *
      * The result is transform id needed into a Response object
      */
-    public function onKernelView(ViewEvent $event)
+    public function onKernelView(ViewEvent $event): void
     {
         $this->parser->setTemplateDefinition($this->templateHelper->getActiveFrontTemplate(), true);
         $response = null;
@@ -115,7 +115,7 @@ class ViewListener implements EventSubscriberInterface
         $event->setResponse($response);
     }
 
-    public function beforeKernelView(ViewEvent $event)
+    public function beforeKernelView(ViewEvent $event): void
     {
         $request = $this->request;
 

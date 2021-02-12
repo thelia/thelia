@@ -45,12 +45,12 @@ abstract class JsonFileAbstractExport extends AbstractExport
         return $this->data->key();
     }
 
-    public function next()
+    public function next(): void
     {
         $this->data->next();
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         if ($this->data === null) {
             $data = $this->getData();

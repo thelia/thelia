@@ -135,7 +135,7 @@ class CustomerController extends BaseFrontController
         }
     }
 
-    public function newPasswordSentAction()
+    public function newPasswordSentAction(): void
     {
         $this->getParser()->assign('password_sent', true);
     }
@@ -234,7 +234,7 @@ class CustomerController extends BaseFrontController
     /**
      * Prepare customer data update.
      */
-    public function viewAction()
+    public function viewAction(): void
     {
         $this->checkAuth();
 
@@ -547,7 +547,7 @@ class CustomerController extends BaseFrontController
     /**
      * Dispatch event for customer login action.
      */
-    protected function processLogin(Customer $customer)
+    protected function processLogin(Customer $customer): void
     {
         $this->dispatch(TheliaEvents::CUSTOMER_LOGIN, new CustomerLoginEvent($customer));
     }

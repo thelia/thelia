@@ -88,7 +88,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      * @throws \Thelia\Exception\ImageException
      * @throws \InvalidArgumentException
      */
-    public function processImage(ImageEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function processImage(ImageEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $subdir = $event->getCacheSubdirectory();
         $source_file = $event->getSourceFilepath();

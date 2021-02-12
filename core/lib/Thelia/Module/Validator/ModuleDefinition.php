@@ -66,7 +66,7 @@ class ModuleDefinition
     /**
      * @param array $authors
      */
-    public function setAuthors($authors)
+    public function setAuthors($authors): void
     {
         $this->authors = $authors;
     }
@@ -82,7 +82,7 @@ class ModuleDefinition
     /**
      * @param string $code
      */
-    public function setCode($code)
+    public function setCode($code): void
     {
         $this->code = $code;
     }
@@ -98,7 +98,7 @@ class ModuleDefinition
     /**
      * @param array $dependencies
      */
-    public function setDependencies($dependencies)
+    public function setDependencies($dependencies): void
     {
         $this->dependencies = $dependencies;
     }
@@ -114,7 +114,7 @@ class ModuleDefinition
     /**
      * @param array $descriptives
      */
-    public function setDescriptives($descriptives)
+    public function setDescriptives($descriptives): void
     {
         $this->descriptives = $descriptives;
     }
@@ -130,7 +130,7 @@ class ModuleDefinition
     /**
      * @param string $documentation
      */
-    public function setDocumentation($documentation)
+    public function setDocumentation($documentation): void
     {
         $this->documentation = $documentation;
     }
@@ -146,7 +146,7 @@ class ModuleDefinition
     /**
      * @param array $languages
      */
-    public function setLanguages($languages)
+    public function setLanguages($languages): void
     {
         $this->languages = $languages;
     }
@@ -162,7 +162,7 @@ class ModuleDefinition
     /**
      * @param string $logo
      */
-    public function setLogo($logo)
+    public function setLogo($logo): void
     {
         $this->logo = $logo;
     }
@@ -178,7 +178,7 @@ class ModuleDefinition
     /**
      * @param string $theliaVersion
      */
-    public function setTheliaVersion($theliaVersion)
+    public function setTheliaVersion($theliaVersion): void
     {
         $this->theliaVersion = $theliaVersion;
     }
@@ -194,7 +194,7 @@ class ModuleDefinition
     /**
      * @param string $namespace
      */
-    public function setNamespace($namespace)
+    public function setNamespace($namespace): void
     {
         $this->namespace = $namespace;
     }
@@ -210,7 +210,7 @@ class ModuleDefinition
     /**
      * @param string $stability
      */
-    public function setStability($stability)
+    public function setStability($stability): void
     {
         $this->stability = $stability;
     }
@@ -226,7 +226,7 @@ class ModuleDefinition
     /**
      * @param string $type
      */
-    public function setType($type)
+    public function setType($type): void
     {
         $this->type = $type;
     }
@@ -242,7 +242,7 @@ class ModuleDefinition
     /**
      * @param string $version
      */
-    public function setVersion($version)
+    public function setVersion($version): void
     {
         $this->version = $version;
     }

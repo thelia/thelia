@@ -31,7 +31,7 @@ class ProductTest extends BaseLoopTestor
         return [];
     }
 
-    public function testSearchById()
+    public function testSearchById(): void
     {
         $product = ProductQuery::create()->orderById(Criteria::ASC)->findOne();
 
@@ -56,7 +56,7 @@ class ProductTest extends BaseLoopTestor
         $this->baseTestSearchById($product->getId(), $otherParameters);
     }
 
-    public function testSearchByIdComplex()
+    public function testSearchByIdComplex(): void
     {
         $product = ProductQuery::create()->orderById(Criteria::ASC)->findOne();
 
@@ -76,7 +76,7 @@ class ProductTest extends BaseLoopTestor
         $this->baseTestSearchById($product->getId(), $otherParameters);
     }
 
-    public function testSearchLimit()
+    public function testSearchLimit(): void
     {
         $this->baseTestSearchWithLimit(3);
     }

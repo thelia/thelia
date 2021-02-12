@@ -30,7 +30,7 @@ class ProfileUpdateResourceAccessForm extends BaseForm
 {
     public const RESOURCE_ACCESS_FIELD_PREFIX = 'resource';
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('id', HiddenType::class, [
@@ -72,7 +72,7 @@ class ProfileUpdateResourceAccessForm extends BaseForm
         return 'thelia_profile_resource_access_modification';
     }
 
-    public function verifyProfileId($value, ExecutionContextInterface $context)
+    public function verifyProfileId($value, ExecutionContextInterface $context): void
     {
         $profile = ProfileQuery::create()
             ->findPk($value);

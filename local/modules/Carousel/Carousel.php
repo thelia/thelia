@@ -43,7 +43,7 @@ class Carousel extends BaseModule
         return true;
     }
 
-    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
+    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false): void
     {
         $database = new Database($con);
 
@@ -70,7 +70,7 @@ class Carousel extends BaseModule
      *
      * @author Thomas Arnaud <tarnaud@openstudio.fr>
      */
-    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
     {
         $uploadDir = $this->getUploadDir();
         $fileSystem = new Filesystem();
@@ -112,7 +112,7 @@ class Carousel extends BaseModule
     /**
      * Defines how services are loaded in your modules.
      */
-    public static function configureServices(ServicesConfigurator $servicesConfigurator)
+    public static function configureServices(ServicesConfigurator $servicesConfigurator): void
     {
         $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
             ->exclude([THELIA_MODULE_DIR.ucfirst(self::getModuleCode()).'/I18n/*'])

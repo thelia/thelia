@@ -23,7 +23,7 @@ use Thelia\Model\ConfigQuery;
  */
 class Configuration extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $form = $this->formBuilder;
 

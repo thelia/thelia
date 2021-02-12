@@ -41,7 +41,7 @@ class SendPaymentConfirmationEmail extends BaseAction implements EventSubscriber
      *
      * Check if we're the payment module, and send the payment confirmation email to the customer if it's the case
      */
-    public function sendConfirmationEmail(OrderEvent $event)
+    public function sendConfirmationEmail(OrderEvent $event): void
     {
         if ($event->getOrder()->getPaymentModuleId() === Cheque::getModuleId()) {
             if ($event->getOrder()->isPaid()) {
