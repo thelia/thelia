@@ -17,8 +17,8 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Order;
 
 /**
- * Class PaymentEvent
- * @package Thelia\Core\Event\Module
+ * Class PaymentEvent.
+ *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class OrderPaymentEvent extends ActionEvent
@@ -47,7 +47,6 @@ class OrderPaymentEvent extends ActionEvent
     }
 
     /**
-     *
      * @return $this
      */
     public function setResponse(Response $response)

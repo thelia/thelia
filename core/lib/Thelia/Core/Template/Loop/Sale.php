@@ -27,19 +27,20 @@ use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 
 /**
- * Sale loop
+ * Sale loop.
  *
  * Class Sale
- * @package Thelia\Core\Template\Loop
+ *
  * @author Franck Allimant <thelia@cqfdev.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[] getExclude()
+ *
+ * @method int[]       getId()
+ * @method int[]       getExclude()
  * @method bool|string getActive()
- * @method int[] getProduct()
- * @method int getCurrency()
- * @method string[] getOrder()
+ * @method int[]       getProduct()
+ * @method int         getCurrency()
+ * @method string[]    getOrder()
  */
 class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -78,7 +79,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                             'created',
                             'created-reverse',
                             'updated',
-                            'updated-reverse'
+                            'updated-reverse',
                         ]
                     )
                 ),
@@ -93,16 +94,16 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
     public function getSearchIn()
     {
         return array_merge(
-            [ "sale_label" ],
+            ['sale_label'],
             $this->getStandardI18nSearchFields()
         );
     }
 
     /**
      * @param SaleQuery $search
-     * @param string $searchTerm
-     * @param array $searchIn
-     * @param string $searchCriteria
+     * @param string    $searchTerm
+     * @param array     $searchIn
+     * @param string    $searchCriteria
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
@@ -113,7 +114,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                 $search->_or();
             }
             switch ($searchInElement) {
-                case "sale_label":
+                case 'sale_label':
                     $this->addSearchInI18nColumn($search, 'SALE_LABEL', $searchCriteria, $searchTerm);
                     break;
             }
@@ -149,7 +150,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
 
         $productIdList = $this->getProduct();
 
-        if (! \is_null($productIdList)) {
+        if (!\is_null($productIdList)) {
             $search
                 ->useSaleProductQuery()
                     ->filterByProductId($productIdList, Criteria::IN)
@@ -165,7 +166,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
 
         $search->withColumn('`SaleOffsetCurrency`.PRICE_OFFSET_VALUE', 'price_offset_value');
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
@@ -175,46 +176,46 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                 case 'id-reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha-reverse":
+                case 'alpha-reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "label":
+                case 'label':
                     $search->addAscendingOrderByColumn('i18n_SALE_LABEL');
                     break;
-                case "label-reverse":
+                case 'label-reverse':
                     $search->addDescendingOrderByColumn('i18n_SALE_LABEL');
                     break;
-                case "active":
+                case 'active':
                     $search->orderByActive(Criteria::ASC);
                     break;
-                case "active-reverse":
+                case 'active-reverse':
                     $search->orderByActive(Criteria::DESC);
                     break;
-                case "start-date":
+                case 'start-date':
                     $search->orderByStartDate(Criteria::ASC);
                     break;
-                case "start-date-reverse":
+                case 'start-date-reverse':
                     $search->orderByStartDate(Criteria::DESC);
                     break;
-                case "end-date":
+                case 'end-date':
                     $search->orderByEndDate(Criteria::ASC);
                     break;
-                case "end-date-reverse":
+                case 'end-date-reverse':
                     $search->orderByEndDate(Criteria::DESC);
                     break;
-                case "created":
+                case 'created':
                     $search->addAscendingOrderByColumn('created_at');
                     break;
-                case "created-reverse":
+                case 'created-reverse':
                     $search->addDescendingOrderByColumn('created_at');
                     break;
-                case "updated":
+                case 'updated':
                     $search->addAscendingOrderByColumn('updated_at');
                     break;
-                case "updated-reverse":
+                case 'updated-reverse':
                     $search->addDescendingOrderByColumn('updated_at');
                     break;
             }
@@ -242,23 +243,23 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                     $priceOffsetType = $priceOffsetSymbol = '?';
             }
 
-            $loopResultRow->set("ID", $sale->getId())
-                ->set("IS_TRANSLATED", $sale->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("TITLE", $sale->getVirtualColumn('i18n_TITLE'))
-                ->set("SALE_LABEL", $sale->getVirtualColumn('i18n_SALE_LABEL'))
-                ->set("DESCRIPTION", $sale->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("CHAPO", $sale->getVirtualColumn('i18n_CHAPO'))
-                ->set("POSTSCRIPTUM", $sale->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("ACTIVE", $sale->getActive())
-                ->set("DISPLAY_INITIAL_PRICE", $sale->getDisplayInitialPrice())
-                ->set("START_DATE", $sale->getStartDate())
-                ->set("HAS_START_DATE", $sale->hasStartDate() ? 1 : 0)
-                ->set("END_DATE", $sale->getEndDate())
-                ->set("HAS_END_DATE", $sale->hasEndDate() ? 1 : 0)
-                ->set("PRICE_OFFSET_TYPE", $priceOffsetType)
-                ->set("PRICE_OFFSET_SYMBOL", $priceOffsetSymbol)
-                ->set("PRICE_OFFSET_VALUE", $sale->getVirtualColumn('price_offset_value'))
+            $loopResultRow->set('ID', $sale->getId())
+                ->set('IS_TRANSLATED', $sale->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('TITLE', $sale->getVirtualColumn('i18n_TITLE'))
+                ->set('SALE_LABEL', $sale->getVirtualColumn('i18n_SALE_LABEL'))
+                ->set('DESCRIPTION', $sale->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('CHAPO', $sale->getVirtualColumn('i18n_CHAPO'))
+                ->set('POSTSCRIPTUM', $sale->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set('ACTIVE', $sale->getActive())
+                ->set('DISPLAY_INITIAL_PRICE', $sale->getDisplayInitialPrice())
+                ->set('START_DATE', $sale->getStartDate())
+                ->set('HAS_START_DATE', $sale->hasStartDate() ? 1 : 0)
+                ->set('END_DATE', $sale->getEndDate())
+                ->set('HAS_END_DATE', $sale->hasEndDate() ? 1 : 0)
+                ->set('PRICE_OFFSET_TYPE', $priceOffsetType)
+                ->set('PRICE_OFFSET_SYMBOL', $priceOffsetSymbol)
+                ->set('PRICE_OFFSET_VALUE', $sale->getVirtualColumn('price_offset_value'))
             ;
 
             $this->addOutputFields($loopResultRow, $sale);

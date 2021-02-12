@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\AttributeTemplateQuery;
 
 /**
- * Class AttributeTemplateIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class AttributeTemplateIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class AttributeTemplateIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class AttributeTemplateIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "attribute_template_id";
+        return 'attribute_template_id';
     }
 }

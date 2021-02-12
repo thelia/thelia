@@ -20,19 +20,18 @@ use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 
 /**
- * Class ModelCriteriaTools
+ * Class ModelCriteriaTools.
  *
- * @package Thelia\Model\Tools
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class ModelCriteriaTools
 {
     /**
-     * @param               $requestedLocale
-     * @param array $columns
-     * @param null $foreignTable
+     * @param        $requestedLocale
+     * @param array  $columns
+     * @param null   $foreignTable
      * @param string $foreignKey
-     * @param bool $forceReturn
+     * @param bool   $forceReturn
      * @param string $forceReturn
      */
     public static function getFrontEndI18n(
@@ -49,7 +48,7 @@ class ModelCriteriaTools
                 $foreignTable = $search->getTableMap()->getName();
                 $aliasPrefix = '';
             } else {
-                $aliasPrefix = $foreignTable . '_';
+                $aliasPrefix = $foreignTable.'_';
             }
 
             if ($localeAlias === null) {
@@ -58,8 +57,8 @@ class ModelCriteriaTools
 
             $defaultLangWithoutTranslation = ConfigQuery::getDefaultLangWhenNoTranslationAvailable();
 
-            $requestedLocaleI18nAlias = $aliasPrefix . 'requested_locale_i18n';
-            $defaultLocaleI18nAlias = $aliasPrefix . 'default_locale_i18n';
+            $requestedLocaleI18nAlias = $aliasPrefix.'requested_locale_i18n';
+            $defaultLocaleI18nAlias = $aliasPrefix.'default_locale_i18n';
 
             if ($defaultLangWithoutTranslation == Lang::STRICTLY_USE_REQUESTED_LANGUAGE) {
                 $requestedLocaleJoin = new Join();
@@ -67,7 +66,7 @@ class ModelCriteriaTools
                     $localeAlias,
                     $foreignKey,
                     null,
-                    $foreignTable . '_i18n',
+                    $foreignTable.'_i18n',
                     'ID',
                     $requestedLocaleI18nAlias
                 );
@@ -76,7 +75,7 @@ class ModelCriteriaTools
                 $search->addJoinObject($requestedLocaleJoin, $requestedLocaleI18nAlias)
                     ->addJoinCondition(
                         $requestedLocaleI18nAlias,
-                        '`' . $requestedLocaleI18nAlias . '`.LOCALE = ?',
+                        '`'.$requestedLocaleI18nAlias.'`.LOCALE = ?',
                         $requestedLocale,
                         null,
                         \PDO::PARAM_STR
@@ -84,14 +83,14 @@ class ModelCriteriaTools
                 ;
 
                 $search->withColumn(
-                    'NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.`ID`)',
-                    $aliasPrefix . 'IS_TRANSLATED'
+                    'NOT ISNULL(`'.$requestedLocaleI18nAlias.'`.`ID`)',
+                    $aliasPrefix.'IS_TRANSLATED'
                 );
 
                 foreach ($columns as $column) {
                     $search->withColumn(
-                        '`' . $requestedLocaleI18nAlias . '`.`' . $column . '`',
-                        $aliasPrefix . 'i18n_' . $column
+                        '`'.$requestedLocaleI18nAlias.'`.`'.$column.'`',
+                        $aliasPrefix.'i18n_'.$column
                     );
                 }
             } else {
@@ -102,7 +101,7 @@ class ModelCriteriaTools
                     $localeAlias,
                     $foreignKey,
                     null,
-                    $foreignTable . '_i18n',
+                    $foreignTable.'_i18n',
                     'ID',
                     $defaultLocaleI18nAlias
                 );
@@ -111,7 +110,7 @@ class ModelCriteriaTools
                 $search->addJoinObject($defaultLocaleJoin, $defaultLocaleI18nAlias)
                     ->addJoinCondition(
                         $defaultLocaleI18nAlias,
-                        '`' . $defaultLocaleI18nAlias . '`.LOCALE = ?',
+                        '`'.$defaultLocaleI18nAlias.'`.LOCALE = ?',
                         $defaultLocale,
                         null,
                         \PDO::PARAM_STR
@@ -123,7 +122,7 @@ class ModelCriteriaTools
                     $localeAlias,
                     $foreignKey,
                     null,
-                    $foreignTable . '_i18n',
+                    $foreignTable.'_i18n',
                     'ID',
                     $requestedLocaleI18nAlias
                 );
@@ -132,7 +131,7 @@ class ModelCriteriaTools
                 $search->addJoinObject($requestedLocaleJoin, $requestedLocaleI18nAlias)
                     ->addJoinCondition(
                         $requestedLocaleI18nAlias,
-                        '`' . $requestedLocaleI18nAlias . '`.LOCALE = ?',
+                        '`'.$requestedLocaleI18nAlias.'`.LOCALE = ?',
                         $requestedLocale,
                         null,
                         \PDO::PARAM_STR
@@ -140,21 +139,21 @@ class ModelCriteriaTools
                 ;
 
                 $search->withColumn(
-                    'NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.`ID`)',
-                    $aliasPrefix . 'IS_TRANSLATED'
+                    'NOT ISNULL(`'.$requestedLocaleI18nAlias.'`.`ID`)',
+                    $aliasPrefix.'IS_TRANSLATED'
                 );
 
                 if ($forceReturn === false) {
-                    $search->where('NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.ID)')->_or()->where(
-                        'NOT ISNULL(`' . $defaultLocaleI18nAlias . '`.ID)'
+                    $search->where('NOT ISNULL(`'.$requestedLocaleI18nAlias.'`.ID)')->_or()->where(
+                        'NOT ISNULL(`'.$defaultLocaleI18nAlias.'`.ID)'
                     )
                     ;
                 }
 
                 foreach ($columns as $column) {
                     $search->withColumn(
-                        'CASE WHEN NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.`' . $column . '`) THEN `' . $requestedLocaleI18nAlias . '`.`' . $column . '` ELSE `' . $defaultLocaleI18nAlias . '`.`' . $column . '` END',
-                        $aliasPrefix . 'i18n_' . $column
+                        'CASE WHEN NOT ISNULL(`'.$requestedLocaleI18nAlias.'`.`'.$column.'`) THEN `'.$requestedLocaleI18nAlias.'`.`'.$column.'` ELSE `'.$defaultLocaleI18nAlias.'`.`'.$column.'` END',
+                        $aliasPrefix.'i18n_'.$column
                     );
                 }
             }
@@ -174,21 +173,21 @@ class ModelCriteriaTools
                 $foreignTable = $search->getTableMap()->getName();
                 $aliasPrefix = '';
             } else {
-                $aliasPrefix = $foreignTable . '_';
+                $aliasPrefix = $foreignTable.'_';
             }
 
             if ($localeAlias === null) {
                 $localeAlias = $search->getTableMap()->getName();
             }
 
-            $requestedLocaleI18nAlias = $aliasPrefix . 'requested_locale_i18n';
+            $requestedLocaleI18nAlias = $aliasPrefix.'requested_locale_i18n';
 
             $requestedLocaleJoin = new Join();
             $requestedLocaleJoin->addExplicitCondition(
                 $localeAlias,
                 $foreignKey,
                 null,
-                $foreignTable . '_i18n',
+                $foreignTable.'_i18n',
                 'ID',
                 $requestedLocaleI18nAlias
             );
@@ -197,35 +196,35 @@ class ModelCriteriaTools
             $search->addJoinObject($requestedLocaleJoin, $requestedLocaleI18nAlias)
                 ->addJoinCondition(
                     $requestedLocaleI18nAlias,
-                    '`' . $requestedLocaleI18nAlias . '`.LOCALE = ?',
+                    '`'.$requestedLocaleI18nAlias.'`.LOCALE = ?',
                     $requestedLocale,
                     null,
                     \PDO::PARAM_STR
                 )
             ;
 
-            $search->withColumn('NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.`ID`)', $aliasPrefix . 'IS_TRANSLATED');
+            $search->withColumn('NOT ISNULL(`'.$requestedLocaleI18nAlias.'`.`ID`)', $aliasPrefix.'IS_TRANSLATED');
 
             foreach ($columns as $column) {
                 $search->withColumn(
-                    '`' . $requestedLocaleI18nAlias . '`.`' . $column . '`',
-                    $aliasPrefix . 'i18n_' . $column
+                    '`'.$requestedLocaleI18nAlias.'`.`'.$column.'`',
+                    $aliasPrefix.'i18n_'.$column
                 );
             }
         }
     }
 
     /**
-     * Bild query to retrieve I18n
+     * Bild query to retrieve I18n.
      *
-     * @param bool $backendContext
-     * @param int $requestedLangId
-     * @param string $currentLocale
-     * @param array $columns
-     * @param string $foreignTable
-     * @param string $foreignKey
-     * @param bool $forceReturn
-     * @param string|null $localeAlias le local table if different of the main query table
+     * @param bool        $backendContext
+     * @param int         $requestedLangId
+     * @param string      $currentLocale
+     * @param array       $columns
+     * @param string      $foreignTable
+     * @param string      $foreignKey
+     * @param bool        $forceReturn
+     * @param string|null $localeAlias     le local table if different of the main query table
      *
      * @return string
      */

@@ -18,8 +18,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 
 /**
- * Class AreaCreateForm
- * @package Thelia\Form\Shipping
+ * Class AreaCreateForm.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AreaCreateForm extends BaseForm
@@ -36,10 +36,10 @@ class AreaCreateForm extends BaseForm
                     ],
                     'label' => Translator::getInstance()->trans('Shipping zone name'),
                     'label_attr' => [
-                        'for' => 'shipping_name'
+                        'for' => 'shipping_name',
                     ],
                     'attr' => [
-                        'placeholder' => Translator::getInstance()->trans("A name such as Europe or Overseas"),
+                        'placeholder' => Translator::getInstance()->trans('A name such as Europe or Overseas'),
                     ],
                 ]
             )

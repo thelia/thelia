@@ -13,13 +13,13 @@
 namespace Thelia\Install\Exception;
 
 /**
- * Class UpdateException
- * @package Thelia\Install\Exception
+ * Class UpdateException.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class UpdateException extends \RuntimeException
 {
-    /** @var string the version that has failed  */
+    /** @var string the version that has failed */
     protected $version;
 
     /**

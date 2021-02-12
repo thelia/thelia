@@ -13,11 +13,8 @@
 namespace Thelia\Type;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
-
 class FloatToFloatArrayType extends BaseType
 {
     public function getType()

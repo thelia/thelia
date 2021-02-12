@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Brand;
 
 /**
- * Class BrandCreateEvent
- * @package Thelia\Core\Event\Brand
+ * Class BrandCreateEvent.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class BrandCreateEvent extends BrandEvent

@@ -17,7 +17,9 @@
     </div>
 </footer>
 <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
-<?php if (isset($scriptHook)) { echo $scriptHook; } ?>
+<?php if (isset($scriptHook)) {
+    echo $scriptHook;
+} ?>
 </body>
 </html>
 <?php

@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Brand;
 
 /**
- * Class BrandDeleteEvent
- * @package Thelia\Core\Event\Brand
+ * Class BrandDeleteEvent.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class BrandDeleteEvent extends BrandEvent

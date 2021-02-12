@@ -13,13 +13,10 @@
 namespace Thelia\Tests\Core\Template\Loop;
 
 use Cheque\Cheque;
-use Thelia\Core\Template\Loop\ModuleConfig;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
- *
  * @author Franck Allimant <franck@cqfdev.fr>
- *
  */
 class ModuleConfigTest extends BaseLoopTestor
 {
@@ -31,8 +28,8 @@ class ModuleConfigTest extends BaseLoopTestor
     public function getMandatoryArguments()
     {
         return [
-            "module" => "cheque",
-            "variable" => "test"
+            'module' => 'cheque',
+            'variable' => 'test',
         ];
     }
 
@@ -41,10 +38,10 @@ class ModuleConfigTest extends BaseLoopTestor
         Cheque::setConfigValue('test', 'test-value', null, true);
 
         $this->instance->initializeArgs([
-                "type" => "module-config",
-                "name" => "testGetVariable",
-                "module" => "cheque",
-                "variable" => "test"
+                'type' => 'module-config',
+                'name' => 'testGetVariable',
+                'module' => 'cheque',
+                'variable' => 'test',
             ]);
 
         $dummy = null;
@@ -61,11 +58,11 @@ class ModuleConfigTest extends BaseLoopTestor
     public function testGetVariableWithDefault()
     {
         $this->instance->initializeArgs([
-                "type" => "module-config",
-                "name" => "testGetVariable",
-                "module" => "cheque",
-                "variable" => "nonexistent",
-                "default_value" => "a default value"
+                'type' => 'module-config',
+                'name' => 'testGetVariable',
+                'module' => 'cheque',
+                'variable' => 'nonexistent',
+                'default_value' => 'a default value',
             ]);
 
         $dummy = null;
@@ -85,11 +82,11 @@ class ModuleConfigTest extends BaseLoopTestor
 
         $this->instance->initializeArgs(
             [
-                "type" => "foo",
-                "name" => "foo",
-                "module" => "cheque",
-                "variable" => "testI18N",
-                "locale" => "fr_FR"
+                'type' => 'foo',
+                'name' => 'foo',
+                'module' => 'cheque',
+                'variable' => 'testI18N',
+                'locale' => 'fr_FR',
             ]
         )
         ;
@@ -111,10 +108,10 @@ class ModuleConfigTest extends BaseLoopTestor
 
         $this->instance->initializeArgs(
             [
-                "type" => "foo",
-                "name" => "foo",
-                "module" => "tagapouet",
-                "variable" => "xdes"
+                'type' => 'foo',
+                'name' => 'foo',
+                'module' => 'tagapouet',
+                'variable' => 'xdes',
             ]
         )
         ;

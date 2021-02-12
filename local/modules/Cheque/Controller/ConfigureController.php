@@ -13,7 +13,6 @@
 namespace Cheque\Controller;
 
 use Cheque\Cheque;
-use Cheque\Form\ConfigurationForm;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
@@ -22,8 +21,8 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Tools\URL;
 
 /**
- * Class SetTransferConfig
- * @package WireTransfer\Controller
+ * Class SetTransferConfig.
+ *
  * @author Thelia <info@thelia.net>
  */
 class ConfigureController extends BaseAdminController
@@ -42,7 +41,7 @@ class ConfigureController extends BaseAdminController
 
         try {
             // Check the form against constraints violations
-            $form = $this->validateForm($configurationForm, "POST");
+            $form = $this->validateForm($configurationForm, 'POST');
 
             // Get the form field values
             $data = $form->getData();
@@ -52,9 +51,9 @@ class ConfigureController extends BaseAdminController
 
             // Log configuration modification
             $this->adminLogAppend(
-                "cheque.configuration.message",
+                'cheque.configuration.message',
                 AccessManager::UPDATE,
-                sprintf("Cheque instructions configuration updated")
+                sprintf('Cheque instructions configuration updated')
             );
 
             // Everything is OK.
@@ -63,8 +62,7 @@ class ConfigureController extends BaseAdminController
             // Form cannot be validated. Create the error message using
             // the BaseAdminController helper method.
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -73,7 +71,7 @@ class ConfigureController extends BaseAdminController
         // just redisplay the same template.
         // Setup the Form error context, to make error information available in the template.
         $this->setupFormErrorContext(
-            $this->getTranslator()->trans("Cheque instructions configuration", [], Cheque::MESSAGE_DOMAIN),
+            $this->getTranslator()->trans('Cheque instructions configuration', [], Cheque::MESSAGE_DOMAIN),
             $error_msg,
             $configurationForm,
             $ex

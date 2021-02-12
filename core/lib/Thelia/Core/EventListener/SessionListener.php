@@ -23,8 +23,8 @@ use Thelia\Core\TheliaKernelEvents;
 use Thelia\Model\ConfigQuery;
 
 /**
- * Class SessionListener
- * @package Thelia\Core\EventListener
+ * Class SessionListener.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class SessionListener implements EventSubscriberInterface
@@ -32,11 +32,11 @@ class SessionListener implements EventSubscriberInterface
     public function prodSession(SessionEvent $event)
     {
         $storage = new NativeSessionStorage(
-            [ 'cookie_lifetime' => ConfigQuery::read('session_config.lifetime', 0) ]
+            ['cookie_lifetime' => ConfigQuery::read('session_config.lifetime', 0)]
         );
         $storage->setSaveHandler(
             new NativeFileSessionHandler(
-                ConfigQuery::read("session_config.save_path", THELIA_SESSION_DIR)
+                ConfigQuery::read('session_config.save_path', THELIA_SESSION_DIR)
             )
         );
         $event->setSession($this->getSession($storage));
@@ -45,7 +45,7 @@ class SessionListener implements EventSubscriberInterface
     public function testSession(SessionEvent $event)
     {
         if ($event->getEnv() == 'test') {
-            $storage = new MockFileSessionStorage($event->getCacheDir() . DS . 'sessions');
+            $storage = new MockFileSessionStorage($event->getCacheDir().DS.'sessions');
             $event->setSession($this->getSession($storage));
             $event->stopPropagation();
         }
@@ -58,15 +58,15 @@ class SessionListener implements EventSubscriberInterface
 
     /**
      * {@inheritdoc}
-     * api
+     * api.
      */
     public static function getSubscribedEvents()
     {
         return [
-            TheliaKernelEvents::SESSION =>[
+            TheliaKernelEvents::SESSION => [
                 ['prodSession', 0],
-                ['testSession', 128]
-            ]
+                ['testSession', 128],
+            ],
         ];
     }
 }

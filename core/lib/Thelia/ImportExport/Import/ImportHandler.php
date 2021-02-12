@@ -15,9 +15,10 @@ namespace Thelia\ImportExport\Import;
 use Thelia\ImportExport\AbstractHandler;
 
 /**
- * Class ImportHandler
- * @package Thelia\ImportExport
+ * Class ImportHandler.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
+ *
  * @deprecated since 2.3, fore more information http://doc.thelia.net/en/documentation/features/import_export/import.html
  */
 abstract class ImportHandler extends AbstractHandler

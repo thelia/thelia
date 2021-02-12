@@ -1,29 +1,29 @@
 <?php
 
-$step=6;
-include "header.php";
+$step = 6;
+include 'header.php';
 
 try {
     if ($_SESSION['install']['step'] != $step && (empty($_POST['admin_login']) || empty($_POST['admin_password']) || ($_POST['admin_password'] != $_POST['admin_password_verif']) || strlen($_POST['admin_login']) < 3)) {
         $query = $_POST;
-        $query["err"] = 0;
+        $query['err'] = 0;
         if (empty($_POST['admin_login'])) {
-            $query["err"] |= 1;
+            $query['err'] |= 1;
         }
         if (empty($_POST['admin_email'])) {
-            $query["err"] |= 3;
+            $query['err'] |= 3;
         }
         if (empty($_POST['admin_password'])) {
-            $query["err"] |= 2;
+            $query['err'] |= 2;
         }
         if ($_POST['admin_password'] != $_POST['admin_password_verif']) {
-            $query["err"] |= 4;
+            $query['err'] |= 4;
         }
-        if (isset($query["admin_password"])) {
-            unset($query["admin_password"]);
+        if (isset($query['admin_password'])) {
+            unset($query['admin_password']);
         }
-        if (isset($query["admin_password_verif"])) {
-            unset($query["admin_password_verif"]);
+        if (isset($query['admin_password_verif'])) {
+            unset($query['admin_password_verif']);
         }
         header(sprintf('location: config.php?%s', http_build_query($query)));
         exit; // Don't forget to exit, otherwise, the script will continue to run.
@@ -31,7 +31,7 @@ try {
 
     if ($_SESSION['install']['step'] == 5) {
         // Check now if we can create the App.
-        $thelia = new \Thelia\Core\Thelia("install", true);
+        $thelia = new \Thelia\Core\Thelia('install', true);
         $thelia->boot();
 
         $admin = new \Thelia\Model\Admin();
@@ -49,7 +49,7 @@ try {
         \Thelia\Model\ConfigQuery::write('url_site', $_POST['url_site']);
 
         $lang = \Thelia\Model\LangQuery::create()
-            ->findOneByLocale(empty($_POST['shop_locale']) ? "en_US" : $_POST['shop_locale'])
+            ->findOneByLocale(empty($_POST['shop_locale']) ? 'en_US' : $_POST['shop_locale'])
         ;
 
         if (null !== $lang) {
@@ -61,12 +61,12 @@ try {
         \Thelia\Model\ConfigQuery::write('form.secret', $secret, 0, 0);
 
         // Check if symlinks are working, and adjust original_image_delivery_mode and original_document_delivery_mode
-        $target = __DIR__ . '/../symlink_test';
+        $target = __DIR__.'/../symlink_test';
         // One never knows...
         @unlink($target);
 
         if (true === touch($target)) {
-            $link = $target . '.tmp';
+            $link = $target.'.tmp';
             // One never knows...
             @unlink($link);
 
@@ -87,18 +87,16 @@ try {
     //clean up cache directories
     $fs = new \Symfony\Component\Filesystem\Filesystem();
 
-    $fs->remove(THELIA_ROOT . '/cache/prod');
-    $fs->remove(THELIA_ROOT . '/cache/dev');
-    $fs->remove(THELIA_ROOT . '/cache/install');
+    $fs->remove(THELIA_ROOT.'/cache/prod');
+    $fs->remove(THELIA_ROOT.'/cache/dev');
+    $fs->remove(THELIA_ROOT.'/cache/install');
 
     $request = \Thelia\Core\HttpFoundation\Request::createFromGlobals();
     $_SESSION['install']['step'] = $step;
 
     // Retrieve the website url
     $url = $_SERVER['PHP_SELF'];
-    $website_url = preg_replace("#/install/[a-z](.*)#", '', $url);
-
-    ?>
+    $website_url = preg_replace('#/install/[a-z](.*)#', '', $url); ?>
     <div class="well">
         <p class="lead text-center">
             <?php echo $trans->trans('Thelia is now installed. Thank you !'); ?>
@@ -120,7 +118,7 @@ try {
 SCRIPT;
 
     ob_start();
-    include('footer.php');
+    include 'footer.php';
     $footerContent = ob_get_clean();
 
     // Remove the install wizard
@@ -138,9 +136,7 @@ SCRIPT;
             <?php echo $trans->trans('Don\'t forget to delete the web/install directory.'); ?>
         </p>
         <?php
-    }*/
-
-    ?>
+    }*/ ?>
     <p class="lead text-center">
         <?php echo $trans->trans('Don\'t forget to delete the web/install directory.'); ?>
     </p>
@@ -158,12 +154,11 @@ SCRIPT;
             '<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>',
             [
                 '%err' => $ex->getMessage(),
-                '%details' => nl2br($ex->getTraceAsString())
+                '%details' => nl2br($ex->getTraceAsString()),
             ]
         ); ?>
     </div>
     <?php
 
-    include('footer.php');
+    include 'footer.php';
 }
-

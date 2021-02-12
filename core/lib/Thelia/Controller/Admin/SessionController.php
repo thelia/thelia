@@ -13,14 +13,12 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Thelia\Action\Administrator;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\User\UserInterface;
-use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\AdminLogin;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
@@ -53,14 +51,14 @@ class SessionController extends BaseAdminController
         // Check if user is already authenticate
         if (!\boolval(ConfigQuery::read('enable_lost_admin_password_recovery', false))) {
             AdminLog::append(
-                "admin",
-                "ADMIN_CREATE_PASSWORD",
-                "Lost password recovery function invoked",
+                'admin',
+                'ADMIN_CREATE_PASSWORD',
+                'Lost password recovery function invoked',
                 $this->getRequest()
             );
 
             // Redirect to the error page
-            return $this->errorPage($this->getTranslator()->trans("The lost admin password recovery feature is disabled."), 403);
+            return $this->errorPage($this->getTranslator()->trans('The lost admin password recovery feature is disabled.'), 403);
         }
     }
 
@@ -70,7 +68,7 @@ class SessionController extends BaseAdminController
             return $response;
         }
 
-        return $this->render("login");
+        return $this->render('login');
     }
 
     public function showLostPasswordAction()
@@ -79,7 +77,7 @@ class SessionController extends BaseAdminController
             return $response;
         }
 
-        return $this->render("lost-password");
+        return $this->render('lost-password');
     }
 
     public function passwordCreateRequestAction()
@@ -91,7 +89,7 @@ class SessionController extends BaseAdminController
         $adminLostPasswordForm = $this->createForm(AdminForm::ADMIN_LOST_PASSWORD);
 
         try {
-            $form = $this->validateForm($adminLostPasswordForm, "post");
+            $form = $this->validateForm($adminLostPasswordForm, 'post');
 
             $data = $form->getData();
 
@@ -101,13 +99,13 @@ class SessionController extends BaseAdminController
             }
 
             if (null === $admin) {
-                throw new \Exception($this->getTranslator()->trans("Invalid username or email."));
+                throw new \Exception($this->getTranslator()->trans('Invalid username or email.'));
             }
 
             $email = $admin->getEmail();
 
             if (empty($email)) {
-                throw new \Exception($this->getTranslator()->trans("Sorry, no email defined for this administrator."));
+                throw new \Exception($this->getTranslator()->trans('Sorry, no email defined for this administrator.'));
             }
 
             $this->dispatch(TheliaEvents::ADMINISTRATOR_CREATEPASSWORD, new AdministratorEvent($admin));
@@ -119,14 +117,14 @@ class SessionController extends BaseAdminController
             $message = $this->createStandardFormValidationErrorMessage($ex);
         } catch (\Exception $ex) {
             // Log failure
-            AdminLog::append("admin", "ADMIN_LOST_PASSWORD", $ex->getMessage(), $this->getRequest());
+            AdminLog::append('admin', 'ADMIN_LOST_PASSWORD', $ex->getMessage(), $this->getRequest());
 
             $message = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext("Admin password create request", $message, $adminLostPasswordForm, $ex);
+        $this->setupFormErrorContext('Admin password create request', $message, $adminLostPasswordForm, $ex);
 
-        return $this->render("lost-password");
+        return $this->render('lost-password');
     }
 
     public function passwordCreateRequestSuccessAction()
@@ -135,7 +133,7 @@ class SessionController extends BaseAdminController
             return $response;
         }
 
-        return $this->render("lost-password", [ 'create_request_success' => true ]);
+        return $this->render('lost-password', ['create_request_success' => true]);
     }
 
     public function displayCreateFormAction($token)
@@ -147,14 +145,14 @@ class SessionController extends BaseAdminController
         // Check the token
         if (null == $admin = AdminQuery::create()->findOneByPasswordRenewToken($token)) {
             return $this->render(
-                "lost-password",
-                [ 'token_error' => true ]
+                'lost-password',
+                ['token_error' => true]
             );
         }
 
         $this->getSession()->set(self::ADMIN_TOKEN_SESSION_VAR_NAME, $token);
 
-        return $this->render("create-password");
+        return $this->render('create-password');
     }
 
     public function passwordCreatedAction()
@@ -166,14 +164,14 @@ class SessionController extends BaseAdminController
         $adminCreatePasswordForm = $this->createForm(AdminForm::ADMIN_CREATE_PASSWORD);
 
         try {
-            $form = $this->validateForm($adminCreatePasswordForm, "post");
+            $form = $this->validateForm($adminCreatePasswordForm, 'post');
 
             $data = $form->getData();
 
             $token = $this->getSession()->get(self::ADMIN_TOKEN_SESSION_VAR_NAME);
 
             if (empty($token) || null === $admin = AdminQuery::create()->findOneByPasswordRenewToken($token)) {
-                throw new \Exception($this->getTranslator()->trans("An invalid token was provided, your password cannot be changed"));
+                throw new \Exception($this->getTranslator()->trans('An invalid token was provided, your password cannot be changed'));
             }
 
             $event = new AdministratorUpdatePasswordEvent($admin);
@@ -189,14 +187,14 @@ class SessionController extends BaseAdminController
             $message = $this->createStandardFormValidationErrorMessage($ex);
         } catch (\Exception $ex) {
             // Log authentication failure
-            AdminLog::append("admin", "ADMIN_CREATE_PASSWORD", $ex->getMessage(), $this->getRequest());
+            AdminLog::append('admin', 'ADMIN_CREATE_PASSWORD', $ex->getMessage(), $this->getRequest());
 
             $message = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext("Login process", $message, $adminCreatePasswordForm, $ex);
+        $this->setupFormErrorContext('Login process', $message, $adminCreatePasswordForm, $ex);
 
-        return $this->render("create-password");
+        return $this->render('create-password');
     }
 
     public function passwordCreatedSuccessAction()
@@ -205,7 +203,7 @@ class SessionController extends BaseAdminController
             return $response;
         }
 
-        return $this->render("create-password-success");
+        return $this->render('create-password-success');
     }
 
     public function checkLogoutAction()
@@ -226,12 +224,12 @@ class SessionController extends BaseAdminController
         $request = $this->getRequest();
 
         /** @var AdminLogin $adminLoginForm */
-        $adminLoginForm = $this->createForm("thelia.admin.login");
+        $adminLoginForm = $this->createForm('thelia.admin.login');
 
         $authenticator = null;
 
         try {
-            $form = $this->validateForm($adminLoginForm, "post");
+            $form = $this->validateForm($adminLoginForm, 'post');
 
             $authenticator = new AdminUsernamePasswordFormAuthenticator($request, $adminLoginForm);
 
@@ -242,7 +240,7 @@ class SessionController extends BaseAdminController
             $this->getSecurityContext()->setAdminUser($user);
 
             // Log authentication success
-            AdminLog::append("admin", "LOGIN", "Authentication successful", $request, $user, false);
+            AdminLog::append('admin', 'LOGIN', 'Authentication successful', $request, $user, false);
 
             $this->applyUserLocale($user);
 
@@ -268,32 +266,31 @@ class SessionController extends BaseAdminController
             return $this->generateSuccessRedirect($adminLoginForm);
         } catch (FormValidationException $ex) {
             // Validation problem
-             $message = $this->createStandardFormValidationErrorMessage($ex);
+            $message = $this->createStandardFormValidationErrorMessage($ex);
         } catch (AuthenticationException $ex) {
-            $username = null !== $authenticator ? $authenticator->getUsername() : "unknown";
+            $username = null !== $authenticator ? $authenticator->getUsername() : 'unknown';
             // Log authentication failure
-            AdminLog::append("admin", "LOGIN", sprintf("Authentication failure for username '%s'", $username), $request);
+            AdminLog::append('admin', 'LOGIN', sprintf("Authentication failure for username '%s'", $username), $request);
 
-            $message =  $this->getTranslator()->trans("Login failed. Please check your username and password.");
+            $message = $this->getTranslator()->trans('Login failed. Please check your username and password.');
         } catch (\Exception $ex) {
             // Log authentication failure
-             AdminLog::append("admin", "LOGIN", sprintf("Undefined error: %s", $ex->getMessage()), $request);
+            AdminLog::append('admin', 'LOGIN', sprintf('Undefined error: %s', $ex->getMessage()), $request);
 
             $message = $this->getTranslator()->trans(
-                "Unable to process your request. Please try again (%err).",
-                ["%err" => $ex->getMessage()]
+                'Unable to process your request. Please try again (%err).',
+                ['%err' => $ex->getMessage()]
             );
         }
 
-        $this->setupFormErrorContext("Login process", $message, $adminLoginForm, $ex);
+        $this->setupFormErrorContext('Login process', $message, $adminLoginForm, $ex);
 
-          // Display the login form again
-        return $this->render("login");
+        // Display the login form again
+        return $this->render('login');
     }
 
     /**
      * Save user locale preference in session.
-     *
      */
     protected function applyUserLocale(UserInterface $user)
     {

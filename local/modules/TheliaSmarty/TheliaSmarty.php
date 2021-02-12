@@ -30,18 +30,17 @@ class TheliaSmarty extends BaseModule
     public static function getCompilers()
     {
         return [
-            new RegisterParserPluginPass()
+            new RegisterParserPluginPass(),
         ];
     }
 
     /**
-     * Defines how services are loaded in your modules
-     *
+     * Defines how services are loaded in your modules.
      */
     public static function configureServices(ServicesConfigurator $servicesConfigurator)
     {
         $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
-            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
+            ->exclude([THELIA_MODULE_DIR.ucfirst(self::getModuleCode()).'/I18n/*'])
             ->autowire(true)
             ->autoconfigure(true);
     }
@@ -49,6 +48,6 @@ class TheliaSmarty extends BaseModule
     public static function loadConfiguration(ContainerBuilder $containerBuilder)
     {
         $containerBuilder->registerForAutoconfiguration(SmartyPluginInterface::class)
-            ->addTag("thelia.parser.register_plugin");
+            ->addTag('thelia.parser.register_plugin');
     }
 }

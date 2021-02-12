@@ -34,7 +34,7 @@ class TaxRuleEvent extends ActionEvent
 
     public function hasTaxRule()
     {
-        return ! \is_null($this->taxRule);
+        return !\is_null($this->taxRule);
     }
 
     public function getTaxRule()
@@ -117,6 +117,7 @@ class TaxRuleEvent extends ActionEvent
     public function setCountryDeletedList($countryDeletedList)
     {
         $this->countryDeletedList = $countryDeletedList;
+
         return $this;
     }
 

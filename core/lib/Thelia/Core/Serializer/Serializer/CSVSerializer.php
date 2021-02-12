@@ -15,7 +15,8 @@ namespace Thelia\Core\Serializer\Serializer;
 use Thelia\Core\Serializer\AbstractSerializer;
 
 /**
- * Class CSVSerializer
+ * Class CSVSerializer.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class CSVSerializer extends AbstractSerializer
@@ -31,7 +32,7 @@ class CSVSerializer extends AbstractSerializer
     protected $enclosure = '"';
 
     /**
-     * @var null|array Headers
+     * @var array|null Headers
      */
     private $headers;
 
@@ -56,7 +57,7 @@ class CSVSerializer extends AbstractSerializer
     }
 
     /**
-     * Set delimiter char
+     * Set delimiter char.
      *
      * @param string $delimiter Delimiter char
      *
@@ -70,7 +71,7 @@ class CSVSerializer extends AbstractSerializer
     }
 
     /**
-     * Set enclosure char
+     * Set enclosure char.
      *
      * @param string $enclosure Enclosure char
      *
@@ -134,15 +135,14 @@ class CSVSerializer extends AbstractSerializer
 
         clearstatcache(true, $fileObject->getPathname());
     }
-    
-    
+
     public function unserialize(\SplFileObject $fileObject)
     {
         $data = [];
 
         $index = 0;
-        while(null !== $row = $fileObject->fgetcsv($this->delimiter, $this->enclosure)) {
-            $index++;
+        while (null !== $row = $fileObject->fgetcsv($this->delimiter, $this->enclosure)) {
+            ++$index;
             if (empty($row)) {
                 continue;
             }
@@ -152,7 +152,7 @@ class CSVSerializer extends AbstractSerializer
                 continue;
             }
 
-            if (count($row) !== count($this->headers)) {
+            if (\count($row) !== \count($this->headers)) {
                 continue;
             }
 

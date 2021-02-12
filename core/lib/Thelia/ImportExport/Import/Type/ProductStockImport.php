@@ -17,14 +17,15 @@ use Thelia\ImportExport\Import\AbstractImport;
 use Thelia\Model\ProductSaleElementsQuery;
 
 /**
- * Class ControllerTestBase
+ * Class ControllerTestBase.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class ProductStockImport extends AbstractImport
 {
     protected $mandatoryColumns = [
         'id',
-        'stock'
+        'stock',
     ];
 
     public function importData(array $data)
@@ -35,18 +36,18 @@ class ProductStockImport extends AbstractImport
             return Translator::getInstance()->trans(
                 'The product sale element id %id doesn\'t exist',
                 [
-                    '%id' => $data['id']
+                    '%id' => $data['id'],
                 ]
             );
         }
-            $pse->setQuantity($data['stock']);
+        $pse->setQuantity($data['stock']);
 
-            if (isset($data['ean']) && !empty($data['ean'])) {
-                $pse->setEanCode($data['ean']);
-            }
+        if (isset($data['ean']) && !empty($data['ean'])) {
+            $pse->setEanCode($data['ean']);
+        }
 
-            $pse->save();
-            $this->importedRows++;
+        $pse->save();
+        ++$this->importedRows;
 
         return null;
     }

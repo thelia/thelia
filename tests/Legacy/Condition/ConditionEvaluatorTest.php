@@ -18,18 +18,16 @@ use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
 
 /**
- * Unit Test ConditionEvaluator Class
+ * Unit Test ConditionEvaluator Class.
  *
- * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class ConditionEvaluatorTest extends TestCase
 {
     /**
-     * Test variable comparison
+     * Test variable comparison.
      *
-     * @covers Thelia\Condition\ConditionEvaluator::variableOpComparison
+     * @covers \Thelia\Condition\ConditionEvaluator::variableOpComparison
      */
     public function testVariableOpComparisonSuccess()
     {
@@ -67,9 +65,9 @@ class ConditionEvaluatorTest extends TestCase
     }
 
     /**
-     * Test variable comparison
+     * Test variable comparison.
      *
-     * @covers Thelia\Condition\ConditionEvaluator::variableOpComparison
+     * @covers \Thelia\Condition\ConditionEvaluator::variableOpComparison
      */
     public function testVariableOpComparisonFail()
     {
@@ -101,9 +99,9 @@ class ConditionEvaluatorTest extends TestCase
     }
 
     /**
-     * Test variable comparison
+     * Test variable comparison.
      *
-     * @covers Thelia\Condition\ConditionEvaluator::variableOpComparison
+     * @covers \Thelia\Condition\ConditionEvaluator::variableOpComparison
      */
     public function testVariableOpComparisonException()
     {
@@ -114,9 +112,9 @@ class ConditionEvaluatorTest extends TestCase
     }
 
     /**
-     * Test condition collection matching
+     * Test condition collection matching.
      *
-     * @covers Thelia\Condition\ConditionEvaluator::isMatching
+     * @covers \Thelia\Condition\ConditionEvaluator::isMatching
      */
     public function testIsMatchingTrue()
     {
@@ -145,9 +143,9 @@ class ConditionEvaluatorTest extends TestCase
     }
 
     /**
-     * Test condition collection matching
+     * Test condition collection matching.
      *
-     * @covers Thelia\Condition\ConditionEvaluator::isMatching
+     * @covers \Thelia\Condition\ConditionEvaluator::isMatching
      */
     public function testIsMatchingFalse()
     {

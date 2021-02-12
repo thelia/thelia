@@ -23,8 +23,8 @@ use Thelia\Model\Event\AddressEvent;
 use Thelia\Model\Map\AddressTableMap;
 
 /**
- * Class Address
- * @package Thelia\Action
+ * Class Address.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Address extends BaseAction implements EventSubscriberInterface
@@ -98,9 +98,9 @@ class Address extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::ADDRESS_CREATE => ["create", 128],
-            TheliaEvents::ADDRESS_UPDATE => ["update", 128],
-            TheliaEvents::ADDRESS_DELETE => ["delete", 128],
+            TheliaEvents::ADDRESS_CREATE => ['create', 128],
+            TheliaEvents::ADDRESS_UPDATE => ['update', 128],
+            TheliaEvents::ADDRESS_DELETE => ['delete', 128],
             TheliaEvents::ADDRESS_DEFAULT => ['useDefault', 128],
         ];
     }

@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\OrderCouponQuery;
 
 /**
- * Class OrderCouponIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class OrderCouponIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class OrderCouponIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class OrderCouponIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "order_coupon_id";
+        return 'order_coupon_id';
     }
 }

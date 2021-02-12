@@ -19,9 +19,7 @@ use Thelia\Rewriting\RewritingRetriever;
 use Thelia\Tools\URL;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class RewritingRetrieverTest extends TestCase
 {

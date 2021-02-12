@@ -50,15 +50,15 @@ class CartController extends BaseFrontController
 
             $this->afterModifyCart();
 
-            if (! $this->changeViewForAjax()) {
+            if (!$this->changeViewForAjax()) {
                 if (null !== $response = $this->generateSuccessRedirect($cartAdd)) {
                     return $response;
                 }
             }
         } catch (PropelException $e) {
-            Tlog::getInstance()->error(sprintf("Failed to add item to cart with message : %s", $e->getMessage()));
+            Tlog::getInstance()->error(sprintf('Failed to add item to cart with message : %s', $e->getMessage()));
             $message = $this->getTranslator()->trans(
-                "Failed to add this article to your cart, please try again",
+                'Failed to add this article to your cart, please try again',
                 [],
                 Front::MESSAGE_DOMAIN
             );
@@ -75,8 +75,8 @@ class CartController extends BaseFrontController
     public function changeItem()
     {
         $cartEvent = $this->getCartEvent();
-        $cartEvent->setCartItemId($this->getRequest()->get("cart_item"));
-        $cartEvent->setQuantity($this->getRequest()->get("quantity"));
+        $cartEvent->setCartItemId($this->getRequest()->get('cart_item'));
+        $cartEvent->setQuantity($this->getRequest()->get('quantity'));
 
         try {
             $this->getTokenProvider()->checkToken(
@@ -87,13 +87,13 @@ class CartController extends BaseFrontController
 
             $this->afterModifyCart();
 
-            if (! $this->changeViewForAjax()) {
-                if (null !== $successUrl = $this->getRequest()->get("success_url")) {
+            if (!$this->changeViewForAjax()) {
+                if (null !== $successUrl = $this->getRequest()->get('success_url')) {
                     return $this->generateRedirect(URL::getInstance()->absoluteUrl($successUrl));
                 }
             }
         } catch (\Exception $e) {
-            Tlog::getInstance()->error(sprintf("Failed to change cart item quantity: %s", $e->getMessage()));
+            Tlog::getInstance()->error(sprintf('Failed to change cart item quantity: %s', $e->getMessage()));
 
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
@@ -102,7 +102,7 @@ class CartController extends BaseFrontController
     public function deleteItem()
     {
         $cartEvent = $this->getCartEvent();
-        $cartEvent->setCartItemId($this->getRequest()->get("cart_item"));
+        $cartEvent->setCartItemId($this->getRequest()->get('cart_item'));
 
         try {
             $this->getTokenProvider()->checkToken(
@@ -113,12 +113,12 @@ class CartController extends BaseFrontController
 
             $this->afterModifyCart();
         } catch (\Exception $e) {
-            Tlog::getInstance()->error(sprintf("error during deleting cartItem with message : %s", $e->getMessage()));
+            Tlog::getInstance()->error(sprintf('error during deleting cartItem with message : %s', $e->getMessage()));
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
 
-        if (! $this->changeViewForAjax()) {
-            if (null !== $successUrl = $this->getRequest()->get("success_url")) {
+        if (!$this->changeViewForAjax()) {
+            if (null !== $successUrl = $this->getRequest()->get('success_url')) {
                 return $this->generateRedirect(URL::getInstance()->absoluteUrl($successUrl));
             }
         }
@@ -130,7 +130,7 @@ class CartController extends BaseFrontController
         if ($this->getRequest()->isXmlHttpRequest() && (0 === \intval($this->getRequest()->get('no_ajax_check', 0)))) {
             $request = $this->getRequest();
 
-            $view = $request->get('ajax-view', "includes/mini-cart");
+            $view = $request->get('ajax-view', 'includes/mini-cart');
 
             $request->attributes->set('_view', $view);
 
@@ -142,8 +142,8 @@ class CartController extends BaseFrontController
 
     public function changeCountry()
     {
-        $redirectUrl = URL::getInstance()->absoluteUrl("/cart");
-        $deliveryId = $this->getRequest()->get("country");
+        $redirectUrl = URL::getInstance()->absoluteUrl('/cart');
+        $deliveryId = $this->getRequest()->get('country');
         $cookieName = ConfigQuery::read('front_cart_country_cookie_name', 'fcccn');
         $cookieExpires = ConfigQuery::read('front_cart_country_cookie_expires', 2592000);
         $cookieExpires = \intval($cookieExpires) ?: 2592000;
@@ -167,14 +167,14 @@ class CartController extends BaseFrontController
     }
 
     /**
-     * Find the good way to construct the cart form
+     * Find the good way to construct the cart form.
      *
      * @return CartAdd
      */
     private function getAddCartForm(Request $request)
     {
-        /** @var CartAdd $cartAdd */
-        if ($request->isMethod("post")) {
+        /* @var CartAdd $cartAdd */
+        if ($request->isMethod('post')) {
             $cartAdd = $this->createForm(FrontForm::CART_ADD);
         } else {
             $cartAdd = $this->createForm(
@@ -182,7 +182,7 @@ class CartController extends BaseFrontController
                 FormType::class,
                 [],
                 [
-                    'csrf_protection'   => false,
+                    'csrf_protection' => false,
                 ]
             );
         }
@@ -220,7 +220,7 @@ class CartController extends BaseFrontController
 
                     $postage = $deliveryPostageEvent->getPostage();
 
-                    if (null !== $postage)  {
+                    if (null !== $postage) {
                         $orderEvent->setPostage($postage->getAmount());
                         $orderEvent->setPostageTax($postage->getAmountTax());
                         $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());

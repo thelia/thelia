@@ -13,14 +13,12 @@
 namespace Thelia\Core\Template\Element;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 interface ArraySearchLoopInterface
 {
     /**
-     * this method returns an array
+     * this method returns an array.
      *
      * @return array
      */

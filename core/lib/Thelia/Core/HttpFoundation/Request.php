@@ -19,10 +19,10 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\ConfigQuery;
 
 /**
- * extends Symfony\Component\HttpFoundation\Request for adding some helpers
+ * extends Symfony\Component\HttpFoundation\Request for adding some helpers.
  *
  * Class Request
- * @package Thelia\Core\HttpFoundation
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Request extends BaseRequest
@@ -52,7 +52,7 @@ class Request extends BaseRequest
     }
 
     /**
-     * Filter PathInfo to allow slash ending uri
+     * Filter PathInfo to allow slash ending uri.
      *
      * example:
      * /admin will be the same as /admin/
@@ -82,7 +82,7 @@ class Request extends BaseRequest
 
     public function getProductId()
     {
-        return $this->get("product_id");
+        return $this->get('product_id');
     }
 
     public function getUriAddingParameters(array $parameters = null)
@@ -92,21 +92,21 @@ class Request extends BaseRequest
         $additionalQs = '';
 
         foreach ($parameters as $key => $value) {
-            $additionalQs .= sprintf("&%s=%s", $key, $value);
+            $additionalQs .= sprintf('&%s=%s', $key, $value);
         }
 
         if ('' == $this->getQueryString()) {
-            $additionalQs = '?'. ltrim($additionalQs, '&');
+            $additionalQs = '?'.ltrim($additionalQs, '&');
         }
 
-        return $uri . $additionalQs;
+        return $uri.$additionalQs;
     }
 
     public function toString($withContent = true)
     {
         $string =
             sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))
-            . "\r\n" . $this->headers . "\r\n"
+            ."\r\n".$this->headers."\r\n"
         ;
 
         if (true === $withContent) {
@@ -125,13 +125,14 @@ class Request extends BaseRequest
     }
 
     /**
-     * Detects where does the request
+     * Detects where does the request.
      *
      * <code>
      * if ($request->fromControllerType(BaseFrontController::CONTROLLER_TYPE)) {...}
      * </code>
      *
      * @param $controllerType
+     *
      * @return bool
      */
     public function fromControllerType($controllerType)
@@ -140,7 +141,7 @@ class Request extends BaseRequest
     }
 
     /**
-     * Detect if the request comes from the admin
+     * Detect if the request comes from the admin.
      *
      * @return bool
      */
@@ -150,7 +151,7 @@ class Request extends BaseRequest
     }
 
     /**
-     * Detect if the request comes from the front
+     * Detect if the request comes from the front.
      *
      * @return bool
      */
@@ -162,7 +163,7 @@ class Request extends BaseRequest
     /**
      * From a Thelia request, we always return a Thelia Session object.
      *
-     * @return null|\Thelia\Core\HttpFoundation\Session\Session
+     * @return \Thelia\Core\HttpFoundation\Session\Session|null
      */
     public function getSession()
     {
@@ -170,6 +171,7 @@ class Request extends BaseRequest
             $this->session = $session = new Session();
             $session->start();
         }
+
         return parent::getSession();
     }
 }

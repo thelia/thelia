@@ -20,8 +20,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 
 /**
- * Class HttpCache
- * @package Thelia\Core\HttpKernel\HttpCache
+ * Class HttpCache.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class HttpCache extends BaseHttpCache implements HttpKernelInterface

@@ -63,7 +63,7 @@ class SecurityTest extends WebTestCase
             ['GET', '/account'],
             ['GET', '/address/create'],
             ['GET', '/order/delivery'],
-            ['GET', '/order/invoice']
+            ['GET', '/order/invoice'],
         ];
     }
 }

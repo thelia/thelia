@@ -13,8 +13,8 @@
 namespace Thelia\Model;
 
 /**
- * Class OrderPostage
- * @package Thelia\Model
+ * Class OrderPostage.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class OrderPostage
@@ -36,9 +36,10 @@ class OrderPostage
     }
 
     /**
-     * Convert a amount or OrderPostage object to an OrderPostage object
+     * Convert a amount or OrderPostage object to an OrderPostage object.
      *
      * @param OrderPostage|float $postage
+     *
      * @return OrderPostage
      */
     public static function loadFromPostage($postage)

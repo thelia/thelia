@@ -17,25 +17,23 @@ use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Coupon\FacadeInterface;
 
 /**
- * Manage how Condition could interact with the current application state (Thelia)
+ * Manage how Condition could interact with the current application state (Thelia).
  *
- * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class ConditionFactory
 {
     /** @var ContainerInterface Service Container */
     protected $container;
 
-    /** @var  FacadeInterface Provide necessary value from Thelia */
+    /** @var FacadeInterface Provide necessary value from Thelia */
     protected $adapter;
 
-    /** @var array ConditionCollection to process*/
+    /** @var array ConditionCollection to process */
     protected $conditions;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param ContainerInterface $container Service container
      */
@@ -48,7 +46,7 @@ class ConditionFactory
     }
 
     /**
-     * Serialize a collection of conditions
+     * Serialize a collection of conditions.
      *
      * @param ConditionCollection $collection A collection of conditions
      *
@@ -73,7 +71,7 @@ class ConditionFactory
     }
 
     /**
-     * Unserialize a collection of conditions
+     * Unserialize a collection of conditions.
      *
      * @param string $serializedConditions Serialized Conditions
      *
@@ -104,14 +102,15 @@ class ConditionFactory
     }
 
     /**
-     * Build a Condition from form
+     * Build a Condition from form.
      *
      * @param string $conditionServiceId Condition class name
      * @param array  $operators          Condition Operator (<, >, = )
      * @param array  $values             Values setting this Condition
      *
      * @throws \InvalidArgumentException
-     * @return ConditionInterface        Ready to use Condition or false
+     *
+     * @return ConditionInterface Ready to use Condition or false
      */
     public function build($conditionServiceId, array $operators, array $values)
     {
@@ -127,7 +126,7 @@ class ConditionFactory
     }
 
     /**
-     * Get Condition inputs from serviceId
+     * Get Condition inputs from serviceId.
      *
      * @param string $conditionServiceId ConditionManager class name
      *
@@ -146,7 +145,7 @@ class ConditionFactory
     }
 
     /**
-     * Get Condition inputs from serviceId
+     * Get Condition inputs from serviceId.
      *
      * @param ConditionInterface $condition ConditionManager
      *

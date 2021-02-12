@@ -17,11 +17,12 @@ use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
 
 /**
- * Class FrontHook
- * @package HookCurrency\Hook
+ * Class FrontHook.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class FrontHook extends BaseHook {
+class FrontHook extends BaseHook
+{
     public function onMainHeadBottom(HookRenderEvent $event)
     {
         $lang = $this->getRequest()->getSession()->get("thelia.current.lang");

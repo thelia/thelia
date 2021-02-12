@@ -17,15 +17,14 @@ namespace Thelia\Coupon\Type;
  */
 class RemovePercentageOnCategories extends AbstractRemoveOnCategories
 {
+    use PercentageCouponTrait;
     public const PERCENTAGE = 'percentage';
 
-    use PercentageCouponTrait;
-
-    /** @var string Service Id  */
+    /** @var string Service Id */
     protected $serviceId = 'thelia.coupon.type.remove_percentage_on_categories';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getPercentageFieldName()
     {
@@ -33,7 +32,7 @@ class RemovePercentageOnCategories extends AbstractRemoveOnCategories
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -43,7 +42,7 @@ class RemovePercentageOnCategories extends AbstractRemoveOnCategories
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getToolTip()
     {
@@ -58,7 +57,7 @@ class RemovePercentageOnCategories extends AbstractRemoveOnCategories
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function drawBackOfficeInputs()
     {

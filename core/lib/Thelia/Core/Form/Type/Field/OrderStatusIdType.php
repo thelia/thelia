@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\OrderStatusQuery;
 
 /**
- * Class OrderStatusIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class OrderStatusIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class OrderStatusIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class OrderStatusIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "order_status_id";
+        return 'order_status_id';
     }
 }

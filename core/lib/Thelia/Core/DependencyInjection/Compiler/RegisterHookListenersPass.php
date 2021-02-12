@@ -33,8 +33,7 @@ use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
 
 /**
- * Class RegisterListenersPass
- * @package Thelia\Core\DependencyInjection\Compiler
+ * Class RegisterListenersPass.
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
@@ -52,13 +51,13 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
         // We have to check if Propel is initialized before registering hooks
         $managers = Propel::getServiceContainer()->getConnectionManagers();
-        if (! \array_key_exists('TheliaMain', $managers)) {
+        if (!\array_key_exists('TheliaMain', $managers)) {
             return;
         }
 
-        $this->debugEnabled = $container->getParameter("kernel.debug");
+        $this->debugEnabled = $container->getParameter('kernel.debug');
 
-        if (true === version_compare(ConfigQuery::getTheliaSimpleVersion(), '2.1.0', ">=")) {
+        if (true === version_compare(ConfigQuery::getTheliaSimpleVersion(), '2.1.0', '>=')) {
             $this->processHook($container, $definition);
         }
     }
@@ -79,7 +78,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
             // the class must extends BaseHook
             $implementClass = HookDefinition::BASE_CLASS;
-            if (! is_subclass_of($class, $implementClass)) {
+            if (!is_subclass_of($class, $implementClass)) {
                 throw new \InvalidArgumentException(sprintf('Hook class "%s" must extends class "%s".', $class, $implementClass));
             }
 
@@ -92,11 +91,11 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 $moduleProperty = $properties['module'];
 
                 if ($moduleProperty instanceof Definition) {
-                    $moduleCode = explode("\\", $moduleProperty->getClass())[1];
+                    $moduleCode = explode('\\', $moduleProperty->getClass())[1];
                 }
 
                 if ($moduleProperty instanceof Reference) {
-                    $moduleCode = explode(".", $moduleProperty)[1];
+                    $moduleCode = explode('.', $moduleProperty)[1];
                 }
 
                 if (null !== $moduleCode) {
@@ -116,10 +115,10 @@ class RegisterHookListenersPass implements CompilerPassInterface
     /**
      * Create a new hook if the hook definition is valid.
      *
-     * @param string               $class  the namespace of the class
-     * @param \Thelia\Model\Module $module the module
-     * @param string               $id     the service (hook) id
-     * @param array                $attributes  the hook attributes
+     * @param string               $class      the namespace of the class
+     * @param \Thelia\Model\Module $module     the module
+     * @param string               $id         the service (hook) id
+     * @param array                $attributes the hook attributes
      *
      * @throws \InvalidArgumentException
      */
@@ -142,7 +141,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
         // test if method exists
         $validMethod = true;
-        if (! $this->isValidHookMethod($class, $attributes['method'], $hook->getBlock())) {
+        if (!$this->isValidHookMethod($class, $attributes['method'], $hook->getBlock())) {
             $validMethod = false;
         }
 
@@ -157,12 +156,13 @@ class RegisterHookListenersPass implements CompilerPassInterface
             if (!$validMethod) {
                 $this->logAlertMessage(
                     sprintf(
-                        "Module [%s] could not be registered hook [%s], method [%s] is not reachable.",
+                        'Module [%s] could not be registered hook [%s], method [%s] is not reachable.',
                         $module->getCode(),
                         $attributes['event'],
                         $attributes['method']
                     )
                 );
+
                 return;
             }
 
@@ -195,7 +195,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
             if (!$validMethod) {
                 $this->logAlertMessage(
                     sprintf(
-                        "Module [%s] could not use hook [%s], method [%s] is not reachable anymore.",
+                        'Module [%s] could not use hook [%s], method [%s] is not reachable anymore.',
                         $module->getCode(),
                         $attributes['event'],
                         $attributes['method']
@@ -261,7 +261,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 $hookId = $moduleHook->getHookId();
                 $modulePosition = 1;
             } else {
-                $modulePosition++;
+                ++$modulePosition;
             }
 
             if ($moduleHook->getPosition() === ModuleHook::MAX_POSITION) {
@@ -277,7 +277,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
                 // we a register an event which is relative to a specific module
                 if ($hook->getByModule()) {
-                    $eventName .= '.' . $moduleHook->getModuleId();
+                    $eventName .= '.'.$moduleHook->getModuleId();
                 }
 
                 $definition->addMethodCall(
@@ -286,17 +286,17 @@ class RegisterHookListenersPass implements CompilerPassInterface
                         $eventName,
                         [
                             (new ServiceClosureArgument(new Reference($moduleHook->getClassname()))),
-                            $moduleHook->getMethod()
+                            $moduleHook->getMethod(),
                         ],
-                        ModuleHook::MAX_POSITION - $moduleHook->getPosition()
+                        ModuleHook::MAX_POSITION - $moduleHook->getPosition(),
                     ]
                 );
 
                 if ($moduleHook->getTemplates()) {
                     if ($container->hasDefinition($moduleHook->getClassname())) {
-                        $moduleHookEventName = 'hook.' . $hook->getType() . '.' . $hook->getCode();
+                        $moduleHookEventName = 'hook.'.$hook->getType().'.'.$hook->getCode();
                         if (true === $moduleHook->getHook()->getByModule()) {
-                            $moduleHookEventName .= '.' . $moduleHook->getModuleId();
+                            $moduleHookEventName .= '.'.$moduleHook->getModuleId();
                         }
                         $container
                             ->getDefinition($moduleHook->getClassname())
@@ -304,7 +304,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
                                 'addTemplate',
                                 [
                                     $moduleHookEventName,
-                                    $moduleHook->getTemplates()
+                                    $moduleHook->getTemplates(),
                                 ]
                             )
                         ;
@@ -315,7 +315,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
     }
 
     /**
-     * get the hook type according to the type attribute of the hook tag
+     * get the hook type according to the type attribute of the hook tag.
      *
      * @param string $name
      *
@@ -326,7 +326,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
         $type = TemplateDefinition::FRONT_OFFICE;
 
         if (null !== $name && \is_string($name)) {
-            $name = preg_replace("[^a-z]", "", strtolower(trim($name)));
+            $name = preg_replace('[^a-z]', '', strtolower(trim($name)));
             if (\in_array($name, ['bo', 'back', 'backoffice'])) {
                 $type = TemplateDefinition::BACK_OFFICE;
             } elseif (\in_array($name, ['email'])) {
@@ -343,7 +343,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
      * G<et a hook for a hook name (code) and a hook type. The hook should exists and be activated.
      *
      * @param string $hookName
-     * @param int $hookType
+     * @param int    $hookType
      *
      * @return Hook|null
      */
@@ -355,20 +355,20 @@ class RegisterHookListenersPass implements CompilerPassInterface
             ->findOne();
 
         if (null === $hook) {
-            $this->logAlertMessage(sprintf("Hook %s is unknown.", $hookName));
+            $this->logAlertMessage(sprintf('Hook %s is unknown.', $hookName));
 
             return null;
         }
 
-        if (! $hook->getActivate()) {
-            $this->logAlertMessage(sprintf("Hook %s is not activated.", $hookName), true);
+        if (!$hook->getActivate()) {
+            $this->logAlertMessage(sprintf('Hook %s is not activated.', $hookName), true);
         }
 
         return $hook;
     }
 
     /**
-     * Test if the method that will handled the hook is valid
+     * Test if the method that will handled the hook is valid.
      *
      * @param string $className  the namespace of the class
      * @param string $methodName the method name
@@ -388,13 +388,13 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 HookDefinition::RENDER_FUNCTION_EVENT;
 
             if (!($parameters[0]->getClass()->getName() == $eventType || is_subclass_of($parameters[0]->getClass()->getName(), $eventType))) {
-                $this->logAlertMessage(sprintf("Method %s should use an event of type %s. found: %s", $methodName, $eventType, $parameters[0]->getClass()->getName()));
+                $this->logAlertMessage(sprintf('Method %s should use an event of type %s. found: %s', $methodName, $eventType, $parameters[0]->getClass()->getName()));
 
                 return false;
             }
         } catch (ReflectionException $ex) {
             $this->logAlertMessage(
-                sprintf("Method %s does not exist in %s : %s", $methodName, $className, $ex),
+                sprintf('Method %s does not exist in %s : %s', $methodName, $className, $ex),
                 $failSafe
             );
 
@@ -412,12 +412,13 @@ class RegisterHookListenersPass implements CompilerPassInterface
         if (!isset($event['method'])) {
             if (!empty($event['templates'])) {
                 $event['method'] = BaseHook::INJECT_TEMPLATE_METHOD_NAME;
+
                 return $event;
             }
-                $callback = function ($matches) {
-                    return strtoupper($matches[0]);
-                };
-                $event['method'] = 'on' . preg_replace_callback(
+            $callback = function ($matches) {
+                return strtoupper($matches[0]);
+            };
+            $event['method'] = 'on'.preg_replace_callback(
                     [
                         '/(?<=\b)[a-z]/i',
                         '/[^a-z0-9]/i',
@@ -425,8 +426,9 @@ class RegisterHookListenersPass implements CompilerPassInterface
                     $callback,
                     $event['event']
                 );
-                $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
-                return $event;
+            $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
+
+            return $event;
         }
 
         return $event;

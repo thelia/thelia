@@ -22,23 +22,23 @@ use Thelia\Model\ProfileQuery;
 use Thelia\Model\ResourceQuery;
 
 /**
- * Class ProfileUpdateResourceAccessForm
- * @package Thelia\Form
+ * Class ProfileUpdateResourceAccessForm.
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class ProfileUpdateResourceAccessForm extends BaseForm
 {
-    public const RESOURCE_ACCESS_FIELD_PREFIX = "resource";
+    public const RESOURCE_ACCESS_FIELD_PREFIX = 'resource';
 
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("id", HiddenType::class, [
-                "required" => true,
-                "constraints" => [
+            ->add('id', HiddenType::class, [
+                'required' => true,
+                'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        [$this, "verifyProfileId"]
+                        [$this, 'verifyProfileId']
                     ),
                 ],
             ])
@@ -46,21 +46,21 @@ class ProfileUpdateResourceAccessForm extends BaseForm
 
         foreach (ResourceQuery::create()->find() as $resource) {
             $this->formBuilder->add(
-                self::RESOURCE_ACCESS_FIELD_PREFIX.':'.str_replace(".", ":", $resource->getCode()),
+                self::RESOURCE_ACCESS_FIELD_PREFIX.':'.str_replace('.', ':', $resource->getCode()),
                 ChoiceType::class,
                 [
-                    "choices" => [
+                    'choices' => [
                         AccessManager::VIEW => AccessManager::VIEW,
                         AccessManager::CREATE => AccessManager::CREATE,
                         AccessManager::UPDATE => AccessManager::UPDATE,
                         AccessManager::DELETE => AccessManager::DELETE,
                     ],
-                    "attr" => [
-                        "tag" => "resources",
-                        "resource_code" => $resource->getCode(),
+                    'attr' => [
+                        'tag' => 'resources',
+                        'resource_code' => $resource->getCode(),
                     ],
-                    "multiple" => true,
-                    "constraints" => [
+                    'multiple' => true,
+                    'constraints' => [
                     ],
                 ]
             );
@@ -69,7 +69,7 @@ class ProfileUpdateResourceAccessForm extends BaseForm
 
     public static function getName()
     {
-        return "thelia_profile_resource_access_modification";
+        return 'thelia_profile_resource_access_modification';
     }
 
     public function verifyProfileId($value, ExecutionContextInterface $context)
@@ -78,7 +78,7 @@ class ProfileUpdateResourceAccessForm extends BaseForm
             ->findPk($value);
 
         if (null === $profile) {
-            $context->addViolation(Translator::getInstance()->trans("Profile ID not found"));
+            $context->addViolation(Translator::getInstance()->trans('Profile ID not found'));
         }
     }
 }

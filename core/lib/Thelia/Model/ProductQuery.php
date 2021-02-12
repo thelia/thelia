@@ -25,7 +25,8 @@ use Thelia\Model\Base\ProductQuery as BaseProductQuery;
 class ProductQuery extends BaseProductQuery
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ProductCategoryQuery::filterByPosition
      */
     public function filterByPosition($position = null, $comparison = null)
@@ -34,7 +35,8 @@ class ProductQuery extends BaseProductQuery
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ProductCategoryQuery::orderByPosition
      */
     public function orderByPosition($order = Criteria::ASC)
@@ -43,7 +45,8 @@ class ProductQuery extends BaseProductQuery
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ProductCategoryQuery::groupByPosition
      */
     public function groupByPosition()
@@ -52,7 +55,8 @@ class ProductQuery extends BaseProductQuery
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ProductCategoryQuery::findOneByPosition
      */
     public function findOneByPosition($position)
@@ -61,7 +65,8 @@ class ProductQuery extends BaseProductQuery
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ProductCategoryQuery::findByPosition
      */
     public function findByPosition($position)

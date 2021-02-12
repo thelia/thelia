@@ -22,12 +22,12 @@ use Thelia\Model\Address;
 use Thelia\Model\Lang;
 
 /**
- * @package Coupon
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class StartDateTest extends TestCase
 {
     public $startDate;
+
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
@@ -38,7 +38,7 @@ class StartDateTest extends TestCase
     }
 
     /**
-     * Generate adapter stub
+     * Generate adapter stub.
      *
      * @param int    $cartTotalPrice   Cart total price
      * @param string $checkoutCurrency Checkout currency
@@ -75,7 +75,7 @@ class StartDateTest extends TestCase
             ->will($this->returnValue($stubTranslator));
 
         $lang = new Lang();
-        $lang->setDateFormat("d/m/Y");
+        $lang->setDateFormat('d/m/Y');
 
         $stubSession = $this->getMockBuilder('\Thelia\Core\HttpFoundation\Session\Session')
             ->disableOriginalConstructor()
@@ -101,9 +101,9 @@ class StartDateTest extends TestCase
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\StartDate::setValidators
+     * @covers \Thelia\Condition\Implementation\StartDate::setValidators
      */
     public function testInValidBackOfficeInputOperator()
     {
@@ -113,10 +113,10 @@ class StartDateTest extends TestCase
         $condition1 = new StartDate($stubFacade);
 
         $operators = [
-            StartDate::START_DATE => 'petite licorne'
+            StartDate::START_DATE => 'petite licorne',
         ];
         $values = [
-            StartDate::START_DATE => $this->startDate
+            StartDate::START_DATE => $this->startDate,
         ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
@@ -125,14 +125,14 @@ class StartDateTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\StartDate::setValidators
+     * @covers \Thelia\Condition\Implementation\StartDate::setValidators
      */
     public function testInValidBackOfficeInputValue()
     {
@@ -141,10 +141,10 @@ class StartDateTest extends TestCase
 
         $condition1 = new StartDate($stubFacade);
         $operators = [
-            StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL
+            StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL,
         ];
         $values = [
-            StartDate::START_DATE => 'petit poney'
+            StartDate::START_DATE => 'petit poney',
         ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
@@ -152,10 +152,9 @@ class StartDateTest extends TestCase
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\StartDate::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\StartDate::isMatching
      */
     public function testMatchingRule()
     {
@@ -164,10 +163,10 @@ class StartDateTest extends TestCase
 
         $condition1 = new StartDate($stubFacade);
         $operators = [
-            StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL
+            StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL,
         ];
         $values = [
-            StartDate::START_DATE => $this->startDate
+            StartDate::START_DATE => $this->startDate,
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -175,15 +174,14 @@ class StartDateTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\StartDate::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\StartDate::isMatching
      */
     public function testNotMatching()
     {
@@ -193,10 +191,10 @@ class StartDateTest extends TestCase
         $condition1 = new StartDate($stubFacade);
 
         $operators = [
-            StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL
+            StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL,
         ];
         $values = [
-            StartDate::START_DATE => time() + 2000
+            StartDate::START_DATE => time() + 2000,
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -204,7 +202,7 @@ class StartDateTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
@@ -216,10 +214,10 @@ class StartDateTest extends TestCase
         $condition1 = new StartDate($stubFacade);
 
         $operators = [
-            StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL
+            StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL,
         ];
         $values = [
-            StartDate::START_DATE => $this->startDate
+            StartDate::START_DATE => $this->startDate,
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -237,10 +235,9 @@ class StartDateTest extends TestCase
     }
 
     /**
-     * Check getName i18n
+     * Check getName i18n.
      *
-     * @covers Thelia\Condition\Implementation\StartDate::getName
-     *
+     * @covers \Thelia\Condition\Implementation\StartDate::getName
      */
     public function testGetName()
     {
@@ -255,10 +252,9 @@ class StartDateTest extends TestCase
     }
 
     /**
-     * Check tooltip i18n
+     * Check tooltip i18n.
      *
-     * @covers Thelia\Condition\Implementation\StartDate::getToolTip
-     *
+     * @covers \Thelia\Condition\Implementation\StartDate::getToolTip
      */
     public function testGetToolTip()
     {
@@ -273,10 +269,9 @@ class StartDateTest extends TestCase
     }
 
     /**
-     * Check validator
+     * Check validator.
      *
-     * @covers Thelia\Condition\Implementation\StartDate::generateInputs
-     *
+     * @covers \Thelia\Condition\Implementation\StartDate::generateInputs
      */
     public function testGetValidator()
     {
@@ -286,10 +281,10 @@ class StartDateTest extends TestCase
         $condition1 = new StartDate($stubFacade);
 
         $operators = [
-            StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL
+            StartDate::START_DATE => Operators::SUPERIOR_OR_EQUAL,
         ];
         $values = [
-            StartDate::START_DATE => $this->startDate
+            StartDate::START_DATE => $this->startDate,
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -303,15 +298,15 @@ class StartDateTest extends TestCase
                         '>=' => 'Price',
                     ],
                     'value' => '',
-                    'selectedOperator' => '>='
-                ]
+                    'selectedOperator' => '>=',
+                ],
             ],
             'setOperators' => [
-                'start_date' => '>='
+                'start_date' => '>=',
             ],
             'setValues' => [
-                'start_date' => $this->startDate
-            ]
+                'start_date' => $this->startDate,
+            ],
         ];
         $expected = $validators;
 

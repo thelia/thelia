@@ -15,8 +15,8 @@ namespace Thelia\Core\Template\Smarty;
 use TheliaSmarty\Template\SmartyPluginDescriptor as BaseSmartyPluginDescriptor;
 
 /**
- * Class SmartyPluginDescriptpor
- * @package Thelia\Core\Template\Smarty
+ * Class SmartyPluginDescriptpor.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  *
  * @deprecated this class is now present in module TheliaSmarty and will be removed in Thelia 2.3

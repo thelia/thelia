@@ -19,11 +19,9 @@ use Thelia\Coupon\CouponManager;
 
 /**
  * Class RegisterListenersPass
- * Source code come from Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass class
+ * Source code come from Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass class.
  *
- * @package Thelia\Core\DependencyInjection\Compiler
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class RegisterCouponPass implements CompilerPassInterface
 {
@@ -41,13 +39,13 @@ class RegisterCouponPass implements CompilerPassInterface
         }
 
         $couponManager = $container->getDefinition(CouponManager::class);
-        $services = $container->findTaggedServiceIds("thelia.coupon.addCoupon");
+        $services = $container->findTaggedServiceIds('thelia.coupon.addCoupon');
 
         foreach ($services as $id => $rule) {
             $couponManager->addMethodCall(
                 'addAvailableCoupon',
                 [
-                    new Reference($id)
+                    new Reference($id),
                 ]
             );
         }

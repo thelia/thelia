@@ -13,8 +13,8 @@
 namespace TheliaMigrateCountry\Events;
 
 /**
- * Class MigrateCountryEvents
- * @package TheliaMigrateCountry\Events
+ * Class MigrateCountryEvents.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class MigrateCountryEvents

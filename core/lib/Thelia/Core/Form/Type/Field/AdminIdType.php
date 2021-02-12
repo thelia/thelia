@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\AdminQuery;
 
 /**
- * Class AdminIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class AdminIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class AdminIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class AdminIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "admin_id";
+        return 'admin_id';
     }
 }

@@ -28,8 +28,8 @@ use Thelia\Model\LangQuery;
 use Thelia\Tests\ContainerAwareTestCase;
 
 /**
- * Class LangTest
- * @package Thelia\Tests\Action
+ * Class LangTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangTest extends ContainerAwareTestCase
@@ -69,9 +69,9 @@ class LangTest extends ContainerAwareTestCase
             ->setCode('TES')
             ->setDateFormat('Y-m-d')
             ->setTimeFormat('H:i:s')
-            ->setDecimalSeparator(".")
-            ->setThousandsSeparator(" ")
-            ->setDecimals("2")
+            ->setDecimalSeparator('.')
+            ->setThousandsSeparator(' ')
+            ->setDecimals('2')
         ;
 
         $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
@@ -98,6 +98,7 @@ class LangTest extends ContainerAwareTestCase
 
     /**
      * @depends testCreate
+     *
      * @return LangModel
      */
     public function testUpdate(LangModel $lang)
@@ -110,9 +111,9 @@ class LangTest extends ContainerAwareTestCase
             ->setCode('TEST')
             ->setDateFormat('d-m-Y')
             ->setTimeFormat('H-i-s')
-            ->setDecimalSeparator(",")
-            ->setThousandsSeparator(".")
-            ->setDecimals("1")
+            ->setDecimalSeparator(',')
+            ->setThousandsSeparator('.')
+            ->setDecimals('1')
         ;
 
         $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
@@ -148,6 +149,7 @@ class LangTest extends ContainerAwareTestCase
 
     /**
      * @depends testUpdate
+     *
      * @return LangModel
      */
     public function testToggleDefault(LangModel $lang)
@@ -199,7 +201,7 @@ class LangTest extends ContainerAwareTestCase
         $action = new Lang(new TheliaTemplateHelper(), $this->requestStack);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage("It is not allowed to delete the default language");
+        $this->expectExceptionMessage('It is not allowed to delete the default language');
         $action->delete($event, null, $this->getMockEventDispatcher());
     }
 
@@ -212,13 +214,13 @@ class LangTest extends ContainerAwareTestCase
 
     protected function tearDown(): void
     {
-        @unlink(THELIA_TEMPLATE_DIR . "backOffice/default/assets/img/flags/TEST.png");
-        @unlink(THELIA_TEMPLATE_DIR . "backOffice/default/assets/img/flags/TES.png");
+        @unlink(THELIA_TEMPLATE_DIR.'backOffice/default/assets/img/flags/TEST.png');
+        @unlink(THELIA_TEMPLATE_DIR.'backOffice/default/assets/img/flags/TES.png');
     }
 
     /**
-     * @param ContainerBuilder $container
-     * Use this method to build the container with the services that you need.
+     * @param containerBuilder $container
+     *                                    Use this method to build the container with the services that you need
      */
     protected function buildContainer(ContainerBuilder $container)
     {

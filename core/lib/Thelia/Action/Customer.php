@@ -32,11 +32,10 @@ use Thelia\Model\LangQuery;
 use Thelia\Tools\Password;
 
 /**
- *
- * customer class where all actions are managed
+ * customer class where all actions are managed.
  *
  * Class Customer
- * @package Thelia\Action
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Customer extends BaseAction implements EventSubscriberInterface
@@ -59,6 +58,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param $eventName
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function create(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -73,7 +73,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $this->mailer->sendEmailToCustomer(
                 'customer_account_created',
                 $customer,
-                [ 'password' => $plainPassword ]
+                ['password' => $plainPassword]
             );
         }
 
@@ -98,6 +98,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param $eventName
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function modify(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -110,13 +111,14 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         $this->createOrUpdateCustomer($customer, $event, $dispatcher);
 
-        if ($event->getNotifyCustomerOfAccountModification() && (! empty($plainPassword) || $emailChanged)) {
+        if ($event->getNotifyCustomerOfAccountModification() && (!empty($plainPassword) || $emailChanged)) {
             $this->mailer->sendEmailToCustomer('customer_account_changed', $customer, ['password' => $plainPassword]);
         }
     }
 
     /**
      * @param $eventName
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function updateProfile(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -171,7 +173,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     {
         if (null !== $customer = $event->getModel()) {
             if (true === $customer->hasOrder()) {
-                throw new CustomerException(Translator::getInstance()->trans("Impossible to delete a customer who already have orders"));
+                throw new CustomerException(Translator::getInstance()->trans('Impossible to delete a customer who already have orders'));
             }
 
             $customer->delete();
@@ -223,7 +225,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         // Set the preferred customer language
         if (null !== $this->requestStack
             &&
-            ! empty($customer->getLangId())
+            !empty($customer->getLangId())
             &&
             (null !== $lang = LangQuery::create()->findPk($customer->getLangId()))
         ) {
@@ -233,9 +235,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     /**
      * Perform user logout. The user is redirected to the provided view, if any.
-     *
      */
-    public function logout(/** @noinspection PhpUnusedParameterInspection */ ActionEvent $event)
+    public function logout(/* @noinspection PhpUnusedParameterInspection */ ActionEvent $event)
     {
         $this->securityContext->clearCustomerUser();
     }
@@ -263,14 +264,14 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::CUSTOMER_CREATEACCOUNT    => ['create', 128],
-            TheliaEvents::CUSTOMER_UPDATEACCOUNT    => ['modify', 128],
-            TheliaEvents::CUSTOMER_UPDATEPROFILE     => ['updateProfile', 128],
-            TheliaEvents::CUSTOMER_LOGOUT           => ['logout', 128],
-            TheliaEvents::CUSTOMER_LOGIN            => ['login', 128],
-            TheliaEvents::CUSTOMER_DELETEACCOUNT    => ['delete', 128],
-            TheliaEvents::LOST_PASSWORD             => ['lostPassword', 128],
-            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL => ['customerConfirmationEmail', 128]
+            TheliaEvents::CUSTOMER_CREATEACCOUNT => ['create', 128],
+            TheliaEvents::CUSTOMER_UPDATEACCOUNT => ['modify', 128],
+            TheliaEvents::CUSTOMER_UPDATEPROFILE => ['updateProfile', 128],
+            TheliaEvents::CUSTOMER_LOGOUT => ['logout', 128],
+            TheliaEvents::CUSTOMER_LOGIN => ['login', 128],
+            TheliaEvents::CUSTOMER_DELETEACCOUNT => ['delete', 128],
+            TheliaEvents::LOST_PASSWORD => ['lostPassword', 128],
+            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL => ['customerConfirmationEmail', 128],
         ];
     }
 }

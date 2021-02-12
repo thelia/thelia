@@ -17,8 +17,8 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class SeoForm
- * @package Thelia\Form
+ * Class SeoForm.
+ *
  * @author Christophe Laffont <claffont@openstudio.fr>
  */
 class SeoForm extends BaseForm
@@ -26,20 +26,20 @@ class SeoForm extends BaseForm
     use SeoFieldsTrait;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("id", HiddenType::class, [
+            ->add('id', HiddenType::class, [
                 'required' => true,
-                "constraints" => [
+                'constraints' => [
                     new GreaterThan(['value' => 0]),
                 ],
             ])
-            ->add("locale", HiddenType::class, [
+            ->add('locale', HiddenType::class, [
                 'required' => true,
-                "constraints" => [
+                'constraints' => [
                     new NotBlank(),
                 ],
             ])
@@ -51,6 +51,6 @@ class SeoForm extends BaseForm
 
     public static function getName()
     {
-        return "thelia_seo";
+        return 'thelia_seo';
     }
 }

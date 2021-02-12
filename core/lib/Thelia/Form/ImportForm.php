@@ -19,8 +19,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Model\LangQuery;
 
 /**
- * Class ImportForm
- * @package Thelia\Form
+ * Class ImportForm.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class ImportForm extends BaseForm
@@ -28,23 +28,23 @@ class ImportForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("file_upload", FileType::class, [
-            "label" => $this->translator->trans("File to upload"),
-            "label_attr" => ["for" => "file_to_upload"],
-            "required" => true,
-                "constraints" => [
-                    new Assert\NotNull
-                ]
+            ->add('file_upload', FileType::class, [
+            'label' => $this->translator->trans('File to upload'),
+            'label_attr' => ['for' => 'file_to_upload'],
+            'required' => true,
+                'constraints' => [
+                    new Assert\NotNull(),
+                ],
             ])
-            ->add("language", IntegerType::class, [
-                "label" => $this->translator->trans("Language"),
-                "label_attr" => ["for" => "language"],
-                "required" => true,
-                "constraints" => [
+            ->add('language', IntegerType::class, [
+                'label' => $this->translator->trans('Language'),
+                'label_attr' => ['for' => 'language'],
+                'required' => true,
+                'constraints' => [
                     new Assert\Callback(
-                            [$this, "checkLanguage"]
-                    )
-                ]
+                            [$this, 'checkLanguage']
+                    ),
+                ],
             ])
         ;
     }
@@ -54,7 +54,7 @@ class ImportForm extends BaseForm
      */
     public static function getName()
     {
-        return "thelia_import";
+        return 'thelia_import';
     }
 
     public function checkLanguage($value, ExecutionContextInterface $context)
@@ -64,7 +64,7 @@ class ImportForm extends BaseForm
                 $this->translator->trans(
                     "The language \"%id\" doesn't exist",
                     [
-                        "%id" => $value
+                        '%id' => $value,
                     ]
                 )
             );

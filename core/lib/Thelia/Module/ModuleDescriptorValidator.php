@@ -17,8 +17,8 @@ use Symfony\Component\Finder\Finder;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
 
 /**
- * Class ModuleDescriptorValidator
- * @package Thelia\Module
+ * Class ModuleDescriptorValidator.
+ *
  * @author  Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleDescriptorValidator
@@ -26,7 +26,7 @@ class ModuleDescriptorValidator
     protected static $versions = [
         '1' => 'module.xsd',
         '2' => 'module-2_1.xsd',
-        '3' => 'module-2_2.xsd'
+        '3' => 'module-2_2.xsd',
     ];
 
     /** @var Finder */
@@ -39,11 +39,9 @@ class ModuleDescriptorValidator
         $this->xsdFinder = new Finder();
         $this->xsdFinder
             ->name('*.xsd')
-            ->in(__DIR__ . '/schema/module/');
+            ->in(__DIR__.'/schema/module/');
     }
 
-    /**
-     */
     public function getModuleVersion()
     {
         return $this->moduleVersion;
@@ -51,7 +49,7 @@ class ModuleDescriptorValidator
 
     public function validate($xml_file, $version = null)
     {
-        $dom    = new \DOMDocument();
+        $dom = new \DOMDocument();
         $errors = [];
 
         if ($dom->load($xml_file)) {
@@ -75,18 +73,19 @@ class ModuleDescriptorValidator
 
         throw new InvalidXmlDocumentException(
             sprintf(
-                "%s file is not a valid file : %s",
+                '%s file is not a valid file : %s',
                 $xml_file,
-                implode(", ", $errors)
+                implode(', ', $errors)
             )
         );
     }
 
     /**
-     * Validate the schema of a XML file with a given xsd file
+     * Validate the schema of a XML file with a given xsd file.
      *
-     * @param \DOMDocument $dom The XML document
+     * @param \DOMDocument $dom     The XML document
      * @param \SplFileInfo $xsdFile The XSD file
+     *
      * @return array an array of errors if validation fails, otherwise an empty array
      */
     protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile)
@@ -101,7 +100,7 @@ class ModuleDescriptorValidator
 
                 foreach ($errors as $error) {
                     $errorMessages[] = sprintf(
-                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d' . "\n",
+                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d'."\n",
                         $error->message,
                         $error->level,
                         $error->code,

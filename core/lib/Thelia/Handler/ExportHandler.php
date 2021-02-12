@@ -12,7 +12,6 @@
 
 namespace Thelia\Handler;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Archiver\ArchiverInterface;
@@ -27,7 +26,8 @@ use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
 
 /**
- * Class ExportHandler
+ * Class ExportHandler.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class ExportHandler
@@ -38,7 +38,7 @@ class ExportHandler
     protected $eventDispatcher;
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param EventDispatcherInterface $eventDispatcher An event dispatcher interface
      */
@@ -48,25 +48,25 @@ class ExportHandler
     }
 
     /**
-     * Get export model based on given identifier
+     * Get export model based on given identifier.
      *
-     * @param integer $exportId          An export identifier
-     * @param boolean $dispatchException Dispatch exception if model doesn't exist
+     * @param int  $exportId          An export identifier
+     * @param bool $dispatchException Dispatch exception if model doesn't exist
      *
      * @throws \ErrorException
      *
-     * @return null|\Thelia\Model\Export
+     * @return \Thelia\Model\Export|null
      */
     public function getExport($exportId, $dispatchException = false)
     {
-        $export = (new ExportQuery)->findPk($exportId);
+        $export = (new ExportQuery())->findPk($exportId);
 
         if ($export === null && $dispatchException) {
             throw new \ErrorException(
                 Translator::getInstance()->trans(
                     'There is no id "%id" in the exports',
                     [
-                        '%id' => $exportId
+                        '%id' => $exportId,
                     ]
                 )
             );
@@ -76,25 +76,25 @@ class ExportHandler
     }
 
     /**
-     * Get export model based on given reference
+     * Get export model based on given reference.
      *
-     * @param string  $exportRef         An export reference
-     * @param boolean $dispatchException Dispatch exception if model doesn't exist
+     * @param string $exportRef         An export reference
+     * @param bool   $dispatchException Dispatch exception if model doesn't exist
      *
      * @throws \ErrorException
      *
-     * @return null|\Thelia\Model\Export
+     * @return \Thelia\Model\Export|null
      */
     public function getExportByRef($exportRef, $dispatchException = false)
     {
-        $export = (new ExportQuery)->findOneByRef($exportRef);
+        $export = (new ExportQuery())->findOneByRef($exportRef);
 
         if ($export === null && $dispatchException) {
             throw new \ErrorException(
                 Translator::getInstance()->trans(
                     'There is no ref "%ref" in the exports',
                     [
-                        '%ref' => $exportRef
+                        '%ref' => $exportRef,
                     ]
                 )
             );
@@ -104,25 +104,25 @@ class ExportHandler
     }
 
     /**
-     * Get export category model based on given identifier
+     * Get export category model based on given identifier.
      *
-     * @param integer $exportCategoryId  An export category identifier
-     * @param boolean $dispatchException Dispatch exception if model doesn't exist
+     * @param int  $exportCategoryId  An export category identifier
+     * @param bool $dispatchException Dispatch exception if model doesn't exist
      *
      * @throws \ErrorException
      *
-     * @return null|\Thelia\Model\ExportCategory
+     * @return \Thelia\Model\ExportCategory|null
      */
     public function getCategory($exportCategoryId, $dispatchException = false)
     {
-        $category = (new ExportCategoryQuery)->findPk($exportCategoryId);
+        $category = (new ExportCategoryQuery())->findPk($exportCategoryId);
 
         if ($category === null && $dispatchException) {
             throw new \ErrorException(
                 Translator::getInstance()->trans(
                     'There is no id "%id" in the export categories',
                     [
-                        '%id' => $exportCategoryId
+                        '%id' => $exportCategoryId,
                     ]
                 )
             );
@@ -132,11 +132,11 @@ class ExportHandler
     }
 
     /**
-     * Export
+     * Export.
      *
-     * @param boolean                                      $includeImages
-     * @param boolean                                      $includeDocuments
-     * @param null|array                                   $rangeDate
+     * @param bool       $includeImages
+     * @param bool       $includeDocuments
+     * @param array|null $rangeDate
      *
      * @return \Thelia\Core\Event\ExportEvent
      */
@@ -152,7 +152,7 @@ class ExportHandler
         $exportHandleClass = $export->getHandleClass();
 
         /** @var \Thelia\ImportExport\Export\AbstractExport $instance */
-        $instance = new $exportHandleClass;
+        $instance = new $exportHandleClass();
 
         // Configure handle class
         $instance->setLang($language);
@@ -168,14 +168,14 @@ class ExportHandler
         if ($rangeDate['start'] && !($rangeDate['start'] instanceof \DateTime)) {
             $rangeDate['start'] = \DateTime::createFromFormat(
                 'Y-m-d H:i:s',
-                $rangeDate['start']['year'] . '-' . $rangeDate['start']['month'] . '-1 00:00:00'
+                $rangeDate['start']['year'].'-'.$rangeDate['start']['month'].'-1 00:00:00'
             );
         }
         if ($rangeDate['end'] && !($rangeDate['end'] instanceof \DateTime)) {
             // To get the last day of selected month, go to the first day of next month and substract 1 day
             $rangeDate['end'] = \DateTime::createFromFormat(
                 'Y-m-d H:i:s',
-                $rangeDate['end']['year'] . '-' . $rangeDate['end']['month'] . '-1 23:59:59'
+                $rangeDate['end']['year'].'-'.$rangeDate['end']['month'].'-1 23:59:59'
             )
             ->add(new \DateInterval('P1M'))
             ->sub(new \DateInterval('P1D'));
@@ -221,7 +221,7 @@ class ExportHandler
     }
 
     /**
-     * Process export
+     * Process export.
      *
      * @param \Thelia\ImportExport\Export\AbstractExport  $export     An export
      * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface
@@ -232,15 +232,15 @@ class ExportHandler
     {
         $filename = sprintf(
             '%s-%s-%s.%s',
-            (new \DateTime)->format('Ymd'),
+            (new \DateTime())->format('Ymd'),
             uniqid(),
             $export->getFileName(),
             $serializer->getExtension()
         );
 
-        $filePath = THELIA_CACHE_DIR . 'export' . DS . $filename;
+        $filePath = THELIA_CACHE_DIR.'export'.DS.$filename;
 
-        $fileSystem = new Filesystem;
+        $fileSystem = new Filesystem();
         $fileSystem->mkdir(\dirname($filePath));
 
         $file = new \SplFileObject($filePath, 'w+b');
@@ -254,7 +254,7 @@ class ExportHandler
             $data = $export->afterSerialize($data);
 
             if ($idx > 0) {
-                $data = $serializer->separator() . $data;
+                $data = $serializer->separator().$data;
             }
 
             $file->fwrite($data);
@@ -268,9 +268,9 @@ class ExportHandler
     }
 
     /**
-     * Add images to archive
+     * Add images to archive.
      *
-     * @param \Thelia\ImportExport\Export\AbstractExport $export   An export instance
+     * @param \Thelia\ImportExport\Export\AbstractExport $export An export instance
      */
     protected function processExportImages(AbstractExport $export, ArchiverInterface $archiver)
     {
@@ -280,9 +280,9 @@ class ExportHandler
     }
 
     /**
-     * Add documents to archive
+     * Add documents to archive.
      *
-     * @param \Thelia\ImportExport\Export\AbstractExport $export   An export instance
+     * @param \Thelia\ImportExport\Export\AbstractExport $export An export instance
      */
     protected function processExportDocuments(AbstractExport $export, ArchiverInterface $archiver)
     {

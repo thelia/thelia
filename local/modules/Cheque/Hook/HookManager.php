@@ -16,16 +16,16 @@ use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
 
 /**
- * Class HookManager
+ * Class HookManager.
  *
- * @package Cheque\Hook
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class HookManager extends BaseHook {
+class HookManager extends BaseHook
+{
     public function onAdditionalPaymentInfo(HookRenderEvent $event)
     {
-        $content = $this->render("order-placed.additional-payment-info.html", [
-            'placed_order_id' => $event->getArgument('placed_order_id')
+        $content = $this->render('order-placed.additional-payment-info.html', [
+            'placed_order_id' => $event->getArgument('placed_order_id'),
         ]);
 
         $event->add($content);

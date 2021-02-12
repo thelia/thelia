@@ -16,12 +16,10 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
-use Thelia\Form\FolderDocumentModification;
 use Thelia\Model\Base\FolderDocument as BaseFolderDocument;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\FolderBreadcrumbTrait;
@@ -32,7 +30,7 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
     use FolderBreadcrumbTrait;
 
     /**
-     * Calculate next position relative to our parent
+     * Calculate next position relative to our parent.
      *
      * @param FolderDocumentQuery $query
      */
@@ -54,7 +52,7 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setParentId($parentId)
     {
@@ -64,7 +62,7 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getParentId()
     {
@@ -77,7 +75,7 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
 
         $this->reorderBeforeDelete(
             [
-                "folder_id" => $this->getFolderId(),
+                'folder_id' => $this->getFolderId(),
             ]
         );
 
@@ -85,7 +83,7 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
@@ -101,7 +99,7 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
     }
 
     /**
-     * Get the ID of the form used to change this object information
+     * Get the ID of the form used to change this object information.
      *
      * @return BaseForm the form
      */
@@ -117,12 +115,12 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
     {
         $uploadDir = ConfigQuery::read('documents_library_path');
         if ($uploadDir === null) {
-            $uploadDir = THELIA_LOCAL_DIR . 'media' . DS . 'documents';
+            $uploadDir = THELIA_LOCAL_DIR.'media'.DS.'documents';
         } else {
-            $uploadDir = THELIA_ROOT . $uploadDir;
+            $uploadDir = THELIA_ROOT.$uploadDir;
         }
 
-        return $uploadDir . DS . 'folder';
+        return $uploadDir.DS.'folder';
     }
 
     /**
@@ -130,11 +128,11 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
      */
     public function getRedirectionUrl()
     {
-        return '/admin/folders/update/' . $this->getFolderId();
+        return '/admin/folders/update/'.$this->getFolderId();
     }
 
     /**
-     * Get the Query instance for this object
+     * Get the Query instance for this object.
      *
      * @return ModelCriteria
      */

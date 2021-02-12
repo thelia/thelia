@@ -28,8 +28,8 @@ use Thelia\Model\AreaQuery;
 use Thelia\Model\Event\AreaEvent;
 
 /**
- * Class AreaController
- * @package Thelia\Controller\Admin
+ * Class AreaController.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  * @author Franck Allimant <franck@cqfdev.fr>
  */
@@ -54,7 +54,7 @@ class AreaController extends AbstractCrudController
     }
 
     /**
-     * Return the creation form for this object
+     * Return the creation form for this object.
      */
     protected function getCreationForm()
     {
@@ -62,7 +62,7 @@ class AreaController extends AbstractCrudController
     }
 
     /**
-     * Return the update form for this object
+     * Return the update form for this object.
      */
     protected function getUpdateForm()
     {
@@ -70,26 +70,26 @@ class AreaController extends AbstractCrudController
     }
 
     /**
-     * Hydrate the update form for this object, before passing it to the update template
+     * Hydrate the update form for this object, before passing it to the update template.
      *
-     * @param  Area $object
+     * @param Area $object
+     *
      * @return BaseForm
      */
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
             'area_id' => $object->getId(),
-            'name' => $object->getName()
+            'name' => $object->getName(),
         ];
 
         return $this->createForm(AdminForm::AREA_MODIFICATION, FormType::class, $data);
     }
 
     /**
-     * Creates the creation event with the provided form data
+     * Creates the creation event with the provided form data.
      *
      * @param array $formData
-     *
      */
     protected function getCreationEvent($formData)
     {
@@ -100,7 +100,7 @@ class AreaController extends AbstractCrudController
     }
 
     /**
-     * Creates the update event with the provided form data
+     * Creates the update event with the provided form data.
      *
      * @param array $formData
      */
@@ -122,17 +122,17 @@ class AreaController extends AbstractCrudController
     }
 
     /**
-     * Creates the delete event with the provided form data
-     *
+     * Creates the delete event with the provided form data.
      */
     protected function getDeleteEvent(): AreaEvent
     {
         $area = $this->findAreaOrFail($this->getAreaId());
+
         return new AreaEvent($area);
     }
 
     /**
-     * Load an existing object from the database
+     * Load an existing object from the database.
      */
     protected function getExistingObject()
     {
@@ -140,9 +140,10 @@ class AreaController extends AbstractCrudController
     }
 
     /**
-     * Returns the object label form the object event (name, title, etc.)
+     * Returns the object label form the object event (name, title, etc.).
      *
      * @param \Thelia\Model\Area $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
@@ -151,9 +152,10 @@ class AreaController extends AbstractCrudController
     }
 
     /**
-     * Returns the object ID from the object
+     * Returns the object ID from the object.
      *
      * @param \Thelia\Model\Area $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -162,30 +164,30 @@ class AreaController extends AbstractCrudController
     }
 
     /**
-     * Render the main list template
+     * Render the main list template.
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function renderListTemplate($currentOrder)
     {
-        return $this->render("shipping-configuration");
+        return $this->render('shipping-configuration');
     }
 
     /**
-     * Render the edition template
+     * Render the edition template.
      */
     protected function renderEditionTemplate()
     {
         return $this->render(
             'shipping-configuration-edit',
             [
-            'area_id' => $this->getAreaId()
+            'area_id' => $this->getAreaId(),
             ]
         );
     }
 
     /**
-     * Redirect to the edition template
+     * Redirect to the edition template.
      */
     protected function redirectToEditionTemplate()
     {
@@ -193,13 +195,13 @@ class AreaController extends AbstractCrudController
             'admin.configuration.shipping-configuration.update.view',
             [],
             [
-                "area_id" => $this->getAreaId()
+                'area_id' => $this->getAreaId(),
             ]
         );
     }
 
     /**
-     * Redirect to the list template
+     * Redirect to the list template.
      */
     protected function redirectToListTemplate()
     {
@@ -207,7 +209,7 @@ class AreaController extends AbstractCrudController
     }
 
     /**
-     * add a country to a define area
+     * add a country to a define area.
      */
     public function addCountry()
     {
@@ -233,7 +235,7 @@ class AreaController extends AbstractCrudController
                     $this->resourceCode,
                     AccessManager::UPDATE,
                     sprintf(
-                        "%s %s (ID %s) modified, new country added",
+                        '%s %s (ID %s) modified, new country added',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
                         $this->getObjectId($changedObject)
@@ -253,7 +255,7 @@ class AreaController extends AbstractCrudController
         }
 
         $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj modification", ['%obj' => $this->objectName]),
+            $this->getTranslator()->trans('%obj modification', ['%obj' => $this->objectName]),
             $error_msg,
             $areaCountryForm
         );
@@ -263,7 +265,7 @@ class AreaController extends AbstractCrudController
     }
 
     /**
-     * delete several countries from a shipping zone
+     * delete several countries from a shipping zone.
      */
     public function removeCountries()
     {
@@ -295,7 +297,7 @@ class AreaController extends AbstractCrudController
         }
 
         $this->setupFormErrorContext(
-            $this->getTranslator()->trans("Failed to delete selected countries"),
+            $this->getTranslator()->trans('Failed to delete selected countries'),
             $error_msg,
             $areaDeleteCountriesForm
         );
@@ -319,7 +321,7 @@ class AreaController extends AbstractCrudController
                 $this->resourceCode,
                 AccessManager::UPDATE,
                 sprintf(
-                    "%s %s (ID %s) removed country ID %s from shipping zone ID %s",
+                    '%s %s (ID %s) removed country ID %s from shipping zone ID %s',
                     ucfirst($this->objectName),
                     $this->getObjectLabel($changedObject),
                     $this->getObjectId($changedObject),
@@ -355,7 +357,7 @@ class AreaController extends AbstractCrudController
 
         if (null === $area) {
             throw new ElementNotFoundException(
-                $this->getTranslator()->trans("Area not found")
+                $this->getTranslator()->trans('Area not found')
             );
         }
 

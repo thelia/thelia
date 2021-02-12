@@ -24,9 +24,9 @@ class ClearImageCache extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName("image-cache:clear")
-            ->setDescription("Empty part or whole web space image cache")
-            ->addArgument("subdir", InputArgument::OPTIONAL, "Clear only the specified subdirectory")
+            ->setName('image-cache:clear')
+            ->setDescription('Empty part or whole web space image cache')
+            ->addArgument('subdir', InputArgument::OPTIONAL, 'Clear only the specified subdirectory')
         ;
     }
 
@@ -39,7 +39,7 @@ class ClearImageCache extends ContainerAwareCommand
 
             $subdir = $input->getArgument('subdir');
 
-            if (! \is_null($subdir)) {
+            if (!\is_null($subdir)) {
                 $event->setCacheSubdirectory($subdir);
             }
 
@@ -47,7 +47,8 @@ class ClearImageCache extends ContainerAwareCommand
 
             $output->writeln(sprintf('%s image cache successfully cleared.', \is_null($subdir) ? 'Entire' : ucfirst($subdir)));
         } catch (\Exception $ex) {
-            $output->writeln(sprintf("Failed to clear image cache: %s", $ex->getMessage()));
+            $output->writeln(sprintf('Failed to clear image cache: %s', $ex->getMessage()));
+
             return 1;
         }
 

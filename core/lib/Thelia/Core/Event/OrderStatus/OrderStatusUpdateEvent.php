@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\OrderStatus;
 
 /**
- * Class OrderStatusUpdateEvent
- * @package Thelia\Core\Event\OrderStatus
+ * Class OrderStatusUpdateEvent.
+ *
  * @author Gilles Bourgeat <gbourgeat@openstudio.fr>
  */
 class OrderStatusUpdateEvent extends OrderStatusEvent
@@ -24,6 +24,7 @@ class OrderStatusUpdateEvent extends OrderStatusEvent
 
     /**
      * OrderStatusUpdateEvent constructor.
+     *
      * @param int $id
      */
     public function __construct($id)
@@ -41,11 +42,13 @@ class OrderStatusUpdateEvent extends OrderStatusEvent
 
     /**
      * @param int $id
+     *
      * @return OrderStatusUpdateEvent
      */
     public function setId($id)
     {
         $this->id = $id;
+
         return $this;
     }
 }

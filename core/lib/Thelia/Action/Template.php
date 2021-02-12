@@ -39,7 +39,7 @@ use Thelia\Model\TemplateQuery;
 class Template extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * Create a new template entry
+     * Create a new template entry.
      *
      * @param $eventName
      */
@@ -59,7 +59,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Dupliucate an existing template entry
+     * Dupliucate an existing template entry.
      *
      * @param \Thelia\Core\Event\Template\TemplateCreateEvent $event
      * @param $eventName
@@ -73,16 +73,16 @@ class Template extends BaseAction implements EventSubscriberInterface
             $createEvent
                 ->setLocale($event->getLocale())
                 ->setTemplateName(
-                    Translator::getInstance()->trans("Copy of %tpl", ["%tpl" => $source->getName() ])
+                    Translator::getInstance()->trans('Copy of %tpl', ['%tpl' => $source->getName()])
                 );
 
-            $dispatcher->dispatch($createEvent,TheliaEvents::TEMPLATE_CREATE);
+            $dispatcher->dispatch($createEvent, TheliaEvents::TEMPLATE_CREATE);
 
             $clone = $createEvent->getTemplate();
 
             $attrList = AttributeTemplateQuery::create()->findByTemplateId($source->getId());
 
-            /** @var  $feat AttributeTemplate */
+            /** @var $feat AttributeTemplate */
             foreach ($attrList as $feat) {
                 $dispatcher->dispatch(
                     new TemplateAddAttributeEvent($clone, $feat->getAttributeId()),
@@ -92,7 +92,7 @@ class Template extends BaseAction implements EventSubscriberInterface
 
             $featList = FeatureTemplateQuery::create()->findByTemplateId($source->getId());
 
-            /** @var  $feat FeatureTemplate */
+            /** @var $feat FeatureTemplate */
             foreach ($featList as $feat) {
                 $dispatcher->dispatch(
                     new TemplateAddFeatureEvent($clone, $feat->getFeatureId()),
@@ -105,7 +105,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Change a product template
+     * Change a product template.
      *
      * @param $eventName
      */
@@ -123,9 +123,10 @@ class Template extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Delete a product template entry
+     * Delete a product template entry.
      *
      * @param $eventName
+     *
      * @throws \Exception
      */
     public function delete(TemplateDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -148,7 +149,7 @@ class Template extends BaseAction implements EventSubscriberInterface
                     // so let's take care of this.
                     CategoryQuery::create()
                         ->filterByDefaultTemplateId($event->getTemplateId())
-                        ->update([ 'DefaultTemplateId' => null], $con);
+                        ->update(['DefaultTemplateId' => null], $con);
 
                     $con->commit();
                 } catch (\Exception $ex) {
@@ -257,19 +258,19 @@ class Template extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::TEMPLATE_CREATE          => ["create", 128],
-            TheliaEvents::TEMPLATE_UPDATE          => ["update", 128],
-            TheliaEvents::TEMPLATE_DELETE          => ["delete", 128],
-            TheliaEvents::TEMPLATE_DUPLICATE       => ["duplicate", 128],
+            TheliaEvents::TEMPLATE_CREATE => ['create', 128],
+            TheliaEvents::TEMPLATE_UPDATE => ['update', 128],
+            TheliaEvents::TEMPLATE_DELETE => ['delete', 128],
+            TheliaEvents::TEMPLATE_DUPLICATE => ['duplicate', 128],
 
-            TheliaEvents::TEMPLATE_ADD_ATTRIBUTE    => ["addAttribute", 128],
-            TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE => ["deleteAttribute", 128],
+            TheliaEvents::TEMPLATE_ADD_ATTRIBUTE => ['addAttribute', 128],
+            TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE => ['deleteAttribute', 128],
 
-            TheliaEvents::TEMPLATE_ADD_FEATURE    => ["addFeature", 128],
-            TheliaEvents::TEMPLATE_DELETE_FEATURE => ["deleteFeature", 128],
+            TheliaEvents::TEMPLATE_ADD_FEATURE => ['addFeature', 128],
+            TheliaEvents::TEMPLATE_DELETE_FEATURE => ['deleteFeature', 128],
 
             TheliaEvents::TEMPLATE_CHANGE_ATTRIBUTE_POSITION => ['updateAttributePosition', 128],
-            TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION   => ['updateFeaturePosition', 128],
+            TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION => ['updateFeaturePosition', 128],
         ];
     }
 }

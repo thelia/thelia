@@ -20,8 +20,8 @@ use Thelia\Model\MetaData as MetaDataModel;
 use Thelia\Model\MetaDataQuery;
 
 /**
- * Class MetaData
- * @package Thelia\Action
+ * Class MetaData.
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class MetaData extends BaseAction implements EventSubscriberInterface
@@ -62,7 +62,7 @@ class MetaData extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

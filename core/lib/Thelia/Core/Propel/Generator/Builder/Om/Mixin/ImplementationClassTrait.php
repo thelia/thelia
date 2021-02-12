@@ -12,7 +12,6 @@
 
 namespace Thelia\Core\Propel\Generator\Builder\Om\Mixin;
 
-use Propel\Generator\Builder\Om\AbstractOMBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -27,9 +26,10 @@ trait ImplementationClassTrait
     {
         $path = rtrim((new Filesystem())->makePathRelative(
             TheliaMain_BUILD_MODEL_PATH
-            . parent::getClassFilePath(),
+            .parent::getClassFilePath(),
             THELIA_ROOT
         ), '/');
+
         return $path;
     }
 }

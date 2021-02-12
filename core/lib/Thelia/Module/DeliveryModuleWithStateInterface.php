@@ -21,31 +21,31 @@ interface DeliveryModuleWithStateInterface extends BaseModuleInterface
 {
     /**
      * This method is called by the Delivery  loop, to check if the current module has to be displayed to the customer.
-     * Override it to implements your delivery rules/
+     * Override it to implements your delivery rules/.
      *
      * If you return true, the delivery method will de displayed to the customer
      * If you return false, the delivery method will not be displayed
      *
-     * @param Country $country the country to deliver to.
-     * @param State $state
+     * @param Country $country the country to deliver to
+     * @param State   $state
      *
-     * @return boolean
+     * @return bool
      */
     public function isValidDelivery(Country $country, State $state = null);
 
     /**
-     * Calculate and return delivery price in the shop's default currency
+     * Calculate and return delivery price in the shop's default currency.
      *
-     * @param Country $country the country to deliver to.
-     * @param State $state
+     * @param Country $country the country to deliver to
+     * @param State   $state
      *
-     * @return OrderPostage|float             the delivery price
-     * @throws DeliveryException if the postage price cannot be calculated.
+     * @return OrderPostage|float the delivery price
+     *
+     * @throws DeliveryException if the postage price cannot be calculated
      */
     public function getPostage(Country $country, State $state = null);
 
     /**
-     *
      * This method return true if your delivery manages virtual product delivery.
      *
      * @return bool

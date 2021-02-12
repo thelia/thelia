@@ -17,7 +17,8 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Thelia\Core\Translation\Translator;
 
-class PickupLocation  {
+class PickupLocation
+{
     /** OPENING HOURS ARRAY KEYS */
     public const MONDAY_OPENING_HOURS_KEY = '0';
     public const TUESDAY_OPENING_HOURS_KEY = '1';
@@ -39,7 +40,7 @@ class PickupLocation  {
     /** @var string */
     protected $title;
 
-    /** @var integer */
+    /** @var int */
     protected $moduleId;
 
     /** @var Serializer */
@@ -53,7 +54,7 @@ class PickupLocation  {
         self::THURSDAY_OPENING_HOURS_KEY => null,
         self::FRIDAY_OPENING_HOURS_KEY => null,
         self::SATURDAY_OPENING_HOURS_KEY => null,
-        self::SUNDAY_OPENING_HOURS_KEY => null
+        self::SUNDAY_OPENING_HOURS_KEY => null,
     ];
 
     /**
@@ -61,7 +62,8 @@ class PickupLocation  {
      */
     protected $address;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->serializer = new Serializer([new ObjectNormalizer()], [new JsonEncoder()]);
     }
 
@@ -75,11 +77,13 @@ class PickupLocation  {
 
     /**
      * @param string $id
+     *
      * @return PickupLocation
      */
     public function setId($id)
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -95,6 +99,7 @@ class PickupLocation  {
     public function setLatitude($latitude)
     {
         $this->latitude = $latitude;
+
         return $this;
     }
 
@@ -110,6 +115,7 @@ class PickupLocation  {
     public function setLongitude($longitude)
     {
         $this->longitude = $longitude;
+
         return $this;
     }
 
@@ -125,6 +131,7 @@ class PickupLocation  {
     public function setTitle($title)
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -144,6 +151,7 @@ class PickupLocation  {
     public function setAddress($address)
     {
         $this->address = $address;
+
         return $this;
     }
 
@@ -157,6 +165,7 @@ class PickupLocation  {
 
     /**
      * @param int $moduleId
+     *
      * @return PickupLocation
      */
     public function setModuleId($moduleId)
@@ -175,10 +184,11 @@ class PickupLocation  {
     }
 
     /**
-     * @param integer $day
+     * @param int    $day
      * @param string $hours
      *
      * @return $this
+     *
      * @throws \Exception
      */
     public function setOpeningHours($day, $hours)
@@ -195,7 +205,8 @@ class PickupLocation  {
     /**
      * @return array
      * */
-    public function toArray() {
+    public function toArray()
+    {
         return json_decode($this->serializer->serialize($this, 'json'), true);
     }
 }

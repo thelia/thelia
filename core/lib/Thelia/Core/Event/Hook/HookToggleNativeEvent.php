@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Hook;
 
 /**
- * Class HookToggleNativeEvent
- * @package Thelia\Core\Event\Hook
+ * Class HookToggleNativeEvent.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookToggleNativeEvent extends HookEvent
@@ -26,8 +26,6 @@ class HookToggleNativeEvent extends HookEvent
         $this->hook_id = $hook_id;
     }
 
-    /**
-     */
     public function setHookId($hook_id)
     {
         $this->hook_id = $hook_id;
@@ -35,8 +33,6 @@ class HookToggleNativeEvent extends HookEvent
         return $this;
     }
 
-    /**
-     */
     public function getHookId()
     {
         return $this->hook_id;

@@ -31,22 +31,22 @@ use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**
- * Coupon Loop
+ * Coupon Loop.
  *
- * @package Thelia\Core\Template\Loop
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method bool|string  getIsEnabled()
- * @method bool getInUse()
- * @method string getCode()
- * @method string[] getOrder()
+ *
+ * @method int[]       getId()
+ * @method bool|string getIsEnabled()
+ * @method bool        getInUse()
+ * @method string      getCode()
+ * @method string[]    getOrder()
  */
 class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     /**
-     * Define all args used in your loop
+     * Define all args used in your loop.
      *
      * @return ArgumentCollection
      */
@@ -69,7 +69,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                         'start-date', 'start-date-reverse',
                         'expiration-date', 'expiration-date-reverse',
                         'days-left', 'days-left-reverse',
-                        'usages-left', 'usages-left-reverse'
+                        'usages-left', 'usages-left-reverse',
                         ]
                     )
                 ),
@@ -172,6 +172,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
 
     /**
      * @return LoopResult
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function parseResults(LoopResult $loopResult)
@@ -212,7 +213,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
             foreach ($conditions as $condition) {
                 $temp = [
                     'toolTip' => $condition->getToolTip(),
-                    'summary' => $condition->getSummary()
+                    'summary' => $condition->getSummary(),
                 ];
                 $cleanedConditions[] = $temp;
             }
@@ -235,29 +236,29 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
             $discount = $couponManager->isInUse() ? $couponManager->exec() : 0;
 
             $loopResultRow
-                ->set("ID", $coupon->getId())
-                ->set("IS_TRANSLATED", $coupon->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("CODE", $coupon->getCode())
-                ->set("TITLE", $coupon->getVirtualColumn('i18n_TITLE'))
-                ->set("SHORT_DESCRIPTION", $coupon->getVirtualColumn('i18n_SHORT_DESCRIPTION'))
-                ->set("DESCRIPTION", $coupon->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("START_DATE", $coupon->getStartDate())
-                ->set("EXPIRATION_DATE", $coupon->getExpirationDate())
-                ->set("USAGE_LEFT", $coupon->getMaxUsage())
-                ->set("PER_CUSTOMER_USAGE_COUNT", $coupon->getPerCustomerUsageCount())
-                ->set("IS_CUMULATIVE", $coupon->getIsCumulative())
-                ->set("IS_REMOVING_POSTAGE", $coupon->getIsRemovingPostage())
-                ->set("IS_AVAILABLE_ON_SPECIAL_OFFERS", $coupon->getIsAvailableOnSpecialOffers())
-                ->set("IS_ENABLED", $coupon->getIsEnabled())
-                ->set("AMOUNT", $coupon->getAmount())
-                ->set("APPLICATION_CONDITIONS", $cleanedConditions)
-                ->set("TOOLTIP", $couponManager->getToolTip())
-                ->set("DAY_LEFT_BEFORE_EXPIRATION", max(0, $coupon->getVirtualColumn('days_left')))
-                ->set("SERVICE_ID", $couponManager->getServiceId())
-                ->set("FREE_SHIPPING_FOR_COUNTRIES_LIST", implode(',', $freeShippingForCountriesIds))
-                ->set("FREE_SHIPPING_FOR_MODULES_LIST", implode(',', $freeShippingForModulesIds))
-                ->set("DISCOUNT_AMOUNT", $discount)
+                ->set('ID', $coupon->getId())
+                ->set('IS_TRANSLATED', $coupon->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('CODE', $coupon->getCode())
+                ->set('TITLE', $coupon->getVirtualColumn('i18n_TITLE'))
+                ->set('SHORT_DESCRIPTION', $coupon->getVirtualColumn('i18n_SHORT_DESCRIPTION'))
+                ->set('DESCRIPTION', $coupon->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('START_DATE', $coupon->getStartDate())
+                ->set('EXPIRATION_DATE', $coupon->getExpirationDate())
+                ->set('USAGE_LEFT', $coupon->getMaxUsage())
+                ->set('PER_CUSTOMER_USAGE_COUNT', $coupon->getPerCustomerUsageCount())
+                ->set('IS_CUMULATIVE', $coupon->getIsCumulative())
+                ->set('IS_REMOVING_POSTAGE', $coupon->getIsRemovingPostage())
+                ->set('IS_AVAILABLE_ON_SPECIAL_OFFERS', $coupon->getIsAvailableOnSpecialOffers())
+                ->set('IS_ENABLED', $coupon->getIsEnabled())
+                ->set('AMOUNT', $coupon->getAmount())
+                ->set('APPLICATION_CONDITIONS', $cleanedConditions)
+                ->set('TOOLTIP', $couponManager->getToolTip())
+                ->set('DAY_LEFT_BEFORE_EXPIRATION', max(0, $coupon->getVirtualColumn('days_left')))
+                ->set('SERVICE_ID', $couponManager->getServiceId())
+                ->set('FREE_SHIPPING_FOR_COUNTRIES_LIST', implode(',', $freeShippingForCountriesIds))
+                ->set('FREE_SHIPPING_FOR_MODULES_LIST', implode(',', $freeShippingForModulesIds))
+                ->set('DISCOUNT_AMOUNT', $discount)
             ;
             $this->addOutputFields($loopResultRow, $coupon);
 

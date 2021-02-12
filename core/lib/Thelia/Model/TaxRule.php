@@ -21,7 +21,7 @@ class TaxRule extends BaseTaxRule
     /**
      * @param $untaxedAmount
      * @param $untaxedPromoAmount
-     * @param null    $askedLocale
+     * @param null $askedLocale
      *
      * @return OrderProductTaxCollection
      */

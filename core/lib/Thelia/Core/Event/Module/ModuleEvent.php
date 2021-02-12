@@ -16,8 +16,8 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Module;
 
 /**
- * Class ModuleEvent
- * @package Thelia\Core\Event\Module
+ * Class ModuleEvent.
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleEvent extends ActionEvent
@@ -34,85 +34,61 @@ class ModuleEvent extends ActionEvent
     protected $description;
     protected $postscriptum;
 
-    /**
-     */
     public function setChapo($chapo)
     {
         $this->chapo = $chapo;
     }
 
-    /**
-     */
     public function getChapo()
     {
         return $this->chapo;
     }
 
-    /**
-     */
     public function setDescription($description)
     {
         $this->description = $description;
     }
 
-    /**
-     */
     public function getDescription()
     {
         return $this->description;
     }
 
-    /**
-     */
     public function setId($id)
     {
         $this->id = $id;
     }
 
-    /**
-     */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     */
     public function setLocale($locale)
     {
         $this->locale = $locale;
     }
 
-    /**
-     */
     public function getLocale()
     {
         return $this->locale;
     }
 
-    /**
-     */
     public function setPostscriptum($postscriptum)
     {
         $this->postscriptum = $postscriptum;
     }
 
-    /**
-     */
     public function getPostscriptum()
     {
         return $this->postscriptum;
     }
 
-    /**
-     */
     public function setTitle($title)
     {
         $this->title = $title;
     }
 
-    /**
-     */
     public function getTitle()
     {
         return $this->title;
@@ -124,7 +100,6 @@ class ModuleEvent extends ActionEvent
     }
 
     /**
-     *
      * @return $this
      */
     public function setModule(Module $module)

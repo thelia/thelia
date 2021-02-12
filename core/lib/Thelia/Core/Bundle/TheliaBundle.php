@@ -41,18 +41,13 @@ use Thelia\Core\DependencyInjection\Compiler\TranslatorPass;
  * @TODO load configuration from thelia plugin
  * @TODO register database configuration.
  *
- *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-
 class TheliaBundle extends Bundle
 {
     /**
-     *
-     * Construct the depency injection builder
-     *
+     * Construct the depency injection builder.
      */
-
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
@@ -66,9 +61,9 @@ class TheliaBundle extends Bundle
             ->addCompilerPass(new RegisterRouterPass())
             ->addCompilerPass(new RegisterCouponPass())
             ->addCompilerPass(new RegisterCouponConditionPass())
-            ->addCompilerPass(new RegisterArchiverPass)
+            ->addCompilerPass(new RegisterArchiverPass())
             ->addCompilerPass(new RegisterAssetFilterPass())
-            ->addCompilerPass(new RegisterSerializerPass)
+            ->addCompilerPass(new RegisterSerializerPass())
             ->addCompilerPass(new StackPass())
             ->addCompilerPass(new RegisterFormExtensionPass())
             ->addCompilerPass(new CurrencyConverterProviderPass())

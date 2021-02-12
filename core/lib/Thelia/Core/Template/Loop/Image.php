@@ -26,40 +26,40 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImage;
-use Thelia\Model\ProductImageQuery;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\EnumListType;
 use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
 
 /**
- * The image loop
+ * The image loop.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
+ *
+ * @method int[]       getId()
  * @method bool|string getVisible()
- * @method int[] getExclude()
- * @method int getWidth()
- * @method int getHeight()
- * @method int getRotation()
- * @method string getBackgroundColor()
- * @method int getQuality()
- * @method string getEffects()
- * @method int getCategory()
- * @method int getProduct()
- * @method int getFolder()
- * @method int getContent()
- * @method string getSource()
- * @method int getSourceId()
- * @method string getQueryNamespace()
- * @method bool getAllowZoom()
- * @method bool getIgnoreProcessingErrors()
- * @method string getResizeMode()
- * @method bool getBase64()
- * @method bool getWithPrevNextInfo()
- * @method string[] getOrder()
+ * @method int[]       getExclude()
+ * @method int         getWidth()
+ * @method int         getHeight()
+ * @method int         getRotation()
+ * @method string      getBackgroundColor()
+ * @method int         getQuality()
+ * @method string      getEffects()
+ * @method int         getCategory()
+ * @method int         getProduct()
+ * @method int         getFolder()
+ * @method int         getContent()
+ * @method string      getSource()
+ * @method int         getSourceId()
+ * @method string      getQueryNamespace()
+ * @method bool        getAllowZoom()
+ * @method bool        getIgnoreProcessingErrors()
+ * @method string      getResizeMode()
+ * @method bool        getBase64()
+ * @method bool        getWithPrevNextInfo()
+ * @method string[]    getOrder()
  */
 class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -125,10 +125,11 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * Dynamically create the search query, and set the proper filter and order
+     * Dynamically create the search query, and set the proper filter and order.
      *
-     * @param  string        $source    a valid source identifier (@see $possible_sources)
-     * @param  int           $object_id the source object ID
+     * @param string $source    a valid source identifier (@see $possible_sources)
+     * @param int    $object_id the source object ID
+     *
      * @return ModelCriteria the propel Query object
      */
     protected function createSearchQuery($source, $object_id)
@@ -141,40 +142,40 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             $ns = '\\'.$ns;
         }
 
-        $queryClass   = sprintf("%s\\%sImageQuery", $ns, $object);
-        $filterMethod = sprintf("filterBy%sId", $object);
+        $queryClass = sprintf('%s\\%sImageQuery', $ns, $object);
+        $filterMethod = sprintf('filterBy%sId', $object);
 
         // xxxImageQuery::create()
         $method = new \ReflectionMethod($queryClass, 'create');
         $search = $method->invoke(null); // Static !
 
         // $query->filterByXXX(id)
-        if (! \is_null($object_id)) {
+        if (!\is_null($object_id)) {
             $method = new \ReflectionMethod($queryClass, $filterMethod);
             $method->invoke($search, $object_id);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         // Results ordering
         foreach ($orders as $order) {
             switch ($order) {
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha-reverse":
+                case 'alpha-reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "manual-reverse":
+                case 'manual-reverse':
                     $search->orderByPosition(Criteria::DESC);
                     break;
-                case "manual":
+                case 'manual':
                     $search->orderByPosition(Criteria::ASC);
                     break;
-                case "random":
+                case 'random':
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
-                    break(2);
+                    break 2;
                     break;
             }
         }
@@ -183,10 +184,11 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * Dynamically create the search query, and set the proper filter and order
+     * Dynamically create the search query, and set the proper filter and order.
      *
-     * @param  string        $objectType (returned) the a valid source identifier (@see $possible_sources)
-     * @param  string        $objectId   (returned) the ID of the source object
+     * @param string $objectType (returned) the a valid source identifier (@see $possible_sources)
+     * @param string $objectId   (returned) the ID of the source object
+     *
      * @return ModelCriteria the propel Query object
      */
     protected function getSearchQuery(&$objectType, &$objectId)
@@ -196,7 +198,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         // Check form source="product" source_id="123" style arguments
         $source = $this->getSource();
 
-        if (! \is_null($source)) {
+        if (!\is_null($source)) {
             $sourceId = $this->getSourceId();
             $id = $this->getId();
 
@@ -209,19 +211,19 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             $search = $this->createSearchQuery($source, $sourceId);
 
             $objectType = $source;
-            $objectId   = $sourceId;
+            $objectId = $sourceId;
         } else {
             // Check for product="id" folder="id", etc. style arguments
             foreach ($this->possible_sources as $source) {
                 $argValue = $this->getArgValue($source);
 
-                if (! empty($argValue)) {
+                if (!empty($argValue)) {
                     $argValue = \intval($argValue);
 
                     $search = $this->createSearchQuery($source, $argValue);
 
                     $objectType = $source;
-                    $objectId   = $argValue;
+                    $objectId = $argValue;
 
                     break;
                 }
@@ -230,7 +232,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if ($search == null) {
             throw new \InvalidArgumentException(
-                sprintf("Unable to find image source. Valid sources are %s", implode(',', $this->possible_sources))
+                sprintf('Unable to find image source. Valid sources are %s', implode(',', $this->possible_sources))
             );
         }
 
@@ -250,7 +252,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $id = $this->getId();
 
-        if (! \is_null($id)) {
+        if (!\is_null($id)) {
             $search->filterById($id, Criteria::IN);
         }
 
@@ -282,7 +284,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $event->setAllowZoom($this->getAllowZoom());
 
-        if (! \is_null($effects)) {
+        if (!\is_null($effects)) {
             $effects = explode(',', $effects);
         }
 
@@ -300,31 +302,31 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $baseSourceFilePath = ConfigQuery::read('images_library_path');
         if ($baseSourceFilePath === null) {
-            $baseSourceFilePath = THELIA_LOCAL_DIR . 'media' . DS . 'images';
+            $baseSourceFilePath = THELIA_LOCAL_DIR.'media'.DS.'images';
         } else {
-            $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
+            $baseSourceFilePath = THELIA_ROOT.$baseSourceFilePath;
         }
 
         /** @var ProductImage $result */
         foreach ($loopResult->getResultDataCollection() as $result) {
             // Setup required transformations
-            if (! \is_null($width)) {
+            if (!\is_null($width)) {
                 $event->setWidth($width);
             }
-            if (! \is_null($height)) {
+            if (!\is_null($height)) {
                 $event->setHeight($height);
             }
             $event->setResizeMode($resizeMode);
-            if (! \is_null($rotation)) {
+            if (!\is_null($rotation)) {
                 $event->setRotation($rotation);
             }
-            if (! \is_null($background_color)) {
+            if (!\is_null($background_color)) {
                 $event->setBackgroundColor($background_color);
             }
-            if (! \is_null($quality)) {
+            if (!\is_null($quality)) {
                 $event->setQuality($quality);
             }
-            if (! \is_null($effects)) {
+            if (!\is_null($effects)) {
                 $event->setEffects($effects);
             }
 
@@ -342,47 +344,47 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($result);
 
             $loopResultRow
-                ->set("ID", $result->getId())
-                ->set("LOCALE", $this->locale)
-                ->set("ORIGINAL_IMAGE_PATH", $sourceFilePath)
-                ->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $result->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $result->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("VISIBLE", $result->getVisible())
-                ->set("POSITION", $result->getPosition())
-                ->set("OBJECT_TYPE", $this->objectType)
-                ->set("OBJECT_ID", $this->objectId)
+                ->set('ID', $result->getId())
+                ->set('LOCALE', $this->locale)
+                ->set('ORIGINAL_IMAGE_PATH', $sourceFilePath)
+                ->set('TITLE', $result->getVirtualColumn('i18n_TITLE'))
+                ->set('CHAPO', $result->getVirtualColumn('i18n_CHAPO'))
+                ->set('DESCRIPTION', $result->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set('VISIBLE', $result->getVisible())
+                ->set('POSITION', $result->getPosition())
+                ->set('OBJECT_TYPE', $this->objectType)
+                ->set('OBJECT_ID', $this->objectId)
             ;
 
             $addRow = true;
 
-            $returnErroredImages = $this->getBackendContext() || ! $this->getIgnoreProcessingErrors();
+            $returnErroredImages = $this->getBackendContext() || !$this->getIgnoreProcessingErrors();
 
             try {
                 // Dispatch image processing event
                 $this->dispatcher->dispatch($event, TheliaEvents::IMAGE_PROCESS);
 
                 $loopResultRow
-                    ->set("IMAGE_URL", $event->getFileUrl())
-                    ->set("ORIGINAL_IMAGE_URL", $event->getOriginalFileUrl())
-                    ->set("IMAGE_PATH", $event->getCacheFilepath())
-                    ->set("PROCESSING_ERROR", false)
+                    ->set('IMAGE_URL', $event->getFileUrl())
+                    ->set('ORIGINAL_IMAGE_URL', $event->getOriginalFileUrl())
+                    ->set('IMAGE_PATH', $event->getCacheFilepath())
+                    ->set('PROCESSING_ERROR', false)
                 ;
 
                 if ($this->getBase64()) {
-                    $loopResultRow->set("IMAGE_BASE64", $this->toBase64($event->getCacheFilepath()));
+                    $loopResultRow->set('IMAGE_BASE64', $this->toBase64($event->getCacheFilepath()));
                 }
             } catch (\Exception $ex) {
                 // Ignore the result and log an error
-                Tlog::getInstance()->addError(sprintf("Failed to process image in image loop: %s", $ex->getMessage()));
+                Tlog::getInstance()->addError(sprintf('Failed to process image in image loop: %s', $ex->getMessage()));
 
                 if ($returnErroredImages) {
                     $loopResultRow
-                        ->set("IMAGE_URL", '')
-                        ->set("ORIGINAL_IMAGE_URL", '')
-                        ->set("IMAGE_PATH", '')
-                        ->set("PROCESSING_ERROR", true)
+                        ->set('IMAGE_URL', '')
+                        ->set('ORIGINAL_IMAGE_URL', '')
+                        ->set('IMAGE_PATH', '')
+                        ->set('PROCESSING_ERROR', true)
                     ;
                 } else {
                     $addRow = false;
@@ -392,7 +394,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             if ($this->getWithPrevNextInfo()) {
                 $previousQuery = $this->getSearchQuery($this->objectType, $this->objectId)
                     ->filterByPosition($result->getPosition(), Criteria::LESS_THAN);
-                if (! $isBackendContext) {
+                if (!$isBackendContext) {
                     $previousQuery->filterByVisible(true);
                 }
                 $previous = $previousQuery
@@ -400,17 +402,17 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->findOne();
                 $nextQuery = $this->getSearchQuery($this->objectType, $this->objectId)
                     ->filterByPosition($result->getPosition(), Criteria::GREATER_THAN);
-                if (! $isBackendContext) {
+                if (!$isBackendContext) {
                     $nextQuery->filterByVisible(true);
                 }
                 $next = $nextQuery
                     ->orderByPosition(Criteria::ASC)
                     ->findOne();
                 $loopResultRow
-                    ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
-                    ->set("HAS_NEXT", $next != null ? 1 : 0)
-                    ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
-                    ->set("NEXT", $next != null ? $next->getId() : -1);
+                    ->set('HAS_PREVIOUS', $previous != null ? 1 : 0)
+                    ->set('HAS_NEXT', $next != null ? 1 : 0)
+                    ->set('PREVIOUS', $previous != null ? $previous->getId() : -1)
+                    ->set('NEXT', $next != null ? $next->getId() : -1);
             }
 
             if ($addRow) {
@@ -426,6 +428,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     private function toBase64($path)
     {
         $imgData = base64_encode(file_get_contents($path));
+
         return $src = 'data: '.mime_content_type($path).';base64,'.$imgData;
     }
 }

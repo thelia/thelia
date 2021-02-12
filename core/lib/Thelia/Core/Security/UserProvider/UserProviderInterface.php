@@ -17,10 +17,11 @@ use Thelia\Core\Security\User\UserInterface;
 interface UserProviderInterface
 {
     /**
-     * Returns a UserInterface instance
+     * Returns a UserInterface instance.
      *
      * @param string $key the unique user key (username, email address, etc.)
-     * @return UserInterface instance, or null if none was found.
+     *
+     * @return UserInterface instance, or null if none was found
      */
     public function getUser($key);
 }

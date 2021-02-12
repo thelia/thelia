@@ -18,16 +18,15 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 
 /**
- * Class LangDefaultBehaviorForm
- * @package Thelia\Form\Lang
+ * Class LangDefaultBehaviorForm.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangDefaultBehaviorForm extends BaseForm
 {
     /**
-     *
      * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
+     * Form this you have to call add method on $this->formBuilder attribute :.
      *
      * $this->formBuilder->add("name", TextType::class)
      *   ->add("email", EmailType::class, array(
@@ -49,13 +48,13 @@ class LangDefaultBehaviorForm extends BaseForm
         $this->formBuilder
             ->add('behavior', ChoiceType::class, [
                 'choices' => [
-                    Translator::getInstance()->trans("Strictly use the requested language") => 0,
-                    Translator::getInstance()->trans("Replace by the default language") => 1,
+                    Translator::getInstance()->trans('Strictly use the requested language') => 0,
+                    Translator::getInstance()->trans('Replace by the default language') => 1,
                 ],
                 'constraints' => [
                     new NotBlank(),
                 ],
-                'label' => Translator::getInstance()->trans("If a translation is missing or incomplete :"),
+                'label' => Translator::getInstance()->trans('If a translation is missing or incomplete :'),
                 'label_attr' => [
                     'for' => 'defaultBehavior-form',
                 ],

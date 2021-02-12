@@ -18,8 +18,8 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class CustomerTitleI18nType
- * @package Thelia\Core\Form\Type
+ * Class CustomerTitleI18nType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class CustomerTitleI18nType extends AbstractTheliaType
@@ -27,29 +27,29 @@ class CustomerTitleI18nType extends AbstractTheliaType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            "cascade_validation" => true,
+            'cascade_validation' => true,
         ]);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add("locale", "text", [
-                "required" => true,
-                "constraints" => [
+            ->add('locale', 'text', [
+                'required' => true,
+                'constraints' => [
                     new NotBlank(),
                 ],
             ])
-            ->add("short", "text", [
-                "required" => false,
-                "constraints" => [
-                    new Length(["max" => 10]),
+            ->add('short', 'text', [
+                'required' => false,
+                'constraints' => [
+                    new Length(['max' => 10]),
                 ],
             ])
-            ->add("long", "text", [
-                "required" => false,
-                "constraints" => [
-                    new Length(["max" => 45]),
+            ->add('long', 'text', [
+                'required' => false,
+                'constraints' => [
+                    new Length(['max' => 45]),
                 ],
             ])
         ;
@@ -62,6 +62,6 @@ class CustomerTitleI18nType extends AbstractTheliaType
      */
     public function getName()
     {
-        return "customer_title_i18n";
+        return 'customer_title_i18n';
     }
 }

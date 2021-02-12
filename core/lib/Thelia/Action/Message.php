@@ -24,7 +24,7 @@ use Thelia\Model\MessageQuery;
 class Message extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * Create a new messageuration entry
+     * Create a new messageuration entry.
      *
      * @param $eventName
      */
@@ -46,7 +46,7 @@ class Message extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Change a message
+     * Change a message.
      *
      * @param $eventName
      */
@@ -78,7 +78,7 @@ class Message extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Delete a messageuration entry
+     * Delete a messageuration entry.
      *
      * @param $eventName
      */
@@ -100,9 +100,9 @@ class Message extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::MESSAGE_CREATE   => ["create", 128],
-            TheliaEvents::MESSAGE_UPDATE   => ["modify", 128],
-            TheliaEvents::MESSAGE_DELETE   => ["delete", 128],
+            TheliaEvents::MESSAGE_CREATE => ['create', 128],
+            TheliaEvents::MESSAGE_UPDATE => ['modify', 128],
+            TheliaEvents::MESSAGE_DELETE => ['delete', 128],
         ];
     }
 }

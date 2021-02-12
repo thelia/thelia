@@ -28,18 +28,17 @@ use TheliaSmarty\Template\Exception\SmartyPluginException;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 /**
- *
  * format_date and format_date smarty function.
  *
  * Class Format
- * @package Thelia\Core\Template\Smarty\Plugins
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  * @author Benjamin Perche <benjamin@thelia.net>
  */
 class Format extends AbstractSmartyPlugin
 {
-    private static $dateKeys = ["day", "month", "year"];
-    private static $timeKeys = ["hour", "minute", "second"];
+    private static $dateKeys = ['day', 'month', 'year'];
+    private static $timeKeys = ['hour', 'minute', 'second'];
 
     /** @var RequestStack */
     protected $requestStack;
@@ -50,7 +49,7 @@ class Format extends AbstractSmartyPlugin
     }
 
     /**
-     * return date in expected format
+     * return date in expected format.
      *
      * available parameters :
      *  date => DateTime object (mandatory)
@@ -66,25 +65,27 @@ class Format extends AbstractSmartyPlugin
      *  {format_date date=$dateTimeObject output="date"} will output the date using the default date system format
      *  {format_date date=$dateTimeObject} will output with the default datetime system format
      *
-     * @param  array                                                  $params
-     * @param  null                                                   $template
+     * @param array $params
+     * @param null  $template
+     *
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
+     *
      * @return string
      */
     public function formatDate($params, $template = null)
     {
-        $date = $this->getParam($params, "date", false);
+        $date = $this->getParam($params, 'date', false);
 
         if ($date === false) {
             // Check if we have a timestamp
-            $timestamp = $this->getParam($params, "timestamp", false);
+            $timestamp = $this->getParam($params, 'timestamp', false);
 
             if ($timestamp === false) {
                 // No timestamp => error
-                throw new SmartyPluginException("Either date or timestamp is a mandatory parameter in format_date function");
+                throw new SmartyPluginException('Either date or timestamp is a mandatory parameter in format_date function');
             }
-                $date = new \DateTime();
-                $date->setTimestamp($timestamp);
+            $date = new \DateTime();
+            $date->setTimestamp($timestamp);
         } elseif (\is_array($date)) {
             $keys = array_keys($date);
 
@@ -93,24 +94,24 @@ class Format extends AbstractSmartyPlugin
 
             // If this is not a date, fallback on today
             // If this is not a time, fallback on midnight
-            $dateFormat = $isDate ? sprintf("%d-%d-%d", $date["year"], $date["month"], $date["day"]) : (new \DateTime())->format("Y-m-d");
-            $timeFormat = $isTime ? sprintf("%d:%d:%d", $date["hour"], $date["minute"], $date["second"]) : "0:0:0";
+            $dateFormat = $isDate ? sprintf('%d-%d-%d', $date['year'], $date['month'], $date['day']) : (new \DateTime())->format('Y-m-d');
+            $timeFormat = $isTime ? sprintf('%d:%d:%d', $date['hour'], $date['minute'], $date['second']) : '0:0:0';
 
-            $date = new \DateTime(sprintf("%s %s", $dateFormat, $timeFormat));
+            $date = new \DateTime(sprintf('%s %s', $dateFormat, $timeFormat));
         }
 
         if (!($date instanceof \DateTime)) {
             try {
                 $date = new \DateTime($date);
             } catch (\Exception $e) {
-                return "";
+                return '';
             }
         }
 
-        $format = $this->getParam($params, "format", false);
+        $format = $this->getParam($params, 'format', false);
 
         if ($format === false) {
-            $format = DateTimeFormat::getInstance($this->requestStack->getCurrentRequest())->getFormat($this->getParam($params, "output", null));
+            $format = DateTimeFormat::getInstance($this->requestStack->getCurrentRequest())->getFormat($this->getParam($params, 'output', null));
         }
 
         $locale = $this->getParam($params, 'locale', false);
@@ -144,7 +145,7 @@ class Format extends AbstractSmartyPlugin
                 setlocale(LC_TIME, $systemLocale);
             } else {
                 // setlocale() function not available => error
-                throw new SmartyPluginException("The setlocale() function is not available on your system.");
+                throw new SmartyPluginException('The setlocale() function is not available on your system.');
             }
         }
 
@@ -152,8 +153,7 @@ class Format extends AbstractSmartyPlugin
     }
 
     /**
-     *
-     * display numbers in expected format
+     * display numbers in expected format.
      *
      * available parameters :
      *  number => int or float number
@@ -164,29 +164,30 @@ class Format extends AbstractSmartyPlugin
      *  ex : {format_number number="1246.12" decimals="1" dec_point="," thousands_sep=" "} will output "1 246,1"
      *
      * @param $params
-     * @param  null                                                   $template
+     * @param null $template
+     *
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
-     * @return string                                                 the expected number formatted
+     *
+     * @return string the expected number formatted
      */
     public function formatNumber($params, $template = null)
     {
-        $number = $this->getParam($params, "number", false);
+        $number = $this->getParam($params, 'number', false);
 
-        if ($number ===  false || $number === '') {
-            return "";
+        if ($number === false || $number === '') {
+            return '';
         }
 
         return NumberFormat::getInstance($this->requestStack->getCurrentRequest())->format(
             $number,
-            $this->getParam($params, "decimals", null),
-            $this->getParam($params, "dec_point", null),
-            $this->getParam($params, "thousands_sep", null)
+            $this->getParam($params, 'decimals', null),
+            $this->getParam($params, 'dec_point', null),
+            $this->getParam($params, 'thousands_sep', null)
         );
     }
 
     /**
-     *
-     * display a amount in expected format
+     * display a amount in expected format.
      *
      * available parameters :
      *  number => int or float number
@@ -200,41 +201,43 @@ class Format extends AbstractSmartyPlugin
      *  ex : {format_money number="1246.00" decimals="2" dec_point="," thousands_sep=" " symbol="€" remove_zero_decimal=true} will output "1 246 €"
      *
      * @param $params
-     * @param  null                                                   $template
+     * @param null $template
+     *
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
-     * @return string                                                 the expected number formatted
+     *
+     * @return string the expected number formatted
      */
     public function formatMoney($params, $template = null)
     {
-        $number = $this->getParam($params, "number", false);
+        $number = $this->getParam($params, 'number', false);
 
-        if ($number ===  false || $number === '') {
-            return "";
+        if ($number === false || $number === '') {
+            return '';
         }
 
-        if ($this->getParam($params, "symbol", null) === null) {
+        if ($this->getParam($params, 'symbol', null) === null) {
             return MoneyFormat::getInstance($this->requestStack->getCurrentRequest())->formatByCurrency(
                 $number,
-                $this->getParam($params, "decimals", null),
-                $this->getParam($params, "dec_point", null),
-                $this->getParam($params, "thousands_sep", null),
-                $this->getParam($params, "currency_id", null),
-                $this->getParam($params, "remove_zero_decimal", false)
+                $this->getParam($params, 'decimals', null),
+                $this->getParam($params, 'dec_point', null),
+                $this->getParam($params, 'thousands_sep', null),
+                $this->getParam($params, 'currency_id', null),
+                $this->getParam($params, 'remove_zero_decimal', false)
             );
         }
 
         return MoneyFormat::getInstance($this->requestStack->getCurrentRequest())->format(
             $number,
-            $this->getParam($params, "decimals", null),
-            $this->getParam($params, "dec_point", null),
-            $this->getParam($params, "thousands_sep", null),
-            $this->getParam($params, "symbol", null),
-            $this->getParam($params, "remove_zero_decimal", false)
+            $this->getParam($params, 'decimals', null),
+            $this->getParam($params, 'dec_point', null),
+            $this->getParam($params, 'thousands_sep', null),
+            $this->getParam($params, 'symbol', null),
+            $this->getParam($params, 'remove_zero_decimal', false)
         );
     }
 
     /**
-     * return two-dimensional arrays in string
+     * return two-dimensional arrays in string.
      *
      * available parameters :
      *  values => array 2D ['key A' => ['value 1', 'value 2'], 'key B' => ['value 3', 'value 4']]
@@ -245,13 +248,14 @@ class Format extends AbstractSmartyPlugin
      *  will output the format with specific format : "Colors : Green / Yellow / Red | Material : Wood"
      *
      * @param $params
+     *
      * @return string
      */
     public function formatTwoDimensionalArray($params)
     {
         $output = '';
-        $values = $this->getParam($params, "values", null);
-        $separators = $this->getParam($params, "separators", [' : ', ' / ', ' | ']);
+        $values = $this->getParam($params, 'values', null);
+        $separators = $this->getParam($params, 'separators', [' : ', ' / ', ' | ']);
 
         if (!\is_array($values)) {
             return $output;
@@ -262,7 +266,7 @@ class Format extends AbstractSmartyPlugin
                 $output .= $separators[2];
             }
 
-            $output .= $key . $separators[0];
+            $output .= $key.$separators[0];
 
             if (!\is_array($value)) {
                 $output .= $value;
@@ -271,6 +275,7 @@ class Format extends AbstractSmartyPlugin
 
             $output .= implode($separators[1], $value);
         }
+
         return $output;
     }
 
@@ -286,8 +291,7 @@ class Format extends AbstractSmartyPlugin
     }
 
     /**
-     * This function comes from [Yii framework](http://www.yiiframework.com/)
-     *
+     * This function comes from [Yii framework](http://www.yiiframework.com/).
      *
      * Converts a date format pattern from [php date() function format][] to [ICU format][].
      *
@@ -300,8 +304,9 @@ class Format extends AbstractSmartyPlugin
      * [php date() function format]: http://php.net/manual/en/function.date.php
      * [ICU format]: http://userguide.icu-project.org/formatparse/datetime#TOC-Date-Time-Format-Syntax
      *
-     * @param string $pattern date format pattern in php date()-function format.
-     * @return string The converted date format pattern.
+     * @param string $pattern date format pattern in php date()-function format
+     *
+     * @return string the converted date format pattern
      */
     protected function convertDatePhpToIcu($pattern)
     {
@@ -358,8 +363,7 @@ class Format extends AbstractSmartyPlugin
     }
 
     /**
-     *
-     * display an address in expected format
+     * display an address in expected format.
      *
      * available parameters :
      *  address => the id of the address to display
@@ -372,25 +376,27 @@ class Format extends AbstractSmartyPlugin
      *  ex : {format_money number="1246.12" decimals="1" dec_point="," thousands_sep=" " symbol="€"} will output "1 246,1 €"
      *
      * @param $params
-     * @param  null                                                   $template
+     * @param null $template
+     *
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
-     * @return string                                                 the expected number formatted
+     *
+     * @return string the expected number formatted
      */
     public function formatAddress($params, $template = null)
     {
         $postal = filter_var(
-            $this->getParam($params, "postal", null),
+            $this->getParam($params, 'postal', null),
             FILTER_VALIDATE_BOOLEAN
         );
 
         $html = filter_var(
-            $this->getParam($params, "html", true),
+            $this->getParam($params, 'html', true),
             FILTER_VALIDATE_BOOLEAN
         );
 
-        $htmlTag = $this->getParam($params, "html_tag", "p");
-        $originCountry = $this->getParam($params, "origin_country", null);
-        $locale = $this->getParam($params, "locale", $this->getSession()->getLang()->getLocale());
+        $htmlTag = $this->getParam($params, 'html_tag', 'p');
+        $originCountry = $this->getParam($params, 'origin_country', null);
+        $locale = $this->getParam($params, 'locale', $this->getSession()->getLang()->getLocale());
 
         // extract html attributes
         $htmlAttributes = [];
@@ -402,11 +408,11 @@ class Format extends AbstractSmartyPlugin
 
         // get address or order address
         $address = null;
-        if (null !== $id = $this->getParam($params, "address", null)) {
+        if (null !== $id = $this->getParam($params, 'address', null)) {
             if (null === $address = AddressQuery::create()->findPk($id)) {
                 return '';
             }
-        } elseif (null !== $id = $this->getParam($params, "order_address", null)) {
+        } elseif (null !== $id = $this->getParam($params, 'order_address', null)) {
             if (null === $address = OrderAddressQuery::create()->findPk($id)) {
                 return '';
             }
@@ -417,7 +423,7 @@ class Format extends AbstractSmartyPlugin
 
         if (null === $address) {
             throw new SmartyPluginException(
-                "Either address, order_address or full list of address fields should be provided"
+                'Either address, order_address or full list of address fields should be provided'
             );
         }
 
@@ -453,7 +459,7 @@ class Format extends AbstractSmartyPlugin
             'address_line2',
             'organization',
             'recipient',
-            'locale'
+            'locale',
         ];
         $valid = false;
 
@@ -462,7 +468,7 @@ class Format extends AbstractSmartyPlugin
         foreach ($addressArgs as $arg) {
             if (null !== $argVal = $this->getParam($params, $arg, null)) {
                 $valid = true;
-                $functionName = 'with' . Container::camelize($arg);
+                $functionName = 'with'.Container::camelize($arg);
                 $address = $address->$functionName($argVal);
             }
         }
@@ -480,11 +486,11 @@ class Format extends AbstractSmartyPlugin
     public function getPluginDescriptors()
     {
         return [
-            new SmartyPluginDescriptor("function", "format_date", $this, "formatDate"),
-            new SmartyPluginDescriptor("function", "format_number", $this, "formatNumber"),
-            new SmartyPluginDescriptor("function", "format_money", $this, "formatMoney"),
-            new SmartyPluginDescriptor("function", "format_array_2d", $this, "formatTwoDimensionalArray"),
-            new SmartyPluginDescriptor("function", "format_address", $this, "formatAddress"),
+            new SmartyPluginDescriptor('function', 'format_date', $this, 'formatDate'),
+            new SmartyPluginDescriptor('function', 'format_number', $this, 'formatNumber'),
+            new SmartyPluginDescriptor('function', 'format_money', $this, 'formatMoney'),
+            new SmartyPluginDescriptor('function', 'format_array_2d', $this, 'formatTwoDimensionalArray'),
+            new SmartyPluginDescriptor('function', 'format_address', $this, 'formatAddress'),
         ];
     }
 

@@ -19,24 +19,24 @@ class TlogDestinationPopup extends AbstractTlogDestination
 {
     // Nom des variables de configuration
     // ----------------------------------
-    public const VAR_POPUP_WIDTH = "tlog_destinationpopup_width";
-    public const VALEUR_POPUP_WIDTH_DEFAUT = "600";
+    public const VAR_POPUP_WIDTH = 'tlog_destinationpopup_width';
+    public const VALEUR_POPUP_WIDTH_DEFAUT = '600';
 
-    public const VAR_POPUP_HEIGHT = "tlog_destinationpopup_height";
-    public const VALEUR_POPUP_HEIGHT_DEFAUT = "600";
+    public const VAR_POPUP_HEIGHT = 'tlog_destinationpopup_height';
+    public const VALEUR_POPUP_HEIGHT_DEFAUT = '600';
 
-    public const VAR_POPUP_TPL = "tlog_destinationpopup_template";
+    public const VAR_POPUP_TPL = 'tlog_destinationpopup_template';
     // Ce fichier doit se trouver dans le même répertoire que TlogDestinationPopup.class.php
-    public const VALEUR_POPUP_TPL_DEFAUT = "TlogDestinationPopup.tpl";
+    public const VALEUR_POPUP_TPL_DEFAUT = 'TlogDestinationPopup.tpl';
 
     public function getTitle()
     {
-        return "Javascript popup window";
+        return 'Javascript popup window';
     }
 
     public function getDescription()
     {
-        return "Display logs in a popup window, separate from the main window .";
+        return 'Display logs in a popup window, separate from the main window .';
     }
 
     public function getConfigs()
@@ -44,35 +44,35 @@ class TlogDestinationPopup extends AbstractTlogDestination
         return [
             new TlogDestinationConfig(
                 self::VAR_POPUP_TPL,
-                "Popup windows template",
-                "Put #LOGTEXT in the template text where you want to display logs..",
-                file_get_contents(__DIR__.DS. self::VALEUR_POPUP_TPL_DEFAUT),
+                'Popup windows template',
+                'Put #LOGTEXT in the template text where you want to display logs..',
+                file_get_contents(__DIR__.DS.self::VALEUR_POPUP_TPL_DEFAUT),
                 TlogDestinationConfig::TYPE_TEXTAREA
             ),
             new TlogDestinationConfig(
                 self::VAR_POPUP_HEIGHT,
-                "Height of the popup window",
-                "In pixels",
+                'Height of the popup window',
+                'In pixels',
                 self::VALEUR_POPUP_HEIGHT_DEFAUT,
                 TlogDestinationConfig::TYPE_TEXTFIELD
             ),
             new TlogDestinationConfig(
                 self::VAR_POPUP_WIDTH,
-                "Width of the popup window",
-                "In pixels",
+                'Width of the popup window',
+                'In pixels',
                 self::VALEUR_POPUP_WIDTH_DEFAUT,
                 TlogDestinationConfig::TYPE_TEXTFIELD
-            )
+            ),
         ];
     }
 
     public function write(&$res)
     {
-        $content = "";
+        $content = '';
         $count = 1;
 
         foreach ($this->logs as $line) {
-            $content .= "<div class=\"".($count++ % 2 ? "paire" : "impaire")."\">".htmlspecialchars($line)."</div>";
+            $content .= '<div class="'.($count++ % 2 ? 'paire' : 'impaire').'">'.htmlspecialchars($line).'</div>';
         }
 
         $tpl = $this->getConfig(self::VAR_POPUP_TPL);
@@ -95,8 +95,8 @@ class TlogDestinationPopup extends AbstractTlogDestination
             str_replace('"', '\\"', $tpl)
         );
 
-        if (preg_match("|</body>|i", $res)) {
-            $res = preg_replace("|</body>|i", "$wop\n</body>", $res);
+        if (preg_match('|</body>|i', $res)) {
+            $res = preg_replace('|</body>|i', "$wop\n</body>", $res);
         } else {
             $res .= $wop;
         }

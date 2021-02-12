@@ -12,14 +12,14 @@
 
 namespace Thelia\ImportExport\Export\Type;
 
-use PDO;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Content;
 
 /**
- * Class ContentExport
+ * Class ContentExport.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  * @author Florian Bernard <fbernard@openstudio.fr>
@@ -32,7 +32,7 @@ class ContentExport extends JsonFileAbstractExport
 
     public const EXPORT_DOCUMENT = true;
 
-    public const DIRECTORY_NAME = "content";
+    public const DIRECTORY_NAME = 'content';
 
     protected $orderAndAliases = [
         'content_id' => 'id',
@@ -47,20 +47,20 @@ class ContentExport extends JsonFileAbstractExport
         'rewriting_url_url' => 'url',
         'content_folder_folder_id' => 'folder_id',
         'content_folder_default_folder' => 'is_default_folder',
-        'folder_i18n_title' => 'folder_title'
+        'folder_i18n_title' => 'folder_title',
     ];
 
     /**
-     * Class constructor
+     * Class constructor.
      */
     public function __construct()
     {
         $this->imagesPaths = [
-            THELIA_ROOT . ConfigQuery::read('images_library_path') . DS . 'content'
+            THELIA_ROOT.ConfigQuery::read('images_library_path').DS.'content',
         ];
 
         $this->documentsPaths = [
-            THELIA_ROOT . ConfigQuery::read('documents_library_path') . DS . 'content'
+            THELIA_ROOT.ConfigQuery::read('documents_library_path').DS.'content',
         ];
     }
 

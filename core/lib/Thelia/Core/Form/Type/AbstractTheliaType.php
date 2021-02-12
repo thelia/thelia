@@ -16,8 +16,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class AbstractTheliaType
- * @package Thelia\Core\Form\Type
+ * Class AbstractTheliaType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  *
  * This class adds some tools for simple validation
@@ -26,6 +26,7 @@ abstract class AbstractTheliaType extends AbstractType
 {
     /**
      * @param $groups
+     *
      * @return array
      *
      * Replaces validation groups in constraints
@@ -45,29 +46,30 @@ abstract class AbstractTheliaType extends AbstractType
     }
 
     /**
-     * @param  string       $groups
+     * @param string $groups
+     *
      * @return array
      *
      * Get an array with the type's constraints loaded with groups
      */
-    protected function getConstraints(AbstractType $type, $groups = "Default")
+    protected function getConstraints(AbstractType $type, $groups = 'Default')
     {
         /**
-         * Create a resolver to get the options
+         * Create a resolver to get the options.
          */
         $nullResolver = new OptionsResolver();
         $type->configureOptions($nullResolver);
 
         $options = $nullResolver->resolve();
 
-        if (!isset($options["constraints"])) {
-            $options["constraints"] = [];
+        if (!isset($options['constraints'])) {
+            $options['constraints'] = [];
         }
 
         /**
-         * Then replace groups
+         * Then replace groups.
          */
-        $constraints = $this->replaceGroups($groups, $options["constraints"]);
+        $constraints = $this->replaceGroups($groups, $options['constraints']);
 
         return $constraints;
     }

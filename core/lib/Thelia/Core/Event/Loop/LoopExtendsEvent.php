@@ -16,8 +16,8 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Template\Element\BaseLoop;
 
 /**
- * Class LoopExtendsEvent
- * @package Thelia\Core\Event\Loop
+ * Class LoopExtendsEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class LoopExtendsEvent extends ActionEvent
@@ -27,7 +27,8 @@ class LoopExtendsEvent extends ActionEvent
 
     /**
      * LoopExtendsEvent constructor.
-     * @param null|BaseLoop $loop
+     *
+     * @param BaseLoop|null $loop
      */
     public function __construct(BaseLoop $loop)
     {
@@ -35,9 +36,9 @@ class LoopExtendsEvent extends ActionEvent
     }
 
     /**
-     * Get the loop
+     * Get the loop.
      *
-     * @return null|BaseLoop
+     * @return BaseLoop|null
      */
     public function getLoop()
     {
@@ -45,9 +46,9 @@ class LoopExtendsEvent extends ActionEvent
     }
 
     /**
-     * Get the loop name
+     * Get the loop name.
      *
-     * @return null|string
+     * @return string|null
      */
     public function getLoopName()
     {

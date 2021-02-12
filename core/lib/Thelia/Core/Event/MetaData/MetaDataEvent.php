@@ -16,8 +16,8 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\MetaData;
 
 /**
- * Class MetaDataEvent
- * @package Thelia\Core\Event\MetaData
+ * Class MetaDataEvent.
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class MetaDataEvent extends ActionEvent
@@ -30,7 +30,7 @@ class MetaDataEvent extends ActionEvent
     }
 
     /**
-     * @param null|\Thelia\Model\MetaData $metaData
+     * @param \Thelia\Model\MetaData|null $metaData
      *
      * @return $this
      */
@@ -42,7 +42,7 @@ class MetaDataEvent extends ActionEvent
     }
 
     /**
-     * @return null|\Thelia\Model\MetaData
+     * @return \Thelia\Model\MetaData|null
      */
     public function getMetaData()
     {

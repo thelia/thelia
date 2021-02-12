@@ -13,8 +13,6 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\Feature\FeatureEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Feature as BaseFeature;
 
 class Feature extends BaseFeature

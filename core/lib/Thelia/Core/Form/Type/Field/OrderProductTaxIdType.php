@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\OrderProductTaxQuery;
 
 /**
- * Class OrderProductTaxIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class OrderProductTaxIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class OrderProductTaxIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class OrderProductTaxIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "order_product_tax_id";
+        return 'order_product_tax_id';
     }
 }

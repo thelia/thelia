@@ -15,8 +15,8 @@ namespace VirtualProductDelivery\Events;
 use Thelia\Core\Event\ActionEvent;
 
 /**
- * Class VirtualProductDeliveryEvents
- * @package VirtualProductDelivery\Events
+ * Class VirtualProductDeliveryEvents.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class VirtualProductDeliveryEvents extends ActionEvent

@@ -18,8 +18,8 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
 use Thelia\Core\Translation\Translator;
 
 /**
- * Class HookModificationForm
- * @package Thelia\Form
+ * Class HookModificationForm.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookModificationForm extends HookCreationForm
@@ -31,24 +31,24 @@ class HookModificationForm extends HookCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", HiddenType::class, ["constraints" => [new GreaterThan(['value' => 0])]])
-            ->add("by_module", CheckboxType::class, [
-                "label" => Translator::getInstance()->trans("By Module"),
-                "required" => false,
-                "label_attr" => [
-                    "for" => "by_module",
-                    "help" => Translator::getInstance()->trans(
-                        "This hook is specific to a module (delivery/payment modules)."
+            ->add('id', HiddenType::class, ['constraints' => [new GreaterThan(['value' => 0])]])
+            ->add('by_module', CheckboxType::class, [
+                'label' => Translator::getInstance()->trans('By Module'),
+                'required' => false,
+                'label_attr' => [
+                    'for' => 'by_module',
+                    'help' => Translator::getInstance()->trans(
+                        'This hook is specific to a module (delivery/payment modules).'
                     ),
                 ],
             ])
-            ->add("block", CheckboxType::class, [
-                "label" => Translator::getInstance()->trans("Hook block"),
-                "required" => false,
-                "label_attr" => [
-                    "for" => "block",
-                    "help" => Translator::getInstance()->trans(
-                        "If checked, this hook will be used by a hook block. If not, by hook function."
+            ->add('block', CheckboxType::class, [
+                'label' => Translator::getInstance()->trans('Hook block'),
+                'required' => false,
+                'label_attr' => [
+                    'for' => 'block',
+                    'help' => Translator::getInstance()->trans(
+                        'If checked, this hook will be used by a hook block. If not, by hook function.'
                     ),
                 ],
             ])
@@ -60,6 +60,6 @@ class HookModificationForm extends HookCreationForm
 
     public static function getName()
     {
-        return "thelia_hook_modification";
+        return 'thelia_hook_modification';
     }
 }

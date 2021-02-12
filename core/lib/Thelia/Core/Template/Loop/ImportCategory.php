@@ -15,8 +15,8 @@ namespace Thelia\Core\Template\Loop;
 use Thelia\Model\ImportCategoryQuery;
 
 /**
- * Class ImportCategory
- * @package Thelia\Core\Template\Loop
+ * Class ImportCategory.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class ImportCategory extends ImportExportCategory

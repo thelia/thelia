@@ -19,7 +19,7 @@ class ContentFolder extends BaseContentFolder
     use \Thelia\Model\Tools\PositionManagementTrait;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function addCriteriaToPositionQuery(ContentFolderQuery $query)
     {

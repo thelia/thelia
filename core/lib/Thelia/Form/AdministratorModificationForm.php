@@ -25,16 +25,16 @@ class AdministratorModificationForm extends AdministratorCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", HiddenType::class, [
-                "required" => true,
-                "constraints" => [
+            ->add('id', HiddenType::class, [
+                'required' => true,
+                'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                                [$this, "verifyAdministratorId"]
+                                [$this, 'verifyAdministratorId']
                     ),
                 ],
-                "attr" => [
-                    "id" => "administrator_update_id",
+                'attr' => [
+                    'id' => 'administrator_update_id',
                 ],
             ])
         ;
@@ -48,7 +48,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
      */
     public static function getName()
     {
-        return "thelia_admin_administrator_modification";
+        return 'thelia_admin_administrator_modification';
     }
 
     public function verifyAdministratorId($value, ExecutionContextInterface $context)
@@ -57,7 +57,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
             ->findPk($value);
 
         if (null === $administrator) {
-            $context->addViolation(Translator::getInstance()->trans("Administrator ID not found"));
+            $context->addViolation(Translator::getInstance()->trans('Administrator ID not found'));
         }
     }
 
@@ -68,7 +68,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
         $administrator = AdminQuery::create()->findOneByLogin($value);
 
         if (null !== $administrator && $administrator->getId() != $data['id']) {
-            $context->addViolation($this->translator->trans("This administrator login already exists"));
+            $context->addViolation($this->translator->trans('This administrator login already exists'));
         }
     }
 
@@ -79,7 +79,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
         $administrator = AdminQuery::create()->findOneByEmail($value);
 
         if (null !== $administrator && $administrator->getId() != $data['id']) {
-            $context->addViolation($this->translator->trans("An administrator with this email address already exists"));
+            $context->addViolation($this->translator->trans('An administrator with this email address already exists'));
         }
     }
 
@@ -87,13 +87,13 @@ class AdministratorModificationForm extends AdministratorCreationForm
     {
         $data = $context->getRoot()->getData();
 
-        if (!empty($data["password"])) {
-            if ($data["password"] != $data["password_confirm"]) {
-                $context->addViolation(Translator::getInstance()->trans("password confirmation is not the same as password field"));
+        if (!empty($data['password'])) {
+            if ($data['password'] != $data['password_confirm']) {
+                $context->addViolation(Translator::getInstance()->trans('password confirmation is not the same as password field'));
             }
 
-            if ($data["password"] !== '' && \strlen($data["password"]) < 4) {
-                $context->addViolation(Translator::getInstance()->trans("password must be composed of at least 4 characters"));
+            if ($data['password'] !== '' && \strlen($data['password']) < 4) {
+                $context->addViolation(Translator::getInstance()->trans('password must be composed of at least 4 characters'));
             }
         }
     }

@@ -26,16 +26,15 @@ use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * Resource loop
+ * Resource loop.
  *
  * Class Resource
  *
- * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int getProfile()
+ *
+ * @method int      getProfile()
  * @method string[] getCode()
  * @method string[] getOrder()
  */
@@ -75,6 +74,7 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
 
     /**
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria|ResourceQuery
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function buildModelCriteria()
@@ -102,22 +102,22 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "id":
+                case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case "id_reverse":
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "title":
+                case 'title':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "title_reverse":
+                case 'title_reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "code":
+                case 'code':
                     $search->orderByCode(Criteria::ASC);
                     break;
-                case "code_reverse":
+                case 'code_reverse':
                     $search->orderByCode(Criteria::DESC);
                     break;
             }
@@ -128,6 +128,7 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
 
     /**
      * @return LoopResult
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function parseResults(LoopResult $loopResult)
@@ -135,24 +136,24 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
         /** @var ResourceModel $resource */
         foreach ($loopResult->getResultDataCollection() as $resource) {
             $loopResultRow = new LoopResultRow($resource);
-            $loopResultRow->set("ID", $resource->getId())
-                ->set("IS_TRANSLATED", $resource->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("CODE", $resource->getCode())
-                ->set("TITLE", $resource->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $resource->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $resource->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $resource->getVirtualColumn('i18n_POSTSCRIPTUM'))
+            $loopResultRow->set('ID', $resource->getId())
+                ->set('IS_TRANSLATED', $resource->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('CODE', $resource->getCode())
+                ->set('TITLE', $resource->getVirtualColumn('i18n_TITLE'))
+                ->set('CHAPO', $resource->getVirtualColumn('i18n_CHAPO'))
+                ->set('DESCRIPTION', $resource->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $resource->getVirtualColumn('i18n_POSTSCRIPTUM'))
             ;
 
             if (null !== $this->getProfile()) {
                 $accessValue = $resource->getVirtualColumn('access');
                 $manager = new AccessManager($accessValue);
 
-                $loopResultRow->set("VIEWABLE", $manager->can(AccessManager::VIEW)? 1 : 0)
-                    ->set("CREATABLE", $manager->can(AccessManager::CREATE) ? 1 : 0)
-                    ->set("UPDATABLE", $manager->can(AccessManager::UPDATE)? 1 : 0)
-                    ->set("DELETABLE", $manager->can(AccessManager::DELETE)? 1 : 0);
+                $loopResultRow->set('VIEWABLE', $manager->can(AccessManager::VIEW) ? 1 : 0)
+                    ->set('CREATABLE', $manager->can(AccessManager::CREATE) ? 1 : 0)
+                    ->set('UPDATABLE', $manager->can(AccessManager::UPDATE) ? 1 : 0)
+                    ->set('DELETABLE', $manager->can(AccessManager::DELETE) ? 1 : 0);
             }
 
             $this->addOutputFields($loopResultRow, $resource);

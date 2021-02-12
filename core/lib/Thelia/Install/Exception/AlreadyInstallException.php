@@ -13,8 +13,8 @@
 namespace Thelia\Install\Exception;
 
 /**
- * Class AlreadyInstallException
- * @package Thelia\Install\Exception
+ * Class AlreadyInstallException.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AlreadyInstallException extends InstallException

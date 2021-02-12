@@ -13,8 +13,6 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\Attribute\AttributeEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Attribute as BaseAttribute;
 
 class Attribute extends BaseAttribute

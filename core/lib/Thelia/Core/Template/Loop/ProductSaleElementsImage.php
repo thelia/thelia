@@ -22,20 +22,20 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\ProductSaleElementsProductImageQuery;
 
 /**
- * Class ProductSaleElementsImage
- * @package Thelia\Core\Template\Loop
+ * Class ProductSaleElementsImage.
+ *
  * @author Benjamin Perche <benjamin@thelia.net>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[] getProductSaleElementsId()
- * @method int[] getProductImageId()
+ *
+ * @method int[]    getId()
+ * @method int[]    getProductSaleElementsId()
+ * @method int[]    getProductImageId()
  * @method string[] getOrder()
  */
 class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInterface
 {
     /**
-     *
      * @return LoopResult
      */
     public function parseResults(LoopResult $loopResult)
@@ -45,9 +45,9 @@ class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInter
             $row = new LoopResultRow($productSaleElementImage);
 
             $row
-                ->set("ID", $productSaleElementImage->getId())
-                ->set("PRODUCT_SALE_ELEMENTS_ID", $productSaleElementImage->getProductSaleElementsId())
-                ->set("PRODUCT_IMAGE_ID", $productSaleElementImage->getProductImageId())
+                ->set('ID', $productSaleElementImage->getId())
+                ->set('PRODUCT_SALE_ELEMENTS_ID', $productSaleElementImage->getProductSaleElementsId())
+                ->set('PRODUCT_IMAGE_ID', $productSaleElementImage->getProductImageId())
             ;
 
             $this->addOutputFields($row, $productSaleElementImage);
@@ -58,7 +58,7 @@ class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInter
     }
 
     /**
-     * Definition of loop arguments
+     * Definition of loop arguments.
      *
      * example :
      *
@@ -84,22 +84,22 @@ class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInter
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument("id"),
-            Argument::createIntListTypeArgument("product_sale_elements_id"),
-            Argument::createIntListTypeArgument("product_image_id"),
+            Argument::createIntListTypeArgument('id'),
+            Argument::createIntListTypeArgument('product_sale_elements_id'),
+            Argument::createIntListTypeArgument('product_image_id'),
             Argument::createEnumListTypeArgument(
-                "order",
+                'order',
                 [
-                    "position",
-                    "position-reverse"
+                    'position',
+                    'position-reverse',
                 ],
-                "position"
+                'position'
             )
         );
     }
 
     /**
-     * this method returns a Propel ModelCriteria
+     * this method returns a Propel ModelCriteria.
      *
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      */
@@ -121,14 +121,14 @@ class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInter
 
         foreach ($this->getOrder() as $order) {
             switch ($order) {
-                case "position":
+                case 'position':
                     $query
                         ->useProductImageQuery()
                             ->orderByPosition(Criteria::ASC)
                         ->endUse()
                     ;
                     break;
-                case "position-reverse":
+                case 'position-reverse':
                     $query
                         ->useProductImageQuery()
                             ->orderByPosition(Criteria::DESC)

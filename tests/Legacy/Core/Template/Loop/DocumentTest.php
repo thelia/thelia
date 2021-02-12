@@ -12,7 +12,6 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Core\Template\Loop\Document;
 use Thelia\Model\CategoryDocumentQuery;
 use Thelia\Model\ContentDocumentQuery;
 use Thelia\Model\FolderDocumentQuery;
@@ -20,9 +19,7 @@ use Thelia\Model\ProductDocumentQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class DocumentTest extends BaseLoopTestor
 {

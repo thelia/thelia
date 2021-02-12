@@ -17,8 +17,8 @@ use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 
 /**
- * Class CurrencyTest
- * @package Thelia\Tests\Model
+ * Class CurrencyTest.
+ *
  * @author Gilles Bourgeat <gilles@thelia.net>
  */
 class CurrencyTest extends TestCase

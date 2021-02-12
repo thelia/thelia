@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Hook;
 
 /**
- * Class HookCreateEvent
- * @package Thelia\Core\Event\Hook
+ * Class HookCreateEvent.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookCreateAllEvent extends HookEvent
@@ -51,6 +51,7 @@ class HookCreateAllEvent extends HookEvent
 
     /**
      * @param string $locale
+     *
      * @return $this
      */
     public function setLocale($locale)
@@ -70,6 +71,7 @@ class HookCreateAllEvent extends HookEvent
 
     /**
      * @param bool $native
+     *
      * @return $this
      */
     public function setNative($native)
@@ -89,6 +91,7 @@ class HookCreateAllEvent extends HookEvent
 
     /**
      * @param string $title
+     *
      * @return $this
      */
     public function setTitle($title)
@@ -108,6 +111,7 @@ class HookCreateAllEvent extends HookEvent
 
     /**
      * @param int $type
+     *
      * @return $this
      */
     public function setType($type)
@@ -127,6 +131,7 @@ class HookCreateAllEvent extends HookEvent
 
     /**
      * @param bool $active
+     *
      * @return $this
      */
     public function setActive($active)
@@ -146,6 +151,7 @@ class HookCreateAllEvent extends HookEvent
 
     /**
      * @param string $code
+     *
      * @return $this
      */
     public function setCode($code)
@@ -165,6 +171,7 @@ class HookCreateAllEvent extends HookEvent
 
     /**
      * @param bool $block
+     *
      * @return $this
      */
     public function setBlock($block)
@@ -184,6 +191,7 @@ class HookCreateAllEvent extends HookEvent
 
     /**
      * @param bool $by_module
+     *
      * @return $this
      */
     public function setByModule($by_module)
@@ -203,6 +211,7 @@ class HookCreateAllEvent extends HookEvent
 
     /**
      * @param string $chapo
+     *
      * @return $this
      */
     public function setChapo($chapo)
@@ -222,6 +231,7 @@ class HookCreateAllEvent extends HookEvent
 
     /**
      * @param string $description
+     *
      * @return $this
      */
     public function setDescription($description)

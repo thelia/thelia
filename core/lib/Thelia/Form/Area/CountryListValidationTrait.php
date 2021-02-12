@@ -18,8 +18,8 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\StateQuery;
 
 /**
- * Class CountryListValidationTrait
- * @package Thelia\Form\Area
+ * Class CountryListValidationTrait.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 trait CountryListValidationTrait
@@ -36,13 +36,13 @@ trait CountryListValidationTrait
                 if (null === $country) {
                     $context->addViolation(
                         Translator::getInstance()->trans(
-                            "Country ID %id not found",
+                            'Country ID %id not found',
                             ['%id' => $item[0]]
                         )
                     );
                 }
 
-                if ($item[1] == "0") {
+                if ($item[1] == '0') {
                     continue;
                 }
 
@@ -50,13 +50,13 @@ trait CountryListValidationTrait
                 if (null === $state) {
                     $context->addViolation(
                         Translator::getInstance()->trans(
-                            "State ID %id not found",
+                            'State ID %id not found',
                             ['%id' => $item[1]]
                         )
                     );
                 }
             } else {
-                $context->addViolation(Translator::getInstance()->trans("Wrong country definition"));
+                $context->addViolation(Translator::getInstance()->trans('Wrong country definition'));
             }
         }
     }

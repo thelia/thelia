@@ -25,7 +25,7 @@ use Thelia\Model\Config;
 use Thelia\Model\ConfigQuery;
 
 /**
- * Manages variables
+ * Manages variables.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
@@ -63,7 +63,7 @@ class ConfigController extends AbstractCrudController
         $createEvent
             ->setEventName($data['name'])
             ->setValue($data['value'])
-            ->setLocale($data["locale"])
+            ->setLocale($data['locale'])
             ->setTitle($data['title'])
             ->setHidden($data['hidden'])
             ->setSecured($data['secured'])
@@ -82,7 +82,7 @@ class ConfigController extends AbstractCrudController
             ->setValue($data['value'])
             ->setHidden($data['hidden'])
             ->setSecured($data['secured'])
-            ->setLocale($data["locale"])
+            ->setLocale($data['locale'])
             ->setTitle($data['title'])
             ->setChapo($data['chapo'])
             ->setDescription($data['description'])
@@ -106,16 +106,16 @@ class ConfigController extends AbstractCrudController
     {
         // Prepare the data that will hydrate the form
         $data = [
-            'id'           => $object->getId(),
-            'name'         => $object->getName(),
-            'value'        => $object->getValue(),
-            'hidden'       => $object->getHidden(),
-            'secured'      => $object->getSecured(),
-            'locale'       => $object->getLocale(),
-            'title'        => $object->getTitle(),
-            'chapo'        => $object->getChapo(),
-            'description'  => $object->getDescription(),
-            'postscriptum' => $object->getPostscriptum()
+            'id' => $object->getId(),
+            'name' => $object->getName(),
+            'value' => $object->getValue(),
+            'hidden' => $object->getHidden(),
+            'secured' => $object->getSecured(),
+            'locale' => $object->getLocale(),
+            'title' => $object->getTitle(),
+            'chapo' => $object->getChapo(),
+            'description' => $object->getDescription(),
+            'postscriptum' => $object->getPostscriptum(),
         ];
 
         // Setup the object form
@@ -141,6 +141,7 @@ class ConfigController extends AbstractCrudController
 
     /**
      * @param Config $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
@@ -150,6 +151,7 @@ class ConfigController extends AbstractCrudController
 
     /**
      * @param Config $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -170,7 +172,7 @@ class ConfigController extends AbstractCrudController
     protected function redirectToEditionTemplate()
     {
         return $this->generateRedirectFromRoute(
-            "admin.configuration.variables.update",
+            'admin.configuration.variables.update',
             ['variable_id' => $this->getRequest()->get('variable_id')]
         );
     }
@@ -181,7 +183,7 @@ class ConfigController extends AbstractCrudController
     }
 
     /**
-     * Change values modified directly from the variable list
+     * Change values modified directly from the variable list.
      *
      * @return \Thelia\Core\HttpFoundation\Response the response
      */

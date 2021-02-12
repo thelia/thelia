@@ -21,8 +21,8 @@ use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 
 /**
- * Class Cache
- * @package Thelia\Action
+ * Class Cache.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  * @author Gilles Bourgeat <gilles.bourgeat@gmail.com>
  */
@@ -48,6 +48,7 @@ class Cache extends BaseAction implements EventSubscriberInterface
     {
         if (!$event->isOnKernelTerminate()) {
             $this->execCacheClear($event);
+
             return;
         }
 
@@ -89,7 +90,7 @@ class Cache extends BaseAction implements EventSubscriberInterface
         return [
             TheliaEvents::CACHE_CLEAR => ['cacheClear', 128],
             KernelEvents::TERMINATE => ['onTerminate', 128],
-            ConsoleEvents::TERMINATE => ['onTerminate', 128]
+            ConsoleEvents::TERMINATE => ['onTerminate', 128],
         ];
     }
 }

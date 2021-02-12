@@ -25,17 +25,18 @@ use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- * Class Hook
- * @package Thelia\Controller\Admin
+ * Class Hook.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method string[] getCode()
- * @method string[] getHook_type()
+ *
+ * @method int[]       getId()
+ * @method string[]    getCode()
+ * @method string[]    getHook_type()
  * @method bool|string getActive()
- * @method int[] getExclude()
- * @method string[] getOrder()
+ * @method int[]       getExclude()
+ * @method string[]    getOrder()
  */
 class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -69,7 +70,7 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
                 'order',
                 new TypeCollection(
                     new Type\EnumListType(['id', 'id_reverse', 'code', 'code_reverse', 'alpha', 'alpha_reverse',
-                        'manual', 'manual_reverse', 'enabled', 'enabled_reverse', 'native', 'native_reverse' ])
+                        'manual', 'manual_reverse', 'enabled', 'enabled_reverse', 'native', 'native_reverse', ])
                 ),
                 'id'
             ),
@@ -114,44 +115,44 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByActivate($active ? 1 : 0, Criteria::EQUAL);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "id":
+                case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case "id_reverse":
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha_reverse":
+                case 'alpha_reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "code":
+                case 'code':
                     $search->orderByCode(Criteria::ASC);
                     break;
-                case "code_reverse":
+                case 'code_reverse':
                     $search->orderByCode(Criteria::DESC);
                     break;
-                case "manual":
+                case 'manual':
                     $search->orderByPosition(Criteria::ASC);
                     break;
-                case "manual_reverse":
+                case 'manual_reverse':
                     $search->orderByPosition(Criteria::DESC);
                     break;
-                case "enabled":
+                case 'enabled':
                     $search->orderByActivate(Criteria::ASC);
                     break;
-                case "enabled_reverse":
+                case 'enabled_reverse':
                     $search->orderByActivate(Criteria::DESC);
                     break;
-                case "native":
+                case 'native':
                     $search->orderByNative(Criteria::ASC);
                     break;
-                case "native_reverse":
+                case 'native_reverse':
                     $search->orderByNative(Criteria::DESC);
                     break;
             }
@@ -171,19 +172,19 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResultRow = new LoopResultRow($hook);
 
                 $loopResultRow
-                    ->set("ID", $hook->getId())
-                    ->set("IS_TRANSLATED", $hook->getVirtualColumn('IS_TRANSLATED'))
-                    ->set("LOCALE", $this->locale)
-                    ->set("TITLE", $hook->getVirtualColumn('i18n_TITLE'))
-                    ->set("CHAPO", $hook->getVirtualColumn('i18n_CHAPO'))
-                    ->set("DESCRIPTION", $hook->getVirtualColumn('i18n_DESCRIPTION'))
-                    ->set("CODE", $hook->getCode())
-                    ->set("TYPE", $hook->getType())
-                    ->set("NATIVE", $hook->getNative())
-                    ->set("ACTIVE", $hook->getActivate())
-                    ->set("BY_MODULE", $hook->getByModule())
-                    ->set("BLOCK", $hook->getBlock())
-                    ->set("POSITION", $hook->getPosition())
+                    ->set('ID', $hook->getId())
+                    ->set('IS_TRANSLATED', $hook->getVirtualColumn('IS_TRANSLATED'))
+                    ->set('LOCALE', $this->locale)
+                    ->set('TITLE', $hook->getVirtualColumn('i18n_TITLE'))
+                    ->set('CHAPO', $hook->getVirtualColumn('i18n_CHAPO'))
+                    ->set('DESCRIPTION', $hook->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set('CODE', $hook->getCode())
+                    ->set('TYPE', $hook->getType())
+                    ->set('NATIVE', $hook->getNative())
+                    ->set('ACTIVE', $hook->getActivate())
+                    ->set('BY_MODULE', $hook->getByModule())
+                    ->set('BLOCK', $hook->getBlock())
+                    ->set('POSITION', $hook->getPosition())
                 ;
 
                 $this->addOutputFields($loopResultRow, $hook);

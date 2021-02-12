@@ -15,8 +15,8 @@ namespace Thelia\Tests\Rewriting;
 use Thelia\Model\Product;
 
 /**
- * Class ProductRewriteTest
- * @package Thelia\Tests\Rewriting
+ * Class ProductRewriteTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ProductRewriteTest extends BaseRewritingObject

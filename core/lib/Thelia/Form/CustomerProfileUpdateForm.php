@@ -19,8 +19,8 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
 
 /**
- * Class CustomerProfileUpdateForm
- * @package Thelia\Form
+ * Class CustomerProfileUpdateForm.
+ *
  * @author Christophe Laffont <claffont@openstudio.fr>
  */
 class CustomerProfileUpdateForm extends CustomerCreateForm
@@ -30,37 +30,37 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
         parent::buildForm();
 
         $this->formBuilder
-            ->remove("auto_login")
+            ->remove('auto_login')
             // Remove From Personal Informations
-            ->remove("phone")
-            ->remove("cellphone")
+            ->remove('phone')
+            ->remove('cellphone')
             // Remove Delivery Informations
-            ->remove("company")
-            ->remove("address1")
-            ->remove("address2")
-            ->remove("address3")
-            ->remove("city")
-            ->remove("zipcode")
-            ->remove("country")
-            ->remove("state")
+            ->remove('company')
+            ->remove('address1')
+            ->remove('address2')
+            ->remove('address3')
+            ->remove('city')
+            ->remove('zipcode')
+            ->remove('country')
+            ->remove('state')
             // Remove Login Information
-            ->remove("password")
-            ->remove("password_confirm")
+            ->remove('password')
+            ->remove('password_confirm')
         ;
 
-        $customerCanChangeEmail = ConfigQuery::read("customer_change_email");
-        $emailConfirmation = ConfigQuery::read("customer_confirm_email");
+        $customerCanChangeEmail = ConfigQuery::read('customer_change_email');
+        $emailConfirmation = ConfigQuery::read('customer_confirm_email');
 
-        if (! $customerCanChangeEmail) {
-            $currentOptions = $this->formBuilder->get("email")->getOptions();
-            $currentOptions["constraints"] = [];
-            $currentOptions["required"] = false;
+        if (!$customerCanChangeEmail) {
+            $currentOptions = $this->formBuilder->get('email')->getOptions();
+            $currentOptions['constraints'] = [];
+            $currentOptions['required'] = false;
 
-            $this->formBuilder->remove("email")->add("email", TextType::class, $currentOptions);
+            $this->formBuilder->remove('email')->add('email', TextType::class, $currentOptions);
         }
 
-        if ($this->formBuilder->has("email_confirm") && ! ($customerCanChangeEmail && $emailConfirmation)) {
-            $this->formBuilder->remove("email_confirm");
+        if ($this->formBuilder->has('email_confirm') && !($customerCanChangeEmail && $emailConfirmation)) {
+            $this->formBuilder->remove('email_confirm');
         }
     }
 
@@ -72,12 +72,12 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
         $customer = CustomerQuery::getCustomerByEmail($value);
         // If there is already a customer for this email address and if the customer is different from the current user, do a violation
         if ($customer && $customer->getId() != $this->getRequest()->getSession()->getCustomerUser()->getId()) {
-            $context->addViolation(Translator::getInstance()->trans("This email already exists."));
+            $context->addViolation(Translator::getInstance()->trans('This email already exists.'));
         }
     }
 
     public static function getName()
     {
-        return "thelia_customer_profile_update";
+        return 'thelia_customer_profile_update';
     }
 }

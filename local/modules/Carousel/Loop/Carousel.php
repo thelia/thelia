@@ -27,14 +27,14 @@ use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
 
 /**
- * Class CarouselLoop
- * @package Carousel\Loop
+ * Class CarouselLoop.
+ *
  * @author manuel raynaud <mraynaud@openstudio.fr>
  */
 class Carousel extends Image
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getArgDefinitions()
     {
@@ -66,15 +66,15 @@ class Carousel extends Image
     }
 
     /**
-     *
      * @return LoopResult
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function parseResults(LoopResult $loopResult)
     {
         /** @var \Carousel\Model\Carousel $carousel */
         foreach ($loopResult->getResultDataCollection() as $carousel) {
-            $imgSourcePath = $carousel->getUploadDir() . DS . $carousel->getFile();
+            $imgSourcePath = $carousel->getUploadDir().DS.$carousel->getFile();
             if (!file_exists($imgSourcePath)) {
                 Tlog::getInstance()->error(sprintf('Carousel source image file %s does not exists.', $imgSourcePath));
                 continue;
@@ -190,7 +190,7 @@ class Carousel extends Image
     }
 
     /**
-     * this method returns a Propel ModelCriteria
+     * this method returns a Propel ModelCriteria.
      *
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      */
@@ -199,34 +199,34 @@ class Carousel extends Image
         $search = CarouselQuery::create();
         $group = $this->getGroup();
 
-        $this->configureI18nProcessing($search, [ 'ALT', 'TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM' ]);
+        $this->configureI18nProcessing($search, ['ALT', 'TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM']);
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         // Results ordering
         foreach ($orders as $order) {
             switch ($order) {
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha-reverse":
+                case 'alpha-reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "manual-reverse":
+                case 'manual-reverse':
                     $search->orderByPosition(Criteria::DESC);
                     break;
-                case "manual":
+                case 'manual':
                     $search->orderByPosition(Criteria::ASC);
                     break;
-                case "random":
+                case 'random':
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
-                    break(2);
+                    break 2;
                     break;
             }
         }
 
-        if ($group){
+        if ($group) {
             $search->filterByGroup($group);
         }
 

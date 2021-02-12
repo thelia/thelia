@@ -15,12 +15,10 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Translation\Translator;
 use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
-use Thelia\Form\ModuleImageModification;
 use Thelia\Model\Base\ModuleImage as BaseModuleImage;
 use Thelia\Model\Tools\PositionManagementTrait;
 
@@ -29,7 +27,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
     use PositionManagementTrait;
 
     /**
-     * Set file parent id
+     * Set file parent id.
      *
      * @param int $parentId parent id
      *
@@ -43,7 +41,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
     }
 
     /**
-     * Get file parent id
+     * Get file parent id.
      *
      * @return int parent id
      */
@@ -61,7 +59,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
     }
 
     /**
-     * Get the ID of the form used to change this object information
+     * Get the ID of the form used to change this object information.
      *
      * @return BaseForm the form
      */
@@ -75,7 +73,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
      */
     public function getUploadDir()
     {
-        return THELIA_LOCAL_DIR . 'media' . DS . 'images' . DS . 'module';
+        return THELIA_LOCAL_DIR.'media'.DS.'images'.DS.'module';
     }
 
     /**
@@ -83,11 +81,11 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
      */
     public function getRedirectionUrl()
     {
-        return '/admin/module/update/' . $this->getModuleId();
+        return '/admin/module/update/'.$this->getModuleId();
     }
 
     /**
-     * Get the Query instance for this object
+     * Get the Query instance for this object.
      *
      * @return ModelCriteria
      */
@@ -97,7 +95,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
@@ -105,7 +103,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
 
         /** @var \Thelia\Model\Module */
         $module = $this->getModule();
-        $breadcrumb  = [
+        $breadcrumb = [
             $translator->trans('Home') => $router->generate('admin.home.view', [], Router::ABSOLUTE_URL),
             $translator->trans('Module') => $router->generate('admin.module', [], Router::ABSOLUTE_URL),
         ];
@@ -113,7 +111,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
         $module->setLocale($locale);
 
         $breadcrumb[$module->getTitle()] = sprintf(
-            "%s?current_tab=%s",
+            '%s?current_tab=%s',
             $router->generate(
                 'admin.module.update',
                 ['module_id' => $module->getId()],

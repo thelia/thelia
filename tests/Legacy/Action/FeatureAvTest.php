@@ -20,8 +20,8 @@ use Thelia\Model\FeatureAv as FeatureAvModel;
 use Thelia\Model\FeatureQuery;
 
 /**
- * Class FeatureAvTest
- * @package Thelia\Tests\Action
+ * Class FeatureAvTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FeatureAvTest extends BaseAction
@@ -70,6 +70,7 @@ class FeatureAvTest extends BaseAction
 
     /**
      * @depends testCreate
+     *
      * @return FeatureAvModel
      */
     public function testUpdate(FeatureAvModel $featureAv)

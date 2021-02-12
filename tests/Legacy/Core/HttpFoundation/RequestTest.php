@@ -15,10 +15,10 @@ namespace Thelia\Tests\Core\HttpFoundation;
 use PHPUnit\Framework\TestCase;
 
 /**
- * the the helpers addinf in Request class
+ * the the helpers addinf in Request class.
  *
  * Class RequestTest
- * @package Thelia\Tests\Core\HttpFoundation
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class RequestTest extends TestCase
@@ -30,25 +30,25 @@ class RequestTest extends TestCase
         );
 
         $request->expects($this->any())
-            ->method("getUri")
+            ->method('getUri')
             ->will($this->onConsecutiveCalls(
-                "http://localhost/",
-                "http://localhost/?test=fu"
+                'http://localhost/',
+                'http://localhost/?test=fu'
             ));
 
         $request->expects($this->any())
-            ->method("getQueryString")
+            ->method('getQueryString')
             ->will($this->onConsecutiveCalls(
-                "",
-                "test=fu"
+                '',
+                'test=fu'
             ));
 
-        $result = $request->getUriAddingParameters(["foo" => "bar"]);
+        $result = $request->getUriAddingParameters(['foo' => 'bar']);
 
-        $this->assertEquals("http://localhost/?foo=bar", $result);
+        $this->assertEquals('http://localhost/?foo=bar', $result);
 
-        $result = $request->getUriAddingParameters(["foo" => "bar"]);
+        $result = $request->getUriAddingParameters(['foo' => 'bar']);
 
-        $this->assertEquals("http://localhost/?test=fu&foo=bar", $result);
+        $this->assertEquals('http://localhost/?test=fu&foo=bar', $result);
     }
 }

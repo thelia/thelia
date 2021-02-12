@@ -15,7 +15,7 @@ namespace Thelia\TaxEngine;
 use Thelia\Type\TypeInterface;
 
 /**
- * This class defines a Tax type requirement
+ * This class defines a Tax type requirement.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
@@ -37,7 +37,7 @@ class TaxTypeRequirementDefinition
     protected $title;
 
     /**
-     * Create a new Tax type requirement
+     * Create a new Tax type requirement.
      *
      * @param string        $name the name of the requirement
      * @param TypeInterface $type the type of the data

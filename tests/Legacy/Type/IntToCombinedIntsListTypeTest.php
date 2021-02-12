@@ -16,9 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Thelia\Type\IntToCombinedIntsListType;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class IntToCombinedIntsListTypeTest extends TestCase
 {
@@ -36,16 +34,16 @@ class IntToCombinedIntsListTypeTest extends TestCase
             $type->getFormattedValue('1: 2 & 5 | (6 &7), 4: *, 67: (1 & 9)'),
             [
                 1 => [
-                    "values" => [2, 5, 6, 7],
-                    "expression" => '2&5|(6&7)',
+                    'values' => [2, 5, 6, 7],
+                    'expression' => '2&5|(6&7)',
                 ],
                 4 => [
-                    "values" => ['*'],
-                    "expression" => '*',
+                    'values' => ['*'],
+                    'expression' => '*',
                 ],
                 67 => [
-                    "values" => [1, 9],
-                    "expression" => '(1&9)',
+                    'values' => [1, 9],
+                    'expression' => '(1&9)',
                 ],
             ]
         );

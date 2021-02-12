@@ -12,13 +12,11 @@
 
 namespace Carousel\Model;
 
-use Carousel\Form\CarouselImageForm;
 use Carousel\Model\Base\Carousel as BaseCarousel;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
@@ -32,7 +30,7 @@ class Carousel extends BaseCarousel implements FileModelInterface
         $fs = new Filesystem();
 
         try {
-            $fs->remove($carousel->getUploadDir() . DS . $this->getFile());
+            $fs->remove($carousel->getUploadDir().DS.$this->getFile());
 
             return true;
         } catch (IOException $e) {
@@ -41,7 +39,7 @@ class Carousel extends BaseCarousel implements FileModelInterface
     }
 
     /**
-     * Set file parent id
+     * Set file parent id.
      *
      * @param int $parentId parent id
      *
@@ -53,7 +51,7 @@ class Carousel extends BaseCarousel implements FileModelInterface
     }
 
     /**
-     * Get file parent id
+     * Get file parent id.
      *
      * @return int parent id
      */
@@ -67,11 +65,11 @@ class Carousel extends BaseCarousel implements FileModelInterface
      */
     public function getParentFileModel()
     {
-        return new static;
+        return new static();
     }
 
     /**
-     * Get the ID of the form used to change this object information
+     * Get the ID of the form used to change this object information.
      *
      * @return BaseForm the form
      */
@@ -86,11 +84,11 @@ class Carousel extends BaseCarousel implements FileModelInterface
     public function getUploadDir()
     {
         $carousel = new \Carousel\Carousel();
+
         return $carousel->getUploadDir();
     }
 
     /**
-     *
      * @return string the URL to redirect to after update from the back-office
      */
     public function getRedirectionUrl()
@@ -99,7 +97,7 @@ class Carousel extends BaseCarousel implements FileModelInterface
     }
 
     /**
-     * Get the Query instance for this object
+     * Get the Query instance for this object.
      *
      * @return ModelCriteria
      */
@@ -109,7 +107,8 @@ class Carousel extends BaseCarousel implements FileModelInterface
     }
 
     /**
-     * @param  bool $visible true if the file is visible, false otherwise
+     * @param bool $visible true if the file is visible, false otherwise
+     *
      * @return FileModelInterface
      */
     public function setVisible($visible)

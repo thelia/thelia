@@ -29,13 +29,13 @@ class TokenProvider
         $data = explode("\0", base64_decode($key), 3);
 
         if (\count($data) !== 3) {
-            $data = ["", "", ""];
+            $data = ['', '', ''];
         }
 
         return [
             'username' => $data[0],
-            'token'    => $data[1],
-            'serial'   => $data[2]
+            'token' => $data[1],
+            'serial' => $data[2],
         ];
     }
 }

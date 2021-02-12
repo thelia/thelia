@@ -20,16 +20,16 @@ use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Form\BaseForm;
 
 /**
- * Class TheliaFormFactory
- * @package Thelia\Core\Form
+ * Class TheliaFormFactory.
+ *
  * @author Benjamin Perche <benjamin@thelia.net>
  */
 class TheliaFormFactory implements TheliaFormFactoryInterface
 {
-    /** @var RequestStack  */
+    /** @var RequestStack */
     protected $requestStack;
 
-    /** @var EventDispatcher  */
+    /** @var EventDispatcher */
     protected $eventDispatcher;
 
     /**

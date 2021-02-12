@@ -41,8 +41,8 @@ use Thelia\Module\ModuleManagement;
 use Thelia\Module\Validator\ModuleValidator;
 
 /**
- * Class Module
- * @package Thelia\Action
+ * Class Module.
+ *
  * @author  Manuel Raynaud <manu@raynaud.io>
  */
 class Module extends BaseAction implements EventSubscriberInterface
@@ -110,9 +110,11 @@ class Module extends BaseAction implements EventSubscriberInterface
     /**
      * Check if module can be activated : supported version of Thelia, module dependencies.
      *
-     * @param  \Thelia\Model\Module $module
-     * @throws Exception            if activation fails.
-     * @return bool                 true if the module can be activated, otherwise false
+     * @param \Thelia\Model\Module $module
+     *
+     * @throws Exception if activation fails
+     *
+     * @return bool true if the module can be activated, otherwise false
      */
     private function checkActivation($module)
     {
@@ -128,10 +130,11 @@ class Module extends BaseAction implements EventSubscriberInterface
 
     /**
      * Check if module can be deactivated safely because other modules
-     * could have dependencies to this module
+     * could have dependencies to this module.
      *
-     * @param  \Thelia\Model\Module $module
-     * @return bool                 true if the module can be deactivated, otherwise false
+     * @param \Thelia\Model\Module $module
+     *
+     * @return bool true if the module can be deactivated, otherwise false
      */
     private function checkDeactivation($module)
     {
@@ -159,7 +162,7 @@ class Module extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Get dependencies of the current module and activate it if needed
+     * Get dependencies of the current module and activate it if needed.
      *
      * @param $eventName
      */
@@ -170,7 +173,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             $dependencies = $moduleValidator->getCurrentModuleDependencies();
             foreach ($dependencies as $defMod) {
                 $submodule = ModuleQuery::create()
-                    ->findOneByCode($defMod["code"]);
+                    ->findOneByCode($defMod['code']);
                 if ($submodule && $submodule->getActivate() != BaseModule::IS_ACTIVATED) {
                     $subevent = new ModuleToggleActivationEvent($submodule->getId());
                     $subevent->setRecursive(true);
@@ -181,7 +184,7 @@ class Module extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Get modules having current module in dependence and deactivate it if needed
+     * Get modules having current module in dependence and deactivate it if needed.
      *
      * @param $eventName
      */
@@ -192,7 +195,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             $dependencies = $moduleValidator->getModulesDependOf(true);
             foreach ($dependencies as $defMod) {
                 $submodule = ModuleQuery::create()
-                    ->findOneByCode($defMod["code"]);
+                    ->findOneByCode($defMod['code']);
                 if ($submodule && $submodule->getActivate() == BaseModule::IS_ACTIVATED) {
                     $subevent = new ModuleToggleActivationEvent($submodule->getId());
                     $subevent->setRecursive(true);
@@ -336,7 +339,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 // disable the check of the module because it's already done
                 $toggleEvent->setNoCheck(true);
 
-                $dispatcher->dispatch($toggleEvent,TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+                $dispatcher->dispatch($toggleEvent, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
             }
 
             // delete
@@ -383,10 +386,9 @@ class Module extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Call the payment method of the payment module of the given order
+     * Call the payment method of the payment module of the given order.
      *
-     *
-     * @throws \RuntimeException if no payment module can be found.
+     * @throws \RuntimeException if no payment module can be found
      */
     public function pay(OrderPaymentEvent $event)
     {
@@ -396,10 +398,10 @@ class Module extends BaseAction implements EventSubscriberInterface
         if (null === $paymentModule = ModuleQuery::create()->findPk($order->getPaymentModuleId())) {
             throw new \RuntimeException(
                 Translator::getInstance()->trans(
-                    "Failed to find a payment Module with ID=%mid for order ID=%oid",
+                    'Failed to find a payment Module with ID=%mid for order ID=%oid',
                     [
-                        "%mid" => $order->getPaymentModuleId(),
-                        "%oid" => $order->getId()
+                        '%mid' => $order->getPaymentModuleId(),
+                        '%oid' => $order->getId(),
                     ]
                 )
             );
@@ -436,7 +438,7 @@ class Module extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

@@ -24,18 +24,21 @@ class SchemaCombinerTest extends TestCase
 {
     /**
      * Path of the XML Schema Definition (XSD) for Propel schema files.
+     *
      * @var string
      */
     protected static $PROPEL_SCHEMA_XSD_PATH;
 
     /**
      * Map of [database attributes inheritable by tables => corresponding table attribute].
+     *
      * @var array
      */
     protected static $DATABASE_INHERITABLE_ATTRIBUTES;
 
     /**
      * Path of the fixture files, relative to this file.
+     *
      * @var string
      */
     protected static $FIXTURES_PATH;
@@ -44,10 +47,10 @@ class SchemaCombinerTest extends TestCase
     {
         $fs = new Filesystem();
 
-        if ($fs->exists(THELIA_VENDOR . '/thelia/propel/resources/xsd/database.xsd')) {
-            self::$PROPEL_SCHEMA_XSD_PATH = THELIA_VENDOR . '/thelia/propel/resources/xsd/database.xsd';
+        if ($fs->exists(THELIA_VENDOR.'/thelia/propel/resources/xsd/database.xsd')) {
+            self::$PROPEL_SCHEMA_XSD_PATH = THELIA_VENDOR.'/thelia/propel/resources/xsd/database.xsd';
         } else {
-            self::$PROPEL_SCHEMA_XSD_PATH = THELIA_VENDOR . '/propel/propel/resources/xsd/database.xsd';
+            self::$PROPEL_SCHEMA_XSD_PATH = THELIA_VENDOR.'/propel/propel/resources/xsd/database.xsd';
         }
 
         $schemaProcessorReflection = new \ReflectionClass('Thelia\Core\Propel\Schema\SchemaCombiner');
@@ -56,7 +59,7 @@ class SchemaCombinerTest extends TestCase
         $databaseInheritableAttributesProperty->setAccessible(true);
         self::$DATABASE_INHERITABLE_ATTRIBUTES = $databaseInheritableAttributesProperty->getValue();
 
-        self::$FIXTURES_PATH = __DIR__ . '/Fixtures/schema/';
+        self::$FIXTURES_PATH = __DIR__.'/Fixtures/schema/';
     }
 
     public function combineExpectationsProvider()
@@ -65,7 +68,7 @@ class SchemaCombinerTest extends TestCase
     }
 
     /**
-     * @covers       Thelia\Core\Propel\Schema\SchemaCombiner
+     * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
     public function testOutputTypesAreCorrect(array $schemaFiles)
@@ -95,8 +98,10 @@ class SchemaCombinerTest extends TestCase
 
     /**
      * Load fixture files.
-     * @param array $files Fixture file names.
-     * @return array A map of [file name => \DOMDocument].
+     *
+     * @param array $files fixture file names
+     *
+     * @return array a map of [file name => \DOMDocument]
      */
     protected function loadFixtureFiles(array $files)
     {
@@ -104,7 +109,7 @@ class SchemaCombinerTest extends TestCase
 
         foreach ($files as $file) {
             $document = new \DOMDocument();
-            $document->load(self::$FIXTURES_PATH . $file);
+            $document->load(self::$FIXTURES_PATH.$file);
             $documents[$file] = $document;
         }
 
@@ -112,7 +117,7 @@ class SchemaCombinerTest extends TestCase
     }
 
     /**
-     * @covers       Thelia\Core\Propel\Schema\SchemaCombiner
+     * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
     public function testCombinedSchemasAreValid(array $schemaFiles)
@@ -129,7 +134,7 @@ class SchemaCombinerTest extends TestCase
     }
 
     /**
-     * @covers       Thelia\Core\Propel\Schema\SchemaCombiner
+     * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
     public function testOneGlobalSchemaPerDatabaseIsProduced(array $schemaFiles, array $expectedDatabases)
@@ -153,7 +158,7 @@ class SchemaCombinerTest extends TestCase
     }
 
     /**
-     * @covers       Thelia\Core\Propel\Schema\SchemaCombiner
+     * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
     public function testCombinedSchemasContainOnlyOneDatabaseElement(array $schemaFiles)
@@ -174,7 +179,7 @@ class SchemaCombinerTest extends TestCase
     }
 
     /**
-     * @covers       Thelia\Core\Propel\Schema\SchemaCombiner
+     * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
     public function testDatabaseElementsAreCorrectlyNamed(array $schemaFiles)
@@ -196,7 +201,7 @@ class SchemaCombinerTest extends TestCase
     }
 
     /**
-     * @covers       Thelia\Core\Propel\Schema\SchemaCombiner
+     * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
     public function testDatabaseElementsHaveIdentifierQuotingActive(array $schemaFiles)
@@ -218,7 +223,7 @@ class SchemaCombinerTest extends TestCase
     }
 
     /**
-     * @covers       Thelia\Core\Propel\Schema\SchemaCombiner
+     * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
     public function testDatabaseElementsHaveNoTablePrefixAttribute(array $schemaFiles)
@@ -234,13 +239,13 @@ class SchemaCombinerTest extends TestCase
             $this->assertFalse(
                 $databaseElement->hasAttribute('tablePrefix'),
                 "Element for database '{$database}' should not have a 'tablePrefix' attribute"
-                . " (tables will be prefixed)."
+                .' (tables will be prefixed).'
             );
         }
     }
 
     /**
-     * @covers       Thelia\Core\Propel\Schema\SchemaCombiner
+     * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
     public function testDatabaseElementsHaveNoInheritableAttributes(array $schemaFiles)
@@ -257,14 +262,14 @@ class SchemaCombinerTest extends TestCase
                 $this->assertFalse(
                     $databaseElement->hasAttribute($databaseInheritableAttribute),
                     "Element for database '{$database}'"
-                    . " should not have inheritable attribute '{$databaseInheritableAttribute}' (it will be inherited)."
+                    ." should not have inheritable attribute '{$databaseInheritableAttribute}' (it will be inherited)."
                 );
             }
         }
     }
 
     /**
-     * @covers       Thelia\Core\Propel\Schema\SchemaCombiner
+     * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
     public function testDatabaseElementsHaveNoExternalSchemaElements(array $schemaFiles)
@@ -285,7 +290,7 @@ class SchemaCombinerTest extends TestCase
     }
 
     /**
-     * @covers       Thelia\Core\Propel\Schema\SchemaCombiner
+     * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
     public function testExpectedTableElementsAreGenerated(array $schemaFiles, array $expectedDatabases)
@@ -336,7 +341,7 @@ class SchemaCombinerTest extends TestCase
     }
 
     /**
-     * @covers       Thelia\Core\Propel\Schema\SchemaCombiner
+     * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
     public function testInheritableDatabaseAttributesAreInheritedOnTables(array $schemaFiles, array $expectedDatabases)
@@ -367,7 +372,7 @@ class SchemaCombinerTest extends TestCase
                     $this->assertTrue(
                         $tableElement->hasAttribute($expectedAttributeName),
                         "Attribute '{$expectedAttributeName}' is missing on table '{$table}'"
-                        . " (database '{$database}')."
+                        ." (database '{$database}')."
                     );
 
                     $expectedAttributeValue = $attributeExpectations['value'];
@@ -377,8 +382,8 @@ class SchemaCombinerTest extends TestCase
                         $tableElement->getAttribute($expectedAttributeName),
                         $attributeExpectations['value'],
                         "Incorrect value for attribute '{$expectedAttributeName}' on table '{$table}'"
-                        . " (database '{$database}'). "
-                        . "Should be '{$expectedAttributeValue}', from the {$expectedAttributeSource}."
+                        ." (database '{$database}'). "
+                        ."Should be '{$expectedAttributeValue}', from the {$expectedAttributeSource}."
                     );
                 }
             }
@@ -386,7 +391,7 @@ class SchemaCombinerTest extends TestCase
     }
 
     /**
-     * @covers       Thelia\Core\Propel\Schema\SchemaCombiner
+     * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
      * @dataProvider combineExpectationsProvider
      */
     public function testTableElementsContentIsPreserved(array $schemaFiles, array $expectedDatabases)
@@ -433,9 +438,11 @@ class SchemaCombinerTest extends TestCase
     }
 
     /**
-     * Canonicalize child nodes of a nodes to a string
-     * @param \DOMNode $node Source node.
-     * @return string Child nodes as a string.
+     * Canonicalize child nodes of a nodes to a string.
+     *
+     * @param \DOMNode $node source node
+     *
+     * @return string child nodes as a string
      */
     protected function c14nChildNodes(\DOMNode $node)
     {

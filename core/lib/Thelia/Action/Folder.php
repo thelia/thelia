@@ -32,8 +32,8 @@ use Thelia\Model\FolderQuery;
 use Thelia\Model\Map\FolderTableMap;
 
 /**
- * Class Folder
- * @package Thelia\Action
+ * Class Folder.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Folder extends BaseAction implements EventSubscriberInterface
@@ -50,17 +50,17 @@ class Folder extends BaseAction implements EventSubscriberInterface
                 ->setChapo($event->getChapo())
                 ->setPostscriptum($event->getPostscriptum())
                 ->save();
-            ;
 
             $event->setFolder($folder);
         }
     }
 
     /**
-     * Change Folder SEO
+     * Change Folder SEO.
      *
      * @param $eventName
-     * @return Object
+     *
+     * @return object
      */
     public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -151,7 +151,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Check if is a folder view and if folder_id is visible
+     * Check if is a folder view and if folder_id is visible.
      *
      * @param string $eventName
      */
@@ -164,7 +164,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
                 ->count();
 
             if ($folder == 0) {
-                $dispatcher->dispatch($event,TheliaEvents::VIEW_FOLDER_ID_NOT_VISIBLE);
+                $dispatcher->dispatch($event, TheliaEvents::VIEW_FOLDER_ID_NOT_VISIBLE);
             }
         }
     }
@@ -183,16 +183,16 @@ class Folder extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::FOLDER_CREATE            => ["create", 128],
-            TheliaEvents::FOLDER_UPDATE            => ["update", 128],
-            TheliaEvents::FOLDER_DELETE            => ["delete", 128],
-            TheliaEvents::FOLDER_TOGGLE_VISIBILITY => ["toggleVisibility", 128],
+            TheliaEvents::FOLDER_CREATE => ['create', 128],
+            TheliaEvents::FOLDER_UPDATE => ['update', 128],
+            TheliaEvents::FOLDER_DELETE => ['delete', 128],
+            TheliaEvents::FOLDER_TOGGLE_VISIBILITY => ['toggleVisibility', 128],
 
-            TheliaEvents::FOLDER_UPDATE_POSITION   => ["updatePosition", 128],
-            TheliaEvents::FOLDER_UPDATE_SEO        => ['updateSeo', 128],
+            TheliaEvents::FOLDER_UPDATE_POSITION => ['updatePosition', 128],
+            TheliaEvents::FOLDER_UPDATE_SEO => ['updateSeo', 128],
 
-            TheliaEvents::VIEW_CHECK                    => ['viewCheck', 128],
-            TheliaEvents::VIEW_FOLDER_ID_NOT_VISIBLE    => ['viewFolderIdNotVisible', 128],
+            TheliaEvents::VIEW_CHECK => ['viewCheck', 128],
+            TheliaEvents::VIEW_FOLDER_ID_NOT_VISIBLE => ['viewFolderIdNotVisible', 128],
         ];
     }
 }

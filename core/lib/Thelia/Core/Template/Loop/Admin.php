@@ -23,15 +23,14 @@ use Thelia\Model\Admin as AdminModel;
 use Thelia\Model\AdminQuery;
 
 /**
- *
- * Admin loop
- *
+ * Admin loop.
  *
  * Class Admin
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
+ *
  * @method int[] getId()
  * @method int[] getProfile()
  */
@@ -76,13 +75,13 @@ class Admin extends BaseLoop implements PropelSearchLoopInterface
         /** @var AdminModel $admin */
         foreach ($loopResult->getResultDataCollection() as $admin) {
             $loopResultRow = new LoopResultRow($admin);
-            $loopResultRow->set("ID", $admin->getId())
-                ->set("PROFILE", $admin->getProfileId())
-                ->set("FIRSTNAME", $admin->getFirstname())
-                ->set("LASTNAME", $admin->getLastname())
-                ->set("LOGIN", $admin->getLogin())
-                ->set("LOCALE", $admin->getLocale())
-                ->set("EMAIL", $admin->getEmail())
+            $loopResultRow->set('ID', $admin->getId())
+                ->set('PROFILE', $admin->getProfileId())
+                ->set('FIRSTNAME', $admin->getFirstname())
+                ->set('LASTNAME', $admin->getLastname())
+                ->set('LOGIN', $admin->getLogin())
+                ->set('LOCALE', $admin->getLocale())
+                ->set('EMAIL', $admin->getEmail())
             ;
             $this->addOutputFields($loopResultRow, $admin);
 

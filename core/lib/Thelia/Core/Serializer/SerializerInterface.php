@@ -15,48 +15,49 @@ namespace Thelia\Core\Serializer;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**
- * Interface SerializerInterface
+ * Interface SerializerInterface.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 interface SerializerInterface
 {
     /**
-     * Get serializer identifier
+     * Get serializer identifier.
      *
      * @return string The serializer identifier
      */
     public function getId();
 
     /**
-     * Get serializer name
+     * Get serializer name.
      *
      * @return string The serializer name
      */
     public function getName();
 
     /**
-     * Get serializer extension
+     * Get serializer extension.
      *
      * @return string The serializer extension
      */
     public function getExtension();
 
     /**
-     * Get serializer mime type
+     * Get serializer mime type.
      *
      * @return string The serializer mime type
      */
     public function getMimeType();
 
     /**
-     * Prepare file to receive serialized data
+     * Prepare file to receive serialized data.
      *
      * @param \SplFileObject $fileObject A file object
      */
     public function prepareFile(\SplFileObject $fileObject);
 
     /**
-     * Serialize data
+     * Serialize data.
      *
      * @param mixed $data Data to serialize
      *
@@ -65,21 +66,21 @@ interface SerializerInterface
     public function serialize($data);
 
     /**
-     * Get string that separate serialized data
+     * Get string that separate serialized data.
      *
-     * @return null|string Wrap separator string
+     * @return string|null Wrap separator string
      */
     public function separator();
 
     /**
-     * Finalize file with serialized data
+     * Finalize file with serialized data.
      *
      * @param \SplFileObject $fileObject A file object
      */
     public function finalizeFile(\SplFileObject $fileObject);
 
     /**
-     * Unserialize data
+     * Unserialize data.
      *
      * @param \SplFileObject $fileObject A file object
      *

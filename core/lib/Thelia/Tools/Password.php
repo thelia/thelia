@@ -13,15 +13,15 @@
 namespace Thelia\Tools;
 
 /**
- * Class Password
- * @package Thelia\Tools
+ * Class Password.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Password
 {
     private static function randgen($letter, $length)
     {
-        $string = "";
+        $string = '';
         do {
             $string .= substr(str_shuffle($letter), 0, 1);
         } while (\strlen($string) < $length);
@@ -30,23 +30,23 @@ class Password
     }
 
     /**
-     * generate a Random password with defined length
+     * generate a Random password with defined length.
      *
-     * @param  int   $length
+     * @param int $length
      */
     public static function generateRandom($length = 8)
     {
-        $letter = "abcdefghijklmnopqrstuvwxyz";
-        $letter .= "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        $letter .= "0123456789";
+        $letter = 'abcdefghijklmnopqrstuvwxyz';
+        $letter .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $letter .= '0123456789';
 
         return self::randgen($letter, $length);
     }
 
     public static function generateHexaRandom($length = 8)
     {
-        $letter = "ABCDEF";
-        $letter .= "0123456789";
+        $letter = 'ABCDEF';
+        $letter .= '0123456789';
 
         return self::randgen($letter, $length);
     }

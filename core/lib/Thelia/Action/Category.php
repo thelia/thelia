@@ -38,7 +38,7 @@ use Thelia\Model\Map\CategoryTableMap;
 class Category extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * Create a new category entry
+     * Create a new category entry.
      *
      * @param $eventName
      */
@@ -59,7 +59,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Change a category
+     * Change a category.
      *
      * @param $eventName
      */
@@ -84,10 +84,11 @@ class Category extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Change a Category SEO
+     * Change a Category SEO.
      *
      * @param $eventName
-     * @return Object
+     *
+     * @return object
      */
     public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -95,9 +96,10 @@ class Category extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Delete a category entry
+     * Delete a category entry.
      *
      * @param $eventName
+     *
      * @throws \Exception
      */
     public function delete(CategoryDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -141,7 +143,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Toggle category visibility. No form used here
+     * Toggle category visibility. No form used here.
      *
      * @param $eventName
      */
@@ -196,7 +198,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Check if is a category view and if category_id is visible
+     * Check if is a category view and if category_id is visible.
      *
      * @param string $eventName
      */
@@ -228,19 +230,19 @@ class Category extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::CATEGORY_CREATE            => ["create", 128],
-            TheliaEvents::CATEGORY_UPDATE            => ["update", 128],
-            TheliaEvents::CATEGORY_DELETE            => ["delete", 128],
-            TheliaEvents::CATEGORY_TOGGLE_VISIBILITY => ["toggleVisibility", 128],
+            TheliaEvents::CATEGORY_CREATE => ['create', 128],
+            TheliaEvents::CATEGORY_UPDATE => ['update', 128],
+            TheliaEvents::CATEGORY_DELETE => ['delete', 128],
+            TheliaEvents::CATEGORY_TOGGLE_VISIBILITY => ['toggleVisibility', 128],
 
-            TheliaEvents::CATEGORY_UPDATE_POSITION   => ["updatePosition", 128],
-            TheliaEvents::CATEGORY_UPDATE_SEO        => ["updateSeo", 128],
+            TheliaEvents::CATEGORY_UPDATE_POSITION => ['updatePosition', 128],
+            TheliaEvents::CATEGORY_UPDATE_SEO => ['updateSeo', 128],
 
-            TheliaEvents::CATEGORY_ADD_CONTENT       => ["addContent", 128],
-            TheliaEvents::CATEGORY_REMOVE_CONTENT    => ["removeContent", 128],
+            TheliaEvents::CATEGORY_ADD_CONTENT => ['addContent', 128],
+            TheliaEvents::CATEGORY_REMOVE_CONTENT => ['removeContent', 128],
 
-            TheliaEvents::VIEW_CHECK                    => ['viewCheck', 128],
-            TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE  => ['viewcategoryIdNotVisible', 128],
+            TheliaEvents::VIEW_CHECK => ['viewCheck', 128],
+            TheliaEvents::VIEW_CATEGORY_ID_NOT_VISIBLE => ['viewcategoryIdNotVisible', 128],
         ];
     }
 }

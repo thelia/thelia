@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\CustomerQuery;
 
 /**
- * Class CustomerIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class CustomerIdType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class CustomerIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class CustomerIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "customer_id";
+        return 'customer_id';
     }
 }

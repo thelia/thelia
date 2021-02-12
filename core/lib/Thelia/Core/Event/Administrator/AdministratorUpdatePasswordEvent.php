@@ -16,8 +16,8 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Admin;
 
 /**
- * Class AdministratorUpdatePasswordEvent
- * @package Thelia\Core\Event\Administrator
+ * Class AdministratorUpdatePasswordEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AdministratorUpdatePasswordEvent extends ActionEvent
@@ -55,8 +55,6 @@ class AdministratorUpdatePasswordEvent extends ActionEvent
         return $this->password;
     }
 
-    /**
-     */
     public function setAdmin(Admin $admin)
     {
         $this->admin = $admin;

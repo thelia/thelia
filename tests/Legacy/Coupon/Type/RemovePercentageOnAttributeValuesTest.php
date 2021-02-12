@@ -24,13 +24,12 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
 
 /**
- * @package Coupon
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class RemovePercentageOnAttributeValuesTest extends TestCase
 {
     /**
-     * Generate adapter stub
+     * Generate adapter stub.
      *
      * @param int    $cartTotalPrice   Cart total price
      * @param string $checkoutCurrency Checkout currency
@@ -121,7 +120,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
         $pse2 = $this->getMockBuilder('\Thelia\Model\ProductSaleElements')
             ->disableOriginalConstructor()
             ->getMock();
-        ;
+
         $pse2
             ->expects($this->any())
             ->method('getAttributeCombinations')
@@ -146,7 +145,8 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
             ->expects($this->any())
             ->method('getRealTaxedPrice')
             ->will($this->returnValue(100))
-        ;$cartItem1Stub
+        ;
+        $cartItem1Stub
             ->expects($this->any())
             ->method('getTotalRealTaxedPrice')
             ->will($this->returnValue(100))
@@ -170,7 +170,8 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
             ->expects($this->any())
             ->method('getRealTaxedPrice')
             ->will($this->returnValue(150))
-        ;$cartItem2Stub
+        ;
+        $cartItem2Stub
             ->expects($this->any())
             ->method('getTotalRealTaxedPrice')
             ->will($this->returnValue(300))
@@ -237,7 +238,8 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
             ->expects($this->any())
             ->method('getRealTaxedPrice')
             ->will($this->returnValue(100))
-        ;$cartItem1Stub
+        ;
+        $cartItem1Stub
             ->expects($this->any())
             ->method('getTotalRealTaxedPrice')
             ->will($this->returnValue(100))
@@ -277,7 +279,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false
@@ -286,22 +288,22 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+            MatchForTotalAmount::CART_CURRENCY => 'EUR',
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+            MatchForTotalAmount::CART_CURRENCY => 'EUR',
         ];
         $condition2->setValidatorsFromForm($operators, $values);
 
@@ -344,7 +346,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false
@@ -375,7 +377,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false
@@ -406,7 +408,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false

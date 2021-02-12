@@ -27,7 +27,7 @@ class TlogTest extends TestCase
 
         self::$logger->setDestinations("Thelia\Log\Destination\TlogDestinationText");
         self::$logger->setLevel(Tlog::DEBUG);
-        self::$logger->setFiles("*");
+        self::$logger->setFiles('*');
     }
 
     public function testDebugWithDebugLevel()
@@ -36,8 +36,8 @@ class TlogTest extends TestCase
         $logger->setLevel(Tlog::DEBUG);
 
         //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
-        $this->expectOutputRegex(sprintf($this->regex, "DEBUG", "foo"));
-        $logger->debug("foo");
+        $this->expectOutputRegex(sprintf($this->regex, 'DEBUG', 'foo'));
+        $logger->debug('foo');
     }
 
     public function testDebugWithoutDebugLevel()
@@ -45,8 +45,8 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);
 
-        $this->expectOutputRegex("/^$/");
-        $logger->debug("foo");
+        $this->expectOutputRegex('/^$/');
+        $logger->debug('foo');
     }
 
     public function testDebugWithInfoLevel()
@@ -55,8 +55,8 @@ class TlogTest extends TestCase
         $logger->setLevel(Tlog::INFO);
 
         //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
-        $this->expectOutputRegex(sprintf($this->regex, "INFO", "foo"));
-        $logger->info("foo");
+        $this->expectOutputRegex(sprintf($this->regex, 'INFO', 'foo'));
+        $logger->info('foo');
     }
 
     public function testDebugWithoutInfoLevel()
@@ -64,8 +64,8 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);
 
-        $this->expectOutputRegex("/^$/");
-        $logger->info("foo");
+        $this->expectOutputRegex('/^$/');
+        $logger->info('foo');
     }
 
     public function testDebugWithNoticeLevel()
@@ -74,8 +74,8 @@ class TlogTest extends TestCase
         $logger->setLevel(Tlog::NOTICE);
 
         //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
-        $this->expectOutputRegex(sprintf($this->regex, "NOTICE", "foo"));
-        $logger->notice("foo");
+        $this->expectOutputRegex(sprintf($this->regex, 'NOTICE', 'foo'));
+        $logger->notice('foo');
     }
 
     public function testDebugWithoutNoticeLevel()
@@ -83,8 +83,8 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);
 
-        $this->expectOutputRegex("/^$/");
-        $logger->notice("foo");
+        $this->expectOutputRegex('/^$/');
+        $logger->notice('foo');
     }
 
     public function testWarningWithWarningLevel()
@@ -93,8 +93,8 @@ class TlogTest extends TestCase
         $logger->setLevel(Tlog::WARNING);
 
         //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
-        $this->expectOutputRegex(sprintf($this->regex, "WARNING", "foo"));
-        $logger->warning("foo");
+        $this->expectOutputRegex(sprintf($this->regex, 'WARNING', 'foo'));
+        $logger->warning('foo');
     }
 
     public function testWarningWithoutWarningLevel()
@@ -102,8 +102,8 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);
 
-        $this->expectOutputRegex("/^$/");
-        $logger->warning("foo");
+        $this->expectOutputRegex('/^$/');
+        $logger->warning('foo');
     }
 
     public function testErrorWithErrorLevel()
@@ -112,8 +112,8 @@ class TlogTest extends TestCase
         $logger->setLevel(Tlog::ERROR);
 
         //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
-        $this->expectOutputRegex(sprintf($this->regex, "ERROR", "foo"));
-        $logger->error("foo");
+        $this->expectOutputRegex(sprintf($this->regex, 'ERROR', 'foo'));
+        $logger->error('foo');
     }
 
     public function testErrorWithoutErrorLevel()
@@ -121,8 +121,8 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);
 
-        $this->expectOutputRegex("/^$/");
-        $logger->error("foo");
+        $this->expectOutputRegex('/^$/');
+        $logger->error('foo');
     }
 
     public function testErrorWithCriticalLevel()
@@ -131,8 +131,8 @@ class TlogTest extends TestCase
         $logger->setLevel(Tlog::CRITICAL);
 
         //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
-        $this->expectOutputRegex(sprintf($this->regex, "CRITICAL", "foo"));
-        $logger->critical("foo");
+        $this->expectOutputRegex(sprintf($this->regex, 'CRITICAL', 'foo'));
+        $logger->critical('foo');
     }
 
     public function testErrorWithoutCriticalLevel()
@@ -140,8 +140,8 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);
 
-        $this->expectOutputRegex("/^$/");
-        $logger->critical("foo");
+        $this->expectOutputRegex('/^$/');
+        $logger->critical('foo');
     }
 
     public function testErrorWithAlertLevel()
@@ -150,8 +150,8 @@ class TlogTest extends TestCase
         $logger->setLevel(Tlog::ALERT);
 
         //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
-        $this->expectOutputRegex(sprintf($this->regex, "ALERT", "foo"));
-        $logger->alert("foo");
+        $this->expectOutputRegex(sprintf($this->regex, 'ALERT', 'foo'));
+        $logger->alert('foo');
     }
 
     public function testErrorWithoutAlertLevel()
@@ -159,8 +159,8 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);
 
-        $this->expectOutputRegex("/^$/");
-        $logger->alert("foo");
+        $this->expectOutputRegex('/^$/');
+        $logger->alert('foo');
     }
 
     public function testErrorWithEmergencyLevel()
@@ -169,8 +169,8 @@ class TlogTest extends TestCase
         $logger->setLevel(Tlog::EMERGENCY);
 
         //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
-        $this->expectOutputRegex(sprintf($this->regex, "EMERGENCY", "foo"));
-        $logger->emergency("foo");
+        $this->expectOutputRegex(sprintf($this->regex, 'EMERGENCY', 'foo'));
+        $logger->emergency('foo');
     }
 
     public function testErrorWithoutEmergencyLevel()
@@ -178,7 +178,7 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::MUET);
 
-        $this->expectOutputRegex("/^$/");
-        $logger->emergency("foo");
+        $this->expectOutputRegex('/^$/');
+        $logger->emergency('foo');
     }
 }

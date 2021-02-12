@@ -80,7 +80,8 @@ class ProductUpdateEvent extends ProductCreateEvent
     }
 
     /**
-     * @param  int   $brand_id
+     * @param int $brand_id
+     *
      * @return $this
      */
     public function setBrandId($brand_id)
@@ -99,7 +100,6 @@ class ProductUpdateEvent extends ProductCreateEvent
     }
 
     /**
-     *
      * @return $this
      */
     public function setVirtualDocumentId($virtual_document_id)
@@ -109,8 +109,6 @@ class ProductUpdateEvent extends ProductCreateEvent
         return $this;
     }
 
-    /**
-     */
     public function getVirtualDocumentId()
     {
         return $this->virtual_document_id;

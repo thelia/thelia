@@ -14,16 +14,13 @@ namespace Thelia\Core\Template\Element;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 
-/**
- *
- */
 trait StandardI18nFieldsSearchTrait
 {
     protected static $standardI18nSearchFields = [
-        "title",
-        "chapo",
-        "description",
-        "postscriptum"
+        'title',
+        'chapo',
+        'description',
+        'postscriptum',
     ];
 
     protected function getStandardI18nSearchFields()
@@ -31,13 +28,13 @@ trait StandardI18nFieldsSearchTrait
         return self::$standardI18nSearchFields;
     }
 
-     /**
+    /**
      * @param ModelCriteria $search
      * @param $searchTerm
      * @param $searchCriteria
      * @param string[] $searchIn
      */
-    protected function addStandardI18nSearch(&$search, $searchTerm, $searchCriteria, $searchIn = [ "title", "chapo", "description", "postscriptum" ])
+    protected function addStandardI18nSearch(&$search, $searchTerm, $searchCriteria, $searchIn = ['title', 'chapo', 'description', 'postscriptum'])
     {
         $firstSearch = true;
         foreach (self::$standardI18nSearchFields as $searchInElement) {

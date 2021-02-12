@@ -18,8 +18,8 @@ use Thelia\Form\BaseForm;
 use Thelia\Model\LangQuery;
 
 /**
- * Class LangUrlForm
- * @package Thelia\Form\Lang
+ * Class LangUrlForm.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangUrlForm extends BaseForm
@@ -27,9 +27,8 @@ class LangUrlForm extends BaseForm
     public const LANG_PREFIX = 'url_';
 
     /**
-     *
      * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
+     * Form this you have to call add method on $this->formBuilder attribute :.
      *
      * $this->formBuilder->add("name", TextType::class)
      *   ->add("email", EmailType::class, array(
@@ -56,10 +55,10 @@ class LangUrlForm extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                     ],
-                    "attr" => [
-                        "tag" => "url",
-                        "url_id" => $lang->getId(),
-                        "url_title" => $lang->getTitle(),
+                    'attr' => [
+                        'tag' => 'url',
+                        'url_id' => $lang->getId(),
+                        'url_title' => $lang->getTitle(),
                     ],
                 ]
             );

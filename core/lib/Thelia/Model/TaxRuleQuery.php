@@ -19,12 +19,9 @@ use Thelia\Model\Map\TaxRuleCountryTableMap;
 /**
  * Skeleton subclass for performing query and update operations on the 'tax_rule' table.
  *
- *
- *
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
- *
  */
 class TaxRuleQuery extends BaseTaxRuleQuery
 {
@@ -34,6 +31,7 @@ class TaxRuleQuery extends BaseTaxRuleQuery
 
     /**
      * @return array|mixed|\Propel\Runtime\ActiveRecord\ActiveRecordInterface[]|\Propel\Runtime\Collection\ObjectCollection|Tax[]
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTaxCalculatorCollection(TaxRule $taxRule, Country $country = null, State $state = null)
@@ -72,7 +70,6 @@ class TaxRuleQuery extends BaseTaxRuleQuery
             ->filterByTaxRuleCountry($taxRuleQuery->find())
             ->withColumn(TaxRuleCountryTableMap::COL_POSITION, self::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION)
             ->orderBy(self::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION, Criteria::ASC);
-        ;
 
         return self::$caches[$key] = $search->find();
     }

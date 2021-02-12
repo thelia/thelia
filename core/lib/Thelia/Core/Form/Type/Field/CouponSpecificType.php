@@ -13,12 +13,9 @@
 namespace Thelia\Core\Form\Type\Field;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Thelia\Model\CouponQuery;
 
 /**
- * Class CouponSpecificType
- * @package Thelia\Core\Form\Type\Field
+ * Class CouponSpecificType.
  */
 class CouponSpecificType extends AbstractType
 {

@@ -16,13 +16,13 @@ use Thelia\Core\Hook\Fragment;
 use Thelia\Core\Hook\FragmentBag;
 
 /**
- * Class HookRenderBlockEvent
- * @package Thelia\Core\Hook
+ * Class HookRenderBlockEvent.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookRenderBlockEvent extends BaseHookRenderEvent
 {
-    /** @var  FragmentBag $fragmentBag */
+    /** @var FragmentBag $fragmentBag */
     protected $fragmentBag;
 
     /** @var array fields that can be added, if empty array any fields can be added */
@@ -36,9 +36,10 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
     }
 
     /**
-     * Add a new fragment as an array
+     * Add a new fragment as an array.
      *
-     * @param  array $data
+     * @param array $data
+     *
      * @return $this
      */
     public function add($data)
@@ -51,7 +52,7 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
     }
 
     /**
-     * Add a new fragment
+     * Add a new fragment.
      *
      * @return $this
      */
@@ -66,7 +67,7 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
     }
 
     /**
-     * Get all contents
+     * Get all contents.
      *
      * @return FragmentBag
      */
@@ -83,8 +84,6 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
         return $this->fields;
     }
 
-    /**
-     */
     public function setFields(array $fields)
     {
         $this->fields = $fields;

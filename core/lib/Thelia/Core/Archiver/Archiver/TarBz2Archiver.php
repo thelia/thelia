@@ -13,7 +13,8 @@
 namespace Thelia\Core\Archiver\Archiver;
 
 /**
- * Class TarBz2Archiver
+ * Class TarBz2Archiver.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class TarBz2Archiver extends TarArchiver

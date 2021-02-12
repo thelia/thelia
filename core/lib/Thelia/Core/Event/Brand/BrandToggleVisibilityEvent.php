@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Brand;
 
 /**
- * Class BrandToggleVisibilityEvent
- * @package Thelia\Core\Event\Brand
+ * Class BrandToggleVisibilityEvent.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class BrandToggleVisibilityEvent extends BrandEvent

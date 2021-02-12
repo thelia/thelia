@@ -17,7 +17,6 @@ use Thelia\Model\Order;
 interface PaymentModuleInterface extends BaseModuleInterface
 {
     /**
-     *
      *  Method used by payment gateway.
      *
      *  If this method return a \Thelia\Core\HttpFoundation\Response instance, this response is send to the
@@ -26,25 +25,25 @@ interface PaymentModuleInterface extends BaseModuleInterface
      *  In many cases, it's necessary to send a form to the payment gateway. On your response you can return this form already
      *  completed, ready to be sent
      *
-     * @param  \Thelia\Model\Order                       $order processed order
-     * @return null|\Thelia\Core\HttpFoundation\Response
+     * @param \Thelia\Model\Order $order processed order
+     *
+     * @return \Thelia\Core\HttpFoundation\Response|null
      */
     public function pay(Order $order);
 
     /**
-     *
      * This method is call on Payment loop.
      *
      * If you return true, the payment method will de display
      * If you return false, the payment method will not be display
      *
-     * @return boolean
+     * @return bool
      */
     public function isValidPayment();
 
     /**
      * if you want, you can manage stock in your module instead of order process.
-     * Return false to decrease the stock when order status switch to pay
+     * Return false to decrease the stock when order status switch to pay.
      *
      * @return bool
      */

@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Loop;
 
 /**
- * Class LoopExtendsArgDefinitionsEvent
- * @package Thelia\Core\Event\Loop
+ * Class LoopExtendsArgDefinitionsEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class LoopExtendsArgDefinitionsEvent extends LoopExtendsEvent

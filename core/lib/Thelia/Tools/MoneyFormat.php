@@ -28,6 +28,7 @@ class MoneyFormat extends NumberFormat
      *
      * @param float  $number   the number
      * @param string $decimals number of decimal figures
+     *
      * @return string
      */
     public function formatStandardMoney($number, $decimals = null)
@@ -46,7 +47,7 @@ class MoneyFormat extends NumberFormat
         $number = $this->preFormat($number, $decimals, $decPoint, $thousandsSep, $removeZeroDecimal);
 
         if ($symbol !== null) {
-            return $number . ' ' . $symbol;
+            return $number.' '.$symbol;
         }
 
         return $number;
@@ -54,12 +55,14 @@ class MoneyFormat extends NumberFormat
 
     /**
      * @since 2.3
-     * @param float $number
-     * @param int $decimals
-     * @param string $decPoint
-     * @param string $thousandsSep
+     *
+     * @param float    $number
+     * @param int      $decimals
+     * @param string   $decPoint
+     * @param string   $thousandsSep
      * @param int|null $currencyId
-     * @param boolean $removeZeroDecimal
+     * @param bool     $removeZeroDecimal
+     *
      * @return string
      */
     public function formatByCurrency(
@@ -100,12 +103,11 @@ class MoneyFormat extends NumberFormat
         $decPoint = null,
         $thousandsSep = null,
         $removeZeroDecimal = false
-    )
-    {
+    ) {
         $number = preg_replace('/\s+/', '', $number);
 
         if ($removeZeroDecimal === true) {
-            if($number == (int)$number) {
+            if ($number == (int) $number) {
                 $number = \intval($number);
             }
         }

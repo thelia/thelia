@@ -16,11 +16,12 @@ class ProductSaleElementDeleteEvent extends ProductSaleElementEvent
 {
     /** @var int */
     protected $product_sale_element_id;
-    /** @var  int */
+    /** @var int */
     protected $currency_id;
 
     /**
      * ProductSaleElementDeleteEvent constructor.
+     *
      * @param int $product_sale_element_id
      * @param int $currency_id
      */
@@ -42,6 +43,7 @@ class ProductSaleElementDeleteEvent extends ProductSaleElementEvent
 
     /**
      * @param int $product_sale_element_id
+     *
      * @return $this
      */
     public function setProductSaleElementId($product_sale_element_id)
@@ -61,6 +63,7 @@ class ProductSaleElementDeleteEvent extends ProductSaleElementEvent
 
     /**
      * @param int $currency_id
+     *
      * @return $this
      */
     public function setCurrencyId($currency_id)

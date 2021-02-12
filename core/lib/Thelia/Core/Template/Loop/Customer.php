@@ -28,23 +28,22 @@ use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * Customer loop
- *
+ * Customer loop.
  *
  * Class Customer
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method bool getCurrent()
- * @method string getRef()
- * @method bool getReseller()
- * @method int getSponsor()
+ *
+ * @method int[]       getId()
+ * @method bool        getCurrent()
+ * @method string      getRef()
+ * @method bool        getReseller()
+ * @method int         getSponsor()
  * @method bool|string getNewsletter()
- * @method string[] getOrder()
- * @method bool getWithPrevNextInfo()
+ * @method string[]    getOrder()
+ * @method bool        getWithPrevNextInfo()
  */
 class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
@@ -85,23 +84,23 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                             'order_amount',
                             'order_amount_reverse',
                             'registration_date',
-                            'registration_date_reverse'
+                            'registration_date_reverse',
                         ]
                     )
                 ),
                 'lastname'
             ),
-            Argument::createBooleanOrBothTypeArgument("newsletter", Type\BooleanOrBothType::ANY)
+            Argument::createBooleanOrBothTypeArgument('newsletter', Type\BooleanOrBothType::ANY)
         );
     }
 
     public function getSearchIn()
     {
         return [
-            "ref",
-            "firstname",
-            "lastname",
-            "email",
+            'ref',
+            'firstname',
+            'lastname',
+            'email',
         ];
     }
 
@@ -119,16 +118,16 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                 $search->_or();
             }
             switch ($searchInElement) {
-                case "ref":
+                case 'ref':
                     $search->filterByRef($searchTerm, $searchCriteria);
                     break;
-                case "firstname":
+                case 'firstname':
                     $search->filterByFirstname($searchTerm, $searchCriteria);
                     break;
-                case "lastname":
+                case 'lastname':
                     $search->filterByLastname($searchTerm, $searchCriteria);
                     break;
-                case "email":
+                case 'email':
                     $search->filterByEmail($searchTerm, $searchCriteria);
                     break;
             }
@@ -151,12 +150,12 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
 
         $search
             ->addJoinObject($join, 'newsletter_join')
-            ->addJoinCondition('newsletter_join', NewsletterTableMap::COL_UNSUBSCRIBED . ' = ?', false, null, \PDO::PARAM_BOOL)
-            ->withColumn("IF(ISNULL(".NewsletterTableMap::COL_EMAIL."), 0, 1)", "is_registered_to_newsletter");
+            ->addJoinCondition('newsletter_join', NewsletterTableMap::COL_UNSUBSCRIBED.' = ?', false, null, \PDO::PARAM_BOOL)
+            ->withColumn('IF(ISNULL('.NewsletterTableMap::COL_EMAIL.'), 0, 1)', 'is_registered_to_newsletter');
 
         // If "*" === $newsletter, no filter will be applied, so it won't change anything
         if (false === $newsletter) {
-            $search->having("is_registered_to_newsletter = 0");
+            $search->having('is_registered_to_newsletter = 0');
         }
 
         $current = $this->getCurrent();
@@ -166,7 +165,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             if ($currentCustomer === null) {
                 return null;
             }
-                $search->filterById($currentCustomer->getId(), Criteria::EQUAL);
+            $search->filterById($currentCustomer->getId(), Criteria::EQUAL);
         }
 
         $id = $this->getId();
@@ -242,17 +241,17 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
             $loopResultRow = new LoopResultRow($customer);
 
             $loopResultRow
-                ->set("ID", $customer->getId())
-                ->set("REF", $customer->getRef())
-                ->set("TITLE", $customer->getTitleId())
-                ->set("FIRSTNAME", $customer->getFirstname())
-                ->set("LASTNAME", $customer->getLastname())
-                ->set("EMAIL", $customer->getEmail())
-                ->set("RESELLER", $customer->getReseller())
-                ->set("SPONSOR", $customer->getSponsor())
-                ->set("DISCOUNT", $customer->getDiscount())
-                ->set("NEWSLETTER", $customer->getVirtualColumn("is_registered_to_newsletter"))
-                ->set("CONFIRMATION_TOKEN", $customer->getConfirmationToken())
+                ->set('ID', $customer->getId())
+                ->set('REF', $customer->getRef())
+                ->set('TITLE', $customer->getTitleId())
+                ->set('FIRSTNAME', $customer->getFirstname())
+                ->set('LASTNAME', $customer->getLastname())
+                ->set('EMAIL', $customer->getEmail())
+                ->set('RESELLER', $customer->getReseller())
+                ->set('SPONSOR', $customer->getSponsor())
+                ->set('DISCOUNT', $customer->getDiscount())
+                ->set('NEWSLETTER', $customer->getVirtualColumn('is_registered_to_newsletter'))
+                ->set('CONFIRMATION_TOKEN', $customer->getConfirmationToken())
             ;
 
             if ($this->getWithPrevNextInfo()) {
@@ -268,10 +267,10 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                     ->orderById(Criteria::ASC)
                     ->findOne();
                 $loopResultRow
-                    ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
-                    ->set("HAS_NEXT", $next != null ? 1 : 0)
-                    ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
-                    ->set("NEXT", $next != null ? $next->getId() : -1);
+                    ->set('HAS_PREVIOUS', $previous != null ? 1 : 0)
+                    ->set('HAS_NEXT', $next != null ? 1 : 0)
+                    ->set('PREVIOUS', $previous != null ? $previous->getId() : -1)
+                    ->set('NEXT', $next != null ? $next->getId() : -1);
             }
 
             $this->addOutputFields($loopResultRow, $customer);

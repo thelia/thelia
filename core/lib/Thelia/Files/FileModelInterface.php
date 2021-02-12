@@ -13,13 +13,12 @@
 namespace Thelia\Files;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Form\BaseForm;
 
 interface FileModelInterface
 {
     /**
-     * Set file parent id
+     * Set file parent id.
      *
      * @param int $parentId parent id
      *
@@ -28,7 +27,7 @@ interface FileModelInterface
     public function setParentId($parentId);
 
     /**
-     * Get file parent id
+     * Get file parent id.
      *
      * @return int parent id
      */
@@ -50,7 +49,7 @@ interface FileModelInterface
     public function getParentFileModel();
 
     /**
-     * Get the ID of the form used to change this object information
+     * Get the ID of the form used to change this object information.
      *
      * @return BaseForm the form
      */
@@ -62,13 +61,12 @@ interface FileModelInterface
     public function getUploadDir();
 
     /**
-     *
      * @return string the URL to redirect to after update from the back-office
      */
     public function getRedirectionUrl();
 
     /**
-     * Get the Query instance for this object
+     * Get the Query instance for this object.
      *
      * @return ModelCriteria
      */
@@ -76,73 +74,76 @@ interface FileModelInterface
 
     /**
      * Save the model object.
-     *
      */
     public function save();
 
     /**
      * Delete the model object.
-     *
      */
     public function delete();
 
     /**
-     * Get the model object ID
+     * Get the model object ID.
      *
      * @return int
      */
     public function getId();
 
     /**
-     * Set the current title
+     * Set the current title.
      *
      * @param string $title the title in the current locale
      */
     public function setTitle($title);
 
     /**
-     * Get the current title
+     * Get the current title.
      *
      * @return FileModelInterface
      */
     public function getTitle();
 
     /**
-     * Set the chapo
+     * Set the chapo.
      *
-     * @param  string             $chapo the chapo in the current locale
+     * @param string $chapo the chapo in the current locale
+     *
      * @return FileModelInterface
      */
     public function setChapo($chapo);
 
     /**
-     * Set the description
+     * Set the description.
      *
-     * @param  string             $description the description in the current locale
+     * @param string $description the description in the current locale
+     *
      * @return FileModelInterface
      */
     public function setDescription($description);
 
     /**
-     * Set the postscriptum
+     * Set the postscriptum.
      *
-     * @param  string             $postscriptum the postscriptum in the current locale
+     * @param string $postscriptum the postscriptum in the current locale
+     *
      * @return FileModelInterface
      */
     public function setPostscriptum($postscriptum);
 
     /**
-     * Set the current locale
+     * Set the current locale.
      *
-     * @param  string             $locale the locale string
+     * @param string $locale the locale string
+     *
      * @return FileModelInterface
      */
     public function setLocale($locale);
 
     /**
-     * Set the current locale
+     * Set the current locale.
      *
-     * @param  bool            $visible true if the file is visible, false otherwise
+     * @param bool $visible true if the file is visible, false otherwise
+     *
      * @return FileModelInterface
      */
     public function setVisible($visible);

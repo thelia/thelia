@@ -35,7 +35,7 @@ class TemplateEvent extends ActionEvent
      */
     public function hasTemplate()
     {
-        return ! \is_null($this->template);
+        return !\is_null($this->template);
     }
 
     /**
@@ -48,6 +48,7 @@ class TemplateEvent extends ActionEvent
 
     /**
      * @param Template $template
+     *
      * @return $this
      */
     public function setTemplate($template)

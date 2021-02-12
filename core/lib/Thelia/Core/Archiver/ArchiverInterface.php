@@ -13,55 +13,56 @@
 namespace Thelia\Core\Archiver;
 
 /**
- * Interface ArchiverInterface
+ * Interface ArchiverInterface.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 interface ArchiverInterface
 {
     /**
-     * Get archiver identifier
+     * Get archiver identifier.
      *
      * @return string The archiver identifier
      */
     public function getId();
 
     /**
-     * Get archiver name
+     * Get archiver name.
      *
      * @return string The archiver name
      */
     public function getName();
 
     /**
-     * Get archiver extension
+     * Get archiver extension.
      *
      * @return string The archiver extension
      */
     public function getExtension();
 
     /**
-     * Get archiver mime type
+     * Get archiver mime type.
      *
      * @return string The archiver mime type
      */
     public function getMimeType();
 
     /**
-     * Get archiver availability
+     * Get archiver availability.
      *
-     * @return boolean Archiver availability
+     * @return bool Archiver availability
      */
     public function isAvailable();
 
     /**
-     * Get archive path
+     * Get archive path.
      *
      * @return string
      */
     public function getArchivePath();
 
     /**
-     * Set archive path
+     * Set archive path.
      *
      * @param string $archivePath
      *
@@ -70,7 +71,7 @@ interface ArchiverInterface
     public function setArchivePath($archivePath);
 
     /**
-     * Create a new archive
+     * Create a new archive.
      *
      * @param string $baseName The archive name without extension
      *
@@ -79,7 +80,7 @@ interface ArchiverInterface
     public function create($baseName);
 
     /**
-     * Open an archive
+     * Open an archive.
      *
      * @param string $path Path to archive
      *
@@ -88,24 +89,24 @@ interface ArchiverInterface
     public function open($path);
 
     /**
-     * Add directory or file to archive
+     * Add directory or file to archive.
      *
      * @param string      $path
-     * @param null|string $pathInArchive
+     * @param string|null $pathInArchive
      *
      * @return $this Return $this, allow chaining
      */
     public function add($path, $pathInArchive = null);
 
     /**
-     * Save archive
+     * Save archive.
      *
-     * @return boolean True on success, false otherwise
+     * @return bool True on success, false otherwise
      */
     public function save();
 
     /**
-     * Extract archive
+     * Extract archive.
      *
      * @param string $toPath Where to extract
      *

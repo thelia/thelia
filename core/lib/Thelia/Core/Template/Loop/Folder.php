@@ -28,24 +28,24 @@ use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 
 /**
- * Class Folder
+ * Class Folder.
  *
- * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int getParent()
- * @method int getContent()
- * @method bool getCurrent()
+ *
+ * @method int[]       getId()
+ * @method int         getParent()
+ * @method int         getContent()
+ * @method bool        getCurrent()
  * @method bool|string getVisible()
- * @method int[] getExclude()
- * @method string getTitle()
- * @method string[] getOrder()
- * @method bool getWithPrevNextInfo()
- * @method bool getNeedCountChild()
- * @method bool getNeedContentCount()
- * @method bool getContentCountVisible()
+ * @method int[]       getExclude()
+ * @method string      getTitle()
+ * @method string[]    getOrder()
+ * @method bool        getWithPrevNextInfo()
+ * @method bool        getNeedCountChild()
+ * @method bool        getNeedContentCount()
+ * @method bool        getContentCountVisible()
  */
 class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -80,7 +80,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                             'visible', 'visible_reverse',
                             'random',
                             'created', 'created_reverse',
-                            'updated', 'updated_reverse'
+                            'updated', 'updated_reverse',
                         ]
                     )
                 ),
@@ -102,9 +102,9 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
     /**
      * @param FolderQuery $search
-     * @param string $searchTerm
-     * @param array $searchIn
-     * @param string $searchCriteria
+     * @param string      $searchTerm
+     * @param array       $searchIn
+     * @param string      $searchCriteria
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
@@ -119,7 +119,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         /* manage translations */
         $this->configureI18nProcessing(
             $search,
-            [ 'TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS']
+            ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS']
         );
 
         $id = $this->getId();
@@ -137,9 +137,9 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         $current = $this->getCurrent();
 
         if ($current === true) {
-            $search->filterById($this->getCurrentRequest()->get("folder_id"));
+            $search->filterById($this->getCurrentRequest()->get('folder_id'));
         } elseif ($current === false) {
-            $search->filterById($this->getCurrentRequest()->get("folder_id"), Criteria::NOT_IN);
+            $search->filterById($this->getCurrentRequest()->get('folder_id'), Criteria::NOT_IN);
         }
 
         $exclude = $this->getExclude();
@@ -161,7 +161,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         $title = $this->getTitle();
 
         if (!\is_null($title)) {
-            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%'.$title.'%');
         }
 
         $visible = $this->getVisible();
@@ -170,49 +170,49 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
             $search->filterByVisible($visible ? 1 : 0);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "id":
+                case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case "id_reverse":
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha_reverse":
+                case 'alpha_reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "manual_reverse":
+                case 'manual_reverse':
                     $search->orderByPosition(Criteria::DESC);
                     break;
-                case "manual":
+                case 'manual':
                     $search->orderByPosition(Criteria::ASC);
                     break;
-                case "visible":
+                case 'visible':
                     $search->orderByVisible(Criteria::ASC);
                     break;
-                case "visible_reverse":
+                case 'visible_reverse':
                     $search->orderByVisible(Criteria::DESC);
                     break;
-                case "random":
+                case 'random':
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
-                    break(2);
+                    break 2;
                     break;
-                case "created":
+                case 'created':
                     $search->addAscendingOrderByColumn('created_at');
                     break;
-                case "created_reverse":
+                case 'created_reverse':
                     $search->addDescendingOrderByColumn('created_at');
                     break;
-                case "updated":
+                case 'updated':
                     $search->addAscendingOrderByColumn('updated_at');
                     break;
-                case "updated_reverse":
+                case 'updated_reverse':
                     $search->addDescendingOrderByColumn('updated_at');
                     break;
             }
@@ -237,28 +237,28 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
             $loopResultRow = new LoopResultRow($folder);
 
             $loopResultRow
-                ->set("ID", $folder->getId())
-                ->set("IS_TRANSLATED", $folder->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("TITLE", $folder->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $folder->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $folder->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("PARENT", $folder->getParent())
-                ->set("ROOT", $folder->getRoot($folder->getId()))
-                ->set("URL", $this->getReturnUrl() ? $folder->getUrl($this->locale) : null)
-                ->set("META_TITLE", $folder->getVirtualColumn('i18n_META_TITLE'))
-                ->set("META_DESCRIPTION", $folder->getVirtualColumn('i18n_META_DESCRIPTION'))
-                ->set("META_KEYWORDS", $folder->getVirtualColumn('i18n_META_KEYWORDS'))
-                ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
-                ->set("POSITION", $folder->getPosition());
+                ->set('ID', $folder->getId())
+                ->set('IS_TRANSLATED', $folder->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('TITLE', $folder->getVirtualColumn('i18n_TITLE'))
+                ->set('CHAPO', $folder->getVirtualColumn('i18n_CHAPO'))
+                ->set('DESCRIPTION', $folder->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set('PARENT', $folder->getParent())
+                ->set('ROOT', $folder->getRoot($folder->getId()))
+                ->set('URL', $this->getReturnUrl() ? $folder->getUrl($this->locale) : null)
+                ->set('META_TITLE', $folder->getVirtualColumn('i18n_META_TITLE'))
+                ->set('META_DESCRIPTION', $folder->getVirtualColumn('i18n_META_DESCRIPTION'))
+                ->set('META_KEYWORDS', $folder->getVirtualColumn('i18n_META_KEYWORDS'))
+                ->set('VISIBLE', $folder->getVisible() ? '1' : '0')
+                ->set('POSITION', $folder->getPosition());
 
             if ($needCountChild) {
-                $loopResultRow->set("CHILD_COUNT", $folder->countChild());
+                $loopResultRow->set('CHILD_COUNT', $folder->countChild());
             }
 
             if ($needContentCount) {
-                $loopResultRow->set("CONTENT_COUNT", $folder->countAllContents($contentCountVisiblility));
+                $loopResultRow->set('CONTENT_COUNT', $folder->countAllContents($contentCountVisiblility));
             }
 
             $isBackendContext = $this->getBackendContext();
@@ -269,7 +269,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                     ->filterByParent($folder->getParent())
                     ->filterByPosition($folder->getPosition(), Criteria::LESS_THAN);
 
-                if (! $isBackendContext) {
+                if (!$isBackendContext) {
                     $previousQuery->filterByVisible(true);
                 }
 
@@ -281,7 +281,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                     ->filterByParent($folder->getParent())
                     ->filterByPosition($folder->getPosition(), Criteria::GREATER_THAN);
 
-                if (! $isBackendContext) {
+                if (!$isBackendContext) {
                     $nextQuery->filterByVisible(true);
                 }
 
@@ -290,10 +290,10 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                     ->findOne();
 
                 $loopResultRow
-                    ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
-                    ->set("HAS_NEXT", $next != null ? 1 : 0)
-                    ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
-                    ->set("NEXT", $next != null ? $next->getId() : -1);
+                    ->set('HAS_PREVIOUS', $previous != null ? 1 : 0)
+                    ->set('HAS_NEXT', $next != null ? 1 : 0)
+                    ->set('PREVIOUS', $previous != null ? $previous->getId() : -1)
+                    ->set('NEXT', $next != null ? $next->getId() : -1);
             }
 
             $this->addOutputFields($loopResultRow, $folder);

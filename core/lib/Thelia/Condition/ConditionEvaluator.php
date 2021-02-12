@@ -15,16 +15,14 @@ namespace Thelia\Condition;
 use Thelia\Condition\Implementation\ConditionInterface;
 
 /**
- * Validate Conditions
+ * Validate Conditions.
  *
- * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class ConditionEvaluator
 {
     /**
-     * Check if an Event matches SerializableCondition
+     * Check if an Event matches SerializableCondition.
      *
      * @param ConditionCollection $conditions Conditions to check against the Event
      *
@@ -44,13 +42,14 @@ class ConditionEvaluator
     }
 
     /**
-     * Do variable comparison
+     * Do variable comparison.
      *
      * @param mixed  $v1 Variable 1
      * @param string $o  Operator ex : Operators::DIFFERENT
      * @param mixed  $v2 Variable 2
      *
      * @throws \Exception
+     *
      * @return bool
      */
     public function variableOpComparison($v1, $o, $v2)
@@ -58,30 +57,30 @@ class ConditionEvaluator
         switch ($o) {
             case Operators::DIFFERENT:
                 // !=
-                return ($v1 != $v2);
+                return $v1 != $v2;
             case Operators::SUPERIOR:
                 // >
-                return ($v1 > $v2);
+                return $v1 > $v2;
             case Operators::SUPERIOR_OR_EQUAL:
                 // >=
-                return ($v1 >= $v2);
+                return $v1 >= $v2;
             case Operators::INFERIOR:
                 // <
-                return ($v1 < $v2);
+                return $v1 < $v2;
             case Operators::INFERIOR_OR_EQUAL:
                 // <=
-                return ($v1 <= $v2);
+                return $v1 <= $v2;
             case Operators::EQUAL:
                 // ==
-                return ($v1 == $v2);
+                return $v1 == $v2;
             case Operators::IN:
                 // in
-                return (\in_array($v1, $v2));
+                return \in_array($v1, $v2);
             case Operators::OUT:
                 // not in
-                return (!\in_array($v1, $v2));
+                return !\in_array($v1, $v2);
             default:
-                throw new \Exception('Unrecognized operator ' . $o);
+                throw new \Exception('Unrecognized operator '.$o);
         }
     }
 }

@@ -29,25 +29,25 @@ use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * Product Sale Elements loop
+ * Product Sale Elements loop.
  *
  * @todo : manage attribute_availability ?
  *
  * Class ProductSaleElements
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int getCurrency()
- * @method int getProduct()
- * @method bool getPromo()
- * @method bool getNew()
- * @method bool getDefault()
- * @method string getRef()
- * @method int[] getAttributeAvailability()
- * @method string[] getOrder()
+ *
+ * @method int[]       getId()
+ * @method int         getCurrency()
+ * @method int         getProduct()
+ * @method bool        getPromo()
+ * @method bool        getNew()
+ * @method bool        getDefault()
+ * @method string      getRef()
+ * @method int[]       getAttributeAvailability()
+ * @method string[]    getOrder()
  * @method bool|string getVisible()
  */
 class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface, SearchLoopInterface
@@ -87,7 +87,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                             'weight', 'weight_reverse',
                             'created', 'created_reverse',
                             'updated', 'updated_reverse',
-                            'random'
+                            'random',
                         ]
                     )
                 ),
@@ -142,62 +142,62 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             $search->filterByIsDefault($default);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "id":
+                case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case "id_reverse":
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "ref":
+                case 'ref':
                     $search->orderByRef(Criteria::ASC);
                     break;
-                case "ref_reverse":
+                case 'ref_reverse':
                     $search->orderByRef(Criteria::DESC);
                     break;
-                case "quantity":
+                case 'quantity':
                     $search->orderByQuantity(Criteria::ASC);
                     break;
-                case "quantity_reverse":
+                case 'quantity_reverse':
                     $search->orderByQuantity(Criteria::DESC);
                     break;
-                case "min_price":
+                case 'min_price':
                     $search->addAscendingOrderByColumn('price_FINAL_PRICE');
                     break;
-                case "max_price":
+                case 'max_price':
                     $search->addDescendingOrderByColumn('price_FINAL_PRICE');
                     break;
-                case "promo":
+                case 'promo':
                     $search->orderByPromo(Criteria::DESC);
                     break;
-                case "new":
+                case 'new':
                     $search->orderByNewness(Criteria::DESC);
                     break;
-                case "weight":
+                case 'weight':
                     $search->orderByWeight(Criteria::ASC);
                     break;
-                case "weight_reverse":
+                case 'weight_reverse':
                     $search->orderByWeight(Criteria::DESC);
                     break;
-                case "created":
+                case 'created':
                     $search->addAscendingOrderByColumn('created_at');
                     break;
-                case "created_reverse":
+                case 'created_reverse':
                     $search->addDescendingOrderByColumn('created_at');
                     break;
-                case "updated":
+                case 'updated':
                     $search->addAscendingOrderByColumn('updated_at');
                     break;
-                case "updated_reverse":
+                case 'updated_reverse':
                     $search->addDescendingOrderByColumn('updated_at');
                     break;
-                case "random":
+                case 'random':
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
-                    break(2);
+                    break 2;
             }
         }
 
@@ -205,7 +205,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         if (null !== $currencyId) {
             $currency = CurrencyQuery::create()->findPk($currencyId);
             if (null === $currency) {
-                throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
+                throw new \InvalidArgumentException('Cannot found currency id: `'.$currency.'` in product_sale_elements loop');
             }
         } else {
             $currency = $this->getCurrentRequest()->getSession()->getCurrency();
@@ -217,17 +217,17 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         $search->joinProductPrice('price', Criteria::LEFT_JOIN)
             ->addJoinCondition('price', '`price`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
 
-        $search->joinProductPrice('price' . $defaultCurrencySuffix, Criteria::LEFT_JOIN)
-            ->addJoinCondition('price_default_currency', '`price' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+        $search->joinProductPrice('price'.$defaultCurrencySuffix, Criteria::LEFT_JOIN)
+            ->addJoinCondition('price_default_currency', '`price'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
         /**
          * rate value is checked as a float in overloaded getRate method.
          */
-        $priceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END';
-        $promoPriceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PROMO_PRICE  * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END';
+        $priceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PRICE * '.$currency->getRate().' ELSE `price`.PRICE END';
+        $promoPriceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PROMO_PRICE  * '.$currency->getRate().' ELSE `price`.PROMO_PRICE END';
         $search->withColumn($priceSelectorAsSQL, 'price_PRICE')
             ->withColumn($promoPriceSelectorAsSQL, 'price_PROMO_PRICE')
-            ->withColumn('CASE WHEN ' . ProductSaleElementsTableMap::COL_PROMO . ' = 1 THEN ' . $promoPriceSelectorAsSQL . ' ELSE ' . $priceSelectorAsSQL . ' END', 'price_FINAL_PRICE');
+            ->withColumn('CASE WHEN '.ProductSaleElementsTableMap::COL_PROMO.' = 1 THEN '.$promoPriceSelectorAsSQL.' ELSE '.$priceSelectorAsSQL.' END', 'price_FINAL_PRICE');
 
         $search->groupById();
 
@@ -272,21 +272,21 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
             }
 
             $loopResultRow
-                ->set("ID", $PSEValue->getId())
-                ->set("QUANTITY", $PSEValue->getQuantity())
-                ->set("IS_PROMO", $PSEValue->getPromo() === 1 ? 1 : 0)
-                ->set("IS_NEW", $PSEValue->getNewness() === 1 ? 1 : 0)
-                ->set("IS_DEFAULT", $PSEValue->getIsDefault() ? 1 : 0)
-                ->set("WEIGHT", $PSEValue->getWeight())
-                ->set("REF", $PSEValue->getRef())
-                ->set("EAN_CODE", $PSEValue->getEanCode())
-                ->set("PRODUCT_ID", $PSEValue->getProductId())
-                ->set("PRICE", $price)
-                ->set("PRICE_TAX", $taxedPrice - $price)
-                ->set("TAXED_PRICE", $taxedPrice)
-                ->set("PROMO_PRICE", $promoPrice)
-                ->set("PROMO_PRICE_TAX", $taxedPromoPrice - $promoPrice)
-                ->set("TAXED_PROMO_PRICE", $taxedPromoPrice);
+                ->set('ID', $PSEValue->getId())
+                ->set('QUANTITY', $PSEValue->getQuantity())
+                ->set('IS_PROMO', $PSEValue->getPromo() === 1 ? 1 : 0)
+                ->set('IS_NEW', $PSEValue->getNewness() === 1 ? 1 : 0)
+                ->set('IS_DEFAULT', $PSEValue->getIsDefault() ? 1 : 0)
+                ->set('WEIGHT', $PSEValue->getWeight())
+                ->set('REF', $PSEValue->getRef())
+                ->set('EAN_CODE', $PSEValue->getEanCode())
+                ->set('PRODUCT_ID', $PSEValue->getProductId())
+                ->set('PRICE', $price)
+                ->set('PRICE_TAX', $taxedPrice - $price)
+                ->set('TAXED_PRICE', $taxedPrice)
+                ->set('PROMO_PRICE', $promoPrice)
+                ->set('PROMO_PRICE_TAX', $taxedPromoPrice - $promoPrice)
+                ->set('TAXED_PROMO_PRICE', $taxedPromoPrice);
 
             $this->addOutputFields($loopResultRow, $PSEValue);
             $loopResult->addRow($loopResultRow);
@@ -301,8 +301,8 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
     public function getSearchIn()
     {
         return [
-            "ref",
-            "ean_code"
+            'ref',
+            'ean_code',
         ];
     }
 
@@ -321,10 +321,10 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 $search->_or();
             }
             switch ($searchInElement) {
-                case "ref":
+                case 'ref':
                     $search->filterByRef($searchTerm, $searchCriteria);
                     break;
-                case "ean_code":
+                case 'ean_code':
                     $search->filterByEanCode($searchTerm, $searchCriteria);
                     break;
             }

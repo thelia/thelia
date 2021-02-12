@@ -22,10 +22,7 @@ use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Type;
 
 /**
- *
  * Template loop, to get available back-office or front-office templates.
- *
- * @package Thelia\Core\Template\Loop
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  *
@@ -49,7 +46,7 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
                         'admin',
                         'pdf',
                         'email',
-                        'mail'
+                        'mail',
                     ])
                 )
             )
@@ -60,7 +57,7 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
     {
         $type = $this->getArg('template-type')->getValue();
 
-        $templateType =  TemplateDefinition::FRONT_OFFICE;
+        $templateType = TemplateDefinition::FRONT_OFFICE;
 
         if ($type == 'front-office' || $type == 'front') {
             $templateType = TemplateDefinition::FRONT_OFFICE;
@@ -82,9 +79,9 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
             $loopResultRow = new LoopResultRow($template);
 
             $loopResultRow
-                ->set("NAME", $template->getName())
-                ->set("RELATIVE_PATH", $template->getPath())
-                ->set("ABSOLUTE_PATH", $template->getAbsolutePath())
+                ->set('NAME', $template->getName())
+                ->set('RELATIVE_PATH', $template->getPath())
+                ->set('ABSOLUTE_PATH', $template->getAbsolutePath())
             ;
             $this->addOutputFields($loopResultRow, $template);
 

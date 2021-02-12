@@ -22,7 +22,7 @@ class Type extends AbstractSmartyPlugin
     {
         $typeClass = "\\Thelia\\Type\\$option";
         if (!class_exists($typeClass)) {
-            throw new \InvalidArgumentException(sprintf("Invalid type name `%s` in `assertType` modifier", $option));
+            throw new \InvalidArgumentException(sprintf('Invalid type name `%s` in `assertType` modifier', $option));
         }
 
         $typeInstance = new $typeClass();
@@ -34,7 +34,7 @@ class Type extends AbstractSmartyPlugin
     }
 
     /**
-     * Define the various smarty plugins handled by this class
+     * Define the various smarty plugins handled by this class.
      *
      * @return an array of smarty plugin descriptors
      */

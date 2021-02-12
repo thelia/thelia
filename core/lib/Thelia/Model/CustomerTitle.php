@@ -13,7 +13,6 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Thelia\Model\Base\CustomerTitle as BaseCustomerTitle;
 use Thelia\Model\Map\CustomerTitleTableMap;

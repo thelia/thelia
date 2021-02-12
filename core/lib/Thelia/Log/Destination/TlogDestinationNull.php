@@ -18,7 +18,7 @@ class TlogDestinationNull extends AbstractTlogDestination
 {
     public function getTitle()
     {
-        return "Black hole";
+        return 'Black hole';
     }
 
     public function getDescription()

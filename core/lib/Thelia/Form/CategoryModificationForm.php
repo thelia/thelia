@@ -42,40 +42,40 @@ class CategoryModificationForm extends CategoryCreationForm
 
         asort($templateList);
 
-        $templateList[0] = $this->translator->trans("None");
+        $templateList[0] = $this->translator->trans('None');
 
         $this->formBuilder
             ->add(
                 'id',
                 HiddenType::class,
                 [
-                    'constraints' => [ new GreaterThan(['value' => 0]) ]
+                    'constraints' => [new GreaterThan(['value' => 0])],
                 ]
             )
             ->add(
                 'default_template_id',
                 ChoiceType::class,
                 [
-                    'choices'     => $templateList,
-                    'label'       => $this->translator->trans('Default product template'),
-                    'label_attr'  => [
-                        'for'         => 'price_offset_type',
-                        'help'        => $this->translator->trans(
+                    'choices' => $templateList,
+                    'label' => $this->translator->trans('Default product template'),
+                    'label_attr' => [
+                        'for' => 'price_offset_type',
+                        'help' => $this->translator->trans(
                             'Select a default template for new products created in this category'
-                        )
+                        ),
                     ],
                     'attr' => [
-                    ]
+                    ],
                 ]
             )
         ;
 
         // Add standard description fields, excluding title which is defined in parent class
-        $this->addStandardDescFields([ 'title' ]);
+        $this->addStandardDescFields(['title']);
     }
 
     public static function getName()
     {
-        return "thelia_category_modification";
+        return 'thelia_category_modification';
     }
 }

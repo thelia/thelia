@@ -20,7 +20,7 @@ use Thelia\Form\Image\DocumentModification;
 class BrandDocumentModification extends DocumentModification
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getName()
     {

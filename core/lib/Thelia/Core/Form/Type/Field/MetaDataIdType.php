@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\MetaDataQuery;
 
 /**
- * Class MetaDataIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class MetaDataIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class MetaDataIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class MetaDataIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "meta_data_id";
+        return 'meta_data_id';
     }
 }

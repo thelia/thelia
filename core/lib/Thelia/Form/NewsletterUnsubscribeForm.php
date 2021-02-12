@@ -21,8 +21,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Model\NewsletterQuery;
 
 /**
- * Class NewsletterForm
- * @package Thelia\Form
+ * Class NewsletterForm.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class NewsletterUnsubscribeForm extends BaseForm
@@ -34,7 +34,7 @@ class NewsletterUnsubscribeForm extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Email(),
-                    new Callback([$this, "verifyExistingEmail"]),
+                    new Callback([$this, 'verifyExistingEmail']),
                 ],
                 'label' => Translator::getInstance()->trans('Email address'),
                 'label_attr' => [
@@ -49,8 +49,8 @@ class NewsletterUnsubscribeForm extends BaseForm
         if (null === NewsletterQuery::create()->filterByUnsubscribed(false)->findOneByEmail($value)) {
             $context->addViolation(
                 Translator::getInstance()->trans(
-                    "The email address \"%mail\" was not found.",
-                    [ '%mail' => $value ]
+                    'The email address "%mail" was not found.',
+                    ['%mail' => $value]
                 )
             );
         }

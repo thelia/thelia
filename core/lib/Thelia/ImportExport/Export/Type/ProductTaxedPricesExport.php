@@ -12,14 +12,12 @@
 
 namespace Thelia\ImportExport\Export\Type;
 
-use PDO;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
 /**
- * Class ProductTaxedPricesExport
+ * Class ProductTaxedPricesExport.
+ *
  * @author Thomas Arnaud <tarnaud@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  * @author Florian Bernard <fbernard@openstudio.fr>
@@ -39,7 +37,7 @@ class ProductTaxedPricesExport extends JsonFileAbstractExport
         'currency_code' => 'currency',
         'product_sale_elements_promo' => 'promo',
         'tax_rule_i18n_id' => 'tax_id',
-        'tax_rule_i18n_title' => 'tax_title'
+        'tax_rule_i18n_title' => 'tax_title',
     ];
 
     public function getData()

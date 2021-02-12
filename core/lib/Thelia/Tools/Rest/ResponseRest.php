@@ -19,9 +19,7 @@ use Symfony\Component\Serializer\Serializer;
 use Thelia\Core\HttpFoundation\Response;
 
 /**
- * Class ResponseRest Create a serialized Response
- *
- * @package Thelia\Tools\Rest
+ * Class ResponseRest Create a serialized Response.
  */
 class ResponseRest extends Response
 {
@@ -34,15 +32,15 @@ class ResponseRest extends Response
     /**
      * Constructor.
      *
-     * @param array   $data    Array to be serialized
-     * @param string  $format  serialization format, text, xml or json available
-     * @param integer $status  The response status code
-     * @param array   $headers An array of response headers
+     * @param array  $data    Array to be serialized
+     * @param string $format  serialization format, text, xml or json available
+     * @param int    $status  The response status code
+     * @param array  $headers An array of response headers
      *
      * @throws \InvalidArgumentException When the HTTP status code is not valid
      *
      * @api
-    */
+     */
     public function __construct($data = null, $format = 'json', $status = 200, $headers = [])
     {
         parent::__construct('', $status, $headers);
@@ -61,12 +59,12 @@ class ResponseRest extends Response
                 $this->setContent($serializer->serialize($data, $this->format));
             }
 
-            $this->headers->set('Content-Type', 'application/' . $this->format);
+            $this->headers->set('Content-Type', 'application/'.$this->format);
         }
     }
 
     /**
-     * Set Content to be serialized in the response, array or object
+     * Set Content to be serialized in the response, array or object.
      *
      * @param array $data array or object to be serialized
      *
@@ -82,7 +80,7 @@ class ResponseRest extends Response
     }
 
     /**
-     * Get Serializer
+     * Get Serializer.
      *
      * @return Serializer
      */

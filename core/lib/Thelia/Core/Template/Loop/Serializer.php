@@ -23,7 +23,8 @@ use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
 
 /**
- * Class Serializer
+ * Class Serializer.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
@@ -71,7 +72,7 @@ class Serializer extends BaseLoop implements ArraySearchLoopInterface
     {
         /** @var \Thelia\Core\Serializer\SerializerInterface $serializer */
         foreach ($loopResult->getResultDataCollection() as $serializer) {
-            $loopResultRow = new LoopResultRow;
+            $loopResultRow = new LoopResultRow();
 
             $loopResultRow
                 ->set('ID', $serializer->getId())

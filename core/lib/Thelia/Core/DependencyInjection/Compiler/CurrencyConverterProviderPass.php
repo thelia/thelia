@@ -17,15 +17,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class CurrencyConverterProviderPass
- * @package Thelia\Core\DependencyInjection\Compiler
+ * Class CurrencyConverterProviderPass.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CurrencyConverterProviderPass implements CompilerPassInterface
 {
     /**
      * You can modify the container here before it is dumped to PHP code.
-     *
      *
      * @api
      */

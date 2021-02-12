@@ -25,7 +25,7 @@ use Thelia\Model\FeatureAvQuery;
 class FeatureAv extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * Create a new feature entry
+     * Create a new feature entry.
      *
      * @param $eventName
      */
@@ -46,7 +46,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Change a product feature
+     * Change a product feature.
      *
      * @param $eventName
      */
@@ -68,7 +68,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Delete a product feature entry
+     * Delete a product feature entry.
      *
      * @param $eventName
      */
@@ -100,10 +100,10 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::FEATURE_AV_CREATE          => ["create", 128],
-            TheliaEvents::FEATURE_AV_UPDATE          => ["update", 128],
-            TheliaEvents::FEATURE_AV_DELETE          => ["delete", 128],
-            TheliaEvents::FEATURE_AV_UPDATE_POSITION => ["updatePosition", 128],
+            TheliaEvents::FEATURE_AV_CREATE => ['create', 128],
+            TheliaEvents::FEATURE_AV_UPDATE => ['update', 128],
+            TheliaEvents::FEATURE_AV_DELETE => ['delete', 128],
+            TheliaEvents::FEATURE_AV_UPDATE_POSITION => ['updatePosition', 128],
         ];
     }
 }

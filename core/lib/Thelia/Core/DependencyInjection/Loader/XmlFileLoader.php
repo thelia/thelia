@@ -23,7 +23,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ReferenceConfigurator;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -43,16 +42,15 @@ use Thelia\Model\Map\ImportCategoryTableMap;
 use Thelia\Model\Map\ImportTableMap;
 
 /**
- *
- * Load, read and validate config xml files
+ * Load, read and validate config xml files.
  *
  * Class XmlFileLoader
- * @package Thelia\Core\DependencyInjection\Loader
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class XmlFileLoader extends FileLoader
 {
-    public const DEFAULT_HOOK_CLASS = "Thelia\\Core\\Hook\\DefaultHook";
+    public const DEFAULT_HOOK_CLASS = 'Thelia\\Core\\Hook\\DefaultHook';
 
     /**
      * Loads an XML file.
@@ -88,22 +86,22 @@ class XmlFileLoader extends FileLoader
         $this->parseHooks($xml, $path, $type);
 
         $this->propelOnlyRun(
-            [$this, "parseExportCategories"],
+            [$this, 'parseExportCategories'],
             $xml
         );
 
         $this->propelOnlyRun(
-            [$this, "parseExports"],
+            [$this, 'parseExports'],
             $xml
         );
 
         $this->propelOnlyRun(
-            [$this, "parseImportCategories"],
+            [$this, 'parseImportCategories'],
             $xml
         );
 
         $this->propelOnlyRun(
-            [$this, "parseImports"],
+            [$this, 'parseImports'],
             $xml
         );
     }
@@ -121,21 +119,20 @@ class XmlFileLoader extends FileLoader
             return;
         }
         try {
-            $commandConfig = $this->container->getParameter("command.definition");
+            $commandConfig = $this->container->getParameter('command.definition');
         } catch (ParameterNotFoundException $e) {
             $commandConfig = [];
         }
 
         foreach ($commands as $command) {
-            array_push($commandConfig, $this->getAttributeAsPhp($command, "class"));
+            array_push($commandConfig, $this->getAttributeAsPhp($command, 'class'));
         }
 
-        $this->container->setParameter("command.definition", $commandConfig);
+        $this->container->setParameter('command.definition', $commandConfig);
     }
 
     /**
-     * Parses parameters
-     *
+     * Parses parameters.
      */
     protected function parseParameters(SimpleXMLElement $xml)
     {
@@ -147,9 +144,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     *
-     * parse Loops property
-     *
+     * parse Loops property.
      */
     protected function parseLoops(SimpleXMLElement $xml)
     {
@@ -157,16 +152,16 @@ class XmlFileLoader extends FileLoader
             return;
         }
         try {
-            $loopConfig = $this->container->getParameter("Thelia.parser.loops");
+            $loopConfig = $this->container->getParameter('Thelia.parser.loops');
         } catch (ParameterNotFoundException $e) {
             $loopConfig = [];
         }
 
         foreach ($loops as $loop) {
-            $loopConfig[$this->getAttributeAsPhp($loop, "name")] = $this->getAttributeAsPhp($loop, "class");
+            $loopConfig[$this->getAttributeAsPhp($loop, 'name')] = $this->getAttributeAsPhp($loop, 'class');
         }
 
-        $this->container->setParameter("Thelia.parser.loops", $loopConfig);
+        $this->container->setParameter('Thelia.parser.loops', $loopConfig);
     }
 
     protected function parseForms(SimpleXMLElement $xml)
@@ -176,7 +171,7 @@ class XmlFileLoader extends FileLoader
         }
 
         try {
-            $formConfig = $this->container->getParameter("Thelia.parser.forms");
+            $formConfig = $this->container->getParameter('Thelia.parser.forms');
         } catch (ParameterNotFoundException $e) {
             $formConfig = [];
         }
@@ -189,8 +184,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * parse Filters property
-     *
+     * parse Filters property.
      */
     protected function parseFilters(SimpleXMLElement $xml)
     {
@@ -198,21 +192,20 @@ class XmlFileLoader extends FileLoader
             return;
         }
         try {
-            $filterConfig = $this->container->getParameter("Thelia.parser.filters");
+            $filterConfig = $this->container->getParameter('Thelia.parser.filters');
         } catch (ParameterNotFoundException $e) {
             $filterConfig = [];
         }
 
         foreach ($filters as $filter) {
-            $filterConfig[$this->getAttributeAsPhp($filter, "name")] = $this->getAttributeAsPhp($filter, "class");
+            $filterConfig[$this->getAttributeAsPhp($filter, 'name')] = $this->getAttributeAsPhp($filter, 'class');
         }
 
-        $this->container->setParameter("Thelia.parser.filters", $filterConfig);
+        $this->container->setParameter('Thelia.parser.filters', $filterConfig);
     }
 
     /**
-     * parse BaseParams property
-     *
+     * parse BaseParams property.
      */
     protected function parseTemplateDirectives(SimpleXMLElement $xml)
     {
@@ -220,22 +213,22 @@ class XmlFileLoader extends FileLoader
             return;
         }
         try {
-            $baseParamConfig = $this->container->getParameter("Thelia.parser.templateDirectives");
+            $baseParamConfig = $this->container->getParameter('Thelia.parser.templateDirectives');
         } catch (ParameterNotFoundException $e) {
             $baseParamConfig = [];
         }
 
         foreach ($baseParams as $baseParam) {
-            $baseParamConfig[$this->getAttributeAsPhp($baseParam, "name")] = $this->getAttributeAsPhp($baseParam, "class");
+            $baseParamConfig[$this->getAttributeAsPhp($baseParam, 'name')] = $this->getAttributeAsPhp($baseParam, 'class');
         }
 
-        $this->container->setParameter("Thelia.parser.templateDirectives", $baseParamConfig);
+        $this->container->setParameter('Thelia.parser.templateDirectives', $baseParamConfig);
     }
 
     /**
-     * Parses multiple definitions
+     * Parses multiple definitions.
      *
-     * @param string           $file
+     * @param string $file
      */
     protected function parseDefinitions(SimpleXMLElement $xml, $file)
     {
@@ -256,10 +249,10 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses multiple definitions
+     * Parses multiple definitions.
      *
-     * @param string           $file
-     * @param string           $type
+     * @param string $file
+     * @param string $type
      */
     protected function parseHooks(SimpleXMLElement $xml, $file, $type)
     {
@@ -273,7 +266,7 @@ class XmlFileLoader extends FileLoader
 
     protected function parseHook($id, $hook, $file, $type)
     {
-        if (! isset($hook['class'])) {
+        if (!isset($hook['class'])) {
             $hook['class'] = self::DEFAULT_HOOK_CLASS;
         }
 
@@ -293,11 +286,12 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses an individual Definition
+     * Parses an individual Definition.
      *
-     * @param  string           $id
-     * @param  SimpleXMLElement $service
-     * @param  string           $file
+     * @param string           $id
+     * @param SimpleXMLElement $service
+     * @param string           $file
+     *
      * @return Definition
      */
     protected function parseService($id, $service, $file)
@@ -381,7 +375,7 @@ class XmlFileLoader extends FileLoader
         try {
             /** @var SimpleXMLElement $exportCategory */
             foreach ($exportCategories as $exportCategory) {
-                $id = (string) $this->getAttributeAsPhp($exportCategory, "id");
+                $id = (string) $this->getAttributeAsPhp($exportCategory, 'id');
 
                 $exportCategoryModel = ExportCategoryQuery::create()->findOneByRef($id);
 
@@ -395,14 +389,13 @@ class XmlFileLoader extends FileLoader
 
                 /** @var SimpleXMLElement $child */
                 foreach ($exportCategory->children() as $child) {
-                    $locale = (string) $this->getAttributeAsPhp($child, "locale");
+                    $locale = (string) $this->getAttributeAsPhp($child, 'locale');
                     $value = (string) $child;
 
                     $exportCategoryModel
                         ->setLocale($locale)
                         ->setTitle($value)
                         ->save($con);
-                    ;
                 }
             }
 
@@ -426,9 +419,9 @@ class XmlFileLoader extends FileLoader
         try {
             /** @var SimpleXMLElement $export */
             foreach ($exports as $export) {
-                $id = (string) $this->getAttributeAsPhp($export, "id");
-                $class = (string) $this->getAttributeAsPhp($export, "class");
-                $categoryRef = (string) $this->getAttributeAsPhp($export, "category_id");
+                $id = (string) $this->getAttributeAsPhp($export, 'id');
+                $class = (string) $this->getAttributeAsPhp($export, 'class');
+                $categoryRef = (string) $this->getAttributeAsPhp($export, 'category_id');
 
                 if (!class_exists($class)) {
                     throw new \ErrorException(
@@ -461,17 +454,17 @@ class XmlFileLoader extends FileLoader
 
                 /** @var SimpleXMLElement $descriptive */
                 foreach ($export->children() as $descriptive) {
-                    $locale = $this->getAttributeAsPhp($descriptive, "locale");
+                    $locale = $this->getAttributeAsPhp($descriptive, 'locale');
                     $title = null;
                     $description = null;
 
                     /** @var SimpleXMLElement $row */
                     foreach ($descriptive->children() as $row) {
                         switch ($row->getName()) {
-                            case "title":
+                            case 'title':
                                 $title = (string) $row;
                                 break;
-                            case "description":
+                            case 'description':
                                 $description = (string) $row;
                                 break;
                         }
@@ -506,7 +499,7 @@ class XmlFileLoader extends FileLoader
         try {
             /** @var SimpleXMLElement $importCategory */
             foreach ($importCategories as $importCategory) {
-                $id = (string) $this->getAttributeAsPhp($importCategory, "id");
+                $id = (string) $this->getAttributeAsPhp($importCategory, 'id');
 
                 $importCategoryModel = ImportCategoryQuery::create()->findOneByRef($id);
 
@@ -520,14 +513,13 @@ class XmlFileLoader extends FileLoader
 
                 /** @var SimpleXMLElement $child */
                 foreach ($importCategory->children() as $child) {
-                    $locale = (string) $this->getAttributeAsPhp($child, "locale");
+                    $locale = (string) $this->getAttributeAsPhp($child, 'locale');
                     $value = (string) $child;
 
                     $importCategoryModel
                         ->setLocale($locale)
                         ->setTitle($value)
                         ->save($con);
-                    ;
                 }
             }
 
@@ -551,9 +543,9 @@ class XmlFileLoader extends FileLoader
         try {
             /** @var SimpleXMLElement $import */
             foreach ($imports as $import) {
-                $id = (string) $this->getAttributeAsPhp($import, "id");
-                $class = (string) $this->getAttributeAsPhp($import, "class");
-                $categoryRef = (string) $this->getAttributeAsPhp($import, "category_id");
+                $id = (string) $this->getAttributeAsPhp($import, 'id');
+                $class = (string) $this->getAttributeAsPhp($import, 'class');
+                $categoryRef = (string) $this->getAttributeAsPhp($import, 'category_id');
 
                 if (!class_exists($class)) {
                     throw new \ErrorException(
@@ -586,17 +578,17 @@ class XmlFileLoader extends FileLoader
 
                 /** @var SimpleXMLElement $descriptive */
                 foreach ($import->children() as $descriptive) {
-                    $locale = $this->getAttributeAsPhp($descriptive, "locale");
+                    $locale = $this->getAttributeAsPhp($descriptive, 'locale');
                     $title = null;
                     $description = null;
 
                     /** @var SimpleXMLElement $row */
                     foreach ($descriptive->children() as $row) {
                         switch ($row->getName()) {
-                            case "title":
+                            case 'title':
                                 $title = (string) $row;
                                 break;
-                            case "description":
+                            case 'description':
                                 $description = (string) $row;
                                 break;
                         }
@@ -642,8 +634,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Validates a documents XML schema.
      *
-     *
-     * @return Boolean
+     * @return bool
      *
      * @throws RuntimeException When extension references a non-existent XSD file
      */
@@ -697,7 +688,7 @@ EOF
      * @param mixed  $resource A resource
      * @param string $type     The resource type
      *
-     * @return Boolean true if this class supports the given resource, false otherwise
+     * @return bool true if this class supports the given resource, false otherwise
      */
     public function supports($resource, $type = null)
     {
@@ -709,6 +700,7 @@ EOF
      *
      * @param $name
      * @param bool $lowercase
+     *
      * @return array
      */
     private function getArgumentsAsPhp(SimpleXMLElement $xml, $name, $lowercase = true)
@@ -766,25 +758,25 @@ EOF
     {
         $factoryMethod = $this->getAttributeAsPhp($factoryXml, 'method');
 
-        if ("" === $factoryMethod) {
-            $factoryMethod = "__invoke";
+        if ('' === $factoryMethod) {
+            $factoryMethod = '__invoke';
         }
 
-        if ("" !== $this->getAttributeAsPhp($factoryXml, 'service')) {
+        if ('' !== $this->getAttributeAsPhp($factoryXml, 'service')) {
             return [
                 (new Reference($this->getAttributeAsPhp($factoryXml, 'service'))),
-                $factoryMethod
+                $factoryMethod,
             ];
         }
 
-        if ("" !== $this->getAttributeAsPhp($factoryXml, 'class')) {
+        if ('' !== $this->getAttributeAsPhp($factoryXml, 'class')) {
             return [
                 $this->getAttributeAsPhp($factoryXml, 'class'),
-                $factoryMethod
+                $factoryMethod,
             ];
         }
 
-        throw new \ErrorException("You must specify either a class or a service in factory");
+        throw new \ErrorException('You must specify either a class or a service in factory');
     }
 
     /**

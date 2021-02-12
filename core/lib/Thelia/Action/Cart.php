@@ -36,11 +36,10 @@ use Thelia\Model\Tools\ProductPriceTools;
 use Thelia\Tools\TokenProvider;
 
 /**
- *
  * Class Cart where all actions are manage like adding, modifying or delete items.
  *
  * Class Cart
- * @package Thelia\Action
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Cart extends BaseAction implements EventSubscriberInterface
@@ -48,7 +47,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /** @var RequestStack */
     protected $requestStack;
 
-    /** @var  TokenProvider */
+    /** @var TokenProvider */
     protected $tokenProvider;
 
     public function __construct(RequestStack $requestStack, TokenProvider $tokenProvider)
@@ -71,7 +70,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * add an article in the current cart
+     * add an article in the current cart.
      *
      * @param $eventName
      */
@@ -120,9 +119,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     *
-     * Delete specify article present into cart
-     *
+     * Delete specify article present into cart.
      */
     public function deleteItem(CartEvent $event)
     {
@@ -140,7 +137,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Clear the cart
+     * Clear the cart.
      */
     public function clear(CartEvent $event)
     {
@@ -150,8 +147,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     *
-     * Modify article's quantity
+     * Modify article's quantity.
      *
      * don't use Form here just test the Request.
      *
@@ -185,9 +181,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     *
-     * Refresh article's price
-     *
+     * Refresh article's price.
      */
     public function updateCartPrices(CartModel $cart, CurrencyModel $currency)
     {
@@ -217,12 +211,13 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * increase the quantity for an existing cartItem
+     * increase the quantity for an existing cartItem.
      *
      * @param float $quantity
      *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
+     *
      * @return CartItem
      */
     protected function updateQuantity(EventDispatcherInterface $dispatcher, CartItem $cartItem, $quantity)
@@ -235,10 +230,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * try to attach a new item to an existing cart
+     * try to attach a new item to an existing cart.
      *
-     * @param int                      $productId
-     * @param float                    $quantity
+     * @param int   $productId
+     * @param float $quantity
      *
      * @return CartItem
      */
@@ -260,7 +255,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->setPrice($productPrices->getPrice())
             ->setPromoPrice($productPrices->getPromoPrice())
             ->setPromo($productSaleElements->getPromo())
-            ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30))
+            ->setPriceEndOfLife(time() + ConfigQuery::read('cart.priceEOF', 60 * 60 * 24 * 30))
             ->save();
 
         return $cartItem;
@@ -268,11 +263,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     /**
      * find a specific record in CartItem table using the Cart id, the product id
-     * and the product_sale_elements id
+     * and the product_sale_elements id.
      *
-     * @param  int           $cartId
-     * @param  int           $productId
-     * @param  int           $productSaleElementsId
+     * @param int $cartId
+     * @param int $productId
+     * @param int $productSaleElementsId
+     *
      * @return CartItem
      *
      * @deprecated this method is deprecated. Dispatch a TheliaEvents::CART_FINDITEM instead
@@ -287,7 +283,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Find a specific record in CartItem table using the current CartEvent
+     * Find a specific record in CartItem table using the current CartEvent.
      *
      * @param CartEvent $event the cart event
      */
@@ -312,8 +308,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function restoreCurrentCart(CartRestoreEvent $cartRestoreEvent, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $cookieName = ConfigQuery::read("cart.cookie_name", 'thelia_cart');
-        $persistentCookie = ConfigQuery::read("cart.use_persistent_cookie", 1);
+        $cookieName = ConfigQuery::read('cart.cookie_name', 'thelia_cart');
+        $persistentCookie = ConfigQuery::read('cart.use_persistent_cookie', 1);
 
         $cart = null;
 
@@ -337,6 +333,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * the cart.
      *
      * @return CartModel
+     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -354,11 +351,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     *
      * The cart token is saved in a cookie so we try to retrieve it. Then the customer is checked.
      *
      * @param $cookieName
+     *
      * @return CartModel
+     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -429,7 +427,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     /**
      * Create a new, empty cart object, and assign it to the current customer, if any.
-     *
      */
     public function createEmptyCart(CartCreateEvent $cartCreateEvent)
     {
@@ -444,10 +441,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         $this->getSession()->setSessionCart($cart);
 
-        if (ConfigQuery::read("cart.use_persistent_cookie", 1) == 1) {
+        if (ConfigQuery::read('cart.use_persistent_cookie', 1) == 1) {
             // set cart_use_cookie to "" to remove the cart cookie
             // see Thelia\Core\EventListener\ResponseListener
-            $this->getSession()->set("cart_use_cookie", "");
+            $this->getSession()->set('cart_use_cookie', '');
         }
 
         $cartCreateEvent->setCart($cart);
@@ -457,6 +454,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * Duplicate an existing Cart. If a customer ID is provided the created cart will be attached to this customer.
      *
      * @param CustomerModel $customer
+     *
      * @return CartModel
      */
     protected function duplicateCart(EventDispatcherInterface $dispatcher, CartModel $cart, CustomerModel $customer = null)
@@ -484,7 +482,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $id = null;
 
-        if (ConfigQuery::read("cart.use_persistent_cookie", 1) == 1) {
+        if (ConfigQuery::read('cart.use_persistent_cookie', 1) == 1) {
             $id = $this->tokenProvider->getToken();
             $this->getSession()->set('cart_use_cookie', $id);
         }
@@ -498,20 +496,20 @@ class Cart extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::CART_PERSIST => ["persistCart", 128],
-            TheliaEvents::CART_RESTORE_CURRENT => ["restoreCurrentCart", 128],
-            TheliaEvents::CART_CREATE_NEW => ["createEmptyCart", 128],
-            TheliaEvents::CART_ADDITEM => ["addItem", 128],
-            TheliaEvents::CART_FINDITEM => ["findCartItem", 128],
-            TheliaEvents::CART_DELETEITEM => ["deleteItem", 128],
-            TheliaEvents::CART_UPDATEITEM => ["changeItem", 128],
-            TheliaEvents::CART_CLEAR => ["clear", 128],
-            TheliaEvents::CHANGE_DEFAULT_CURRENCY => ["updateCart", 128],
+            TheliaEvents::CART_PERSIST => ['persistCart', 128],
+            TheliaEvents::CART_RESTORE_CURRENT => ['restoreCurrentCart', 128],
+            TheliaEvents::CART_CREATE_NEW => ['createEmptyCart', 128],
+            TheliaEvents::CART_ADDITEM => ['addItem', 128],
+            TheliaEvents::CART_FINDITEM => ['findCartItem', 128],
+            TheliaEvents::CART_DELETEITEM => ['deleteItem', 128],
+            TheliaEvents::CART_UPDATEITEM => ['changeItem', 128],
+            TheliaEvents::CART_CLEAR => ['clear', 128],
+            TheliaEvents::CHANGE_DEFAULT_CURRENCY => ['updateCart', 128],
         ];
     }
 
     /**
-     * Returns the session from the current request
+     * Returns the session from the current request.
      *
      * @return \Thelia\Core\HttpFoundation\Session\Session
      */

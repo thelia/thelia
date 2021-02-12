@@ -13,8 +13,8 @@
 namespace Thelia\Core\Hook;
 
 /**
- * Class DefaultHook
- * @package Thelia\Core\Hook
+ * Class DefaultHook.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class DefaultHook extends BaseHook

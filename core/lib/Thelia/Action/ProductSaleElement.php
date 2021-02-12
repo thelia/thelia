@@ -53,7 +53,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Create a new product sale element, with or without combination
+     * Create a new product sale element, with or without combination.
      *
      * @throws \Exception
      */
@@ -110,7 +110,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Update an existing product sale element
+     * Update an existing product sale element.
      *
      * @throws \Exception
      */
@@ -212,7 +212,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Delete a product sale element
+     * Delete a product sale element.
      *
      * @throws \Exception
      */
@@ -313,11 +313,12 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Create a combination for a given product sale element
+     * Create a combination for a given product sale element.
      *
      * @param ConnectionInterface $con                   the Propel connection
      * @param ProductSaleElements $salesElement          the product sale element
      * @param array               $combinationAttributes an array oif attributes av IDs
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     protected function createCombination(ConnectionInterface $con, ProductSaleElements $salesElement, $combinationAttributes)
@@ -342,7 +343,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      *******************/
 
     /**
-     * Clone product's PSEs and associated datas
+     * Clone product's PSEs and associated datas.
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -356,9 +357,9 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             ->findByProductId($event->getOriginalProduct()->getId());
 
         /**
-         * Handle PSEs
+         * Handle PSEs.
          *
-         * @var int  $key
+         * @var int                 $key
          * @var ProductSaleElements $originalProductPSE
          */
         foreach ($originalProductPSEs as $key => $originalProductPSE) {
@@ -392,7 +393,9 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param $currencyId
+     *
      * @return int
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function createClonePSE(ProductCloneEvent $event, ProductSaleElements $originalProductPSE, $currencyId)
@@ -403,7 +406,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             ->find();
 
         $clonedProductCreatePSEEvent = new ProductSaleElementCreateEvent($event->getClonedProduct(), $attributeCombinationList, $currencyId);
-        $this->eventDispatcher->dispatch($clonedProductCreatePSEEvent,TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT);
+        $this->eventDispatcher->dispatch($clonedProductCreatePSEEvent, TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT);
 
         return $clonedProductCreatePSEEvent->getProductSaleElement()->getId();
     }
@@ -438,6 +441,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      * @param $clonedProductPSEId
      * @param $originalProductPSEFiles
      * @param $type
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function clonePSEAssociatedFiles($clonedProductId, $clonedProductPSEId, $originalProductPSEFiles, $type)
@@ -447,8 +451,8 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             $originalProductFilePositionQuery = [];
             $originalProductPSEFileId = null;
 
-            if (!in_array($type, ['images', 'documents'])) {
-                throw new \Exception(Translator::getInstance()->trans("Cloning files of type %type is not allowed.", ['%type' => $type], "core"));
+            if (!\in_array($type, ['images', 'documents'])) {
+                throw new \Exception(Translator::getInstance()->trans('Cloning files of type %type is not allowed.', ['%type' => $type], 'core'));
             }
 
             // Get file's original position
@@ -466,7 +470,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->select(['POSITION'])
                 ->findPk($originalProductPSEFileId);
 
-            $clonedProductFileIdToLinkToPSEQuery = "";
+            $clonedProductFileIdToLinkToPSEQuery = '';
             // Get cloned file ID to link to the cloned PSE
             switch ($type) {
                 case 'image':
@@ -511,11 +515,11 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT    => ["create", 128],
-            TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT => ["update", 128],
-            TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT => ["delete", 128],
-            TheliaEvents::PRODUCT_COMBINATION_GENERATION      => ["generateCombinations", 128],
-            TheliaEvents::PSE_CLONE                           => ["clonePSE", 128]
+            TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT => ['create', 128],
+            TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT => ['update', 128],
+            TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT => ['delete', 128],
+            TheliaEvents::PRODUCT_COMBINATION_GENERATION => ['generateCombinations', 128],
+            TheliaEvents::PSE_CLONE => ['clonePSE', 128],
         ];
     }
 }

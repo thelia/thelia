@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\NewsletterQuery;
 
 /**
- * Class NewsletterIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class NewsletterIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class NewsletterIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class NewsletterIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "newsletter_id";
+        return 'newsletter_id';
     }
 }

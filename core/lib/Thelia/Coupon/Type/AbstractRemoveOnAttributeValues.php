@@ -20,19 +20,19 @@ use Thelia\Model\CartItem;
 /**
  * The base class to process a discount related to Attribute values.
  *
- * @package Coupon
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements AmountAndPercentageCouponInterface
 {
     public const ATTRIBUTES_AV_LIST = 'attribute_avs';
-    public const ATTRIBUTE          = 'attribute_id';
+    public const ATTRIBUTE = 'attribute_id';
 
     public $attributeAvList = [];
     public $attribute = 0;
 
     /**
      * Set the value of specific coupon fields.
+     *
      * @param array $effects the Coupon effects params
      */
     abstract public function setFieldsValue($effects);
@@ -40,13 +40,14 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
     /**
      * Get the discount for a specific cart item.
      *
-     * @param  CartItem $cartItem the cart item
-     * @return float    the discount value
+     * @param CartItem $cartItem the cart item
+     *
+     * @return float the discount value
      */
     abstract public function getCartItemDiscount(CartItem $cartItem);
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function set(
         FacadeInterface $facade,
@@ -85,7 +86,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
 
         $this->attributeAvList = $effects[self::ATTRIBUTES_AV_LIST] ?? [];
 
-        if (! \is_array($this->attributeAvList)) {
+        if (!\is_array($this->attributeAvList)) {
             $this->attributeAvList = [$this->attributeAvList];
         }
 
@@ -97,7 +98,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function exec()
     {
@@ -109,7 +110,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
 
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
-            if (! $cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
+            if (!$cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
                 $productSaleElements = $cartItem->getProductSaleElements();
 
                 $combinations = $productSaleElements->getAttributeCombinations();
@@ -137,23 +138,23 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
      * @param string $templateName the path to the template
      * @param array  $otherFields  the list of additional fields fields
      *
-     * @return string the rendered template.
+     * @return string the rendered template
      */
     public function drawBaseBackOfficeInputs($templateName, $otherFields)
     {
         return $this->facade->getParser()->render($templateName, array_merge($otherFields, [
             // The attributes list field
             'attribute_field_name' => $this->makeCouponFieldName(self::ATTRIBUTE),
-            'attribute_value'      => $this->attribute,
+            'attribute_value' => $this->attribute,
 
             // The attributes list field
             'attribute_av_field_name' => $this->makeCouponFieldName(self::ATTRIBUTES_AV_LIST),
-            'attribute_av_values'     => $this->attributeAvList
+            'attribute_av_values' => $this->attributeAvList,
         ]));
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getBaseFieldList($otherFields)
     {
@@ -161,7 +162,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function checkBaseCouponFieldValue($fieldName, $fieldValue)
     {

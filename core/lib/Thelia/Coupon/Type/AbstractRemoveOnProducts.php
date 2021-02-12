@@ -17,17 +17,16 @@ use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\CartItem;
 
 /**
- * Allow to remove an amount from the checkout total
+ * Allow to remove an amount from the checkout total.
  *
- * @package Coupon
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 abstract class AbstractRemoveOnProducts extends CouponAbstract implements AmountAndPercentageCouponInterface
 {
-    public const CATEGORY_ID   = 'category_id';
+    public const CATEGORY_ID = 'category_id';
     public const PRODUCTS_LIST = 'products';
 
-    public $category_id  = 0;
+    public $category_id = 0;
     public $product_list = [];
 
     /**
@@ -40,13 +39,14 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
     /**
      * Get the discount for a specific cart item.
      *
-     * @param  CartItem $cartItem the cart item
-     * @return float    the discount value
+     * @param CartItem $cartItem the cart item
+     *
+     * @return float the discount value
      */
     abstract public function getCartItemDiscount(CartItem $cartItem);
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function set(
         FacadeInterface $facade,
@@ -85,7 +85,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
 
         $this->product_list = $effects[self::PRODUCTS_LIST] ?? [];
 
-        if (! \is_array($this->product_list)) {
+        if (!\is_array($this->product_list)) {
             $this->product_list = [$this->product_list];
         }
 
@@ -97,7 +97,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function exec()
     {
@@ -110,7 +110,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
             if (\in_array($cartItem->getProduct()->getId(), $this->product_list)) {
-                if (! $cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
+                if (!$cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
                     $discount += $this->getCartItemDiscount($cartItem);
                 }
             }
@@ -120,24 +120,24 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function drawBaseBackOfficeInputs($templateName, $otherFields)
     {
         return $this->facade->getParser()->render($templateName, array_merge($otherFields, [
             // The category ID field
             'category_id_field_name' => $this->makeCouponFieldName(self::CATEGORY_ID),
-            'category_id_value'     => $this->category_id,
+            'category_id_value' => $this->category_id,
 
             // The products list field
             'products_field_name' => $this->makeCouponFieldName(self::PRODUCTS_LIST),
-            'products_values'     => $this->product_list,
-            'products_values_csv' => implode(', ', $this->product_list)
+            'products_values' => $this->product_list,
+            'products_values_csv' => implode(', ', $this->product_list),
         ]));
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getBaseFieldList($otherFields)
     {
@@ -145,7 +145,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function checkBaseCouponFieldValue($fieldName, $fieldValue)
     {

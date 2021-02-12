@@ -25,9 +25,8 @@ use Thelia\Model\ModuleQuery;
 
 /**
  * Class ModulePositionCommand
- * Set modules position
+ * Set modules position.
  *
- * @package Thelia\Command
  * @author  Jérôme Billiras <jerome.billiras+github@gmail.com>
  */
 class ModulePositionCommand extends ContainerAwareCommand
@@ -51,7 +50,7 @@ class ModulePositionCommand extends ContainerAwareCommand
     {
         parent::__construct($name);
 
-        $this->moduleQuery = new ModuleQuery;
+        $this->moduleQuery = new ModuleQuery();
     }
 
     protected function configure()
@@ -120,9 +119,9 @@ class ModulePositionCommand extends ContainerAwareCommand
     }
 
     /**
-     * Check a module argument format
+     * Check a module argument format.
      *
-     * @param string  $paramValue
+     * @param string $paramValue
      *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
@@ -146,7 +145,7 @@ class ModulePositionCommand extends ContainerAwareCommand
     }
 
     /**
-     * Reorder modules positions (without holes)
+     * Reorder modules positions (without holes).
      *
      * @return array Maximum position by type
      */
@@ -173,9 +172,9 @@ class ModulePositionCommand extends ContainerAwareCommand
     }
 
     /**
-     * Check positions consistency
+     * Check positions consistency.
      *
-     * @param InputInterface $input     An InputInterface instance
+     * @param InputInterface  $input      An InputInterface instance
      * @param OutputInterface $output     An OutputInterface instance
      * @param bool            $isAbsolute Set to true or false according to position values
      *

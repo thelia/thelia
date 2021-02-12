@@ -23,8 +23,8 @@ use TheliaSmarty\Template\Exception\SmartyPluginException;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 /**
- * Class Render
- * @package TheliaSmarty\Template\Plugins
+ * Class Render.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class Render extends AbstractSmartyPlugin
@@ -38,8 +38,6 @@ class Render extends AbstractSmartyPlugin
     /** @var Container */
     protected $container;
 
-    /**
-     */
     public function __construct(ControllerResolver $controllerResolver, RequestStack $requestStack, ContainerInterface $container)
     {
         $this->controllerResolver = $controllerResolver;
@@ -49,12 +47,14 @@ class Render extends AbstractSmartyPlugin
 
     /**
      * @param $params
+     *
      * @return mixed|string
+     *
      * @throws SmartyPluginException
      */
     public function processRender($params)
     {
-        if (null === $params["action"]) {
+        if (null === $params['action']) {
             throw new SmartyPluginException(
                 "You must declare the 'action' parameter in the 'render' smarty function"
             );
@@ -80,24 +80,24 @@ class Render extends AbstractSmartyPlugin
     protected function prepareRequest(array $params)
     {
         // Get action
-        $action = $this->popParameter($params, "action");
+        $action = $this->popParameter($params, 'action');
 
         // Then get and filter query, request and method
-        $query = $this->popParameter($params, "query");
+        $query = $this->popParameter($params, 'query');
         $query = $this->filterArrayStrParam($query);
-        $request = $this->popParameter($params, "request");
+        $request = $this->popParameter($params, 'request');
         $request = $this->filterArrayStrParam($request);
-        $method = strtoupper($this->popParameter($params, "method", "GET"));
+        $method = strtoupper($this->popParameter($params, 'method', 'GET'));
 
         // Then build the request
         $requestObject = clone $this->requestStack->getCurrentRequest();
         $requestObject->query = new ParameterBag($query);
         $requestObject->request = new ParameterBag($request);
-        $requestObject->attributes = new ParameterBag(["_controller" => $action]);
+        $requestObject->attributes = new ParameterBag(['_controller' => $action]);
 
         // Apply the method
-        if (!empty($request) && "GET" === $method) {
-            $requestObject->setMethod("POST");
+        if (!empty($request) && 'GET' === $method) {
+            $requestObject->setMethod('POST');
         } else {
             $requestObject->setMethod($method);
         }
@@ -112,6 +112,7 @@ class Render extends AbstractSmartyPlugin
 
     /**
      * @param $param
+     *
      * @return array
      *
      * If $param is an array, return it.
@@ -135,7 +136,8 @@ class Render extends AbstractSmartyPlugin
 
     /**
      * @param $name
-     * @param  null  $default
+     * @param null $default
+     *
      * @return mixed
      *
      * Get a parameter then unset it

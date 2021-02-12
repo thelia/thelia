@@ -18,8 +18,8 @@ use Thelia\Model\Newsletter as NewsletterModel;
 use Thelia\Model\NewsletterQuery;
 
 /**
- * Class NewsletterTest
- * @package Thelia\Tests\Action
+ * Class NewsletterTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class NewsletterTest extends BaseAction
@@ -29,7 +29,7 @@ class NewsletterTest extends BaseAction
 
     public function setUp(): void
     {
-        $this->mailerFactory = $this->getMockBuilder("Thelia\\Mailer\\MailerFactory")
+        $this->mailerFactory = $this->getMockBuilder('Thelia\\Mailer\\MailerFactory')
             ->disableOriginalConstructor()
             ->getMock()
         ;
@@ -48,8 +48,8 @@ class NewsletterTest extends BaseAction
     {
         $event = new NewsletterEvent('test@foo.com', 'en_US');
         $event
-            ->setFirstname("foo")
-            ->setLastname("bar")
+            ->setFirstname('foo')
+            ->setLastname('bar')
         ;
 
         $action = new Newsletter($this->mailerFactory, $this->dispatcher);
@@ -70,6 +70,7 @@ class NewsletterTest extends BaseAction
 
     /**
      * @depends testSubscribe
+     *
      * @return NewsletterModel
      */
     public function testUpdate(NewsletterModel $newsletter)
@@ -77,8 +78,8 @@ class NewsletterTest extends BaseAction
         $event = new NewsletterEvent('test@foo.com', 'en_US');
         $event
             ->setId($newsletter->getId())
-            ->setFirstname("foo update")
-            ->setLastname("bar update")
+            ->setFirstname('foo update')
+            ->setLastname('bar update')
         ;
 
         $action = new Newsletter($this->mailerFactory, $this->dispatcher);

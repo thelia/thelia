@@ -17,15 +17,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\Area as AreaModel;
-use Thelia\Model\AreaQuery;
 use Thelia\Model\CountryArea;
 use Thelia\Model\CountryAreaQuery;
 use Thelia\Model\Event\AreaEvent;
 
 /**
- * Class Area
- * @package Thelia\Action
+ * Class Area.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Area extends BaseAction implements EventSubscriberInterface
@@ -92,7 +90,7 @@ class Area extends BaseAction implements EventSubscriberInterface
             TheliaEvents::AREA_POSTAGE_UPDATE => ['updatePostage', 128],
             TheliaEvents::AREA_DELETE => ['delete', 128],
             TheliaEvents::AREA_CREATE => ['save', 128],
-            TheliaEvents::AREA_UPDATE => ['save', 128]
+            TheliaEvents::AREA_UPDATE => ['save', 128],
         ];
     }
 }

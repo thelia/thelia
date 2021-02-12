@@ -12,12 +12,12 @@
 
 namespace Thelia\ImportExport\Export\Type;
 
-use PDO;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
 /**
- * Class CustomerExport
+ * Class CustomerExport.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  * @author Florian Bernard <fbernard@openstudio.fr>
@@ -43,7 +43,7 @@ class CustomerExport extends JsonFileAbstractExport
         'address_city' => 'city',
         'country_i18n_title' => 'country',
         'address_phone' => 'phone',
-        'address_cellphone' => 'cellphone'
+        'address_cellphone' => 'cellphone',
     ];
 
     protected function getData()

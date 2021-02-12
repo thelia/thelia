@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Country;
 
 /**
- * Class CountryDeleteEvent
- * @package Thelia\Core\Event\Country
+ * Class CountryDeleteEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CountryDeleteEvent extends CountryEvent

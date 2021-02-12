@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\TaxRuleQuery;
 
 /**
- * Class TaxRuleIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class TaxRuleIdType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class TaxRuleIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class TaxRuleIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "tax_rule_id";
+        return 'tax_rule_id';
     }
 }

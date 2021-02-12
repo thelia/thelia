@@ -35,6 +35,7 @@ class ProductDeleteEvent extends ProductEvent
 
     /**
      * @param $product_id
+     *
      * @return $this
      */
     public function setProductId($product_id)

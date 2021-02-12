@@ -27,8 +27,8 @@ use Thelia\Model\TaxRuleQuery;
 use Thelia\Tools\I18n;
 
 /**
- * Class Calculator
- * @package Thelia\TaxEngine
+ * Class Calculator.
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  * @author Franck Allimant <fallimant@openstudio.fr>
  * @author Vincent Lopes <vlopes@openstudio.fr>
@@ -41,7 +41,7 @@ class Calculator
     protected $taxRuleQuery;
 
     /**
-     * @var null|\Propel\Runtime\Collection\ObjectCollection
+     * @var \Propel\Runtime\Collection\ObjectCollection|null
      */
     protected $taxRulesCollection;
 
@@ -55,8 +55,8 @@ class Calculator
     }
 
     /**
-     *
      * @return float
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public static function getUntaxedCartDiscount(Cart $cart, Country $country, State $state = null)
@@ -65,12 +65,14 @@ class Calculator
     }
 
     /**
-     *
      * @return float|int
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
+
     /**
      * @return float
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public static function getUntaxedOrderDiscount(Order $order)
@@ -80,6 +82,7 @@ class Calculator
 
     /**
      * @return float
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public static function getOrderTaxFactor(Order $order)
@@ -88,7 +91,7 @@ class Calculator
         static $orderTaxFactor;
 
         if (null === $orderTaxFactor) {
-            if ((float)$order->getDiscount() === 0.0) {
+            if ((float) $order->getDiscount() === 0.0) {
                 return 1;
             }
 
@@ -114,8 +117,8 @@ class Calculator
     }
 
     /**
-     *
      * @return float
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public static function getCartTaxFactor(Cart $cart, Country $country, State $state = null)
@@ -124,7 +127,7 @@ class Calculator
         static $cartFactor;
 
         if (null === $cartFactor) {
-            if ((float)$cart->getDiscount() === 0.0) {
+            if ((float) $cart->getDiscount() === 0.0) {
                 return 1;
             }
 
@@ -150,6 +153,7 @@ class Calculator
 
     /**
      * @return $this
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function load(Product $product, Country $country, State $state = null)
@@ -172,6 +176,7 @@ class Calculator
 
     /**
      * @return $this
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function loadTaxRule(TaxRule $taxRule, Country $country, Product $product, State $state = null)
@@ -197,6 +202,7 @@ class Calculator
 
     /**
      * @return $this
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function loadTaxRuleWithoutCountry(TaxRule $taxRule, Product $product)
@@ -220,9 +226,11 @@ class Calculator
 
     /**
      * @return $this
+     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
      * @since 2.4
-    */
+     */
     public function loadTaxRuleWithoutProduct(TaxRule $taxRule, Country $country, State $state = null)
     {
         if ($taxRule->getId() === null) {
@@ -244,7 +252,9 @@ class Calculator
     /**
      * @param $untaxedPrice
      * @param null $taxCollection
+     *
      * @return float
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTaxAmountFromUntaxedPrice($untaxedPrice, &$taxCollection = null)
@@ -254,6 +264,7 @@ class Calculator
 
     /**
      * @param $taxedPrice
+     *
      * @return float
      */
     public function getTaxAmountFromTaxedPrice($taxedPrice)
@@ -262,10 +273,12 @@ class Calculator
     }
 
     /**
-     * @param float $untaxedPrice
+     * @param float                          $untaxedPrice
      * @param OrderProductTaxCollection|null $taxCollection returns OrderProductTaxCollection
-     * @param string|null $askedLocale
+     * @param string|null                    $askedLocale
+     *
      * @return float
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTaxedPrice($untaxedPrice, &$taxCollection = null, $askedLocale = null)
@@ -327,6 +340,7 @@ class Calculator
 
     /**
      * @param $taxedPrice
+     *
      * @return float|int|number
      */
     public function getUntaxedPrice($taxedPrice)

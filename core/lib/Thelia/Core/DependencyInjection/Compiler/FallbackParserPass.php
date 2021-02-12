@@ -17,15 +17,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
- * Class FallbackParserPass
- * @package Thelia\Core\DependencyInjection\Compiler
+ * Class FallbackParserPass.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class FallbackParserPass implements CompilerPassInterface
 {
     /**
      * You can modify the container here before it is dumped to PHP code.
-     *
      *
      * @api
      */
@@ -37,9 +36,9 @@ class FallbackParserPass implements CompilerPassInterface
 
         $container->addDefinitions(
             [
-                'thelia.parser' => new Definition("Thelia\\Core\\Template\\Parser\\ParserFallback"),
-                'thelia.parser.helper' => new Definition("Thelia\\Core\\Template\\Parser\\ParserHelperFallback"),
-                'thelia.parser.asset.resolver' => new Definition("Thelia\\Core\\Template\\Parser\\ParserHelperFallback")
+                'thelia.parser' => new Definition('Thelia\\Core\\Template\\Parser\\ParserFallback'),
+                'thelia.parser.helper' => new Definition('Thelia\\Core\\Template\\Parser\\ParserHelperFallback'),
+                'thelia.parser.asset.resolver' => new Definition('Thelia\\Core\\Template\\Parser\\ParserHelperFallback'),
             ]
         );
     }

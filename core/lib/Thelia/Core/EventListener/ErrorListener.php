@@ -26,8 +26,8 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 /**
- * Class ErrorListener
- * @package Thelia\Core\EventListener
+ * Class ErrorListener.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class ErrorListener implements EventSubscriberInterface
@@ -61,8 +61,8 @@ class ErrorListener implements EventSubscriberInterface
 
     public function defaultErrorFallback(ExceptionEvent $event)
     {
-        $this->parser->assign("status_code", 500);
-        $this->parser->assign("exception_message", $event->getThrowable()->getMessage());
+        $this->parser->assign('status_code', 500);
+        $this->parser->assign('exception_message', $event->getThrowable()->getMessage());
 
         if (!$this->parser->hasTemplateDefinition()) {
             $this->parser->setTemplateDefinition(
@@ -82,7 +82,7 @@ class ErrorListener implements EventSubscriberInterface
 
     public function handleException(ExceptionEvent $event)
     {
-        if ("prod" === $this->env && ConfigQuery::isShowingErrorMessage()) {
+        if ('prod' === $this->env && ConfigQuery::isShowingErrorMessage()) {
             $this->eventDispatcher
                 ->dispatch(
                     $event,
@@ -101,10 +101,10 @@ class ErrorListener implements EventSubscriberInterface
 
         do {
             $logMessage .=
-                ($logMessage ? PHP_EOL . 'Caused by' : 'Uncaught exception')
-                . $exception->getMessage()
-                . PHP_EOL
-                . "Stack Trace: " . $exception->getTraceAsString()
+                ($logMessage ? PHP_EOL.'Caused by' : 'Uncaught exception')
+                .$exception->getMessage()
+                .PHP_EOL
+                .'Stack Trace: '.$exception->getTraceAsString()
             ;
         } while (null !== $exception = $exception->getPrevious());
 
@@ -123,18 +123,18 @@ class ErrorListener implements EventSubscriberInterface
 
     /**
      * {@inheritdoc}
-     * api
+     * api.
      */
     public static function getSubscribedEvents()
     {
         return [
             KernelEvents::EXCEPTION => [
-                ["logException", 0],
-                ["handleException", 0],
-                ['authenticationException', 100]
+                ['logException', 0],
+                ['handleException', 0],
+                ['authenticationException', 100],
             ],
             TheliaKernelEvents::THELIA_HANDLE_ERROR => [
-                ["defaultErrorFallback", 0],
+                ['defaultErrorFallback', 0],
             ],
         ];
     }

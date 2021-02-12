@@ -13,7 +13,7 @@
 namespace Thelia\Core\Security;
 
 /**
- * A simple security manager, in charge of checking user
+ * A simple security manager, in charge of checking user.
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
@@ -25,17 +25,17 @@ class AccessManager
     public const DELETE = 'DELETE';
 
     protected $accessGranted = [
-        self::VIEW      =>  false,
-        self::CREATE    =>  false,
-        self::UPDATE    =>  false,
-        self::DELETE    =>  false,
+        self::VIEW => false,
+        self::CREATE => false,
+        self::UPDATE => false,
+        self::DELETE => false,
     ];
 
     protected static $accessPows = [
-        self::VIEW      =>  3,
-        self::CREATE    =>  2,
-        self::UPDATE    =>  1,
-        self::DELETE    =>  0,
+        self::VIEW => 3,
+        self::CREATE => 2,
+        self::UPDATE => 1,
+        self::DELETE => 0,
     ];
 
     protected $accessValue;

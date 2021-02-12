@@ -17,8 +17,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Thelia\Form\StandardDescriptionFieldsTrait;
 
 /**
- * Class TaxRuleI18nType
- * @package Thelia\Core\Form\Type
+ * Class TaxRuleI18nType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class TaxRuleI18nType extends AbstractTheliaType
@@ -35,7 +35,7 @@ class TaxRuleI18nType extends AbstractTheliaType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            "cascade_validation" => true,
+            'cascade_validation' => true,
         ]);
     }
 
@@ -43,7 +43,7 @@ class TaxRuleI18nType extends AbstractTheliaType
     {
         $this->formBuilder = $builder;
 
-        $this->addStandardDescFields(["chapo", "postscriptum"]);
+        $this->addStandardDescFields(['chapo', 'postscriptum']);
     }
 
     /**
@@ -53,6 +53,6 @@ class TaxRuleI18nType extends AbstractTheliaType
      */
     public function getName()
     {
-        return "tax_rule_i18n";
+        return 'tax_rule_i18n';
     }
 }

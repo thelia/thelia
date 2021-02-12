@@ -14,11 +14,10 @@ namespace Thelia\Tests\Type;
 
 use PHPUnit\Framework\TestCase;
 use Thelia\Type\AnyListType;
-use Thelia\Type\IntListType;
 
 /**
- * Class AnyListTypeTest
- * @package Thelia\Tests\Type
+ * Class AnyListTypeTest.
+ *
  * @author Gilles Bourgeat <gbourgeat@openstudio.fr>
  */
 class AnyListTypeTest extends TestCase

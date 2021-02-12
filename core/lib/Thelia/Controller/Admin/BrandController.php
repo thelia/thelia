@@ -29,8 +29,8 @@ use Thelia\Model\Brand;
 use Thelia\Model\BrandQuery;
 
 /**
- * Class BrandController
- * @package Thelia\Controller\Admin
+ * Class BrandController.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class BrandController extends AbstractSeoCrudController
@@ -52,7 +52,7 @@ class BrandController extends AbstractSeoCrudController
     }
 
     /**
-     * Return the creation form for this object
+     * Return the creation form for this object.
      */
     protected function getCreationForm()
     {
@@ -60,7 +60,7 @@ class BrandController extends AbstractSeoCrudController
     }
 
     /**
-     * Return the update form for this object
+     * Return the update form for this object.
      */
     protected function getUpdateForm()
     {
@@ -68,29 +68,29 @@ class BrandController extends AbstractSeoCrudController
     }
 
     /**
-     * Hydrate the update form for this object, before passing it to the update template
+     * Hydrate the update form for this object, before passing it to the update template.
      *
-     * @param  Brand                 $object
+     * @param Brand $object
+     *
      * @return BrandModificationForm $object
      */
     protected function hydrateObjectForm(
         ParserContext $parserContext,
         $object
-    )
-    {
+    ) {
         // Hydrate the "SEO" tab form
         $this->hydrateSeoForm($parserContext, $object);
 
         // Prepare the data that will hydrate the form
         $data = [
-            'id'            => $object->getId(),
-            'locale'        => $object->getLocale(),
-            'title'         => $object->getTitle(),
-            'chapo'         => $object->getChapo(),
-            'description'   => $object->getDescription(),
-            'postscriptum'  => $object->getPostscriptum(),
-            'visible'       => $object->getVisible() ? true : false,
-            'logo_image_id' => $object->getLogoImageId()
+            'id' => $object->getId(),
+            'locale' => $object->getLocale(),
+            'title' => $object->getTitle(),
+            'chapo' => $object->getChapo(),
+            'description' => $object->getDescription(),
+            'postscriptum' => $object->getPostscriptum(),
+            'visible' => $object->getVisible() ? true : false,
+            'logo_image_id' => $object->getLogoImageId(),
         ];
 
         // Setup the object form
@@ -98,9 +98,10 @@ class BrandController extends AbstractSeoCrudController
     }
 
     /**
-     * Creates the creation event with the provided form data
+     * Creates the creation event with the provided form data.
      *
-     * @param  array            $formData
+     * @param array $formData
+     *
      * @return BrandCreateEvent
      */
     protected function getCreationEvent($formData)
@@ -117,9 +118,10 @@ class BrandController extends AbstractSeoCrudController
     }
 
     /**
-     * Creates the update event with the provided form data
+     * Creates the update event with the provided form data.
      *
-     * @param  array            $formData
+     * @param array $formData
+     *
      * @return BrandUpdateEvent
      */
     protected function getUpdateEvent($formData)
@@ -140,7 +142,7 @@ class BrandController extends AbstractSeoCrudController
     }
 
     /**
-     * Creates the delete event with the provided form data
+     * Creates the delete event with the provided form data.
      *
      * @return BrandDeleteEvent
      */
@@ -152,7 +154,8 @@ class BrandController extends AbstractSeoCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param  BrandEvent $event
+     * @param BrandEvent $event
+     *
      * @return bool
      */
     protected function eventContainsObject($event)
@@ -165,7 +168,7 @@ class BrandController extends AbstractSeoCrudController
      *
      * @param $event \Thelia\Core\Event\Brand\BrandEvent
      *
-     * @return null|\Thelia\Model\Brand
+     * @return \Thelia\Model\Brand|null
      */
     protected function getObjectFromEvent($event)
     {
@@ -173,7 +176,7 @@ class BrandController extends AbstractSeoCrudController
     }
 
     /**
-     * Load an existing object from the database
+     * Load an existing object from the database.
      *
      * @return \Thelia\Model\Brand
      */
@@ -190,7 +193,7 @@ class BrandController extends AbstractSeoCrudController
     }
 
     /**
-     * Returns the object label form the object event (name, title, etc.)
+     * Returns the object label form the object event (name, title, etc.).
      *
      * @param Brand $object
      *
@@ -202,7 +205,7 @@ class BrandController extends AbstractSeoCrudController
     }
 
     /**
-     * Returns the object ID from the object
+     * Returns the object ID from the object.
      *
      * @param Brand $object
      *
@@ -214,8 +217,7 @@ class BrandController extends AbstractSeoCrudController
     }
 
     /**
-     * Render the main list template
-     *
+     * Render the main list template.
      *
      * @return Response
      */
@@ -232,12 +234,12 @@ class BrandController extends AbstractSeoCrudController
     {
         return [
             'brand_id' => $this->getRequest()->get('brand_id', 0),
-            'current_tab' => $this->getRequest()->get('current_tab', 'general')
+            'current_tab' => $this->getRequest()->get('current_tab', 'general'),
         ];
     }
 
     /**
-     * Render the edition template
+     * Render the edition template.
      */
     protected function renderEditionTemplate()
     {
@@ -245,7 +247,7 @@ class BrandController extends AbstractSeoCrudController
     }
 
     /**
-     * Redirect to the edition template
+     * Redirect to the edition template.
      */
     protected function redirectToEditionTemplate()
     {
@@ -257,7 +259,7 @@ class BrandController extends AbstractSeoCrudController
     }
 
     /**
-     * Redirect to the list template
+     * Redirect to the list template.
      */
     protected function redirectToListTemplate()
     {
@@ -273,7 +275,7 @@ class BrandController extends AbstractSeoCrudController
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {

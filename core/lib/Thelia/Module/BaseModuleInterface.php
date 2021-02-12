@@ -21,17 +21,17 @@ use Thelia\Model\Module;
 interface BaseModuleInterface
 {
     /**
-     * This method is called when the plugin is installed for the first time
+     * This method is called when the plugin is installed for the first time.
      *
      * @param ConnectionInterface $con
      */
     public function install(ConnectionInterface $con = null);
 
     /**
-     * This method is called when a newer version of the plugin is installed
+     * This method is called when a newer version of the plugin is installed.
      *
-     * @param string $currentVersion the current (installed) module version, as defined in the module.xml file
-     * @param string $newVersion the new module version, as defined in the module.xml file
+     * @param string              $currentVersion the current (installed) module version, as defined in the module.xml file
+     * @param string              $newVersion     the new module version, as defined in the module.xml file
      * @param ConnectionInterface $con
      */
     public function update($currentVersion, $newVersion, ConnectionInterface $con = null);
@@ -41,19 +41,19 @@ interface BaseModuleInterface
      * to delete its data.
      *
      * @param ConnectionInterface $con
-     * @param bool $deleteModuleData if true, the module should remove all its data from the system.
+     * @param bool                $deleteModuleData if true, the module should remove all its data from the system
      */
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false);
 
     /**
-     * This method is called when the module is activated
+     * This method is called when the module is activated.
      *
      * @param Module $moduleModel the module
      */
     public function activate($moduleModel = null);
 
     /**
-     * This method is called when the module is deactivated
+     * This method is called when the module is deactivated.
      *
      * @param Module $moduleModel the module
      */
@@ -64,7 +64,7 @@ interface BaseModuleInterface
      *
      * @param ConnectionInterface $con
      *
-     * @return bool true to continue module activation, false to prevent it.
+     * @return bool true to continue module activation, false to prevent it
      */
     public function preActivation(ConnectionInterface $con = null);
 
@@ -78,8 +78,9 @@ interface BaseModuleInterface
     /**
      * This method is called before the module de-activation, and may prevent it by returning false.
      *
-     * @param  ConnectionInterface $con
-     * @return bool                true to continue module de-activation, false to prevent it.
+     * @param ConnectionInterface $con
+     *
+     * @return bool true to continue module de-activation, false to prevent it
      */
     public function preDeactivation(ConnectionInterface $con = null);
 
@@ -91,31 +92,34 @@ interface BaseModuleInterface
     public function postDeactivation(ConnectionInterface $con = null);
 
     /**
-     * Sets a module titles for various languages
+     * Sets a module titles for various languages.
      *
-     * @param Module $module the module.
-     * @param array $titles an associative array of locale => title_string
+     * @param Module $module the module
+     * @param array  $titles an associative array of locale => title_string
      */
     public function setTitle(Module $module, $titles);
 
     /**
-     * Get a module's configuration variable
+     * Get a module's configuration variable.
      *
-     * @param  string $variableName the variable name
-     * @param  string $defaultValue the default value, if variable is not defined
-     * @param  null $valueLocale the required locale, or null to get default one
+     * @param string $variableName the variable name
+     * @param string $defaultValue the default value, if variable is not defined
+     * @param null   $valueLocale  the required locale, or null to get default one
+     *
      * @return string the variable value
      */
     public static function getConfigValue($variableName, $defaultValue = null, $valueLocale = null);
 
     /**
-     * Set module configuration variable, creating it if required
+     * Set module configuration variable, creating it if required.
      *
-     * @param  string $variableName the variable name
-     * @param  string $variableValue the variable value
-     * @param  null $valueLocale the locale, or null if not required
-     * @param  bool $createIfNotExists if true, the variable will be created if not already defined
+     * @param string $variableName      the variable name
+     * @param string $variableValue     the variable value
+     * @param null   $valueLocale       the locale, or null if not required
+     * @param bool   $createIfNotExists if true, the variable will be created if not already defined
+     *
      * @throws \LogicException if variable does not exists and $createIfNotExists is false
+     *
      * @return $this;
      */
     public static function setConfigValue(
@@ -130,8 +134,8 @@ interface BaseModuleInterface
      *
      * TODO : this method does not take care of internationalization. This is a bug.
      *
-     * @param Module $module the module
-     * @param string $folderPath the image folder path
+     * @param Module              $module     the module
+     * @param string              $folderPath the image folder path
      * @param ConnectionInterface $con
      *
      * @throws \Thelia\Exception\ModuleException
@@ -142,6 +146,7 @@ interface BaseModuleInterface
 
     /**
      * @return Module
+     *
      * @throws \Thelia\Exception\ModuleException
      */
     public function getModuleModel();
@@ -162,8 +167,7 @@ interface BaseModuleInterface
     public function getCode();
 
     /**
-     *
-     * This method adds new compilers to Thelia container
+     * This method adds new compilers to Thelia container.
      *
      * You must return an array. This array can contain :
      *  - arrays
@@ -195,25 +199,21 @@ interface BaseModuleInterface
      *      Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION
      *  )
      * );
-     *
      */
     public static function getCompilers();
 
     /**
-     * Called on Thelia container configurator to allow module to add their configuration
-     *
+     * Called on Thelia container configurator to allow module to add their configuration.
      */
     public static function configureContainer(ContainerConfigurator $containerConfigurator);
 
     /**
-     * Called on Thelia services configurator to allow module to add their configuration
-     *
+     * Called on Thelia services configurator to allow module to add their configuration.
      */
     public static function configureServices(ServicesConfigurator $servicesConfigurator);
 
     /**
-     * Allow modules to add their configuration to the container
-     *
+     * Allow modules to add their configuration to the container.
      */
     public static function loadConfiguration(ContainerBuilder $containerBuilder);
 
@@ -261,7 +261,7 @@ interface BaseModuleInterface
     public function getHooks();
 
     /**
-     * Create or update module hooks returned by the `getHooks` function
+     * Create or update module hooks returned by the `getHooks` function.
      */
     public function registerHooks();
 }

@@ -18,11 +18,10 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Module\BaseModule;
-use Thelia\Module\PaymentModuleInterface;
 
 /**
- * Class Payment
- * @package Thelia\Core\Template\Loop
+ * Class Payment.
+ *
  * @author Etienne Roudeix <eroudeix@gmail.com>
  */
 class Payment extends BaseSpecificModule implements PropelSearchLoopInterface

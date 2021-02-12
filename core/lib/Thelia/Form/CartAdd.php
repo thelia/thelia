@@ -25,16 +25,15 @@ use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 
 /**
- * Class CartAdd
- * @package Thelia\Form
+ * Class CartAdd.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CartAdd extends BaseForm
 {
     /**
-     *
      * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
+     * Form this you have to call add method on $this->formBuilder attribute :.
      *
      * $this->formBuilder->add("name", TextType::class)
      *   ->add("email", EmailType::class, array(
@@ -54,38 +53,38 @@ class CartAdd extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("product", TextType::class, [
-                "constraints" => [
+            ->add('product', TextType::class, [
+                'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, "checkProduct"]),
+                    new Constraints\Callback([$this, 'checkProduct']),
                 ],
-                "label" => "product",
-                "label_attr" => [
-                    "for" => "cart_product",
+                'label' => 'product',
+                'label_attr' => [
+                    'for' => 'cart_product',
                 ],
             ])
-            ->add("product_sale_elements_id", TextType::class, [
-                "constraints" => [
+            ->add('product_sale_elements_id', TextType::class, [
+                'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, "checkStockAvailability"]),
+                    new Constraints\Callback([$this, 'checkStockAvailability']),
                 ],
-                "required" => true,
+                'required' => true,
             ])
-            ->add("quantity", NumberType::class, [
-                "constraints" => [
+            ->add('quantity', NumberType::class, [
+                'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, "checkStock"]),
+                    new Constraints\Callback([$this, 'checkStock']),
                     new Constraints\GreaterThanOrEqual([
-                        "value" => 0,
+                        'value' => 0,
                     ]),
                 ],
-                "label" => Translator::getInstance()->trans("Quantity"),
-                "label_attr" => [
-                    "for" => "quantity",
+                'label' => Translator::getInstance()->trans('Quantity'),
+                'label_attr' => [
+                    'for' => 'quantity',
                 ],
             ])
-            ->add("append", IntegerType::class)
-            ->add("newness", IntegerType::class)
+            ->add('append', IntegerType::class)
+            ->add('newness', IntegerType::class)
         ;
     }
 
@@ -94,7 +93,7 @@ class CartAdd extends BaseForm
         $product = ProductQuery::create()->findPk($value);
 
         if (\is_null($product) || $product->getVisible() == 0) {
-            throw new ProductNotFoundException(sprintf(Translator::getInstance()->trans("this product id does not exists : %d"), $value));
+            throw new ProductNotFoundException(sprintf(Translator::getInstance()->trans('this product id does not exists : %d'), $value));
         }
     }
 
@@ -105,11 +104,11 @@ class CartAdd extends BaseForm
 
             $productSaleElements = ProductSaleElementsQuery::create()
                 ->filterById($value)
-                ->filterByProductId($data["product"])
+                ->filterByProductId($data['product'])
                 ->count();
 
             if ($productSaleElements == 0) {
-                throw new StockNotFoundException(sprintf(Translator::getInstance()->trans("This product_sale_elements_id does not exists for this product : %d"), $value));
+                throw new StockNotFoundException(sprintf(Translator::getInstance()->trans('This product_sale_elements_id does not exists for this product : %d'), $value));
             }
         }
     }
@@ -118,18 +117,18 @@ class CartAdd extends BaseForm
     {
         $data = $context->getRoot()->getData();
 
-        if (null === $data["product_sale_elements_id"]) {
-            $context->buildViolation(Translator::getInstance()->trans("Invalid product_sale_elements"));
+        if (null === $data['product_sale_elements_id']) {
+            $context->buildViolation(Translator::getInstance()->trans('Invalid product_sale_elements'));
         } else {
             $productSaleElements = ProductSaleElementsQuery::create()
-                ->filterById($data["product_sale_elements_id"])
-                ->filterByProductId($data["product"])
+                ->filterById($data['product_sale_elements_id'])
+                ->filterByProductId($data['product'])
                 ->findOne();
 
             $product = $productSaleElements->getProduct();
 
             if ($productSaleElements->getQuantity() < $value && $product->getVirtual() === 0 && ConfigQuery::checkAvailableStock()) {
-                $context->addViolation(Translator::getInstance()->trans("quantity value is not valid"));
+                $context->addViolation(Translator::getInstance()->trans('quantity value is not valid'));
             }
         }
     }
@@ -139,6 +138,6 @@ class CartAdd extends BaseForm
      */
     public static function getName()
     {
-        return "thelia_cart_add";
+        return 'thelia_cart_add';
     }
 }

@@ -25,20 +25,19 @@ use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * Currency loop
- *
+ * Currency loop.
  *
  * Class Currency
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[]  getExclude()
- * @method bool getDefaultOnly()
+ *
+ * @method int[]       getId()
+ * @method int[]       getExclude()
+ * @method bool        getDefaultOnly()
  * @method bool|string getVisible()
- * @method string[] getOrder()
+ * @method string[]    getOrder()
  */
 class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -66,7 +65,7 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
                             'rate', 'rate_reverse',
                             'visible', 'visible_reverse',
                             'is_default', 'is_default_reverse',
-                            'manual', 'manual_reverse']
+                            'manual', 'manual_reverse', ]
                     )
                 ),
                 'manual'
@@ -97,7 +96,7 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByVisible($visible);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
@@ -161,17 +160,17 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $currency) {
             $loopResultRow = new LoopResultRow($currency);
             $loopResultRow
-                ->set("ID", $currency->getId())
-                ->set("IS_TRANSLATED", $currency->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("NAME", $currency->getVirtualColumn('i18n_NAME'))
-                ->set("ISOCODE", $currency->getCode())
-                ->set("SYMBOL", $currency->getSymbol())
-                ->set("FORMAT", $currency->getFormat())
-                ->set("RATE", $currency->getRate())
-                ->set("VISIBLE", $currency->getVisible())
-                ->set("POSITION", $currency->getPosition())
-                ->set("IS_DEFAULT", $currency->getByDefault())
+                ->set('ID', $currency->getId())
+                ->set('IS_TRANSLATED', $currency->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('NAME', $currency->getVirtualColumn('i18n_NAME'))
+                ->set('ISOCODE', $currency->getCode())
+                ->set('SYMBOL', $currency->getSymbol())
+                ->set('FORMAT', $currency->getFormat())
+                ->set('RATE', $currency->getRate())
+                ->set('VISIBLE', $currency->getVisible())
+                ->set('POSITION', $currency->getPosition())
+                ->set('IS_DEFAULT', $currency->getByDefault())
             ;
             $this->addOutputFields($loopResultRow, $currency);
 

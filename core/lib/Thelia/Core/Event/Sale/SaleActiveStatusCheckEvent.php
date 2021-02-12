@@ -13,9 +13,8 @@
 namespace Thelia\Core\Event\Sale;
 
 /**
- * Class SaleActiveStatusCheckEvent
+ * Class SaleActiveStatusCheckEvent.
  *
- * @package Thelia\Core\Event\Sale
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class SaleActiveStatusCheckEvent extends SaleEvent

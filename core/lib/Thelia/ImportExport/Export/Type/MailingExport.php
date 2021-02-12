@@ -12,12 +12,12 @@
 
 namespace Thelia\ImportExport\Export\Type;
 
-use PDO;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
 /**
- * Class MailingExport
+ * Class MailingExport.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  * @author Florian Bernard <fbernard@openstudio.fr>
  */
@@ -30,7 +30,7 @@ class MailingExport extends JsonFileAbstractExport
         'newsletter_email' => 'Email',
         'newsletter_firstname' => 'FirstName',
         'newsletter_lastname' => 'LastName',
-        'newsletter_locale' => 'Locale'
+        'newsletter_locale' => 'Locale',
     ];
 
     protected function getData()

@@ -12,11 +12,10 @@
 
 use Symfony\Component\Dotenv\Dotenv;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpKernel\HttpCache\HttpCache;
 use Thelia\Core\Thelia;
 
 $env = 'dev';
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 if (file_exists(THELIA_ROOT.'.env')) {
     (new Dotenv())->load(THELIA_ROOT.'.env');
@@ -35,7 +34,7 @@ if (false && false === in_array($request->getClientIp(), $trustedIp)) {
     exit('You are not allowed to access this file.');
 }
 
-$thelia = new Thelia("dev", true);
+$thelia = new Thelia('dev', true);
 
 $response = $thelia->handle($request)->prepare($request)->send();
 $thelia->terminate($request, $response);

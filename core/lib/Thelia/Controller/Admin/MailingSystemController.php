@@ -23,7 +23,7 @@ use Thelia\Model\ConfigQuery;
 
 class MailingSystemController extends BaseAdminController
 {
-    public const RESOURCE_CODE = "admin.configuration.mailing-system";
+    public const RESOURCE_CODE = 'admin.configuration.mailing-system';
 
     public function defaultAction()
     {
@@ -33,15 +33,15 @@ class MailingSystemController extends BaseAdminController
 
         // Hydrate the form abd pass it to the parser
         $data = [
-            'enabled'       => ConfigQuery::isSmtpEnable() ? true : false,
-            'host'          => ConfigQuery::getSmtpHost(),
-            'port'          => ConfigQuery::getSmtpPort(),
-            'encryption'    => ConfigQuery::getSmtpEncryption(),
-            'username'      => ConfigQuery::getSmtpUsername(),
-            'password'      => ConfigQuery::getSmtpPassword(),
-            'authmode'      => ConfigQuery::getSmtpAuthMode(),
-            'timeout'       => ConfigQuery::getSmtpTimeout(),
-            'sourceip'      => ConfigQuery::getSmtpSourceIp(),
+            'enabled' => ConfigQuery::isSmtpEnable() ? true : false,
+            'host' => ConfigQuery::getSmtpHost(),
+            'port' => ConfigQuery::getSmtpPort(),
+            'encryption' => ConfigQuery::getSmtpEncryption(),
+            'username' => ConfigQuery::getSmtpUsername(),
+            'password' => ConfigQuery::getSmtpPassword(),
+            'authmode' => ConfigQuery::getSmtpAuthMode(),
+            'timeout' => ConfigQuery::getSmtpTimeout(),
+            'sourceip' => ConfigQuery::getSmtpSourceIp(),
         ];
 
         // Setup the object form
@@ -69,7 +69,7 @@ class MailingSystemController extends BaseAdminController
 
         try {
             // Check the form against constraints violations
-            $formData = $this->validateForm($form, "POST");
+            $formData = $this->validateForm($form, 'POST');
 
             // Get the form field values
             $event = new MailingSystemEvent();
@@ -86,7 +86,7 @@ class MailingSystemController extends BaseAdminController
             $this->dispatch(TheliaEvents::MAILING_SYSTEM_UPDATE, $event);
 
             // Redirect to the success URL
-            $response = $this->generateRedirectFromRoute("admin.configuration.mailing-system.view");
+            $response = $this->generateRedirectFromRoute('admin.configuration.mailing-system.view');
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -97,7 +97,7 @@ class MailingSystemController extends BaseAdminController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("mailing system modification", []),
+                $this->getTranslator()->trans('mailing system modification', []),
                 $error_msg,
                 $form,
                 $ex
@@ -121,14 +121,14 @@ class MailingSystemController extends BaseAdminController
         $storeName = ConfigQuery::read('store_name', 'Thelia');
 
         $json_data = [
-            "success" => false,
-            "message" => "",
+            'success' => false,
+            'message' => '',
         ];
 
         if ($contactEmail) {
-            $emailTest = $this->getRequest()->get("email", $contactEmail);
+            $emailTest = $this->getRequest()->get('email', $contactEmail);
 
-            $message = $this->getTranslator()->trans("Email test from : %store%", ["%store%" => $storeName]);
+            $message = $this->getTranslator()->trans('Email test from : %store%', ['%store%' => $storeName]);
 
             $htmlMessage = "<p>$message</p>";
 
@@ -142,13 +142,13 @@ class MailingSystemController extends BaseAdminController
 
             try {
                 $this->getMailer()->send($instance);
-                $json_data["success"] = true;
-                $json_data["message"] = $this->getTranslator()->trans("Your configuration seems to be ok. Checked out your mailbox : %email%", ["%email%" => $emailTest]);
+                $json_data['success'] = true;
+                $json_data['message'] = $this->getTranslator()->trans('Your configuration seems to be ok. Checked out your mailbox : %email%', ['%email%' => $emailTest]);
             } catch (\Exception $ex) {
-                $json_data["message"] = $ex->getMessage();
+                $json_data['message'] = $ex->getMessage();
             }
         } else {
-            $json_data["message"] = $this->getTranslator()->trans("You have to configure your store email first !");
+            $json_data['message'] = $this->getTranslator()->trans('You have to configure your store email first !');
         }
 
         $response = JsonResponse::create($json_data);

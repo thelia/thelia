@@ -36,14 +36,14 @@ class DateTimeFormat
 
         if ($lang) {
             switch ($output) {
-                case "date":
+                case 'date':
                     $format = $lang->getDateFormat();
                     break;
-                case "time":
+                case 'time':
                     $format = $lang->getTimeFormat();
                     break;
                 default:
-                case "datetime":
+                case 'datetime':
                     $format = $lang->getDateTimeFormat();
                     break;
             }

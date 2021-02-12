@@ -15,8 +15,8 @@ namespace Thelia\Tests\Action;
 use Thelia\Model\LangQuery;
 
 /**
- * Class I18NTestTrait
- * @package Thelia\Tests\Action
+ * Class I18NTestTrait.
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 trait I18nTestTrait
@@ -25,18 +25,18 @@ trait I18nTestTrait
     protected static $localeList = null;
 
     /**
-     * populate a list of field for each locale for an object
+     * populate a list of field for each locale for an object.
      *
      * @param mixed $object     the object to populate
      * @param array $fields     list of field to populate
      * @param array $localeList list of locale to use populate the object
      */
-    protected function setI18n(&$object, $fields = ["Title"], $localeList = null)
+    protected function setI18n(&$object, $fields = ['Title'], $localeList = null)
     {
         if (null === $localeList) {
             if (null === self::$localeList) {
                 self::$localeList = LangQuery::create()
-                    ->select("Locale")
+                    ->select('Locale')
                     ->find()
                     ->toArray();
             }
@@ -46,7 +46,7 @@ trait I18nTestTrait
 
         foreach ($localeList as $locale) {
             foreach ($fields as $name) {
-                $object->getTranslation($locale)->setByName($name, $locale . ' : ' . $name);
+                $object->getTranslation($locale)->setByName($name, $locale.' : '.$name);
             }
         }
     }

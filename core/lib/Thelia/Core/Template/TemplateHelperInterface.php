@@ -12,11 +12,6 @@
 
 namespace Thelia\Core\Template;
 
-use Symfony\Component\Filesystem\Filesystem;
-use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
-use Thelia\Model\ConfigQuery;
-
 interface TemplateHelperInterface
 {
     /**
@@ -25,9 +20,9 @@ interface TemplateHelperInterface
     public function getActiveMailTemplate();
 
     /**
-     * Check if a template definition is the current active template
+     * Check if a template definition is the current active template.
      *
-     * @return bool               true is the given template is the active template
+     * @return bool true is the given template is the active template
      */
     public function isActive(TemplateDefinition $tplDefinition);
 
@@ -47,15 +42,16 @@ interface TemplateHelperInterface
     public function getActiveFrontTemplate();
 
     /**
-     * Returns an array which contains all standard template definitions
+     * Returns an array which contains all standard template definitions.
      */
     public function getStandardTemplateDefinitions();
 
     /**
-     * Return a list of existing templates for a given template type
+     * Return a list of existing templates for a given template type.
      *
-     * @param int  $templateType the template type
-     * @param string $base the template base (module or core, default to core).
+     * @param int    $templateType the template type
+     * @param string $base         the template base (module or core, default to core)
+     *
      * @return TemplateDefinition[] of \Thelia\Core\Template\TemplateDefinition
      */
     public function getList($templateType, $base = THELIA_TEMPLATE_DIR);

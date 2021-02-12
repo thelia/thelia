@@ -20,7 +20,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 
 /**
- * Controller uses to generate sitemap.xml
+ * Controller uses to generate sitemap.xml.
  *
  * A default cache of 2 hours is used to avoid attack. You can flush cache if you have `ADMIN` role and pass flush=1 in
  * query string parameter.
@@ -32,19 +32,19 @@ use Thelia\Model\LangQuery;
  * {url}/sitemap?lang=fr&context=catalog will generate a sitemap for catalog (categories and products)
  * for french language.
  *
- * @package Front\Controller
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class SitemapController extends BaseFrontController {
+class SitemapController extends BaseFrontController
+{
     /**
-     * Folder name for sitemap cache
+     * Folder name for sitemap cache.
      */
-    public const SITEMAP_CACHE_DIR = "sitemap";
+    public const SITEMAP_CACHE_DIR = 'sitemap';
 
     /**
-     * Key prefix for sitemap cache
+     * Key prefix for sitemap cache.
      */
-    public const SITEMAP_CACHE_KEY = "sitemap";
+    public const SITEMAP_CACHE_KEY = 'sitemap';
 
     /**
      * @return Response
@@ -55,29 +55,29 @@ class SitemapController extends BaseFrontController {
         $request = $this->getRequest();
 
         // the locale : fr, en,
-        $lang = $request->query->get("lang", "");
-        if ("" !== $lang) {
-            if (! $this->checkLang($lang)){
+        $lang = $request->query->get('lang', '');
+        if ('' !== $lang) {
+            if (!$this->checkLang($lang)) {
                 $this->pageNotFound();
             }
         }
         // specific content : product, category, cms
-        $context = $request->query->get("context", "");
-        if (! \in_array($context, ["", "catalog", "content"]) ){
+        $context = $request->query->get('context', '');
+        if (!\in_array($context, ['', 'catalog', 'content'])) {
             $this->pageNotFound();
         }
 
-        $flush = $request->query->get("flush", "");
+        $flush = $request->query->get('flush', '');
 
         // check if sitemap already in cache
         $cacheContent = false;
 
         $cacheDir = $this->getCacheDir();
-        $cacheKey = self::SITEMAP_CACHE_KEY . $lang . $context;
-        $cacheExpire = \intval(ConfigQuery::read("sitemap_ttl", '7200')) ?: 7200;
+        $cacheKey = self::SITEMAP_CACHE_KEY.$lang.$context;
+        $cacheExpire = \intval(ConfigQuery::read('sitemap_ttl', '7200')) ?: 7200;
 
         $cacheDriver = new FilesystemCache($cacheDir);
-        if (!($this->checkAdmin() && "" !== $flush)) {
+        if (!($this->checkAdmin() && '' !== $flush)) {
             $cacheContent = $cacheDriver->fetch($cacheKey);
         } else {
             $cacheDriver->delete($cacheKey);
@@ -89,8 +89,8 @@ class SitemapController extends BaseFrontController {
             $cacheContent = $this->getParser(null)->render(
                 'sitemap.html',
                 [
-                    "_lang_" => $lang,
-                    "_context_" => $context
+                    '_lang_' => $lang,
+                    '_context_' => $context,
                 ],
                 false
             );
@@ -107,32 +107,34 @@ class SitemapController extends BaseFrontController {
     }
 
     /**
-     * get the cache directory for sitemap
+     * get the cache directory for sitemap.
      *
      * @return mixed|string
      */
     protected function getCacheDir()
     {
-        $cacheDir = $this->container->getParameter("kernel.cache_dir");
+        $cacheDir = $this->container->getParameter('kernel.cache_dir');
         $cacheDir = rtrim($cacheDir, '/');
-        $cacheDir .= '/' . self::SITEMAP_CACHE_DIR . '/';
+        $cacheDir .= '/'.self::SITEMAP_CACHE_DIR.'/';
 
         return $cacheDir;
     }
 
     /**
-     * Check if current user has ADMIN role
+     * Check if current user has ADMIN role.
      *
      * @return bool
      */
-    protected function checkAdmin(){
+    protected function checkAdmin()
+    {
         return $this->getSecurityContext()->hasAdminUser();
     }
 
     /**
-     * Check if a lang is used
+     * Check if a lang is used.
      *
      * @param $lang The lang code. e.g.: fr
+     *
      * @return bool true if the language is used, otherwise false
      */
     private function checkLang($lang)
@@ -141,6 +143,6 @@ class SitemapController extends BaseFrontController {
         $lang = LangQuery::create()
             ->findOneByCode($lang);
 
-        return (null !== $lang);
+        return null !== $lang;
     }
 }

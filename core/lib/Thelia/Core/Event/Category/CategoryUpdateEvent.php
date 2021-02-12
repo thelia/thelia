@@ -103,11 +103,13 @@ class CategoryUpdateEvent extends CategoryCreateEvent
 
     /**
      * @param int $defaultTemplateId
+     *
      * @return $this
      */
     public function setDefaultTemplateId($defaultTemplateId)
     {
         $this->defaultTemplateId = $defaultTemplateId;
+
         return $this;
     }
 }

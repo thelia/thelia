@@ -12,7 +12,6 @@
 
 namespace Thelia\Tests\Action;
 
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Action\Administrator;
@@ -20,16 +19,14 @@ use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AdminQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Tools\TokenProvider;
 
 /**
- * Class AdministratorTest
- * @package Thelia\Tests\Action
+ * Class AdministratorTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AdministratorTest extends BaseAction
@@ -44,7 +41,7 @@ class AdministratorTest extends BaseAction
         $request = new Request();
         $request->setSession($session);
 
-        $this->mailerFactory = $this->getMockBuilder("Thelia\\Mailer\\MailerFactory")
+        $this->mailerFactory = $this->getMockBuilder('Thelia\\Mailer\\MailerFactory')
             ->disableOriginalConstructor()
             ->getMock();
 

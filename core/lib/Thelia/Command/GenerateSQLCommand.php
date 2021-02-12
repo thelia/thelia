@@ -19,15 +19,13 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\ProductTableMap;
-use Thelia\Tools\URL;
 use Thelia\Tools\Version\Version;
 use TheliaSmarty\Template\SmartyParser;
 
 /**
- * Class GenerateSQLCommand
- * @package Thelia\Command
+ * Class GenerateSQLCommand.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class GenerateSQLCommand extends ContainerAwareCommand
@@ -47,13 +45,13 @@ class GenerateSQLCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName("generate:sql")
-            ->setDescription("Generate SQL files (insert.sql, update*.sql)")
+            ->setName('generate:sql')
+            ->setDescription('Generate SQL files (insert.sql, update*.sql)')
             ->addOption(
-                "locales",
+                'locales',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                "generate only for only specific locales (separated by a ,) : fr_FR,es_ES or es_ES"
+                'generate only for only specific locales (separated by a ,) : fr_FR,es_ES or es_ES'
             );
     }
 
@@ -62,33 +60,33 @@ class GenerateSQLCommand extends ContainerAwareCommand
         $this->init($input);
 
         // Main insert.sql file
-        $content = file_get_contents(THELIA_SETUP_DIRECTORY . 'insert.sql.tpl');
+        $content = file_get_contents(THELIA_SETUP_DIRECTORY.'insert.sql.tpl');
         $version = Version::parse();
         $content = $this->parser->renderString($content, $version, false);
 
-        if (false === file_put_contents(THELIA_SETUP_DIRECTORY . 'insert.sql', $content)) {
-            $output->writeln("Can't write file " . THELIA_SETUP_DIRECTORY . 'insert.sql');
+        if (false === file_put_contents(THELIA_SETUP_DIRECTORY.'insert.sql', $content)) {
+            $output->writeln("Can't write file ".THELIA_SETUP_DIRECTORY.'insert.sql');
         } else {
-            $output->writeln("File " . THELIA_SETUP_DIRECTORY . 'insert.sql generated successfully.');
+            $output->writeln('File '.THELIA_SETUP_DIRECTORY.'insert.sql generated successfully.');
         }
 
         // sql update files
         $finder = Finder::create()
             ->name('*.tpl')
             ->depth(0)
-            ->in(THELIA_SETUP_DIRECTORY . 'update' . DS . 'tpl');
+            ->in(THELIA_SETUP_DIRECTORY.'update'.DS.'tpl');
 
         /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
             $content = file_get_contents($file->getRealPath());
             $content = $this->parser->renderString($content, [], false);
 
-            $destination = THELIA_SETUP_DIRECTORY . 'update' . DS . 'sql' . DS . $file->getBasename('.tpl');
+            $destination = THELIA_SETUP_DIRECTORY.'update'.DS.'sql'.DS.$file->getBasename('.tpl');
 
             if (false === file_put_contents($destination, $content)) {
-                $output->writeln("Can't write file " . $destination);
+                $output->writeln("Can't write file ".$destination);
             } else {
-                $output->writeln("File " . $destination . ' generated successfully.');
+                $output->writeln('File '.$destination.' generated successfully.');
             }
         }
 
@@ -123,10 +121,10 @@ class GenerateSQLCommand extends ContainerAwareCommand
             ->name('*.php')
             ->depth(0)
             ->sortByName()
-            ->in(THELIA_SETUP_DIRECTORY . 'I18n');
+            ->in(THELIA_SETUP_DIRECTORY.'I18n');
 
         // limit to only some locale(s)
-        $localesToKeep = $input->getOption("locales");
+        $localesToKeep = $input->getOption('locales');
         if (!empty($localesToKeep)) {
             $localesToKeep = explode(',', $localesToKeep);
         } else {
@@ -152,7 +150,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
         if (empty($this->locales)) {
             throw new \RuntimeException(
                 sprintf(
-                    "You should at least generate sql for one locale. Available locales : %s",
+                    'You should at least generate sql for one locale. Available locales : %s',
                     implode(', ', $availableLocales)
                 )
             );
@@ -170,7 +168,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
     {
         $this->parser->unregisterPlugin('function', 'intl');
         $this->parser->registerPlugin('function', 'intl', [$this, 'translate']);
-        $this->parser->assign("locales", $this->locales);
+        $this->parser->assign('locales', $this->locales);
     }
 
     /**
@@ -184,38 +182,39 @@ class GenerateSQLCommand extends ContainerAwareCommand
      *
      * @param $params
      * @param $smarty
+     *
      * @return string
      */
     public function translate($params, $smarty)
     {
         $translation = '';
 
-        if (empty($params["l"])) {
+        if (empty($params['l'])) {
             throw new RuntimeException('Translation Error. Key is empty.');
         }
-        if (empty($params["locale"])) {
+        if (empty($params['locale'])) {
             throw new RuntimeException('Translation Error. Locale is empty.');
         }
-            $inString = (0 !== \intval($params["in_string"]));
-            $useDefault = (0 !== \intval($params["use_default"]));
+        $inString = (0 !== \intval($params['in_string']));
+        $useDefault = (0 !== \intval($params['use_default']));
 
-            $translation = $this->translator->trans(
-                $params["l"],
+        $translation = $this->translator->trans(
+                $params['l'],
                 [],
                 'install',
-                $params["locale"],
+                $params['locale'],
                 $useDefault
             );
 
-            if (empty($translation)) {
-                $translation = ($inString) ? '' : "NULL";
-            } else {
-                $translation = $this->con->quote($translation);
-                // remove quote
-                if ($inString) {
-                    $translation = substr($translation, 1, -1);
-                }
+        if (empty($translation)) {
+            $translation = ($inString) ? '' : 'NULL';
+        } else {
+            $translation = $this->con->quote($translation);
+            // remove quote
+            if ($inString) {
+                $translation = substr($translation, 1, -1);
             }
+        }
 
         return $translation;
     }

@@ -23,8 +23,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Model\CustomerQuery;
 
 /**
- * Class CustomerLogin
- * @package Thelia\Form
+ * Class CustomerLogin.
+ *
  * @author  Manuel Raynaud <manu@raynaud.io>
  */
 class CustomerLogin extends BruteforceForm
@@ -32,48 +32,48 @@ class CustomerLogin extends BruteforceForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("email", EmailType::class, [
-                "constraints" => [
+            ->add('email', EmailType::class, [
+                'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
-                    new Constraints\Callback([$this, "verifyExistingEmail"]),
+                    new Constraints\Callback([$this, 'verifyExistingEmail']),
                 ],
-                "label" => Translator::getInstance()->trans("Please enter your email address"),
-                "label_attr" => [
-                    "for" => "email",
+                'label' => Translator::getInstance()->trans('Please enter your email address'),
+                'label_attr' => [
+                    'for' => 'email',
                 ],
             ])
-            ->add("account", ChoiceType::class, [
-                "constraints" => [
+            ->add('account', ChoiceType::class, [
+                'constraints' => [
                     new Constraints\Callback(
-                            [$this, "verifyAccount"]),
+                            [$this, 'verifyAccount']),
                     ],
-                "choices" => [
-                    Translator::getInstance()->trans("No, I am a new customer.") => 0,
-                    Translator::getInstance()->trans("Yes, I have a password :") => 1,
+                'choices' => [
+                    Translator::getInstance()->trans('No, I am a new customer.') => 0,
+                    Translator::getInstance()->trans('Yes, I have a password :') => 1,
                 ],
-                "label_attr" => [
-                    "for" => "account",
+                'label_attr' => [
+                    'for' => 'account',
                 ],
-                "data" => 0,
+                'data' => 0,
             ])
-            ->add("password", PasswordType::class, [
-                "constraints" => [
+            ->add('password', PasswordType::class, [
+                'constraints' => [
                     new Constraints\NotBlank([
                         'groups' => ['existing_customer'],
                     ]),
                 ],
-                "label" => Translator::getInstance()->trans("Please enter your password"),
-                "label_attr" => [
-                    "for" => "password",
+                'label' => Translator::getInstance()->trans('Please enter your password'),
+                'label_attr' => [
+                    'for' => 'password',
                 ],
-                "required"    => false,
+                'required' => false,
             ])
-            ->add("remember_me", CheckboxType::class, [
+            ->add('remember_me', CheckboxType::class, [
                 'value' => 'yes',
-                "label" => Translator::getInstance()->trans("Remember me ?"),
-                "label_attr" => [
-                    "for" => "remember_me",
+                'label' => Translator::getInstance()->trans('Remember me ?'),
+                'label_attr' => [
+                    'for' => 'remember_me',
                 ],
             ])
         ;
@@ -105,7 +105,7 @@ class CustomerLogin extends BruteforceForm
     public function verifyExistingEmail($value, ExecutionContextInterface $context)
     {
         $data = $context->getRoot()->getData();
-        if ($data["account"] == 0) {
+        if ($data['account'] == 0) {
             $customer = CustomerQuery::create()->findOneByEmail($value);
             if ($customer) {
                 $context->addViolation(Translator::getInstance()->trans("A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password."));
@@ -115,6 +115,6 @@ class CustomerLogin extends BruteforceForm
 
     public static function getName()
     {
-        return "thelia_customer_login";
+        return 'thelia_customer_login';
     }
 }

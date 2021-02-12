@@ -12,14 +12,11 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Core\Template\Loop\Sale;
 use Thelia\Model\SaleQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
- *
  * @author Franck Allimant <franck@cqfdev.fr>
- *
  */
 class SaleTest extends BaseLoopTestor
 {
@@ -30,7 +27,7 @@ class SaleTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return ["active" => "*"];
+        return ['active' => '*'];
     }
 
     public function testSearchById()

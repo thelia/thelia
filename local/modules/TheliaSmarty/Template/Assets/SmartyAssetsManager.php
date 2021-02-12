@@ -33,12 +33,12 @@ class SmartyAssetsManager
     private static $assetsDirectory = null;
 
     /**
-     * Creates a new SmartyAssetsManager instance
+     * Creates a new SmartyAssetsManager instance.
      *
-     * @param AssetManagerInterface  $assetsManager   an asset manager instance
-     * @param AssetResolverInterface $assetsResolver  an asset resolver instance
-     * @param string $web_root the disk path to the web root (with final /)
-     * @param string $path_relative_to_web_root the path (relative to web root) where the assets will be generated
+     * @param AssetManagerInterface  $assetsManager             an asset manager instance
+     * @param AssetResolverInterface $assetsResolver            an asset resolver instance
+     * @param string                 $web_root                  the disk path to the web root (with final /)
+     * @param string                 $path_relative_to_web_root the path (relative to web root) where the assets will be generated
      */
     public function __construct(
         AssetManagerInterface $assetsManager,
@@ -54,10 +54,10 @@ class SmartyAssetsManager
     }
 
     /**
-     * Prepare current template assets
+     * Prepare current template assets.
      *
-     * @param string $assets_directory the assets directory in the template
-     * @param \Smarty_Internal_Template $smarty the smarty parser
+     * @param string                    $assets_directory the assets directory in the template
+     * @param \Smarty_Internal_Template $smarty           the smarty parser
      */
     public function prepareAssets($assets_directory, \Smarty_Internal_Template $smarty)
     {
@@ -76,11 +76,11 @@ class SmartyAssetsManager
     }
 
     /**
-     * Prepare template assets
+     * Prepare template assets.
      *
-     * @param TemplateDefinition $templateDefinition the template to process
-     * @param string $assets_directory the assets directory in the template
-     * @param \TheliaSmarty\Template\SmartyParser $smartyParser the current parser.
+     * @param TemplateDefinition                  $templateDefinition the template to process
+     * @param string                              $assets_directory   the assets directory in the template
+     * @param \TheliaSmarty\Template\SmartyParser $smartyParser       the current parser
      */
     protected function prepareTemplateAssets(
         TemplateDefinition $templateDefinition,
@@ -92,7 +92,7 @@ class SmartyAssetsManager
 
         // Use the template name first
         $templateDefinitionList = array_merge(
-            [ $templateDefinition ],
+            [$templateDefinition],
             $templateDefinition->getParentList()
         );
 
@@ -106,14 +106,14 @@ class SmartyAssetsManager
                 /* create assets foreach registered directory : main @ modules */
                 foreach ($templateDirectories[$templateDefinitionItem->getName()] as $key => $directory) {
                     // This is the assets directory in the template's tree
-                    $tpl_path = $directory . DS . $assets_directory;
+                    $tpl_path = $directory.DS.$assets_directory;
 
                     if (false !== $asset_dir_absolute_path = realpath($tpl_path)) {
                         $this->assetsManager->prepareAssets(
                             $asset_dir_absolute_path,
-                            $this->web_root . $this->path_relative_to_web_root,
+                            $this->web_root.$this->path_relative_to_web_root,
                             $templateDefinitionItem->getPath(),
-                            $key . DS . $assets_directory
+                            $key.DS.$assets_directory
                         );
                     }
                 }
@@ -122,19 +122,20 @@ class SmartyAssetsManager
     }
 
     /**
-     * Retrieve asset URL
+     * Retrieve asset URL.
      *
-     * @param string $assetType js|css|image
-     * @param array $params Parameters
-     *                                             - file File path in the default template
-     *                                             - source module asset
-     *                                             - filters filter to apply
-     *                                             - debug
-     *                                             - template if you want to load asset from another template
-     * @param \Smarty_Internal_Template $template Smarty Template
+     * @param string                    $assetType    js|css|image
+     * @param array                     $params       Parameters
+     *                                                - file File path in the default template
+     *                                                - source module asset
+     *                                                - filters filter to apply
+     *                                                - debug
+     *                                                - template if you want to load asset from another template
+     * @param \Smarty_Internal_Template $template     Smarty Template
+     * @param bool                      $allowFilters if false, the 'filters' parameter is ignored
      *
-     * @param bool $allowFilters if false, the 'filters' parameter is ignored
      * @return string
+     *
      * @throws \Exception
      */
     public function computeAssetUrl($assetType, $params, \Smarty_Internal_Template $template, $allowFilters = true)
@@ -148,18 +149,18 @@ class SmartyAssetsManager
             );
         }
 
-        $assetOrigin  = $params['source'] ?? ParserInterface::TEMPLATE_ASSETS_KEY;
-        $filters      = $allowFilters && isset($params['filters']) ? $params['filters'] : '';
-        $debug        = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
+        $assetOrigin = $params['source'] ?? ParserInterface::TEMPLATE_ASSETS_KEY;
+        $filters = $allowFilters && isset($params['filters']) ? $params['filters'] : '';
+        $debug = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
         $templateName = $params['template'] ?? false;
-        $failsafe     = $params['failsafe'] ?? false;
+        $failsafe = $params['failsafe'] ?? false;
 
         Tlog::getInstance()->debug("Searching asset $file in source $assetOrigin, with template $templateName");
 
         /** @var \TheliaSmarty\Template\SmartyParser $smartyParser */
         $smartyParser = $template->smarty;
 
-        if (false !==  $templateName) {
+        if (false !== $templateName) {
             // We have to be sure that this external template assets have been properly prepared.
             // We will assume the following:
             //   1) this template have the same type as the current template,
@@ -176,7 +177,7 @@ class SmartyAssetsManager
             $smartyParser->addTemplateDirectory(
                 $templateDefinition->getType(),
                 $templateDefinition->getName(),
-                THELIA_TEMPLATE_DIR . $templateDefinition->getPath(),
+                THELIA_TEMPLATE_DIR.$templateDefinition->getPath(),
                 ParserInterface::TEMPLATE_ASSETS_KEY
             );
 
@@ -198,9 +199,9 @@ class SmartyAssetsManager
             // Log the problem
             if ($failsafe) {
                 // The asset URL will be ''
-                Tlog::getInstance()->addWarning("Failed to find asset source file " . $params['file']);
+                Tlog::getInstance()->addWarning('Failed to find asset source file '.$params['file']);
             } else {
-                throw new TheliaProcessException("Failed to find asset source file " . $params['file']);
+                throw new TheliaProcessException('Failed to find asset source file '.$params['file']);
             }
         }
 
@@ -212,7 +213,9 @@ class SmartyAssetsManager
      * @param $params
      * @param $content
      * @param $repeat
+     *
      * @return null
+     *
      * @throws \Exception
      */
     public function processSmartyPluginCall(
@@ -236,26 +239,26 @@ class SmartyAssetsManager
                 $url = $this->computeAssetUrl($assetType, $params, $template);
 
                 if (empty($url)) {
-                    $message = sprintf("Failed to get real path of asset %s without exception", $params['file']);
+                    $message = sprintf('Failed to get real path of asset %s without exception', $params['file']);
 
                     Tlog::getInstance()->addWarning($message);
 
                     // In debug mode, throw exception
-                    if ($this->assetsManager->isDebugMode() && ! $isfailsafe) {
+                    if ($this->assetsManager->isDebugMode() && !$isfailsafe) {
                         throw new TheliaProcessException($message);
                     }
                 }
             } catch (\Exception $ex) {
                 Tlog::getInstance()->addWarning(
                     sprintf(
-                        "Failed to get real path of asset %s with exception: %s",
+                        'Failed to get real path of asset %s with exception: %s',
                         $params['file'],
                         $ex->getMessage()
                     )
                 );
 
                 // If we're in development mode, just retrow the exception, so that it will be displayed
-                if ($this->assetsManager->isDebugMode() && ! $isfailsafe) {
+                if ($this->assetsManager->isDebugMode() && !$isfailsafe) {
                     throw $ex;
                 }
             }

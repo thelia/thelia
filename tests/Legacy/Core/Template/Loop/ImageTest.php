@@ -12,7 +12,6 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Core\Template\Loop\Image;
 use Thelia\Model\CategoryImageQuery;
 use Thelia\Model\ContentImageQuery;
 use Thelia\Model\FolderImageQuery;
@@ -20,9 +19,7 @@ use Thelia\Model\ProductImageQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class ImageTest extends BaseLoopTestor
 {

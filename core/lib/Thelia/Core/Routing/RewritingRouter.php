@@ -27,7 +27,6 @@ use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\CustomerQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 use Thelia\Model\RewritingUrlQuery;
@@ -35,8 +34,8 @@ use Thelia\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 
 /**
- * Class RewritingRouter
- * @package Thelia\Core\Routing
+ * Class RewritingRouter.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
@@ -106,9 +105,9 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      *
      * If there is no route with the given name, the generator must throw the RouteNotFoundException.
      *
-     * @param string         $name          The name of the route
-     * @param mixed          $parameters    An array of parameters
-     * @param Boolean|string $referenceType The type of reference to be generated (one of the constants)
+     * @param string      $name          The name of the route
+     * @param mixed       $parameters    An array of parameters
+     * @param bool|string $referenceType The type of reference to be generated (one of the constants)
      *
      * @return string The generated URL
      *
@@ -141,7 +140,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      */
     public function match($pathinfo)
     {
-        throw new ResourceNotFoundException("impossible to find route with this method, please use matchRequest method");
+        throw new ResourceNotFoundException('impossible to find route with this method, please use matchRequest method');
     }
 
     /**
@@ -154,8 +153,8 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      *
      * @throws \Exception|\Thelia\Exception\UrlRewritingException
      * @throws \Symfony\Component\Routing\Exception\ResourceNotFoundException
-     * @return array                                                          An array of parameters
      *
+     * @return array An array of parameters
      */
     public function matchRequest(Request $request)
     {
@@ -182,7 +181,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                 if (null !== $requestedLang = LangQuery::create()->filterByActive(true)->findOneByLocale($requestedLocale)) {
                     if ($requestedLang->getLocale() != $rewrittenUrlData->locale) {
                         // Save one redirection if requested locale is disabled.
-                        if (! $requestedLang->getActive()) {
+                        if (!$requestedLang->getActive()) {
                             $requestedLang = Lang::getDefaultLanguage();
                         }
 
@@ -231,7 +230,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
             if (null !== $rewrittenUrlData->view) {
                 $request->attributes->set('_view', $rewrittenUrlData->view);
                 if (null !== $rewrittenUrlData->viewId) {
-                    $request->query->set($rewrittenUrlData->view . '_id', $rewrittenUrlData->viewId);
+                    $request->query->set($rewrittenUrlData->view.'_id', $rewrittenUrlData->viewId);
                 }
             }
 
@@ -263,7 +262,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
         if ($lang != $langSession) {
             if (ConfigQuery::isMultiDomainActivated()) {
                 $this->redirect(
-                    sprintf("%s/%s", $lang->getUrl(), $rewrittenUrlData->rewrittenUrl),
+                    sprintf('%s/%s', $lang->getUrl(), $rewrittenUrlData->rewrittenUrl),
                     301
                 );
             } else {

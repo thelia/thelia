@@ -15,8 +15,7 @@ namespace Thelia\Core\Event\Order;
 use Thelia\Model\Order;
 
 /**
- * Class OrderEvent
- * @package Thelia\Core\Event\Order
+ * Class OrderEvent.
  */
 class OrderProductEvent extends OrderEvent
 {
@@ -34,6 +33,7 @@ class OrderProductEvent extends OrderEvent
 
     /**
      * @param $id
+     *
      * @return $this
      */
     public function setId($id)

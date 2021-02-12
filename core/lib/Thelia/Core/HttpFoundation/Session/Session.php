@@ -13,12 +13,8 @@
 namespace Thelia\Core\HttpFoundation\Session;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
-use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Thelia\Core\Event\Cart\CartCreateEvent;
-use Thelia\Core\Event\Cart\CartPersistEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\User\UserInterface;
@@ -30,14 +26,9 @@ use Thelia\Model\Order;
 use Thelia\Tools\URL;
 
 /**
- *
- * extends mfony\Component\HttpFoundation\Session\Session for adding some helpers
+ * extends mfony\Component\HttpFoundation\Session\Session for adding some helpers.
  *
  * Class Session
- *
- * @package Thelia\Core\HttpFoundation\Session
- *
- * Symfony\Component\HttpFoundation\Request
  */
 class Session extends BaseSession
 {
@@ -45,13 +36,13 @@ class Session extends BaseSession
     protected static $transientCart = null;
 
     /**
-     * @param bool $forceDefault if true, the default language will be returned if no current language is defined.
+     * @param bool $forceDefault if true, the default language will be returned if no current language is defined
      *
      * @return \Thelia\Model\Lang
      */
     public function getLang($forceDefault = true)
     {
-        $lang = $this->get("thelia.current.lang");
+        $lang = $this->get('thelia.current.lang');
         if (null === $lang && $forceDefault) {
             $lang = Lang::getDefaultLanguage();
         }
@@ -61,26 +52,26 @@ class Session extends BaseSession
 
     public function setLang(Lang $lang)
     {
-        $this->set("thelia.current.lang", $lang);
+        $this->set('thelia.current.lang', $lang);
 
         return $this;
     }
 
     public function setCurrency(Currency $currency)
     {
-        $this->set("thelia.current.currency", $currency);
+        $this->set('thelia.current.currency', $currency);
     }
 
     /**
-     * Return current currency
+     * Return current currency.
      *
-     * @param bool $forceDefault if true, the default currency will be returned if no current currency is defined.
+     * @param bool $forceDefault if true, the default currency will be returned if no current currency is defined
      *
      * @return Currency
      */
     public function getCurrency($forceDefault = true)
     {
-        $currency = $this->get("thelia.current.currency");
+        $currency = $this->get('thelia.current.currency');
 
         if (null === $currency && $forceDefault) {
             $currency = Currency::getDefaultCurrency();
@@ -96,7 +87,7 @@ class Session extends BaseSession
         $currency = $this->get('thelia.admin.edition.currency', null);
 
         if (null === $currency) {
-            $currency =  Currency::getDefaultCurrency();
+            $currency = Currency::getDefaultCurrency();
         }
 
         return $currency;
@@ -117,7 +108,7 @@ class Session extends BaseSession
         $lang = $this->get('thelia.admin.edition.lang');
 
         if (null === $lang) {
-            $lang =  Lang::getDefaultLanguage();
+            $lang = Lang::getDefaultLanguage();
         }
 
         return $lang;
@@ -125,6 +116,7 @@ class Session extends BaseSession
 
     /**
      * @param Lang $lang the current edition language to set in the back-office
+     *
      * @return $this
      */
     public function setAdminEditionLang(Lang $lang)
@@ -185,8 +177,7 @@ class Session extends BaseSession
     }
 
     /**
-     *
-     * @return string the return-to URL, or the index page if none is defined.
+     * @return string the return-to URL, or the index page if none is defined
      */
     public function getReturnToUrl()
     {
@@ -203,8 +194,7 @@ class Session extends BaseSession
     }
 
     /**
-     *
-     * @return string the return-to catalog last URL, or the index page if none is defined.
+     * @return string the return-to catalog last URL, or the index page if none is defined
      */
     public function getReturnToCatalogLastUrl()
     {
@@ -224,25 +214,25 @@ class Session extends BaseSession
     {
         if (null === $cart || $cart->isNew()) {
             self::$transientCart = $cart;
-            $this->remove("thelia.cart_id");
+            $this->remove('thelia.cart_id');
         } else {
             self::$transientCart = null;
-            $this->set("thelia.cart_id", $cart->getId());
+            $this->set('thelia.cart_id', $cart->getId());
         }
 
         return $this;
     }
 
     /**
-     * Return the cart stored in the current session
+     * Return the cart stored in the current session.
      *
      * @param EventDispatcherInterface $dispatcher the event dispatcher, required if no cart is currently stored in the session
      *
-     * @return Cart The cart in the current session.
+     * @return Cart the cart in the current session
      */
     public function getSessionCart(EventDispatcherInterface $dispatcher = null)
     {
-        $cart_id = $this->get("thelia.cart_id", null);
+        $cart_id = $this->get('thelia.cart_id', null);
         if (null !== $cart_id) {
             $cart = CartQuery::create()->findPk($cart_id);
         } else {
@@ -251,7 +241,7 @@ class Session extends BaseSession
 
         // If we do not have a cart, or if the current cart is nor valid
         // restore it from the cart cookie, or create a new one
-        if (null === $cart || ! $this->isValidCart($cart)) {
+        if (null === $cart || !$this->isValidCart($cart)) {
             // A dispatcher is required here. If we do not have it, throw an exception
             // This is a temporary workaround to ensure backward compatibility with getCart(),
             // When genCart() will be removed, this check should be removed, and  $dispatcher should become
@@ -259,7 +249,7 @@ class Session extends BaseSession
 
             if (null == $dispatcher) {
                 throw new \InvalidArgumentException(
-                    "In this context (no cart in session), an EventDispatcher should be provided to Session::getSessionCart()."
+                    'In this context (no cart in session), an EventDispatcher should be provided to Session::getSessionCart().'
                 );
             }
 
@@ -273,7 +263,7 @@ class Session extends BaseSession
 
             if (null === $cart = $cartEvent->getCart()) {
                 throw new \LogicException(
-                    "Unable to get a Cart."
+                    'Unable to get a Cart.'
                 );
             }
 
@@ -286,7 +276,6 @@ class Session extends BaseSession
 
     /**
      * Clear the current session cart, and store a new, empty one in the session.
-     *
      */
     public function clearSessionCart(EventDispatcherInterface $dispatcher)
     {
@@ -296,7 +285,7 @@ class Session extends BaseSession
 
         if (null === $cart = $event->getCart()) {
             throw new \LogicException(
-                "Unable to get a new empty Cart."
+                'Unable to get a new empty Cart.'
             );
         }
 
@@ -305,9 +294,10 @@ class Session extends BaseSession
     }
 
     /**
-     * Return cart if it exists and is valid (checking customer)
+     * Return cart if it exists and is valid (checking customer).
      *
      * @return \Thelia\Model\Cart|null
+     *
      * @deprecated use getSessionCart() instead
      */
     public function getCart()
@@ -321,7 +311,7 @@ class Session extends BaseSession
     }
 
     /**
-     * A cart is valid if its customer ID is the same as the current logged in user
+     * A cart is valid if its customer ID is the same as the current logged in user.
      *
      * @param Cart $cart The cart to check
      *
@@ -340,7 +330,7 @@ class Session extends BaseSession
 
     public function setOrder(Order $order)
     {
-        $this->set("thelia.order", $order);
+        $this->set('thelia.order', $order);
 
         return $this;
     }
@@ -350,7 +340,7 @@ class Session extends BaseSession
      */
     public function getOrder()
     {
-        $order = $this->get("thelia.order");
+        $order = $this->get('thelia.order');
 
         if (null === $order) {
             $order = new Order();
@@ -361,7 +351,7 @@ class Session extends BaseSession
     }
 
     /**
-     * Set consumed coupons by the Customer
+     * Set consumed coupons by the Customer.
      *
      * @param array $couponsCode An array of Coupon code
      *
@@ -375,7 +365,7 @@ class Session extends BaseSession
     }
 
     /**
-     * Get Customer consumed coupons
+     * Get Customer consumed coupons.
      *
      * @return array $couponsCode An array of Coupon code
      */
@@ -385,7 +375,7 @@ class Session extends BaseSession
     }
 
     /**
-     * Get saved errored forms information
+     * Get saved errored forms information.
      *
      * @return array
      */
@@ -395,7 +385,7 @@ class Session extends BaseSession
     }
 
     /**
-     * Save errored forms information
+     * Save errored forms information.
      *
      * @param array $formInformation
      */

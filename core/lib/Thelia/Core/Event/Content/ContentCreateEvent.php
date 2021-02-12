@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Content;
 
 /**
- * Class ContentCreateEvent
- * @package Thelia\Core\Event\Content
+ * Class ContentCreateEvent.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class ContentCreateEvent extends ContentEvent
@@ -25,7 +25,6 @@ class ContentCreateEvent extends ContentEvent
     protected $visible;
 
     /**
-     *
      * @return $this
      */
     public function setLocale($locale)
@@ -35,15 +34,12 @@ class ContentCreateEvent extends ContentEvent
         return $this;
     }
 
-    /**
-     */
     public function getLocale()
     {
         return $this->locale;
     }
 
     /**
-     *
      * @return $this
      */
     public function setDefaultFolder($default_folder)
@@ -53,15 +49,12 @@ class ContentCreateEvent extends ContentEvent
         return $this;
     }
 
-    /**
-     */
     public function getDefaultFolder()
     {
         return $this->default_folder;
     }
 
     /**
-     *
      * @return $this
      */
     public function setVisible($visible)
@@ -71,15 +64,12 @@ class ContentCreateEvent extends ContentEvent
         return $this;
     }
 
-    /**
-     */
     public function getVisible()
     {
         return $this->visible;
     }
 
     /**
-     *
      * @return $this
      */
     public function setTitle($title)
@@ -89,8 +79,6 @@ class ContentCreateEvent extends ContentEvent
         return $this;
     }
 
-    /**
-     */
     public function getTitle()
     {
         return $this->title;

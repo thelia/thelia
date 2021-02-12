@@ -12,13 +12,13 @@
 
 namespace Thelia\ImportExport\Import;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
 
 /**
- * Class AbstractImport
+ * Class AbstractImport.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 abstract class AbstractImport implements \Iterator
@@ -44,7 +44,7 @@ abstract class AbstractImport implements \Iterator
     protected $mandatoryColumns = [];
 
     /**
-     * @var integer Imported row count
+     * @var int Imported row count
      */
     protected $importedRows = 0;
 
@@ -74,7 +74,7 @@ abstract class AbstractImport implements \Iterator
     }
 
     /**
-     * Get data
+     * Get data.
      *
      * @return array Parsed data
      */
@@ -84,7 +84,7 @@ abstract class AbstractImport implements \Iterator
     }
 
     /**
-     * Set data
+     * Set data.
      *
      * @param array $data Parsed data
      *
@@ -98,7 +98,7 @@ abstract class AbstractImport implements \Iterator
     }
 
     /**
-     * Get file
+     * Get file.
      *
      * @return \Symfony\Component\HttpFoundation\File\File
      */
@@ -108,8 +108,7 @@ abstract class AbstractImport implements \Iterator
     }
 
     /**
-     * Set file
-     *
+     * Set file.
      *
      * @return $this Return $this, allow chaining
      */
@@ -121,7 +120,7 @@ abstract class AbstractImport implements \Iterator
     }
 
     /**
-     * Get language
+     * Get language.
      *
      * @return \Thelia\Model\Lang A language model
      */
@@ -131,9 +130,9 @@ abstract class AbstractImport implements \Iterator
     }
 
     /**
-     * Set language
+     * Set language.
      *
-     * @param null|\Thelia\Model\Lang $language A language model
+     * @param \Thelia\Model\Lang|null $language A language model
      *
      * @return $this Return $this, allow chaining
      */
@@ -145,11 +144,11 @@ abstract class AbstractImport implements \Iterator
     }
 
     /**
-     * Check mandatory columns
+     * Check mandatory columns.
      *
      * @param array $data Data
      *
-     * @return boolean Data contains mandatory columns or not
+     * @return bool Data contains mandatory columns or not
      */
     public function checkMandatoryColumns(array $data)
     {
@@ -160,7 +159,7 @@ abstract class AbstractImport implements \Iterator
                 Translator::getInstance()->trans(
                     'The following columns are missing: %columns',
                     [
-                        '%columns' => implode(', ', $diff)
+                        '%columns' => implode(', ', $diff),
                     ]
                 )
             );
@@ -168,7 +167,7 @@ abstract class AbstractImport implements \Iterator
     }
 
     /**
-     * Get imported rows
+     * Get imported rows.
      *
      * @return int Imported rows count
      */
@@ -178,7 +177,7 @@ abstract class AbstractImport implements \Iterator
     }
 
     /**
-     * Set imported rows
+     * Set imported rows.
      *
      * @param int $importedRows Imported rows count
      *
@@ -192,11 +191,11 @@ abstract class AbstractImport implements \Iterator
     }
 
     /**
-     * Import data
+     * Import data.
      *
      * @param array $data Data to import
      *
-     * @return null|String String with error, null otherwise
+     * @return string|null String with error, null otherwise
      */
     abstract public function importData(array $data);
 }

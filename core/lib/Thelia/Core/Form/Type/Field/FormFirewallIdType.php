@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\FormFirewallQuery;
 
 /**
- * Class FormFirewallIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class FormFirewallIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class FormFirewallIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class FormFirewallIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "form_firewall_id";
+        return 'form_firewall_id';
     }
 }

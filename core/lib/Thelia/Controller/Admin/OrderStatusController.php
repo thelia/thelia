@@ -28,9 +28,10 @@ use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
 
 /**
- * Class OrderStatusController
- * @package Thelia\Controller\Admin
+ * Class OrderStatusController.
+ *
  * @author  Gilles Bourgeat <gbourgeat@openstudio.com>
+ *
  * @since 2.4
  */
 class OrderStatusController extends AbstractCrudController
@@ -51,7 +52,7 @@ class OrderStatusController extends AbstractCrudController
     }
 
     /**
-     * Return the creation form for this object
+     * Return the creation form for this object.
      */
     protected function getCreationForm()
     {
@@ -59,7 +60,7 @@ class OrderStatusController extends AbstractCrudController
     }
 
     /**
-     * Return the update form for this object
+     * Return the update form for this object.
      */
     protected function getUpdateForm()
     {
@@ -67,23 +68,24 @@ class OrderStatusController extends AbstractCrudController
     }
 
     /**
-     * Hydrate the update form for this object, before passing it to the update template
+     * Hydrate the update form for this object, before passing it to the update template.
      *
-     * @param  OrderStatus                 $object
+     * @param OrderStatus $object
+     *
      * @return OrderStatusModificationForm $object
      */
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         // Prepare the data that will hydrate the form
         $data = [
-            'id'            => $object->getId(),
-            'locale'        => $object->getLocale(),
-            'title'         => $object->getTitle(),
-            'chapo'         => $object->getChapo(),
-            'description'   => $object->getDescription(),
-            'postscriptum'  => $object->getPostscriptum(),
-            'color'         => $object->getColor(),
-            'code'          => $object->getCode()
+            'id' => $object->getId(),
+            'locale' => $object->getLocale(),
+            'title' => $object->getTitle(),
+            'chapo' => $object->getChapo(),
+            'description' => $object->getDescription(),
+            'postscriptum' => $object->getPostscriptum(),
+            'color' => $object->getColor(),
+            'code' => $object->getCode(),
         ];
 
         $form = $this->createForm(AdminForm::ORDER_STATUS_MODIFICATION, FormType::class, $data);
@@ -93,9 +95,10 @@ class OrderStatusController extends AbstractCrudController
     }
 
     /**
-     * Creates the creation event with the provided form data
+     * Creates the creation event with the provided form data.
      *
-     * @param  array            $formData
+     * @param array $formData
+     *
      * @return OrderStatusCreateEvent
      */
     protected function getCreationEvent($formData)
@@ -113,9 +116,10 @@ class OrderStatusController extends AbstractCrudController
     }
 
     /**
-     * Creates the update event with the provided form data
+     * Creates the update event with the provided form data.
      *
-     * @param  array            $formData
+     * @param array $formData
+     *
      * @return OrderStatusUpdateEvent
      */
     protected function getUpdateEvent($formData)
@@ -136,11 +140,12 @@ class OrderStatusController extends AbstractCrudController
     }
 
     /**
-     * Creates the delete event with the provided form data
+     * Creates the delete event with the provided form data.
      *
      * @return OrderStatusDeleteEvent
+     *
      * @throws \Exception
-    */
+     */
     protected function getDeleteEvent()
     {
         return new OrderStatusDeleteEvent((int) $this->getRequest()->get('order_status_id'));
@@ -149,7 +154,8 @@ class OrderStatusController extends AbstractCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param  OrderStatusEvent $event
+     * @param OrderStatusEvent $event
+     *
      * @return bool
      */
     protected function eventContainsObject($event)
@@ -162,7 +168,7 @@ class OrderStatusController extends AbstractCrudController
      *
      * @param $event \Thelia\Core\Event\OrderStatus\OrderStatusEvent
      *
-     * @return null|OrderStatus
+     * @return OrderStatus|null
      */
     protected function getObjectFromEvent($event)
     {
@@ -170,7 +176,7 @@ class OrderStatusController extends AbstractCrudController
     }
 
     /**
-     * Load an existing object from the database
+     * Load an existing object from the database.
      *
      * @return \Thelia\Model\OrderStatus
      */
@@ -187,7 +193,7 @@ class OrderStatusController extends AbstractCrudController
     }
 
     /**
-     * Returns the object label form the object event (name, title, etc.)
+     * Returns the object label form the object event (name, title, etc.).
      *
      * @param OrderStatus $object
      *
@@ -199,7 +205,7 @@ class OrderStatusController extends AbstractCrudController
     }
 
     /**
-     * Returns the object ID from the object
+     * Returns the object ID from the object.
      *
      * @param OrderStatus $object
      *
@@ -211,9 +217,9 @@ class OrderStatusController extends AbstractCrudController
     }
 
     /**
-     * Render the main list template
+     * Render the main list template.
      *
-     * @param string $currentOrder , if any, null otherwise.
+     * @param string $currentOrder , if any, null otherwise
      *
      * @return Response
      */
@@ -230,12 +236,12 @@ class OrderStatusController extends AbstractCrudController
     {
         return [
             'order_status_id' => $this->getRequest()->get('order_status_id', 0),
-            'current_tab' => $this->getRequest()->get('current_tab', 'general')
+            'current_tab' => $this->getRequest()->get('current_tab', 'general'),
         ];
     }
 
     /**
-     * Render the edition template
+     * Render the edition template.
      */
     protected function renderEditionTemplate()
     {
@@ -243,7 +249,7 @@ class OrderStatusController extends AbstractCrudController
     }
 
     /**
-     * Redirect to the edition template
+     * Redirect to the edition template.
      */
     protected function redirectToEditionTemplate()
     {
@@ -255,7 +261,7 @@ class OrderStatusController extends AbstractCrudController
     }
 
     /**
-     * Redirect to the list template
+     * Redirect to the list template.
      */
     protected function redirectToListTemplate()
     {
@@ -265,6 +271,7 @@ class OrderStatusController extends AbstractCrudController
     /**
      * @param $positionChangeMode
      * @param $positionValue
+     *
      * @return UpdatePositionEvent|void
      */
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
@@ -278,7 +285,8 @@ class OrderStatusController extends AbstractCrudController
 
     /**
      * @param $event \Thelia\Core\Event\UpdatePositionEvent
-     * @return null|Response
+     *
+     * @return Response|null
      */
     protected function performAdditionalUpdatePositionAction($event)
     {
@@ -289,6 +297,7 @@ class OrderStatusController extends AbstractCrudController
                 'admin.order-status.default'
             );
         }
-            return null;
+
+        return null;
     }
 }

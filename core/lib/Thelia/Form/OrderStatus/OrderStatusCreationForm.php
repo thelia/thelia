@@ -24,9 +24,10 @@ use Thelia\Model\Lang;
 use Thelia\Model\OrderStatusQuery;
 
 /**
- * Class OrderStatusCreationForm
- * @package Thelia\Form\OrderStatus
+ * Class OrderStatusCreationForm.
+ *
  * @author  Gilles Bourgeat <gbourgeat@openstudio.fr>
+ *
  * @since 2.4
  */
 class OrderStatusCreationForm extends BaseForm
@@ -40,19 +41,19 @@ class OrderStatusCreationForm extends BaseForm
                 'title',
                 TextType::class,
                 [
-                    'constraints' => [ new NotBlank() ],
-                    'required'    => true,
-                    'label'       => Translator::getInstance()->trans('Order status name'),
-                    'label_attr'  => [
-                        'for'         => 'title',
-                        'help'        => Translator::getInstance()->trans(
+                    'constraints' => [new NotBlank()],
+                    'required' => true,
+                    'label' => Translator::getInstance()->trans('Order status name'),
+                    'label_attr' => [
+                        'for' => 'title',
+                        'help' => Translator::getInstance()->trans(
                             'Enter here the order status name in the default language (%title%)',
-                            [ '%title%' => Lang::getDefaultLanguage()->getTitle()]
+                            ['%title%' => Lang::getDefaultLanguage()->getTitle()]
                         ),
                     ],
                     'attr' => [
                         'placeholder' => Translator::getInstance()->trans('The order status name or title'),
-                    ]
+                    ],
                 ]
             )
             ->add(
@@ -64,19 +65,19 @@ class OrderStatusCreationForm extends BaseForm
                             'methods' => [
                                 [$this, 'checkUniqueCode'],
                                 [$this, 'checkFormatCode'],
-                                [$this, 'checkIsRequiredCode']
-                            ]
-                        ])
+                                [$this, 'checkIsRequiredCode'],
+                            ],
+                        ]),
                     ],
-                    'required'    => true,
-                    'label'       => Translator::getInstance()->trans('Order status code'),
-                    'label_attr'  => [
-                        'for'         => 'title',
-                        'help'        => Translator::getInstance()->trans('Enter here the order status code'),
+                    'required' => true,
+                    'label' => Translator::getInstance()->trans('Order status code'),
+                    'label_attr' => [
+                        'for' => 'title',
+                        'help' => Translator::getInstance()->trans('Enter here the order status code'),
                     ],
                     'attr' => [
                         'placeholder' => Translator::getInstance()->trans('The order status code'),
-                    ]
+                    ],
                 ]
             )
             ->add(
@@ -86,18 +87,18 @@ class OrderStatusCreationForm extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                         new Callback([
-                            'methods' => [[$this, 'checkColor']]
-                        ])
+                            'methods' => [[$this, 'checkColor']],
+                        ]),
                     ],
-                    'required'    => false,
-                    'label'       => Translator::getInstance()->trans('Order status color'),
-                    'label_attr'  => [
-                        'for'         => 'title',
-                        'help'        => Translator::getInstance()->trans('Choice a color for this order status code'),
+                    'required' => false,
+                    'label' => Translator::getInstance()->trans('Order status color'),
+                    'label_attr' => [
+                        'for' => 'title',
+                        'help' => Translator::getInstance()->trans('Choice a color for this order status code'),
                     ],
                     'attr' => [
                         'placeholder' => Translator::getInstance()->trans('#000000'),
-                    ]
+                    ],
                 ]
             );
 
@@ -111,9 +112,9 @@ class OrderStatusCreationForm extends BaseForm
 
     public function checkColor($value, ExecutionContextInterface $context)
     {
-        if (!preg_match("/^#[0-9a-fA-F]{6}$/", $value)) {
+        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $value)) {
             $context->addViolation(
-                Translator::getInstance()->trans("This is not a hexadecimal color.")
+                Translator::getInstance()->trans('This is not a hexadecimal color.')
             );
         }
     }
@@ -129,7 +130,7 @@ class OrderStatusCreationForm extends BaseForm
 
         if ($query->findOne()) {
             $context->addViolation(
-                Translator::getInstance()->trans("This code is already used.")
+                Translator::getInstance()->trans('This code is already used.')
             );
         }
     }
@@ -138,7 +139,7 @@ class OrderStatusCreationForm extends BaseForm
     {
         if (!empty($value) && !preg_match('/^\w+$/', $value)) {
             $context->addViolation(
-                Translator::getInstance()->trans("This is not a valid code.")
+                Translator::getInstance()->trans('This is not a valid code.')
             );
         }
     }
@@ -149,7 +150,7 @@ class OrderStatusCreationForm extends BaseForm
             if (null !== $orderStatus = OrderStatusQuery::create()->findOneById($this->form->get('id')->getData())) {
                 if (!$orderStatus->getProtectedStatus() && empty($this->form->get('code')->getData())) {
                     $context->addViolation(
-                        Translator::getInstance()->trans("This value should not be blank.")
+                        Translator::getInstance()->trans('This value should not be blank.')
                     );
                 }
             }

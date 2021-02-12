@@ -37,7 +37,7 @@ class Tinymce extends BaseModule
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function postActivation(ConnectionInterface $con = null)
     {
@@ -46,7 +46,7 @@ class Tinymce extends BaseModule
         //Check for environment
         if ($env = $this->getContainer()->getParameter('kernel.environment')) {
             //Check for backward compatibility
-            if ($env !== "prod" && $env !== "dev") {
+            if ($env !== 'prod' && $env !== 'dev') {
                 //Remove separtion between dev and prod in particular environment
                 $env = str_replace('_dev', '', $env);
                 $this->webMediaEnvPath = $this->webMediaPath.DS.$env;
@@ -84,7 +84,7 @@ class Tinymce extends BaseModule
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function postDeactivation(ConnectionInterface $con = null)
     {
@@ -94,7 +94,7 @@ class Tinymce extends BaseModule
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
     {

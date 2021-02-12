@@ -23,15 +23,14 @@ use Thelia\Model\Profile as ProfileModel;
 use Thelia\Model\ProfileQuery;
 
 /**
- *
- * Profile loop
- *
+ * Profile loop.
  *
  * Class Profile
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
+ *
  * @method int[] getId()
  */
 class Profile extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -71,14 +70,14 @@ class Profile extends BaseI18nLoop implements PropelSearchLoopInterface
         /** @var ProfileModel $profile */
         foreach ($loopResult->getResultDataCollection() as $profile) {
             $loopResultRow = new LoopResultRow($profile);
-            $loopResultRow->set("ID", $profile->getId())
-                ->set("IS_TRANSLATED", $profile->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("CODE", $profile->getCode())
-                ->set("TITLE", $profile->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $profile->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $profile->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $profile->getVirtualColumn('i18n_POSTSCRIPTUM'))
+            $loopResultRow->set('ID', $profile->getId())
+                ->set('IS_TRANSLATED', $profile->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('CODE', $profile->getCode())
+                ->set('TITLE', $profile->getVirtualColumn('i18n_TITLE'))
+                ->set('CHAPO', $profile->getVirtualColumn('i18n_CHAPO'))
+                ->set('DESCRIPTION', $profile->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $profile->getVirtualColumn('i18n_POSTSCRIPTUM'))
             ;
             $this->addOutputFields($loopResultRow, $profile);
 

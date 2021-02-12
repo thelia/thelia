@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\ImportCategoryQuery;
 
 /**
- * Class ImportCategoryIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class ImportCategoryIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ImportCategoryIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class ImportCategoryIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "import_category_id";
+        return 'import_category_id';
     }
 }

@@ -28,7 +28,7 @@ class LoopListCommand extends ContainerAwareCommand
     }
 
     /**
-     * @return int|null|void
+     * @return int|void|null
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -44,7 +44,7 @@ class LoopListCommand extends ContainerAwareCommand
         }
 
         $helper
-            ->setHeaders(["Name", "Class"])
+            ->setHeaders(['Name', 'Class'])
             ->render()
         ;
 

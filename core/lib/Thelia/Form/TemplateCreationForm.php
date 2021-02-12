@@ -13,7 +13,6 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
@@ -23,22 +22,22 @@ class TemplateCreationForm extends BaseForm
     {
         $this->formBuilder
             ->add(
-                "name",
+                'name',
                 TextType::class,
                 [
-                "constraints" => [
+                'constraints' => [
                     new NotBlank(),
                 ],
-                "label" => Translator::getInstance()->trans("Template Name *"),
-                "label_attr" => [
-                    "for" => "name",
+                'label' => Translator::getInstance()->trans('Template Name *'),
+                'label_attr' => [
+                    'for' => 'name',
                 ], ]
             )
             ->add(
-                "locale",
+                'locale',
                 TextType::class,
                 [
-                "constraints" => [
+                'constraints' => [
                     new NotBlank(),
                 ], ]
             )
@@ -47,6 +46,6 @@ class TemplateCreationForm extends BaseForm
 
     public static function getName()
     {
-        return "thelia_template_creation";
+        return 'thelia_template_creation';
     }
 }

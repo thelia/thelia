@@ -15,15 +15,14 @@ namespace Thelia\Tests\Module;
 use PHPUnit\Framework\TestCase;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 abstract class BaseModuleTestor extends TestCase
 {
     protected $instance;
 
     abstract public function getTestedClassName();
+
     abstract public function getTestedInstance();
 
     public function setUp(): void

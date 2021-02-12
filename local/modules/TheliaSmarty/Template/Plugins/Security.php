@@ -43,11 +43,13 @@ class Security extends AbstractSmartyPlugin
     }
 
     /**
-     * Process security check function
+     * Process security check function.
      *
-     * @param  array                                                   $params
-     * @param  \Smarty                                                 $smarty
-     * @return string                                                  no text is returned.
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
+     * @return string no text is returned
+     *
      * @throws \Thelia\Core\Security\Exception\AuthenticationException
      * @throws AuthenticationException
      * @throws AuthorizationException
@@ -59,7 +61,7 @@ class Security extends AbstractSmartyPlugin
         $modules = $this->explode($this->getParam($params, 'module'));
         $accesses = $this->explode($this->getParam($params, 'access'));
 
-        if (! $this->securityContext->isGranted($roles, $resources, $modules, $accesses)) {
+        if (!$this->securityContext->isGranted($roles, $resources, $modules, $accesses)) {
             if (null === $this->securityContext->checkRole($roles)) {
                 // The current user is not logged-in.
                 $ex = new AuthenticationException(
@@ -97,11 +99,11 @@ class Security extends AbstractSmartyPlugin
     public function checkCartNotEmptyFunction($params, &$smarty)
     {
         $cart = $this->getSession()->getSessionCart($this->dispatcher);
-        if ($cart===null || $cart->countCartItems() == 0) {
+        if ($cart === null || $cart->countCartItems() == 0) {
             throw new OrderException('Cart must not be empty', OrderException::CART_EMPTY, ['empty' => 1]);
         }
 
-        return "";
+        return '';
     }
 
     public function checkValidDeliveryFunction($params, &$smarty)
@@ -119,11 +121,11 @@ class Security extends AbstractSmartyPlugin
             throw new OrderException('Delivery must be defined', OrderException::UNDEFINED_DELIVERY, ['missing' => 1]);
         }
 
-        return "";
+        return '';
     }
 
     /**
-     * Define the various smarty plugins handled by this class
+     * Define the various smarty plugins handled by this class.
      *
      * @return array an array of smarty plugin descriptors
      */

@@ -12,10 +12,10 @@
 
 namespace TheliaSmarty\Template;
 
-use \Smarty;
-use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use \Symfony\Component\HttpFoundation\Request;
 use Imagine\Exception\InvalidArgumentException;
+use Smarty;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
@@ -29,7 +29,6 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 
 /**
- *
  * @author Franck Allimant <franck@cqfdev.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
@@ -69,7 +68,7 @@ class SmartyParser extends Smarty implements ParserInterface
     /** @var bool */
     protected $debug;
 
-    /** @var array The template stack  */
+    /** @var array The template stack */
     protected $tplStack = [];
 
     /** @var bool */
@@ -77,7 +76,8 @@ class SmartyParser extends Smarty implements ParserInterface
 
     /**
      * @param string $kernelEnvironment
-     * @param bool $kernelDebug
+     * @param bool   $kernelDebug
+     *
      * @throws \SmartyException
      */
     public function __construct(
@@ -85,7 +85,7 @@ class SmartyParser extends Smarty implements ParserInterface
         EventDispatcherInterface $dispatcher,
         ParserContext $parserContext,
         TemplateHelperInterface $templateHelper,
-        $kernelEnvironment = "prod",
+        $kernelEnvironment = 'prod',
         $kernelDebug = false
     ) {
         parent::__construct();
@@ -102,13 +102,13 @@ class SmartyParser extends Smarty implements ParserInterface
 
         // Configure basic Smarty parameters
 
-        $compile_dir = THELIA_CACHE_DIR . DS . $kernelEnvironment . DS . 'smarty' . DS . 'compile';
-        if (! is_dir($compile_dir)) {
+        $compile_dir = THELIA_CACHE_DIR.DS.$kernelEnvironment.DS.'smarty'.DS.'compile';
+        if (!is_dir($compile_dir)) {
             @mkdir($compile_dir, 0777, true);
         }
 
-        $cache_dir = THELIA_CACHE_DIR . DS . $kernelEnvironment . DS . 'smarty' . DS . 'cache';
-        if (! is_dir($cache_dir)) {
+        $cache_dir = THELIA_CACHE_DIR.DS.$kernelEnvironment.DS.'smarty'.DS.'cache';
+        if (!is_dir($cache_dir)) {
             @mkdir($cache_dir, 0777, true);
         }
 
@@ -121,12 +121,12 @@ class SmartyParser extends Smarty implements ParserInterface
         // The default HTTP status
         $this->status = 200;
 
-        $this->registerFilter('output', [$this, "trimWhitespaces"]);
-        $this->registerFilter('variable', [__CLASS__, "theliaEscape"]);
+        $this->registerFilter('output', [$this, 'trimWhitespaces']);
+        $this->registerFilter('variable', [__CLASS__, 'theliaEscape']);
     }
 
     /**
-     * Return the current request or null if no request exists
+     * Return the current request or null if no request exists.
      *
      * @return Request|null
      */
@@ -137,7 +137,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
     /**
      * Trim whitespaces from the HTML output, preserving required ones in pre, textarea, javascript.
-     * This methois uses 3 levels of trimming :
+     * This methois uses 3 levels of trimming :.
      *
      *    - 0 : whitespaces are not trimmed, code remains as is.
      *    - 1 : only blank lines are trimmed, code remains indented and human-readable (the default)
@@ -145,10 +145,11 @@ class SmartyParser extends Smarty implements ParserInterface
      *
      * The trim level is defined by the configuration variable html_output_trim_level
      *
-     * @param  string                    $source   the HTML source
+     * @param string $source the HTML source
+     *
      * @return string
      */
-    public function trimWhitespaces($source, /** @noinspection PhpUnusedParameterInspection */ \Smarty_Internal_Template $template)
+    public function trimWhitespaces($source, /* @noinspection PhpUnusedParameterInspection */ \Smarty_Internal_Template $template)
     {
         $compressionMode = ConfigQuery::read('html_output_trim_level', 1);
 
@@ -168,18 +169,18 @@ class SmartyParser extends Smarty implements ParserInterface
             $expressions = [
                 // remove spaces between attributes (but not in attribute values!)
                 '#(([a-z0-9]\s*=\s*(["\'])[^\3]*?\3)|<[a-z0-9_]+)\s+([a-z/>])#is' => '\1 \4',
-                '/(^[\n]*|[\n]+)[\s\t]*[\n]+/' => "\n"
+                '/(^[\n]*|[\n]+)[\s\t]*[\n]+/' => "\n",
             ];
         } elseif ($compressionMode >= 2) {
             if (preg_match_all('#<!--\[[^\]]+\]>.*?<!\[[^\]]+\]-->#is', $source, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
                 foreach ($matches as $match) {
                     $store[] = $match[0][0];
                     $_length = \strlen($match[0][0]);
-                    $replace = '@!@SMARTY:' . $_store . ':SMARTY@!@';
+                    $replace = '@!@SMARTY:'.$_store.':SMARTY@!@';
                     $source = substr_replace($source, $replace, $match[0][1] - $_offset, $_length);
 
                     $_offset += $_length - \strlen($replace);
-                    $_store++;
+                    ++$_store;
                 }
             }
 
@@ -208,11 +209,11 @@ class SmartyParser extends Smarty implements ParserInterface
             foreach ($matches as $match) {
                 $store[] = $match[0][0];
                 $_length = \strlen($match[0][0]);
-                $replace = '@!@SMARTY:' . $_store . ':SMARTY@!@';
+                $replace = '@!@SMARTY:'.$_store.':SMARTY@!@';
                 $source = substr_replace($source, $replace, $match[0][1] - $_offset, $_length);
 
                 $_offset += $_length - \strlen($replace);
-                $_store++;
+                ++$_store;
             }
         }
 
@@ -228,7 +229,7 @@ class SmartyParser extends Smarty implements ParserInterface
                 $source = substr_replace($source, $replace, $match[0][1] + $_offset, $_length);
 
                 $_offset += \strlen($replace) - $_length;
-                $_store++;
+                ++$_store;
             }
         }
 
@@ -236,13 +237,13 @@ class SmartyParser extends Smarty implements ParserInterface
     }
 
     /**
-     * Add a template directory to the current template list
+     * Add a template directory to the current template list.
      *
-     * @param int     $templateType      the template type (a TemplateDefinition type constant)
-     * @param string  $templateName      the template name
-     * @param string  $templateDirectory path to the template directory
-     * @param string  $key               ???
-     * @param boolean $addAtBeginning    if true, the template definition should be added at the beginning of the template directory list
+     * @param int    $templateType      the template type (a TemplateDefinition type constant)
+     * @param string $templateName      the template name
+     * @param string $templateDirectory path to the template directory
+     * @param string $key               ???
+     * @param bool   $addAtBeginning    if true, the template definition should be added at the beginning of the template directory list
      */
     public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $addAtBeginning = false)
     {
@@ -251,7 +252,7 @@ class SmartyParser extends Smarty implements ParserInterface
         if (true === $addAtBeginning && isset($this->templateDirectories[$templateType][$templateName])) {
             // When using array_merge, the key was set to 0. Use + instead.
             $this->templateDirectories[$templateType][$templateName] =
-                [ $key => $templateDirectory ] + $this->templateDirectories[$templateType][$templateName]
+                [$key => $templateDirectory] + $this->templateDirectories[$templateType][$templateName]
             ;
         } else {
             $this->templateDirectories[$templateType][$templateName][$key] = $templateDirectory;
@@ -259,31 +260,34 @@ class SmartyParser extends Smarty implements ParserInterface
     }
 
     /**
-     * Return the registered template directories for a given template type
+     * Return the registered template directories for a given template type.
      *
-     * @param  int                      $templateType
+     * @param int $templateType
+     *
      * @throws InvalidArgumentException
+     *
      * @return mixed:
      */
     public function getTemplateDirectories($templateType)
     {
-        if (! isset($this->templateDirectories[$templateType])) {
-            throw new InvalidArgumentException("Failed to get template type %", $templateType);
+        if (!isset($this->templateDirectories[$templateType])) {
+            throw new InvalidArgumentException('Failed to get template type %', $templateType);
         }
 
         return $this->templateDirectories[$templateType];
     }
 
-    public static function theliaEscape($content, /** @noinspection PhpUnusedParameterInspection */ $smarty)
+    public static function theliaEscape($content, /* @noinspection PhpUnusedParameterInspection */ $smarty)
     {
         if (is_scalar($content)) {
             return htmlspecialchars($content, ENT_QUOTES, Smarty::$_CHARSET);
         }
-            return $content;
+
+        return $content;
     }
 
     /**
-     * Set a new template definition, and save the current one
+     * Set a new template definition, and save the current one.
      *
      * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
      */
@@ -302,14 +306,14 @@ class SmartyParser extends Smarty implements ParserInterface
     public function popTemplateDefinition()
     {
         if (\count($this->tplStack) > 0) {
-             [$templateDefinition, $fallbackToDefaultTemplate] = array_pop($this->tplStack);
+            [$templateDefinition, $fallbackToDefaultTemplate] = array_pop($this->tplStack);
 
             $this->setTemplateDefinition($templateDefinition, $fallbackToDefaultTemplate);
         }
     }
 
     /**
-     * Configure the parser to use the template defined by $templateDefinition
+     * Configure the parser to use the template defined by $templateDefinition.
      *
      * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
      */
@@ -329,7 +333,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
         $templateList = ['' => $templateDefinition] + $templateDefinition->getParentList();
 
-        /** @var  TemplateDefinition $template */
+        /** @var TemplateDefinition $template */
         foreach (array_reverse($templateList) as $template) {
             // Add template directories  in the current template, in order to get assets
             $this->addTemplateDirectory(
@@ -347,18 +351,18 @@ class SmartyParser extends Smarty implements ParserInterface
         // -------------------------------------------------------------------------------------------------------------
 
         /**
-         * @var string $keyPrefix
-         * @var  TemplateDefinition $template
+         * @var string             $keyPrefix
+         * @var TemplateDefinition $template
          */
         foreach ($templateList as $keyPrefix => $template) {
-            $templateKey = $keyPrefix . self::TEMPLATE_ASSETS_KEY;
+            $templateKey = $keyPrefix.self::TEMPLATE_ASSETS_KEY;
 
             // Add the template directory to the Smarty search path
             $this->addTemplateDir($template->getAbsolutePath(), $templateKey);
 
             // Also add the configuration directory
             $this->addConfigDir(
-                $template->getAbsolutePath() . DS . 'configs',
+                $template->getAbsolutePath().DS.'configs',
                 $templateKey
             );
         }
@@ -374,7 +378,7 @@ class SmartyParser extends Smarty implements ParserInterface
                 foreach ($this->templateDirectories[$type][$template->getName()] as $key => $directory) {
                     if (null === $this->getTemplateDir($key)) {
                         $this->addTemplateDir($directory, $key);
-                        $this->addConfigDir($directory . DS . 'configs', $key);
+                        $this->addConfigDir($directory.DS.'configs', $key);
                     }
                 }
             }
@@ -389,7 +393,7 @@ class SmartyParser extends Smarty implements ParserInterface
                 foreach ($this->templateDirectories[$type]['default'] as $key => $directory) {
                     if (null === $this->getTemplateDir($key)) {
                         $this->addTemplateDir($directory, $key);
-                        $this->addConfigDir($directory . DS . 'configs', $key);
+                        $this->addConfigDir($directory.DS.'configs', $key);
                     }
                 }
             }
@@ -397,10 +401,10 @@ class SmartyParser extends Smarty implements ParserInterface
     }
 
     /**
-     * Get template definition
+     * Get template definition.
      *
      * @param bool|string $webAssetTemplateName false to use the current template path, or a template name to
-     *     load assets from this template instead of the current one.
+     *                                          load assets from this template instead of the current one
      *
      * @return TemplateDefinition
      */
@@ -422,9 +426,9 @@ class SmartyParser extends Smarty implements ParserInterface
     }
 
     /**
-     * Check if template definition is not null
+     * Check if template definition is not null.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasTemplateDefinition()
     {
@@ -432,7 +436,7 @@ class SmartyParser extends Smarty implements ParserInterface
     }
 
     /**
-     * Get the current status of the fallback to "default" feature
+     * Get the current status of the fallback to "default" feature.
      *
      * @return bool
      */
@@ -450,7 +454,7 @@ class SmartyParser extends Smarty implements ParserInterface
     }
 
     /**
-     * Return a rendered template, either from file or from a string
+     * Return a rendered template, either from file or from a string.
      *
      * @param string $resourceType    either 'string' (rendering from a string) or 'file' (rendering a file)
      * @param string $resourceContent the resource content (a text, or a template file name)
@@ -458,6 +462,7 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param bool   $compressOutput  if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      *
      * @return string the rendered template text
+     *
      * @throws \Exception
      * @throws \SmartyException
      */
@@ -465,7 +470,7 @@ class SmartyParser extends Smarty implements ParserInterface
     {
         // If we have to diable the output compression, just unregister the output filter temporarly
         if ($compressOutput == false) {
-            $this->unregisterFilter('output', [$this, "trimWhitespaces"]);
+            $this->unregisterFilter('output', [$this, 'trimWhitespaces']);
         }
 
         // Prepare common template variables
@@ -483,8 +488,8 @@ class SmartyParser extends Smarty implements ParserInterface
                 'environment' => $this->env,
                 'request' => $this->getRequest(),
                 'session' => $session,
-                'debug' => $this->debug
-            ]
+                'debug' => $this->debug,
+            ],
         ]);
 
         // Assign the parserContext variables
@@ -494,22 +499,25 @@ class SmartyParser extends Smarty implements ParserInterface
 
         $this->assign($parameters);
 
-        $output = $this->fetch(sprintf("%s:%s", $resourceType, $resourceContent));
+        $output = $this->fetch(sprintf('%s:%s', $resourceType, $resourceContent));
 
         if ($compressOutput == false) {
-            $this->registerFilter('output', [$this, "trimWhitespaces"]);
+            $this->registerFilter('output', [$this, 'trimWhitespaces']);
         }
 
         return $output;
     }
 
     /**
-     * Return a rendered template file
+     * Return a rendered template file.
      *
-     * @param  string                    $realTemplateName the template name (from the template directory)
-     * @param  array                     $parameters       an associative array of names / value pairs
-     * @return string                    the rendered template text
-     * @param  bool                      $compressOutput   if true, te output is compressed using trimWhitespaces. If false, no compression occurs
+     * @param string $realTemplateName the template name (from the template directory)
+     * @param array  $parameters       an associative array of names / value pairs
+     *
+     * @return string the rendered template text
+     *
+     * @param bool $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
+     *
      * @throws ResourceNotFoundException if the template cannot be found
      * @throws \Exception
      * @throws \SmartyException
@@ -517,7 +525,7 @@ class SmartyParser extends Smarty implements ParserInterface
     public function render($realTemplateName, array $parameters = [], $compressOutput = true)
     {
         if (false === $this->templateExists($realTemplateName) || false === $this->checkTemplate($realTemplateName)) {
-            throw new ResourceNotFoundException(Translator::getInstance()->trans("Template file %file cannot be found.", ['%file' => $realTemplateName]));
+            throw new ResourceNotFoundException(Translator::getInstance()->trans('Template file %file cannot be found.', ['%file' => $realTemplateName]));
         }
 
         return $this->internalRenderer('file', $realTemplateName, $parameters, $compressOutput);
@@ -529,10 +537,10 @@ class SmartyParser extends Smarty implements ParserInterface
 
         $found = true;
 
-        /** @noinspection PhpUnusedLocalVariableInspection */
+        /* @noinspection PhpUnusedLocalVariableInspection */
         foreach ($templates as $key => $value) {
-            $absolutePath = rtrim(realpath(\dirname($value.$fileName)), "/");
-            $templateDir =  rtrim(realpath($value), "/");
+            $absolutePath = rtrim(realpath(\dirname($value.$fileName)), '/');
+            $templateDir = rtrim(realpath($value), '/');
             if (!empty($absolutePath) && strpos($absolutePath, $templateDir) !== 0) {
                 $found = false;
             }
@@ -542,12 +550,14 @@ class SmartyParser extends Smarty implements ParserInterface
     }
 
     /**
-     * Return a rendered template text
+     * Return a rendered template text.
      *
-     * @param  string $templateText   the template text
-     * @param  array  $parameters     an associative array of names / value pairs
-     * @param  bool   $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
+     * @param string $templateText   the template text
+     * @param array  $parameters     an associative array of names / value pairs
+     * @param bool   $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
+     *
      * @return string the rendered template text
+     *
      * @throws \Exception
      * @throws \SmartyException
      */
@@ -557,7 +567,6 @@ class SmartyParser extends Smarty implements ParserInterface
     }
 
     /**
-     *
      * @return int the status of the response
      */
     public function getStatus()
@@ -566,8 +575,7 @@ class SmartyParser extends Smarty implements ParserInterface
     }
 
     /**
-     *
-     * status HTTP of the response
+     * status HTTP of the response.
      *
      * @param int $status
      */
@@ -596,7 +604,7 @@ class SmartyParser extends Smarty implements ParserInterface
      */
     public function registerPlugins()
     {
-        /** @var  AbstractSmartyPlugin $register_plugin */
+        /** @var AbstractSmartyPlugin $register_plugin */
         foreach ($this->plugins as $register_plugin) {
             $plugins = $register_plugin->getPluginDescriptors();
 
@@ -608,7 +616,7 @@ class SmartyParser extends Smarty implements ParserInterface
             foreach ($plugins as $plugin) {
                 // Use the wrapper to ensure Smarty 3.1.33 compatibility
                 $methodName = $this->useMethodCallWrapper && $plugin->getType() === 'function' ?
-                    AbstractSmartyPlugin::WRAPPED_METHOD_PREFIX . $plugin->getMethod() :
+                    AbstractSmartyPlugin::WRAPPED_METHOD_PREFIX.$plugin->getMethod() :
                     $plugin->getMethod()
                 ;
 
@@ -617,7 +625,7 @@ class SmartyParser extends Smarty implements ParserInterface
                     $plugin->getName(),
                     [
                         $plugin->getClass(),
-                        $methodName
+                        $methodName,
                     ]
                 );
             }

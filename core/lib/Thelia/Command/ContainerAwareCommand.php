@@ -25,7 +25,6 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
-use Thelia\Tools\URL;
 
 /**
  * Command.
@@ -56,6 +55,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
     /**
      * @see ContainerAwareInterface::setContainer()
+     *
      * @param ContainerInterface $container
      */
     public function setContainer(ContainerInterface $container = null)
@@ -81,7 +81,8 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
     }
 
     /**
-     * For init an Request, if your command has need an Request
+     * For init an Request, if your command has need an Request.
+     *
      * @since 2.3
      */
     protected function initRequest(Lang $lang = null)
@@ -90,7 +91,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
         $request = Request::create($this->getBaseUrl($lang));
         $request->setSession(new Session(new MockArraySessionStorage()));
-        $container->set("request_stack", new RequestStack());
+        $container->set('request_stack', new RequestStack());
         $container->get('request_stack')->push($request);
 
         $requestContext = new RequestContext();
@@ -102,6 +103,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
     /**
      * @return string
+     *
      * @since 2.3
      */
     protected function getBaseUrl(Lang $lang = null)

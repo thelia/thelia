@@ -17,19 +17,17 @@ use Thelia\Form\Image\DocumentModification;
 /**
  * Created by JetBrains PhpStorm.
  * Date: 9/18/13
- * Time: 3:56 PM
+ * Time: 3:56 PM.
  *
  * Form allowing to process an document collection
  *
- * @package Image
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class CategoryDocumentModification extends DocumentModification
 {
     /**
      * Get form name
-     * This name must be unique
+     * This name must be unique.
      *
      * @return string
      */

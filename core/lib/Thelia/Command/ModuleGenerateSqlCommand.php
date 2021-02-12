@@ -21,10 +21,10 @@ use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\PropelInitService;
 
 /**
- * generate sql for a specific module
+ * generate sql for a specific module.
  *
  * Class ModuleGenerateSqlCommand
- * @package Thelia\Command
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleGenerateSqlCommand extends BaseModuleGenerate
@@ -32,29 +32,29 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate
     public function configure()
     {
         $this
-            ->setName("module:generate:sql")
-            ->setDescription("Generate the sql from schema.xml file")
+            ->setName('module:generate:sql')
+            ->setDescription('Generate the sql from schema.xml file')
             ->addArgument(
-                "name",
+                'name',
                 InputArgument::REQUIRED,
-                "Module name"
+                'Module name'
             )
         ;
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->module = $this->formatModuleName($input->getArgument("name"));
-        $this->moduleDirectory = THELIA_MODULE_DIR . $this->module;
+        $this->module = $this->formatModuleName($input->getArgument('name'));
+        $this->moduleDirectory = THELIA_MODULE_DIR.$this->module;
 
         $fs = new Filesystem();
 
         if ($fs->exists($this->moduleDirectory) === false) {
-            throw new \RuntimeException(sprintf("%s module does not exists", $this->module));
+            throw new \RuntimeException(sprintf('%s module does not exists', $this->module));
         }
 
-        if ($fs->exists($this->moduleDirectory . DS . "Config" . DS . "schema.xml") === false) {
-            throw new \RuntimeException("schema.xml not found in Config directory. Needed file for generating model");
+        if ($fs->exists($this->moduleDirectory.DS.'Config'.DS.'schema.xml') === false) {
+            throw new \RuntimeException('schema.xml not found in Config directory. Needed file for generating model');
         }
 
         $this->checkModuleSchema();
@@ -65,9 +65,9 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate
         $propelInitService->runCommand(
             new SqlBuildCommand(),
             [
-                "--output-dir" => "{$this->moduleDirectory}/Config",
-                "--schema-dir" => "{$this->moduleDirectory}/Config",
-                "--config-dir" => $propelInitService->getPropelConfigDir(),
+                '--output-dir' => "{$this->moduleDirectory}/Config",
+                '--schema-dir' => "{$this->moduleDirectory}/Config",
+                '--config-dir' => $propelInitService->getPropelConfigDir(),
             ],
             $output
         );

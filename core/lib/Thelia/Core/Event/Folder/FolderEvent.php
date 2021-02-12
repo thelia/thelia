@@ -16,9 +16,10 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Folder;
 
 /**
- * Class FolderEvent
- * @package Thelia\Core\Event
+ * Class FolderEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
+ *
  * @deprecated since 2.4, please use \Thelia\Model\Event\FolderEvent
  */
 class FolderEvent extends ActionEvent
@@ -33,8 +34,6 @@ class FolderEvent extends ActionEvent
         $this->folder = $folder;
     }
 
-    /**
-     */
     public function setFolder(Folder $folder)
     {
         $this->folder = $folder;
@@ -51,7 +50,7 @@ class FolderEvent extends ActionEvent
     }
 
     /**
-     * test if a folder object exists
+     * test if a folder object exists.
      *
      * @return bool
      */

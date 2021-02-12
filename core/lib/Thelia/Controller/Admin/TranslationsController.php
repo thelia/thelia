@@ -28,8 +28,8 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Tools\URL;
 
 /**
- * Class TranslationsController
- * @package Thelia\Controller\Admin
+ * Class TranslationsController.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class TranslationsController extends BaseAdminController
@@ -48,7 +48,7 @@ class TranslationsController extends BaseAdminController
         );
     }
 
-    protected function getModuleTemplateNames(TemplateHelperInterface  $templateHelper, Module $module, $templateType): array
+    protected function getModuleTemplateNames(TemplateHelperInterface $templateHelper, Module $module, $templateType): array
     {
         $templates =
             $templateHelper->getList(
@@ -68,7 +68,7 @@ class TranslationsController extends BaseAdminController
     protected function renderTemplate(
         Request $request,
         TemplateHelperInterface $templateHelper,
-        EventDispatcherInterface  $eventDispatcher,
+        EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator
     ) {
         // Get related strings, if all input data are here
@@ -78,7 +78,7 @@ class TranslationsController extends BaseAdminController
 
         $modulePart = false;
 
-        if ($itemToTranslate == 'mo' && ! empty($itemName)) {
+        if ($itemToTranslate == 'mo' && !empty($itemName)) {
             $modulePart = $request->get('module_part', '');
         }
 
@@ -87,16 +87,16 @@ class TranslationsController extends BaseAdminController
         $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
 
         $templateArguments = [
-                'item_to_translate'             => $itemToTranslate,
-                'item_name'                     => $itemName,
-                'module_part'                   => $modulePart,
+                'item_to_translate' => $itemToTranslate,
+                'item_name' => $itemName,
+                'module_part' => $modulePart,
                 'view_missing_traductions_only' => $request->get('view_missing_traductions_only'),
-                'max_input_vars_warning'        => false,
+                'max_input_vars_warning' => false,
         ];
 
         // Find the i18n directory, and the directory to examine.
 
-        if (! empty($itemName) || $itemToTranslate == 'co' || $itemToTranslate == 'in' || $itemToTranslate == 'wi') {
+        if (!empty($itemName) || $itemToTranslate == 'co' || $itemToTranslate == 'in' || $itemToTranslate == 'wi') {
             switch ($itemToTranslate) {
                 // Module core
                 case 'mo':
@@ -112,7 +112,7 @@ class TranslationsController extends BaseAdminController
                         $domain = $module->getAdminIncludesTranslationDomain();
                         $i18nDirectory = $module->getAbsoluteAdminIncludesI18nPath();
                         $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
-                    } elseif (! empty($modulePart)) {
+                    } elseif (!empty($modulePart)) {
                         // Front, back, pdf or email office template,
                         // form of $module_part is [bo|fo|pdf|email].subdir-name
                         [$type, $subdir] = explode('.', $modulePart);
@@ -147,7 +147,7 @@ class TranslationsController extends BaseAdminController
 
                     // Modules translations files are in the cache, and are not always
                     // updated. Force a reload of the files to get last changes.
-                    if (! empty($domain)) {
+                    if (!empty($domain)) {
                         $this->loadTranslation($i18nDirectory, $domain);
                     }
 
@@ -185,14 +185,14 @@ class TranslationsController extends BaseAdminController
                 case 'co':
                     $directory = THELIA_LIB;
                     $domain = 'core';
-                    $i18nDirectory = THELIA_LIB . 'Config' . DS . 'I18n';
+                    $i18nDirectory = THELIA_LIB.'Config'.DS.'I18n';
                     $walkMode = TranslationEvent::WALK_MODE_PHP;
                     break;
                 // Thelia Install
                 case 'in':
                     $directory = THELIA_SETUP_DIRECTORY;
                     $domain = 'install';
-                    $i18nDirectory = THELIA_SETUP_DIRECTORY . 'I18n';
+                    $i18nDirectory = THELIA_SETUP_DIRECTORY.'I18n';
                     $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
                     // resources not loaded by default
                     $this->loadTranslation($i18nDirectory, $domain);
@@ -201,7 +201,7 @@ class TranslationsController extends BaseAdminController
                 case 'wi':
                     $directory = THELIA_SETUP_WIZARD_DIRECTORY;
                     $domain = 'wizard';
-                    $i18nDirectory = THELIA_SETUP_WIZARD_DIRECTORY . 'I18n';
+                    $i18nDirectory = THELIA_SETUP_WIZARD_DIRECTORY.'I18n';
                     $walkMode = TranslationEvent::WALK_MODE_PHP;
                     // resources not loaded by default
                     $this->loadTranslation($i18nDirectory, $domain);
@@ -233,13 +233,13 @@ class TranslationsController extends BaseAdminController
 
                 // Load translations files if this template is not the current template
                 // as it is not loaded in Thelia.php
-                if (! $templateHelper->isActive($template)) {
+                if (!$templateHelper->isActive($template)) {
                     $this->loadTranslation($i18nDirectory, $domain);
                 }
             }
 
             // Load strings to translate
-            if ($directory && ! empty($domain)) {
+            if ($directory && !empty($domain)) {
                 // Save the string set, if the form was submitted
                 if ($i18nDirectory) {
                     $save_mode = $request->get('save_mode', false);
@@ -247,9 +247,9 @@ class TranslationsController extends BaseAdminController
                     if ($save_mode !== false) {
                         $texts = $request->get('text', []);
 
-                        if (! empty($texts)) {
+                        if (!empty($texts)) {
                             $event = TranslationEvent::createWriteFileEvent(
-                                sprintf("%s".DS."%s.php", $i18nDirectory, $this->getCurrentEditionLocale()),
+                                sprintf('%s'.DS.'%s.php', $i18nDirectory, $this->getCurrentEditionLocale()),
                                 $texts,
                                 $request->get('translation', []),
                                 true
@@ -265,11 +265,12 @@ class TranslationsController extends BaseAdminController
 
                             if ($save_mode == 'stay') {
                                 return $this->generateRedirectFromRoute(
-                                    "admin.configuration.translations",
+                                    'admin.configuration.translations',
                                     $templateArguments
                                 );
                             }
-                                return $this->generateRedirect(URL::getInstance()->adminViewUrl('configuration'));
+
+                            return $this->generateRedirect(URL::getInstance()->adminViewUrl('configuration'));
                         }
                     }
                 }
@@ -288,14 +289,14 @@ class TranslationsController extends BaseAdminController
                 $stringsCount = $event->getTranslatableStringCount() * 4 + 6;
 
                 if ($stringsCount > ini_get('max_input_vars')) {
-                    $templateArguments['max_input_vars_warning']  = true;
+                    $templateArguments['max_input_vars_warning'] = true;
                     $templateArguments['required_max_input_vars'] = $stringsCount;
-                    $templateArguments['current_max_input_vars']  = ini_get('max_input_vars');
+                    $templateArguments['current_max_input_vars'] = ini_get('max_input_vars');
                 } else {
                     $templateArguments['all_strings'] = $event->getTranslatableStrings();
                 }
 
-                $templateArguments['is_writable'] = $this->checkWritableI18nDirectory(THELIA_LOCAL_DIR . 'I18n');
+                $templateArguments['is_writable'] = $this->checkWritableI18nDirectory(THELIA_LOCAL_DIR.'I18n');
             }
         }
 
@@ -303,10 +304,11 @@ class TranslationsController extends BaseAdminController
     }
 
     /**
-     * Check if a directory is writable or if the parent directory is writable
+     * Check if a directory is writable or if the parent directory is writable.
      *
-     * @param string $dir   the directory to test
-     * @return boolean      return true if the directory is writable otr if the parent dir is writable.
+     * @param string $dir the directory to test
+     *
+     * @return bool return true if the directory is writable otr if the parent dir is writable
      */
     public function checkWritableI18nDirectory($dir)
     {
@@ -322,26 +324,26 @@ class TranslationsController extends BaseAdminController
     public function defaultAction(
         Request $request,
         TemplateHelperInterface $templateHelper,
-        EventDispatcherInterface  $eventDispatcher,
+        EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator
-    )
-    {
+    ) {
         if (null !== $response = $this->checkAuth(AdminResources::TRANSLATIONS, [], AccessManager::VIEW)) {
             return $response;
         }
+
         return $this->renderTemplate($request, $templateHelper, $eventDispatcher, $translator);
     }
 
     public function updateAction(
         Request $request,
         TemplateHelperInterface $templateHelper,
-        EventDispatcherInterface  $eventDispatcher,
+        EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator
-    )
-    {
+    ) {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
         }
+
         return $this->renderTemplate($request, $templateHelper, $eventDispatcher, $translator);
     }
 

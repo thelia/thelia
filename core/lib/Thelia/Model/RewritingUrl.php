@@ -30,7 +30,7 @@ class RewritingUrl extends BaseRewritingUrl
                 ->filterByViewLocale($this->getViewLocale())
                 ->filterByRedirected($this->getId(), Criteria::NOT_IN)
                 ->update([
-                    "Redirected" => $this->getId()
+                    'Redirected' => $this->getId(),
                 ]);
         }
     }

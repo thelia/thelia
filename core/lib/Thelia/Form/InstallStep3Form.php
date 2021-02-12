@@ -20,18 +20,16 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/29/13
- * Time: 3:45 PM
+ * Time: 3:45 PM.
  *
  * Allow to build a form Install Step 3 Database connection
  *
- * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class InstallStep3Form extends BaseForm
 {
     /**
-     * Build Coupon form
+     * Build Coupon form.
      *
      * @return void
      */
@@ -91,7 +89,7 @@ class InstallStep3Form extends BaseForm
     }
 
     /**
-     * Get form name
+     * Get form name.
      *
      * @return string
      */

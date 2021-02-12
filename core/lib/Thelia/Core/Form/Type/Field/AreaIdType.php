@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\AreaQuery;
 
 /**
- * Class AreaIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class AreaIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class AreaIdType extends AbstractIdType

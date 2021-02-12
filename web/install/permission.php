@@ -3,7 +3,7 @@
 ?>
 <?php
 $step = 2;
-include("header.php");
+include 'header.php';
 
 try {
     $checkPermission = new \Thelia\Install\CheckPermission(true, $trans);
@@ -12,22 +12,21 @@ try {
     $_SESSION['install']['return_step'] = 'permission.php';
     $_SESSION['install']['continue'] = $isValid;
     $_SESSION['install']['current_step'] = 'permission.php';
-    $_SESSION['install']['step'] = 2;
-    ?>
+    $_SESSION['install']['step'] = 2; ?>
     <div class="well">
 
         <p class="lead"><?php echo $trans->trans('Checking PHP version and permissions'); ?></p>
         <ul class="list-unstyled list-group">
             <?php foreach ($validationMessage as $item => $data) { ?>
                 <li class="list-group-item <?php if ($data['status']) {
-                    echo 'text-success';
-                } else {
-                    echo 'text-danger';
-                } ?>">
+        echo 'text-success';
+    } else {
+        echo 'text-danger';
+    } ?>">
                     <?php echo $data['text']; ?>
                     <?php if (!$data['status']) {
-                        echo $data['hint'];
-                    } ?>
+        echo $data['hint'];
+    } ?>
                 </li>
             <?php } ?>
         </ul>
@@ -45,26 +44,24 @@ try {
         <?php } ?>
     </div>
 <?php
-}
-catch (\Thelia\Install\Exception\AlreadyInstallException $ex) {
-        ?>
+} catch (\Thelia\Install\Exception\AlreadyInstallException $ex) {
+    ?>
         <div class="alert alert-danger">
             <?php echo $trans->trans(
                 'It seems that Thelia is already installed on this system. Please check configuration, perform some cleanup if required, an try again.'
             ); ?>
         </div>
         <?php
-}
-catch (\Exception $ex) {
+} catch (\Exception $ex) {
     ?>
     <div class="alert alert-danger">
         <?php echo $trans->trans('<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>', [
                 '%err' => $ex->getMessage(),
-                '%details' => nl2br($ex->getTraceAsString())
+                '%details' => nl2br($ex->getTraceAsString()),
             ]); ?>
     </div>
     <?php
 }
 
-include("footer.php");
+include 'footer.php';
 ?>

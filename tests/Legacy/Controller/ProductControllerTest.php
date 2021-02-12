@@ -21,8 +21,8 @@ use Thelia\Model\ProductSaleElementsProductImageQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 
 /**
- * Class ProductControllerTest
- * @package Thelia\Tests\Controller
+ * Class ProductControllerTest.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class ProductControllerTest extends ControllerTestBase
@@ -32,12 +32,12 @@ class ProductControllerTest extends ControllerTestBase
      */
     protected function buildContainer(ContainerBuilder $container)
     {
-        $parser = $this->getMockBuilder("Thelia\\Core\\Template\\ParserInterface")
+        $parser = $this->getMockBuilder('Thelia\\Core\\Template\\ParserInterface')
             ->disableOriginalConstructor()
             ->getMock()
         ;
 
-        $container->set("thelia.parser", $parser);
+        $container->set('thelia.parser', $parser);
     }
 
     /**
@@ -53,7 +53,7 @@ class ProductControllerTest extends ControllerTestBase
     public function testAssociatePSEImage()
     {
         /**
-         * Get a product sale elements which has a related product image
+         * Get a product sale elements which has a related product image.
          */
         $pse = ProductSaleElementsQuery::create()
             ->useProductQuery()
@@ -67,7 +67,7 @@ class ProductControllerTest extends ControllerTestBase
         }
 
         /**
-         * Get this image and check if they are associated
+         * Get this image and check if they are associated.
          */
         $productImage = ProductImageQuery::create()
             ->findOneByProductId($pse->getProductId())
@@ -83,7 +83,7 @@ class ProductControllerTest extends ControllerTestBase
         $this->controller
             ->getAssociationResponseData(
                 $pse->getId(),
-                "image",
+                'image',
                 $productImage->getId()
             );
 
@@ -100,7 +100,7 @@ class ProductControllerTest extends ControllerTestBase
     public function testAssociatePSEDocument()
     {
         /**
-         * Get a product sale elements which has a related product image
+         * Get a product sale elements which has a related product image.
          */
         $pse = ProductSaleElementsQuery::create()
             ->useProductQuery()
@@ -114,7 +114,7 @@ class ProductControllerTest extends ControllerTestBase
         }
 
         /**
-         * Get this image and check if they are associated
+         * Get this image and check if they are associated.
          */
         $productDocument = ProductDocumentQuery::create()
             ->findOneByProductId($pse->getProductId())
@@ -130,7 +130,7 @@ class ProductControllerTest extends ControllerTestBase
         $this->controller
             ->getAssociationResponseData(
                 $pse->getId(),
-                "document",
+                'document',
                 $productDocument->getId()
             );
 

@@ -21,20 +21,18 @@ use Thelia\Form\StandardDescriptionFieldsTrait;
 /**
  * Created by JetBrains PhpStorm.
  * Date: 9/18/13
- * Time: 3:56 PM
+ * Time: 3:56 PM.
  *
  * Form allowing to process a file
  *
- * @package File
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 abstract class DocumentModification extends BaseForm
 {
     use StandardDescriptionFieldsTrait;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function buildForm()
     {
@@ -46,11 +44,11 @@ abstract class DocumentModification extends BaseForm
                 FileType::class,
                 [
                     'required' => false,
-                    'constraints' => [ ],
+                    'constraints' => [],
                     'label' => $translator->trans('Replace current document by this file'),
                     'label_attr' => [
                         'for' => 'file',
-                    ]
+                    ],
                 ]
             )
             // Is this document online ?
@@ -58,12 +56,12 @@ abstract class DocumentModification extends BaseForm
                 'visible',
                 CheckboxType::class,
                 [
-                    'constraints' => [ ],
-                    'required'    => false,
-                    'label'       => $translator->trans('This document is online'),
+                    'constraints' => [],
+                    'required' => false,
+                    'label' => $translator->trans('This document is online'),
                     'label_attr' => [
                         'for' => 'visible_create',
-                    ]
+                    ],
                 ]
             );
 

@@ -25,15 +25,12 @@ class ViewCheckEvent extends ActionEvent
         $this->view_id = $view_id;
     }
 
-    /**
-     */
     public function getView()
     {
         return $this->view;
     }
 
     /**
-     *
      * @return $this
      */
     public function setView($view)
@@ -43,15 +40,12 @@ class ViewCheckEvent extends ActionEvent
         return $this;
     }
 
-     /**
-     */
     public function getViewId()
     {
         return $this->view_id;
     }
 
     /**
-     *
      * @return $this
      */
     public function setViewId($view_id)

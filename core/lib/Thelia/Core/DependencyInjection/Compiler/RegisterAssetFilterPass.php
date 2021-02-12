@@ -18,13 +18,13 @@ use Symfony\Component\DependencyInjection\Reference;
 use Thelia\Core\Template\Assets\AsseticAssetManager;
 
 /**
- * Class RegisterAssetFilterPass
- * @package Thelia\Core\DependencyInjection\Compiler
+ * Class RegisterAssetFilterPass.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class RegisterAssetFilterPass implements CompilerPassInterface
 {
-    public const SERVICE_TAG = "thelia.asset.filter";
+    public const SERVICE_TAG = 'thelia.asset.filter';
 
     /**
      * You can modify the container here before it is dumped to PHP code.
@@ -43,7 +43,7 @@ class RegisterAssetFilterPass implements CompilerPassInterface
         $services = $container->findTaggedServiceIds(static::SERVICE_TAG);
 
         foreach ($services as $id => $attributes) {
-            if (! isset($attributes[0]['key']) || empty($attributes[0]['key'])) {
+            if (!isset($attributes[0]['key']) || empty($attributes[0]['key'])) {
                 throw new \InvalidArgumentException(
                     sprintf(
                         'Service "%s" must define the "key" attribute on "thelia.asset.filter" tag.',
@@ -54,7 +54,7 @@ class RegisterAssetFilterPass implements CompilerPassInterface
 
             $class = $container->getDefinition($id)->getClass();
 
-            if (! is_subclass_of($class, '\Assetic\Contracts\Filter\FilterInterface')) {
+            if (!is_subclass_of($class, '\Assetic\Contracts\Filter\FilterInterface')) {
                 throw new \InvalidArgumentException(
                     sprintf(
                         'Service "%s" should implement the \Assetic\Contracts\Filter\FilterInterface interface',
@@ -65,7 +65,7 @@ class RegisterAssetFilterPass implements CompilerPassInterface
 
             $manager->addMethodCall(
                 'registerAssetFilter',
-                [ $attributes[0]['key'], new Reference($id) ]
+                [$attributes[0]['key'], new Reference($id)]
             );
         }
     }

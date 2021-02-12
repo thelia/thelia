@@ -22,8 +22,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 
 /**
- * Class AreaCountryForm
- * @package Thelia\Form\Area
+ * Class AreaCountryForm.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AreaCountryForm extends BaseForm
@@ -31,7 +31,7 @@ class AreaCountryForm extends BaseForm
     use CountryListValidationTrait;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function buildForm()
     {
@@ -43,7 +43,7 @@ class AreaCountryForm extends BaseForm
                     'constraints' => [
                         new GreaterThan(['value' => 0]),
                         new NotBlank(),
-                    ]
+                    ],
                 ]
             )
             ->add(
@@ -54,7 +54,7 @@ class AreaCountryForm extends BaseForm
                     'required' => true,
                     'constraints' => [
                         new NotBlank(),
-                        new Callback([$this, "verifyCountryList"])
+                        new Callback([$this, 'verifyCountryList']),
                     ],
                     'allow_add' => true,
                     'allow_delete' => true,
@@ -67,7 +67,7 @@ class AreaCountryForm extends BaseForm
                     'attr' => [
                         'size' => 10,
                         'multiple' => true,
-                    ]
+                    ],
                 ]
             )
         ;

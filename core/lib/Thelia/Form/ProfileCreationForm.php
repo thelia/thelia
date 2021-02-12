@@ -20,8 +20,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Model\ProfileQuery;
 
 /**
- * Class ProfileCreationForm
- * @package Thelia\Form
+ * Class ProfileCreationForm.
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class ProfileCreationForm extends BaseForm
@@ -31,18 +31,18 @@ class ProfileCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("locale", TextType::class, [
-                "constraints" => [new NotBlank()],
+            ->add('locale', TextType::class, [
+                'constraints' => [new NotBlank()],
             ])
-            ->add("code", TextType::class, [
-                "constraints" => [
+            ->add('code', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
                     new Constraints\Callback(
-                        [$this, "verifyCode"]
+                        [$this, 'verifyCode']
                     ),
                 ],
-                "label" => Translator::getInstance()->trans("Profile Code"),
-                "label_attr" => ["for" => "profile_code_fiels"],
+                'label' => Translator::getInstance()->trans('Profile Code'),
+                'label_attr' => ['for' => 'profile_code_fiels'],
             ])
         ;
 
@@ -51,7 +51,7 @@ class ProfileCreationForm extends BaseForm
 
     public static function getName()
     {
-        return "thelia_profile_creation";
+        return 'thelia_profile_creation';
     }
 
     public function verifyCode($value, ExecutionContextInterface $context)
@@ -61,7 +61,7 @@ class ProfileCreationForm extends BaseForm
             ->findOneByCode($value);
 
         if (null !== $profile) {
-            $context->addViolation(Translator::getInstance()->trans("Profile `code` already exists"));
+            $context->addViolation(Translator::getInstance()->trans('Profile `code` already exists'));
         }
     }
 }

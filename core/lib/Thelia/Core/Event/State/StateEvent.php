@@ -16,9 +16,10 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\State;
 
 /**
- * Class StateEvent
- * @package Thelia\Core\Event\State
+ * Class StateEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
+ *
  * @deprecated since 2.4, please use \Thelia\Model\Event\StateEvent
  */
 class StateEvent extends ActionEvent
@@ -44,7 +45,7 @@ class StateEvent extends ActionEvent
     }
 
     /**
-     * @return null|\Thelia\Model\State
+     * @return \Thelia\Model\State|null
      */
     public function getState()
     {

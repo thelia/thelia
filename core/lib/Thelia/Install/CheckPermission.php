@@ -16,21 +16,20 @@ use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class CheckPermission
+ * Class CheckPermission.
  *
  * Take care of integration tests (files permissions)
  *
- * @package Thelia\Install
  * @author  Manuel Raynaud <manu@raynaud.io>
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  */
 class CheckPermission extends BaseInstall
 {
-    public const DIR_CONF =            'local/config';
-    public const DIR_VAR  =            'var';
-    public const DIR_WEB =             'web';
-    public const DIR_SESSION =         'var/session';
-    public const DIR_MEDIA =           'local/media';
+    public const DIR_CONF = 'local/config';
+    public const DIR_VAR = 'var';
+    public const DIR_WEB = 'web';
+    public const DIR_SESSION = 'var/session';
+    public const DIR_MEDIA = 'local/media';
 
     /** @var array Directory needed to be writable */
     protected $directoriesToBeWritable = [
@@ -38,14 +37,14 @@ class CheckPermission extends BaseInstall
         self::DIR_VAR,
         self::DIR_WEB,
         self::DIR_SESSION,
-        self::DIR_MEDIA
+        self::DIR_MEDIA,
     ];
 
     /** @var array Minimum server configuration necessary */
     protected $minServerConfigurationNecessary = [
         'memory_limit' => 134217728,
         'post_max_size' => 20971520,
-        'upload_max_filesize' => 2097152
+        'upload_max_filesize' => 2097152,
     ];
 
     protected $phpExpectedVerions = array(
@@ -61,7 +60,7 @@ class CheckPermission extends BaseInstall
         'openssl',
         'pdo_mysql',
         'dom',
-        'zip'
+        'zip',
     ];
 
     protected $validationMessages = [];
@@ -73,7 +72,7 @@ class CheckPermission extends BaseInstall
     protected $translator;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param bool       $verifyInstall If verify install
      * @param Translator $translator    Translator Service
@@ -83,24 +82,24 @@ class CheckPermission extends BaseInstall
     {
         $this->translator = $translator;
 
-        $this->validationMessages['php_version'] =  [
+        $this->validationMessages['php_version'] = [
             'text' => $this->getI18nPhpVersionText(phpversion(), true),
-            'hint' =>  $this->getI18nPhpVersionHint(),
-            'status' => true
+            'hint' => $this->getI18nPhpVersionHint(),
+            'status' => true,
         ];
 
         foreach ($this->directoriesToBeWritable as $directory) {
-            $this->validationMessages[$directory] =  [
+            $this->validationMessages[$directory] = [
                 'text' => '',
-                'hint' =>  '',
-                'status' => true
+                'hint' => '',
+                'status' => true,
             ];
         }
         foreach ($this->minServerConfigurationNecessary as $key => $value) {
-            $this->validationMessages[$key] =  [
+            $this->validationMessages[$key] = [
                 'text' => '',
-                'hint' =>  $this->getI18nConfigHint(),
-                'status' => true
+                'hint' => $this->getI18nConfigHint(),
+                'status' => true,
             ];
         }
 
@@ -116,7 +115,7 @@ class CheckPermission extends BaseInstall
     }
 
     /**
-     * Perform file permission check
+     * Perform file permission check.
      *
      * @return bool
      */
@@ -130,7 +129,7 @@ class CheckPermission extends BaseInstall
         }
 
         foreach ($this->directoriesToBeWritable as $directory) {
-            $fullDirectory = THELIA_ROOT . $directory;
+            $fullDirectory = THELIA_ROOT.$directory;
             $this->validationMessages[$directory]['text'] = $this->getI18nDirectoryText($fullDirectory, true);
             if (is_writable($fullDirectory) === false) {
                 if (!$this->makeDirectoryWritable($fullDirectory)) {
@@ -147,7 +146,6 @@ class CheckPermission extends BaseInstall
                 $this->isValid = false;
                 $this->validationMessages[$key]['status'] = false;
                 $this->validationMessages[$key]['text'] = $this->getI18nConfigText($key, $this->formatBytes($value), ini_get($key), false);
-                ;
             }
         }
 
@@ -164,7 +162,7 @@ class CheckPermission extends BaseInstall
     }
 
     /**
-     * Get validation messages
+     * Get validation messages.
      *
      * @return array
      */
@@ -174,7 +172,7 @@ class CheckPermission extends BaseInstall
     }
 
     /**
-     * Make a directory writable (recursively)
+     * Make a directory writable (recursively).
      *
      * @param string $directory path to directory
      *
@@ -182,11 +180,11 @@ class CheckPermission extends BaseInstall
      */
     protected function makeDirectoryWritable($directory)
     {
-        return (is_writable(THELIA_ROOT . $directory) === true);
+        return is_writable(THELIA_ROOT.$directory) === true;
     }
 
     /**
-     * Get Translated text about the directory state
+     * Get Translated text about the directory state.
      *
      * @param string $directory Directory being checked
      * @param bool   $isValid   If directory permission is valid
@@ -209,7 +207,7 @@ class CheckPermission extends BaseInstall
 
     /**
      * Get Translated text about the directory state
-     * Not usable with CLI
+     * Not usable with CLI.
      *
      * @param string $key           .ini file key
      * @param string $expectedValue Expected server value
@@ -228,7 +226,7 @@ class CheckPermission extends BaseInstall
             [
                 '%key%' => $key,
                 '%expectedValue%' => $expectedValue,
-                '%currentValue%' => $currentValue
+                '%currentValue%' => $currentValue,
             ]
         );
     }
@@ -239,17 +237,17 @@ class CheckPermission extends BaseInstall
     }
 
     /**
-     * Get Translated hint about the config requirement issue
+     * Get Translated hint about the config requirement issue.
      *
      * @return string
      */
     protected function getI18nConfigHint()
     {
-        return $this->formatString("Change this value in the php.ini configuration file.", []);
+        return $this->formatString('Change this value in the php.ini configuration file.', []);
     }
 
     /**
-     * Get Translated hint about the PHP version requirement issue
+     * Get Translated hint about the PHP version requirement issue.
      *
      * @param string $currentValue
      * @param bool   $isValid
@@ -272,17 +270,17 @@ class CheckPermission extends BaseInstall
     }
 
     /**
-     * Get Translated hint about the config requirement issue
+     * Get Translated hint about the config requirement issue.
      *
      * @return string
      */
     protected function getI18nPhpVersionHint()
     {
-        return $this->formatString("You should change the installed PHP version to continue Thelia 2 installation.", []);
+        return $this->formatString('You should change the installed PHP version to continue Thelia 2 installation.', []);
     }
 
     /**
-     * Check if a server memory value is met or not
+     * Check if a server memory value is met or not.
      *
      * @param string $key                   .ini file key
      * @param int    $necessaryValueInBytes Expected value in bytes
@@ -297,11 +295,11 @@ class CheckPermission extends BaseInstall
             return true;
         }
 
-        return ($serverValueInBytes >= $necessaryValueInBytes);
+        return $serverValueInBytes >= $necessaryValueInBytes;
     }
 
     /**
-     * Return bytes from memory .ini value
+     * Return bytes from memory .ini value.
      *
      * @param string $val .ini value
      *
@@ -310,25 +308,25 @@ class CheckPermission extends BaseInstall
     protected function returnBytes($val)
     {
         $val = trim($val);
-        $last = strtolower($val[\strlen($val)-1]);
+        $last = strtolower($val[\strlen($val) - 1]);
         // Do not add breaks in the switch below
         switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':
-                $val = (int)$val*1024;
+                $val = (int) $val * 1024;
                 // no break
             case 'm':
-                $val = (int)$val*1024;
+                $val = (int) $val * 1024;
                 // no break
             case 'k':
-                $val = (int)$val*1024;
+                $val = (int) $val * 1024;
         }
 
         return $val;
     }
 
     /**
-     * Convert bytes to readable string
+     * Convert bytes to readable string.
      *
      * @param int $bytes     bytes
      * @param int $precision conversion precision
@@ -340,7 +338,7 @@ class CheckPermission extends BaseInstall
         $base = log($bytes) / log(1024);
         $suffixes = ['', 'k', 'M', 'G', 'T'];
 
-        return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
+        return round(pow(1024, $base - floor($base)), $precision).$suffixes[floor($base)];
     }
 
     protected function formatString($string, $parameters = [])

@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Hook;
 
 /**
- * Class ModuleHookCreateEvent
- * @package Thelia\Core\Event\Hook
+ * Class ModuleHookCreateEvent.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleHookCreateEvent extends ModuleHookEvent
@@ -36,6 +36,7 @@ class ModuleHookCreateEvent extends ModuleHookEvent
 
     /**
      * @param int $hook_id
+     *
      * @return $this
      */
     public function setHookId($hook_id)
@@ -55,6 +56,7 @@ class ModuleHookCreateEvent extends ModuleHookEvent
 
     /**
      * @param int $module_id
+     *
      * @return $this
      */
     public function setModuleId($module_id)
@@ -74,6 +76,7 @@ class ModuleHookCreateEvent extends ModuleHookEvent
 
     /**
      * @param string $classname
+     *
      * @return $this
      */
     public function setClassname($classname)
@@ -93,6 +96,7 @@ class ModuleHookCreateEvent extends ModuleHookEvent
 
     /**
      * @param string $method
+     *
      * @return $this
      */
     public function setMethod($method)
@@ -120,6 +124,7 @@ class ModuleHookCreateEvent extends ModuleHookEvent
 
     /**
      * @param string $templates
+     *
      * @return $this
      */
     public function setTemplates($templates)

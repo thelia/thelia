@@ -15,7 +15,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Thelia;
 
 $env = 'prod';
-$loader = require __DIR__ . '/../vendor/autoload.php';
+$loader = require __DIR__.'/../vendor/autoload.php';
 
 if (file_exists(THELIA_ROOT.'.env')) {
     (new Dotenv())->load(THELIA_ROOT.'.env');
@@ -23,7 +23,7 @@ if (file_exists(THELIA_ROOT.'.env')) {
 
 $request = Request::createFromGlobals();
 
-$thelia = new Thelia("prod", false);
+$thelia = new Thelia('prod', false);
 
 //$thelia = new HttpCache($thelia);
 

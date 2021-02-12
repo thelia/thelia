@@ -21,7 +21,8 @@ use Thelia\Model\ImportCategoryQuery;
 use Thelia\Model\ImportQuery;
 
 /**
- * Class Import
+ * Class Import.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class Import extends BaseAction implements EventSubscriberInterface
@@ -43,33 +44,33 @@ class Import extends BaseAction implements EventSubscriberInterface
     {
         return [
             TheliaEvents::IMPORT_CHANGE_POSITION => [
-                ['importChangePosition', 128]
+                ['importChangePosition', 128],
             ],
             TheliaEvents::IMPORT_CATEGORY_CHANGE_POSITION => [
-                ['importCategoryChangePosition', 128]
-            ]
+                ['importCategoryChangePosition', 128],
+            ],
         ];
     }
 
     /**
-     * Handle import change position event
+     * Handle import change position event.
      *
      * @param $eventName
      */
     public function importChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher)
     {
         $this->handler->getImport($updatePositionEvent->getObjectId(), true);
-        $this->genericUpdatePosition(new ImportQuery, $updatePositionEvent, $dispatcher);
+        $this->genericUpdatePosition(new ImportQuery(), $updatePositionEvent, $dispatcher);
     }
 
     /**
-     * Handle import category change position event
+     * Handle import category change position event.
      *
      * @param $eventName
      */
     public function importCategoryChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher)
     {
         $this->handler->getCategory($updatePositionEvent->getObjectId(), true);
-        $this->genericUpdatePosition(new ImportCategoryQuery, $updatePositionEvent, $dispatcher);
+        $this->genericUpdatePosition(new ImportCategoryQuery(), $updatePositionEvent, $dispatcher);
     }
 }

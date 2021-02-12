@@ -15,16 +15,13 @@ namespace Thelia\Tests\Model;
 use PHPUnit\Framework\TestCase;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Action\Product;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\FeatureProductQuery;
 
 /**
- * Class ProductTest
- * @package Thelia\Tests\Model
+ * Class ProductTest.
  */
 class FeatureProductTest extends TestCase
 {

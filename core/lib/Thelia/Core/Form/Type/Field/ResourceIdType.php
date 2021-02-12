@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\ResourceQuery;
 
 /**
- * Class ResourceIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class ResourceIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ResourceIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class ResourceIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "resource_id";
+        return 'resource_id';
     }
 }

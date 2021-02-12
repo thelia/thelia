@@ -15,8 +15,8 @@ namespace Thelia\Core\Event\Loop;
 use Thelia\Core\Template\Element\BaseLoop;
 
 /**
- * Class LoopExtendsInitializeArgsEvent
- * @package Thelia\Core\Event\Loop
+ * Class LoopExtendsInitializeArgsEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class LoopExtendsInitializeArgsEvent extends LoopExtendsEvent
@@ -49,6 +49,7 @@ class LoopExtendsInitializeArgsEvent extends LoopExtendsEvent
     public function setLoopParameters($loopParameters)
     {
         $this->loopParameters = $loopParameters;
+
         return $this;
     }
 }

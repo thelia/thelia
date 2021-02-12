@@ -14,12 +14,11 @@ namespace Thelia\Tests\Model;
 
 use PHPUnit\Framework\TestCase;
 use Thelia\Model\Base\ModuleQuery;
-use Thelia\Model\ModuleConfig;
 use Thelia\Model\ModuleConfigQuery;
 
 /**
- * Class ModuleConfigTest
- * @package Thelia\Tests\Model
+ * Class ModuleConfigTest.
+ *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class ModuleConfigTest extends TestCase

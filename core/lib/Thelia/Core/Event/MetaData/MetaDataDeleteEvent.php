@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\MetaData;
 
 /**
- * Class MetaDataCreateOrUpdateEvent
- * @package Thelia\Core\Event\MetaData
+ * Class MetaDataCreateOrUpdateEvent.
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class MetaDataDeleteEvent extends MetaDataEvent
@@ -30,17 +30,18 @@ class MetaDataDeleteEvent extends MetaDataEvent
 
     /**
      * MetaDataDeleteEvent constructor.
+     *
      * @param string|null $metaKey
      * @param string|null $elementKey
-     * @param int|null $elementId
+     * @param int|null    $elementId
      */
     public function __construct($metaKey = null, $elementKey = null, $elementId = null)
     {
         parent::__construct();
 
-        $this->metaKey    = $metaKey;
+        $this->metaKey = $metaKey;
         $this->elementKey = $elementKey;
-        $this->elementId  = $elementId;
+        $this->elementId = $elementId;
     }
 
     /**
@@ -76,7 +77,7 @@ class MetaDataDeleteEvent extends MetaDataEvent
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getElementKey()
     {

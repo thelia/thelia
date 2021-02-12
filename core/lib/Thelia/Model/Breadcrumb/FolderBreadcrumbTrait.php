@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Core\Template\Loop\CategoryPath;
 use Thelia\Core\Template\Loop\FolderPath;
 use Thelia\Core\Translation\Translator;
 
@@ -43,14 +42,14 @@ trait FolderBreadcrumbTrait
         );
         $folderPath->initializeArgs([
                 'folder' => $folderId,
-                'visible' => '*'
+                'visible' => '*',
             ]);
 
         $results = $folderPath->buildArray();
 
         foreach ($results as $result) {
             $breadcrumb[$result['TITLE']] = sprintf(
-                "%s?parent=%d",
+                '%s?parent=%d',
                 $router->generate(
                     'admin.folders.default',
                     [],
@@ -65,7 +64,7 @@ trait FolderBreadcrumbTrait
 
     public function getFolderBreadcrumb(Router $router, $container, $tab, $locale)
     {
-        if (!method_exists($this, "getFolder")) {
+        if (!method_exists($this, 'getFolder')) {
             return null;
         }
 
@@ -76,7 +75,7 @@ trait FolderBreadcrumbTrait
         $folder->setLocale($locale);
 
         $breadcrumb[$folder->getTitle()] = sprintf(
-            "%s?current_tab=%s",
+            '%s?current_tab=%s',
             $router->generate(
                 'admin.folders.update',
                 ['folder_id' => $folder->getId()],
@@ -90,7 +89,7 @@ trait FolderBreadcrumbTrait
 
     public function getContentBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
-        if (!method_exists($this, "getContent")) {
+        if (!method_exists($this, 'getContent')) {
             return null;
         }
 
@@ -102,7 +101,7 @@ trait FolderBreadcrumbTrait
         $content->setLocale($locale);
 
         $breadcrumb[$content->getTitle()] = sprintf(
-            "%s?current_tab=%s",
+            '%s?current_tab=%s',
             $router->generate(
                 'admin.content.update',
                 ['content_id' => $content->getId()],

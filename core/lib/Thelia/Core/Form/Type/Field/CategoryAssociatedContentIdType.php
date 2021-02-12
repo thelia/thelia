@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\CategoryAssociatedContentQuery;
 
 /**
- * Class CategoryAssociatedContentIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class CategoryAssociatedContentIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class CategoryAssociatedContentIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class CategoryAssociatedContentIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "category_associated_content_id";
+        return 'category_associated_content_id';
     }
 }

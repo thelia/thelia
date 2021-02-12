@@ -22,7 +22,8 @@ use Thelia\Model\ImportQuery;
 use Thelia\Model\LangQuery;
 
 /**
- * Class ImportCommand
+ * Class ImportCommand.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class ImportCommand extends ContainerAwareCommand
@@ -71,7 +72,7 @@ class ImportCommand extends ContainerAwareCommand
         $path = $input->getArgument('filePath');
         if ($importRef === null || $path === null) {
             throw new \RuntimeException(
-                'Not enough arguments.' . PHP_EOL . 'If no options are provided, ref and filePath arguments are required.'
+                'Not enough arguments.'.PHP_EOL.'If no options are provided, ref and filePath arguments are required.'
             );
         }
 
@@ -81,18 +82,18 @@ class ImportCommand extends ContainerAwareCommand
         $import = $importHandler->getImportByRef($importRef);
         if ($import === null) {
             throw new \RuntimeException(
-                $importRef . ' import doesn\'t exist.'
+                $importRef.' import doesn\'t exist.'
             );
         }
 
         $importEvent = $importHandler->import(
             $import,
             new File($input->getArgument('filePath')),
-            (new LangQuery)->findOneByLocale($input->getOption('locale'))
+            (new LangQuery())->findOneByLocale($input->getOption('locale'))
         );
 
         $formattedLine = $this->getHelper('formatter')->formatBlock(
-            'Successfully import ' . $importEvent->getImport()->getImportedRows() . ' row(s)',
+            'Successfully import '.$importEvent->getImport()->getImportedRows().' row(s)',
             'fg=black;bg=green',
             true
         );
@@ -107,7 +108,7 @@ class ImportCommand extends ContainerAwareCommand
             $output->writeln($formattedLine);
 
             foreach ($importEvent->getErrors() as $error) {
-                $output->writeln('<comment>' . $error . '</comment>');
+                $output->writeln('<comment>'.$error.'</comment>');
             }
         }
 
@@ -115,7 +116,7 @@ class ImportCommand extends ContainerAwareCommand
     }
 
     /**
-     * Output available imports
+     * Output available imports.
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output An output interface
      */
@@ -123,11 +124,11 @@ class ImportCommand extends ContainerAwareCommand
     {
         $table = new Table($output);
 
-        foreach ((new ImportQuery)->find() as $import) {
+        foreach ((new ImportQuery())->find() as $import) {
             $table->addRow([
                 $import->getRef(),
                 $import->getTitle(),
-                $import->getDescription()
+                $import->getDescription(),
             ]);
         }
 
@@ -135,7 +136,7 @@ class ImportCommand extends ContainerAwareCommand
             ->setHeaders([
                 'Reference',
                 'Title',
-                'Description'
+                'Description',
             ])
             ->render()
         ;

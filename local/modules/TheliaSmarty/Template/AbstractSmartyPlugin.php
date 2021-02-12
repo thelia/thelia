@@ -13,18 +13,16 @@
 namespace TheliaSmarty\Template;
 
 /**
- *
- * The class all Smarty Thelia plugin should extend
+ * The class all Smarty Thelia plugin should extend.
  *
  * Class AbstractSmartyPlugin
- * @package TheliaSmarty
  */
 abstract class AbstractSmartyPlugin implements SmartyPluginInterface
 {
     public const WRAPPED_METHOD_PREFIX = '__wrap__';
 
     /**
-     * Explode a comma separated list in a array, trimming all array elements
+     * Explode a comma separated list in a array, trimming all array elements.
      *
      * @return mixed:
      */
@@ -39,7 +37,7 @@ abstract class AbstractSmartyPlugin implements SmartyPluginInterface
         if (array_walk(
             $array,
             function (&$item) {
-            $item = strtoupper(trim($item));
+                $item = strtoupper(trim($item));
             }
         )) {
             return $array;
@@ -50,12 +48,13 @@ abstract class AbstractSmartyPlugin implements SmartyPluginInterface
 
     /**
      * Get a function or block parameter value, and normalize it, trimming balnks and
-     * making it lowercase
+     * making it lowercase.
      *
-     * @param  array $params  the parameters array
-     * @param  mixed $name    as single parameter name, or an array of names. In this case, the first defined parameter is returned. Use this for aliases (context, ctx, c)
-     * @param  mixed $default the defaut value if parameter is missing (default to null)
-     * @return mixed the parameter value, or the default value if it is not found.
+     * @param array $params  the parameters array
+     * @param mixed $name    as single parameter name, or an array of names. In this case, the first defined parameter is returned. Use this for aliases (context, ctx, c)
+     * @param mixed $default the defaut value if parameter is missing (default to null)
+     *
+     * @return mixed the parameter value, or the default value if it is not found
      */
     public function getNormalizedParam($params, $name, $default = null)
     {
@@ -64,16 +63,18 @@ abstract class AbstractSmartyPlugin implements SmartyPluginInterface
         if (\is_string($value)) {
             $value = strtolower(trim($value));
         }
+
         return $value;
     }
 
     /**
-     * Get a function or block parameter value
+     * Get a function or block parameter value.
      *
-     * @param  array $params  the parameters array
-     * @param  mixed $name    as single parameter name, or an array of names. In this case, the first defined parameter is returned. Use this for aliases (context, ctx, c)
-     * @param  mixed $default the defaut value if parameter is missing (default to null)
-     * @return mixed the parameter value, or the default value if it is not found.
+     * @param array $params  the parameters array
+     * @param mixed $name    as single parameter name, or an array of names. In this case, the first defined parameter is returned. Use this for aliases (context, ctx, c)
+     * @param mixed $default the defaut value if parameter is missing (default to null)
+     *
+     * @return mixed the parameter value, or the default value if it is not found
      */
     public function getParam($params, $name, $default = null)
     {
@@ -99,8 +100,8 @@ abstract class AbstractSmartyPlugin implements SmartyPluginInterface
      *
      * This method wraps the method call to prevent this error
      *
-     * @param string $functionName the method name
-     * @param mixed[] $args the method arguments
+     * @param string  $functionName the method name
+     * @param mixed[] $args         the method arguments
      *
      * @throws \BadMethodCallException if the method was not found in this class
      */
@@ -123,7 +124,7 @@ abstract class AbstractSmartyPlugin implements SmartyPluginInterface
         return $functionName($params, $smarty);
     }
 
-        /**
+    /**
      * @return SmartyPluginDescriptor[] an array of SmartyPluginDescriptor
      */
     abstract public function getPluginDescriptors();

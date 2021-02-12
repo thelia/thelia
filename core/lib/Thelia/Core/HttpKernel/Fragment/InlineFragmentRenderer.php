@@ -23,6 +23,7 @@ class InlineFragmentRenderer extends SymfonyInlineFragmentRenderer
 {
     /**
      * @param string $uri
+     *
      * @return Request
      */
     protected function createSubRequest($uri, Request $request)

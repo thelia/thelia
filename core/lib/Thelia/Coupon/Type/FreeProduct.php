@@ -21,17 +21,16 @@ use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 
 /**
- * Allow to remove an amount from the checkout total
+ * Allow to remove an amount from the checkout total.
  *
- * @package Coupon
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class FreeProduct extends AbstractRemoveOnProducts
 {
-    public const OFFERED_PRODUCT_ID  = 'offered_product_id';
+    public const OFFERED_PRODUCT_ID = 'offered_product_id';
     public const OFFERED_CATEGORY_ID = 'offered_category_id';
 
-    /** @var string Service Id  */
+    /** @var string Service Id */
     protected $serviceId = 'thelia.coupon.type.free_product';
 
     protected $offeredProductId;
@@ -44,7 +43,7 @@ class FreeProduct extends AbstractRemoveOnProducts
     public const ADD_TO_CART_IN_PROCESS = -1;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setFieldsValue($effects)
     {
@@ -53,7 +52,7 @@ class FreeProduct extends AbstractRemoveOnProducts
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCartItemDiscount(CartItem $cartItem)
     {
@@ -66,10 +65,11 @@ class FreeProduct extends AbstractRemoveOnProducts
      */
     protected function getSessionVarName()
     {
-        return "coupon.free_product.cart_items." . $this->getCode();
+        return 'coupon.free_product.cart_items.'.$this->getCode();
     }
+
     /**
-     * Return the cart item id which contains the free product related to a given product
+     * Return the cart item id which contains the free product related to a given product.
      *
      * @param Product $product the product in the cart which triggered the discount
      *
@@ -77,7 +77,7 @@ class FreeProduct extends AbstractRemoveOnProducts
      */
     protected function getRelatedCartItem($product)
     {
-        $cartItemIdList =  $this->facade->getRequest()->getSession()->get(
+        $cartItemIdList = $this->facade->getRequest()->getSession()->get(
             $this->getSessionVarName(),
             []
         );
@@ -110,10 +110,10 @@ class FreeProduct extends AbstractRemoveOnProducts
     }
 
     /**
-     * Set the cart item id which contains the free product related to a given product
+     * Set the cart item id which contains the free product related to a given product.
      *
      * @param Product  $product    the product in the cart which triggered the discount
-     * @param bool|int $cartItemId the cart item ID which contains the free product, or just true if the free product is not yet added.
+     * @param bool|int $cartItemId the cart item ID which contains the free product, or just true if the free product is not yet added
      */
     protected function setRelatedCartItem($product, $cartItemId)
     {
@@ -122,7 +122,7 @@ class FreeProduct extends AbstractRemoveOnProducts
             []
         );
 
-        if (! \is_array($cartItemIdList)) {
+        if (!\is_array($cartItemIdList)) {
             $cartItemIdList = [];
         }
 
@@ -137,7 +137,7 @@ class FreeProduct extends AbstractRemoveOnProducts
     /**
      * Get the product id / cart item id list.
      *
-     * @return array an array where the free product ID is the key, and the related cart item id the value.
+     * @return array an array where the free product ID is the key, and the related cart item id the value
      */
     protected function getFreeProductsCartItemIds()
     {
@@ -159,13 +159,13 @@ class FreeProduct extends AbstractRemoveOnProducts
      * We overload this method here to remove the free products when the
      * coupons conditions are no longer met.
      *
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isMatching()
     {
         $match = parent::isMatching();
 
-        if (! $match) {
+        if (!$match) {
             // Cancel coupon effect (but no not remove the product)
             $this->clearFreeProductsCartItemIds();
         }
@@ -174,7 +174,7 @@ class FreeProduct extends AbstractRemoveOnProducts
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function exec()
     {
@@ -188,7 +188,7 @@ class FreeProduct extends AbstractRemoveOnProducts
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
             if (\in_array($cartItem->getProduct()->getId(), $this->product_list)) {
-                if (! $cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
+                if (!$cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
                     $eligibleProduct = $cartItem;
                     break;
                 }
@@ -244,15 +244,15 @@ class FreeProduct extends AbstractRemoveOnProducts
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getFieldList()
     {
-        return  $this->getBaseFieldList([self::OFFERED_CATEGORY_ID, self::OFFERED_PRODUCT_ID]);
+        return $this->getBaseFieldList([self::OFFERED_CATEGORY_ID, self::OFFERED_PRODUCT_ID]);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function checkCouponFieldValue($fieldName, $fieldValue)
     {
@@ -280,7 +280,7 @@ class FreeProduct extends AbstractRemoveOnProducts
     }
 
     /**
-     * Get I18n name
+     * Get I18n name.
      *
      * @return string
      */
@@ -292,7 +292,7 @@ class FreeProduct extends AbstractRemoveOnProducts
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getToolTip()
     {
@@ -307,21 +307,21 @@ class FreeProduct extends AbstractRemoveOnProducts
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function drawBackOfficeInputs()
     {
-        return $this->drawBaseBackOfficeInputs("coupon/type-fragments/free-product.html", [
+        return $this->drawBaseBackOfficeInputs('coupon/type-fragments/free-product.html', [
                 'offered_category_field_name' => $this->makeCouponFieldName(self::OFFERED_CATEGORY_ID),
-                'offered_category_value'      => $this->offeredCategoryId,
+                'offered_category_value' => $this->offeredCategoryId,
 
-                'offered_product_field_name'  => $this->makeCouponFieldName(self::OFFERED_PRODUCT_ID),
-                'offered_product_value'       => $this->offeredProductId
+                'offered_product_field_name' => $this->makeCouponFieldName(self::OFFERED_PRODUCT_ID),
+                'offered_product_value' => $this->offeredProductId,
             ]);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function clear()
     {

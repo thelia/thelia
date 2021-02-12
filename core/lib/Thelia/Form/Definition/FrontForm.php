@@ -13,10 +13,9 @@
 namespace Thelia\Form\Definition;
 
 /**
- * Class FrontForm
+ * Class FrontForm.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
- * @package Thelia\Form\Definition
  */
 final class FrontForm
 {

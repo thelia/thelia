@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Hook;
 
 /**
- * Class ModuleHookToggleActivationEvent
- * @package Thelia\Core\Event\Hook
+ * Class ModuleHookToggleActivationEvent.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleHookToggleActivationEvent extends ModuleHookEvent

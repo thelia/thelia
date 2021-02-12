@@ -25,34 +25,33 @@ class HookAdminHome extends BaseModule
     public const ACTIVATE_NEWS = 'activate_home_news';
 
     /** @var string */
-    public const ACTIVATE_SALES= 'activate_home_sales';
+    public const ACTIVATE_SALES = 'activate_home_sales';
 
     /** @var string */
-    public const ACTIVATE_INFO= 'activate_home_info';
+    public const ACTIVATE_INFO = 'activate_home_info';
 
     /** @var string */
-    public const ACTIVATE_STATS= 'activate_stats';
+    public const ACTIVATE_STATS = 'activate_stats';
 
     public function getHooks()
     {
         return [
             [
-                "type" => TemplateDefinition::BACK_OFFICE,
-                "code" => "hook_home_stats",
-                "title" => "Hook Home Stats",
-                "description" => "Hook to change default stats",
-            ]
+                'type' => TemplateDefinition::BACK_OFFICE,
+                'code' => 'hook_home_stats',
+                'title' => 'Hook Home Stats',
+                'description' => 'Hook to change default stats',
+            ],
         ];
     }
 
     /**
-     * Defines how services are loaded in your modules
-     *
+     * Defines how services are loaded in your modules.
      */
     public static function configureServices(ServicesConfigurator $servicesConfigurator)
     {
         $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
-            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
+            ->exclude([THELIA_MODULE_DIR.ucfirst(self::getModuleCode()).'/I18n/*'])
             ->autowire(true)
             ->autoconfigure(true);
     }

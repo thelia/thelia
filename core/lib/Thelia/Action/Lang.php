@@ -35,16 +35,16 @@ use Thelia\Model\Lang as LangModel;
 use Thelia\Model\LangQuery;
 
 /**
- * Class Lang
- * @package Thelia\Action
+ * Class Lang.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Lang extends BaseAction implements EventSubscriberInterface
 {
-    /** @var TemplateHelperInterface  */
+    /** @var TemplateHelperInterface */
     protected $templateHelper;
 
-    /** @var  RequestStack */
+    /** @var RequestStack */
     protected $requestStack;
 
     public function __construct(TemplateHelperInterface $templateHelper, RequestStack $requestStack)
@@ -55,6 +55,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param $eventName
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function update(LangUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -77,6 +78,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param $eventName
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function toggleDefault(LangToggleDefaultEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -138,6 +140,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param $eventName
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function create(LangCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -161,6 +164,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param $eventName
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function delete(LangDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -229,7 +233,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
             // Check if the country flag exists
             $countryFlag = rtrim(\dirname($unknownFlagPath), DS).DS.$event->getLang()->getCode().'.png';
 
-            if (! file_exists($countryFlag)) {
+            if (!file_exists($countryFlag)) {
                 $fs = new Filesystem();
 
                 $fs->copy($unknownFlagPath, $countryFlag);
@@ -237,8 +241,8 @@ class Lang extends BaseAction implements EventSubscriberInterface
         } catch (TemplateException $ex) {
             throw new \RuntimeException(
                 Translator::getInstance()->trans(
-                    "The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.",
-                    ["%file" => $unknownFlag]
+                    'The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.',
+                    ['%file' => $unknownFlag]
                 ),
                 0,
                 $ex
@@ -261,7 +265,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
             TheliaEvents::LANG_DEFAULTBEHAVIOR => ['defaultBehavior', 128],
             TheliaEvents::LANG_URL => ['langUrl', 128],
             LangEvent::POST_INSERT => ['fixMissingFlag', 128],
-            LangEvent::POST_UPDATE => ['fixMissingFlag', 128]
+            LangEvent::POST_UPDATE => ['fixMissingFlag', 128],
         ];
     }
 }

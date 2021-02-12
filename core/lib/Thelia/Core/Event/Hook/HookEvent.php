@@ -16,8 +16,8 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Hook;
 
 /**
- * Class HookEvent
- * @package Thelia\Core\Event\Hook
+ * Class HookEvent.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookEvent extends ActionEvent
@@ -31,7 +31,7 @@ class HookEvent extends ActionEvent
 
     public function hasHook()
     {
-        return ! \is_null($this->hook);
+        return !\is_null($this->hook);
     }
 
     public function getHook()

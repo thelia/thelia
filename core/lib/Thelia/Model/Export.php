@@ -37,7 +37,7 @@ class Export extends BaseExport
         $class = $this->getHandleClass();
 
         if ($class[0] !== '\\') {
-            $class = '\\' . $class;
+            $class = '\\'.$class;
         }
 
         if (!class_exists($class)) {
@@ -47,7 +47,7 @@ class Export extends BaseExport
                 Translator::getInstance()->trans(
                     'The class "%class" doesn\'t exist',
                     [
-                        '%class' => $class
+                        '%class' => $class,
                     ]
                 )
             );

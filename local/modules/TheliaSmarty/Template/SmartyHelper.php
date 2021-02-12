@@ -15,10 +15,10 @@ namespace TheliaSmarty\Template;
 use Thelia\Core\Template\ParserHelperInterface;
 
 /**
- * Helper class for smarty templates
+ * Helper class for smarty templates.
  *
  * Class SmartyHelper
- * @package Thelia\Core\Template\Smarty
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class SmartyHelper implements ParserHelperInterface
@@ -26,8 +26,6 @@ class SmartyHelper implements ParserHelperInterface
     /**
      * Parse a string and get all smarty function and block with theirs arguments.
      * some smarty functions are not supported : if, for, ...
-     *
-     *
      *
      * @param string $content   the template content
      * @param array  $functions the only functions we want to parse
@@ -39,25 +37,25 @@ class SmartyHelper implements ParserHelperInterface
         $strlen = \strlen($content);
 
         // init
-        $buffer        = '';
-        $name          = '';
+        $buffer = '';
+        $name = '';
         $attributeName = '';
-        $waitfor       = '';
+        $waitfor = '';
 
-        $inFunction      = false;
-        $hasName         = false;
-        $inAttribute     = false;
+        $inFunction = false;
+        $hasName = false;
+        $inAttribute = false;
         $inInnerFunction = false;
 
-        $ldelim         = '{';
-        $rdelim         = '}';
-        $skipFunctions  = ["if", "for"];
+        $ldelim = '{';
+        $rdelim = '}';
+        $skipFunctions = ['if', 'for'];
         $skipCharacters = ["\t", "\r", "\n"];
 
-        $store      = [];
+        $store = [];
         $attributes = [];
 
-        for ($pos = 0; $pos < $strlen; $pos++) {
+        for ($pos = 0; $pos < $strlen; ++$pos) {
             $char = $content[$pos];
 
             if (\in_array($char, $skipCharacters)) {
@@ -66,7 +64,7 @@ class SmartyHelper implements ParserHelperInterface
 
             if (!$inFunction) {
                 if ($char === $ldelim) {
-                    $inFunction      = true;
+                    $inFunction = true;
                     $inInnerFunction = false;
                 }
                 continue;
@@ -74,20 +72,20 @@ class SmartyHelper implements ParserHelperInterface
 
             // get function name
             if (!$hasName) {
-                if ($char === " " || $char === $rdelim) {
+                if ($char === ' ' || $char === $rdelim) {
                     $name = $buffer;
                     // we catch this name ?
                     $hasName = $inFunction = (!\in_array($name, $skipFunctions) && (0 === \count($functions) || \in_array($name, $functions)));
-                    $buffer  = "";
+                    $buffer = '';
                     continue;
                 }
-                    // skip {
-                    if (\in_array($char, ["/", "$", "#", "'", "\""])) {
-                        $inFunction = false;
-                    } else {
-                        $buffer .= $char;
-                    }
-                    continue;
+                // skip {
+                if (\in_array($char, ['/', '$', '#', "'", '"'])) {
+                    $inFunction = false;
+                } else {
+                    $buffer .= $char;
+                }
+                continue;
             }
 
             // inner Function ?
@@ -104,54 +102,54 @@ class SmartyHelper implements ParserHelperInterface
                     $buffer .= $char;
                 } else {
                     if ($inAttribute) {
-                        if ("" === $attributeName) {
-                            $attributes[trim($buffer)] = "";
+                        if ('' === $attributeName) {
+                            $attributes[trim($buffer)] = '';
                         } else {
                             $attributes[$attributeName] = $buffer;
                         }
                         $inAttribute = false;
                     }
-                    $store[]         = [
-                        "name"       => $name,
-                        "attributes" => $attributes
+                    $store[] = [
+                        'name' => $name,
+                        'attributes' => $attributes,
                     ];
-                    $inFunction      = false;
-                    $inAttribute     = false;
+                    $inFunction = false;
+                    $inAttribute = false;
                     $inInnerFunction = false;
-                    $hasName         = false;
-                    $name            = "";
-                    $buffer          = "";
-                    $waitfor         = "";
-                    $attributes      = [];
+                    $hasName = false;
+                    $name = '';
+                    $buffer = '';
+                    $waitfor = '';
+                    $attributes = [];
                 }
                 continue;
             }
 
             // attributes
             if (!$inAttribute) {
-                if ($char !== " ") {
-                    $inAttribute   = true;
-                    $buffer        = $char;
-                    $attributeName = "";
+                if ($char !== ' ') {
+                    $inAttribute = true;
+                    $buffer = $char;
+                    $attributeName = '';
                 }
             } else {
-                if ("" === $attributeName) {
-                    if (\in_array($char, [" ", "="])) {
+                if ('' === $attributeName) {
+                    if (\in_array($char, [' ', '='])) {
                         $attributeName = trim($buffer);
-                        if (" " === $char) {
-                            $attributes[$attributeName] = "";
-                            $inAttribute                = false;
+                        if (' ' === $char) {
+                            $attributes[$attributeName] = '';
+                            $inAttribute = false;
                         }
-                        $buffer = "";
+                        $buffer = '';
                     } else {
                         $buffer .= $char;
                     }
                 } else {
-                    if ("" === $waitfor) {
-                        if (\in_array($char, ["'", "\""])) {
+                    if ('' === $waitfor) {
+                        if (\in_array($char, ["'", '"'])) {
                             $waitfor = $char;
                         } else {
-                            $waitfor = " ";
+                            $waitfor = ' ';
                             $buffer .= $char;
                         }
                         continue;
@@ -162,8 +160,8 @@ class SmartyHelper implements ParserHelperInterface
                         // end of attribute ?
                         if ($char === $waitfor) {
                             $attributes[$attributeName] = $buffer;
-                            $inAttribute                = false;
-                            $waitfor                    = "";
+                            $inAttribute = false;
+                            $waitfor = '';
                         } else {
                             $buffer .= $char;
                         }

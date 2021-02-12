@@ -29,8 +29,8 @@ use Thelia\Model\Folder;
 use Thelia\Model\FolderQuery;
 
 /**
- * Class FolderController
- * @package Thelia\Controller\Admin
+ * Class FolderController.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FolderController extends AbstractSeoCrudController
@@ -52,7 +52,7 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * Return the creation form for this object
+     * Return the creation form for this object.
      */
     protected function getCreationForm()
     {
@@ -60,7 +60,7 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * Return the update form for this object
+     * Return the update form for this object.
      */
     protected function getUpdateForm()
     {
@@ -68,9 +68,10 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * Hydrate the update form for this object, before passing it to the update template
+     * Hydrate the update form for this object, before passing it to the update template.
      *
      * @param \Thelia\Model\Folder $object
+     *
      * @return BaseForm
      */
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
@@ -80,14 +81,14 @@ class FolderController extends AbstractSeoCrudController
 
         // Prepare the data that will hydrate the form
         $data = [
-            'id'           => $object->getId(),
-            'locale'       => $object->getLocale(),
-            'title'        => $object->getTitle(),
-            'chapo'        => $object->getChapo(),
-            'description'  => $object->getDescription(),
+            'id' => $object->getId(),
+            'locale' => $object->getLocale(),
+            'title' => $object->getTitle(),
+            'chapo' => $object->getChapo(),
+            'description' => $object->getDescription(),
             'postscriptum' => $object->getPostscriptum(),
-            'visible'      => $object->getVisible(),
-            'parent'       => $object->getParent()
+            'visible' => $object->getVisible(),
+            'parent' => $object->getParent(),
         ];
 
         // Setup the object form
@@ -95,9 +96,10 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * Creates the creation event with the provided form data
+     * Creates the creation event with the provided form data.
      *
      * @param array $formData
+     *
      * @return FolderCreateEvent
      */
     protected function getCreationEvent($formData)
@@ -114,9 +116,10 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * Creates the update event with the provided form data
+     * Creates the update event with the provided form data.
      *
      * @param array $formData
+     *
      * @return FolderUpdateEvent
      */
     protected function getUpdateEvent($formData)
@@ -137,7 +140,7 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * Creates the delete event with the provided form data
+     * Creates the delete event with the provided form data.
      */
     protected function getDeleteEvent()
     {
@@ -155,6 +158,7 @@ class FolderController extends AbstractSeoCrudController
     /**
      * @param $positionChangeMode
      * @param $positionValue
+     *
      * @return UpdatePositionEvent|void
      */
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
@@ -170,6 +174,7 @@ class FolderController extends AbstractSeoCrudController
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
      * @param \Thelia\Core\Event\Folder\FolderEvent $event
+     *
      * @return bool
      */
     protected function eventContainsObject($event)
@@ -182,7 +187,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @param $event \Thelia\Core\Event\Folder\FolderEvent $event
      *
-     * @return null|\Thelia\Model\Folder
+     * @return \Thelia\Model\Folder|null
      */
     protected function getObjectFromEvent($event)
     {
@@ -190,7 +195,7 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * Load an existing object from the database
+     * Load an existing object from the database.
      */
     protected function getExistingObject()
     {
@@ -205,9 +210,10 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * Returns the object label form the object event (name, title, etc.)
+     * Returns the object label form the object event (name, title, etc.).
      *
      * @param Folder $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
@@ -216,9 +222,10 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * Returns the object ID from the object
+     * Returns the object ID from the object.
      *
      * @param Folder $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -227,7 +234,7 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * Render the main list template
+     * Render the main list template.
      *
      * @return Response
      */
@@ -241,13 +248,13 @@ class FolderController extends AbstractSeoCrudController
             [
                 'folder_order' => $currentOrder,
                 'content_order' => $content_order,
-                'parent' => $this->getRequest()->get('parent', 0)
+                'parent' => $this->getRequest()->get('parent', 0),
             ]
         );
     }
 
     /**
-     * Render the edition template
+     * Render the edition template.
      */
     protected function renderEditionTemplate()
     {
@@ -262,12 +269,13 @@ class FolderController extends AbstractSeoCrudController
 
         return [
             'folder_id' => $request->get('folder_id', 0),
-            'current_tab' => $request->get('current_tab', 'general')
+            'current_tab' => $request->get('current_tab', 'general'),
         ];
     }
 
     /**
-     * @param  \Thelia\Core\Event\Folder\FolderUpdateEvent $updateEvent
+     * @param \Thelia\Core\Event\Folder\FolderUpdateEvent $updateEvent
+     *
      * @return Response|void
      */
     protected function performAdditionalUpdateAction($updateEvent)
@@ -278,14 +286,16 @@ class FolderController extends AbstractSeoCrudController
                 ['parent' => $updateEvent->getFolder()->getParent()]
             );
         }
-            return null;
+
+        return null;
     }
 
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param  \Thelia\Core\Event\Folder\FolderDeleteEvent $deleteEvent the delete event
-     * @return Response                                    a response, or null to continue normal processing
+     * @param \Thelia\Core\Event\Folder\FolderDeleteEvent $deleteEvent the delete event
+     *
+     * @return Response a response, or null to continue normal processing
      */
     protected function performAdditionalDeleteAction($deleteEvent)
     {
@@ -297,7 +307,8 @@ class FolderController extends AbstractSeoCrudController
 
     /**
      * @param $event \Thelia\Core\Event\UpdatePositionEvent
-     * @return null|Response
+     *
+     * @return Response|null
      */
     protected function performAdditionalUpdatePositionAction($event)
     {
@@ -309,11 +320,12 @@ class FolderController extends AbstractSeoCrudController
                 ['parent' => $folder->getParent()]
             );
         }
-            return null;
+
+        return null;
     }
 
     /**
-     * Redirect to the edition template
+     * Redirect to the edition template.
      *
      * @return Response
      */
@@ -323,7 +335,7 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * Redirect to the list template
+     * Redirect to the list template.
      */
     protected function redirectToListTemplate()
     {

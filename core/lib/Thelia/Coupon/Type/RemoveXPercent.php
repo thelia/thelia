@@ -13,21 +13,18 @@
 namespace Thelia\Coupon\Type;
 
 /**
- * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>, Franck Allimant <franck@cqfdev.fr>
- *
  */
 class RemoveXPercent extends AbstractRemove
 {
+    use PercentageCouponTrait;
     public const INPUT_PERCENTAGE_NAME = 'percentage';
 
-    use PercentageCouponTrait;
-
-    /** @var string Service Id  */
+    /** @var string Service Id */
     protected $serviceId = 'thelia.coupon.type.remove_x_percent';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getPercentageFieldName()
     {
@@ -35,7 +32,7 @@ class RemoveXPercent extends AbstractRemove
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -45,7 +42,7 @@ class RemoveXPercent extends AbstractRemove
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getToolTip()
     {
@@ -60,15 +57,15 @@ class RemoveXPercent extends AbstractRemove
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function exec()
     {
-        return ($this->facade->getCartTotalTaxPrice($this->isAvailableOnSpecialOffers()) *  $this->percentage/100);
+        return $this->facade->getCartTotalTaxPrice($this->isAvailableOnSpecialOffers()) * $this->percentage / 100;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function drawBackOfficeInputs()
     {

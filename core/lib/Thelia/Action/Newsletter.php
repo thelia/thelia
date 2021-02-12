@@ -22,16 +22,16 @@ use Thelia\Model\Newsletter as NewsletterModel;
 use Thelia\Model\NewsletterQuery;
 
 /**
- * Class Newsletter
- * @package Thelia\Action
+ * Class Newsletter.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Newsletter extends BaseAction implements EventSubscriberInterface
 {
-    /** @var  MailerFactory */
+    /** @var MailerFactory */
     protected $mailer;
 
-    /** @var EventDispatcherInterface  */
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
 
     public function __construct(MailerFactory $mailer, EventDispatcherInterface $dispatcher)
@@ -94,12 +94,12 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
     {
         $this->mailer->sendEmailMessage(
             'newsletter_subscription_confirmation',
-            [ ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName() ],
-            [ $event->getEmail() => $event->getFirstname()." ".$event->getLastname() ],
+            [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
+            [$event->getEmail() => $event->getFirstname().' '.$event->getLastname()],
             [
                 'email' => $event->getEmail(),
                 'firstname' => $event->getFirstname(),
-                'lastname' => $event->getLastname()
+                'lastname' => $event->getLastname(),
             ],
             $event->getLocale()
         );
@@ -114,7 +114,7 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
             TheliaEvents::NEWSLETTER_SUBSCRIBE => ['subscribe', 128],
             TheliaEvents::NEWSLETTER_UPDATE => ['update', 128],
             TheliaEvents::NEWSLETTER_UNSUBSCRIBE => ['unsubscribe', 128],
-            TheliaEvents::NEWSLETTER_CONFIRM_SUBSCRIPTION => ['confirmSubscription', 128]
+            TheliaEvents::NEWSLETTER_CONFIRM_SUBSCRIPTION => ['confirmSubscription', 128],
         ];
     }
 }

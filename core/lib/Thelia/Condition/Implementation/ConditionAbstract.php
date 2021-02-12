@@ -24,11 +24,9 @@ use Thelia\Model\CurrencyQuery;
 use Thelia\Type\FloatType;
 
 /**
- * Assist in writing a condition of whether the Condition is applied or not
+ * Assist in writing a condition of whether the Condition is applied or not.
  *
- * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 abstract class ConditionAbstract implements ConditionInterface
 {
@@ -38,7 +36,7 @@ abstract class ConditionAbstract implements ConditionInterface
     /** @var array Parameters validating parameters against */
     protected $validators = [];
 
-    /** @var  FacadeInterface Provide necessary value from Thelia */
+    /** @var FacadeInterface Provide necessary value from Thelia */
     protected $facade;
 
     /** @var Translator Service Translator */
@@ -54,7 +52,7 @@ abstract class ConditionAbstract implements ConditionInterface
     protected $conditionValidator;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param FacadeInterface $facade Service Facade
      */
@@ -91,7 +89,7 @@ abstract class ConditionAbstract implements ConditionInterface
     }
 
     /**
-     * Return all validators
+     * Return all validators.
      *
      * @return array
      */
@@ -117,9 +115,9 @@ abstract class ConditionAbstract implements ConditionInterface
         }
 
         $validators = [
-            'inputs'       => $translatedInputs,
+            'inputs' => $translatedInputs,
             'setOperators' => $this->operators,
-            'setValues'    => $this->values
+            'setValues' => $this->values,
         ];
 
         return $validators;
@@ -131,29 +129,30 @@ abstract class ConditionAbstract implements ConditionInterface
      * TODO: what these "inputs ready to be drawn" is not clear.
      *
      * @throws \Thelia\Exception\NotImplementedException
+     *
      * @return array
      */
     protected function generateInputs()
     {
         throw new \Thelia\Exception\NotImplementedException(
-            'The generateInputs method must be implemented in ' . \get_class()
+            'The generateInputs method must be implemented in '.\get_class()
         );
     }
 
     /**
-     * Get ConditionManager Service id
+     * Get ConditionManager Service id.
      *
      * @return string
      */
     public function getServiceId()
     {
         throw new \Thelia\Exception\NotImplementedException(
-            'The getServiceId method must be implemented in ' . \get_class()
+            'The getServiceId method must be implemented in '.\get_class()
         );
     }
 
     /**
-     * Validate if Operator given is available for this Condition
+     * Validate if Operator given is available for this Condition.
      *
      * @param string $operator           Operator to validate ex <
      * @param array  $availableOperators Available operators
@@ -166,7 +165,7 @@ abstract class ConditionAbstract implements ConditionInterface
     }
 
     /**
-     * Return a serializable Condition
+     * Return a serializable Condition.
      *
      * @return SerializableCondition
      */
@@ -182,11 +181,12 @@ abstract class ConditionAbstract implements ConditionInterface
     }
 
     /**
-     * Check if currency if valid or not
+     * Check if currency if valid or not.
      *
      * @param string $currencyValue Currency EUR|USD|..
      *
      * @return bool
+     *
      * @throws \Thelia\Exception\InvalidConditionValueException
      */
     protected function isCurrencyValid($currencyValue)
@@ -210,11 +210,12 @@ abstract class ConditionAbstract implements ConditionInterface
     }
 
     /**
-     * Check if price is valid
+     * Check if price is valid.
      *
      * @param float $priceValue Price value to check
      *
      * @return bool
+     *
      * @throws \Thelia\Exception\InvalidConditionValueException
      */
     protected function isPriceValid($priceValue)
@@ -232,7 +233,7 @@ abstract class ConditionAbstract implements ConditionInterface
 
     /**
      * Draw the operator input displayed in the BackOffice
-     * allowing Admin to set its Coupon Conditions
+     * allowing Admin to set its Coupon Conditions.
      *
      * @param string $inputKey Input key (ex: self::INPUT1)
      *
@@ -249,8 +250,8 @@ abstract class ConditionAbstract implements ConditionInterface
                 'coupon/condition-fragments/condition-selector.html',
                 [
                     'operators' => $inputs['inputs'][$inputKey]['availableOperators'],
-                    'value'     => $this->operators[$inputKey] ?? '',
-                    'inputKey'  => $inputKey
+                    'value' => $this->operators[$inputKey] ?? '',
+                    'inputKey' => $inputKey,
                 ]
             );
         }
@@ -260,7 +261,7 @@ abstract class ConditionAbstract implements ConditionInterface
 
     /**
      * Draw the base input displayed in the BackOffice
-     * allowing Admin to set its Coupon Conditions
+     * allowing Admin to set its Coupon Conditions.
      *
      * @param string $label    I18n input label
      * @param string $inputKey Input key (ex: self::INPUT1)
@@ -282,14 +283,14 @@ abstract class ConditionAbstract implements ConditionInterface
                 'label' => $label,
                 'inputKey' => $inputKey,
                 'currentValue' => $currentValue,
-                'operatorSelectHtml' => $operatorSelectHtml
+                'operatorSelectHtml' => $operatorSelectHtml,
             ]
         );
     }
 
     /**
      * Draw the quantity input displayed in the BackOffice
-     * allowing Admin to set its Coupon Conditions
+     * allowing Admin to set its Coupon Conditions.
      *
      * @param string $inputKey Input key (ex: self::INPUT1)
      * @param int    $max      Maximum selectable
@@ -302,17 +303,17 @@ abstract class ConditionAbstract implements ConditionInterface
         return $this->facade->getParser()->render(
             'coupon/condition-fragments/quantity-selector.html',
             [
-                'min'      => $min,
-                'max'      => $max,
-                'value'    => $this->values[$inputKey] ?? '',
-                'inputKey' => $inputKey
+                'min' => $min,
+                'max' => $max,
+                'value' => $this->values[$inputKey] ?? '',
+                'inputKey' => $inputKey,
             ]
         );
     }
 
     /**
      * Draw the currency input displayed in the BackOffice
-     * allowing Admin to set its Coupon Conditions
+     * allowing Admin to set its Coupon Conditions.
      *
      * @param string $inputKey Input key (ex: self::INPUT1)
      *
@@ -333,8 +334,8 @@ abstract class ConditionAbstract implements ConditionInterface
             'coupon/condition-fragments/currency-selector.html',
             [
                 'currencies' => $cleanedCurrencies,
-                'value'      => $this->values[$inputKey] ?? '',
-                'inputKey'   => $inputKey
+                'value' => $this->values[$inputKey] ?? '',
+                'inputKey' => $inputKey,
             ]
         );
     }
@@ -342,7 +343,7 @@ abstract class ConditionAbstract implements ConditionInterface
     /**
      * A helper to het the current locale.
      *
-     * @return string the current locale.
+     * @return string the current locale
      */
     protected function getCurrentLocale()
     {

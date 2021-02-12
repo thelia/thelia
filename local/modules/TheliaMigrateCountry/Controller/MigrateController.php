@@ -27,8 +27,8 @@ use TheliaMigrateCountry\Events\MigrateCountryEvent;
 use TheliaMigrateCountry\Events\MigrateCountryEvents;
 
 /**
- * Class MigrateController
- * @package TheliaMigrateCountry\Controller
+ * Class MigrateController.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class MigrateController extends BaseAdminController
@@ -65,7 +65,7 @@ class MigrateController extends BaseAdminController
                         'migrate' => false,
                         'country' => $oldCountry->getId(),
                         'new_country' => $country->getId(),
-                        'new_state' => null
+                        'new_state' => null,
                     ];
                 }
             }
@@ -79,7 +79,7 @@ class MigrateController extends BaseAdminController
             'countries-migrate',
             [
                 'countriesMigrated' => $migratedCountries,
-                'showForm' => \count($dataForm) != 0
+                'showForm' => \count($dataForm) != 0,
             ]
         );
     }
@@ -95,7 +95,7 @@ class MigrateController extends BaseAdminController
 
         try {
             // Check the form against constraints violations
-            $form = $this->validateForm($changeForm, "POST");
+            $form = $this->validateForm($changeForm, 'POST');
 
             // Get the form field values
             $data = $form->getData();
@@ -118,7 +118,7 @@ class MigrateController extends BaseAdminController
                 $migratedCountries[$changeEvent->getCountry()] = [
                     'country' => $changeEvent->getNewCountry(),
                     'state' => $changeEvent->getNewState(),
-                    'counter' => $changeEvent->getCounter()
+                    'counter' => $changeEvent->getCounter(),
                 ];
                 ConfigQuery::write('thelia_country_state_migration', json_encode($migratedCountries));
 
@@ -131,7 +131,7 @@ class MigrateController extends BaseAdminController
                         '%state' => $changeEvent->getNewState(),
                         '%address' => $changeEvent->getCounter()[AddressTableMap::TABLE_NAME],
                         '%tax' => $changeEvent->getCounter()[TaxRuleCountryTableMap::TABLE_NAME],
-                        '%zone' => $changeEvent->getCounter()[CountryAreaTableMap::TABLE_NAME]
+                        '%zone' => $changeEvent->getCounter()[CountryAreaTableMap::TABLE_NAME],
                     ]
                 );
 
@@ -155,7 +155,7 @@ class MigrateController extends BaseAdminController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("Country migration"),
+                $this->getTranslator()->trans('Country migration'),
                 $error_msg,
                 $changeForm,
                 $ex
@@ -165,7 +165,7 @@ class MigrateController extends BaseAdminController
                 'countries-migrate',
                 [
                     'countriesMigrated' => $migratedCountries,
-                    'showForm' => true
+                    'showForm' => true,
                 ]
             );
         }

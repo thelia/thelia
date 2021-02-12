@@ -19,7 +19,6 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Model\ProductCategory;
 
 class BaseAction
 {
@@ -34,7 +33,7 @@ class BaseAction
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
             if (!isset(class_uses($object)['Thelia\Model\Tools\PositionManagementTrait'])) {
-                throw new \InvalidArgumentException("Your model does not implement the PositionManagementTrait trait");
+                throw new \InvalidArgumentException('Your model does not implement the PositionManagementTrait trait');
             }
 
             $mode = $event->getMode();
@@ -50,14 +49,13 @@ class BaseAction
     }
 
     /**
-     *
      * @since 2.3
      */
     protected function genericUpdateDelegatePosition(ModelCriteria $query, UpdatePositionEvent $event, EventDispatcherInterface $dispatcher = null)
     {
         if (null !== $object = $query->findOne()) {
             if (!isset(class_uses($object)['Thelia\Model\Tools\PositionManagementTrait'])) {
-                throw new \InvalidArgumentException("Your model does not implement the PositionManagementTrait trait");
+                throw new \InvalidArgumentException('Your model does not implement the PositionManagementTrait trait');
             }
 
             $mode = $event->getMode();
@@ -77,7 +75,8 @@ class BaseAction
      *
      * @param EventDispatcherInterface $dispatcher
      *
-     * @return mixed                   an SEOxxx object
+     * @return mixed an SEOxxx object
+     *
      * @throws FormValidationException if a rewritten URL cannot be created
      */
     protected function genericUpdateSeo(ModelCriteria $query, UpdateSeoEvent $event, EventDispatcherInterface $dispatcher = null)
@@ -105,10 +104,9 @@ class BaseAction
     }
 
     /**
-     * Toggle visibility for an object
+     * Toggle visibility for an object.
      *
      * @param EventDispatcherInterface $dispatcher
-     *
      */
     public function genericToggleVisibility(ModelCriteria $query, ToggleVisibilityEvent $event, EventDispatcherInterface $dispatcher = null)
     {

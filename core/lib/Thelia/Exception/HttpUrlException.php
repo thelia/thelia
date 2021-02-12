@@ -13,8 +13,8 @@
 namespace Thelia\Exception;
 
 /**
- * Class HttpUrlException
- * @package Thelia\Exception
+ * Class HttpUrlException.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class HttpUrlException extends \Exception

@@ -19,7 +19,6 @@ use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
-use TheliaSmarty\Template\SmartyParser;
 
 class SmartyAssetsResolver implements AssetResolverInterface
 {
@@ -30,10 +29,10 @@ class SmartyAssetsResolver implements AssetResolverInterface
     protected $cdnBaseUrl;
 
     /**
-     * Creates a new SmartyAssetsManager instance
+     * Creates a new SmartyAssetsManager instance.
      *
      * @param AssetManagerInterface $assetsManager an asset manager instance
-      */
+     */
     public function __construct(AssetManagerInterface $assetsManager)
     {
         $this->path_relative_to_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
@@ -44,7 +43,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
     }
 
     /**
-     * @param string $url the fully qualified CDN URL that will be used to create doucments URL.
+     * @param string $url the fully qualified CDN URL that will be used to create doucments URL
      */
     public function setCdnBaseUrl($url)
     {
@@ -52,20 +51,20 @@ class SmartyAssetsResolver implements AssetResolverInterface
     }
 
     /**
-     * Generate an asset URL
+     * Generate an asset URL.
      *
-     * @param string $source a module code, or ParserInterface::TEMPLATE_ASSETS_KEY
-     * @param string $file the file path, relative to a template base directory (e.g. assets/css/style.css)
-     * @param string $type the asset type, either 'css' or '
-     * @param ParserInterface $parserInterface the current template parser
-     * @param array $filters the filters to pass to the asset manager
-     * @param bool $debug the debug mode
-     * @param string $declaredAssetsDirectory if not null, this is the assets directory declared in the {declare_assets} function of a template.
-     * @param mixed $sourceTemplateName A template name, of false. If provided, the assets will be searched in this template directory instead of the current one.
+     * @param string          $source                  a module code, or ParserInterface::TEMPLATE_ASSETS_KEY
+     * @param string          $file                    the file path, relative to a template base directory (e.g. assets/css/style.css)
+     * @param string          $type                    the asset type, either 'css' or '
+     * @param ParserInterface $parserInterface         the current template parser
+     * @param array           $filters                 the filters to pass to the asset manager
+     * @param bool            $debug                   the debug mode
+     * @param string          $declaredAssetsDirectory if not null, this is the assets directory declared in the {declare_assets} function of a template
+     * @param mixed           $sourceTemplateName      A template name, of false. If provided, the assets will be searched in this template directory instead of the current one.
      */
     public function resolveAssetURL($source, $file, $type, ParserInterface $parserInterface, $filters = [], $debug = false, $declaredAssetsDirectory = null, $sourceTemplateName = false)
     {
-        $url = "";
+        $url = '';
 
         // Normalize path separator
         $file = $this->fixPathSeparator($file);
@@ -76,12 +75,12 @@ class SmartyAssetsResolver implements AssetResolverInterface
 
         if (null !== $fileRoot) {
             $url = $this->assetsManager->processAsset(
-                $fileRoot . DS . $file,
+                $fileRoot.DS.$file,
                 $fileRoot,
-                THELIA_WEB_DIR . $this->path_relative_to_web_root,
+                THELIA_WEB_DIR.$this->path_relative_to_web_root,
                 $templateDefinition->getPath(),
                 $source,
-                URL::getInstance()->absoluteUrl($this->path_relative_to_web_root, null, URL::PATH_TO_FILE /* path only */, $this->cdnBaseUrl),
+                URL::getInstance()->absoluteUrl($this->path_relative_to_web_root, null, URL::PATH_TO_FILE /* path only */ , $this->cdnBaseUrl),
                 $type,
                 $filters,
                 $debug
@@ -101,12 +100,12 @@ class SmartyAssetsResolver implements AssetResolverInterface
      *      - in the module in the current template if it exists
      *      - in the module in the default template
      *
-     * @param  string $source a module code, or or ParserInterface::TEMPLATE_ASSETS_KEY
-     * @param  string $templateName a template name, or false to use the current template
-     * @param  string $fileName the filename
-     * @param  ParserInterface $parserInterface the current template parser
+     * @param string          $source          a module code, or or ParserInterface::TEMPLATE_ASSETS_KEY
+     * @param string          $templateName    a template name, or false to use the current template
+     * @param string          $fileName        the filename
+     * @param ParserInterface $parserInterface the current template parser
      *
-     * @return mixed the path to directory containing the file, or null if the file doesn't exists.
+     * @return mixed the path to directory containing the file, or null if the file doesn't exists
      */
     public function resolveAssetSourcePath($source, $templateName, $fileName, ParserInterface $parserInterface)
     {
@@ -122,7 +121,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
     }
 
     /**
-     * Return an asset source file path, and get the original template where it was found
+     * Return an asset source file path, and get the original template where it was found.
      *
      * A system of fallback enables file overriding. It will look for the template :
      *      - in the current template in directory /modules/{module code}/
@@ -130,14 +129,14 @@ class SmartyAssetsResolver implements AssetResolverInterface
      *      - in the module in the current template if it exists
      *      - in the module in the default template
      *
-     * @param  string $source a module code, or or ParserInterface::TEMPLATE_ASSETS_KEY
-     * @param  string $templateName a template name, or false to use the current template
-     * @param  string $fileName the filename
-     * @param  ParserInterface $parserInterface the current template parser
-     * @param  TemplateDefinition &$templateDefinition the template where to start search.
-     *         This parameter will contain the template where the asset was found.
+     * @param string             $source              a module code, or or ParserInterface::TEMPLATE_ASSETS_KEY
+     * @param string             $templateName        a template name, or false to use the current template
+     * @param string             $fileName            the filename
+     * @param ParserInterface    $parserInterface     the current template parser
+     * @param TemplateDefinition &$templateDefinition the template where to start search.
+     *                                                This parameter will contain the template where the asset was found.
      *
-     * @return mixed the path to directory containing the file, or null if the file doesn't exists.
+     * @return mixed the path to directory containing the file, or null if the file doesn't exists
      */
     public function resolveAssetSourcePathAndTemplate(
         $source,
@@ -163,7 +162,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
 
         $hash = "$source|$templateType|$templateName";
 
-        if (! isset($cache[$hash])) {
+        if (!isset($cache[$hash])) {
             // Build a list of all template names, starting with current template
             $templateList = [$templateName => $templateDefinition];
 
@@ -177,7 +176,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
             // Get all possible directories to search, including the parent templates ones.
             // The current template is checked firts, then the parent ones.
 
-            /** @var TemplateDefinition $templateDef */
+            /* @var TemplateDefinition $templateDef */
             foreach ($templateList as $tplName => $dummy) {
                 $this->getPossibleAssetSources(
                     $templateDirectories,
@@ -187,7 +186,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
                 );
             }
 
-            $cache[$hash] = [ $pathList, $templateList ];
+            $cache[$hash] = [$pathList, $templateList];
         } else {
             [$pathList, $templateList] = $cache[$hash];
         }
@@ -201,7 +200,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
         /* Navigating in the server's directory tree is not allowed :) */
         if (preg_match('!\.\.\\'.DS.'!', $fileName)) {
             // This time, we will not forgive.
-            throw new \InvalidArgumentException("Relative paths are not allowed in assets names.");
+            throw new \InvalidArgumentException('Relative paths are not allowed in assets names.');
         }
 
         // Find the first occurrence of the file in the directory list.
@@ -228,6 +227,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
      * Be sure that the pat separator of a pathname is always the platform path separator.
      *
      * @param string $path the iput path
+     *
      * @return string the fixed path
      */
     protected function fixPathSeparator($path)
@@ -240,11 +240,12 @@ class SmartyAssetsResolver implements AssetResolverInterface
     }
 
     /**
-     * Check if a file(s) exists in a directory
+     * Check if a file(s) exists in a directory.
      *
-     * @param  string $dir  the directory path
-     * @param  string $file the file path. It can contain wildcard. eg: /path/*.css
-     * @return bool   true if file(s)
+     * @param string $dir  the directory path
+     * @param string $file the file path. It can contain wildcard. eg: /path/*.css
+     *
+     * @return bool true if file(s)
      */
     protected function filesExist($dir, $file)
     {
@@ -252,12 +253,12 @@ class SmartyAssetsResolver implements AssetResolverInterface
             return false;
         }
 
-        $full_path = rtrim($dir, DS) . DS . ltrim($file, DS);
+        $full_path = rtrim($dir, DS).DS.ltrim($file, DS);
 
         try {
             $files = glob($full_path);
 
-            $files_found = ! empty($files);
+            $files_found = !empty($files);
         } catch (\Exception $ex) {
             Tlog::getInstance()->addError($ex->getMessage());
 
@@ -271,10 +272,10 @@ class SmartyAssetsResolver implements AssetResolverInterface
      * Get all possible directories from which the asset can be found.
      * It returns an array of directories ordered by priority.
      *
-     * @param  array  $directories all directories source available for the template type
-     * @param  string $templateName the name of the template
-     * @param  string $source the module code or ParserInterface::TEMPLATE_ASSETS_KEY
-     * @param  array $pathList the pathList that will be updated
+     * @param array  $directories  all directories source available for the template type
+     * @param string $templateName the name of the template
+     * @param string $source       the module code or ParserInterface::TEMPLATE_ASSETS_KEY
+     * @param array  $pathList     the pathList that will be updated
      */
     protected function getPossibleAssetSources($directories, $templateName, $source, &$pathList)
     {
@@ -287,23 +288,23 @@ class SmartyAssetsResolver implements AssetResolverInterface
                 $pathList['module_override'][] = [
                     $templateName,
                     $directories[$templateName][ParserInterface::TEMPLATE_ASSETS_KEY]
-                    . DS
-                    . self::MODULE_OVERRIDE_DIRECTORY_NAME . DS
-                    . $source
+                    .DS
+                    .self::MODULE_OVERRIDE_DIRECTORY_NAME.DS
+                    .$source,
                 ];
             }
 
             // then in the implementation for the current template used in the module directory
             if (isset($directories[$templateName][$source])) {
-                $pathList['module_directory'][] = [ $templateName, $directories[$templateName][$source] ];
+                $pathList['module_directory'][] = [$templateName, $directories[$templateName][$source]];
             }
 
             // then in the default theme in the module itself
             if (isset($directories[self::DEFAULT_TEMPLATE_NAME][$source])) {
-                $pathList['default_fallback'][] = [ $templateName, $directories[self::DEFAULT_TEMPLATE_NAME][$source] ];
+                $pathList['default_fallback'][] = [$templateName, $directories[self::DEFAULT_TEMPLATE_NAME][$source]];
             }
         } else {
-            $pathList['template'][] = [ $templateName, $directories[$templateName][$source] ];
+            $pathList['template'][] = [$templateName, $directories[$templateName][$source]];
         }
     }
 }

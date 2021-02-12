@@ -25,17 +25,17 @@ use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * OrderProductOrderProductAttributeCombination loop
+ * OrderProductOrderProductAttributeCombination loop.
  *
  * Class OrderProductAttributeCombination
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int getOrderProduct()
+ *
+ * @method int      getOrderProduct()
  * @method string[] getOrder()
- * @method bool getVirtual()
+ * @method bool     getVirtual()
  */
 class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -66,7 +66,7 @@ class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSea
 
         $search->filterByOrderProductId($orderProduct, Criteria::EQUAL);
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {

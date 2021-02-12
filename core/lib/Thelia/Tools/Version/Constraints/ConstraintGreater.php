@@ -13,15 +13,15 @@
 namespace Thelia\Tools\Version\Constraints;
 
 /**
- * Class ConstraintGreater
- * @package Thelia\Tools\Version\Constraints
+ * Class ConstraintGreater.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ConstraintGreater extends BaseConstraint
 {
     public function __construct($expression, $strict = false)
     {
-        $this->operator = $strict ? ">" : ">=";
+        $this->operator = $strict ? '>' : '>=';
         $this->expression = substr(
             $expression,
             \strlen($this->operator)

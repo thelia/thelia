@@ -17,11 +17,9 @@ use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;
 
 /**
- * Check a Checkout against its Product number
+ * Check a Checkout against its Product number.
  *
- * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>, Franck Allimant <franck@cqfdev.fr>
- *
  */
 class MatchForXArticles extends ConditionAbstract
 {
@@ -29,7 +27,7 @@ class MatchForXArticles extends ConditionAbstract
     public const CART_QUANTITY = 'quantity';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(FacadeInterface $facade)
     {
@@ -39,15 +37,15 @@ class MatchForXArticles extends ConditionAbstract
                 Operators::INFERIOR_OR_EQUAL,
                 Operators::EQUAL,
                 Operators::SUPERIOR_OR_EQUAL,
-                Operators::SUPERIOR
-            ]
+                Operators::SUPERIOR,
+            ],
         ];
 
         parent::__construct($facade);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getServiceId()
     {
@@ -55,7 +53,7 @@ class MatchForXArticles extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setValidatorsFromForm(array $operators, array $values)
     {
@@ -69,18 +67,18 @@ class MatchForXArticles extends ConditionAbstract
         }
 
         $this->operators = [
-            self::CART_QUANTITY => $operators[self::CART_QUANTITY]
+            self::CART_QUANTITY => $operators[self::CART_QUANTITY],
         ];
 
         $this->values = [
-            self::CART_QUANTITY => $values[self::CART_QUANTITY]
+            self::CART_QUANTITY => $values[self::CART_QUANTITY],
         ];
 
         return $this;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isMatching()
     {
@@ -98,7 +96,7 @@ class MatchForXArticles extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -109,7 +107,7 @@ class MatchForXArticles extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getToolTip()
     {
@@ -122,7 +120,7 @@ class MatchForXArticles extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getSummary()
     {
@@ -135,7 +133,7 @@ class MatchForXArticles extends ConditionAbstract
             'If cart item count is <strong>%operator%</strong> %quantity%',
             [
                 '%operator%' => $i18nOperator,
-                '%quantity%' => $this->values[self::CART_QUANTITY]
+                '%quantity%' => $this->values[self::CART_QUANTITY],
             ]
         );
 
@@ -143,7 +141,7 @@ class MatchForXArticles extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function generateInputs()
     {
@@ -151,13 +149,13 @@ class MatchForXArticles extends ConditionAbstract
             self::CART_QUANTITY => [
                 'availableOperators' => $this->availableOperators[self::CART_QUANTITY],
                 'value' => '',
-                'selectedOperator' => ''
-            ]
+                'selectedOperator' => '',
+            ],
         ];
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function drawBackOfficeInputs()
     {
@@ -171,16 +169,16 @@ class MatchForXArticles extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function drawBackOfficeBaseInputsText($label, $inputKey)
     {
         return $this->facade->getParser()->render(
             'coupon/condition-fragments/cart-item-count-condition.html',
             [
-                'label'              => $label,
+                'label' => $label,
                 'operatorSelectHtml' => $this->drawBackOfficeInputOperators($inputKey),
-                'quantitySelectHtml' => $this->drawBackOfficeInputQuantityValues($inputKey, 20, 1)
+                'quantitySelectHtml' => $this->drawBackOfficeInputQuantityValues($inputKey, 20, 1),
             ]
         );
     }

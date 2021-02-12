@@ -71,8 +71,6 @@ class Profile extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     */
     public function updateResourceAccess(ProfileEvent $event)
     {
         if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
@@ -93,8 +91,6 @@ class Profile extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     */
     public function updateModuleAccess(ProfileEvent $event)
     {
         if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
@@ -115,8 +111,6 @@ class Profile extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     */
     public function delete(ProfileEvent $event)
     {
         if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
@@ -134,11 +128,11 @@ class Profile extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::PROFILE_CREATE                        => ["create", 128],
-            TheliaEvents::PROFILE_UPDATE                        => ["update", 128],
-            TheliaEvents::PROFILE_DELETE                        => ["delete", 128],
-            TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE        => ["updateResourceAccess", 128],
-            TheliaEvents::PROFILE_MODULE_ACCESS_UPDATE          => ["updateModuleAccess", 128],
+            TheliaEvents::PROFILE_CREATE => ['create', 128],
+            TheliaEvents::PROFILE_UPDATE => ['update', 128],
+            TheliaEvents::PROFILE_DELETE => ['delete', 128],
+            TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE => ['updateResourceAccess', 128],
+            TheliaEvents::PROFILE_MODULE_ACCESS_UPDATE => ['updateModuleAccess', 128],
         ];
     }
 }

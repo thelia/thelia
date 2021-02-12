@@ -20,7 +20,7 @@ use Propel\Runtime\Propel;
 trait PositionManagementTrait
 {
     /**
-     * Create an instance of this object query
+     * Create an instance of this object query.
      */
     private function createQuery()
     {
@@ -39,7 +39,7 @@ trait PositionManagementTrait
     }
 
     /**
-     * Get the position of the next inserted object
+     * Get the position of the next inserted object.
      */
     public function getNextPosition()
     {
@@ -55,7 +55,7 @@ trait PositionManagementTrait
     }
 
     /**
-     * Move up a object
+     * Move up a object.
      */
     public function movePositionUp()
     {
@@ -63,7 +63,7 @@ trait PositionManagementTrait
     }
 
     /**
-     * Move down a object
+     * Move down a object.
      */
     public function movePositionDown()
     {
@@ -71,7 +71,7 @@ trait PositionManagementTrait
     }
 
     /**
-     * Move up or down a object
+     * Move up or down a object.
      *
      * @param bool $up the exchange mode: go up (POSITION_UP) or go down (POSITION_DOWN)
      */
@@ -88,10 +88,10 @@ trait PositionManagementTrait
         // Up or down ?
         if ($up === true) {
             // Find the object immediately before me
-            $search->filterByPosition(['max' => $myPosition-1])->orderByPosition(Criteria::DESC);
+            $search->filterByPosition(['max' => $myPosition - 1])->orderByPosition(Criteria::DESC);
         } else {
             // Find the object immediately after me
-            $search->filterByPosition(['min' => $myPosition+1])->orderByPosition(Criteria::ASC);
+            $search->filterByPosition(['min' => $myPosition + 1])->orderByPosition(Criteria::ASC);
         }
 
         $result = $search->findOne();
@@ -129,7 +129,7 @@ trait PositionManagementTrait
     }
 
     /**
-     * Changes object position
+     * Changes object position.
      *
      * @param newPosition
      */
@@ -146,7 +146,7 @@ trait PositionManagementTrait
 
             if ($newPosition > $current_position) {
                 // The new position is after the current position -> we will offset + 1 all categories located between us and the new position
-                $search->filterByPosition(['min' => 1+$current_position, 'max' => $newPosition]);
+                $search->filterByPosition(['min' => 1 + $current_position, 'max' => $newPosition]);
 
                 $delta = -1;
             } else {
@@ -190,13 +190,13 @@ trait PositionManagementTrait
         $whereCriteria = [];
 
         foreach ($fields as $field => $value) {
-            $whereCriteria[] = $field . '=:' . $field;
-            $data[':' . $field] = $value;
+            $whereCriteria[] = $field.'=:'.$field;
+            $data[':'.$field] = $value;
         }
 
         $data[':position'] = $this->getPosition();
 
-        $sql = sprintf("UPDATE `%s` SET position=(position-1) WHERE " . (\count($whereCriteria)>0 ? implode(" AND ", $whereCriteria) : '1') . " AND position>:position", $mapClassName::TABLE_NAME);
+        $sql = sprintf('UPDATE `%s` SET position=(position-1) WHERE '.(\count($whereCriteria) > 0 ? implode(' AND ', $whereCriteria) : '1').' AND position>:position', $mapClassName::TABLE_NAME);
 
         $con = Propel::getConnection($mapClassName::DATABASE_NAME);
         $statement = $con->prepare($sql);

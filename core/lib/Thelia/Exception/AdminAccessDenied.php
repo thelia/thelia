@@ -13,8 +13,8 @@
 namespace Thelia\Exception;
 
 /**
- * Class AdminAccessDenied
- * @package Thelia\Exception
+ * Class AdminAccessDenied.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AdminAccessDenied extends \RuntimeException

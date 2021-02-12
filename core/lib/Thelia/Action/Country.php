@@ -24,8 +24,8 @@ use Thelia\Model\Country as CountryModel;
 use Thelia\Model\CountryQuery;
 
 /**
- * Class Country
- * @package Thelia\Action
+ * Class Country.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Country extends BaseAction implements EventSubscriberInterface
@@ -87,7 +87,7 @@ class Country extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Toggle Country visibility
+     * Toggle Country visibility.
      *
      * @param $eventName
      */
@@ -109,11 +109,11 @@ class Country extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::COUNTRY_CREATE            => ['create', 128],
-            TheliaEvents::COUNTRY_UPDATE            => ['update', 128],
-            TheliaEvents::COUNTRY_DELETE            => ['delete', 128],
-            TheliaEvents::COUNTRY_TOGGLE_DEFAULT    => ['toggleDefault', 128],
-            TheliaEvents::COUNTRY_TOGGLE_VISIBILITY => ['toggleVisibility', 128]
+            TheliaEvents::COUNTRY_CREATE => ['create', 128],
+            TheliaEvents::COUNTRY_UPDATE => ['update', 128],
+            TheliaEvents::COUNTRY_DELETE => ['delete', 128],
+            TheliaEvents::COUNTRY_TOGGLE_DEFAULT => ['toggleDefault', 128],
+            TheliaEvents::COUNTRY_TOGGLE_VISIBILITY => ['toggleVisibility', 128],
         ];
     }
 }

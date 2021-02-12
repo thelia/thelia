@@ -34,21 +34,19 @@ use Thelia\Tools\URL;
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
- * Time: 3:24 PM
+ * Time: 3:24 PM.
  *
  * Control View and Action (Model) via Events
  * Control Files and Images
  *
- * @package File
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class FileController extends BaseAdminController
 {
-    public const MODULE_RIGHT = "thelia";
+    public const MODULE_RIGHT = 'thelia';
 
     /**
-     * Get the FileManager
+     * Get the FileManager.
      *
      * @return FileManager
      */
@@ -58,13 +56,14 @@ class FileController extends BaseAdminController
     }
 
     /**
-     * Manage how a file collection has to be saved
+     * Manage how a file collection has to be saved.
      *
-     * @param  int      $parentId       Parent id owning files being saved
-     * @param  string   $parentType     Parent Type owning files being saved (product, category, content, etc.)
-     * @param  string   $objectType     Object type, e.g. image or document
-     * @param  array    $validMimeTypes an array of valid mime types. If empty, any mime type is allowed.
-     * @param  array    $extBlackList   an array of blacklisted extensions.
+     * @param int    $parentId       Parent id owning files being saved
+     * @param string $parentType     Parent Type owning files being saved (product, category, content, etc.)
+     * @param string $objectType     Object type, e.g. image or document
+     * @param array  $validMimeTypes an array of valid mime types. If empty, any mime type is allowed.
+     * @param array  $extBlackList   an array of blacklisted extensions
+     *
      * @return Response
      */
     public function saveFileAjaxAction(
@@ -103,14 +102,15 @@ class FileController extends BaseAdminController
     }
 
     /**
-     * Process file uploaded
+     * Process file uploaded.
      *
      * @param UploadedFile $fileBeingUploaded
-     * @param int $parentId
-     * @param string $parentType
-     * @param string $objectType
-     * @param array $validMimeTypes
-     * @param array $extBlackList
+     * @param int          $parentId
+     * @param string       $parentType
+     * @param string       $objectType
+     * @param array        $validMimeTypes
+     * @param array        $extBlackList
+     *
      * @return ResponseRest
      *
      * @deprecated since version 2.3, to be removed in 2.6. Please use the process method File present in the same class.
@@ -129,14 +129,15 @@ class FileController extends BaseAdminController
     }
 
     /**
-     * Process file uploaded
+     * Process file uploaded.
      *
      * @param UploadedFile $fileBeingUploaded
-     * @param  int      $parentId       Parent id owning files being saved
-     * @param  string   $parentType     Parent Type owning files being saved (product, category, content, etc.)
-     * @param  string   $objectType     Object type, e.g. image or document
-     * @param  array    $validMimeTypes an array of valid mime types. If empty, any mime type is allowed.
-     * @param  array    $extBlackList   an array of blacklisted extensions.
+     * @param int          $parentId          Parent id owning files being saved
+     * @param string       $parentType        Parent Type owning files being saved (product, category, content, etc.)
+     * @param string       $objectType        Object type, e.g. image or document
+     * @param array        $validMimeTypes    an array of valid mime types. If empty, any mime type is allowed.
+     * @param array        $extBlackList      an array of blacklisted extensions
+     *
      * @return ResponseRest
      *
      * @since 2.3
@@ -166,17 +167,17 @@ class FileController extends BaseAdminController
         $message = null;
         $realFileName = $fileBeingUploaded->getClientOriginalName();
 
-        if (! empty($validMimeTypes)) {
+        if (!empty($validMimeTypes)) {
             $mimeType = $fileBeingUploaded->getMimeType();
 
             if (!isset($validMimeTypes[$mimeType])) {
                 $message = $this->getTranslator()
                     ->trans(
                         'Only files having the following mime type are allowed: %types%',
-                        [ '%types%' => implode(', ', array_keys($validMimeTypes))]
+                        ['%types%' => implode(', ', array_keys($validMimeTypes))]
                     );
             } else {
-                $regex = "#^(.+)\.(".implode("|", $validMimeTypes[$mimeType]).")$#i";
+                $regex = "#^(.+)\.(".implode('|', $validMimeTypes[$mimeType]).')$#i';
 
                 if (!preg_match($regex, $realFileName)) {
                     $message = $this->getTranslator()
@@ -184,7 +185,7 @@ class FileController extends BaseAdminController
                             "There's a conflict between your file extension \"%ext\" and the mime type \"%mime\"",
                             [
                                 '%mime' => $mimeType,
-                                '%ext' => $fileBeingUploaded->getClientOriginalExtension()
+                                '%ext' => $fileBeingUploaded->getClientOriginalExtension(),
                             ]
                         );
                 }
@@ -192,7 +193,7 @@ class FileController extends BaseAdminController
         }
 
         if (!empty($extBlackList)) {
-            $regex = "#^(.+)\.(".implode("|", $extBlackList).")$#i";
+            $regex = "#^(.+)\.(".implode('|', $extBlackList).')$#i';
 
             if (preg_match($regex, $realFileName)) {
                 $message = $this->getTranslator()
@@ -248,7 +249,7 @@ class FileController extends BaseAdminController
                 [
                     '%parentName%' => $fileCreateOrUpdateEvent->getParentName(),
                     '%parentId%' => $fileCreateOrUpdateEvent->getParentId(),
-                    '%obj%' => $objectType
+                    '%obj%' => $objectType,
                 ]
             )
         );
@@ -258,7 +259,7 @@ class FileController extends BaseAdminController
     }
 
     /**
-     * Manage how a image collection has to be saved
+     * Manage how a image collection has to be saved.
      *
      * @param int    $parentId   Parent id owning images being saved
      * @param string $parentType Parent Type owning images being saved
@@ -268,6 +269,7 @@ class FileController extends BaseAdminController
     public function saveImageAjaxAction($parentId, $parentType)
     {
         $config = FileConfiguration::getImageConfig();
+
         return $this->saveFileAjaxAction(
             $parentId,
             $parentType,
@@ -278,7 +280,7 @@ class FileController extends BaseAdminController
     }
 
     /**
-     * Manage how a document collection has to be saved
+     * Manage how a document collection has to be saved.
      *
      * @param int    $parentId   Parent id owning documents being saved
      * @param string $parentType Parent Type owning documents being saved
@@ -288,6 +290,7 @@ class FileController extends BaseAdminController
     public function saveDocumentAjaxAction($parentId, $parentType)
     {
         $config = FileConfiguration::getDocumentConfig();
+
         return $this->saveFileAjaxAction(
             $parentId,
             $parentType,
@@ -298,7 +301,7 @@ class FileController extends BaseAdminController
     }
 
     /**
-     * Manage how a image list will be displayed in AJAX
+     * Manage how a image list will be displayed in AJAX.
      *
      * @param int    $parentId   Parent id owning images being saved
      * @param string $parentType Parent Type owning images being saved
@@ -313,16 +316,16 @@ class FileController extends BaseAdminController
         $successUrl = $this->getRequest()->get('successUrl');
 
         $args = [
-            'imageType'   => $parentType,
-            'parentId'    => $parentId,
-            'successUrl' => $successUrl
+            'imageType' => $parentType,
+            'parentId' => $parentId,
+            'successUrl' => $successUrl,
         ];
 
         return $this->render('includes/image-upload-list-ajax', $args);
     }
 
     /**
-     * Manage how a document list will be displayed in AJAX
+     * Manage how a document list will be displayed in AJAX.
      *
      * @param int    $parentId   Parent id owning documents being saved
      * @param string $parentType Parent Type owning documents being saved
@@ -339,7 +342,7 @@ class FileController extends BaseAdminController
     }
 
     /**
-     * Manage how an image list will be uploaded in AJAX
+     * Manage how an image list will be uploaded in AJAX.
      *
      * @param int    $parentId   Parent id owning images being saved
      * @param string $parentType Parent Type owning images being saved
@@ -353,16 +356,16 @@ class FileController extends BaseAdminController
         $successUrl = $this->getRequest()->get('successUrl');
 
         $args = [
-            'imageType'   => $parentType,
-            'parentId'    => $parentId,
-            'successUrl' => $successUrl
+            'imageType' => $parentType,
+            'parentId' => $parentId,
+            'successUrl' => $successUrl,
         ];
 
         return $this->render('includes/image-upload-form', $args);
     }
 
     /**
-     * Manage how an document list will be uploaded in AJAX
+     * Manage how an document list will be uploaded in AJAX.
      *
      * @param int    $parentId   Parent id owning documents being saved
      * @param string $parentType Parent Type owning documents being saved
@@ -379,7 +382,7 @@ class FileController extends BaseAdminController
     }
 
     /**
-     * Manage how an image is viewed
+     * Manage how an image is viewed.
      *
      * @param int    $imageId    Parent id owning images being saved
      * @param string $parentType Parent Type owning images being saved
@@ -408,12 +411,12 @@ class FileController extends BaseAdminController
                 $this->container,
                 'images',
                 $this->getCurrentEditionLocale()
-            )
+            ),
         ]);
     }
 
     /**
-     * Manage how an document is viewed
+     * Manage how an document is viewed.
      *
      * @param int    $documentId Parent id owning images being saved
      * @param string $parentType Parent Type owning images being saved
@@ -443,17 +446,17 @@ class FileController extends BaseAdminController
                 $this->container,
                 'documents',
                 $this->getCurrentEditionLocale()
-            )
+            ),
         ]);
     }
 
     /**
-     * Manage how a file is updated
+     * Manage how a file is updated.
      *
      * @param int    $fileId     File identifier
      * @param string $parentType Parent Type owning file being saved
      * @param string $objectType the type of the file, image or document
-     * @param string $eventName  the event type.
+     * @param string $eventName  the event type
      *
      * @return FileModelInterface
      */
@@ -542,7 +545,8 @@ class FileController extends BaseAdminController
                     URL::getInstance()->absoluteUrl($file->getRedirectionUrl(), ['current_tab' => $tab])
                 );
             }
-                return $this->generateSuccessRedirect($fileUpdateForm);
+
+            return $this->generateSuccessRedirect($fileUpdateForm);
         } catch (FormValidationException $e) {
             $message = sprintf('Please check your input: %s', $e->getMessage());
         } catch (PropelException $e) {
@@ -565,7 +569,7 @@ class FileController extends BaseAdminController
     }
 
     /**
-     * Manage how an image is updated
+     * Manage how an image is updated.
      *
      * @param int    $imageId    Parent id owning images being saved
      * @param string $parentType Parent Type owning images being saved
@@ -583,16 +587,17 @@ class FileController extends BaseAdminController
         if ($imageInstance instanceof \Symfony\Component\HttpFoundation\Response) {
             return $imageInstance;
         }
-            return $this->render('image-edit', [
+
+        return $this->render('image-edit', [
                 'imageId' => $imageId,
                 'imageType' => $parentType,
                 'redirectUrl' => $imageInstance->getRedirectionUrl(),
-                'formId' => $imageInstance->getUpdateFormId()
+                'formId' => $imageInstance->getUpdateFormId(),
             ]);
     }
 
     /**
-     * Manage how an document is updated
+     * Manage how an document is updated.
      *
      * @param int    $documentId Parent id owning documents being saved
      * @param string $parentType Parent Type owning documents being saved
@@ -610,21 +615,22 @@ class FileController extends BaseAdminController
         if ($documentInstance instanceof \Symfony\Component\HttpFoundation\Response) {
             return $documentInstance;
         }
-            return $this->render('document-edit', [
+
+        return $this->render('document-edit', [
                 'documentId' => $documentId,
                 'documentType' => $parentType,
                 'redirectUrl' => $documentInstance->getRedirectionUrl(),
-                'formId' => $documentInstance->getUpdateFormId()
+                'formId' => $documentInstance->getUpdateFormId(),
             ]);
     }
 
     /**
-     * Manage how a file has to be deleted
+     * Manage how a file has to be deleted.
      *
      * @param int    $fileId     Parent id owning file being deleted
      * @param string $parentType Parent Type owning file being deleted
      * @param string $objectType the type of the file, image or document
-     * @param string $eventName  the event type.
+     * @param string $eventName  the event type
      *
      * @return Response
      */
@@ -671,7 +677,7 @@ class FileController extends BaseAdminController
                     '%obj%' => $objectType,
                     '%id%' => $fileDeleteEvent->getFileToDelete()->getId(),
                     '%parentId%' => $fileDeleteEvent->getFileToDelete()->getParentId(),
-                    '%e%' => $e->getMessage()
+                    '%e%' => $e->getMessage(),
                 ]
             );
 
@@ -695,7 +701,7 @@ class FileController extends BaseAdminController
     }
 
     /**
-     * Manage how an image has to be deleted (AJAX)
+     * Manage how an image has to be deleted (AJAX).
      *
      * @param int    $imageId    Parent id owning image being deleted
      * @param string $parentType Parent Type owning image being deleted
@@ -708,7 +714,7 @@ class FileController extends BaseAdminController
     }
 
     /**
-     * Manage how a document has to be deleted (AJAX)
+     * Manage how a document has to be deleted (AJAX).
      *
      * @param int    $documentId Parent id owning document being deleted
      * @param string $parentType Parent Type owning document being deleted
@@ -751,14 +757,14 @@ class FileController extends BaseAdminController
         } catch (\Exception $e) {
             $message = $this->getTranslator()->trans(
                 'Fail to update %type% position: %err%',
-                [ '%type%' => $objectType, '%err%' => $e->getMessage() ]
+                ['%type%' => $objectType, '%err%' => $e->getMessage()]
             );
         }
 
         if (null === $message) {
             $message = $this->getTranslator()->trans(
                 '%type% position updated',
-                [ '%type%' => ucfirst($objectType) ]
+                ['%type%' => ucfirst($objectType)]
             );
         }
 
@@ -792,14 +798,14 @@ class FileController extends BaseAdminController
         );
     }
 
-    public function updateImagePositionAction($parentType, /** @noinspection PhpUnusedParameterInspection */  $parentId)
+    public function updateImagePositionAction($parentType, /* @noinspection PhpUnusedParameterInspection */ $parentId)
     {
         $imageId = $this->getRequest()->request->get('image_id');
 
         return $this->updateFilePositionAction($parentType, $imageId, 'image', TheliaEvents::IMAGE_UPDATE_POSITION);
     }
 
-    public function updateDocumentPositionAction($parentType, /** @noinspection PhpUnusedParameterInspection */  $parentId)
+    public function updateDocumentPositionAction($parentType, /* @noinspection PhpUnusedParameterInspection */ $parentId)
     {
         $documentId = $this->getRequest()->request->get('document_id');
 
@@ -836,14 +842,14 @@ class FileController extends BaseAdminController
         } catch (\Exception $e) {
             $message = $this->getTranslator()->trans(
                 'Fail to update %type% visibility: %err%',
-                [ '%type%' => $objectType, '%err%' => $e->getMessage() ]
+                ['%type%' => $objectType, '%err%' => $e->getMessage()]
             );
         }
 
         if (null === $message) {
             $message = $this->getTranslator()->trans(
                 '%type% visibility updated',
-                [ '%type%' => ucfirst($objectType) ]
+                ['%type%' => ucfirst($objectType)]
             );
         }
 

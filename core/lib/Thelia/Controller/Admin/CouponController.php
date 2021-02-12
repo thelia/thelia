@@ -40,16 +40,14 @@ use Thelia\Tools\Rest\ResponseRest;
 use Thelia\Tools\URL;
 
 /**
- * Control View and Action (Model) via Events
+ * Control View and Action (Model) via Events.
  *
- * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class CouponController extends BaseAdminController
 {
     /**
-     * Manage Coupons list display
+     * Manage Coupons list display.
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
@@ -60,12 +58,12 @@ class CouponController extends BaseAdminController
         }
 
         return $this->render('coupon-list', [
-            'coupon_order' => $this->getListOrderFromSession('coupon', 'coupon_order', 'code')
+            'coupon_order' => $this->getListOrderFromSession('coupon', 'coupon_order', 'code'),
         ]);
     }
 
     /**
-     * Manage Coupons creation display
+     * Manage Coupons creation display.
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
@@ -114,7 +112,7 @@ class CouponController extends BaseAdminController
     }
 
     /**
-     * Manage Coupons edition display
+     * Manage Coupons edition display.
      *
      * @param int $couponId Coupon id
      *
@@ -230,7 +228,7 @@ class CouponController extends BaseAdminController
             'admin.coupon.draw.condition.update.inputs.ajax',
             [
                 'couponId' => $couponId,
-                'conditionIndex' => 8888888
+                'conditionIndex' => 8888888,
             ],
             Router::ABSOLUTE_URL
         );
@@ -244,7 +242,7 @@ class CouponController extends BaseAdminController
             'admin.coupon.condition.delete',
             [
                 'couponId' => $couponId,
-                'conditionIndex' => 8888888
+                'conditionIndex' => 8888888,
             ],
             Router::ABSOLUTE_URL
         );
@@ -254,7 +252,7 @@ class CouponController extends BaseAdminController
             Router::ABSOLUTE_URL
         );
 
-        $args['formAction'] = 'admin/coupon/update/' . $couponId;
+        $args['formAction'] = 'admin/coupon/update/'.$couponId;
 
         $args['dateFormat'] = $this->getDefaultDateFormat();
 
@@ -264,7 +262,7 @@ class CouponController extends BaseAdminController
     }
 
     /**
-     * Manage Coupons read display
+     * Manage Coupons read display.
      *
      * @param string $conditionId Condition service id
      *
@@ -278,7 +276,7 @@ class CouponController extends BaseAdminController
 
         $this->checkXmlHttpRequest();
 
-        if (! empty($conditionId)) {
+        if (!empty($conditionId)) {
             /** @var ConditionFactory $conditionFactory */
             $conditionFactory = $this->container->get('thelia.condition.factory');
             $inputs = $conditionFactory->getInputsFromServiceId($conditionId);
@@ -294,7 +292,7 @@ class CouponController extends BaseAdminController
             /** @var ConditionInterface $condition */
             $condition = $this->container->get($conditionId);
 
-            $html      = $condition->drawBackOfficeInputs();
+            $html = $condition->drawBackOfficeInputs();
             $serviceId = $condition->getServiceId();
         } else {
             $html = '';
@@ -306,13 +304,13 @@ class CouponController extends BaseAdminController
             [
                 'inputsDrawn' => $html,
                 'conditionServiceId' => $serviceId,
-                'conditionIndex' => ''
+                'conditionIndex' => '',
             ]
         );
     }
 
     /**
-     * Manage Coupons read display
+     * Manage Coupons read display.
      *
      * @param int $couponId       Coupon id being updated
      * @param int $conditionIndex Coupon Condition position in the collection
@@ -368,7 +366,7 @@ class CouponController extends BaseAdminController
     }
 
     /**
-     * Manage Coupons read display
+     * Manage Coupons read display.
      *
      * @param int $couponId Coupon id
      *
@@ -416,7 +414,7 @@ class CouponController extends BaseAdminController
     }
 
     /**
-     * Manage Coupons condition deleteion
+     * Manage Coupons condition deleteion.
      *
      * @param int $couponId       Coupon id
      * @param int $conditionIndex Coupon condition index in the collection
@@ -456,7 +454,7 @@ class CouponController extends BaseAdminController
     }
 
     /**
-     * Log error message
+     * Log error message.
      *
      * @param string     $action  Creation|Update|Delete
      * @param string     $message Message to log
@@ -468,7 +466,7 @@ class CouponController extends BaseAdminController
     {
         Tlog::getInstance()->error(
             sprintf(
-                'Error during Coupon ' . $action . ' process : %s. Exception was %s',
+                'Error during Coupon '.$action.' process : %s. Exception was %s',
                 $message,
                 $e->getMessage()
             )
@@ -478,7 +476,7 @@ class CouponController extends BaseAdminController
     }
 
     /**
-     * Validate the CreateOrUpdate form
+     * Validate the CreateOrUpdate form.
      *
      * @param string $eventToDispatch Event which will activate actions
      * @param string $log             created|edited
@@ -509,7 +507,7 @@ class CouponController extends BaseAdminController
                 AdminResources::COUPON,
                 AccessManager::UPDATE,
                 sprintf(
-                    'Coupon %s (ID ) ' . $log,
+                    'Coupon %s (ID ) '.$log,
                     $couponEvent->getTitle(),
                     $couponEvent->getCouponModel()->getId()
                 ),
@@ -552,7 +550,7 @@ class CouponController extends BaseAdminController
     }
 
     /**
-     * Get all available conditions
+     * Get all available conditions.
      *
      * @return array
      */
@@ -575,7 +573,7 @@ class CouponController extends BaseAdminController
     }
 
     /**
-     * Get all available coupons
+     * Get all available coupons.
      *
      * @return array
      */
@@ -599,7 +597,7 @@ class CouponController extends BaseAdminController
     }
 
     /**
-     * Clean condition for template
+     * Clean condition for template.
      *
      * @param ConditionCollection $conditions Condition collection
      *
@@ -616,7 +614,7 @@ class CouponController extends BaseAdminController
                 'name' => $condition->getName(),
                 'toolTip' => $condition->getToolTip(),
                 'summary' => $condition->getSummary(),
-                'validators' => $condition->getValidators()
+                'validators' => $condition->getValidators(),
             ];
             $cleanedConditions[] = $temp;
         }
@@ -626,7 +624,7 @@ class CouponController extends BaseAdminController
 
     /**
      * Draw the input displayed in the BackOffice
-     * allowing Admin to set its Coupon effect
+     * allowing Admin to set its Coupon effect.
      *
      * @param string $couponServiceId Coupon service id
      *
@@ -638,7 +636,7 @@ class CouponController extends BaseAdminController
             return $response;
         }
 
-        if (! empty($couponServiceId)) {
+        if (!empty($couponServiceId)) {
             $this->checkXmlHttpRequest();
 
             /** @var CouponInterface $coupon */
@@ -660,7 +658,7 @@ class CouponController extends BaseAdminController
 
     /**
      * Draw the input displayed in the BackOffice
-     * allowing Admin to set its Coupon effect
+     * allowing Admin to set its Coupon effect.
      *
      * @param int $couponId Coupon id
      *
@@ -695,7 +693,7 @@ class CouponController extends BaseAdminController
     }
 
     /**
-     * Feed the Coupon Create or Update event with the User inputs
+     * Feed the Coupon Create or Update event with the User inputs.
      *
      * @param Form   $form  Form containing user data
      * @param Coupon $model Model if in update mode
@@ -740,7 +738,7 @@ class CouponController extends BaseAdminController
     }
 
     /**
-     * Build ConditionInterface from request
+     * Build ConditionInterface from request.
      *
      * @return ConditionInterface
      */
@@ -766,7 +764,7 @@ class CouponController extends BaseAdminController
     }
 
     /**
-     * Manage how a Condition is updated
+     * Manage how a Condition is updated.
      *
      * @param Coupon              $coupon     Coupon Model
      * @param ConditionCollection $conditions Condition collection
@@ -820,8 +818,9 @@ class CouponController extends BaseAdminController
     }
 
     /**
-     * @param string $action
+     * @param string      $action
      * @param Coupon|null $coupon
+     *
      * @return \Thelia\Form\BaseForm
      */
     protected function getForm($action, $coupon)
@@ -829,11 +828,11 @@ class CouponController extends BaseAdminController
         $data = [];
 
         if (null !== $coupon) {
-            $data["code"] = $coupon->getCode();
+            $data['code'] = $coupon->getCode();
         }
 
         return $this->createForm(AdminForm::COUPON_CREATION, FormType::class, $data, [
-            'validation_groups' => ["Default", $action]
+            'validation_groups' => ['Default', $action],
         ]);
     }
 
@@ -847,12 +846,12 @@ class CouponController extends BaseAdminController
         try {
             // Check token
             $this->getTokenProvider()->checkToken(
-                $this->getRequest()->query->get("_token")
+                $this->getRequest()->query->get('_token')
             );
 
             // Retrieve coupon
             $coupon = CouponQuery::create()
-                ->findPk($couponId = $this->getRequest()->request->get("coupon_id"))
+                ->findPk($couponId = $this->getRequest()->request->get('coupon_id'))
             ;
             $deleteEvent = new CouponDeleteEvent($coupon);
 
@@ -863,7 +862,7 @@ class CouponController extends BaseAdminController
                     AdminResources::COUPON,
                     AccessManager::DELETE,
                     sprintf(
-                        "Coupon %s (ID %s) deleted",
+                        'Coupon %s (ID %s) deleted',
                         $deletedObject->getCode(),
                         $deletedObject->getId()
                     ),

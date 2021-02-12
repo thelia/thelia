@@ -13,14 +13,11 @@
 namespace Thelia\Tests\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Template\Loop\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class ProductTest extends BaseLoopTestor
 {
@@ -40,7 +37,7 @@ class ProductTest extends BaseLoopTestor
 
         // ensure translation
         $product->getTranslation()
-            ->setTitle("foo")
+            ->setTitle('foo')
             ->save()
         ;
 
@@ -53,7 +50,7 @@ class ProductTest extends BaseLoopTestor
         }
 
         $otherParameters = [
-            "visible" => "*",
+            'visible' => '*',
         ];
 
         $this->baseTestSearchById($product->getId(), $otherParameters);
@@ -72,8 +69,8 @@ class ProductTest extends BaseLoopTestor
         }
 
         $otherParameters = [
-            "visible" => "*",
-            "complex" => 1
+            'visible' => '*',
+            'complex' => 1,
         ];
 
         $this->baseTestSearchById($product->getId(), $otherParameters);

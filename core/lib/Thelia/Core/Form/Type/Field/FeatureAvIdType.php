@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\FeatureAvQuery;
 
 /**
- * Class FeatureAvIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class FeatureAvIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class FeatureAvIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class FeatureAvIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "feature_av_id";
+        return 'feature_av_id';
     }
 }

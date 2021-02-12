@@ -21,9 +21,8 @@ use Thelia\Model\RewritingUrlQuery;
 use Thelia\Rewriting\RewritingResolver;
 
 /**
- * Class RewrittenUrlTestTrait
- * @package Thelia\Tests\Action
-
+ * Class RewrittenUrlTestTrait.
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * @method EventDispatcherInterface getMockEventDispatcher()
@@ -31,8 +30,11 @@ use Thelia\Rewriting\RewritingResolver;
 trait RewrittenUrlTestTrait
 {
     abstract public function getUpdateEvent(&$object);
+
     abstract public function getUpdateSeoEvent(&$object);
+
     abstract public function processUpdateAction($event);
+
     abstract public function processUpdateSeoAction($event);
 
     public function testUpdateExistingUrl()
@@ -68,7 +70,7 @@ trait RewrittenUrlTestTrait
         /* get a brand new URL */
         $exist = true;
         while (true === $exist) {
-            $newUrl = md5(rand(1, 999999)) . ".html";
+            $newUrl = md5(rand(1, 999999)).'.html';
             try {
                 new RewritingResolver($newUrl);
             } catch (UrlRewritingException $e) {

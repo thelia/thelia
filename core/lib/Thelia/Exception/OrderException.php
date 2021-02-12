@@ -17,8 +17,8 @@ class OrderException extends \RuntimeException
     /**
      * @var string The cart template name
      */
-    public $cartRoute = "cart.view";
-    public $orderDeliveryRoute = "order.delivery";
+    public $cartRoute = 'cart.view';
+    public $orderDeliveryRoute = 'order.delivery';
 
     public $arguments = [];
 

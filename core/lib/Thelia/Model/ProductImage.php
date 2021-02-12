@@ -16,11 +16,9 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Files\FileModelInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
-use Thelia\Form\ProductImageModification;
 use Thelia\Model\Base\ProductImage as BaseProductImage;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\CatalogBreadcrumbTrait;
@@ -32,7 +30,7 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
     use CatalogBreadcrumbTrait;
 
     /**
-     * Calculate next position relative to our parent
+     * Calculate next position relative to our parent.
      *
      * @param ProductImageQuery $query
      */
@@ -42,7 +40,7 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function preInsert(ConnectionInterface $con = null)
     {
@@ -54,7 +52,7 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setParentId($parentId)
     {
@@ -64,7 +62,7 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getParentId()
     {
@@ -77,7 +75,7 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
 
         $this->reorderBeforeDelete(
             [
-                "product_id" => $this->getProductId(),
+                'product_id' => $this->getProductId(),
             ]
         );
 
@@ -85,7 +83,7 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
@@ -101,7 +99,7 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
     }
 
     /**
-     * Get the ID of the form used to change this object information
+     * Get the ID of the form used to change this object information.
      *
      * @return BaseForm the form
      */
@@ -117,25 +115,24 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
     {
         $uploadDir = ConfigQuery::read('images_library_path');
         if ($uploadDir === null) {
-            $uploadDir = THELIA_LOCAL_DIR . 'media' . DS . 'images';
+            $uploadDir = THELIA_LOCAL_DIR.'media'.DS.'images';
         } else {
-            $uploadDir = THELIA_ROOT . $uploadDir;
+            $uploadDir = THELIA_ROOT.$uploadDir;
         }
 
-        return $uploadDir . DS . 'product';
+        return $uploadDir.DS.'product';
     }
 
     /**
-     *
      * @return string the URL to redirect to after update from the back-office
      */
     public function getRedirectionUrl()
     {
-        return '/admin/products/update?product_id=' . $this->getProductId();
+        return '/admin/products/update?product_id='.$this->getProductId();
     }
 
     /**
-     * Get the Query instance for this object
+     * Get the Query instance for this object.
      *
      * @return ModelCriteria
      */

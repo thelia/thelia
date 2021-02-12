@@ -24,7 +24,7 @@ use Thelia\Model\AttributeAv;
 use Thelia\Model\AttributeAvQuery;
 
 /**
- * Manages attributes-av
+ * Manages attributes-av.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
@@ -52,7 +52,7 @@ class AttributeAvController extends AbstractCrudController
 
     protected function getUpdateForm()
     {
-        throw new \LogicException("Attribute Av. modification is not yet implemented");
+        throw new \LogicException('Attribute Av. modification is not yet implemented');
     }
 
     protected function getCreationEvent($formData)
@@ -62,7 +62,7 @@ class AttributeAvController extends AbstractCrudController
         $createEvent
             ->setAttributeId($formData['attribute_id'])
             ->setTitle($formData['title'])
-            ->setLocale($formData["locale"])
+            ->setLocale($formData['locale'])
         ;
 
         return $createEvent;
@@ -74,7 +74,7 @@ class AttributeAvController extends AbstractCrudController
 
         // Create and dispatch the change event
         $changeEvent
-            ->setLocale($formData["locale"])
+            ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
             ->setChapo($formData['chapo'])
             ->setDescription($formData['description'])
@@ -105,7 +105,7 @@ class AttributeAvController extends AbstractCrudController
 
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
-        throw new \LogicException("Attribute Av. modification is not yet implemented");
+        throw new \LogicException('Attribute Av. modification is not yet implemented');
     }
 
     protected function getObjectFromEvent($event)
@@ -115,7 +115,7 @@ class AttributeAvController extends AbstractCrudController
 
     protected function getExistingObject()
     {
-        $attributeAv =  AttributeAvQuery::create()
+        $attributeAv = AttributeAvQuery::create()
         ->findOneById($this->getRequest()->get('attributeav_id', 0));
 
         if (null !== $attributeAv) {
@@ -127,6 +127,7 @@ class AttributeAvController extends AbstractCrudController
 
     /**
      * @param AttributeAv $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
@@ -136,6 +137,7 @@ class AttributeAvController extends AbstractCrudController
 
     /**
      * @param AttributeAv $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -147,7 +149,7 @@ class AttributeAvController extends AbstractCrudController
     {
         return [
             'attribute_id' => $this->getRequest()->get('attribute_id'),
-            'order' => $this->getCurrentListOrder()
+            'order' => $this->getCurrentListOrder(),
         ];
     }
 
@@ -169,7 +171,7 @@ class AttributeAvController extends AbstractCrudController
     protected function redirectToEditionTemplate()
     {
         return $this->generateRedirectFromRoute(
-            "admin.configuration.attributes.update",
+            'admin.configuration.attributes.update',
             $this->getViewArguments()
         );
     }
@@ -177,7 +179,7 @@ class AttributeAvController extends AbstractCrudController
     protected function redirectToListTemplate()
     {
         return $this->generateRedirectFromRoute(
-            "admin.configuration.attributes.update",
+            'admin.configuration.attributes.update',
             $this->getViewArguments()
         );
     }

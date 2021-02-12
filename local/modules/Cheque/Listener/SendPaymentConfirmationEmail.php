@@ -20,8 +20,8 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Mailer\MailerFactory;
 
 /**
- * Class SendEMail
- * @package IciRelais\Listener
+ * Class SendEMail.
+ *
  * @author Thelia <info@thelia.net>
  */
 class SendPaymentConfirmationEmail extends BaseAction implements EventSubscriberInterface
@@ -37,9 +37,9 @@ class SendPaymentConfirmationEmail extends BaseAction implements EventSubscriber
     }
 
     /**
-     * @param OrderEvent $event
+     * @param orderEvent $event
      *
-     * Check if we're the payment module, and send the payment confirmation email to the customer if it's the case.
+     * Check if we're the payment module, and send the payment confirmation email to the customer if it's the case
      */
     public function sendConfirmationEmail(OrderEvent $event)
     {
@@ -52,7 +52,7 @@ class SendPaymentConfirmationEmail extends BaseAction implements EventSubscriber
                     $order->getCustomer(),
                     [
                         'order_id' => $order->getId(),
-                        'order_ref' => $order->getRef()
+                        'order_ref' => $order->getRef(),
                     ]
                 );
             }
@@ -60,12 +60,12 @@ class SendPaymentConfirmationEmail extends BaseAction implements EventSubscriber
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::ORDER_UPDATE_STATUS => ["sendConfirmationEmail", 128]
+            TheliaEvents::ORDER_UPDATE_STATUS => ['sendConfirmationEmail', 128],
         ];
     }
 }

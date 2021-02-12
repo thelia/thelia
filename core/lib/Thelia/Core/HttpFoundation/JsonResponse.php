@@ -17,15 +17,15 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Translation\Translator;
 
 /**
- * Class JsonResponse
- * @package Thelia\Core\HttpFoundation
+ * Class JsonResponse.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 final class JsonResponse extends BaseJsonResponse
 {
     public static function createError($errorMessage, $statusCode = 500)
     {
-        return new self(["error" => $errorMessage], $statusCode);
+        return new self(['error' => $errorMessage], $statusCode);
     }
 
     public static function createAuthError($access)
@@ -55,7 +55,7 @@ final class JsonResponse extends BaseJsonResponse
     public static function createNotFoundError($resource)
     {
         $errorMessage = Translator::getInstance()
-            ->trans("The resource %res has not been found", ["%res" => $resource])
+            ->trans('The resource %res has not been found', ['%res' => $resource])
         ;
 
         return static::createError($errorMessage, 404);

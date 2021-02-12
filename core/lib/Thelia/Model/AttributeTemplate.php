@@ -20,7 +20,7 @@ class AttributeTemplate extends BaseAttributeTemplate
     use \Thelia\Model\Tools\PositionManagementTrait;
 
     /**
-     * Calculate next position relative to our template
+     * Calculate next position relative to our template.
      */
     protected function addCriteriaToPositionQuery($query)
     {

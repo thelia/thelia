@@ -60,6 +60,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * ProductSaleElementUpdateEvent constructor.
+     *
      * @param int $product_sale_element_id
      */
     public function __construct(Product $product, $product_sale_element_id)
@@ -81,6 +82,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * @param int $product_sale_element_id
+     *
      * @return $this
      */
     public function setProductSaleElementId($product_sale_element_id)
@@ -100,6 +102,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * @param float $price
+     *
      * @return $this
      */
     public function setPrice($price)
@@ -119,6 +122,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * @param int $currency_id
+     *
      * @return $this
      */
     public function setCurrencyId($currency_id)
@@ -138,6 +142,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * @param float $weight
+     *
      * @return $this
      */
     public function setWeight($weight)
@@ -157,6 +162,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * @param float $quantity
+     *
      * @return $this
      */
     public function setQuantity($quantity)
@@ -176,6 +182,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * @param float $sale_price
+     *
      * @return $this
      */
     public function setSalePrice($sale_price)
@@ -195,6 +202,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * @param int $onsale
+     *
      * @return $this
      */
     public function setOnsale($onsale)
@@ -214,6 +222,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * @param int $isnew
+     *
      * @return $this
      */
     public function setIsnew($isnew)
@@ -233,6 +242,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * @param string $ean_code
+     *
      * @return $this
      */
     public function setEanCode($ean_code)
@@ -252,6 +262,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * @param bool $isdefault
+     *
      * @return $this
      */
     public function setIsdefault($isdefault)
@@ -271,6 +282,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * @param string $reference
+     *
      * @return $this
      */
     public function setReference($reference)
@@ -290,6 +302,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * @param Product $product
+     *
      * @return $this
      */
     public function setProduct($product)
@@ -309,6 +322,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * @param int $tax_rule_id
+     *
      * @return $this
      */
     public function setTaxRuleId($tax_rule_id)
@@ -328,6 +342,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
 
     /**
      * @param int $from_default_currency
+     *
      * @return $this
      */
     public function setFromDefaultCurrency($from_default_currency)

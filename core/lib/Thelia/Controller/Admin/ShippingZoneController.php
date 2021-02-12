@@ -22,8 +22,8 @@ use Thelia\Form\ShippingZone\ShippingZoneAddArea;
 use Thelia\Form\ShippingZone\ShippingZoneRemoveArea;
 
 /**
- * Class ShippingZoneController
- * @package Thelia\Controller\Admin
+ * Class ShippingZoneController.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ShippingZoneController extends BaseAdminController
@@ -35,7 +35,8 @@ class ShippingZoneController extends BaseAdminController
         if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::VIEW)) {
             return $response;
         }
-        return $this->render("shipping-zones", ["display_shipping_zone" => 20]);
+
+        return $this->render('shipping-zones', ['display_shipping_zone' => 20]);
     }
 
     public function updateAction($delivery_module_id)
@@ -45,8 +46,8 @@ class ShippingZoneController extends BaseAdminController
         }
 
         return $this->render(
-            "shipping-zones-edit",
-            ["delivery_module_id" => $delivery_module_id]
+            'shipping-zones-edit',
+            ['delivery_module_id' => $delivery_module_id]
         );
     }
 
@@ -60,7 +61,7 @@ class ShippingZoneController extends BaseAdminController
         }
 
 //        $shippingAreaForm = new ShippingZoneAddArea($this->getRequest());
-        $shippingAreaForm = $this->createForm("thelia.shipping_zone_area");
+        $shippingAreaForm = $this->createForm('thelia.shipping_zone_area');
         $error_msg = null;
 
         try {
@@ -84,7 +85,7 @@ class ShippingZoneController extends BaseAdminController
         }
 
         $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj modification", ['%obj' => $this->objectName]),
+            $this->getTranslator()->trans('%obj modification', ['%obj' => $this->objectName]),
             $error_msg,
             $shippingAreaForm
         );
@@ -123,7 +124,7 @@ class ShippingZoneController extends BaseAdminController
         }
 
         $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj modification", ['%obj' => $this->objectName]),
+            $this->getTranslator()->trans('%obj modification', ['%obj' => $this->objectName]),
             $error_msg,
             $shippingAreaForm
         );
@@ -133,13 +134,13 @@ class ShippingZoneController extends BaseAdminController
     }
 
     /**
-     * Render the edition template
+     * Render the edition template.
      */
     protected function renderEditionTemplate()
     {
         return $this->render(
-            "shipping-zones-edit",
-            ["delivery_module_id" => $this->getDeliveryModuleId()]
+            'shipping-zones-edit',
+            ['delivery_module_id' => $this->getDeliveryModuleId()]
         );
     }
 

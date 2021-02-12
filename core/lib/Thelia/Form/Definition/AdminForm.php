@@ -13,10 +13,9 @@
 namespace Thelia\Form\Definition;
 
 /**
- * Class AdminForm
+ * Class AdminForm.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
- * @package Thelia\Form\Definition
  */
 final class AdminForm
 {

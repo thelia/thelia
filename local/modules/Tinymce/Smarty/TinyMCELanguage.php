@@ -15,18 +15,16 @@ namespace Tinymce\Smarty;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\Lang;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 /**
- * Class TinyMCELanguage
- * @package Tinymce\Smarty
+ * Class TinyMCELanguage.
  */
 class TinyMCELanguage extends AbstractSmartyPlugin
 {
-    /** @var  string $locale */
+    /** @var string $locale */
     private $locale;
 
     public function __construct(RequestStack $requestStack)
@@ -44,7 +42,7 @@ class TinyMCELanguage extends AbstractSmartyPlugin
         // Find TinyMCE available languages
         $finder = new Finder();
 
-        $files = $finder->in(__DIR__.DS."..".DS."Resources".DS.'js'.DS.'tinymce'.DS.'langs')->sortByName();
+        $files = $finder->in(__DIR__.DS.'..'.DS.'Resources'.DS.'js'.DS.'tinymce'.DS.'langs')->sortByName();
 
         $miniLocale = substr($this->locale, 0, 2);
 
@@ -62,7 +60,7 @@ class TinyMCELanguage extends AbstractSmartyPlugin
     }
 
     /**
-     * Define the various smarty plugins hendled by this class
+     * Define the various smarty plugins hendled by this class.
      *
      * @return array an array of smarty plugin descriptors
      */

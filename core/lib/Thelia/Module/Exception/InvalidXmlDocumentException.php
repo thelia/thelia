@@ -13,8 +13,8 @@
 namespace Thelia\Module\Exception;
 
 /**
- * Class InvalidXmlDocumentException
- * @package Thelia\Module\Exception
+ * Class InvalidXmlDocumentException.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class InvalidXmlDocumentException extends \RuntimeException

@@ -24,8 +24,8 @@ use Thelia\Model\ModuleHook as ModuleHookModel;
 use Thelia\Model\ModuleQuery;
 
 /**
- * Class HookTest
- * @package Thelia\Tests\Action
+ * Class HookTest.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleHookTest extends BaseAction
@@ -74,6 +74,7 @@ class ModuleHookTest extends BaseAction
 
     /**
      * @depends testCreate
+     *
      * @return ModuleHookModel
      */
     public function testToggleActivation(ModuleHookModel $moduleHook)
@@ -92,6 +93,7 @@ class ModuleHookTest extends BaseAction
 
     /**
      * @depends testToggleActivation
+     *
      * @return ModuleHookModel
      */
     public function testUpdate(ModuleHookModel $moduleHook)
@@ -118,6 +120,7 @@ class ModuleHookTest extends BaseAction
 
     /**
      * @depends testUpdate
+     *
      * @return ModuleHookModel
      */
     public function testDelete(ModuleHookModel $moduleHook)

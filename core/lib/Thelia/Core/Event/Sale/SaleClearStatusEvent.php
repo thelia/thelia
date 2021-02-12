@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Sale;
 
 /**
- * Class SaleClearStatusEvent
- * @package Thelia\Core\Event\Sale
+ * Class SaleClearStatusEvent.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class SaleClearStatusEvent extends SaleEvent

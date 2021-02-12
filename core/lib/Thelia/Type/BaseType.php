@@ -16,9 +16,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 abstract class BaseType implements TypeInterface
 {
@@ -37,10 +35,10 @@ abstract class BaseType implements TypeInterface
         if (!$this->isValid($value)) {
             $context->addViolation(
                 Translator::getInstance()->trans(
-                    "received value `%value` does not match `%type` type",
+                    'received value `%value` does not match `%type` type',
                     [
                         '%value' => $value,
-                        '%type' => $this->getType()
+                        '%type' => $this->getType(),
                     ]
                 )
             );

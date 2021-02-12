@@ -21,8 +21,8 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Model\ProductQuery;
 
 /**
- * Class VirtualProductHook
- * @package VirtualProductHook\Hook
+ * Class VirtualProductHook.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class VirtualProductHook extends BaseHook
@@ -40,7 +40,7 @@ class VirtualProductHook extends BaseHook
     public function onMainBeforeContent(HookRenderEvent $event)
     {
         if ($this->securityContext->isGranted(
-            ["ADMIN"],
+            ['ADMIN'],
             [AdminResources::PRODUCT],
             [],
             [AccessManager::VIEW]

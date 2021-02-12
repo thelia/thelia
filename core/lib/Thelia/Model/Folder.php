@@ -15,8 +15,6 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\Folder\FolderEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Folder as BaseFolder;
 use Thelia\Model\Tools\PositionManagementTrait;
@@ -45,7 +43,7 @@ class Folder extends BaseFolder implements FileModelParentInterface
     }
 
     /**
-     * count all products for current category and sub categories
+     * count all products for current category and sub categories.
      *
      * @return int
      */
@@ -64,8 +62,9 @@ class Folder extends BaseFolder implements FileModelParentInterface
     }
 
     /**
-     * Get the root folder
-     * @param  int   $folderId
+     * Get the root folder.
+     *
+     * @param int $folderId
      */
     public function getRoot($folderId)
     {
@@ -83,8 +82,8 @@ class Folder extends BaseFolder implements FileModelParentInterface
     }
 
     /**
-     * Calculate next position relative to our parent
-
+     * Calculate next position relative to our parent.
+     *
      * @param FolderQuery $query
      */
     protected function addCriteriaToPositionQuery($query)
@@ -110,7 +109,7 @@ class Folder extends BaseFolder implements FileModelParentInterface
 
         $this->reorderBeforeDelete(
             [
-                "parent" => $this->getParent(),
+                'parent' => $this->getParent(),
             ]
         );
 
@@ -125,9 +124,10 @@ class Folder extends BaseFolder implements FileModelParentInterface
     }
 
     /**
-     * Overload for the position management
+     * Overload for the position management.
+     *
      * @param Base\ContentFolder $contentFolder
-     * @inheritdoc
+     *                                          {@inheritdoc}
      */
     protected function doAddContentFolder($contentFolder)
     {

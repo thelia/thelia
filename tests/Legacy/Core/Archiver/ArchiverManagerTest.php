@@ -13,16 +13,14 @@
 namespace Tests\Core\Archiver;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Archiver\ArchiverManager as SUT;
 use Thelia\Core\Translation\Translator;
 use Thelia\Tests\ContainerAwareTestCase;
 
 /**
- * Class ArchiverManagerTest
+ * Class ArchiverManagerTest.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class ArchiverManagerTest extends ContainerAwareTestCase
@@ -39,10 +37,10 @@ class ArchiverManagerTest extends ContainerAwareTestCase
 
     public function setUp(): void
     {
-        $this->sut = new SUT;
+        $this->sut = new SUT();
         $this->stubArchiver = $this->createMock('Thelia\\Core\\Archiver\\ArchiverInterface');
 
-        new Translator($this->getContainer()->get("request_stack"));
+        new Translator($this->getContainer()->get('request_stack'));
     }
 
     public function testGetArchivers()
@@ -84,7 +82,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
             ->will($this->onConsecutiveCalls('archiver1', 'archiver2', 'archiver3', 'archiver1'))
         ;
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 3; ++$i) {
             $this->sut->add($this->stubArchiver);
 
             $archivers = $this->sut->getArchivers();
@@ -117,7 +115,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
             ->will($this->onConsecutiveCalls('archiver1', 'archiver2', 'archiver3', 'archiver4', 'archiver5'))
         ;
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 3; ++$i) {
             $this->sut->add($this->stubArchiver);
         }
 
@@ -160,7 +158,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
             ->will($this->onConsecutiveCalls('archiver1', 'archiver2', 'archiver3'))
         ;
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 3; ++$i) {
             $this->sut->add($this->stubArchiver);
         }
 
@@ -268,7 +266,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
             ->will($this->onConsecutiveCalls('archiver1', 'archiver2', 'archiver3'))
         ;
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 3; ++$i) {
             $this->sut->add($this->stubArchiver);
         }
 

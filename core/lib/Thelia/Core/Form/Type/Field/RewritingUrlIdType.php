@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\RewritingUrlQuery;
 
 /**
- * Class RewritingUrlIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class RewritingUrlIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class RewritingUrlIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class RewritingUrlIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "rewriting_url_id";
+        return 'rewriting_url_id';
     }
 }

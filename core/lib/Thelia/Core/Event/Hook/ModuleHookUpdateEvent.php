@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Hook;
 
 /**
- * Class ModuleHookUpdateEvent
- * @package Thelia\Core\Event\Hook
+ * Class ModuleHookUpdateEvent.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleHookUpdateEvent extends ModuleHookCreateEvent
@@ -24,6 +24,7 @@ class ModuleHookUpdateEvent extends ModuleHookCreateEvent
 
     /**
      * @param int $module_hook_id
+     *
      * @return $this
      */
     public function setModuleHookId($module_hook_id)
@@ -43,6 +44,7 @@ class ModuleHookUpdateEvent extends ModuleHookCreateEvent
 
     /**
      * @param bool $active
+     *
      * @return $this
      */
     public function setActive($active)

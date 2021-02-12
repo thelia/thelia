@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\BrandQuery;
 
 /**
- * Class BrandIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class BrandIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class BrandIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class BrandIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "brand_id";
+        return 'brand_id';
     }
 }

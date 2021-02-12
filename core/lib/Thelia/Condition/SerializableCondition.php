@@ -13,15 +13,13 @@
 namespace Thelia\Condition;
 
 /**
- * A condition ready to be serialized and stored in DataBase
+ * A condition ready to be serialized and stored in DataBase.
  *
- * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class SerializableCondition
 {
-    /** @var string Condition Service id  */
+    /** @var string Condition Service id */
     public $conditionServiceId;
 
     /** @var array Operators set by Admin for this Condition */

@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Folder;
 
 /**
- * Class FolderCreateEvent
- * @package Thelia\Core\Event
+ * Class FolderCreateEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FolderCreateEvent extends FolderEvent
@@ -25,7 +25,6 @@ class FolderCreateEvent extends FolderEvent
     protected $visible;
 
     /**
-     *
      * @return $this
      */
     public function setLocale($locale)
@@ -35,16 +34,12 @@ class FolderCreateEvent extends FolderEvent
         return $this;
     }
 
-    /**
-     */
     public function getLocale()
     {
         return $this->locale;
     }
 
     /**
-     *
-     *
      * @return $this
      */
     public function setParent($parent)
@@ -54,15 +49,12 @@ class FolderCreateEvent extends FolderEvent
         return $this;
     }
 
-    /**
-     */
     public function getParent()
     {
         return $this->parent;
     }
 
     /**
-     *
      * @return $this
      */
     public function setTitle($title)
@@ -72,15 +64,12 @@ class FolderCreateEvent extends FolderEvent
         return $this;
     }
 
-    /**
-     */
     public function getTitle()
     {
         return $this->title;
     }
 
     /**
-     *
      * @return $this
      */
     public function setVisible($visible)
@@ -90,8 +79,6 @@ class FolderCreateEvent extends FolderEvent
         return $this;
     }
 
-    /**
-     */
     public function getVisible()
     {
         return $this->visible;

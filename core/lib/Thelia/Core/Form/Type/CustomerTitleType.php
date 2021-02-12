@@ -17,8 +17,8 @@ use Symfony\Component\Validator\Constraints\Count;
 use Thelia\Core\Form\Type\Field\CustomerTitleIdType;
 
 /**
- * Class CustomerTitleType
- * @package Thelia\Core\Form\Type
+ * Class CustomerTitleType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class CustomerTitleType extends AbstractTheliaType
@@ -36,18 +36,18 @@ class CustomerTitleType extends AbstractTheliaType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add("i18n", "collection", [
-                "type" => "customer_title_i18n",
-                "allow_add" => true,
-                "required" => true,
-                "cascade_validation" => true,
-                "constraints" => [
-                    new Count(["min" => 1]),
+            ->add('i18n', 'collection', [
+                'type' => 'customer_title_i18n',
+                'allow_add' => true,
+                'required' => true,
+                'cascade_validation' => true,
+                'constraints' => [
+                    new Count(['min' => 1]),
                 ],
             ])
-            ->add("default", "checkbox")
-            ->add("title_id", "customer_title_id", [
-                "constraints" => $this->getConstraints($this->customerTitleIdType, "update"),
+            ->add('default', 'checkbox')
+            ->add('title_id', 'customer_title_id', [
+                'constraints' => $this->getConstraints($this->customerTitleIdType, 'update'),
             ])
         ;
     }
@@ -59,6 +59,6 @@ class CustomerTitleType extends AbstractTheliaType
      */
     public function getName()
     {
-        return "customer_title";
+        return 'customer_title';
     }
 }

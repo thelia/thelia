@@ -26,8 +26,8 @@ use TheliaMigrateCountry\Events\MigrateCountryEvent;
 use TheliaMigrateCountry\Events\MigrateCountryEvents;
 
 /**
- * Class MigrateCountryListener
- * @package TheliaMigrateCountry\EventListeners
+ * Class MigrateCountryListener.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class MigrateCountryListener implements EventSubscriberInterface
@@ -141,12 +141,12 @@ class MigrateCountryListener implements EventSubscriberInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
         return [
-            MigrateCountryEvents::MIGRATE_COUNTRY => 'migrateCountry'
+            MigrateCountryEvents::MIGRATE_COUNTRY => 'migrateCountry',
         ];
     }
 }

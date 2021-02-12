@@ -25,7 +25,7 @@ class CustomerUsernamePasswordFormAuthenticator extends UsernamePasswordFormAuth
             $loginForm,
             new CustomerUserProvider(),
             [
-                'username_field_name' => 'email'
+                'username_field_name' => 'email',
             ]
         );
     }

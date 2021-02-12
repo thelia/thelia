@@ -19,13 +19,13 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\FirewallForm;
 
 /**
- * Class TheliaFormValidator
- * @package Thelia\Core
+ * Class TheliaFormValidator.
+ *
  * @author Benjamin Perche <benjamin@thelia.net>
  */
 class TheliaFormValidator implements TheliaFormValidatorInterface
 {
-    /** @var TranslatorInterface  */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /** @var string */
@@ -38,11 +38,13 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
     }
 
     /**
-     * Validate a BaseForm
+     * Validate a BaseForm.
      *
-     * @param  BaseForm                     $aBaseForm      the form
-     * @param  string                       $expectedMethod the expected method, POST or GET, or null for any of them
-     * @throws FormValidationException      is the form contains error, or the method is not the right one
+     * @param BaseForm $aBaseForm      the form
+     * @param string   $expectedMethod the expected method, POST or GET, or null for any of them
+     *
+     * @throws FormValidationException is the form contains error, or the method is not the right one
+     *
      * @return \Symfony\Component\Form\Form Form the symfony form object
      */
     public function validateForm(BaseForm $aBaseForm, $expectedMethod = null)
@@ -56,9 +58,9 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
                 if ($aBaseForm instanceof FirewallForm && !$aBaseForm->isFirewallOk($this->environment)) {
                     throw new FormValidationException(
                       $this->translator->trans("You've submitted this form too many times. ")
-                      .$this->translator->trans("Further submissions will be ignored during %time",
+                      .$this->translator->trans('Further submissions will be ignored during %time',
                             [
-                                "%time" => $aBaseForm->getWaitingTime(),
+                                '%time' => $aBaseForm->getWaitingTime(),
                             ]
                         )
                     );
@@ -66,24 +68,24 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
 
                 return $form;
             }
-                $errorMessage = null;
-                if ($form->get("error_message")->getData() != null) {
-                    $errorMessage = $form->get("error_message")->getData();
-                } else {
-                    $errorMessage = sprintf(
+            $errorMessage = null;
+            if ($form->get('error_message')->getData() != null) {
+                $errorMessage = $form->get('error_message')->getData();
+            } else {
+                $errorMessage = sprintf(
                         $this->translator->trans(
-                            "Missing or invalid data: %s"
+                            'Missing or invalid data: %s'
                         ),
                         $this->getErrorMessages($form)
                     );
-                }
-                $aBaseForm->setError(true);
-                throw new FormValidationException($errorMessage);
+            }
+            $aBaseForm->setError(true);
+            throw new FormValidationException($errorMessage);
         }
-            throw new FormValidationException(
+        throw new FormValidationException(
                 sprintf(
                     $this->translator->trans(
-                        "Wrong form method, %s expected."
+                        'Wrong form method, %s expected.'
                     ),
                     $expectedMethod
                 )
@@ -91,9 +93,9 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
     }
 
     /**
-     * Get all errors that occurred in a form
+     * Get all errors that occurred in a form.
      *
-     * @return string                       the error string
+     * @return string the error string
      */
     public function getErrorMessages(Form $form)
     {
@@ -112,7 +114,7 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
                     $fieldName = $child->getName();
                 }
 
-                $errors .= sprintf("[%s] %s, ", $fieldName, $this->getErrorMessages($child));
+                $errors .= sprintf('[%s] %s, ', $fieldName, $this->getErrorMessages($child));
             }
         }
 

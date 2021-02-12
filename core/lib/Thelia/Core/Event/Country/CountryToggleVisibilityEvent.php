@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Country;
 
 /**
- * Class CountryToggleVisibilityEvent
- * @package Thelia\Core\Event\Country
+ * Class CountryToggleVisibilityEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class CountryToggleVisibilityEvent extends CountryEvent

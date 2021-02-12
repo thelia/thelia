@@ -15,8 +15,8 @@ namespace Thelia\Core\Event\Newsletter;
 use Thelia\Core\Event\ActionEvent;
 
 /**
- * Class NewsletterEvent
- * @package Thelia\Core\Event\Newsletter
+ * Class NewsletterEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class NewsletterEvent extends ActionEvent

@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\ProductAssociatedContentQuery;
 
 /**
- * Class ProductAssociatedContentIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class ProductAssociatedContentIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ProductAssociatedContentIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class ProductAssociatedContentIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "product_associated_content_id";
+        return 'product_associated_content_id';
     }
 }

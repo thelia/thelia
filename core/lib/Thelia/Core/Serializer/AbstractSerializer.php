@@ -13,7 +13,8 @@
 namespace Thelia\Core\Serializer;
 
 /**
- * Class AbstractSerializer
+ * Class AbstractSerializer.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 abstract class AbstractSerializer implements SerializerInterface

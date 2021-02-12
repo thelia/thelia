@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\CategoryQuery;
 
 /**
- * Class CategoryIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class CategoryIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class CategoryIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class CategoryIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "category_id";
+        return 'category_id';
     }
 }

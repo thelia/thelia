@@ -48,6 +48,7 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
 
     /**
      * @param $product_id
+     *
      * @return $this
      */
     public function setProductId($product_id)
@@ -67,6 +68,7 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
 
     /**
      * @param $feature_id
+     *
      * @return $this
      */
     public function setFeatureId($feature_id)
@@ -90,12 +92,12 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
 
     public function getIsTextValue()
     {
-        return (bool)$this->is_text_value;
+        return (bool) $this->is_text_value;
     }
 
     public function setIsTextValue($is_text_value)
     {
-        $this->is_text_value = (bool)$is_text_value;
+        $this->is_text_value = (bool) $is_text_value;
 
         return $this;
     }

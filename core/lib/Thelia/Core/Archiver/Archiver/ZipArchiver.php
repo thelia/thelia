@@ -15,7 +15,8 @@ namespace Thelia\Core\Archiver\Archiver;
 use Thelia\Core\Archiver\AbstractArchiver;
 
 /**
- * Class ZipArchiver
+ * Class ZipArchiver.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class ZipArchiver extends AbstractArchiver
@@ -47,9 +48,9 @@ class ZipArchiver extends AbstractArchiver
 
     public function create($baseName)
     {
-        $this->archive = new \ZipArchive;
+        $this->archive = new \ZipArchive();
 
-        $this->archivePath = $baseName . '.' . $this->getExtension();
+        $this->archivePath = $baseName.'.'.$this->getExtension();
 
         $this->archive->open($this->archivePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 
@@ -58,7 +59,7 @@ class ZipArchiver extends AbstractArchiver
 
     public function open($path)
     {
-        $this->archive = new \ZipArchive;
+        $this->archive = new \ZipArchive();
 
         $this->archivePath = $path;
 

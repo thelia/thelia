@@ -12,13 +12,10 @@
 
 namespace TheliaSmarty\Template;
 
-use TheliaSmarty\Template\AbstractSmartyPlugin;
-
 /**
- * Class allowing to describe a smarty plugin
+ * Class allowing to describe a smarty plugin.
  *
  * Class SmartyPluginDescriptor
- * @package Thelia\Core\Template\Smarty
  */
 class SmartyPluginDescriptor
 {

@@ -18,8 +18,8 @@ use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
 use Thelia\Core\Event\TheliaEvents;
 
 /**
- * Class SaleCheckActivationCommand
- * @package Thelia\Command
+ * Class SaleCheckActivationCommand.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class SaleCheckActivationCommand extends ContainerAwareCommand
@@ -27,8 +27,8 @@ class SaleCheckActivationCommand extends ContainerAwareCommand
     public function configure()
     {
         $this
-            ->setName("sale:check-activation")
-            ->setDescription("check the activation and deactivation dates of sales, and perform the required action depending on the current date.");
+            ->setName('sale:check-activation')
+            ->setDescription('check the activation and deactivation dates of sales, and perform the required action depending on the current date.');
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
@@ -39,9 +39,10 @@ class SaleCheckActivationCommand extends ContainerAwareCommand
                 TheliaEvents::CHECK_SALE_ACTIVATION_EVENT
             );
 
-            $output->writeln("<info>Sale verification processed successfully</info>");
+            $output->writeln('<info>Sale verification processed successfully</info>');
         } catch (\Exception $ex) {
-            $output->writeln(sprintf("<error>Error : %s</error>", $ex->getMessage()));
+            $output->writeln(sprintf('<error>Error : %s</error>', $ex->getMessage()));
+
             return 1;
         }
 

@@ -14,11 +14,10 @@ namespace Thelia\Core\Event\Payment;
 
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Module\AbstractPaymentModule;
-use Thelia\Module\PaymentModuleInterface;
 
 /**
- * Class BasePaymentEvent
- * @package Thelia\Core\Event\Payment
+ * Class BasePaymentEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class BasePaymentEvent extends ActionEvent
@@ -48,6 +47,7 @@ class BasePaymentEvent extends ActionEvent
     public function setModule($module)
     {
         $this->module = $module;
+
         return $this;
     }
 }

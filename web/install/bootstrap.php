@@ -11,4 +11,4 @@
  */
 
 define('THELIA_INSTALL_MODE', true);
-include __DIR__ . "/../../core/vendor/autoload.php";
+include __DIR__.'/../../core/vendor/autoload.php';

@@ -19,8 +19,8 @@ use Thelia\Core\Event\Feature\FeatureUpdateEvent;
 use Thelia\Model\Feature as FeatureModel;
 
 /**
- * Class FeatureTest
- * @package Thelia\Tests\Action
+ * Class FeatureTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FeatureTest extends BaseAction
@@ -41,14 +41,15 @@ class FeatureTest extends BaseAction
 
         $this->assertFalse($createdFeature->isNew());
 
-        $this->assertEquals("en_US", $createdFeature->getLocale());
-        $this->assertEquals("test feature", $createdFeature->getTitle());
+        $this->assertEquals('en_US', $createdFeature->getLocale());
+        $this->assertEquals('test feature', $createdFeature->getTitle());
 
         return $createdFeature;
     }
 
     /**
      * @depends testCreate
+     *
      * @return FeatureModel
      */
     public function testUpdate(FeatureModel $feature)

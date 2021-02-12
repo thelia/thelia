@@ -12,7 +12,6 @@
 
 namespace Thelia\Module\Validator;
 
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
@@ -26,9 +25,8 @@ use Thelia\Module\ModuleDescriptorValidator;
 use Thelia\Tools\Version\Version;
 
 /**
- * Class ModuleValidartor
+ * Class ModuleValidartor.
  *
- * @package Thelia\Module\Validator
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleValidator
@@ -52,7 +50,7 @@ class ModuleValidator
     protected $moduleDirName;
 
     /**
-     * @param string $modulePath the path of the module directory
+     * @param string                              $modulePath the path of the module directory
      * @param \Thelia\Core\Translation\Translator $translator FOR UNIT TEST PURPOSE ONLY
      */
     public function __construct($modulePath = null, $translator = null)
@@ -70,15 +68,11 @@ class ModuleValidator
         $this->loadModuleDefinition();
     }
 
-    /**
-     */
     public function setModulePath($modulePath)
     {
         $this->modulePath = $modulePath;
     }
 
-    /**
-     */
     public function getModulePath()
     {
         return $this->modulePath;
@@ -100,8 +94,6 @@ class ModuleValidator
         return $this->moduleDefinition;
     }
 
-    /**
-     */
     public function getModuleVersion()
     {
         return $this->moduleVersion;
@@ -129,7 +121,7 @@ class ModuleValidator
     }
 
     /**
-     * Validate a module, checks :
+     * Validate a module, checks :.
      *
      * - version of Thelia
      * - modules dependencies
@@ -142,8 +134,8 @@ class ModuleValidator
         if (null === $this->moduleDescriptor) {
             throw new \Exception(
                 $this->trans(
-                    "The %name module definition has not been initialized.",
-                    [ '%name' => $this->moduleDirName ]
+                    'The %name module definition has not been initialized.',
+                    ['%name' => $this->moduleDirName]
                 )
             );
         }
@@ -164,27 +156,27 @@ class ModuleValidator
             throw new FileNotFoundException(
                 $this->trans(
                     "Module %name directory doesn't exists.",
-                    [ '%name' => $this->moduleDirName]
+                    ['%name' => $this->moduleDirName]
                 )
             );
         }
 
-        $path = sprintf("%s/Config/module.xml", $this->modulePath);
+        $path = sprintf('%s/Config/module.xml', $this->modulePath);
         if (false === file_exists($path)) {
             throw new FileNotFoundException(
                 $this->trans(
-                    "Module %name should have a module.xml in the Config directory.",
-                    [ '%name' => $this->moduleDirName]
+                    'Module %name should have a module.xml in the Config directory.',
+                    ['%name' => $this->moduleDirName]
                 )
             );
         }
 
-        $path = sprintf("%s/Config/config.xml", $this->modulePath);
+        $path = sprintf('%s/Config/config.xml', $this->modulePath);
         if (false === file_exists($path)) {
             throw new FileNotFoundException(
                 $this->trans(
-                    "Module %name should have a config.xml in the Config directory.",
-                    [ '%name' => $this->moduleDirName]
+                    'Module %name should have a config.xml in the Config directory.',
+                    ['%name' => $this->moduleDirName]
                 )
             );
         }
@@ -192,7 +184,7 @@ class ModuleValidator
 
     protected function loadModuleDescriptor()
     {
-        $path = sprintf("%s/Config/module.xml", $this->modulePath);
+        $path = sprintf('%s/Config/module.xml', $this->modulePath);
 
         $descriptorValidator = new ModuleDescriptorValidator();
 
@@ -210,8 +202,8 @@ class ModuleValidator
         if (null === $this->moduleDescriptor) {
             throw new \Exception(
                 $this->trans(
-                    "The %name module descriptor has not been initialized.",
-                    [ '%name' => $this->moduleDirName ]
+                    'The %name module descriptor has not been initialized.',
+                    ['%name' => $this->moduleDirName]
                 )
             );
         }
@@ -219,17 +211,17 @@ class ModuleValidator
         $moduleDefinition = new ModuleDefinition();
 
         // Try to guess the proper module name, using the descriptor information.
-        $fullnamespace = trim((string)$this->moduleDescriptor->fullnamespace);
+        $fullnamespace = trim((string) $this->moduleDescriptor->fullnamespace);
 
-        $namespaceComponents = explode("\\", $fullnamespace);
+        $namespaceComponents = explode('\\', $fullnamespace);
 
-        if (! isset($namespaceComponents[0]) || empty($namespaceComponents[0])) {
+        if (!isset($namespaceComponents[0]) || empty($namespaceComponents[0])) {
             throw new ModuleException(
                 $this->trans(
                     "Unable to get module code from the fullnamespace element of the module descriptor: '%val'",
                     [
                         '%name' => $this->moduleDirName,
-                        '%val' => $fullnamespace
+                        '%val' => $fullnamespace,
                     ]
                 )
             );
@@ -238,7 +230,7 @@ class ModuleValidator
         // Assume the module code is the first component of the declared namespace
         $moduleDefinition->setCode($namespaceComponents[0]);
         $moduleDefinition->setNamespace($fullnamespace);
-        $moduleDefinition->setVersion((string)$this->moduleDescriptor->version);
+        $moduleDefinition->setVersion((string) $this->moduleDescriptor->version);
 
         $this->getModuleLanguages($moduleDefinition);
 
@@ -248,20 +240,20 @@ class ModuleValidator
 
         $this->getModuleAuthors($moduleDefinition);
 
-        $moduleDefinition->setLogo((string)$this->moduleDescriptor->logo);
-        $moduleDefinition->setTheliaVersion((string)$this->moduleDescriptor->thelia);
-        $moduleDefinition->setType((string)$this->moduleDescriptor->type);
-        $moduleDefinition->setStability((string)$this->moduleDescriptor->stability);
+        $moduleDefinition->setLogo((string) $this->moduleDescriptor->logo);
+        $moduleDefinition->setTheliaVersion((string) $this->moduleDescriptor->thelia);
+        $moduleDefinition->setType((string) $this->moduleDescriptor->type);
+        $moduleDefinition->setStability((string) $this->moduleDescriptor->stability);
 
         // documentation
-        $moduleDefinition->setDocumentation((string)$this->moduleDescriptor->documentation);
+        $moduleDefinition->setDocumentation((string) $this->moduleDescriptor->documentation);
 
         $this->moduleDefinition = $moduleDefinition;
     }
 
     public function checkModulePropelSchema()
     {
-        $schemaFile = $this->getModulePath() . DS . "Config" . DS . "schema.xml";
+        $schemaFile = $this->getModulePath().DS.'Config'.DS.'schema.xml';
         $fs = new Filesystem();
 
         if ($fs->exists($schemaFile) === false) {
@@ -270,7 +262,7 @@ class ModuleValidator
 
         if (preg_match('/<behavior.*name="versionable".*\/>/s', preg_replace('/<!--(.|\s)*?-->/', '', file_get_contents($schemaFile)))) {
             throw new ModuleException(
-                "On Thelia version >= 2.4.0 the behavior \"versionnable\" is not available for modules, please remove this behavior from your module schema."
+                'On Thelia version >= 2.4.0 the behavior "versionnable" is not available for modules, please remove this behavior from your module schema.'
             );
         }
     }
@@ -278,13 +270,13 @@ class ModuleValidator
     protected function checkVersion()
     {
         if ($this->moduleDefinition->getTheliaVersion()) {
-            if (!Version::test(Thelia::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion(), false, ">=")) {
+            if (!Version::test(Thelia::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion(), false, '>=')) {
                 throw new ModuleException(
                     $this->trans(
-                        "The module %name requires Thelia %version or newer",
+                        'The module %name requires Thelia %version or newer',
                         [
                             '%name' => $this->moduleDirName,
-                            '%version' => $this->moduleDefinition->getTheliaVersion()
+                            '%version' => $this->moduleDefinition->getTheliaVersion(),
                         ]
                     )
                 );
@@ -301,8 +293,8 @@ class ModuleValidator
             if (version_compare($module->getVersion(), $this->moduleDefinition->getVersion(), '>=')) {
                 throw new ModuleException(
                     $this->trans(
-                        "The module %name is already installed in the same or greater version.",
-                        [ '%name' => $this->moduleDirName]
+                        'The module %name is already installed in the same or greater version.',
+                        ['%name' => $this->moduleDirName]
                     )
                 );
             }
@@ -321,7 +313,7 @@ class ModuleValidator
 
             if (null !== $module) {
                 if ($module->getActivate() === BaseModule::IS_ACTIVATED) {
-                    if ("" == $dependency[1] || Version::test($module->getVersion(), $dependency[1], false, ">=")) {
+                    if ('' == $dependency[1] || Version::test($module->getVersion(), $dependency[1], false, '>=')) {
                         $pass = true;
                     }
                 }
@@ -333,7 +325,7 @@ class ModuleValidator
                         '%module (version: %version)',
                         [
                             '%module' => $dependency[0],
-                            '%version' => $dependency[1]
+                            '%version' => $dependency[1],
                         ]
                     );
                 } else {
@@ -353,11 +345,12 @@ class ModuleValidator
     }
 
     /**
-     * Get an array of modules that depend of the current module
+     * Get an array of modules that depend of the current module.
      *
-     * @param  bool|null $active if true only search in activated module, false only deactivated and null on all modules
-     * @return array     array of array with `code` which is the module code that depends of this current module and
-     *                   `version` which is the required version of current module
+     * @param bool|null $active if true only search in activated module, false only deactivated and null on all modules
+     *
+     * @return array array of array with `code` which is the module code that depends of this current module and
+     *               `version` which is the required version of current module
      */
     public function getModulesDependOf($active = true)
     {
@@ -386,7 +379,7 @@ class ModuleValidator
                         if ($dependency[0] == $code) {
                             $dependantModules[] = [
                                 'code' => $definition->getCode(),
-                                'version' => $dependency[1]
+                                'version' => $dependency[1],
                             ];
 
                             break;
@@ -394,7 +387,6 @@ class ModuleValidator
                     }
                 }
             } catch (\Exception $ex) {
-                ;
             }
         }
 
@@ -403,7 +395,9 @@ class ModuleValidator
 
     /**
      * Get the dependencies of this module.
+     *
      * @param bool $recursive Whether to also get the dependencies of dependencies, their dependencies, and so on...
+     *
      * @return array Array of dependencies as ["code" => ..., "version" => ...]. No check for duplicates is made.
      */
     public function getCurrentModuleDependencies($recursive = false)
@@ -415,15 +409,15 @@ class ModuleValidator
         $dependencies = [];
         foreach ($this->moduleDescriptor->required->module as $dependency) {
             $dependencyArray = [
-                "code" => (string)$dependency,
-                "version" => (string)$dependency['version'],
+                'code' => (string) $dependency,
+                'version' => (string) $dependency['version'],
             ];
             if (!\in_array($dependencyArray, $dependencies)) {
                 $dependencies[] = $dependencyArray;
             }
 
             if ($recursive) {
-                $recursiveModuleValidator = new ModuleValidator(THELIA_MODULE_DIR . '/' . (string)$dependency);
+                $recursiveModuleValidator = new ModuleValidator(THELIA_MODULE_DIR.'/'.(string) $dependency);
                 array_merge(
                     $dependencies,
                     $recursiveModuleValidator->getCurrentModuleDependencies(true)
@@ -434,53 +428,45 @@ class ModuleValidator
         return $dependencies;
     }
 
-    /**
-     */
     protected function getModuleLanguages(ModuleDefinition $moduleDefinition)
     {
         $languages = [];
-        if ($this->getModuleVersion() != "1") {
+        if ($this->getModuleVersion() != '1') {
             foreach ($this->moduleDescriptor->languages->language as $language) {
-                $languages[] = (string)$language;
+                $languages[] = (string) $language;
             }
         }
         $moduleDefinition->setLanguages($languages);
     }
 
-    /**
-     */
     protected function getModuleDescriptives(ModuleDefinition $moduleDefinition)
     {
         $descriptives = [];
         foreach ($this->moduleDescriptor->descriptive as $descriptive) {
-            $descriptives[(string)$descriptive['locale']] = [
-                'title' => (string)$descriptive->title,
-                'subtitle' => (string)$descriptive->subtitle,
-                'description' => (string)$descriptive->description,
-                'postscriptum' => (string)$descriptive->postscriptum,
+            $descriptives[(string) $descriptive['locale']] = [
+                'title' => (string) $descriptive->title,
+                'subtitle' => (string) $descriptive->subtitle,
+                'description' => (string) $descriptive->description,
+                'postscriptum' => (string) $descriptive->postscriptum,
             ];
         }
         $moduleDefinition->setDescriptives($descriptives);
     }
 
-    /**
-     */
     protected function getModuleDependencies(ModuleDefinition $moduleDefinition)
     {
         $dependencies = [];
         if (is_countable($this->moduleDescriptor->required) && 0 !== \count($this->moduleDescriptor->required)) {
             foreach ($this->moduleDescriptor->required->module as $dependency) {
                 $dependencies[] = [
-                    (string)$dependency,
-                    (string)$dependency['version'],
+                    (string) $dependency,
+                    (string) $dependency['version'],
                 ];
             }
         }
         $moduleDefinition->setDependencies($dependencies);
     }
 
-    /**
-     */
     protected function getModuleAuthors(ModuleDefinition $moduleDefinition)
     {
         $authors = [];
@@ -488,10 +474,10 @@ class ModuleValidator
         if (is_countable($this->moduleDescriptor->author) && 0 !== \count($this->moduleDescriptor->author)) {
             foreach ($this->moduleDescriptor->author as $author) {
                 $authors[] = [
-                    (string)$author->name,
-                    (string)$author->company,
-                    (string)$author->email,
-                    (string)$author->website
+                    (string) $author->name,
+                    (string) $author->company,
+                    (string) $author->email,
+                    (string) $author->website,
                 ];
             }
         } else {
@@ -512,10 +498,10 @@ class ModuleValidator
 
         foreach ($this->moduleDescriptor->authors->author as $author) {
             $authors[] = [
-                (string)$author->name,
-                (string)$author->company,
-                (string)$author->email,
-                (string)$author->website
+                (string) $author->name,
+                (string) $author->company,
+                (string) $author->email,
+                (string) $author->website,
             ];
         }
 

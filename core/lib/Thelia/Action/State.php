@@ -23,8 +23,8 @@ use Thelia\Model\State as StateModel;
 use Thelia\Model\StateQuery;
 
 /**
- * Class State
- * @package Thelia\Action
+ * Class State.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class State extends BaseAction implements EventSubscriberInterface
@@ -71,8 +71,7 @@ class State extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Toggle State visibility
-     *
+     * Toggle State visibility.
      */
     public function toggleVisibility(StateToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -96,7 +95,7 @@ class State extends BaseAction implements EventSubscriberInterface
             TheliaEvents::STATE_CREATE => ['create', 128],
             TheliaEvents::STATE_UPDATE => ['update', 128],
             TheliaEvents::STATE_DELETE => ['delete', 128],
-            TheliaEvents::STATE_TOGGLE_VISIBILITY => ['toggleVisibility', 128]
+            TheliaEvents::STATE_TOGGLE_VISIBILITY => ['toggleVisibility', 128],
         ];
     }
 }

@@ -13,12 +13,10 @@
 namespace Thelia\Type;
 
 /**
- * This filter accepts either a boolean value, or '*' which means both, true and false
+ * This filter accepts either a boolean value, or '*' which means both, true and false.
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
-
 class BooleanOrBothType extends BaseType
 {
     public const ANY = '*';
@@ -38,6 +36,7 @@ class BooleanOrBothType extends BaseType
         if ($value === self::ANY) {
             return $value;
         }
+
         return $value === null ? null : filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
 

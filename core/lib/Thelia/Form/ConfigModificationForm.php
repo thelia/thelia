@@ -25,31 +25,31 @@ class ConfigModificationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("id", HiddenType::class, [
-                    "constraints" => [
+            ->add('id', HiddenType::class, [
+                    'constraints' => [
                         new GreaterThan(
                             ['value' => 0]
                         ),
                     ],
             ])
-            ->add("name", TextType::class, [
-                "constraints" => [
+            ->add('name', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
                 ],
-                "label" => Translator::getInstance()->trans('Name'),
-                "label_attr" => [
-                    "for" => "name",
+                'label' => Translator::getInstance()->trans('Name'),
+                'label_attr' => [
+                    'for' => 'name',
                 ],
             ])
-            ->add("value", TextType::class, [
-                "label" => Translator::getInstance()->trans('Value'),
-                "label_attr" => [
-                    "for" => "value",
+            ->add('value', TextType::class, [
+                'label' => Translator::getInstance()->trans('Value'),
+                'label_attr' => [
+                    'for' => 'value',
                 ],
             ])
-            ->add("hidden", HiddenType::class, [])
-            ->add("secured", HiddenType::class, [
-                "label" => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin'),
+            ->add('hidden', HiddenType::class, [])
+            ->add('secured', HiddenType::class, [
+                'label' => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin'),
             ])
          ;
 
@@ -59,6 +59,6 @@ class ConfigModificationForm extends BaseForm
 
     public static function getName()
     {
-        return "thelia_config_modification";
+        return 'thelia_config_modification';
     }
 }

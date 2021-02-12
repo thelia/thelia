@@ -14,12 +14,11 @@ namespace Thelia\Exception;
 
 /**
  * these exception are non fatal exception, due to thelia process exception
- * or customer random navigation
+ * or customer random navigation.
  *
  * they redirect the customer who trig them to a specific error page // @todo
  *
  * Class TheliaProcessException
- * @package Thelia\Exception
  */
 class TheliaProcessException extends \RuntimeException
 {

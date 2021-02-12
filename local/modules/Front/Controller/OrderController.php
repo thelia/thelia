@@ -39,8 +39,8 @@ use Thelia\Module\AbstractDeliveryModule;
 use Thelia\Module\Exception\DeliveryException;
 
 /**
- * Class OrderController
- * @package Thelia\Controller\Front
+ * Class OrderController.
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class OrderController extends BaseFrontController
@@ -65,7 +65,7 @@ class OrderController extends BaseFrontController
                 if (false === $deliveryModule) {
                     Tlog::getInstance()->error(
                         $this->getTranslator()->trans(
-                            "To enable the virtual product feature, the VirtualProductDelivery module should be activated",
+                            'To enable the virtual product feature, the VirtualProductDelivery module should be activated',
                             [],
                             Front::MESSAGE_DOMAIN
                         )
@@ -79,14 +79,15 @@ class OrderController extends BaseFrontController
         return $this->render(
             'order-delivery',
             [
-                'delivery_address_id' => (null !== $deliveryAddress) ? $deliveryAddress->getId() : null
+                'delivery_address_id' => (null !== $deliveryAddress) ? $deliveryAddress->getId() : null,
             ]
         );
     }
 
     /**
      * @param AbstractDeliveryModule $moduleInstance
-     * @param Address $deliveryAddress
+     * @param Address                $deliveryAddress
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     private function registerVirtualProductDelivery($moduleInstance, $deliveryAddress)
@@ -114,12 +115,12 @@ class OrderController extends BaseFrontController
         $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_MODULE);
         $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
 
-        return $this->generateRedirectFromRoute("order.invoice");
+        return $this->generateRedirectFromRoute('order.invoice');
     }
 
     /**
      * set delivery address
-     * set delivery module
+     * set delivery module.
      */
     public function deliver()
     {
@@ -131,10 +132,10 @@ class OrderController extends BaseFrontController
         $orderDelivery = $this->createForm(FrontForm::ORDER_DELIVER);
 
         try {
-            $form = $this->validateForm($orderDelivery, "post");
+            $form = $this->validateForm($orderDelivery, 'post');
 
-            $deliveryAddressId = $form->get("delivery-address")->getData();
-            $deliveryModuleId = $form->get("delivery-module")->getData();
+            $deliveryAddressId = $form->get('delivery-address')->getData();
+            $deliveryModuleId = $form->get('delivery-module')->getData();
             $deliveryAddress = AddressQuery::create()->findPk($deliveryAddressId);
             $deliveryModule = ModuleQuery::create()->findPk($deliveryModuleId);
 
@@ -142,7 +143,7 @@ class OrderController extends BaseFrontController
             if ($deliveryAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
                 throw new \Exception(
                     $this->getTranslator()->trans(
-                        "Delivery address does not belong to the current customer",
+                        'Delivery address does not belong to the current customer',
                         [],
                         Front::MESSAGE_DOMAIN
                     )
@@ -157,7 +158,7 @@ class OrderController extends BaseFrontController
             )) {
                 throw new \Exception(
                     $this->getTranslator()->trans(
-                        "Delivery module cannot be use with selected delivery address",
+                        'Delivery module cannot be use with selected delivery address',
                         [],
                         Front::MESSAGE_DOMAIN
                     )
@@ -194,10 +195,10 @@ class OrderController extends BaseFrontController
             $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_MODULE);
             $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
 
-            return $this->generateRedirectFromRoute("order.invoice");
+            return $this->generateRedirectFromRoute('order.invoice');
         } catch (FormValidationException $e) {
             $message = $this->getTranslator()->trans(
-                "Please check your input: %s",
+                'Please check your input: %s',
                 ['%s' => $e->getMessage()],
                 Front::MESSAGE_DOMAIN
             );
@@ -205,7 +206,7 @@ class OrderController extends BaseFrontController
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {
             $message = $this->getTranslator()->trans(
-                "Sorry, an error occured: %s",
+                'Sorry, an error occured: %s',
                 ['%s' => $e->getMessage()],
                 Front::MESSAGE_DOMAIN
             );
@@ -213,7 +214,7 @@ class OrderController extends BaseFrontController
 
         if ($message !== false) {
             Tlog::getInstance()->error(
-                sprintf("Error during order delivery process : %s. Exception was %s", $message, $e->getMessage())
+                sprintf('Error during order delivery process : %s. Exception was %s', $message, $e->getMessage())
             );
 
             $orderDelivery->setErrorMessage($message);
@@ -227,7 +228,7 @@ class OrderController extends BaseFrontController
 
     /**
      * set invoice address
-     * set payment module
+     * set payment module.
      */
     public function invoice()
     {
@@ -240,17 +241,17 @@ class OrderController extends BaseFrontController
         $orderPayment = $this->createForm(FrontForm::ORDER_PAYMENT);
 
         try {
-            $form = $this->validateForm($orderPayment, "post");
+            $form = $this->validateForm($orderPayment, 'post');
 
-            $invoiceAddressId = $form->get("invoice-address")->getData();
-            $paymentModuleId = $form->get("payment-module")->getData();
+            $invoiceAddressId = $form->get('invoice-address')->getData();
+            $paymentModuleId = $form->get('payment-module')->getData();
 
             /* check that the invoice address belongs to the current customer */
             $invoiceAddress = AddressQuery::create()->findPk($invoiceAddressId);
             if ($invoiceAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
                 throw new \Exception(
                     $this->getTranslator()->trans(
-                        "Invoice address does not belong to the current customer",
+                        'Invoice address does not belong to the current customer',
                         [],
                         Front::MESSAGE_DOMAIN
                     )
@@ -264,10 +265,10 @@ class OrderController extends BaseFrontController
             $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_INVOICE_ADDRESS);
             $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_PAYMENT_MODULE);
 
-            return $this->generateRedirectFromRoute("order.payment.process");
+            return $this->generateRedirectFromRoute('order.payment.process');
         } catch (FormValidationException $e) {
             $message = $this->getTranslator()->trans(
-                "Please check your input: %s",
+                'Please check your input: %s',
                 ['%s' => $e->getMessage()],
                 Front::MESSAGE_DOMAIN
             );
@@ -275,7 +276,7 @@ class OrderController extends BaseFrontController
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {
             $message = $this->getTranslator()->trans(
-                "Sorry, an error occured: %s",
+                'Sorry, an error occured: %s',
                 ['%s' => $e->getMessage()],
                 Front::MESSAGE_DOMAIN
             );
@@ -283,7 +284,7 @@ class OrderController extends BaseFrontController
 
         if ($message !== false) {
             Tlog::getInstance()->error(
-                sprintf("Error during order payment process : %s. Exception was %s", $message, $e->getMessage())
+                sprintf('Error during order payment process : %s. Exception was %s', $message, $e->getMessage())
             );
 
             $orderPayment->setErrorMessage($message);
@@ -320,7 +321,7 @@ class OrderController extends BaseFrontController
 
         $orderEvent = $this->getOrderEvent();
 
-        $this->getDispatcher()->dispatch($orderEvent,TheliaEvents::ORDER_PAY);
+        $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_PAY);
 
         $placedOrder = $orderEvent->getPlacedOrder();
 
@@ -329,14 +330,15 @@ class OrderController extends BaseFrontController
             if ($orderEvent->hasResponse()) {
                 return $orderEvent->getResponse();
             }
-                return $this->generateRedirectFromRoute(
+
+            return $this->generateRedirectFromRoute(
                     'order.placed',
                     [],
                     ['order_id' => $orderEvent->getPlacedOrder()->getId()]
                 );
         }
-            /* order has not been placed */
-            return $this->generateRedirectFromRoute('cart.view');
+        /* order has not been placed */
+        return $this->generateRedirectFromRoute('cart.view');
     }
 
     public function orderPlaced($order_id)
@@ -349,7 +351,7 @@ class OrderController extends BaseFrontController
         if (null === $placedOrder) {
             throw new TheliaProcessException(
                 $this->getTranslator()->trans(
-                    "No placed order",
+                    'No placed order',
                     [],
                     Front::MESSAGE_DOMAIN
                 ),
@@ -363,7 +365,7 @@ class OrderController extends BaseFrontController
         if (null === $customer || $placedOrder->getCustomerId() !== $customer->getId()) {
             throw new TheliaProcessException(
                 $this->getTranslator()->trans(
-                    "Received placed order id does not belong to the current customer",
+                    'Received placed order id does not belong to the current customer',
                     [],
                     Front::MESSAGE_DOMAIN
                 ),
@@ -372,9 +374,9 @@ class OrderController extends BaseFrontController
             );
         }
 
-        $this->getDispatcher()->dispatch($this->getOrderEvent(),TheliaEvents::ORDER_CART_CLEAR);
+        $this->getDispatcher()->dispatch($this->getOrderEvent(), TheliaEvents::ORDER_CART_CLEAR);
 
-        $this->getParserContext()->set("placed_order_id", $placedOrder->getId());
+        $this->getParserContext()->set('placed_order_id', $placedOrder->getId());
     }
 
     public function orderFailed($order_id, $message)
@@ -392,7 +394,7 @@ class OrderController extends BaseFrontController
             if (null === $customer || $failedOrder->getCustomerId() !== $customer->getId()) {
                 throw new TheliaProcessException(
                     $this->getTranslator()->trans(
-                        "Received failed order id does not belong to the current customer",
+                        'Received failed order id does not belong to the current customer',
                         [],
                         Front::MESSAGE_DOMAIN
                     ),
@@ -405,8 +407,8 @@ class OrderController extends BaseFrontController
         }
 
         $this->getParserContext()
-            ->set("failed_order_id", $order_id)
-            ->set("failed_order_message", $message)
+            ->set('failed_order_id', $order_id)
+            ->set('failed_order_message', $message)
         ;
     }
 
@@ -526,16 +528,16 @@ class OrderController extends BaseFrontController
         $args = [
             'country' => $countryId,
             'state' => $stateId,
-            'address' => $session->getOrder()->getChoosenDeliveryAddress()
+            'address' => $session->getOrder()->getChoosenDeliveryAddress(),
         ];
 
         return $this->render('ajax/order-delivery-module-list', $args);
     }
 
     /**
-     * Redirect to cart view if at least one non product is out of stock
+     * Redirect to cart view if at least one non product is out of stock.
      *
-     * @return null|BaseResponse
+     * @return BaseResponse|null
      */
     private function checkStockNotEmpty()
     {
@@ -557,9 +559,9 @@ class OrderController extends BaseFrontController
     }
 
     /**
-     * Retrieve the chosen delivery address for a cart or the default customer address if not exists
+     * Retrieve the chosen delivery address for a cart or the default customer address if not exists.
      *
-     * @return null|Address
+     * @return Address|null
      */
     protected function getCustomerAddress()
     {

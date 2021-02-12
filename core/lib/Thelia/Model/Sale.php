@@ -12,15 +12,12 @@
 
 namespace Thelia\Model;
 
-use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\Sale\SaleEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Sale as BaseSale;
 
 class Sale extends BaseSale
 {
     /**
-     * The price offsets types, either amount or percentage
+     * The price offsets types, either amount or percentage.
      */
     public const OFFSET_TYPE_PERCENTAGE = 10;
     public const OFFSET_TYPE_AMOUNT = 20;
@@ -30,7 +27,7 @@ class Sale extends BaseSale
      */
     public function hasStartDate()
     {
-        return ! \is_null($this->getStartDate());
+        return !\is_null($this->getStartDate());
     }
 
     /**
@@ -38,7 +35,7 @@ class Sale extends BaseSale
      */
     public function hasEndDate()
     {
-        return ! \is_null($this->getEndDate());
+        return !\is_null($this->getEndDate());
     }
 
     /**

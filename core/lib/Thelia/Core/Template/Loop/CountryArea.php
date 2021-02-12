@@ -24,19 +24,18 @@ use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * Country Area loop
- *
+ * Country Area loop.
  *
  * Class CountryArea
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[] getArea()
- * @method int[] getCountry()
- * @method int[] getState()
+ *
+ * @method int[]    getId()
+ * @method int[]    getArea()
+ * @method int[]    getCountry()
+ * @method int[]    getState()
  * @method string[] getOrder()
  */
 class CountryArea extends BaseLoop implements PropelSearchLoopInterface
@@ -93,28 +92,28 @@ class CountryArea extends BaseLoop implements PropelSearchLoopInterface
         $orders = $this->getOrder();
         foreach ($orders as $order) {
             switch ($order) {
-                case "id":
+                case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case "id_reverse":
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "area":
+                case 'area':
                     $search->orderByAreaId(Criteria::ASC);
                     break;
-                case "area_reverse":
+                case 'area_reverse':
                     $search->orderByAreaId(Criteria::DESC);
                     break;
-                case "country":
+                case 'country':
                     $search->orderByCountryId(Criteria::ASC);
                     break;
-                case "country_reverse":
+                case 'country_reverse':
                     $search->orderByCountryId(Criteria::DESC);
                     break;
-                case "state":
+                case 'state':
                     $search->orderByStateId(Criteria::ASC);
                     break;
-                case "state_reverse":
+                case 'state_reverse':
                     $search->orderByStateId(Criteria::DESC);
                     break;
             }
@@ -129,10 +128,10 @@ class CountryArea extends BaseLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $countryArea) {
             $loopResultRow = new LoopResultRow($countryArea);
             $loopResultRow
-                ->set("ID", $countryArea->getId())
-                ->set("AREA_ID", $countryArea->getAreaId())
-                ->set("COUNTRY_ID", $countryArea->getCountryId())
-                ->set("STATE_ID", $countryArea->getStateId())
+                ->set('ID', $countryArea->getId())
+                ->set('AREA_ID', $countryArea->getAreaId())
+                ->set('COUNTRY_ID', $countryArea->getCountryId())
+                ->set('STATE_ID', $countryArea->getStateId())
             ;
 
             $this->addOutputFields($loopResultRow, $countryArea);

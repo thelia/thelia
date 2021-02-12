@@ -15,8 +15,8 @@ namespace Thelia\Core\Event\Cache;
 use Thelia\Core\Event\ActionEvent;
 
 /**
- * Class CacheEvent
- * @package Thelia\Core\Event\Cache
+ * Class CacheEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  * @author Gilles Bourgeat <gilles.bourgeat@gmail.com>
  */
@@ -29,6 +29,7 @@ class CacheEvent extends ActionEvent
 
     /**
      * @since 2.4.0
+     *
      * @var bool
      */
     protected $onKernelTerminate = true;
@@ -61,6 +62,7 @@ class CacheEvent extends ActionEvent
 
     /**
      * @since 2.4.0
+     *
      * @return bool
      */
     public function isOnKernelTerminate()
@@ -70,12 +72,15 @@ class CacheEvent extends ActionEvent
 
     /**
      * @since 2.4.0
+     *
      * @param bool $onKernelTerminate
+     *
      * @return CacheEvent
      */
     public function setOnKernelTerminate($onKernelTerminate)
     {
         $this->onKernelTerminate = $onKernelTerminate;
+
         return $this;
     }
 }

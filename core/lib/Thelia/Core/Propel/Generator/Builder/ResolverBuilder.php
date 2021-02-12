@@ -20,7 +20,7 @@ class ResolverBuilder extends \Propel\Generator\Builder\ResolverBuilder
     {
         return rtrim((new Filesystem())->makePathRelative(
             TheliaMain_BUILD_DATABASE_PATH
-            . parent::getClassFilePath(),
+            .parent::getClassFilePath(),
             THELIA_ROOT
         ), '/');
     }

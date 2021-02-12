@@ -15,7 +15,8 @@ namespace Thelia\Core\Serializer\Serializer;
 use Thelia\Core\Serializer\AbstractSerializer;
 
 /**
- * Class JSONSerializer
+ * Class JSONSerializer.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class JSONSerializer extends AbstractSerializer
@@ -52,7 +53,7 @@ class JSONSerializer extends AbstractSerializer
 
     public function separator()
     {
-        return ',' . PHP_EOL;
+        return ','.PHP_EOL;
     }
 
     public function finalizeFile(\SplFileObject $fileObject)

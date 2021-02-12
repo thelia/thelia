@@ -23,14 +23,14 @@ use Thelia\Model\ModuleConfigQuery;
 use Thelia\Model\ModuleQuery;
 
 /**
- *
- * Brand loop
+ * Brand loop.
  *
  * Class ModuleConfig
- * @package Thelia\Core\Template\Loop
+ *
  * @author Franck Allimant <franck@cqfdev.fr>
  *
  * {@inheritdoc}
+ *
  * @method string getModule()
  * @method string getVariable()
  * @method string getDefaultValue()
@@ -52,7 +52,6 @@ class ModuleConfig extends BaseLoop implements ArraySearchLoopInterface
     }
 
     /**
-     *
      * @return LoopResult
      */
     public function parseResults(LoopResult $loopResult)
@@ -73,8 +72,8 @@ class ModuleConfig extends BaseLoop implements ArraySearchLoopInterface
         $loopResultRow = new LoopResultRow();
 
         $loopResultRow
-            ->set("VARIABLE", $this->getVariable())
-            ->set("VALUE", $configValue)
+            ->set('VARIABLE', $this->getVariable())
+            ->set('VALUE', $configValue)
         ;
 
         $loopResult->addRow($loopResultRow);
@@ -83,13 +82,13 @@ class ModuleConfig extends BaseLoop implements ArraySearchLoopInterface
     }
 
     /**
-     * this method returns an array
+     * this method returns an array.
      *
      * @return array
      */
     public function buildArray()
     {
         // Return an array containing one element, so that parseResults() will be called one time.
-        return [ 'dummy-element' ];
+        return ['dummy-element'];
     }
 }

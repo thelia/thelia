@@ -14,11 +14,9 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
-use Thelia\Form\Brand\BrandDocumentModification;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\BrandDocument as BaseBrandDocument;
 use Thelia\Model\Breadcrumb\BrandBreadcrumbTrait;
@@ -31,7 +29,7 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
     use BrandBreadcrumbTrait;
 
     /**
-     * Calculate next position relative to our parent
+     * Calculate next position relative to our parent.
      *
      * @param BrandDocumentQuery $query
      */
@@ -41,7 +39,7 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function preInsert(ConnectionInterface $con = null)
     {
@@ -58,7 +56,7 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
 
         $this->reorderBeforeDelete(
             [
-                "brand_id" => $this->getBrandId(),
+                'brand_id' => $this->getBrandId(),
             ]
         );
 
@@ -66,7 +64,7 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setParentId($parentId)
     {
@@ -76,7 +74,7 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getParentId()
     {
@@ -92,7 +90,7 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
     }
 
     /**
-     * Get the ID of the form used to change this object information
+     * Get the ID of the form used to change this object information.
      *
      * @return BaseForm the form
      */
@@ -108,25 +106,24 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
     {
         $uploadDir = ConfigQuery::read('documents_library_path');
         if ($uploadDir === null) {
-            $uploadDir = THELIA_LOCAL_DIR . 'media' . DS . 'documents';
+            $uploadDir = THELIA_LOCAL_DIR.'media'.DS.'documents';
         } else {
-            $uploadDir = THELIA_ROOT . $uploadDir;
+            $uploadDir = THELIA_ROOT.$uploadDir;
         }
 
-        return $uploadDir . DS . 'brand';
+        return $uploadDir.DS.'brand';
     }
 
     /**
-     *
      * @return string the URL to redirect to after update from the back-office
      */
     public function getRedirectionUrl()
     {
-        return '/admin/brand/update/' . $this->getBrandId();
+        return '/admin/brand/update/'.$this->getBrandId();
     }
 
     /**
-     * Get the Query instance for this object
+     * Get the Query instance for this object.
      *
      * @return ModelCriteria
      */

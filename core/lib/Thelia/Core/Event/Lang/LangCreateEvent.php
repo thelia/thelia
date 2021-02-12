@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Lang;
 
 /**
- * Class LangCreateEvent
- * @package Thelia\Core\Event\Lang
+ * Class LangCreateEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangCreateEvent extends LangEvent
@@ -34,7 +34,6 @@ class LangCreateEvent extends LangEvent
     protected $visible;
 
     /**
-     *
      * @return $this
      */
     public function setCode($code)
@@ -44,30 +43,24 @@ class LangCreateEvent extends LangEvent
         return $this;
     }
 
-    /**
-     */
     public function getCode()
     {
         return $this->code;
     }
 
-    /**
-     */
     public function getDateTimeFormat()
     {
         return $this->date_time_format;
     }
 
-    /**
-     */
     public function setDateTimeFormat($date_time_format)
     {
         $this->date_time_format = $date_time_format;
+
         return $this;
     }
 
     /**
-     *
      * @return $this
      */
     public function setDateFormat($date_format)
@@ -77,15 +70,12 @@ class LangCreateEvent extends LangEvent
         return $this;
     }
 
-    /**
-     */
     public function getDateFormat()
     {
         return $this->date_format;
     }
 
     /**
-     *
      * @return $this
      */
     public function setLocale($locale)
@@ -95,15 +85,12 @@ class LangCreateEvent extends LangEvent
         return $this;
     }
 
-    /**
-     */
     public function getLocale()
     {
         return $this->locale;
     }
 
     /**
-     *
      * @return $this
      */
     public function setTimeFormat($time_format)
@@ -113,15 +100,12 @@ class LangCreateEvent extends LangEvent
         return $this;
     }
 
-    /**
-     */
     public function getTimeFormat()
     {
         return $this->time_format;
     }
 
     /**
-     *
      * @return $this
      */
     public function setTitle($title)
@@ -131,15 +115,11 @@ class LangCreateEvent extends LangEvent
         return $this;
     }
 
-    /**
-     */
     public function getTitle()
     {
         return $this->title;
     }
 
-    /**
-     */
     public function setDecimalSeparator($decimal_separator)
     {
         $this->decimal_separator = $decimal_separator;
@@ -147,15 +127,11 @@ class LangCreateEvent extends LangEvent
         return $this;
     }
 
-    /**
-     */
     public function getDecimalSeparator()
     {
         return $this->decimal_separator;
     }
 
-    /**
-     */
     public function setDecimals($decimals)
     {
         $this->decimals = $decimals;
@@ -163,15 +139,11 @@ class LangCreateEvent extends LangEvent
         return $this;
     }
 
-    /**
-     */
     public function getDecimals()
     {
         return $this->decimals;
     }
 
-    /**
-     */
     public function setThousandsSeparator($thousands_separator)
     {
         $this->thousands_separator = $thousands_separator;
@@ -179,8 +151,6 @@ class LangCreateEvent extends LangEvent
         return $this;
     }
 
-    /**
-     */
     public function getThousandsSeparator()
     {
         return $this->thousands_separator;
@@ -188,6 +158,7 @@ class LangCreateEvent extends LangEvent
 
     /**
      * @param bool $active
+     *
      * @return $this
      */
     public function setActive($active)
@@ -207,6 +178,7 @@ class LangCreateEvent extends LangEvent
 
     /**
      * @param bool $visible
+     *
      * @return $this
      */
     public function setVisible($visible)
@@ -221,6 +193,6 @@ class LangCreateEvent extends LangEvent
      */
     public function getVisible()
     {
-        return$this->visible;
+        return $this->visible;
     }
 }

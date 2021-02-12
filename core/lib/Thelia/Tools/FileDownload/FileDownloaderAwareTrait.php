@@ -13,13 +13,13 @@
 namespace Thelia\Tools\FileDownload;
 
 /**
- * Trait FileDownloaderAwareTrait
- * @package Thelia\Tools\FileDownload
+ * Trait FileDownloaderAwareTrait.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 trait FileDownloaderAwareTrait
 {
-    /** @var  FileDownloaderInterface */
+    /** @var FileDownloaderInterface */
     protected $fileDownloader;
 
     /**

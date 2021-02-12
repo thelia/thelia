@@ -84,8 +84,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Create a new product entry
-     *
+     * Create a new product entry.
      */
     public function create(ProductCreateEvent $event)
     {
@@ -289,7 +288,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->findByProductId($event->getOriginalProduct()->getId());
 
         // Set clone product associated contents
-        /** @var  ProductAssociatedContent $originalProductAssocCont */
+        /** @var ProductAssociatedContent $originalProductAssocCont */
         foreach ($originalProductAssocConts as $originalProductAssocCont) {
             $clonedProductCreatePAC = new ProductAddContentEvent($event->getClonedProduct(), $originalProductAssocCont->getContentId());
             $this->eventDispatcher->dispatch($clonedProductCreatePAC, TheliaEvents::PRODUCT_ADD_CONTENT);
@@ -331,7 +330,7 @@ class Product extends BaseAction implements EventSubscriberInterface
      ***************/
 
     /**
-     * Change a product
+     * Change a product.
      *
      * @throws PropelException
      * @throws \Exception
@@ -388,7 +387,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Delete a product entry
+     * Delete a product entry.
      *
      * @throws \Exception
      */
@@ -434,8 +433,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Toggle product visibility. No form used here
-     *
+     * Toggle product visibility. No form used here.
      */
     public function toggleVisibility(ProductToggleVisibilityEvent $event)
     {
@@ -569,12 +567,12 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             $currentFeatures = FeatureTemplateQuery::create()
                 ->filterByTemplateId($currentTemplateId)
-                ->select([ FeatureTemplateTableMap::COL_FEATURE_ID ])
+                ->select([FeatureTemplateTableMap::COL_FEATURE_ID])
                 ->find($con);
 
             $nextFeatures = FeatureTemplateQuery::create()
                 ->filterByTemplateId($nextTemplateId)
-                ->select([ FeatureTemplateTableMap::COL_FEATURE_ID ])
+                ->select([FeatureTemplateTableMap::COL_FEATURE_ID])
                 ->find($con);
 
             // Find features values we shoud delete. To do this, we have to
@@ -593,12 +591,12 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             $currentAttributes = AttributeTemplateQuery::create()
                 ->filterByTemplateId($currentTemplateId)
-                ->select([ AttributeTemplateTableMap::COL_ATTRIBUTE_ID ])
+                ->select([AttributeTemplateTableMap::COL_ATTRIBUTE_ID])
                 ->find($con);
 
             $nextAttributes = AttributeTemplateQuery::create()
                 ->filterByTemplateId($nextTemplateId)
-                ->select([ AttributeTemplateTableMap::COL_ATTRIBUTE_ID ])
+                ->select([AttributeTemplateTableMap::COL_ATTRIBUTE_ID])
                 ->find($con);
 
             // Find attributes values we shoud delete. To do this, we have to
@@ -611,7 +609,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->useAttributeCombinationQuery()
                     ->filterByAttributeId($attributesToDelete, Criteria::IN)
                 ->endUse()
-                ->select([ ProductSaleElementsTableMap::COL_ID ])
+                ->select([ProductSaleElementsTableMap::COL_ID])
                 ->find();
 
             // Delete obsolete PSEs
@@ -652,7 +650,8 @@ class Product extends BaseAction implements EventSubscriberInterface
      * Changes accessry position, selecting absolute ou relative change.
      *
      * @param $eventName
-     * @return Object
+     *
+     * @return object
      */
     public function updateAccessoryPosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -663,7 +662,8 @@ class Product extends BaseAction implements EventSubscriberInterface
      * Changes position, selecting absolute ou relative change.
      *
      * @param $eventName
-     * @return Object
+     *
+     * @return object
      */
     public function updateContentPosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -672,7 +672,6 @@ class Product extends BaseAction implements EventSubscriberInterface
 
     /**
      * Update the value of a product feature.
-     *
      */
     public function updateFeatureProductValue(FeatureProductUpdateEvent $event)
     {
@@ -752,6 +751,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                     $deleteFeatureAvEvent = new FeatureAvDeleteEvent($freeTextFeatureAv->getId());
                     $this->eventDispatcher->dispatch($deleteFeatureAvEvent, TheliaEvents::FEATURE_AV_DELETE);
                 }
+
                 return;
             } // Else if a FeatureAvI18n is found and the new value is not empty : update existing FeatureAvI18n
             elseif ($freeTextFeatureAvI18n !== null && !empty($featureAvId)) {
@@ -773,8 +773,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Delete a product feature value
-     *
+     * Delete a product feature value.
      */
     public function deleteFeatureProductValue(FeatureProductDeleteEvent $event)
     {
@@ -840,7 +839,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->useAttributeCombinationQuery()
                 ->filterByAttributeId($event->getAttributeId())
             ->endUse()
-            ->select([ ProductSaleElementsTableMap::COL_ID ])
+            ->select([ProductSaleElementsTableMap::COL_ID])
             ->find();
 
         $currencyId = CurrencyModel::getDefaultCurrency()->getId();
@@ -857,7 +856,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Check if is a product view and if product_id is visible
+     * Check if is a product view and if product_id is visible.
      *
      * @param string $eventName
      */
@@ -889,40 +888,40 @@ class Product extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::PRODUCT_CREATE                    => ["create", 128],
-            TheliaEvents::PRODUCT_CLONE                     => ["cloneProduct", 128],
-            TheliaEvents::PRODUCT_UPDATE                    => ["update", 128],
-            TheliaEvents::PRODUCT_DELETE                    => ["delete", 128],
-            TheliaEvents::PRODUCT_TOGGLE_VISIBILITY         => ["toggleVisibility", 128],
+            TheliaEvents::PRODUCT_CREATE => ['create', 128],
+            TheliaEvents::PRODUCT_CLONE => ['cloneProduct', 128],
+            TheliaEvents::PRODUCT_UPDATE => ['update', 128],
+            TheliaEvents::PRODUCT_DELETE => ['delete', 128],
+            TheliaEvents::PRODUCT_TOGGLE_VISIBILITY => ['toggleVisibility', 128],
 
-            TheliaEvents::PRODUCT_UPDATE_POSITION           => ["updatePosition", 128],
-            TheliaEvents::PRODUCT_UPDATE_SEO                => ["updateSeo", 128],
+            TheliaEvents::PRODUCT_UPDATE_POSITION => ['updatePosition', 128],
+            TheliaEvents::PRODUCT_UPDATE_SEO => ['updateSeo', 128],
 
-            TheliaEvents::PRODUCT_ADD_CONTENT               => ["addContent", 128],
-            TheliaEvents::PRODUCT_REMOVE_CONTENT            => ["removeContent", 128],
-            TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION   => ["updateContentPosition", 128],
+            TheliaEvents::PRODUCT_ADD_CONTENT => ['addContent', 128],
+            TheliaEvents::PRODUCT_REMOVE_CONTENT => ['removeContent', 128],
+            TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION => ['updateContentPosition', 128],
 
-            TheliaEvents::PRODUCT_ADD_ACCESSORY             => ["addAccessory", 128],
-            TheliaEvents::PRODUCT_REMOVE_ACCESSORY          => ["removeAccessory", 128],
-            TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION => ["updateAccessoryPosition", 128],
+            TheliaEvents::PRODUCT_ADD_ACCESSORY => ['addAccessory', 128],
+            TheliaEvents::PRODUCT_REMOVE_ACCESSORY => ['removeAccessory', 128],
+            TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION => ['updateAccessoryPosition', 128],
 
-            TheliaEvents::PRODUCT_ADD_CATEGORY              => ["addCategory", 128],
-            TheliaEvents::PRODUCT_REMOVE_CATEGORY           => ["removeCategory", 128],
+            TheliaEvents::PRODUCT_ADD_CATEGORY => ['addCategory', 128],
+            TheliaEvents::PRODUCT_REMOVE_CATEGORY => ['removeCategory', 128],
 
-            TheliaEvents::PRODUCT_SET_TEMPLATE              => ["setProductTemplate", 128],
+            TheliaEvents::PRODUCT_SET_TEMPLATE => ['setProductTemplate', 128],
 
-            TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE      => ["updateFeatureProductValue", 128],
-            TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE      => ["deleteFeatureProductValue", 128],
+            TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE => ['updateFeatureProductValue', 128],
+            TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE => ['deleteFeatureProductValue', 128],
 
-            TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE         => ["deleteTemplateAttribute", 128],
-            TheliaEvents::TEMPLATE_DELETE_FEATURE           => ["deleteTemplateFeature", 128],
+            TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE => ['deleteTemplateAttribute', 128],
+            TheliaEvents::TEMPLATE_DELETE_FEATURE => ['deleteTemplateFeature', 128],
 
             // Those two have to be executed before
-            TheliaEvents::IMAGE_DELETE                      => ["deleteImagePSEAssociations", 192],
-            TheliaEvents::DOCUMENT_DELETE                   => ["deleteDocumentPSEAssociations", 192],
+            TheliaEvents::IMAGE_DELETE => ['deleteImagePSEAssociations', 192],
+            TheliaEvents::DOCUMENT_DELETE => ['deleteDocumentPSEAssociations', 192],
 
-            TheliaEvents::VIEW_CHECK                        => ['viewCheck', 128],
-            TheliaEvents::VIEW_PRODUCT_ID_NOT_VISIBLE       => ['viewProductIdNotVisible', 128],
+            TheliaEvents::VIEW_CHECK => ['viewCheck', 128],
+            TheliaEvents::VIEW_PRODUCT_ID_NOT_VISIBLE => ['viewProductIdNotVisible', 128],
         ];
     }
 }

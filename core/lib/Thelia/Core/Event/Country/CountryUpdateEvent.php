@@ -13,13 +13,13 @@
 namespace Thelia\Core\Event\Country;
 
 /**
- * Class CountryUpdateEvent
- * @package Thelia\Core\Event\Country
+ * Class CountryUpdateEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CountryUpdateEvent extends CountryCreateEvent
 {
-    /** @var  $country_id */
+    /** @var $country_id */
     protected $country_id;
 
     /** @var bool */
@@ -47,6 +47,7 @@ class CountryUpdateEvent extends CountryCreateEvent
 
     /**
      * @param string $chapo
+     *
      * @return $this
      */
     public function setChapo($chapo)
@@ -66,6 +67,7 @@ class CountryUpdateEvent extends CountryCreateEvent
 
     /**
      * @param string $description
+     *
      * @return $this
      */
     public function setDescription($description)
@@ -75,8 +77,6 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this;
     }
 
-    /**
-     */
     public function getDescription()
     {
         return $this->description;
@@ -84,6 +84,7 @@ class CountryUpdateEvent extends CountryCreateEvent
 
     /**
      * @param string $postscriptum
+     *
      * @return $this
      */
     public function setPostscriptum($postscriptum)
@@ -93,8 +94,6 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this;
     }
 
-    /**
-     */
     public function getPostscriptum()
     {
         return $this->postscriptum;
@@ -102,6 +101,7 @@ class CountryUpdateEvent extends CountryCreateEvent
 
     /**
      * @param int $country_id
+     *
      * @return $this
      */
     public function setCountryId($country_id)
@@ -128,12 +128,14 @@ class CountryUpdateEvent extends CountryCreateEvent
     }
 
     /**
-     * @param boolean $needZipCode
+     * @param bool $needZipCode
+     *
      * @return $this
      */
     public function setNeedZipCode($needZipCode)
     {
         $this->needZipCode = $needZipCode;
+
         return $this;
     }
 
@@ -147,11 +149,13 @@ class CountryUpdateEvent extends CountryCreateEvent
 
     /**
      * @param string $zipCodeFormat
+     *
      * @return $this
      */
     public function setZipCodeFormat($zipCodeFormat)
     {
         $this->zipCodeFormat = $zipCodeFormat;
+
         return $this;
     }
 }

@@ -19,8 +19,8 @@ use Thelia\Core\Form\Type\Field\ProductIdType;
 use Thelia\Core\Form\Type\Field\ProductSaleElementsIdType;
 
 /**
- * Class ProductSaleElementsType
- * @package Thelia\Core\Form\Type
+ * Class ProductSaleElementsType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class ProductSaleElementsType extends AbstractTheliaType
@@ -48,77 +48,75 @@ class ProductSaleElementsType extends AbstractTheliaType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            "cascade_validation" => true,
+            'cascade_validation' => true,
         ]);
     }
 
-    /**
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add("reference", "text", [
-                "required" => false,
+            ->add('reference', 'text', [
+                'required' => false,
             ])
-            ->add("price", "number", [
-                "required" => false,
-                "constraints" => [
-                    new GreaterThanOrEqual(["value" => 0]),
+            ->add('price', 'number', [
+                'required' => false,
+                'constraints' => [
+                    new GreaterThanOrEqual(['value' => 0]),
                 ],
             ])
-            ->add("price_with_tax", "number", [
-                "required" => false,
-                "constraints" => [
-                    new GreaterThanOrEqual(["value" => 0]),
+            ->add('price_with_tax', 'number', [
+                'required' => false,
+                'constraints' => [
+                    new GreaterThanOrEqual(['value' => 0]),
                 ],
             ])
-            ->add("weight", "number", [
-                "required" => false,
-                "constraints" => [
-                    new GreaterThanOrEqual(["value" => 0]),
+            ->add('weight', 'number', [
+                'required' => false,
+                'constraints' => [
+                    new GreaterThanOrEqual(['value' => 0]),
                 ],
             ])
-            ->add("quantity", "number", [
-                "required" => false,
-                "constraints" => [
-                    new GreaterThanOrEqual(["value" => 0]),
+            ->add('quantity', 'number', [
+                'required' => false,
+                'constraints' => [
+                    new GreaterThanOrEqual(['value' => 0]),
                 ],
             ])
-            ->add("sale_price", "number", [
-                "required" => false,
-                "constraints" => [
-                    new GreaterThanOrEqual(["value" => 0]),
+            ->add('sale_price', 'number', [
+                'required' => false,
+                'constraints' => [
+                    new GreaterThanOrEqual(['value' => 0]),
                 ],
             ])
-            ->add("sale_price_with_tax", "number", [
-                "required" => false,
-                "constraints" => [
-                    new GreaterThanOrEqual(["value" => 0]),
+            ->add('sale_price_with_tax', 'number', [
+                'required' => false,
+                'constraints' => [
+                    new GreaterThanOrEqual(['value' => 0]),
                 ],
             ])
-            ->add("ean_code", "text", [
-                "required" => false,
+            ->add('ean_code', 'text', [
+                'required' => false,
             ])
-            ->add("attribute_av", "collection", [
-                "type" => "attribute_av",
-                "required" => false,
-                "allow_add" => true,
+            ->add('attribute_av', 'collection', [
+                'type' => 'attribute_av',
+                'required' => false,
+                'allow_add' => true,
             ])
-            ->add("tax_rule_id", "tax_rule_id")
-            ->add("currency_id", "currency_id")
-            ->add("onsale", "checkbox")
-            ->add("isnew", "checkbox")
-            ->add("isdefault", "checkbox")
-            ->add("use_exchange_rate", "checkbox")
+            ->add('tax_rule_id', 'tax_rule_id')
+            ->add('currency_id', 'currency_id')
+            ->add('onsale', 'checkbox')
+            ->add('isnew', 'checkbox')
+            ->add('isdefault', 'checkbox')
+            ->add('use_exchange_rate', 'checkbox')
 
             // Only on create
-            ->add("product_id", "product_id", [
-                "constraints" => $this->getConstraints($this->productIdType, "create"),
+            ->add('product_id', 'product_id', [
+                'constraints' => $this->getConstraints($this->productIdType, 'create'),
             ])
 
             // Only on update
-            ->add("id", "product_sale_elements_id", [
-                "constraints" => $this->getConstraints($this->pseIdType, "update"),
+            ->add('id', 'product_sale_elements_id', [
+                'constraints' => $this->getConstraints($this->pseIdType, 'update'),
             ])
         ;
     }
@@ -130,6 +128,6 @@ class ProductSaleElementsType extends AbstractTheliaType
      */
     public function getName()
     {
-        return "product_sale_elements";
+        return 'product_sale_elements';
     }
 }

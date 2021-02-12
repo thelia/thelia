@@ -15,16 +15,14 @@ namespace Thelia\Condition\Implementation;
 use Thelia\Exception\UnmatchableConditionException;
 
 /**
- * Check a Checkout against its Product number
+ * Check a Checkout against its Product number.
  *
- * @package Condition
  * @author  Franck Allimant <franck@cqfdev.fr>
- *
  */
 class MatchDeliveryCountries extends AbstractMatchCountries
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getServiceId()
     {
@@ -32,7 +30,7 @@ class MatchDeliveryCountries extends AbstractMatchCountries
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isMatching()
     {
@@ -52,7 +50,7 @@ class MatchDeliveryCountries extends AbstractMatchCountries
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -63,7 +61,7 @@ class MatchDeliveryCountries extends AbstractMatchCountries
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getToolTip()
     {
@@ -81,7 +79,7 @@ class MatchDeliveryCountries extends AbstractMatchCountries
             'Only if order shipping country is %op% <strong>%countries_list%</strong>',
             [
                 '%countries_list%' => $cntryStrList,
-                '%op%' => $i18nOperator
+                '%op%' => $i18nOperator,
             ]
         );
     }

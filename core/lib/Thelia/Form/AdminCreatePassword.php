@@ -23,29 +23,29 @@ class AdminCreatePassword extends BruteforceForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("password", PasswordType::class, [
-                "constraints" => [],
-                "label" => $this->translator->trans("Password"),
-                "label_attr" => [
-                    "for" => "password",
+            ->add('password', PasswordType::class, [
+                'constraints' => [],
+                'label' => $this->translator->trans('Password'),
+                'label_attr' => [
+                    'for' => 'password',
                 ],
-                "attr" => [
-                    'placeholder' => Translator::getInstance()->trans('Enter the new password')
-                ]
+                'attr' => [
+                    'placeholder' => Translator::getInstance()->trans('Enter the new password'),
+                ],
             ])
-            ->add("password_confirm", PasswordType::class, [
-                "constraints" => [
+            ->add('password_confirm', PasswordType::class, [
+                'constraints' => [
                     new Callback(
-                        [$this, "verifyPasswordField"]
+                        [$this, 'verifyPasswordField']
                     ),
                 ],
-                "label" => $this->translator->trans('Password confirmation'),
-                "label_attr" => [
-                    "for" => "password_confirmation",
+                'label' => $this->translator->trans('Password confirmation'),
+                'label_attr' => [
+                    'for' => 'password_confirmation',
                 ],
-                "attr" => [
-                    'placeholder' => Translator::getInstance()->trans('Enter the new password again')
-                ]
+                'attr' => [
+                    'placeholder' => Translator::getInstance()->trans('Enter the new password again'),
+                ],
             ])
         ;
     }
@@ -54,17 +54,17 @@ class AdminCreatePassword extends BruteforceForm
     {
         $data = $context->getRoot()->getData();
 
-        if ($data["password"] === '' && $data["password_confirm"] === '') {
+        if ($data['password'] === '' && $data['password_confirm'] === '') {
             $context->addViolation("password can't be empty");
         }
 
-        if ($data["password"] != $data["password_confirm"]) {
-            $context->addViolation("password confirmation is not the same as password field");
+        if ($data['password'] != $data['password_confirm']) {
+            $context->addViolation('password confirmation is not the same as password field');
         }
 
         $minLength = ConfigQuery::getMinimuAdminPasswordLength();
 
-        if (\strlen($data["password"]) < $minLength) {
+        if (\strlen($data['password']) < $minLength) {
             $context->addViolation("password must be composed of at least $minLength characters");
         }
     }

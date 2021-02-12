@@ -21,7 +21,6 @@ use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
-use Thelia\Coupon\Type\FreeProduct;
 use Thelia\Model\CartItem;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
@@ -29,12 +28,11 @@ use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 
 /**
- * @package Coupon
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class FreeProductTest extends TestCase
 {
-    /** @var  Product $freeProduct */
+    /** @var Product $freeProduct */
     public $freeProduct;
     public $originalPrice;
     public $originalPromo;
@@ -49,8 +47,8 @@ class FreeProductTest extends TestCase
 
         // Find a product
         $this->freeProduct = ProductQuery::create()
-            ->joinProductSaleElements("pse_join")
-            ->addJoinCondition("pse_join", "is_default = ?", 1, null, \PDO::PARAM_INT)
+            ->joinProductSaleElements('pse_join')
+            ->addJoinCondition('pse_join', 'is_default = ?', 1, null, \PDO::PARAM_INT)
             ->findOne()
         ;
 
@@ -65,7 +63,7 @@ class FreeProductTest extends TestCase
     }
 
     /**
-     * Generate adapter stub
+     * Generate adapter stub.
      *
      * @param int    $cartTotalPrice   Cart total price
      * @param string $checkoutCurrency Checkout currency
@@ -286,7 +284,7 @@ class FreeProductTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false
@@ -295,22 +293,22 @@ class FreeProductTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+            MatchForTotalAmount::CART_CURRENCY => 'EUR',
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+            MatchForTotalAmount::CART_CURRENCY => 'EUR',
         ];
         $condition2->setValidatorsFromForm($operators, $values);
 
@@ -355,7 +353,7 @@ class FreeProductTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false
@@ -390,7 +388,7 @@ class FreeProductTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false
@@ -423,7 +421,7 @@ class FreeProductTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false

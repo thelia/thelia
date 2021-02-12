@@ -26,7 +26,7 @@ class ProductSaleElementEvent extends ActionEvent
 
     public function hasProductSaleElement()
     {
-        return ! \is_null($this->product_sale_element);
+        return !\is_null($this->product_sale_element);
     }
 
     public function getProductSaleElement()

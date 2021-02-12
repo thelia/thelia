@@ -16,8 +16,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
-use Thelia\Core\Event\Product\ProductEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Product as BaseProduct;
 use Thelia\Model\Map\ProductTableMap;
@@ -78,6 +76,7 @@ class Product extends BaseProduct implements FileModelParentInterface
      * Return PSE count fir this product.
      *
      * @param ConnectionInterface $con an optional connection object
+     *
      * @return int
      */
     public function countSaleElements($con = null)
@@ -100,9 +99,10 @@ class Product extends BaseProduct implements FileModelParentInterface
     }
 
     /**
-     * Set default category for this product
+     * Set default category for this product.
      *
      * @param int $defaultCategoryId the new default category id
+     *
      * @return $this
      */
     public function setDefaultCategory($defaultCategoryId)
@@ -148,7 +148,9 @@ class Product extends BaseProduct implements FileModelParentInterface
 
     /**
      * @deprecated since 2.3, and will be removed in 2.4, please use Product::setDefaultCategory
+     *
      * @param int $defaultCategoryId
+     *
      * @return $this
      */
     public function updateDefaultCategory($defaultCategoryId)
@@ -157,14 +159,15 @@ class Product extends BaseProduct implements FileModelParentInterface
     }
 
     /**
-     * Create a new product, along with the default category ID
+     * Create a new product, along with the default category ID.
      *
-     * @param  int        $defaultCategoryId the default category ID of this product
-     * @param  float      $basePrice         the product base price
-     * @param  int        $priceCurrencyId   the price currency Id
-     * @param  int        $taxRuleId         the product tax rule ID
-     * @param  float      $baseWeight        base weight in Kg
-     * @param  int        $baseQuantity     the product quantity (default: 0)
+     * @param int   $defaultCategoryId the default category ID of this product
+     * @param float $basePrice         the product base price
+     * @param int   $priceCurrencyId   the price currency Id
+     * @param int   $taxRuleId         the product tax rule ID
+     * @param float $baseWeight        base weight in Kg
+     * @param int   $baseQuantity      the product quantity (default: 0)
+     *
      * @throws \Exception
      */
     public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight, $baseQuantity = 0)
@@ -197,17 +200,19 @@ class Product extends BaseProduct implements FileModelParentInterface
     /**
      * Create a basic product sale element attached to this product.
      *
-     * @param float $weight
-     * @param float $basePrice
-     * @param float $salePrice
-     * @param int $currencyId
-     * @param int $isDefault
-     * @param bool $isPromo
-     * @param bool $isNew
-     * @param int $quantity
+     * @param float  $weight
+     * @param float  $basePrice
+     * @param float  $salePrice
+     * @param int    $currencyId
+     * @param int    $isDefault
+     * @param bool   $isPromo
+     * @param bool   $isNew
+     * @param int    $quantity
      * @param string $eanCode
-     * @param bool $ref
+     * @param bool   $ref
+     *
      * @return ProductSaleElements
+     *
      * @throws PropelException
      * @throws \Exception
      */
@@ -244,9 +249,10 @@ class Product extends BaseProduct implements FileModelParentInterface
     }
 
     /**
-     * Calculate next position relative to our default category
+     * Calculate next position relative to our default category.
      *
      * @param ProductQuery $query
+     *
      * @deprecated since 2.3, and will be removed in 2.4
      */
     protected function addCriteriaToPositionQuery($query)
@@ -301,7 +307,8 @@ class Product extends BaseProduct implements FileModelParentInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ProductCategory::setPosition
      */
     public function setPosition($v)
@@ -310,7 +317,8 @@ class Product extends BaseProduct implements FileModelParentInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ProductCategory::getPosition
      */
     public function getPosition()
@@ -337,9 +345,10 @@ class Product extends BaseProduct implements FileModelParentInterface
     }
 
     /**
-     * Overload for the position management
+     * Overload for the position management.
+     *
      * @param ProductCategory $productCategory
-     * @inheritdoc
+     *                                         {@inheritdoc}
      */
     protected function doAddProductCategory($productCategory)
     {

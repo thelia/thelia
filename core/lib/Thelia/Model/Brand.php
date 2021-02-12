@@ -13,8 +13,6 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\Brand\BrandEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Brand as BaseBrand;
 use Thelia\Model\Tools\PositionManagementTrait;

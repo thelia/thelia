@@ -16,9 +16,10 @@ use Symfony\Component\Form\Form;
 use Thelia\Core\Event\ActionEvent;
 
 /**
- * Class ContactController
- * @package Thelia\Controller\Front
+ * Class ContactController.
+ *
  * @author Vincent Lopes-Vicente <vlopesvicente@gmail.com>
+ *
  * @since 2.4
  */
 class ContactEvent extends ActionEvent
@@ -58,11 +59,13 @@ class ContactEvent extends ActionEvent
 
     /**
      * @param string $subject
+     *
      * @return ContactEvent
      */
     public function setSubject($subject)
     {
         $this->subject = $subject;
+
         return $this;
     }
 
@@ -76,11 +79,13 @@ class ContactEvent extends ActionEvent
 
     /**
      * @param string $message
+     *
      * @return ContactEvent
      */
     public function setMessage($message)
     {
         $this->message = $message;
+
         return $this;
     }
 
@@ -94,11 +99,13 @@ class ContactEvent extends ActionEvent
 
     /**
      * @param string $email
+     *
      * @return ContactEvent
      */
     public function setEmail($email)
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -112,11 +119,13 @@ class ContactEvent extends ActionEvent
 
     /**
      * @param string $name
+     *
      * @return ContactEvent
      */
     public function setName($name)
     {
         $this->name = $name;
+
         return $this;
     }
 }

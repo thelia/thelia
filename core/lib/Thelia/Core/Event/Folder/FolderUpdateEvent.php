@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Folder;
 
 /**
- * Class FolderUpdateEvent
- * @package Thelia\Core\Event
+ * Class FolderUpdateEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FolderUpdateEvent extends FolderCreateEvent
@@ -44,8 +44,6 @@ class FolderUpdateEvent extends FolderCreateEvent
         return $this;
     }
 
-    /**
-     */
     public function getChapo()
     {
         return $this->chapo;
@@ -61,8 +59,6 @@ class FolderUpdateEvent extends FolderCreateEvent
         return $this;
     }
 
-    /**
-     */
     public function getDescription()
     {
         return $this->description;
@@ -78,8 +74,6 @@ class FolderUpdateEvent extends FolderCreateEvent
         return $this;
     }
 
-    /**
-     */
     public function getFolderId()
     {
         return $this->folder_id;
@@ -95,8 +89,6 @@ class FolderUpdateEvent extends FolderCreateEvent
         return $this;
     }
 
-    /**
-     */
     public function getPostscriptum()
     {
         return $this->postscriptum;

@@ -1,11 +1,11 @@
 <?php
 
-include("php_version_check.php");
+include 'php_version_check.php';
 
 $context = 'update';
 $step = 1;
 
-include("header.php");
+include 'header.php';
 
 // todo: check security
 
@@ -51,7 +51,7 @@ include("header.php");
                 'Would you like to update your installation of Thelia from version <strong>%current</strong> to version <strong>%latest</strong>.',
                 [
                     '%current' => $update->getCurrentVersion(),
-                    '%latest'  => $update->getLatestVersion()
+                    '%latest' => $update->getLatestVersion(),
                 ]
             );
             ?></p>
@@ -90,5 +90,4 @@ include("header.php");
 <?php
 }
 
-include("footer.php");
-
+include 'footer.php';

@@ -49,10 +49,9 @@ use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 /**
- * Implementation of data access to main Thelia objects (users, cart, etc.)
+ * Implementation of data access to main Thelia objects (users, cart, etc.).
  *
  * @author Franck Allimant <franck@cqfdev.fr>
- *
  */
 class DataAccessFunctions extends AbstractSmartyPlugin
 {
@@ -71,7 +70,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     /** @var TaxEngine */
     protected $taxEngine;
 
-    /** @var  CouponManager */
+    /** @var CouponManager */
     protected $couponManager;
 
     private static $dataAccessCache = [];
@@ -95,32 +94,35 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     /**
      * Provides access to the current logged administrator attributes using the accessors.
      *
-     * @param  array   $params
-     * @param  \Smarty $smarty
-     * @return string  the value of the requested attribute
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
+     * @return string the value of the requested attribute
      */
     public function adminDataAccess($params, &$smarty)
     {
-        return $this->dataAccess("Admin User", $params, $this->securityContext->getAdminUser());
+        return $this->dataAccess('Admin User', $params, $this->securityContext->getAdminUser());
     }
 
     /**
-     * Provides access to the current logged customer attributes thought the accessor
+     * Provides access to the current logged customer attributes thought the accessor.
      *
-     * @param  array $params
-     * @param  \Smarty $smarty
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
      * @return string the value of the requested attribute
      */
     public function customerDataAccess($params, &$smarty)
     {
-        return $this->dataAccess("Customer User", $params, $this->securityContext->getCustomerUser());
+        return $this->dataAccess('Customer User', $params, $this->securityContext->getCustomerUser());
     }
 
     /**
-     * Provides access to an attribute of the current product
+     * Provides access to an attribute of the current product.
      *
-     * @param  array $params
-     * @param  \Smarty $smarty
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
      * @return string the value of the requested attribute
      */
     public function productDataAccess($params, &$smarty)
@@ -129,7 +131,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
         if ($productId !== null) {
             return $this->dataAccessWithI18n(
-                "Product",
+                'Product',
                 $params,
                 ProductQuery::create()->filterByPrimaryKey($productId)
             );
@@ -139,10 +141,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * Provides access to an attribute of the current category
+     * Provides access to an attribute of the current category.
      *
-     * @param  array $params
-     * @param  \Smarty $smarty
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
      * @return string the value of the requested attribute
      */
     public function categoryDataAccess($params, &$smarty)
@@ -161,7 +164,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
         if ($categoryId !== null) {
             return $this->dataAccessWithI18n(
-                "Category",
+                'Category',
                 $params,
                 CategoryQuery::create()->filterByPrimaryKey($categoryId)
             );
@@ -171,10 +174,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * Provides access to an attribute of the current content
+     * Provides access to an attribute of the current content.
      *
-     * @param  array $params
-     * @param  \Smarty $smarty
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
      * @return string the value of the requested attribute
      */
     public function contentDataAccess($params, &$smarty)
@@ -183,7 +187,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
         if ($contentId !== null) {
             return $this->dataAccessWithI18n(
-                "Content",
+                'Content',
                 $params,
                 ContentQuery::create()->filterByPrimaryKey($contentId)
             );
@@ -193,10 +197,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * Provides access to an attribute of the current folder
+     * Provides access to an attribute of the current folder.
      *
-     * @param  array $params
-     * @param  \Smarty $smarty
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
      * @return string the value of the requested attribute
      */
     public function folderDataAccess($params, &$smarty)
@@ -215,7 +220,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
         if ($folderId !== null) {
             return $this->dataAccessWithI18n(
-                "Folder",
+                'Folder',
                 $params,
                 FolderQuery::create()->filterByPrimaryKey($folderId)
             );
@@ -225,10 +230,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * Provides access to an attribute of the current brand
+     * Provides access to an attribute of the current brand.
      *
-     * @param  array $params
-     * @param  \Smarty $smarty
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
      * @return string the value of the requested attribute
      */
     public function brandDataAccess($params, &$smarty)
@@ -247,7 +253,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
         if ($brandId !== null) {
             return $this->dataAccessWithI18n(
-                "Brand",
+                'Brand',
                 $params,
                 BrandQuery::create()->filterByPrimaryKey($brandId)
             );
@@ -257,10 +263,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * Provides access to an attribute of the current currency
+     * Provides access to an attribute of the current currency.
      *
-     * @param  array $params
-     * @param  \Smarty $smarty
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
      * @return string the value of the requested attribute
      */
     public function currencyDataAccess($params, $smarty)
@@ -269,10 +276,10 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
         if ($currency) {
             return $this->dataAccessWithI18n(
-                "Currency",
+                'Currency',
                 $params,
                 CurrencyQuery::create()->filterByPrimaryKey($currency->getId()),
-                ["NAME"]
+                ['NAME']
             );
         }
 
@@ -280,18 +287,19 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * Provides access to an attribute of the default country
+     * Provides access to an attribute of the default country.
      *
-     * @param  array $params
-     * @param  \Smarty $smarty
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
      * @return string the value of the requested attribute
      */
     public function countryDataAccess($params, $smarty)
     {
-        switch ($params["ask"]) {
-            case "default":
+        switch ($params['ask']) {
+            case 'default':
                 return $this->dataAccessWithI18n(
-                    "defaultCountry",
+                    'defaultCountry',
                     $params,
                     CountryQuery::create()->filterByByDefault(1)->limit(1)
                 );
@@ -301,16 +309,18 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * Provides access to an attribute of the cart
+     * Provides access to an attribute of the cart.
      *
-     * @param  array $params
-     * @param  \Smarty $smarty
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
      * @return string the value of the requested attribute
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function cartDataAccess($params, $smarty)
     {
-        /** @var Country $taxCountry */
+        /* @var Country $taxCountry */
         if (\array_key_exists('currentCountry', self::$dataAccessCache)) {
             $taxCountry = self::$dataAccessCache['currentCountry'];
         } else {
@@ -318,7 +328,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             self::$dataAccessCache['currentCountry'] = $taxCountry;
         }
 
-        /** @var State $taxState */
+        /* @var State $taxState */
         if (\array_key_exists('currentState', self::$dataAccessCache)) {
             $taxState = self::$dataAccessCache['currentState'];
         } else {
@@ -329,39 +339,39 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         /** @var Cart $cart */
         $cart = $this->getSession()->getSessionCart($this->dispatcher);
 
-        $result = "";
-        switch ($params["attr"]) {
-            case "count_product":
-            case "product_count":
+        $result = '';
+        switch ($params['attr']) {
+            case 'count_product':
+            case 'product_count':
                 $result = $cart->getCartItems()->count();
                 break;
-            case "count_item":
-            case "item_count":
+            case 'count_item':
+            case 'item_count':
                 $count_allitem = 0;
                 foreach ($cart->getCartItems() as $cartItem) {
                     $count_allitem += $cartItem->getQuantity();
                 }
                 $result = $count_allitem;
                 break;
-            case "total_price":
-            case "total_price_with_discount":
+            case 'total_price':
+            case 'total_price_with_discount':
                 $result = $cart->getTotalAmount(true, $taxCountry, $taxState);
                 break;
-            case "total_price_without_discount":
+            case 'total_price_without_discount':
                 $result = $cart->getTotalAmount(false, $taxCountry, $taxState);
                 break;
-            case "total_taxed_price":
-            case "total_taxed_price_with_discount":
+            case 'total_taxed_price':
+            case 'total_taxed_price_with_discount':
                 $result = $cart->getTaxedAmount($taxCountry, true, $taxState);
                 break;
-            case "total_taxed_price_without_discount":
+            case 'total_taxed_price_without_discount':
                 $result = $cart->getTaxedAmount($taxCountry, false, $taxState);
                 break;
-            case "is_virtual":
-            case "contains_virtual_product":
+            case 'is_virtual':
+            case 'contains_virtual_product':
                 $result = $cart->isVirtual();
                 break;
-            case "total_vat":
+            case 'total_vat':
             case 'total_tax_amount':
                 $result = $cart->getTotalVAT($taxCountry, $taxState);
                 break;
@@ -371,7 +381,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             case 'discount_tax_amount':
                 $result = $cart->getDiscountVAT($taxCountry, $taxState);
                 break;
-            case "weight":
+            case 'weight':
                 $result = $cart->getWeight();
                 break;
         }
@@ -396,6 +406,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 foreach ($this->couponManager->getCouponsKept() as $coupon) {
                     $orderCoupons[] = $coupon->getCode();
                 }
+
                 return $orderCoupons;
             case 'is_delivery_free':
                 return $this->couponManager->isCouponRemovingPostage($order);
@@ -405,10 +416,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * Provides access to an attribute of the current order
+     * Provides access to an attribute of the current order.
      *
-     * @param  array $params
-     * @param  \Smarty $smarty
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
      * @return string the value of the requested attribute
      */
     public function orderDataAccess($params, &$smarty)
@@ -441,16 +453,16 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * Provides access to an attribute of the current language
+     * Provides access to an attribute of the current language.
      *
-     * @param  array $params
-     * @param  \Smarty $smarty
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
      * @return string the value of the requested attribute
      */
-
     public function langDataAccess($params, $smarty)
     {
-        return $this->dataAccess("Lang", $params, $this->getSession()->getLang());
+        return $this->dataAccess('Lang', $params, $this->getSession()->getLang());
     }
 
     public function configDataAccess($params, $smarty)
@@ -467,13 +479,13 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * Provides access to a module configuration value
+     * Provides access to a module configuration value.
      *
-     * @param  array $params
-     * @param  \Smarty $smarty
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
      * @return string the value of the configuration value
      */
-
     public function moduleConfigDataAccess($params, $smarty)
     {
         $key = $this->getParam($params, 'key', false);
@@ -499,45 +511,47 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                     $locale
                 );
         }
-            Tlog::getInstance()->addWarning(
+        Tlog::getInstance()->addWarning(
                 sprintf(
                     "Module code '%s' not found in module-config Smarty function",
                     $moduleCode
                 )
             );
 
-            $value = $default;
+        $value = $default;
 
         return $value;
     }
 
     /**
-     * Provides access to sales statistics
+     * Provides access to sales statistics.
      *
-     * @param  array $params
-     * @param  \Smarty $smarty
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
      * @return string the value of the requested attribute
+     *
      * @throws \Exception
      */
     public function statsAccess($params, $smarty)
     {
-        if (false === \array_key_exists("key", $params)) {
-            throw new \InvalidArgumentException(sprintf("missing key attribute in stats access function"));
+        if (false === \array_key_exists('key', $params)) {
+            throw new \InvalidArgumentException(sprintf('missing key attribute in stats access function'));
         }
-        if (false === \array_key_exists("startDate", $params) || $params['startDate'] === '') {
-            throw new \InvalidArgumentException(sprintf("missing startDate attribute in stats access function"));
+        if (false === \array_key_exists('startDate', $params) || $params['startDate'] === '') {
+            throw new \InvalidArgumentException(sprintf('missing startDate attribute in stats access function'));
         }
-        if (false === \array_key_exists("endDate", $params) || $params['endDate'] === '') {
-            throw new \InvalidArgumentException(sprintf("missing endDate attribute in stats access function"));
+        if (false === \array_key_exists('endDate', $params) || $params['endDate'] === '') {
+            throw new \InvalidArgumentException(sprintf('missing endDate attribute in stats access function'));
         }
 
-        if (false !== \array_key_exists("includeShipping", $params) && $params['includeShipping'] == 'false') {
+        if (false !== \array_key_exists('includeShipping', $params) && $params['includeShipping'] == 'false') {
             $includeShipping = false;
         } else {
             $includeShipping = true;
         }
 
-        if (false !== \array_key_exists("withTaxes", $params) && $params['withTaxes'] == 'false') {
+        if (false !== \array_key_exists('withTaxes', $params) && $params['withTaxes'] == 'false') {
             $withTaxes = false;
         } else {
             $withTaxes = true;
@@ -624,14 +638,14 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * Retrieve meta data associated to an element
+     * Retrieve meta data associated to an element.
      *
      * params should contain at least key an id attributes. Thus it will return
      * an array of associated data.
      *
      * If meta argument is specified then it will return an unique value.
      *
-     * @param array $params
+     * @param array   $params
      * @param \Smarty $smarty
      *
      * @throws \InvalidArgumentException
@@ -659,7 +673,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 $out = MetaDataQuery::getVal($meta, $key, (int) $id);
             }
         } else {
-            throw new \InvalidArgumentException("key and id arguments are required in meta access function");
+            throw new \InvalidArgumentException('key and id arguments are required in meta access function');
         }
 
         self::$dataAccessCache[$cacheKey] = $out;
@@ -669,19 +683,19 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
             return $out !== null ? true : false;
         }
-            if (\is_array($out)) {
-                throw new \InvalidArgumentException('The argument "out" is required if the meta value is an array');
-            }
+        if (\is_array($out)) {
+            throw new \InvalidArgumentException('The argument "out" is required if the meta value is an array');
+        }
 
-            return $out;
+        return $out;
     }
 
     /**
-     * @param               $objectLabel
-     * @param               $params
-     * @param array         $columns
-     * @param null          $foreignTable
-     * @param string        $foreignKey
+     * @param        $objectLabel
+     * @param        $params
+     * @param array  $columns
+     * @param null   $foreignTable
+     * @param string $foreignKey
      *
      * @return string
      */
@@ -693,8 +707,8 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $foreignTable = null,
         $foreignKey = 'ID'
     ) {
-        if (\array_key_exists('data_' . $objectLabel, self::$dataAccessCache)) {
-            $data = self::$dataAccessCache['data_' . $objectLabel];
+        if (\array_key_exists('data_'.$objectLabel, self::$dataAccessCache)) {
+            $data = self::$dataAccessCache['data_'.$objectLabel];
         } else {
             $lang = $this->getNormalizedParam($params, ['lang']);
             if ($lang === null) {
@@ -714,19 +728,19 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
             $data = $search->findOne();
 
-            self::$dataAccessCache['data_' . $objectLabel] = $data;
+            self::$dataAccessCache['data_'.$objectLabel] = $data;
         }
 
         if ($data !== null) {
             $noGetterData = [];
 
             foreach ($columns as $column) {
-                $noGetterData[$column] = $data->getVirtualColumn('i18n_' . $column);
+                $noGetterData[$column] = $data->getVirtualColumn('i18n_'.$column);
             }
 
             return $this->dataAccess($objectLabel, $params, $data, $noGetterData);
         }
-            throw new NotFoundHttpException();
+        throw new NotFoundHttpException();
     }
 
     /**
@@ -736,6 +750,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      * @param array $noGetterData
      *
      * @return string
+     *
      * @throws \InvalidArgumentException
      */
     protected function dataAccess($objectLabel, $params, $data, $noGetterData = [])
@@ -749,16 +764,16 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                     return $noGetterData[$keyAttribute];
                 }
 
-                $getter = sprintf("get%s", $this->underscoreToCamelcase($attribute));
+                $getter = sprintf('get%s', $this->underscoreToCamelcase($attribute));
                 if (method_exists($data, $getter)) {
                     $return = $data->$getter();
 
                     if ($return instanceof \DateTime) {
-                        if (\array_key_exists("format", $params)) {
-                            $format = $params["format"];
+                        if (\array_key_exists('format', $params)) {
+                            $format = $params['format'];
                         } else {
                             $format = DateTimeFormat::getInstance($this->getRequest())->getFormat(
-                                \array_key_exists("output", $params) ? $params["output"] : null
+                                \array_key_exists('output', $params) ? $params['output'] : null
                             );
                         }
 
@@ -776,11 +791,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * Transcode an underscored string into a camel-cased string, eg. default_folder into DefaultFolder
+     * Transcode an underscored string into a camel-cased string, eg. default_folder into DefaultFolder.
      *
      * @param string $str the string to convert from underscore to camel-case
      *
-     * @return string the camel cased string.
+     * @return string the camel cased string
      */
     private function underscoreToCamelcase($str)
     {
@@ -797,11 +812,12 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * Provides access to the uploaded store-related images (such as logo or favicon)
+     * Provides access to the uploaded store-related images (such as logo or favicon).
      *
-     * @param array $params
+     * @param array  $params
      * @param string $content
-     * @param boolean $repeat
+     * @param bool   $repeat
+     *
      * @return string|null
      */
     public function storeMediaDataAccess($params, $content, \Smarty_Internal_Template $template, &$repeat)
@@ -828,12 +844,12 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             $uploadDir = ConfigQuery::read('images_library_path');
 
             if ($uploadDir === null) {
-                $uploadDir = THELIA_LOCAL_DIR . 'media' . DS . 'images';
+                $uploadDir = THELIA_LOCAL_DIR.'media'.DS.'images';
             } else {
-                $uploadDir = THELIA_ROOT . $uploadDir;
+                $uploadDir = THELIA_ROOT.$uploadDir;
             }
 
-            $uploadDir .= DS . 'store';
+            $uploadDir .= DS.'store';
 
             $imageFileName = ConfigQuery::read($configKey);
 
@@ -841,13 +857,13 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
             // If we couldn't find the image path in the config table or if it doesn't exist, we take the default image provided.
             if ($imageFileName == null) {
-                $imageSourcePath = $uploadDir . DS . $defaultImageName;
+                $imageSourcePath = $uploadDir.DS.$defaultImageName;
             } else {
-                $imageSourcePath = $uploadDir . DS . $imageFileName;
+                $imageSourcePath = $uploadDir.DS.$imageFileName;
 
                 if (!file_exists($imageSourcePath)) {
                     Tlog::getInstance()->error(sprintf('Source image file %s does not exists.', $imageSourcePath));
-                    $imageSourcePath = $uploadDir . DS . $defaultImageName;
+                    $imageSourcePath = $uploadDir.DS.$defaultImageName;
                 }
 
                 if ($type == 'favicon') {
@@ -912,11 +928,12 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         if (isset($content)) {
             return $content;
         }
-            return null;
+
+        return null;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getPluginDescriptors()
     {

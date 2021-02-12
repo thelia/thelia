@@ -20,17 +20,16 @@ use Thelia\Model\CategoryAssociatedContentQuery;
 use Thelia\Model\ProductAssociatedContentQuery;
 
 /**
- *
- * AssociatedContent loop
- *
+ * AssociatedContent loop.
  *
  * Class AssociatedContent
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int getProduct()
- * @method int getCategory()
+ *
+ * @method int   getProduct()
+ * @method int   getCategory()
  * @method int[] getExcludeProduct()
  * @method int[] getExcludeCategory()
  */
@@ -53,7 +52,7 @@ class AssociatedContent extends Content
             ->addArgument(Argument::createIntListTypeArgument('exclude_category'))
             ;
 
-        $argumentCollection->get('order')->default = "associated_content";
+        $argumentCollection->get('order')->default = 'associated_content';
 
         $argumentCollection->get('order')->type->getKey(0)->addValue('associated_content');
         $argumentCollection->get('order')->type->getKey(0)->addValue('associated_content_reverse');
@@ -153,9 +152,9 @@ class AssociatedContent extends Content
             $relatedContentId = $loopResultRow->get('ID');
 
             $loopResultRow
-                ->set("ID", $this->contentId[$relatedContentId])
-                ->set("CONTENT_ID", $relatedContentId)
-                ->set("POSITION", $this->contentPosition[$relatedContentId])
+                ->set('ID', $this->contentId[$relatedContentId])
+                ->set('CONTENT_ID', $relatedContentId)
+                ->set('POSITION', $this->contentPosition[$relatedContentId])
 
             ;
         }

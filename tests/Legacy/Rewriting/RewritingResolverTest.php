@@ -18,9 +18,7 @@ use Thelia\Model\RewritingArgument;
 use Thelia\Rewriting\RewritingResolver;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class RewritingResolverTest extends TestCase
 {
@@ -106,10 +104,10 @@ class RewritingResolverTest extends TestCase
         $collection = new ObjectCollection();
         $collection->setModel('\Thelia\Model\RewritingArgument');
 
-        for ($i=0; $i<3; $i++) {
+        for ($i = 0; $i < 3; ++$i) {
             $ra = new RewritingArgument();
-            $ra->setParameter('foo' . $i);
-            $ra->setValue('bar' . $i);
+            $ra->setParameter('foo'.$i);
+            $ra->setValue('bar'.$i);
             $ra->setVirtualColumn('ru_view', 'view');
             $ra->setVirtualColumn('ru_viewId', 'viewId');
             $ra->setVirtualColumn('ru_locale', 'locale');

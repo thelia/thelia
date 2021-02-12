@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Lang;
 
 /**
- * Class LangDeleteEvent
- * @package Thelia\Core\Event\Lang
+ * Class LangDeleteEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangDeleteEvent extends LangEvent

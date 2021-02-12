@@ -20,8 +20,8 @@ use Thelia\Model\CustomerTitle as CustomerTitleModel;
 use Thelia\Model\Map\CustomerTitleTableMap;
 
 /**
- * Class CustomerTitle
- * @package Thelia\Action
+ * Class CustomerTitle.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class CustomerTitle extends BaseAction implements EventSubscriberInterface
@@ -62,7 +62,7 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
     {
         if (null === $event->getCustomerTitle()) {
             throw new \LogicException(
-                "You must set the customer title before its update"
+                'You must set the customer title before its update'
             );
         }
     }
@@ -72,7 +72,7 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
         $con = Propel::getConnection(CustomerTitleTableMap::DATABASE_NAME);
         $con->beginTransaction();
 
-        $i18n  = $customerTitle->getTranslation($event->getLocale(), $con);
+        $i18n = $customerTitle->getTranslation($event->getLocale(), $con);
 
         try {
             $i18n
@@ -103,9 +103,9 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::CUSTOMER_TITLE_CREATE => ["create"],
-            TheliaEvents::CUSTOMER_TITLE_UPDATE => ["update"],
-            TheliaEvents::CUSTOMER_TITLE_DELETE => ["delete"],
+            TheliaEvents::CUSTOMER_TITLE_CREATE => ['create'],
+            TheliaEvents::CUSTOMER_TITLE_UPDATE => ['update'],
+            TheliaEvents::CUSTOMER_TITLE_DELETE => ['delete'],
         ];
     }
 }

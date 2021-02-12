@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\FeatureTemplateQuery;
 
 /**
- * Class FeatureTemplateIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class FeatureTemplateIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class FeatureTemplateIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class FeatureTemplateIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "feature_template_id";
+        return 'feature_template_id';
     }
 }

@@ -22,14 +22,14 @@ use Thelia\Model\Map\ResourceTableMap;
 class GenerateResources extends ContainerAwareCommand
 {
     /**
-     * Configure the command
+     * Configure the command.
      */
     protected function configure()
     {
         $this
-            ->setName("thelia:generate-resources")
-            ->setDescription("Outputs admin resources")
-            ->setHelp("The <info>thelia:generate-resources</info> outputs admin resources.")
+            ->setName('thelia:generate-resources')
+            ->setDescription('Outputs admin resources')
+            ->setHelp('The <info>thelia:generate-resources</info> outputs admin resources.')
             ->addOption(
                 'output',
                 null,
@@ -50,25 +50,25 @@ class GenerateResources extends ContainerAwareCommand
             throw new \RuntimeException('No resources found');
         }
 
-        switch ($input->getOption("output")) {
+        switch ($input->getOption('output')) {
             case 'sql':
                 $output->writeln(
-                    'INSERT INTO ' . ResourceTableMap::TABLE_NAME . ' (`id`, `code`, `created_at`, `updated_at`) VALUES '
+                    'INSERT INTO '.ResourceTableMap::TABLE_NAME.' (`id`, `code`, `created_at`, `updated_at`) VALUES '
                 );
                 $compteur = 0;
                 foreach ($constants as $constant => $value) {
                     if ($constant == AdminResources::SUPERADMINISTRATOR) {
                         continue;
                     }
-                    $compteur++;
+                    ++$compteur;
                     $output->writeln(
-                        "($compteur, '$value', NOW(), NOW())" . ($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
+                        "($compteur, '$value', NOW(), NOW())".($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
                     );
                 }
                 break;
             case 'sql-i18n':
                 $output->writeln(
-                    'INSERT INTO ' . ResourceI18nTableMap::TABLE_NAME . ' (`id`, `locale`, `title`) VALUES '
+                    'INSERT INTO '.ResourceI18nTableMap::TABLE_NAME.' (`id`, `locale`, `title`) VALUES '
                 );
                 $compteur = 0;
                 foreach ($constants as $constant => $value) {
@@ -76,7 +76,7 @@ class GenerateResources extends ContainerAwareCommand
                         continue;
                     }
 
-                    $compteur++;
+                    ++$compteur;
 
                     $title = ucwords(str_replace('.', ' / ', str_replace('admin.', '', $value)));
 
@@ -84,7 +84,7 @@ class GenerateResources extends ContainerAwareCommand
                         "($compteur, 'en_US', '$title'),"
                     );
                     $output->writeln(
-                        "($compteur, 'fr_FR', '$title')" . ($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
+                        "($compteur, 'fr_FR', '$title')".($constant === key(\array_slice($constants, -1, 1, true)) ? ';' : ',')
                     );
                 }
                 break;
@@ -93,7 +93,7 @@ class GenerateResources extends ContainerAwareCommand
                     if ($constant == AdminResources::SUPERADMINISTRATOR) {
                         continue;
                     }
-                    $output->writeln('[' . $constant . "] => " . $value);
+                    $output->writeln('['.$constant.'] => '.$value);
                 }
                 break;
         }

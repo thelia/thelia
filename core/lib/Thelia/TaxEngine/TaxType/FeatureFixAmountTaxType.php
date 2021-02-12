@@ -23,9 +23,7 @@ use Thelia\Type\FloatType;
 use Thelia\Type\ModelValidIdType;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class FeatureFixAmountTaxType extends BaseTaxType
 {
@@ -39,7 +37,7 @@ class FeatureFixAmountTaxType extends BaseTaxType
     public function fixAmountRetriever(Product $product)
     {
         $taxAmount = 0;
-        $featureId = $this->getRequirement("feature");
+        $featureId = $this->getRequirement('feature');
 
         $query = FeatureProductQuery::create()
             ->filterByProduct($product)
@@ -58,6 +56,7 @@ class FeatureFixAmountTaxType extends BaseTaxType
             if (!$testFloat->isValid($taxAmount)) {
                 //We cannot modify "bad" (consider uninitialized) feature value in backOffice if we throw exception
                 Tlog::getInstance()->error(Translator::getInstance()->trans('Feature value does not match FLOAT format'));
+
                 return 0;
             }
         }
@@ -71,7 +70,7 @@ class FeatureFixAmountTaxType extends BaseTaxType
             new TaxTypeRequirementDefinition(
                 'feature',
                 new ModelValidIdType('Feature'),
-                Translator::getInstance()->trans("Feature")
+                Translator::getInstance()->trans('Feature')
             ),
             new TaxTypeRequirementDefinition(
                 'lang',

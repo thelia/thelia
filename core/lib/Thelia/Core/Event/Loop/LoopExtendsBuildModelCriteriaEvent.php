@@ -16,8 +16,8 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseLoop;
 
 /**
- * Class LoopExtendsBuildModelCriteriaEvent
- * @package Thelia\Core\Event\Loop
+ * Class LoopExtendsBuildModelCriteriaEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class LoopExtendsBuildModelCriteriaEvent extends LoopExtendsEvent

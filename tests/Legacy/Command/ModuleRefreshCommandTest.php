@@ -25,9 +25,8 @@ use Thelia\Module\ModuleManagement;
 
 /**
  * Class ModuleRefreshCommandTest
- * Test refresh modules list command
+ * Test refresh modules list command.
  *
- * @package Thelia\Tests\Command
  * @author  Jérôme Billiras <jbilliras@openstudio.fr>
  *
  * Date: 2014-06-06
@@ -36,7 +35,7 @@ use Thelia\Module\ModuleManagement;
 class ModuleRefreshCommandTest extends TestCase
 {
     /**
-     * Test ModuleRefreshCommand
+     * Test ModuleRefreshCommand.
      */
     public function testModuleRefreshCommand()
     {
@@ -50,7 +49,7 @@ class ModuleRefreshCommandTest extends TestCase
 
             $application = new Application($this->getKernel());
 
-            $moduleRefresh = new ModuleRefreshCommand;
+            $moduleRefresh = new ModuleRefreshCommand();
             $moduleRefresh->setContainer($this->getContainer());
 
             $application->add($moduleRefresh);
@@ -58,7 +57,7 @@ class ModuleRefreshCommandTest extends TestCase
             $command = $application->find('module:refresh');
             $commandTester = new CommandTester($command);
             $commandTester->execute([
-                'command' => $command->getName()
+                'command' => $command->getName(),
             ]);
 
             $expected = $module;
@@ -80,7 +79,7 @@ class ModuleRefreshCommandTest extends TestCase
     }
 
     /**
-     * Get HttpKernel mock
+     * Get HttpKernel mock.
      *
      * @return Kernel Not really a Kernel but the mocked one
      */
@@ -92,13 +91,13 @@ class ModuleRefreshCommandTest extends TestCase
     }
 
     /**
-     * Get new ContainerBuilder
+     * Get new ContainerBuilder.
      *
      * @return ContainerBuilder
      */
     public function getContainer()
     {
-        $container = new ContainerBuilder;
+        $container = new ContainerBuilder();
 
         $container->set('event_dispatcher', new EventDispatcher());
 

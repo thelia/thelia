@@ -16,8 +16,8 @@ use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
 
 /**
- * Class HookManager
- * @package VirtualProductDelivery\Hook
+ * Class HookManager.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookManager extends BaseHook
@@ -30,7 +30,7 @@ class HookManager extends BaseHook
             $render = $this->render(
                 'account-order-after-products.html',
                 [
-                    "order_id" => $orderId
+                    'order_id' => $orderId,
                 ]
             );
             $event->add($render);

@@ -14,17 +14,16 @@ namespace Tests\Core\Serializer;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Serializer\SerializerManager as SUT;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Exception\InvalidArgumentException;
 
 /**
- * Class SerializerManagerTest
+ * Class SerializerManagerTest.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class SerializerManagerTest extends TestCase
@@ -41,7 +40,7 @@ class SerializerManagerTest extends TestCase
 
     public function setUp(): void
     {
-        $this->sut = new SUT;
+        $this->sut = new SUT();
         $this->stubSerializer = $this->createMock('Thelia\\Core\\Serializer\\SerializerInterface');
 
         $request = new Request();
@@ -80,7 +79,7 @@ class SerializerManagerTest extends TestCase
             ->will($this->onConsecutiveCalls('serializer1', 'serializer2', 'serializer3', 'serializer1'))
         ;
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 3; ++$i) {
             $this->sut->add($this->stubSerializer);
 
             $serializers = $this->sut->getSerializers();
@@ -113,7 +112,7 @@ class SerializerManagerTest extends TestCase
             ->will($this->onConsecutiveCalls('serializer1', 'serializer2', 'serializer3', 'serializer4', 'serializer5'))
         ;
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 3; ++$i) {
             $this->sut->add($this->stubSerializer);
         }
 
@@ -156,7 +155,7 @@ class SerializerManagerTest extends TestCase
             ->will($this->onConsecutiveCalls('serializer1', 'serializer2', 'serializer3'))
         ;
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 3; ++$i) {
             $this->sut->add($this->stubSerializer);
         }
 
@@ -225,7 +224,7 @@ class SerializerManagerTest extends TestCase
             ->will($this->onConsecutiveCalls('serializer1', 'serializer2', 'serializer3'))
         ;
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 3; ++$i) {
             $this->sut->add($this->stubSerializer);
         }
 
@@ -251,7 +250,7 @@ class SerializerManagerTest extends TestCase
             ->will($this->onConsecutiveCalls('serializer1', 'serializer2', 'serializer3'))
         ;
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 3; ++$i) {
             $this->sut->add($this->stubSerializer);
         }
 

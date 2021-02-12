@@ -15,8 +15,8 @@ namespace Thelia\Core\Event\Lang;
 use Thelia\Core\Event\ActionEvent;
 
 /**
- * Class LangDefaultBehaviorEvent
- * @package Thelia\Core\Event\Lang
+ * Class LangDefaultBehaviorEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangDefaultBehaviorEvent extends ActionEvent

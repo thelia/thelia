@@ -17,7 +17,8 @@ use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\ImportExport\Import\AbstractImport;
 
 /**
- * Class ImportEvent
+ * Class ImportEvent.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class ImportEvent extends Event
@@ -38,7 +39,7 @@ class ImportEvent extends Event
     protected $errors = [];
 
     /**
-     * Event constructor
+     * Event constructor.
      *
      * @param \Thelia\ImportExport\Import\AbstractImport  $import     An import
      * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface
@@ -50,7 +51,7 @@ class ImportEvent extends Event
     }
 
     /**
-     * Get import
+     * Get import.
      *
      * @return \Thelia\ImportExport\Import\AbstractImport An import
      */
@@ -60,7 +61,7 @@ class ImportEvent extends Event
     }
 
     /**
-     * Set import
+     * Set import.
      *
      * @param \Thelia\ImportExport\Import\AbstractImport $import An import
      *
@@ -74,7 +75,7 @@ class ImportEvent extends Event
     }
 
     /**
-     * Get serializer
+     * Get serializer.
      *
      * @return \Thelia\Core\Serializer\SerializerInterface A serializer interface
      */
@@ -84,7 +85,7 @@ class ImportEvent extends Event
     }
 
     /**
-     * Set serializer
+     * Set serializer.
      *
      * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface
      *
@@ -98,7 +99,7 @@ class ImportEvent extends Event
     }
 
     /**
-     * Get errors
+     * Get errors.
      *
      * @return array Errors list
      */
@@ -108,7 +109,7 @@ class ImportEvent extends Event
     }
 
     /**
-     * Set errors
+     * Set errors.
      *
      * @param array $errors Errors list
      *

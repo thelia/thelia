@@ -16,7 +16,7 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Order;
 
 /**
- * This event allow modules to get information on a virtual product :
+ * This event allow modules to get information on a virtual product :.
  *
  * - download path if a file is attached to the product sale element
  * - use stock or not
@@ -24,24 +24,24 @@ use Thelia\Model\Order;
  *      really virtual.
  *
  * Class VirtualProductCreateEvent
- * @package Thelia\Core\Event\Product
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class VirtualProductOrderHandleEvent extends ActionEvent
 {
-    /** @var  int the product sale element id*/
+    /** @var int the product sale element id */
     protected $pseId;
 
-    /** @var  Order the order */
+    /** @var Order the order */
     protected $order;
 
-    /** @var  string the path of the file */
+    /** @var string the path of the file */
     protected $path;
 
-    /** @var  bool is virtual product is really virtual */
+    /** @var bool is virtual product is really virtual */
     protected $virtual = true;
 
-    /** @var  bool use the stock for this virtual product */
+    /** @var bool use the stock for this virtual product */
     protected $useStock = false;
 
     public function __construct(Order $order, $pseId)
@@ -105,7 +105,7 @@ class VirtualProductOrderHandleEvent extends ActionEvent
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isUseStock()
     {
@@ -113,7 +113,7 @@ class VirtualProductOrderHandleEvent extends ActionEvent
     }
 
     /**
-     * @param boolean $useStock
+     * @param bool $useStock
      */
     public function setUseStock($useStock)
     {
@@ -123,7 +123,7 @@ class VirtualProductOrderHandleEvent extends ActionEvent
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isVirtual()
     {
@@ -131,7 +131,7 @@ class VirtualProductOrderHandleEvent extends ActionEvent
     }
 
     /**
-     * @param boolean $virtual
+     * @param bool $virtual
      */
     public function setVirtual($virtual)
     {

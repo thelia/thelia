@@ -19,8 +19,6 @@ use Thelia\Model\ConfigQuery;
 
 class MailingSystem extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     */
     public function update(MailingSystemEvent $event)
     {
         if ($event->getEnabled()) {
@@ -44,7 +42,7 @@ class MailingSystem extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::MAILING_SYSTEM_UPDATE => ["update", 128],
+            TheliaEvents::MAILING_SYSTEM_UPDATE => ['update', 128],
         ];
     }
 }

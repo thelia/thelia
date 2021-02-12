@@ -18,8 +18,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Security\Exception\TokenAuthenticationException;
 
 /**
- * Class TokenProvider
- * @package Thelia\Tools
+ * Class TokenProvider.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class TokenProvider
@@ -54,7 +54,7 @@ class TokenProvider
      */
     public function __construct(RequestStack $requestStack, TranslatorInterface $translator, $tokenName)
     {
-        /**
+        /*
          * Store the services
          */
         $this->requestStack = $requestStack;
@@ -81,19 +81,21 @@ class TokenProvider
 
     /**
      * @param string $entryValue
+     *
      * @return bool
+     *
      * @throws \Thelia\Core\Security\Exception\TokenAuthenticationException
      */
     public function checkToken($entryValue)
     {
         if (null === $this->token) {
             throw new TokenAuthenticationException(
-                "Tried to check a token without assigning it before"
+                'Tried to check a token without assigning it before'
             );
         }
         if ($this->token !== $entryValue) {
             throw new TokenAuthenticationException(
-                "Tried to validate an invalid token"
+                'Tried to validate an invalid token'
             );
         }
 
@@ -115,9 +117,10 @@ class TokenProvider
     }
 
     /**
-     * Same method as getToken but can be called statically
+     * Same method as getToken but can be called statically.
      *
      * @alias getToken
+     *
      * @return string
      */
     public static function generateToken()
@@ -126,16 +129,18 @@ class TokenProvider
         if (false === $raw) {
             $raw = self::getComplexRandom();
         }
+
         return md5($raw);
     }
 
     /**
      * @param int $length
+     *
      * @return string
      */
     protected static function getOpenSSLRandom($length = 40)
     {
-        if (!\function_exists("openssl_random_pseudo_bytes")) {
+        if (!\function_exists('openssl_random_pseudo_bytes')) {
             return false;
         }
 
@@ -150,6 +155,6 @@ class TokenProvider
         $firstValue = (float) (mt_rand(1, 0xFFFF) * rand(1, 0x10001));
         $secondValues = (float) (rand(1, 0xFFFF) * mt_rand(1, 0x10001));
 
-        return microtime() . ceil($firstValue / $secondValues) . uniqid();
+        return microtime().ceil($firstValue / $secondValues).uniqid();
     }
 }

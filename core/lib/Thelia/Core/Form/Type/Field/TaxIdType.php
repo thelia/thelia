@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\TaxQuery;
 
 /**
- * Class TaxIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class TaxIdType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class TaxIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class TaxIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "tax_id";
+        return 'tax_id';
     }
 }

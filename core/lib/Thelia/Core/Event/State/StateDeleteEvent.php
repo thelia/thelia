@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\State;
 
 /**
- * Class StateDeleteEvent
- * @package Thelia\Core\Event\State
+ * Class StateDeleteEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class StateDeleteEvent extends StateEvent

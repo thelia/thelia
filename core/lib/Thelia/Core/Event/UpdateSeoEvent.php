@@ -41,8 +41,6 @@ class UpdateSeoEvent extends ActionEvent
         $this->meta_keywords = $meta_keywords;
     }
 
-    /**
-     */
     public function getObjectId()
     {
         return $this->object_id;
@@ -50,6 +48,7 @@ class UpdateSeoEvent extends ActionEvent
 
     /**
      * @param $object_id
+     *
      * @return $this
      */
     public function setObjectId($object_id)
@@ -69,6 +68,7 @@ class UpdateSeoEvent extends ActionEvent
 
     /**
      * @param $locale
+     *
      * @return $this
      */
     public function setLocale($locale)
@@ -88,6 +88,7 @@ class UpdateSeoEvent extends ActionEvent
 
     /**
      * @param $url
+     *
      * @return $this
      */
     public function setUrl($url)
@@ -107,6 +108,7 @@ class UpdateSeoEvent extends ActionEvent
 
     /**
      * @param $meta_title
+     *
      * @return $this
      */
     public function setMetaTitle($meta_title)
@@ -126,6 +128,7 @@ class UpdateSeoEvent extends ActionEvent
 
     /**
      * @param $meta_description
+     *
      * @return $this
      */
     public function setMetaDescription($meta_description)
@@ -145,6 +148,7 @@ class UpdateSeoEvent extends ActionEvent
 
     /**
      * @param $meta_keywords
+     *
      * @return $this
      */
     public function setMetaKeywords($meta_keywords)
@@ -154,8 +158,6 @@ class UpdateSeoEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     */
     public function setObject($object)
     {
         $this->object = $object;
@@ -163,8 +165,6 @@ class UpdateSeoEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     */
     public function getObject()
     {
         return $this->object;

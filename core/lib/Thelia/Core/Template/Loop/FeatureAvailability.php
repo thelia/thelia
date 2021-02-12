@@ -21,24 +21,21 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\FeatureAv;
 use Thelia\Model\FeatureAvQuery;
-use Thelia\Model\FeatureProductQuery;
-use Thelia\Model\Map\FeatureAvTableMap;
-use Thelia\Model\Map\FeatureProductTableMap;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- * FeatureAvailability loop
- *
+ * FeatureAvailability loop.
  *
  * Class FeatureAvailability
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[] getFeature()
- * @method int[] getExclude()
+ *
+ * @method int[]    getId()
+ * @method int[]    getFeature()
+ * @method int[]    getExclude()
  * @method string[] getOrder()
  */
 class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -99,17 +96,17 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
                 case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha_reverse":
-                case "alpha-reverse":
+                case 'alpha_reverse':
+                case 'alpha-reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "manual":
+                case 'manual':
                     $search->orderByPosition(Criteria::ASC);
                     break;
-                case "manual_reverse":
+                case 'manual_reverse':
                     $search->orderByPosition(Criteria::DESC);
                     break;
             }
@@ -135,15 +132,15 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
         /** @var FeatureAv $featureAv */
         foreach ($loopResult->getResultDataCollection() as $featureAv) {
             $loopResultRow = new LoopResultRow($featureAv);
-            $loopResultRow->set("ID", $featureAv->getId())
-                ->set("IS_TRANSLATED", $featureAv->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("FEATURE_ID", $featureAv->getFeatureId())
-                ->set("TITLE", $featureAv->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $featureAv->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $featureAv->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $featureAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("POSITION", $featureAv->getPosition());
+            $loopResultRow->set('ID', $featureAv->getId())
+                ->set('IS_TRANSLATED', $featureAv->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('FEATURE_ID', $featureAv->getFeatureId())
+                ->set('TITLE', $featureAv->getVirtualColumn('i18n_TITLE'))
+                ->set('CHAPO', $featureAv->getVirtualColumn('i18n_CHAPO'))
+                ->set('DESCRIPTION', $featureAv->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $featureAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set('POSITION', $featureAv->getPosition());
             $this->addOutputFields($loopResultRow, $featureAv);
 
             $loopResult->addRow($loopResultRow);

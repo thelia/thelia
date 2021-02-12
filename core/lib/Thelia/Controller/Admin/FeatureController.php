@@ -28,7 +28,7 @@ use Thelia\Model\Feature;
 use Thelia\Model\FeatureQuery;
 
 /**
- * Manages features
+ * Manages features.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
@@ -65,7 +65,7 @@ class FeatureController extends AbstractCrudController
 
         $createEvent
             ->setTitle($formData['title'])
-            ->setLocale($formData["locale"])
+            ->setLocale($formData['locale'])
             ->setAddToAllTemplates($formData['add_to_all'])
         ;
 
@@ -78,7 +78,7 @@ class FeatureController extends AbstractCrudController
 
         // Create and dispatch the change event
         $changeEvent
-            ->setLocale($formData["locale"])
+            ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
             ->setChapo($formData['chapo'])
             ->setDescription($formData['description'])
@@ -89,7 +89,7 @@ class FeatureController extends AbstractCrudController
     }
 
     /**
-     * Process the features values (fix it in future version to integrate it in the feature form as a collection)
+     * Process the features values (fix it in future version to integrate it in the feature form as a collection).
      *
      * @see \Thelia\Controller\Admin\AbstractCrudController::performAdditionalUpdateAction()
      */
@@ -133,12 +133,12 @@ class FeatureController extends AbstractCrudController
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
-            'id'           => $object->getId(),
-            'locale'       => $object->getLocale(),
-            'title'        => $object->getTitle(),
-            'chapo'        => $object->getChapo(),
-            'description'  => $object->getDescription(),
-            'postscriptum' => $object->getPostscriptum()
+            'id' => $object->getId(),
+            'locale' => $object->getLocale(),
+            'title' => $object->getTitle(),
+            'chapo' => $object->getChapo(),
+            'description' => $object->getDescription(),
+            'postscriptum' => $object->getPostscriptum(),
         ];
 
         // Setup the object form
@@ -164,6 +164,7 @@ class FeatureController extends AbstractCrudController
 
     /**
      * @param Feature $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
@@ -173,6 +174,7 @@ class FeatureController extends AbstractCrudController
 
     /**
      * @param Feature $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -191,7 +193,7 @@ class FeatureController extends AbstractCrudController
             'feature-edit',
             [
                     'feature_id' => $this->getRequest()->get('feature_id'),
-                    'featureav_order' => $this->getFeatureAvListOrder()
+                    'featureav_order' => $this->getFeatureAvListOrder(),
             ]
         );
     }
@@ -199,10 +201,10 @@ class FeatureController extends AbstractCrudController
     protected function redirectToEditionTemplate()
     {
         return $this->generateRedirectFromRoute(
-            "admin.configuration.features.update",
+            'admin.configuration.features.update',
             [
                 'feature_id' => $this->getRequest()->get('feature_id'),
-                'featureav_order' => $this->getFeatureAvListOrder()
+                'featureav_order' => $this->getFeatureAvListOrder(),
             ]
         );
     }
@@ -227,7 +229,7 @@ class FeatureController extends AbstractCrudController
     }
 
     /**
-     * Add or Remove from all product templates
+     * Add or Remove from all product templates.
      */
     protected function addRemoveFromAllTemplates($eventType)
     {
@@ -251,7 +253,7 @@ class FeatureController extends AbstractCrudController
     }
 
     /**
-     * Remove from all product templates
+     * Remove from all product templates.
      */
     public function removeFromAllTemplates()
     {
@@ -259,7 +261,7 @@ class FeatureController extends AbstractCrudController
     }
 
     /**
-     * Add to all product templates
+     * Add to all product templates.
      */
     public function addToAllTemplates()
     {

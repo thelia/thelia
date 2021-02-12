@@ -28,7 +28,7 @@ class CurrencyUpdateRateEvent extends ActionEvent
 
     public function hasUndefinedRates()
     {
-        return ! empty($this->undefinedRates);
+        return !empty($this->undefinedRates);
     }
 
     /**

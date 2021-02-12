@@ -12,14 +12,11 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Core\Template\Loop\Content;
 use Thelia\Model\ContentQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class ContentTest extends BaseLoopTestor
 {
@@ -44,7 +41,7 @@ class ContentTest extends BaseLoopTestor
         }
 
         $otherParameters = [
-            "visible" => "*",
+            'visible' => '*',
         ];
 
         $this->baseTestSearchById($content->getId(), $otherParameters);

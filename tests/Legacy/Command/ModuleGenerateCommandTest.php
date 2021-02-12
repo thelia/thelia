@@ -19,10 +19,10 @@ use Thelia\Command\ModuleGenerateCommand;
 use Thelia\Core\Application;
 
 /**
- * test the module:generate command
+ * test the module:generate command.
  *
  * Class ModuleGenerateCommandTest
- * @package Thelia\Tests\Command
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleGenerateCommandTest extends BaseCommandTest
@@ -37,8 +37,8 @@ class ModuleGenerateCommandTest extends BaseCommandTest
     {
         $fs = new Filesystem();
 
-        if ($fs->exists(THELIA_MODULE_DIR . "Test")) {
-            $fs->remove(THELIA_MODULE_DIR . "Test");
+        if ($fs->exists(THELIA_MODULE_DIR.'Test')) {
+            $fs->remove(THELIA_MODULE_DIR.'Test');
         }
     }
 
@@ -60,7 +60,7 @@ class ModuleGenerateCommandTest extends BaseCommandTest
 
         $application->add($moduleGenerator);
 
-        $this->command = $application->find("module:generate");
+        $this->command = $application->find('module:generate');
         $this->commandTester = new CommandTester($this->command);
     }
 
@@ -69,13 +69,13 @@ class ModuleGenerateCommandTest extends BaseCommandTest
         $tester = $this->commandTester;
 
         $tester->execute([
-           "command" => $this->command->getName(),
-            "name" => "test"
+           'command' => $this->command->getName(),
+            'name' => 'test',
         ]);
 
         $fs = new Filesystem();
 
-        $this->assertTrue($fs->exists(THELIA_MODULE_DIR . "Test"));
+        $this->assertTrue($fs->exists(THELIA_MODULE_DIR.'Test'));
     }
 
     /**
@@ -87,8 +87,8 @@ class ModuleGenerateCommandTest extends BaseCommandTest
 
         $this->expectException(\RuntimeException::class);
         $tester->execute([
-            "command" => $this->command->getName(),
-            "name" => "test"
+            'command' => $this->command->getName(),
+            'name' => 'test',
         ]);
     }
 
@@ -101,16 +101,16 @@ class ModuleGenerateCommandTest extends BaseCommandTest
 
         // remove the config.xml
         $fs = new Filesystem();
-        $configFile = THELIA_MODULE_DIR . "Test" .
-            DIRECTORY_SEPARATOR . "Config" .
-            DIRECTORY_SEPARATOR . "config.xml"
+        $configFile = THELIA_MODULE_DIR.'Test'.
+            DIRECTORY_SEPARATOR.'Config'.
+            DIRECTORY_SEPARATOR.'config.xml'
         ;
         $fs->remove($configFile);
 
         $tester->execute([
-            "command" => $this->command->getName(),
-            "name" => "test",
-            "--force" => ""
+            'command' => $this->command->getName(),
+            'name' => 'test',
+            '--force' => '',
         ]);
 
         $this->assertTrue($fs->exists($configFile));
@@ -122,8 +122,8 @@ class ModuleGenerateCommandTest extends BaseCommandTest
 
         $this->expectException(\RuntimeException::class);
         $tester->execute([
-           "command" => $this->command->getName(),
-            "name" => "thelia"
+           'command' => $this->command->getName(),
+            'name' => 'thelia',
         ]);
     }
 }

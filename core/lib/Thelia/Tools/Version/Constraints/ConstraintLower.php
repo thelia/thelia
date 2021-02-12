@@ -13,15 +13,15 @@
 namespace Thelia\Tools\Version\Constraints;
 
 /**
- * Class ConstraintLower
- * @package Thelia\Tools\Version\Constraints
+ * Class ConstraintLower.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ConstraintLower extends BaseConstraint
 {
     public function __construct($expression, $strict = false)
     {
-        $this->operator = $strict ? "<" : "<=";
+        $this->operator = $strict ? '<' : '<=';
         $this->expression = substr(
             $expression,
             \strlen($this->operator)

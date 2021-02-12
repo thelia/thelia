@@ -17,8 +17,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 
 /**
- *
- * Thelia Logger
+ * Thelia Logger.
  *
  * Allow to define different level and output.
  *
@@ -28,58 +27,56 @@ use Thelia\Model\ConfigQuery;
 class Tlog implements LoggerInterface
 {
     // Nom des variables de configuration
-    public const VAR_LEVEL        = "tlog_level";
-    public const VAR_DESTINATIONS    = "tlog_destinations";
-    public const VAR_PREFIXE        = "tlog_prefix";
-    public const VAR_FILES        = "tlog_files";
-    public const VAR_IP                = "tlog_ip";
-    public const VAR_SHOW_REDIRECT     = "tlog_show_redirect";
+    public const VAR_LEVEL = 'tlog_level';
+    public const VAR_DESTINATIONS = 'tlog_destinations';
+    public const VAR_PREFIXE = 'tlog_prefix';
+    public const VAR_FILES = 'tlog_files';
+    public const VAR_IP = 'tlog_ip';
+    public const VAR_SHOW_REDIRECT = 'tlog_show_redirect';
 
     // all level of trace
-    public const DEBUG                 = 100;
-    public const INFO                  = 200;
-    public const NOTICE                = 300;
-    public const WARNING               = 400;
-    public const ERROR                 = 500;
-    public const CRITICAL              = 600;
-    public const ALERT                 = 700;
-    public const EMERGENCY             = 800;
-    public const MUET                  = PHP_INT_MAX;
+    public const DEBUG = 100;
+    public const INFO = 200;
+    public const NOTICE = 300;
+    public const WARNING = 400;
+    public const ERROR = 500;
+    public const CRITICAL = 600;
+    public const ALERT = 700;
+    public const EMERGENCY = 800;
+    public const MUET = PHP_INT_MAX;
 
     protected $levels = [
-        100 => "DEBUG",
-        200 => "INFO",
-        300 => "NOTICE",
-        400 => "WARNING",
-        500 => "ERROR",
-        600 => "CRITICAL",
-        700 => "ALERT",
-        800 => "EMERGENCY"
+        100 => 'DEBUG',
+        200 => 'INFO',
+        300 => 'NOTICE',
+        400 => 'WARNING',
+        500 => 'ERROR',
+        600 => 'CRITICAL',
+        700 => 'ALERT',
+        800 => 'EMERGENCY',
     ];
 
     // default values
-    public const DEFAULT_LEVEL         = self::ERROR;
-    public const DEFAUT_DESTINATIONS   = "Thelia\Log\Destination\TlogDestinationRotatingFile";
-    public const DEFAUT_PREFIXE    = "#INDEX: #LEVEL [#FILE:#FUNCTION()] {#LINE} #DATE #HOUR: ";
-    public const DEFAUT_FILES        = "*";
-    public const DEFAUT_IP        = "";
-    public const DEFAUT_SHOW_REDIRECT  = 0;
+    public const DEFAULT_LEVEL = self::ERROR;
+    public const DEFAUT_DESTINATIONS = "Thelia\Log\Destination\TlogDestinationRotatingFile";
+    public const DEFAUT_PREFIXE = '#INDEX: #LEVEL [#FILE:#FUNCTION()] {#LINE} #DATE #HOUR: ';
+    public const DEFAUT_FILES = '*';
+    public const DEFAUT_IP = '';
+    public const DEFAUT_SHOW_REDIRECT = 0;
 
     /**
-     *
      * @var \Thelia\Log\Tlog
      */
     private static $instance = false;
 
     /**
-     *
      * @var array containing class of destination handler
      */
     protected $destinations = [];
 
     protected $mode_back_office = false;
     protected $level = self::MUET;
-    protected $prefix = "";
+    protected $prefix = '';
     protected $files = [];
     protected $all_files = false;
     protected $show_redirect = false;
@@ -91,15 +88,11 @@ class Tlog implements LoggerInterface
     // directories where are the Destinations Files
     public $dir_destinations = [];
 
-    /**
-     *
-     */
     private function __construct()
     {
     }
 
     /**
-     *
      * @return \Thelia\Log\Tlog
      */
     public static function getInstance()
@@ -117,9 +110,9 @@ class Tlog implements LoggerInterface
     }
 
     /**
-     * Create a new Tlog instance, that could be configured without interfering with the "main" instance
+     * Create a new Tlog instance, that could be configured without interfering with the "main" instance.
      *
-     * @return Tlog a new Tlog instance.
+     * @return Tlog a new Tlog instance
      */
     public static function getNewInstance()
     {
@@ -131,15 +124,15 @@ class Tlog implements LoggerInterface
     }
 
     /**
-     * initialize default configuration
+     * initialize default configuration.
      */
     protected function init()
-    {;
+    {
         $this->setLevel(ConfigQuery::read(self::VAR_LEVEL, self::DEFAULT_LEVEL));
 
         $this->dir_destinations = [
                 __DIR__.DS.'Destination',
-                THELIA_LOCAL_DIR.'tlog'.DS.'destinations'
+                THELIA_LOCAL_DIR.'tlog'.DS.'destinations',
         ];
 
         $this->setPrefix(ConfigQuery::read(self::VAR_PREFIXE, self::DEFAUT_PREFIXE));
@@ -156,12 +149,11 @@ class Tlog implements LoggerInterface
     // -------------
 
     /**
-     *
      * @param string $destinations
      */
     public function setDestinations($destinations)
     {
-        if (! empty($destinations)) {
+        if (!empty($destinations)) {
             $this->destinations = [];
 
             $classes_destinations = explode(';', $destinations);
@@ -183,8 +175,7 @@ class Tlog implements LoggerInterface
     }
 
     /**
-     *
-     * change the debug level. Use Tlog constant : \Thelia\Log\Tlog::DEBUG set level to Debug
+     * change the debug level. Use Tlog constant : \Thelia\Log\Tlog::DEBUG set level to Debug.
      *
      * @param int $level
      */
@@ -204,7 +195,7 @@ class Tlog implements LoggerInterface
 
     public function setFiles($files)
     {
-        $this->files = explode(";", $files);
+        $this->files = explode(';', $files);
 
         $this->all_files = \in_array('*', $this->files);
 
@@ -214,9 +205,10 @@ class Tlog implements LoggerInterface
     public function setIp($ips)
     {
         // isset($_SERVER['REMOTE_ADDR']) if we are in cli mode
-        if (! empty($ips) && isset($_SERVER['REMOTE_ADDR']) && ! \in_array($_SERVER['REMOTE_ADDR'], explode(";", $ips))) {
+        if (!empty($ips) && isset($_SERVER['REMOTE_ADDR']) && !\in_array($_SERVER['REMOTE_ADDR'], explode(';', $ips))) {
             $this->level = self::MUET;
         }
+
         return $this;
     }
 
@@ -253,7 +245,8 @@ class Tlog implements LoggerInterface
     /**
      * Detailed debug information.
      *
-     * @param  string $message
+     * @param string $message
+     *
      * @return null
      */
     public function debug($message, array $context = [])
@@ -262,11 +255,9 @@ class Tlog implements LoggerInterface
     }
 
     /**
-     *
-     * Alias of debug method. With this method you can put all parameter you want
+     * Alias of debug method. With this method you can put all parameter you want.
      *
      * ex : Tlog::getInstance()->addDebug($arg1, $arg2, $arg3);
-     *
      */
     public function addDebug()
     {
@@ -282,7 +273,8 @@ class Tlog implements LoggerInterface
      *
      * Example: User logs in, SQL logs.
      *
-     * @param  string $message
+     * @param string $message
+     *
      * @return null
      */
     public function info($message, array $context = [])
@@ -291,11 +283,9 @@ class Tlog implements LoggerInterface
     }
 
     /**
-     *
-     * Alias of info method. With this method you can put all parameter you want
+     * Alias of info method. With this method you can put all parameter you want.
      *
      * ex : Tlog::getInstance()->addInfo($arg1, $arg2, $arg3);
-     *
      */
     public function addInfo()
     {
@@ -309,7 +299,8 @@ class Tlog implements LoggerInterface
     /**
      * Normal but significant events.
      *
-     * @param  string $message
+     * @param string $message
+     *
      * @return null
      */
     public function notice($message, array $context = [])
@@ -318,11 +309,9 @@ class Tlog implements LoggerInterface
     }
 
     /**
-     *
-     * Alias of notice method. With this method you can put all parameter you want
+     * Alias of notice method. With this method you can put all parameter you want.
      *
      * ex : Tlog::getInstance()->addNotice($arg1, $arg2, $arg3);
-     *
      */
     public function addNotice()
     {
@@ -339,7 +328,8 @@ class Tlog implements LoggerInterface
      * Example: Use of deprecated APIs, poor use of an API, undesirable things
      * that are not necessarily wrong.
      *
-     * @param  string $message
+     * @param string $message
+     *
      * @return null
      */
     public function warning($message, array $context = [])
@@ -348,11 +338,9 @@ class Tlog implements LoggerInterface
     }
 
     /**
-     *
-     * Alias of warning method. With this method you can put all parameter you want
+     * Alias of warning method. With this method you can put all parameter you want.
      *
      * ex : Tlog::getInstance()->addWarning($arg1, $arg2, $arg3);
-     *
      */
     public function addWarning()
     {
@@ -367,7 +355,8 @@ class Tlog implements LoggerInterface
      * Runtime errors that do not require immediate action but should typically
      * be logged and monitored.
      *
-     * @param  string $message
+     * @param string $message
+     *
      * @return null
      */
     public function error($message, array $context = [])
@@ -376,11 +365,9 @@ class Tlog implements LoggerInterface
     }
 
     /**
-     *
-     * Alias of error method. With this method you can put all parameter you want
+     * Alias of error method. With this method you can put all parameter you want.
      *
      * ex : Tlog::getInstance()->addError($arg1, $arg2, $arg3);
-     *
      */
     public function addError()
     {
@@ -392,7 +379,6 @@ class Tlog implements LoggerInterface
     }
 
     /**
-     *
      * @see error()
      */
     public function err($message, array $context = [])
@@ -405,7 +391,8 @@ class Tlog implements LoggerInterface
      *
      * Example: Application component unavailable, unexpected exception.
      *
-     * @param  string $message
+     * @param string $message
+     *
      * @return null
      */
     public function critical($message, array $context = [])
@@ -414,11 +401,9 @@ class Tlog implements LoggerInterface
     }
 
     /**
-     *
-     * Alias of critical method. With this method you can put all parameter you want
+     * Alias of critical method. With this method you can put all parameter you want.
      *
      * ex : Tlog::getInstance()->addCritical($arg1, $arg2, $arg3);
-     *
      */
     public function addCritical()
     {
@@ -430,7 +415,6 @@ class Tlog implements LoggerInterface
     }
 
     /**
-     *
      * @see critical()
      */
     public function crit($message, array $context = [])
@@ -444,7 +428,8 @@ class Tlog implements LoggerInterface
      * Example: Entire website down, database unavailable, etc. This should
      * trigger the SMS alerts and wake you up.
      *
-     * @param  string $message
+     * @param string $message
+     *
      * @return null
      */
     public function alert($message, array $context = [])
@@ -453,11 +438,9 @@ class Tlog implements LoggerInterface
     }
 
     /**
-     *
-     * Alias of alert method. With this method you can put all parameter you want
+     * Alias of alert method. With this method you can put all parameter you want.
      *
      * ex : Tlog::getInstance()->addAlert($arg1, $arg2, $arg3);
-     *
      */
     public function addAlert()
     {
@@ -471,7 +454,8 @@ class Tlog implements LoggerInterface
     /**
      * System is unusable.
      *
-     * @param  string $message
+     * @param string $message
+     *
      * @return null
      */
     public function emergency($message, array $context = [])
@@ -480,11 +464,9 @@ class Tlog implements LoggerInterface
     }
 
     /**
-     *
-     * Alias of emergency method. With this method you can put all parameter you want
+     * Alias of emergency method. With this method you can put all parameter you want.
      *
      * ex : Tlog::getInstance()->addEmergency($arg1, $arg2, $arg3);
-     *
      */
     public function addEmergency()
     {
@@ -498,7 +480,8 @@ class Tlog implements LoggerInterface
     /**
      * Logs with an arbitrary level.
      *
-     * @param  string $message
+     * @param string $message
+     *
      * @return null
      */
     public function log($level, $message, array $context = [])
@@ -511,10 +494,10 @@ class Tlog implements LoggerInterface
     }
 
     /**
+     * final end method. Write log for each destination handler.
      *
-     * final end method. Write log for each destination handler
+     * @param string $res
      *
-     * @param  string $res
      * @return void
      */
     public function write(&$res)
@@ -538,7 +521,7 @@ class Tlog implements LoggerInterface
     {
         // Si les infos de debug n'ont pas été ecrites, le faire maintenant
         if ($this->done === false) {
-            $res = "";
+            $res = '';
 
             $this->write($res);
 
@@ -549,26 +532,27 @@ class Tlog implements LoggerInterface
     public function showRedirect($url)
     {
         if ($this->level != self::MUET && $this->show_redirect) {
-            echo "
+            echo '
 <html>
-<head><title>".Translator::getInstance()->trans('Redirecting ...')."</title></head>
+<head><title>'.Translator::getInstance()->trans('Redirecting ...')."</title></head>
 <body>
-<a href=\"$url\">".Translator::getInstance()->trans('Redirecting to %url', ['%url' => $url])."</a>
+<a href=\"$url\">".Translator::getInstance()->trans('Redirecting to %url', ['%url' => $url]).'</a>
 </body>
 </html>
-";
+';
 
             return true;
         }
-            return false;
+
+        return false;
     }
 
     /**
+     * check if level is activated and control if current file is activated.
      *
-     * check if level is activated and control if current file is activated
+     * @param int $level
      *
-     * @param  int     $level
-     * @return boolean
+     * @return bool
      */
     public function isActivated($level)
     {
@@ -586,15 +570,15 @@ class Tlog implements LoggerInterface
     }
 
     /**
+     * check if $file is in authorized files.
      *
-     * check if $file is in authorized files
+     * @param string $file
      *
-     * @param  string  $file
-     * @return boolean
+     * @return bool
      */
     public function isActivedFile($file)
     {
-        return ($this->all_files || \in_array($file, $this->files)) && ! \in_array("!$file", $this->files);
+        return ($this->all_files || \in_array($file, $this->files)) && !\in_array("!$file", $this->files);
     }
 
     /* -- Methodes privees ---------------------------------------- */
@@ -614,7 +598,7 @@ class Tlog implements LoggerInterface
                     // we are sometimes in functions = no class available: avoid php warning here
                     $className = $hop['class'];
 
-                    if (! empty($className) && ($className == ltrim(__CLASS__, '\\') || strtolower(get_parent_class($className)) == ltrim(__CLASS__, '\\'))) {
+                    if (!empty($className) && ($className == ltrim(__CLASS__, '\\') || strtolower(get_parent_class($className)) == ltrim(__CLASS__, '\\'))) {
                         $origin['line'] = $hop['line'];
                         $origin['file'] = $hop['file'];
                         break;
@@ -645,7 +629,7 @@ class Tlog implements LoggerInterface
         // build a replacement array with braces around the context keys
         $replace = [];
         foreach ($context as $key => $val) {
-            $replace['{' . $key . '}'] = $val;
+            $replace['{'.$key.'}'] = $val;
         }
 
         // interpolate replacement values into the message and return
@@ -675,23 +659,22 @@ class Tlog implements LoggerInterface
             $line = $origin['line'];
 
             $prefix = str_replace(
-                ["#INDEX", "#LEVEL", "#FILE", "#FUNCTION", "#LINE", "#DATE", "#HOUR"],
-                [1+$this->linecount, $level, $file, $function, $line, date("Y-m-d"), date("G:i:s")],
+                ['#INDEX', '#LEVEL', '#FILE', '#FUNCTION', '#LINE', '#DATE', '#HOUR'],
+                [1 + $this->linecount, $level, $file, $function, $line, date('Y-m-d'), date('G:i:s')],
                 $this->prefix
             );
 
-            $trace = $prefix . $text;
+            $trace = $prefix.$text;
 
             foreach ($this->destinations as $dest) {
                 $dest->add($trace);
             }
 
-            $this->linecount++;
+            ++$this->linecount;
         }
     }
 
     /**
-     *
      * @param type  $destinations
      * @param array $actives      array containing classes instanceof AbstractTlogDestination
      */

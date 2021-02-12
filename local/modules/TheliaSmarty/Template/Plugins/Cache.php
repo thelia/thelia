@@ -22,8 +22,8 @@ use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 /**
- * Class Cache
- * @package Thelia\Core\Template\Smarty\Plugins
+ * Class Cache.
+ *
  * @author Gilles Bourgeat <gbourgeat@openstudio.fr>
  */
 class Cache extends AbstractSmartyPlugin
@@ -42,6 +42,7 @@ class Cache extends AbstractSmartyPlugin
 
     /**
      * Cache constructor.
+     *
      * @param $kernelDebug
      */
     public function __construct(AdapterInterface $esiFragmentRenderer, RequestStack $requestStack, TaxEngine $taxEngine, $kernelDebug)
@@ -71,8 +72,10 @@ class Cache extends AbstractSmartyPlugin
         if ($this->debug || $ttl < 1) {
             if (null !== $content) {
                 $repeat = false;
+
                 return $content;
             }
+
             return null;
         }
 
@@ -83,6 +86,7 @@ class Cache extends AbstractSmartyPlugin
 
         if ($cacheItem->isHit()) {
             $repeat = false;
+
             return $cacheItem->get();
         }
 
@@ -93,6 +97,7 @@ class Cache extends AbstractSmartyPlugin
 
             $this->adapter->save($cacheItem);
             $repeat = false;
+
             return $cacheItem->get();
         }
     }
@@ -125,7 +130,7 @@ class Cache extends AbstractSmartyPlugin
             }
         }
 
-        return 'smarty_cache_' . md5(json_encode($params));
+        return 'smarty_cache_'.md5(json_encode($params));
     }
 
     /**
@@ -134,7 +139,7 @@ class Cache extends AbstractSmartyPlugin
     public function getPluginDescriptors()
     {
         return [
-            new SmartyPluginDescriptor('block', 'cache', $this, 'cache')
+            new SmartyPluginDescriptor('block', 'cache', $this, 'cache'),
         ];
     }
 }

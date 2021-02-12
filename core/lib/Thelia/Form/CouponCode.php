@@ -20,30 +20,29 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Model\CouponQuery;
 
 /**
- * Class CouponCode
+ * Class CouponCode.
  *
  * Manage how a coupon is entered by a customer
  *
- * @package Thelia\Form
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  */
 class CouponCode extends BaseForm
 {
     /**
-     * Build form
+     * Build form.
      */
     protected function buildForm()
     {
         $this->formBuilder
             ->add(
-                "coupon-code",
+                'coupon-code',
                 TextType::class,
                 [
-                    "required"    => true,
-                    "constraints" => [
+                    'required' => true,
+                    'constraints' => [
                         new Constraints\NotBlank(),
-                        new Constraints\Callback([$this, "verifyExistingCode"]),
-                    ]
+                        new Constraints\Callback([$this, 'verifyExistingCode']),
+                    ],
                 ]
             )
         ;
@@ -56,17 +55,17 @@ class CouponCode extends BaseForm
             ->findOne();
 
         if (null === $coupon) {
-            $context->addViolation(Translator::getInstance()->trans("This coupon does not exists"));
+            $context->addViolation(Translator::getInstance()->trans('This coupon does not exists'));
         }
     }
 
     /**
-     * Form name
+     * Form name.
      *
      * @return string
      */
     public static function getName()
     {
-        return "thelia_coupon_code";
+        return 'thelia_coupon_code';
     }
 }

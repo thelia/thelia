@@ -22,7 +22,6 @@ use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CountryQuery;
-use Thelia\Model\ProductQuery;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleCountryQuery;
 use Thelia\Model\TaxRuleQuery;
@@ -122,10 +121,10 @@ class TaxRuleController extends AbstractCrudController
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
-            'id'           => $object->getId(),
-            'locale'       => $object->getLocale(),
-            'title'        => $object->getTitle(),
-            'description'  => $object->getDescription(),
+            'id' => $object->getId(),
+            'locale' => $object->getLocale(),
+            'title' => $object->getTitle(),
+            'description' => $object->getDescription(),
         ];
 
         // Setup the object form
@@ -134,12 +133,13 @@ class TaxRuleController extends AbstractCrudController
 
     /**
      * @param TaxRule $object
+     *
      * @return \Thelia\Form\BaseForm
      */
     protected function hydrateTaxUpdateForm($object)
     {
         $data = [
-            'id'           => $object->getId(),
+            'id' => $object->getId(),
         ];
 
         // Setup the object form
@@ -165,6 +165,7 @@ class TaxRuleController extends AbstractCrudController
 
     /**
      * @param TaxRule $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
@@ -174,6 +175,7 @@ class TaxRuleController extends AbstractCrudController
 
     /**
      * @param TaxRule $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -215,7 +217,7 @@ class TaxRuleController extends AbstractCrudController
     protected function redirectToEditionTemplate($request = null, $country = null, $state = null)
     {
         return $this->generateRedirectFromRoute(
-            "admin.configuration.taxes-rules.update",
+            'admin.configuration.taxes-rules.update',
             $this->getViewArguments($country, null, $state),
             $this->getRouteArguments()
         );
@@ -224,13 +226,14 @@ class TaxRuleController extends AbstractCrudController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param  TaxRuleEvent $createEvent the create event
-     * @return Response     a response, or null to continue normal processing
+     * @param TaxRuleEvent $createEvent the create event
+     *
+     * @return Response a response, or null to continue normal processing
      */
     protected function performAdditionalCreateAction($createEvent)
     {
         return $this->generateRedirectFromRoute(
-            "admin.configuration.taxes-rules.update",
+            'admin.configuration.taxes-rules.update',
             $this->getViewArguments(),
             $this->getRouteArguments($createEvent->getTaxRule()->getId())
         );
@@ -238,7 +241,7 @@ class TaxRuleController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        return $this->generateRedirectFromRoute("admin.configuration.taxes-rules.list");
+        return $this->generateRedirectFromRoute('admin.configuration.taxes-rules.list');
     }
 
     public function updateAction(ParserContext $parserContext)
@@ -287,8 +290,8 @@ class TaxRuleController extends AbstractCrudController
         }
 
         $responseData = [
-            "success" => false,
-            "message" => ''
+            'success' => false,
+            'message' => '',
         ];
 
         $error_msg = false;
@@ -298,7 +301,7 @@ class TaxRuleController extends AbstractCrudController
 
         try {
             // Check the form against constraints violations
-            $form = $this->validateForm($changeForm, "POST");
+            $form = $this->validateForm($changeForm, 'POST');
 
             // Get the form field values
             $data = $form->getData();
@@ -307,9 +310,9 @@ class TaxRuleController extends AbstractCrudController
 
             $this->dispatch(TheliaEvents::TAX_RULE_TAXES_UPDATE, $changeEvent);
 
-            if (! $this->eventContainsObject($changeEvent)) {
+            if (!$this->eventContainsObject($changeEvent)) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", ['%obj', $this->objectName])
+                    $this->getTranslator()->trans('No %obj was updated.', ['%obj', $this->objectName])
                 );
             }
 
@@ -319,7 +322,7 @@ class TaxRuleController extends AbstractCrudController
                     $this->resourceCode,
                     AccessManager::UPDATE,
                     sprintf(
-                        "%s %s (ID %s) modified",
+                        '%s %s (ID %s) modified',
                         ucfirst($this->objectName),
                         $this->getObjectLabel($changedObject),
                         $this->getObjectId($changedObject)
@@ -342,10 +345,10 @@ class TaxRuleController extends AbstractCrudController
             $error_msg = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext($this->getTranslator()->trans("%obj modification", ['%obj' => 'taxrule']), $error_msg, $changeForm, $ex);
+        $this->setupFormErrorContext($this->getTranslator()->trans('%obj modification', ['%obj' => 'taxrule']), $error_msg, $changeForm, $ex);
 
         // At this point, the form has errors, and should be redisplayed.
-        $responseData["message"] = $error_msg;
+        $responseData['message'] = $error_msg;
 
         return $this->jsonResponse(json_encode($responseData));
     }
@@ -391,7 +394,7 @@ class TaxRuleController extends AbstractCrudController
                     $specifications[] = [
                         'country' => $currentCountryId,
                         'state' => $currentStateId,
-                        'specification' => $specification
+                        'specification' => $specification,
                     ];
 
                     if (!\in_array($specification, $taxRules)) {
@@ -407,7 +410,7 @@ class TaxRuleController extends AbstractCrudController
                     $specKey = [];
                 }
 
-                $specKey[] = $taxRuleCountry->getTaxId() . '-' . $taxRuleCountry->getPosition();
+                $specKey[] = $taxRuleCountry->getTaxId().'-'.$taxRuleCountry->getPosition();
 
                 $taxRuleCountry = $taxRuleCountries->getNext();
             }

@@ -42,13 +42,13 @@ trait CatalogBreadcrumbTrait
         );
         $categoryPath->initializeArgs([
                 'category' => $categoryId,
-                'visible' => '*'
+                'visible' => '*',
             ]);
 
         $results = $categoryPath->buildArray();
 
         foreach ($results as $result) {
-            $breadcrumb[$result['TITLE']] =  sprintf("%s?category_id=%d", $catalogUrl, $result['ID']);
+            $breadcrumb[$result['TITLE']] = sprintf('%s?category_id=%d', $catalogUrl, $result['ID']);
         }
 
         return $breadcrumb;
@@ -56,7 +56,7 @@ trait CatalogBreadcrumbTrait
 
     public function getProductBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
-        if (!method_exists($this, "getProduct")) {
+        if (!method_exists($this, 'getProduct')) {
             return null;
         }
 
@@ -67,8 +67,8 @@ trait CatalogBreadcrumbTrait
 
         $product->setLocale($locale);
 
-        $breadcrumb[$product->getTitle()] =  sprintf(
-            "%s?product_id=%d&current_tab=%s",
+        $breadcrumb[$product->getTitle()] = sprintf(
+            '%s?product_id=%d&current_tab=%s',
             $router->generate('admin.products.update', [], Router::ABSOLUTE_URL),
             $product->getId(),
             $tab
@@ -79,7 +79,7 @@ trait CatalogBreadcrumbTrait
 
     public function getCategoryBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
-        if (!method_exists($this, "getCategory")) {
+        if (!method_exists($this, 'getCategory')) {
             return null;
         }
 
@@ -90,7 +90,7 @@ trait CatalogBreadcrumbTrait
         $category->setLocale($locale);
 
         $breadcrumb[$category->getTitle()] = sprintf(
-            "%s?category_id=%d&current_tab=%s",
+            '%s?category_id=%d&current_tab=%s',
             $router->generate(
                 'admin.categories.update',
                 [],

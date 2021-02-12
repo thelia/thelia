@@ -15,15 +15,15 @@ namespace Thelia\Core\Template\Loop;
 use Thelia\Model\ExportQuery;
 
 /**
- * Class Export
- * @package Thelia\Core\Template\Loop
+ * Class Export.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class Export extends ImportExportType
 {
     protected function getBaseUrl()
     {
-        return $this->container->getParameter("export.base_url");
+        return $this->container->getParameter('export.base_url');
     }
 
     /**
@@ -36,6 +36,6 @@ class Export extends ImportExportType
 
     protected function getCategoryName()
     {
-        return "ExportCategoryId";
+        return 'ExportCategoryId';
     }
 }

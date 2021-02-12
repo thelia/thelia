@@ -33,8 +33,8 @@ use Thelia\Model\LangQuery;
 use Thelia\Tools\URL;
 
 /**
- * Class ConfigurationController
- * @package Carousel\Controller
+ * Class ConfigurationController.
+ *
  * @author manuel raynaud <mraynaud@openstudio.fr>
  */
 class ConfigurationController extends BaseAdminController
@@ -75,7 +75,7 @@ class ConfigurationController extends BaseAdminController
                 $fileCreateOrUpdateEvent->getModel()->setLocale($lang->getLocale())->setTitle('')->save();
             }
 
-            $response =  $this->redirectToConfigurationPage();
+            $response = $this->redirectToConfigurationPage();
         } catch (FormValidationException $e) {
             $error_message = $this->createStandardFormValidationErrorMessage($e);
         }
@@ -88,9 +88,9 @@ class ConfigurationController extends BaseAdminController
             );
 
             $response = $this->render(
-                "module-configure",
+                'module-configure',
                 [
-                    'module_code' => 'Carousel'
+                    'module_code' => 'Carousel',
                 ]
             );
         }
@@ -99,9 +99,10 @@ class ConfigurationController extends BaseAdminController
     }
 
     /**
-     * @param Form $form
+     * @param Form   $form
      * @param string $fieldName
-     * @param int $id
+     * @param int    $id
+     *
      * @return string
      */
     protected function getFormFieldValue($form, $fieldName, $id)
@@ -113,7 +114,7 @@ class ConfigurationController extends BaseAdminController
 
     public function updateAction(
         TheliaFormFactory $formFactory
-    ){
+    ) {
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, ['carousel'], AccessManager::UPDATE)) {
             return $response;
         }
@@ -150,7 +151,7 @@ class ConfigurationController extends BaseAdminController
                     ->save();
             }
 
-            $response =  $this->redirectToConfigurationPage();
+            $response = $this->redirectToConfigurationPage();
         } catch (FormValidationException $e) {
             $error_message = $this->createStandardFormValidationErrorMessage($e);
         }
@@ -162,7 +163,7 @@ class ConfigurationController extends BaseAdminController
                 $form
             );
 
-            $response = $this->render("module-configure", [ 'module_code' => 'Carousel' ]);
+            $response = $this->render('module-configure', ['module_code' => 'Carousel']);
         }
 
         return $response;
@@ -170,15 +171,14 @@ class ConfigurationController extends BaseAdminController
 
     public function deleteAction(
         Request $request
-    )
-    {
+    ) {
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, ['carousel'], AccessManager::DELETE)) {
             return $response;
         }
 
         $imageId = $request->get('image_id');
 
-        if ($imageId != "") {
+        if ($imageId != '') {
             $carousel = CarouselQuery::create()->findPk($imageId);
 
             if (null !== $carousel) {

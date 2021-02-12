@@ -13,11 +13,8 @@
 namespace Thelia\Type;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
-
 class EnumListType extends BaseType
 {
     protected $values = [];
@@ -38,6 +35,7 @@ class EnumListType extends BaseType
 
     /**
      * @param array|\Traversable $values
+     *
      * @since 2.3.0
      */
     public function addValues($values)

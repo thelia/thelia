@@ -19,16 +19,15 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
 /**
- * Class ContactForm
- * @package Thelia\Form
+ * Class ContactForm.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ContactForm extends FirewallForm
 {
     /**
-     *
      * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
+     * Form this you have to call add method on $this->formBuilder attribute :.
      *
      * $this->formBuilder->add("name", TextType::class)
      *   ->add("email", EmailType::class, array(

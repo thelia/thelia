@@ -17,8 +17,8 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
 use Thelia\Form\StandardDescriptionFieldsTrait;
 
 /**
- * Class StateModificationForm
- * @package Thelia\Form\State
+ * Class StateModificationForm.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class StateModificationForm extends StateCreationForm
@@ -36,6 +36,6 @@ class StateModificationForm extends StateCreationForm
 
     public static function getName()
     {
-        return "thelia_state_modification";
+        return 'thelia_state_modification';
     }
 }

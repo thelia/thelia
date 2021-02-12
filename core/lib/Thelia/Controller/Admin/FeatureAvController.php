@@ -20,12 +20,11 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
-use Thelia\Form\FeatureAvModificationForm;
 use Thelia\Model\FeatureAv;
 use Thelia\Model\FeatureAvQuery;
 
 /**
- * Manages features-av
+ * Manages features-av.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
@@ -53,7 +52,7 @@ class FeatureAvController extends AbstractCrudController
 
     protected function getUpdateForm()
     {
-        throw new \LogicException("Featiure Av. modification is not yet implemented");
+        throw new \LogicException('Featiure Av. modification is not yet implemented');
     }
 
     protected function getCreationEvent($formData)
@@ -63,7 +62,7 @@ class FeatureAvController extends AbstractCrudController
         $createEvent
             ->setFeatureId($formData['feature_id'])
             ->setTitle($formData['title'])
-            ->setLocale($formData["locale"])
+            ->setLocale($formData['locale'])
         ;
 
         return $createEvent;
@@ -75,7 +74,7 @@ class FeatureAvController extends AbstractCrudController
 
         // Create and dispatch the change event
         $changeEvent
-            ->setLocale($formData["locale"])
+            ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
             ->setChapo($formData['chapo'])
             ->setDescription($formData['description'])
@@ -106,7 +105,7 @@ class FeatureAvController extends AbstractCrudController
 
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
-        throw new \LogicException("Feature Av. modification is not yet implemented");
+        throw new \LogicException('Feature Av. modification is not yet implemented');
     }
 
     protected function getObjectFromEvent($event)
@@ -128,6 +127,7 @@ class FeatureAvController extends AbstractCrudController
 
     /**
      * @param FeatureAv $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
@@ -137,6 +137,7 @@ class FeatureAvController extends AbstractCrudController
 
     /**
      * @param FeatureAv $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -148,7 +149,7 @@ class FeatureAvController extends AbstractCrudController
     {
         return [
             'feature_id' => $this->getRequest()->get('feature_id'),
-            'order' => $this->getCurrentListOrder()
+            'order' => $this->getCurrentListOrder(),
         ];
     }
 
@@ -171,7 +172,7 @@ class FeatureAvController extends AbstractCrudController
     {
         // We always return to the feature edition form
         return $this->generateRedirectFromRoute(
-            "admin.configuration.features.update",
+            'admin.configuration.features.update',
             $this->getViewArguments()
         );
     }
@@ -179,7 +180,7 @@ class FeatureAvController extends AbstractCrudController
     protected function redirectToListTemplate()
     {
         return $this->generateRedirectFromRoute(
-            "admin.configuration.features.update",
+            'admin.configuration.features.update',
             $this->getViewArguments()
         );
     }

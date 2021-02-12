@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\State;
 
 /**
- * Class StateCreateEvent
- * @package Thelia\Core\Event\State
+ * Class StateCreateEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class StateCreateEvent extends StateEvent
@@ -29,8 +29,6 @@ class StateCreateEvent extends StateEvent
     /** @var int */
     protected $country;
 
-    /**
-     */
     public function setIsocode($isocode)
     {
         $this->isocode = $isocode;
@@ -38,15 +36,11 @@ class StateCreateEvent extends StateEvent
         return $this;
     }
 
-    /**
-     */
     public function getIsocode()
     {
         return $this->isocode;
     }
 
-    /**
-     */
     public function setLocale($locale)
     {
         $this->locale = $locale;
@@ -54,15 +48,11 @@ class StateCreateEvent extends StateEvent
         return $this;
     }
 
-    /**
-     */
     public function getLocale()
     {
         return $this->locale;
     }
 
-    /**
-     */
     public function setTitle($title)
     {
         $this->title = $title;
@@ -70,15 +60,13 @@ class StateCreateEvent extends StateEvent
         return $this;
     }
 
-    /**
-     */
     public function getTitle()
     {
         return $this->title;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isVisible()
     {
@@ -86,11 +74,12 @@ class StateCreateEvent extends StateEvent
     }
 
     /**
-     * @param boolean $visible
+     * @param bool $visible
      */
     public function setVisible($visible)
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -108,6 +97,7 @@ class StateCreateEvent extends StateEvent
     public function setCountry($country)
     {
         $this->country = $country;
+
         return $this;
     }
 }

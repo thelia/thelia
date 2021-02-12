@@ -13,8 +13,8 @@
 namespace Thelia\Type;
 
 /**
- * Class AnyListType
- * @package Thelia\Type
+ * Class AnyListType.
+ *
  * @author GIlles Bourgeat <gbourgeat@openstudio.fr>
  */
 class AnyListType extends BaseType

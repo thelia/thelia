@@ -17,15 +17,15 @@ use Thelia\Action\Pdf;
 use Thelia\Core\Event\PdfEvent;
 
 /**
- * Class PdfTest
- * @package Thelia\Tests\Action
+ * Class PdfTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class PdfTest extends TestCase
 {
     public function testGeneratePdf()
     {
-        $event = new PdfEvent("test content");
+        $event = new PdfEvent('test content');
 
         $action = new Pdf();
         $action->generatePdf($event);

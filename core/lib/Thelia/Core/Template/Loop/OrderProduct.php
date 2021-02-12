@@ -27,14 +27,14 @@ use Thelia\Model\OrderProductQuery;
 use Thelia\Type\BooleanOrBothType;
 
 /**
- * OrderProduct loop
+ * OrderProduct loop.
  *
  * Class OrderProduct
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * @method int getOrder()
- * @method int[] getId()
+ * @method int         getOrder()
+ * @method int[]       getId()
  * @method bool|string getVirtual()
  */
 class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
@@ -103,6 +103,7 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 
     /**
      * @return LoopResult
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function parseResults(LoopResult $loopResult)
@@ -127,7 +128,7 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 $totalPrice = $orderProduct->getPrice() * $orderProduct->getQuantity();
                 $totalPromoPrice = $orderProduct->getPromoPrice() * $orderProduct->getQuantity();
 
-                $totalTaxedPrice =  round($taxedPrice, 2) * $orderProduct->getQuantity();
+                $totalTaxedPrice = round($taxedPrice, 2) * $orderProduct->getQuantity();
                 $totalTaxedPromoPrice = round($taxedPromoPrice, 2) * $orderProduct->getQuantity();
             } else {
                 $tax = round($tax, 2);

@@ -19,19 +19,18 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\AccessoryQuery;
 
 /**
- *
- * Accessory loop
- *
+ * Accessory loop.
  *
  * Class Accessory
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getProduct()
+ *
+ * @method int[]    getProduct()
  * @method string[] getOrder()
  *
- * @link http://doc.thelia.net/en/documentation/loop/accessory.html
+ * @see http://doc.thelia.net/en/documentation/loop/accessory.html
  */
 class Accessory extends Product
 {
@@ -49,7 +48,7 @@ class Accessory extends Product
             Argument::createIntListTypeArgument('product', null, true)
         );
 
-        $argumentCollection->get('order')->default = "accessory";
+        $argumentCollection->get('order')->default = 'accessory';
 
         $argumentCollection->get('order')->type->getKey(0)->addValue('accessory');
         $argumentCollection->get('order')->type->getKey(0)->addValue('accessory_reverse');
@@ -113,9 +112,9 @@ class Accessory extends Product
             $accessoryProductId = $loopResultRow->get('ID');
 
             $loopResultRow
-                ->set("ID", $this->accessoryId[$accessoryProductId])
-                ->set("POSITION", $this->accessoryPosition[$accessoryProductId])
-                ->set("ACCESSORY_ID", $accessoryProductId)
+                ->set('ID', $this->accessoryId[$accessoryProductId])
+                ->set('POSITION', $this->accessoryPosition[$accessoryProductId])
+                ->set('ACCESSORY_ID', $accessoryProductId)
                 ;
         }
 

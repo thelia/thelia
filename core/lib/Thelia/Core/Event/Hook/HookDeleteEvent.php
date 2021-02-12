@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Hook;
 
 /**
- * Class HookDeleteEvent
- * @package Thelia\Core\Event\Hook
+ * Class HookDeleteEvent.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookDeleteEvent extends HookEvent

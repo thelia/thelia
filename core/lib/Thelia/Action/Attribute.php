@@ -29,7 +29,7 @@ use Thelia\Model\TemplateQuery;
 class Attribute extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * Create a new attribute entry
+     * Create a new attribute entry.
      *
      * @param $eventName
      */
@@ -52,7 +52,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Change a product attribute
+     * Change a product attribute.
      *
      * @param $eventName
      */
@@ -73,7 +73,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Delete a product attribute entry
+     * Delete a product attribute entry.
      *
      * @param $eventName
      */
@@ -132,13 +132,13 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::ATTRIBUTE_CREATE          => ["create", 128],
-            TheliaEvents::ATTRIBUTE_UPDATE          => ["update", 128],
-            TheliaEvents::ATTRIBUTE_DELETE          => ["delete", 128],
-            TheliaEvents::ATTRIBUTE_UPDATE_POSITION => ["updatePosition", 128],
+            TheliaEvents::ATTRIBUTE_CREATE => ['create', 128],
+            TheliaEvents::ATTRIBUTE_UPDATE => ['update', 128],
+            TheliaEvents::ATTRIBUTE_DELETE => ['delete', 128],
+            TheliaEvents::ATTRIBUTE_UPDATE_POSITION => ['updatePosition', 128],
 
-            TheliaEvents::ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES => ["removeFromAllTemplates", 128],
-            TheliaEvents::ATTRIBUTE_ADD_TO_ALL_TEMPLATES      => ["addToAllTemplates", 128],
+            TheliaEvents::ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES => ['removeFromAllTemplates', 128],
+            TheliaEvents::ATTRIBUTE_ADD_TO_ALL_TEMPLATES => ['addToAllTemplates', 128],
         ];
     }
 }

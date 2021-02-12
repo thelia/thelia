@@ -25,8 +25,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Model\HookQuery;
 
 /**
- * Class HookCreationForm
- * @package Thelia\Form
+ * Class HookCreationForm.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookCreationForm extends BaseForm
@@ -34,57 +34,57 @@ class HookCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("code", TextType::class, [
-                "constraints" => [
+            ->add('code', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
-                    new Callback([$this, "checkCodeUnicity"]),
+                    new Callback([$this, 'checkCodeUnicity']),
                 ],
-                "label" => Translator::getInstance()->trans("Hook code"),
-                "label_attr" => [
-                    "for" => "code",
+                'label' => Translator::getInstance()->trans('Hook code'),
+                'label_attr' => [
+                    'for' => 'code',
                 ],
             ])
-            ->add("locale", HiddenType::class, [
-                "constraints" => [
-                    new NotBlank(),
-                ],
-            ])
-            ->add("type", ChoiceType::class, [
-                "choices" => [
-                    Translator::getInstance()->trans("Front Office") => TemplateDefinition::FRONT_OFFICE,
-                    Translator::getInstance()->trans("Back Office") => TemplateDefinition::BACK_OFFICE,
-                    Translator::getInstance()->trans("email") => TemplateDefinition::EMAIL,
-                    Translator::getInstance()->trans("pdf") => TemplateDefinition::PDF,
-                ],
-                "constraints" => [
+            ->add('locale', HiddenType::class, [
+                'constraints' => [
                     new NotBlank(),
                 ],
-                "label" => Translator::getInstance()->trans("Type"),
-                "label_attr" => [
-                    "for" => "type",
-                ],
             ])
-            ->add("native", HiddenType::class, [
-                "label" => Translator::getInstance()->trans("Native"),
-                "label_attr" => [
-                    "for" => "native",
-                    "help" => Translator::getInstance()->trans("Core hook of Thelia."),
+            ->add('type', ChoiceType::class, [
+                'choices' => [
+                    Translator::getInstance()->trans('Front Office') => TemplateDefinition::FRONT_OFFICE,
+                    Translator::getInstance()->trans('Back Office') => TemplateDefinition::BACK_OFFICE,
+                    Translator::getInstance()->trans('email') => TemplateDefinition::EMAIL,
+                    Translator::getInstance()->trans('pdf') => TemplateDefinition::PDF,
                 ],
-            ])
-            ->add("active", CheckboxType::class, [
-                "label" => Translator::getInstance()->trans("Active"),
-                "required" => false,
-                "label_attr" => [
-                    "for" => "active",
-                ],
-            ])
-            ->add("title", TextType::class, [
-                "constraints" => [
+                'constraints' => [
                     new NotBlank(),
                 ],
-                "label" => Translator::getInstance()->trans("Hook title"),
-                "label_attr" => [
-                    "for" => "title",
+                'label' => Translator::getInstance()->trans('Type'),
+                'label_attr' => [
+                    'for' => 'type',
+                ],
+            ])
+            ->add('native', HiddenType::class, [
+                'label' => Translator::getInstance()->trans('Native'),
+                'label_attr' => [
+                    'for' => 'native',
+                    'help' => Translator::getInstance()->trans('Core hook of Thelia.'),
+                ],
+            ])
+            ->add('active', CheckboxType::class, [
+                'label' => Translator::getInstance()->trans('Active'),
+                'required' => false,
+                'label_attr' => [
+                    'for' => 'active',
+                ],
+            ])
+            ->add('title', TextType::class, [
+                'constraints' => [
+                    new NotBlank(),
+                ],
+                'label' => Translator::getInstance()->trans('Hook title'),
+                'label_attr' => [
+                    'for' => 'title',
                 ],
             ])
         ;
@@ -103,7 +103,7 @@ class HookCreationForm extends BaseForm
         if ($query->count() > 0) {
             $context->addViolation(
                 Translator::getInstance()->trans(
-                    "A Hook with code %name already exists. Please choose another code.",
+                    'A Hook with code %name already exists. Please choose another code.',
                     ['%name' => $code]
                 )
             );
@@ -112,6 +112,6 @@ class HookCreationForm extends BaseForm
 
     public static function getName()
     {
-        return "thelia_hook_creation";
+        return 'thelia_hook_creation';
     }
 }

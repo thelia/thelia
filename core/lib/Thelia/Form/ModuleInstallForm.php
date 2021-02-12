@@ -23,8 +23,8 @@ use Thelia\Module\Validator\ModuleDefinition;
 use Thelia\Module\Validator\ModuleValidator;
 
 /**
- * Class ProductCreationForm
- * @package Thelia\Form
+ * Class ProductCreationForm.
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleInstallForm extends BaseForm
@@ -52,20 +52,19 @@ class ModuleInstallForm extends BaseForm
                             ]
                         ),
                         new Constraints\Callback(
-                                [$this, "checkModuleValidity"]
+                                [$this, 'checkModuleValidity']
                         ),
                     ],
                     'label' => Translator::getInstance()->trans('The module zip file'),
                     'label_attr' => [
                         'for' => 'module',
-                    ]
+                    ],
                 ]
             );
     }
 
     /**
-     * Check module validity
-     *
+     * Check module validity.
      */
     public function checkModuleValidity(UploadedFile $file, ExecutionContextInterface $context)
     {
@@ -78,7 +77,7 @@ class ModuleInstallForm extends BaseForm
                 if (\count($moduleFiles['directories']) !== 1) {
                     throw new Exception(
                         Translator::getInstance()->trans(
-                            "Your zip must contain 1 root directory which is the root folder directory of your module"
+                            'Your zip must contain 1 root directory which is the root folder directory of your module'
                         )
                     );
                 }
@@ -95,7 +94,7 @@ class ModuleInstallForm extends BaseForm
             } catch (Exception $ex) {
                 $context->addViolation(
                     Translator::getInstance()->trans(
-                        "The module is not valid : %message",
+                        'The module is not valid : %message',
                         ['%message' => $ex->getMessage()]
                     )
                 );
@@ -119,7 +118,6 @@ class ModuleInstallForm extends BaseForm
     /**
      * Unzip a module file.
      *
-     *
      * @return string|bool the path where the module has been extracted or false if an error has occured
      */
     protected function unzipModule(UploadedFile $file)
@@ -127,7 +125,7 @@ class ModuleInstallForm extends BaseForm
         $extractPath = false;
         $zip = new ZipArchiver(true);
         if (!$zip->open($file->getRealPath())) {
-            throw new \Exception("unable to open zipfile");
+            throw new \Exception('unable to open zipfile');
         }
 
         $extractPath = $this->tempdir();
@@ -184,6 +182,6 @@ class ModuleInstallForm extends BaseForm
 
     public static function getName()
     {
-        return "module_install";
+        return 'module_install';
     }
 }

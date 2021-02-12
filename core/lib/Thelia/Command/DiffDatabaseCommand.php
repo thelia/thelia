@@ -71,6 +71,7 @@ class DiffDatabaseCommand extends ContainerAwareCommand
 
         if ($finder->count() != 1) {
             $output->writeln('Could not find the generated migration class.');
+
             return 1;
         }
 

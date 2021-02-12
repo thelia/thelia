@@ -26,8 +26,8 @@ use Thelia\Model\CurrencyQuery;
 use Thelia\Tests\WebTestCase;
 
 /**
- * Class RequestListenerTest
- * @package Thelia\Tests\Core\EventListener
+ * Class RequestListenerTest.
+ *
  * @author Gilles Bourgeat <gilles@thelia.net>
  */
 class RequestListenerTest extends WebTestCase

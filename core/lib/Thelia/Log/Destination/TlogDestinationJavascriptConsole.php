@@ -36,8 +36,8 @@ class TlogDestinationJavascriptConsole extends AbstractTlogDestination
 
         $content .= '} catch (ex) { alert("Les logs Thelia ne peuvent être affichés dans la console javascript:" + ex); }</script>'."\n";
 
-        if (preg_match("|</body>|i", $res)) {
-            $res = preg_replace("|</body>|i", "$content</html>", $res);
+        if (preg_match('|</body>|i', $res)) {
+            $res = preg_replace('|</body>|i', "$content</html>", $res);
         }
     }
 }

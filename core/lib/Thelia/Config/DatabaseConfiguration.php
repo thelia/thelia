@@ -24,12 +24,13 @@ class DatabaseConfiguration implements ConfigurationInterface
 {
     /**
      * Name of the main database connection used by Thelia.
+     *
      * @var string
      */
     public const THELIA_CONNECTION_NAME = 'TheliaMain';
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getConfigTreeBuilder()
     {
@@ -49,7 +50,7 @@ class DatabaseConfiguration implements ConfigurationInterface
                 }
             )
             ->thenInvalid(
-                "The '" . static::THELIA_CONNECTION_NAME . "' connection must be defined."
+                "The '".static::THELIA_CONNECTION_NAME."' connection must be defined."
             );
         $databaseNodeBuilder->append($connectionsNode);
 
@@ -68,10 +69,12 @@ class DatabaseConfiguration implements ConfigurationInterface
     }
 
     /**
-     * Build a configuration node describing one or more database connection
-     * @param string $rootName Node name.
-     * @param bool $isArray Whether the node is a single connection or an array of connections.
-     * @return ArrayNodeDefinition|NodeDefinition Connection(s) node.
+     * Build a configuration node describing one or more database connection.
+     *
+     * @param string $rootName node name
+     * @param bool   $isArray  whether the node is a single connection or an array of connections
+     *
+     * @return ArrayNodeDefinition|NodeDefinition connection(s) node
      */
     public function buildConnectionNode($rootName, $isArray)
     {

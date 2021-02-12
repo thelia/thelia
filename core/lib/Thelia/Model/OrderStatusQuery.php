@@ -18,12 +18,9 @@ use Thelia\Model\Exception\InvalidArgumentException;
 /**
  * Skeleton subclass for performing query and update operations on the 'order_status' table.
  *
- *
- *
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
- *
  */
 class OrderStatusQuery extends BaseOrderStatusQuery
 {
@@ -62,7 +59,7 @@ class OrderStatusQuery extends BaseOrderStatusQuery
 
     public static function getStatusModelFromCode($statusCode)
     {
-        if (! isset(self::$statusModelCache[$statusCode])) {
+        if (!isset(self::$statusModelCache[$statusCode])) {
             self::$statusModelCache[$statusCode] = OrderStatusQuery::create()->findOneByCode($statusCode);
         }
 
@@ -70,7 +67,7 @@ class OrderStatusQuery extends BaseOrderStatusQuery
     }
 
     /**
-     * Return the list of order status IDs for which an order is considered as not paid
+     * Return the list of order status IDs for which an order is considered as not paid.
      *
      * @return array
      */
@@ -80,7 +77,7 @@ class OrderStatusQuery extends BaseOrderStatusQuery
     }
 
     /**
-     * Return the list of order status IDs for which an order is considered as paid
+     * Return the list of order status IDs for which an order is considered as paid.
      *
      * @return array
      */
@@ -90,7 +87,7 @@ class OrderStatusQuery extends BaseOrderStatusQuery
     }
 
     /**
-     * Return the list of order status IDs for which an order is considered as in process
+     * Return the list of order status IDs for which an order is considered as in process.
      *
      * @return array
      */
@@ -100,7 +97,7 @@ class OrderStatusQuery extends BaseOrderStatusQuery
     }
 
     /**
-     * Return the list of order status IDs for which an order is considered as sent
+     * Return the list of order status IDs for which an order is considered as sent.
      *
      * @return array
      */
@@ -110,7 +107,7 @@ class OrderStatusQuery extends BaseOrderStatusQuery
     }
 
     /**
-     * Return the list of order status IDs for which an order is considered as canceled
+     * Return the list of order status IDs for which an order is considered as canceled.
      *
      * @return array
      */
@@ -120,7 +117,7 @@ class OrderStatusQuery extends BaseOrderStatusQuery
     }
 
     /**
-     * Return the list of order status IDs for which an order is considered as refunded
+     * Return the list of order status IDs for which an order is considered as refunded.
      *
      * @return array
      */
@@ -133,11 +130,12 @@ class OrderStatusQuery extends BaseOrderStatusQuery
      * Return a list of status IDs which match $statusCode value.
      *
      * @param string $statusCode the satus code
+     *
      * @return array
      */
     public static function getStatusIdList($statusCode)
     {
-        if (! isset(self::$statusIdListsCache[$statusCode])) {
+        if (!isset(self::$statusIdListsCache[$statusCode])) {
             $statusIdList = [];
 
             $statusList = OrderStatusQuery::create()->find();

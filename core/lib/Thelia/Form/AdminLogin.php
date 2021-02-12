@@ -24,30 +24,30 @@ class AdminLogin extends BruteforceForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("username", TextType::class, [
-                "constraints" => [
+            ->add('username', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
-                    new Length(["min" => 3]),
+                    new Length(['min' => 3]),
                 ],
-                "label" => Translator::getInstance()->trans("Username or e-mail address *"),
-                "label_attr" => [
-                    "for" => "username",
+                'label' => Translator::getInstance()->trans('Username or e-mail address *'),
+                'label_attr' => [
+                    'for' => 'username',
                 ],
             ])
-            ->add("password", PasswordType::class, [
-                "constraints" => [
+            ->add('password', PasswordType::class, [
+                'constraints' => [
                     new NotBlank(),
                 ],
-                "label" => Translator::getInstance()->trans("Password *"),
-                "label_attr" => [
-                    "for" => "password",
+                'label' => Translator::getInstance()->trans('Password *'),
+                'label_attr' => [
+                    'for' => 'password',
                 ],
             ])
-            ->add("remember_me", CheckboxType::class, [
+            ->add('remember_me', CheckboxType::class, [
                     'value' => 'yes',
-                    "label" => Translator::getInstance()->trans("Remember me ?"),
-                    "label_attr" => [
-                        "for" => "remember_me",
+                    'label' => Translator::getInstance()->trans('Remember me ?'),
+                    'label_attr' => [
+                        'for' => 'remember_me',
                     ],
             ])
             ;
@@ -55,6 +55,6 @@ class AdminLogin extends BruteforceForm
 
     public static function getName()
     {
-        return "thelia_admin_login";
+        return 'thelia_admin_login';
     }
 }

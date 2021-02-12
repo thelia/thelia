@@ -24,26 +24,23 @@ use Thelia\Exception\UnmatchableConditionException;
 use Thelia\Model\Coupon;
 
 /**
- * Generate a CouponInterface
+ * Generate a CouponInterface.
  *
- * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class CouponFactory
 {
     /** @var ContainerInterface Service Container */
     protected $container;
 
-    /** @var  FacadeInterface */
+    /** @var FacadeInterface */
     protected $facade;
 
-    /** @var  ConditionFactory Provide necessary value from Thelia*/
+    /** @var ConditionFactory Provide necessary value from Thelia */
     protected $conditionFactory;
 
     /**
-     * Constructor
-     *
+     * Constructor.
      */
     public function __construct(
         ContainerInterface $container,
@@ -56,10 +53,12 @@ class CouponFactory
     }
 
     /**
-     * Build a CouponInterface from its database data
+     * Build a CouponInterface from its database data.
      *
      * @param string $couponCode Coupon code ex: XMAS
+     *
      * @return CouponInterface
+     *
      * @throws CouponExpiredException
      * @throws CouponNoUsageLeftException
      * @throws CouponNotReleaseException
@@ -89,7 +88,7 @@ class CouponFactory
         }
 
         // Check coupon usage count
-        if (! $couponModel->isUsageUnlimited()) {
+        if (!$couponModel->isUsageUnlimited()) {
             if (null === $customer = $this->facade->getCustomer()) {
                 throw new UnmatchableConditionException($couponCode);
             }
@@ -112,7 +111,7 @@ class CouponFactory
     }
 
     /**
-     * Build a CouponInterface from its Model data contained in the DataBase
+     * Build a CouponInterface from its Model data contained in the DataBase.
      *
      * @param Coupon $model Database data
      *
@@ -127,7 +126,7 @@ class CouponFactory
             return false;
         }
 
-        /** @var CouponInterface $couponManager*/
+        /** @var CouponInterface $couponManager */
         $couponManager = $this->container->get($model->getType());
         $couponManager->set(
             $this->facade,

@@ -19,11 +19,9 @@ use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 
 /**
- * Check a Checkout against its Product number
+ * Check a Checkout against its Product number.
  *
- * @package Condition
  * @author  Franck Allimant <franck@cqfdev.fr>
- *
  */
 abstract class AbstractMatchCountries extends ConditionAbstract
 {
@@ -31,15 +29,15 @@ abstract class AbstractMatchCountries extends ConditionAbstract
     public const COUNTRIES_LIST = 'countries';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(FacadeInterface $facade)
     {
         $this->availableOperators = [
             self::COUNTRIES_LIST => [
                 Operators::IN,
-                Operators::OUT
-            ]
+                Operators::OUT,
+            ],
         ];
 
         parent::__construct($facade);
@@ -50,20 +48,20 @@ abstract class AbstractMatchCountries extends ConditionAbstract
     abstract protected function getFormLabel();
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setValidatorsFromForm(array $operators, array $values)
     {
         $this->checkComparisonOperatorValue($operators, self::COUNTRIES_LIST);
 
         // Use default values if data is not defined.
-        if (! isset($operators[self::COUNTRIES_LIST]) || ! isset($values[self::COUNTRIES_LIST])) {
+        if (!isset($operators[self::COUNTRIES_LIST]) || !isset($values[self::COUNTRIES_LIST])) {
             $operators[self::COUNTRIES_LIST] = Operators::IN;
             $values[self::COUNTRIES_LIST] = [];
         }
 
         // Be sure that the value is an array, make one if required
-        if (! \is_array($values[self::COUNTRIES_LIST])) {
+        if (!\is_array($values[self::COUNTRIES_LIST])) {
             $values[self::COUNTRIES_LIST] = [$values[self::COUNTRIES_LIST]];
         }
 
@@ -75,14 +73,14 @@ abstract class AbstractMatchCountries extends ConditionAbstract
             );
         }
 
-        $this->operators = [ self::COUNTRIES_LIST => $operators[self::COUNTRIES_LIST] ];
-        $this->values    = [ self::COUNTRIES_LIST => $values[self::COUNTRIES_LIST] ];
+        $this->operators = [self::COUNTRIES_LIST => $operators[self::COUNTRIES_LIST]];
+        $this->values = [self::COUNTRIES_LIST => $values[self::COUNTRIES_LIST]];
 
         return $this;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isMatching()
     {
@@ -98,7 +96,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getSummary()
     {
@@ -114,7 +112,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         if (null !== $cntryList = CountryQuery::create()->findPks($cntryIds)) {
             /** @var Country $cntry */
             foreach ($cntryList as $cntry) {
-                $cntryStrList .= $cntry->setLocale($this->getCurrentLocale())->getTitle() . ', ';
+                $cntryStrList .= $cntry->setLocale($this->getCurrentLocale())->getTitle().', ';
             }
 
             $cntryStrList = rtrim($cntryStrList, ', ');
@@ -124,7 +122,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function generateInputs()
     {
@@ -132,23 +130,23 @@ abstract class AbstractMatchCountries extends ConditionAbstract
             self::COUNTRIES_LIST => [
                 'availableOperators' => $this->availableOperators[self::COUNTRIES_LIST],
                 'value' => '',
-                'selectedOperator' => Operators::IN
-            ]
+                'selectedOperator' => Operators::IN,
+            ],
         ];
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function drawBackOfficeInputs()
     {
         return $this->facade->getParser()->render(
             'coupon/condition-fragments/countries-condition.html',
             [
-                'operatorSelectHtml'   => $this->drawBackOfficeInputOperators(self::COUNTRIES_LIST),
+                'operatorSelectHtml' => $this->drawBackOfficeInputOperators(self::COUNTRIES_LIST),
                 'countries_field_name' => self::COUNTRIES_LIST,
-                'values'               => $this->values[self::COUNTRIES_LIST] ?? [],
-                'countryLabel'         => $this->getFormLabel()
+                'values' => $this->values[self::COUNTRIES_LIST] ?? [],
+                'countryLabel' => $this->getFormLabel(),
             ]
         );
     }

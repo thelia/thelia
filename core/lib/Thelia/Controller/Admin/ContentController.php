@@ -30,8 +30,8 @@ use Thelia\Model\Content;
 use Thelia\Model\ContentQuery;
 
 /**
- * Class ContentController
- * @package Thelia\Controller\Admin
+ * Class ContentController.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class ContentController extends AbstractSeoCrudController
@@ -53,7 +53,7 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * controller adding content to additional folder
+     * controller adding content to additional folder.
      *
      * @return mixed|\Thelia\Core\HttpFoundation\Response
      */
@@ -83,7 +83,7 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * controller removing additional folder to a content
+     * controller removing additional folder to a content.
      *
      * @return mixed|\Thelia\Core\HttpFoundation\Response
      */
@@ -113,7 +113,7 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * Return the creation form for this object
+     * Return the creation form for this object.
      */
     protected function getCreationForm()
     {
@@ -121,7 +121,7 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * Return the update form for this object
+     * Return the update form for this object.
      */
     protected function getUpdateForm()
     {
@@ -129,9 +129,10 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * Hydrate the update form for this object, before passing it to the update template
+     * Hydrate the update form for this object, before passing it to the update template.
      *
-     * @param  Content                              $object
+     * @param Content $object
+     *
      * @return \Thelia\Form\ContentModificationForm
      */
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
@@ -141,13 +142,13 @@ class ContentController extends AbstractSeoCrudController
 
         // Prepare the data that will hydrate the form
         $data = [
-            'id'           => $object->getId(),
-            'locale'       => $object->getLocale(),
-            'title'        => $object->getTitle(),
-            'chapo'        => $object->getChapo(),
-            'description'  => $object->getDescription(),
+            'id' => $object->getId(),
+            'locale' => $object->getLocale(),
+            'title' => $object->getTitle(),
+            'chapo' => $object->getChapo(),
+            'description' => $object->getDescription(),
             'postscriptum' => $object->getPostscriptum(),
-            'visible'      => $object->getVisible()
+            'visible' => $object->getVisible(),
         ];
 
         // Setup the object form
@@ -155,9 +156,10 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * Creates the creation event with the provided form data
+     * Creates the creation event with the provided form data.
      *
-     * @param  array                                         $formData
+     * @param array $formData
+     *
      * @return \Thelia\Core\Event\Content\ContentCreateEvent
      */
     protected function getCreationEvent($formData)
@@ -175,9 +177,10 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * Creates the update event with the provided form data
+     * Creates the update event with the provided form data.
      *
-     * @param  array                                         $formData
+     * @param array $formData
+     *
      * @return \Thelia\Core\Event\Content\ContentUpdateEvent
      */
     protected function getUpdateEvent($formData)
@@ -197,7 +200,7 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * Creates the delete event with the provided form data
+     * Creates the delete event with the provided form data.
      */
     protected function getDeleteEvent()
     {
@@ -207,7 +210,8 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param  \Thelia\Core\Event\Content\ContentEvent $event
+     * @param \Thelia\Core\Event\Content\ContentEvent $event
+     *
      * @return bool
      */
     protected function eventContainsObject($event)
@@ -220,7 +224,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @param $event \Thelia\Core\Event\Content\ContentEvent
      *
-     * @return null|\Thelia\Model\Content
+     * @return \Thelia\Model\Content|null
      */
     protected function getObjectFromEvent($event)
     {
@@ -228,7 +232,7 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * Load an existing object from the database
+     * Load an existing object from the database.
      *
      * @return \Thelia\Model\Content
      */
@@ -245,12 +249,11 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * Returns the object label form the object event (name, title, etc.)
+     * Returns the object label form the object event (name, title, etc.).
      *
      * @param Content $object
      *
      * @return string content title
-     *
      */
     protected function getObjectLabel($object)
     {
@@ -258,7 +261,7 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * Returns the object ID from the object
+     * Returns the object ID from the object.
      *
      * @param Content $object
      *
@@ -285,9 +288,10 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * Render the main list template
+     * Render the main list template.
      *
-     * @param  int                                  $currentOrder , if any, null otherwise.
+     * @param int $currentOrder , if any, null otherwise
+     *
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function renderListTemplate($currentOrder)
@@ -298,7 +302,7 @@ class ContentController extends AbstractSeoCrudController
             'folders',
             [
                 'content_order' => $currentOrder,
-                'parent' => $this->getFolderId()
+                'parent' => $this->getFolderId(),
             ]
         );
     }
@@ -313,7 +317,7 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * Render the edition template
+     * Render the edition template.
      */
     protected function renderEditionTemplate()
     {
@@ -321,7 +325,7 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * Redirect to the edition template
+     * Redirect to the edition template.
      */
     protected function redirectToEditionTemplate()
     {
@@ -333,7 +337,7 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * Redirect to the list template
+     * Redirect to the list template.
      */
     protected function redirectToListTemplate()
     {
@@ -344,7 +348,8 @@ class ContentController extends AbstractSeoCrudController
     }
 
     /**
-     * @param  \Thelia\Core\Event\Content\ContentUpdateEvent $updateEvent
+     * @param \Thelia\Core\Event\Content\ContentUpdateEvent $updateEvent
+     *
      * @return Response|void
      */
     protected function performAdditionalUpdateAction($updateEvent)
@@ -355,14 +360,16 @@ class ContentController extends AbstractSeoCrudController
                 ['parent' => $this->getFolderId()]
             );
         }
-            return null;
+
+        return null;
     }
 
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param  \Thelia\Core\Event\Content\ContentDeleteEvent $deleteEvent the delete event
-     * @return Response                                      a response, or null to continue normal processing
+     * @param \Thelia\Core\Event\Content\ContentDeleteEvent $deleteEvent the delete event
+     *
+     * @return Response a response, or null to continue normal processing
      */
     protected function performAdditionalDeleteAction($deleteEvent)
     {
@@ -374,7 +381,8 @@ class ContentController extends AbstractSeoCrudController
 
     /**
      * @param $event \Thelia\Core\Event\UpdatePositionEvent
-     * @return null|Response
+     *
+     * @return Response|null
      */
     protected function performAdditionalUpdatePositionAction($event)
     {
@@ -385,12 +393,14 @@ class ContentController extends AbstractSeoCrudController
                 ['parent' => $event->getReferrerId()]
             );
         }
-            return null;
+
+        return null;
     }
 
     /**
      * @param $positionChangeMode
      * @param $positionValue
+     *
      * @return UpdatePositionEvent|void
      */
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)

@@ -17,8 +17,6 @@ interface ParserHelperInterface
     /**
      * Parse a string and get all parser's function and block with theirs arguments.
      *
-     *
-     *
      * @param string $content   the template content
      * @param array  $functions the only functions we want to parse
      *

@@ -16,7 +16,8 @@ use Symfony\Component\Yaml\Yaml;
 use Thelia\Core\Serializer\AbstractSerializer;
 
 /**
- * Class YAMLSerializer
+ * Class YAMLSerializer.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class YAMLSerializer extends AbstractSerializer

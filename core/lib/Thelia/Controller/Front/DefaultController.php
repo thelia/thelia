@@ -23,7 +23,6 @@ use Thelia\Tools\URL;
  *
  * @author Manuel Raynaud <mraynadu@openstudio.fr>
  */
-
 class DefaultController extends BaseFrontController
 {
     /**
@@ -42,7 +41,7 @@ class DefaultController extends BaseFrontController
     {
         $view = null;
 
-        if (! $view = $request->query->get('view')) {
+        if (!$view = $request->query->get('view')) {
             if ($request->request->has('view')) {
                 $view = $request->request->get('view');
             }
@@ -51,8 +50,8 @@ class DefaultController extends BaseFrontController
             $request->attributes->set('_view', $view);
         }
 
-        if (null === $view && null === $request->attributes->get("_view")) {
-            $request->attributes->set("_view", "index");
+        if (null === $view && null === $request->attributes->get('_view')) {
+            $request->attributes->set('_view', 'index');
         }
 
         if (ConfigQuery::isRewritingEnable()) {

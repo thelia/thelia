@@ -14,32 +14,30 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
-use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-use Thelia\Model\LangQuery;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
+ * Class ModuleHook.
  *
- * Class ModuleHook
- * @package Thelia\Controller\Admin
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int getHook()
- * @method int getModule()
- * @method int[] getExclude()
+ *
+ * @method int[]       getId()
+ * @method int         getHook()
+ * @method int         getModule()
+ * @method int[]       getExclude()
  * @method bool|string getModuleActive()
  * @method bool|string getHookActive()
  * @method bool|string getActive()
- * @method string[] getOrder()
+ * @method string[]    getOrder()
  */
 class ModuleHook extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -109,32 +107,32 @@ class ModuleHook extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByModuleActive($moduleActive, Criteria::EQUAL);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "id":
+                case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case "id_reverse":
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "hook":
+                case 'hook':
                     $search->orderByHookId(Criteria::ASC);
                     break;
-                case "hook_reverse":
+                case 'hook_reverse':
                     $search->orderByHookId(Criteria::DESC);
                     break;
-                case "manual":
+                case 'manual':
                     $search->orderByPosition(Criteria::ASC);
                     break;
-                case "manual_reverse":
+                case 'manual_reverse':
                     $search->orderByPosition(Criteria::DESC);
                     break;
-                case "enabled":
+                case 'enabled':
                     $search->orderByActive(Criteria::ASC);
                     break;
-                case "enabled_reverse":
+                case 'enabled_reverse':
                     $search->orderByActive(Criteria::DESC);
                     break;
             }
@@ -151,18 +149,18 @@ class ModuleHook extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResultRow = new LoopResultRow($moduleHook);
 
                 $loopResultRow
-                    ->set("ID", $moduleHook->getId())
-                    ->set("HOOK_ID", $moduleHook->getHookId())
-                    ->set("MODULE_ID", $moduleHook->getModuleId())
-                    ->set("MODULE_TITLE", $moduleHook->getModule()->setLocale($this->locale)->getTitle())
-                    ->set("MODULE_CODE", $moduleHook->getModule()->getCode())
-                    ->set("CLASSNAME", $moduleHook->getClassname())
-                    ->set("METHOD", $moduleHook->getMethod())
-                    ->set("ACTIVE", $moduleHook->getActive())
-                    ->set("HOOK_ACTIVE", $moduleHook->getHookActive())
-                    ->set("MODULE_ACTIVE", $moduleHook->getModuleActive())
-                    ->set("POSITION", $moduleHook->getPosition())
-                    ->set("TEMPLATES", $moduleHook->getTemplates())
+                    ->set('ID', $moduleHook->getId())
+                    ->set('HOOK_ID', $moduleHook->getHookId())
+                    ->set('MODULE_ID', $moduleHook->getModuleId())
+                    ->set('MODULE_TITLE', $moduleHook->getModule()->setLocale($this->locale)->getTitle())
+                    ->set('MODULE_CODE', $moduleHook->getModule()->getCode())
+                    ->set('CLASSNAME', $moduleHook->getClassname())
+                    ->set('METHOD', $moduleHook->getMethod())
+                    ->set('ACTIVE', $moduleHook->getActive())
+                    ->set('HOOK_ACTIVE', $moduleHook->getHookActive())
+                    ->set('MODULE_ACTIVE', $moduleHook->getModuleActive())
+                    ->set('POSITION', $moduleHook->getPosition())
+                    ->set('TEMPLATES', $moduleHook->getTemplates())
                 ;
 
                 $this->addOutputFields($loopResultRow, $moduleHook);

@@ -16,20 +16,18 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Thelia\Form\FormInterface;
-use TheliaSmarty\Template\Plugins\Form;
-use TheliaSmarty\Template\Plugins\TheliaLoop;
 
 class RegisterFormPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
         try {
-            $formConfig = $container->getParameter("Thelia.parser.forms");
+            $formConfig = $container->getParameter('Thelia.parser.forms');
         } catch (ParameterNotFoundException $e) {
             $formConfig = [];
         }
 
-        foreach ($container->findTaggedServiceIds("thelia.form") as $id => $tag) {
+        foreach ($container->findTaggedServiceIds('thelia.form') as $id => $tag) {
             $formDefinition = $container->getDefinition($id);
             /** @var FormInterface $formClass */
             $formClass = $formDefinition->getClass();

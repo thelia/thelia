@@ -35,8 +35,8 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
 /**
- * Class ModuleHook
- * @package Thelia\Action
+ * Class ModuleHook.
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleHook extends BaseAction implements EventSubscriberInterface
@@ -175,7 +175,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
                 $moduleHook->setActive(!$moduleHook->getActive());
                 $moduleHook->save();
             } else {
-                throw new \LogicException(Translator::getInstance()->trans("The module has to be activated."));
+                throw new \LogicException(Translator::getInstance()->trans('The module has to be activated.'));
             }
         }
         $this->cacheClear($dispatcher);
@@ -233,17 +233,17 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::MODULE_HOOK_CREATE            => ['createModuleHook', 128],
-            TheliaEvents::MODULE_HOOK_UPDATE            => ['updateModuleHook', 128],
-            TheliaEvents::MODULE_HOOK_DELETE            => ['deleteModuleHook', 128],
-            TheliaEvents::MODULE_HOOK_UPDATE_POSITION   => ['updateModuleHookPosition', 128],
+            TheliaEvents::MODULE_HOOK_CREATE => ['createModuleHook', 128],
+            TheliaEvents::MODULE_HOOK_UPDATE => ['updateModuleHook', 128],
+            TheliaEvents::MODULE_HOOK_DELETE => ['deleteModuleHook', 128],
+            TheliaEvents::MODULE_HOOK_UPDATE_POSITION => ['updateModuleHookPosition', 128],
             TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION => ['toggleModuleHookActivation', 128],
 
-            TheliaEvents::MODULE_TOGGLE_ACTIVATION      => ['toggleModuleActivation', 64],
-            TheliaEvents::MODULE_DELETE                 => ['deleteModule', 64],
+            TheliaEvents::MODULE_TOGGLE_ACTIVATION => ['toggleModuleActivation', 64],
+            TheliaEvents::MODULE_DELETE => ['deleteModule', 64],
 
-            TheliaEvents::HOOK_TOGGLE_ACTIVATION        => ['toggleHookActivation', 64],
-            TheliaEvents::HOOK_UPDATE                   => ['updateHook', 64],
+            TheliaEvents::HOOK_TOGGLE_ACTIVATION => ['toggleHookActivation', 64],
+            TheliaEvents::HOOK_UPDATE => ['updateHook', 64],
         ];
     }
 }

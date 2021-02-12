@@ -19,14 +19,14 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 
 /**
- * Class CarouselImageForm
- * @package Carousel\Form
+ * Class CarouselImageForm.
+ *
  * @author manuel raynaud <mraynaud@openstudio.fr>
  */
 class CarouselImageForm extends BaseForm
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function buildForm()
     {
@@ -37,12 +37,12 @@ class CarouselImageForm extends BaseForm
                 FileType::class,
                 [
                     'constraints' => [
-                        new Image()
+                        new Image(),
                     ],
                     'label' => $translator->trans('Carousel image', [], Carousel::DOMAIN_NAME),
                     'label_attr' => [
-                        'for' => 'file'
-                    ]
+                        'for' => 'file',
+                    ],
                 ]
             );
     }

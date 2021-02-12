@@ -15,9 +15,7 @@ namespace Thelia\Core\Event\Document;
 use Thelia\Core\Event\CachedFileEvent;
 
 /**
- * Class DocumentEvent
- *
- * @package Thelia\Core\Event
+ * Class DocumentEvent.
  */
 class DocumentEvent extends CachedFileEvent
 {
@@ -25,7 +23,7 @@ class DocumentEvent extends CachedFileEvent
     protected $documentUrl;
 
     /**
-     * Get Document path
+     * Get Document path.
      *
      * @return string The document file path
      */
@@ -35,7 +33,7 @@ class DocumentEvent extends CachedFileEvent
     }
 
     /**
-     * Set Document path
+     * Set Document path.
      *
      * @param string $documentPath the document file path
      *
@@ -49,7 +47,7 @@ class DocumentEvent extends CachedFileEvent
     }
 
     /**
-     * Get Document URL
+     * Get Document URL.
      *
      * @return string The document URL
      */
@@ -59,7 +57,7 @@ class DocumentEvent extends CachedFileEvent
     }
 
     /**
-     * Set Document URL
+     * Set Document URL.
      *
      * @param string $documentUrl the document URL
      *

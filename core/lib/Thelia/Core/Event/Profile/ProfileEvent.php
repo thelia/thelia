@@ -35,7 +35,7 @@ class ProfileEvent extends ActionEvent
 
     public function hasProfile()
     {
-        return ! \is_null($this->profile);
+        return !\is_null($this->profile);
     }
 
     public function getProfile()

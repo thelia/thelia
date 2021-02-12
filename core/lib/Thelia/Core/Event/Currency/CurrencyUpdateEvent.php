@@ -38,6 +38,7 @@ class CurrencyUpdateEvent extends CurrencyCreateEvent
 
     /**
      * @param $is_default
+     *
      * @return $this
      */
     public function setIsDefault($is_default)
@@ -57,6 +58,7 @@ class CurrencyUpdateEvent extends CurrencyCreateEvent
 
     /**
      * @param $visible
+     *
      * @return $this
      */
     public function setVisible($visible)

@@ -15,15 +15,15 @@ namespace Thelia\Core\Template\Loop;
 use Thelia\Model\ImportQuery;
 
 /**
- * Class Import
- * @package Thelia\Core\Template\Loop
+ * Class Import.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class Import extends ImportExportType
 {
     protected function getBaseUrl()
     {
-        return $this->container->getParameter("import.base_url");
+        return $this->container->getParameter('import.base_url');
     }
 
     /**
@@ -36,6 +36,6 @@ class Import extends ImportExportType
 
     protected function getCategoryName()
     {
-        return "ImportCategoryId";
+        return 'ImportCategoryId';
     }
 }

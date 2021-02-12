@@ -21,8 +21,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Model\StateQuery;
 
 /**
- * Class CountryStateMigrationType
- * @package TheliaMigrateCountry\Form\Type
+ * Class CountryStateMigrationType.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class CountryStateMigrationType extends AbstractTheliaType
@@ -31,11 +31,11 @@ class CountryStateMigrationType extends AbstractTheliaType
     {
         $resolver->setDefaults(
             [
-                "cascade_validation" => true,
-                "constraints" => [
+                'cascade_validation' => true,
+                'constraints' => [
                     new Callback([
-                        "methods" => [
-                            [$this, "checkStateId"],
+                        'methods' => [
+                            [$this, 'checkStateId'],
                         ],
                     ]),
                 ],
@@ -46,20 +46,20 @@ class CountryStateMigrationType extends AbstractTheliaType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add("migrate", "checkbox")
+            ->add('migrate', 'checkbox')
             ->add(
-                "country",
-                "country_id"
+                'country',
+                'country_id'
             )
             ->add(
-                "new_country",
-                "country_id"
+                'new_country',
+                'country_id'
             )
             ->add(
-                "new_state",
-                "state_id",
+                'new_state',
+                'state_id',
                 [
-                    "constraints" => [],
+                    'constraints' => [],
                 ]
             )
         ;
@@ -75,7 +75,7 @@ class CountryStateMigrationType extends AbstractTheliaType
                             "The state id '%id' does not belong to country id '%id_country'",
                             [
                                 '%id' => $value['new_state'],
-                                '%id_country' => $value['new_country']
+                                '%id_country' => $value['new_country'],
                             ]
                         )
                     );

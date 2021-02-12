@@ -26,8 +26,8 @@ use Thelia\Model\RewritingUrlQuery;
 use Thelia\Tools\URL;
 
 /**
- * Class RewritingRouterTest
- * @package Thelia\Tests\Core\Routing
+ * Class RewritingRouterTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class RewritingRouterTest extends TestCase
@@ -38,7 +38,7 @@ class RewritingRouterTest extends TestCase
     }
 
     /**
-     * @covers RewritingRouter::generate
+     * @covers \RewritingRouter::generate
      */
     public function testGenerate()
     {
@@ -49,7 +49,7 @@ class RewritingRouterTest extends TestCase
     }
 
     /**
-     * @covers RewritingRouter::match
+     * @covers \RewritingRouter::match
      */
     public function testMatch()
     {
@@ -60,7 +60,7 @@ class RewritingRouterTest extends TestCase
     }
 
     /**
-     * covers RewritingRouter::matchRequest
+     * covers RewritingRouter::matchRequest.
      */
     public function testMatchRequestWithNoRewriting()
     {
@@ -74,7 +74,7 @@ class RewritingRouterTest extends TestCase
     }
 
     /**
-     * covers RewritingRouter::matchRequest
+     * covers RewritingRouter::matchRequest.
      */
     public function testMatchRequestWithNonExistingUrl()
     {
@@ -88,7 +88,7 @@ class RewritingRouterTest extends TestCase
     }
 
     /**
-     * covers RewritingRouter::matchRequest
+     * covers RewritingRouter::matchRequest.
      */
     public function testMatchRequestWithSameLocale()
     {
@@ -127,7 +127,7 @@ class RewritingRouterTest extends TestCase
     }
 
     /**
-     * covers RewritingRouter::matchRequest
+     * covers RewritingRouter::matchRequest.
      */
     public function testMatchRequestWithDifferentLocale()
     {
@@ -167,7 +167,7 @@ class RewritingRouterTest extends TestCase
     }
 
     /**
-     * covers RewritingRouter::matchRequest
+     * covers RewritingRouter::matchRequest.
      */
     public function testMatchRequestWithDifferentLocaleAndDomain()
     {
@@ -205,6 +205,7 @@ class RewritingRouterTest extends TestCase
             $parameters = $rewritingRouter->matchRequest($request);
         } catch (RedirectException $e) {
             $this->assertMatchesRegularExpression("/http:\/\/test\.com\/.*/", $e->getUrl());
+
             return;
         }
 

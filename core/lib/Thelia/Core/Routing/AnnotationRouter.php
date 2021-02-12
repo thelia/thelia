@@ -46,7 +46,7 @@ class AnnotationRouter extends BaseRouter
 
         $coreControllerPath = THELIA_LIB.'Controller';
         $routes->addCollection(
-            $loader->load($coreControllerPath, "annotation")
+            $loader->load($coreControllerPath, 'annotation')
         );
 
         foreach ($modules as $module) {
@@ -57,7 +57,7 @@ class AnnotationRouter extends BaseRouter
             }
 
             $routes->addCollection(
-                $loader->load($moduleControllerPath, "annotation")
+                $loader->load($moduleControllerPath, 'annotation')
             );
         }
 

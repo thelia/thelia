@@ -23,8 +23,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 
 /**
- * Class Translation
- * @package Thelia\Action
+ * Class Translation.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Translation extends BaseAction implements EventSubscriberInterface
@@ -52,6 +52,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
             ->setTranslatableStringCount($stringCount)
             ;
     }
+
     /**
      * Recursively examine files in a directory tree, and extract translatable strings.
      *
@@ -61,12 +62,14 @@ class Translation extends BaseAction implements EventSubscriberInterface
      * 'translation' => the text translation, or an empty string if none available.
      * 'dollar'  => true if the translatable text contains a $
      *
-     * @param  string $directory the path to the directory to examine
-     * @param  string $walkMode type of file scanning: WALK_MODE_PHP or WALK_MODE_TEMPLATE
-     * @param  string $currentLocale the current locale
-     * @param  string $domain the translation domain (fontoffice, backoffice, module, etc...)
-     * @param  array $strings the list of strings
+     * @param string $directory     the path to the directory to examine
+     * @param string $walkMode      type of file scanning: WALK_MODE_PHP or WALK_MODE_TEMPLATE
+     * @param string $currentLocale the current locale
+     * @param string $domain        the translation domain (fontoffice, backoffice, module, etc...)
+     * @param array  $strings       the list of strings
+     *
      * @throws \InvalidArgumentException if $walkMode contains an invalid value
+     *
      * @return number the total number of translatable texts
      */
     protected function walkDir($directory, $walkMode, $currentLocale, $domain, &$strings)
@@ -125,7 +128,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                                 $content,
                                 $matches
                             )) {
-                                Tlog::getInstance()->debug("Strings found: ", $matches[2]);
+                                Tlog::getInstance()->debug('Strings found: ', $matches[2]);
 
                                 $idx = 0;
 
@@ -133,11 +136,11 @@ class Translation extends BaseAction implements EventSubscriberInterface
                                     $hash = md5($match);
 
                                     if (isset($strings[$hash])) {
-                                        if (! \in_array($short_path, $strings[$hash]['files'])) {
+                                        if (!\in_array($short_path, $strings[$hash]['files'])) {
                                             $strings[$hash]['files'][] = $short_path;
                                         }
                                     } else {
-                                        $numTexts++;
+                                        ++$numTexts;
 
                                         // remove \' (or \"), that will prevent the translator to work properly, as
                                         // "abc \def\" ghi" will be passed as abc "def" ghi to the translator.
@@ -152,8 +155,8 @@ class Translation extends BaseAction implements EventSubscriberInterface
                                         }
 
                                         $strings[$hash] = [
-                                            'files'   => [$short_path],
-                                            'text'  => $match,
+                                            'files' => [$short_path],
+                                            'text' => $match,
                                             'translation' => Translator::getInstance()->trans(
                                                 $match,
                                                 [],
@@ -182,11 +185,11 @@ class Translation extends BaseAction implements EventSubscriberInterface
                                                 false,
                                                 false
                                             ),
-                                            'dollar'  => strstr($match, '$') !== false
+                                            'dollar' => strstr($match, '$') !== false,
                                         ];
                                     }
 
-                                    $idx++;
+                                    ++$idx;
                                 }
                             }
                         }
@@ -206,10 +209,10 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
         $fs = new Filesystem();
 
-        if (! $fs->exists($file) && true === $event->isCreateFileIfNotExists()) {
+        if (!$fs->exists($file) && true === $event->isCreateFileIfNotExists()) {
             $dir = \dirname($file);
 
-            if (! $fs->exists($file)) {
+            if (!$fs->exists($file)) {
                 $fs->mkdir($dir);
 
                 $this->cacheClear($dispatcher);
@@ -217,7 +220,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
         }
 
         if ($fp = @fopen($file, 'w')) {
-            fwrite($fp, '<' . "?php\n\n");
+            fwrite($fp, '<'."?php\n\n");
             fwrite($fp, "return array(\n");
 
             $texts = $event->getTranslatableStrings();
@@ -228,7 +231,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
             foreach ($texts as $key => $text) {
                 // Write only defined (not empty) translations
-                if (! empty($translations[$key])) {
+                if (!empty($translations[$key])) {
                     $text = str_replace("'", "\'", $text);
 
                     $translation = str_replace("'", "\'", $translations[$key]);
@@ -252,12 +255,12 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
     public function writeFallbackFile(TranslationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $file = THELIA_LOCAL_DIR . 'I18n' . DS . $event->getLocale() . '.php';
+        $file = THELIA_LOCAL_DIR.'I18n'.DS.$event->getLocale().'.php';
 
         $fs = new Filesystem();
         $translations = [];
 
-        if (! $fs->exists($file)) {
+        if (!$fs->exists($file)) {
             if (true === $event->isCreateFileIfNotExists()) {
                 $dir = \dirname($file);
                 $fs->mkdir($dir);
@@ -278,7 +281,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
             */
             $translations = require $file;
 
-            if (! \is_array($translations)) {
+            if (!\is_array($translations)) {
                 $translations = [];
             }
         }
@@ -303,7 +306,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                 }
             }
 
-            fwrite($fp, '<' . "?php\n\n");
+            fwrite($fp, '<'."?php\n\n");
             fwrite($fp, "return [\n");
 
             // Sort keys alphabetically while keeping index
@@ -365,8 +368,8 @@ class Translation extends BaseAction implements EventSubscriberInterface
             TheliaEvents::TRANSLATION_GET_STRINGS => ['getTranslatableStrings', 128],
             TheliaEvents::TRANSLATION_WRITE_FILE => [
                 ['writeTranslationFile', 128],
-                ['writeFallbackFile', 128]
-            ]
+                ['writeFallbackFile', 128],
+            ],
         ];
     }
 }

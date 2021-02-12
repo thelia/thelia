@@ -12,7 +12,6 @@
 
 namespace Thelia\Files;
 
-use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
@@ -20,11 +19,9 @@ use Thelia\Exception\FileException;
 use Thelia\Exception\ImageException;
 
 /**
- * File Manager
+ * File Manager.
  *
- * @package File
  * @author  Guillaume MOREL <gmorel@openstudio.fr>, Franck Allimant <franck@cqfdev.fr>
- *
  */
 class FileManager
 {
@@ -43,19 +40,21 @@ class FileManager
     /**
      * Create the file type identifier, to access the related class in the supportedFileModels table.
      *
-     * @param  string $fileType   the file type, e.g. document or image.
-     * @param  string $parentType the parent object type, e.g. product, folder, brand, etc.
+     * @param string $fileType   the file type, e.g. document or image.
+     * @param string $parentType the parent object type, e.g. product, folder, brand, etc.
+     *
      * @return string
      */
     protected function getFileTypeIdentifier($fileType, $parentType)
     {
         return strtolower("$fileType.$parentType");
     }
+
     /**
-     * Create a new FileModelInterface instance, from the supportedFileModels table
+     * Create a new FileModelInterface instance, from the supportedFileModels table.
      *
-     * @param string $fileType   the file type, such as document, image, etc.
-     * @param string $parentType the parent type, such as product, category, etc.
+     * @param string $fileType   the file type, such as document, image, etc
+     * @param string $parentType the parent type, such as product, category, etc
      *
      * @return FileModelInterface a file model interface instance
      *
@@ -63,7 +62,7 @@ class FileManager
      */
     public function getModelInstance($fileType, $parentType)
     {
-        if (! isset($this->supportedFileModels[$this->getFileTypeIdentifier($fileType, $parentType)])) {
+        if (!isset($this->supportedFileModels[$this->getFileTypeIdentifier($fileType, $parentType)])) {
             throw new FileException(
                 sprintf("Unsupported file type '%s' for parent type '%s'", $fileType, $parentType)
             );
@@ -71,9 +70,9 @@ class FileManager
 
         $className = $this->supportedFileModels[$this->getFileTypeIdentifier($fileType, $parentType)];
 
-        $instance = new $className;
+        $instance = new $className();
 
-        if (! $instance instanceof FileModelInterface) {
+        if (!$instance instanceof FileModelInterface) {
             throw new FileException(
                 sprintf(
                     "Wrong class type for file type '%s', parent type '%s'. Class '%s' should implements FileModelInterface",
@@ -90,8 +89,8 @@ class FileManager
     /**
      * A a new FileModelInterface class name to the supported class list.
      *
-     * @param string $fileType                the file type, such as document, image, etc.
-     * @param string $parentType              the parent type, such as Product, Category, etc.
+     * @param string $fileType                the file type, such as document, image, etc
+     * @param string $parentType              the parent type, such as Product, Category, etc
      * @param string $fullyQualifiedClassName the fully qualified class name
      */
     public function addFileModel($fileType, $parentType, $fullyQualifiedClassName)
@@ -99,13 +98,14 @@ class FileManager
         $this->supportedFileModels[$this->getFileTypeIdentifier($fileType, $parentType)] = $fullyQualifiedClassName;
     }
 
-     /**
-     * Copy UploadedFile into the server storage directory
+    /**
+     * Copy UploadedFile into the server storage directory.
      *
      * @param FileModelInterface $model        Model saved
      * @param UploadedFile       $uploadedFile Ready to be uploaded file
      *
      * @throws \Thelia\Exception\ImageException
+     *
      * @return UploadedFile|null
      */
     public function copyUploadedFile(FileModelInterface $model, UploadedFile $uploadedFile)
@@ -123,8 +123,8 @@ class FileManager
 
             $fileName = $this->renameFile($model->getId(), $uploadedFile);
 
-            $fileSystem->rename($uploadedFile->getPathname(), $directory. DS .$fileName);
-            $newUploadedFile = new UploadedFile($directory. DS .$fileName, $fileName);
+            $fileSystem->rename($uploadedFile->getPathname(), $directory.DS.$fileName);
+            $newUploadedFile = new UploadedFile($directory.DS.$fileName, $fileName);
             $model->setFile($fileName);
 
             if (!$model->save()) {
@@ -140,11 +140,12 @@ class FileManager
 
         return $newUploadedFile;
     }
+
     /**
-     * Save file into the database
+     * Save file into the database.
      *
      * @param int                $parentId  the parent object ID
-     * @param FileModelInterface $fileModel the file model object (image or document) to save.
+     * @param FileModelInterface $fileModel the file model object (image or document) to save
      *
      * @return int number of modified rows in database
      *
@@ -173,10 +174,10 @@ class FileManager
     }
 
     /**
-     * Save file into the database
+     * Save file into the database.
      *
      * @param FileCreateOrUpdateEvent $event      the event
-     * @param FileModelInterface      $imageModel the file model object (image or document) to save.
+     * @param FileModelInterface      $imageModel the file model object (image or document) to save
      *
      * @return int number of modified rows in database
      */
@@ -186,10 +187,10 @@ class FileManager
     }
 
     /**
-     * Save file into the database
+     * Save file into the database.
      *
      * @param FileCreateOrUpdateEvent $event         the event
-     * @param FileModelInterface      $documentModel the file model object (image or document) to save.
+     * @param FileModelInterface      $documentModel the file model object (image or document) to save
      *
      * @return int number of modified rows in database
      */
@@ -199,7 +200,7 @@ class FileManager
     }
 
     /**
-     * Sanitizes a filename replacing whitespace with dashes
+     * Sanitizes a filename replacing whitespace with dashes.
      *
      * Removes special characters that are illegal in filenames on certain
      * operating systems and special characters requiring special escaping
@@ -215,13 +216,13 @@ class FileManager
     }
 
     /**
-     * Delete image from file storage and database
+     * Delete image from file storage and database.
      *
      * @param FileModelInterface $model File being deleted
      */
     public function deleteFile(FileModelInterface $model)
     {
-        $url = $model->getUploadDir() . DS . $model->getFile();
+        $url = $model->getUploadDir().DS.$model->getFile();
 
         @unlink(str_replace('..', '', $url));
 
@@ -229,7 +230,7 @@ class FileManager
     }
 
     /**
-     * Rename file with image model id
+     * Rename file with image model id.
      *
      * @param int          $modelId      Model id
      * @param UploadedFile $uploadedFile File being saved
@@ -240,14 +241,14 @@ class FileManager
     {
         $extension = $uploadedFile->getClientOriginalExtension();
         if (!empty($extension)) {
-            $extension = '.' . strtolower($extension);
+            $extension = '.'.strtolower($extension);
         }
         $fileName = $this->sanitizeFileName(
             str_replace(
                 $extension,
                 '',
                 $uploadedFile->getClientOriginalName()
-            ) . '-' . $modelId . $extension
+            ).'-'.$modelId.$extension
         );
 
         return $fileName;
@@ -255,7 +256,7 @@ class FileManager
 
     /**
      * Check if a file is an image
-     * Check based on mime type
+     * Check based on mime type.
      *
      * @param string $mimeType File mime type
      *
@@ -265,7 +266,7 @@ class FileManager
     {
         $isValid = false;
 
-        $allowedType = ['image/jpeg' , 'image/png' ,'image/gif'];
+        $allowedType = ['image/jpeg', 'image/png', 'image/gif'];
 
         if (\in_array($mimeType, $allowedType)) {
             $isValid = true;

@@ -28,59 +28,59 @@ class TaxRuleTaxListUpdateForm extends BaseForm
     {
         $this->formBuilder
             ->add(
-                "id",
+                'id',
                 HiddenType::class,
                 [
-                    "required" => true,
-                    "constraints" => [
+                    'required' => true,
+                    'constraints' => [
                         new Constraints\NotBlank(),
                         new Constraints\Callback(
-                            [$this, "verifyTaxRuleId"]
+                            [$this, 'verifyTaxRuleId']
                         ),
                     ],
                 ]
             )
             ->add(
-                "tax_list",
+                'tax_list',
                 HiddenType::class,
                 [
-                    "required" => true,
-                    "attr" => [
-                        "id" => 'tax_list',
+                    'required' => true,
+                    'attr' => [
+                        'id' => 'tax_list',
                     ],
-                    "constraints" => [
+                    'constraints' => [
                         new Constraints\Callback(
-                            [$this, "verifyTaxList"]
+                            [$this, 'verifyTaxList']
                         ),
                     ],
                 ]
             )
             ->add(
-                "country_list",
+                'country_list',
                 HiddenType::class,
                 [
-                    "required" => true,
-                    "attr" => [
-                        "id" => 'country_list',
+                    'required' => true,
+                    'attr' => [
+                        'id' => 'country_list',
                     ],
-                    "constraints" => [
+                    'constraints' => [
                         new Constraints\Callback(
-                                [$this, "verifyCountryList"]
+                                [$this, 'verifyCountryList']
                         ),
                     ],
                 ]
             )
             ->add(
-                "country_deleted_list",
+                'country_deleted_list',
                 HiddenType::class,
                 [
-                    "required" => true,
-                    "attr" => [
-                        "id" => 'country_deleted_list',
+                    'required' => true,
+                    'attr' => [
+                        'id' => 'country_deleted_list',
                     ],
-                    "constraints" => [
+                    'constraints' => [
                         new Constraints\Callback(
-                            [$this, "verifyCountryList"]
+                            [$this, 'verifyCountryList']
                         ),
                     ],
                 ]
@@ -90,7 +90,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
 
     public static function getName()
     {
-        return "thelia_tax_rule_taxlistupdate";
+        return 'thelia_tax_rule_taxlistupdate';
     }
 
     public function verifyTaxRuleId($value, ExecutionContextInterface $context)
@@ -100,7 +100,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
         ;
 
         if (null === $taxRule) {
-            $context->addViolation(Translator::getInstance()->trans("Tax rule ID not found"));
+            $context->addViolation(Translator::getInstance()->trans('Tax rule ID not found'));
         }
     }
 
@@ -108,7 +108,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
     {
         $jsonType = new JsonType();
         if (!$jsonType->isValid($value)) {
-            $context->addViolation(Translator::getInstance()->trans("Tax list is not valid JSON"));
+            $context->addViolation(Translator::getInstance()->trans('Tax list is not valid JSON'));
         }
 
         $taxList = json_decode($value, true);
@@ -119,19 +119,19 @@ class TaxRuleTaxListUpdateForm extends BaseForm
             if (\is_array($taxLevel1)) {
                 foreach ($taxLevel1 as $taxLevel2) {
                     if (\is_array($taxLevel2)) {
-                        $context->addViolation(Translator::getInstance()->trans("Bad tax list JSON"));
+                        $context->addViolation(Translator::getInstance()->trans('Bad tax list JSON'));
                     } else {
                         $taxModel = TaxQuery::create()->findPk($taxLevel2);
                         if (null === $taxModel) {
                             $context->addViolation(Translator::getInstance()
-                                ->trans("Tax ID not found in tax list JSON"));
+                                ->trans('Tax ID not found in tax list JSON'));
                         }
                     }
                 }
             } else {
                 $taxModel = TaxQuery::create()->findPk($taxLevel1);
                 if (null === $taxModel) {
-                    $context->addViolation(Translator::getInstance()->trans("Tax ID not found in tax list JSON"));
+                    $context->addViolation(Translator::getInstance()->trans('Tax ID not found in tax list JSON'));
                 }
             }
         }
@@ -141,7 +141,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
     {
         $jsonType = new JsonType();
         if (!$jsonType->isValid($value)) {
-            $context->addViolation(Translator::getInstance()->trans("Country list is not valid JSON"));
+            $context->addViolation(Translator::getInstance()->trans('Country list is not valid JSON'));
         }
 
         $countryList = json_decode($value, true);
@@ -152,13 +152,13 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                 if (null === $country) {
                     $context->addViolation(
                         Translator::getInstance()->trans(
-                            "Country ID %id not found",
+                            'Country ID %id not found',
                             ['%id' => $countryItem[0]]
                         )
                     );
                 }
 
-                if ($countryItem[1] == "0") {
+                if ($countryItem[1] == '0') {
                     continue;
                 }
 
@@ -166,13 +166,13 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                 if (null === $state) {
                     $context->addViolation(
                         Translator::getInstance()->trans(
-                            "State ID %id not found",
+                            'State ID %id not found',
                             ['%id' => $countryItem[1]]
                         )
                     );
                 }
             } else {
-                $context->addViolation(Translator::getInstance()->trans("Wrong country definition"));
+                $context->addViolation(Translator::getInstance()->trans('Wrong country definition'));
             }
         }
     }

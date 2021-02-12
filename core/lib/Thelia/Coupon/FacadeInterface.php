@@ -24,17 +24,14 @@ use Thelia\Model\Coupon;
 use Thelia\TaxEngine\TaxEngine;
 
 /**
- * Allow to assist in getting relevant data on the current application state
+ * Allow to assist in getting relevant data on the current application state.
  *
- * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 interface FacadeInterface
 {
     /**
-     * Constructor
-     *
+     * Constructor.
      */
     public function __construct(
         SecurityContext $securityContext,
@@ -47,14 +44,14 @@ interface FacadeInterface
     );
 
     /**
-     * Return a Cart a CouponManager can process
+     * Return a Cart a CouponManager can process.
      *
      * @return \Thelia\Model\Cart
      */
     public function getCart();
 
     /**
-     * Return an Address a CouponManager can process
+     * Return an Address a CouponManager can process.
      *
      * @return \Thelia\Model\Address
      */
@@ -66,14 +63,14 @@ interface FacadeInterface
     public function getDeliveryCountry();
 
     /**
-     * Return an Customer a CouponManager can process
+     * Return an Customer a CouponManager can process.
      *
      * @return \Thelia\Model\Customer
      */
     public function getCustomer();
 
     /**
-     * Return Checkout total price
+     * Return Checkout total price.
      *
      * @return float
      */
@@ -81,51 +78,53 @@ interface FacadeInterface
 
     /**
      * Return Products total price
-     * CartTotalPrice = Checkout total - discount - postage
-     * @param bool $withItemsInPromo true (default) if item in promotion should be included in the total, false otherwise.
+     * CartTotalPrice = Checkout total - discount - postage.
+     *
+     * @param bool $withItemsInPromo true (default) if item in promotion should be included in the total, false otherwise
      *
      * @return float
      */
     public function getCartTotalPrice($withItemsInPromo = true);
 
     /**
-     * Return Product total tax price
-     * @param bool $withItemsInPromo true (default) if item in promotion should be included in the total, false otherwise.
+     * Return Product total tax price.
+     *
+     * @param bool $withItemsInPromo true (default) if item in promotion should be included in the total, false otherwise
      *
      * @return float
      */
     public function getCartTotalTaxPrice($withItemsInPromo = true);
 
     /**
-     * Return the Checkout currency EUR|USD
+     * Return the Checkout currency EUR|USD.
      *
      * @return string
      */
     public function getCheckoutCurrency();
 
     /**
-     * Return Checkout total postage (only) price
+     * Return Checkout total postage (only) price.
      *
      * @return float
      */
     public function getCheckoutPostagePrice();
 
     /**
-     * Return the number of Products in the Cart
+     * Return the number of Products in the Cart.
      *
      * @return int
      */
     public function getNbArticlesInCart();
 
     /**
-     * Return the number of Products include quantity in the Cart
+     * Return the number of Products include quantity in the Cart.
      *
      * @return int
      */
     public function getNbArticlesInCartIncludeQuantity();
 
     /**
-     * Find one Coupon in the database from its code
+     * Find one Coupon in the database from its code.
      *
      * @param string $code Coupon code
      *
@@ -134,13 +133,14 @@ interface FacadeInterface
     public function findOneCouponByCode($code);
 
     /**
-     * Return platform TranslatorInterface
+     * Return platform TranslatorInterface.
      *
      * @return TranslatorInterface
      */
     public function getTranslator();
+
     /**
-     * Return platform ParserInterface
+     * Return platform ParserInterface.
      *
      * @return ParserInterface
      */
@@ -148,44 +148,45 @@ interface FacadeInterface
 
     /**
      * Return the main currency
-     * THe one used to set prices in BackOffice
+     * THe one used to set prices in BackOffice.
      *
      * @return string
      */
     public function getMainCurrency();
 
     /**
-     * Return request
+     * Return request.
      *
      * @return Request
      */
     public function getRequest();
 
     /**
-     * Return Condition Evaluator
+     * Return Condition Evaluator.
      *
      * @return ConditionEvaluator
      */
     public function getConditionEvaluator();
 
     /**
-     * Return all available currencies
+     * Return all available currencies.
      *
      * @return array of Currency
      */
     public function getAvailableCurrencies();
 
     /**
-     * Return the event dispatcher,
+     * Return the event dispatcher,.
      *
      * @return \Symfony\Component\EventDispatcher\EventDispatcher
      */
     public function getDispatcher();
 
     /**
-     * Add a coupon in session
+     * Add a coupon in session.
      *
      * @param $couponCode
+     *
      * @return mixed|void
      */
     public function pushCouponInSession($couponCode);

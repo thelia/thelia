@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\AreaDeliveryModuleQuery;
 
 /**
- * Class AreaDeliveryModuleIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class AreaDeliveryModuleIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class AreaDeliveryModuleIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class AreaDeliveryModuleIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "area_delivery_module_id";
+        return 'area_delivery_module_id';
     }
 }

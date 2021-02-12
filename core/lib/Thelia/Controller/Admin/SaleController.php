@@ -32,8 +32,8 @@ use Thelia\Model\SaleProduct;
 use Thelia\Model\SaleQuery;
 
 /**
- * Class SaleController
- * @package Thelia\Controller\Admin
+ * Class SaleController.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class SaleController extends AbstractCrudController
@@ -52,7 +52,7 @@ class SaleController extends AbstractCrudController
     }
 
     /**
-     * Return the creation form for this object
+     * Return the creation form for this object.
      */
     protected function getCreationForm()
     {
@@ -60,7 +60,7 @@ class SaleController extends AbstractCrudController
     }
 
     /**
-     * Return the update form for this object
+     * Return the update form for this object.
      */
     protected function getUpdateForm()
     {
@@ -68,9 +68,10 @@ class SaleController extends AbstractCrudController
     }
 
     /**
-     * Hydrate the update form for this object, before passing it to the update template
+     * Hydrate the update form for this object, before passing it to the update template.
      *
-     * @param  Sale                 $sale
+     * @param Sale $sale
+     *
      * @return SaleModificationForm
      */
     protected function hydrateObjectForm(ParserContext $parserContext, $sale)
@@ -78,7 +79,7 @@ class SaleController extends AbstractCrudController
         // Find all categories of the selected products
         $saleProducts = $sale->getSaleProductList();
 
-        $categories = $products = [ ];
+        $categories = $products = [];
 
         /** @var SaleProduct $saleProduct */
         foreach ($saleProducts as $saleProduct) {
@@ -100,22 +101,22 @@ class SaleController extends AbstractCrudController
 
         // Prepare the data that will hydrate the form
         $data = [
-            'id'            => $sale->getId(),
-            'locale'        => $sale->getLocale(),
-            'title'         => $sale->getTitle(),
-            'label'         => $sale->getSaleLabel(),
-            'chapo'         => $sale->getChapo(),
-            'description'   => $sale->getDescription(),
-            'postscriptum'  => $sale->getPostscriptum(),
-            'active'        => $sale->getActive(),
+            'id' => $sale->getId(),
+            'locale' => $sale->getLocale(),
+            'title' => $sale->getTitle(),
+            'label' => $sale->getSaleLabel(),
+            'chapo' => $sale->getChapo(),
+            'description' => $sale->getDescription(),
+            'postscriptum' => $sale->getPostscriptum(),
+            'active' => $sale->getActive(),
             'display_initial_price' => $sale->getDisplayInitialPrice(),
-            'start_date'            => $sale->getStartDate($dateFormat),
-            'end_date'              => $sale->getEndDate($dateFormat),
-            'price_offset_type'     => $sale->getPriceOffsetType(),
-            'price_offset'          => $sale->getPriceOffsets(),
-            'categories'            => $categories,
-            'products'              => $products,
-            'product_attributes'    => $product_attributes
+            'start_date' => $sale->getStartDate($dateFormat),
+            'end_date' => $sale->getEndDate($dateFormat),
+            'price_offset_type' => $sale->getPriceOffsetType(),
+            'price_offset' => $sale->getPriceOffsets(),
+            'categories' => $categories,
+            'products' => $products,
+            'product_attributes' => $product_attributes,
         ];
 
         // Setup the object form
@@ -123,9 +124,10 @@ class SaleController extends AbstractCrudController
     }
 
     /**
-     * Creates the creation event with the provided form data
+     * Creates the creation event with the provided form data.
      *
-     * @param  array           $formData
+     * @param array $formData
+     *
      * @return SaleCreateEvent
      */
     protected function getCreationEvent($formData)
@@ -142,9 +144,10 @@ class SaleController extends AbstractCrudController
     }
 
     /**
-     * Creates the update event with the provided form data
+     * Creates the update event with the provided form data.
      *
-     * @param  array           $formData
+     * @param array $formData
+     *
      * @return SaleUpdateEvent
      */
     protected function getUpdateEvent($formData)
@@ -153,7 +156,7 @@ class SaleController extends AbstractCrudController
         $productAttributes = [];
 
         foreach ($formData['product_attributes'] as $productId => $attributeAvIdList) {
-            if (! empty($attributeAvIdList)) {
+            if (!empty($attributeAvIdList)) {
                 $productAttributes[$productId] = explode(',', $attributeAvIdList);
             }
         }
@@ -181,7 +184,7 @@ class SaleController extends AbstractCrudController
     }
 
     /**
-     * Creates the delete event with the provided form data
+     * Creates the delete event with the provided form data.
      *
      * @return SaleDeleteEvent
      */
@@ -193,7 +196,8 @@ class SaleController extends AbstractCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param  SaleEvent $event
+     * @param SaleEvent $event
+     *
      * @return bool
      */
     protected function eventContainsObject($event)
@@ -206,7 +210,7 @@ class SaleController extends AbstractCrudController
      *
      * @param $event \Thelia\Core\Event\Sale\SaleEvent
      *
-     * @return null|\Thelia\Model\Sale
+     * @return \Thelia\Model\Sale|null
      */
     protected function getObjectFromEvent($event)
     {
@@ -214,7 +218,7 @@ class SaleController extends AbstractCrudController
     }
 
     /**
-     * Load an existing object from the database
+     * Load an existing object from the database.
      *
      * @return \Thelia\Model\Sale
      */
@@ -231,7 +235,7 @@ class SaleController extends AbstractCrudController
     }
 
     /**
-     * Returns the object label form the object event (name, title, etc.)
+     * Returns the object label form the object event (name, title, etc.).
      *
      * @param Sale $object
      *
@@ -243,7 +247,7 @@ class SaleController extends AbstractCrudController
     }
 
     /**
-     * Returns the object ID from the object
+     * Returns the object ID from the object.
      *
      * @param Sale $object
      *
@@ -255,8 +259,7 @@ class SaleController extends AbstractCrudController
     }
 
     /**
-     * Render the main list template
-     *
+     * Render the main list template.
      *
      * @return Response
      */
@@ -272,12 +275,12 @@ class SaleController extends AbstractCrudController
     protected function getEditionArguments()
     {
         return [
-            'sale_id' => $this->getRequest()->get('sale_id', 0)
+            'sale_id' => $this->getRequest()->get('sale_id', 0),
         ];
     }
 
     /**
-     * Render the edition template
+     * Render the edition template.
      */
     protected function renderEditionTemplate()
     {
@@ -285,7 +288,7 @@ class SaleController extends AbstractCrudController
     }
 
     /**
-     * Redirect to the edition template
+     * Redirect to the edition template.
      */
     protected function redirectToEditionTemplate()
     {
@@ -293,7 +296,7 @@ class SaleController extends AbstractCrudController
     }
 
     /**
-     * Redirect to the list template
+     * Redirect to the list template.
      */
     protected function redirectToListTemplate()
     {
@@ -336,15 +339,15 @@ class SaleController extends AbstractCrudController
         $categories = '';
 
         foreach ($this->getRequest()->get('categories', []) as $category_id) {
-            $categories .=  $category_id . ',';
+            $categories .= $category_id.',';
         }
 
         return $this->render(
             'ajax/sale-edit-products',
             [
-                'sale_id'       => $this->getRequest()->get('sale_id'),
+                'sale_id' => $this->getRequest()->get('sale_id'),
                 'category_list' => rtrim($categories, ','),
-                'product_list'  => $this->getRequest()->get('products', [])
+                'product_list' => $this->getRequest()->get('products', []),
             ]
         );
     }
@@ -362,8 +365,8 @@ class SaleController extends AbstractCrudController
         return $this->render(
             'ajax/sale-edit-product-attributes',
             [
-            'product_id'                => $productId,
-            'selected_attributes_av_id' => $selectedAttributesAvId
+            'product_id' => $productId,
+            'selected_attributes_av_id' => $selectedAttributesAvId,
             ]
         );
     }

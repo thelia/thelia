@@ -18,9 +18,7 @@ use Thelia\TaxEngine\TaxTypeRequirementDefinition;
 use Thelia\Type\FloatType;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class PricePercentTaxType extends BaseTaxType
 {
@@ -33,7 +31,7 @@ class PricePercentTaxType extends BaseTaxType
 
     public function pricePercentRetriever()
     {
-        return ($this->getRequirement("percent") * 0.01);
+        return $this->getRequirement('percent') * 0.01;
     }
 
     public function getRequirementsDefinition()
@@ -42,13 +40,13 @@ class PricePercentTaxType extends BaseTaxType
             new TaxTypeRequirementDefinition(
                 'percent',
                 new FloatType(),
-                Translator::getInstance()->trans("Percent")
-            )
+                Translator::getInstance()->trans('Percent')
+            ),
         ];
     }
 
     public function getTitle()
     {
-        return Translator::getInstance()->trans("Percentage of the product price");
+        return Translator::getInstance()->trans('Percentage of the product price');
     }
 }

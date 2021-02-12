@@ -63,8 +63,6 @@ class Tax extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     */
     public function delete(TaxEvent $event)
     {
         if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {
@@ -82,9 +80,9 @@ class Tax extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::TAX_CREATE            => ["create", 128],
-            TheliaEvents::TAX_UPDATE            => ["update", 128],
-            TheliaEvents::TAX_DELETE            => ["delete", 128],
+            TheliaEvents::TAX_CREATE => ['create', 128],
+            TheliaEvents::TAX_UPDATE => ['update', 128],
+            TheliaEvents::TAX_DELETE => ['delete', 128],
         ];
     }
 }

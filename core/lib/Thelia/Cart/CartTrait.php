@@ -13,20 +13,14 @@
 namespace Thelia\Cart;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\Event\Cart\CartEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Model\Cart as CartModel;
-use Thelia\Model\CartQuery;
-use Thelia\Model\ConfigQuery;
-use Thelia\Model\Customer;
 
 /**
- * managed cart
+ * managed cart.
  *
  * Trait CartTrait
- * @package Thelia\Cart
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  *
  * @deprecated CartTrait is deprecated, please use Session::getSessionCart method instead
@@ -34,12 +28,13 @@ use Thelia\Model\Customer;
 trait CartTrait
 {
     /**
-     *
      * search if cart already exists in session. If not try to create a new one or duplicate an old one.
      *
-     * @param  EventDispatcherInterface                  $dispatcher the event dispatcher
-     * @param  \Symfony\Component\HttpFoundation\Request $request
+     * @param EventDispatcherInterface                  $dispatcher the event dispatcher
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     *
      * @deprecated use Session::getSessionCart method instead
+     *
      * @return \Thelia\Model\Cart
      */
     public function getCart(EventDispatcherInterface $dispatcher, Request $request)

@@ -27,8 +27,8 @@ use Thelia\Model\Hook as HookModel;
 use Thelia\Model\HookQuery;
 
 /**
- * Class HookAction
- * @package Thelia\Action
+ * Class HookAction.
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class Hook extends BaseAction implements EventSubscriberInterface
@@ -155,13 +155,13 @@ class Hook extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::HOOK_CREATE            => ['create', 128],
-            TheliaEvents::HOOK_UPDATE            => ['update', 128],
-            TheliaEvents::HOOK_DELETE            => ['delete', 128],
+            TheliaEvents::HOOK_CREATE => ['create', 128],
+            TheliaEvents::HOOK_UPDATE => ['update', 128],
+            TheliaEvents::HOOK_DELETE => ['delete', 128],
             TheliaEvents::HOOK_TOGGLE_ACTIVATION => ['toggleActivation', 128],
-            TheliaEvents::HOOK_TOGGLE_NATIVE     => ['toggleNative', 128],
-            TheliaEvents::HOOK_CREATE_ALL        => ['createAll', 128],
-            TheliaEvents::HOOK_DEACTIVATION      => ['deactivation', 128],
+            TheliaEvents::HOOK_TOGGLE_NATIVE => ['toggleNative', 128],
+            TheliaEvents::HOOK_CREATE_ALL => ['createAll', 128],
+            TheliaEvents::HOOK_DEACTIVATION => ['deactivation', 128],
         ];
     }
 }

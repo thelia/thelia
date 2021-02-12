@@ -18,8 +18,8 @@ use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
 
 /**
- * Class Pdf
- * @package Thelia\Action
+ * Class Pdf.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Pdf extends BaseAction implements EventSubscriberInterface
@@ -50,7 +50,7 @@ class Pdf extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::GENERATE_PDF => ["generatePdf", 128]
+            TheliaEvents::GENERATE_PDF => ['generatePdf', 128],
         ];
     }
 }

@@ -28,7 +28,6 @@ class RegisterParserPluginPass implements CompilerPassInterface
     /**
      * You can modify the container here before it is dumped to PHP code.
      *
-     *
      * @api
      */
     public function process(ContainerBuilder $container)
@@ -39,10 +38,10 @@ class RegisterParserPluginPass implements CompilerPassInterface
 
         $smarty = $container->getDefinition(SmartyParser::class);
 
-        foreach ($container->findTaggedServiceIds("thelia.parser.register_plugin") as $id => $plugin) {
-            $smarty->addMethodCall("addPlugins", [new Reference($id)]);
+        foreach ($container->findTaggedServiceIds('thelia.parser.register_plugin') as $id => $plugin) {
+            $smarty->addMethodCall('addPlugins', [new Reference($id)]);
         }
 
-        $smarty->addMethodCall("registerPlugins");
+        $smarty->addMethodCall('registerPlugins');
     }
 }

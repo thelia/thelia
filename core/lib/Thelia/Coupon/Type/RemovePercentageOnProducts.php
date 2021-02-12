@@ -12,25 +12,21 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Model\Product;
-
 /**
- * Allow to remove an amount from the checkout total
+ * Allow to remove an amount from the checkout total.
  *
- * @package Coupon
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class RemovePercentageOnProducts extends AbstractRemoveOnProducts
 {
+    use PercentageCouponTrait;
     public const PERCENTAGE = 'percentage';
 
-    use PercentageCouponTrait;
-
-    /** @var string Service Id  */
+    /** @var string Service Id */
     protected $serviceId = 'thelia.coupon.type.remove_percentage_on_products';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getPercentageFieldName()
     {
@@ -38,7 +34,7 @@ class RemovePercentageOnProducts extends AbstractRemoveOnProducts
     }
 
     /**
-     * Get I18n name
+     * Get I18n name.
      *
      * @return string
      */
@@ -50,7 +46,7 @@ class RemovePercentageOnProducts extends AbstractRemoveOnProducts
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getToolTip()
     {
@@ -65,7 +61,7 @@ class RemovePercentageOnProducts extends AbstractRemoveOnProducts
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function drawBackOfficeInputs()
     {

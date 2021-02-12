@@ -23,8 +23,8 @@ use Thelia\Model\Customer;
 use Thelia\Model\NewsletterQuery;
 
 /**
- * Class NewsletterController
- * @package Thelia\Controller\Front
+ * Class NewsletterController.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>, Franck Allimant <franck@cqfdev.fr>
  */
 class NewsletterController extends BaseFrontController
@@ -69,12 +69,12 @@ class NewsletterController extends BaseFrontController
         // If Ajax Request
         if ($this->getRequest()->isXmlHttpRequest()) {
             return new JsonResponse([
-                "success" => ($errorMessage) ? false : true,
-                "message" => ($errorMessage) ? $errorMessage : $this->getTranslator()->trans(
-                    "Your subscription to our newsletter has been canceled.",
+                'success' => ($errorMessage) ? false : true,
+                'message' => ($errorMessage) ? $errorMessage : $this->getTranslator()->trans(
+                    'Your subscription to our newsletter has been canceled.',
                     [],
                     Front::MESSAGE_DOMAIN
-                )
+                ),
             ], ($errorMessage) ? 500 : 200);
         }
 
@@ -118,7 +118,7 @@ class NewsletterController extends BaseFrontController
             $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $event);
 
             // If a success URL is defined in the form, redirect to it, otherwise use the defaut view
-            if ($newsletterForm->hasSuccessUrl() && ! $this->getRequest()->isXmlHttpRequest()) {
+            if ($newsletterForm->hasSuccessUrl() && !$this->getRequest()->isXmlHttpRequest()) {
                 return $this->generateSuccessRedirect($newsletterForm);
             }
         } catch (\Exception $e) {
@@ -132,12 +132,12 @@ class NewsletterController extends BaseFrontController
         // If Ajax Request
         if ($this->getRequest()->isXmlHttpRequest()) {
             return new JsonResponse([
-                "success" => ($errorMessage) ? false : true,
-                "message" => ($errorMessage) ? $errorMessage : $this->getTranslator()->trans(
+                'success' => ($errorMessage) ? false : true,
+                'message' => ($errorMessage) ? $errorMessage : $this->getTranslator()->trans(
                     "Thanks for signing up! We'll keep you posted whenever we have any new updates.",
                     [],
                     Front::MESSAGE_DOMAIN
-                )
+                ),
             ], ($errorMessage) ? 500 : 200);
         }
 

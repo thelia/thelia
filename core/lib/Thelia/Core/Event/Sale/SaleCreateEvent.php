@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Sale;
 
 /**
- * Class SaleCreateEvent
- * @package Thelia\Core\Event\Sale
+ * Class SaleCreateEvent.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class SaleCreateEvent extends SaleEvent
@@ -64,7 +64,8 @@ class SaleCreateEvent extends SaleEvent
     }
 
     /**
-     * @param  string $saleLabel
+     * @param string $saleLabel
+     *
      * @return $this
      */
     public function setSaleLabel($saleLabel)

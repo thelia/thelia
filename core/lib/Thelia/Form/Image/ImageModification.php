@@ -22,20 +22,18 @@ use Thelia\Form\StandardDescriptionFieldsTrait;
 /**
  * Created by JetBrains PhpStorm.
  * Date: 9/18/13
- * Time: 3:56 PM
+ * Time: 3:56 PM.
  *
  * Form allowing to process an image
  *
- * @package Image
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 abstract class ImageModification extends BaseForm
 {
     use StandardDescriptionFieldsTrait;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function buildForm()
     {
@@ -56,7 +54,7 @@ abstract class ImageModification extends BaseForm
                     'label' => $translator->trans('Replace current image by this file'),
                     'label_attr' => [
                         'for' => 'file',
-                    ]
+                    ],
                 ]
             )
             // Is this image online ?
@@ -64,12 +62,12 @@ abstract class ImageModification extends BaseForm
                 'visible',
                 CheckboxType::class,
                 [
-                    'constraints' => [ ],
-                    'required'    => false,
-                    'label'       => $translator->trans('This image is online'),
+                    'constraints' => [],
+                    'required' => false,
+                    'label' => $translator->trans('This image is online'),
                     'label_attr' => [
                         'for' => 'visible_create',
-                    ]
+                    ],
                 ]
             )
         ;

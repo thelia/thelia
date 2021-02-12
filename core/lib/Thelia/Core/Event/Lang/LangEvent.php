@@ -16,9 +16,10 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Lang;
 
 /**
- * Class LangEvent
- * @package Thelia\Core\Event\Lang
+ * Class LangEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
+ *
  * @deprecated since 2.4, please use \Thelia\Model\Event\LangEvent
  */
 class LangEvent extends ActionEvent
@@ -33,8 +34,6 @@ class LangEvent extends ActionEvent
         $this->lang = $lang;
     }
 
-    /**
-     */
     public function setLang(Lang $lang)
     {
         $this->lang = $lang;
@@ -49,8 +48,7 @@ class LangEvent extends ActionEvent
     }
 
     /**
-     *
-     * check if lang object is present
+     * check if lang object is present.
      *
      * @return bool
      */

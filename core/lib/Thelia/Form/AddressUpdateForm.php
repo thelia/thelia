@@ -13,8 +13,8 @@
 namespace Thelia\Form;
 
 /**
- * Class AddressUpdateForm
- * @package Thelia\Form
+ * Class AddressUpdateForm.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AddressUpdateForm extends AddressCreateForm
@@ -29,6 +29,6 @@ class AddressUpdateForm extends AddressCreateForm
      */
     public static function getName()
     {
-        return "thelia_address_update";
+        return 'thelia_address_update';
     }
 }

@@ -14,14 +14,13 @@ namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Model\ConfigQuery;
 
 /**
- * Class ResponseListener
- * @package Thelia\Core\EventListener
+ * Class ResponseListener.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ResponseListener implements EventSubscriberInterface
@@ -30,35 +29,35 @@ class ResponseListener implements EventSubscriberInterface
     {
         $session = $event->getRequest()->getSession();
 
-        if (null !== $id = $session->get("cart_use_cookie")) {
+        if (null !== $id = $session->get('cart_use_cookie')) {
             $response = $event->getResponse();
-            $cookieName = ConfigQuery::read("cart.cookie_name", 'thelia_cart');
+            $cookieName = ConfigQuery::read('cart.cookie_name', 'thelia_cart');
 
             if (empty($id)) {
                 $response->headers->clearCookie($cookieName, '/');
             } else {
                 $response->headers->setCookie(
                     new Cookie(
-                        ConfigQuery::read("cart.cookie_name", 'thelia_cart'),
+                        ConfigQuery::read('cart.cookie_name', 'thelia_cart'),
                         $id,
-                        time()+ConfigQuery::read("cart.cookie_lifetime", 60*60*24*365),
+                        time() + ConfigQuery::read('cart.cookie_lifetime', 60 * 60 * 24 * 365),
                         '/'
                     )
                 );
             }
 
-            $session->set("cart_use_cookie", null);
+            $session->set('cart_use_cookie', null);
         }
     }
 
     /**
      * {@inheritdoc}
-     * api
+     * api.
      */
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::RESPONSE => ['beforeResponse', 128]
+            KernelEvents::RESPONSE => ['beforeResponse', 128],
         ];
     }
 }

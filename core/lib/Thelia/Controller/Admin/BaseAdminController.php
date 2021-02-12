@@ -33,25 +33,26 @@ class BaseAdminController extends BaseController
 {
     public const CONTROLLER_TYPE = 'admin';
 
-    public const TEMPLATE_404 = "404";
+    public const TEMPLATE_404 = '404';
 
     /**
      * The current router identifier. The default is router.admin. Modules may use
      * setCurrentRouter() method to pass their own router, and use the route related
      * methods of this class.
      */
-    protected $currentRouter = "router.admin";
+    protected $currentRouter = 'router.admin';
 
     /**
-     * This method process the rendering of view called from an admin page
+     * This method process the rendering of view called from an admin page.
      *
-     * @param  string   $template the template name
+     * @param string $template the template name
+     *
      * @return Response the response which contains the rendered view
      */
     public function processTemplateAction($template)
     {
         try {
-            if (! empty($template)) {
+            if (!empty($template)) {
                 // If we have a view in the URL, render this view
                 return $this->render($template);
             }
@@ -94,7 +95,7 @@ class BaseAdminController extends BaseController
     }
 
     /**
-     * Return a 404 error
+     * Return a 404 error.
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
@@ -104,10 +105,10 @@ class BaseAdminController extends BaseController
     }
 
     /**
-     * Return a general error page
+     * Return a general error page.
      *
      * @param \Exception|string $message a message string, or an exception instance
-     * @param int    $status  the HTTP status (default is 500)
+     * @param int               $status  the HTTP status (default is 500)
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
@@ -115,11 +116,11 @@ class BaseAdminController extends BaseController
     {
         if ($message instanceof \Exception) {
             $strMessage = $this->getTranslator()->trans(
-                "Sorry, an error occured: %msg",
-                [ '%msg' => $message->getMessage() ]
+                'Sorry, an error occured: %msg',
+                ['%msg' => $message->getMessage()]
             );
 
-            Tlog::getInstance()->addError($strMessage.": ".$message->getTraceAsString());
+            Tlog::getInstance()->addError($strMessage.': '.$message->getTraceAsString());
 
             $message = $strMessage;
         } else {
@@ -129,7 +130,7 @@ class BaseAdminController extends BaseController
         return $this->render(
             'general_error',
             [
-                "error_message" => $message
+                'error_message' => $message,
             ],
             $status
         );
@@ -138,9 +139,9 @@ class BaseAdminController extends BaseController
     /**
      * Check current admin user authorisations. An ADMIN role is assumed.
      *
-     * @param mixed $resources a single resource or an array of resources.
-     * @param mixed $modules   a single module or an array of modules.
-     * @param mixed $accesses  a single access or an array of accesses.
+     * @param mixed $resources a single resource or an array of resources
+     * @param mixed $modules   a single module or an array of modules
+     * @param mixed $accesses  a single access or an array of accesses
      *
      * @return mixed null if authorization is granted, or a Response object which contains the error page otherwise
      */
@@ -150,13 +151,13 @@ class BaseAdminController extends BaseController
         $modules = \is_array($modules) ? $modules : [$modules];
         $accesses = \is_array($accesses) ? $accesses : [$accesses];
 
-        if ($this->getSecurityContext()->isGranted(["ADMIN"], $resources, $modules, $accesses)) {
+        if ($this->getSecurityContext()->isGranted(['ADMIN'], $resources, $modules, $accesses)) {
             // Okay !
-             return null;
+            return null;
         }
 
-         // Log the problem
-         $this->adminLogAppend(implode(",", $resources), implode(",", $accesses), "User is not granted for resources %s with accesses %s", implode(", ", $resources));
+        // Log the problem
+        $this->adminLogAppend(implode(',', $resources), implode(',', $accesses), 'User is not granted for resources %s with accesses %s', implode(', ', $resources));
 
         return $this->errorPage($this->getTranslator()->trans("Sorry, you're not allowed to perform this action"), 403);
     }
@@ -167,9 +168,9 @@ class BaseAdminController extends BaseController
     protected function createStandardFormValidationErrorMessage(FormValidationException $exception)
     {
         return $this->getTranslator()->trans(
-            "Please check your input: %error",
+            'Please check your input: %error',
             [
-                '%error' => $exception->getMessage()
+                '%error' => $exception->getMessage(),
             ]
         );
     }
@@ -188,11 +189,11 @@ class BaseAdminController extends BaseController
             // Log the error message
             Tlog::getInstance()->error(
                 $this->getTranslator()->trans(
-                    "Error during %action process : %error. Exception was %exc",
+                    'Error during %action process : %error. Exception was %exc',
                     [
                         '%action' => $action,
-                        '%error'  => $error_message,
-                        '%exc'    => $exception != null ? $exception->getMessage() : 'no exception'
+                        '%error' => $error_message,
+                        '%exc' => $exception != null ? $exception->getMessage() : 'no exception',
                     ]
                 )
             );
@@ -217,7 +218,7 @@ class BaseAdminController extends BaseController
      */
     protected function getParser($template = null)
     {
-        $parser = $this->container->get("thelia.parser");
+        $parser = $this->container->get('thelia.parser');
 
         // Define the template that should be used
         $parser->setTemplateDefinition(
@@ -288,8 +289,9 @@ class BaseAdminController extends BaseController
     /**
      * A simple helper to get the URL based on the language.
      *
-     * @param  string      $locale the locale, or null to get the current one
-     * @return null|string the URL for the current language, or null if the "One domain for each lang" feature is disabled.
+     * @param string $locale the locale, or null to get the current one
+     *
+     * @return string|null the URL for the current language, or null if the "One domain for each lang" feature is disabled
      */
     protected function getUrlLanguage($locale = null)
     {
@@ -313,16 +315,15 @@ class BaseAdminController extends BaseController
      * @param string $objectName           the object name (e.g. 'attribute', 'message')
      * @param string $requestParameterName the name of the request parameter that defines the list order
      * @param string $defaultListOrder     the default order to use, if none is defined
-     * @param bool   $updateSession        if true, the session will be updated with the current order.
+     * @param bool   $updateSession        if true, the session will be updated with the current order
      *
-     * @return String the current list order.
+     * @return string the current list order
      */
     protected function getListOrderFromSession($objectName, $requestParameterName, $defaultListOrder, $updateSession = true)
     {
-        $orderSessionIdentifier = sprintf("admin.%s.currentListOrder", $objectName);
+        $orderSessionIdentifier = sprintf('admin.%s.currentListOrder', $objectName);
 
-        if (null === $requestParameterName || null === $defaultListOrder)
-        {
+        if (null === $requestParameterName || null === $defaultListOrder) {
             return null;
         }
 
@@ -335,15 +336,17 @@ class BaseAdminController extends BaseController
         if ($updateSession) {
             $this->getSession()->set($orderSessionIdentifier, $order);
         }
+
         return $order;
     }
 
     /**
      * Render the given template, and returns the result as an Http Response.
      *
-     * @param  string                               $templateName the complete template name, with extension
-     * @param  array                                $args         the template arguments
-     * @param  int                                  $status       http code status
+     * @param string $templateName the complete template name, with extension
+     * @param array  $args         the template arguments
+     * @param int    $status       http code status
+     *
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function render($templateName, $args = [], $status = 200)
@@ -379,9 +382,9 @@ class BaseAdminController extends BaseController
 
         // Prepare common template variables
         $args = array_merge($args, [
-            'edit_language_id'     => $edition_language->getId(),
+            'edit_language_id' => $edition_language->getId(),
             'edit_language_locale' => $edition_language->getLocale(),
-            'edit_currency_id'     => $edition_currency->getId(),
+            'edit_currency_id' => $edition_currency->getId(),
         ]);
 
         // Update the current edition language & currency in session
@@ -399,7 +402,7 @@ class BaseAdminController extends BaseController
             $content = new RedirectResponse(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
         } catch (AuthorizationException $ex) {
             // User is not allowed to perform the required action. Return the error page instead of the requested page.
-            $content = $this->errorPage($this->getTranslator()->trans("Sorry, you are not allowed to perform this action."), 403);
+            $content = $this->errorPage($this->getTranslator()->trans('Sorry, you are not allowed to perform this action.'), 403);
         }
 
         return $content;

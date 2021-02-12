@@ -20,8 +20,8 @@ use Thelia\Model\AttributeAv as AttributeAvModel;
 use Thelia\Model\AttributeQuery;
 
 /**
- * Class AttributeAvTest
- * @package Thelia\Tests\Action
+ * Class AttributeAvTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AttributeAvTest extends BaseAction
@@ -56,6 +56,7 @@ class AttributeAvTest extends BaseAction
 
     /**
      * @depends testCreate
+     *
      * @return AttributeAvModel
      */
     public function testUpdate(AttributeAvModel $attributeAv)

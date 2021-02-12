@@ -19,9 +19,9 @@ class UpdateFilePositionEvent extends UpdatePositionEvent
     protected $query;
 
     /**
-     * @param               $object_id
-     * @param null          $mode
-     * @param null          $position
+     * @param      $object_id
+     * @param null $mode
+     * @param null $position
      */
     public function __construct(ModelCriteria $query, $object_id, $mode, $position = null)
     {
@@ -30,8 +30,6 @@ class UpdateFilePositionEvent extends UpdatePositionEvent
         $this->setQuery($query);
     }
 
-    /**
-     */
     public function setQuery(ModelCriteria $query)
     {
         $this->query = $query;

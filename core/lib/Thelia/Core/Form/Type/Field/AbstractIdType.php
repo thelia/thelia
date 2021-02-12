@@ -18,12 +18,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Translation\Translator;
 
 /**
- * Class AbstractIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class AbstractIdType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 abstract class AbstractIdType extends AbstractType
@@ -31,12 +30,12 @@ abstract class AbstractIdType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            "required" => true,
-            "constraints" => [
+            'required' => true,
+            'constraints' => [
                 new NotBlank(),
-                new Callback([$this, "checkId"]),
+                new Callback([$this, 'checkId']),
             ],
-            "cascade_validation" => true,
+            'cascade_validation' => true,
         ]);
     }
 
@@ -52,8 +51,8 @@ abstract class AbstractIdType extends AbstractType
                 Translator::getInstance()->trans(
                     "The %obj_name id '%id' doesn't exist",
                     [
-                        "%obj_name" => $this->getObjName(),
-                        "%id" => $value,
+                        '%obj_name' => $this->getObjName(),
+                        '%id' => $value,
                     ]
                 )
             );
@@ -62,7 +61,7 @@ abstract class AbstractIdType extends AbstractType
 
     protected function getObjName()
     {
-        if (preg_match("#^(.+)_id$#i", $this->getName(), $match)) {
+        if (preg_match('#^(.+)_id$#i', $this->getName(), $match)) {
             return $match[1];
         }
 

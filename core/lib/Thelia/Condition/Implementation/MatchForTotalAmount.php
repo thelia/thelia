@@ -19,11 +19,9 @@ use Thelia\Model\CurrencyQuery;
 
 /**
  * Condition AvailableForTotalAmount
- * Check if a Checkout total amount match criteria
+ * Check if a Checkout total amount match criteria.
  *
- * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>, Franck Allimant <franck@cqfdev.fr>
- *
  */
 class MatchForTotalAmount extends ConditionAbstract
 {
@@ -42,18 +40,18 @@ class MatchForTotalAmount extends ConditionAbstract
                 Operators::INFERIOR_OR_EQUAL,
                 Operators::EQUAL,
                 Operators::SUPERIOR_OR_EQUAL,
-                Operators::SUPERIOR
+                Operators::SUPERIOR,
             ],
             self::CART_CURRENCY => [
                 Operators::EQUAL,
-            ]
+            ],
         ];
 
         parent::__construct($facade);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getServiceId()
     {
@@ -61,7 +59,7 @@ class MatchForTotalAmount extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setValidatorsFromForm(array $operators, array $values)
     {
@@ -86,7 +84,7 @@ class MatchForTotalAmount extends ConditionAbstract
     }
 
     /**
-     * Test if Customer meets conditions
+     * Test if Customer meets conditions.
      *
      * @return bool
      */
@@ -114,7 +112,7 @@ class MatchForTotalAmount extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -125,7 +123,7 @@ class MatchForTotalAmount extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getToolTip()
     {
@@ -138,7 +136,7 @@ class MatchForTotalAmount extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getSummary()
     {
@@ -152,7 +150,7 @@ class MatchForTotalAmount extends ConditionAbstract
             [
                 '%operator%' => $i18nOperator,
                 '%amount%' => $this->values[self::CART_TOTAL],
-                '%currency%' => $this->values[self::CART_CURRENCY]
+                '%currency%' => $this->values[self::CART_CURRENCY],
             ]
         );
 
@@ -160,7 +158,7 @@ class MatchForTotalAmount extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function generateInputs()
     {
@@ -178,19 +176,19 @@ class MatchForTotalAmount extends ConditionAbstract
                 'availableOperators' => $this->availableOperators[self::CART_TOTAL],
                 'availableValues' => '',
                 'value' => '',
-                'selectedOperator' => ''
+                'selectedOperator' => '',
             ],
             self::CART_CURRENCY => [
                 'availableOperators' => $this->availableOperators[self::CART_CURRENCY],
                 'availableValues' => $cleanedCurrencies,
                 'value' => '',
-                'selectedOperator' => Operators::EQUAL
-            ]
+                'selectedOperator' => Operators::EQUAL,
+            ],
         ];
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function drawBackOfficeInputs()
     {
@@ -204,7 +202,7 @@ class MatchForTotalAmount extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function drawBackOfficeBaseInputsText($label, $inputKey)
     {

@@ -18,8 +18,8 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
 use Thelia\Core\Translation\Translator;
 
 /**
- * Class HookModificationForm
- * @package Thelia\Form
+ * Class HookModificationForm.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleHookModificationForm extends ModuleHookCreationForm
@@ -29,12 +29,12 @@ class ModuleHookModificationForm extends ModuleHookCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", HiddenType::class, ["constraints" => [new GreaterThan(['value' => 0])]])
-            ->add("active", CheckboxType::class, [
-                "label" => Translator::getInstance()->trans("Active"),
-                "required" => false,
-                "label_attr" => [
-                    "for" => "active",
+            ->add('id', HiddenType::class, ['constraints' => [new GreaterThan(['value' => 0])]])
+            ->add('active', CheckboxType::class, [
+                'label' => Translator::getInstance()->trans('Active'),
+                'required' => false,
+                'label_attr' => [
+                    'for' => 'active',
                 ],
             ])
         ;
@@ -42,6 +42,6 @@ class ModuleHookModificationForm extends ModuleHookCreationForm
 
     public static function getName()
     {
-        return "thelia_module_hook_modification";
+        return 'thelia_module_hook_modification';
     }
 }

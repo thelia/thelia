@@ -12,7 +12,6 @@
 
 namespace Thelia\Tests\Action;
 
-use http\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Action\Currency;
@@ -26,8 +25,8 @@ use Thelia\Model\CurrencyQuery;
 use Thelia\Tests\ContainerAwareTestCase;
 
 /**
- * Class CurrencyTest
- * @package Thelia\Tests\Action
+ * Class CurrencyTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CurrencyTest extends ContainerAwareTestCase
@@ -73,6 +72,7 @@ class CurrencyTest extends ContainerAwareTestCase
 
     /**
      * @depends testCreate
+     *
      * @return CurrencyModel
      */
     public function testUpdate(CurrencyModel $currency)
@@ -106,6 +106,7 @@ class CurrencyTest extends ContainerAwareTestCase
 
     /**
      * @depends testUpdate
+     *
      * @return CurrencyModel
      */
     public function testSetDefault(CurrencyModel $currency)
@@ -161,11 +162,11 @@ class CurrencyTest extends ContainerAwareTestCase
         $action = new Currency($this->getCurrencyConverter());
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage("It is not allowed to delete the default currency");
+        $this->expectExceptionMessage('It is not allowed to delete the default currency');
         $action->delete($event, null, $this->getMockEventDispatcher());
     }
 
-    public static function tearDownAfterClass():void
+    public static function tearDownAfterClass(): void
     {
         CurrencyQuery::create()
             ->addAscendingOrderByColumn('RAND()')
@@ -174,8 +175,8 @@ class CurrencyTest extends ContainerAwareTestCase
     }
 
     /**
-     * @param ContainerBuilder $container
-     * Use this method to build the container with the services that you need.
+     * @param containerBuilder $container
+     *                                    Use this method to build the container with the services that you need
      */
     protected function buildContainer(ContainerBuilder $container)
     {

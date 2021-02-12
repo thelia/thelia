@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Hook;
 
 /**
- * Class HookCreateEvent
- * @package Thelia\Core\Event\Hook
+ * Class HookCreateEvent.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookCreateEvent extends HookEvent
@@ -39,6 +39,7 @@ class HookCreateEvent extends HookEvent
 
     /**
      * @param string $locale
+     *
      * @return $this
      */
     public function setLocale($locale)
@@ -58,6 +59,7 @@ class HookCreateEvent extends HookEvent
 
     /**
      * @param $native
+     *
      * @return $this
      */
     public function setNative($native)
@@ -67,8 +69,6 @@ class HookCreateEvent extends HookEvent
         return $this;
     }
 
-    /**
-     */
     public function getNative()
     {
         return $this->native;
@@ -76,6 +76,7 @@ class HookCreateEvent extends HookEvent
 
     /**
      * @param $title
+     *
      * @return $this
      */
     public function setTitle($title)
@@ -85,8 +86,6 @@ class HookCreateEvent extends HookEvent
         return $this;
     }
 
-    /**
-     */
     public function getTitle()
     {
         return $this->title;
@@ -94,6 +93,7 @@ class HookCreateEvent extends HookEvent
 
     /**
      * @param $type
+     *
      * @return $this
      */
     public function setType($type)
@@ -103,8 +103,6 @@ class HookCreateEvent extends HookEvent
         return $this;
     }
 
-    /**
-     */
     public function getType()
     {
         return $this->type;
@@ -112,6 +110,7 @@ class HookCreateEvent extends HookEvent
 
     /**
      * @param $active
+     *
      * @return $this
      */
     public function setActive($active)
@@ -121,8 +120,6 @@ class HookCreateEvent extends HookEvent
         return $this;
     }
 
-    /**
-     */
     public function getActive()
     {
         return $this->active;
@@ -130,6 +127,7 @@ class HookCreateEvent extends HookEvent
 
     /**
      * @param $code
+     *
      * @return $this
      */
     public function setCode($code)
@@ -139,8 +137,6 @@ class HookCreateEvent extends HookEvent
         return $this;
     }
 
-    /**
-     */
     public function getCode()
     {
         return $this->code;

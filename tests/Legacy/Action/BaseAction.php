@@ -18,8 +18,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Template\ParserInterface;
 
 /**
- * Class BaseAction
- * @package Thelia\Tests\Action\ImageTest
+ * Class BaseAction.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class BaseAction extends TestCase
@@ -38,7 +38,8 @@ class BaseAction extends TestCase
     protected function getMockParserInterface()
     {
         /** @var ParserInterface $parserInterface */
-        $parserInterface = $this->createMock("Thelia\\Core\\Template\\ParserInterface");
+        $parserInterface = $this->createMock('Thelia\\Core\\Template\\ParserInterface');
+
         return $parserInterface;
     }
 
@@ -46,7 +47,7 @@ class BaseAction extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->set("event_dispatcher", $this->getMockEventDispatcher());
+        $container->set('event_dispatcher', $this->getMockEventDispatcher());
 
         return $container;
     }

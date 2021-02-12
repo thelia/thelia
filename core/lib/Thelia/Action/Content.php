@@ -37,15 +37,15 @@ use Thelia\Model\ContentQuery;
 use Thelia\Model\Map\ContentTableMap;
 
 /**
- * Class Content
- * @package Thelia\Action
+ * Class Content.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class Content extends BaseAction implements EventSubscriberInterface
 {
     public function create(ContentCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $content = (new ContentModel)
+        $content = (new ContentModel())
 
             ->setVisible($event->getVisible())
             ->setLocale($event->getLocale())
@@ -57,9 +57,10 @@ class Content extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * process update content
+     * process update content.
      *
      * @param $eventName
+     *
      * @throws PropelException
      * @throws \Exception
      */
@@ -91,10 +92,11 @@ class Content extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Change Content SEO
+     * Change Content SEO.
      *
      * @param $eventName
-     * @return Object
+     *
+     * @return object
      */
     public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -168,9 +170,7 @@ class Content extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     *
-     * associate a folder to a content if the association already does not exists
-     *
+     * associate a folder to a content if the association already does not exists.
      */
     public function addFolder(ContentAddFolderEvent $event)
     {
@@ -203,7 +203,7 @@ class Content extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Check if is a content view and if content_id is visible
+     * Check if is a content view and if content_id is visible.
      *
      * @param string $eventName
      */
@@ -235,19 +235,19 @@ class Content extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::CONTENT_CREATE            => ['create', 128],
-            TheliaEvents::CONTENT_UPDATE            => ['update', 128],
-            TheliaEvents::CONTENT_DELETE            => ['delete', 128],
+            TheliaEvents::CONTENT_CREATE => ['create', 128],
+            TheliaEvents::CONTENT_UPDATE => ['update', 128],
+            TheliaEvents::CONTENT_DELETE => ['delete', 128],
             TheliaEvents::CONTENT_TOGGLE_VISIBILITY => ['toggleVisibility', 128],
 
-            TheliaEvents::CONTENT_UPDATE_POSITION   => ['updatePosition', 128],
-            TheliaEvents::CONTENT_UPDATE_SEO        => ['updateSeo', 128],
+            TheliaEvents::CONTENT_UPDATE_POSITION => ['updatePosition', 128],
+            TheliaEvents::CONTENT_UPDATE_SEO => ['updateSeo', 128],
 
-            TheliaEvents::CONTENT_ADD_FOLDER        => ['addFolder', 128],
-            TheliaEvents::CONTENT_REMOVE_FOLDER     => ['removeFolder', 128],
+            TheliaEvents::CONTENT_ADD_FOLDER => ['addFolder', 128],
+            TheliaEvents::CONTENT_REMOVE_FOLDER => ['removeFolder', 128],
 
-            TheliaEvents::VIEW_CHECK                    => ['viewCheck', 128],
-            TheliaEvents::VIEW_CONTENT_ID_NOT_VISIBLE   => ['viewContentIdNotVisible', 128],
+            TheliaEvents::VIEW_CHECK => ['viewCheck', 128],
+            TheliaEvents::VIEW_CONTENT_ID_NOT_VISIBLE => ['viewContentIdNotVisible', 128],
         ];
     }
 }

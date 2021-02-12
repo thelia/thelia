@@ -12,7 +12,6 @@
 
 namespace Thelia\Core\Translation;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 
@@ -27,14 +26,12 @@ class Translator extends BaseTranslator
 
     protected static $instance = null;
 
-    /**
-     */
     public function __construct(RequestStack $requestStack)
     {
         // Allow singleton style calls once intanciated.
         // For this to work, the Translator service has to be instanciated very early. This is done manually
         // in TheliaHttpKernel, by calling $this->container->get('thelia.translator');
-        parent::__construct("");
+        parent::__construct('');
         self::$instance = $this;
         $this->requestStack = $requestStack;
     }
@@ -42,14 +39,16 @@ class Translator extends BaseTranslator
     /**
      * Return this class instance, only once instanciated.
      *
-     * @throws \RuntimeException                   if the class has not been instanciated.
-     * @return \Thelia\Core\Translation\Translator the instance.
+     * @throws \RuntimeException if the class has not been instanciated
+     *
+     * @return \Thelia\Core\Translation\Translator the instance
      */
     public static function getInstance()
     {
         if (self::$instance == null) {
-            throw new \RuntimeException("Translator instance is not initialized.");
+            throw new \RuntimeException('Translator instance is not initialized.');
         }
+
         return self::$instance;
     }
 
@@ -70,8 +69,7 @@ class Translator extends BaseTranslator
         string $locale = null,
         $returnDefaultIfNotAvailable = true,
         $useFallback = true
-    ): string
-    {
+    ): string {
         $domain = $domain ?? 'core';
         if (null === $locale) {
             $locale = $this->getLocale();
