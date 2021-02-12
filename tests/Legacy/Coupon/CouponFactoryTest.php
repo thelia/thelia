@@ -224,10 +224,11 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
     /**
      * @covers \Thelia\Coupon\CouponFactory::buildCouponFromCode
-     * @expectedException \Thelia\Exception\CouponNoUsageLeftException
      */
     public function testBuildCouponFromCodeUsageLimitCoupon()
     {
+        $this->expectException(\Thelia\Exception\CouponNoUsageLeftException::class);
+
         $this->markTestSkipped('It\'s necessary to mock the facade');
 
         /** @var FacadeInterface|MockObject $stubFacade */
@@ -329,10 +330,11 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
     /**
      * @covers \Thelia\Coupon\CouponFactory::buildCouponFromCode
-     * @expectedException \Thelia\Exception\CouponExpiredException
      */
     public function testBuildCouponFromCodeExpiredCoupon()
     {
+        $this->expectException(\Thelia\Exception\CouponExpiredException::class);
+
         $this->markTestSkipped('It\'s necessary to mock the facade');
 
         /** @var FacadeInterface|MockObject $stubFacade */
@@ -398,10 +400,11 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
     /**
      * @covers \Thelia\Coupon\CouponFactory::buildCouponFromCode
-     * @expectedException \Thelia\Exception\InvalidConditionException
      */
     public function testBuildCouponFromCodeNoConditionCoupon()
     {
+        $this->expectException(\Thelia\Exception\InvalidConditionException::class);
+
         $this->markTestSkipped('It\'s necessary to mock the facade');
 
         /** @var FacadeInterface|MockObject $stubFacade */

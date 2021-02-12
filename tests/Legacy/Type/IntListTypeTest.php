@@ -31,7 +31,7 @@ class IntListTypeTest extends TestCase
     public function testFormatIntListType()
     {
         $intListType = new IntListType();
-        $this->assertTrue(\is_array($intListType->getFormattedValue('1,2,3')));
+        $this->assertIsArray($intListType->getFormattedValue('1,2,3'));
         $this->assertNull($intListType->getFormattedValue('foo'));
     }
 }

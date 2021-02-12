@@ -52,7 +52,7 @@ $path = str_replace(' ', '~', $path);
  * can use any name you want, but the function must accept one unique parameter: the array that contains the file
  * descriptions.
  *
- * @param $juploadPhpSupportClass The instance of the JUpload PHP class.
+ * @param $juploadPhpSupportClass the instance of the JUpload PHP class
  */
 function handle_uploaded_files($juploadPhpSupportClass, $files)
 {

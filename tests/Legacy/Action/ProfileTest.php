@@ -118,7 +118,7 @@ class ProfileTest extends BaseAction
 
         $resources = $updatedProfile->getResources();
 
-        $this->assertEquals(1, \count($resources));
+        $this->assertCount(1, $resources);
 
         $resource = $resources->getFirst();
         $this->assertEquals('admin.address', $resource->getCode());

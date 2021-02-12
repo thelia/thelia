@@ -45,15 +45,15 @@ try {
     </div>
 <?php
 } catch (\Thelia\Install\Exception\AlreadyInstallException $ex) {
-    ?>
+        ?>
         <div class="alert alert-danger">
             <?php echo $trans->trans(
                 'It seems that Thelia is already installed on this system. Please check configuration, perform some cleanup if required, an try again.'
             ); ?>
         </div>
         <?php
-} catch (\Exception $ex) {
-    ?>
+    } catch (\Exception $ex) {
+        ?>
     <div class="alert alert-danger">
         <?php echo $trans->trans('<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>', [
                 '%err' => $ex->getMessage(),
@@ -61,7 +61,7 @@ try {
             ]); ?>
     </div>
     <?php
-}
+    }
 
 include 'footer.php';
 ?>

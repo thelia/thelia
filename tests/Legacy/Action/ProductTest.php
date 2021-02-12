@@ -117,7 +117,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $productSaleElements = $createdProduct->getProductSaleElementss();
 
-        $this->assertEquals(1, \count($productSaleElements));
+        $this->assertCount(1, $productSaleElements);
 
         $defaultProductSaleElement = $productSaleElements->getFirst();
 
@@ -183,7 +183,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $productSaleElements = $createdProduct->getProductSaleElementss();
 
-        $this->assertEquals(1, \count($productSaleElements));
+        $this->assertCount(1, $productSaleElements);
 
         $defaultProductSaleElement = $productSaleElements->getFirst();
 
@@ -241,7 +241,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals($defaultCategory, $updatedProduct->getDefaultCategoryId());
 
         $PSE = $updatedProduct->getProductSaleElementss();
-        $this->assertEquals(1, \count($PSE));
+        $this->assertCount(1, $PSE);
 
         /** @var ProductSaleElements $defaultPSE */
         $defaultPSE = $product->getDefaultSaleElements();
@@ -282,7 +282,7 @@ class ProductTest extends TestCaseWithURLToolSetup
     {
         $contents = $product->getProductAssociatedContents();
 
-        $this->assertEquals(0, \count($contents));
+        $this->assertCount(0, $contents);
 
         /** @var Content $content */
         $content = ContentQuery::create()->addAscendingOrderByColumn('RAND()')->findOne();
@@ -294,7 +294,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $product->clearProductAssociatedContents();
         $newContents = $product->getProductAssociatedContents();
 
-        $this->assertEquals(1, \count($newContents));
+        $this->assertCount(1, $newContents);
 
         return $product;
     }
@@ -309,7 +309,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $product->clearProductAssociatedContents();
         $contents = $product->getProductAssociatedContents();
 
-        $this->assertEquals(1, \count($contents));
+        $this->assertCount(1, $contents);
 
         $content = $contents->getFirst();
 
@@ -320,7 +320,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $product->clearProductAssociatedContents();
         $deletedContent = $product->getProductAssociatedContents();
 
-        $this->assertEquals(0, \count($deletedContent));
+        $this->assertCount(0, $deletedContent);
 
         return $product;
     }
@@ -334,7 +334,7 @@ class ProductTest extends TestCaseWithURLToolSetup
     {
         $categories = $product->getProductCategories();
 
-        $this->assertEquals(1, \count($categories));
+        $this->assertCount(1, $categories);
 
         $defaultCategory = $categories->getFirst();
 
@@ -353,7 +353,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $newCategories = $product->getProductCategories();
 
-        $this->assertEquals(2, \count($newCategories));
+        $this->assertCount(2, $newCategories);
 
         return [
             'product' => $product,
@@ -377,7 +377,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $product->clearProductCategories();
 
-        $this->assertEquals(2, \count($product->getProductCategories()));
+        $this->assertCount(2, $product->getProductCategories());
 
         $event = new ProductDeleteCategoryEvent($product, $category->getId());
 
@@ -386,7 +386,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $product->clearProductCategories();
 
-        $this->assertEquals(1, \count($product->getProductCategories()));
+        $this->assertCount(1, $product->getProductCategories());
 
         return $product;
     }
@@ -427,7 +427,7 @@ class ProductTest extends TestCaseWithURLToolSetup
     public function testRemoveAccessory(ProductModel $product)
     {
         $accessories = AccessoryQuery::create()->filterByProductId($product->getId())->find();
-        $this->assertEquals(1, \count($accessories));
+        $this->assertCount(1, $accessories);
 
         $currentAccessory = $accessories->getFirst();
         $event = new ProductDeleteAccessoryEvent($product, $currentAccessory->getAccessory());
@@ -468,7 +468,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $productSaleElements = $updatedProduct->getProductSaleElementss();
 
-        $this->assertEquals(1, \count($productSaleElements), 'after setting a new template, only 1 product_sale_elements must be present');
+        $this->assertCount(1, $productSaleElements, 'after setting a new template, only 1 product_sale_elements must be present');
 
         /** @var \Thelia\Model\ProductSaleElements $newProductSaleElements */
         $newProductSaleElements = $productSaleElements->getFirst();

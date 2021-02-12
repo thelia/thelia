@@ -65,9 +65,9 @@ class ModuleValidatorTest extends TestCase
 
         $this->assertEquals('VirtualProductDelivery', $moduleDefinition->getCode());
         $this->assertEquals('VirtualProductDelivery\\VirtualProductDelivery', $moduleDefinition->getNamespace());
-        $this->assertEquals(2, \count($moduleDefinition->getLanguages()));
-        $this->assertEquals(0, \count($moduleDefinition->getDependencies()));
-        $this->assertEquals(1, \count($moduleDefinition->getAuthors()));
+        $this->assertCount(2, $moduleDefinition->getLanguages());
+        $this->assertCount(0, $moduleDefinition->getDependencies());
+        $this->assertCount(1, $moduleDefinition->getAuthors());
         $this->assertEquals('', $moduleDefinition->getDocumentation());
         $this->assertEquals('', $moduleDefinition->getLogo());
         $this->assertEquals('2.4.4', $moduleDefinition->getTheliaVersion());
