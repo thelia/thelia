@@ -5,7 +5,7 @@ include("header.php");
 
 try {
     $err = isset($_GET['err']) && $_GET['err'];
-    $errCode = isset($_GET['err']) ? $_GET['err'] : 0;
+    $errCode = $_GET['err'] ?? 0;
 
     if (!$err && $_SESSION['install']['step'] != $step) {
         try {

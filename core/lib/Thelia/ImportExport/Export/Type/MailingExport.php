@@ -23,7 +23,7 @@ use Thelia\ImportExport\Export\JsonFileAbstractExport;
  */
 class MailingExport extends JsonFileAbstractExport
 {
-    const FILE_NAME = 'mailing';
+    public const FILE_NAME = 'mailing';
 
     protected $orderAndAliases = [
         'newsletter_id' => 'Identifier',

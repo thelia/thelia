@@ -14,26 +14,26 @@ namespace Thelia\Exception;
 
 class TaxEngineException extends \RuntimeException
 {
-    const UNKNOWN_EXCEPTION = 0;
+    public const UNKNOWN_EXCEPTION = 0;
 
-    const BAD_RECORDED_TYPE = 101;
-    const BAD_RECORDED_REQUIREMENTS = 102;
+    public const BAD_RECORDED_TYPE = 101;
+    public const BAD_RECORDED_REQUIREMENTS = 102;
 
-    const TAX_TYPE_BAD_ABSTRACT_METHOD = 201;
-    const TAX_TYPE_REQUIREMENT_NOT_FOUND = 202;
-    const TAX_TYPE_BAD_REQUIREMENT_VALUE = 203;
+    public const TAX_TYPE_BAD_ABSTRACT_METHOD = 201;
+    public const TAX_TYPE_REQUIREMENT_NOT_FOUND = 202;
+    public const TAX_TYPE_BAD_REQUIREMENT_VALUE = 203;
 
-    const UNDEFINED_PRODUCT = 501;
-    const UNDEFINED_COUNTRY = 502;
-    const UNDEFINED_TAX_RULES_COLLECTION = 503;
-    const UNDEFINED_REQUIREMENTS = 504;
-    const UNDEFINED_REQUIREMENT_VALUE = 505;
-    const UNDEFINED_TAX_RULE = 506;
-    const NO_TAX_IN_TAX_RULES_COLLECTION = 507;
+    public const UNDEFINED_PRODUCT = 501;
+    public const UNDEFINED_COUNTRY = 502;
+    public const UNDEFINED_TAX_RULES_COLLECTION = 503;
+    public const UNDEFINED_REQUIREMENTS = 504;
+    public const UNDEFINED_REQUIREMENT_VALUE = 505;
+    public const UNDEFINED_TAX_RULE = 506;
+    public const NO_TAX_IN_TAX_RULES_COLLECTION = 507;
 
-    const BAD_AMOUNT_FORMAT = 601;
+    public const BAD_AMOUNT_FORMAT = 601;
 
-    const FEATURE_BAD_EXPECTED_VALUE = 701;
+    public const FEATURE_BAD_EXPECTED_VALUE = 701;
 
     public function __construct($message, $code = null, $previous = null)
     {

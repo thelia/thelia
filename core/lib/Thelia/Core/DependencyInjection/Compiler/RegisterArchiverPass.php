@@ -28,12 +28,12 @@ class RegisterArchiverPass implements CompilerPassInterface
     /**
      * @var string Archiver manager service ID
      */
-    const MANAGER_SERVICE_ID = ArchiverManager::class;
+    public const MANAGER_SERVICE_ID = ArchiverManager::class;
 
     /**
      * @var string Archiver tag name
      */
-    const ARCHIVER_SERVICE_TAG = 'thelia.archiver';
+    public const ARCHIVER_SERVICE_TAG = 'thelia.archiver';
 
     public function process(ContainerBuilder $container)
     {

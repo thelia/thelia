@@ -108,7 +108,7 @@ class CartPostage extends AbstractSmartyPlugin
         $customer = $this->getCurrentRequest()->getSession()->getCustomerUser();
         /** @var Address $address */
         /** @var Country $country */
-        list($address, $country, $state) = $this->getDeliveryInformation($customer);
+        [$address, $country, $state] = $this->getDeliveryInformation($customer);
 
         if (null !== $country) {
             $this->countryId = $country->getId();

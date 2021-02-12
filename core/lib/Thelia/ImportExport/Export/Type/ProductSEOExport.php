@@ -27,7 +27,7 @@ use Thelia\Model\Product;
  */
 class ProductSEOExport extends JsonFileAbstractExport
 {
-    const FILE_NAME = 'product_seo';
+    public const FILE_NAME = 'product_seo';
 
     protected $orderAndAliases = [
         'product_ref' => 'ref',

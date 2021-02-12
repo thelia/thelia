@@ -51,20 +51,20 @@ class BaseModule implements BaseModuleInterface
 {
     use ContainerAwareTrait;
 
-    const CLASSIC_MODULE_TYPE  = 1;
-    const DELIVERY_MODULE_TYPE = 2;
-    const PAYMENT_MODULE_TYPE  = 3;
+    public const CLASSIC_MODULE_TYPE  = 1;
+    public const DELIVERY_MODULE_TYPE = 2;
+    public const PAYMENT_MODULE_TYPE  = 3;
 
-    const MODULE_CATEGORIES = 'classic,delivery,payment,marketplace,price,accounting,seo,administration,statistic';
+    public const MODULE_CATEGORIES = 'classic,delivery,payment,marketplace,price,accounting,seo,administration,statistic';
 
-    const IS_ACTIVATED     = 1;
-    const IS_NOT_ACTIVATED = 0;
+    public const IS_ACTIVATED     = 1;
+    public const IS_NOT_ACTIVATED = 0;
 
-    const IS_MANDATORY       = 1;
-    const IS_NOT_MANDATORY   = 0;
+    public const IS_MANDATORY       = 1;
+    public const IS_NOT_MANDATORY   = 0;
 
-    const IS_HIDDEN        = 1;
-    const IS_NOT_HIDDEN    = 0;
+    public const IS_HIDDEN        = 1;
+    public const IS_NOT_HIDDEN    = 0;
 
     protected $reflected;
 
@@ -596,7 +596,7 @@ class BaseModule implements BaseModuleInterface
                  *
                  * @var \Thelia\Model\Hook $hookModel
                  */
-                list($hookModel, $updateData) = $this->createOrUpdateHook($hook, $dispatcher, $defaultLocale);
+                [$hookModel, $updateData] = $this->createOrUpdateHook($hook, $dispatcher, $defaultLocale);
 
                 /**
                  * Update translations
@@ -639,7 +639,7 @@ class BaseModule implements BaseModuleInterface
          */
         $locale = $defaultLocale;
 
-        list($titles, $descriptions, $chapos) = $this->getHookI18nInfo($hook, $defaultLocale);
+        [$titles, $descriptions, $chapos] = $this->getHookI18nInfo($hook, $defaultLocale);
 
         /**
          * If the default locale exists

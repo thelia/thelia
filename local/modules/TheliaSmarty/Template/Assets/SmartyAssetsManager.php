@@ -22,7 +22,7 @@ use TheliaSmarty\Template\SmartyParser;
 
 class SmartyAssetsManager
 {
-    const ASSET_TYPE_AUTO = '';
+    public const ASSET_TYPE_AUTO = '';
 
     private $assetsManager;
     private $assetsResolver;
@@ -148,11 +148,11 @@ class SmartyAssetsManager
             );
         }
 
-        $assetOrigin  = isset($params['source']) ? $params['source'] : ParserInterface::TEMPLATE_ASSETS_KEY;
+        $assetOrigin  = $params['source'] ?? ParserInterface::TEMPLATE_ASSETS_KEY;
         $filters      = $allowFilters && isset($params['filters']) ? $params['filters'] : '';
         $debug        = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
-        $templateName = isset($params['template']) ? $params['template'] : false;
-        $failsafe     = isset($params['failsafe']) ? $params['failsafe'] : false;
+        $templateName = $params['template'] ?? false;
+        $failsafe     = $params['failsafe'] ?? false;
 
         Tlog::getInstance()->debug("Searching asset $file in source $assetOrigin, with template $templateName");
 

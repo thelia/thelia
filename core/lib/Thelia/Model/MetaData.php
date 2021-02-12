@@ -16,29 +16,29 @@ use Thelia\Model\Base\MetaData as BaseMetaData;
 
 class MetaData extends BaseMetaData
 {
-    const CATEGORY_KEY     = 'category';
-    const PRODUCT_KEY      = 'product';
-    const PSE_KEY          = 'pse';
-    const FEATURE_KEY      = 'feature';
-    const FEATURE_AV_KEY   = 'feature_av';
-    const ATTRIBUTE_KEY    = 'attribute';
-    const ATTRIBUTE_AV_KEY = 'attribute_av';
-    const BRAND_KEY        = 'brand_av';
+    public const CATEGORY_KEY     = 'category';
+    public const PRODUCT_KEY      = 'product';
+    public const PSE_KEY          = 'pse';
+    public const FEATURE_KEY      = 'feature';
+    public const FEATURE_AV_KEY   = 'feature_av';
+    public const ATTRIBUTE_KEY    = 'attribute';
+    public const ATTRIBUTE_AV_KEY = 'attribute_av';
+    public const BRAND_KEY        = 'brand_av';
 
-    const FOLDER_KEY  = 'folder';
-    const CONTENT_KEY = 'content';
+    public const FOLDER_KEY  = 'folder';
+    public const CONTENT_KEY = 'content';
 
-    const ORDER_KEY = 'order';
-    const ORDER_PRODUCT_KEY = 'order_product';
+    public const ORDER_KEY = 'order';
+    public const ORDER_PRODUCT_KEY = 'order_product';
 
-    const MODULE_KEY = 'module';
+    public const MODULE_KEY = 'module';
 
-    const CUSTOMER_KEY = 'customer';
-    const ADDRESS_KEY  = 'address';
+    public const CUSTOMER_KEY = 'customer';
+    public const ADDRESS_KEY  = 'address';
 
-    const CURRENCY_KEY = 'currency';
-    const COUNTRY_KEY  = 'country';
-    const LANG_KEY     = 'lang';
+    public const CURRENCY_KEY = 'currency';
+    public const COUNTRY_KEY  = 'country';
+    public const LANG_KEY     = 'lang';
 
     public function getValue()
     {

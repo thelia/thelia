@@ -52,7 +52,7 @@ use Thelia\Model\Map\ImportTableMap;
  */
 class XmlFileLoader extends FileLoader
 {
-    const DEFAULT_HOOK_CLASS = "Thelia\\Core\\Hook\\DefaultHook";
+    public const DEFAULT_HOOK_CLASS = "Thelia\\Core\\Hook\\DefaultHook";
 
     /**
      * Loads an XML file.

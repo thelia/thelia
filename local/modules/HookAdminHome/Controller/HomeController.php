@@ -32,9 +32,9 @@ class HomeController extends BaseAdminController
     /**
      * Key prefix for stats cache
      */
-    const STATS_CACHE_KEY = "stats";
+    public const STATS_CACHE_KEY = "stats";
 
-    const RESOURCE_CODE = "admin.home";
+    public const RESOURCE_CODE = "admin.home";
 
     /**
      * @Route("/admin/home/stats", name="admin.home.stats")

@@ -19,6 +19,6 @@ use Thelia\Module\BaseModule;
  */
 class HookNavigation extends BaseModule
 {
-    const MESSAGE_DOMAIN = 'hooknavigation';
-    const ROUTER = 'router.hooknavigation';
+    public const MESSAGE_DOMAIN = 'hooknavigation';
+    public const ROUTER = 'router.hooknavigation';
 }

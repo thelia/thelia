@@ -26,7 +26,7 @@ use Thelia\Model\ProfileQuery;
 
 class AdministratorCreationForm extends BaseForm
 {
-    const PROFILE_FIELD_PREFIX = "profile";
+    public const PROFILE_FIELD_PREFIX = "profile";
 
     protected function buildForm()
     {

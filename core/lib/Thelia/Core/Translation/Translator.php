@@ -18,9 +18,9 @@ use Symfony\Component\Translation\Translator as BaseTranslator;
 
 class Translator extends BaseTranslator
 {
-    const GLOBAL_FALLBACK_DOMAIN = 'global';
+    public const GLOBAL_FALLBACK_DOMAIN = 'global';
 
-    const GLOBAL_FALLBACK_KEY = '%s.%s';
+    public const GLOBAL_FALLBACK_KEY = '%s.%s';
 
     /** @var RequestStack */
     protected $requestStack;

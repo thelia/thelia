@@ -24,7 +24,7 @@ use Thelia\Core\Template\Assets\AsseticAssetManager;
  */
 class RegisterAssetFilterPass implements CompilerPassInterface
 {
-    const SERVICE_TAG = "thelia.asset.filter";
+    public const SERVICE_TAG = "thelia.asset.filter";
 
     /**
      * You can modify the container here before it is dumped to PHP code.

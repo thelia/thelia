@@ -29,7 +29,7 @@ use Thelia\Model\Map\CouponTableMap;
 class Coupon extends BaseCoupon
 {
     // Define the value of an unlimited coupon usage.
-    const UNLIMITED_COUPON_USE = -1;
+    public const UNLIMITED_COUPON_USE = -1;
 
     /**
      * Create or Update this Coupon

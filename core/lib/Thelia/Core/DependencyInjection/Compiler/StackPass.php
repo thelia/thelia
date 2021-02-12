@@ -40,7 +40,7 @@ class StackPass implements CompilerPassInterface
         $stackPriority = [];
 
         foreach ($container->findTaggedServiceIds('stack_middleware') as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+            $priority = $attributes[0]['priority'] ?? 0;
             $stackPriority[$priority][] = $this->retrieveArguments($container, $id);
         }
 

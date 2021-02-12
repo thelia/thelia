@@ -28,23 +28,23 @@ use Thelia\Model\ConfigQuery;
 class Tlog implements LoggerInterface
 {
     // Nom des variables de configuration
-    const VAR_LEVEL        = "tlog_level";
-    const VAR_DESTINATIONS    = "tlog_destinations";
-    const VAR_PREFIXE        = "tlog_prefix";
-    const VAR_FILES        = "tlog_files";
-    const VAR_IP                = "tlog_ip";
-    const VAR_SHOW_REDIRECT     = "tlog_show_redirect";
+    public const VAR_LEVEL        = "tlog_level";
+    public const VAR_DESTINATIONS    = "tlog_destinations";
+    public const VAR_PREFIXE        = "tlog_prefix";
+    public const VAR_FILES        = "tlog_files";
+    public const VAR_IP                = "tlog_ip";
+    public const VAR_SHOW_REDIRECT     = "tlog_show_redirect";
 
     // all level of trace
-    const DEBUG                 = 100;
-    const INFO                  = 200;
-    const NOTICE                = 300;
-    const WARNING               = 400;
-    const ERROR                 = 500;
-    const CRITICAL              = 600;
-    const ALERT                 = 700;
-    const EMERGENCY             = 800;
-    const MUET                  = PHP_INT_MAX;
+    public const DEBUG                 = 100;
+    public const INFO                  = 200;
+    public const NOTICE                = 300;
+    public const WARNING               = 400;
+    public const ERROR                 = 500;
+    public const CRITICAL              = 600;
+    public const ALERT                 = 700;
+    public const EMERGENCY             = 800;
+    public const MUET                  = PHP_INT_MAX;
 
     protected $levels = [
         100 => "DEBUG",
@@ -58,12 +58,12 @@ class Tlog implements LoggerInterface
     ];
 
     // default values
-    const DEFAULT_LEVEL         = self::ERROR;
-    const DEFAUT_DESTINATIONS   = "Thelia\Log\Destination\TlogDestinationRotatingFile";
-    const DEFAUT_PREFIXE    = "#INDEX: #LEVEL [#FILE:#FUNCTION()] {#LINE} #DATE #HOUR: ";
-    const DEFAUT_FILES        = "*";
-    const DEFAUT_IP        = "";
-    const DEFAUT_SHOW_REDIRECT  = 0;
+    public const DEFAULT_LEVEL         = self::ERROR;
+    public const DEFAUT_DESTINATIONS   = "Thelia\Log\Destination\TlogDestinationRotatingFile";
+    public const DEFAUT_PREFIXE    = "#INDEX: #LEVEL [#FILE:#FUNCTION()] {#LINE} #DATE #HOUR: ";
+    public const DEFAUT_FILES        = "*";
+    public const DEFAUT_IP        = "";
+    public const DEFAUT_SHOW_REDIRECT  = 0;
 
     /**
      *
@@ -624,7 +624,7 @@ class Tlog implements LoggerInterface
                 $hop = array_pop($trace);
             }
 
-            $origin['class'] = isset($prevHop['class']) ? $prevHop['class'] : 'main';
+            $origin['class'] = $prevHop['class'] ?? 'main';
 
             if (isset($prevHop['function']) &&
                 $prevHop['function'] !== 'include' &&

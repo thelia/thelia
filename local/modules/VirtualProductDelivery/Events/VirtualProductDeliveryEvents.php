@@ -21,5 +21,5 @@ use Thelia\Core\Event\ActionEvent;
  */
 class VirtualProductDeliveryEvents extends ActionEvent
 {
-    const ORDER_VIRTUAL_FILES_AVAILABLE = 'virtual_product_delivery.virtual_files_available';
+    public const ORDER_VIRTUAL_FILES_AVAILABLE = 'virtual_product_delivery.virtual_files_available';
 }

@@ -32,7 +32,7 @@ class ConfigCommandTest extends BaseCommandTest
     /** @var  CommandTester */
     protected $commandTester;
 
-    const PREFIX_NAME = "config_command_test_";
+    public const PREFIX_NAME = "config_command_test_";
 
     public static function setUpBeforeClass(): void
     {

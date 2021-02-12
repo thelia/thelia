@@ -36,12 +36,12 @@ class FeedController extends BaseFrontController {
     /**
      * Folder name for feeds cache
      */
-    const FEED_CACHE_DIR = "feeds";
+    public const FEED_CACHE_DIR = "feeds";
 
     /**
      * Key prefix for feed cache
      */
-    const FEED_CACHE_KEY = "feed";
+    public const FEED_CACHE_KEY = "feed";
 
     /**
      * render the RSS feed

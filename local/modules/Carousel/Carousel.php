@@ -28,7 +28,7 @@ use Thelia\Module\BaseModule;
  */
 class Carousel extends BaseModule
 {
-    const DOMAIN_NAME = 'carousel';
+    public const DOMAIN_NAME = 'carousel';
 
     public function preActivation(ConnectionInterface $con = null)
     {

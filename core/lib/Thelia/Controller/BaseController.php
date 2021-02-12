@@ -53,7 +53,7 @@ abstract class BaseController implements ControllerInterface
 {
     use ContainerAwareTrait;
 
-    const EMPTY_FORM_NAME = "thelia.empty";
+    public const EMPTY_FORM_NAME = "thelia.empty";
 
     protected $tokenProvider;
 

@@ -559,26 +559,26 @@ class CustomerController extends BaseFrontController
     private function createEventInstance($data)
     {
         $customerCreateEvent = new CustomerCreateOrUpdateEvent(
-            isset($data["title"])?$data["title"]:null,
-            isset($data["firstname"])?$data["firstname"]:null,
-            isset($data["lastname"])?$data["lastname"]:null,
-            isset($data["address1"])?$data["address1"]:null,
-            isset($data["address2"])?$data["address2"]:null,
-            isset($data["address3"])?$data["address3"]:null,
-            isset($data["phone"])?$data["phone"]:null,
-            isset($data["cellphone"])?$data["cellphone"]:null,
-            isset($data["zipcode"])?$data["zipcode"]:null,
-            isset($data["city"])?$data["city"]:null,
-            isset($data["country"])?$data["country"]:null,
-            isset($data["email"])?$data["email"]:null,
-            isset($data["password"]) ? $data["password"]:null,
-            isset($data["lang_id"]) ? $data["lang_id"]:$this->getSession()->getLang()->getId(),
-            isset($data["reseller"])?$data["reseller"]:null,
-            isset($data["sponsor"])?$data["sponsor"]:null,
-            isset($data["discount"])?$data["discount"]:null,
-            isset($data["company"])?$data["company"]:null,
+            $data["title"]??null,
+            $data["firstname"]??null,
+            $data["lastname"]??null,
+            $data["address1"]??null,
+            $data["address2"]??null,
+            $data["address3"]??null,
+            $data["phone"]??null,
+            $data["cellphone"]??null,
+            $data["zipcode"]??null,
+            $data["city"]??null,
+            $data["country"]??null,
+            $data["email"]??null,
+            $data["password"]??null,
+            $data["lang_id"]??$this->getSession()->getLang()->getId(),
+            $data["reseller"]??null,
+            $data["sponsor"]??null,
+            $data["discount"]??null,
+            $data["company"]??null,
             null,
-            isset($data["state"])?$data["state"]:null
+            $data["state"]??null
         );
 
         return $customerCreateEvent;

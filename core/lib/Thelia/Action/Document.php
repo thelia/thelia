@@ -45,7 +45,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
     /**
      * @var string Config key for document delivery mode
      */
-    const CONFIG_DELIVERY_MODE = 'original_document_delivery_mode';
+    public const CONFIG_DELIVERY_MODE = 'original_document_delivery_mode';
 
     /**
      * @return string root of the document cache directory in web space

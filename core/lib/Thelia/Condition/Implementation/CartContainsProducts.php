@@ -29,7 +29,7 @@ use Thelia\Model\ProductQuery;
 class CartContainsProducts extends ConditionAbstract
 {
     /** Condition 1st parameter : quantity */
-    const PRODUCTS_LIST = 'products';
+    public const PRODUCTS_LIST = 'products';
 
     /**
      * @inheritdoc
@@ -188,7 +188,7 @@ class CartContainsProducts extends ConditionAbstract
             [
                 'operatorSelectHtml'    => $this->drawBackOfficeInputOperators(self::PRODUCTS_LIST),
                 'products_field_name' => self::PRODUCTS_LIST,
-                'values'                => isset($this->values[self::PRODUCTS_LIST]) ? $this->values[self::PRODUCTS_LIST] : []
+                'values'                => $this->values[self::PRODUCTS_LIST] ?? []
             ]
         );
     }

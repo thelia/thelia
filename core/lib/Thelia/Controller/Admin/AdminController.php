@@ -22,7 +22,7 @@ use Thelia\Tools\URL;
 
 class AdminController extends BaseAdminController
 {
-    const RESOURCE_CODE = "admin.home";
+    public const RESOURCE_CODE = "admin.home";
 
     /**
      * @Route("/admin", name="admin", defaults={"not-logged": 1})

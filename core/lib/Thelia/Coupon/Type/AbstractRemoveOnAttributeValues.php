@@ -25,8 +25,8 @@ use Thelia\Model\CartItem;
  */
 abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements AmountAndPercentageCouponInterface
 {
-    const ATTRIBUTES_AV_LIST = 'attribute_avs';
-    const ATTRIBUTE          = 'attribute_id';
+    public const ATTRIBUTES_AV_LIST = 'attribute_avs';
+    public const ATTRIBUTE          = 'attribute_id';
 
     public $attributeAvList = [];
     public $attribute = 0;
@@ -83,13 +83,13 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
             $perCustomerUsageCount
         );
 
-        $this->attributeAvList = isset($effects[self::ATTRIBUTES_AV_LIST]) ? $effects[self::ATTRIBUTES_AV_LIST] : [];
+        $this->attributeAvList = $effects[self::ATTRIBUTES_AV_LIST] ?? [];
 
         if (! \is_array($this->attributeAvList)) {
             $this->attributeAvList = [$this->attributeAvList];
         }
 
-        $this->attribute = isset($effects[self::ATTRIBUTE]) ? $effects[self::ATTRIBUTE] : 0;
+        $this->attribute = $effects[self::ATTRIBUTE] ?? 0;
 
         $this->setFieldsValue($effects);
 

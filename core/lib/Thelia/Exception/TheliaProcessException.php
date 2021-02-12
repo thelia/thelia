@@ -25,11 +25,11 @@ class TheliaProcessException extends \RuntimeException
 {
     public $data;
 
-    const UNKNOWN_EXCEPTION = 0;
+    public const UNKNOWN_EXCEPTION = 0;
 
-    const CART_ITEM_NOT_ENOUGH_STOCK = 100;
-    const NO_PLACED_ORDER = 101;
-    const PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER = 102;
+    public const CART_ITEM_NOT_ENOUGH_STOCK = 100;
+    public const NO_PLACED_ORDER = 101;
+    public const PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER = 102;
 
     public function __construct($message, $code = null, $data = null, $previous = null)
     {

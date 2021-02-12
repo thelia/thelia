@@ -25,7 +25,7 @@ class Module extends BaseModule
 {
     use PositionManagementTrait;
 
-    const ADMIN_INCLUDES_DIRECTORY_NAME = "AdminIncludes";
+    public const ADMIN_INCLUDES_DIRECTORY_NAME = "AdminIncludes";
 
     public function postSave(ConnectionInterface $con = null)
     {

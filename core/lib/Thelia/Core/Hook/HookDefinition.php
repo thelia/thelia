@@ -19,8 +19,8 @@ namespace Thelia\Core\Hook;
  */
 class HookDefinition
 {
-    const BASE_CLASS = 'Thelia\Core\Hook\BaseHook';
+    public const BASE_CLASS = 'Thelia\Core\Hook\BaseHook';
 
-    const RENDER_BLOCK_EVENT = 'Thelia\Core\Event\Hook\HookRenderBlockEvent';
-    const RENDER_FUNCTION_EVENT = 'Thelia\Core\Event\Hook\HookRenderEvent';
+    public const RENDER_BLOCK_EVENT = 'Thelia\Core\Event\Hook\HookRenderBlockEvent';
+    public const RENDER_FUNCTION_EVENT = 'Thelia\Core\Event\Hook\HookRenderEvent';
 }

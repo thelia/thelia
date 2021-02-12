@@ -10,7 +10,7 @@ include 'bootstrap.php';
 
 use Symfony\Component\Translation\Translator;
 
-$lang = isset($_REQUEST['lang']) ? $_REQUEST['lang'] : null;
+$lang = $_REQUEST['lang'] ?? null;
 
 if($lang){
     $_SESSION['install']['lang'] = $_REQUEST['lang'];

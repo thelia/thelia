@@ -170,15 +170,15 @@
 # ========================================================================#
 
 class imageLib {
-	private   $fileName;
-	private   $image;
+	private $fileName;
+	private $image;
 	protected $imageResized;
-	private   $widthOriginal;     # Always be the original width
-	private   $heightOriginal;
-	private   $width;         # Current width (width after resize)
-	private   $height;
-	private   $imageSize;
-	private   $fileExtension;
+	private $widthOriginal;     # Always be the original width
+	private $heightOriginal;
+	private $width;         # Current width (width after resize)
+	private $height;
+	private $imageSize;
+	private $fileExtension;
 
 	private $debug      = true;
 	private $errorArray = [];
@@ -205,7 +205,7 @@ class imageLib {
 
 ## --------------------------------------------------------
 
-	function __construct($fileName)
+	public function __construct($fileName)
 		# Author:     Jarrod Oberto
 		# Date:     27-02-08
 		# Purpose:    Constructor
@@ -507,7 +507,7 @@ class imageLib {
 			$pos = str_replace(' ', '', $pos);
 
 			$xyArray = explode('x', $pos);
-			list($cropStartX, $cropStartY) = $xyArray;
+			[$cropStartX, $cropStartY] = $xyArray;
 		}
 		else
 		{
@@ -1210,7 +1210,7 @@ class imageLib {
 
 		for ($x = 0; $x < $numColors; $x++)
 		{
-			list($r, $g, $b) = array_values(imageColorsForIndex($this->imageResized, $x));
+			[$r, $g, $b] = array_values(imageColorsForIndex($this->imageResized, $x));
 
 			// calculate grayscale in percent
 			$grayscale = ($r + $g + $b) / 3 / 0xff;
@@ -2399,7 +2399,7 @@ class imageLib {
 			$pos = str_replace(' ', '', $pos);
 
 			$xyArray = explode('x', $pos);
-			list($width, $height) = $xyArray;
+			[$width, $height] = $xyArray;
 		}
 		else
 		{
@@ -3038,7 +3038,7 @@ class imageLib {
 
 	## --------------------------------------------------------
 
-	function hex2dec($hex)
+	public function hex2dec($hex)
 		# Purpose:  Convert #hex color to RGB
 	{
 		$color = str_replace('#', '', $hex);
@@ -3197,7 +3197,7 @@ class imageLib {
 
 	## --------------------------------------------------------
 
-	function checkStringStartsWith($needle, $haystack)
+	public function checkStringStartsWith($needle, $haystack)
 		# Check if a string starts with a specific pattern
 	{
 		return (substr($haystack, 0, strlen($needle)) == $needle);

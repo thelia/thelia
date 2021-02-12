@@ -249,7 +249,7 @@ abstract class ConditionAbstract implements ConditionInterface
                 'coupon/condition-fragments/condition-selector.html',
                 [
                     'operators' => $inputs['inputs'][$inputKey]['availableOperators'],
-                    'value'     => isset($this->operators[$inputKey]) ? $this->operators[$inputKey] : '',
+                    'value'     => $this->operators[$inputKey] ?? '',
                     'inputKey'  => $inputKey
                 ]
             );
@@ -304,7 +304,7 @@ abstract class ConditionAbstract implements ConditionInterface
             [
                 'min'      => $min,
                 'max'      => $max,
-                'value'    => isset($this->values[$inputKey]) ? $this->values[$inputKey] : '',
+                'value'    => $this->values[$inputKey] ?? '',
                 'inputKey' => $inputKey
             ]
         );
@@ -333,7 +333,7 @@ abstract class ConditionAbstract implements ConditionInterface
             'coupon/condition-fragments/currency-selector.html',
             [
                 'currencies' => $cleanedCurrencies,
-                'value'      => isset($this->values[$inputKey]) ? $this->values[$inputKey] : '',
+                'value'      => $this->values[$inputKey] ?? '',
                 'inputKey'   => $inputKey
             ]
         );

@@ -17,7 +17,7 @@ namespace Thelia\Coupon\Type;
  */
 class RemovePercentageOnCategories extends AbstractRemoveOnCategories
 {
-    const PERCENTAGE = 'percentage';
+    public const PERCENTAGE = 'percentage';
 
     use PercentageCouponTrait;
 

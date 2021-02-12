@@ -26,7 +26,7 @@ class DatabaseConfiguration implements ConfigurationInterface
      * Name of the main database connection used by Thelia.
      * @var string
      */
-    const THELIA_CONNECTION_NAME = 'TheliaMain';
+    public const THELIA_CONNECTION_NAME = 'TheliaMain';
 
     /**
      * @inheritDoc

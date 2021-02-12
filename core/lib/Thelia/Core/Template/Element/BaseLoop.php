@@ -250,14 +250,14 @@ abstract class BaseLoop implements BaseLoopInterface
             $nameValuePairs = $event->getLoopParameters();
         }
 
-        $loopType = isset($nameValuePairs['type']) ? $nameValuePairs['type'] : "undefined";
-        $loopName = isset($nameValuePairs['name']) ? $nameValuePairs['name'] : "undefined";
+        $loopType = $nameValuePairs['type'] ?? "undefined";
+        $loopName = $nameValuePairs['name'] ?? "undefined";
 
         $this->args->rewind();
         while (($argument = $this->args->current()) !== false) {
             $this->args->next();
 
-            $value = isset($nameValuePairs[$argument->name]) ? $nameValuePairs[$argument->name] : null;
+            $value = $nameValuePairs[$argument->name] ?? null;
 
             /* check if mandatory */
             if ($value === null && $argument->mandatory) {

@@ -41,7 +41,7 @@ use Thelia\Module\BaseModule;
  */
 abstract class BaseHook
 {
-    const INJECT_TEMPLATE_METHOD_NAME = "insertTemplate";
+    public const INJECT_TEMPLATE_METHOD_NAME = "insertTemplate";
 
     /** @var BaseModule */
     public $module;
@@ -97,7 +97,7 @@ abstract class BaseHook
             $allArguments = $event->getTemplateVars() + $event->getArguments();
 
             foreach ($templates as $template) {
-                list($type, $filepath) = $this->getTemplateParams($template);
+                [$type, $filepath] = $this->getTemplateParams($template);
 
                 if ("render" === $type) {
                     $event->add($this->render($filepath, $allArguments));

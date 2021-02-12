@@ -19,12 +19,12 @@ class OrderStatus extends BaseOrderStatus
 {
     use PositionManagementTrait;
 
-    const CODE_NOT_PAID = "not_paid";
-    const CODE_PAID = "paid";
-    const CODE_PROCESSING = "processing";
-    const CODE_SENT = "sent";
-    const CODE_CANCELED = "canceled";
-    const CODE_REFUNDED = "refunded";
+    public const CODE_NOT_PAID = "not_paid";
+    public const CODE_PAID = "paid";
+    public const CODE_PROCESSING = "processing";
+    public const CODE_SENT = "sent";
+    public const CODE_CANCELED = "canceled";
+    public const CODE_REFUNDED = "refunded";
 
     /**
      * Check if the current status is NOT PAID

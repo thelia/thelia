@@ -45,7 +45,7 @@ class RegisterRouterPass implements CompilerPassInterface
         }
 
         foreach ($container->findTaggedServiceIds("router.register") as $id => $attributes) {
-            $priority = isset($attributes[0]["priority"]) ? $attributes[0]["priority"] : 0;
+            $priority = $attributes[0]["priority"] ?? 0;
             $router = $container->getDefinition($id);
             $router->addMethodCall("setOption", ["cache_dir", THELIA_CACHE_DIR . $container->getParameter("kernel.environment") . DS . "routing" . DS . $id]);
 

@@ -28,12 +28,12 @@ class RegisterSerializerPass implements CompilerPassInterface
     /**
      * @var string Serializer manager service ID
      */
-    const MANAGER_SERVICE_ID = SerializerManager::class;
+    public const MANAGER_SERVICE_ID = SerializerManager::class;
 
     /**
      * @var string Serializer tag name
      */
-    const SERIALIZER_SERVICE_TAG = 'thelia.serializer';
+    public const SERIALIZER_SERVICE_TAG = 'thelia.serializer';
 
     public function process(ContainerBuilder $container)
     {

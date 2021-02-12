@@ -18,15 +18,15 @@ use Thelia\Core\Template\Validator\TemplateValidator;
 
 class TemplateDefinition
 {
-    const FRONT_OFFICE = 1;
-    const BACK_OFFICE = 2;
-    const PDF = 3;
-    const EMAIL = 4;
+    public const FRONT_OFFICE = 1;
+    public const BACK_OFFICE = 2;
+    public const PDF = 3;
+    public const EMAIL = 4;
 
-    const FRONT_OFFICE_SUBDIR = 'frontOffice';
-    const BACK_OFFICE_SUBDIR = 'backOffice';
-    const PDF_SUBDIR = 'pdf';
-    const EMAIL_SUBDIR = 'email';
+    public const FRONT_OFFICE_SUBDIR = 'frontOffice';
+    public const BACK_OFFICE_SUBDIR = 'backOffice';
+    public const PDF_SUBDIR = 'pdf';
+    public const EMAIL_SUBDIR = 'email';
 
     /** @var string the template directory full path */
     protected $path;

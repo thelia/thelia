@@ -22,8 +22,8 @@ class Sale extends BaseSale
     /**
      * The price offsets types, either amount or percentage
      */
-    const OFFSET_TYPE_PERCENTAGE = 10;
-    const OFFSET_TYPE_AMOUNT = 20;
+    public const OFFSET_TYPE_PERCENTAGE = 10;
+    public const OFFSET_TYPE_AMOUNT = 20;
 
     /**
      * @return bool true if the sale has an end date, false otherwise

@@ -41,7 +41,7 @@ class CurrencyConverterProviderPass implements CompilerPassInterface
         $providers = [];
 
         foreach ($services as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+            $priority = $attributes[0]['priority'] ?? 0;
             $providers[$priority] = $id;
         }
 

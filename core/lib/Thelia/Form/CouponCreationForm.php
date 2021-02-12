@@ -50,7 +50,7 @@ use Thelia\Module\BaseModule;
  */
 class CouponCreationForm extends BaseForm
 {
-    const COUPON_CREATION_FORM_NAME = 'thelia_coupon_creation';
+    public const COUPON_CREATION_FORM_NAME = 'thelia_coupon_creation';
 
     /**
      * Build Coupon form

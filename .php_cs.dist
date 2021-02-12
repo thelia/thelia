@@ -14,6 +14,7 @@ return (new PhpCsFixer\Config)
     ->setRiskyAllowed(true)
     ->setRules([
         '@Symfony' => false,
+        '@PHP71Migration' => true,
         'yoda_style' => false,
         'no_superfluous_phpdoc_tags' => true,
         'header_comment' => [

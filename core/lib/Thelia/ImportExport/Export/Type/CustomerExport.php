@@ -24,7 +24,7 @@ use Thelia\ImportExport\Export\JsonFileAbstractExport;
  */
 class CustomerExport extends JsonFileAbstractExport
 {
-    const FILE_NAME = 'customer';
+    public const FILE_NAME = 'customer';
 
     protected $orderAndAliases = [
         'customer_ref' => 'ref',

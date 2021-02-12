@@ -28,7 +28,7 @@ use Thelia\Model\ResourceQuery;
  */
 class ProfileUpdateResourceAccessForm extends BaseForm
 {
-    const RESOURCE_ACCESS_FIELD_PREFIX = "resource";
+    public const RESOURCE_ACCESS_FIELD_PREFIX = "resource";
 
     protected function buildForm()
     {

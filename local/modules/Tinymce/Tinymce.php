@@ -21,7 +21,7 @@ use Thelia\Module\BaseModule;
 class Tinymce extends BaseModule
 {
     /** The module domain for internationalisation */
-    const MODULE_DOMAIN = 'tinymce';
+    public const MODULE_DOMAIN = 'tinymce';
 
     private $jsPath;
     private $webJsPath;

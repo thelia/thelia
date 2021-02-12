@@ -30,22 +30,22 @@ abstract class AbstractExport implements \Iterator
     /**
      * @var string Default file name
      */
-    const FILE_NAME = 'export';
+    public const FILE_NAME = 'export';
 
     /**
      * @var boolean Export images with data
      */
-    const EXPORT_IMAGE = false;
+    public const EXPORT_IMAGE = false;
 
     /**
      * @var boolean Export documents with data
      */
-    const EXPORT_DOCUMENT = false;
+    public const EXPORT_DOCUMENT = false;
 
     /**
      * @var boolean Use range date
      */
-    const USE_RANGE_DATE = false;
+    public const USE_RANGE_DATE = false;
 
     /**
      * @var SplFileObject|\Propel\Runtime\Util\PropelModelPager Data to export

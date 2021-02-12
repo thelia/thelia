@@ -18,7 +18,7 @@ class ModuleHook extends BaseModuleHook
 {
     use \Thelia\Model\Tools\PositionManagementTrait;
 
-    const MAX_POSITION = 1000;
+    public const MAX_POSITION = 1000;
 
     /**
      * Calculate next position relative to our default category

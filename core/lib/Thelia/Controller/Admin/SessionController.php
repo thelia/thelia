@@ -35,7 +35,7 @@ class SessionController extends BaseAdminController
 {
     use \Thelia\Tools\RememberMeTrait;
 
-    const ADMIN_TOKEN_SESSION_VAR_NAME = 'thelia_admin_password_renew_token';
+    public const ADMIN_TOKEN_SESSION_VAR_NAME = 'thelia_admin_password_renew_token';
 
     protected function checkAdminLoggedIn()
     {

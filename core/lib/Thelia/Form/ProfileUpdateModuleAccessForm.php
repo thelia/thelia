@@ -28,7 +28,7 @@ use Thelia\Model\ProfileQuery;
  */
 class ProfileUpdateModuleAccessForm extends BaseForm
 {
-    const MODULE_ACCESS_FIELD_PREFIX = "module";
+    public const MODULE_ACCESS_FIELD_PREFIX = "module";
 
     protected function buildForm()
     {

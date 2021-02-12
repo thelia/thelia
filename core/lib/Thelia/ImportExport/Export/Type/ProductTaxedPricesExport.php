@@ -26,7 +26,7 @@ use Thelia\ImportExport\Export\JsonFileAbstractExport;
  */
 class ProductTaxedPricesExport extends JsonFileAbstractExport
 {
-    const FILE_NAME = 'product_taxed_price';
+    public const FILE_NAME = 'product_taxed_price';
 
     protected $orderAndAliases = [
         'product_sale_elements_id' => 'id',

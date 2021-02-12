@@ -215,9 +215,9 @@ class ModuleManagement
             $module
                 ->setLocale($locale)
                 ->setTitle($description->title)
-                ->setDescription(isset($description->description) ? $description->description : null)
-                ->setPostscriptum(isset($description->postscriptum) ? $description->postscriptum : null)
-                ->setChapo(isset($description->subtitle) ? $description->subtitle : null)
+                ->setDescription($description->description ?? null)
+                ->setPostscriptum($description->postscriptum ?? null)
+                ->setChapo($description->subtitle ?? null)
                 ->save($con)
             ;
         }

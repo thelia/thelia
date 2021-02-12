@@ -24,8 +24,8 @@ use Thelia\Model\CartItem;
  */
 abstract class AbstractRemoveOnProducts extends CouponAbstract implements AmountAndPercentageCouponInterface
 {
-    const CATEGORY_ID   = 'category_id';
-    const PRODUCTS_LIST = 'products';
+    public const CATEGORY_ID   = 'category_id';
+    public const PRODUCTS_LIST = 'products';
 
     public $category_id  = 0;
     public $product_list = [];
@@ -83,13 +83,13 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
             $perCustomerUsageCount
         );
 
-        $this->product_list = isset($effects[self::PRODUCTS_LIST]) ? $effects[self::PRODUCTS_LIST] : [];
+        $this->product_list = $effects[self::PRODUCTS_LIST] ?? [];
 
         if (! \is_array($this->product_list)) {
             $this->product_list = [$this->product_list];
         }
 
-        $this->category_id = isset($effects[self::CATEGORY_ID]) ? $effects[self::CATEGORY_ID] : 0;
+        $this->category_id = $effects[self::CATEGORY_ID] ?? 0;
 
         $this->setFieldsValue($effects);
 

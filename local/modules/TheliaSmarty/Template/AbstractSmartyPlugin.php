@@ -21,7 +21,7 @@ namespace TheliaSmarty\Template;
  */
 abstract class AbstractSmartyPlugin implements SmartyPluginInterface
 {
-    const WRAPPED_METHOD_PREFIX = '__wrap__';
+    public const WRAPPED_METHOD_PREFIX = '__wrap__';
 
     /**
      * Explode a comma separated list in a array, trimming all array elements
@@ -109,8 +109,8 @@ abstract class AbstractSmartyPlugin implements SmartyPluginInterface
         if (false !== strpos($functionName, self::WRAPPED_METHOD_PREFIX)) {
             $functionName = str_replace(self::WRAPPED_METHOD_PREFIX, '', $functionName);
 
-            $params = isset($args[0]) ? $args[0] : [];
-            $smarty = isset($args[1]) ? $args[1] : null;
+            $params = $args[0] ?? [];
+            $smarty = $args[1] ?? null;
 
             return $this->$functionName($params, $smarty);
         }

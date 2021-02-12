@@ -18,7 +18,7 @@ namespace Thelia\Core\Archiver\Archiver;
  */
 class TarBz2Archiver extends TarArchiver
 {
-    const COMPRESSION_METHOD = \Phar::BZ2;
+    public const COMPRESSION_METHOD = \Phar::BZ2;
 
     public function getId()
     {
