@@ -12,7 +12,7 @@
 
 use Thelia\Model\ProductAssociatedContent;
 
-if (PHP_SAPI != 'cli') {
+if (\PHP_SAPI != 'cli') {
     throw new \Exception('this script can only be launched with cli sapi');
 }
 

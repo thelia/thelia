@@ -67,11 +67,9 @@ class GetStockUpdateOperationOnOrderStatusChangeEvent extends ActionEvent
     }
 
     /**
-     * @param int $operation
-     *
      * @return $this
      */
-    public function setOperation($operation)
+    public function setOperation(int $operation): self
     {
         $this->operation = $operation;
 

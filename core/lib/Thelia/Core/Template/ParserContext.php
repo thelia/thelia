@@ -66,7 +66,7 @@ class ParserContext implements \IteratorAggregate
      *
      * @return $this
      */
-    public function pushCurrentForm(BaseForm $form)
+    public function pushCurrentForm(BaseForm $form): self
     {
         $this->formStore[] = $form;
 
@@ -131,7 +131,7 @@ class ParserContext implements \IteratorAggregate
      *
      * @return $this
      */
-    public function addForm(BaseForm $form)
+    public function addForm(BaseForm $form): self
     {
         $formErrorInformation = $this->getSession()->getFormErrorInformation();
 
@@ -256,7 +256,7 @@ class ParserContext implements \IteratorAggregate
      *
      * @return $this
      */
-    public function clearForm(BaseForm $form)
+    public function clearForm(BaseForm $form): self
     {
         $formErrorInformation = $this->getSession()->getFormErrorInformation();
 

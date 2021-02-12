@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\Archiver;
 
+use Symfony\Component\HttpFoundation\File\File;
+
 /**
  * Interface ArchiverInterface.
  *
@@ -64,11 +66,9 @@ interface ArchiverInterface
     /**
      * Set archive path.
      *
-     * @param string $archivePath
-     *
      * @return $this Return $this, allow chaining
      */
-    public function setArchivePath($archivePath);
+    public function setArchivePath(string $archivePath): self;
 
     /**
      * Create a new archive.
@@ -77,7 +77,7 @@ interface ArchiverInterface
      *
      * @return $this Return $this, allow chaining
      */
-    public function create($baseName);
+    public function create(string $baseName): self;
 
     /**
      * Open an archive.
@@ -86,31 +86,26 @@ interface ArchiverInterface
      *
      * @return $this Return $this, allow chaining
      */
-    public function open($path);
+    public function open(string $path): self;
 
     /**
      * Add directory or file to archive.
      *
-     * @param string      $path
-     * @param string|null $pathInArchive
-     *
      * @return $this Return $this, allow chaining
      */
-    public function add($path, $pathInArchive = null);
+    public function add(string $path, string $pathInArchive = null): self;
 
     /**
      * Save archive.
      *
      * @return bool True on success, false otherwise
      */
-    public function save();
+    public function save(): bool;
 
     /**
      * Extract archive.
      *
      * @param string $toPath Where to extract
-     *
-     * @return \Symfony\Component\HttpFoundation\File\File
      */
-    public function extract($toPath);
+    public function extract(string $toPath): File;
 }

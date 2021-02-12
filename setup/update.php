@@ -43,7 +43,7 @@ if (!$bootstraped) {
     }
 }
 
-if (PHP_SAPI != 'cli') {
+if (\PHP_SAPI != 'cli') {
     cliOutput('this script can only be launched with cli sapi', 'error');
     exit(1);
 }

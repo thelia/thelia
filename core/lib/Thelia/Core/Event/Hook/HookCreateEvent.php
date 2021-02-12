@@ -42,7 +42,7 @@ class HookCreateEvent extends HookEvent
      *
      * @return $this
      */
-    public function setLocale($locale)
+    public function setLocale($locale): self
     {
         $this->locale = $locale;
 
@@ -62,7 +62,7 @@ class HookCreateEvent extends HookEvent
      *
      * @return $this
      */
-    public function setNative($native)
+    public function setNative($native): self
     {
         $this->native = $native;
 
@@ -79,7 +79,7 @@ class HookCreateEvent extends HookEvent
      *
      * @return $this
      */
-    public function setTitle($title)
+    public function setTitle($title): self
     {
         $this->title = $title;
 
@@ -96,7 +96,7 @@ class HookCreateEvent extends HookEvent
      *
      * @return $this
      */
-    public function setType($type)
+    public function setType($type): self
     {
         $this->type = $type;
 
@@ -113,7 +113,7 @@ class HookCreateEvent extends HookEvent
      *
      * @return $this
      */
-    public function setActive($active)
+    public function setActive($active): self
     {
         $this->active = $active;
 
@@ -130,7 +130,7 @@ class HookCreateEvent extends HookEvent
      *
      * @return $this
      */
-    public function setCode($code)
+    public function setCode($code): self
     {
         $this->code = $code;
 

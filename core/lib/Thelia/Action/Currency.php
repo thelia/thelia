@@ -179,10 +179,8 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
     /**
      * Changes position, selecting absolute ou relative change.
-     *
-     * @param string $eventName
      */
-    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function updatePosition(UpdatePositionEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition(CurrencyQuery::create(), $event, $dispatcher);
     }

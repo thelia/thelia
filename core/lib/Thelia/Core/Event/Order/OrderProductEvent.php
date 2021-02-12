@@ -36,7 +36,7 @@ class OrderProductEvent extends OrderEvent
      *
      * @return $this
      */
-    public function setId($id)
+    public function setId($id): self
     {
         $this->id = $id;
 

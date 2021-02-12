@@ -48,48 +48,35 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     protected $notifyCustomerOfAccountModification = true;
 
     /**
-     * @param int    $title     the title customer id
-     * @param string $firstname
-     * @param string $lastname
-     * @param string $address1
-     * @param string $address2
-     * @param string $address3
-     * @param string $phone
-     * @param string $cellphone
-     * @param string $zipcode
-     * @param string $city
-     * @param int    $country   the country id
-     * @param string $email
-     * @param string $password  plain password, don't put hash password, it will hashes again
+     * @param int    $title    the title customer id
+     * @param int    $country  the country id
+     * @param string $password plain password, don't put hash password, it will hashes again
      * @param $langId
-     * @param int    $reseller if customer is a reseller
-     * @param int    $sponsor  customer's id sponsor
-     * @param float  $discount
-     * @param string $company
-     * @param string $ref
-     * @param int    $state    thre State ID
+     * @param int      $reseller if customer is a reseller
+     * @param int      $sponsor  customer's id sponsor
+     * @param int|null $state    thre State ID
      */
     public function __construct(
-        $title,
-        $firstname,
-        $lastname,
-        $address1,
-        $address2,
-        $address3,
-        $phone,
-        $cellphone,
-        $zipcode,
-        $city,
-        $country,
-        $email,
-        $password,
-        $langId,
-        $reseller,
-        $sponsor,
-        $discount,
-        $company,
-        $ref,
-        $state = null
+        int $title,
+        string $firstname,
+        string $lastname,
+        string $address1,
+        string $address2,
+        string $address3,
+        string $phone,
+        string $cellphone,
+        string $zipcode,
+        string $city,
+        string $country,
+        string $email,
+        string $password,
+        int $langId,
+        int $reseller,
+        int $sponsor,
+        float $discount,
+        string $company,
+        string $ref,
+        int $state = null
     ) {
         parent::__construct();
 

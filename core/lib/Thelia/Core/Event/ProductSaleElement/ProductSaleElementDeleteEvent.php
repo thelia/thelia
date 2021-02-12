@@ -46,7 +46,7 @@ class ProductSaleElementDeleteEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setProductSaleElementId($product_sale_element_id)
+    public function setProductSaleElementId($product_sale_element_id): self
     {
         $this->product_sale_element_id = $product_sale_element_id;
 
@@ -66,7 +66,7 @@ class ProductSaleElementDeleteEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setCurrencyId($currency_id)
+    public function setCurrencyId($currency_id): self
     {
         $this->currency_id = $currency_id;
 

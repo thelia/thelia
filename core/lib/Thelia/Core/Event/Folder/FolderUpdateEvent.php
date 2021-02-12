@@ -26,18 +26,12 @@ class FolderUpdateEvent extends FolderCreateEvent
     protected $description;
     protected $postscriptum;
 
-    /**
-     * @param int $folder_id
-     */
-    public function __construct($folder_id)
+    public function __construct(int $folder_id)
     {
         $this->folder_id = $folder_id;
     }
 
-    /**
-     * @return $this
-     */
-    public function setChapo($chapo)
+    public function setChapo(string $chapo): self
     {
         $this->chapo = $chapo;
 
@@ -49,10 +43,7 @@ class FolderUpdateEvent extends FolderCreateEvent
         return $this->chapo;
     }
 
-    /**
-     * @return $this
-     */
-    public function setDescription($description)
+    public function setDescription($description): self
     {
         $this->description = $description;
 
@@ -64,10 +55,7 @@ class FolderUpdateEvent extends FolderCreateEvent
         return $this->description;
     }
 
-    /**
-     * @return $this
-     */
-    public function setFolderId($folder_id)
+    public function setFolderId($folder_id): self
     {
         $this->folder_id = $folder_id;
 
@@ -79,10 +67,7 @@ class FolderUpdateEvent extends FolderCreateEvent
         return $this->folder_id;
     }
 
-    /**
-     * @return $this
-     */
-    public function setPostscriptum($postscriptum)
+    public function setPostscriptum(string $postscriptum): self
     {
         $this->postscriptum = $postscriptum;
 

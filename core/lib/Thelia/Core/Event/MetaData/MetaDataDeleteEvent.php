@@ -44,62 +44,38 @@ class MetaDataDeleteEvent extends MetaDataEvent
         $this->elementId = $elementId;
     }
 
-    /**
-     * @param string $metaKey
-     *
-     * @return $this
-     */
-    public function setMetaKey($metaKey)
+    public function setMetaKey(?string $metaKey)
     {
         $this->metaKey = $metaKey;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getMetaKey()
+    public function getMetaKey(): ?string
     {
         return $this->metaKey;
     }
 
-    /**
-     * @param $elementKey
-     *
-     * @return $this
-     */
-    public function setElementKey($elementKey)
+    public function setElementKey(?string $elementKey)
     {
         $this->elementKey = $elementKey;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getElementKey()
+    public function getElementKey(): ?string
     {
         return $this->elementKey;
     }
 
-    /**
-     * @param int $elementId
-     *
-     * @return $this
-     */
-    public function setElementId($elementId)
+    public function setElementId(?int $elementId)
     {
         $this->elementId = $elementId;
 
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getElementId()
+    public function getElementId(): ?int
     {
         return $this->elementId;
     }

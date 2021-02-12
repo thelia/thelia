@@ -31,7 +31,7 @@ class SerializerManager
      *
      * @return $this Return $this, allow chaining
      */
-    public function reset()
+    public function reset(): self
     {
         $this->serializers = [];
 
@@ -58,7 +58,7 @@ class SerializerManager
      *
      * @return bool True if the serializer exists, false otherwise
      */
-    public function has($serializerId, $throwException = false)
+    public function has(string $serializerId, bool $throwException = false)
     {
         $exists = isset($this->serializers[$serializerId]);
 
@@ -83,7 +83,7 @@ class SerializerManager
      *
      * @return \Thelia\Core\Serializer\SerializerInterface Return a serializer
      */
-    public function get($serializerId)
+    public function get(string $serializerId)
     {
         $this->has($serializerId, true);
 
@@ -99,7 +99,7 @@ class SerializerManager
      *
      * @return $this Return $this, allow chaining
      */
-    public function setSerializers(array $serializers)
+    public function setSerializers(array $serializers): self
     {
         $this->serializers = [];
 
@@ -121,7 +121,7 @@ class SerializerManager
      *
      * @return $this Return $this, allow chaining
      */
-    public function add(SerializerInterface $serializer)
+    public function add(SerializerInterface $serializer): self
     {
         $this->serializers[$serializer->getId()] = $serializer;
 
@@ -133,7 +133,7 @@ class SerializerManager
      *
      * @param string $serializerId A serializer identifier
      */
-    public function remove($serializerId): void
+    public function remove(string $serializerId): void
     {
         $this->has($serializerId, true);
 

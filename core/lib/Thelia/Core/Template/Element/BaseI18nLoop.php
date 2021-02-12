@@ -45,18 +45,17 @@ abstract class BaseI18nLoop extends BaseLoop
      *
      * @param ModelCriteria $search       the Propel Criteria to configure
      * @param array         $columns      the i18n columns
-     * @param string        $foreignTable the specified table (default  to criteria table)
+     * @param string|null   $foreignTable the specified table (default  to criteria table)
      * @param string        $foreignKey   the foreign key in this table (default to criteria table)
-     * @param bool          $forceReturn
      *
      * @return mixed the locale
      */
     protected function configureI18nProcessing(
         ModelCriteria $search,
-        $columns = ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
-        $foreignTable = null,
-        $foreignKey = 'ID',
-        $forceReturn = false
+        array $columns = ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
+        string $foreignTable = null,
+        string $foreignKey = 'ID',
+        bool $forceReturn = false
     ) {
         /* manage translations */
 
@@ -76,12 +75,11 @@ abstract class BaseI18nLoop extends BaseLoop
      * Add the search clause for an I18N column, taking care of the back/front context, as default_locale_i18n is
      * not defined in the backEnd I18N context.
      *
-     * @param ModelCriteria $search
-     * @param string        $columnName     the column to search into, such as TITLE
-     * @param string        $searchCriteria the search criteria, such as Criterial::LIKE, Criteria::EQUAL, etc
-     * @param string        $searchTerm     the searched term
+     * @param string $columnName     the column to search into, such as TITLE
+     * @param string $searchCriteria the search criteria, such as Criterial::LIKE, Criteria::EQUAL, etc
+     * @param string $searchTerm     the searched term
      */
-    public function addSearchInI18nColumn($search, $columnName, $searchCriteria, $searchTerm): void
+    public function addSearchInI18nColumn(ModelCriteria $search, string $columnName, string $searchCriteria, string $searchTerm): void
     {
         if (!$this->getBackendContext()) {
             $search->where(

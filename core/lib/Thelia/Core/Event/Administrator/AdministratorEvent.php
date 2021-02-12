@@ -146,11 +146,9 @@ class AdministratorEvent extends ActionEvent
     }
 
     /**
-     * @param string $email
-     *
      * @return $this
      */
-    public function setEmail($email)
+    public function setEmail(string $email): self
     {
         $this->email = $email;
 

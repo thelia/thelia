@@ -24,27 +24,19 @@ class MetaDataEvent extends ActionEvent
 {
     protected $metaData;
 
-    public function __construct(MetaData $metaData = null)
+    public function __construct(?MetaData $metaData = null)
     {
         $this->metaData = $metaData;
     }
 
-    /**
-     * @param \Thelia\Model\MetaData|null $metaData
-     *
-     * @return $this
-     */
-    public function setMetaData($metaData)
+    public function setMetaData(?MetaData $metaData): self
     {
         $this->metaData = $metaData;
 
         return $this;
     }
 
-    /**
-     * @return \Thelia\Model\MetaData|null
-     */
-    public function getMetaData()
+    public function getMetaData(): ?MetaData
     {
         return $this->metaData;
     }

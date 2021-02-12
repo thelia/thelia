@@ -34,52 +34,52 @@ class ModuleEvent extends ActionEvent
     protected $description;
     protected $postscriptum;
 
-    public function setChapo($chapo): void
+    public function setChapo(string $chapo): void
     {
         $this->chapo = $chapo;
     }
 
-    public function getChapo()
+    public function getChapo(): string
     {
         return $this->chapo;
     }
 
-    public function setDescription($description): void
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
-    public function setId($id): void
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function setLocale($locale): void
+    public function setLocale(string $locale): void
     {
         $this->locale = $locale;
     }
 
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->locale;
     }
 
-    public function setPostscriptum($postscriptum): void
+    public function setPostscriptum(string $postscriptum): void
     {
         $this->postscriptum = $postscriptum;
     }
 
-    public function getPostscriptum()
+    public function getPostscriptum(): string
     {
         return $this->postscriptum;
     }
@@ -89,7 +89,7 @@ class ModuleEvent extends ActionEvent
         $this->title = $title;
     }
 
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -99,25 +99,19 @@ class ModuleEvent extends ActionEvent
         $this->module = $module;
     }
 
-    /**
-     * @return $this
-     */
-    public function setModule(Module $module)
+    public function setModule(?Module $module): self
     {
         $this->module = $module;
 
         return $this;
     }
 
-    /**
-     * @return \Thelia\Model\Module
-     */
-    public function getModule()
+    public function getModule(): ?Module
     {
         return $this->module;
     }
 
-    public function hasModule()
+    public function hasModule(): bool
     {
         return null !== $this->module;
     }

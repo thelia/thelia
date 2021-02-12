@@ -37,7 +37,7 @@ class TemplateDescriptorValidator
      *
      * @param string $xmlDescriptorPath the path to the template XML descriprot
      */
-    public function __construct($xmlDescriptorPath)
+    public function __construct(string $xmlDescriptorPath)
     {
         $this->xmlDescriptorPath = $xmlDescriptorPath;
 
@@ -48,12 +48,12 @@ class TemplateDescriptorValidator
     }
 
     /**
-     * @param string $version the XSD version to use,, or null to use the latest version
+     * @param string|null $version the XSD version to use,, or null to use the latest version
      *
      * @return $this
      * @throw InvalidDescriptorException
      */
-    public function validate($version = null)
+    public function validate(string $version = null): self
     {
         $dom = new \DOMDocument();
         $errors = [];

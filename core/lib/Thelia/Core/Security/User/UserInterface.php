@@ -45,11 +45,9 @@ interface UserInterface
     /**
      * Check a string against a the user password.
      *
-     * @param string $password
-     *
      * @return bool
      */
-    public function checkPassword($password);
+    public function checkPassword(string $password);
 
     /**
      * Returns the roles granted to the user.
@@ -82,10 +80,8 @@ interface UserInterface
 
     /**
      * Set a token in the user data (used by remember me authnetication system).
-     *
-     * @param string $token
      */
-    public function setToken($token);
+    public function setToken(string $token);
 
     /**
      * return the user serial  (used by remember me authnetication system).
@@ -96,10 +92,8 @@ interface UserInterface
 
     /**
      * Set a serial number int the user data  (used by remember me authnetication system).
-     *
-     * @param string $serial
      */
-    public function setSerial($serial);
+    public function setSerial(string $serial);
 
     /**
      * Get the user preferred locale.

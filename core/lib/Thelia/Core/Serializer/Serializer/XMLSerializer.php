@@ -91,7 +91,7 @@ class XMLSerializer extends AbstractSerializer
      *
      * @return $this Return $this, allow chaining
      */
-    public function setDataNodeName($dataNodeName)
+    public function setDataNodeName($dataNodeName): self
     {
         $this->dataNodeName = $dataNodeName;
 

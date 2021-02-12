@@ -44,14 +44,12 @@ class ControllerResolver extends BaseControllerResolver
     /**
      * Returns a callable for the given controller.
      *
-     * @param string $controller A Controller string
-     *
      * @return mixed A PHP callable
      *
      * @throws \LogicException           When the name could not be parsed
      * @throws \InvalidArgumentException When the controller class does not exist
      */
-    protected function createController($controller)
+    protected function createController(string $controller)
     {
         if (false === strpos($controller, '::')) {
             $count = substr_count($controller, ':');

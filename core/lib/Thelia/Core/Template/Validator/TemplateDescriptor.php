@@ -53,11 +53,8 @@ class TemplateDescriptor
 
     /**
      * TemplateDescriptor constructor.
-     *
-     * @param string $name
-     * @param int    $type
      */
-    public function __construct($name, $type)
+    public function __construct(string $name, int $type)
     {
         $this->name = $name;
         $this->type = $type;
@@ -72,11 +69,9 @@ class TemplateDescriptor
     }
 
     /**
-     * @param string $name
-     *
      * @return $this
      */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -96,7 +91,7 @@ class TemplateDescriptor
      *
      * @return $this
      */
-    public function setType($type)
+    public function setType($type): self
     {
         $this->type = $type;
 
@@ -116,7 +111,7 @@ class TemplateDescriptor
      *
      * @return $this
      */
-    public function setLanguages($languages)
+    public function setLanguages($languages): self
     {
         $this->languages = $languages;
 
@@ -136,7 +131,7 @@ class TemplateDescriptor
      *
      * @return $this
      */
-    public function setDescriptives($descriptives)
+    public function setDescriptives($descriptives): self
     {
         $this->descriptives = $descriptives;
 
@@ -152,11 +147,9 @@ class TemplateDescriptor
     }
 
     /**
-     * @param string $theliaVersion
-     *
      * @return $this
      */
-    public function setTheliaVersion($theliaVersion)
+    public function setTheliaVersion(string $theliaVersion): self
     {
         $this->theliaVersion = $theliaVersion;
 
@@ -172,11 +165,9 @@ class TemplateDescriptor
     }
 
     /**
-     * @param string $version
-     *
      * @return $this
      */
-    public function setVersion($version)
+    public function setVersion(string $version): self
     {
         $this->version = $version;
 
@@ -196,7 +187,7 @@ class TemplateDescriptor
      *
      * @return $this
      */
-    public function setParent($parent)
+    public function setParent($parent): self
     {
         $this->parent = $parent;
 
@@ -217,11 +208,9 @@ class TemplateDescriptor
     }
 
     /**
-     * @param string $documentation
-     *
      * @return $this
      */
-    public function setDocumentation($documentation)
+    public function setDocumentation(string $documentation): self
     {
         $this->documentation = $documentation;
 
@@ -237,11 +226,9 @@ class TemplateDescriptor
     }
 
     /**
-     * @param string $stability
-     *
      * @return $this
      */
-    public function setStability($stability)
+    public function setStability(string $stability): self
     {
         $this->stability = $stability;
 
@@ -261,7 +248,7 @@ class TemplateDescriptor
      *
      * @return $this
      */
-    public function setAuthors($authors)
+    public function setAuthors($authors): self
     {
         $this->authors = $authors;
 

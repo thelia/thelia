@@ -19,18 +19,12 @@ class CartCreateEvent extends ActionEvent
 {
     protected $cart;
 
-    /**
-     * @return \Thelia\Model\Cart
-     */
-    public function getCart()
+    public function getCart(): Cart
     {
         return $this->cart;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCart(Cart $cart)
+    public function setCart(Cart $cart): self
     {
         $this->cart = $cart;
 

@@ -31,14 +31,13 @@ class ProductCloneEvent extends ActionEvent
     /**
      * ProductCloneEvent constructor.
      *
-     * @param string $ref
      * @param string $lang the locale (such as fr_FR)
      * @param $originalProduct
      */
     public function __construct(
-        $ref,
-        $lang,
-        $originalProduct
+        string $ref,
+        string $lang,
+        Product $originalProduct
     ) {
         $this->ref = $ref;
         $this->lang = $lang;
@@ -53,10 +52,7 @@ class ProductCloneEvent extends ActionEvent
         return $this->ref;
     }
 
-    /**
-     * @param string $ref
-     */
-    public function setRef($ref): void
+    public function setRef(string $ref): void
     {
         $this->ref = $ref;
     }
@@ -72,7 +68,7 @@ class ProductCloneEvent extends ActionEvent
     /**
      * @param string $lang the locale (such as fr_FR)
      */
-    public function setLang($lang): void
+    public function setLang(string $lang): void
     {
         $this->lang = $lang;
     }

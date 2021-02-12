@@ -220,12 +220,7 @@ class ImageEvent extends CachedFileEvent
         return $this;
     }
 
-    /**
-     * @param ImageInterface $imageObject
-     *
-     * @return $this
-     */
-    public function setImageObject($imageObject)
+    public function setImageObject(ImageInterface $imageObject): self
     {
         $this->imageObject = $imageObject;
 
@@ -248,12 +243,7 @@ class ImageEvent extends CachedFileEvent
         return $this->allowZoom;
     }
 
-    /**
-     * @param bool $allowZoom
-     *
-     * @return $this
-     */
-    public function setAllowZoom($allowZoom)
+    public function setAllowZoom(bool $allowZoom): self
     {
         $this->allowZoom = $allowZoom;
 

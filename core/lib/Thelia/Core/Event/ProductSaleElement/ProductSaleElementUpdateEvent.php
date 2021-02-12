@@ -85,7 +85,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setProductSaleElementId($product_sale_element_id)
+    public function setProductSaleElementId($product_sale_element_id): self
     {
         $this->product_sale_element_id = $product_sale_element_id;
 
@@ -105,7 +105,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setPrice($price)
+    public function setPrice($price): self
     {
         $this->price = $price;
 
@@ -125,7 +125,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setCurrencyId($currency_id)
+    public function setCurrencyId($currency_id): self
     {
         $this->currency_id = $currency_id;
 
@@ -145,7 +145,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setWeight($weight)
+    public function setWeight($weight): self
     {
         $this->weight = $weight;
 
@@ -165,7 +165,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setQuantity($quantity)
+    public function setQuantity($quantity): self
     {
         $this->quantity = $quantity;
 
@@ -185,7 +185,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setSalePrice($sale_price)
+    public function setSalePrice($sale_price): self
     {
         $this->sale_price = $sale_price;
 
@@ -205,7 +205,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setOnsale($onsale)
+    public function setOnsale($onsale): self
     {
         $this->onsale = $onsale;
 
@@ -225,7 +225,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setIsnew($isnew)
+    public function setIsnew($isnew): self
     {
         $this->isnew = $isnew;
 
@@ -245,7 +245,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setEanCode($ean_code)
+    public function setEanCode($ean_code): self
     {
         $this->ean_code = $ean_code;
 
@@ -265,7 +265,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setIsdefault($isdefault)
+    public function setIsdefault($isdefault): self
     {
         $this->isdefault = $isdefault;
 
@@ -285,7 +285,7 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
      *
      * @return $this
      */
-    public function setReference($reference)
+    public function setReference($reference): self
     {
         $this->reference = $reference;
 

@@ -33,7 +33,7 @@ class ShippingZoneAddAreaEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setAreaId($area_id)
+    public function setAreaId($area_id): self
     {
         $this->area_id = $area_id;
 
@@ -48,7 +48,7 @@ class ShippingZoneAddAreaEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setShippingZoneId($shipping_zone_id)
+    public function setShippingZoneId($shipping_zone_id): self
     {
         $this->shipping_zone_id = $shipping_zone_id;
 

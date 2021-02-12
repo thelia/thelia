@@ -119,7 +119,7 @@ class Session extends BaseSession
      *
      * @return $this
      */
-    public function setAdminEditionLang(Lang $lang)
+    public function setAdminEditionLang(Lang $lang): self
     {
         $this->set('thelia.admin.edition.lang', $lang);
 
@@ -210,7 +210,7 @@ class Session extends BaseSession
      *
      * @return $this
      */
-    public function setSessionCart(Cart $cart = null)
+    public function setSessionCart(Cart $cart = null): self
     {
         if (null === $cart || $cart->isNew()) {
             self::$transientCart = $cart;
@@ -357,7 +357,7 @@ class Session extends BaseSession
      *
      * @return $this
      */
-    public function setConsumedCoupons(array $couponsCode)
+    public function setConsumedCoupons(array $couponsCode): self
     {
         $this->set('thelia.consumed_coupons', $couponsCode);
 
