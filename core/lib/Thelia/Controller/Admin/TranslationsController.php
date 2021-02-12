@@ -35,9 +35,7 @@ use Thelia\Tools\URL;
 class TranslationsController extends BaseAdminController
 {
     /**
-     * @param TranslatorInterface $translator
      * @param string
-     * @return Module
      */
     protected function getModule(TranslatorInterface $translator, string $moduleCode): Module
     {

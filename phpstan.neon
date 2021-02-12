@@ -1,0 +1,5 @@
+parameters:
+    level: 1
+    tmpDir: var/cache-ci/phpstan
+    paths:
+        - core

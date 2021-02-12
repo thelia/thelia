@@ -384,28 +384,6 @@ class PropelInitService
     }
 
     /**
-     * Register a class loader to load the generated Propel models.
-     */
-    public function registerPropelModelLoader()
-    {
-        $loader = new \Composer\Autoload\ClassLoader();
-
-        $loader->add(
-            '', // no prefix, models already define their full namespace
-            $this->getPropelModelDir()
-        );
-
-        $loader->add(
-            '', // no prefix, models already define their full namespace
-            $this->getPropelDatabaseDir()
-        );
-
-        $loader->register(
-            true // prepend the autoloader to use cached models first
-        );
-    }
-
-    /**
      * Initialize the Propel environment and connection.
      * @return bool Whether a Propel connection is available.
      * @param bool $force force cache generation
@@ -446,8 +424,6 @@ class PropelInitService
             if ($buildPropelGlobalSchema || $buildPropelModels) {
                 $cacheRefresh = true;
             }
-
-            $this->registerPropelModelLoader();
 
             $theliaDatabaseConnection->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
 
