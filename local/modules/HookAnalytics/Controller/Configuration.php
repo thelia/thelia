@@ -29,7 +29,7 @@ class Configuration extends BaseAdminController {
             return $response;
         }
 
-        $form = new \HookAnalytics\Form\Configuration($this->getRequest());
+        $form = $this->createForm(\HookAnalytics\Form\Configuration::class);
         $resp = [
             "error" =>  0,
             "message" => ""

@@ -228,6 +228,8 @@ class SessionController extends BaseAdminController
         /** @var AdminLogin $adminLoginForm */
         $adminLoginForm = $this->createForm("thelia.admin.login");
 
+        $authenticator = null;
+
         try {
             $form = $this->validateForm($adminLoginForm, "post");
 
@@ -268,8 +270,9 @@ class SessionController extends BaseAdminController
             // Validation problem
              $message = $this->createStandardFormValidationErrorMessage($ex);
         } catch (AuthenticationException $ex) {
+            $username = null !== $authenticator ? $authenticator->getUsername() : "unknown";
             // Log authentication failure
-             AdminLog::append("admin", "LOGIN", sprintf("Authentication failure for username '%s'", $authenticator->getUsername()), $request);
+            AdminLog::append("admin", "LOGIN", sprintf("Authentication failure for username '%s'", $username), $request);
 
             $message =  $this->getTranslator()->trans("Login failed. Please check your username and password.");
         } catch (\Exception $ex) {

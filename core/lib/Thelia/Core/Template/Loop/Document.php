@@ -48,6 +48,7 @@ use Thelia\Type\TypeCollection;
  * @method int getSourceId()
  * @method bool getNewsletter()
  * @method string getQueryNamespace()
+ * @method bool getWithPrevNextInfo()
  * @method string[] getOrder()
  */
 class Document extends BaseI18nLoop implements PropelSearchLoopInterface

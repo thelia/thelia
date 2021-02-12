@@ -57,6 +57,8 @@ use Thelia\Type\TypeCollection;
  * @method bool getAllowZoom()
  * @method bool getIgnoreProcessingErrors()
  * @method string getResizeMode()
+ * @method bool getBase64()
+ * @method bool getWithPrevNextInfo()
  * @method string[] getOrder()
  */
 class Image extends BaseI18nLoop implements PropelSearchLoopInterface

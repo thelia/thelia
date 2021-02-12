@@ -35,7 +35,7 @@ class ClearImageCache extends ContainerAwareCommand
         $request = new Request();
 
         try {
-            $event = new ImageEvent($request);
+            $event = new ImageEvent();
 
             $subdir = $input->getArgument('subdir');
 

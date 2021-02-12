@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Core\Event\MailingSystem\MailingSystemEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\JsonResponse;
@@ -61,6 +62,7 @@ class MailingSystemController extends BaseAdminController
         }
 
         $error_msg = false;
+        $ex = null;
 
         // Create the form from the request
         $form = $this->createForm(AdminForm::MAILING_SYSTEM_MODIFICATION);

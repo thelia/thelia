@@ -25,9 +25,7 @@ class CouponDeleteEvent extends ActionEvent
     /** @var Coupon */
     protected $coupon;
 
-    protected $couponId;
-
-    public function __construct($couponId, Coupon $coupon = null)
+    public function __construct(Coupon $coupon = null)
     {
         $this->coupon = $coupon;
     }
@@ -47,22 +45,6 @@ class CouponDeleteEvent extends ActionEvent
     public function setCoupon(Coupon $coupon = null)
     {
         $this->coupon = $coupon;
-        return $this;
-    }
-
-    /**
-     */
-    public function getCouponId()
-    {
-        return $this->couponId;
-    }
-
-    /**
-     * @return $this
-     */
-    public function setCouponId($couponId)
-    {
-        $this->couponId = $couponId;
         return $this;
     }
 }

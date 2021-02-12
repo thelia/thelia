@@ -57,6 +57,7 @@ use Thelia\Type\TypeCollection;
  * @method bool getWithPrevNextInfo()
  * @method bool getNeedCountChild()
  * @method bool getNeedProductCount()
+ * @method bool getProductCountVisibleOnly()
  * @method bool|string getVisible()
  * @method int[] getExclude()
  * @method string[] getOrder()

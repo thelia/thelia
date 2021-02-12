@@ -196,7 +196,7 @@ class ImportController extends BaseAdminController
             /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
             $file = $validatedForm->get('file_upload')->getData();
             $file = $file->move(
-                THELIA_CACHE_DIR . 'import' . DS . (new\DateTime)->format('Ymd'),
+                THELIA_CACHE_DIR . 'import' . DS . (new \DateTime)->format('Ymd'),
                 uniqid() . '-' . $file->getClientOriginalName()
             );
 

@@ -333,10 +333,6 @@ class BaseFacade implements FacadeInterface
     {
         $consumedCoupons = $this->getRequest()->getSession()->getConsumedCoupons();
 
-        if (!isset($consumedCoupons) || !$consumedCoupons) {
-            $consumedCoupons = [];
-        }
-
         if (!isset($consumedCoupons[$couponCode])) {
             // Prevent accumulation of the same Coupon on a Checkout
             $consumedCoupons[$couponCode] = $couponCode;

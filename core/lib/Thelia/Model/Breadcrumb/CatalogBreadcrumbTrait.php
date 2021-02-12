@@ -13,7 +13,10 @@
 namespace Thelia\Model\Breadcrumb;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Loop\CategoryPath;
 use Thelia\Core\Translation\Translator;
 
@@ -28,7 +31,15 @@ trait CatalogBreadcrumbTrait
             $translator->trans('Catalog') => $catalogUrl,
         ];
 
-        $categoryPath = new CategoryPath($container);
+        // Todo stop using loop in php
+        $categoryPath = new CategoryPath(
+            $container,
+            $container->get(RequestStack::class),
+            $container->get(EventDispatcherInterface::class),
+            $container->get(SecurityContext::class),
+            $container->get(Translator::getInstance()),
+            $container->getParameter('thelia.parser.loops')
+        );
         $categoryPath->initializeArgs([
                 'category' => $categoryId,
                 'visible' => '*'
@@ -45,10 +56,14 @@ trait CatalogBreadcrumbTrait
 
     public function getProductBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
+        if (!method_exists($this, "getProduct")) {
+            return null;
+        }
+
         /** @var \Thelia\Model\Product $product */
         $product = $this->getProduct();
 
-        $breadcrumb = $this->getBaseBreadcrumb($router, $container, $product->getDefaultCategoryId(), $locale);
+        $breadcrumb = $this->getBaseBreadcrumb($router, $container, $product->getDefaultCategoryId());
 
         $product->setLocale($locale);
 
@@ -64,6 +79,10 @@ trait CatalogBreadcrumbTrait
 
     public function getCategoryBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
+        if (!method_exists($this, "getCategory")) {
+            return null;
+        }
+
         /** @var \Thelia\Model\Category $category */
         $category = $this->getCategory();
         $breadcrumb = $this->getBaseBreadcrumb($router, $container, $this->getParentId());

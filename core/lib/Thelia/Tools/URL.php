@@ -260,6 +260,8 @@ class URL
      */
     public function retrieveCurrent(Request $request)
     {
+        $allOtherParameters = $request->query->all();
+
         if (ConfigQuery::isRewritingEnable()) {
             $view = $request->attributes->get('_view', null);
 
@@ -267,7 +269,6 @@ class URL
 
             $viewId = $view === null ? null : $request->query->get($view . '_id', null);
 
-            $allOtherParameters = $request->query->all();
             if ($view !== null) {
                 unset($allOtherParameters['view']);
                 if ($viewId !== null) {

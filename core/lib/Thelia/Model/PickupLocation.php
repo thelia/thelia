@@ -42,6 +42,9 @@ class PickupLocation  {
     /** @var integer */
     protected $moduleId;
 
+    /** @var Serializer */
+    protected $serializer;
+
     /** @var array */
     protected $openingHours = [
         self::MONDAY_OPENING_HOURS_KEY => null,
@@ -195,4 +198,4 @@ class PickupLocation  {
     public function toArray() {
         return json_decode($this->serializer->serialize($this, 'json'), true);
     }
-}                    
+}

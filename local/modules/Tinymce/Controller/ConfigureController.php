@@ -39,7 +39,7 @@ class ConfigureController extends BaseAdminController
         $ex = null;
 
         // Create the Form from the request
-        $configurationForm = new ConfigurationForm($this->getRequest());
+        $configurationForm = $this->createForm(ConfigurationForm::class);
 
         try {
             // Check the form against constraints violations

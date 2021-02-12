@@ -1697,10 +1697,9 @@ class ProductController extends AbstractSeoCrudController
 
     protected function getPSEImages(ProductSaleElementsModel $pse)
     {
-        /**
-         * Compute images with the associated loop
-         */
-        $imageLoop = new Image($this->container);
+        /** @var Image $imageLoop */
+        $imageLoop = $this->createLoopInstance(Image::class);
+
         $imageLoop->initializeArgs([
             "product" => $pse->getProductId(),
             "width" => 100,
@@ -1743,10 +1742,8 @@ class ProductController extends AbstractSeoCrudController
 
     protected function getPSEDocuments(ProductSaleElementsModel $pse)
     {
-        /**
-         * Compute documents with the associated loop
-         */
-        $documentLoop = new Document($this->container);
+        /** @var Document $documentLoop */
+        $documentLoop = $this->createLoopInstance(Document::class);
 
         $documentLoop->initializeArgs([
             "product" => $pse->getProductId(),
@@ -1790,10 +1787,9 @@ class ProductController extends AbstractSeoCrudController
 
     protected function getPSEVirtualDocument(ProductSaleElementsModel $pse)
     {
-        /**
-         * Compute documents with the associated loop
-         */
-        $documentLoop = new Document($this->container);
+        /** @var Document $documentLoop */
+        $documentLoop = $this->createLoopInstance(Document::class);
+
         // select only not visible documents
         $documentLoop->initializeArgs([
             "product" => $pse->getProductId(),
@@ -1822,6 +1818,22 @@ class ProductController extends AbstractSeoCrudController
         }
 
         return $data;
+    }
+
+    /**
+     * Todo refactor this to not use container or not use loop at all
+     * Compute images with the associated loop
+     */
+    protected function createLoopInstance($loopClass)
+    {
+        return new $loopClass(
+            $this->container,
+            $this->container->get("request_stack"),
+            $this->getDispatcher(),
+            $this->getSecurityContext(),
+            $this->getTranslator(),
+            $this->container->getParameter('thelia.parser.loops')
+        );
     }
 
     protected function arrayHasEntries(array $data, array $entries)

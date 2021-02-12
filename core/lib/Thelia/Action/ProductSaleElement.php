@@ -25,6 +25,7 @@ use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Loop\ProductSaleElementsDocument;
 use Thelia\Core\Template\Loop\ProductSaleElementsImage;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeCombination;
 use Thelia\Model\AttributeCombinationQuery;
@@ -446,6 +447,10 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             $originalProductFilePositionQuery = [];
             $originalProductPSEFileId = null;
 
+            if (!in_array($type, ['images', 'documents'])) {
+                throw new \Exception(Translator::getInstance()->trans("Cloning files of type %type is not allowed.", ['%type' => $type], "core"));
+            }
+
             // Get file's original position
             switch ($type) {
                 case 'image':
@@ -461,6 +466,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->select(['POSITION'])
                 ->findPk($originalProductPSEFileId);
 
+            $clonedProductFileIdToLinkToPSEQuery = "";
             // Get cloned file ID to link to the cloned PSE
             switch ($type) {
                 case 'image':
@@ -477,6 +483,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->select(['ID'])
                 ->findOne();
 
+            $assoc = null;
             // Save association
             switch ($type) {
                 case 'image':

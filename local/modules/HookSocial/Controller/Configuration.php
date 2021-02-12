@@ -32,7 +32,7 @@ class Configuration extends BaseAdminController
             return $response;
         }
 
-        $form = new \HookSocial\Form\Configuration($this->getRequest());
+        $form = $this->createForm(Configuration::class);
         $resp = [
             "error" =>  0,
             "message" => ""

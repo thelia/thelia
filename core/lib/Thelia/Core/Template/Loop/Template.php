@@ -60,6 +60,8 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
     {
         $type = $this->getArg('template-type')->getValue();
 
+        $templateType =  TemplateDefinition::FRONT_OFFICE;
+
         if ($type == 'front-office' || $type == 'front') {
             $templateType = TemplateDefinition::FRONT_OFFICE;
         } elseif ($type == 'back-office' || $type == 'admin') {

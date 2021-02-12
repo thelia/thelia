@@ -29,16 +29,6 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
     use PositionManagementTrait;
 
     /**
-     * Get the form instance used to change this object information
-     *
-     * @return BaseForm the form
-     */
-    public function getUpdateFormInstance(Request $request)
-    {
-        return new ModuleImageModification($request);
-    }
-
-    /**
      * Set file parent id
      *
      * @param int $parentId parent id

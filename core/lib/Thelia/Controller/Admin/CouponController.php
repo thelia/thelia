@@ -854,7 +854,7 @@ class CouponController extends BaseAdminController
             $coupon = CouponQuery::create()
                 ->findPk($couponId = $this->getRequest()->request->get("coupon_id"))
             ;
-            $deleteEvent = new CouponDeleteEvent($couponId, $coupon);
+            $deleteEvent = new CouponDeleteEvent($coupon);
 
             $this->dispatch(TheliaEvents::COUPON_DELETE, $deleteEvent);
 

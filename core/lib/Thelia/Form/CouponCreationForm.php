@@ -271,7 +271,9 @@ class CouponCreationForm extends BaseForm
 
     public function checkCouponCodeChangedAndDoesntExists($value, ExecutionContextInterface $context)
     {
-        $changed = isset($this->data["code"]) && $this->data["code"] !== $value;
+        $data = $context->getRoot()->getData();
+
+        $changed = isset($data["code"]) && $data["code"] !== $value;
         $exists = CouponQuery::create()->filterByCode($value)->count() > 0;
 
         if ($changed && $exists) {

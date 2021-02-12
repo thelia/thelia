@@ -91,10 +91,7 @@ class ModuleHookCreationForm extends BaseForm
                 [
                     "label" => $this->trans("Method Name"),
                     "constraints" => [
-                        new NotBlank(),
-                        new Callback(
-                                    [$this, "verifyMethod"]
-                                ),
+                        new NotBlank()
                     ],
                     "label_attr" => [
                         "for" => "method",
@@ -172,39 +169,6 @@ class ModuleHookCreationForm extends BaseForm
         }
 
         return $choices;
-    }
-
-    /**
-     *
-     * Check if method has a valid signature.
-     * See RegisterListenersPass::isValidHookMethod for implementing this verification
-     *
-     * @param $value
-     * @return bool
-     */
-    public function verifyMethod($value, ExecutionContextInterface $context)
-    {
-        if (! $this->hasContainer()) {
-            return true;
-        }
-
-        $data = $context->getRoot()->getData();
-
-        if (null === $service = $this->container->get($data["classname"])) {
-            return true;
-        }
-
-        if (!method_exists($service, $data['method'])) {
-            $context->addViolation(
-                $this->trans(
-                    "The method %method% doesn't exist in classname %classname%",
-                    [
-                        '%method%' => $data['method'],
-                        '%classname%' => $data['classname']
-                    ]
-                )
-            );
-        }
     }
 
     /**

@@ -14,6 +14,7 @@ namespace Thelia\Controller;
 
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -588,7 +589,7 @@ abstract class BaseController implements ControllerInterface
      *
      * @deprecated since Thelia 2.5, use autowiring to get form factory and create your form.
      */
-    public function createForm($name, $type = "Symfony\Component\Form\Extension\Core\Type\FormType", array $data = [], array $options = [])
+    public function createForm($name, $type = FormType::class, array $data = [], array $options = [])
     {
         if (empty($name)) {
             $name = static::EMPTY_FORM_NAME;

@@ -30,13 +30,9 @@ class RewritingRetriever
     public $url;
     public $rewrittenUrl;
 
-    public function __construct($view = null, $viewLocale = null, $viewId = null)
+    public function __construct()
     {
         $this->rewritingUrlQuery = new RewritingUrlQuery();
-
-        if ($view !== null && $viewLocale !== null) {
-            $this->load($view, $viewLocale, $viewId);
-        }
     }
 
     /**

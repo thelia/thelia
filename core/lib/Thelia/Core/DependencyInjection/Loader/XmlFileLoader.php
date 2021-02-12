@@ -340,7 +340,7 @@ class XmlFileLoader extends FileLoader
                 $definition->setConfigurator((string) $service->configurator['function']);
             } else {
                 if (isset($service->configurator['service'])) {
-                    $class = new Reference((string) $service->configurator['service'], ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false);
+                    $class = new Reference((string) $service->configurator['service'], ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
                 } else {
                     $class = (string) $service->configurator['class'];
                 }
@@ -740,13 +740,7 @@ EOF
                         $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
                     }
 
-                    if (isset($arg['strict'])) {
-                        $strict = XmlUtils::phpize($arg['strict']);
-                    } else {
-                        $strict = true;
-                    }
-
-                    $arguments[$key] = new Reference((string) $arg['id'], $invalidBehavior, $strict);
+                    $arguments[$key] = new Reference((string) $arg['id'], $invalidBehavior);
                     break;
                 case 'expression':
                     $arguments[$key] = new Expression((string) $arg);

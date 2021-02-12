@@ -155,7 +155,7 @@ class OrderController extends BaseAdminController
 
         $message = null;
 
-        $orderUpdateAddress = new OrderUpdateAddress($this->getRequest());
+        $orderUpdateAddress = $this->createForm(OrderUpdateAddress::getName());
 
         try {
             $order = OrderQuery::create()->findPk($order_id);
