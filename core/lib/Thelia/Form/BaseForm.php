@@ -98,11 +98,6 @@ abstract class BaseForm implements FormInterface
     private $type;
 
     /**
-     * @param Request $request
-     * @param EventDispatcher $eventDispatcher
-     * @param TranslatorInterface $translator
-     * @param FormFactoryBuilderInterface $formFactoryBuilder
-     * @param ValidatorBuilder $validationBuilder
      * @param string $type
      * @param array $data
      * @param array $options
@@ -402,9 +397,9 @@ abstract class BaseForm implements FormInterface
      */
     public static function getName()
     {
-        $classParts = explode('\\', get_called_class());
+        $classParts = explode('\\', \get_called_class());
         $nameParts = array_map(function ($classPart, $index) use ($classParts) {
-            if ($index !== count($classParts) -1) {
+            if ($index !== \count($classParts) -1) {
                 return strtolower($classPart);
             }
             return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $classPart));

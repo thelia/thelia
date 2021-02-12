@@ -317,8 +317,6 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Create a new object
      *
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param TranslatorInterface $translator
      * @return \Thelia\Core\HttpFoundation\Response the response
      */
     public function createAction(
@@ -534,8 +532,6 @@ abstract class AbstractCrudController extends BaseAdminController
 
     /**
      * Update object position (only for objects whichsupport that)
-     * @param Request $request
-     * @param EventDispatcherInterface $eventDispatcher
      * @return mixed|string|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|Response|null
      */
     public function updatePositionAction(

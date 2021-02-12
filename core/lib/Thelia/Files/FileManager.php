@@ -104,7 +104,6 @@ class FileManager
      *
      * @param FileModelInterface $model        Model saved
      * @param UploadedFile       $uploadedFile Ready to be uploaded file
-     * @param ConnectionInterface $con         current transaction with database
      *
      * @throws \Thelia\Exception\ImageException
      * @return UploadedFile|null
