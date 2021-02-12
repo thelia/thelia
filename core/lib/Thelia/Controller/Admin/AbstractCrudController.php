@@ -52,28 +52,28 @@ abstract class AbstractCrudController extends BaseAdminController
     protected $changePositionEventIdentifier;
 
     /**
-     * @param string $objectName                      the lower case object name. Example. "message"
-     * @param string $defaultListOrder                the default object list order, or null if list is not sortable. Example: manual
-     * @param string $orderRequestParameterName       Name of the request parameter that set the list order (null if list is not sortable)
-     * @param string $resourceCode                    the 'resource' code. Example: "admin.configuration.message"
-     * @param string $createEventIdentifier           the dispatched create TheliaEvent identifier. Example: TheliaEvents::MESSAGE_CREATE
-     * @param string $updateEventIdentifier           the dispatched update TheliaEvent identifier. Example: TheliaEvents::MESSAGE_UPDATE
-     * @param string $deleteEventIdentifier           the dispatched delete TheliaEvent identifier. Example: TheliaEvents::MESSAGE_DELETE
-     * @param string $visibilityToggleEventIdentifier the dispatched visibility toggle TheliaEvent identifier, or null if the object has no visible options. Example: TheliaEvents::MESSAGE_TOGGLE_VISIBILITY
-     * @param string $changePositionEventIdentifier   the dispatched position change TheliaEvent identifier, or null if the object has no position. Example: TheliaEvents::MESSAGE_UPDATE_POSITION
-     * @param string $moduleCode                      The module code for ACL
+     * @param string      $objectName                      the lower case object name. Example. "message"
+     * @param string      $defaultListOrder                the default object list order, or null if list is not sortable. Example: manual
+     * @param string      $orderRequestParameterName       Name of the request parameter that set the list order (null if list is not sortable)
+     * @param string      $resourceCode                    the 'resource' code. Example: "admin.configuration.message"
+     * @param string      $createEventIdentifier           the dispatched create TheliaEvent identifier. Example: TheliaEvents::MESSAGE_CREATE
+     * @param string      $updateEventIdentifier           the dispatched update TheliaEvent identifier. Example: TheliaEvents::MESSAGE_UPDATE
+     * @param string      $deleteEventIdentifier           the dispatched delete TheliaEvent identifier. Example: TheliaEvents::MESSAGE_DELETE
+     * @param string|null $visibilityToggleEventIdentifier the dispatched visibility toggle TheliaEvent identifier, or null if the object has no visible options. Example: TheliaEvents::MESSAGE_TOGGLE_VISIBILITY
+     * @param string|null $changePositionEventIdentifier   the dispatched position change TheliaEvent identifier, or null if the object has no position. Example: TheliaEvents::MESSAGE_UPDATE_POSITION
+     * @param string|null $moduleCode                      The module code for ACL
      */
     public function __construct(
-        $objectName,
-        $defaultListOrder,
-        $orderRequestParameterName,
-        $resourceCode,
-        $createEventIdentifier,
-        $updateEventIdentifier,
-        $deleteEventIdentifier,
-        $visibilityToggleEventIdentifier = null,
-        $changePositionEventIdentifier = null,
-        $moduleCode = null
+        string $objectName,
+        string $defaultListOrder,
+        string $orderRequestParameterName,
+        string $resourceCode,
+        string $createEventIdentifier,
+        string $updateEventIdentifier,
+        string $deleteEventIdentifier,
+        string $visibilityToggleEventIdentifier = null,
+        string $changePositionEventIdentifier = null,
+        string $moduleCode = null
     ) {
         $this->objectName = $objectName;
 
@@ -165,17 +165,13 @@ abstract class AbstractCrudController extends BaseAdminController
 
     /**
      * Returns the object label form the object event (name, title, etc.).
-     *
-     * @param string|null $object
      */
-    abstract protected function getObjectLabel($object);
+    abstract protected function getObjectLabel(?string $object);
 
     /**
      * Returns the object ID from the object.
-     *
-     * @param int|null $object
      */
-    abstract protected function getObjectId($object);
+    abstract protected function getObjectId(?int $object);
 
     /**
      * Render the main list template.

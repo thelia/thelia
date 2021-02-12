@@ -78,7 +78,7 @@ class ExportEvent extends Event
      *
      * @return $this Return $this, allow chaining
      */
-    public function setExport(AbstractExport $export)
+    public function setExport(AbstractExport $export): self
     {
         $this->export = $export;
 

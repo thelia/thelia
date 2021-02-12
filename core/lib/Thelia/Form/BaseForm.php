@@ -101,10 +101,6 @@ abstract class BaseForm implements FormInterface
     private $type;
 
     /**
-     * @param string $type
-     * @param array  $data
-     * @param array  $options
-     *
      * @deprecated Thelia forms should not be instantiated directly. Please use BaseController::createForm() instead or form factory
      * @see BaseController::createForm()
      * @see TheliaFormFactory::createForm()
@@ -115,9 +111,9 @@ abstract class BaseForm implements FormInterface
         TranslatorInterface $translator,
         FormFactoryBuilderInterface $formFactoryBuilder,
         ValidatorBuilder $validationBuilder,
-        $type = "Symfony\Component\Form\Extension\Core\Type\FormType",
-        $data = [],
-        $options = []
+        string $type = "Symfony\Component\Form\Extension\Core\Type\FormType",
+        array $data = [],
+        array $options = []
     ) {
         $this->request = $request;
         $this->type = $type;
@@ -263,7 +259,7 @@ abstract class BaseForm implements FormInterface
      *
      * @return string an absolute URL
      */
-    public function getErrorUrl($default = null)
+    public function getErrorUrl(string $default = null)
     {
         return $this->getFormDefinedUrl('error_url', $default);
     }
@@ -280,11 +276,11 @@ abstract class BaseForm implements FormInterface
      * Returns the absolute URL to redirect the user to if the form is successfully processed.
      * using the 'success_url' form parameter value.
      *
-     * @param string $default the default URL. If not given, the configured base URL is used.
+     * @param string|null $default the default URL. If not given, the configured base URL is used.
      *
      * @return string an absolute URL
      */
-    public function getSuccessUrl($default = null)
+    public function getSuccessUrl(string $default = null)
     {
         return $this->getFormDefinedUrl('success_url', $default);
     }
@@ -300,12 +296,12 @@ abstract class BaseForm implements FormInterface
     /**
      * Build an absolute URL using the value of a form parameter.
      *
-     * @param string $parameterName the form parameter name
-     * @param string $default       a default value for the form parameter. If not defined, the configured base URL is used.
+     * @param string      $parameterName the form parameter name
+     * @param string|null $default       a default value for the form parameter. If not defined, the configured base URL is used.
      *
      * @return string an absolute URL
      */
-    public function getFormDefinedUrl($parameterName, $default = null)
+    public function getFormDefinedUrl(string $parameterName, string $default = null): string
     {
         $formDefinedUrl = $this->form->get($parameterName)->getData();
 
@@ -350,7 +346,7 @@ abstract class BaseForm implements FormInterface
      *
      * @return $this
      */
-    public function setError($has_error = true)
+    public function setError($has_error = true): self
     {
         $this->has_error = $has_error;
 
@@ -370,11 +366,9 @@ abstract class BaseForm implements FormInterface
     /**
      * Set the error message related to global form error.
      *
-     * @param string $message
-     *
      * @return $this
      */
-    public function setErrorMessage($message)
+    public function setErrorMessage(string $message): self
     {
         $this->setError(true);
         $this->error_message = $message;

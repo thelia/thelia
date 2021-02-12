@@ -30,10 +30,7 @@ class UpdateException extends \RuntimeException
         return $this->version;
     }
 
-    /**
-     * @param string $version
-     */
-    public function setVersion($version): void
+    public function setVersion(string $version): void
     {
         $this->version = $version;
     }

@@ -35,7 +35,7 @@ class CustomerNotConfirmedException extends AuthenticationException
     /**
      * @return $this
      */
-    public function setUser(Customer $user)
+    public function setUser(Customer $user): self
     {
         $this->user = $user;
 

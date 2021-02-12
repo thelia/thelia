@@ -34,50 +34,36 @@ class CacheEvent extends ActionEvent
      */
     protected $onKernelTerminate = true;
 
-    public function __construct($dir, $onKernelTerminate = true)
+    public function __construct(string $dir, bool $onKernelTerminate = true)
     {
         $this->dir = $dir;
         $this->onKernelTerminate = $onKernelTerminate;
     }
 
-    /**
-     * @param string $dir
-     *
-     * @return $this
-     */
-    public function setDir($dir)
+    public function setDir(string $dir): self
     {
         $this->dir = $dir;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getDir()
+    public function getDir(): string
     {
         return $this->dir;
     }
 
     /**
      * @since 2.4.0
-     *
-     * @return bool
      */
-    public function isOnKernelTerminate()
+    public function isOnKernelTerminate(): bool
     {
         return $this->onKernelTerminate;
     }
 
     /**
      * @since 2.4.0
-     *
-     * @param bool $onKernelTerminate
-     *
-     * @return CacheEvent
      */
-    public function setOnKernelTerminate($onKernelTerminate)
+    public function setOnKernelTerminate(bool $onKernelTerminate): self
     {
         $this->onKernelTerminate = $onKernelTerminate;
 

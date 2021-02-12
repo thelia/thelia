@@ -63,7 +63,7 @@ abstract class BaseCachedFile extends BaseAction
     /**
      * @param string $url the fully qualified CDN URL that will be used to create doucments URL
      */
-    public function setCdnBaseUrl($url): void
+    public function setCdnBaseUrl(string $url): void
     {
         $this->cdnBaseUrl = $url;
     }
@@ -85,7 +85,7 @@ abstract class BaseCachedFile extends BaseAction
      *
      * @param string $path the directory path
      */
-    protected function clearDirectory($path): void
+    protected function clearDirectory(string $path): void
     {
         $iterator = new \DirectoryIterator($path);
 
@@ -111,7 +111,7 @@ abstract class BaseCachedFile extends BaseAction
      *
      * @return string the absolute URL to the cached file
      */
-    protected function getCacheFileURL($subdir, $safe_filename)
+    protected function getCacheFileURL(string $subdir, string $safe_filename)
     {
         $path = $this->getCachePathFromWebRoot($subdir);
 
@@ -121,14 +121,14 @@ abstract class BaseCachedFile extends BaseAction
     /**
      * Return the full path of the cached file.
      *
-     * @param string $subdir            the subdirectory related to cache base
-     * @param string $filename          the filename
-     * @param bool   $forceOriginalFile if true, the original file path in the cache dir is returned
-     * @param string $hashed_options    a hash of transformation options, or null if no transformations have been applied
+     * @param string      $subdir            the subdirectory related to cache base
+     * @param string      $filename          the filename
+     * @param bool        $forceOriginalFile if true, the original file path in the cache dir is returned
+     * @param string|null $hashed_options    a hash of transformation options, or null if no transformations have been applied
      *
      * @return string the cache directory path relative to Web Root
      */
-    protected function getCacheFilePath($subdir, $filename, $forceOriginalFile = false, $hashed_options = null)
+    protected function getCacheFilePath(string $subdir, string $filename, bool $forceOriginalFile = false, string $hashed_options = null)
     {
         $path = $this->getCachePath($subdir);
 
@@ -145,11 +145,11 @@ abstract class BaseCachedFile extends BaseAction
     /**
      * Return the cache directory path relative to Web Root.
      *
-     * @param string $subdir the subdirectory related to cache base, or null to get the cache directory only
+     * @param string|null $subdir the subdirectory related to cache base, or null to get the cache directory only
      *
      * @return string the cache directory path relative to Web Root
      */
-    protected function getCachePathFromWebRoot($subdir = null)
+    protected function getCachePathFromWebRoot(string $subdir = null)
     {
         $cache_dir_from_web_root = $this->getCacheDirFromWebRoot();
 
@@ -168,15 +168,15 @@ abstract class BaseCachedFile extends BaseAction
     /**
      * Return the absolute cache directory path.
      *
-     * @param string $subdir               the subdirectory related to cache base, or null to get the cache base directory
-     * @param bool   $create_if_not_exists create the directory if it is not found
+     * @param string|null $subdir               the subdirectory related to cache base, or null to get the cache base directory
+     * @param bool        $create_if_not_exists create the directory if it is not found
      *
      * @throws \RuntimeException         if cache directory cannot be created
      * @throws \InvalidArgumentException ii path is invalid, e.g. not in the cache dir
      *
      * @return string the absolute cache directory path
      */
-    protected function getCachePath($subdir = null, $create_if_not_exists = true)
+    protected function getCachePath(string $subdir = null, bool $create_if_not_exists = true)
     {
         $cache_base = $this->getCachePathFromWebRoot($subdir);
 

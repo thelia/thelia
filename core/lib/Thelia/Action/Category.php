@@ -199,10 +199,8 @@ class Category extends BaseAction implements EventSubscriberInterface
 
     /**
      * Check if is a category view and if category_id is visible.
-     *
-     * @param string $eventName
      */
-    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function viewCheck(ViewCheckEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
         if ($event->getView() == 'category') {
             $category = CategoryQuery::create()

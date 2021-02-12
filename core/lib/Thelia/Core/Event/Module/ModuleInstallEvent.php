@@ -39,25 +39,19 @@ class ModuleInstallEvent extends ActionEvent
         $this->module = $module;
     }
 
-    /**
-     * @return $this
-     */
-    public function setModule(Module $module)
+    public function setModule(Module $module): self
     {
         $this->module = $module;
 
         return $this;
     }
 
-    /**
-     * @return \Thelia\Model\Module
-     */
-    public function getModule()
+    public function getModule(): Module
     {
         return $this->module;
     }
 
-    public function hasModule()
+    public function hasModule(): bool
     {
         return null !== $this->module;
     }
@@ -67,7 +61,7 @@ class ModuleInstallEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setModuleDefinition($moduleDefinition)
+    public function setModuleDefinition($moduleDefinition): self
     {
         $this->moduleDefinition = $moduleDefinition;
 
@@ -87,7 +81,7 @@ class ModuleInstallEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setModulePath($modulePath)
+    public function setModulePath($modulePath): self
     {
         $this->modulePath = $modulePath;
 

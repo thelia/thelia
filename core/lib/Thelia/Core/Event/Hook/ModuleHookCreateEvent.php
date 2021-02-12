@@ -75,11 +75,9 @@ class ModuleHookCreateEvent extends ModuleHookEvent
     }
 
     /**
-     * @param string $classname
-     *
      * @return $this
      */
-    public function setClassname($classname)
+    public function setClassname(string $classname)
     {
         $this->classname = $classname;
 
@@ -95,11 +93,9 @@ class ModuleHookCreateEvent extends ModuleHookEvent
     }
 
     /**
-     * @param string $method
-     *
      * @return $this
      */
-    public function setMethod($method)
+    public function setMethod(string $method)
     {
         $this->method = $method;
 
@@ -123,11 +119,9 @@ class ModuleHookCreateEvent extends ModuleHookEvent
     }
 
     /**
-     * @param string $templates
-     *
      * @return $this
      */
-    public function setTemplates($templates)
+    public function setTemplates(string $templates)
     {
         $this->templates = $templates;
 

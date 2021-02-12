@@ -148,10 +148,7 @@ class Tlog implements LoggerInterface
     // Configuration
     // -------------
 
-    /**
-     * @param string $destinations
-     */
-    public function setDestinations($destinations)
+    public function setDestinations(string $destinations)
     {
         if (!empty($destinations)) {
             $this->destinations = [];

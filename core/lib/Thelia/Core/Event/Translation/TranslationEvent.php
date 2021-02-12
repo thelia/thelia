@@ -98,7 +98,7 @@ class TranslationEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setDirectory($directory)
+    public function setDirectory($directory): self
     {
         $this->directory = $directory;
 
@@ -118,7 +118,7 @@ class TranslationEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setMode($mode)
+    public function setMode($mode): self
     {
         $this->mode = $mode;
 
@@ -138,7 +138,7 @@ class TranslationEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setLocale($locale)
+    public function setLocale($locale): self
     {
         $this->locale = $locale;
 
@@ -158,7 +158,7 @@ class TranslationEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setDomain($domain)
+    public function setDomain($domain): self
     {
         $this->domain = $domain;
 
@@ -178,7 +178,7 @@ class TranslationEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setTranslatableStrings($translatableStrings)
+    public function setTranslatableStrings($translatableStrings): self
     {
         $this->translatableStrings = $translatableStrings;
 
@@ -198,7 +198,7 @@ class TranslationEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setTranslatableStringCount($translatableStringCount)
+    public function setTranslatableStringCount($translatableStringCount): self
     {
         $this->translatableStringCount = $translatableStringCount;
 
@@ -218,7 +218,7 @@ class TranslationEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setTranslationFilePath($translationFilePath)
+    public function setTranslationFilePath($translationFilePath): self
     {
         $this->translationFilePath = $translationFilePath;
 
@@ -238,7 +238,7 @@ class TranslationEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setTranslatedStrings($translatedStrings)
+    public function setTranslatedStrings($translatedStrings): self
     {
         $this->translatedStrings = $translatedStrings;
 
@@ -258,7 +258,7 @@ class TranslationEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setCreateFileIfNotExists($createFileIfNotExists)
+    public function setCreateFileIfNotExists($createFileIfNotExists): self
     {
         $this->createFileIfNotExists = $createFileIfNotExists;
 

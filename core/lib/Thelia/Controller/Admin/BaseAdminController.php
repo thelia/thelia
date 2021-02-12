@@ -49,7 +49,7 @@ class BaseAdminController extends BaseController
      *
      * @return Response the response which contains the rendered view
      */
-    public function processTemplateAction($template)
+    public function processTemplateAction(string $template)
     {
         try {
             if (!empty($template)) {
@@ -76,12 +76,8 @@ class BaseAdminController extends BaseController
 
     /**
      * Helper to append a message to the admin log.
-     *
-     * @param string $resource
-     * @param string $action
-     * @param string $message
      */
-    protected function adminLogAppend($resource, $action, $message, $resourceId = null): void
+    protected function adminLogAppend(string $resource, string $action, string $message, string $resourceId = null): void
     {
         AdminLog::append(
             $resource,
@@ -178,12 +174,12 @@ class BaseAdminController extends BaseController
     /**
      * Setup the error context when an error occurs in a action method.
      *
-     * @param string     $action        the action that caused the error (category modification, variable creation, currency update, etc.)
-     * @param BaseForm   $form          the form where the error occured, or null if no form was involved
-     * @param string     $error_message the error message
-     * @param \Exception $exception     the exception or null if no exception
+     * @param string          $action        the action that caused the error (category modification, variable creation, currency update, etc.)
+     * @param BaseForm        $form          the form where the error occured, or null if no form was involved
+     * @param string          $error_message the error message
+     * @param \Exception|null $exception     the exception or null if no exception
      */
-    protected function setupFormErrorContext($action, $error_message, BaseForm $form = null, \Exception $exception = null): void
+    protected function setupFormErrorContext(string $action, string $error_message, BaseForm $form = null, \Exception $exception = null): void
     {
         if ($error_message !== false) {
             // Log the error message
@@ -238,7 +234,7 @@ class BaseAdminController extends BaseController
      *
      * @return Response A Response instance
      */
-    protected function forward($controller, array $path = [], array $query = [])
+    protected function forward(string $controller, array $path = [], array $query = [])
     {
         $path['_controller'] = $controller;
         $subRequest = $this->container->get('request_stack')->getCurrentRequest()->duplicate($query, null, $path);
@@ -289,11 +285,11 @@ class BaseAdminController extends BaseController
     /**
      * A simple helper to get the URL based on the language.
      *
-     * @param string $locale the locale, or null to get the current one
+     * @param string|null $locale the locale, or null to get the current one
      *
      * @return string|null the URL for the current language, or null if the "One domain for each lang" feature is disabled
      */
-    protected function getUrlLanguage($locale = null)
+    protected function getUrlLanguage(string $locale = null)
     {
         // Check if the functionality is activated
         if (!ConfigQuery::isMultiDomainActivated()) {
@@ -319,7 +315,7 @@ class BaseAdminController extends BaseController
      *
      * @return string the current list order
      */
-    protected function getListOrderFromSession($objectName, $requestParameterName, $defaultListOrder, $updateSession = true)
+    protected function getListOrderFromSession(string $objectName, string $requestParameterName, string $defaultListOrder, bool $updateSession = true)
     {
         $orderSessionIdentifier = sprintf('admin.%s.currentListOrder', $objectName);
 

@@ -804,10 +804,8 @@ class Product extends BaseAction implements EventSubscriberInterface
 
     /**
      * When a feature is removed from a template, the products which are using this feature should be updated.
-     *
-     * @param string $eventName
      */
-    public function deleteTemplateFeature(TemplateDeleteFeatureEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function deleteTemplateFeature(TemplateDeleteFeatureEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
         // Detete the removed feature in all products which are using this template
         $products = ProductQuery::create()
@@ -826,10 +824,8 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * When an attribute is removed from a template, the conbinations and PSE of products which are using this template
      * should be updated.
-     *
-     * @param string $eventName
      */
-    public function deleteTemplateAttribute(TemplateDeleteAttributeEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function deleteTemplateAttribute(TemplateDeleteAttributeEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
         // Detete the removed attribute in all products which are using this template
         $pseToDelete = ProductSaleElementsQuery::create()

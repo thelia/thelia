@@ -25,10 +25,7 @@ class HookUpdateEvent extends HookCreateEvent
     protected $chapo;
     protected $description;
 
-    /**
-     * @param int $hook_id
-     */
-    public function __construct($hook_id)
+    public function __construct(int $hook_id)
     {
         $this->hook_id = $hook_id;
     }
@@ -38,7 +35,7 @@ class HookUpdateEvent extends HookCreateEvent
      *
      * @return $this
      */
-    public function setHookId($hook_id)
+    public function setHookId($hook_id): self
     {
         $this->hook_id = $hook_id;
 

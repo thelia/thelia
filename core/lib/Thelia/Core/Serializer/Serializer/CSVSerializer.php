@@ -63,7 +63,7 @@ class CSVSerializer extends AbstractSerializer
      *
      * @return $this Return $this, allow chaining
      */
-    public function setDelimiter($delimiter)
+    public function setDelimiter($delimiter): self
     {
         $this->delimiter = $delimiter;
 
@@ -77,7 +77,7 @@ class CSVSerializer extends AbstractSerializer
      *
      * @return $this Return $this, allow chaining
      */
-    public function setEnclosure($enclosure)
+    public function setEnclosure($enclosure): self
     {
         $this->enclosure = $enclosure;
 

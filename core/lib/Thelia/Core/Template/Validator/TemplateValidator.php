@@ -76,7 +76,7 @@ class TemplateValidator
      *
      * @throws \Exception
      */
-    public function getTemplateDefinition($name, $type)
+    public function getTemplateDefinition(string $name, int $type)
     {
         $templateDescriptor = new TemplateDescriptor($name, $type);
 

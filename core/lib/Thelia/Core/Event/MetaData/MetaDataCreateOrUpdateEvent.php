@@ -28,9 +28,6 @@ class MetaDataCreateOrUpdateEvent extends MetaDataDeleteEvent
         $this->value = $value;
     }
 
-    /**
-     * @return $this
-     */
     public function setValue($value)
     {
         $this->value = $value;

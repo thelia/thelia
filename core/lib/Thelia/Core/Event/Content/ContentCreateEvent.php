@@ -24,10 +24,7 @@ class ContentCreateEvent extends ContentEvent
     protected $locale;
     protected $visible;
 
-    /**
-     * @return $this
-     */
-    public function setLocale($locale)
+    public function setLocale($locale): self
     {
         $this->locale = $locale;
 
@@ -39,10 +36,7 @@ class ContentCreateEvent extends ContentEvent
         return $this->locale;
     }
 
-    /**
-     * @return $this
-     */
-    public function setDefaultFolder($default_folder)
+    public function setDefaultFolder($default_folder): self
     {
         $this->default_folder = $default_folder;
 
@@ -54,10 +48,7 @@ class ContentCreateEvent extends ContentEvent
         return $this->default_folder;
     }
 
-    /**
-     * @return $this
-     */
-    public function setVisible($visible)
+    public function setVisible($visible): self
     {
         $this->visible = $visible;
 
@@ -69,10 +60,7 @@ class ContentCreateEvent extends ContentEvent
         return $this->visible;
     }
 
-    /**
-     * @return $this
-     */
-    public function setTitle($title)
+    public function setTitle($title): self
     {
         $this->title = $title;
 

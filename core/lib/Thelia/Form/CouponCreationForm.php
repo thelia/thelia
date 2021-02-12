@@ -239,10 +239,8 @@ class CouponCreationForm extends BaseForm
 
     /**
      * Check coupon code unicity.
-     *
-     * @param string $value
      */
-    public function checkDuplicateCouponCode($value, ExecutionContextInterface $context): void
+    public function checkDuplicateCouponCode(string $value, ExecutionContextInterface $context): void
     {
         $exists = CouponQuery::create()->filterByCode($value)->count() > 0;
 
@@ -275,10 +273,8 @@ class CouponCreationForm extends BaseForm
 
     /**
      * Validate a date entered with the default Language date format.
-     *
-     * @param string $value
      */
-    public function checkLocalizedDate($value, ExecutionContextInterface $context): void
+    public function checkLocalizedDate(string $value, ExecutionContextInterface $context): void
     {
         $format = LangQuery::create()->findOneByByDefault(true)->getDatetimeFormat();
 

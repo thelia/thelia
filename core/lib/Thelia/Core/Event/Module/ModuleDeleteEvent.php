@@ -19,63 +19,44 @@ namespace Thelia\Core\Event\Module;
  */
 class ModuleDeleteEvent extends ModuleEvent
 {
-    /**
-     * @var int module id
-     */
     protected $module_id;
     protected $delete_data;
-
-    /**
-     * @var bool
-     */
     protected $assume_delete;
 
-    public function __construct($module_id, $assume_delete = false)
+    public function __construct(int $module_id, bool $assume_delete = false)
     {
         $this->module_id = $module_id;
         $this->assume_delete = $assume_delete;
     }
 
-    /**
-     * @param int $module_id
-     */
-    public function setModuleId($module_id): void
+    public function setModuleId(int $module_id): void
     {
         $this->module_id = $module_id;
     }
 
-    /**
-     * @return int
-     */
-    public function getModuleId()
+    public function getModuleId(): int
     {
         return $this->module_id;
     }
 
-    public function getDeleteData()
+    public function getDeleteData(): bool
     {
         return $this->delete_data;
     }
 
-    public function setDeleteData($delete_data)
+    public function setDeleteData(bool $delete_data): self
     {
         $this->delete_data = $delete_data;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getAssumeDelete()
+    public function getAssumeDelete(): bool
     {
         return $this->assume_delete;
     }
 
-    /**
-     * @return $this;
-     */
-    public function setAssumeDelete($assume_delete)
+    public function setAssumeDelete(bool $assume_delete): self
     {
         $this->assume_delete = $assume_delete;
 

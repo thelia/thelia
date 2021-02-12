@@ -77,7 +77,7 @@ class ConditionFactory
      *
      * @return ConditionCollection Conditions ready to be processed
      */
-    public function unserializeConditionCollection($serializedConditions)
+    public function unserializeConditionCollection(string $serializedConditions)
     {
         $unserializedConditions = json_decode(base64_decode($serializedConditions));
 
@@ -112,7 +112,7 @@ class ConditionFactory
      *
      * @return ConditionInterface Ready to use Condition or false
      */
-    public function build($conditionServiceId, array $operators, array $values)
+    public function build(string $conditionServiceId, array $operators, array $values)
     {
         if (!$this->container->has($conditionServiceId)) {
             return false;
@@ -132,7 +132,7 @@ class ConditionFactory
      *
      * @return array Ready to be drawn condition inputs
      */
-    public function getInputsFromServiceId($conditionServiceId)
+    public function getInputsFromServiceId(string $conditionServiceId)
     {
         if (!$this->container->has($conditionServiceId)) {
             return false;

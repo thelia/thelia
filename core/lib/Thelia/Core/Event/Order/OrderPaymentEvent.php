@@ -49,7 +49,7 @@ class OrderPaymentEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setResponse(Response $response)
+    public function setResponse(Response $response): self
     {
         $this->response = $response;
 

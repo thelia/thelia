@@ -76,7 +76,7 @@ class OrderEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setOrder(Order $order)
+    public function setOrder(Order $order): self
     {
         $this->order = $order;
 
@@ -88,7 +88,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setCartItemId($cartItemId)
+    public function setCartItemId($cartItemId): self
     {
         $this->cartItemId = $cartItemId;
 
@@ -106,7 +106,7 @@ class OrderEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function setPlacedOrder(Order $order)
+    public function setPlacedOrder(Order $order): self
     {
         $this->placedOrder = $order;
 
@@ -118,7 +118,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setInvoiceAddress($address)
+    public function setInvoiceAddress($address): self
     {
         $this->invoiceAddress = $address;
 
@@ -130,7 +130,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setDeliveryAddress($address)
+    public function setDeliveryAddress($address): self
     {
         $this->deliveryAddress = $address;
 
@@ -142,7 +142,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setDeliveryModule($module)
+    public function setDeliveryModule($module): self
     {
         $this->deliveryModule = $module;
 
@@ -154,7 +154,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setPaymentModule($module)
+    public function setPaymentModule($module): self
     {
         $this->paymentModule = $module;
 
@@ -166,7 +166,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setPostage($postage)
+    public function setPostage($postage): self
     {
         $this->postage = $postage;
 
@@ -178,7 +178,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setRef($ref)
+    public function setRef($ref): self
     {
         $this->ref = $ref;
 
@@ -190,7 +190,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setStatus($status)
+    public function setStatus($status): self
     {
         $this->status = $status;
 
@@ -202,7 +202,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setDeliveryRef($deliveryRef)
+    public function setDeliveryRef($deliveryRef): self
     {
         $this->deliveryRef = $deliveryRef;
 
@@ -300,7 +300,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setResponse(Response $response)
+    public function setResponse(Response $response): self
     {
         $this->response = $response;
 
@@ -336,7 +336,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setPostageTax($postageTax)
+    public function setPostageTax($postageTax): self
     {
         $this->postageTax = $postageTax;
 
@@ -356,7 +356,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setPostageTaxRuleTitle($postageTaxRuleTitle)
+    public function setPostageTaxRuleTitle($postageTaxRuleTitle): self
     {
         $this->postageTaxRuleTitle = $postageTaxRuleTitle;
 
@@ -380,7 +380,7 @@ class OrderEvent extends ActionEvent
      *
      * @return $this
      */
-    public function setTransactionRef($transactionRef)
+    public function setTransactionRef($transactionRef): self
     {
         $this->transactionRef = $transactionRef;
 

@@ -38,9 +38,9 @@ trait UrlRewritingTrait
     /**
      * Get the object URL for the given locale, rewritten if rewriting is enabled.
      *
-     * @param string $locale a valid locale (e.g. en_US)
+     * @param string|null $locale a valid locale (e.g. en_US)
      */
-    public function getUrl($locale = null)
+    public function getUrl(string $locale = null)
     {
         if (null === $locale) {
             $locale = $this->getLocale();
@@ -116,7 +116,7 @@ trait UrlRewritingTrait
      *
      * @return null
      */
-    public function getRewrittenUrl($locale)
+    public function getRewrittenUrl(string $locale)
     {
         $rewritingUrl = RewritingUrlQuery::create()
             ->filterByViewLocale($locale)
@@ -159,7 +159,7 @@ trait UrlRewritingTrait
      * @throws UrlRewritingException
      * @throws \Thelia\Exception\UrlRewritingException
      */
-    public function setRewrittenUrl($locale, $url)
+    public function setRewrittenUrl(string $locale, ?string $url)
     {
         $currentUrl = $this->getRewrittenUrl($locale);
         if ($currentUrl == $url || null === $url) {

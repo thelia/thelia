@@ -40,17 +40,12 @@ class CountryUpdateEvent extends CountryCreateEvent
     /**
      * @param int $country_id
      */
-    public function __construct($country_id)
+    public function __construct(int $country_id)
     {
         $this->country_id = $country_id;
     }
 
-    /**
-     * @param string $chapo
-     *
-     * @return $this
-     */
-    public function setChapo($chapo)
+    public function setChapo(string $chapo)
     {
         $this->chapo = $chapo;
 
@@ -65,12 +60,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this->chapo;
     }
 
-    /**
-     * @param string $description
-     *
-     * @return $this
-     */
-    public function setDescription($description)
+    public function setDescription(string $description)
     {
         $this->description = $description;
 
@@ -82,12 +72,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this->description;
     }
 
-    /**
-     * @param string $postscriptum
-     *
-     * @return $this
-     */
-    public function setPostscriptum($postscriptum)
+    public function setPostscriptum(string $postscriptum)
     {
         $this->postscriptum = $postscriptum;
 

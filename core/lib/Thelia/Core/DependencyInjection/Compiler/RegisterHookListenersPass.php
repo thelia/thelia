@@ -122,7 +122,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
      *
      * @throws \InvalidArgumentException
      */
-    protected function registerHook($class, $module, $id, $attributes): void
+    protected function registerHook(string $class, \Thelia\Model\Module $module, string $id, array $attributes): void
     {
         if (!isset($attributes['event'])) {
             throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "hook.event_listener" tags.', $id));
@@ -317,11 +317,9 @@ class RegisterHookListenersPass implements CompilerPassInterface
     /**
      * get the hook type according to the type attribute of the hook tag.
      *
-     * @param string $name
-     *
      * @return int the hook type
      */
-    protected function getHookType($name)
+    protected function getHookType(string $name)
     {
         $type = TemplateDefinition::FRONT_OFFICE;
 
@@ -342,12 +340,9 @@ class RegisterHookListenersPass implements CompilerPassInterface
     /**
      * G<et a hook for a hook name (code) and a hook type. The hook should exists and be activated.
      *
-     * @param string $hookName
-     * @param int    $hookType
-     *
      * @return Hook|null
      */
-    protected function getHook($hookName, $hookType)
+    protected function getHook(string $hookName, int $hookType)
     {
         $hook = HookQuery::create()
             ->filterByCode($hookName)
@@ -376,7 +371,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
      *
      * @return bool
      */
-    protected function isValidHookMethod($className, $methodName, $block, $failSafe = false)
+    protected function isValidHookMethod(string $className, string $methodName, bool $block, bool $failSafe = false)
     {
         try {
             $method = new ReflectionMethod($className, $methodName);

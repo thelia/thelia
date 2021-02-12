@@ -73,12 +73,10 @@ class Brand extends BaseAction implements EventSubscriberInterface
     /**
      * Toggle Brand visibility.
      *
-     * @param string $eventName
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function toggleVisibility(BrandToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function toggleVisibility(BrandToggleVisibilityEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
         $brand = $event->getBrand();
 
@@ -117,10 +115,8 @@ class Brand extends BaseAction implements EventSubscriberInterface
 
     /**
      * Check if is a brand view and if brand_id is visible.
-     *
-     * @param string $eventName
      */
-    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function viewCheck(ViewCheckEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
         if ($event->getView() == 'brand') {
             $brand = BrandQuery::create()

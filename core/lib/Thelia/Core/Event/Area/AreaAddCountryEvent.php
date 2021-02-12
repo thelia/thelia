@@ -25,7 +25,7 @@ class AreaAddCountryEvent extends AreaEvent
     protected $areaId;
     protected $countryId;
 
-    public function __construct(Area $area, $countryId)
+    public function __construct(Area $area, int $countryId)
     {
         parent::__construct($area);
 
@@ -35,14 +35,14 @@ class AreaAddCountryEvent extends AreaEvent
     /**
      * @return $this
      */
-    public function setCountryId($countryId)
+    public function setCountryId(int $countryId): self
     {
         $this->countryId = $countryId;
 
         return $this;
     }
 
-    public function getCountryId()
+    public function getCountryId(): int
     {
         return $this->countryId;
     }

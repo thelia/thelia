@@ -53,7 +53,7 @@ class ModuleToggleActivationEvent extends ModuleEvent
      *
      * @return $this
      */
-    public function setModuleId($module_id)
+    public function setModuleId($module_id): self
     {
         $this->module_id = $module_id;
 
@@ -81,7 +81,7 @@ class ModuleToggleActivationEvent extends ModuleEvent
      *
      * @return $this;
      */
-    public function setNoCheck($noCheck)
+    public function setNoCheck($noCheck): self
     {
         $this->noCheck = $noCheck;
 
@@ -101,7 +101,7 @@ class ModuleToggleActivationEvent extends ModuleEvent
      *
      * @return $this;
      */
-    public function setRecursive($recursive)
+    public function setRecursive($recursive): self
     {
         $this->recursive = $recursive;
 
@@ -119,7 +119,7 @@ class ModuleToggleActivationEvent extends ModuleEvent
     /**
      * @return $this;
      */
-    public function setAssumeDeactivate($assume_deactivate)
+    public function setAssumeDeactivate($assume_deactivate): self
     {
         $this->assume_deactivate = $assume_deactivate;
 

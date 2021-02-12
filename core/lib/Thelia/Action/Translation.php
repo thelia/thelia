@@ -72,7 +72,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
      *
      * @return number the total number of translatable texts
      */
-    protected function walkDir($directory, $walkMode, $currentLocale, $domain, &$strings)
+    protected function walkDir(string $directory, string $walkMode, string $currentLocale, string $domain, array &$strings)
     {
         $numTexts = 0;
 

@@ -105,7 +105,7 @@ class ArgumentCollection implements \Iterator
      *
      * @since 2.2.0-beta1
      */
-    public function removeArgument($argumentName)
+    public function removeArgument(string $argumentName)
     {
         if (isset($this->arguments[$argumentName])) {
             unset($this->arguments[$argumentName]);
