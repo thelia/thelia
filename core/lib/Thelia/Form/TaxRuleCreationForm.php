@@ -19,7 +19,7 @@ class TaxRuleCreationForm extends BaseForm
 {
     use StandardDescriptionFieldsTrait;
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('locale', HiddenType::class, [

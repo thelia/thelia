@@ -68,7 +68,7 @@ class ModuleValidator
         $this->loadModuleDefinition();
     }
 
-    public function setModulePath($modulePath)
+    public function setModulePath($modulePath): void
     {
         $this->modulePath = $modulePath;
     }
@@ -129,7 +129,7 @@ class ModuleValidator
      * @param bool $checkCurrentVersion if true it will also check if the module is
      *                                  already installed (not activated - present in module list)
      */
-    public function validate($checkCurrentVersion = true)
+    public function validate($checkCurrentVersion = true): void
     {
         if (null === $this->moduleDescriptor) {
             throw new \Exception(
@@ -150,7 +150,7 @@ class ModuleValidator
         $this->checkModulePropelSchema();
     }
 
-    protected function checkDirectoryStructure()
+    protected function checkDirectoryStructure(): void
     {
         if (false === file_exists($this->modulePath)) {
             throw new FileNotFoundException(
@@ -182,7 +182,7 @@ class ModuleValidator
         }
     }
 
-    protected function loadModuleDescriptor()
+    protected function loadModuleDescriptor(): void
     {
         $path = sprintf('%s/Config/module.xml', $this->modulePath);
 
@@ -197,7 +197,7 @@ class ModuleValidator
         }
     }
 
-    public function loadModuleDefinition()
+    public function loadModuleDefinition(): void
     {
         if (null === $this->moduleDescriptor) {
             throw new \Exception(
@@ -251,7 +251,7 @@ class ModuleValidator
         $this->moduleDefinition = $moduleDefinition;
     }
 
-    public function checkModulePropelSchema()
+    public function checkModulePropelSchema(): void
     {
         $schemaFile = $this->getModulePath().DS.'Config'.DS.'schema.xml';
         $fs = new Filesystem();
@@ -267,7 +267,7 @@ class ModuleValidator
         }
     }
 
-    protected function checkVersion()
+    protected function checkVersion(): void
     {
         if ($this->moduleDefinition->getTheliaVersion()) {
             if (!Version::test(Thelia::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion(), false, '>=')) {
@@ -284,7 +284,7 @@ class ModuleValidator
         }
     }
 
-    protected function checkModuleVersion()
+    protected function checkModuleVersion(): void
     {
         $module = ModuleQuery::create()
             ->findOneByFullNamespace($this->moduleDefinition->getNamespace());
@@ -301,7 +301,7 @@ class ModuleValidator
         }
     }
 
-    protected function checkModuleDependencies()
+    protected function checkModuleDependencies(): void
     {
         $errors = [];
 
@@ -428,7 +428,7 @@ class ModuleValidator
         return $dependencies;
     }
 
-    protected function getModuleLanguages(ModuleDefinition $moduleDefinition)
+    protected function getModuleLanguages(ModuleDefinition $moduleDefinition): void
     {
         $languages = [];
         if ($this->getModuleVersion() != '1') {
@@ -439,7 +439,7 @@ class ModuleValidator
         $moduleDefinition->setLanguages($languages);
     }
 
-    protected function getModuleDescriptives(ModuleDefinition $moduleDefinition)
+    protected function getModuleDescriptives(ModuleDefinition $moduleDefinition): void
     {
         $descriptives = [];
         foreach ($this->moduleDescriptor->descriptive as $descriptive) {
@@ -453,7 +453,7 @@ class ModuleValidator
         $moduleDefinition->setDescriptives($descriptives);
     }
 
-    protected function getModuleDependencies(ModuleDefinition $moduleDefinition)
+    protected function getModuleDependencies(ModuleDefinition $moduleDefinition): void
     {
         $dependencies = [];
         if (is_countable($this->moduleDescriptor->required) && 0 !== \count($this->moduleDescriptor->required)) {
@@ -467,7 +467,7 @@ class ModuleValidator
         $moduleDefinition->setDependencies($dependencies);
     }
 
-    protected function getModuleAuthors(ModuleDefinition $moduleDefinition)
+    protected function getModuleAuthors(ModuleDefinition $moduleDefinition): void
     {
         $authors = [];
 

@@ -82,7 +82,7 @@ class DatabaseConfigurationSource
      * @param array  $parameters    connection parameters
      * @param array  $envParameters environment parameters
      */
-    protected function addConnection($name, array $parameters = [], array $envParameters = [])
+    protected function addConnection($name, array $parameters = [], array $envParameters = []): void
     {
         $connectionParameterBag = new ParameterBag($envParameters);
         $connectionParameterBag->add($parameters);

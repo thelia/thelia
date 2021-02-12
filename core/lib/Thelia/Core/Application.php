@@ -56,7 +56,7 @@ class Application extends BaseApplication
         return parent::doRun($input, $output);
     }
 
-    protected function registerCommands()
+    protected function registerCommands(): void
     {
         if (!Thelia::isInstalled()) {
             $this->add(new Install());

@@ -38,7 +38,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         $this->parser = $parser;
     }
 
-    public function checkHttpException(ExceptionEvent $event)
+    public function checkHttpException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
         if ($exception instanceof NotFoundHttpException) {
@@ -54,7 +54,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    protected function displayAdminGeneralError(ExceptionEvent $event)
+    protected function displayAdminGeneralError(ExceptionEvent $event): void
     {
         // Define the template thant shoud be used
         $this->parser->setTemplateDefinition(
@@ -76,7 +76,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         $event->setResponse($response);
     }
 
-    protected function display404(ExceptionEvent $event)
+    protected function display404(ExceptionEvent $event): void
     {
         // Define the template thant shoud be used
         $this->parser->setTemplateDefinition(
@@ -88,7 +88,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         $event->setResponse($response);
     }
 
-    protected function displayException(ExceptionEvent $event)
+    protected function displayException(ExceptionEvent $event): void
     {
         /** @var \Symfony\Component\HttpKernel\Exception\HttpException $exception */
         $exception = $event->getThrowable();

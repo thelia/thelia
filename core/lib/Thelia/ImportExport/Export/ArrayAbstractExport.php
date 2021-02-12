@@ -29,12 +29,12 @@ abstract class ArrayAbstractExport extends AbstractExport
         return key($this->data);
     }
 
-    public function next()
+    public function next(): void
     {
         next($this->data);
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         if ($this->data === null) {
             $data = $this->getData();

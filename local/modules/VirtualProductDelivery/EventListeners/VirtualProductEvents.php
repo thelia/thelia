@@ -32,7 +32,7 @@ use VirtualProductDelivery\VirtualProductDelivery;
  */
 class VirtualProductEvents implements EventSubscriberInterface
 {
-    public function handleOrder(VirtualProductOrderHandleEvent $event)
+    public function handleOrder(VirtualProductOrderHandleEvent $event): void
     {
         $documentId = MetaDataQuery::getVal(
             'virtual',
@@ -48,7 +48,7 @@ class VirtualProductEvents implements EventSubscriberInterface
         }
     }
 
-    public function download(VirtualProductOrderDownloadResponseEvent $event)
+    public function download(VirtualProductOrderDownloadResponseEvent $event): void
     {
         $orderProduct = $event->getOrderProduct();
 

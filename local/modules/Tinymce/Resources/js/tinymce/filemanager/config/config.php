@@ -23,7 +23,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Thelia;
 use Thelia\Model\ConfigQuery;
 
-function generateFolder($env)
+function generateFolder($env): void
 {
     $webMediaPath = THELIA_WEB_DIR.'media';
     $webMediaEnvPath = null;

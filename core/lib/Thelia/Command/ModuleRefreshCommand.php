@@ -25,7 +25,7 @@ use Thelia\Module\ModuleManagement;
  */
 class ModuleRefreshCommand extends ContainerAwareCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('module:refresh')

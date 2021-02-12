@@ -20,7 +20,7 @@ use Thelia\Type\BooleanType;
  */
 class BooleanTypeTest extends TestCase
 {
-    public function testBooleanType()
+    public function testBooleanType(): void
     {
         $booleanType = new BooleanType();
         $this->assertTrue($booleanType->isValid('1'));
@@ -34,7 +34,7 @@ class BooleanTypeTest extends TestCase
         $this->assertFalse($booleanType->isValid(2));
     }
 
-    public function testFormatBooleanType()
+    public function testFormatBooleanType(): void
     {
         $booleanType = new BooleanType();
         $this->assertTrue($booleanType->getFormattedValue('on'));

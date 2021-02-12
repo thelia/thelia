@@ -245,7 +245,7 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param string $key               ???
      * @param bool   $addAtBeginning    if true, the template definition should be added at the beginning of the template directory list
      */
-    public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $addAtBeginning = false)
+    public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $addAtBeginning = false): void
     {
         Tlog::getInstance()->addDebug("Adding template directory $templateDirectory, type:$templateType name:$templateName, key: $key");
 
@@ -291,7 +291,7 @@ class SmartyParser extends Smarty implements ParserInterface
      *
      * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
      */
-    public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
+    public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): void
     {
         if (null !== $this->templateDefinition) {
             array_push($this->tplStack, [$this->templateDefinition, $this->fallbackToDefaultTemplate]);
@@ -303,7 +303,7 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * Restore the previous stored template definition, if one exists.
      */
-    public function popTemplateDefinition()
+    public function popTemplateDefinition(): void
     {
         if (\count($this->tplStack) > 0) {
             [$templateDefinition, $fallbackToDefaultTemplate] = array_pop($this->tplStack);
@@ -317,7 +317,7 @@ class SmartyParser extends Smarty implements ParserInterface
      *
      * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
      */
-    public function setTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
+    public function setTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): void
     {
         $this->templateDefinition = $templateDefinition;
 
@@ -579,12 +579,12 @@ class SmartyParser extends Smarty implements ParserInterface
      *
      * @param int $status
      */
-    public function setStatus($status)
+    public function setStatus($status): void
     {
         $this->status = $status;
     }
 
-    public function addPlugins(AbstractSmartyPlugin $plugin)
+    public function addPlugins(AbstractSmartyPlugin $plugin): void
     {
         $this->plugins[] = $plugin;
     }
@@ -602,7 +602,7 @@ class SmartyParser extends Smarty implements ParserInterface
      *
      * @throws \SmartyException
      */
-    public function registerPlugins()
+    public function registerPlugins(): void
     {
         /** @var AbstractSmartyPlugin $register_plugin */
         foreach ($this->plugins as $register_plugin) {

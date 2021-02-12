@@ -111,7 +111,7 @@ class Export extends BaseExport
         return true;
     }
 
-    public function addCriteriaToPositionQuery($query)
+    public function addCriteriaToPositionQuery($query): void
     {
         $query->filterByExportCategoryId($this->getExportCategoryId());
     }

@@ -32,7 +32,7 @@ class Import extends BaseImport
         return true;
     }
 
-    public function addCriteriaToPositionQuery($query)
+    public function addCriteriaToPositionQuery($query): void
     {
         $query->filterByImportCategoryId($this->getImportCategoryId());
     }

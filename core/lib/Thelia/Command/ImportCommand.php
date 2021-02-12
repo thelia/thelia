@@ -28,7 +28,7 @@ use Thelia\Model\LangQuery;
  */
 class ImportCommand extends ContainerAwareCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('import')
@@ -120,7 +120,7 @@ class ImportCommand extends ContainerAwareCommand
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output An output interface
      */
-    protected function listImport(OutputInterface $output)
+    protected function listImport(OutputInterface $output): void
     {
         $table = new Table($output);
 

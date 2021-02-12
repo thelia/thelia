@@ -28,7 +28,7 @@ use Thelia\Model\Event\AreaEvent;
  */
 class Area extends BaseAction implements EventSubscriberInterface
 {
-    public function addCountry(AreaAddCountryEvent $event)
+    public function addCountry(AreaAddCountryEvent $event): void
     {
         $countryIds = $event->getCountryId();
 
@@ -67,13 +67,13 @@ class Area extends BaseAction implements EventSubscriberInterface
         return $area;
     }
 
-    public function delete(AreaEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(AreaEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $event->getModel()
             ->delete();
     }
 
-    public function save(AreaEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function save(AreaEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $event->getModel()
             ->save();

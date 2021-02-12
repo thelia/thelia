@@ -26,7 +26,7 @@ class BaseFrontController extends BaseController
 
     protected $currentRouter = 'router.front';
 
-    public function checkAuth()
+    public function checkAuth(): void
     {
         if ($this->getSecurityContext()->hasCustomerUser() === false) {
             throw new RedirectException($this->retrieveUrlFromRouteId('customer.login.process'));
@@ -41,7 +41,7 @@ class BaseFrontController extends BaseController
         return self::CONTROLLER_TYPE;
     }
 
-    protected function checkCartNotEmpty()
+    protected function checkCartNotEmpty(): void
     {
         $cart = $this->getSession()->getSessionCart($this->getDispatcher());
         if ($cart === null || $cart->countCartItems() == 0) {
@@ -49,7 +49,7 @@ class BaseFrontController extends BaseController
         }
     }
 
-    protected function checkValidDelivery()
+    protected function checkValidDelivery(): void
     {
         $order = $this->getSession()->getOrder();
         if (null === $order
@@ -65,7 +65,7 @@ class BaseFrontController extends BaseController
         }
     }
 
-    protected function checkValidInvoice()
+    protected function checkValidInvoice(): void
     {
         $order = $this->getSession()->getOrder();
         if (null === $order

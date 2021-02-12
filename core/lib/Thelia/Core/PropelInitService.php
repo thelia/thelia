@@ -201,7 +201,7 @@ class PropelInitService
     /**
      * Generate the Propel configuration file.
      */
-    public function buildPropelConfig()
+    public function buildPropelConfig(): void
     {
         $propelConfigCache = new ConfigCache(
             $this->getPropelConfigFile(),
@@ -249,7 +249,7 @@ class PropelInitService
      *
      * @throws \Exception
      */
-    public function buildPropelInitFile()
+    public function buildPropelInitFile(): void
     {
         $propelInitCache = new ConfigCache(
             $this->getPropelInitFile(),
@@ -354,7 +354,7 @@ class PropelInitService
         return true;
     }
 
-    public function migrate()
+    public function migrate(): void
     {
         $this->runCommand(
             new MigrationUpCommand(),

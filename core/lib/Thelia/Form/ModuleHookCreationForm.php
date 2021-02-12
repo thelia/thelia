@@ -37,7 +37,7 @@ class ModuleHookCreationForm extends BaseForm
     /** @var Translator */
     protected $translator;
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(

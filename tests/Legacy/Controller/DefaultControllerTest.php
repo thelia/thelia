@@ -23,7 +23,7 @@ use Thelia\Core\HttpFoundation\Request;
  */
 class DefaultControllerTest extends ControllerTestBase
 {
-    public function testNoAction()
+    public function testNoAction(): void
     {
         $request = $this->buildRequest();
         $this->getController()->noAction($request);
@@ -31,7 +31,7 @@ class DefaultControllerTest extends ControllerTestBase
         $this->assertEquals($request->attributes->get('_view'), 'index');
     }
 
-    public function testNoActionWithGetParam()
+    public function testNoActionWithGetParam(): void
     {
         $request = $this->buildRequest(
             ['view' => 'foo']
@@ -42,7 +42,7 @@ class DefaultControllerTest extends ControllerTestBase
         $this->assertEquals($request->attributes->get('_view'), 'foo');
     }
 
-    public function testNoActionWithPostParam()
+    public function testNoActionWithPostParam(): void
     {
         $request = $this->buildRequest(
             [],
@@ -54,7 +54,7 @@ class DefaultControllerTest extends ControllerTestBase
         $this->assertEquals($request->attributes->get('_view'), 'foo');
     }
 
-    public function testNoActionWithAttribute()
+    public function testNoActionWithAttribute(): void
     {
         $request = $this->buildRequest(
             [],
@@ -67,7 +67,7 @@ class DefaultControllerTest extends ControllerTestBase
         $this->assertEquals($request->attributes->get('_view'), 'foo');
     }
 
-    public function testNoActionWithAttributeAndQuery()
+    public function testNoActionWithAttributeAndQuery(): void
     {
         $request = $this->buildRequest(
             ['view' => 'bar'],
@@ -80,7 +80,7 @@ class DefaultControllerTest extends ControllerTestBase
         $this->assertEquals($request->attributes->get('_view'), 'bar');
     }
 
-    public function testNoActionWithAttributeAndRequest()
+    public function testNoActionWithAttributeAndRequest(): void
     {
         $request = $this->buildRequest(
             [],
@@ -107,7 +107,7 @@ class DefaultControllerTest extends ControllerTestBase
     /**
      * Use this method to build the container with the services that you need.
      */
-    protected function buildContainer(ContainerBuilder $container)
+    protected function buildContainer(ContainerBuilder $container): void
     {
         $parser = $this->getMockBuilder('Thelia\\Core\\Template\\ParserInterface')
             ->disableOriginalConstructor()

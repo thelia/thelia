@@ -158,7 +158,7 @@ class CategoryTest extends TestCaseWithURLToolSetup
     /**
      * @depends testRemoveTemplate
      */
-    public function testDelete(CategoryModel $category)
+    public function testDelete(CategoryModel $category): void
     {
         $event = new CategoryDeleteEvent($category->getId());
 
@@ -171,7 +171,7 @@ class CategoryTest extends TestCaseWithURLToolSetup
         $this->assertTrue($deletedCategory->isDeleted());
     }
 
-    public function testToggleVisibility()
+    public function testToggleVisibility(): void
     {
         $category = $this->getRandomCategory();
         $expectedVisibility = !$category->getVisible();

@@ -29,7 +29,7 @@ class FakeFileDownloader extends FileDownloader
      *
      * Downloads the file $url in $pathToStore
      */
-    public function download($url, $pathToStore)
+    public function download($url, $pathToStore): void
     {
         if (!file_exists($url) || !is_readable($url)) {
             throw new FileNotFoundException();

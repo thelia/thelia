@@ -27,7 +27,7 @@ class ProductCloneForm extends BaseForm
         return 'thelia_product_clone';
     }
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('productId', IntegerType::class, [
@@ -44,7 +44,7 @@ class ProductCloneForm extends BaseForm
         ;
     }
 
-    public function checkRefDifferent($value, ExecutionContextInterface $context)
+    public function checkRefDifferent($value, ExecutionContextInterface $context): void
     {
         $originalRef = ProductQuery::create()
             ->filterByRef($value, Criteria::EQUAL)

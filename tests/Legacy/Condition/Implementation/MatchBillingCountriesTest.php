@@ -78,7 +78,7 @@ class MatchBillingCountriesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchBillingCountries::setValidators
      */
-    public function testInValidBackOfficeInputOperator()
+    public function testInValidBackOfficeInputOperator(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateFacadeStub();
@@ -106,7 +106,7 @@ class MatchBillingCountriesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchBillingCountries::setValidators
      */
-    public function testInValidBackOfficeInputValue()
+    public function testInValidBackOfficeInputValue(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateFacadeStub();
@@ -128,7 +128,7 @@ class MatchBillingCountriesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchBillingCountries::isMatching
      */
-    public function testMatchingRule()
+    public function testMatchingRule(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateFacadeStub();
@@ -155,7 +155,7 @@ class MatchBillingCountriesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchBillingCountries::isMatching
      */
-    public function testNotMatching()
+    public function testNotMatching(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateFacadeStub();
@@ -178,7 +178,7 @@ class MatchBillingCountriesTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testGetSerializableRule()
+    public function testGetSerializableRule(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateFacadeStub();
@@ -211,7 +211,7 @@ class MatchBillingCountriesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchBillingCountries::getName
      */
-    public function testGetName()
+    public function testGetName(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Number of articles in cart');
 
@@ -228,7 +228,7 @@ class MatchBillingCountriesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchBillingCountries::getToolTip
      */
-    public function testGetToolTip()
+    public function testGetToolTip(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Sample coupon condition');
 
@@ -245,7 +245,7 @@ class MatchBillingCountriesTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchBillingCountries::generateInputs
      */
-    public function testGetValidator()
+    public function testGetValidator(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Price');
 

@@ -130,7 +130,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
+    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
     {
         $search->_and();
         foreach ($searchIn as $index => $searchInElement) {

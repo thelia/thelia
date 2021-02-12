@@ -35,7 +35,7 @@ class CountryDeleteEvent extends CountryEvent
     /**
      * @param int $country_id
      */
-    public function setCountryId($country_id)
+    public function setCountryId($country_id): void
     {
         $this->country_id = $country_id;
     }

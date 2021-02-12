@@ -358,7 +358,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      *
      * @throws \Thelia\Model\Exception\InvalidArgumentException
      */
-    public function setEffects(array $effects)
+    public function setEffects(array $effects): void
     {
         // Amount is now optionnal.
         $this->amount = $effects['amount'] ?? 0;

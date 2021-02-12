@@ -33,7 +33,7 @@ use Thelia\Model\LangQuery;
  */
 class ExportCommand extends ContainerAwareCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('export')
@@ -154,7 +154,7 @@ class ExportCommand extends ContainerAwareCommand
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output An output interface
      */
-    protected function listExport(OutputInterface $output)
+    protected function listExport(OutputInterface $output): void
     {
         $table = new Table($output);
 
@@ -181,7 +181,7 @@ class ExportCommand extends ContainerAwareCommand
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output An output interface
      */
-    protected function listSerializer(OutputInterface $output)
+    protected function listSerializer(OutputInterface $output): void
     {
         $table = new Table($output);
 
@@ -214,7 +214,7 @@ class ExportCommand extends ContainerAwareCommand
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output An output interface
      */
-    protected function listArchiver(OutputInterface $output)
+    protected function listArchiver(OutputInterface $output): void
     {
         $table = new Table($output);
 

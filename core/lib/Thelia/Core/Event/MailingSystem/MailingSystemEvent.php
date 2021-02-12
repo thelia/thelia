@@ -29,7 +29,7 @@ class MailingSystemEvent extends ActionEvent
     /**
      * @param null $authMode
      */
-    public function setAuthMode($authMode)
+    public function setAuthMode($authMode): void
     {
         $this->authMode = $authMode;
     }
@@ -45,7 +45,7 @@ class MailingSystemEvent extends ActionEvent
     /**
      * @param null $enabled
      */
-    public function setEnabled($enabled)
+    public function setEnabled($enabled): void
     {
         $this->enabled = $enabled;
     }
@@ -61,7 +61,7 @@ class MailingSystemEvent extends ActionEvent
     /**
      * @param null $encryption
      */
-    public function setEncryption($encryption)
+    public function setEncryption($encryption): void
     {
         $this->encryption = $encryption;
     }
@@ -77,7 +77,7 @@ class MailingSystemEvent extends ActionEvent
     /**
      * @param null $host
      */
-    public function setHost($host)
+    public function setHost($host): void
     {
         $this->host = $host;
     }
@@ -93,7 +93,7 @@ class MailingSystemEvent extends ActionEvent
     /**
      * @param null $password
      */
-    public function setPassword($password)
+    public function setPassword($password): void
     {
         $this->password = $password;
     }
@@ -109,7 +109,7 @@ class MailingSystemEvent extends ActionEvent
     /**
      * @param null $port
      */
-    public function setPort($port)
+    public function setPort($port): void
     {
         $this->port = $port;
     }
@@ -125,7 +125,7 @@ class MailingSystemEvent extends ActionEvent
     /**
      * @param null $sourceIp
      */
-    public function setSourceIp($sourceIp)
+    public function setSourceIp($sourceIp): void
     {
         $this->sourceIp = $sourceIp;
     }
@@ -141,7 +141,7 @@ class MailingSystemEvent extends ActionEvent
     /**
      * @param null $timeout
      */
-    public function setTimeout($timeout)
+    public function setTimeout($timeout): void
     {
         $this->timeout = $timeout;
     }
@@ -157,7 +157,7 @@ class MailingSystemEvent extends ActionEvent
     /**
      * @param null $username
      */
-    public function setUsername($username)
+    public function setUsername($username): void
     {
         $this->username = $username;
     }

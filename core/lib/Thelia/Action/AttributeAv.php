@@ -29,7 +29,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function create(AttributeAvCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(AttributeAvCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $attribute = new AttributeAvModel();
 
@@ -49,7 +49,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function update(AttributeAvUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(AttributeAvUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId())) {
             $attribute
@@ -70,7 +70,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function delete(AttributeAvDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(AttributeAvDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== ($attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId()))) {
             $attribute
@@ -86,7 +86,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition(AttributeAvQuery::create(), $event);
     }

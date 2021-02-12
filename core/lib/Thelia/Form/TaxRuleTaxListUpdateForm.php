@@ -24,7 +24,7 @@ use Thelia\Type\JsonType;
 
 class TaxRuleTaxListUpdateForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(
@@ -93,7 +93,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
         return 'thelia_tax_rule_taxlistupdate';
     }
 
-    public function verifyTaxRuleId($value, ExecutionContextInterface $context)
+    public function verifyTaxRuleId($value, ExecutionContextInterface $context): void
     {
         $taxRule = TaxRuleQuery::create()
             ->findPk($value)
@@ -104,7 +104,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
         }
     }
 
-    public function verifyTaxList($value, ExecutionContextInterface $context)
+    public function verifyTaxList($value, ExecutionContextInterface $context): void
     {
         $jsonType = new JsonType();
         if (!$jsonType->isValid($value)) {
@@ -137,7 +137,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
         }
     }
 
-    public function verifyCountryList($value, ExecutionContextInterface $context)
+    public function verifyCountryList($value, ExecutionContextInterface $context): void
     {
         $jsonType = new JsonType();
         if (!$jsonType->isValid($value)) {

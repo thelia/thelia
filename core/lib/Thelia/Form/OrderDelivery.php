@@ -27,7 +27,7 @@ use Thelia\Module\BaseModule;
  */
 class OrderDelivery extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('delivery-address', IntegerType::class, [
@@ -50,7 +50,7 @@ class OrderDelivery extends BaseForm
             ]);
     }
 
-    public function verifyDeliveryAddress($value, ExecutionContextInterface $context)
+    public function verifyDeliveryAddress($value, ExecutionContextInterface $context): void
     {
         $address = AddressQuery::create()
             ->findPk($value);
@@ -60,7 +60,7 @@ class OrderDelivery extends BaseForm
         }
     }
 
-    public function verifyDeliveryModule($value, ExecutionContextInterface $context)
+    public function verifyDeliveryModule($value, ExecutionContextInterface $context): void
     {
         $module = ModuleQuery::create()
             ->filterActivatedByTypeAndId(BaseModule::DELIVERY_MODULE_TYPE, $value)

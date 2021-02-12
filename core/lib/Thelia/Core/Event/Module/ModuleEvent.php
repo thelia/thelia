@@ -34,7 +34,7 @@ class ModuleEvent extends ActionEvent
     protected $description;
     protected $postscriptum;
 
-    public function setChapo($chapo)
+    public function setChapo($chapo): void
     {
         $this->chapo = $chapo;
     }
@@ -44,7 +44,7 @@ class ModuleEvent extends ActionEvent
         return $this->chapo;
     }
 
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->description = $description;
     }
@@ -54,7 +54,7 @@ class ModuleEvent extends ActionEvent
         return $this->description;
     }
 
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
@@ -64,7 +64,7 @@ class ModuleEvent extends ActionEvent
         return $this->id;
     }
 
-    public function setLocale($locale)
+    public function setLocale($locale): void
     {
         $this->locale = $locale;
     }
@@ -74,7 +74,7 @@ class ModuleEvent extends ActionEvent
         return $this->locale;
     }
 
-    public function setPostscriptum($postscriptum)
+    public function setPostscriptum($postscriptum): void
     {
         $this->postscriptum = $postscriptum;
     }
@@ -84,7 +84,7 @@ class ModuleEvent extends ActionEvent
         return $this->postscriptum;
     }
 
-    public function setTitle($title)
+    public function setTitle($title): void
     {
         $this->title = $title;
     }

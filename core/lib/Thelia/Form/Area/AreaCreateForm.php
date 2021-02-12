@@ -24,7 +24,7 @@ use Thelia\Form\BaseForm;
  */
 class AreaCreateForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(

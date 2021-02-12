@@ -130,7 +130,7 @@ abstract class BaseLoop implements BaseLoopInterface
      * First it will get the loop name according to the loop class.
      * Then argument definitions is initialized
      */
-    protected function initialize()
+    protected function initialize(): void
     {
         $class = \get_class($this);
 
@@ -237,7 +237,7 @@ abstract class BaseLoop implements BaseLoopInterface
      *
      * @throws \InvalidArgumentException if some argument values are missing, or invalid
      */
-    public function initializeArgs(array $nameValuePairs)
+    public function initializeArgs(array $nameValuePairs): void
     {
         $faultActor = [];
         $faultDetails = [];
@@ -370,7 +370,7 @@ abstract class BaseLoop implements BaseLoopInterface
         return $this->searchWithOffset($search);
     }
 
-    protected function setupSearchContext(ModelCriteria $search)
+    protected function setupSearchContext(ModelCriteria $search): void
     {
         if ($this instanceof SearchLoopInterface) {
             $searchTerm = $this->getArgValue('search_term');
@@ -560,7 +560,7 @@ abstract class BaseLoop implements BaseLoopInterface
         return $parsedResults;
     }
 
-    protected function checkInterface()
+    protected function checkInterface(): void
     {
         /* Must implement either :
          *  - PropelSearchLoopInterface
@@ -660,7 +660,7 @@ abstract class BaseLoop implements BaseLoopInterface
      *
      * @param object|array $item
      */
-    protected function addOutputFields(LoopResultRow $loopResultRow, $item)
+    protected function addOutputFields(LoopResultRow $loopResultRow, $item): void
     {
     }
 

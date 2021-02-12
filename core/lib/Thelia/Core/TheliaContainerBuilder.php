@@ -23,11 +23,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class TheliaContainerBuilder extends ContainerBuilder
 {
-    public function compile(bool $resolveEnvPlaceholders = false)
+    public function compile(bool $resolveEnvPlaceholders = false): void
     {
     }
 
-    public function customCompile()
+    public function customCompile(): void
     {
         parent::compile();
     }

@@ -37,7 +37,7 @@ trait RewrittenUrlTestTrait
 
     abstract public function processUpdateSeoAction($event);
 
-    public function testUpdateExistingUrl()
+    public function testUpdateExistingUrl(): void
     {
         $object = null;
         $event = $this->getUpdateSeoEvent($object);
@@ -60,7 +60,7 @@ trait RewrittenUrlTestTrait
         $this->processUpdateSeoAction($event);
     }
 
-    public function testUpdateUrl()
+    public function testUpdateUrl(): void
     {
         $object = null;
         $event = $this->getUpdateSeoEvent($object);
@@ -70,7 +70,7 @@ trait RewrittenUrlTestTrait
         /* get a brand new URL */
         $exist = true;
         while (true === $exist) {
-            $newUrl = md5(rand(1, 999999)).'.html';
+            $newUrl = md5(random_int(1, 999999)).'.html';
             try {
                 new RewritingResolver($newUrl);
             } catch (UrlRewritingException $e) {

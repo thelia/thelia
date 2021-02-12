@@ -26,12 +26,12 @@ class TlogDestinationNull extends AbstractTlogDestination
         return "This destinations consumes the logs but don't display them";
     }
 
-    public function add($string)
+    public function add($string): void
     {
         // Rien
     }
 
-    public function write(&$res)
+    public function write(&$res): void
     {
         // Rien
     }

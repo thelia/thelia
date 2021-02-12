@@ -23,7 +23,7 @@ class BrandI18n extends BaseBrandI18n
     /**
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function postInsert(ConnectionInterface $con = null)
+    public function postInsert(ConnectionInterface $con = null): void
     {
         parent::postInsert($con);
 

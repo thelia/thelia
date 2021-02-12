@@ -769,7 +769,7 @@ class CouponController extends BaseAdminController
      * @param Coupon              $coupon     Coupon Model
      * @param ConditionCollection $conditions Condition collection
      */
-    protected function manageConditionUpdate(Coupon $coupon, ConditionCollection $conditions)
+    protected function manageConditionUpdate(Coupon $coupon, ConditionCollection $conditions): void
     {
         $couponEvent = new CouponCreateOrUpdateEvent(
             $coupon->getCode(),

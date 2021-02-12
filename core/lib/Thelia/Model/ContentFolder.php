@@ -21,7 +21,7 @@ class ContentFolder extends BaseContentFolder
     /**
      * {@inheritdoc}
      */
-    protected function addCriteriaToPositionQuery(ContentFolderQuery $query)
+    protected function addCriteriaToPositionQuery(ContentFolderQuery $query): void
     {
         $query->filterByFolderId($this->getFolderId());
     }

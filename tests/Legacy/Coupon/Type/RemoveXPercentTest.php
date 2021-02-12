@@ -80,7 +80,7 @@ class RemoveXPercentTest extends TestCase
      * @covers \Thelia\Coupon\Type\RemoveXPercent::set
      * @covers \Thelia\Coupon\Type\RemoveXPercent::exec
      */
-    public function testSet()
+    public function testSet(): void
     {
         $stubFacade = $this->generateFacadeStub();
 
@@ -100,7 +100,7 @@ class RemoveXPercentTest extends TestCase
             $stubFacade,
             'XMAS',
             'XMAS Coupon',
-            'Coupon for Springbreak removing 10% if you have a cart between 40.00€ and 400.00€ (excluded)',
+            "Coupon for Springbreak removing 10% if you have a cart between 40.00€\u{a0}and 400.00€ (excluded)",
             $description,
             ['amount' => 0.00, 'percentage' => 10.00],
             true,
@@ -143,7 +143,7 @@ class RemoveXPercentTest extends TestCase
 
         $this->assertEquals('XMAS', $coupon->getCode());
         $this->assertEquals('XMAS Coupon', $coupon->getTitle());
-        $this->assertEquals('Coupon for Springbreak removing 10% if you have a cart between 40.00€ and 400.00€ (excluded)', $coupon->getShortDescription());
+        $this->assertEquals("Coupon for Springbreak removing 10% if you have a cart between 40.00€\u{a0}and 400.00€ (excluded)", $coupon->getShortDescription());
         $this->assertEquals($description, $coupon->getDescription());
         $this->assertEquals(true, $coupon->isCumulative());
         $this->assertEquals(true, $coupon->isRemovingPostage());
@@ -159,7 +159,7 @@ class RemoveXPercentTest extends TestCase
     /**
      * @covers \Thelia\Coupon\Type\RemoveXPercent::getName
      */
-    public function testGetName()
+    public function testGetName(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Remove X percent to total cart');
 
@@ -174,7 +174,7 @@ class RemoveXPercentTest extends TestCase
     /**
      * @covers \Thelia\Coupon\Type\RemoveXPercent::getToolTip
      */
-    public function testGetToolTip()
+    public function testGetToolTip(): void
     {
         $tooltip = 'This coupon will remove the entered percentage to the customer total checkout. If the discount is superior to the total checkout price the customer will only pay the postage. Unless if the coupon is set to remove postage too.';
         $stubFacade = $this->generateFacadeStub(399, 'EUR', $tooltip);

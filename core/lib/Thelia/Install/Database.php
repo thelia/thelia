@@ -65,7 +65,7 @@ class Database
      * @param string $dbName        Database name
      * @param array  $extraSqlFiles SQL Files uri to insert
      */
-    public function insertSql($dbName = null, array $extraSqlFiles = null)
+    public function insertSql($dbName = null, array $extraSqlFiles = null): void
     {
         if ($dbName) {
             $this->connection->query(sprintf('use `%s`', $dbName));
@@ -161,7 +161,7 @@ class Database
      * @param string $filename
      * @param string $tables
      */
-    public function backupDb($filename, $tables = '*')
+    public function backupDb($filename, $tables = '*'): void
     {
         $data = [];
 
@@ -239,7 +239,7 @@ class Database
      *
      * @param string $filename the file containing sql queries
      */
-    public function restoreDb($filename)
+    public function restoreDb($filename): void
     {
         $this->insertSql(null, [$filename]);
     }
@@ -250,7 +250,7 @@ class Database
      * @param string $filename
      * @param array  $data
      */
-    private function writeFilename($filename, $data)
+    private function writeFilename($filename, $data): void
     {
         $f = fopen($filename, 'w+');
 
@@ -263,7 +263,7 @@ class Database
      *
      * @param $dbName
      */
-    public function createDatabase($dbName)
+    public function createDatabase($dbName): void
     {
         $this->execute(
             sprintf(

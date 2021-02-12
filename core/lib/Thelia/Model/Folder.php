@@ -86,7 +86,7 @@ class Folder extends BaseFolder implements FileModelParentInterface
      *
      * @param FolderQuery $query
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByParent($this->getParent());
     }
@@ -116,7 +116,7 @@ class Folder extends BaseFolder implements FileModelParentInterface
         return true;
     }
 
-    public function postDelete(ConnectionInterface $con = null)
+    public function postDelete(ConnectionInterface $con = null): void
     {
         parent::postDelete($con);
 
@@ -129,7 +129,7 @@ class Folder extends BaseFolder implements FileModelParentInterface
      * @param Base\ContentFolder $contentFolder
      *                                          {@inheritdoc}
      */
-    protected function doAddContentFolder($contentFolder)
+    protected function doAddContentFolder($contentFolder): void
     {
         parent::doAddContentFolder($contentFolder);
 

@@ -71,7 +71,7 @@ class Coupon extends BaseCoupon
         $freeShippingForMethods,
         $perCustomerUsageCount,
         $startDate = null
-    ) {
+    ): void {
         $con = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);
 
         $con->beginTransaction();
@@ -149,7 +149,7 @@ class Coupon extends BaseCoupon
      *
      * @throws \Exception
      */
-    public function createOrUpdateConditions($serializableConditions, $locale)
+    public function createOrUpdateConditions($serializableConditions, $locale): void
     {
         $this->setSerializedConditions($serializableConditions);
 

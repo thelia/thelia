@@ -30,14 +30,14 @@ class SaleTest extends BaseLoopTestor
         return ['active' => '*'];
     }
 
-    public function testSearchById()
+    public function testSearchById(): void
     {
         $sale = SaleQuery::create()->findOne();
 
         $this->baseTestSearchById($sale->getId());
     }
 
-    public function testSearchLimit()
+    public function testSearchLimit(): void
     {
         $this->baseTestSearchWithLimit(3);
     }

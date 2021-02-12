@@ -88,7 +88,7 @@ class I18n
         $i18nIdColumn,
         $localeColumn,
         $locale
-    ) {
+    ): void {
         if (null === static::$defaultLocale) {
             static::$defaultLocale = Lang::getDefaultLanguage()->getLocale();
         }

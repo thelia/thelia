@@ -39,7 +39,7 @@ class CacheTest extends TestCase
         $fs->mkdir($this->dir2);
     }
 
-    public function testCacheClear()
+    public function testCacheClear(): void
     {
         $event = new CacheEvent($this->dir, false);
 
@@ -51,7 +51,7 @@ class CacheTest extends TestCase
         $this->assertFalse($fs->exists($this->dir));
     }
 
-    public function testKernelTerminateCacheClear()
+    public function testKernelTerminateCacheClear(): void
     {
         $event = new CacheEvent($this->dir2);
 

@@ -30,7 +30,7 @@ class UpdateFilePositionEvent extends UpdatePositionEvent
         $this->setQuery($query);
     }
 
-    public function setQuery(ModelCriteria $query)
+    public function setQuery(ModelCriteria $query): void
     {
         $this->query = $query;
     }

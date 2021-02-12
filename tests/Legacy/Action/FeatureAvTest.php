@@ -102,7 +102,7 @@ class FeatureAvTest extends BaseAction
     /**
      * @depends testUpdate
      */
-    public function testDelete(FeatureAvModel $featureAv)
+    public function testDelete(FeatureAvModel $featureAv): void
     {
         $event = new FeatureAvDeleteEvent($featureAv->getId());
 

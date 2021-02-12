@@ -27,7 +27,7 @@ use Thelia\Core\Translation\Translator;
  */
 abstract class AbstractIdType extends AbstractType
 {
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'required' => true,
@@ -44,7 +44,7 @@ abstract class AbstractIdType extends AbstractType
         return IntegerType::class;
     }
 
-    public function checkId($value, ExecutionContextInterface $context)
+    public function checkId($value, ExecutionContextInterface $context): void
     {
         if (null === $this->getQuery()->findPk($value)) {
             $context->addViolation(

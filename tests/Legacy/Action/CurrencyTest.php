@@ -131,7 +131,7 @@ class CurrencyTest extends ContainerAwareTestCase
     /**
      * @depends testSetDefault
      */
-    public function testDelete(CurrencyModel $currency)
+    public function testDelete(CurrencyModel $currency): void
     {
         $currency->setByDefault(0)
             ->save();
@@ -148,7 +148,7 @@ class CurrencyTest extends ContainerAwareTestCase
         $this->assertTrue($deletedCurrency->isDeleted());
     }
 
-    public function testDeleteDefault()
+    public function testDeleteDefault(): void
     {
         CurrencyQuery::create()
             ->addAscendingOrderByColumn('RAND()')
@@ -178,7 +178,7 @@ class CurrencyTest extends ContainerAwareTestCase
      * @param containerBuilder $container
      *                                    Use this method to build the container with the services that you need
      */
-    protected function buildContainer(ContainerBuilder $container)
+    protected function buildContainer(ContainerBuilder $container): void
     {
         // TODO: Implement buildContainer() method.
     }

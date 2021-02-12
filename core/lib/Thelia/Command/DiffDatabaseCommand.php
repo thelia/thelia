@@ -27,7 +27,7 @@ use Thelia\Core\PropelInitService;
  */
 class DiffDatabaseCommand extends ContainerAwareCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('thelia:dev:db:diff')

@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CountryCreationForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(

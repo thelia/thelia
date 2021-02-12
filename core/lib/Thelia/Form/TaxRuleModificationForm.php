@@ -20,7 +20,7 @@ use Thelia\Model\TaxRuleQuery;
 
 class TaxRuleModificationForm extends TaxRuleCreationForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         parent::buildForm();
 
@@ -42,7 +42,7 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
         return 'thelia_tax_rule_modification';
     }
 
-    public function verifyTaxRuleId($value, ExecutionContextInterface $context)
+    public function verifyTaxRuleId($value, ExecutionContextInterface $context): void
     {
         $taxRule = TaxRuleQuery::create()
             ->findPk($value);

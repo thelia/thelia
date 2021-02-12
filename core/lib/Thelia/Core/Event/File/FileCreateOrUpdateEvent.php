@@ -149,7 +149,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
      *
      * @param FileModelInterface $oldModel
      */
-    public function setOldModel($oldModel)
+    public function setOldModel($oldModel): void
     {
         $this->oldModel = $oldModel;
     }

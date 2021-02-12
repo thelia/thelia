@@ -24,7 +24,7 @@ use Thelia\Model\StateQuery;
  */
 trait AddressCountryValidationTrait
 {
-    public function verifyZipCode($value, ExecutionContextInterface $context)
+    public function verifyZipCode($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 
@@ -45,7 +45,7 @@ trait AddressCountryValidationTrait
         }
     }
 
-    public function verifyState($value, ExecutionContextInterface $context)
+    public function verifyState($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 

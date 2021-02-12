@@ -20,7 +20,7 @@ class Config extends BaseConfig
     /**
      * {@inheritDoc}
      */
-    public function postUpdate(ConnectionInterface $con = null)
+    public function postUpdate(ConnectionInterface $con = null): void
     {
         parent::postUpdate($con);
 
@@ -30,14 +30,14 @@ class Config extends BaseConfig
     /**
      * {@inheritDoc}
      */
-    public function postDelete(ConnectionInterface $con = null)
+    public function postDelete(ConnectionInterface $con = null): void
     {
         parent::postDelete($con);
 
         $this->resetQueryCache();
     }
 
-    public function resetQueryCache()
+    public function resetQueryCache(): void
     {
         ConfigQuery::resetCache($this->getName());
     }

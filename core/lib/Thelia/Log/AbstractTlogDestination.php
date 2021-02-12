@@ -66,12 +66,12 @@ abstract class AbstractTlogDestination
     }
 
     //Ajoute une ligne de logs à la destination
-    public function add($string)
+    public function add($string): void
     {
         $this->logs[] = $string;
     }
 
-    protected function insertAfterBody(&$res, $logdata)
+    protected function insertAfterBody(&$res, $logdata): void
     {
         $match = [];
 
@@ -83,7 +83,7 @@ abstract class AbstractTlogDestination
     // Demande à la destination de se configurer pour être prête
     // a fonctionner. Si $config est != false, celà indique
     // que seul le paramètre de configuration indiqué a été modifié.
-    protected function configure()
+    protected function configure(): void
     {
         // Cette methode doit etre surchargée si nécessaire.
     }

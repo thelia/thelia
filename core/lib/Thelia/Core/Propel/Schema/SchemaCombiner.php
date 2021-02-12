@@ -103,7 +103,7 @@ class SchemaCombiner
      *
      * @throws \InvalidArgumentException if the database is not in the combined databases
      */
-    protected function assertDatabase($database)
+    protected function assertDatabase($database): void
     {
         if (!\in_array($database, $this->databases)) {
             throw new \InvalidArgumentException("Database '{$database}' is not in the combined databases.");
@@ -226,7 +226,7 @@ class SchemaCombiner
      *
      * @param \DOMElement $databaseElement database element to process
      */
-    protected function filterExternalSchemaElements(\DOMElement $databaseElement)
+    protected function filterExternalSchemaElements(\DOMElement $databaseElement): void
     {
         // removing the elements in the foreach itself will break the iterator, remove them later
         $externalSchemaElementsToDelete = [];
@@ -251,7 +251,7 @@ class SchemaCombiner
      *
      * @param \DOMElement $databaseElement database element to process
      */
-    protected function inheritDatabaseAttributes(\DOMElement $databaseElement)
+    protected function inheritDatabaseAttributes(\DOMElement $databaseElement): void
     {
         $attributesToInherit = [];
         foreach (static::$DATABASE_INHERITABLE_ATTRIBUTES as $databaseAttribute => $tableAttribute) {
@@ -294,7 +294,7 @@ class SchemaCombiner
      *
      * @param \DOMElement $databaseElement database element to process
      */
-    protected function applyDatabaseTablePrefix(\DOMElement $databaseElement)
+    protected function applyDatabaseTablePrefix(\DOMElement $databaseElement): void
     {
         if (!$databaseElement->hasAttribute('tablePrefix')) {
             return;
@@ -344,7 +344,7 @@ class SchemaCombiner
      *
      * @param string $database database
      */
-    protected function initGlobalDatabaseElement($database)
+    protected function initGlobalDatabaseElement($database): void
     {
         if (\in_array($database, $this->databases)) {
             return;
@@ -375,7 +375,7 @@ class SchemaCombiner
      *
      * @param \DOMElement $sourceDatabaseElement source database element to merge
      */
-    protected function mergeDatabaseElement(\DOMElement $sourceDatabaseElement)
+    protected function mergeDatabaseElement(\DOMElement $sourceDatabaseElement): void
     {
         $database = $this->getDatabaseFromDatabaseElement($sourceDatabaseElement);
 
@@ -409,7 +409,7 @@ class SchemaCombiner
      *
      * @param \DOMElement $externalDatabaseElement external schema database element to include
      */
-    protected function includeExternalSchema(\DOMElement $externalDatabaseElement)
+    protected function includeExternalSchema(\DOMElement $externalDatabaseElement): void
     {
         $database = $this->getDatabaseFromDatabaseElement($externalDatabaseElement);
 

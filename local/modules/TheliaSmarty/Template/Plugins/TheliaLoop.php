@@ -487,7 +487,7 @@ class TheliaLoop extends AbstractSmartyPlugin
      *
      * @throws \InvalidArgumentException if loop name already exists
      */
-    public function setLoopList(array $loopDefinition)
+    public function setLoopList(array $loopDefinition): void
     {
         foreach ($loopDefinition as $name => $className) {
             $this->registerLoop($className, $name);
@@ -499,7 +499,7 @@ class TheliaLoop extends AbstractSmartyPlugin
         return $this->loopDefinition;
     }
 
-    public function registerLoop($className, $name = null)
+    public function registerLoop($className, $name = null): void
     {
         if (null === $name) {
             $classParts = explode('\\', $className);

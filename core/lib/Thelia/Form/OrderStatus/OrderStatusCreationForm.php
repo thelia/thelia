@@ -34,7 +34,7 @@ class OrderStatusCreationForm extends BaseForm
 {
     use StandardDescriptionFieldsTrait;
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(
@@ -110,7 +110,7 @@ class OrderStatusCreationForm extends BaseForm
         return 'thelia_order_status_creation';
     }
 
-    public function checkColor($value, ExecutionContextInterface $context)
+    public function checkColor($value, ExecutionContextInterface $context): void
     {
         if (!preg_match('/^#[0-9a-fA-F]{6}$/', $value)) {
             $context->addViolation(
@@ -119,7 +119,7 @@ class OrderStatusCreationForm extends BaseForm
         }
     }
 
-    public function checkUniqueCode($value, ExecutionContextInterface $context)
+    public function checkUniqueCode($value, ExecutionContextInterface $context): void
     {
         $query = OrderStatusQuery::create()
             ->filterByCode($value);
@@ -135,7 +135,7 @@ class OrderStatusCreationForm extends BaseForm
         }
     }
 
-    public function checkFormatCode($value, ExecutionContextInterface $context)
+    public function checkFormatCode($value, ExecutionContextInterface $context): void
     {
         if (!empty($value) && !preg_match('/^\w+$/', $value)) {
             $context->addViolation(
@@ -144,7 +144,7 @@ class OrderStatusCreationForm extends BaseForm
         }
     }
 
-    public function checkIsRequiredCode($value, ExecutionContextInterface $context)
+    public function checkIsRequiredCode($value, ExecutionContextInterface $context): void
     {
         if ($this->form->has('id')) {
             if (null !== $orderStatus = OrderStatusQuery::create()->findOneById($this->form->get('id')->getData())) {

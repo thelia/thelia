@@ -158,7 +158,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     /**
      * @covers \Thelia\Coupon\CouponFactory::buildCouponFromCode
      */
-    public function testBuildCouponFromCode()
+    public function testBuildCouponFromCode(): void
     {
         $this->markTestSkipped('It\'s necessary to mock the facade');
 
@@ -225,7 +225,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     /**
      * @covers \Thelia\Coupon\CouponFactory::buildCouponFromCode
      */
-    public function testBuildCouponFromCodeUsageLimitCoupon()
+    public function testBuildCouponFromCodeUsageLimitCoupon(): void
     {
         $this->expectException(\Thelia\Exception\CouponNoUsageLeftException::class);
 
@@ -298,7 +298,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     /**
      * @covers \Thelia\Coupon\CouponFactory::buildCouponFromCode
      */
-    public function testBuildCouponFromCodeUnknownCode()
+    public function testBuildCouponFromCodeUnknownCode(): void
     {
         $this->markTestSkipped('It\'s necessary to mock the facade');
 
@@ -331,7 +331,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     /**
      * @covers \Thelia\Coupon\CouponFactory::buildCouponFromCode
      */
-    public function testBuildCouponFromCodeExpiredCoupon()
+    public function testBuildCouponFromCodeExpiredCoupon(): void
     {
         $this->expectException(\Thelia\Exception\CouponExpiredException::class);
 
@@ -401,7 +401,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     /**
      * @covers \Thelia\Coupon\CouponFactory::buildCouponFromCode
      */
-    public function testBuildCouponFromCodeNoConditionCoupon()
+    public function testBuildCouponFromCodeNoConditionCoupon(): void
     {
         $this->expectException(\Thelia\Exception\InvalidConditionException::class);
 
@@ -465,7 +465,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     /**
      * @covers \Thelia\Coupon\CouponFactory::buildCouponFromModel
      */
-    public function testBuildCouponFromModel()
+    public function testBuildCouponFromModel(): void
     {
         $this->markTestSkipped('It\'s necessary to mock the facade');
 

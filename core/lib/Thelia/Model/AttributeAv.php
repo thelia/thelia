@@ -22,7 +22,7 @@ class AttributeAv extends BaseAttributeAv
     /**
      * when dealing with position, be sure to work insite the current attribute.
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByAttributeId($this->getAttributeId());
     }

@@ -228,7 +228,7 @@ return [
     'Configuration / Template' => 'Configuración / Plantilla',
     'Configuration variables' => 'Variables de configuración',
     'Congo' => 'Congo',
-    'Contact block' => 'Bloque de contacto',
+    'Contact block' => "Bloque\u{a0}de contacto",
     'Contact page - CSS stylesheet' => 'Página de contacto - hoja de estilos CSS',
     'Contact page - after javascript include' => 'Página de contacto - después del include de javascript',
     'Contact page - after javascript initialisation' => 'Página de contacto - después de la inicialización de javascript',

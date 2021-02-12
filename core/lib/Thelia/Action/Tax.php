@@ -24,7 +24,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
     /**
      * @param $eventName
      */
-    public function create(TaxEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(TaxEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $tax = new TaxModel();
 
@@ -45,7 +45,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
     /**
      * @param $eventName
      */
-    public function update(TaxEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(TaxEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {
             $tax
@@ -63,7 +63,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function delete(TaxEvent $event)
+    public function delete(TaxEvent $event): void
     {
         if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {
             $tax

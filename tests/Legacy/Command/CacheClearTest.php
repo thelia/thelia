@@ -53,7 +53,7 @@ class CacheClearTest extends ContainerAwareTestCase
         }
     }
 
-    public function testCacheClear()
+    public function testCacheClear(): void
     {
         // Fails on windows - do not execute this test on windows
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -79,7 +79,7 @@ class CacheClearTest extends ContainerAwareTestCase
         $this->assertFalse($fs->exists($this->cache_dir));
     }
 
-    public function testCacheClearWithoutWritePermission()
+    public function testCacheClearWithoutWritePermission(): void
     {
         // Fails on windows - mock this test on windows
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -109,7 +109,7 @@ class CacheClearTest extends ContainerAwareTestCase
     /**
      * Use this method to build the container with the services that you need.
      */
-    protected function buildContainer(ContainerBuilder $container)
+    protected function buildContainer(ContainerBuilder $container): void
     {
         $eventDispatcher = new EventDispatcher();
         $eventDispatcher->addSubscriber(new Cache(new ArrayAdapter()));

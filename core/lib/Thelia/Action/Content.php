@@ -43,7 +43,7 @@ use Thelia\Model\Map\ContentTableMap;
  */
 class Content extends BaseAction implements EventSubscriberInterface
 {
-    public function create(ContentCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(ContentCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $content = (new ContentModel())
 
@@ -64,7 +64,7 @@ class Content extends BaseAction implements EventSubscriberInterface
      * @throws PropelException
      * @throws \Exception
      */
-    public function update(ContentUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(ContentUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $content = ContentQuery::create()->findPk($event->getContentId())) {
             $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);
@@ -103,7 +103,7 @@ class Content extends BaseAction implements EventSubscriberInterface
         return $this->genericUpdateSeo(ContentQuery::create(), $event, $dispatcher);
     }
 
-    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdateDelegatePosition(
             ContentFolderQuery::create()
@@ -114,7 +114,7 @@ class Content extends BaseAction implements EventSubscriberInterface
         );
     }
 
-    public function toggleVisibility(ContentToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function toggleVisibility(ContentToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $content = $event->getContent();
 
@@ -126,7 +126,7 @@ class Content extends BaseAction implements EventSubscriberInterface
         $event->setContent($content);
     }
 
-    public function delete(ContentDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(ContentDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $content = ContentQuery::create()->findPk($event->getContentId())) {
             $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);
@@ -172,7 +172,7 @@ class Content extends BaseAction implements EventSubscriberInterface
     /**
      * associate a folder to a content if the association already does not exists.
      */
-    public function addFolder(ContentAddFolderEvent $event)
+    public function addFolder(ContentAddFolderEvent $event): void
     {
         if (ContentFolderQuery::create()
             ->filterByContent($event->getContent())
@@ -190,7 +190,7 @@ class Content extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function removeFolder(ContentRemoveFolderEvent $event)
+    public function removeFolder(ContentRemoveFolderEvent $event): void
     {
         $contentFolder = ContentFolderQuery::create()
             ->filterByContent($event->getContent())
@@ -207,7 +207,7 @@ class Content extends BaseAction implements EventSubscriberInterface
      *
      * @param string $eventName
      */
-    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if ($event->getView() == 'content') {
             $content = ContentQuery::create()
@@ -224,7 +224,7 @@ class Content extends BaseAction implements EventSubscriberInterface
     /**
      * @throws NotFoundHttpException
      */
-    public function viewContentIdNotVisible(ViewCheckEvent $event)
+    public function viewContentIdNotVisible(ViewCheckEvent $event): void
     {
         throw new NotFoundHttpException();
     }

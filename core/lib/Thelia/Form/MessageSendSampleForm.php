@@ -23,7 +23,7 @@ class MessageSendSampleForm extends BaseForm
         return 'thelia_message_send_sample';
     }
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(

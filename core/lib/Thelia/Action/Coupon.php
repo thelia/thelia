@@ -83,7 +83,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon
      * @param $eventName
      */
-    public function create(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $coupon = new CouponModel();
 
@@ -96,14 +96,14 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon
      * @param $eventName
      */
-    public function update(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $coupon = $event->getCouponModel();
 
         $this->createOrUpdate($coupon, $event, $dispatcher);
     }
 
-    public function delete(CouponDeleteEvent $event)
+    public function delete(CouponDeleteEvent $event): void
     {
         $coupon = $event->getCoupon();
 
@@ -124,7 +124,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon condition
      * @param $eventName
      */
-    public function updateCondition(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updateCondition(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $modelCoupon = $event->getCouponModel();
 
@@ -136,7 +136,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function clearAllCoupons(Event $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function clearAllCoupons(Event $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         // Tell coupons to clear any data they may have stored
         $this->couponManager->clear();
@@ -152,7 +152,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * @param CouponConsumeEvent $event Event consuming Coupon
      * @param $eventName
      */
-    public function consume(CouponConsumeEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function consume(CouponConsumeEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $totalDiscount = 0;
         $isValid = false;
@@ -183,7 +183,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $event->setDiscount($totalDiscount);
     }
 
-    public function updateOrderDiscount(Event $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updateOrderDiscount(Event $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $discount = $this->couponManager->getDiscount();
 
@@ -204,7 +204,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * @param CouponModel               $coupon Model to save
      * @param CouponCreateOrUpdateEvent $event  Event containing data
      */
-    protected function createOrUpdate(CouponModel $coupon, CouponCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher)
+    protected function createOrUpdate(CouponModel $coupon, CouponCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher): void
     {
         // Set default condition if none found
         /** @var ConditionInterface $noConditionRule */
@@ -248,7 +248,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * @param CouponModel               $coupon Model to save
      * @param CouponCreateOrUpdateEvent $event  Event containing data
      */
-    protected function createOrUpdateCondition(CouponModel $coupon, CouponCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher)
+    protected function createOrUpdateCondition(CouponModel $coupon, CouponCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher): void
     {
         /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->conditionFactory;
@@ -261,7 +261,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $event->setCouponModel($coupon);
     }
 
-    public function testFreePostage(OrderEvent $event)
+    public function testFreePostage(OrderEvent $event): void
     {
         $order = $event->getOrder();
 
@@ -279,7 +279,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function afterOrder(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function afterOrder(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         /** @var CouponInterface[] $consumedCoupons */
         $consumedCoupons = $this->couponManager->getCouponsKept();
@@ -365,7 +365,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function orderStatusChange(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function orderStatusChange(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         // The order has been canceled or refunded ?
         if ($event->getOrder()->isCancelled() || $event->getOrder()->isRefunded()) {

@@ -24,7 +24,7 @@ use Thelia\Core\Translation\Translator;
  */
 class ModuleHookModificationForm extends ModuleHookCreationForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         parent::buildForm();
 

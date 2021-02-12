@@ -20,7 +20,7 @@ use Thelia\Type\AlphaNumStringType;
  */
 class AlphaNumStringTypeTest extends TestCase
 {
-    public function testAlphaNumStringType()
+    public function testAlphaNumStringType(): void
     {
         $type = new AlphaNumStringType();
         $this->assertTrue($type->isValid('azs_qs-0-9ds'));

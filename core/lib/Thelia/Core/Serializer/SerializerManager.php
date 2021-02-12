@@ -133,7 +133,7 @@ class SerializerManager
      *
      * @param string $serializerId A serializer identifier
      */
-    public function remove($serializerId)
+    public function remove($serializerId): void
     {
         $this->has($serializerId, true);
 

@@ -32,7 +32,7 @@ use Thelia\Tests\WebTestCase;
  */
 class RequestListenerTest extends WebTestCase
 {
-    public function testCheckCurrency()
+    public function testCheckCurrency(): void
     {
         $listener = $this->getRequestListener();
 

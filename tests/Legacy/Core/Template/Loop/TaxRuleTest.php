@@ -30,7 +30,7 @@ class TaxRuleTest extends BaseLoopTestor
         return [];
     }
 
-    public function testSearchById()
+    public function testSearchById(): void
     {
         $tr = TaxRuleQuery::create()->findOne();
         if (null === $tr) {

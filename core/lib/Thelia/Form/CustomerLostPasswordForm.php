@@ -64,7 +64,7 @@ class CustomerLostPasswordForm extends FirewallForm
             ]);
     }
 
-    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    public function verifyExistingEmail($value, ExecutionContextInterface $context): void
     {
         $customer = CustomerQuery::create()->findOneByEmail($value);
         if (null === $customer) {

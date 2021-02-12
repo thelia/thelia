@@ -105,7 +105,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
      * @param array     $searchIn
      * @param string    $searchCriteria
      */
-    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
+    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
     {
         $search->_and();
 

@@ -53,7 +53,7 @@ class FragmentBag implements Iterator
      *
      * @return void any returned value is ignored
      */
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
@@ -93,7 +93,7 @@ class FragmentBag implements Iterator
      *
      * @return void any returned value is ignored
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }
@@ -103,7 +103,7 @@ class FragmentBag implements Iterator
      *
      * @api
      */
-    public function clear()
+    public function clear(): void
     {
         $this->position = 0;
         $this->fragments = [];
@@ -119,13 +119,13 @@ class FragmentBag implements Iterator
         return \count($this->fragments);
     }
 
-    public function add($data)
+    public function add($data): void
     {
         $fragment = new Fragment($data);
         $this->addFragment($fragment);
     }
 
-    public function addFragment(Fragment $fragment)
+    public function addFragment(Fragment $fragment): void
     {
         $this->fragments[] = $fragment;
     }

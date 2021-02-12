@@ -29,7 +29,7 @@ use Thelia\Model\CustomerQuery;
  */
 class CustomerLogin extends BruteforceForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('email', EmailType::class, [
@@ -82,7 +82,7 @@ class CustomerLogin extends BruteforceForm
     /**
      * If the user select "Yes, I have a password", we check the password.
      */
-    public function verifyAccount($value, ExecutionContextInterface $context)
+    public function verifyAccount($value, ExecutionContextInterface $context): void
     {
         if ($value == 1) {
             $data = $context->getRoot()->getData();
@@ -102,7 +102,7 @@ class CustomerLogin extends BruteforceForm
     /**
      * If the user select "I'am a new customer", we make sure is email address does not exit in the database.
      */
-    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    public function verifyExistingEmail($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
         if ($data['account'] == 0) {

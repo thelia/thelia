@@ -70,7 +70,7 @@ class ForSomeCustomersTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\ForSomeCustomers::setValidators
      */
-    public function testInValidBackOfficeInputOperator()
+    public function testInValidBackOfficeInputOperator(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateFacadeStub();
@@ -98,7 +98,7 @@ class ForSomeCustomersTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\ForSomeCustomers::setValidators
      */
-    public function testInValidBackOfficeInputValue()
+    public function testInValidBackOfficeInputValue(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateFacadeStub();
@@ -120,7 +120,7 @@ class ForSomeCustomersTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\ForSomeCustomers::isMatching
      */
-    public function testMatchingRule()
+    public function testMatchingRule(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateFacadeStub();
@@ -147,7 +147,7 @@ class ForSomeCustomersTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\ForSomeCustomers::isMatching
      */
-    public function testNotMatching()
+    public function testNotMatching(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateFacadeStub();
@@ -170,7 +170,7 @@ class ForSomeCustomersTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testGetSerializableRule()
+    public function testGetSerializableRule(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateFacadeStub();
@@ -203,7 +203,7 @@ class ForSomeCustomersTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\ForSomeCustomers::getName
      */
-    public function testGetName()
+    public function testGetName(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Number of articles in cart');
 
@@ -220,7 +220,7 @@ class ForSomeCustomersTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\ForSomeCustomers::getToolTip
      */
-    public function testGetToolTip()
+    public function testGetToolTip(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Sample coupon condition');
 
@@ -237,7 +237,7 @@ class ForSomeCustomersTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\ForSomeCustomers::generateInputs
      */
-    public function testGetValidator()
+    public function testGetValidator(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Price');
 

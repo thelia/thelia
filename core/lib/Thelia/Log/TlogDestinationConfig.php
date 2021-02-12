@@ -41,7 +41,7 @@ class TlogDestinationConfig
         return $this->name;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -51,7 +51,7 @@ class TlogDestinationConfig
         return $this->title;
     }
 
-    public function setTitle($title)
+    public function setTitle($title): void
     {
         $this->title = $title;
     }
@@ -61,7 +61,7 @@ class TlogDestinationConfig
         return $this->label;
     }
 
-    public function setLabel($label)
+    public function setLabel($label): void
     {
         $this->label = $label;
     }
@@ -71,7 +71,7 @@ class TlogDestinationConfig
         return $this->default;
     }
 
-    public function setDefault($default)
+    public function setDefault($default): void
     {
         $this->default = $default;
     }
@@ -81,7 +81,7 @@ class TlogDestinationConfig
         return $this->type;
     }
 
-    public function setType($type)
+    public function setType($type): void
     {
         $this->type = $type;
     }
@@ -91,7 +91,7 @@ class TlogDestinationConfig
         return $this->value;
     }
 
-    public function setValue($value)
+    public function setValue($value): void
     {
         $this->value = $value;
     }

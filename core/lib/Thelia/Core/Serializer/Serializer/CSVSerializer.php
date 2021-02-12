@@ -84,7 +84,7 @@ class CSVSerializer extends AbstractSerializer
         return $this;
     }
 
-    public function prepareFile(\SplFileObject $fileObject)
+    public function prepareFile(\SplFileObject $fileObject): void
     {
         $this->headers = null;
     }
@@ -110,7 +110,7 @@ class CSVSerializer extends AbstractSerializer
         return $csvRow;
     }
 
-    public function finalizeFile(\SplFileObject $fileObject)
+    public function finalizeFile(\SplFileObject $fileObject): void
     {
         if ($this->headers !== null) {
             // Create tmp file with header

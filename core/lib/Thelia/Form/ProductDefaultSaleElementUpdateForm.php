@@ -22,7 +22,7 @@ use Thelia\Model\Currency;
 
 class ProductDefaultSaleElementUpdateForm extends ProductSaleElementUpdateForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
         ->add('product_id', IntegerType::class, [

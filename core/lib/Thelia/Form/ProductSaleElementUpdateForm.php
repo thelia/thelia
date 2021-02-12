@@ -23,7 +23,7 @@ use Thelia\Model\Currency;
 
 class ProductSaleElementUpdateForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('tax_rule', IntegerType::class, [

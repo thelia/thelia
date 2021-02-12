@@ -24,7 +24,7 @@ class ProductModificationForm extends ProductCreationForm
 {
     use StandardDescriptionFieldsTrait;
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         parent::doBuildForm(true);
 
@@ -57,7 +57,7 @@ class ProductModificationForm extends ProductCreationForm
         $this->addStandardDescFields(['title', 'locale']);
     }
 
-    public function checkDuplicateRef($value, ExecutionContextInterface $context)
+    public function checkDuplicateRef($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 

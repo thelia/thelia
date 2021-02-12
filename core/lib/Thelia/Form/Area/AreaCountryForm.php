@@ -33,7 +33,7 @@ class AreaCountryForm extends BaseForm
     /**
      * {@inheritdoc}
      */
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(

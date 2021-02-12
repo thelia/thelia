@@ -75,7 +75,7 @@ class SaleCheckActivationCommandTest extends ContainerAwareTestCase
         self::$activated = $otherSale->getId();
     }
 
-    public function testCommand()
+    public function testCommand(): void
     {
         $application = new Application($this->getKernel());
 
@@ -103,7 +103,7 @@ class SaleCheckActivationCommandTest extends ContainerAwareTestCase
     /**
      * Use this method to build the container with the services that you need.
      */
-    protected function buildContainer(ContainerBuilder $container)
+    protected function buildContainer(ContainerBuilder $container): void
     {
         $eventDispatcher = new EventDispatcher();
         $eventDispatcher->addSubscriber(new Sale());

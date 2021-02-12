@@ -102,7 +102,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      * @covers \Thelia\Coupon\CouponManager::sortCoupons
      * @covers \Thelia\Coupon\CouponManager::getEffect
      */
-    public function testGetDiscountCumulativeRemovingPostage()
+    public function testGetDiscountCumulativeRemovingPostage(): void
     {
         $this->markTestSkipped('It\'s necessary to mock the factory');
 
@@ -170,7 +170,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      * @covers \Thelia\Coupon\CouponManager::sortCoupons
      * @covers \Thelia\Coupon\CouponManager::getEffect
      */
-    public function testGetDiscountNonCumulativeNotRemovingPostage()
+    public function testGetDiscountNonCumulativeNotRemovingPostage(): void
     {
         $this->markTestSkipped('It\'s necessary to mock the factory');
 
@@ -229,7 +229,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      * @covers \Thelia\Coupon\CouponManager::sortCoupons
      * @covers \Thelia\Coupon\CouponManager::getEffect
      */
-    public function testGetDiscountGreaterThanCartAmount()
+    public function testGetDiscountGreaterThanCartAmount(): void
     {
         $this->markTestSkipped('It\'s necessary to mock the factory');
 
@@ -284,7 +284,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      * @covers \Thelia\Coupon\CouponManager::addAvailableCoupon
      * @covers \Thelia\Coupon\CouponManager::getAvailableCoupons
      */
-    public function testGetAvailableCoupons()
+    public function testGetAvailableCoupons(): void
     {
         $this->markTestSkipped('It\'s necessary to mock the factory');
 
@@ -331,7 +331,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      * @covers \Thelia\Coupon\CouponManager::addAvailableCondition
      * @covers \Thelia\Coupon\CouponManager::getAvailableConditions
      */
-    public function testGetAvailableConditions()
+    public function testGetAvailableConditions(): void
     {
         $this->markTestSkipped('It\'s necessary to mock the factory');
 
@@ -384,7 +384,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     /**
      * @covers \Thelia\Coupon\CouponManager::decrementQuantity
      */
-    public function testDecrementeQuantity()
+    public function testDecrementeQuantity(): void
     {
         $this->markTestSkipped('It\'s necessary to mock the factory');
 
@@ -467,7 +467,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     /**
      * @covers \Thelia\Coupon\CouponManager::incrementQuantity
      */
-    public function testIncrementeQuantity()
+    public function testIncrementeQuantity(): void
     {
         $this->markTestSkipped('It\'s necessary to mock the factory');
 
@@ -550,7 +550,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     /**
      * @covers \Thelia\Coupon\CouponManager::decrementQuantity
      */
-    public function testDecrementeQuantityIllimited()
+    public function testDecrementeQuantityIllimited(): void
     {
         $this->markTestSkipped('It\'s necessary to mock the factory');
 
@@ -636,7 +636,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     /**
      * @covers \Thelia\Coupon\CouponManager::incrementQuantity
      */
-    public function testIncrementQuantityIllimited()
+    public function testIncrementQuantityIllimited(): void
     {
         $this->markTestSkipped('It\'s necessary to mock the factory');
 

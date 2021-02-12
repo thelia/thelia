@@ -82,7 +82,7 @@ class FirewallTest extends TestCase
         FormFirewallQuery::create()->find()->delete();
     }
 
-    public function testBlock()
+    public function testBlock(): void
     {
         for ($i = 1; $i <= 10; ++$i) {
             if ($i > 6) {
@@ -104,7 +104,7 @@ class FirewallTest extends TestCase
         }
     }
 
-    public function testFormatTime()
+    public function testFormatTime(): void
     {
         $this->assertEquals(
             '1 hour(s)',
@@ -140,7 +140,7 @@ class FirewallTest extends TestCase
         );
     }
 
-    public function testAutoDelete()
+    public function testAutoDelete(): void
     {
         /* Add two rows */
         $this->form->isFirewallOk('prod');

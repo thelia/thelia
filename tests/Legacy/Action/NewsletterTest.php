@@ -100,7 +100,7 @@ class NewsletterTest extends BaseAction
     /**
      * @depends testUpdate
      */
-    public function testUnsubscribe(NewsletterModel $newsletter)
+    public function testUnsubscribe(NewsletterModel $newsletter): void
     {
         $event = new NewsletterEvent('test@foo.com', 'en_US');
         $event->setId($newsletter->getId());

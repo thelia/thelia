@@ -26,7 +26,7 @@ class TlogDestinationJavascriptConsole extends AbstractTlogDestination
         return "The Thelia logs are displayed in your browser's Javascript console.";
     }
 
-    public function write(&$res)
+    public function write(&$res): void
     {
         $content = '<script>try {'."\n";
 

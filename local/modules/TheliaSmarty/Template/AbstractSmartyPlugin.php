@@ -36,7 +36,7 @@ abstract class AbstractSmartyPlugin implements SmartyPluginInterface
 
         if (array_walk(
             $array,
-            function (&$item) {
+            function (&$item): void {
                 $item = strtoupper(trim($item));
             }
         )) {

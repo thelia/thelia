@@ -21,7 +21,7 @@ class CategoryModificationForm extends CategoryCreationForm
 {
     use StandardDescriptionFieldsTrait;
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->doBuilForm(
             $this->translator->trans('The category title')

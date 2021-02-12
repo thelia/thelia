@@ -32,7 +32,7 @@ class ModuleHookTest extends BaseLoopTestor
         return ['backend_context' => 1];
     }
 
-    public function testSearchByHookId()
+    public function testSearchByHookId(): void
     {
         $moduleHook = ModuleHookQuery::create()->findOne();
         if (null !== $moduleHook) {

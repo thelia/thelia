@@ -29,7 +29,7 @@ use Thelia\Model\ConfigQuery;
  */
 class CacheClear extends ContainerAwareCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('cache:clear')
@@ -88,7 +88,7 @@ class CacheClear extends ContainerAwareCommand
         return 0;
     }
 
-    protected function clearCache($dir, OutputInterface $output)
+    protected function clearCache($dir, OutputInterface $output): void
     {
         $output->writeln(sprintf('Clearing cache in <info>%s</info> directory', $dir));
 

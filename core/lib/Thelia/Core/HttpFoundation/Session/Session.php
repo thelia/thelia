@@ -57,7 +57,7 @@ class Session extends BaseSession
         return $this;
     }
 
-    public function setCurrency(Currency $currency)
+    public function setCurrency(Currency $currency): void
     {
         $this->set('thelia.current.currency', $currency);
     }
@@ -277,7 +277,7 @@ class Session extends BaseSession
     /**
      * Clear the current session cart, and store a new, empty one in the session.
      */
-    public function clearSessionCart(EventDispatcherInterface $dispatcher)
+    public function clearSessionCart(EventDispatcherInterface $dispatcher): void
     {
         $event = new CartCreateEvent();
 

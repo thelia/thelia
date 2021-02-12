@@ -22,7 +22,7 @@ use Thelia\Model\MessageQuery;
 
 class MessageCreationForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('name', TextType::class, [
@@ -69,7 +69,7 @@ class MessageCreationForm extends BaseForm
         return 'thelia_message_creation';
     }
 
-    public function checkDuplicateName($value, ExecutionContextInterface $context)
+    public function checkDuplicateName($value, ExecutionContextInterface $context): void
     {
         $message = MessageQuery::create()->findOneByName($value);
 

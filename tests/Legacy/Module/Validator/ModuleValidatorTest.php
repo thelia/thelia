@@ -25,7 +25,7 @@ use Thelia\Tools\Version\Version;
  */
 class ModuleValidatorTest extends TestCase
 {
-    public function testCheque()
+    public function testCheque(): void
     {
         $moduleChequePath = THELIA_MODULE_DIR.'Cheque';
 
@@ -48,7 +48,7 @@ class ModuleValidatorTest extends TestCase
         $moduleValidator->validate();
     }
 
-    public function testVirtualProductDelivery()
+    public function testVirtualProductDelivery(): void
     {
         $modulePath = THELIA_MODULE_DIR.'VirtualProductDelivery';
 
@@ -99,7 +99,7 @@ class ModuleValidatorTest extends TestCase
      * @param $path
      * @param $expectedAuthors
      */
-    public function testAuthorsTag($path, $expectedAuthors)
+    public function testAuthorsTag($path, $expectedAuthors): void
     {
         $modulePath = __DIR__.'/Authors/'.$path;
 
@@ -127,7 +127,7 @@ class ModuleValidatorTest extends TestCase
      * @param $exceptionExpected
      * @param $exceptionMessage
      */
-    public function testValidator($path, $exceptionExpected, $exceptionMessage)
+    public function testValidator($path, $exceptionExpected, $exceptionMessage): void
     {
         $modulePath = __DIR__.'ModuleValidatorTest.php/'.$path;
         /** @var \Exception $exception */
@@ -167,7 +167,7 @@ class ModuleValidatorTest extends TestCase
         }
     }
 
-    public function testNonExistentModule()
+    public function testNonExistentModule(): void
     {
         $moduleChuckNorrisPath = THELIA_MODULE_DIR.'ChuckNorris';
 

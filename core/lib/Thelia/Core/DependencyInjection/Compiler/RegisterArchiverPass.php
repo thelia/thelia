@@ -36,7 +36,7 @@ class RegisterArchiverPass implements CompilerPassInterface
      */
     public const ARCHIVER_SERVICE_TAG = 'thelia.archiver';
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         try {
             $manager = $container->getDefinition(self::MANAGER_SERVICE_ID);

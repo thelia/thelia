@@ -31,7 +31,7 @@ class CouponCode extends BaseForm
     /**
      * Build form.
      */
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(
@@ -48,7 +48,7 @@ class CouponCode extends BaseForm
         ;
     }
 
-    public function verifyExistingCode($value, ExecutionContextInterface $context)
+    public function verifyExistingCode($value, ExecutionContextInterface $context): void
     {
         $coupon = CouponQuery::create()
             ->filterByCode($value, Criteria::EQUAL)

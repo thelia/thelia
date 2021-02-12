@@ -157,7 +157,7 @@ class ArchiverManager
      *
      * @param string $archiverId An archiver identifier
      */
-    public function remove($archiverId)
+    public function remove($archiverId): void
     {
         $this->has($archiverId, true);
 

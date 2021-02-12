@@ -43,7 +43,7 @@ class RewritingResolver
         }
     }
 
-    public function load($rewrittenUrl)
+    public function load($rewrittenUrl): void
     {
         $rewrittenUrl = ltrim($rewrittenUrl, '/');
         $rewrittenUrl = urldecode($rewrittenUrl);

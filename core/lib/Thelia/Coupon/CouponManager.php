@@ -293,7 +293,7 @@ class CouponManager
      *
      * @param CouponInterface $coupon CouponManager
      */
-    public function addAvailableCoupon(CouponInterface $coupon)
+    public function addAvailableCoupon(CouponInterface $coupon): void
     {
         $this->availableCoupons[] = $coupon;
     }
@@ -313,7 +313,7 @@ class CouponManager
      *
      * @param ConditionInterface $condition ConditionInterface
      */
-    public function addAvailableCondition(ConditionInterface $condition)
+    public function addAvailableCondition(ConditionInterface $condition): void
     {
         $this->availableConditions[] = $condition;
     }
@@ -331,7 +331,7 @@ class CouponManager
     /**
      * Clear all data kept by coupons.
      */
-    public function clear()
+    public function clear(): void
     {
         $coupons = $this->getCurrentCoupons();
 

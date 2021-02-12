@@ -77,7 +77,7 @@ class NewsletterForm extends BaseForm
             ]);
     }
 
-    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    public function verifyExistingEmail($value, ExecutionContextInterface $context): void
     {
         $customer = NewsletterQuery::create()->filterByUnsubscribed(false)->findOneByEmail($value);
         if ($customer) {

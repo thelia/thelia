@@ -21,7 +21,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
  */
 trait I18nTimestampableTrait
 {
-    public function postSave(ConnectionInterface $con = null)
+    public function postSave(ConnectionInterface $con = null): void
     {
         $this->getBaseQueryObject()
             ->filterById($this->getId())

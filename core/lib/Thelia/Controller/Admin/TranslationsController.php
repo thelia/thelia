@@ -347,7 +347,7 @@ class TranslationsController extends BaseAdminController
         return $this->renderTemplate($request, $templateHelper, $eventDispatcher, $translator);
     }
 
-    private function loadTranslation($directory, $domain)
+    private function loadTranslation($directory, $domain): void
     {
         try {
             $finder = Finder::create()

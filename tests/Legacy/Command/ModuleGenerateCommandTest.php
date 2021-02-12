@@ -33,7 +33,7 @@ class ModuleGenerateCommandTest extends BaseCommandTest
     /** @var CommandTester */
     protected $commandTester;
 
-    public static function clearTest()
+    public static function clearTest(): void
     {
         $fs = new Filesystem();
 
@@ -64,7 +64,7 @@ class ModuleGenerateCommandTest extends BaseCommandTest
         $this->commandTester = new CommandTester($this->command);
     }
 
-    public function testGenerateModule()
+    public function testGenerateModule(): void
     {
         $tester = $this->commandTester;
 
@@ -81,7 +81,7 @@ class ModuleGenerateCommandTest extends BaseCommandTest
     /**
      * @depends testGenerateModule
      */
-    public function testGenerateDuplicateModule()
+    public function testGenerateDuplicateModule(): void
     {
         $tester = $this->commandTester;
 
@@ -95,7 +95,7 @@ class ModuleGenerateCommandTest extends BaseCommandTest
     /**
      * @depends testGenerateModule
      */
-    public function testGenerateDuplicateModuleWithForceOption()
+    public function testGenerateDuplicateModuleWithForceOption(): void
     {
         $tester = $this->commandTester;
 
@@ -116,7 +116,7 @@ class ModuleGenerateCommandTest extends BaseCommandTest
         $this->assertTrue($fs->exists($configFile));
     }
 
-    public function testGenerateWithReservedKeyWord()
+    public function testGenerateWithReservedKeyWord(): void
     {
         $tester = $this->commandTester;
 

@@ -71,7 +71,7 @@ class RewritingRetrieverTest extends TestCase
         return $property;
     }
 
-    public function testLoadViewUrl()
+    public function testLoadViewUrl(): void
     {
         $searchResult = new RewritingUrl();
         $searchResult->setUrl('foo.html');
@@ -93,7 +93,7 @@ class RewritingRetrieverTest extends TestCase
         $this->assertEquals(URL::getInstance()->viewUrl('view', ['lang' => 'fr_FR', 'view_id' => 1]), $retriever->url);
     }
 
-    public function testLoadSpecificUrl()
+    public function testLoadSpecificUrl(): void
     {
         $searchResult = new RewritingUrl();
         $searchResult->setUrl('foo.html');

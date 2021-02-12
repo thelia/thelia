@@ -29,7 +29,7 @@ use Thelia\Model\CustomerQuery;
  */
 class CustomerCreateForm extends AddressCreateForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         parent::buildForm();
 
@@ -109,7 +109,7 @@ class CustomerCreateForm extends AddressCreateForm
         }
     }
 
-    public function verifyPasswordField($value, ExecutionContextInterface $context)
+    public function verifyPasswordField($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 
@@ -118,7 +118,7 @@ class CustomerCreateForm extends AddressCreateForm
         }
     }
 
-    public function verifyEmailField($value, ExecutionContextInterface $context)
+    public function verifyEmailField($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 
@@ -127,7 +127,7 @@ class CustomerCreateForm extends AddressCreateForm
         }
     }
 
-    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    public function verifyExistingEmail($value, ExecutionContextInterface $context): void
     {
         $customer = CustomerQuery::getCustomerByEmail($value);
         if ($customer) {

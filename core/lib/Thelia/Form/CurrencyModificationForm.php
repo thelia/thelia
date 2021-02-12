@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
 
 class CurrencyModificationForm extends CurrencyCreationForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         parent::buildForm();
 

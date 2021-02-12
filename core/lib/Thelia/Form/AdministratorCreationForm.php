@@ -27,7 +27,7 @@ class AdministratorCreationForm extends BaseForm
 {
     public const PROFILE_FIELD_PREFIX = 'profile';
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('login', TextType::class, [
@@ -137,7 +137,7 @@ class AdministratorCreationForm extends BaseForm
         return $locales;
     }
 
-    public function verifyPasswordField($value, ExecutionContextInterface $context)
+    public function verifyPasswordField($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 
@@ -156,14 +156,14 @@ class AdministratorCreationForm extends BaseForm
         }
     }
 
-    public function verifyExistingLogin($value, ExecutionContextInterface $context)
+    public function verifyExistingLogin($value, ExecutionContextInterface $context): void
     {
         if (null !== $administrator = AdminQuery::create()->findOneByLogin($value)) {
             $context->addViolation($this->translator->trans('This administrator login already exists'));
         }
     }
 
-    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    public function verifyExistingEmail($value, ExecutionContextInterface $context): void
     {
         if (null !== $administrator = AdminQuery::create()->findOneByEmail($value)) {
             $context->addViolation($this->translator->trans('An administrator with thie email address already exists'));

@@ -45,7 +45,7 @@ class LessDotPhpFilter extends LessphpFilter implements EventSubscriberInterface
         }
     }
 
-    public function filterLoad(AssetInterface $asset)
+    public function filterLoad(AssetInterface $asset): void
     {
         $filePath = $asset->getSourceRoot().DS.$asset->getSourcePath();
 
@@ -83,7 +83,7 @@ class LessDotPhpFilter extends LessphpFilter implements EventSubscriberInterface
         Tlog::getInstance()->addDebug('CSS processing done.');
     }
 
-    public function clearCacheDir()
+    public function clearCacheDir(): void
     {
         $fs = new Filesystem();
 

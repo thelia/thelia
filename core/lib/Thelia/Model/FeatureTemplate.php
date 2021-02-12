@@ -22,7 +22,7 @@ class FeatureTemplate extends BaseFeatureTemplate
     /**
      * Calculate next position relative to our template.
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByTemplateId($this->getTemplateId());
     }

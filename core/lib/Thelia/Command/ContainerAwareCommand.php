@@ -58,7 +58,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
      *
      * @param ContainerInterface $container
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(ContainerInterface $container = null): void
     {
         $this->container = $container;
     }
@@ -85,7 +85,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
      *
      * @since 2.3
      */
-    protected function initRequest(Lang $lang = null)
+    protected function initRequest(Lang $lang = null): void
     {
         $container = $this->getContainer();
 

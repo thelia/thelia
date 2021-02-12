@@ -30,7 +30,7 @@ class ProductAddAccessoryEvent extends ProductEvent
         return $this->accessory_id;
     }
 
-    public function setAccessoryId($accessory_id)
+    public function setAccessoryId($accessory_id): void
     {
         $this->accessory_id = $accessory_id;
     }

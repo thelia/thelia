@@ -42,7 +42,7 @@ class ModelCriteriaTools
         $foreignKey,
         $forceReturn = false,
         $localeAlias = null
-    ) {
+    ): void {
         if (!empty($columns)) {
             if ($foreignTable === null) {
                 $foreignTable = $search->getTableMap()->getName();
@@ -167,7 +167,7 @@ class ModelCriteriaTools
         $foreignTable = null,
         $foreignKey = 'ID',
         $localeAlias = null
-    ) {
+    ): void {
         if (!empty($columns)) {
             if ($foreignTable === null) {
                 $foreignTable = $search->getTableMap()->getName();

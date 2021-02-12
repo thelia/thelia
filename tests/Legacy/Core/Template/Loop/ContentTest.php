@@ -30,7 +30,7 @@ class ContentTest extends BaseLoopTestor
         return [];
     }
 
-    public function testSearchById()
+    public function testSearchById(): void
     {
         $content = ContentQuery::create()->findOne();
         if (null === $content) {
@@ -47,7 +47,7 @@ class ContentTest extends BaseLoopTestor
         $this->baseTestSearchById($content->getId(), $otherParameters);
     }
 
-    public function testSearchLimit()
+    public function testSearchLimit(): void
     {
         $this->baseTestSearchWithLimit(3);
     }

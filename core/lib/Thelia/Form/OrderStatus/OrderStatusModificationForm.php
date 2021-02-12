@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
  */
 class OrderStatusModificationForm extends OrderStatusCreationForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder->add('id', HiddenType::class, [
             'required' => true,

@@ -58,7 +58,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function update(LangUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(LangUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getId())) {
             $lang->setTitle($event->getTitle())
@@ -81,7 +81,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function toggleDefault(LangToggleDefaultEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function toggleDefault(LangToggleDefaultEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
             $lang->toggleDefault();
@@ -93,7 +93,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
     /**
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function toggleActive(LangToggleActiveEvent $event)
+    public function toggleActive(LangToggleActiveEvent $event): void
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
             if ($lang->getByDefault()) {
@@ -117,7 +117,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
     /**
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function toggleVisible(LangToggleVisibleEvent $event)
+    public function toggleVisible(LangToggleVisibleEvent $event): void
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
             if ($lang->getByDefault()) {
@@ -143,7 +143,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function create(LangCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(LangCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $lang = new LangModel();
 
@@ -167,7 +167,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function delete(LangDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(LangDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
             if ($lang->getByDefault()) {
@@ -200,7 +200,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function defaultBehavior(LangDefaultBehaviorEvent $event)
+    public function defaultBehavior(LangDefaultBehaviorEvent $event): void
     {
         ConfigQuery::create()
             ->filterByName('default_lang_without_translation')
@@ -211,7 +211,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function langUrl(LangUrlEvent $event)
+    public function langUrl(LangUrlEvent $event): void
     {
         foreach ($event->getUrl() as $id => $url) {
             LangQuery::create()
@@ -220,7 +220,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function fixMissingFlag(LangEvent $event)
+    public function fixMissingFlag(LangEvent $event): void
     {
         // Be sure that a lang have a flag, otherwise copy the
         // "unknown" flag

@@ -435,7 +435,7 @@ function checkresultingsize($sizeAdded)
  * @param string $path
  * @param string $path_thumbs
  */
-function create_folder($path = null, $path_thumbs = null, $ftp = null, $config = null)
+function create_folder($path = null, $path_thumbs = null, $ftp = null, $config = null): void
 {
     if ($ftp) {
         $ftp->mkdir($path);
@@ -458,7 +458,7 @@ function create_folder($path = null, $path_thumbs = null, $ftp = null, $config =
  * @param string $path
  * @param string $ext
  */
-function check_files_extensions_on_path($path, $ext)
+function check_files_extensions_on_path($path, $ext): void
 {
     if (!is_dir($path)) {
         $fileinfo = pathinfo($path);
@@ -481,7 +481,7 @@ function check_files_extensions_on_path($path, $ext)
  * @param string $basepath
  * @param string $ext
  */
-function check_files_extensions_on_phar($phar, &$files, $basepath, $ext)
+function check_files_extensions_on_phar($phar, &$files, $basepath, $ext): void
 {
     foreach ($phar as $file) {
         if ($file->isFile()) {
@@ -793,7 +793,7 @@ function is_really_writable($dir)
 
     // Windows, safe ON. (have to write a file :S)
     if (is_dir($dir)) {
-        $dir = $dir.'/'.md5(mt_rand(1, 1000).mt_rand(1, 1000));
+        $dir = $dir.'/'.md5(random_int(1, 1000).random_int(1, 1000));
 
         if (($fp = @fopen($dir, 'ab')) === false) {
             return false;
@@ -839,7 +839,7 @@ function is_function_callable($name)
  * @param string $destination
  * @param bool   $is_rec
  */
-function rcopy($source, $destination, $is_rec = false)
+function rcopy($source, $destination, $is_rec = false): void
 {
     if (is_dir($source)) {
         if ($is_rec === false) {
@@ -881,7 +881,7 @@ function rcopy($source, $destination, $is_rec = false)
  * @param string $destination
  * @param bool   $is_rec
  */
-function rrename($source, $destination, $is_rec = false)
+function rrename($source, $destination, $is_rec = false): void
 {
     if (is_dir($source)) {
         if ($is_rec === false) {
@@ -940,7 +940,7 @@ function rrename_after_cleaner($source)
  * @param string $rec_option
  * @param bool   $is_rec
  */
-function rchmod($source, $mode, $rec_option = 'none', $is_rec = false)
+function rchmod($source, $mode, $rec_option = 'none', $is_rec = false): void
 {
     if ($rec_option == 'none') {
         chmod($source, $mode);
@@ -973,7 +973,7 @@ function rchmod($source, $mode, $rec_option = 'none', $is_rec = false)
  * @param bool   $trace
  * @param bool   $halt
  */
-function debugger($input, $trace = false, $halt = false)
+function debugger($input, $trace = false, $halt = false): void
 {
     ob_start();
 

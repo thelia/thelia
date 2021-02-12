@@ -51,7 +51,7 @@ class TlogDestinationFile extends AbstractTlogDestination
         return strtolower($this->getConfig(self::VAR_MODE, self::VALEUR_MODE_DEFAULT)) == 'a' ? 'a' : 'w';
     }
 
-    public function configure()
+    public function configure(): void
     {
         $filePath = $this->getFilePath();
         $mode = $this->getOpenMode();
@@ -116,14 +116,14 @@ class TlogDestinationFile extends AbstractTlogDestination
         ];
     }
 
-    public function add($texte)
+    public function add($texte): void
     {
         if ($this->fh) {
             fwrite($this->fh, $texte."\n");
         }
     }
 
-    public function write(&$res)
+    public function write(&$res): void
     {
         if ($this->fh) {
             @fclose($this->fh);

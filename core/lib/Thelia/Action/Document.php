@@ -65,7 +65,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      * @throws \Thelia\Exception\DocumentException
      * @throws \InvalidArgumentException           , DocumentException
      */
-    public function processDocument(DocumentEvent $event)
+    public function processDocument(DocumentEvent $event): void
     {
         $subdir = $event->getCacheSubdirectory();
         $sourceFile = $event->getSourceFilepath();

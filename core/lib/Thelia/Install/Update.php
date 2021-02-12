@@ -304,7 +304,7 @@ class Update
         return $this->logs;
     }
 
-    protected function log($level, $message)
+    protected function log($level, $message): void
     {
         if ($this->usePropel) {
             switch ($level) {
@@ -332,7 +332,7 @@ class Update
         }
     }
 
-    protected function updateToVersion($version, Database $database)
+    protected function updateToVersion($version, Database $database): void
     {
         // sql update
         $filename = sprintf(
@@ -384,7 +384,7 @@ class Update
         return $stmt->fetchColumn();
     }
 
-    public function setCurrentVersion($version)
+    public function setCurrentVersion($version): void
     {
         $currentVersion = null;
 
@@ -470,7 +470,7 @@ class Update
     /**
      * @param array $updatedVersions
      */
-    public function setUpdatedVersions($updatedVersions)
+    public function setUpdatedVersions($updatedVersions): void
     {
         $this->updatedVersions = $updatedVersions;
     }
@@ -480,7 +480,7 @@ class Update
      *
      * @param string $instructions content of the instruction un markdown format
      */
-    protected function addPostInstructions($version, $instructions)
+    protected function addPostInstructions($version, $instructions): void
     {
         if (!isset($this->postInstructions[$version])) {
             $this->postInstructions[$version] = [];

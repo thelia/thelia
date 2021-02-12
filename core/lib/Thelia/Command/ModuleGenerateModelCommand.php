@@ -31,7 +31,7 @@ use Thelia\Core\PropelInitService;
  */
 class ModuleGenerateModelCommand extends BaseModuleGenerate
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('module:generate:model')
@@ -85,7 +85,7 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
         return 0;
     }
 
-    protected function generateSql(OutputInterface $output)
+    protected function generateSql(OutputInterface $output): void
     {
         $command = $this->getApplication()->find('module:generate:sql');
 
@@ -98,7 +98,7 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
         );
     }
 
-    protected function generateModel(OutputInterface $output)
+    protected function generateModel(OutputInterface $output): void
     {
         $schemaDir = $this->generateGlobalSchemaForModule();
 

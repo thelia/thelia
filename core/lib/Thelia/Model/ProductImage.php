@@ -34,7 +34,7 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
      *
      * @param ProductImageQuery $query
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByProduct($this->getProduct());
     }

@@ -20,7 +20,7 @@ use Thelia\Type\IntToCombinedStringsListType;
  */
 class IntToCombinedStringsListTypeTest extends TestCase
 {
-    public function testIntToCombinedStringsListType()
+    public function testIntToCombinedStringsListType(): void
     {
         $type = new IntToCombinedStringsListType();
         $this->assertTrue($type->isValid('1: foo & bar | (fooo &baar), 4: *, 67: (foooo & baaar)'));
@@ -29,7 +29,7 @@ class IntToCombinedStringsListTypeTest extends TestCase
         $this->assertFalse($type->isValid('1,2,3'));
     }
 
-    public function testFormatJsonType()
+    public function testFormatJsonType(): void
     {
         $type = new IntToCombinedStringsListType();
         $this->assertEquals(
@@ -71,7 +71,7 @@ class IntToCombinedStringsListTypeTest extends TestCase
         $this->assertNull($type->getFormattedValue('foo'));
     }
 
-    public function testEscape()
+    public function testEscape(): void
     {
         $this->assertEquals(
             IntToCombinedStringsListType::escape('def&ghi|jkl,mno(pqr)stu:vwx'),
@@ -79,7 +79,7 @@ class IntToCombinedStringsListTypeTest extends TestCase
         );
     }
 
-    public function testUnescape()
+    public function testUnescape(): void
     {
         $this->assertEquals(
             IntToCombinedStringsListType::unescape('def\&ghi\|jkl\,mno\(pqr\)stu\:vwx'),

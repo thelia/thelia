@@ -26,7 +26,7 @@ use Thelia\Model\CustomerQuery;
  */
 class CustomerPasswordUpdateForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
 
@@ -64,7 +64,7 @@ class CustomerPasswordUpdateForm extends BaseForm
             ]);
     }
 
-    public function verifyCurrentPasswordField($value, ExecutionContextInterface $context)
+    public function verifyCurrentPasswordField($value, ExecutionContextInterface $context): void
     {
         /**
          * Retrieve the user recording, because after the login action, the password is deleted in the session.
@@ -78,7 +78,7 @@ class CustomerPasswordUpdateForm extends BaseForm
         }
     }
 
-    public function verifyPasswordField($value, ExecutionContextInterface $context)
+    public function verifyPasswordField($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 

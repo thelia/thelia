@@ -73,7 +73,7 @@ interface UserInterface
      *
      * @return void
      */
-    public function eraseCredentials();
+    public function eraseCredentials(): void;
 
     /**
      * return the user token (used by remember me authnetication system).

@@ -37,7 +37,7 @@ class TestCaseWithURLToolSetup extends TestCase
         $this->setupURLTool();
     }
 
-    protected function setupURLTool()
+    protected function setupURLTool(): void
     {
         $context = new RequestContext(
             '/thelia/index.php',

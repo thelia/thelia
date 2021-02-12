@@ -64,7 +64,7 @@ class CustomerTest extends BaseAction
         );
     }
 
-    public function testCreatedCustomer()
+    public function testCreatedCustomer(): void
     {
         $customerCreateEvent = new CustomerCreateOrUpdateEvent(
             1,
@@ -124,7 +124,7 @@ class CustomerTest extends BaseAction
         $this->assertEquals($customerCreateEvent->getCompany(), $addressCreated->getCompany());
     }
 
-    public function testCreatedCustomerWithSpecifiedRef()
+    public function testCreatedCustomerWithSpecifiedRef(): void
     {
         $customerCreateEvent = new CustomerCreateOrUpdateEvent(
             1,

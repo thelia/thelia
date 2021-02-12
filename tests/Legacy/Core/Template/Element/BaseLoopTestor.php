@@ -114,7 +114,7 @@ abstract class BaseLoopTestor extends TestCase
         $this->instance->initializeArgs($this->getMandatoryArguments());
     }
 
-    public function testGetArgDefinitions()
+    public function testGetArgDefinitions(): void
     {
         $method = $this->getMethod('getArgDefinitions');
 
@@ -123,7 +123,7 @@ abstract class BaseLoopTestor extends TestCase
         $this->assertInstanceOf('Thelia\Core\Template\Loop\Argument\ArgumentCollection', $methodReturn);
     }
 
-    public function testExec()
+    public function testExec(): void
     {
         $method = $this->getMethod('exec');
         $page = 0;
@@ -132,7 +132,7 @@ abstract class BaseLoopTestor extends TestCase
         $this->assertInstanceOf('\Thelia\Core\Template\Element\LoopResult', $methodReturn);
     }
 
-    public function baseTestSearchById($id, $other_args = [])
+    public function baseTestSearchById($id, $other_args = []): void
     {
         $this->instance->initializeArgs(array_merge(
             $this->getMandatoryArguments(),
@@ -154,7 +154,7 @@ abstract class BaseLoopTestor extends TestCase
         $this->assertEquals($id, $substitutions['ID']);
     }
 
-    public function baseTestSearchWithLimit($limit)
+    public function baseTestSearchWithLimit($limit): void
     {
         $this->instance->initializeArgs(array_merge(
             $this->getMandatoryArguments(),

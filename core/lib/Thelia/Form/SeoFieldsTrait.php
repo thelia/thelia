@@ -28,7 +28,7 @@ trait SeoFieldsTrait
      *
      * @param array $exclude name of the fields that should not be added to the form
      */
-    protected function addSeoFields($exclude = [])
+    protected function addSeoFields($exclude = []): void
     {
         if (!\in_array('url', $exclude)) {
             $this->formBuilder->add(

@@ -88,7 +88,7 @@ abstract class BaseTaxType
         return $this->requirements;
     }
 
-    public function loadRequirements($requirementsValues)
+    public function loadRequirements($requirementsValues): void
     {
         $requirements = $this->getRequirementsDefinition();
 

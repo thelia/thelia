@@ -84,7 +84,7 @@ class TheliaFormFactoryTest extends TestCase
         );
     }
 
-    public function testCreateFormWithoutType()
+    public function testCreateFormWithoutType(): void
     {
         /**
          * If we build the form without type, we only have
@@ -105,7 +105,7 @@ class TheliaFormFactoryTest extends TestCase
         );
     }
 
-    public function testCreateFormWithType()
+    public function testCreateFormWithType(): void
     {
         /**
          * If we use a type, we have that type's fields.

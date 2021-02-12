@@ -58,7 +58,7 @@ class XmlFileLoader extends FileLoader
      * @param mixed  $file The resource
      * @param string $type The resource type
      */
-    public function load($file, $type = null)
+    public function load($file, $type = null): void
     {
         $path = $this->locator->locate($file);
 
@@ -106,14 +106,14 @@ class XmlFileLoader extends FileLoader
         );
     }
 
-    public function propelOnlyRun(callable $method, $arg)
+    public function propelOnlyRun(callable $method, $arg): void
     {
         if (Thelia::isInstalled()) {
             \call_user_func($method, $arg);
         }
     }
 
-    protected function parseCommands(SimpleXMLElement $xml)
+    protected function parseCommands(SimpleXMLElement $xml): void
     {
         if (false === $commands = $xml->xpath('//config:commands/config:command')) {
             return;
@@ -134,7 +134,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses parameters.
      */
-    protected function parseParameters(SimpleXMLElement $xml)
+    protected function parseParameters(SimpleXMLElement $xml): void
     {
         if (!$xml->parameters) {
             return;
@@ -146,7 +146,7 @@ class XmlFileLoader extends FileLoader
     /**
      * parse Loops property.
      */
-    protected function parseLoops(SimpleXMLElement $xml)
+    protected function parseLoops(SimpleXMLElement $xml): void
     {
         if (false === $loops = $xml->xpath('//config:loops/config:loop')) {
             return;
@@ -164,7 +164,7 @@ class XmlFileLoader extends FileLoader
         $this->container->setParameter('Thelia.parser.loops', $loopConfig);
     }
 
-    protected function parseForms(SimpleXMLElement $xml)
+    protected function parseForms(SimpleXMLElement $xml): void
     {
         if (false === $forms = $xml->xpath('//config:forms/config:form')) {
             return;
@@ -186,7 +186,7 @@ class XmlFileLoader extends FileLoader
     /**
      * parse Filters property.
      */
-    protected function parseFilters(SimpleXMLElement $xml)
+    protected function parseFilters(SimpleXMLElement $xml): void
     {
         if (false === $filters = $xml->xpath('//config:filters/config:filter')) {
             return;
@@ -207,7 +207,7 @@ class XmlFileLoader extends FileLoader
     /**
      * parse BaseParams property.
      */
-    protected function parseTemplateDirectives(SimpleXMLElement $xml)
+    protected function parseTemplateDirectives(SimpleXMLElement $xml): void
     {
         if (false === $baseParams = $xml->xpath('//config:templateDirectives/config:templateDirective')) {
             return;
@@ -230,7 +230,7 @@ class XmlFileLoader extends FileLoader
      *
      * @param string $file
      */
-    protected function parseDefinitions(SimpleXMLElement $xml, $file)
+    protected function parseDefinitions(SimpleXMLElement $xml, $file): void
     {
         if (false === $services = $xml->xpath('//config:services/config:service')) {
             return;
@@ -240,7 +240,7 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    protected function parseDefinition($id, $service, $file)
+    protected function parseDefinition($id, $service, $file): void
     {
         $definition = $this->parseService($id, $service, $file);
         if (null !== $definition) {
@@ -254,7 +254,7 @@ class XmlFileLoader extends FileLoader
      * @param string $file
      * @param string $type
      */
-    protected function parseHooks(SimpleXMLElement $xml, $file, $type)
+    protected function parseHooks(SimpleXMLElement $xml, $file, $type): void
     {
         if (false === $hooks = $xml->xpath('//config:hooks/config:hook')) {
             return;
@@ -264,7 +264,7 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    protected function parseHook($id, $hook, $file, $type)
+    protected function parseHook($id, $hook, $file, $type): void
     {
         if (!isset($hook['class'])) {
             $hook['class'] = self::DEFAULT_HOOK_CLASS;
@@ -363,7 +363,7 @@ class XmlFileLoader extends FileLoader
         return $definition;
     }
 
-    protected function parseExportCategories(SimpleXMLElement $xml)
+    protected function parseExportCategories(SimpleXMLElement $xml): void
     {
         if (false === $exportCategories = $xml->xpath('//config:export_categories/config:export_category')) {
             return;
@@ -407,7 +407,7 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    protected function parseExports(SimpleXMLElement $xml)
+    protected function parseExports(SimpleXMLElement $xml): void
     {
         if (false === $exports = $xml->xpath('//config:exports/config:export')) {
             return;
@@ -487,7 +487,7 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    protected function parseImportCategories(SimpleXMLElement $xml)
+    protected function parseImportCategories(SimpleXMLElement $xml): void
     {
         if (false === $importCategories = $xml->xpath('//config:import_categories/config:import_category')) {
             return;
@@ -531,7 +531,7 @@ class XmlFileLoader extends FileLoader
         }
     }
 
-    protected function parseImports(SimpleXMLElement $xml)
+    protected function parseImports(SimpleXMLElement $xml): void
     {
         if (false === $imports = $xml->xpath('//config:imports/config:import')) {
             return;
@@ -789,7 +789,7 @@ EOF
         return XmlUtils::phpize($xml[$name]);
     }
 
-    private function removeScope(SimpleXMLElement $xml)
+    private function removeScope(SimpleXMLElement $xml): void
     {
         $nodes = $xml->xpath('//*[@scope]');
 

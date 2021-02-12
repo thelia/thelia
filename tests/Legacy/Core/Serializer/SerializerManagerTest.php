@@ -50,7 +50,7 @@ class SerializerManagerTest extends TestCase
         new Translator($requestStack);
     }
 
-    public function testGetSerializers()
+    public function testGetSerializers(): void
     {
         $serializers = $this->sut->getSerializers();
 
@@ -58,7 +58,7 @@ class SerializerManagerTest extends TestCase
         $this->assertCount(0, $serializers);
     }
 
-    public function testAddArgs()
+    public function testAddArgs(): void
     {
         $reflectedParameters = (new \ReflectionMethod($this->sut, 'add'))->getParameters();
 
@@ -71,7 +71,7 @@ class SerializerManagerTest extends TestCase
         );
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $this->stubSerializer
             ->expects($this->any())
@@ -94,7 +94,7 @@ class SerializerManagerTest extends TestCase
         $this->assertCount(3, $serializers);
     }
 
-    public function testSetSerializersArgs()
+    public function testSetSerializersArgs(): void
     {
         $reflectedParameters = (new \ReflectionMethod($this->sut, 'setSerializers'))->getParameters();
 
@@ -104,7 +104,7 @@ class SerializerManagerTest extends TestCase
         $this->assertTrue($reflectedParameters[0]->isArray());
     }
 
-    public function testSetSerializers()
+    public function testSetSerializers(): void
     {
         $this->stubSerializer
             ->expects($this->any())
@@ -141,7 +141,7 @@ class SerializerManagerTest extends TestCase
         $this->sut->setSerializers(['notASerializerInterface']);
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $this->sut->reset();
 
@@ -170,7 +170,7 @@ class SerializerManagerTest extends TestCase
         $this->assertCount(0, $serializers);
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $this->stubSerializer
             ->expects($this->any())
@@ -199,7 +199,7 @@ class SerializerManagerTest extends TestCase
         $this->assertFalse($this->sut->has(false));
     }
 
-    public function testHasThrowException()
+    public function testHasThrowException(): void
     {
         $this->stubSerializer
             ->expects($this->any())
@@ -216,7 +216,7 @@ class SerializerManagerTest extends TestCase
         $this->sut->has('serializer2', true);
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $this->stubSerializer
             ->expects($this->any())
@@ -237,7 +237,7 @@ class SerializerManagerTest extends TestCase
         $this->sut->get('serializer4');
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $this->assertFalse($this->sut->has('serializer1'));
         $this->assertFalse($this->sut->has('serializer2'));

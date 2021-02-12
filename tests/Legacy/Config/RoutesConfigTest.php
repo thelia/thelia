@@ -78,7 +78,7 @@ class RoutesConfigTest extends ContainerAwareTestCase
      */
     protected $routerFileLoaders;
 
-    protected function buildContainer(ContainerBuilder $container)
+    protected function buildContainer(ContainerBuilder $container): void
     {
     }
 
@@ -124,7 +124,7 @@ class RoutesConfigTest extends ContainerAwareTestCase
     /**
      * Check that there are no duplicate route ids.
      */
-    public function testNoDuplicateIds()
+    public function testNoDuplicateIds(): void
     {
         $existingIds = [];
 
@@ -161,7 +161,7 @@ class RoutesConfigTest extends ContainerAwareTestCase
      * Will not catch all duplicates, but should catch most of the common errors.
      * Can catch some routes that looks like they are conflicting but are not due to disjoint arguments requirements.
      */
-    public function testNoDuplicatePaths()
+    public function testNoDuplicatePaths(): void
     {
         // a map of existing paths => [existing methods for this path]
         $existingPaths = [];
@@ -213,7 +213,7 @@ class RoutesConfigTest extends ContainerAwareTestCase
     /**
      * Check that controller methods for the routes are callable.
      */
-    public function testTargetControllerMethodsAreCallable()
+    public function testTargetControllerMethodsAreCallable(): void
     {
         $anExceptionWasThrown = false;
 
@@ -247,7 +247,7 @@ class RoutesConfigTest extends ContainerAwareTestCase
     /**
      * Check that views for the front routes exists.
      */
-    public function testTargetFrontViewsExists()
+    public function testTargetFrontViewsExists(): void
     {
         /** @var RequestStack $requestStack */
         $requestStack = $this->getContainer()->get('request_stack');

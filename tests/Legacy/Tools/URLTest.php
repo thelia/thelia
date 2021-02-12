@@ -50,7 +50,7 @@ class URLTest extends TestCase
         new URL($router);
     }
 
-    public function testGetIndexPage()
+    public function testGetIndexPage(): void
     {
         $this->context->setBaseUrl('/thelia/index.php');
         $url = URL::getInstance()->getIndexPage();
@@ -69,7 +69,7 @@ class URLTest extends TestCase
         $this->assertEquals('http://localhost/', $url);
     }
 
-    public function testGetBaseUrl()
+    public function testGetBaseUrl(): void
     {
         $this->context->setBaseUrl('/thelia/index.php');
         $url = URL::getInstance()->getBaseUrl();
@@ -84,7 +84,7 @@ class URLTest extends TestCase
         $this->assertEquals('http://localhost/', $url);
     }
 
-    public function testAbsoluteUrl()
+    public function testAbsoluteUrl(): void
     {
         $this->context->setBaseUrl('/');
         $url = URL::getInstance()->absoluteUrl('/path/to/action');
@@ -103,7 +103,7 @@ class URLTest extends TestCase
         $this->assertEquals('http://localhost/thelia/index.php/path/to/action', $url);
     }
 
-    public function testAbsoluteUrlAlternateBase()
+    public function testAbsoluteUrlAlternateBase(): void
     {
         $this->context->setBaseUrl('/');
         $url = URL::getInstance()->absoluteUrl('/path/to/action', null, URL::WITH_INDEX_PAGE, 'https://mycdn.myshop.tld/');
@@ -122,7 +122,7 @@ class URLTest extends TestCase
         $this->assertEquals('https://mycdn.myshop.tld/path/to/action', $url);
     }
 
-    public function testAbsoluteUrlOnAbsolutePath()
+    public function testAbsoluteUrlOnAbsolutePath(): void
     {
         $this->context->setBaseUrl('/thelia/index.php');
         $url = URL::getInstance()->absoluteUrl('http://myhost/path/to/action');
@@ -137,7 +137,7 @@ class URLTest extends TestCase
         $this->assertEquals('http://myhost/path/to/action', $url);
     }
 
-    public function testAbsoluteUrlOnAbsolutePathWithParameters()
+    public function testAbsoluteUrlOnAbsolutePathWithParameters(): void
     {
         $this->context->setBaseUrl('/thelia/index.php');
         $url = URL::getInstance()->absoluteUrl('http://myhost/path/to/action', ['p1' => 'v1', 'p2' => 'v2']);
@@ -152,7 +152,7 @@ class URLTest extends TestCase
         $this->assertEquals('http://myhost/path/to/action?p1=v1&p2=v2', $url);
     }
 
-    public function testAbsoluteUrlOnAbsolutePathWithParametersAddParameters()
+    public function testAbsoluteUrlOnAbsolutePathWithParametersAddParameters(): void
     {
         $this->context->setBaseUrl('/thelia/index.php');
         $url = URL::getInstance()->absoluteUrl('http://myhost/path/to/action?p0=v0', ['p1' => 'v1', 'p2' => 'v2']);
@@ -167,7 +167,7 @@ class URLTest extends TestCase
         $this->assertEquals('http://myhost/path/to/action?p0=v0&p1=v1&p2=v2', $url);
     }
 
-    public function testAbsoluteUrlWithParameters()
+    public function testAbsoluteUrlWithParameters(): void
     {
         $this->context->setBaseUrl('/thelia/index.php');
         $url = URL::getInstance()->absoluteUrl('/path/to/action', ['p1' => 'v1', 'p2' => 'v2']);
@@ -190,14 +190,14 @@ class URLTest extends TestCase
         $this->assertEquals('http://localhost/path/to/action?p1=v1&p2=v2', $url);
     }
 
-    public function testAbsoluteUrlPathOnly()
+    public function testAbsoluteUrlPathOnly(): void
     {
         $this->context->setBaseUrl('/thelia/index.php');
         $url = URL::getInstance()->absoluteUrl('/path/to/action', [], URL::PATH_TO_FILE);
         $this->assertEquals('http://localhost/thelia/path/to/action', $url);
     }
 
-    public function testAbsoluteUrlPathOnlyWithParameters()
+    public function testAbsoluteUrlPathOnlyWithParameters(): void
     {
         $this->context->setBaseUrl('/thelia/index.php');
         $url = URL::getInstance()->absoluteUrl('/path/to/action', ['p1' => 'v1', 'p2' => 'v2'], URL::PATH_TO_FILE);
@@ -212,7 +212,7 @@ class URLTest extends TestCase
         $this->assertEquals('http://localhost/path/to/action?p1=v1&p2=v2', $url);
     }
 
-    public function testAbsoluteUrlFromIndexWithParameters()
+    public function testAbsoluteUrlFromIndexWithParameters(): void
     {
         $this->context->setBaseUrl('/thelia/index.php');
         $url = URL::getInstance()->absoluteUrl('/', ['p1' => 'v1', 'p2' => 'v2']);
@@ -227,7 +227,7 @@ class URLTest extends TestCase
         $this->assertEquals('http://localhost/?p1=v1&p2=v2', $url);
     }
 
-    public function testAbsoluteUrlPathOnlyFromIndexWithParameters()
+    public function testAbsoluteUrlPathOnlyFromIndexWithParameters(): void
     {
         $this->context->setBaseUrl('/thelia/index.php');
         $url = URL::getInstance()->absoluteUrl('/', ['p1' => 'v1', 'p2' => 'v2'], URL::PATH_TO_FILE);
@@ -242,7 +242,7 @@ class URLTest extends TestCase
         $this->assertEquals('http://localhost/?p1=v1&p2=v2', $url);
     }
 
-    public function testAbsoluteUrlPathWithParameterReplacement()
+    public function testAbsoluteUrlPathWithParameterReplacement(): void
     {
         $this->context->setBaseUrl('/thelia/index.php');
         $url = URL::getInstance()->absoluteUrl(
@@ -286,7 +286,7 @@ class URLTest extends TestCase
         );
     }
 
-    public function testRetrieve()
+    public function testRetrieve(): void
     {
     }
 }

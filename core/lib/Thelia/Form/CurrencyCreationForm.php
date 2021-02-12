@@ -20,7 +20,7 @@ use Thelia\Model\CurrencyQuery;
 
 class CurrencyCreationForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(true);
 
@@ -115,7 +115,7 @@ class CurrencyCreationForm extends BaseForm
         return 'thelia_currency_creation';
     }
 
-    public function checkDuplicateCode($value, ExecutionContextInterface $context)
+    public function checkDuplicateCode($value, ExecutionContextInterface $context): void
     {
         $currency = CurrencyQuery::create()->findOneByCode($value);
 

@@ -27,7 +27,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class ModuleGenerateCommand extends BaseModuleGenerate
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('module:generate')
@@ -76,7 +76,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         return 0;
     }
 
-    private function createDirectories()
+    private function createDirectories(): void
     {
         $fs = new Filesystem();
 
@@ -91,7 +91,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         }
     }
 
-    protected function copyConfigFile($filename, $skeletonDir, Filesystem $fs)
+    protected function copyConfigFile($filename, $skeletonDir, Filesystem $fs): void
     {
         $filename = $this->moduleDirectory.DIRECTORY_SEPARATOR.'Config'.DIRECTORY_SEPARATOR.$filename;
         if (!$fs->exists($filename)) {
@@ -108,7 +108,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         }
     }
 
-    private function createFiles()
+    private function createFiles(): void
     {
         $fs = new Filesystem();
 

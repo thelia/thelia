@@ -68,7 +68,7 @@ class TypeCollection implements \Iterator
      *
      * @return void any returned value is ignored
      */
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
@@ -108,7 +108,7 @@ class TypeCollection implements \Iterator
      *
      * @return void any returned value is ignored
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }

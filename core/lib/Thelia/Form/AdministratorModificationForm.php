@@ -20,7 +20,7 @@ use Thelia\Model\AdminQuery;
 
 class AdministratorModificationForm extends AdministratorCreationForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         parent::buildForm();
 
@@ -51,7 +51,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
         return 'thelia_admin_administrator_modification';
     }
 
-    public function verifyAdministratorId($value, ExecutionContextInterface $context)
+    public function verifyAdministratorId($value, ExecutionContextInterface $context): void
     {
         $administrator = AdminQuery::create()
             ->findPk($value);
@@ -61,7 +61,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
         }
     }
 
-    public function verifyExistingLogin($value, ExecutionContextInterface $context)
+    public function verifyExistingLogin($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 
@@ -72,7 +72,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
         }
     }
 
-    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    public function verifyExistingEmail($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 
@@ -83,7 +83,7 @@ class AdministratorModificationForm extends AdministratorCreationForm
         }
     }
 
-    public function verifyPasswordField($value, ExecutionContextInterface $context)
+    public function verifyPasswordField($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 

@@ -40,7 +40,7 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
         $this->dispatcher = $dispatcher;
     }
 
-    public function subscribe(NewsletterEvent $event)
+    public function subscribe(NewsletterEvent $event): void
     {
         // test if the email is already registered and unsubscribed
         if (null === $newsletter = NewsletterQuery::create()->findOneByEmail($event->getEmail())) {
@@ -62,7 +62,7 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function unsubscribe(NewsletterEvent $event)
+    public function unsubscribe(NewsletterEvent $event): void
     {
         if (null !== $nl = NewsletterQuery::create()->findPk($event->getId())) {
             $nl
@@ -73,7 +73,7 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function update(NewsletterEvent $event)
+    public function update(NewsletterEvent $event): void
     {
         if (null !== $nl = NewsletterQuery::create()->findPk($event->getId())) {
             $nl->setEmail($event->getEmail())
@@ -90,7 +90,7 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
     /**
      * @since 2.3.0-alpha2
      */
-    public function confirmSubscription(NewsletterEvent $event)
+    public function confirmSubscription(NewsletterEvent $event): void
     {
         $this->mailer->sendEmailMessage(
             'newsletter_subscription_confirmation',

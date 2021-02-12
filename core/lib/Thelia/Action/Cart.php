@@ -57,7 +57,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $this->tokenProvider = $tokenProvider;
     }
 
-    public function persistCart(CartPersistEvent $event)
+    public function persistCart(CartPersistEvent $event): void
     {
         $cart = $event->getCart();
 
@@ -74,7 +74,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function addItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function addItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $cart = $event->getCart();
         $newness = $event->getNewness();
@@ -121,7 +121,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * Delete specify article present into cart.
      */
-    public function deleteItem(CartEvent $event)
+    public function deleteItem(CartEvent $event): void
     {
         if (null !== $cartItemId = $event->getCartItemId()) {
             $cart = $event->getCart();
@@ -139,7 +139,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * Clear the cart.
      */
-    public function clear(CartEvent $event)
+    public function clear(CartEvent $event): void
     {
         if (null !== $cart = $event->getCart()) {
             $cart->delete();
@@ -153,7 +153,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function changeItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function changeItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if ((null !== $cartItemId = $event->getCartItemId()) && (null !== $quantity = $event->getQuantity())) {
             $cart = $event->getCart();
@@ -171,7 +171,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updateCart(CurrencyChangeEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updateCart(CurrencyChangeEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $cart = $event->getRequest()->getSession()->getSessionCart($dispatcher);
 
@@ -183,7 +183,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * Refresh article's price.
      */
-    public function updateCartPrices(CartModel $cart, CurrencyModel $currency)
+    public function updateCartPrices(CartModel $cart, CurrencyModel $currency): void
     {
         $customer = $cart->getCustomer();
         $discount = 0;
@@ -287,7 +287,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @param CartEvent $event the cart event
      */
-    public function findCartItem(CartEvent $event)
+    public function findCartItem(CartEvent $event): void
     {
         // Do not try to find a cartItem if one exists in the event, as previous event handlers
         // mays have put it in th event.
@@ -306,7 +306,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function restoreCurrentCart(CartRestoreEvent $cartRestoreEvent, $eventName, EventDispatcherInterface $dispatcher)
+    public function restoreCurrentCart(CartRestoreEvent $cartRestoreEvent, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $cookieName = ConfigQuery::read('cart.cookie_name', 'thelia_cart');
         $persistentCookie = ConfigQuery::read('cart.use_persistent_cookie', 1);
@@ -428,7 +428,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new, empty cart object, and assign it to the current customer, if any.
      */
-    public function createEmptyCart(CartCreateEvent $cartCreateEvent)
+    public function createEmptyCart(CartCreateEvent $cartCreateEvent): void
     {
         $cart = new CartModel();
 

@@ -77,7 +77,7 @@ class ConditionCollectionTest extends TestCase
         return $stubFacade;
     }
 
-    public function testGetConditions()
+    public function testGetConditions(): void
     {
         $stubFacade = $this->generateFacadeStub();
 
@@ -105,7 +105,7 @@ class ConditionCollectionTest extends TestCase
     /**
      * @covers \Thelia\Condition\ConditionCollection::count
      */
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $collection = new ConditionCollection();
         $this->assertTrue($collection->count() == 0);
@@ -114,7 +114,7 @@ class ConditionCollectionTest extends TestCase
     /**
      * @covers \Thelia\Condition\ConditionCollection::__toString
      */
-    public function testToString()
+    public function testToString(): void
     {
         $stubFacade = $this->generateFacadeStub();
 

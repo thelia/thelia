@@ -28,7 +28,7 @@ class Config extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function create(ConfigCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(ConfigCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $config = new ConfigModel();
 
@@ -49,7 +49,7 @@ class Config extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function setValue(ConfigUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function setValue(ConfigUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $config = ConfigQuery::create()->findPk($event->getConfigId())) {
             if ($event->getValue() !== $config->getValue()) {
@@ -65,7 +65,7 @@ class Config extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function modify(ConfigUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function modify(ConfigUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $config = ConfigQuery::create()->findPk($event->getConfigId())) {
             $config
@@ -89,7 +89,7 @@ class Config extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function delete(ConfigDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(ConfigDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== ($config = ConfigQuery::create()->findPk($event->getConfigId()))) {
             if (!$config->getSecured()) {

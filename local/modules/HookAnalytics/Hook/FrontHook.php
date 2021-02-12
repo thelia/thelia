@@ -23,7 +23,7 @@ use Thelia\Core\Hook\BaseHook;
  */
 class FrontHook extends BaseHook
 {
-    public function onMainHeadBottom(HookRenderEvent $event)
+    public function onMainHeadBottom(HookRenderEvent $event): void
     {
         $lang = $this->getRequest()->getSession()->get("thelia.current.lang");
         $value = trim(HookAnalytics::getConfigValue("hookanalytics_trackingcode", "", $lang->getLocale()));

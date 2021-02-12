@@ -26,7 +26,7 @@ class HookModificationForm extends HookCreationForm
 {
     use StandardDescriptionFieldsTrait;
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         parent::buildForm();
 

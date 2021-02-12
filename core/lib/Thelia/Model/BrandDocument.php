@@ -33,7 +33,7 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
      *
      * @param BrandDocumentQuery $query
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByBrandId($this->getBrandId());
     }

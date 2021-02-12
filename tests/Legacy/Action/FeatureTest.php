@@ -82,7 +82,7 @@ class FeatureTest extends BaseAction
     /**
      * @depends testUpdate
      */
-    public function testDelete(FeatureModel $feature)
+    public function testDelete(FeatureModel $feature): void
     {
         $event = new FeatureDeleteEvent($feature->getId());
 

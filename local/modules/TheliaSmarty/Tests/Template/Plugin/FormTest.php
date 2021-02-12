@@ -43,7 +43,7 @@ class FormTest extends SmartyPluginTestCase
         return $this->plugin;
     }
 
-    public function testSimpleStackedForm()
+    public function testSimpleStackedForm(): void
     {
         $parserContext = $this->getParserContext();
         $this->assertNull($parserContext->popCurrentForm());
@@ -91,7 +91,7 @@ class FormTest extends SmartyPluginTestCase
         $parserContext->getCurrentForm();
     }
 
-    public function testMultipleStackedForms()
+    public function testMultipleStackedForms(): void
     {
         $parserContext = $this->getParserContext();
         $this->assertNull($parserContext->popCurrentForm());

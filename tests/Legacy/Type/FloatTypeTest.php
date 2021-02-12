@@ -20,7 +20,7 @@ use Thelia\Type\FloatType;
  */
 class FloatTypeTest extends TestCase
 {
-    public function testFloatType()
+    public function testFloatType(): void
     {
         $floatType = new FloatType();
         $this->assertTrue($floatType->isValid('1.1'));

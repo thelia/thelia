@@ -46,7 +46,7 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
          'Hook',
      ];
 
-    protected function verifyExistingModule()
+    protected function verifyExistingModule(): void
     {
         if (file_exists($this->moduleDirectory)) {
             throw new \RuntimeException(
@@ -67,7 +67,7 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
         return ucfirst($name);
     }
 
-    protected function validModuleName($name)
+    protected function validModuleName($name): void
     {
         if (!preg_match('#^[A-Z]([A-Za-z\d])+$#', $name)) {
             throw new \RuntimeException(
@@ -76,7 +76,7 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
         }
     }
 
-    protected function checkModuleSchema()
+    protected function checkModuleSchema(): void
     {
         $moduleValidator = new ModuleValidator($this->moduleDirectory);
         $moduleValidator->checkModulePropelSchema();

@@ -21,7 +21,7 @@ class ProductCategory extends BaseProductCategory
     /**
      * {@inheritdoc}
      */
-    protected function addCriteriaToPositionQuery(ProductCategoryQuery $query)
+    protected function addCriteriaToPositionQuery(ProductCategoryQuery $query): void
     {
         $query->filterByCategoryId($this->getCategoryId());
     }

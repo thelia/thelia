@@ -22,7 +22,7 @@ class FeatureAv extends BaseFeatureAv
     /**
      * when dealing with position, be sure to work insite the current feature.
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByFeatureId($this->getFeatureId());
     }

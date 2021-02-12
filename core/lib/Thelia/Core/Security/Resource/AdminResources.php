@@ -190,7 +190,7 @@ class AdminResources
      *
      * @throws \Exception
      */
-    public function addModuleResources($data, $module = 'thelia')
+    public function addModuleResources($data, $module = 'thelia'): void
     {
         if (null !== $data && \is_array($data)) {
             $this->resources[$module] = $data;
@@ -204,7 +204,7 @@ class AdminResources
      * @param string $value
      * @param string $module
      */
-    public function addResource($name, $value, $module = 'thelia')
+    public function addResource($name, $value, $module = 'thelia'): void
     {
         if (null !== $name && null !== $value) {
             $nameFormated = strtoupper($name);

@@ -20,7 +20,7 @@ use Thelia\Model\ConfigQuery;
 
 class AdminCreatePassword extends BruteforceForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('password', PasswordType::class, [
@@ -50,7 +50,7 @@ class AdminCreatePassword extends BruteforceForm
         ;
     }
 
-    public function verifyPasswordField($value, ExecutionContextInterface $context)
+    public function verifyPasswordField($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 

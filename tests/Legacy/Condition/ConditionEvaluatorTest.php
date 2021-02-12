@@ -29,7 +29,7 @@ class ConditionEvaluatorTest extends TestCase
      *
      * @covers \Thelia\Condition\ConditionEvaluator::variableOpComparison
      */
-    public function testVariableOpComparisonSuccess()
+    public function testVariableOpComparisonSuccess(): void
     {
         $conditionEvaluator = new ConditionEvaluator();
         $expected = true;
@@ -69,7 +69,7 @@ class ConditionEvaluatorTest extends TestCase
      *
      * @covers \Thelia\Condition\ConditionEvaluator::variableOpComparison
      */
-    public function testVariableOpComparisonFail()
+    public function testVariableOpComparisonFail(): void
     {
         $conditionEvaluator = new ConditionEvaluator();
         $expected = false;
@@ -103,7 +103,7 @@ class ConditionEvaluatorTest extends TestCase
      *
      * @covers \Thelia\Condition\ConditionEvaluator::variableOpComparison
      */
-    public function testVariableOpComparisonException()
+    public function testVariableOpComparisonException(): void
     {
         $conditionEvaluator = new ConditionEvaluator();
         $this->expectException(\Exception::class);
@@ -116,7 +116,7 @@ class ConditionEvaluatorTest extends TestCase
      *
      * @covers \Thelia\Condition\ConditionEvaluator::isMatching
      */
-    public function testIsMatchingTrue()
+    public function testIsMatchingTrue(): void
     {
         $stubConditionTrue1 = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticles')
             ->disableOriginalConstructor()
@@ -147,7 +147,7 @@ class ConditionEvaluatorTest extends TestCase
      *
      * @covers \Thelia\Condition\ConditionEvaluator::isMatching
      */
-    public function testIsMatchingFalse()
+    public function testIsMatchingFalse(): void
     {
         $stubConditionTrue = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticles')
             ->disableOriginalConstructor()

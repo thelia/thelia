@@ -22,7 +22,7 @@ use Thelia\Tools\Password;
  */
 class PasswordTest extends TestCase
 {
-    public function testGenerateRandom()
+    public function testGenerateRandom(): void
     {
         $length = 8;
         $password = Password::generateRandom($length);
@@ -30,7 +30,7 @@ class PasswordTest extends TestCase
         $this->assertEquals($length, \strlen($password));
     }
 
-    public function testGenerateHexaRandom()
+    public function testGenerateHexaRandom(): void
     {
         $length = 8;
         $password = Password::generateHexaRandom($length);

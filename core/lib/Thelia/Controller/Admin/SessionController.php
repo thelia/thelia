@@ -292,7 +292,7 @@ class SessionController extends BaseAdminController
     /**
      * Save user locale preference in session.
      */
-    protected function applyUserLocale(UserInterface $user)
+    protected function applyUserLocale(UserInterface $user): void
     {
         // Set the current language according to locale preference
         $locale = $user->getLocale();

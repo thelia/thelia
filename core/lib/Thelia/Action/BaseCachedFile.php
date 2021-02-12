@@ -63,7 +63,7 @@ abstract class BaseCachedFile extends BaseAction
     /**
      * @param string $url the fully qualified CDN URL that will be used to create doucments URL
      */
-    public function setCdnBaseUrl($url)
+    public function setCdnBaseUrl($url): void
     {
         $this->cdnBaseUrl = $url;
     }
@@ -73,7 +73,7 @@ abstract class BaseCachedFile extends BaseAction
      * If no directory is specified, the whole cache is cleared.
      * Only files are deleted, directories will remain.
      */
-    public function clearCache(CachedFileEvent $event)
+    public function clearCache(CachedFileEvent $event): void
     {
         $path = $this->getCachePath($event->getCacheSubdirectory(), false);
 
@@ -85,7 +85,7 @@ abstract class BaseCachedFile extends BaseAction
      *
      * @param string $path the directory path
      */
-    protected function clearDirectory($path)
+    protected function clearDirectory($path): void
     {
         $iterator = new \DirectoryIterator($path);
 
@@ -208,7 +208,7 @@ abstract class BaseCachedFile extends BaseAction
      *
      * @throws \Thelia\Exception\FileException|\Exception
      */
-    public function saveFile(FileCreateOrUpdateEvent $event)
+    public function saveFile(FileCreateOrUpdateEvent $event): void
     {
         $model = $event->getModel();
         $model->setFile(sprintf('tmp/%s', $event->getUploadedFile()->getFilename()));
@@ -248,7 +248,7 @@ abstract class BaseCachedFile extends BaseAction
      *
      * @throws \Thelia\Exception\FileException
      */
-    public function updateFile(FileCreateOrUpdateEvent $event)
+    public function updateFile(FileCreateOrUpdateEvent $event): void
     {
         // Copy and save file
         if ($event->getUploadedFile()) {
@@ -271,17 +271,17 @@ abstract class BaseCachedFile extends BaseAction
      *
      * @param FileDeleteEvent $event Image event
      */
-    public function deleteFile(FileDeleteEvent $event)
+    public function deleteFile(FileDeleteEvent $event): void
     {
         $this->fileManager->deleteFile($event->getFileToDelete());
     }
 
-    public function updatePosition(UpdateFilePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updatePosition(UpdateFilePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition($event->getQuery(), $event, $dispatcher);
     }
 
-    public function toggleVisibility(FileToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function toggleVisibility(FileToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericToggleVisibility($event->getQuery(), $event, $dispatcher);
     }

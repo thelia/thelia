@@ -34,7 +34,7 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
      *
      * @param FolderDocumentQuery $query
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByFolder($this->getFolder());
     }

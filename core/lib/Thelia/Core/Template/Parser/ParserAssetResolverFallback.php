@@ -44,7 +44,7 @@ class ParserAssetResolverFallback implements AssetResolverInterface
         $debug = false,
         $declaredAssetsDirectory = null,
         $sourceTemplateName = false
-    ) {
+    ): void {
         throw new \RuntimeException('if you want to use a parser, please register one');
     }
 

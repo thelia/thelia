@@ -19,7 +19,7 @@ use Thelia\Core\Translation\Translator;
 
 class AttributeCreationForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('title', TextType::class, [

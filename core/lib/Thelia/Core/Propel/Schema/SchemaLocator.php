@@ -67,7 +67,7 @@ class SchemaLocator
     /**
      * @param ConnectionInterface $theliaDatabaseConnection connection to the thelia database
      */
-    public function setTheliaDatabaseConnection(ConnectionInterface $theliaDatabaseConnection)
+    public function setTheliaDatabaseConnection(ConnectionInterface $theliaDatabaseConnection): void
     {
         $this->theliaDatabaseConnection = $theliaDatabaseConnection;
     }

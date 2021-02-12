@@ -23,12 +23,12 @@ use Thelia\Model\ProductQuery;
 
 class ProductCreationForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->doBuildForm(false);
     }
 
-    protected function doBuildForm($change_mode)
+    protected function doBuildForm($change_mode): void
     {
         $this->formBuilder
             ->add('ref', TextType::class, [
@@ -101,7 +101,7 @@ class ProductCreationForm extends BaseForm
         }
     }
 
-    public function checkDuplicateRef($value, ExecutionContextInterface $context)
+    public function checkDuplicateRef($value, ExecutionContextInterface $context): void
     {
         $count = ProductQuery::create()->filterByRef($value)->count();
 

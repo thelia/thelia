@@ -30,7 +30,7 @@ class ProfileUpdateModuleAccessForm extends BaseForm
 {
     public const MODULE_ACCESS_FIELD_PREFIX = 'module';
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('id', HiddenType::class, [
@@ -72,7 +72,7 @@ class ProfileUpdateModuleAccessForm extends BaseForm
         return 'thelia_profile_module_access_modification';
     }
 
-    public function verifyProfileId($value, ExecutionContextInterface $context)
+    public function verifyProfileId($value, ExecutionContextInterface $context): void
     {
         $profile = ProfileQuery::create()
             ->findPk($value);

@@ -30,7 +30,7 @@ trait StandardDescriptionFieldsTrait
      *
      * @param array $exclude name of the fields that should not be added to the form
      */
-    protected function addStandardDescFields($exclude = [])
+    protected function addStandardDescFields($exclude = []): void
     {
         if (!\in_array('locale', $exclude)) {
             $this->formBuilder->add(

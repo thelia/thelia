@@ -43,7 +43,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
         new Translator($this->getContainer()->get('request_stack'));
     }
 
-    public function testGetArchivers()
+    public function testGetArchivers(): void
     {
         $archivers = $this->sut->getArchivers();
 
@@ -61,7 +61,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
         $this->assertCount(0, $archivers);
     }
 
-    public function testAddArgs()
+    public function testAddArgs(): void
     {
         $reflectedParameters = (new \ReflectionMethod($this->sut, 'add'))->getParameters();
 
@@ -74,7 +74,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
         );
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $this->stubArchiver
             ->expects($this->any())
@@ -97,7 +97,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
         $this->assertCount(3, $archivers);
     }
 
-    public function testSetArchiversArgs()
+    public function testSetArchiversArgs(): void
     {
         $reflectedParameters = (new \ReflectionMethod($this->sut, 'setArchivers'))->getParameters();
 
@@ -107,7 +107,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
         $this->assertTrue($reflectedParameters[0]->isArray());
     }
 
-    public function testSetArchivers()
+    public function testSetArchivers(): void
     {
         $this->stubArchiver
             ->expects($this->any())
@@ -144,7 +144,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
         $this->sut->setArchivers(['notAnArchiverInterface']);
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $this->sut->reset();
 
@@ -173,7 +173,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
         $this->assertCount(0, $archivers);
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $this->stubArchiver
             ->expects($this->any())
@@ -202,7 +202,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
         $this->assertFalse($this->sut->has(false));
     }
 
-    public function testHasThrowException()
+    public function testHasThrowException(): void
     {
         $this->stubArchiver
             ->expects($this->any())
@@ -219,7 +219,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
         $this->sut->has('archiver2', true);
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $this->stubArchiver
             ->expects($this->any())
@@ -253,7 +253,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
         $this->sut->get('archiver4');
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $this->assertFalse($this->sut->has('archiver1'));
         $this->assertFalse($this->sut->has('archiver2'));
@@ -295,7 +295,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
         $this->sut->remove('archiver4');
     }
 
-    protected function buildContainer(ContainerBuilder $container)
+    protected function buildContainer(ContainerBuilder $container): void
     {
         // TODO: Implement buildContainer() method.
     }

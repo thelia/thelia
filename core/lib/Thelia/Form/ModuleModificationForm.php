@@ -22,7 +22,7 @@ class ModuleModificationForm extends BaseForm
 {
     use StandardDescriptionFieldsTrait;
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->addStandardDescFields();
 
@@ -50,7 +50,7 @@ class ModuleModificationForm extends BaseForm
         return 'thelia_admin_module_modification';
     }
 
-    public function verifyModuleId($value, ExecutionContextInterface $context)
+    public function verifyModuleId($value, ExecutionContextInterface $context): void
     {
         $module = ModuleQuery::create()
             ->findPk($value);

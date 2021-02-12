@@ -40,7 +40,7 @@ class RewritingRouterTest extends TestCase
     /**
      * @covers \RewritingRouter::generate
      */
-    public function testGenerate()
+    public function testGenerate(): void
     {
         $rewritingRouter = new RewritingRouter();
 
@@ -51,7 +51,7 @@ class RewritingRouterTest extends TestCase
     /**
      * @covers \RewritingRouter::match
      */
-    public function testMatch()
+    public function testMatch(): void
     {
         $rewritingRouter = new RewritingRouter();
 
@@ -62,7 +62,7 @@ class RewritingRouterTest extends TestCase
     /**
      * covers RewritingRouter::matchRequest.
      */
-    public function testMatchRequestWithNoRewriting()
+    public function testMatchRequestWithNoRewriting(): void
     {
         ConfigQuery::write('rewriting_enable', 0);
         $request = new Request();
@@ -76,7 +76,7 @@ class RewritingRouterTest extends TestCase
     /**
      * covers RewritingRouter::matchRequest.
      */
-    public function testMatchRequestWithNonExistingUrl()
+    public function testMatchRequestWithNonExistingUrl(): void
     {
         ConfigQuery::write('rewriting_enable', 1);
         $request = Request::create('http://test.com/foo');
@@ -90,7 +90,7 @@ class RewritingRouterTest extends TestCase
     /**
      * covers RewritingRouter::matchRequest.
      */
-    public function testMatchRequestWithSameLocale()
+    public function testMatchRequestWithSameLocale(): void
     {
         ConfigQuery::write('rewriting_enable', 1);
         ConfigQuery::write('one_domain_foreach_lang', 0);
@@ -129,7 +129,7 @@ class RewritingRouterTest extends TestCase
     /**
      * covers RewritingRouter::matchRequest.
      */
-    public function testMatchRequestWithDifferentLocale()
+    public function testMatchRequestWithDifferentLocale(): void
     {
         ConfigQuery::write('rewriting_enable', 1);
         ConfigQuery::write('one_domain_foreach_lang', 0);
@@ -169,7 +169,7 @@ class RewritingRouterTest extends TestCase
     /**
      * covers RewritingRouter::matchRequest.
      */
-    public function testMatchRequestWithDifferentLocaleAndDomain()
+    public function testMatchRequestWithDifferentLocaleAndDomain(): void
     {
         ConfigQuery::write('rewriting_enable', 1);
         ConfigQuery::write('one_domain_foreach_lang', 1);

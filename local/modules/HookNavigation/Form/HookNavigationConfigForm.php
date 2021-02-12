@@ -28,7 +28,7 @@ class HookNavigationConfigForm extends BaseForm
         return 'hooknavigation_configuration';
     }
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(

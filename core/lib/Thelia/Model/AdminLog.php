@@ -37,7 +37,7 @@ class AdminLog extends BaseAdminLog
         UserInterface $adminUser = null,
         $withRequestContent = true,
         $resourceId = null
-    ) {
+    ): void {
         $log = new AdminLog();
 
         $log

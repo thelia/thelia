@@ -124,7 +124,7 @@ class HookHelper
      * @internal param string $domain the translation domain (fontoffice, backoffice, module, etc...)
      * @internal param array $strings the list of strings
      */
-    public function walkDir($directory, &$hooks)
+    public function walkDir($directory, &$hooks): void
     {
         $allowed_exts = ['html', 'tpl', 'xml', 'txt'];
 
@@ -243,7 +243,7 @@ class HookHelper
         return $message;
     }
 
-    protected function loadTrans($templateType, $locale)
+    protected function loadTrans($templateType, $locale): void
     {
         switch ($templateType) {
             case TemplateDefinition::FRONT_OFFICE:
@@ -261,7 +261,7 @@ class HookHelper
         }
     }
 
-    protected function loadFrontOfficeTrans($locale)
+    protected function loadFrontOfficeTrans($locale): void
     {
         $t = Translator::getInstance();
 
@@ -335,7 +335,7 @@ class HookHelper
         $this->messages['type']['top'] = $t->trans('at the top', [], 'core', $locale);
     }
 
-    protected function loadBackOfficeTrans($locale)
+    protected function loadBackOfficeTrans($locale): void
     {
         $t = Translator::getInstance();
 
@@ -514,7 +514,7 @@ class HookHelper
         $this->messages['type']['value-table-row'] = $t->trans('value table row', [], 'core', $locale);
     }
 
-    protected function loadPdfOfficeTrans($locale)
+    protected function loadPdfOfficeTrans($locale): void
     {
         $t = Translator::getInstance();
 
@@ -538,7 +538,7 @@ class HookHelper
      *
      * @param $locale
      */
-    protected function loadEmailTrans($locale)
+    protected function loadEmailTrans($locale): void
     {
     }
 }

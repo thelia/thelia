@@ -57,7 +57,7 @@ class URL
     /**
      * @since Version 2.2
      */
-    public function setRequestContext(RequestContext $requestContext)
+    public function setRequestContext(RequestContext $requestContext): void
     {
         $this->requestContext = $requestContext;
     }

@@ -107,7 +107,7 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
         return $this->locale;
     }
 
-    public function setLocale($locale)
+    public function setLocale($locale): void
     {
         $this->locale = $locale;
     }

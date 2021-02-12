@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
  */
 class AreaModificationForm extends AreaCreateForm
 {
-    public function buildForm()
+    public function buildForm(): void
     {
         parent::buildForm();
 

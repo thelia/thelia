@@ -196,7 +196,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      * @param $searchIn
      * @param $searchCriteria
      */
-    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
+    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
     {
         $search->_and();
 
@@ -411,7 +411,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     /**
      * @param int $defaultCategoryId
      */
-    private function findNextPrev(LoopResultRow $loopResultRow, ProductModel $product, $defaultCategoryId)
+    private function findNextPrev(LoopResultRow $loopResultRow, ProductModel $product, $defaultCategoryId): void
     {
         if ($this->getWithPrevNextInfo()) {
             $currentPosition = ProductCategoryQuery::create()
@@ -460,7 +460,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    protected function manageFeatureAv(&$search, $feature_availability)
+    protected function manageFeatureAv(&$search, $feature_availability): void
     {
         if (null !== $feature_availability) {
             foreach ($feature_availability as $feature => $feature_choice) {
@@ -497,7 +497,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    protected function manageFeatureValue(&$search, $feature_values)
+    protected function manageFeatureValue(&$search, $feature_values): void
     {
         if (null !== $feature_values) {
             foreach ($feature_values as $feature => $feature_choice) {

@@ -76,7 +76,7 @@ class Admin extends BaseAdmin implements UserInterface
     /**
      * {@inheritDoc}
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         parent::setPassword(null);
         $this->resetModified();
@@ -101,7 +101,7 @@ class Admin extends BaseAdmin implements UserInterface
     /**
      * {@inheritDoc}
      */
-    public function setToken($token)
+    public function setToken($token): void
     {
         $this->setRememberMeToken($token)->save();
     }
@@ -117,7 +117,7 @@ class Admin extends BaseAdmin implements UserInterface
     /**
      * {@inheritDoc}
      */
-    public function setSerial($serial)
+    public function setSerial($serial): void
     {
         $this->setRememberMeSerial($serial)->save();
     }

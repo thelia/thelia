@@ -20,7 +20,7 @@ use Thelia\Type\IntListType;
  */
 class IntListTypeTest extends TestCase
 {
-    public function testIntListType()
+    public function testIntListType(): void
     {
         $intListType = new IntListType();
         $this->assertTrue($intListType->isValid('1'));
@@ -28,7 +28,7 @@ class IntListTypeTest extends TestCase
         $this->assertFalse($intListType->isValid('1,2,3.3'));
     }
 
-    public function testFormatIntListType()
+    public function testFormatIntListType(): void
     {
         $intListType = new IntListType();
         $this->assertIsArray($intListType->getFormattedValue('1,2,3'));

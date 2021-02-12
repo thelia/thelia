@@ -19,7 +19,7 @@ use Thelia\Core\Translation\Translator;
 
 class AdminLostPassword extends BruteforceForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('username_or_email', TextType::class, [

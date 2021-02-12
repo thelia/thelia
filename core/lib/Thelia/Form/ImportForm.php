@@ -25,7 +25,7 @@ use Thelia\Model\LangQuery;
  */
 class ImportForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('file_upload', FileType::class, [
@@ -57,7 +57,7 @@ class ImportForm extends BaseForm
         return 'thelia_import';
     }
 
-    public function checkLanguage($value, ExecutionContextInterface $context)
+    public function checkLanguage($value, ExecutionContextInterface $context): void
     {
         if (null === LangQuery::create()->findPk($value)) {
             $context->addViolation(

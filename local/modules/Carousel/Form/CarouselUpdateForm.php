@@ -31,7 +31,7 @@ class CarouselUpdateForm extends BaseForm
     /**
      * {@inheritdoc}
      */
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $formBuilder = $this->formBuilder;
 

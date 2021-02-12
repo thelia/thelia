@@ -94,7 +94,7 @@ return [
     'Need help ?' => 'تحتاج مساعدة؟',
     'Newsletter' => 'رسائل بريدية',
     'Newsletter Subscription' => 'الاشتراك في خدمة الرسائل البريدية',
-    'Next' => ' التالي',
+    'Next' => "\u{a0}التالي",
     'Next Step' => 'الخطوة التالية',
     'Next product' => 'المنتج التالي',
     'No deliveries available for this cart and this country' => 'لا توجد شحنات متاحة لهذه السلة وهذا البلد',

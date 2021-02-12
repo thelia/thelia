@@ -27,7 +27,7 @@ use Thelia\Model\NewsletterQuery;
  */
 class NewsletterUnsubscribeForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('email', EmailType::class, [
@@ -44,7 +44,7 @@ class NewsletterUnsubscribeForm extends BaseForm
         ;
     }
 
-    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    public function verifyExistingEmail($value, ExecutionContextInterface $context): void
     {
         if (null === NewsletterQuery::create()->filterByUnsubscribed(false)->findOneByEmail($value)) {
             $context->addViolation(

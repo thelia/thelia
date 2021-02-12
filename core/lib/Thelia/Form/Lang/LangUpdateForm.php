@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class LangUpdateForm extends LangCreateForm
 {
-    public function buildForm()
+    public function buildForm(): void
     {
         parent::buildForm();
 

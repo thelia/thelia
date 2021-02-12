@@ -54,7 +54,7 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
     }
 
     // changement de rubrique
-    protected function buildFolderTree($parent, $visible, $level, $maxLevel, $exclude, &$resultsList)
+    protected function buildFolderTree($parent, $visible, $level, $maxLevel, $exclude, &$resultsList): void
     {
         if ($level > $maxLevel) {
             return;

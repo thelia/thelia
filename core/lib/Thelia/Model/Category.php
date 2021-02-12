@@ -107,12 +107,12 @@ class Category extends BaseCategory implements FileModelParentInterface
      *
      * @param CategoryQuery $query
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByParent($this->getParent());
     }
 
-    public function deleteProducts(ConnectionInterface $con = null)
+    public function deleteProducts(ConnectionInterface $con = null): void
     {
         $productsCategories = ProductCategoryQuery::create()
             ->filterByCategoryId($this->getId())
@@ -165,7 +165,7 @@ class Category extends BaseCategory implements FileModelParentInterface
     /**
      * {@inheritDoc}
      */
-    public function postDelete(ConnectionInterface $con = null)
+    public function postDelete(ConnectionInterface $con = null): void
     {
         parent::postDelete($con);
 
@@ -185,7 +185,7 @@ class Category extends BaseCategory implements FileModelParentInterface
      * @param Base\ProductCategory $productCategory
      *                                              {@inheritdoc}
      */
-    protected function doAddProductCategory($productCategory)
+    protected function doAddProductCategory($productCategory): void
     {
         parent::doAddProductCategory($productCategory);
 

@@ -33,7 +33,7 @@ class InstallStep3Form extends BaseForm
      *
      * @return void
      */
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(

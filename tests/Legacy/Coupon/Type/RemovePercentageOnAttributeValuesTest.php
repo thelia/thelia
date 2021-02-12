@@ -83,7 +83,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
         return $stubFacade;
     }
 
-    public function generateMatchingCart(MockObject $stubFacade, $count)
+    public function generateMatchingCart(MockObject $stubFacade, $count): void
     {
         $attrCombination1 = $this->getMockBuilder('\Thelia\Model\AttributeCombination')
             ->disableOriginalConstructor()
@@ -197,7 +197,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
             ->will($this->returnValue($cartStub));
     }
 
-    public function generateNoMatchingCart(MockObject $stubFacade)
+    public function generateNoMatchingCart(MockObject $stubFacade): void
     {
         $attrCombination1 = $this->getMockBuilder('\Thelia\Model\AttributeCombination')
             ->disableOriginalConstructor()
@@ -259,7 +259,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
             ->will($this->returnValue($cartStub));
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $stubFacade = $this->generateFacadeStub();
 
@@ -326,7 +326,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
         $this->assertEquals($date, $coupon->getExpirationDate());
     }
 
-    public function testMatchOne()
+    public function testMatchOne(): void
     {
         $stubFacade = $this->generateFacadeStub();
 
@@ -357,7 +357,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
         $this->assertEquals(10.00, $coupon->exec());
     }
 
-    public function testMatchSeveral()
+    public function testMatchSeveral(): void
     {
         $stubFacade = $this->generateFacadeStub();
 
@@ -388,7 +388,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
         $this->assertEquals(40.00, $coupon->exec());
     }
 
-    public function testNoMatch()
+    public function testNoMatch(): void
     {
         $stubFacade = $this->generateFacadeStub();
 
@@ -419,7 +419,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
         $this->assertEquals(0.00, $coupon->exec());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Coupon test name');
 
@@ -431,7 +431,7 @@ class RemovePercentageOnAttributeValuesTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testGetToolTip()
+    public function testGetToolTip(): void
     {
         $tooltip = 'Coupon test tooltip';
         $stubFacade = $this->generateFacadeStub(399, 'EUR', $tooltip);

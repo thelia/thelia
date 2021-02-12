@@ -19,15 +19,19 @@ namespace Thelia\Core\Serializer;
  */
 abstract class AbstractSerializer implements SerializerInterface
 {
-    public function prepareFile(\SplFileObject $fileObject)
+    public function prepareFile(\SplFileObject $fileObject): void
     {
     }
 
+    /**
+     * @return string
+     */
     public function separator()
     {
+        return '';
     }
 
-    public function finalizeFile(\SplFileObject $fileObject)
+    public function finalizeFile(\SplFileObject $fileObject): void
     {
     }
 }

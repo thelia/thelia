@@ -41,7 +41,7 @@ class JSONSerializer extends AbstractSerializer
         return 'application/json';
     }
 
-    public function prepareFile(\SplFileObject $fileObject)
+    public function prepareFile(\SplFileObject $fileObject): void
     {
         $fileObject->fwrite('[');
     }
@@ -56,7 +56,7 @@ class JSONSerializer extends AbstractSerializer
         return ','.PHP_EOL;
     }
 
-    public function finalizeFile(\SplFileObject $fileObject)
+    public function finalizeFile(\SplFileObject $fileObject): void
     {
         $fileObject->fwrite(']');
     }

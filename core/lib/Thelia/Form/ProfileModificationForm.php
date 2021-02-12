@@ -25,7 +25,7 @@ use Thelia\Model\ProfileQuery;
  */
 class ProfileModificationForm extends ProfileCreationForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         parent::buildForm();
 
@@ -47,7 +47,7 @@ class ProfileModificationForm extends ProfileCreationForm
         return 'thelia_profile_modification';
     }
 
-    public function verifyProfileId($value, ExecutionContextInterface $context)
+    public function verifyProfileId($value, ExecutionContextInterface $context): void
     {
         $profile = ProfileQuery::create()
             ->findPk($value);

@@ -262,7 +262,7 @@ class AddressCreateOrUpdateEvent extends ActionEvent
         return $this->isDefault;
     }
 
-    public function setCustomer(Customer $customer)
+    public function setCustomer(Customer $customer): void
     {
         $this->customer = $customer;
     }
@@ -275,7 +275,7 @@ class AddressCreateOrUpdateEvent extends ActionEvent
         return $this->customer;
     }
 
-    public function setAddress(Address $address)
+    public function setAddress(Address $address): void
     {
         $this->address = $address;
         $this->setCustomer($address->getCustomer());

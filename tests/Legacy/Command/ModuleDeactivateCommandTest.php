@@ -29,7 +29,7 @@ use Thelia\Tests\ContainerAwareTestCase;
  */
 class ModuleDeactivateCommandTest extends ContainerAwareTestCase
 {
-    public function testModuleDeactivateCommand()
+    public function testModuleDeactivateCommand(): void
     {
         $module = ModuleQuery::create()->findOne();
 
@@ -62,7 +62,7 @@ class ModuleDeactivateCommandTest extends ContainerAwareTestCase
         }
     }
 
-    public function testModuleDeactivateCommandUnknownModule()
+    public function testModuleDeactivateCommandUnknownModule(): void
     {
         $testedModule = ModuleQuery::create()->findOneByCode('Letshopethismoduledoesnotexists');
 
@@ -92,7 +92,7 @@ class ModuleDeactivateCommandTest extends ContainerAwareTestCase
      * @param containerBuilder $container
      *                                    Use this method to build the container with the services that you need
      */
-    protected function buildContainer(ContainerBuilder $container)
+    protected function buildContainer(ContainerBuilder $container): void
     {
         $eventDispatcher = new EventDispatcher();
         $eventDispatcher->addSubscriber(new Module($container, $this->getMockEventDispatcher()));

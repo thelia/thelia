@@ -32,14 +32,14 @@ class TaxRuleI18nType extends AbstractTheliaType
      */
     protected $formBuilder;
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'cascade_validation' => true,
         ]);
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->formBuilder = $builder;
 

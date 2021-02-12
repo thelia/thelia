@@ -50,7 +50,7 @@ class FeatureAvController extends AbstractCrudController
         return $this->createForm(AdminForm::FEATURE_AV_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): void
     {
         throw new \LogicException('Featiure Av. modification is not yet implemented');
     }
@@ -103,7 +103,7 @@ class FeatureAvController extends AbstractCrudController
         return $event->hasFeatureAv();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): void
     {
         throw new \LogicException('Feature Av. modification is not yet implemented');
     }

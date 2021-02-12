@@ -36,7 +36,7 @@ class RegisterSerializerPass implements CompilerPassInterface
      */
     public const SERIALIZER_SERVICE_TAG = 'thelia.serializer';
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         try {
             $manager = $container->getDefinition(self::MANAGER_SERVICE_ID);

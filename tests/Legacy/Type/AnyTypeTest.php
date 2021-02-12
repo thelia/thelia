@@ -20,9 +20,9 @@ use Thelia\Type\AnyType;
  */
 class AnyTypeTest extends TestCase
 {
-    public function testAnyType()
+    public function testAnyType(): void
     {
         $anyType = new AnyType();
-        $this->assertTrue($anyType->isValid(md5(rand(1000, 10000))));
+        $this->assertTrue($anyType->isValid(md5(random_int(1000, 10000))));
     }
 }

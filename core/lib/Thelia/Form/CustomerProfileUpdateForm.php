@@ -25,7 +25,7 @@ use Thelia\Model\CustomerQuery;
  */
 class CustomerProfileUpdateForm extends CustomerCreateForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         parent::buildForm();
 
@@ -67,7 +67,7 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
     /**
      * @param $value
      */
-    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    public function verifyExistingEmail($value, ExecutionContextInterface $context): void
     {
         $customer = CustomerQuery::getCustomerByEmail($value);
         // If there is already a customer for this email address and if the customer is different from the current user, do a violation

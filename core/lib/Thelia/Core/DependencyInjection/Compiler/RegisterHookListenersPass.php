@@ -41,7 +41,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 {
     protected $debugEnabled;
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('event_dispatcher')) {
             return;
@@ -62,7 +62,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
         }
     }
 
-    protected function logAlertMessage($message, $failSafe = false)
+    protected function logAlertMessage($message, $failSafe = false): void
     {
         Tlog::getInstance()->addAlert($message);
 
@@ -71,7 +71,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
         }
     }
 
-    protected function processHook(ContainerBuilder $container, $definition)
+    protected function processHook(ContainerBuilder $container, $definition): void
     {
         foreach ($container->findTaggedServiceIds('hook.event_listener') as $id => $events) {
             $class = $container->getDefinition($id)->getClass();
@@ -122,7 +122,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
      *
      * @throws \InvalidArgumentException
      */
-    protected function registerHook($class, $module, $id, $attributes)
+    protected function registerHook($class, $module, $id, $attributes): void
     {
         if (!isset($attributes['event'])) {
             throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "hook.event_listener" tags.', $id));
@@ -226,7 +226,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
      *
      * @param Definition $definition The service definition
      */
-    protected function addHooksMethodCall(ContainerBuilder $container, Definition $definition)
+    protected function addHooksMethodCall(ContainerBuilder $container, Definition $definition): void
     {
         $moduleHooks = ModuleHookQuery::create()
             ->orderByHookId()

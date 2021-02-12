@@ -131,7 +131,7 @@ class CartContainsProductsTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\CartContainsProducts::setValidators
      */
-    public function testInValidBackOfficeInputOperator()
+    public function testInValidBackOfficeInputOperator(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateFacadeStub();
@@ -159,7 +159,7 @@ class CartContainsProductsTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\CartContainsProducts::setValidators
      */
-    public function testInValidBackOfficeInputValue()
+    public function testInValidBackOfficeInputValue(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateFacadeStub();
@@ -181,7 +181,7 @@ class CartContainsProductsTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\CartContainsProducts::isMatching
      */
-    public function testMatchingRule()
+    public function testMatchingRule(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateFacadeStub();
@@ -208,7 +208,7 @@ class CartContainsProductsTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\CartContainsProducts::isMatching
      */
-    public function testNotMatching()
+    public function testNotMatching(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateFacadeStub();
@@ -231,7 +231,7 @@ class CartContainsProductsTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testGetSerializableRule()
+    public function testGetSerializableRule(): void
     {
         /** @var FacadeInterface $stubFacade */
         $stubFacade = $this->generateFacadeStub();
@@ -264,7 +264,7 @@ class CartContainsProductsTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\CartContainsProducts::getName
      */
-    public function testGetName()
+    public function testGetName(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Number of articles in cart');
 
@@ -281,7 +281,7 @@ class CartContainsProductsTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\CartContainsProducts::getToolTip
      */
-    public function testGetToolTip()
+    public function testGetToolTip(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Sample coupon condition');
 
@@ -298,7 +298,7 @@ class CartContainsProductsTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\CartContainsProducts::generateInputs
      */
-    public function testGetValidator()
+    public function testGetValidator(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Price');
 

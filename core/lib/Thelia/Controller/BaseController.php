@@ -121,7 +121,7 @@ abstract class BaseController implements ControllerInterface
      *
      * @deprecated since Thelia 2.5, use autowiring instead.
      */
-    protected function dispatch(string $eventName, Event $event = null)
+    protected function dispatch(string $eventName, Event $event = null): void
     {
         if ($event == null) {
             $event = new DefaultActionEvent();
@@ -541,6 +541,7 @@ abstract class BaseController implements ControllerInterface
     /**
      * Return a 404 error.
      *
+     * @return \Thelia\Core\HttpFoundation\Response
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function pageNotFound()
@@ -558,7 +559,7 @@ abstract class BaseController implements ControllerInterface
         return $this->container->getParameter('kernel.debug');
     }
 
-    protected function accessDenied()
+    protected function accessDenied(): void
     {
         throw new AccessDeniedHttpException();
     }
@@ -568,7 +569,7 @@ abstract class BaseController implements ControllerInterface
      *
      * If not, send a
      */
-    protected function checkXmlHttpRequest()
+    protected function checkXmlHttpRequest(): void
     {
         if (false === $this->container->get('request_stack')->getCurrentRequest()->isXmlHttpRequest() && false === $this->isDebug()) {
             $this->accessDenied();
@@ -592,7 +593,7 @@ abstract class BaseController implements ControllerInterface
         return $this->currentRouter;
     }
 
-    protected function setCurrentRouter($routerId)
+    protected function setCurrentRouter($routerId): void
     {
         $this->currentRouter = $routerId;
     }

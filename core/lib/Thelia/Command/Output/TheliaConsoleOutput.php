@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 class TheliaConsoleOutput extends ConsoleOutput
 {
-    public function renderBlock(array $messages, $style = 'info')
+    public function renderBlock(array $messages, $style = 'info'): void
     {
         $strlen = function ($string) {
             if (!\function_exists('mb_strlen')) {

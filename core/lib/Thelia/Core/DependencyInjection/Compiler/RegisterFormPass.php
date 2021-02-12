@@ -19,7 +19,7 @@ use Thelia\Form\FormInterface;
 
 class RegisterFormPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         try {
             $formConfig = $container->getParameter('Thelia.parser.forms');

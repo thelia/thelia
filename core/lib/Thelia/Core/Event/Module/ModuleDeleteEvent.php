@@ -39,7 +39,7 @@ class ModuleDeleteEvent extends ModuleEvent
     /**
      * @param int $module_id
      */
-    public function setModuleId($module_id)
+    public function setModuleId($module_id): void
     {
         $this->module_id = $module_id;
     }

@@ -194,7 +194,7 @@ class CartPostage extends AbstractSmartyPlugin
      *
      * @throws PropelException
      */
-    protected function getCheapestDelivery(Address $address = null, Country $country = null, State $state = null)
+    protected function getCheapestDelivery(Address $address = null, Country $country = null, State $state = null): void
     {
         $cart = $this->getCurrentRequest()->getSession()->getSessionCart();
 

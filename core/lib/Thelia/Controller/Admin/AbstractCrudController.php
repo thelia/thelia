@@ -717,7 +717,7 @@ abstract class AbstractCrudController extends BaseAdminController
         return $this->container->get('request_stack')->getCurrentRequest();
     }
 
-    protected function bindFormToPropelEvent(ActiveRecordEvent $propelEvent, Form $form)
+    protected function bindFormToPropelEvent(ActiveRecordEvent $propelEvent, Form $form): void
     {
         $fields = $form->getIterator();
 

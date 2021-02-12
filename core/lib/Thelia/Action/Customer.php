@@ -61,7 +61,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function create(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $customer = new CustomerModel();
 
@@ -83,7 +83,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         );
     }
 
-    public function customerConfirmationEmail(CustomerEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function customerConfirmationEmail(CustomerEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $customer = $event->getModel();
 
@@ -101,7 +101,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function modify(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function modify(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $plainPassword = $event->getPassword();
 
@@ -121,7 +121,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function updateProfile(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updateProfile(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $customer = $event->getCustomer();
 
@@ -169,7 +169,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     /**
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function delete(CustomerEvent $event)
+    public function delete(CustomerEvent $event): void
     {
         if (null !== $customer = $event->getModel()) {
             if (true === $customer->hasOrder()) {
@@ -183,7 +183,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     /**
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher)
+    private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event, EventDispatcherInterface $dispatcher): void
     {
         $customer->createOrUpdate(
             $event->getTitle(),
@@ -212,7 +212,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
         $event->setCustomer($customer);
     }
 
-    public function login(CustomerLoginEvent $event)
+    public function login(CustomerLoginEvent $event): void
     {
         $customer = $event->getCustomer();
 
@@ -236,7 +236,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     /**
      * Perform user logout. The user is redirected to the provided view, if any.
      */
-    public function logout(/* @noinspection PhpUnusedParameterInspection */ ActionEvent $event)
+    public function logout(/* @noinspection PhpUnusedParameterInspection */ ActionEvent $event): void
     {
         $this->securityContext->clearCustomerUser();
     }
@@ -244,7 +244,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     /**
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function lostPassword(LostPasswordEvent $event)
+    public function lostPassword(LostPasswordEvent $event): void
     {
         if (null !== $customer = CustomerQuery::create()->filterByEmail($event->getEmail())->findOne()) {
             $password = Password::generateRandom(8);

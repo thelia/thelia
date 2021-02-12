@@ -49,7 +49,7 @@ class Argument
         return $this->value;
     }
 
-    public function setValue($value)
+    public function setValue($value): void
     {
         if ($value === null) {
             $this->value = null;

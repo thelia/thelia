@@ -45,14 +45,14 @@ class ProductSaleElementsType extends AbstractTheliaType
      *
      * Always allow cascade validation for types
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'cascade_validation' => true,
         ]);
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('reference', 'text', [

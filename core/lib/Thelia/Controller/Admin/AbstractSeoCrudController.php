@@ -121,7 +121,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     /**
      * Hydrate the SEO form for this object, before passing it to the update template.
      */
-    protected function hydrateSeoForm(ParserContext $parserContext, $object)
+    protected function hydrateSeoForm(ParserContext $parserContext, $object): void
     {
         // The "SEO" tab form
         $locale = $object->getLocale();

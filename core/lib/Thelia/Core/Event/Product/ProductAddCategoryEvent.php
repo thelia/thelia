@@ -30,7 +30,7 @@ class ProductAddCategoryEvent extends ProductEvent
         return $this->category_id;
     }
 
-    public function setCategoryId($category_id)
+    public function setCategoryId($category_id): void
     {
         $this->category_id = $category_id;
     }

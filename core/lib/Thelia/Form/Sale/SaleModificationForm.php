@@ -41,7 +41,7 @@ class SaleModificationForm extends SaleCreationForm
     public const PHP_DATE_FORMAT = 'Y-m-d H:i:s';
     public const MOMENT_JS_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->doBuildForm(
             Translator::getInstance()->trans('The sale name or title')
@@ -217,7 +217,7 @@ class SaleModificationForm extends SaleCreationForm
      *
      * @param string $value
      */
-    public function checkDate($value, ExecutionContextInterface $context)
+    public function checkDate($value, ExecutionContextInterface $context): void
     {
         $format = self::PHP_DATE_FORMAT;
 

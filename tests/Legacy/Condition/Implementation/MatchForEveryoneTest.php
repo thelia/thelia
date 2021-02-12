@@ -82,7 +82,7 @@ class MatchForEveryoneTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForEveryone::setValidators
      */
-    public function testValidBackOfficeInputOperator()
+    public function testValidBackOfficeInputOperator(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR');
 
@@ -104,7 +104,7 @@ class MatchForEveryoneTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForEveryone::isMatching
      */
-    public function testIsMatching()
+    public function testIsMatching(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR');
 
@@ -123,7 +123,7 @@ class MatchForEveryoneTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForEveryone::getName
      */
-    public function testGetName()
+    public function testGetName(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Everybody can use it (no condition)');
 
@@ -140,7 +140,7 @@ class MatchForEveryoneTest extends TestCase
      *
      * @covers \Thelia\Condition\Implementation\MatchForEveryone::getToolTip
      */
-    public function testGetToolTip()
+    public function testGetToolTip(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR', 'Will return always true');
 
@@ -158,7 +158,7 @@ class MatchForEveryoneTest extends TestCase
      * @covers \Thelia\Condition\Implementation\MatchForEveryone::generateInputs
      * @covers \Thelia\Condition\Implementation\MatchForEveryone::setValidatorsFromForm
      */
-    public function testGetValidator()
+    public function testGetValidator(): void
     {
         $stubFacade = $this->generateFacadeStub(399, 'EUR');
 

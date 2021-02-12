@@ -124,7 +124,7 @@ class PickupLocationEvent extends ActionEvent
     /**
      * @param string|null $address
      */
-    public function setAddress($address)
+    public function setAddress($address): void
     {
         $this->address = $address;
     }
@@ -140,7 +140,7 @@ class PickupLocationEvent extends ActionEvent
     /**
      * @param string|null $city
      */
-    public function setCity($city)
+    public function setCity($city): void
     {
         $this->city = $city;
     }
@@ -156,7 +156,7 @@ class PickupLocationEvent extends ActionEvent
     /**
      * @param string|null $zipCode
      */
-    public function setZipCode($zipCode)
+    public function setZipCode($zipCode): void
     {
         $this->zipCode = $zipCode;
     }
@@ -172,7 +172,7 @@ class PickupLocationEvent extends ActionEvent
     /**
      * @param State|null $state
      */
-    public function setState($state)
+    public function setState($state): void
     {
         $this->state = $state;
     }
@@ -188,7 +188,7 @@ class PickupLocationEvent extends ActionEvent
     /**
      * @param Country|null $country
      */
-    public function setCountry($country)
+    public function setCountry($country): void
     {
         $this->country = $country;
     }
@@ -204,7 +204,7 @@ class PickupLocationEvent extends ActionEvent
     /**
      * @param int|null $radius
      */
-    public function setRadius($radius)
+    public function setRadius($radius): void
     {
         $this->radius = $radius;
     }
@@ -220,7 +220,7 @@ class PickupLocationEvent extends ActionEvent
     /**
      * @param array|null $moduleIds
      */
-    public function setModuleIds($moduleIds)
+    public function setModuleIds($moduleIds): void
     {
         $this->moduleIds = $moduleIds;
     }

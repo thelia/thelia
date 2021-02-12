@@ -60,7 +60,7 @@ class Fragment
         return array_keys($this->data);
     }
 
-    public function filter(array $fields, $default = null)
+    public function filter(array $fields, $default = null): void
     {
         if (empty($fields)) {
             return;

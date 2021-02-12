@@ -24,7 +24,7 @@ use Thelia\Core\Event\TheliaEvents;
  */
 class Pdf extends BaseAction implements EventSubscriberInterface
 {
-    public function generatePdf(PdfEvent $event)
+    public function generatePdf(PdfEvent $event): void
     {
         $html2pdf = new Html2Pdf(
             $event->getOrientation(),

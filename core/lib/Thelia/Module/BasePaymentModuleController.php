@@ -75,7 +75,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      *
      * @throws \Exception
      */
-    public function confirmPayment($orderId)
+    public function confirmPayment($orderId): void
     {
         try {
             $orderId = \intval($orderId);
@@ -125,7 +125,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      *
      * @throws \Exception
      */
-    public function saveTransactionRef($orderId, $transactionRef)
+    public function saveTransactionRef($orderId, $transactionRef): void
     {
         try {
             $orderId = \intval($orderId);
@@ -169,7 +169,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      *
      * @param int $orderId the order ID
      */
-    public function cancelPayment($orderId)
+    public function cancelPayment($orderId): void
     {
         try {
             $orderId = \intval($orderId);
@@ -234,7 +234,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      *
      * @param int $orderId the order ID
      */
-    public function redirectToSuccessPage($orderId)
+    public function redirectToSuccessPage($orderId): void
     {
         $this->getLog()->addInfo('Redirecting customer to payment success page');
 
@@ -256,7 +256,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      * @param int         $orderId the order ID
      * @param string|null $message an error message
      */
-    public function redirectToFailurePage($orderId, $message)
+    public function redirectToFailurePage($orderId, $message): void
     {
         $this->getLog()->addInfo('Redirecting customer to payment failure page');
 

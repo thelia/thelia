@@ -24,7 +24,7 @@ class MailTransporterEvent extends ActionEvent
      */
     protected $transporter;
 
-    public function setMailerTransporter(\Swift_Transport $transporter)
+    public function setMailerTransporter(\Swift_Transport $transporter): void
     {
         $this->transporter = $transporter;
     }

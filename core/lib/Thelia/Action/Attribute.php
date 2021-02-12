@@ -33,7 +33,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function create(AttributeCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function create(AttributeCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $attribute = new AttributeModel();
 
@@ -56,7 +56,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function update(AttributeUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(AttributeUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $attribute = AttributeQuery::create()->findPk($event->getAttributeId())) {
             $attribute
@@ -77,7 +77,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function delete(AttributeDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(AttributeDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== ($attribute = AttributeQuery::create()->findPk($event->getAttributeId()))) {
             $attribute
@@ -93,12 +93,12 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition(AttributeQuery::create(), $event, $dispatcher);
     }
 
-    protected function doAddToAllTemplates(AttributeModel $attribute)
+    protected function doAddToAllTemplates(AttributeModel $attribute): void
     {
         $templates = TemplateQuery::create()->find();
 
@@ -115,12 +115,12 @@ class Attribute extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function addToAllTemplates(AttributeEvent $event)
+    public function addToAllTemplates(AttributeEvent $event): void
     {
         $this->doAddToAllTemplates($event->getAttribute());
     }
 
-    public function removeFromAllTemplates(AttributeEvent $event)
+    public function removeFromAllTemplates(AttributeEvent $event): void
     {
         // Delete this attribute from all product templates
         AttributeTemplateQuery::create()->filterByAttribute($event->getAttribute())->delete();

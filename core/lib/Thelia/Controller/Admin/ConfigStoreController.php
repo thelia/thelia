@@ -43,7 +43,7 @@ class ConfigStoreController extends BaseAdminController
         return $this->renderTemplate();
     }
 
-    protected function getAndWriteStoreMediaFileInConfig($form, $inputName, $configKey, $storeMediaUploadDir)
+    protected function getAndWriteStoreMediaFileInConfig($form, $inputName, $configKey, $storeMediaUploadDir): void
     {
         $file = $form->get($inputName)->getData();
 

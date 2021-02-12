@@ -23,7 +23,7 @@ class ModuleHook extends BaseModuleHook
     /**
      * Calculate next position relative to our default category.
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByHookId($this->getHookId());
     }

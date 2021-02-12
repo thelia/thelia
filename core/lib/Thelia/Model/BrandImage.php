@@ -33,7 +33,7 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
      *
      * @param BrandImageQuery $query
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByBrandId($this->getBrandId());
     }

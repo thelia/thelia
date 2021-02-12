@@ -58,7 +58,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      *
      * @api
      */
-    public function setContext(RequestContext $context)
+    public function setContext(RequestContext $context): void
     {
         $this->context = $context;
     }
@@ -75,7 +75,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
         return $this->context;
     }
 
-    public function setOption($key, $value)
+    public function setOption($key, $value): void
     {
         //NOTHING TO DO FOR NOW
     }
@@ -251,7 +251,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
         throw new ResourceNotFoundException();
     }
 
-    protected function manageLocale(RewritingResolver $rewrittenUrlData, TheliaRequest $request)
+    protected function manageLocale(RewritingResolver $rewrittenUrlData, TheliaRequest $request): void
     {
         $lang = LangQuery::create()
             ->filterByActive(true)
@@ -271,7 +271,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
         }
     }
 
-    protected function redirect($url, $status = 302)
+    protected function redirect($url, $status = 302): void
     {
         throw new RedirectException($url, $status);
     }

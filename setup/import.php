@@ -120,7 +120,7 @@ try {
     $con->rollBack();
 }
 
-function createProduct($faker, $categories, $brands, $contents, $template, $attribute, $feature, $con)
+function createProduct($faker, $categories, $brands, $contents, $template, $attribute, $feature, $con): void
 {
     echo "start creating products\n";
     $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
@@ -267,7 +267,7 @@ function createProduct($faker, $categories, $brands, $contents, $template, $attr
     echo "end creating products\n";
 }
 
-function createConfig($faker, $folders, $contents, $con)
+function createConfig($faker, $folders, $contents, $con): void
 {
     // Store
     \Thelia\Model\ConfigQuery::write('store_name', 'Thelia');
@@ -282,7 +282,7 @@ function createConfig($faker, $folders, $contents, $con)
     \Thelia\Model\ConfigQuery::write('terms_conditions_content_id', $contents['Terms and Conditions']->getId());
 }
 
-function createCustomer($faker, $con)
+function createCustomer($faker, $con): void
 {
     echo "Creating customer\n";
 
@@ -306,7 +306,7 @@ function createCustomer($faker, $con)
     for ($j = 0; $j <= 2; ++$j) {
         $address = new Thelia\Model\Address();
         $address->setLabel($faker->text(20))
-            ->setTitleId(rand(1, 3))
+            ->setTitleId(random_int(1, 3))
             ->setFirstname($faker->firstname)
             ->setLastname($faker->lastname)
             ->setAddress1($faker->streetAddress)
@@ -704,7 +704,7 @@ function createColors($con)
     return $attribute;
 }
 
-function clearTables($con)
+function clearTables($con): void
 {
     echo "Clearing tables\n";
 

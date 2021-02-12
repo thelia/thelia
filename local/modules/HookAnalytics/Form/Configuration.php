@@ -24,7 +24,7 @@ use Thelia\Model\LangQuery;
  */
 class Configuration extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $form = $this->formBuilder;
 

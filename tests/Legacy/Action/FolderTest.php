@@ -98,7 +98,7 @@ class FolderTest extends TestCaseWithURLToolSetup
      *
      * @covers \Thelia\Action\Folder::create
      */
-    public function testCreateFolder()
+    public function testCreateFolder(): void
     {
         $event = new FolderCreateEvent();
         $event
@@ -124,7 +124,7 @@ class FolderTest extends TestCaseWithURLToolSetup
      *
      * @covers \Thelia\Action\Folder::update
      */
-    public function testUpdateFolder()
+    public function testUpdateFolder(): void
     {
         $folder = $this->getRandomFolder();
 
@@ -159,7 +159,7 @@ class FolderTest extends TestCaseWithURLToolSetup
      *
      * @covers \Thelia\Action\Folder::delete
      */
-    public function testDeleteFolder()
+    public function testDeleteFolder(): void
     {
         $folder = $this->getRandomFolder();
 
@@ -178,7 +178,7 @@ class FolderTest extends TestCaseWithURLToolSetup
      *
      * @covers \Thelia\Action\Folder::toggleVisibility
      */
-    public function testToggleVisibility()
+    public function testToggleVisibility(): void
     {
         $folder = $this->getRandomFolder();
         $visible = $folder->getVisible();
@@ -194,7 +194,7 @@ class FolderTest extends TestCaseWithURLToolSetup
         $this->assertEquals(!$visible, $updatedFolder->getVisible());
     }
 
-    public function testUpdatePositionUp()
+    public function testUpdatePositionUp(): void
     {
         $folder = FolderQuery::create()
             ->filterByParent($this->getFolderIdForPositionTest())
@@ -217,7 +217,7 @@ class FolderTest extends TestCaseWithURLToolSetup
         $this->assertEquals($newPosition, $updatedFolder->getPosition(), sprintf('new position is %d, new position expected is %d for folder %d', $newPosition, $updatedFolder->getPosition(), $updatedFolder->getId()));
     }
 
-    public function testUpdatePositionDown()
+    public function testUpdatePositionDown(): void
     {
         $nextFolder = FolderQuery::create()
             ->filterByParent($this->getFolderIdForPositionTest())
@@ -249,7 +249,7 @@ class FolderTest extends TestCaseWithURLToolSetup
         $this->assertEquals($newPosition, $updatedFolder->getPosition(), sprintf('new position is %d, new position expected is %d for folder %d', $newPosition, $updatedFolder->getPosition(), $updatedFolder->getId()));
     }
 
-    public function testUpdatePositionWithSpecificPosition()
+    public function testUpdatePositionWithSpecificPosition(): void
     {
         $folder = FolderQuery::create()
             ->filterByParent($this->getFolderIdForPositionTest())

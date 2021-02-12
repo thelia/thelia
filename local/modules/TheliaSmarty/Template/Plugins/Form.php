@@ -99,7 +99,7 @@ class Form extends AbstractSmartyPlugin
         $this->translator = $translator;
     }
 
-    public function setFormDefinition($formDefinition)
+    public function setFormDefinition($formDefinition): void
     {
         foreach ($formDefinition as $name => $className) {
             $this->formDefinition[$name] = $className;
@@ -165,7 +165,7 @@ class Form extends AbstractSmartyPlugin
         $fieldType,
         $fieldVars,
         $total_value_count = 1
-    ) {
+    ): void {
         $template->assign('name', $fieldName);
         $template->assign('value', $fieldValue);
         $template->assign('data', $fieldVars['data']);
@@ -207,7 +207,7 @@ class Form extends AbstractSmartyPlugin
      * @param FormConfigInterface       $formFieldConfig
      * @param FormView                  $formFieldView
      */
-    protected function assignFormTypeValues($template, $formFieldConfig, $formFieldView)
+    protected function assignFormTypeValues($template, $formFieldConfig, $formFieldView): void
     {
         $formFieldType = $formFieldConfig->getType()->getInnerType();
 
@@ -299,7 +299,7 @@ class Form extends AbstractSmartyPlugin
      * @param array                     $params
      * @param \Smarty_Internal_Template $template
      */
-    protected function processFormField($params, $template)
+    protected function processFormField($params, $template): void
     {
         $formFieldView = $this->getFormFieldView($params);
         $formFieldConfig = $this->getFormFieldConfig($params);
@@ -567,7 +567,7 @@ class Form extends AbstractSmartyPlugin
         }
     }
 
-    protected function assignFieldErrorVars(\Smarty_Internal_Template $template, FormErrorIterator $errors)
+    protected function assignFieldErrorVars(\Smarty_Internal_Template $template, FormErrorIterator $errors): void
     {
         if ($errors->count()) {
             $template->assign('message', $errors[0]->getMessage());

@@ -28,7 +28,7 @@ use Thelia\Module\BaseModule;
  */
 class OrderPayment extends FirewallForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('invoice-address', IntegerType::class, [
@@ -61,7 +61,7 @@ class OrderPayment extends FirewallForm
             ]);
     }
 
-    public function verifyInvoiceAddress($value, ExecutionContextInterface $context)
+    public function verifyInvoiceAddress($value, ExecutionContextInterface $context): void
     {
         $address = AddressQuery::create()
             ->findPk($value);
@@ -71,7 +71,7 @@ class OrderPayment extends FirewallForm
         }
     }
 
-    public function verifyPaymentModule($value, ExecutionContextInterface $context)
+    public function verifyPaymentModule($value, ExecutionContextInterface $context): void
     {
         $module = ModuleQuery::create()
             ->filterActivatedByTypeAndId(BaseModule::PAYMENT_MODULE_TYPE, $value)

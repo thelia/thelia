@@ -225,7 +225,7 @@ class SecurityContext
      *
      * @param UserInterface $user A UserInterface, or null if no further user should be stored
      */
-    public function setAdminUser(UserInterface $user)
+    public function setAdminUser(UserInterface $user): void
     {
         $user->eraseCredentials();
 
@@ -237,7 +237,7 @@ class SecurityContext
      *
      * @param UserInterface $user A UserInterface, or null if no further user should be stored
      */
-    public function setCustomerUser(UserInterface $user)
+    public function setCustomerUser(UserInterface $user): void
     {
         $user->eraseCredentials();
 
@@ -247,7 +247,7 @@ class SecurityContext
     /**
      * Clear the customer from the security context.
      */
-    public function clearCustomerUser()
+    public function clearCustomerUser(): void
     {
         $this->getSession()->clearCustomerUser();
     }
@@ -255,7 +255,7 @@ class SecurityContext
     /**
      * Clear the admin from the security context.
      */
-    public function clearAdminUser()
+    public function clearAdminUser(): void
     {
         $this->getSession()->clearAdminUser();
     }

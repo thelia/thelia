@@ -503,7 +503,7 @@ return [
     'Sorry, you are not allowed to perform this action.' => 'Désolé, vous n\'êtes pas autorisé à réaliser cette action.',
     'Sorry, you\'re not allowed to perform this action' => 'Désolé, vous n\'êtes pas autorisé à réaliser cette action.',
     'Source IP' => 'IP source',
-    'Start date' => 'Date de début ',
+    'Start date' => "Date de début\u{a0}",
     'Start date and expiration date are inconsistent' => 'Les date de début et date d\'expiration sont incompatibles',
     'Start date of sales' => 'Date de début de la promotion',
     'State *' => 'État/région *',

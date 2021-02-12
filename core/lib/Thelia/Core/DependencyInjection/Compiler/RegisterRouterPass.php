@@ -34,7 +34,7 @@ class RegisterRouterPass implements CompilerPassInterface
      *
      * @api
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         try {
             $chainRouter = $container->getDefinition('router.chainRequest');

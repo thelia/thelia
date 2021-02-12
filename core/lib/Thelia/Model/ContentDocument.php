@@ -35,7 +35,7 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
      *
      * @param ContentDocumentQuery $query
      */
-    protected function addCriteriaToPositionQuery($query)
+    protected function addCriteriaToPositionQuery($query): void
     {
         $query->filterByContent($this->getContent());
     }

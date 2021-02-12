@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class OrderDeliveryTest extends TestCase
 {
-    public function testOrderDelivery()
+    public function testOrderDelivery(): void
     {
     }
 }

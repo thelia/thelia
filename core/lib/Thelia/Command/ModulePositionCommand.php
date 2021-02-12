@@ -53,7 +53,7 @@ class ModulePositionCommand extends ContainerAwareCommand
         $this->moduleQuery = new ModuleQuery();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('module:position')
@@ -126,7 +126,7 @@ class ModulePositionCommand extends ContainerAwareCommand
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    protected function checkModuleArgument($paramValue)
+    protected function checkModuleArgument($paramValue): void
     {
         if (!preg_match('#^([a-z0-9]+):([\+-]?[0-9]+|up|down)$#i', $paramValue, $matches)) {
             throw new \InvalidArgumentException(

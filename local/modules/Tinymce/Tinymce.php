@@ -39,7 +39,7 @@ class Tinymce extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function postActivation(ConnectionInterface $con = null)
+    public function postActivation(ConnectionInterface $con = null): void
     {
         $fileSystem = new Filesystem();
 
@@ -86,7 +86,7 @@ class Tinymce extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function postDeactivation(ConnectionInterface $con = null)
+    public function postDeactivation(ConnectionInterface $con = null): void
     {
         $fileSystem = new Filesystem();
 
@@ -96,7 +96,7 @@ class Tinymce extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
+    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false): void
     {
         // If we have to delete module data, remove the media directory.
         if ($deleteModuleData) {

@@ -101,7 +101,7 @@ class CountryTest extends BaseAction
     /**
      * @depends testUpdate
      */
-    public function testDelete(CountryModel $country)
+    public function testDelete(CountryModel $country): void
     {
         $event = new CountryDeleteEvent($country->getId());
 
@@ -114,7 +114,7 @@ class CountryTest extends BaseAction
         $this->assertTrue($deletedCountry->isDeleted());
     }
 
-    public function testToggleDefault()
+    public function testToggleDefault(): void
     {
         /** @var CountryModel $country */
         $country = CountryQuery::create()

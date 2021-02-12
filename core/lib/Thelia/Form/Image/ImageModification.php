@@ -35,7 +35,7 @@ abstract class ImageModification extends BaseForm
     /**
      * {@inheritdoc}
      */
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $translator = Translator::getInstance();
 

@@ -41,7 +41,7 @@ class FeatureProductTest extends TestCase
         return $eventDispatcher;
     }
 
-    public function testProductDeleteFreeTextFeatureAv()
+    public function testProductDeleteFreeTextFeatureAv(): void
     {
         $con = Propel::getConnection();
         $con->beginTransaction();
@@ -60,7 +60,7 @@ class FeatureProductTest extends TestCase
         $con->rollback();
     }
 
-    public function testCategoryDeleteFreeTextFeatureAv()
+    public function testCategoryDeleteFreeTextFeatureAv(): void
     {
         $con = Propel::getConnection();
         $con->beginTransaction();

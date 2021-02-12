@@ -42,7 +42,7 @@ class Translation extends AbstractSmartyPlugin
     /**
      * Set the default translation domain.
      */
-    public function setDefaultTranslationDomain(array $params)
+    public function setDefaultTranslationDomain(array $params): void
     {
         $this->defaultTranslationDomain = $this->getParam($params, 'domain');
     }
@@ -50,7 +50,7 @@ class Translation extends AbstractSmartyPlugin
     /**
      * Set the default locale.
      */
-    public function setDefaultLocale(array $params)
+    public function setDefaultLocale(array $params): void
     {
         $this->defaultLocale = $this->getParam($params, 'locale');
     }

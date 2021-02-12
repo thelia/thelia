@@ -33,7 +33,7 @@ use Thelia\Model\BrandQuery;
  */
 class Brand extends BaseAction implements EventSubscriberInterface
 {
-    public function create(BrandCreateEvent $event)
+    public function create(BrandCreateEvent $event): void
     {
         $brand = new BrandModel();
 
@@ -52,7 +52,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function update(BrandUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function update(BrandUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $brand = BrandQuery::create()->findPk($event->getBrandId())) {
             $brand
@@ -78,7 +78,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function toggleVisibility(BrandToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function toggleVisibility(BrandToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $brand = $event->getBrand();
 
@@ -101,7 +101,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
         return $this->genericUpdateSeo(BrandQuery::create(), $event, $dispatcher);
     }
 
-    public function delete(BrandDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function delete(BrandDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $brand = BrandQuery::create()->findPk($event->getBrandId())) {
             $brand->delete();
@@ -110,7 +110,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->genericUpdatePosition(BrandQuery::create(), $event, $dispatcher);
     }
@@ -120,7 +120,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
      *
      * @param string $eventName
      */
-    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function viewCheck(ViewCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if ($event->getView() == 'brand') {
             $brand = BrandQuery::create()
@@ -137,7 +137,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
     /**
      * @throws NotFoundHttpException
      */
-    public function viewBrandIdNotVisible(ViewCheckEvent $event)
+    public function viewBrandIdNotVisible(ViewCheckEvent $event): void
     {
         throw new NotFoundHttpException();
     }

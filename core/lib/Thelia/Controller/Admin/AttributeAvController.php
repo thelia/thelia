@@ -50,7 +50,7 @@ class AttributeAvController extends AbstractCrudController
         return $this->createForm(AdminForm::ATTRIBUTE_AV_CREATION);
     }
 
-    protected function getUpdateForm()
+    protected function getUpdateForm(): void
     {
         throw new \LogicException('Attribute Av. modification is not yet implemented');
     }
@@ -103,7 +103,7 @@ class AttributeAvController extends AbstractCrudController
         return $event->hasAttributeAv();
     }
 
-    protected function hydrateObjectForm(ParserContext $parserContext, $object)
+    protected function hydrateObjectForm(ParserContext $parserContext, $object): void
     {
         throw new \LogicException('Attribute Av. modification is not yet implemented');
     }

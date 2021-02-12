@@ -19,7 +19,7 @@ use Thelia\Model\Map\CustomerTitleTableMap;
 
 class CustomerTitle extends BaseCustomerTitle
 {
-    public function toggleDefault(ConnectionInterface $con = null)
+    public function toggleDefault(ConnectionInterface $con = null): void
     {
         if (null === $con) {
             $con = Propel::getConnection(CustomerTitleTableMap::DATABASE_NAME);

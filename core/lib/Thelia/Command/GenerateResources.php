@@ -24,7 +24,7 @@ class GenerateResources extends ContainerAwareCommand
     /**
      * Configure the command.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('thelia:generate-resources')

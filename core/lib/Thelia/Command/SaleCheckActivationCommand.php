@@ -24,7 +24,7 @@ use Thelia\Core\Event\TheliaEvents;
  */
 class SaleCheckActivationCommand extends ContainerAwareCommand
 {
-    public function configure()
+    public function configure(): void
     {
         $this
             ->setName('sale:check-activation')

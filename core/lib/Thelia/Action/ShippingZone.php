@@ -26,7 +26,7 @@ use Thelia\Model\AreaDeliveryModuleQuery;
  */
 class ShippingZone extends BaseAction implements EventSubscriberInterface
 {
-    public function addArea(ShippingZoneAddAreaEvent $event)
+    public function addArea(ShippingZoneAddAreaEvent $event): void
     {
         $areaDelivery = new AreaDeliveryModule();
 
@@ -36,7 +36,7 @@ class ShippingZone extends BaseAction implements EventSubscriberInterface
             ->save();
     }
 
-    public function removeArea(ShippingZoneRemoveAreaEvent $event)
+    public function removeArea(ShippingZoneRemoveAreaEvent $event): void
     {
         $areaDelivery = AreaDeliveryModuleQuery::create()
             ->filterByAreaId($event->getAreaId())

@@ -279,7 +279,7 @@ class AddressController extends AbstractCrudController
     /**
      * Redirect to the list template.
      */
-    protected function redirectToListTemplate()
+    protected function redirectToListTemplate(): void
     {
         // TODO: Implement redirectToListTemplate() method.
     }

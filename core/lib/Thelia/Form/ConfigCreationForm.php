@@ -21,7 +21,7 @@ use Thelia\Model\ConfigQuery;
 
 class ConfigCreationForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add('name', TextType::class, [
@@ -66,7 +66,7 @@ class ConfigCreationForm extends BaseForm
         return 'thelia_config_creation';
     }
 
-    public function checkDuplicateName($value, ExecutionContextInterface $context)
+    public function checkDuplicateName($value, ExecutionContextInterface $context): void
     {
         $config = ConfigQuery::create()->findOneByName($value);
 

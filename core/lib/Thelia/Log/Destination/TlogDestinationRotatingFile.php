@@ -36,7 +36,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
         parent::__construct();
     }
 
-    public function configure()
+    public function configure(): void
     {
         parent::configure();
 

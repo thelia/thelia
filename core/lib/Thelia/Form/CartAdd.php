@@ -88,7 +88,7 @@ class CartAdd extends BaseForm
         ;
     }
 
-    public function checkProduct($value, ExecutionContextInterface $context)
+    public function checkProduct($value, ExecutionContextInterface $context): void
     {
         $product = ProductQuery::create()->findPk($value);
 
@@ -97,7 +97,7 @@ class CartAdd extends BaseForm
         }
     }
 
-    public function checkStockAvailability($value, ExecutionContextInterface $context)
+    public function checkStockAvailability($value, ExecutionContextInterface $context): void
     {
         if ($value) {
             $data = $context->getRoot()->getData();
@@ -113,7 +113,7 @@ class CartAdd extends BaseForm
         }
     }
 
-    public function checkStock($value, ExecutionContextInterface $context)
+    public function checkStock($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 

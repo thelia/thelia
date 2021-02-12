@@ -84,7 +84,7 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
         return $this->fields;
     }
 
-    public function setFields(array $fields)
+    public function setFields(array $fields): void
     {
         $this->fields = $fields;
     }

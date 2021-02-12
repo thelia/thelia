@@ -30,7 +30,7 @@ use Thelia\Module\BaseModule;
  */
 class ModuleActivateCommand extends BaseModuleGenerate
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('module:activate')

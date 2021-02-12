@@ -224,7 +224,7 @@ $updateError = null;
                         }
                     }
 
-function alertBootstrapFormatter($message, $type = null)
+function alertBootstrapFormatter($message, $type = null): void
 {
     if (!in_array($type, ['success', 'info', 'error', 'warning'])) {
         $type = 'info';

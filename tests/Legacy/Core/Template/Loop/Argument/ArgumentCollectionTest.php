@@ -23,7 +23,7 @@ use Thelia\Type\TypeCollection;
  */
 class ArgumentCollectionTest extends TestCase
 {
-    public function testArgumentCollectionCreateAndWalk()
+    public function testArgumentCollectionCreateAndWalk(): void
     {
         $collection = new ArgumentCollection(
             new Argument(

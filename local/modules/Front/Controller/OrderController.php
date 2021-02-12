@@ -341,7 +341,7 @@ class OrderController extends BaseFrontController
         return $this->generateRedirectFromRoute('cart.view');
     }
 
-    public function orderPlaced($order_id)
+    public function orderPlaced($order_id): void
     {
         /* check if the placed order matched the customer */
         $placedOrder = OrderQuery::create()->findPk(
@@ -379,7 +379,7 @@ class OrderController extends BaseFrontController
         $this->getParserContext()->set('placed_order_id', $placedOrder->getId());
     }
 
-    public function orderFailed($order_id, $message)
+    public function orderFailed($order_id, $message): void
     {
         if (empty($order_id)) {
             // Fallback to request parameter if the method parameter is empty.
@@ -483,7 +483,7 @@ class OrderController extends BaseFrontController
         throw new AccessDeniedHttpException();
     }
 
-    private function checkOrderCustomer($order_id)
+    private function checkOrderCustomer($order_id): void
     {
         $this->checkAuth();
 

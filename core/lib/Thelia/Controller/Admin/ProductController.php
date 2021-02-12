@@ -222,7 +222,7 @@ class ProductController extends AbstractSeoCrudController
      * @param Currency            $defaultCurrency
      * @param Currency            $currentCurrency
      */
-    protected function updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency)
+    protected function updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency): void
     {
         // Get price for default currency
         $priceForDefaultCurrency = ProductPriceQuery::create()
@@ -239,7 +239,7 @@ class ProductController extends AbstractSeoCrudController
         }
     }
 
-    protected function appendValue(&$array, $key, $value)
+    protected function appendValue(&$array, $key, $value): void
     {
         if (!isset($array[$key])) {
             $array[$key] = [];
@@ -1070,7 +1070,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @param array $data the form data
      */
-    protected function processSingleProductSaleElementUpdate($data)
+    protected function processSingleProductSaleElementUpdate($data): void
     {
         $event = new ProductSaleElementUpdateEvent(
             $this->getExistingObject(),
@@ -1206,7 +1206,7 @@ class ProductController extends AbstractSeoCrudController
     }
 
     // Create combinations
-    protected function combine($input, &$output, &$tmp)
+    protected function combine($input, &$output, &$tmp): void
     {
         $current = array_shift($input);
 

@@ -24,7 +24,7 @@ class ImagesAndDocumentsCacheFlushForm extends BaseForm
     /**
      * {@inheritdoc}
      */
-    protected function buildForm()
+    protected function buildForm(): void
     {
         //Nothing, we just want CSRF protection
     }

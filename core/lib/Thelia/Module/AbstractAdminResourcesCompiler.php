@@ -41,7 +41,7 @@ abstract class AbstractAdminResourcesCompiler implements CompilerPassInterface
     /**
      * Allow module to add resources in AdminResources Service.
      */
-    public function process(\Symfony\Component\DependencyInjection\ContainerBuilder $container)
+    public function process(\Symfony\Component\DependencyInjection\ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('thelia.admin.resources')) {
             return;

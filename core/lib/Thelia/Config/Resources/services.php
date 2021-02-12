@@ -16,7 +16,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
-return function (ContainerConfigurator $configurator) {
+return function (ContainerConfigurator $configurator): void {
     $serviceConfigurator = $configurator->services();
 
     $serviceConfigurator->defaults()

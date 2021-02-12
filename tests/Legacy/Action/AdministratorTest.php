@@ -53,7 +53,7 @@ class AdministratorTest extends BaseAction
         $this->tokenProvider = new TokenProvider($requestStack, $translator, 'test');
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $login = 'thelia'.uniqid();
         $locale = LangQuery::create()->findOne()->getLocale();
@@ -84,7 +84,7 @@ class AdministratorTest extends BaseAction
         $this->assertTrue(password_verify($adminEvent->getPassword(), $createdAdmin->getPassword()));
     }
 
-    public function testUpdate()
+    public function testUpdate(): void
     {
         $admin = AdminQuery::create()->findOne();
 
@@ -117,7 +117,7 @@ class AdministratorTest extends BaseAction
         $this->assertTrue(password_verify($adminEvent->getPassword(), $updatedAdmin->getPassword()));
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $admin = AdminQuery::create()->findOne();
 
@@ -137,7 +137,7 @@ class AdministratorTest extends BaseAction
         $this->assertTrue($deletedAdmin->isDeleted());
     }
 
-    public function testUpdatePassword()
+    public function testUpdatePassword(): void
     {
         $admin = AdminQuery::create()->findOne();
 
@@ -155,7 +155,7 @@ class AdministratorTest extends BaseAction
         $this->assertTrue(password_verify($adminEvent->getPassword(), $updatedAdmin->getPassword()));
     }
 
-    public function testRenewPassword()
+    public function testRenewPassword(): void
     {
         $admin = AdminQuery::create()->findOne();
         $admin->setPasswordRenewToken(null)->setEmail('no_reply@thelia.net')->save();
