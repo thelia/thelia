@@ -43,7 +43,7 @@ class Tlog implements LoggerInterface
     public const CRITICAL = 600;
     public const ALERT = 700;
     public const EMERGENCY = 800;
-    public const MUET = PHP_INT_MAX;
+    public const MUET = \PHP_INT_MAX;
 
     protected $levels = [
         100 => 'DEBUG',
@@ -98,7 +98,7 @@ class Tlog implements LoggerInterface
     public static function getInstance()
     {
         if (self::$instance == false) {
-            self::$instance = new Tlog();
+            self::$instance = new self();
 
             // On doit placer les initialisations à ce level pour pouvoir
             // utiliser la classe Tlog dans les classes de base (Cnx, BaseObj, etc.)
@@ -116,7 +116,7 @@ class Tlog implements LoggerInterface
      */
     public static function getNewInstance()
     {
-        $instance = new Tlog();
+        $instance = new self();
 
         $instance->init();
 
@@ -497,8 +497,6 @@ class Tlog implements LoggerInterface
      * final end method. Write log for each destination handler.
      *
      * @param string $res
-     *
-     * @return void
      */
     public function write(&$res): void
     {

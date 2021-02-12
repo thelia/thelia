@@ -48,30 +48,30 @@ class RemoveXPercentTest extends TestCase
         $currencies = CurrencyQuery::create()->find();
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
+            ->willReturn($currencies);
 
         $stubFacade->expects($this->any())
             ->method('getCartTotalTaxPrice')
-            ->will($this->returnValue($cartTotalPrice));
+            ->willReturn($cartTotalPrice);
 
         $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
-            ->will($this->returnValue($checkoutCurrency));
+            ->willReturn($checkoutCurrency);
 
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
         $stubTranslator->expects($this->any())
             ->method('trans')
-            ->will($this->returnValue($i18nOutput));
+            ->willReturn($i18nOutput);
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
 
         return $stubFacade;
     }
@@ -145,10 +145,10 @@ class RemoveXPercentTest extends TestCase
         $this->assertEquals('XMAS Coupon', $coupon->getTitle());
         $this->assertEquals("Coupon for Springbreak removing 10% if you have a cart between 40.00€\u{a0}and 400.00€ (excluded)", $coupon->getShortDescription());
         $this->assertEquals($description, $coupon->getDescription());
-        $this->assertEquals(true, $coupon->isCumulative());
-        $this->assertEquals(true, $coupon->isRemovingPostage());
-        $this->assertEquals(true, $coupon->isAvailableOnSpecialOffers());
-        $this->assertEquals(true, $coupon->isEnabled());
+        $this->assertTrue($coupon->isCumulative());
+        $this->assertTrue($coupon->isRemovingPostage());
+        $this->assertTrue($coupon->isAvailableOnSpecialOffers());
+        $this->assertTrue($coupon->isEnabled());
 
         $this->assertEquals(254, $coupon->getMaxUsage());
         $this->assertEquals($date, $coupon->getExpirationDate());

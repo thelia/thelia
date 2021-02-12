@@ -29,7 +29,7 @@ class ConfigEvent extends ActionEvent
 
     public function hasConfig()
     {
-        return !\is_null($this->config);
+        return null !== $this->config;
     }
 
     public function getConfig()

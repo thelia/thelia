@@ -125,7 +125,7 @@ class XmlFileLoader extends FileLoader
         }
 
         foreach ($commands as $command) {
-            array_push($commandConfig, $this->getAttributeAsPhp($command, 'class'));
+            $commandConfig[] = $this->getAttributeAsPhp($command, 'class');
         }
 
         $this->container->setParameter('command.definition', $commandConfig);
@@ -654,7 +654,7 @@ class XmlFileLoader extends FileLoader
                     $parts = explode('/', str_replace('\\', '/', $tmpfile));
                 }
             }
-            $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
+            $drive = '\\' === \DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
             $location = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
 
             $imports .= sprintf('  <xsd:import namespace="%s" schemaLocation="%s" />'."\n", $namespace, $location);

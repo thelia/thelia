@@ -49,15 +49,15 @@ class MatchForTotalAmountTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getCartTotalTaxPrice')
-            ->will($this->returnValue($cartTotalPrice));
+            ->willReturn($cartTotalPrice);
 
         $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
-            ->will($this->returnValue($checkoutCurrency));
+            ->willReturn($checkoutCurrency);
 
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $currency1 = new Currency();
         $currency1->setCode('EUR');
@@ -65,7 +65,7 @@ class MatchForTotalAmountTest extends TestCase
         $currency2->setCode('USD');
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue([$currency1, $currency2]));
+            ->willReturn([$currency1, $currency2]);
 
         return $stubFacade;
     }
@@ -581,16 +581,16 @@ class MatchForTotalAmountTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $currencies = CurrencyQuery::create();
         $currencies = $currencies->find();
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
+            ->willReturn($currencies);
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
@@ -609,15 +609,15 @@ class MatchForTotalAmountTest extends TestCase
             ->getMock();
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue($condition1));
+            ->willReturn($condition1);
 
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $stubFacade->expects($this->any())
             ->method('getContainer')
-            ->will($this->returnValue($stubContainer));
+            ->willReturn($stubContainer);
 
         $conditionFactory = new ConditionFactory($stubContainer);
 
@@ -646,16 +646,16 @@ class MatchForTotalAmountTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $currencies = CurrencyQuery::create();
         $currencies = $currencies->find();
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
+            ->willReturn($currencies);
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
@@ -674,15 +674,15 @@ class MatchForTotalAmountTest extends TestCase
             ->getMock();
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue($condition1));
+            ->willReturn($condition1);
 
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $stubFacade->expects($this->any())
             ->method('getContainer')
-            ->will($this->returnValue($stubContainer));
+            ->willReturn($stubContainer);
 
         $conditionFactory = new ConditionFactory($stubContainer);
 
@@ -711,16 +711,16 @@ class MatchForTotalAmountTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $currencies = CurrencyQuery::create();
         $currencies = $currencies->find();
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
+            ->willReturn($currencies);
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
@@ -739,15 +739,15 @@ class MatchForTotalAmountTest extends TestCase
             ->getMock();
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue($condition1));
+            ->willReturn($condition1);
 
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $stubFacade->expects($this->any())
             ->method('getContainer')
-            ->will($this->returnValue($stubContainer));
+            ->willReturn($stubContainer);
 
         $conditionFactory = new ConditionFactory($stubContainer);
 
@@ -775,26 +775,26 @@ class MatchForTotalAmountTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getCartTotalPrice')
-            ->will($this->returnValue($cartTotalPrice));
+            ->willReturn($cartTotalPrice);
 
         $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
-            ->will($this->returnValue($checkoutCurrency));
+            ->willReturn($checkoutCurrency);
 
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
         $stubTranslator->expects($this->any())
             ->method('trans')
-            ->will($this->returnValue($i18nOutput));
+            ->willReturn($i18nOutput);
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
 
         $currency1 = new Currency();
         $currency1->setCode('EUR');
@@ -802,7 +802,7 @@ class MatchForTotalAmountTest extends TestCase
         $currency2->setCode('USD');
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue([$currency1, $currency2]));
+            ->willReturn([$currency1, $currency2]);
 
         return $stubFacade;
     }

@@ -186,7 +186,7 @@ class CreateAdminUser extends ContainerAwareCommand
 
         $question->setValidator(function ($answer) {
             $answer = trim($answer);
-            if (!empty($answer) && !filter_var($answer, FILTER_VALIDATE_EMAIL)) {
+            if (!empty($answer) && !filter_var($answer, \FILTER_VALIDATE_EMAIL)) {
                 throw new \RuntimeException('Please enter an email or an empty value.');
             }
 

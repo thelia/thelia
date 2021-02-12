@@ -65,7 +65,7 @@ class ProductI18nExport extends JsonFileAbstractExport
             if (\in_array($idx, $this->idxStripHtml) && !empty($value)) {
                 $value = strip_tags($value);
 
-                $value = html_entity_decode($value, ENT_QUOTES, 'UTF-8');
+                $value = html_entity_decode($value, \ENT_QUOTES, 'UTF-8');
             }
         }
 

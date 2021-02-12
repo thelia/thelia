@@ -49,30 +49,30 @@ class ConditionCollectionTest extends TestCase
         $currencies = $currencies->find();
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
+            ->willReturn($currencies);
 
         $stubFacade->expects($this->any())
             ->method('getCartTotalPrice')
-            ->will($this->returnValue($cartTotalPrice));
+            ->willReturn($cartTotalPrice);
 
         $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
-            ->will($this->returnValue($checkoutCurrency));
+            ->willReturn($checkoutCurrency);
 
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
         $stubTranslator->expects($this->any())
             ->method('trans')
-            ->will($this->returnValue($i18nOutput));
+            ->willReturn($i18nOutput);
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
 
         return $stubFacade;
     }

@@ -49,7 +49,7 @@ class MessageTest extends TestCase
 
     private $backup_mail_template = 'undefined';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->backup_mail_template = ConfigQuery::read('active-mail-template', 'default');
 

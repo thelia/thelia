@@ -43,7 +43,7 @@ class AddressFormat
     public static function getInstance()
     {
         if (!isset(self::$instance)) {
-            self::$instance = new AddressFormat();
+            self::$instance = new self();
         }
 
         return self::$instance;
@@ -179,7 +179,7 @@ class AddressFormat
             ->withFamilyName($address->getLastname())
         ;
 
-        if ($country->getHasStates() && \intval($address->getStateId()) !== 0) {
+        if ($country->getHasStates() && (int) ($address->getStateId()) !== 0) {
             $addressModel = $addressModel->withAdministrativeArea(
                 sprintf(
                     '%s-%s',

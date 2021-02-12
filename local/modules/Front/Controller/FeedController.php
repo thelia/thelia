@@ -100,7 +100,7 @@ class FeedController extends BaseFrontController
 
         $cacheDir = $this->getCacheDir();
         $cacheKey = self::FEED_CACHE_KEY.$lang.$context.$id;
-        $cacheExpire = \intval(ConfigQuery::read('feed_ttl', '7200')) ?: 7200;
+        $cacheExpire = (int) (ConfigQuery::read('feed_ttl', '7200')) ?: 7200;
 
         $cacheDriver = new FilesystemCache($cacheDir);
         if (!($this->checkAdmin() && '' !== $flush)) {

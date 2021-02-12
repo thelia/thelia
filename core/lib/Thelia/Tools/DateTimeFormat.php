@@ -25,7 +25,7 @@ class DateTimeFormat
 
     public static function getInstance(Request $request)
     {
-        return new DateTimeFormat($request);
+        return new self($request);
     }
 
     public function getFormat($output = null)

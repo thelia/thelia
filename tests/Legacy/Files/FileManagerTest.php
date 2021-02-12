@@ -161,7 +161,7 @@ class FileManagerTest extends TestCase
             'original.gif',
             'image/gif',
             filesize($testFile),
-            UPLOAD_ERR_OK,
+            \UPLOAD_ERR_OK,
             true
         );
 
@@ -201,7 +201,7 @@ class FileManagerTest extends TestCase
             'original.txt',
             'plain/text',
             filesize($testFile),
-            UPLOAD_ERR_OK,
+            \UPLOAD_ERR_OK,
             true
         );
 

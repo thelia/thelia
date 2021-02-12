@@ -104,7 +104,7 @@ class Version
      */
     public static function parse($version = null)
     {
-        if (\is_null($version)) {
+        if (null === $version) {
             $version = \Thelia\Core\Thelia::THELIA_VERSION;
         }
 
@@ -118,7 +118,7 @@ class Version
         if (!preg_match($pattern, $version, $match)) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'Invalid version number provided : %s'.PHP_EOL,
+                    'Invalid version number provided : %s'.\PHP_EOL,
                     $version
                 )
             );

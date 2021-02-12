@@ -132,7 +132,7 @@ abstract class BaseLoop implements BaseLoopInterface
      */
     protected function initialize(): void
     {
-        $class = \get_class($this);
+        $class = static::class;
 
         if (null === self::$loopDefinitions) {
             self::$loopDefinitions = \array_flip($this->theliaParserLoops);
@@ -177,7 +177,7 @@ abstract class BaseLoop implements BaseLoopInterface
         if (true === $this->countable) {
             $defaultArgs[] = Argument::createIntTypeArgument('offset', 0);
             $defaultArgs[] = Argument::createIntTypeArgument('page');
-            $defaultArgs[] = Argument::createIntTypeArgument('limit', PHP_INT_MAX);
+            $defaultArgs[] = Argument::createIntTypeArgument('limit', \PHP_INT_MAX);
         }
 
         if ($this instanceof SearchLoopInterface) {

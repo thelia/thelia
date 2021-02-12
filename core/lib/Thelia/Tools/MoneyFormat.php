@@ -19,7 +19,7 @@ class MoneyFormat extends NumberFormat
 {
     public static function getInstance(Request $request)
     {
-        return new MoneyFormat($request);
+        return new self($request);
     }
 
     /**
@@ -108,7 +108,7 @@ class MoneyFormat extends NumberFormat
 
         if ($removeZeroDecimal === true) {
             if ($number == (int) $number) {
-                $number = \intval($number);
+                $number = (int) $number;
             }
         }
 

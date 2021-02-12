@@ -407,7 +407,7 @@ abstract class BaseForm implements FormInterface
      */
     public static function getName()
     {
-        $classParts = explode('\\', \get_called_class());
+        $classParts = explode('\\', static::class);
         $nameParts = array_map(function ($classPart, $index) use ($classParts) {
             if ($index !== \count($classParts) - 1) {
                 return strtolower($classPart);

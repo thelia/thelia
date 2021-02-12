@@ -2,7 +2,7 @@
 
 $config = include '../config/config.php';
 //TODO switch to array
-extract($config, EXTR_OVERWRITE);
+extract($config, \EXTR_OVERWRITE);
 
 if (!$java_upload) {
     exit('forbidden');

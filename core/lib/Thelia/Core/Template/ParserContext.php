@@ -68,7 +68,7 @@ class ParserContext implements \IteratorAggregate
      */
     public function pushCurrentForm(BaseForm $form)
     {
-        array_push($this->formStore, $form);
+        $this->formStore[] = $form;
 
         return $this;
     }

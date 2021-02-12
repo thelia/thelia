@@ -128,9 +128,9 @@ class RegisterHookListenersPass implements CompilerPassInterface
             throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "hook.event_listener" tags.', $id));
         }
 
-        $active = isset($attributes['active']) ? \intval($attributes['active']) : 1;
+        $active = isset($attributes['active']) ? (int) ($attributes['active']) : 1;
         $attributes['active'] = (1 === $active);
-        $attributes['templates'] = isset($attributes['templates']) ? \strval($attributes['templates']) : '';
+        $attributes['templates'] = isset($attributes['templates']) ? (string) ($attributes['templates']) : '';
         $attributes['type'] = (isset($attributes['type'])) ? $this->getHookType($attributes['type']) : TemplateDefinition::FRONT_OFFICE;
 
         if (null === $hook = $this->getHook($attributes['event'], $attributes['type'])) {

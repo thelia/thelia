@@ -23,7 +23,7 @@ class URLTest extends TestCase
 {
     protected $context;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
 
@@ -43,7 +43,7 @@ class URLTest extends TestCase
 
         $router->expects($this->any())
             ->method('getContext')
-            ->will($this->returnValue($this->context));
+            ->willReturn($this->context);
 
         $container->set('router.admin', $router);
 

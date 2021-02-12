@@ -82,7 +82,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
         return $fileManager;
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->session = new Session(new MockArraySessionStorage());
         $this->request = new Request();
@@ -117,7 +117,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
         }
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         // restore cache configuration.
         $config = ConfigQuery::create()->filterByName('document_cache_dir_from_web_root')->findOne();

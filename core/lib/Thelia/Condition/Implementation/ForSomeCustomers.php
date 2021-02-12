@@ -72,7 +72,7 @@ class ForSomeCustomers extends ConditionAbstract
         // Check that at least one product is selected
         if (empty($values[self::CUSTOMERS_LIST])) {
             throw new InvalidConditionValueException(
-                \get_class(),
+                __CLASS__,
                 self::CUSTOMERS_LIST
             );
         }

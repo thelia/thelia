@@ -53,7 +53,7 @@ class JSONSerializer extends AbstractSerializer
 
     public function separator()
     {
-        return ','.PHP_EOL;
+        return ','.\PHP_EOL;
     }
 
     public function finalizeFile(\SplFileObject $fileObject): void

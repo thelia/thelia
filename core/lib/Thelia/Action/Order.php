@@ -275,7 +275,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             if ($useStock && $manageStock) {
                 /* decrease stock for non virtual product */
-                $allowNegativeStock = \intval(ConfigQuery::read('allow_negative_stock', 0));
+                $allowNegativeStock = (int) (ConfigQuery::read('allow_negative_stock', 0));
                 $newStock = $pse->getQuantity() - $cartItem->getQuantity();
                 //Forbid negative stock
                 if ($newStock < 0 && 0 === $allowNegativeStock) {

@@ -33,7 +33,7 @@ class TaxEvent extends ActionEvent
 
     public function hasTax()
     {
-        return !\is_null($this->tax);
+        return null !== $this->tax;
     }
 
     public function getTax()

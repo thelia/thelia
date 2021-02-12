@@ -196,7 +196,7 @@ abstract class BaseHook
                 }
             }
             $tags[] = '/>';
-            $tag = implode($tags);
+            $tag = implode('', $tags);
         }
 
         return $tag;
@@ -227,7 +227,7 @@ abstract class BaseHook
                 }
             }
             $tags[] = '></script>';
-            $tag = implode($tags);
+            $tag = implode('', $tags);
         }
 
         return $tag;

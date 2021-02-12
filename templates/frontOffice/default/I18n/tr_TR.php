@@ -170,7 +170,7 @@ return [
     'Proceed checkout' => 'Ödeme sayfasına git',
     'Product Empty Button' => 'İlk ürünü ekle',
     'Product Empty Message' => 'Ürün eklemek gerçekten çok kolay.   <ol>
-<li>Onay <strong>YENİ</strong> ürününüzü en son ürün bölümünde görmek istiyorsanız, Ayrıntılar sekmesini altında.</li>             
+<li>Onay <strong>YENİ</strong> ürününüzü en son ürün bölümünde görmek istiyorsanız, Ayrıntılar sekmesini altında.</li>
 <li>Onay <strong>SATIŞ</strong> ürün teklif ürün bölümünde görmek istiyorsanız, Ayrıntılar sekmesini altında.</li>         </ol>',
     'Product Empty Title' => 'Hoşgeldiniz',
     'Product Name' => 'Ürün adı',

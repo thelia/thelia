@@ -414,7 +414,7 @@ class Update
         );
 
         if ($stmt->rowCount()) {
-            return \floatval($stmt->fetch(PDO::FETCH_OBJ)->size);
+            return (float) ($stmt->fetch(PDO::FETCH_OBJ)->size);
         }
 
         throw new \Exception('Impossible to calculate the database size');
@@ -592,10 +592,10 @@ class Update
     {
         $url = 'http://thelia.net/version.php';
         $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+        curl_setopt($curl, \CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, \CURLOPT_HEADER, false);
+        curl_setopt($curl, \CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($curl, \CURLOPT_TIMEOUT, 5);
         $res = curl_exec($curl);
 
         try {

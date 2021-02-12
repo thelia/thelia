@@ -25,7 +25,7 @@ class RewritingRetrieverTest extends TestCase
 {
     protected $container;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
 
@@ -41,13 +41,13 @@ class RewritingRetrieverTest extends TestCase
 
         $stubRequestContext->expects($this->any())
             ->method('getHost')
-            ->will($this->returnValue('localhost'));
+            ->willReturn('localhost');
 
         $stubRouterAdmin->expects($this->any())
             ->method('getContext')
-            ->will($this->returnValue(
+            ->willReturn(
                 $stubRequestContext
-            ));
+            );
 
         $this->container->set('router.admin', $stubRouterAdmin);
         $this->container->set('thelia.url.manager', new URL($stubRouterAdmin));
@@ -80,7 +80,7 @@ class RewritingRetrieverTest extends TestCase
         $retrieverQuery->expects($this->any())
             ->method('getViewUrlQuery')
             ->with('view', 'fr_FR', 1)
-            ->will($this->returnValue($searchResult));
+            ->willReturn($searchResult);
 
         $retriever = new RewritingRetriever();
 
@@ -102,7 +102,7 @@ class RewritingRetrieverTest extends TestCase
         $retrieverQuery->expects($this->any())
             ->method('getSpecificUrlQuery')
             ->with('view', 'fr_FR', 1, ['foo0' => 'bar0', 'foo1' => 'bar1'])
-            ->will($this->returnValue($searchResult));
+            ->willReturn($searchResult);
 
         $retriever = new RewritingRetriever();
 

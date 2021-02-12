@@ -65,7 +65,7 @@ class FolderQuery extends BaseFolderQuery
                 ->find();
 
             foreach ($categories as $folder) {
-                array_push($result, $folder);
+                $result[] = $folder;
                 $result = array_merge($result, (array) self::findAllChild($folder->getId(), $depth, $currentPosition));
             }
         }

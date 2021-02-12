@@ -106,7 +106,7 @@ class ExportCommand extends ContainerAwareCommand
         $serializer = $input->getArgument('serializer');
         if ($exportRef === null || $serializer === null) {
             throw new \RuntimeException(
-                'Not enough arguments.'.PHP_EOL.'If no options are provided, ref and serializer arguments are required.'
+                'Not enough arguments.'.\PHP_EOL.'If no options are provided, ref and serializer arguments are required.'
             );
         }
 

@@ -44,7 +44,7 @@ class ConfigCommandTest extends BaseCommandTest
         self::clearTest();
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         if (null === $this->commandTester) {
             $application = new Application($this->getKernel());

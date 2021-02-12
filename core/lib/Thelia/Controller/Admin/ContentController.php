@@ -64,7 +64,7 @@ class ContentController extends AbstractSeoCrudController
             return $response;
         }
 
-        $folder_id = \intval($this->getRequest()->request->get('additional_folder_id'));
+        $folder_id = (int) ($this->getRequest()->request->get('additional_folder_id'));
 
         if ($folder_id > 0) {
             $event = new ContentAddFolderEvent(
@@ -94,7 +94,7 @@ class ContentController extends AbstractSeoCrudController
             return $response;
         }
 
-        $folder_id = \intval($this->getRequest()->request->get('additional_folder_id'));
+        $folder_id = (int) ($this->getRequest()->request->get('additional_folder_id'));
 
         if ($folder_id > 0) {
             $event = new ContentRemoveFolderEvent(

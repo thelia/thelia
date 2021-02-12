@@ -84,12 +84,12 @@ class ConfigQuery extends BaseConfigQuery
 
     public static function getConfiguredShopUrl()
     {
-        return ConfigQuery::read('url_site', '');
+        return self::read('url_site', '');
     }
 
     public static function getDefaultLangWhenNoTranslationAvailable()
     {
-        return ConfigQuery::read('default_lang_without_translation', 1);
+        return self::read('default_lang_without_translation', 1);
     }
 
     public static function isRewritingEnable()
@@ -318,7 +318,7 @@ class ConfigQuery extends BaseConfigQuery
 
     public static function getAdminCacheHomeStatsTTL()
     {
-        return \intval(static::read('admin_cache_home_stats_ttl', 600));
+        return (int) (static::read('admin_cache_home_stats_ttl', 600));
     }
 
     /**

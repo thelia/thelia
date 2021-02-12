@@ -43,8 +43,6 @@ class CouponCreationForm extends BaseForm
 
     /**
      * Build Coupon form.
-     *
-     * @return void
      */
     protected function buildForm(): void
     {

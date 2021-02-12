@@ -106,7 +106,7 @@ abstract class BaseController implements ControllerInterface
                 'Content-type' => 'application/pdf',
                 'Content-Disposition' => sprintf(
                     '%s; filename=%s.pdf',
-                    \boolval($browser) === false ? 'attachment' : 'inline',
+                    (bool) $browser === false ? 'attachment' : 'inline',
                     $fileName
                 ),
             ]
@@ -542,6 +542,7 @@ abstract class BaseController implements ControllerInterface
      * Return a 404 error.
      *
      * @return \Thelia\Core\HttpFoundation\Response
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function pageNotFound()

@@ -73,7 +73,7 @@ class CartContainsProducts extends ConditionAbstract
         // Check that at least one product is selected
         if (empty($values[self::PRODUCTS_LIST])) {
             throw new InvalidConditionValueException(
-                \get_class(),
+                __CLASS__,
                 self::PRODUCTS_LIST
             );
         }

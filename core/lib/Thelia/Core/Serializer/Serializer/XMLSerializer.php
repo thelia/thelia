@@ -103,7 +103,7 @@ class XMLSerializer extends AbstractSerializer
         $this->xmlDataStart = null;
 
         $fileObject->fwrite(
-            '<?xml version="1.0" encoding="UTF-8"?>'.PHP_EOL.'<'.$this->rootNodeName.'>'.PHP_EOL
+            '<?xml version="1.0" encoding="UTF-8"?>'.\PHP_EOL.'<'.$this->rootNodeName.'>'.\PHP_EOL
         );
     }
 
@@ -120,12 +120,12 @@ class XMLSerializer extends AbstractSerializer
 
     public function separator()
     {
-        return PHP_EOL;
+        return \PHP_EOL;
     }
 
     public function finalizeFile(\SplFileObject $fileObject): void
     {
-        $fileObject->fwrite(PHP_EOL.'</'.$this->rootNodeName.'>');
+        $fileObject->fwrite(\PHP_EOL.'</'.$this->rootNodeName.'>');
     }
 
     public function unserialize(\SplFileObject $fileObject)

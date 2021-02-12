@@ -27,8 +27,8 @@ use Thelia\Model\Tools\PositionManagementTrait;
 
 class ContentDocument extends BaseContentDocument implements BreadcrumbInterface, FileModelInterface
 {
-    use PositionManagementTrait;
     use FolderBreadcrumbTrait;
+    use PositionManagementTrait;
 
     /**
      * Calculate next position relative to our parent.

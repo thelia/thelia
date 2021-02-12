@@ -44,7 +44,7 @@ abstract class BaseLoopTestor extends TestCase
         return $method;
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
 
@@ -92,13 +92,13 @@ abstract class BaseLoopTestor extends TestCase
 
         $stubRequestContext->expects($this->any())
             ->method('getHost')
-            ->will($this->returnValue('localhost'));
+            ->willReturn('localhost');
 
         $stubRouterAdmin->expects($this->any())
             ->method('getContext')
-            ->will($this->returnValue(
+            ->willReturn(
                 $stubRequestContext
-            ));
+            );
 
         $requestStack->push($request);
         $this->container->set('request', $request);

@@ -377,7 +377,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     {
         $display_initial_price = $product->getVirtualColumn('display_initial_price');
 
-        if (\is_null($display_initial_price)) {
+        if (null === $display_initial_price) {
             $display_initial_price = 1;
         }
 
@@ -633,25 +633,25 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $id = $this->getId();
 
-        if (!\is_null($id)) {
+        if (null !== $id) {
             $search->filterById($id, Criteria::IN);
         }
 
         $ref = $this->getRef();
 
-        if (!\is_null($ref)) {
+        if (null !== $ref) {
             $search->filterByRef($ref, Criteria::IN);
         }
 
         $title = $this->getTitle();
 
-        if (!\is_null($title)) {
+        if (null !== $title) {
             $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%'.$title.'%');
         }
 
         $templateIdList = $this->getTemplateId();
 
-        if (!\is_null($templateIdList)) {
+        if (null !== $templateIdList) {
             $search->filterByTemplateId($templateIdList, Criteria::IN);
         }
 
@@ -690,7 +690,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         $search->withColumn(
-            'CASE WHEN ISNULL(`CategorySelect`.POSITION) THEN '.PHP_INT_MAX.' ELSE CAST(`CategorySelect`.POSITION as SIGNED) END',
+            'CASE WHEN ISNULL(`CategorySelect`.POSITION) THEN '.\PHP_INT_MAX.' ELSE CAST(`CategorySelect`.POSITION as SIGNED) END',
             'position_delegate'
         );
         $search->withColumn('`CategorySelect`.CATEGORY_ID', 'default_category_id');
@@ -763,13 +763,13 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $exclude = $this->getExclude();
 
-        if (!\is_null($exclude)) {
+        if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
         $exclude_category = $this->getExcludeCategory();
 
-        if (!\is_null($exclude_category)) {
+        if (null !== $exclude_category) {
             $search
                 ->useProductCategoryQuery('ExcludeCategorySelect')
                     ->filterByCategoryId($exclude_category, Criteria::NOT_IN)

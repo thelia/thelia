@@ -124,7 +124,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
         $id = $this->getId();
 
-        if (!\is_null($id)) {
+        if (null !== $id) {
             $search->filterById($id, Criteria::IN);
         }
 
@@ -144,7 +144,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
         $exclude = $this->getExclude();
 
-        if (!\is_null($exclude)) {
+        if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
@@ -160,7 +160,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
         $title = $this->getTitle();
 
-        if (!\is_null($title)) {
+        if (null !== $title) {
             $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%'.$title.'%');
         }
 

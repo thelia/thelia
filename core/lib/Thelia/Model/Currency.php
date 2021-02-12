@@ -57,7 +57,7 @@ class Currency extends BaseCurrency
      */
     public function getRate()
     {
-        if (false === filter_var($this->rate, FILTER_VALIDATE_FLOAT)) {
+        if (false === filter_var($this->rate, \FILTER_VALIDATE_FLOAT)) {
             throw new PropelException('Currency::rate is not float value');
         }
 

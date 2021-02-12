@@ -12,7 +12,7 @@
 
 use Thelia\Model\ProductAssociatedContent;
 
-if (php_sapi_name() != 'cli') {
+if (PHP_SAPI != 'cli') {
     throw new \Exception('this script can only be launched with cli sapi');
 }
 
@@ -29,7 +29,7 @@ foreach ($argv as $arg) {
     }
 
     if ($bootstrapToggle) {
-        require __DIR__.DIRECTORY_SEPARATOR.$arg;
+        require __DIR__.\DIRECTORY_SEPARATOR.$arg;
 
         $bootstraped = true;
     }

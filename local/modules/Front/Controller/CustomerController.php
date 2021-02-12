@@ -329,7 +329,7 @@ class CustomerController extends BaseFrontController
                 $customerChangeEvent->setCustomer($customer);
 
                 $customerChangeEvent->setEmailUpdateAllowed(
-                    (\intval(ConfigQuery::read('customer_change_email', 0))) ? true : false
+                    ((int) (ConfigQuery::read('customer_change_email', 0))) ? true : false
                 );
 
                 $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFILE, $customerChangeEvent);
@@ -429,7 +429,7 @@ class CustomerController extends BaseFrontController
 
                     $this->processLogin($customer);
 
-                    if (\intval($form->get('remember_me')->getData()) > 0) {
+                    if ((int) ($form->get('remember_me')->getData()) > 0) {
                         // If a remember me field if present and set in the form, create
                         // the cookie thant store "remember me" information
                         $this->createRememberMeCookie(

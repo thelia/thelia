@@ -128,7 +128,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $id = $this->getId();
 
-        if (!\is_null($id)) {
+        if (null !== $id) {
             $search->filterById($id, Criteria::IN);
         }
 
@@ -166,7 +166,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         $search->withColumn(
-            'CAST(CASE WHEN ISNULL(`FolderSelect`.POSITION) THEN \''.PHP_INT_MAX.'\' ELSE `FolderSelect`.POSITION END AS SIGNED)',
+            'CAST(CASE WHEN ISNULL(`FolderSelect`.POSITION) THEN \''.\PHP_INT_MAX.'\' ELSE `FolderSelect`.POSITION END AS SIGNED)',
             'position_delegate'
         );
         $search->withColumn('`FolderSelect`.FOLDER_ID', 'default_folder_id');
@@ -200,19 +200,19 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $title = $this->getTitle();
 
-        if (!\is_null($title)) {
+        if (null !== $title) {
             $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%'.$title.'%');
         }
 
         $exclude = $this->getExclude();
 
-        if (!\is_null($exclude)) {
+        if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
         $exclude_folder = $this->getExcludeFolder();
 
-        if (!\is_null($exclude_folder)) {
+        if (null !== $exclude_folder) {
             $search->filterByFolder(
                 FolderQuery::create()->filterById($exclude_folder, Criteria::IN)->find(),
                 Criteria::NOT_IN

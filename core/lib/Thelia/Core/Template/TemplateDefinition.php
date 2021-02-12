@@ -58,19 +58,19 @@ class TemplateDefinition
     public function __construct($name, $type)
     {
         switch ($type) {
-            case TemplateDefinition::FRONT_OFFICE:
+            case self::FRONT_OFFICE:
                 $this->path = self::FRONT_OFFICE_SUBDIR.DS.$name;
                 $this->translationDomainPrefix = 'fo.';
                 break;
-            case TemplateDefinition::BACK_OFFICE:
+            case self::BACK_OFFICE:
                 $this->path = self::BACK_OFFICE_SUBDIR.DS.$name;
                 $this->translationDomainPrefix = 'bo.';
                 break;
-            case TemplateDefinition::PDF:
+            case self::PDF:
                 $this->path = self::PDF_SUBDIR.DS.$name;
                 $this->translationDomainPrefix = 'pdf.';
                 break;
-            case TemplateDefinition::EMAIL:
+            case self::EMAIL:
                 $this->path = self::EMAIL_SUBDIR.DS.$name;
                 $this->translationDomainPrefix = 'email.';
                 break;

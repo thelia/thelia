@@ -389,7 +389,7 @@ class BaseModule implements BaseModuleInterface
      */
     public static function getModuleCode()
     {
-        $fullClassName = explode('\\', \get_called_class());
+        $fullClassName = explode('\\', static::class);
 
         return end($fullClassName);
     }

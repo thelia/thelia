@@ -45,7 +45,7 @@ class CustomerTest extends BaseAction
             ->delete();
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $session = new Session(new MockArraySessionStorage());
 

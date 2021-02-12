@@ -25,7 +25,7 @@ class NumberFormat
 
     public static function getInstance(Request $request)
     {
-        return new NumberFormat($request);
+        return new self($request);
     }
 
     /**

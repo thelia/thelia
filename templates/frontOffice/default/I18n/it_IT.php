@@ -137,7 +137,7 @@ return [
     'Price descending' => 'Prezzo decrescente',
     'Proceed checkout' => 'Procedere all\'acquisto',
     'Product Empty Button' => 'Aggiungere il mio primo prodotto',
-    'Product Empty Message' => 'È davvero veloce per aggiungere un prodotto.         
+    'Product Empty Message' => 'È davvero veloce per aggiungere un prodotto.
 <ol>
 <li>Check <strong>NEW</strong> sotto la scheda dei dettagli, se vuoi vedere il tuo prodotto nella sezione prodotti più recente.</li>             <li>Check <strong>in vendita</strong> sotto la scheda dei dettagli, se vuoi vedere il tuo prodotto nella sezione prodotti in offerta.</li>         </ol>',
     'Product Empty Title' => 'Benvenuto',

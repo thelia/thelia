@@ -29,7 +29,7 @@ class FeatureAvEvent extends ActionEvent
 
     public function hasFeatureAv()
     {
-        return !\is_null($this->featureAv);
+        return null !== $this->featureAv;
     }
 
     public function getFeatureAv()

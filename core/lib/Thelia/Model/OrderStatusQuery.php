@@ -60,7 +60,7 @@ class OrderStatusQuery extends BaseOrderStatusQuery
     public static function getStatusModelFromCode($statusCode)
     {
         if (!isset(self::$statusModelCache[$statusCode])) {
-            self::$statusModelCache[$statusCode] = OrderStatusQuery::create()->findOneByCode($statusCode);
+            self::$statusModelCache[$statusCode] = self::create()->findOneByCode($statusCode);
         }
 
         return self::$statusModelCache[$statusCode];
@@ -138,7 +138,7 @@ class OrderStatusQuery extends BaseOrderStatusQuery
         if (!isset(self::$statusIdListsCache[$statusCode])) {
             $statusIdList = [];
 
-            $statusList = OrderStatusQuery::create()->find();
+            $statusList = self::create()->find();
 
             /** @var OrderStatus $status */
             foreach ($statusList as $status) {

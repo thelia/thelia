@@ -126,7 +126,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         $search = $method->invoke(null); // Static !
 
         // $query->filterByXXX(id)
-        if (!\is_null($object_id)) {
+        if (null !== $object_id) {
             $method = new \ReflectionMethod($queryClass, $filterMethod);
             $method->invoke($search, $object_id);
         }
@@ -174,11 +174,11 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         // Check form source="product" source_id="123" style arguments
         $source = $this->getSource();
 
-        if (!\is_null($source)) {
+        if (null !== $source) {
             $source_id = $this->getSourceId();
             $id = $this->getId();
 
-            if (\is_null($source_id) && \is_null($id)) {
+            if (null === $source_id && null === $id) {
                 throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
             }
 
@@ -189,7 +189,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         } else {
             // Check for product="id" folder="id", etc. style arguments
             foreach ($this->possible_sources as $source) {
-                $argValue = \intval($this->getArgValue($source));
+                $argValue = (int) ($this->getArgValue($source));
 
                 if ($argValue > 0) {
                     $search = $this->createSearchQuery($source, $argValue);
@@ -222,12 +222,12 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $id = $this->getId();
 
-        if (!\is_null($id)) {
+        if (null !== $id) {
             $search->filterById($id, Criteria::IN);
         }
 
         $exclude = $this->getExclude();
-        if (!\is_null($exclude)) {
+        if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 

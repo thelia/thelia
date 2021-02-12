@@ -53,34 +53,34 @@ class RemovePercentageOnCategoriesTest extends TestCase
         $currencies = $currencies->find();
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
+            ->willReturn($currencies);
 
         $stubFacade->expects($this->any())
             ->method('getCartTotalPrice')
-            ->will($this->returnValue($cartTotalPrice));
+            ->willReturn($cartTotalPrice);
 
         $stubFacade->expects($this->any())
             ->method('getDeliveryCountry')
-            ->will($this->returnValue($defaultCountry));
+            ->willReturn($defaultCountry);
 
         $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
-            ->will($this->returnValue($checkoutCurrency));
+            ->willReturn($checkoutCurrency);
 
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
         $stubTranslator->expects($this->any())
             ->method('trans')
-            ->will($this->returnValue($i18nOutput));
+            ->willReturn($i18nOutput);
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
 
         return $stubFacade;
     }
@@ -109,22 +109,22 @@ class RemovePercentageOnCategoriesTest extends TestCase
         $cartItem1Stub
             ->expects($this->any())
             ->method('getProduct')
-            ->will($this->returnValue($product1))
+            ->willReturn($product1)
         ;
         $cartItem1Stub
             ->expects($this->any())
             ->method('getQuantity')
-            ->will($this->returnValue(1))
+            ->willReturn(1)
         ;
         $cartItem1Stub
             ->expects($this->any())
             ->method('getRealTaxedPrice')
-            ->will($this->returnValue(100))
+            ->willReturn(100)
         ;
         $cartItem1Stub
             ->expects($this->any())
             ->method('getTotalRealTaxedPrice')
-            ->will($this->returnValue(100))
+            ->willReturn(100)
         ;
 
         $cartItem2Stub = $this->getMockBuilder('\Thelia\Model\CartItem')
@@ -134,22 +134,22 @@ class RemovePercentageOnCategoriesTest extends TestCase
         $cartItem2Stub
             ->expects($this->any())
             ->method('getProduct')
-            ->will($this->returnValue($product2))
+            ->willReturn($product2)
         ;
         $cartItem2Stub
             ->expects($this->any())
             ->method('getQuantity')
-            ->will($this->returnValue(2))
+            ->willReturn(2)
         ;
         $cartItem2Stub
             ->expects($this->any())
             ->method('getRealTaxedPrice')
-            ->will($this->returnValue(200))
+            ->willReturn(200)
         ;
         $cartItem2Stub
             ->expects($this->any())
             ->method('getTotalRealTaxedPrice')
-            ->will($this->returnValue(400))
+            ->willReturn(400)
         ;
 
         $cartStub = $this->getMockBuilder('\Thelia\Model\Cart')
@@ -159,11 +159,11 @@ class RemovePercentageOnCategoriesTest extends TestCase
         $cartStub
             ->expects($this->any())
             ->method('getCartItems')
-            ->will($this->returnValue([$cartItem1Stub, $cartItem2Stub]));
+            ->willReturn([$cartItem1Stub, $cartItem2Stub]);
 
         $stubFacade->expects($this->any())
             ->method('getCart')
-            ->will($this->returnValue($cartStub));
+            ->willReturn($cartStub);
     }
 
     public function generateNoMatchingCart(MockObject $stubFacade): void
@@ -180,21 +180,21 @@ class RemovePercentageOnCategoriesTest extends TestCase
 
         $cartItem2Stub->expects($this->any())
             ->method('getProduct')
-            ->will($this->returnValue($product2));
+            ->willReturn($product2);
 
         $cartItem2Stub->expects($this->any())
             ->method('getQuantity')
-            ->will($this->returnValue(2));
+            ->willReturn(2);
 
         $cartItem2Stub
             ->expects($this->any())
             ->method('getRealTaxedPrice')
-            ->will($this->returnValue(200000))
+            ->willReturn(200000)
         ;
         $cartItem2Stub
             ->expects($this->any())
             ->method('getTotalRealTaxedPrice')
-            ->will($this->returnValue(400000))
+            ->willReturn(400000)
         ;
 
         $cartStub = $this->getMockBuilder('\Thelia\Model\Cart')
@@ -204,11 +204,11 @@ class RemovePercentageOnCategoriesTest extends TestCase
         $cartStub
             ->expects($this->any())
             ->method('getCartItems')
-            ->will($this->returnValue([$cartItem2Stub]));
+            ->willReturn([$cartItem2Stub]);
 
         $stubFacade->expects($this->any())
             ->method('getCart')
-            ->will($this->returnValue($cartStub));
+            ->willReturn($cartStub);
     }
 
     public function testSet(): void
@@ -269,10 +269,10 @@ class RemovePercentageOnCategoriesTest extends TestCase
         $this->assertEquals('This is a test coupon title', $coupon->getShortDescription());
         $this->assertEquals('This is a test coupon description', $coupon->getDescription());
 
-        $this->assertEquals(true, $coupon->isCumulative());
-        $this->assertEquals(true, $coupon->isRemovingPostage());
-        $this->assertEquals(true, $coupon->isAvailableOnSpecialOffers());
-        $this->assertEquals(true, $coupon->isEnabled());
+        $this->assertTrue($coupon->isCumulative());
+        $this->assertTrue($coupon->isRemovingPostage());
+        $this->assertTrue($coupon->isAvailableOnSpecialOffers());
+        $this->assertTrue($coupon->isEnabled());
 
         $this->assertEquals(254, $coupon->getMaxUsage());
         $this->assertEquals($date, $coupon->getExpirationDate());

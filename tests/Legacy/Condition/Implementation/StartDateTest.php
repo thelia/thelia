@@ -57,22 +57,22 @@ class StartDateTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getDeliveryAddress')
-            ->will($this->returnValue($address));
+            ->willReturn($address);
 
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
         $stubTranslator->expects($this->any())
             ->method('trans')
-            ->will($this->returnValue($i18nOutput));
+            ->willReturn($i18nOutput);
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
 
         $lang = new Lang();
         $lang->setDateFormat('d/m/Y');
@@ -83,7 +83,7 @@ class StartDateTest extends TestCase
 
         $stubSession->expects($this->any())
             ->method('getLang')
-            ->will($this->returnValue($lang));
+            ->willReturn($lang);
 
         $stubRequest = $this->getMockBuilder('\Thelia\Core\HttpFoundation\Request')
             ->disableOriginalConstructor()
@@ -91,11 +91,11 @@ class StartDateTest extends TestCase
 
         $stubRequest->expects($this->any())
             ->method('getSession')
-            ->will($this->returnValue($stubSession));
+            ->willReturn($stubSession);
 
         $stubFacade->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($stubRequest));
+            ->willReturn($stubRequest);
 
         return $stubFacade;
     }

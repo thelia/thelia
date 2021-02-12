@@ -169,7 +169,7 @@ class URL
         $queryString = '';
         $anchor = '';
 
-        if (!\is_null($parameters)) {
+        if (null !== $parameters) {
             foreach ($parameters as $name => $value) {
                 // Remove this parameter from base URL to prevent duplicate parameters
                 $base = preg_replace('`([?&])'.preg_quote($name, '`').'=(?:[^&]*)(?:&|$)`', '$1', $base);
@@ -246,7 +246,7 @@ class URL
                 $allParametersWithoutView[$view.'_id'] = $viewId;
             }
             $this->retriever->rewrittenUrl = null;
-            $this->retriever->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);
+            $this->retriever->url = self::getInstance()->viewUrl($view, $allParametersWithoutView);
         }
 
         return $this->retriever;
@@ -287,7 +287,7 @@ class URL
                 unset($allOtherParameters['view']);
             }
             $this->retriever->rewrittenUrl = null;
-            $this->retriever->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);
+            $this->retriever->url = self::getInstance()->viewUrl($view, $allParametersWithoutView);
         }
 
         return $this->retriever;

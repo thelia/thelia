@@ -77,7 +77,7 @@ abstract class ContainerAwareTestCase extends TestCase
         return new Session(new MockArraySessionStorage());
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         Tlog::getNewInstance();
 

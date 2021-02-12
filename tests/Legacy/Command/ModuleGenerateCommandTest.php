@@ -52,7 +52,7 @@ class ModuleGenerateCommandTest extends BaseCommandTest
         self::clearTest();
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $application = new Application($this->getKernel());
 
@@ -102,8 +102,8 @@ class ModuleGenerateCommandTest extends BaseCommandTest
         // remove the config.xml
         $fs = new Filesystem();
         $configFile = THELIA_MODULE_DIR.'Test'.
-            DIRECTORY_SEPARATOR.'Config'.
-            DIRECTORY_SEPARATOR.'config.xml'
+            \DIRECTORY_SEPARATOR.'Config'.
+            \DIRECTORY_SEPARATOR.'config.xml'
         ;
         $fs->remove($configFile);
 

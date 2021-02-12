@@ -83,7 +83,7 @@ class DiffDatabaseCommand extends ContainerAwareCommand
 
         // instantiate the migration class
         require $migration->getRealPath();
-        $migrationClassName = pathinfo($migration->getFilename(), PATHINFO_FILENAME);
+        $migrationClassName = pathinfo($migration->getFilename(), \PATHINFO_FILENAME);
         $migrationClass = new $migrationClassName();
 
         // output the generated SQL

@@ -39,9 +39,9 @@ trait CartTrait
      */
     public function getCart(EventDispatcherInterface $dispatcher, Request $request)
     {
-        trigger_error(
+        @trigger_error(
             'CartTrait is deprecated, please use Session::getSessionCart method instead',
-            E_USER_DEPRECATED
+            \E_USER_DEPRECATED
         );
 
         return $request->getSession()->getSessionCart($dispatcher);

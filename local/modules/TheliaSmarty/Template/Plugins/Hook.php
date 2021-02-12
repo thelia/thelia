@@ -87,7 +87,7 @@ class Hook extends AbstractSmartyPlugin
     public function processHookFunction($params, &$smarty)
     {
         $hookName = $this->getParam($params, 'name');
-        $module = \intval($this->getParam($params, 'module', 0));
+        $module = (int) ($this->getParam($params, 'module', 0));
         $moduleCode = $this->getParam($params, 'modulecode', '');
 
         $type = $smarty->getTemplateDefinition()->getType();
@@ -217,7 +217,7 @@ HTML;
     public function processHookBlock($params, $content, $smarty, &$repeat)
     {
         $hookName = $this->getParam($params, 'name');
-        $module = \intval($this->getParam($params, 'module', 0));
+        $module = (int) ($this->getParam($params, 'module', 0));
         // explicit definition of variable that can be returned
         $fields = preg_replace(
             '|[^a-zA-Z0-9,\-_]|',

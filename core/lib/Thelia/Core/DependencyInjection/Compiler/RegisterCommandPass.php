@@ -28,7 +28,7 @@ class RegisterCommandPass implements CompilerPassInterface
 
         foreach ($container->findTaggedServiceIds('thelia.command') as $id => $tag) {
             $commandDefinition = $container->getDefinition($id);
-            array_push($commands, $commandDefinition->getClass());
+            $commands[] = $commandDefinition->getClass();
         }
 
         $container->setParameter('command.definition', $commands);

@@ -130,23 +130,23 @@ class Carousel extends Image
             $quality = $this->getQuality();
             $effects = $this->getEffects();
 
-            if (!\is_null($width)) {
+            if (null !== $width) {
                 $event->setWidth($width);
             }
-            if (!\is_null($height)) {
+            if (null !== $height) {
                 $event->setHeight($height);
             }
             $event->setResizeMode($resize_mode);
-            if (!\is_null($rotation)) {
+            if (null !== $rotation) {
                 $event->setRotation($rotation);
             }
-            if (!\is_null($background_color)) {
+            if (null !== $background_color) {
                 $event->setBackgroundColor($background_color);
             }
-            if (!\is_null($quality)) {
+            if (null !== $quality) {
                 $event->setQuality($quality);
             }
-            if (!\is_null($effects)) {
+            if (null !== $effects) {
                 $event->setEffects($effects);
             }
 

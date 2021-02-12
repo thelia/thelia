@@ -150,7 +150,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         $search = $method->invoke(null); // Static !
 
         // $query->filterByXXX(id)
-        if (!\is_null($object_id)) {
+        if (null !== $object_id) {
             $method = new \ReflectionMethod($queryClass, $filterMethod);
             $method->invoke($search, $object_id);
         }
@@ -198,11 +198,11 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         // Check form source="product" source_id="123" style arguments
         $source = $this->getSource();
 
-        if (!\is_null($source)) {
+        if (null !== $source) {
             $sourceId = $this->getSourceId();
             $id = $this->getId();
 
-            if (\is_null($sourceId) && \is_null($id)) {
+            if (null === $sourceId && null === $id) {
                 throw new \InvalidArgumentException(
                     "If 'source' argument is specified, 'id' or 'source_id' argument should be specified"
                 );
@@ -218,7 +218,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 $argValue = $this->getArgValue($source);
 
                 if (!empty($argValue)) {
-                    $argValue = \intval($argValue);
+                    $argValue = (int) $argValue;
 
                     $search = $this->createSearchQuery($source, $argValue);
 
@@ -252,12 +252,12 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $id = $this->getId();
 
-        if (!\is_null($id)) {
+        if (null !== $id) {
             $search->filterById($id, Criteria::IN);
         }
 
         $exclude = $this->getExclude();
-        if (!\is_null($exclude)) {
+        if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
@@ -284,7 +284,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $event->setAllowZoom($this->getAllowZoom());
 
-        if (!\is_null($effects)) {
+        if (null !== $effects) {
             $effects = explode(',', $effects);
         }
 
@@ -310,23 +310,23 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         /** @var ProductImage $result */
         foreach ($loopResult->getResultDataCollection() as $result) {
             // Setup required transformations
-            if (!\is_null($width)) {
+            if (null !== $width) {
                 $event->setWidth($width);
             }
-            if (!\is_null($height)) {
+            if (null !== $height) {
                 $event->setHeight($height);
             }
             $event->setResizeMode($resizeMode);
-            if (!\is_null($rotation)) {
+            if (null !== $rotation) {
                 $event->setRotation($rotation);
             }
-            if (!\is_null($background_color)) {
+            if (null !== $background_color) {
                 $event->setBackgroundColor($background_color);
             }
-            if (!\is_null($quality)) {
+            if (null !== $quality) {
                 $event->setQuality($quality);
             }
-            if (!\is_null($effects)) {
+            if (null !== $effects) {
                 $event->setEffects($effects);
             }
 

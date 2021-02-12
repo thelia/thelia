@@ -24,7 +24,7 @@ class FloatType extends BaseType
 
     public function isValid($value)
     {
-        return filter_var($value, FILTER_VALIDATE_FLOAT) === false ? false : true;
+        return filter_var($value, \FILTER_VALIDATE_FLOAT) === false ? false : true;
     }
 
     public function getFormattedValue($value)

@@ -65,7 +65,7 @@ class ImageTest extends TestCaseWithURLToolSetup
         return $fileManager;
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->session = new Session(new MockArraySessionStorage());
         $this->request = new Request();
@@ -100,7 +100,7 @@ class ImageTest extends TestCaseWithURLToolSetup
         }
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         // restore cache configuration.
         $config = ConfigQuery::create()->filterByName('image_cache_dir_from_web_root')->findOne();

@@ -335,11 +335,11 @@ class TheliaLoop extends AbstractSmartyPlugin
             return '';
         }
 
-        $startPage = \intval($this->getParam($params, 'start-page', 1));
-        $displayedPageCount = \intval($this->getParam($params, 'limit', 10));
+        $startPage = (int) ($this->getParam($params, 'start-page', 1));
+        $displayedPageCount = (int) ($this->getParam($params, 'limit', 10));
 
-        if (\intval($displayedPageCount) == 0) {
-            $displayedPageCount = PHP_INT_MAX;
+        if ((int) $displayedPageCount == 0) {
+            $displayedPageCount = \PHP_INT_MAX;
         }
 
         $totalPageCount = $pagination->getLastPage();

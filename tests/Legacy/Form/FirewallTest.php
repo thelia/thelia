@@ -34,7 +34,7 @@ class FirewallTest extends TestCase
     /** @var MockObject */
     protected $form;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $session = new Session();
 
@@ -148,7 +148,7 @@ class FirewallTest extends TestCase
         $this->form
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('test_form_firewall_2'))
+            ->willReturn('test_form_firewall_2')
         ;
 
         $this->form->isFirewallOk('prod');

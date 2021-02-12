@@ -308,7 +308,7 @@ class AreaController extends AbstractCrudController
 
     protected function removeOneCountryFromArea(Area $area, $countryId, $stateId): void
     {
-        if (\intval($stateId) === 0) {
+        if ((int) $stateId === 0) {
             $stateId = null;
         }
 

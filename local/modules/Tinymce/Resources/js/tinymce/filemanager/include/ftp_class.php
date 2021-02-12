@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-class FTPClient
+class ftp_class
 {
     // *** Class variables
     private $connectionId;

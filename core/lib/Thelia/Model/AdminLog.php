@@ -38,7 +38,7 @@ class AdminLog extends BaseAdminLog
         $withRequestContent = true,
         $resourceId = null
     ): void {
-        $log = new AdminLog();
+        $log = new self();
 
         $log
             ->setAdminLogin($adminUser !== null ? $adminUser->getUsername() : '<no login>')

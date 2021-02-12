@@ -72,7 +72,7 @@ class Tax extends BaseTax
     {
         $requirements = json_decode(base64_decode(parent::getSerializedRequirements()), true);
 
-        if (json_last_error() != JSON_ERROR_NONE || !\is_array($requirements)) {
+        if (json_last_error() != \JSON_ERROR_NONE || !\is_array($requirements)) {
             throw new TaxEngineException('BAD RECORDED REQUIREMENTS', TaxEngineException::BAD_RECORDED_REQUIREMENTS);
         }
 

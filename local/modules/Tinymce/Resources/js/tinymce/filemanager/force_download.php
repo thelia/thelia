@@ -13,7 +13,7 @@
 $config = include 'config/config.php';
 
 //TODO switch to array
-extract($config, EXTR_OVERWRITE);
+extract($config, \EXTR_OVERWRITE);
 
 include 'include/utils.php';
 
@@ -78,7 +78,7 @@ if ($ftp) {
     if (function_exists('mime_content_type')) {
         $mime_type = mime_content_type($file_path);
     } elseif (function_exists('finfo_open')) {
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $finfo = finfo_open(\FILEINFO_MIME_TYPE);
         $mime_type = finfo_file($finfo, $file_path);
     } else {
         include 'include/mime_type_lib.php';
@@ -98,11 +98,11 @@ if ($ftp) {
         [$a, $range] = explode('=', $_SERVER['HTTP_RANGE'], 2);
         [$range] = explode(',', $range, 2);
         [$range, $range_end] = explode('-', $range);
-        $range = intval($range);
+        $range = (int) $range;
         if (!$range_end) {
             $range_end = $size - 1;
         } else {
-            $range_end = intval($range_end);
+            $range_end = (int) $range_end;
         }
 
         $new_length = $range_end - $range + 1;

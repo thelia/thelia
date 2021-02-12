@@ -87,7 +87,7 @@ class RewritingResolverTest extends TestCase
         $resolverQuery->expects($this->any())
             ->method('getResolverSearch')
             ->with('foo.html')
-            ->will($this->returnValue($collection));
+            ->willReturn($collection);
 
         $resolver = new RewritingResolver();
 
@@ -120,7 +120,7 @@ class RewritingResolverTest extends TestCase
         $resolverQuery->expects($this->any())
             ->method('getResolverSearch')
             ->with('foo.html')
-            ->will($this->returnValue($collection));
+            ->willReturn($collection);
 
         $resolver = new RewritingResolver();
 

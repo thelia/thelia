@@ -29,7 +29,7 @@ class ProductEvent extends ActionEvent
 
     public function hasProduct()
     {
-        return !\is_null($this->product);
+        return null !== $this->product;
     }
 
     public function getProduct()

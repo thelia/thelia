@@ -10,10 +10,10 @@
  * file that was distributed with this source code.
  */
 
-if (version_compare(phpversion(), '7.2', '<')) {
+if (version_compare(PHP_VERSION, '7.2', '<')) {
     exit(sprintf(
         "Thelia needs at least php 7.2, but you are using php %s. Please upgrade before using Thelia.\n",
-        phpversion()
+        PHP_VERSION
     ));
 }
 
@@ -22,7 +22,7 @@ if (version_compare(phpversion(), '7.2', '<')) {
  */
 
 if (!defined('DS')) {
-    define('DS', DIRECTORY_SEPARATOR);
+    define('DS', \DIRECTORY_SEPARATOR);
 }
 
 if (!defined('THELIA_ROOT')) {
@@ -104,7 +104,7 @@ if (!defined('TheliaMain_BUILD_DATABASE_PATH')) {
 }
 
 if (!file_exists(THELIA_CONF_DIR.'database.yml') && !defined('THELIA_INSTALL_MODE')) {
-    $sapi = php_sapi_name();
+    $sapi = PHP_SAPI;
     if (substr($sapi, 0, 3) == 'cli') {
         define('THELIA_INSTALL_MODE', true);
     } elseif (file_exists(THELIA_ROOT.DS.'web'.DS.'install')) {

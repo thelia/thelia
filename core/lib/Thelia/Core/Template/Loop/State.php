@@ -92,7 +92,7 @@ class State extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $exclude = $this->getExclude();
-        if (!\is_null($exclude)) {
+        if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 

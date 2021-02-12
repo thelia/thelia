@@ -80,7 +80,7 @@ abstract class ConditionAbstract implements ConditionInterface
 
         if (!$isOperator1Legit) {
             throw new InvalidConditionOperatorException(
-                \get_class(),
+                __CLASS__,
                 $parameterName
             );
         }
@@ -135,7 +135,7 @@ abstract class ConditionAbstract implements ConditionInterface
     protected function generateInputs()
     {
         throw new \Thelia\Exception\NotImplementedException(
-            'The generateInputs method must be implemented in '.\get_class()
+            'The generateInputs method must be implemented in '.__CLASS__
         );
     }
 
@@ -147,7 +147,7 @@ abstract class ConditionAbstract implements ConditionInterface
     public function getServiceId()
     {
         throw new \Thelia\Exception\NotImplementedException(
-            'The getServiceId method must be implemented in '.\get_class()
+            'The getServiceId method must be implemented in '.__CLASS__
         );
     }
 
@@ -201,7 +201,7 @@ abstract class ConditionAbstract implements ConditionInterface
         }
         if (!$currencyFound) {
             throw new InvalidConditionValueException(
-                \get_class(),
+                __CLASS__,
                 'currency'
             );
         }
@@ -223,7 +223,7 @@ abstract class ConditionAbstract implements ConditionInterface
         $floatType = new FloatType();
         if (!$floatType->isValid($priceValue) || $priceValue <= 0) {
             throw new InvalidConditionValueException(
-                \get_class(),
+                __CLASS__,
                 'price'
             );
         }

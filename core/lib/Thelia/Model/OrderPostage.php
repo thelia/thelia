@@ -44,10 +44,10 @@ class OrderPostage
      */
     public static function loadFromPostage($postage)
     {
-        if ($postage instanceof OrderPostage) {
+        if ($postage instanceof self) {
             $orderPostage = $postage;
         } else {
-            $orderPostage = new OrderPostage($postage);
+            $orderPostage = new self($postage);
         }
 
         return $orderPostage;

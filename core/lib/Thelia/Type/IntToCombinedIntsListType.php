@@ -29,7 +29,7 @@ class IntToCombinedIntsListType extends BaseType
             if (\count($parts) != 2) {
                 return false;
             }
-            if (filter_var($parts[0], FILTER_VALIDATE_INT) === false) {
+            if (filter_var($parts[0], \FILTER_VALIDATE_INT) === false) {
                 return false;
             }
 

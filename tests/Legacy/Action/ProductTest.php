@@ -864,7 +864,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
                 // Get original file mimeType
                 $finfo = new \finfo();
-                $fileMimeType = $finfo->file($srcPath, FILEINFO_MIME_TYPE);
+                $fileMimeType = $finfo->file($srcPath, \FILEINFO_MIME_TYPE);
 
                 // Check files depending on the type
                 switch ($type) {
@@ -879,7 +879,7 @@ class ProductTest extends TestCaseWithURLToolSetup
                         $this->assertFileExists($cloneProductFile->getUploadDir().DS.$cloneProductFile->getFile(), 'Cloned image doesn\'t exist');
                         $this->assertEquals(
                             $fileMimeType,
-                            $finfo->file($cloneProductFile->getUploadDir().DS.$cloneProductFile->getFile(), FILEINFO_MIME_TYPE),
+                            $finfo->file($cloneProductFile->getUploadDir().DS.$cloneProductFile->getFile(), \FILEINFO_MIME_TYPE),
                             'ProductImage\'s mime type must be equal'
                         );
 
@@ -904,7 +904,7 @@ class ProductTest extends TestCaseWithURLToolSetup
                         $this->assertFileExists($cloneProductFile->getUploadDir().DS.$cloneProductFile->getFile(), 'Cloned document doesn\'t exist');
                         $this->assertEquals(
                             $fileMimeType,
-                            $finfo->file($cloneProductFile->getUploadDir().DS.$cloneProductFile->getFile(), FILEINFO_MIME_TYPE),
+                            $finfo->file($cloneProductFile->getUploadDir().DS.$cloneProductFile->getFile(), \FILEINFO_MIME_TYPE),
                             'ProductDocument\'s mime type must be equal'
                         );
 

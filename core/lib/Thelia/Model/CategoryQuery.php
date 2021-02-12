@@ -65,7 +65,7 @@ class CategoryQuery extends BaseCategoryQuery
                 ->find();
 
             foreach ($categories as $category) {
-                array_push($result, $category);
+                $result[] = $category;
                 $result = array_merge($result, (array) self::findAllChild($category->getId(), $depth, $currentPos));
             }
         }
@@ -109,7 +109,7 @@ class CategoryQuery extends BaseCategoryQuery
                     ->getData();
 
                 foreach ($subCategories as $subCategoryId) {
-                    array_push($result, $subCategoryId);
+                    $result[] = $subCategoryId;
                     $result = array_merge($result, self::findAllChildId($subCategoryId, $depth, $currentPos));
                 }
 
@@ -165,7 +165,7 @@ class CategoryQuery extends BaseCategoryQuery
     {
         $path = [];
 
-        $category = (new CategoryQuery())->findPk($categoryId);
+        $category = (new self())->findPk($categoryId);
         if ($category !== null) {
             $path[] = $category;
 

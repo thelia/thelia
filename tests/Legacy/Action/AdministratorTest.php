@@ -34,7 +34,7 @@ class AdministratorTest extends BaseAction
     protected $mailerFactory;
     protected $tokenProvider;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $session = new Session(new MockArraySessionStorage());
 

@@ -127,7 +127,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
         }
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            file_put_contents($filename, json_encode($row)."\r\n", FILE_APPEND);
+            file_put_contents($filename, json_encode($row)."\r\n", \FILE_APPEND);
         }
 
         return $filename;

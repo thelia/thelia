@@ -59,7 +59,7 @@ class TranslationEvent extends ActionEvent
 
     public static function createGetStringsEvent($directory, $mode, $locale, $domain)
     {
-        $event = new TranslationEvent();
+        $event = new self();
 
         $event->setDirectory($directory);
         $event->setMode($mode);
@@ -75,7 +75,7 @@ class TranslationEvent extends ActionEvent
         $translatedStrings,
         $createFileIfNotExists
     ) {
-        $event = new TranslationEvent();
+        $event = new self();
 
         $event->setTranslatableStrings($translatableStrings);
         $event->setTranslatedStrings($translatedStrings);
