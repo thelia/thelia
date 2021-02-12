@@ -31,25 +31,23 @@ use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * @package Thelia\Core\Template\Loop
- *
  * @author Franck Allimant <franck@cqfdev.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method null|int[] getId()
- * @method null|int[] getRef()
- * @method null|int[] getInvoiceRef()
- * @method null|int[] getDeliveryRef()
- * @method null|int[] getTransactionRef()
- * @method null|string getCustomer()
- * @method null|string[] getStatus()
- * @method null|int[] getExcludeStatus()
- * @method null|string[] getStatusCode()
- * @method null|string[] getExcludeStatusCode()
- * @method null|string[] getOrder()
- * @method null|bool getWithPrevNextInfo()
+ *
+ * @method int[]|null    getId()
+ * @method int[]|null    getRef()
+ * @method int[]|null    getInvoiceRef()
+ * @method int[]|null    getDeliveryRef()
+ * @method int[]|null    getTransactionRef()
+ * @method string|null   getCustomer()
+ * @method string[]|null getStatus()
+ * @method int[]|null    getExcludeStatus()
+ * @method string[]|null getStatusCode()
+ * @method string[]|null getExcludeStatusCode()
+ * @method string[]|null getOrder()
+ * @method bool|null     getWithPrevNextInfo()
  */
 class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
@@ -101,7 +99,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                             'invoice-date', 'invoice-date-reverse',
                             'company', 'company-reverse',
                             'customer-name', 'customer-name-reverse',
-                            'status', 'status-reverse'
+                            'status', 'status-reverse',
                         ]
                     )
                 ),
@@ -129,6 +127,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
      * @param $searchTerm
      * @param $searchIn
      * @param $searchCriteria
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
@@ -316,13 +315,14 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
 
     /**
      * @return LoopResult
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function parseResults(LoopResult $loopResult)
     {
         $lastLegacyOrderId = ConfigQuery::read('last_legacy_rounding_order_id', 0);
 
-        /**  @var \Thelia\Model\Order $order */
+        /** @var \Thelia\Model\Order $order */
         foreach ($loopResult->getResultDataCollection() as $order) {
             $tax = $itemsTax = 0;
 

@@ -21,7 +21,7 @@ class ModuleHook extends BaseModuleHook
     public const MAX_POSITION = 1000;
 
     /**
-     * Calculate next position relative to our default category
+     * Calculate next position relative to our default category.
      */
     protected function addCriteriaToPositionQuery($query)
     {

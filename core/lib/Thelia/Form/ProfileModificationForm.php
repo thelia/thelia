@@ -19,8 +19,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Model\ProfileQuery;
 
 /**
- * Class ProfileModificationForm
- * @package Thelia\Form
+ * Class ProfileModificationForm.
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class ProfileModificationForm extends ProfileCreationForm
@@ -30,21 +30,21 @@ class ProfileModificationForm extends ProfileCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", HiddenType::class, [
-                "required" => true,
-                "constraints" => [
+            ->add('id', HiddenType::class, [
+                'required' => true,
+                'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, "verifyProfileId"]),
+                    new Constraints\Callback([$this, 'verifyProfileId']),
                 ],
             ])
         ;
 
-        $this->formBuilder->remove("code");
+        $this->formBuilder->remove('code');
     }
 
     public static function getName()
     {
-        return "thelia_profile_modification";
+        return 'thelia_profile_modification';
     }
 
     public function verifyProfileId($value, ExecutionContextInterface $context)
@@ -53,7 +53,7 @@ class ProfileModificationForm extends ProfileCreationForm
             ->findPk($value);
 
         if (null === $profile) {
-            $context->addViolation(Translator::getInstance()->trans("Profile ID not found"));
+            $context->addViolation(Translator::getInstance()->trans('Profile ID not found'));
         }
     }
 }

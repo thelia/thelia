@@ -19,8 +19,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\BaseForm;
 
 /**
- * Class StateCreationForm
- * @package Thelia\Form
+ * Class StateCreationForm.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class StateCreationForm extends BaseForm
@@ -35,16 +35,16 @@ class StateCreationForm extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                     ],
-                    'label' => $this->translator->trans('State title')
+                    'label' => $this->translator->trans('State title'),
                 ]
             )
-            ->add("country_id", "country_id", [
-                "constraints" => [
+            ->add('country_id', 'country_id', [
+                'constraints' => [
                     new NotBlank(),
                 ],
-                "label" => $this->translator->trans("Country"),
-                "label_attr" => [
-                    "for" => "country",
+                'label' => $this->translator->trans('Country'),
+                'label_attr' => [
+                    'for' => 'country',
                 ],
             ])
             ->add(
@@ -64,7 +64,7 @@ class StateCreationForm extends BaseForm
                     'label' => $this->translator->trans('This state is online'),
                     'label_attr' => [
                         'for' => 'visible_create',
-                    ]
+                    ],
                 ]
             )
             ->add(
@@ -76,7 +76,7 @@ class StateCreationForm extends BaseForm
                     ],
                     'label' => $this->translator->trans('ISO Code'),
                     'label_attr' => [
-                        'help' => $this->translator->trans('Iso code for states. It depends of the country.')
+                        'help' => $this->translator->trans('Iso code for states. It depends of the country.'),
                     ],
                 ]
             )
@@ -85,6 +85,6 @@ class StateCreationForm extends BaseForm
 
     public static function getName()
     {
-        return "thelia_state_creation";
+        return 'thelia_state_creation';
     }
 }

@@ -17,19 +17,21 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
  * Processes the Thelia database configuration.
+ *
  * @todo Also read the database configuration file here ?
  */
 class DatabaseConfigurationSource
 {
     /**
      * Map of [connection name => connection ParameterBag].
+     *
      * @var array
      */
     protected $connections;
 
     /**
-     * @param array $theliaDatabaseConfiguration Thelia database configuration.
-     * @param array $envParameters Environment parameters.
+     * @param array $theliaDatabaseConfiguration thelia database configuration
+     * @param array $envParameters               environment parameters
      */
     public function __construct(
         array $theliaDatabaseConfiguration,
@@ -60,14 +62,14 @@ class DatabaseConfigurationSource
         } else {
             throw new \LogicException(
                 "No 'connection' or 'connections' node under the 'database' node."
-                . " This is checked at configuration validation, and should not happen."
+                .' This is checked at configuration validation, and should not happen.'
             );
         }
 
         if (!isset($this->connections[DatabaseConfiguration::THELIA_CONNECTION_NAME])) {
-            throw  new \LogicException(
-                "Connection '" . DatabaseConfiguration::THELIA_CONNECTION_NAME . "' is not defined."
-                . " This is checked at configuration validation, and should not happen."
+            throw new \LogicException(
+                "Connection '".DatabaseConfiguration::THELIA_CONNECTION_NAME."' is not defined."
+                .' This is checked at configuration validation, and should not happen.'
             );
         }
     }
@@ -75,9 +77,10 @@ class DatabaseConfigurationSource
     /**
      * Create and resolve a ParameterBag for a connection.
      * Add the bag to the connections map.
-     * @param string $name Connection name.
-     * @param array $parameters Connection parameters.
-     * @param array $envParameters Environment parameters.
+     *
+     * @param string $name          connection name
+     * @param array  $parameters    connection parameters
+     * @param array  $envParameters environment parameters
      */
     protected function addConnection($name, array $parameters = [], array $envParameters = [])
     {
@@ -88,13 +91,13 @@ class DatabaseConfigurationSource
     }
 
     /**
-     * @return array Propel configuration values.
+     * @return array propel configuration values
      */
     public function getPropelConnectionsConfiguration()
     {
         $propelConnections = [];
         /**
-         * @var string $connectionName
+         * @var string       $connectionName
          * @var ParameterBag $connectionParameterBag
          */
         foreach ($this->connections as $connectionName => $connectionParameterBag) {
@@ -120,7 +123,8 @@ class DatabaseConfigurationSource
     }
 
     /**
-     * @return \PDO Thelia database connection.
+     * @return \PDO thelia database connection
+     *
      * @throws \PDOException
      */
     public function getTheliaConnectionPDO()

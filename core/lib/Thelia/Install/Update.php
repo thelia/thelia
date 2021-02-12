@@ -27,8 +27,8 @@ use Thelia\Log\Tlog;
 use Thelia\Tools\Version\Version;
 
 /**
- * Class Update
- * @package Thelia\Install
+ * Class Update.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Update
@@ -44,7 +44,7 @@ class Update
     /** @var bool */
     protected $usePropel;
 
-    /** @var null|Tlog */
+    /** @var Tlog|null */
     protected $logger;
 
     /** @var array log messages */
@@ -56,10 +56,10 @@ class Update
     /** @var array */
     protected $updatedVersions = [];
 
-    /** @var PDO  */
+    /** @var PDO */
     protected $connection;
 
-    /** @var string|null  */
+    /** @var string|null */
     protected $backupFile;
 
     /** @var string */
@@ -87,27 +87,28 @@ class Update
         try {
             $this->connection = $this->getDatabasePDO();
         } catch (ParseException $ex) {
-            throw new UpdateException("database.yml is not a valid file : " . $ex->getMessage());
+            throw new UpdateException('database.yml is not a valid file : '.$ex->getMessage());
         } catch (\PDOException $ex) {
-            throw new UpdateException('Wrong connection information' . $ex->getMessage());
+            throw new UpdateException('Wrong connection information'.$ex->getMessage());
         }
 
         $this->version = $this->getVersionList();
     }
 
     /**
-     * retrieve the database connection
+     * retrieve the database connection.
      *
      * @return \PDO
+     *
      * @throws ParseException
      * @throws \PDOException
      */
     protected function getDatabasePDO()
     {
-        $configPath = THELIA_CONF_DIR . "database.yml";
+        $configPath = THELIA_CONF_DIR.'database.yml';
 
         if (!file_exists($configPath)) {
-            throw new UpdateException("Thelia is not installed yet");
+            throw new UpdateException('Thelia is not installed yet');
         }
 
         $definePropel = new DatabaseConfigurationSource(
@@ -152,10 +153,10 @@ class Update
         $this->updatedVersions = [];
 
         $currentVersion = $this->getCurrentVersion();
-        $this->log('debug', "start update process");
+        $this->log('debug', 'start update process');
 
         if (true === $this->isLatestVersion($currentVersion)) {
-            $this->log('debug', "You already have the latest version. No update available");
+            $this->log('debug', 'You already have the latest version. No update available');
             throw new UpToDateException('You already have the latest version. No update available');
         }
 
@@ -169,7 +170,7 @@ class Update
         try {
             $size = \count($this->version);
 
-            for ($i = ++$index; $i < $size; $i++) {
+            for ($i = ++$index; $i < $size; ++$i) {
                 $version = $this->version[$i];
                 $this->updateToVersion($version, $database);
                 $this->updatedVersions[] = $version;
@@ -178,11 +179,11 @@ class Update
             $currentVersion = Version::parse();
             $this->log('debug', sprintf('setting database configuration to %s', $currentVersion['version']));
             $updateConfigVersion = [
-                'thelia_version'         => $currentVersion['version'],
-                'thelia_major_version'   => $currentVersion['major'],
-                'thelia_minus_version'   => $currentVersion['minus'],
+                'thelia_version' => $currentVersion['version'],
+                'thelia_major_version' => $currentVersion['major'],
+                'thelia_minus_version' => $currentVersion['minus'],
                 'thelia_release_version' => $currentVersion['release'],
-                'thelia_extra_version'    => $currentVersion['extra'],
+                'thelia_extra_version' => $currentVersion['extra'],
             ];
 
             foreach ($updateConfigVersion as $name => $value) {
@@ -215,15 +216,17 @@ class Update
     }
 
     /**
-     * Backup current DB to file local/backup/update.sql
+     * Backup current DB to file local/backup/update.sql.
+     *
      * @return bool if it succeeds, false otherwise
+     *
      * @throws \Exception
      */
     public function backupDb()
     {
         $database = new Database($this->connection);
 
-        if (! $this->checkBackupIsPossible()) {
+        if (!$this->checkBackupIsPossible()) {
             $message = 'Your database is too big for an automatic backup';
 
             $this->log('error', $message);
@@ -231,8 +234,8 @@ class Update
             throw new UpdateException($message);
         }
 
-        $this->backupFile = THELIA_ROOT . $this->backupDir . 'update.sql';
-        $backupDir = THELIA_ROOT . $this->backupDir;
+        $this->backupFile = THELIA_ROOT.$this->backupDir.'update.sql';
+        $backupDir = THELIA_ROOT.$this->backupDir;
 
         $fs = new Filesystem();
 
@@ -262,7 +265,7 @@ class Update
     }
 
     /**
-     * Restores file local/backup/update.sql to current DB
+     * Restores file local/backup/update.sql to current DB.
      *
      * @return bool if it succeeds, false otherwise
      */
@@ -280,7 +283,8 @@ class Update
             $database->restoreDb($this->backupFile);
         } catch (\Exception $ex) {
             $this->log('error', sprintf('error during restore process with message : %s', $ex->getMessage()));
-            print $ex->getMessage();
+            echo $ex->getMessage();
+
             return false;
         }
 
@@ -288,7 +292,7 @@ class Update
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getBackupFile()
     {
@@ -332,38 +336,38 @@ class Update
     {
         // sql update
         $filename = sprintf(
-            "%s%s%s",
+            '%s%s%s',
             THELIA_SETUP_DIRECTORY,
             str_replace('/', DS, self::SQL_DIR),
-            $version . '.sql'
+            $version.'.sql'
         );
 
         if (file_exists($filename)) {
-            $this->log('debug', sprintf('inserting file %s', $version . '.sql'));
+            $this->log('debug', sprintf('inserting file %s', $version.'.sql'));
             $database->insertSql(null, [$filename]);
-            $this->log('debug', sprintf('end inserting file %s', $version . '.sql'));
+            $this->log('debug', sprintf('end inserting file %s', $version.'.sql'));
         }
 
         // php update
         $filename = sprintf(
-            "%s%s%s",
+            '%s%s%s',
             THELIA_SETUP_DIRECTORY,
             str_replace('/', DS, self::PHP_DIR),
-            $version . '.php'
+            $version.'.php'
         );
 
         if (file_exists($filename)) {
-            $this->log('debug', sprintf('executing file %s', $version . '.php'));
-            include_once($filename);
-            $this->log('debug', sprintf('end executing file %s', $version . '.php'));
+            $this->log('debug', sprintf('executing file %s', $version.'.php'));
+            include_once $filename;
+            $this->log('debug', sprintf('end executing file %s', $version.'.php'));
         }
 
         // instructions
         $filename = sprintf(
-            "%s%s%s",
+            '%s%s%s',
             THELIA_SETUP_DIRECTORY,
             str_replace('/', DS, self::INSTRUCTION_DIR),
-            $version . '.md'
+            $version.'.md'
         );
 
         if (file_exists($filename)) {
@@ -397,8 +401,10 @@ class Update
     }
 
     /**
-     * Returns the database size in Mo
+     * Returns the database size in Mo.
+     *
      * @return float
+     *
      * @throws \Exception
      */
     public function getDataBaseSize()
@@ -415,7 +421,7 @@ class Update
     }
 
     /**
-     * Checks whether it is possible to make a data base backup
+     * Checks whether it is possible to make a data base backup.
      *
      * @return bool
      */
@@ -470,7 +476,7 @@ class Update
     }
 
     /**
-     * Add a new post update instruction
+     * Add a new post update instruction.
      *
      * @param string $instructions content of the instruction un markdown format
      */
@@ -484,9 +490,10 @@ class Update
     }
 
     /**
-     * Return the content of all instructions
+     * Return the content of all instructions.
      *
      * @param string $format the format of the export : plain (default) or html
+     *
      * @return string the instructions in plain text or html
      */
     public function getPostInstructions($format = 'plain')
@@ -500,9 +507,9 @@ class Update
         ksort($this->postInstructions);
 
         foreach ($this->postInstructions as $version => $instructions) {
-            $content[] = sprintf("## %s", $version);
+            $content[] = sprintf('## %s', $version);
             foreach ($instructions as $instruction) {
-                $content[] = sprintf("%s", $instruction);
+                $content[] = sprintf('%s', $instruction);
             }
         }
 
@@ -517,17 +524,18 @@ class Update
 
     public function hasPostInstructions()
     {
-        return (\count($this->postInstructions) !== 0);
+        return \count($this->postInstructions) !== 0;
     }
 
     public function getVersionList()
     {
         $list = [];
         $finder = new Finder();
-        $path = sprintf("%s%s", THELIA_SETUP_DIRECTORY, str_replace('/', DS, self::SQL_DIR));
+        $path = sprintf('%s%s', THELIA_SETUP_DIRECTORY, str_replace('/', DS, self::SQL_DIR));
         $sort = function (\SplFileInfo $a, \SplFileInfo $b) {
             $a = strtolower(substr($a->getRelativePathname(), 0, -4));
             $b = strtolower(substr($b->getRelativePathname(), 0, -4));
+
             return version_compare($a, $b);
         };
 
@@ -535,12 +543,14 @@ class Update
         foreach ($files as $file) {
             $list[] = substr($file->getRelativePathname(), 0, -4);
         }
+
         return $list;
     }
 
     /**
      * @param string $message
      * @param string $type
+     *
      * @return $this
      */
     public function setMessage($message, $type = 'info')
@@ -560,6 +570,7 @@ class Update
 
     /**
      * @param string $string
+     *
      * @return string
      */
     public function trans($string)
@@ -579,7 +590,7 @@ class Update
 
     public function getWebVersion()
     {
-        $url = "http://thelia.net/version.php";
+        $url = 'http://thelia.net/version.php';
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HEADER, false);

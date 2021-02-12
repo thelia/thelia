@@ -28,9 +28,8 @@ use Thelia\Module\BaseModule;
 use Thelia\Tests\ContainerAwareTestCase;
 
 /**
- * Class ModuleActivateCommandTest
+ * Class ModuleActivateCommandTest.
  *
- * @package Thelia\Tests\Command
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class ModuleActivateCommandTest extends ContainerAwareTestCase
@@ -54,18 +53,18 @@ class ModuleActivateCommandTest extends ContainerAwareTestCase
 
             $container = $this->getContainer();
             $tanslator = new Translator($requestStack);
-            $container->set("thelia.translator", $tanslator);
+            $container->set('thelia.translator', $tanslator);
 
             $moduleActivate = new ModuleActivateCommand();
             $moduleActivate->setContainer($container);
 
             $application->add($moduleActivate);
 
-            $command = $application->find("module:activate");
+            $command = $application->find('module:activate');
             $commandTester = new CommandTester($command);
             $commandTester->execute([
-                "command" => $command->getName(),
-                "module" => $module->getCode(),
+                'command' => $command->getName(),
+                'module' => $module->getCode(),
             ]);
 
             $activated = ModuleQuery::create()->findPk($module->getId())->getActivate();
@@ -89,14 +88,14 @@ class ModuleActivateCommandTest extends ContainerAwareTestCase
 
             $application->add($moduleActivate);
 
-            $command = $application->find("module:activate");
+            $command = $application->find('module:activate');
             $commandTester = new CommandTester($command);
 
             $this->expectException(\RuntimeException::class);
-            $this->expectExceptionMessage("module Letshopethismoduledoesnotexists not found");
+            $this->expectExceptionMessage('module Letshopethismoduledoesnotexists not found');
             $commandTester->execute([
-                "command" => $command->getName(),
-                "module" => "letshopethismoduledoesnotexists",
+                'command' => $command->getName(),
+                'module' => 'letshopethismoduledoesnotexists',
             ]);
         }
     }
@@ -109,8 +108,8 @@ class ModuleActivateCommandTest extends ContainerAwareTestCase
         $eventDispatcher = new EventDispatcher();
         $eventDispatcher->addSubscriber(new Module($container, $eventDispatcher));
 
-        $container->set("event_dispatcher", $eventDispatcher);
+        $container->set('event_dispatcher', $eventDispatcher);
 
-        $container->setParameter('kernel.cache_dir', THELIA_CACHE_DIR . 'dev');
+        $container->setParameter('kernel.cache_dir', THELIA_CACHE_DIR.'dev');
     }
 }

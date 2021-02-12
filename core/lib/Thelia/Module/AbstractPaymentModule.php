@@ -15,10 +15,7 @@ namespace Thelia\Module;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Template\TemplateHelperInterface;
-use Thelia\Model\Country;
 use Thelia\Model\Order;
-use Thelia\Model\State;
 use Thelia\Tools\URL;
 
 abstract class AbstractPaymentModule extends BaseModule implements PaymentModuleInterface
@@ -30,24 +27,24 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
      * @param string $gateway_url the payment gateway URL
      * @param array  $form_data   an associative array of form data, that will be rendered as hiddent fields
      *
-     * @return Response the HTTP response.
+     * @return Response the HTTP response
      */
     public function generateGatewayFormResponse($order, $gateway_url, $form_data)
     {
         /** @var ParserInterface $parser */
-        $parser = $this->getContainer()->get("thelia.parser");
+        $parser = $this->getContainer()->get('thelia.parser');
 
         $parser->setTemplateDefinition(
             $parser->getTemplateHelper()->getActiveFrontTemplate()
         );
 
         $renderedTemplate = $parser->render(
-            "order-payment-gateway.html",
+            'order-payment-gateway.html',
             [
-                "order_id"          => $order->getId(),
-                "cart_count"        => $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems()->count(),
-                "gateway_url"       => $gateway_url,
-                "payment_form_data" => $form_data
+                'order_id' => $order->getId(),
+                'cart_count' => $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems()->count(),
+                'gateway_url' => $gateway_url,
+                'payment_form_data' => $form_data,
             ]
         );
 
@@ -55,9 +52,10 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
     }
 
     /**
-     * Return the order payment success page URL
+     * Return the order payment success page URL.
      *
-     * @param  int    $order_id the order ID
+     * @param int $order_id the order ID
+     *
      * @return string the order payment success page URL
      */
     public function getPaymentSuccessPageUrl($order_id)
@@ -66,8 +64,8 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
 
         return URL::getInstance()->absoluteUrl(
             $frontOfficeRouter->generate(
-                "order.placed",
-                ["order_id" => $order_id],
+                'order.placed',
+                ['order_id' => $order_id],
                 Router::ABSOLUTE_URL
             )
         );
@@ -77,7 +75,7 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
      * Redirect the customer to the failure payment page. if $message is null, a generic message is displayed.
      *
      * @param int         $order_id the order ID
-     * @param string|null $message  an error message.
+     * @param string|null $message  an error message
      *
      * @return string the order payment failure page URL
      */
@@ -87,10 +85,10 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
 
         return URL::getInstance()->absoluteUrl(
             $frontOfficeRouter->generate(
-                "order.failed",
+                'order.failed',
                 [
-                    "order_id" => $order_id,
-                    "message" => $message
+                    'order_id' => $order_id,
+                    'message' => $message,
                 ],
                 Router::ABSOLUTE_URL
             )

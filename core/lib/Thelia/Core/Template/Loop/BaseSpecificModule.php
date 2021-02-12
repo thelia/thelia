@@ -22,14 +22,14 @@ use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
 
 /**
- * @package Thelia\Core\Template\Loop
  * @author Manuel Raynaud <manu@raynaud.io>
  *
  * {@inheritdoc}
- * @method int getId()
- * @method int[] getExclude()
+ *
+ * @method int      getId()
+ * @method int[]    getExclude()
  * @method string[] getExcludeCode()
- * @method string getCode()
+ * @method string   getCode()
  * @method string[] getOrder()
  */
 abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -91,25 +91,25 @@ abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLo
 
         $search->filterByType($this->getModuleType(), Criteria::EQUAL);
 
-        $order  = $this->getOrder();
+        $order = $this->getOrder();
 
         switch ($order) {
-            case "id":
+            case 'id':
                 $search->orderById(Criteria::ASC);
                 break;
-            case "id_reverse":
+            case 'id_reverse':
                 $search->orderById(Criteria::DESC);
                 break;
-            case "alpha":
+            case 'alpha':
                 $search->addAscendingOrderByColumn('i18n_TITLE');
                 break;
-            case "alpha_reverse":
+            case 'alpha_reverse':
                 $search->addDescendingOrderByColumn('i18n_TITLE');
                 break;
-            case "manual_reverse":
+            case 'manual_reverse':
                 $search->orderByPosition(Criteria::DESC);
                 break;
-            case "manual":
+            case 'manual':
             default:
                 $search->orderByPosition(Criteria::ASC);
                 break;

@@ -22,8 +22,8 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
 /**
- * Class OrderPayment
- * @package Thelia\Form
+ * Class OrderPayment.
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class OrderPayment extends FirewallForm
@@ -31,32 +31,32 @@ class OrderPayment extends FirewallForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("invoice-address", IntegerType::class, [
-                "required" => true,
-                "constraints" => [
+            ->add('invoice-address', IntegerType::class, [
+                'required' => true,
+                'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                            [$this, "verifyInvoiceAddress"]
+                            [$this, 'verifyInvoiceAddress']
                     ),
                 ],
             ])
-            ->add("payment-module", IntegerType::class, [
-                "required" => true,
-                "constraints" => [
+            ->add('payment-module', IntegerType::class, [
+                'required' => true,
+                'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                            [$this, "verifyPaymentModule"]
-                    )
+                            [$this, 'verifyPaymentModule']
+                    ),
                 ],
             ])
             // Add terms & conditions
-            ->add("agreed", CheckboxType::class, [
-                "constraints" => [
-                    new Constraints\IsTrue(["message" => Translator::getInstance()->trans("Please accept the Terms and conditions in order to register.")]),
+            ->add('agreed', CheckboxType::class, [
+                'constraints' => [
+                    new Constraints\IsTrue(['message' => Translator::getInstance()->trans('Please accept the Terms and conditions in order to register.')]),
                 ],
-                "label" => "Agreed",
-                "label_attr" => [
-                    "for" => "agreed",
+                'label' => 'Agreed',
+                'label_attr' => [
+                    'for' => 'agreed',
                 ],
             ]);
     }
@@ -67,7 +67,7 @@ class OrderPayment extends FirewallForm
             ->findPk($value);
 
         if (null === $address) {
-            $context->addViolation(Translator::getInstance()->trans("Address ID not found"));
+            $context->addViolation(Translator::getInstance()->trans('Address ID not found'));
         }
     }
 
@@ -78,8 +78,8 @@ class OrderPayment extends FirewallForm
             ->findOne();
 
         if (null === $module) {
-            $context->addViolation(Translator::getInstance()->trans("Payment module ID not found"));
-        } elseif (! $module->isPayementModule()) {
+            $context->addViolation(Translator::getInstance()->trans('Payment module ID not found'));
+        } elseif (!$module->isPayementModule()) {
             $context->addViolation(
                 sprintf(Translator::getInstance()->trans("payment module %s is not a Thelia\Module\PaymentModuleInterface"), $module->getCode())
             );
@@ -88,6 +88,6 @@ class OrderPayment extends FirewallForm
 
     public static function getName()
     {
-        return "thelia_order_payment";
+        return 'thelia_order_payment';
     }
 }

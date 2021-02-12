@@ -13,15 +13,15 @@
 namespace Thelia\Core;
 
 /**
- * Class TheliaKernelEvents
- * @package Thelia\Core
+ * Class TheliaKernelEvents.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 final class TheliaKernelEvents
 {
-    public const SESSION = "thelia_kernel.session";
+    public const SESSION = 'thelia_kernel.session';
 
     // -- Kernel Error Message Handle ---------------------------
 
-    public const THELIA_HANDLE_ERROR = "thelia_kernel.handle_error";
+    public const THELIA_HANDLE_ERROR = 'thelia_kernel.handle_error';
 }

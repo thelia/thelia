@@ -15,8 +15,6 @@ namespace Thelia\Model;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
-use Thelia\Core\Event\Lang\LangEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Lang as BaseLang;
 use Thelia\Model\Map\LangTableMap;
 
@@ -39,7 +37,7 @@ class Lang extends BaseLang
             self::$defaultLanguage = LangQuery::create()->findOneByByDefault(1);
 
             if (null === self::$defaultLanguage) {
-                throw new \RuntimeException("No default language is defined. Please define one.");
+                throw new \RuntimeException('No default language is defined. Please define one.');
             }
         }
 
@@ -49,7 +47,7 @@ class Lang extends BaseLang
     public function toggleDefault()
     {
         if ($this->getId() === null) {
-            throw new \RuntimeException("impossible to just uncheck default language, choose a new one");
+            throw new \RuntimeException('impossible to just uncheck default language, choose a new one');
         }
         if (!$this->getByDefault()) {
             $con = Propel::getWriteConnection(LangTableMap::DATABASE_NAME);
@@ -78,7 +76,7 @@ class Lang extends BaseLang
         // If the date/time format is not specified, generate it.
         $dateTimeFormat = $this->getDateTimeFormat();
         if (empty($dateTimeFormat)) {
-            $this->setDatetimeFormat(sprintf("%s %s", $this->getDateFormat(), $this->getTimeFormat()));
+            $this->setDatetimeFormat(sprintf('%s %s', $this->getDateFormat(), $this->getTimeFormat()));
         }
 
         return parent::preSave($con);

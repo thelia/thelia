@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Sale;
 
 /**
- * Class SaleToggleVisibilityEvent
- * @package Thelia\Core\Event\Sale
+ * Class SaleToggleVisibilityEvent.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class SaleToggleActivityEvent extends SaleEvent

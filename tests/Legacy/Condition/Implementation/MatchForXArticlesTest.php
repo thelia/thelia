@@ -20,18 +20,16 @@ use Thelia\Condition\SerializableCondition;
 use Thelia\Coupon\FacadeInterface;
 
 /**
- * Unit Test MatchForXArticles Class
+ * Unit Test MatchForXArticles Class.
  *
- * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class MatchForXArticlesTest extends TestCase
 {
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::setValidators
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::setValidators
      */
     public function testInValidBackOfficeInputOperator()
     {
@@ -40,7 +38,7 @@ class MatchForXArticlesTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var FacadeInterface $stubFacade */
+        /* @var FacadeInterface $stubFacade */
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
@@ -50,10 +48,10 @@ class MatchForXArticlesTest extends TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::IN
+            MatchForXArticles::CART_QUANTITY => Operators::IN,
         ];
         $values = [
-            MatchForXArticles::CART_QUANTITY => 5
+            MatchForXArticles::CART_QUANTITY => 5,
         ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
@@ -62,14 +60,14 @@ class MatchForXArticlesTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::setValidators
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::setValidators
      */
     public function testInValidBackOfficeInputValue()
     {
@@ -87,10 +85,10 @@ class MatchForXArticlesTest extends TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR,
         ];
         $values = [
-            MatchForXArticles::CART_QUANTITY => 'X'
+            MatchForXArticles::CART_QUANTITY => 'X',
         ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
@@ -99,15 +97,14 @@ class MatchForXArticlesTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
     public function testMatchingRuleInferior()
     {
@@ -125,25 +122,24 @@ class MatchForXArticlesTest extends TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::INFERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::INFERIOR,
         ];
         $values = [
-            MatchForXArticles::CART_QUANTITY => 5
+            MatchForXArticles::CART_QUANTITY => 5,
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
     public function testNotMatchingRuleInferior()
     {
@@ -161,7 +157,7 @@ class MatchForXArticlesTest extends TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::INFERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::INFERIOR,
         ];
         $values = [
             MatchForXArticles::CART_QUANTITY => 4,
@@ -171,15 +167,14 @@ class MatchForXArticlesTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
     public function testMatchingRuleInferiorEquals()
     {
@@ -207,15 +202,14 @@ class MatchForXArticlesTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
     public function testMatchingRuleInferiorEquals2()
     {
@@ -233,25 +227,24 @@ class MatchForXArticlesTest extends TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::INFERIOR_OR_EQUAL
+            MatchForXArticles::CART_QUANTITY => Operators::INFERIOR_OR_EQUAL,
         ];
         $values = [
-            MatchForXArticles::CART_QUANTITY => 4
+            MatchForXArticles::CART_QUANTITY => 4,
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
     public function testNotMatchingRuleInferiorEquals()
     {
@@ -269,25 +262,24 @@ class MatchForXArticlesTest extends TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::INFERIOR_OR_EQUAL
+            MatchForXArticles::CART_QUANTITY => Operators::INFERIOR_OR_EQUAL,
         ];
         $values = [
-            MatchForXArticles::CART_QUANTITY => 3
+            MatchForXArticles::CART_QUANTITY => 3,
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test equals operator is working
+     * Check if test equals operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
     public function testMatchingRuleEqual()
     {
@@ -305,25 +297,24 @@ class MatchForXArticlesTest extends TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::EQUAL
+            MatchForXArticles::CART_QUANTITY => Operators::EQUAL,
         ];
         $values = [
-            MatchForXArticles::CART_QUANTITY => 4
+            MatchForXArticles::CART_QUANTITY => 4,
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test equals operator is working
+     * Check if test equals operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
     public function testNotMatchingRuleEqual()
     {
@@ -341,25 +332,24 @@ class MatchForXArticlesTest extends TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::EQUAL
+            MatchForXArticles::CART_QUANTITY => Operators::EQUAL,
         ];
         $values = [
-            MatchForXArticles::CART_QUANTITY => 5
+            MatchForXArticles::CART_QUANTITY => 5,
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test superior operator is working
+     * Check if test superior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
     public function testMatchingRuleSuperiorEquals()
     {
@@ -377,25 +367,24 @@ class MatchForXArticlesTest extends TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR_OR_EQUAL
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR_OR_EQUAL,
         ];
         $values = [
-            MatchForXArticles::CART_QUANTITY => 4
+            MatchForXArticles::CART_QUANTITY => 4,
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test superior operator is working
+     * Check if test superior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
     public function testMatchingRuleSuperiorEquals2()
     {
@@ -413,25 +402,24 @@ class MatchForXArticlesTest extends TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR_OR_EQUAL
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR_OR_EQUAL,
         ];
         $values = [
-            MatchForXArticles::CART_QUANTITY => 3
+            MatchForXArticles::CART_QUANTITY => 3,
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test superior operator is working
+     * Check if test superior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
     public function testNotMatchingRuleSuperiorEquals()
     {
@@ -449,25 +437,24 @@ class MatchForXArticlesTest extends TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR_OR_EQUAL
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR_OR_EQUAL,
         ];
         $values = [
-            MatchForXArticles::CART_QUANTITY => 5
+            MatchForXArticles::CART_QUANTITY => 5,
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test superior operator is working
+     * Check if test superior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
     public function testMatchingRuleSuperior()
     {
@@ -485,25 +472,24 @@ class MatchForXArticlesTest extends TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR,
         ];
         $values = [
-            MatchForXArticles::CART_QUANTITY => 3
+            MatchForXArticles::CART_QUANTITY => 3,
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test superior operator is working
+     * Check if test superior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::isMatching
      */
     public function testNotMatchingRuleSuperior()
     {
@@ -521,17 +507,17 @@ class MatchForXArticlesTest extends TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR,
         ];
         $values = [
-            MatchForXArticles::CART_QUANTITY => 4
+            MatchForXArticles::CART_QUANTITY => 4,
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
@@ -551,10 +537,10 @@ class MatchForXArticlesTest extends TestCase
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR,
         ];
         $values = [
-            MatchForXArticles::CART_QUANTITY => 4
+            MatchForXArticles::CART_QUANTITY => 4,
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -571,7 +557,7 @@ class MatchForXArticlesTest extends TestCase
     }
 
     /**
-     * Generate adapter stub
+     * Generate adapter stub.
      *
      * @param int    $cartTotalPrice   Cart total price
      * @param string $checkoutCurrency Checkout currency
@@ -612,10 +598,9 @@ class MatchForXArticlesTest extends TestCase
     }
 
     /**
-     * Check getName i18n
+     * Check getName i18n.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::getName
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::getName
      */
     public function testGetName()
     {
@@ -630,10 +615,9 @@ class MatchForXArticlesTest extends TestCase
     }
 
     /**
-     * Check tooltip i18n
+     * Check tooltip i18n.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::getToolTip
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::getToolTip
      */
     public function testGetToolTip()
     {
@@ -642,10 +626,10 @@ class MatchForXArticlesTest extends TestCase
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR,
         ];
         $values = [
-            MatchForXArticles::CART_QUANTITY => 4
+            MatchForXArticles::CART_QUANTITY => 4,
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -655,10 +639,9 @@ class MatchForXArticlesTest extends TestCase
     }
 
     /**
-     * Check validator
+     * Check validator.
      *
-     * @covers Thelia\Condition\Implementation\MatchForXArticles::generateInputs
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForXArticles::generateInputs
      */
     public function testGetValidator()
     {
@@ -667,10 +650,10 @@ class MatchForXArticlesTest extends TestCase
         /** @var FacadeInterface $stubFacade */
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
-            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR
+            MatchForXArticles::CART_QUANTITY => Operators::SUPERIOR,
         ];
         $values = [
-            MatchForXArticles::CART_QUANTITY => 4
+            MatchForXArticles::CART_QUANTITY => 4,
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -684,18 +667,18 @@ class MatchForXArticlesTest extends TestCase
                         '<=' => 'Price',
                         '==' => 'Price',
                         '>=' => 'Price',
-                        '>' => 'Price'
+                        '>' => 'Price',
                     ],
                     'value' => '',
-                    'selectedOperator' => ''
-                ]
+                    'selectedOperator' => '',
+                ],
             ],
             'setOperators' => [
-                'quantity' => '>'
+                'quantity' => '>',
             ],
             'setValues' => [
-                'quantity' => 4
-            ]
+                'quantity' => 4,
+            ],
         ];
         $expected = $validators;
 

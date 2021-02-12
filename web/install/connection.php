@@ -1,8 +1,8 @@
 <?php
 
 $step = 3;
-include("header.php");
-if(!$_SESSION['install']['continue'] && $_SESSION['install']['step'] == 2) {
+include 'header.php';
+if (!$_SESSION['install']['continue'] && $_SESSION['install']['step'] == 2) {
     header(sprintf('location: %s', $_SESSION['install']['return_step']));
 }
 
@@ -10,7 +10,7 @@ $_SESSION['install']['step'] = 3;
 ?>
 
     <form action="bdd.php" method="POST" >
-        <?php if(isset($_GET['err']) && $_GET['err'] == 1){ ?>
+        <?php if (isset($_GET['err']) && $_GET['err'] == 1) { ?>
             <div class="alert alert-danger"><?php echo $trans->trans('Wrong connection information'); ?></div>
         <?php } ?>
         <div class="well">
@@ -18,12 +18,16 @@ $_SESSION['install']['step'] = 3;
                 <legend><?php echo $trans->trans('Database connection configuration'); ?></legend>
                 <div class="form-group">
                     <label for="host"><?php echo $trans->trans('Host :'); ?></label>
-                    <input id="host" class="form-control" type="text" name="host" placeholder="localhost" value="<?php if(isset($_SESSION['install']['host'])){ echo $_SESSION['install']['host']; } ?>">
+                    <input id="host" class="form-control" type="text" name="host" placeholder="localhost" value="<?php if (isset($_SESSION['install']['host'])) {
+    echo $_SESSION['install']['host'];
+} ?>">
                 </div>
 
                 <div class="form-group">
                     <label for="user"><?php echo $trans->trans('Username :'); ?></label>
-                    <input id="user" type="text" class="form-control" name="username" placeholder="john" value="<?php if(isset($_SESSION['install']['username'])){ echo $_SESSION['install']['username']; } ?>">
+                    <input id="user" type="text" class="form-control" name="username" placeholder="john" value="<?php if (isset($_SESSION['install']['username'])) {
+    echo $_SESSION['install']['username'];
+} ?>">
                 </div>
 
                 <div class="form-group">
@@ -32,7 +36,11 @@ $_SESSION['install']['step'] = 3;
                 </div>
                 <div class="form-group">
                     <label for="port"><?php echo $trans->trans('Port :'); ?></label>
-                    <input id="port" type="text" class="form-control" name="port" value="<?php if(isset($_SESSION['install']['port'])){ echo $_SESSION['install']['port']; } else { echo '3306'; } ?>">
+                    <input id="port" type="text" class="form-control" name="port" value="<?php if (isset($_SESSION['install']['port'])) {
+    echo $_SESSION['install']['port'];
+} else {
+    echo '3306';
+} ?>">
                 </div>
             </fieldset>
         </div>
@@ -45,4 +53,4 @@ $_SESSION['install']['step'] = 3;
         </div>
     </form>
 
-<?php include("footer.php"); ?>
+<?php include 'footer.php'; ?>

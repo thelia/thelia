@@ -18,7 +18,7 @@ use Thelia\Model\Base\Address as BaseAddress;
 class Address extends BaseAddress
 {
     /**
-     * put the the current address as default one
+     * put the the current address as default one.
      */
     public function makeItDefault()
     {
@@ -30,8 +30,7 @@ class Address extends BaseAddress
     }
 
     /**
-     * Code to be run before deleting the object in database
-     * @return boolean
+     * Code to be run before deleting the object in database.
      */
     public function preDelete(ConnectionInterface $con = null): bool
     {

@@ -15,9 +15,7 @@ namespace Thelia\Type;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 interface TypeInterface
 {
@@ -28,6 +26,8 @@ interface TypeInterface
     public function getFormattedValue($value);
 
     public function getFormType();
+
     public function getFormOptions();
+
     public function verifyForm($value, ExecutionContextInterface $context);
 }

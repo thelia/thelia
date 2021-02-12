@@ -13,8 +13,8 @@
 namespace Thelia\Tools\Version\Constraints;
 
 /**
- * Class ConstraintEqual
- * @package Thelia\Tools\Version\Constraints
+ * Class ConstraintEqual.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ConstraintEqual extends BaseConstraint

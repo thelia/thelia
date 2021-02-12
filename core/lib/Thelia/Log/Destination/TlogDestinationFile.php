@@ -20,18 +20,18 @@ class TlogDestinationFile extends AbstractTlogDestination
 {
     // Nom des variables de configuration
     // ----------------------------------
-    public const VAR_PATH_FILE = "tlog_destinationfile_path";
-    public const TLOG_DEFAULT_NAME = "log-thelia.txt";
+    public const VAR_PATH_FILE = 'tlog_destinationfile_path';
+    public const TLOG_DEFAULT_NAME = 'log-thelia.txt';
 
-    public const VAR_MODE = "tlog_destinationfile_mode";
-    public const VALEUR_MODE_DEFAULT = "A";
+    public const VAR_MODE = 'tlog_destinationfile_mode';
+    public const VALEUR_MODE_DEFAULT = 'A';
 
     protected $path_defaut = false;
     protected $fh = false;
 
     public function __construct()
     {
-        $this->path_defaut = THELIA_LOG_DIR . self::TLOG_DEFAULT_NAME;
+        $this->path_defaut = THELIA_LOG_DIR.self::TLOG_DEFAULT_NAME;
         parent::__construct();
     }
 
@@ -40,7 +40,7 @@ class TlogDestinationFile extends AbstractTlogDestination
         $filePath = $this->getConfig(self::VAR_PATH_FILE);
 
         if (preg_match('/^[a-z]:\\\|^\//i', $filePath) === 0) {
-            $filePath = THELIA_ROOT . $filePath;
+            $filePath = THELIA_ROOT.$filePath;
         }
 
         return $filePath;
@@ -63,10 +63,10 @@ class TlogDestinationFile extends AbstractTlogDestination
 
     protected function resolvePath($filePath, $mode)
     {
-        if (! empty($filePath)) {
-            if (! is_file($filePath)) {
+        if (!empty($filePath)) {
+            if (!is_file($filePath)) {
                 $dir = \dirname($filePath);
-                if (! is_dir($dir)) {
+                if (!is_dir($dir)) {
                     mkdir($dir, 0777, true);
                 }
 
@@ -79,6 +79,7 @@ class TlogDestinationFile extends AbstractTlogDestination
             }
 
             $this->fh = fopen($filePath, $mode);
+
             return true;
         }
 
@@ -111,7 +112,7 @@ class TlogDestinationFile extends AbstractTlogDestination
                 'Enter E to empty this file for each request, or A to always append logs. Consider resetting the file from time to time',
                 self::VALEUR_MODE_DEFAULT,
                 TlogDestinationConfig::TYPE_TEXTFIELD
-            )
+            ),
         ];
     }
 

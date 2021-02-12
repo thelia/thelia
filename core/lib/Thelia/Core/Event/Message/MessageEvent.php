@@ -29,7 +29,7 @@ class MessageEvent extends ActionEvent
 
     public function hasMessage()
     {
-        return ! \is_null($this->message);
+        return !\is_null($this->message);
     }
 
     public function getMessage()

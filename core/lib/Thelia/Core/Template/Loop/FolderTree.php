@@ -20,25 +20,23 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\FolderQuery;
-use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 
 /**
- *
  * Folder tree loop, to get a folder tree from a given folder to a given depth.
  *
  * - folder is the folder id
  * - depth is the maximum depth to go, default unlimited
  * - visible if true or missing, only visible categories will be displayed. If false, all categories (visible or not) are returned.
  *
- * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  *
  * {@inheritdoc}
- * @method int getFolder()
- * @method int getDepth()
+ *
+ * @method int         getFolder()
+ * @method int         getDepth()
  * @method bool|string getVisible()
- * @method int[] getExclude()
+ * @method int[]       getExclude()
  */
 class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
 {
@@ -65,7 +63,7 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
         $search = FolderQuery::create();
 
         $this->configureI18nProcessing($search, [
-                    'TITLE'
+                    'TITLE',
                 ]);
 
         $search->filterByParent($parent);
@@ -84,12 +82,12 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
 
         foreach ($results as $result) {
             $resultsList[] = [
-                "ID" => $result->getId(),
-                "TITLE" => $result->getVirtualColumn('i18n_TITLE'),
-                "PARENT" => $result->getParent(),
-                "URL" => $this->getReturnUrl() ? $result->getUrl($this->locale) : null,
-                "VISIBLE" => $result->getVisible() ? "1" : "0",
-                "LEVEL" => $level,
+                'ID' => $result->getId(),
+                'TITLE' => $result->getVirtualColumn('i18n_TITLE'),
+                'PARENT' => $result->getParent(),
+                'URL' => $this->getReturnUrl() ? $result->getUrl($this->locale) : null,
+                'VISIBLE' => $result->getVisible() ? '1' : '0',
+                'LEVEL' => $level,
                 'CHILD_COUNT' => $result->countChild(),
             ];
 

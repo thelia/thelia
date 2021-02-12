@@ -13,8 +13,8 @@
 namespace Thelia\Exception;
 
 /**
- * Class InvalidModuleException
- * @package Thelia\Exception
+ * Class InvalidModuleException.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class InvalidModuleException extends \RuntimeException
@@ -42,7 +42,7 @@ class InvalidModuleException extends \RuntimeException
 
         /** @var \Exception $error */
         foreach ($this->errors as $error) {
-            $message .= $error->getMessage() . $separator;
+            $message .= $error->getMessage().$separator;
         }
 
         return rtrim($message, $separator);

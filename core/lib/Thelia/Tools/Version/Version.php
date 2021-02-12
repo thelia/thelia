@@ -19,8 +19,8 @@ use Thelia\Tools\Version\Constraints\ConstraintLower;
 use Thelia\Tools\Version\Constraints\ConstraintNearlyEqual;
 
 /**
- * Class Version
- * @package Thelia\Tools
+ * Class Version.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class Version
@@ -41,9 +41,10 @@ class Version
      * @param bool   $strict            if true 2.1 is different of 2.1.0, if false version are normalized so 2.1
      *                                  will be expended to 2.1.0
      * @param string $defaultComparison the default comparison if nothing provided
-     * @return bool                     true if version matches the constraints
+     *
+     * @return bool true if version matches the constraints
      */
-    public static function test($version, $constraints, $strict = false, $defaultComparison = "=")
+    public static function test($version, $constraints, $strict = false, $defaultComparison = '=')
     {
         $constraints = self::parseConstraints($constraints, $defaultComparison);
 
@@ -57,13 +58,13 @@ class Version
         return true;
     }
 
-    private static function parseConstraints($constraints, $defaultComparison = "=")
+    private static function parseConstraints($constraints, $defaultComparison = '=')
     {
         $constraintsList = [];
 
-        foreach (explode(" ", $constraints) as $expression) {
+        foreach (explode(' ', $constraints) as $expression) {
             if (1 === preg_match('/^[0-9]/', $expression)) {
-                $expression = $defaultComparison . $expression;
+                $expression = $defaultComparison.$expression;
             }
 
             if (strpos($expression, '>=') !== false) {
@@ -88,17 +89,18 @@ class Version
 
     /**
      * Split a version into an associative array
-     * [version, major, minus, release, extra]
+     * [version, major, minus, release, extra].
      *
-     * @param string $version   the version to split
-     * @return array            associative array
-     * [
-     *     'version' => 'digit',
-     *     'major' => 'digit',
-     *     'minus' => 'digit',
-     *     'release' => 'digit',
-     *     'extra' => 'alphanumeric'
-     * ]
+     * @param string $version the version to split
+     *
+     * @return array associative array
+     *               [
+     *               'version' => 'digit',
+     *               'major' => 'digit',
+     *               'minus' => 'digit',
+     *               'release' => 'digit',
+     *               'extra' => 'alphanumeric'
+     *               ]
      */
     public static function parse($version = null)
     {
@@ -116,7 +118,7 @@ class Version
         if (!preg_match($pattern, $version, $match)) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    "Invalid version number provided : %s".PHP_EOL,
+                    'Invalid version number provided : %s'.PHP_EOL,
                     $version
                 )
             );
@@ -124,10 +126,10 @@ class Version
 
         return [
             'version' => $match['version'],
-            'major'   => $match['major'],
-            'minus'   => $match['minus'],
+            'major' => $match['major'],
+            'minus' => $match['minus'],
             'release' => $match['release'],
-            'extra'   => $match['extra'],
+            'extra' => $match['extra'],
         ];
     }
 }

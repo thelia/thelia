@@ -21,8 +21,10 @@ class ProductSaleElements extends BaseProductSaleElements
 {
     /**
      * @param string $virtualColumnName
-     * @param int $discount
+     * @param int    $discount
+     *
      * @return float|int|mixed
+     *
      * @throws PropelException
      */
     public function getPrice($virtualColumnName = 'price_PRICE', $discount = 0)
@@ -31,7 +33,7 @@ class ProductSaleElements extends BaseProductSaleElements
             $amount = $this->getVirtualColumn($virtualColumnName);
 
             if ($discount > 0) {
-                $amount = $amount * (1-($discount/100));
+                $amount = $amount * (1 - ($discount / 100));
             }
         } catch (PropelException $e) {
             throw new PropelException("Virtual column `$virtualColumnName` does not exist in ProductSaleElements::getPrice");
@@ -42,8 +44,10 @@ class ProductSaleElements extends BaseProductSaleElements
 
     /**
      * @param string $virtualColumnName
-     * @param int $discount
+     * @param int    $discount
+     *
      * @return float|int|mixed
+     *
      * @throws PropelException
      */
     public function getPromoPrice($virtualColumnName = 'price_PROMO_PRICE', $discount = 0)
@@ -52,7 +56,7 @@ class ProductSaleElements extends BaseProductSaleElements
             $amount = $this->getVirtualColumn($virtualColumnName);
 
             if ($discount > 0) {
-                $amount = $amount * (1-($discount/100));
+                $amount = $amount * (1 - ($discount / 100));
             }
         } catch (PropelException $e) {
             throw new PropelException("Virtual column `$virtualColumnName` does not exist in ProductSaleElements::getPromoPrice");
@@ -63,8 +67,10 @@ class ProductSaleElements extends BaseProductSaleElements
 
     /**
      * @param string $virtualColumnName
-     * @param int $discount
+     * @param int    $discount
+     *
      * @return int
+     *
      * @throws PropelException
      */
     public function getTaxedPrice(Country $country, $virtualColumnName = 'price_PRICE', $discount = 0)
@@ -76,8 +82,10 @@ class ProductSaleElements extends BaseProductSaleElements
 
     /**
      * @param string $virtualColumnName
-     * @param int $discount
+     * @param int    $discount
+     *
      * @return int
+     *
      * @throws PropelException
      */
     public function getTaxedPromoPrice(Country $country, $virtualColumnName = 'price_PROMO_PRICE', $discount = 0)
@@ -96,7 +104,9 @@ class ProductSaleElements extends BaseProductSaleElements
      * - set directly in the product price when `from_default_currency` is set to `false`
      *
      * @param int $discount
+     *
      * @return ProductPriceTools
+     *
      * @throws \RuntimeException
      * @throws PropelException
      */
@@ -119,7 +129,7 @@ class ProductSaleElements extends BaseProductSaleElements
                 $price = $productPrice->getPrice() * $currency->getRate() / $defaultCurrency->getRate();
                 $promoPrice = $productPrice->getPromoPrice() * $currency->getRate() / $defaultCurrency->getRate();
             } else {
-                throw new \RuntimeException('Cannot find product prices for currency id: `' . $currency->getId() . '`');
+                throw new \RuntimeException('Cannot find product prices for currency id: `'.$currency->getId().'`');
             }
         } else {
             $price = $productPrice->getPrice();
@@ -127,8 +137,8 @@ class ProductSaleElements extends BaseProductSaleElements
         }
 
         if ($discount > 0) {
-            $price = $price * (1-($discount/100));
-            $promoPrice = $promoPrice * (1-($discount/100));
+            $price = $price * (1 - ($discount / 100));
+            $promoPrice = $promoPrice * (1 - ($discount / 100));
         }
 
         $productPriceTools = new ProductPriceTools($price, $promoPrice);

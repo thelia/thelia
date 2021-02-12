@@ -15,8 +15,8 @@ namespace Thelia\Core\Event\Content;
 use Thelia\Model\Content;
 
 /**
- * Class ContentAddFolderEvent
- * @package Thelia\Core\Event\Content
+ * Class ContentAddFolderEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ContentAddFolderEvent extends ContentEvent

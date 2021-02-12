@@ -71,7 +71,7 @@ return [
     'Allow negative product stock (1) or not (0)' => 'Allow negative product stock (1) or not (0)',
     'Allow negative product stock (1) or not (0, default)' => 'Allow negative product stock (1) or not (0, default)',
     'Allow slash ended uri' => 'Allow slash ended uri',
-    'Allow module installation from ZIP files.' => 'Allow module installation from ZIP files.' ,
+    'Allow module installation from ZIP files.' => 'Allow module installation from ZIP files.',
     'An image carousel on your home page' => 'An image carousel on your home page',
     'Ancona' => 'Ancona',
     'Andorra' => 'Andorra',

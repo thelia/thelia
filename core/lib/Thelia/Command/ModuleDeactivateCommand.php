@@ -25,33 +25,32 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
 /**
- * Deactivates a module
+ * Deactivates a module.
  *
  * Class ModuleDeactivateCommand
- * @package Thelia\Command
- * @author Nicolas Villa <nicolas@libre-shop.com>
  *
+ * @author Nicolas Villa <nicolas@libre-shop.com>
  */
 class ModuleDeactivateCommand extends BaseModuleGenerate
 {
     protected function configure()
     {
         $this
-            ->setName("module:deactivate")
-            ->setDescription("Deactivate a module")
+            ->setName('module:deactivate')
+            ->setDescription('Deactivate a module')
             ->addOption(
-                "with-dependencies",
+                'with-dependencies',
                 null,
                 InputOption::VALUE_NONE,
                 'activate module recursively'
             )
             ->addArgument(
-                "module",
+                'module',
                 InputArgument::REQUIRED,
-                "module to deactivate"
+                'module to deactivate'
             )
             ->addOption(
-                "assume-yes",
+                'assume-yes',
                 'y',
                 InputOption::VALUE_NONE,
                 'Assume to deactivate a mandatory module'
@@ -61,16 +60,16 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $moduleCode = $this->formatModuleName($input->getArgument("module"));
+        $moduleCode = $this->formatModuleName($input->getArgument('module'));
 
         $module = ModuleQuery::create()->findOneByCode($moduleCode);
 
         if (null === $module) {
-            throw new \RuntimeException(sprintf("module %s not found", $moduleCode));
+            throw new \RuntimeException(sprintf('module %s not found', $moduleCode));
         }
 
         if ($module->getActivate() == BaseModule::IS_NOT_ACTIVATED) {
-            throw new \RuntimeException(sprintf("module %s is already deactivated", $moduleCode));
+            throw new \RuntimeException(sprintf('module %s is already deactivated', $moduleCode));
         }
 
         try {
@@ -84,21 +83,21 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
                 $event->setAssumeDeactivate(true);
             }
 
-            if ($input->getOption("with-dependencies")) {
+            if ($input->getOption('with-dependencies')) {
                 $event->setRecursive(true);
             }
-            $this->getDispatcher()->dispatch($event,TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+            $this->getDispatcher()->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
         } catch (\Exception $e) {
-            throw new \RuntimeException(sprintf("Deactivation fail with Exception : [%d] %s", $e->getCode(), $e->getMessage()));
+            throw new \RuntimeException(sprintf('Deactivation fail with Exception : [%d] %s', $e->getCode(), $e->getMessage()));
         }
 
         //impossible to change output class in CommandTester...
-        if (method_exists($output, "renderBlock")) {
+        if (method_exists($output, 'renderBlock')) {
             $output->renderBlock([
                 '',
-                sprintf("Deactivation succeed for module %s", $moduleCode),
-                ''
-            ], "bg=green;fg=black");
+                sprintf('Deactivation succeed for module %s', $moduleCode),
+                '',
+            ], 'bg=green;fg=black');
         }
 
         return 0;
@@ -106,22 +105,22 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
 
     private function askConfirmation(InputInterface $input, OutputInterface $output)
     {
-        $assumeYes = $input->getOption("assume-yes");
-        $moduleCode = $input->getArgument("module");
+        $assumeYes = $input->getOption('assume-yes');
+        $moduleCode = $input->getArgument('module');
 
         if (!$assumeYes) {
             /** @var QuestionHelper $helper */
             $helper = $this->getHelper('question');
-            $questionText = "Module ";
+            $questionText = 'Module ';
             $questionText .= (empty($moduleCode))
-                ? ""
+                ? ''
                 : $moduleCode;
             $questionText .= " is mandatory.\n";
-            $questionText .= "Would you like to deactivate the module ";
+            $questionText .= 'Would you like to deactivate the module ';
             $questionText .= (empty($moduleCode))
-                ? ""
+                ? ''
                 : $moduleCode;
-            $questionText .= " ? (yes, or no) ";
+            $questionText .= ' ? (yes, or no) ';
 
             $question = new ConfirmationQuestion($questionText, false);
 

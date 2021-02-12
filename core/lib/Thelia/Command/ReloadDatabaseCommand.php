@@ -12,16 +12,16 @@
 
 namespace Thelia\Command;
 
-use \Thelia\Model\Map\ProductTableMap;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Install\Database;
+use Thelia\Model\Map\ProductTableMap;
 
 /**
- * Class ReloadDatabasesCommand
- * @package Thelia\Command
+ * Class ReloadDatabasesCommand.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ReloadDatabaseCommand extends BaseModuleGenerate
@@ -29,8 +29,8 @@ class ReloadDatabaseCommand extends BaseModuleGenerate
     public function configure()
     {
         $this
-            ->setName("thelia:dev:reloadDB")
-            ->setDescription("erase current database and create new one")
+            ->setName('thelia:dev:reloadDB')
+            ->setDescription('erase current database and create new one')
 /*            ->addOption(
                 "load-fixtures",
                 null,
@@ -49,13 +49,13 @@ class ReloadDatabaseCommand extends BaseModuleGenerate
         $database = new Database($connection);
         $output->writeln([
            '',
-           '<info>starting reloaded database, please wait</info>'
+           '<info>starting reloaded database, please wait</info>',
         ]);
         $database->insertSql();
         $output->writeln([
             '',
             '<info>Database reloaded with success</info>',
-            ''
+            '',
         ]);
 
         return 0;

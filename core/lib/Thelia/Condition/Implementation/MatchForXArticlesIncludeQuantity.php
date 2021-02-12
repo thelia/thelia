@@ -15,14 +15,14 @@ namespace Thelia\Condition\Implementation;
 use Thelia\Condition\Operators;
 
 /**
- * Class MatchForXArticlesIncludeQuantity
- * @package Thelia\Condition\Implementation
+ * Class MatchForXArticlesIncludeQuantity.
+ *
  * @author Baixas Alban <abaixas@openstudio.fr>
  */
 class MatchForXArticlesIncludeQuantity extends MatchForXArticles
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getServiceId()
     {
@@ -30,7 +30,7 @@ class MatchForXArticlesIncludeQuantity extends MatchForXArticles
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -38,7 +38,7 @@ class MatchForXArticlesIncludeQuantity extends MatchForXArticles
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isMatching()
     {
@@ -50,7 +50,7 @@ class MatchForXArticlesIncludeQuantity extends MatchForXArticles
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function drawBackOfficeInputs()
     {
@@ -60,7 +60,7 @@ class MatchForXArticlesIncludeQuantity extends MatchForXArticles
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getSummary()
     {
@@ -73,7 +73,7 @@ class MatchForXArticlesIncludeQuantity extends MatchForXArticles
             'If cart item (include quantity) count is <strong>%operator%</strong> %quantity%',
             [
                 '%operator%' => $i18nOperator,
-                '%quantity%' => $this->values[self::CART_QUANTITY]
+                '%quantity%' => $this->values[self::CART_QUANTITY],
             ]
         );
 

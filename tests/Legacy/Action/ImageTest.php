@@ -23,9 +23,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
- * Class ImageTest
- *
- * @package Thelia\Tests\Action\ImageTest
+ * Class ImageTest.
  */
 class ImageTest extends TestCaseWithURLToolSetup
 {
@@ -39,12 +37,12 @@ class ImageTest extends TestCaseWithURLToolSetup
     {
         $container = new ContainerBuilder();
 
-        $container->set("event_dispatcher", $this->getDispatcher());
+        $container->set('event_dispatcher', $this->getDispatcher());
 
         $request = new Request();
         $request->setSession($this->session);
 
-        $container->set("request", $request);
+        $container->set('request', $request);
 
         return $container;
     }
@@ -52,16 +50,16 @@ class ImageTest extends TestCaseWithURLToolSetup
     public function getFileManager()
     {
         $fileManager = new FileManager([
-            "document.product" => "Thelia\\Model\\ProductDocument",
-            "image.product" => "Thelia\\Model\\ProductImage",
-            "document.category" => "Thelia\\Model\\CategoryDocument",
-            "image.category" => "Thelia\\Model\\CategoryImage",
-            "document.content" => "Thelia\\Model\\ContentDocument",
-            "image.content" => "Thelia\\Model\\ContentImage",
-            "document.folder" => "Thelia\\Model\\FolderDocument",
-            "image.folder" => "Thelia\\Model\\FolderImage",
-            "document.brand" => "Thelia\\Model\\BrandDocument",
-            "image.brand" => "Thelia\\Model\\BrandImage",
+            'document.product' => 'Thelia\\Model\\ProductDocument',
+            'image.product' => 'Thelia\\Model\\ProductImage',
+            'document.category' => 'Thelia\\Model\\CategoryDocument',
+            'image.category' => 'Thelia\\Model\\CategoryImage',
+            'document.content' => 'Thelia\\Model\\ContentDocument',
+            'image.content' => 'Thelia\\Model\\ContentImage',
+            'document.folder' => 'Thelia\\Model\\FolderDocument',
+            'image.folder' => 'Thelia\\Model\\FolderImage',
+            'document.brand' => 'Thelia\\Model\\BrandDocument',
+            'image.brand' => 'Thelia\\Model\\BrandImage',
         ]);
 
         return $fileManager;
@@ -80,7 +78,7 @@ class ImageTest extends TestCaseWithURLToolSetup
         if ($config != null) {
             $this->cache_dir_from_web_root = $config->getValue();
 
-            $config->setValue(__DIR__ . "/assets/images/cache");
+            $config->setValue(__DIR__.'/assets/images/cache');
 
             $config->setValue($this->cache_dir_from_web_root)->save();
         }
@@ -88,14 +86,14 @@ class ImageTest extends TestCaseWithURLToolSetup
 
     public static function setUpBeforeClass(): void
     {
-        $dir = THELIA_WEB_DIR . "/cache/tests";
+        $dir = THELIA_WEB_DIR.'/cache/tests';
         if ($dh = @opendir($dir)) {
             while ($file = readdir($dh)) {
                 if ($file == '.' || $file == '..') {
                     continue;
                 }
 
-                unlink(sprintf("%s/%s", $dir, $file));
+                unlink(sprintf('%s/%s', $dir, $file));
             }
 
             closedir($dh);
@@ -113,9 +111,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     *
      * Imageevent is empty, mandatory parameters not specified.
-     *
      */
     public function testProcessEmptyImageEvent()
     {
@@ -128,9 +124,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     *
-     * Try to process a non-existent file
-     *
+     * Try to process a non-existent file.
      */
     public function testProcessNonExistentImage()
     {
@@ -138,17 +132,15 @@ class ImageTest extends TestCaseWithURLToolSetup
 
         $image = new Image($this->getFileManager());
 
-        $event->setCacheFilepath("blablabla.png");
-        $event->setCacheSubdirectory("tests");
+        $event->setCacheFilepath('blablabla.png');
+        $event->setCacheSubdirectory('tests');
 
         $this->expectException(\InvalidArgumentException::class);
         $image->processImage($event, null, $this->getMockEventDispatcher());
     }
 
     /**
-     *
-     * Try to process a file outside of the cache
-     *
+     * Try to process a file outside of the cache.
      */
     public function testProcessImageOutsideValidPath()
     {
@@ -156,8 +148,8 @@ class ImageTest extends TestCaseWithURLToolSetup
 
         $image = new Image($this->getFileManager());
 
-        $event->setCacheFilepath("blablabla.png");
-        $event->setCacheSubdirectory("../../../");
+        $event->setCacheFilepath('blablabla.png');
+        $event->setCacheSubdirectory('../../../');
 
         $this->expectException(\InvalidArgumentException::class);
         $image->processImage($event, null, $this->getMockEventDispatcher());
@@ -170,8 +162,8 @@ class ImageTest extends TestCaseWithURLToolSetup
     {
         $event = new ImageEvent();
 
-        $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-1.png");
-        $event->setCacheSubdirectory("tests");
+        $event->setSourceFilepath(__DIR__.'/assets/images/sources/test-image-1.png');
+        $event->setCacheSubdirectory('tests');
 
         $image = new Image($this->getFileManager());
 
@@ -191,7 +183,7 @@ class ImageTest extends TestCaseWithURLToolSetup
 
         $imgdir = ConfigQuery::read('image_cache_dir_from_web_root');
 
-        $this->assertFileExists(THELIA_WEB_DIR . "/$imgdir/tests/test-image-1.png");
+        $this->assertFileExists(THELIA_WEB_DIR."/$imgdir/tests/test-image-1.png");
     }
 
     /**
@@ -201,8 +193,8 @@ class ImageTest extends TestCaseWithURLToolSetup
     {
         $event = new ImageEvent();
 
-        $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-9.png");
-        $event->setCacheSubdirectory("tests");
+        $event->setSourceFilepath(__DIR__.'/assets/images/sources/test-image-9.png');
+        $event->setCacheSubdirectory('tests');
 
         $image = new Image($this->getFileManager());
 
@@ -222,11 +214,11 @@ class ImageTest extends TestCaseWithURLToolSetup
 
         $imgdir = ConfigQuery::read('image_cache_dir_from_web_root');
 
-        $this->assertFileExists(THELIA_WEB_DIR . "/$imgdir/tests/test-image-9.png");
+        $this->assertFileExists(THELIA_WEB_DIR."/$imgdir/tests/test-image-9.png");
     }
 
     /**
-     * Resize image with bands width > height
+     * Resize image with bands width > height.
      */
     public function testProcessImageResizeHorizWithBands()
     {
@@ -235,8 +227,8 @@ class ImageTest extends TestCaseWithURLToolSetup
         try {
             $event = new ImageEvent();
 
-            $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-2.png");
-            $event->setCacheSubdirectory("tests");
+            $event->setSourceFilepath(__DIR__.'/assets/images/sources/test-image-2.png');
+            $event->setCacheSubdirectory('tests');
 
             $event->setBackgroundColor('#ff0000');
             $event->setWidth(100);
@@ -254,7 +246,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * Resize image with bands height > width
+     * Resize image with bands height > width.
      */
     public function testProcessImageResizeVertWithBands()
     {
@@ -263,8 +255,8 @@ class ImageTest extends TestCaseWithURLToolSetup
         try {
             $event = new ImageEvent();
 
-            $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-3.png");
-            $event->setCacheSubdirectory("tests");
+            $event->setSourceFilepath(__DIR__.'/assets/images/sources/test-image-3.png');
+            $event->setCacheSubdirectory('tests');
 
             $event->setBackgroundColor('#ff0000');
             $event->setWidth(100);
@@ -282,7 +274,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * Apply all transformations
+     * Apply all transformations.
      */
     public function testProcessImageWithTransformations()
     {
@@ -291,10 +283,10 @@ class ImageTest extends TestCaseWithURLToolSetup
         try {
             $event = new ImageEvent();
 
-            $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-4.png");
-            $event->setCacheSubdirectory("tests");
+            $event->setSourceFilepath(__DIR__.'/assets/images/sources/test-image-4.png');
+            $event->setCacheSubdirectory('tests');
 
-            $event->setEffects(["grayscale", "vertical_flip", "horizontal_flip", 'colorize:#00ff00', 'gamma: 0.2']);
+            $event->setEffects(['grayscale', 'vertical_flip', 'horizontal_flip', 'colorize:#00ff00', 'gamma: 0.2']);
 
             $image = new Image($this->getFileManager());
 
@@ -307,7 +299,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * Resize image with crop width > height
+     * Resize image with crop width > height.
      */
     public function testProcessImageResizeHorizWithCrop()
     {
@@ -316,8 +308,8 @@ class ImageTest extends TestCaseWithURLToolSetup
         try {
             $event = new ImageEvent();
 
-            $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-5.png");
-            $event->setCacheSubdirectory("tests");
+            $event->setSourceFilepath(__DIR__.'/assets/images/sources/test-image-5.png');
+            $event->setCacheSubdirectory('tests');
 
             $event->setBackgroundColor('#ff0000');
             $event->setWidth(180);
@@ -335,7 +327,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * Resize image with crop height > width
+     * Resize image with crop height > width.
      */
     public function testProcessImageResizeVertWithCrop()
     {
@@ -344,8 +336,8 @@ class ImageTest extends TestCaseWithURLToolSetup
         try {
             $event = new ImageEvent();
 
-            $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-6.png");
-            $event->setCacheSubdirectory("tests");
+            $event->setSourceFilepath(__DIR__.'/assets/images/sources/test-image-6.png');
+            $event->setCacheSubdirectory('tests');
 
             $event->setBackgroundColor('#ff0000');
             $event->setWidth(100);
@@ -363,7 +355,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * Resize image keeping image ration
+     * Resize image keeping image ration.
      */
     public function testProcessImageResizeHorizKeepRatio()
     {
@@ -372,8 +364,8 @@ class ImageTest extends TestCaseWithURLToolSetup
         try {
             $event = new ImageEvent();
 
-            $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-7.png");
-            $event->setCacheSubdirectory("tests");
+            $event->setSourceFilepath(__DIR__.'/assets/images/sources/test-image-7.png');
+            $event->setCacheSubdirectory('tests');
 
             $event->setWidth(100);
             $event->setHeight(100);
@@ -389,7 +381,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * Resize image with crop height > width
+     * Resize image with crop height > width.
      */
     public function testProcessImageResizeVertKeepRatio()
     {
@@ -398,8 +390,8 @@ class ImageTest extends TestCaseWithURLToolSetup
         try {
             $event = new ImageEvent();
 
-            $event->setSourceFilepath(__DIR__ . "/assets/images/sources/test-image-8.png");
-            $event->setCacheSubdirectory("tests");
+            $event->setSourceFilepath(__DIR__.'/assets/images/sources/test-image-8.png');
+            $event->setCacheSubdirectory('tests');
 
             $event->setWidth(100);
             $event->setHeight(100);
@@ -451,8 +443,7 @@ class ImageTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * Try to clear directory ouside of the cache
-     *
+     * Try to clear directory ouside of the cache.
      */
     public function testClearUnallowedPathCache()
     {

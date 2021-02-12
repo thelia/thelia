@@ -16,9 +16,10 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Content;
 
 /**
- * Class ContentEvent
- * @package Thelia\Core\Event\Content
+ * Class ContentEvent.
+ *
  * @author manuel raynaud <manu@raynaud.io>
+ *
  * @deprecated since 2.4, please use \Thelia\Model\Event\ContentEvent
  */
 class ContentEvent extends ActionEvent
@@ -33,8 +34,6 @@ class ContentEvent extends ActionEvent
         $this->content = $content;
     }
 
-    /**
-     */
     public function setContent(Content $content)
     {
         $this->content = $content;
@@ -51,7 +50,7 @@ class ContentEvent extends ActionEvent
     }
 
     /**
-     * check if content exists
+     * check if content exists.
      *
      * @return bool
      */

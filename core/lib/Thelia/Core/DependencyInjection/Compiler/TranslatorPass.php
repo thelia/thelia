@@ -18,15 +18,14 @@ use Symfony\Component\DependencyInjection\Reference;
 use Thelia\Core\Translation\Translator;
 
 /**
- * Class TranslatorPass
- * @package Thelia\Core\DependencyInjection\Compiler
+ * Class TranslatorPass.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class TranslatorPass implements CompilerPassInterface
 {
     /**
      * You can modify the container here before it is dumped to PHP code.
-     *
      *
      * @api
      */

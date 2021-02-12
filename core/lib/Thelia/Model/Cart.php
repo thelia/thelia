@@ -23,13 +23,15 @@ use Thelia\TaxEngine\Calculator;
 class Cart extends BaseCart
 {
     /**
-     * Duplicate the current existing cart. Only the token is changed
+     * Duplicate the current existing cart. Only the token is changed.
      *
-     * @param string $token
-     * @param Customer $customer
-     * @param Currency $currency
+     * @param string                   $token
+     * @param Customer                 $customer
+     * @param Currency                 $currency
      * @param EventDispatcherInterface $dispatcher
+     *
      * @return Cart|bool
+     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -76,7 +78,7 @@ class Cart extends BaseCart
                 &&
                 $productSaleElements
                 &&
-                (int)$product->getVisible() === 1
+                (int) $product->getVisible() === 1
                 &&
                 ($productSaleElements->getQuantity() >= $cartItem->getQuantity() || $product->getVirtual() === 1 || !ConfigQuery::checkAvailableStock())
             ) {
@@ -92,7 +94,7 @@ class Cart extends BaseCart
                     ->setPromo($productSaleElements->getPromo());
 
                 $item->save();
-                $dispatcher->dispatch(new CartItemDuplicationItem($item, $cartItem), TheliaEvents::CART_ITEM_DUPLICATE,);
+                $dispatcher->dispatch(new CartItemDuplicationItem($item, $cartItem), TheliaEvents::CART_ITEM_DUPLICATE, );
             }
         }
 
@@ -109,7 +111,7 @@ class Cart extends BaseCart
     }
 
     /**
-     * Retrieve the last item added in the cart
+     * Retrieve the last item added in the cart.
      *
      * @return CartItem
      */
@@ -123,7 +125,6 @@ class Cart extends BaseCart
     }
 
     /**
-     *
      * Retrieve the total taxed amount.
      *
      * By default, the total include the discount
@@ -131,7 +132,9 @@ class Cart extends BaseCart
      * /!\ The postage amount is not available so it's the total with or without discount an without postage
      *
      * @param bool $withDiscount
+     *
      * @return float
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTaxedAmount(Country $country, $withDiscount = true, State $state = null)
@@ -155,10 +158,12 @@ class Cart extends BaseCart
 
     /**
      * @param bool $withDiscount
-     * @return float
-     * @throws \Propel\Runtime\Exception\PropelException
-     * @see getTaxedAmount same as this method but the amount is without taxes
      *
+     * @return float
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @see getTaxedAmount same as this method but the amount is without taxes
      */
     public function getTotalAmount($withDiscount = true, Country $country = null, State $state = null)
     {
@@ -180,12 +185,14 @@ class Cart extends BaseCart
     }
 
     /**
-     * Return the VAT of all items
+     * Return the VAT of all items.
      *
      * @param Country $taxCountry
-     * @param null $taxState
-     * @param bool $withDiscount
+     * @param null    $taxState
+     * @param bool    $withDiscount
+     *
      * @return float|int|string
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTotalVAT($taxCountry, $taxState = null, $withDiscount = true)
@@ -196,7 +203,9 @@ class Cart extends BaseCart
     /**
      * @param $taxCountry
      * @param null $taxState
+     *
      * @return float
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getDiscountVAT($taxCountry, $taxState = null)
@@ -205,9 +214,10 @@ class Cart extends BaseCart
     }
 
     /**
-     * Retrieve the total weight for all products in cart
+     * Retrieve the total weight for all products in cart.
      *
      * @return float
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getWeight()
@@ -225,9 +235,10 @@ class Cart extends BaseCart
     }
 
     /**
-     * Tell if the cart contains only virtual products
+     * Tell if the cart contains only virtual products.
      *
      * @return bool
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function isVirtual()
@@ -239,7 +250,7 @@ class Cart extends BaseCart
 
             $product = $cartItem->getProductSaleElements()->getProduct();
 
-            if (! $product->getVirtual()) {
+            if (!$product->getVirtual()) {
                 return false;
             }
         }
@@ -250,6 +261,7 @@ class Cart extends BaseCart
 
     /**
      * @param string $discount
+     *
      * @return BaseCart|Cart
      */
     public function setDiscount($discount)
@@ -258,11 +270,12 @@ class Cart extends BaseCart
     }
 
     /**
-     * @param bool $withTaxes
+     * @param bool                       $withTaxes
      * @param \Thelia\Model\Country|null $country
-     * @param \Thelia\Model\State|null $state
+     * @param \Thelia\Model\State|null   $state
      *
      * @return float|int|string
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getDiscount($withTaxes = true, Country $country = null, State $state = null)

@@ -19,7 +19,7 @@ class ProductCategory extends BaseProductCategory
     use \Thelia\Model\Tools\PositionManagementTrait;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function addCriteriaToPositionQuery(ProductCategoryQuery $query)
     {

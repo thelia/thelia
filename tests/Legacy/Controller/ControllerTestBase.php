@@ -16,13 +16,13 @@ use Thelia\Controller\BaseController;
 use Thelia\Tests\ContainerAwareTestCase;
 
 /**
- * Class ControllerTestBase
- * @package Thelia\Tests\ImportExport\Import
+ * Class ControllerTestBase.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 abstract class ControllerTestBase extends ContainerAwareTestCase
 {
-    /** @var BaseController  */
+    /** @var BaseController */
     protected $controller;
 
     public function setUp(): void

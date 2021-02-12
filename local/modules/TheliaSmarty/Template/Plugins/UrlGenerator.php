@@ -38,7 +38,7 @@ class UrlGenerator extends AbstractSmartyPlugin
     private $container;
 
     /**
-     * @param ContainerInterface $container         Needed to get all router.
+     * @param ContainerInterface $container needed to get all router
      */
     public function __construct(RequestStack $requestStack, TokenProvider $tokenProvider, ContainerInterface $container)
     {
@@ -48,17 +48,18 @@ class UrlGenerator extends AbstractSmartyPlugin
     }
 
     /**
-     * Process url generator function
+     * Process url generator function.
      *
-     * @param  array   $params
-     * @param  \Smarty $smarty
-     * @return string  no text is returned.
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
+     * @return string no text is returned
      */
     public function generateUrlFunction($params, &$smarty)
     {
         // the path to process
         $current = $this->getParam($params, 'current', false);
-        $path  = $this->getParam($params, 'path', null);
+        $path = $this->getParam($params, 'path', null);
         // Do not invoke index.php in URL (get a static file in web space
         $file = $this->getParam($params, 'file', null);
         $routeId = $this->getParam($params, 'route_id', null);
@@ -77,7 +78,7 @@ class UrlGenerator extends AbstractSmartyPlugin
 
         if ($current) {
             $path = $this->getRequest()->getPathInfo();
-            unset($params["current"]); // Delete the current param, so it isn't included in the url
+            unset($params['current']); // Delete the current param, so it isn't included in the url
 
             // build the query variables
             $params = array_merge(
@@ -87,12 +88,12 @@ class UrlGenerator extends AbstractSmartyPlugin
         }
 
         if ($routeId !== null && $routerId !== null) {
-            $routerId = 'router.' . $routerId;
+            $routerId = 'router.'.$routerId;
 
             // test if the router exists
             if (!$this->container->has($routerId)) {
                 throw new \InvalidArgumentException(
-                    'The router "' . $routerId . '" not found.'
+                    'The router "'.$routerId.'" not found.'
                 );
             }
             // get url by router and id
@@ -126,9 +127,9 @@ class UrlGenerator extends AbstractSmartyPlugin
             );
 
             $request = $this->getRequest();
-            $requestedLangCodeOrLocale = $params["lang"];
+            $requestedLangCodeOrLocale = $params['lang'];
             $view = $request->attributes->get('_view', null);
-            $viewId = $view === null ? null : $request->query->get($view . '_id', null);
+            $viewId = $view === null ? null : $request->query->get($view.'_id', null);
 
             if (null !== $requestedLangCodeOrLocale) {
                 if (\strlen($requestedLangCodeOrLocale) > 2) {
@@ -147,22 +148,23 @@ class UrlGenerator extends AbstractSmartyPlugin
 
                     $path = '';
                     if (null != $urlRewrite) {
-                        $path = "/".$urlRewrite->getUrl();
+                        $path = '/'.$urlRewrite->getUrl();
                     }
-                    $url = rtrim($lang->getUrl(), "/").$request->getBaseUrl().$path;
+                    $url = rtrim($lang->getUrl(), '/').$request->getBaseUrl().$path;
                 }
             }
         }
+
         return $this->applyNoAmpAndTarget($params, $url);
     }
 
     /**
-     *
-     * find placeholders in the path and replace them by the given value
+     * find placeholders in the path and replace them by the given value.
      *
      * @param $params
      * @param $path
      * @param $smarty
+     *
      * @return array the placeholders found
      */
     protected function resolvePath(&$params, &$path, $smarty)
@@ -185,25 +187,27 @@ class UrlGenerator extends AbstractSmartyPlugin
         return $keys;
     }
 
-     /**
-      * Process view url generator function
-      *
-      * @param  array $params
-      * @param  \Smarty $smarty
-      * @return string no text is returned.
-      */
+    /**
+     * Process view url generator function.
+     *
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
+     * @return string no text is returned
+     */
     public function generateFrontViewUrlFunction($params, &$smarty)
     {
         return $this->generateViewUrlFunction($params, false);
     }
 
-     /**
-      * Process administration view url generator function
-      *
-      * @param  array $params
-      * @param  \Smarty $smarty
-      * @return string no text is returned.
-      */
+    /**
+     * Process administration view url generator function.
+     *
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
+     * @return string no text is returned
+     */
     public function generateAdminViewUrlFunction($params, &$smarty)
     {
         return $this->generateViewUrlFunction($params, true);
@@ -227,7 +231,7 @@ class UrlGenerator extends AbstractSmartyPlugin
     protected function generateViewUrlFunction($params, $forAdmin)
     {
         // the view name (without .html)
-        $view   = $this->getParam($params, 'view');
+        $view = $this->getParam($params, 'view');
 
         $args = $this->getArgsFromParam($params, ['view', 'noamp', 'target', 'base_url']);
 
@@ -236,13 +240,14 @@ class UrlGenerator extends AbstractSmartyPlugin
         return $this->applyNoAmpAndTarget($params, $url);
     }
 
-     /**
-      * Get URL parameters array from parameters.
-      *
-      * @param array $params Smarty function params
-      * @param array $exclude Smarty function exclude params
-      * @return array the parameters array (either emply, of valued)
-      */
+    /**
+     * Get URL parameters array from parameters.
+     *
+     * @param array $params  Smarty function params
+     * @param array $exclude Smarty function exclude params
+     *
+     * @return array the parameters array (either emply, of valued)
+     */
     private function getArgsFromParam($params, $exclude = [])
     {
         $pairs = [];
@@ -261,21 +266,21 @@ class UrlGenerator extends AbstractSmartyPlugin
     public function generateUrlWithToken($params, &$smarty)
     {
         /**
-         * Compute the url
+         * Compute the url.
          */
         $url = $this->generateUrlFunction($params, $smarty);
 
-        $urlTokenParam = $this->getParam($params, "url_param", "_token");
+        $urlTokenParam = $this->getParam($params, 'url_param', '_token');
 
         /**
-         * Add the token
+         * Add the token.
          */
         $token = $this->tokenProvider->assignToken();
 
         $newUrl = URL::getInstance()->absoluteUrl(
             $url,
             [
-                $urlTokenParam => $token
+                $urlTokenParam => $token,
             ]
         );
 
@@ -284,7 +289,7 @@ class UrlGenerator extends AbstractSmartyPlugin
 
     protected function applyNoAmpAndTarget($params, $url)
     {
-        $noamp  = $this->getParam($params, 'noamp', null); // Do not change & in &amp;
+        $noamp = $this->getParam($params, 'noamp', null); // Do not change & in &amp;
         $target = $this->getParam($params, 'target', null);
 
         if (!$noamp) {
@@ -317,7 +322,7 @@ class UrlGenerator extends AbstractSmartyPlugin
     }
 
     /**
-     * Define the various smarty plugins handled by this class
+     * Define the various smarty plugins handled by this class.
      *
      * @return array an array of smarty plugin descriptors
      */
@@ -329,7 +334,7 @@ class UrlGenerator extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'viewurl', $this, 'generateFrontViewUrlFunction'),
             new SmartyPluginDescriptor('function', 'admin_viewurl', $this, 'generateAdminViewUrlFunction'),
             new SmartyPluginDescriptor('function', 'navigate', $this, 'navigateToUrlFunction'),
-            new SmartyPluginDescriptor('function', 'set_previous_url', $this, 'setPreviousUrlFunction')
+            new SmartyPluginDescriptor('function', 'set_previous_url', $this, 'setPreviousUrlFunction'),
         ];
     }
 
@@ -339,10 +344,10 @@ class UrlGenerator extends AbstractSmartyPlugin
     protected function getNavigateToValues()
     {
         return [
-            "current"       => "getCurrentUrl",
-            "previous"      => "getPreviousUrl",
-            "catalog_last"  => "getCatalogLastUrl",
-            "index"         => "getIndexUrl",
+            'current' => 'getCurrentUrl',
+            'previous' => 'getPreviousUrl',
+            'catalog_last' => 'getCatalogLastUrl',
+            'index' => 'getIndexUrl',
         ];
     }
 
@@ -356,7 +361,7 @@ class UrlGenerator extends AbstractSmartyPlugin
 
         if (!\array_key_exists($to, $navigateToValues)) {
             throw new \InvalidArgumentException(
-                sprintf("Incorrect value `%s` for parameter `to` in `navigate` substitution.", $to)
+                sprintf('Incorrect value `%s` for parameter `to` in `navigate` substitution.', $to)
             );
         }
 

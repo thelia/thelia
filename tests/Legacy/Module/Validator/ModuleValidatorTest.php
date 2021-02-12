@@ -19,29 +19,29 @@ use Thelia\Module\Validator\ModuleValidator;
 use Thelia\Tools\Version\Version;
 
 /**
- * Class ModuleValidator
- * @package Thelia\Tests\Module\Validator
+ * Class ModuleValidator.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleValidatorTest extends TestCase
 {
     public function testCheque()
     {
-        $moduleChequePath = THELIA_MODULE_DIR . "Cheque";
+        $moduleChequePath = THELIA_MODULE_DIR.'Cheque';
 
         $moduleValidator = new ModuleValidator($moduleChequePath, $this->getStubTranslator());
 
         $moduleDescriptor = $moduleValidator->getModuleDescriptor();
 
         $this->assertInstanceOf('SimpleXMLElement', $moduleDescriptor);
-        $this->assertEquals("2", $moduleValidator->getModuleVersion());
+        $this->assertEquals('2', $moduleValidator->getModuleVersion());
 
         $moduleDefinition = $moduleValidator->getModuleDefinition();
 
         $this->assertInstanceOf('Thelia\Module\Validator\ModuleDefinition', $moduleDefinition);
 
-        $this->assertEquals("Cheque", $moduleDefinition->getCode());
-        $this->assertEquals("Cheque\\Cheque", $moduleDefinition->getNamespace());
+        $this->assertEquals('Cheque', $moduleDefinition->getCode());
+        $this->assertEquals('Cheque\\Cheque', $moduleDefinition->getNamespace());
 
         // validate
         $this->expectException(\Thelia\Exception\ModuleException::class);
@@ -50,33 +50,33 @@ class ModuleValidatorTest extends TestCase
 
     public function testVirtualProductDelivery()
     {
-        $modulePath = THELIA_MODULE_DIR . "VirtualProductDelivery";
+        $modulePath = THELIA_MODULE_DIR.'VirtualProductDelivery';
 
         $moduleValidator = new ModuleValidator($modulePath, $this->getStubTranslator());
 
         $moduleDescriptor = $moduleValidator->getModuleDescriptor();
 
         $this->assertInstanceOf('SimpleXMLElement', $moduleDescriptor);
-        $this->assertEquals("2", $moduleValidator->getModuleVersion());
+        $this->assertEquals('2', $moduleValidator->getModuleVersion());
 
         $moduleDefinition = $moduleValidator->getModuleDefinition();
 
         $this->assertInstanceOf('Thelia\Module\Validator\ModuleDefinition', $moduleDefinition);
 
-        $this->assertEquals("VirtualProductDelivery", $moduleDefinition->getCode());
-        $this->assertEquals("VirtualProductDelivery\\VirtualProductDelivery", $moduleDefinition->getNamespace());
+        $this->assertEquals('VirtualProductDelivery', $moduleDefinition->getCode());
+        $this->assertEquals('VirtualProductDelivery\\VirtualProductDelivery', $moduleDefinition->getNamespace());
         $this->assertEquals(2, \count($moduleDefinition->getLanguages()));
         $this->assertEquals(0, \count($moduleDefinition->getDependencies()));
         $this->assertEquals(1, \count($moduleDefinition->getAuthors()));
-        $this->assertEquals("", $moduleDefinition->getDocumentation());
-        $this->assertEquals("", $moduleDefinition->getLogo());
-        $this->assertEquals("2.4.4", $moduleDefinition->getTheliaVersion());
+        $this->assertEquals('', $moduleDefinition->getDocumentation());
+        $this->assertEquals('', $moduleDefinition->getLogo());
+        $this->assertEquals('2.4.4', $moduleDefinition->getTheliaVersion());
         $this->assertTrue(
             Version::test(
                 Thelia::THELIA_VERSION,
                 $moduleDefinition->getTheliaVersion(),
                 false,
-                ">="
+                '>='
             )
         );
 
@@ -89,23 +89,24 @@ class ModuleValidatorTest extends TestCase
         return [
             ['Module1', 2],
             ['Module2', 1],
-            ['Module3', 1]
+            ['Module3', 1],
         ];
     }
 
     /**
      * @dataProvider authorsProvider
+     *
      * @param $path
      * @param $expectedAuthors
      */
     public function testAuthorsTag($path, $expectedAuthors)
     {
-        $modulePath = __DIR__ . "/Authors/" . $path;
+        $modulePath = __DIR__.'/Authors/'.$path;
 
         $moduleValidator = new ModuleValidator($modulePath, $this->getStubTranslator());
         $moduleDefinition = $moduleValidator->getModuleDefinition();
 
-        $this->assertEquals($expectedAuthors, \count($moduleDefinition->getAuthors()), sprintf("%d author(s) was expected for module %s", $expectedAuthors, $path));
+        $this->assertEquals($expectedAuthors, \count($moduleDefinition->getAuthors()), sprintf('%d author(s) was expected for module %s', $expectedAuthors, $path));
     }
 
     public function validatorProvider()
@@ -121,18 +122,19 @@ class ModuleValidatorTest extends TestCase
 
     /**
      * @dataProvider validatorProvider
+     *
      * @param $path
      * @param $exceptionExpected
      * @param $exceptionMessage
      */
     public function testValidator($path, $exceptionExpected, $exceptionMessage)
     {
-        $modulePath = __DIR__ . "ModuleValidatorTest.php/" . $path;
+        $modulePath = __DIR__.'ModuleValidatorTest.php/'.$path;
         /** @var \Exception $exception */
         $exception = null;
 
         try {
-            $moduleValidator = new ModuleValidator($modulePath, $this->getStubTranslator("opiopi"));
+            $moduleValidator = new ModuleValidator($modulePath, $this->getStubTranslator('opiopi'));
 
             $moduleValidator->validate(true);
         } catch (\Exception $ex) {
@@ -143,31 +145,31 @@ class ModuleValidatorTest extends TestCase
             $this->assertInstanceOf(
                 $exceptionExpected,
                 $exception,
-                $path . " module should return exception " . $exceptionExpected
+                $path.' module should return exception '.$exceptionExpected
             );
 
             if (null !== $exceptionMessage) {
                 $this->assertNotEmpty(
                     $exception->getMessage(),
-                    $path . " module exception should not be empty"
+                    $path.' module exception should not be empty'
                 );
 
                 $this->assertTrue(
                     false !== strpos($exception->getMessage(), $exceptionMessage),
-                    $path . " module exception should contain : " . $exceptionMessage
+                    $path.' module exception should contain : '.$exceptionMessage
                 );
             }
         } else {
             $this->assertNull(
                 $exception,
-                $path . " module should not return exception [" . $exception->getMessage() . ']'
+                $path.' module should not return exception ['.$exception->getMessage().']'
             );
         }
     }
 
     public function testNonExistentModule()
     {
-        $moduleChuckNorrisPath = THELIA_MODULE_DIR . "ChuckNorris";
+        $moduleChuckNorrisPath = THELIA_MODULE_DIR.'ChuckNorris';
 
         $this->expectException(\Thelia\Exception\FileNotFoundException::class);
         new ModuleValidator($moduleChuckNorrisPath, $this->getStubTranslator());
@@ -190,6 +192,7 @@ class ModuleValidatorTest extends TestCase
                         foreach ($p as $pk => $pv) {
                             $l = str_replace($pk, $pv, $l);
                         }
+
                         return $l;
                     }
                 )

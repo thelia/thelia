@@ -22,8 +22,8 @@ use Thelia\Model\StateQuery;
 use TheliaSmarty\Template\Plugins\Format;
 
 /**
- * Class FormatTest
- * @package TheliaSmarty\Tests\Template\Plugin
+ * Class FormatTest.
+ *
  * @author Gilles Bourgeat <gbourgeat@openstudio.fr>
  * @author Baixas Alban <abaixas@openstudio.fr>
  */
@@ -41,13 +41,13 @@ class FormatTest extends SmartyPluginTestCase
 
         $params['values'] = [
             'Colors' => ['Green', 'Yellow', 'Red'],
-            'Material' => ['Wood']
+            'Material' => ['Wood'],
         ];
 
         $output = $plugin->formatTwoDimensionalArray($params);
 
         $this->assertEquals(
-            "Colors : Green / Yellow / Red | Material : Wood",
+            'Colors : Green / Yellow / Red | Material : Wood',
             $output
         );
     }
@@ -55,74 +55,74 @@ class FormatTest extends SmartyPluginTestCase
     public function testFormatMoneyNotForceCurrency()
     {
         // new format_money method, thelia >= 2.3
-        $data = $this->render("testFormatMoney.html", [
-            'number' => 9.9999
+        $data = $this->render('testFormatMoney.html', [
+            'number' => 9.9999,
         ]);
 
-        $this->assertEquals("10.00 €", $data);
+        $this->assertEquals('10.00 €', $data);
     }
 
     public function testFormatMoneyForceCurrency()
     {
         /*** Test for EUR ***/
-        
+
         $currency = CurrencyQuery::create()->findOneByCode('EUR');
 
         // new format_money method, thelia >= 2.3
-        $data = $this->render("testFormatMoney.html", [
+        $data = $this->render('testFormatMoney.html', [
             'number' => 9.9999,
-            'currency' => $currency->getId()
+            'currency' => $currency->getId(),
         ]);
 
-        $this->assertEquals("10.00 " . $currency->getSymbol(), $data);
+        $this->assertEquals('10.00 '.$currency->getSymbol(), $data);
 
         // old format_money method, thelia < 2.3
-        $data = $this->render("testFormatMoney.html", [
+        $data = $this->render('testFormatMoney.html', [
             'number' => 9.9999,
-            'currency_symbol' => $currency->getSymbol()
+            'currency_symbol' => $currency->getSymbol(),
         ]);
 
-        $this->assertEquals("10.00 " . $currency->getSymbol(), $data);
+        $this->assertEquals('10.00 '.$currency->getSymbol(), $data);
 
         /*** Test for USD ***/
-        
+
         $currency = CurrencyQuery::create()->findOneByCode('USD');
 
         // new format_money method, thelia >= 2.3
-        $data = $this->render("testFormatMoney.html", [
+        $data = $this->render('testFormatMoney.html', [
             'number' => 9.9999,
-            'currency' => $currency->getId()
+            'currency' => $currency->getId(),
         ]);
 
-        $this->assertEquals($currency->getSymbol() . "10.00", $data);
+        $this->assertEquals($currency->getSymbol().'10.00', $data);
 
         // old format_money method, thelia < 2.3
-        $data = $this->render("testFormatMoney.html", [
+        $data = $this->render('testFormatMoney.html', [
             'number' => 9.9999,
-            'currency_symbol' => $currency->getSymbol()
+            'currency_symbol' => $currency->getSymbol(),
         ]);
 
-        $this->assertEquals($currency->getSymbol() . "10.00", $data);
+        $this->assertEquals($currency->getSymbol().'10.00', $data);
 
         /*** Test for GBP ***/
-        
+
         $currency = CurrencyQuery::create()->findOneByCode('GBP');
 
         // new format_money method, thelia >= 2.3
-        $data = $this->render("testFormatMoney.html", [
+        $data = $this->render('testFormatMoney.html', [
             'number' => 9.9999,
-            'currency' => $currency->getId()
+            'currency' => $currency->getId(),
         ]);
 
-        $this->assertEquals($currency->getSymbol() . "10.00", $data);
+        $this->assertEquals($currency->getSymbol().'10.00', $data);
 
         // old format_money method, thelia < 2.3
-        $data = $this->render("testFormatMoney.html", [
+        $data = $this->render('testFormatMoney.html', [
             'number' => 9.9999,
-            'currency_symbol' => $currency->getSymbol()
+            'currency_symbol' => $currency->getSymbol(),
         ]);
 
-        $this->assertEquals($currency->getSymbol() . "10.00", $data);
+        $this->assertEquals($currency->getSymbol().'10.00', $data);
     }
 
     public function testFormatAddress()
@@ -137,7 +137,7 @@ class FormatTest extends SmartyPluginTestCase
         $data = $this->renderString(
             '{format_address address=$address locale="fr_FR"}',
             [
-            'address' => $address->getId()
+            'address' => $address->getId(),
             ]
         );
 
@@ -151,7 +151,7 @@ class FormatTest extends SmartyPluginTestCase
             sprintf('<span class="address-line1">%s</span><br>', $address->getAddress1()),
             sprintf('<span class="postal-code">%s</span> <span class="locality">%s</span><br>', $address->getZipcode(), $address->getCity()),
             '<span class="country">France</span>',
-            '</p>'
+            '</p>',
         ];
 
         $this->assertEquals($data, implode("\n", $expected));
@@ -167,7 +167,7 @@ class FormatTest extends SmartyPluginTestCase
         $data = $this->renderString(
             '{format_address address=$address locale="en_US"}',
             [
-                'address' => $address->getId()
+                'address' => $address->getId(),
             ]
         );
 
@@ -186,7 +186,7 @@ class FormatTest extends SmartyPluginTestCase
                 $address->getZipcode()
             ),
             '<span class="country">United States</span>',
-            '</p>'
+            '</p>',
         ];
 
         $this->assertEquals($data, implode("\n", $expected));
@@ -203,7 +203,7 @@ class FormatTest extends SmartyPluginTestCase
         $data = $this->renderString(
             '{format_address html="0" address=$address locale="en_US"}',
             [
-                'address' => $address->getId()
+                'address' => $address->getId(),
             ]
         );
 
@@ -221,7 +221,7 @@ class FormatTest extends SmartyPluginTestCase
      */
     protected function getPlugin(ContainerBuilder $container)
     {
-        $this->requestStack = $container->get("request_stack");
+        $this->requestStack = $container->get('request_stack');
 
         return new Format($this->requestStack);
     }

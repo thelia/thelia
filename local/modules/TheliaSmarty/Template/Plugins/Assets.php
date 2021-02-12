@@ -84,7 +84,7 @@ class Assets extends AbstractSmartyPlugin
     }
 
     /**
-     * Define the various smarty plugins hendled by this class
+     * Define the various smarty plugins hendled by this class.
      *
      * @return array an array of smarty plugin descriptors
      */
@@ -100,7 +100,7 @@ class Assets extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'javascript', $this, 'functionJavascript'),
             new SmartyPluginDescriptor('function', 'stylesheet', $this, 'functionStylesheet'),
 
-            new SmartyPluginDescriptor('function', 'declare_assets', $this, 'declareAssets')
+            new SmartyPluginDescriptor('function', 'declare_assets', $this, 'declareAssets'),
         ];
     }
 }

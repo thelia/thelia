@@ -13,8 +13,8 @@
 namespace Thelia\Core\Hook;
 
 /**
- * Class Fragment
- * @package Thelia\Core\Hook
+ * Class Fragment.
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class Fragment

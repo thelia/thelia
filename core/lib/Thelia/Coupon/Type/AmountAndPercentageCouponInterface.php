@@ -15,16 +15,15 @@ namespace Thelia\Coupon\Type;
 use Thelia\Model\CartItem;
 
 /**
- * Represents a Coupon ready to be processed in a Checkout process
+ * Represents a Coupon ready to be processed in a Checkout process.
  *
- * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 interface AmountAndPercentageCouponInterface
 {
     /**
      * Set the value of specific coupon fields.
+     *
      * @param array $effects the Coupon effects params
      */
     public function setFieldsValue($effects);
@@ -32,8 +31,9 @@ interface AmountAndPercentageCouponInterface
     /**
      * Get the discount for a specific cart item.
      *
-     * @param  CartItem $cartItem the cart item
-     * @return float    the discount value
+     * @param CartItem $cartItem the cart item
+     *
+     * @return float the discount value
      */
     public function getCartItemDiscount(CartItem $cartItem);
 
@@ -44,23 +44,21 @@ interface AmountAndPercentageCouponInterface
      * @param string $templateName the path to the template
      * @param array  $otherFields  the list of additional fields fields
      *
-     * @return string the rendered template.
+     * @return string the rendered template
      */
     public function drawBaseBackOfficeInputs($templateName, $otherFields);
 
-    /**
-     * @inheritdoc
-     */
     public function getBaseFieldList($otherFields);
 
     /**
-     * Check the value of a coupon configuration field
+     * Check the value of a coupon configuration field.
      *
      * @param string $fieldName
      * @param string $fieldValue
+     *
      * @return string the field value
      *
-     * @throws \InvalidArgumentException is field value is not valid.
+     * @throws \InvalidArgumentException is field value is not valid
      */
     public function checkBaseCouponFieldValue($fieldName, $fieldValue);
 }

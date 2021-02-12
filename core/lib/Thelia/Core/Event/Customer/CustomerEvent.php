@@ -20,7 +20,7 @@ use Thelia\Model\Customer;
  */
 class CustomerEvent extends ActionEvent
 {
-    /** @var null|Customer */
+    /** @var Customer|null */
     public $customer;
 
     public function __construct(Customer $customer = null)
@@ -39,7 +39,7 @@ class CustomerEvent extends ActionEvent
     }
 
     /**
-     * @return null|Customer
+     * @return Customer|null
      */
     public function getCustomer()
     {

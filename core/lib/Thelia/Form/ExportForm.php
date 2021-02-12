@@ -21,7 +21,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Model\LangQuery;
 
 /**
- * Class ExportForm
+ * Class ExportForm.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class ExportForm extends BaseForm
@@ -42,7 +43,7 @@ class ExportForm extends BaseForm
                     'required' => true,
                     'label' => $this->translator->trans('File format'),
                     'label_attr' => [
-                        'for' => 'serializer'
+                        'for' => 'serializer',
                     ],
                 ]
             )
@@ -54,7 +55,7 @@ class ExportForm extends BaseForm
                     'required' => true,
                     'label' => $this->translator->trans('Language'),
                     'label_attr' => [
-                        'for' => 'language'
+                        'for' => 'language',
                     ],
                     'constraints' => [
                         new Callback(
@@ -63,10 +64,10 @@ class ExportForm extends BaseForm
                     ],
                 ]
             )
-            ->add("do_compress", CheckboxType::class, [
-                "label" => $this->translator->trans("Do compress"),
-                "label_attr" => ["for" => "do_compress"],
-                "required" => false,
+            ->add('do_compress', CheckboxType::class, [
+                'label' => $this->translator->trans('Do compress'),
+                'label_attr' => ['for' => 'do_compress'],
+                'required' => false,
             ])
             // Todo: use list
             ->add(
@@ -76,33 +77,33 @@ class ExportForm extends BaseForm
                     'required' => false,
                     'label' => $this->translator->trans('Archive Format'),
                     'label_attr' => [
-                        'for' => 'archiver'
+                        'for' => 'archiver',
                     ],
                 ]
             )
-            ->add("images", CheckboxType::class, [
-                "label" => $this->translator->trans("Include images"),
-                "label_attr" => ["for" => "with_images"],
-                "required" => false,
+            ->add('images', CheckboxType::class, [
+                'label' => $this->translator->trans('Include images'),
+                'label_attr' => ['for' => 'with_images'],
+                'required' => false,
             ])
-            ->add("documents", CheckboxType::class, [
-                "label" => $this->translator->trans("Include documents"),
-                "label_attr" => ["for" => "with_documents"],
-                "required" => false,
+            ->add('documents', CheckboxType::class, [
+                'label' => $this->translator->trans('Include documents'),
+                'label_attr' => ['for' => 'with_documents'],
+                'required' => false,
             ])
-            ->add("range_date_start", DateType::class, [
-                "label" => $this->translator->trans("Range date Start"),
-                "label_attr" => ["for" => "for_range_date_start"],
-                "required" => false,
+            ->add('range_date_start', DateType::class, [
+                'label' => $this->translator->trans('Range date Start'),
+                'label_attr' => ['for' => 'for_range_date_start'],
+                'required' => false,
                 'years' => range(date('Y'), date('Y') - 5),
                 'input' => 'array',
                 'widget' => 'choice',
                 'format' => 'yyyy-MM-d',
             ])
-            ->add("range_date_end", DateType::class, [
-                "label" => $this->translator->trans("Range date End"),
-                "label_attr" => ["for" => "for_range_date_end"],
-                "required" => false,
+            ->add('range_date_end', DateType::class, [
+                'label' => $this->translator->trans('Range date End'),
+                'label_attr' => ['for' => 'for_range_date_end'],
+                'required' => false,
                 'years' => range(date('Y'), date('Y') - 5),
                 'input' => 'array',
                 'widget' => 'choice',
@@ -117,7 +118,7 @@ class ExportForm extends BaseForm
                 $this->translator->trans(
                     "The language \"%id\" doesn't exist",
                     [
-                        "%id" => $value
+                        '%id' => $value,
                     ]
                 )
             );

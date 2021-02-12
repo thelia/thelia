@@ -24,7 +24,7 @@ use Thelia\Model\MessageQuery;
 use Thelia\Type\BooleanOrBothType;
 
 /**
- * Message loop, to access messageuration variables
+ * Message loop, to access messageuration variables.
  *
  * - id is the message id
  * - name is the message name
@@ -32,13 +32,13 @@ use Thelia\Type\BooleanOrBothType;
  * - secured filters by secured status (yes, no, both)
  * - exclude is a comma separated list of message IDs that will be excluded from output
  *
- * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  *
  * {@inheritdoc}
- * @method int getId()
- * @method int[] getExclude()
- * @method string getVariable()
+ *
+ * @method int         getId()
+ * @method int[]       getExclude()
+ * @method string      getVariable()
  * @method bool|string getHidden()
  * @method bool|string getSecured()
  */
@@ -62,8 +62,8 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function buildModelCriteria()
     {
-        $id      = $this->getId();
-        $name    = $this->getVariable();
+        $id = $this->getId();
+        $name = $this->getVariable();
         $secured = $this->getSecured();
         $exclude = $this->getExclude();
 
@@ -75,23 +75,23 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
                 'TITLE',
                 'SUBJECT',
                 'TEXT_MESSAGE',
-                'HTML_MESSAGE'
+                'HTML_MESSAGE',
             ]
         );
 
-        if (! \is_null($id)) {
+        if (!\is_null($id)) {
             $search->filterById($id);
         }
 
-        if (! \is_null($name)) {
+        if (!\is_null($name)) {
             $search->filterByName($name);
         }
 
-        if (! \is_null($exclude)) {
+        if (!\is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        if (! \is_null($secured) && $secured != BooleanOrBothType::ANY) {
+        if (!\is_null($secured) && $secured != BooleanOrBothType::ANY) {
             $search->filterBySecured($secured ? 1 : 0);
         }
 
@@ -107,15 +107,15 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($result);
 
             $loopResultRow
-                ->set("ID", $result->getId())
-                ->set("NAME", $result->getName())
-                ->set("IS_TRANSLATED", $result->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
-                ->set("SUBJECT", $result->getVirtualColumn('i18n_SUBJECT'))
-                ->set("TEXT_MESSAGE", $result->getVirtualColumn('i18n_TEXT_MESSAGE'))
-                ->set("HTML_MESSAGE", $result->getVirtualColumn('i18n_HTML_MESSAGE'))
-                ->set("SECURED", $result->getSecured())
+                ->set('ID', $result->getId())
+                ->set('NAME', $result->getName())
+                ->set('IS_TRANSLATED', $result->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('TITLE', $result->getVirtualColumn('i18n_TITLE'))
+                ->set('SUBJECT', $result->getVirtualColumn('i18n_SUBJECT'))
+                ->set('TEXT_MESSAGE', $result->getVirtualColumn('i18n_TEXT_MESSAGE'))
+                ->set('HTML_MESSAGE', $result->getVirtualColumn('i18n_HTML_MESSAGE'))
+                ->set('SECURED', $result->getSecured())
             ;
             $this->addOutputFields($loopResultRow, $result);
 

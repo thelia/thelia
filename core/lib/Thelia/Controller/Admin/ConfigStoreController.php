@@ -18,8 +18,8 @@ use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\ConfigQuery;
 
 /**
- * Class ConfigStoreController
- * @package Thelia\Controller\Admin
+ * Class ConfigStoreController.
+ *
  * @author Christophe Laffont <claffont@openstudio.fr>
  */
 class ConfigStoreController extends BaseAdminController
@@ -53,14 +53,14 @@ class ConfigStoreController extends BaseAdminController
             $oldFileName = ConfigQuery::read($configKey);
 
             if ($oldFileName !== null) {
-                $oldFilePath = $storeMediaUploadDir . DS . $oldFileName;
+                $oldFilePath = $storeMediaUploadDir.DS.$oldFileName;
                 if ($fs->exists($oldFilePath)) {
                     $fs->remove($oldFilePath);
                 }
             }
 
             // Write the new file
-            $newFileName = uniqid() . '-' . $file->getClientOriginalName();
+            $newFileName = uniqid().'-'.$file->getClientOriginalName();
             $file->move($storeMediaUploadDir, $newFileName);
             ConfigQuery::write($configKey, $newFileName, false);
         }
@@ -82,19 +82,19 @@ class ConfigStoreController extends BaseAdminController
             $storeMediaUploadDir = ConfigQuery::read('images_library_path');
 
             if ($storeMediaUploadDir === null) {
-                $storeMediaUploadDir = THELIA_LOCAL_DIR . 'media' . DS . 'images';
+                $storeMediaUploadDir = THELIA_LOCAL_DIR.'media'.DS.'images';
             } else {
-                $storeMediaUploadDir = THELIA_ROOT . $storeMediaUploadDir;
+                $storeMediaUploadDir = THELIA_ROOT.$storeMediaUploadDir;
             }
 
-            $storeMediaUploadDir .= DS . 'store';
+            $storeMediaUploadDir .= DS.'store';
 
             // List of medias that can be uploaded through this form.
             //  [Name of the form input] => [Key in the config table]
             $storeMediaList = [
                 'favicon_file' => 'favicon_file',
-                'logo_file' =>  'logo_file',
-                'banner_file' => 'banner_file'
+                'logo_file' => 'logo_file',
+                'banner_file' => 'banner_file',
             ];
 
             foreach ($storeMediaList as $input_name => $config_key) {
@@ -110,7 +110,7 @@ class ConfigStoreController extends BaseAdminController
                 }
             }
 
-            $this->adminLogAppend(AdminResources::STORE, AccessManager::UPDATE, "Store configuration changed");
+            $this->adminLogAppend(AdminResources::STORE, AccessManager::UPDATE, 'Store configuration changed');
 
             if ($this->getRequest()->get('save_mode') == 'stay') {
                 $response = $this->generateRedirectFromRoute('admin.configuration.store.default');
@@ -123,7 +123,7 @@ class ConfigStoreController extends BaseAdminController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("Store configuration failed."),
+                $this->getTranslator()->trans('Store configuration failed.'),
                 $error_msg,
                 $configStoreForm,
                 $ex

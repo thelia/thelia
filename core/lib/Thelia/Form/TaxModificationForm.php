@@ -18,8 +18,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Model\TaxQuery;
 
 /**
- * Class TaxModificationForm
- * @package Thelia\Form
+ * Class TaxModificationForm.
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class TaxModificationForm extends TaxCreationForm
@@ -29,12 +29,12 @@ class TaxModificationForm extends TaxCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", HiddenType::class, [
-                    "required" => true,
-                    "constraints" => [
+            ->add('id', HiddenType::class, [
+                    'required' => true,
+                    'constraints' => [
                         new Constraints\NotBlank(),
                         new Constraints\Callback(
-                            [$this, "verifyTaxId"]
+                            [$this, 'verifyTaxId']
                         ),
                     ],
             ])
@@ -43,7 +43,7 @@ class TaxModificationForm extends TaxCreationForm
 
     public static function getName()
     {
-        return "thelia_tax_modification";
+        return 'thelia_tax_modification';
     }
 
     public function verifyTaxId($value, ExecutionContextInterface $context)
@@ -52,7 +52,7 @@ class TaxModificationForm extends TaxCreationForm
             ->findPk($value);
 
         if (null === $tax) {
-            $context->addViolation("Tax ID not found");
+            $context->addViolation('Tax ID not found');
         }
     }
 }

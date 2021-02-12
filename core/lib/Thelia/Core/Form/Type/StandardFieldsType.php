@@ -17,15 +17,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Thelia\Form\StandardDescriptionFieldsTrait;
 
 /**
- * Class StandardFieldsType
- * @package Thelia\Core\Form\Type
+ * Class StandardFieldsType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class StandardFieldsType extends AbstractType
 {
-    protected $formBuilder;
-
     use StandardDescriptionFieldsTrait;
+    protected $formBuilder;
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -40,6 +39,6 @@ class StandardFieldsType extends AbstractType
      */
     public function getName()
     {
-        return "standard_fields";
+        return 'standard_fields';
     }
 }

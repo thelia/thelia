@@ -20,8 +20,8 @@ use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 
 /**
- * Class MetaDataTest
- * @package Thelia\Tests\Action
+ * Class MetaDataTest.
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class MetaDataTest extends BaseAction
@@ -66,7 +66,7 @@ class MetaDataTest extends BaseAction
             ->setMetaKey('test2')
             ->setElementKey(\get_class($product))
             ->setElementId($product->getId())
-            ->setValue(["fr_FR" => "bonjour", "en_US" => "Hello"]);
+            ->setValue(['fr_FR' => 'bonjour', 'en_US' => 'Hello']);
         $action = new MetaData();
         $action->createOrUpdate($event);
 
@@ -79,7 +79,7 @@ class MetaDataTest extends BaseAction
         $this->assertEquals('test2', $created->getMetaKey());
         $this->assertEquals(\get_class($product), $created->getElementKey());
         $this->assertEquals($product->getId(), $created->getElementId());
-        $this->assertEquals(["fr_FR" => "bonjour", "en_US" => "Hello"], $created->getValue());
+        $this->assertEquals(['fr_FR' => 'bonjour', 'en_US' => 'Hello'], $created->getValue());
         $this->assertEquals(true, $created->getIsSerialized());
 
         return $product;
@@ -87,6 +87,7 @@ class MetaDataTest extends BaseAction
 
     /**
      * @depends testCreate
+     *
      * @return Product
      */
     public function testRead(Product $product)
@@ -115,13 +116,14 @@ class MetaDataTest extends BaseAction
         $datas = MetaDataQuery::getAllVal(\get_class($product), $product->getId());
         $this->assertEquals(\count($datas), 2);
         $this->assertEquals($datas['test'], 'test');
-        $this->assertEquals($datas['test2'], ["fr_FR" => "bonjour", "en_US" => "Hello"]);
+        $this->assertEquals($datas['test2'], ['fr_FR' => 'bonjour', 'en_US' => 'Hello']);
 
         return $product;
     }
 
     /**
      * @depends testRead
+     *
      * @return Product
      */
     public function testUpdate(Product $product)
@@ -139,7 +141,7 @@ class MetaDataTest extends BaseAction
             ->setMetaKey($metaData->getMetaKey())
             ->setElementKey($metaData->getElementKey())
             ->setElementId($metaData->getElementId())
-            ->setValue(["fr_FR" => "bonjour", "en_US" => "Hello"]);
+            ->setValue(['fr_FR' => 'bonjour', 'en_US' => 'Hello']);
 
         $action = new MetaData();
         $action->createOrUpdate($event);
@@ -153,7 +155,7 @@ class MetaDataTest extends BaseAction
         $this->assertEquals('test', $updated->getMetaKey());
         $this->assertEquals(\get_class($product), $updated->getElementKey());
         $this->assertEquals($product->getId(), $updated->getElementId());
-        $this->assertEquals(["fr_FR" => "bonjour", "en_US" => "Hello"], $updated->getValue());
+        $this->assertEquals(['fr_FR' => 'bonjour', 'en_US' => 'Hello'], $updated->getValue());
         $this->assertEquals(true, $updated->getIsSerialized());
 
         return $product;
@@ -161,6 +163,7 @@ class MetaDataTest extends BaseAction
 
     /**
      * @depends testUpdate
+     *
      * @return Product
      */
     public function testDelete(Product $product)

@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\AdminLogQuery;
 
 /**
- * Class AdminLogIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class AdminLogIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class AdminLogIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class AdminLogIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "admin_log_id";
+        return 'admin_log_id';
     }
 }

@@ -15,11 +15,9 @@ namespace Thelia\Exception;
 use Thelia\Log\Tlog;
 
 /**
- * Thrown when the Facade is not set
+ * Thrown when the Facade is not set.
  *
- * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class MissingFacadeException extends \RuntimeException
 {

@@ -19,8 +19,8 @@ use Thelia\Action\Cache;
 use Thelia\Core\Event\Cache\CacheEvent;
 
 /**
- * Class CacheTest
- * @package Thelia\Tests\Action\assets
+ * Class CacheTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  * @author Gilles Bourgeat <gilles.bourgeat@gmail.com>
  */
@@ -29,10 +29,10 @@ class CacheTest extends TestCase
     protected $dir;
     protected $dir2;
 
-    public function setUp():void
+    public function setUp(): void
     {
-        $this->dir = __DIR__ . '/test';
-        $this->dir2 = __DIR__ . '/test2';
+        $this->dir = __DIR__.'/test';
+        $this->dir2 = __DIR__.'/test2';
 
         $fs = new Filesystem();
         $fs->mkdir($this->dir);

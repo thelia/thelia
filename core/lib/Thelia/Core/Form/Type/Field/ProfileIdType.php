@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\ProfileQuery;
 
 /**
- * Class ProfileIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class ProfileIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ProfileIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class ProfileIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "profile_id";
+        return 'profile_id';
     }
 }

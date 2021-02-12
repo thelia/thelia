@@ -18,8 +18,8 @@ use Thelia\Core\Thelia;
 use Thelia\Model\ConfigQuery;
 
 /**
- * Class WebTestCase
- * @package Thelia\Tests
+ * Class WebTestCase.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class WebTestCase extends TestCase

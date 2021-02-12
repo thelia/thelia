@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\MessageQuery;
 
 /**
- * Class MessageIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class MessageIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class MessageIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class MessageIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "message_id";
+        return 'message_id';
     }
 }

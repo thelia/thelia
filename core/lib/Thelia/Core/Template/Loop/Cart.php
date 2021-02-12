@@ -24,20 +24,15 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Type;
 
 /**
- *
- * Cart Loop
- *
+ * Cart Loop.
  *
  * Class Cart
- * @package Thelia\Core\Template\Loop
  *
- * {@inheritdoc}
  * @method string[] getOrder()
  */
 class Cart extends BaseLoop implements ArraySearchLoopInterface
 {
     /**
-     *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
     protected function getArgDefinitions()
@@ -64,11 +59,11 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
 
         $returnArray = iterator_to_array($cart->getCartItems());
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "reverse":
+                case 'reverse':
                     $returnArray = array_reverse($returnArray, false);
                     break;
             }
@@ -79,6 +74,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
 
     /**
      * @return LoopResult
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function parseResults(LoopResult $loopResult)
@@ -95,41 +91,41 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
 
             $loopResultRow = new LoopResultRow($cartItem);
 
-            $loopResultRow->set("ITEM_ID", $cartItem->getId());
-            $loopResultRow->set("TITLE", $product->getTitle());
-            $loopResultRow->set("REF", $product->getRef());
-            $loopResultRow->set("QUANTITY", $cartItem->getQuantity());
-            $loopResultRow->set("PRODUCT_ID", $product->getId());
-            $loopResultRow->set("PRODUCT_URL", $product->getUrl($this->getCurrentRequest()->getSession()->getLang()->getLocale()));
+            $loopResultRow->set('ITEM_ID', $cartItem->getId());
+            $loopResultRow->set('TITLE', $product->getTitle());
+            $loopResultRow->set('REF', $product->getRef());
+            $loopResultRow->set('QUANTITY', $cartItem->getQuantity());
+            $loopResultRow->set('PRODUCT_ID', $product->getId());
+            $loopResultRow->set('PRODUCT_URL', $product->getUrl($this->getCurrentRequest()->getSession()->getLang()->getLocale()));
             if (!$checkAvailability || $product->getVirtual() === 1) {
-                $loopResultRow->set("STOCK", $defaultAvailability);
+                $loopResultRow->set('STOCK', $defaultAvailability);
             } else {
-                $loopResultRow->set("STOCK", $productSaleElement->getQuantity());
+                $loopResultRow->set('STOCK', $productSaleElement->getQuantity());
             }
             $loopResultRow
-                ->set("PRICE", $cartItem->getPrice())
-                ->set("PROMO_PRICE", $cartItem->getPromoPrice())
-                ->set("TAXED_PRICE", $cartItem->getTaxedPrice($taxCountry))
-                ->set("PROMO_TAXED_PRICE", $cartItem->getTaxedPromoPrice($taxCountry))
-                ->set("IS_PROMO", $cartItem->getPromo() === 1 ? 1 : 0)
+                ->set('PRICE', $cartItem->getPrice())
+                ->set('PROMO_PRICE', $cartItem->getPromoPrice())
+                ->set('TAXED_PRICE', $cartItem->getTaxedPrice($taxCountry))
+                ->set('PROMO_TAXED_PRICE', $cartItem->getTaxedPromoPrice($taxCountry))
+                ->set('IS_PROMO', $cartItem->getPromo() === 1 ? 1 : 0)
             ;
 
             $loopResultRow
-                ->set("TOTAL_PRICE", $cartItem->getTotalPrice())
-                ->set("TOTAL_PROMO_PRICE", $cartItem->getTotalPromoPrice())
-                ->set("TOTAL_TAXED_PRICE", $cartItem->getTotalTaxedPrice($taxCountry))
-                ->set("TOTAL_PROMO_TAXED_PRICE", $cartItem->getTotalTaxedPromoPrice($taxCountry))
+                ->set('TOTAL_PRICE', $cartItem->getTotalPrice())
+                ->set('TOTAL_PROMO_PRICE', $cartItem->getTotalPromoPrice())
+                ->set('TOTAL_TAXED_PRICE', $cartItem->getTotalTaxedPrice($taxCountry))
+                ->set('TOTAL_PROMO_TAXED_PRICE', $cartItem->getTotalTaxedPromoPrice($taxCountry))
             ;
 
             $loopResultRow
-                ->set("REAL_PRICE", $cartItem->getRealPrice())
-                ->set("REAL_TAXED_PRICE", $cartItem->getRealTaxedPrice($taxCountry))
-                ->set("REAL_TOTAL_PRICE", $cartItem->getTotalRealPrice($taxCountry))
-                ->set("REAL_TOTAL_TAXED_PRICE", $cartItem->getTotalRealTaxedPrice($taxCountry))
+                ->set('REAL_PRICE', $cartItem->getRealPrice())
+                ->set('REAL_TAXED_PRICE', $cartItem->getRealTaxedPrice($taxCountry))
+                ->set('REAL_TOTAL_PRICE', $cartItem->getTotalRealPrice($taxCountry))
+                ->set('REAL_TOTAL_TAXED_PRICE', $cartItem->getTotalRealTaxedPrice($taxCountry))
             ;
 
-            $loopResultRow->set("PRODUCT_SALE_ELEMENTS_ID", $productSaleElement->getId());
-            $loopResultRow->set("PRODUCT_SALE_ELEMENTS_REF", $productSaleElement->getRef());
+            $loopResultRow->set('PRODUCT_SALE_ELEMENTS_ID', $productSaleElement->getId());
+            $loopResultRow->set('PRODUCT_SALE_ELEMENTS_REF', $productSaleElement->getRef());
             $this->addOutputFields($loopResultRow, $cartItem);
             $loopResult->addRow($loopResultRow);
         }
@@ -138,7 +134,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     }
 
     /**
-     * Return the event dispatcher,
+     * Return the event dispatcher,.
      *
      * @return \Symfony\Component\EventDispatcher\EventDispatcher
      */

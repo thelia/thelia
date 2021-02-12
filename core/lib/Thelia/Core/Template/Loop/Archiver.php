@@ -23,7 +23,8 @@ use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
 
 /**
- * Class ArchiveBuilder
+ * Class ArchiveBuilder.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
@@ -78,7 +79,7 @@ class Archiver extends BaseLoop implements ArraySearchLoopInterface
     {
         /** @var \Thelia\Core\Archiver\ArchiverInterface $archiver */
         foreach ($loopResult->getResultDataCollection() as $archiver) {
-            $loopResultRow = new LoopResultRow;
+            $loopResultRow = new LoopResultRow();
 
             $loopResultRow
                 ->set('ID', $archiver->getId())

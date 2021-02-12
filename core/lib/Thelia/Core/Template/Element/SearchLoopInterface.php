@@ -15,9 +15,7 @@ namespace Thelia\Core\Template\Element;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 interface SearchLoopInterface
 {
@@ -31,10 +29,10 @@ interface SearchLoopInterface
     public function getSearchIn();
 
     /**
-     * @param ModelCriteria $search a query
-     * @param string $searchTerm the searched term
-     * @param array $searchIn available field to search in
-     * @param string $searchCriteria the search criteria, such as Criterial::LIKE, Criteria::EQUAL, etc.
+     * @param ModelCriteria $search         a query
+     * @param string        $searchTerm     the searched term
+     * @param array         $searchIn       available field to search in
+     * @param string        $searchCriteria the search criteria, such as Criterial::LIKE, Criteria::EQUAL, etc
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria);
 }

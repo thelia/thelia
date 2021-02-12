@@ -17,11 +17,11 @@ use Thelia\Model\CartItem;
 
 /**
  * A trait to manage a coupon which removes a constant amount from the order total.
- * Should be used on coupons classes which implements AmountAndPercentageCouponInterface
+ * Should be used on coupons classes which implements AmountAndPercentageCouponInterface.
  *
  * Class AmountCouponTrait
+ *
  * @author Franck Allimant <franck@cqfdev.fr>
- * @package Thelia\Coupon\Type
  */
 trait AmountCouponTrait
 {
@@ -36,7 +36,7 @@ trait AmountCouponTrait
     abstract protected function getAmountFieldName();
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setFieldsValue($effects)
     {
@@ -44,7 +44,7 @@ trait AmountCouponTrait
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCartItemDiscount(CartItem $cartItem)
     {
@@ -52,26 +52,26 @@ trait AmountCouponTrait
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function callDrawBackOfficeInputs($templateName)
     {
         return $this->drawBaseBackOfficeInputs($templateName, [
                 'amount_field_name' => $this->makeCouponFieldName($this->getAmountFieldName()),
-                'amount_value'      => $this->amount
+                'amount_value' => $this->amount,
             ]);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getFieldList()
     {
-        return  $this->getBaseFieldList([$this->getAmountFieldName()]);
+        return $this->getBaseFieldList([$this->getAmountFieldName()]);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function checkCouponFieldValue($fieldName, $fieldValue)
     {
@@ -82,7 +82,7 @@ trait AmountCouponTrait
                 throw new \InvalidArgumentException(
                     Translator::getInstance()->trans(
                         'Value %val for Discount Amount is invalid. Please enter a positive value.',
-                        [ '%val' => $fieldValue]
+                        ['%val' => $fieldValue]
                     )
                 );
             }

@@ -13,11 +13,8 @@
 namespace Thelia\Type;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
-
 class IntToCombinedIntsListType extends BaseType
 {
     public function getType()
@@ -54,14 +51,15 @@ class IntToCombinedIntsListType extends BaseType
                 $parts = explode(':', $intToCombinedInts);
 
                 $return[trim($parts[0])] = [
-                    "values"        =>  preg_split("#(&|\|)#", preg_replace('#[\(\)]#', '', $parts[1])),
-                    "expression"    =>  $parts[1],
+                    'values' => preg_split("#(&|\|)#", preg_replace('#[\(\)]#', '', $parts[1])),
+                    'expression' => $parts[1],
                 ];
             }
 
             return $return;
         }
-            return null;
+
+        return null;
     }
 
     protected function checkLogicalFormat($string)
@@ -79,7 +77,7 @@ class IntToCombinedIntsListType extends BaseType
         $closingParenthesesCount = 0;
 
         $length = \strlen($noSpaceString);
-        for ($i=0; $i< $length; $i++) {
+        for ($i = 0; $i < $length; ++$i) {
             $char = $noSpaceString[$i];
             if ($char == '(') {
                 /* must be :
@@ -88,10 +86,10 @@ class IntToCombinedIntsListType extends BaseType
                  * must not be :
                  * - at the end of expression
                  */
-                if (($i!=0 && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i-1])) || !isset($noSpaceString[$i+1]) || !preg_match('#[\(\)0-9]#', $noSpaceString[$i+1])) {
+                if (($i != 0 && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i - 1])) || !isset($noSpaceString[$i + 1]) || !preg_match('#[\(\)0-9]#', $noSpaceString[$i + 1])) {
                     return false;
                 }
-                $openingParenthesesCount++;
+                ++$openingParenthesesCount;
             } elseif ($char == ')') {
                 /* must be :
                  * - after a number or ()
@@ -100,10 +98,10 @@ class IntToCombinedIntsListType extends BaseType
                  * - at the begining of expression
                  * - if no ( remain unclose
                  */
-                if ($i == 0 || !preg_match('#[\(\)0-9]#', $noSpaceString[$i-1]) || (isset($noSpaceString[$i+1]) && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i+1])) || $openingParenthesesCount-$closingParenthesesCount==0) {
+                if ($i == 0 || !preg_match('#[\(\)0-9]#', $noSpaceString[$i - 1]) || (isset($noSpaceString[$i + 1]) && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i + 1])) || $openingParenthesesCount - $closingParenthesesCount == 0) {
                     return false;
                 }
-                $closingParenthesesCount++;
+                ++$closingParenthesesCount;
             }
         }
 

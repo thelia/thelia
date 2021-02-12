@@ -12,7 +12,6 @@
 
 namespace Thelia\Handler;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\Archiver\ArchiverInterface;
@@ -30,7 +29,8 @@ use Thelia\Model\ImportQuery;
 use Thelia\Model\Lang;
 
 /**
- * Class ImportHandler
+ * Class ImportHandler.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class ImportHandler
@@ -51,14 +51,14 @@ class ImportHandler
     protected $archiverManager;
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
-     *  An event dispatcher interface
+     *                                                                                       An event dispatcher interface
      * @param \Thelia\Core\Serializer\SerializerManager                   $serializerManager
-     *  The serializer manager service
+     *                                                                                       The serializer manager service
      * @param \Thelia\Core\Archiver\ArchiverManager                       $archiverManager
-     *  The archiver manager service
+     *                                                                                       The archiver manager service
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -71,25 +71,25 @@ class ImportHandler
     }
 
     /**
-     * Get import model based on given identifier
+     * Get import model based on given identifier.
      *
-     * @param integer $importId          An import identifier
-     * @param boolean $dispatchException Dispatch exception if model doesn't exist
+     * @param int  $importId          An import identifier
+     * @param bool $dispatchException Dispatch exception if model doesn't exist
      *
      * @throws \ErrorException
      *
-     * @return null|\Thelia\Model\Import
+     * @return \Thelia\Model\Import|null
      */
     public function getImport($importId, $dispatchException = false)
     {
-        $import = (new ImportQuery)->findPk($importId);
+        $import = (new ImportQuery())->findPk($importId);
 
         if ($import === null && $dispatchException) {
             throw new \ErrorException(
                 Translator::getInstance()->trans(
                     'There is no id "%id" in the imports',
                     [
-                        '%id' => $importId
+                        '%id' => $importId,
                     ]
                 )
             );
@@ -99,25 +99,25 @@ class ImportHandler
     }
 
     /**
-     * Get import model based on given reference
+     * Get import model based on given reference.
      *
-     * @param string  $importRef         An import reference
-     * @param boolean $dispatchException Dispatch exception if model doesn't exist
+     * @param string $importRef         An import reference
+     * @param bool   $dispatchException Dispatch exception if model doesn't exist
      *
      * @throws \ErrorException
      *
-     * @return null|\Thelia\Model\Import
+     * @return \Thelia\Model\Import|null
      */
     public function getImportByRef($importRef, $dispatchException = false)
     {
-        $import = (new ImportQuery)->findOneByRef($importRef);
+        $import = (new ImportQuery())->findOneByRef($importRef);
 
         if ($import === null && $dispatchException) {
             throw new \ErrorException(
                 Translator::getInstance()->trans(
                     'There is no id "%ref" in the imports',
                     [
-                        '%ref' => $importRef
+                        '%ref' => $importRef,
                     ]
                 )
             );
@@ -127,25 +127,25 @@ class ImportHandler
     }
 
     /**
-     * Get import category model based on given identifier
+     * Get import category model based on given identifier.
      *
-     * @param integer $importCategoryId  An import category identifier
-     * @param boolean $dispatchException Dispatch exception if model doesn't exist
+     * @param int  $importCategoryId  An import category identifier
+     * @param bool $dispatchException Dispatch exception if model doesn't exist
      *
      * @throws \ErrorException
      *
-     * @return null|\Thelia\Model\ImportCategory
+     * @return \Thelia\Model\ImportCategory|null
      */
     public function getCategory($importCategoryId, $dispatchException = false)
     {
-        $category = (new ImportCategoryQuery)->findPk($importCategoryId);
+        $category = (new ImportCategoryQuery())->findPk($importCategoryId);
 
         if ($category === null && $dispatchException) {
             throw new \ErrorException(
                 Translator::getInstance()->trans(
                     'There is no id "%id" in the import categories',
                     [
-                        '%id' => $importCategoryId
+                        '%id' => $importCategoryId,
                     ]
                 )
             );
@@ -155,8 +155,7 @@ class ImportHandler
     }
 
     /**
-     * Import
-     *
+     * Import.
      *
      * @return \Thelia\Core\Event\ImportEvent
      */
@@ -175,7 +174,7 @@ class ImportHandler
                 Translator::getInstance()->trans(
                     'The extension "%extension" is not allowed',
                     [
-                        '%extension' => pathinfo($file->getFilename(), PATHINFO_EXTENSION)
+                        '%extension' => pathinfo($file->getFilename(), PATHINFO_EXTENSION),
                     ]
                 )
             );
@@ -184,7 +183,7 @@ class ImportHandler
         $importHandleClass = $import->getHandleClass();
 
         /** @var \Thelia\ImportExport\Import\AbstractImport $instance */
-        $instance = new $importHandleClass;
+        $instance = new $importHandleClass();
 
         // Configure handle class
         $instance->setLang($language);
@@ -207,17 +206,17 @@ class ImportHandler
     }
 
     /**
-     * Match archiver relative to file name
+     * Match archiver relative to file name.
      *
      * @param string $fileName File name
      *
-     * @return null|\Thelia\Core\Archiver\AbstractArchiver
+     * @return \Thelia\Core\Archiver\AbstractArchiver|null
      */
     public function matchArchiverByExtension($fileName)
     {
         /** @var \Thelia\Core\Archiver\AbstractArchiver $archiver */
         foreach ($this->archiverManager->getArchivers(true) as $archiver) {
-            if (stripos($fileName, '.' . $archiver->getExtension()) !== false) {
+            if (stripos($fileName, '.'.$archiver->getExtension()) !== false) {
                 return $archiver;
             }
         }
@@ -226,17 +225,17 @@ class ImportHandler
     }
 
     /**
-     * Match serializer relative to file name
+     * Match serializer relative to file name.
      *
      * @param string $fileName File name
      *
-     * @return null|\Thelia\Core\Serializer\AbstractSerializer
+     * @return \Thelia\Core\Serializer\AbstractSerializer|null
      */
     public function matchSerializerByExtension($fileName)
     {
         /** @var \Thelia\Core\Serializer\AbstractSerializer $serializer */
         foreach ($this->serializerManager->getSerializers() as $serializer) {
-            if (stripos($fileName, '.' . $serializer->getExtension()) !== false) {
+            if (stripos($fileName, '.'.$serializer->getExtension()) !== false) {
                 return $serializer;
             }
         }
@@ -245,8 +244,7 @@ class ImportHandler
     }
 
     /**
-     * Extract archive
-     *
+     * Extract archive.
      *
      * @return \Symfony\Component\HttpFoundation\File\File First file in unarchiver
      */
@@ -254,7 +252,7 @@ class ImportHandler
     {
         $archiver->open($file->getPathname());
 
-        $extractpath = \dirname($archiver->getArchivePath()) . DS . uniqid();
+        $extractpath = \dirname($archiver->getArchivePath()).DS.uniqid();
 
         $archiver->extract($extractpath);
 
@@ -271,7 +269,7 @@ class ImportHandler
     }
 
     /**
-     * Process import
+     * Process import.
      *
      * @param \Thelia\ImportExport\Import\AbstractImport  $import     An import
      * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface

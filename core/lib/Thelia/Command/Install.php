@@ -33,54 +33,54 @@ use Thelia\Module\BaseModule;
 use Thelia\Tools\TokenProvider;
 
 /**
- * try to install a new instance of Thelia
+ * try to install a new instance of Thelia.
  *
  * Class Install
- * @package Thelia\Command
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Install extends ContainerAwareCommand
 {
     /**
-     * Configure the command
+     * Configure the command.
      */
     protected function configure()
     {
         $this
-            ->setName("thelia:install")
-            ->setDescription("Install thelia using cli tools. For now Thelia only use mysql database")
-            ->setHelp("The <info>thelia:install</info> command install Thelia database and create config file needed.")
+            ->setName('thelia:install')
+            ->setDescription('Install thelia using cli tools. For now Thelia only use mysql database')
+            ->setHelp('The <info>thelia:install</info> command install Thelia database and create config file needed.')
             ->addOption(
-                "db_host",
+                'db_host',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                "host for your database",
-                "localhost"
+                'host for your database',
+                'localhost'
             )
             ->addOption(
-                "db_username",
+                'db_username',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                "username for your database"
+                'username for your database'
             )
             ->addOption(
-                "db_password",
+                'db_password',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                "password for your database"
+                'password for your database'
             )
             ->addOption(
-                "db_name",
+                'db_name',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                "database name"
+                'database name'
             )
             ->addOption(
-                "db_port",
+                'db_port',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                "database port",
-                "3306"
+                'database port',
+                '3306'
             )
         ;
     }
@@ -94,17 +94,17 @@ class Install extends ContainerAwareCommand
             '',
             '<info>Caution : You are installing Thelia in cli mode, we verify some information, but this information are only available for the cli php sapi</info>',
             '<info>This informations can be different in your apache or cgi php.ini files</info>',
-            ''
+            '',
         ]);
 
         $this->checkPermission($output);
 
         $connectionInfo = [
-            "host" => $input->getOption("db_host"),
-            "dbName" => $input->getOption("db_name"),
-            "username" => $input->getOption("db_username"),
-            "password" => $input->getOption("db_password"),
-            "port" => $input->getOption("db_port")
+            'host' => $input->getOption('db_host'),
+            'dbName' => $input->getOption('db_name'),
+            'username' => $input->getOption('db_username'),
+            'password' => $input->getOption('db_password'),
+            'port' => $input->getOption('db_port'),
         ];
 
         while (false === $connection = $this->tryConnection($connectionInfo, $output)) {
@@ -113,29 +113,29 @@ class Install extends ContainerAwareCommand
 
         $database = new Database($connection);
 
-        $database->createDatabase($connectionInfo["dbName"]);
+        $database->createDatabase($connectionInfo['dbName']);
 
         $output->writeln([
-            "",
-            "<info>Creating Thelia database, please wait</info>",
-            ""
+            '',
+            '<info>Creating Thelia database, please wait</info>',
+            '',
         ]);
-        $database->insertSql($connectionInfo["dbName"]);
+        $database->insertSql($connectionInfo['dbName']);
         $this->manageSecret($database);
 
         $output->writeln([
-            "",
-            "<info>Database created without errors</info>",
-            "<info>Creating file configuration, please wait</info>",
-            ""
+            '',
+            '<info>Database created without errors</info>',
+            '<info>Creating file configuration, please wait</info>',
+            '',
         ]);
 
         $this->createConfigFile($connectionInfo);
 
         $output->writeln([
-            "",
-            "<info>Config file created with success. Your thelia is installed</info>",
-            ""
+            '',
+            '<info>Config file created with success. Your thelia is installed</info>',
+            '',
         ]);
 
         exit;
@@ -149,13 +149,12 @@ class Install extends ContainerAwareCommand
     }
 
     /**
-     * Test if needed directories have write permission
-     *
+     * Test if needed directories have write permission.
      */
     protected function checkPermission(OutputInterface $output)
     {
         $output->writeln([
-            "Checking some permissions"
+            'Checking some permissions',
         ]);
 
         $permissions = new CheckPermission(false);
@@ -166,19 +165,19 @@ class Install extends ContainerAwareCommand
                 $output->writeln(
                     [
                         sprintf(
-                            "<info>%s ...</info> %s",
+                            '<info>%s ...</info> %s',
                             $data['text'],
-                            "<info>Ok</info>"
-                        )
+                            '<info>Ok</info>'
+                        ),
                     ]
                 );
             } else {
                 $output->writeln([
                     sprintf(
-                        "<error>%s </error>%s",
+                        '<error>%s </error>%s',
                         $data['text'],
-                        sprintf("<error>%s</error>", $data["hint"])
-                    )
+                        sprintf('<error>%s</error>', $data['hint'])
+                    ),
                 ]);
             }
         }
@@ -189,7 +188,7 @@ class Install extends ContainerAwareCommand
     }
 
     /**
-     * rename database config file and complete it
+     * rename database config file and complete it.
      *
      * @param array $connectionInfo
      */
@@ -197,51 +196,52 @@ class Install extends ContainerAwareCommand
     {
         $fs = new Filesystem();
 
-        $sampleConfigFile = THELIA_CONF_DIR . "database.yml.sample";
-        $configFile = THELIA_CONF_DIR . "database.yml";
+        $sampleConfigFile = THELIA_CONF_DIR.'database.yml.sample';
+        $configFile = THELIA_CONF_DIR.'database.yml';
 
         $fs->copy($sampleConfigFile, $configFile, true);
 
         $configContent = file_get_contents($configFile);
 
-        $configContent = str_replace("%DRIVER%", "mysql", $configContent);
-        $configContent = str_replace("%USERNAME%", $connectionInfo["username"], $configContent);
-        $configContent = str_replace("%PASSWORD%", $connectionInfo["password"], $configContent);
+        $configContent = str_replace('%DRIVER%', 'mysql', $configContent);
+        $configContent = str_replace('%USERNAME%', $connectionInfo['username'], $configContent);
+        $configContent = str_replace('%PASSWORD%', $connectionInfo['password'], $configContent);
         $configContent = str_replace(
-            "%DSN%",
-            sprintf("mysql:host=%s;dbname=%s;port=%s", $connectionInfo["host"], $connectionInfo["dbName"], $connectionInfo['port']),
+            '%DSN%',
+            sprintf('mysql:host=%s;dbname=%s;port=%s', $connectionInfo['host'], $connectionInfo['dbName'], $connectionInfo['port']),
             $configContent
         );
 
         file_put_contents($configFile, $configContent);
 
-        $fs->remove($this->getContainer()->getParameter("kernel.cache_dir"));
+        $fs->remove($this->getContainer()->getParameter('kernel.cache_dir'));
     }
 
     /**
-     * test database access
+     * test database access.
      *
      * @param $connectionInfo
+     *
      * @return bool|\PDO
      */
     protected function tryConnection($connectionInfo, OutputInterface $output)
     {
-        if (\is_null($connectionInfo["dbName"])) {
+        if (\is_null($connectionInfo['dbName'])) {
             return false;
         }
 
-        $dsn = "mysql:host=%s;port=%s";
+        $dsn = 'mysql:host=%s;port=%s';
 
         try {
             $connection = new \PDO(
-                sprintf($dsn, $connectionInfo["host"], $connectionInfo["port"]),
-                $connectionInfo["username"],
-                $connectionInfo["password"]
+                sprintf($dsn, $connectionInfo['host'], $connectionInfo['port']),
+                $connectionInfo['username'],
+                $connectionInfo['password']
             );
             $connection->query('SET NAMES \'UTF8\'');
         } catch (\PDOException $e) {
             $output->writeln([
-                "<error>Wrong connection information</error>"
+                '<error>Wrong connection information</error>',
             ]);
 
             return false;
@@ -251,7 +251,7 @@ class Install extends ContainerAwareCommand
     }
 
     /**
-     * Ask to user all needed information
+     * Ask to user all needed information.
      *
      * @return array
      */
@@ -266,44 +266,44 @@ class Install extends ContainerAwareCommand
             $helper,
             $input,
             $output,
-            "Database host [default: localhost] : ",
-            "You must specify a database host",
+            'Database host [default: localhost] : ',
+            'You must specify a database host',
             false,
-            "localhost"
+            'localhost'
         );
 
         $connectionInfo['port'] = $this->enterData(
             $helper,
             $input,
             $output,
-            "Database port [default: 3306] : ",
-            "You must specify a database port",
+            'Database port [default: 3306] : ',
+            'You must specify a database port',
             false,
-            "3306"
+            '3306'
         );
 
         $connectionInfo['dbName'] = $this->enterData(
             $helper,
             $input,
             $output,
-            "Database name (if database does not exist, Thelia will try to create it) : ",
-            "You must specify a database name"
+            'Database name (if database does not exist, Thelia will try to create it) : ',
+            'You must specify a database name'
         );
 
         $connectionInfo['username'] = $this->enterData(
             $helper,
             $input,
             $output,
-            "Database username : ",
-            "You must specify a database username"
+            'Database username : ',
+            'You must specify a database username'
         );
 
         $connectionInfo['password'] = $this->enterData(
             $helper,
             $input,
             $output,
-            "Database password : ",
-            "You must specify a database username",
+            'Database password : ',
+            'You must specify a database username',
             true,
             null,
             true
@@ -339,7 +339,7 @@ class Install extends ContainerAwareCommand
             return $value;
         });
 
-        return  $helper->ask($input, $output, $question);
+        return $helper->ask($input, $output, $question);
     }
 
     protected function initModernTemplatesRequirements(OutputInterface $output)
@@ -380,6 +380,6 @@ class Install extends ContainerAwareCommand
 
     protected function decorateInfo($text)
     {
-        return sprintf("<info>%s</info>", $text);
+        return sprintf('<info>%s</info>', $text);
     }
 }

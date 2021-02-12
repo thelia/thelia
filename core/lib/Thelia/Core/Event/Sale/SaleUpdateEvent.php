@@ -15,8 +15,8 @@ namespace Thelia\Core\Event\Sale;
 use Propel\Runtime\Util\PropelDateTime;
 
 /**
- * Class SaleUpdateEvent
- * @package Thelia\Core\Event\Sale
+ * Class SaleUpdateEvent.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class SaleUpdateEvent extends SaleCreateEvent
@@ -82,6 +82,7 @@ class SaleUpdateEvent extends SaleCreateEvent
     {
         return $this->chapo;
     }
+
     /**
      * @param string $description
      *
@@ -123,7 +124,8 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param  bool            $active
+     * @param bool $active
+     *
      * @return SaleUpdateEvent $this
      */
     public function setActive($active)
@@ -142,7 +144,8 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param  mixed $endDate string, integer (timestamp), or \DateTime value.
+     * @param mixed $endDate string, integer (timestamp), or \DateTime value
+     *
      * @return SaleUpdateEvent $this
      */
     public function setEndDate($endDate)
@@ -153,7 +156,7 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @return null|\DateTime
+     * @return \DateTime|null
      */
     public function getEndDate()
     {
@@ -161,7 +164,8 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param  int             $priceOffsetType
+     * @param int $priceOffsetType
+     *
      * @return SaleUpdateEvent $this
      */
     public function setPriceOffsetType($priceOffsetType)
@@ -180,7 +184,8 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param  mixed $startDate string, integer (timestamp), or \DateTime value.
+     * @param mixed $startDate string, integer (timestamp), or \DateTime value
+     *
      * @return SaleUpdateEvent $this
      */
     public function setStartDate($startDate)
@@ -191,7 +196,7 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @return null|\DateTime
+     * @return \DateTime|null
      */
     public function getStartDate()
     {
@@ -199,7 +204,8 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param  bool  $displayInitialPrice
+     * @param bool $displayInitialPrice
+     *
      * @return $this
      */
     public function setDisplayInitialPrice($displayInitialPrice)
@@ -218,7 +224,8 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param  array $priceOffsets an array of (currency_id => price offset) couples.
+     * @param array $priceOffsets an array of (currency_id => price offset) couples
+     *
      * @return $this
      */
     public function setPriceOffsets($priceOffsets)
@@ -237,7 +244,8 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param  array $products an array of product ID
+     * @param array $products an array of product ID
+     *
      * @return $this
      */
     public function setProducts($products)
@@ -256,7 +264,8 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param  array $productAttributes an array of (product_id => array of attribute IDs)
+     * @param array $productAttributes an array of (product_id => array of attribute IDs)
+     *
      * @return $this
      */
     public function setProductAttributes($productAttributes)

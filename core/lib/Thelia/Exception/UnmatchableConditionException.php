@@ -14,8 +14,8 @@ namespace Thelia\Exception;
 
 /**
  * Class UnmatchableConditionException
- * UnmatchableConditionException thrown when a condition can't be check (if customer is not connected)
- * @package Thelia\Exception
+ * UnmatchableConditionException thrown when a condition can't be check (if customer is not connected).
+ *
  * @author Baixas Alban <abaixas@openstudio.fr>
  */
 class UnmatchableConditionException extends \RuntimeException

@@ -13,8 +13,8 @@
 namespace Thelia\Module\Validator;
 
 /**
- * Class ModuleDefinition
- * @package Thelia\Module\Validator
+ * Class ModuleDefinition.
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleDefinition

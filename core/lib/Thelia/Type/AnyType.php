@@ -13,11 +13,8 @@
 namespace Thelia\Type;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
-
 class AnyType extends BaseType
 {
     public function getType()

@@ -16,9 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Thelia\Type\IntToCombinedStringsListType;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class IntToCombinedStringsListTypeTest extends TestCase
 {
@@ -38,16 +36,16 @@ class IntToCombinedStringsListTypeTest extends TestCase
             $type->getFormattedValue('1: foo & bar | (fooo &baar), 4: *, 67: (foooo & baaar)'),
             [
                 1 => [
-                    "values" => ['foo', 'bar', 'fooo', 'baar'],
-                    "expression" => 'foo & bar | (fooo &baar)',
+                    'values' => ['foo', 'bar', 'fooo', 'baar'],
+                    'expression' => 'foo & bar | (fooo &baar)',
                 ],
                 4 => [
-                    "values" => ['*'],
-                    "expression" => '*',
+                    'values' => ['*'],
+                    'expression' => '*',
                 ],
                 67 => [
-                    "values" => ['foooo', 'baaar'],
-                    "expression" => '(foooo & baaar)',
+                    'values' => ['foooo', 'baaar'],
+                    'expression' => '(foooo & baaar)',
                 ],
             ]
         );
@@ -56,16 +54,16 @@ class IntToCombinedStringsListTypeTest extends TestCase
             $type->getFormattedValue('9:royal \:enfield,10:500\, continental\, gt,11:(abc & def\&ghi\|ttt)'),
             [
                 9 => [
-                    "values" => ['royal :enfield'],
-                    "expression" => 'royal :enfield',
+                    'values' => ['royal :enfield'],
+                    'expression' => 'royal :enfield',
                 ],
                 10 => [
-                    "values" => ['500, continental, gt'],
-                    "expression" => '500, continental, gt',
+                    'values' => ['500, continental, gt'],
+                    'expression' => '500, continental, gt',
                 ],
                 11 => [
-                    "values" => ['abc', 'def&ghi|ttt'],
-                    "expression" => '(abc & def&ghi|ttt)',
+                    'values' => ['abc', 'def&ghi|ttt'],
+                    'expression' => '(abc & def&ghi|ttt)',
                 ],
             ]
         );

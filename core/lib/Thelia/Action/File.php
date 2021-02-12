@@ -29,9 +29,8 @@ use Thelia\Model\ProductImageI18nQuery;
 use Thelia\Model\ProductImageQuery;
 
 /**
- * Class File
+ * Class File.
  *
- * @package Thelia\Action
  * @author Etienne Perriere <eperriere@openstudio.fr>
  */
 class File extends BaseAction implements EventSubscriberInterface
@@ -42,8 +41,8 @@ class File extends BaseAction implements EventSubscriberInterface
         $clonedProduct = $event->getClonedProduct();
 
         foreach ($event->getTypes() as $type) {
-            if (!in_array($type, ['images', 'documents'])) {
-                throw new \Exception(Translator::getInstance()->trans("Cloning files of type %type is not allowed.", ['%type' => $type], "core"));
+            if (!\in_array($type, ['images', 'documents'])) {
+                throw new \Exception(Translator::getInstance()->trans('Cloning files of type %type is not allowed.', ['%type' => $type], 'core'));
             }
 
             $originalProductFiles = [];
@@ -62,13 +61,13 @@ class File extends BaseAction implements EventSubscriberInterface
             // Set clone's files
             /** @var ProductDocument|ProductImage $originalProductFile */
             foreach ($originalProductFiles as $originalProductFile) {
-                $srcPath = $originalProductFile->getUploadDir() . DS . $originalProductFile->getFile();
+                $srcPath = $originalProductFile->getUploadDir().DS.$originalProductFile->getFile();
 
                 if (file_exists($srcPath)) {
                     $ext = pathinfo($srcPath, PATHINFO_EXTENSION);
 
                     $clonedProductFile = [];
-                    $fileName = "";
+                    $fileName = '';
                     switch ($type) {
                         case 'images':
                             $fileName = $clonedProduct->getRef().'.'.$ext;
@@ -109,14 +108,14 @@ class File extends BaseAction implements EventSubscriberInterface
 
                     switch ($type) {
                         case 'images':
-                            $dispatcher->dispatch($clonedProductCreateFileEvent,TheliaEvents::IMAGE_SAVE);
+                            $dispatcher->dispatch($clonedProductCreateFileEvent, TheliaEvents::IMAGE_SAVE);
 
                             // Get original product image I18n
                             $originalProductFileI18ns = ProductImageI18nQuery::create()
                                 ->findById($originalProductFile->getId());
                             break;
                         case 'documents':
-                            $dispatcher->dispatch($clonedProductCreateFileEvent,TheliaEvents::DOCUMENT_SAVE);
+                            $dispatcher->dispatch($clonedProductCreateFileEvent, TheliaEvents::DOCUMENT_SAVE);
 
                             // Get original product document I18n
                             $originalProductFileI18ns = ProductDocumentI18nQuery::create()
@@ -155,10 +154,10 @@ class File extends BaseAction implements EventSubscriberInterface
 
             switch ($type) {
                 case 'images':
-                    $dispatcher->dispatch($clonedProductUpdateFileEvent,TheliaEvents::IMAGE_UPDATE);
+                    $dispatcher->dispatch($clonedProductUpdateFileEvent, TheliaEvents::IMAGE_UPDATE);
                     break;
                 case 'documents':
-                    $dispatcher->dispatch($clonedProductUpdateFileEvent,TheliaEvents::DOCUMENT_UPDATE);
+                    $dispatcher->dispatch($clonedProductUpdateFileEvent, TheliaEvents::DOCUMENT_UPDATE);
                     break;
             }
         }
@@ -170,7 +169,7 @@ class File extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::FILE_CLONE => ["cloneFile", 128]
+            TheliaEvents::FILE_CLONE => ['cloneFile', 128],
         ];
     }
 }

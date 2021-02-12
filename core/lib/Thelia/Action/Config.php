@@ -24,7 +24,7 @@ use Thelia\Model\ConfigQuery;
 class Config extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * Create a new configuration entry
+     * Create a new configuration entry.
      *
      * @param $eventName
      */
@@ -45,7 +45,7 @@ class Config extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Change a configuration entry value
+     * Change a configuration entry value.
      *
      * @param $eventName
      */
@@ -61,7 +61,7 @@ class Config extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Change a configuration entry
+     * Change a configuration entry.
      *
      * @param $eventName
      */
@@ -85,7 +85,7 @@ class Config extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Delete a configuration entry
+     * Delete a configuration entry.
      *
      * @param $eventName
      */
@@ -107,13 +107,13 @@ class Config extends BaseAction implements EventSubscriberInterface
     {
         return [
                 TheliaEvents::CONFIG_CREATE => [
-                    "create", 128
+                    'create', 128,
                 ], TheliaEvents::CONFIG_SETVALUE => [
-                    "setValue", 128
+                    'setValue', 128,
                 ], TheliaEvents::CONFIG_UPDATE => [
-                    "modify", 128
+                    'modify', 128,
                 ], TheliaEvents::CONFIG_DELETE => [
-                    "delete", 128
+                    'delete', 128,
                 ],
         ];
     }

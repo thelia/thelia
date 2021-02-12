@@ -34,11 +34,11 @@ class CurrencyEvent extends ActionEvent
      */
     public function hasCurrency()
     {
-        return ! \is_null($this->currency);
+        return !\is_null($this->currency);
     }
 
     /**
-     * @return null|Currency
+     * @return Currency|null
      */
     public function getCurrency()
     {
@@ -55,8 +55,6 @@ class CurrencyEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     */
     public function getCurrencyId()
     {
         return $this->currencyId;
@@ -64,6 +62,7 @@ class CurrencyEvent extends ActionEvent
 
     /**
      * @param int $currencyId
+     *
      * @return $this
      */
     public function setCurrencyId($currencyId)

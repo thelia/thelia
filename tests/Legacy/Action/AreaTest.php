@@ -20,8 +20,8 @@ use Thelia\Model\CountryAreaQuery;
 use Thelia\Model\CountryQuery;
 
 /**
- * Class AreaTest
- * @package Thelia\Tests\Action
+ * Class AreaTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AreaTest extends BaseAction
@@ -43,6 +43,7 @@ class AreaTest extends BaseAction
 
     /**
      * @depends testCreate
+     *
      * @return AreaModel
      */
     public function testAddCountry(AreaModel $area)
@@ -68,6 +69,7 @@ class AreaTest extends BaseAction
 
     /**
      * @depends testAddCountry
+     *
      * @return AreaModel
      */
     public function testRemoveCountry(AreaModel $area)

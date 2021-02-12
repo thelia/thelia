@@ -15,8 +15,8 @@ namespace Thelia\Tests\Rewriting;
 use Thelia\Model\Folder;
 
 /**
- * Class FolderRewritingTest
- * @package Thelia\Tests\Rewriting
+ * Class FolderRewritingTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FolderRewritingTest extends BaseRewritingObject

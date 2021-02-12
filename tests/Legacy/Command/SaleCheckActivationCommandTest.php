@@ -23,8 +23,8 @@ use Thelia\Model\SaleQuery;
 use Thelia\Tests\ContainerAwareTestCase;
 
 /**
- * Class SaleCheckActivationCommandTest
- * @package Thelia\Tests\Command
+ * Class SaleCheckActivationCommandTest.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class SaleCheckActivationCommandTest extends ContainerAwareTestCase
@@ -34,7 +34,7 @@ class SaleCheckActivationCommandTest extends ContainerAwareTestCase
     protected static $activated;
 
     /**
-     * in this method two sales are created. The first must be activated and the second one must be deactivated
+     * in this method two sales are created. The first must be activated and the second one must be deactivated.
      */
     public static function setUpBeforeClass(): void
     {
@@ -47,8 +47,8 @@ class SaleCheckActivationCommandTest extends ContainerAwareTestCase
             throw new \RuntimeException('use fixtures before launching test, there is no sale in database');
         }
 
-        $startDate = new \DateTime("@".strtotime("today - 1 month"));
-        $endDate = new \DateTime("@".strtotime("today + 1 month"));
+        $startDate = new \DateTime('@'.strtotime('today - 1 month'));
+        $endDate = new \DateTime('@'.strtotime('today + 1 month'));
 
         $sale->setStartDate($startDate)
             ->setEndDate($endDate)
@@ -63,8 +63,8 @@ class SaleCheckActivationCommandTest extends ContainerAwareTestCase
             ->addAscendingOrderByColumn('RAND()')
             ->findOne();
 
-        $startDate = new \DateTime("@".strtotime("today - 1 month"));
-        $endDate = new \DateTime("@".strtotime("today - 1 day"));
+        $startDate = new \DateTime('@'.strtotime('today - 1 month'));
+        $endDate = new \DateTime('@'.strtotime('today - 1 day'));
 
         $otherSale
             ->setStartDate($startDate)
@@ -84,20 +84,20 @@ class SaleCheckActivationCommandTest extends ContainerAwareTestCase
 
         $application->add($checkCommand);
 
-        $command = $application->find("sale:check-activation");
+        $command = $application->find('sale:check-activation');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
-            "command" => $command->getName(),
-            "--env" => "test"
+            'command' => $command->getName(),
+            '--env' => 'test',
         ]);
 
         $deactivatedSale = SaleQuery::create()->findPk(self::$deactivated);
 
-        $this->assertTrue($deactivatedSale->getActive(), "the sale must be actived now");
+        $this->assertTrue($deactivatedSale->getActive(), 'the sale must be actived now');
 
         $activatedSale = SaleQuery::create()->findPk(self::$activated);
 
-        $this->assertFalse($activatedSale->getActive(), "the sale must be deactived now");
+        $this->assertFalse($activatedSale->getActive(), 'the sale must be deactived now');
     }
 
     /**
@@ -108,6 +108,6 @@ class SaleCheckActivationCommandTest extends ContainerAwareTestCase
         $eventDispatcher = new EventDispatcher();
         $eventDispatcher->addSubscriber(new Sale());
 
-        $container->set("event_dispatcher", $eventDispatcher);
+        $container->set('event_dispatcher', $eventDispatcher);
     }
 }

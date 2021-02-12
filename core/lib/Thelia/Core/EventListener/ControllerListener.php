@@ -14,19 +14,15 @@ namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Controller\Admin\BaseAdminController;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\AdminAccessDenied;
 
 /**
- * Class ControllerListener
- * @package Thelia\Core\EventListener
+ * Class ControllerListener.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ControllerListener implements EventSubscriberInterface
@@ -55,14 +51,15 @@ class ControllerListener implements EventSubscriberInterface
 
     /**
      * {@inheritdoc}
+     *
      * @api
      */
     public static function getSubscribedEvents()
     {
         return [
             KernelEvents::CONTROLLER => [
-                ['adminFirewall', 128]
-            ]
+                ['adminFirewall', 128],
+            ],
         ];
     }
 }

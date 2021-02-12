@@ -15,8 +15,8 @@ namespace Thelia\Form;
 use Thelia\Model\ConfigQuery;
 
 /**
- * Class BruteforceForm
- * @package Thelia\Form
+ * Class BruteforceForm.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 abstract class BruteforceForm extends FirewallForm
@@ -27,11 +27,11 @@ abstract class BruteforceForm extends FirewallForm
 
     public function getConfigTime()
     {
-        return ConfigQuery::read("form_firewall_bruteforce_time_to_wait", static::DEFAULT_TIME_TO_WAIT);
+        return ConfigQuery::read('form_firewall_bruteforce_time_to_wait', static::DEFAULT_TIME_TO_WAIT);
     }
 
     public function getConfigAttempts()
     {
-        return ConfigQuery::read("form_firewall_bruteforce_attempts", static::DEFAULT_ATTEMPTS);
+        return ConfigQuery::read('form_firewall_bruteforce_attempts', static::DEFAULT_ATTEMPTS);
     }
 }

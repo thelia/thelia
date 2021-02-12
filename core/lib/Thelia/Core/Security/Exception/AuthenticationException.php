@@ -17,7 +17,7 @@ class AuthenticationException extends \Exception
     /**
      * @var string The login template name
      */
-    protected $loginTemplate = "login";
+    protected $loginTemplate = 'login';
 
     /**
      * @return string the login template name
@@ -28,8 +28,7 @@ class AuthenticationException extends \Exception
     }
 
     /**
-     * Set the login template name
-     *
+     * Set the login template name.
      */
     public function setLoginTemplate($loginTemplate)
     {

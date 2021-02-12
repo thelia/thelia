@@ -12,13 +12,12 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Core\Template\Loop\ModuleHook;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
- * Class ModuleHookTest
- * @package Thelia\Tests\Core\Template\Loop
+ * Class ModuleHookTest.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleHookTest extends BaseLoopTestor
@@ -30,7 +29,7 @@ class ModuleHookTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return ["backend_context" => 1];
+        return ['backend_context' => 1];
     }
 
     public function testSearchByHookId()

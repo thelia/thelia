@@ -36,7 +36,6 @@ class ToggleVisibilityEvent extends ActionEvent
     }
 
     /**
-     *
      * @return $this
      */
     public function setObject($object)
@@ -46,8 +45,6 @@ class ToggleVisibilityEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     */
     public function getObject()
     {
         return $this->object;

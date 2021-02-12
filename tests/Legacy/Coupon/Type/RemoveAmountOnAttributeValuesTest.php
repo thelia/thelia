@@ -23,13 +23,12 @@ use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\CurrencyQuery;
 
 /**
- * @package Coupon
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class RemoveAmountOnAttributeValuesTest extends TestCase
 {
     /**
-     * Generate adapter stub
+     * Generate adapter stub.
      *
      * @param int    $cartTotalPrice   Cart total price
      * @param string $checkoutCurrency Checkout currency
@@ -112,7 +111,7 @@ class RemoveAmountOnAttributeValuesTest extends TestCase
         $pse2 = $this->getMockBuilder('\Thelia\Model\ProductSaleElements')
             ->disableOriginalConstructor()
             ->getMock();
-        ;
+
         $pse2
             ->expects($this->any())
             ->method('getAttributeCombinations')
@@ -241,7 +240,7 @@ class RemoveAmountOnAttributeValuesTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false
@@ -250,22 +249,22 @@ class RemoveAmountOnAttributeValuesTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+            MatchForTotalAmount::CART_CURRENCY => 'EUR',
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+            MatchForTotalAmount::CART_CURRENCY => 'EUR',
         ];
         $condition2->setValidatorsFromForm($operators, $values);
 
@@ -308,7 +307,7 @@ class RemoveAmountOnAttributeValuesTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false
@@ -339,7 +338,7 @@ class RemoveAmountOnAttributeValuesTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false
@@ -370,7 +369,7 @@ class RemoveAmountOnAttributeValuesTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false

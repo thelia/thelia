@@ -43,13 +43,11 @@ use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductQuery;
 
 /**
- * Class FileManagerTest
- *
- * @package Thelia\Tests\Files
+ * Class FileManagerTest.
  */
 class FileManagerTest extends TestCase
 {
-    /** @var  FileManager */
+    /** @var FileManager */
     protected $fileManager;
 
     protected function setUp(): void
@@ -57,56 +55,56 @@ class FileManagerTest extends TestCase
         $this->container = new ContainerBuilder();
 
         $this->fileManager = new FileManager([
-            "document.product" => "Thelia\\Model\\ProductDocument",
-            "image.product" => "Thelia\\Model\\ProductImage",
+            'document.product' => 'Thelia\\Model\\ProductDocument',
+            'image.product' => 'Thelia\\Model\\ProductImage',
 
-            "document.category" => "Thelia\\Model\\CategoryDocument",
-            "image.category" => "Thelia\\Model\\CategoryImage",
+            'document.category' => 'Thelia\\Model\\CategoryDocument',
+            'image.category' => 'Thelia\\Model\\CategoryImage',
 
-            "document.content" => "Thelia\\Model\\ContentDocument",
-            "image.content" => "Thelia\\Model\\ContentImage",
+            'document.content' => 'Thelia\\Model\\ContentDocument',
+            'image.content' => 'Thelia\\Model\\ContentImage',
 
-            "document.folder" => "Thelia\\Model\\FolderDocument",
-            "image.folder" => "Thelia\\Model\\FolderImage",
+            'document.folder' => 'Thelia\\Model\\FolderDocument',
+            'image.folder' => 'Thelia\\Model\\FolderImage',
 
-            "document.brand" => "Thelia\\Model\\BrandDocument",
-            "image.brand" => "Thelia\\Model\\BrandImage",
+            'document.brand' => 'Thelia\\Model\\BrandDocument',
+            'image.brand' => 'Thelia\\Model\\BrandImage',
         ]);
 
-        $this->container->set("thelia.file_manager", $this->fileManager);
+        $this->container->set('thelia.file_manager', $this->fileManager);
     }
 
     public function testGetFileTypeIdentifier()
     {
         $obj = $this->fileManager->getModelInstance('document', 'product');
-        $this->assertInstanceOf("Thelia\\Model\\ProductDocument", $obj);
+        $this->assertInstanceOf('Thelia\\Model\\ProductDocument', $obj);
 
         $obj = $this->fileManager->getModelInstance('image', 'product');
-        $this->assertInstanceOf("Thelia\\Model\\ProductImage", $obj);
+        $this->assertInstanceOf('Thelia\\Model\\ProductImage', $obj);
 
         $obj = $this->fileManager->getModelInstance('document', 'category');
-        $this->assertInstanceOf("Thelia\\Model\\CategoryDocument", $obj);
+        $this->assertInstanceOf('Thelia\\Model\\CategoryDocument', $obj);
 
         $obj = $this->fileManager->getModelInstance('image', 'category');
-        $this->assertInstanceOf("Thelia\\Model\\CategoryImage", $obj);
+        $this->assertInstanceOf('Thelia\\Model\\CategoryImage', $obj);
 
         $obj = $this->fileManager->getModelInstance('document', 'content');
-        $this->assertInstanceOf("Thelia\\Model\\ContentDocument", $obj);
+        $this->assertInstanceOf('Thelia\\Model\\ContentDocument', $obj);
 
         $obj = $this->fileManager->getModelInstance('image', 'content');
-        $this->assertInstanceOf("Thelia\\Model\\ContentImage", $obj);
+        $this->assertInstanceOf('Thelia\\Model\\ContentImage', $obj);
 
         $obj = $this->fileManager->getModelInstance('document', 'folder');
-        $this->assertInstanceOf("Thelia\\Model\\FolderDocument", $obj);
+        $this->assertInstanceOf('Thelia\\Model\\FolderDocument', $obj);
 
         $obj = $this->fileManager->getModelInstance('image', 'folder');
-        $this->assertInstanceOf("Thelia\\Model\\FolderImage", $obj);
+        $this->assertInstanceOf('Thelia\\Model\\FolderImage', $obj);
 
         $obj = $this->fileManager->getModelInstance('document', 'brand');
-        $this->assertInstanceOf("Thelia\\Model\\BrandDocument", $obj);
+        $this->assertInstanceOf('Thelia\\Model\\BrandDocument', $obj);
 
         $obj = $this->fileManager->getModelInstance('image', 'brand');
-        $this->assertInstanceOf("Thelia\\Model\\BrandImage", $obj);
+        $this->assertInstanceOf('Thelia\\Model\\BrandImage', $obj);
     }
 
     public function testGetFileTypeIdentifierWrongType()
@@ -129,16 +127,16 @@ class FileManagerTest extends TestCase
 
     public function testAddFileModel()
     {
-        $this->fileManager->addFileModel("licorne", "poney", "Thelia\\Model\\ProductDocument");
+        $this->fileManager->addFileModel('licorne', 'poney', 'Thelia\\Model\\ProductDocument');
 
         $obj = $this->fileManager->getModelInstance('licorne', 'poney');
 
-        $this->assertInstanceOf("Thelia\\Model\\ProductDocument", $obj);
+        $this->assertInstanceOf('Thelia\\Model\\ProductDocument', $obj);
     }
 
     public function addFileModelWrongClassTest()
     {
-        $this->fileManager->addFileModel("licorne", "poney", "Thelia\\Model\\Product");
+        $this->fileManager->addFileModel('licorne', 'poney', 'Thelia\\Model\\Product');
 
         $this->expectException(\Thelia\Exception\FileException::class);
         $this->fileManager->getModelInstance('licorne', 'poney');
@@ -150,13 +148,13 @@ class FileManagerTest extends TestCase
 
         $model->setFile(null)->save();
 
-        $testFile = __DIR__ .DS. 'fixtures'  .DS. 'move-test.gif';
-        $targetFile = THELIA_LOCAL_DIR . 'media'.DS.'images'.DS.$type.DS."original-".$model->getId().".gif";
+        $testFile = __DIR__.DS.'fixtures'.DS.'move-test.gif';
+        $targetFile = THELIA_LOCAL_DIR.'media'.DS.'images'.DS.$type.DS.'original-'.$model->getId().'.gif';
 
         @unlink($testFile);
         @unlink($targetFile);
 
-        copy(__DIR__ .DS. 'fixtures' .DS. 'test.gif', $testFile);
+        copy(__DIR__.DS.'fixtures'.DS.'test.gif', $testFile);
 
         $uploadedFile = new UploadedFile(
             $testFile,
@@ -172,7 +170,7 @@ class FileManagerTest extends TestCase
         // Normalize path
         $file = str_replace('/', DS, $file);
 
-        $this->assertEquals("".$file, $targetFile);
+        $this->assertEquals(''.$file, $targetFile);
 
         $this->assertEquals(basename($targetFile), $model->getFile());
 
@@ -190,13 +188,13 @@ class FileManagerTest extends TestCase
 
         $model->setFile(null)->save();
 
-        $testFile = __DIR__ .DS. 'fixtures' .DS. 'move-test.txt';
-        $targetFile = THELIA_LOCAL_DIR . 'media'.DS.'documents'.DS.$type.DS."original-".$model->getId().".txt";
+        $testFile = __DIR__.DS.'fixtures'.DS.'move-test.txt';
+        $targetFile = THELIA_LOCAL_DIR.'media'.DS.'documents'.DS.$type.DS.'original-'.$model->getId().'.txt';
 
         @unlink($testFile);
         @unlink($targetFile);
 
-        copy(__DIR__ .DS. 'fixtures' .DS. 'test.txt', $testFile);
+        copy(__DIR__.DS.'fixtures'.DS.'test.txt', $testFile);
 
         $uploadedFile = new UploadedFile(
             $testFile,
@@ -212,7 +210,7 @@ class FileManagerTest extends TestCase
         // Normalize path
         $file = str_replace('/', DS, $file);
 
-        $this->assertEquals("".$file, $targetFile);
+        $this->assertEquals(''.$file, $targetFile);
 
         $this->assertEquals(basename($targetFile), $model->getFile());
 
@@ -308,22 +306,22 @@ class FileManagerTest extends TestCase
     {
         $file = $this->fileManager->sanitizeFileName("C:\\../test/\\..file/%ù^name \t\n\r²&²:.txt");
 
-        $this->assertEquals("c..test..filename.txt", $file);
+        $this->assertEquals('c..test..filename.txt', $file);
 
-        $file = $this->fileManager->sanitizeFileName("/etc/passwd");
+        $file = $this->fileManager->sanitizeFileName('/etc/passwd');
 
-        $this->assertEquals("etcpasswd", $file);
+        $this->assertEquals('etcpasswd', $file);
     }
 
     public function doTestDeleteFile($model, $modelParent, $type, $obj)
     {
-        $targetFile = THELIA_LOCAL_DIR . 'media'.DS.$type.DS.$obj.DS."original-".$model->getId().".txt";
+        $targetFile = THELIA_LOCAL_DIR.'media'.DS.$type.DS.$obj.DS.'original-'.$model->getId().'.txt';
 
         $model->setParentId($modelParent->getId())->setFile(basename($targetFile))->save();
 
         @unlink($targetFile);
 
-        copy(__DIR__ .DS. 'fixtures' .DS. 'test.txt', $targetFile);
+        copy(__DIR__.DS.'fixtures'.DS.'test.txt', $targetFile);
 
         $this->assertFileExists($targetFile);
 
@@ -371,6 +369,7 @@ class FileManagerTest extends TestCase
             'category'
         );
     }
+
     public function testDeleteFileFolderDocument()
     {
         $this->doTestDeleteFile(
@@ -410,6 +409,7 @@ class FileManagerTest extends TestCase
             'content'
         );
     }
+
     public function testDeleteFileBrandDocument()
     {
         $this->doTestDeleteFile(

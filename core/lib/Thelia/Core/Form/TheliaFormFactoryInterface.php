@@ -16,8 +16,8 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Thelia\Form\BaseForm;
 
 /**
- * Class TheliaFormFactory
- * @package Thelia\Core\Form
+ * Class TheliaFormFactory.
+ *
  * @author Benjamin Perche <benjamin@thelia.net>
  */
 interface TheliaFormFactoryInterface

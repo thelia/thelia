@@ -22,9 +22,8 @@ use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatusQuery;
 
 /**
- * This class implement the minimum
+ * This class implement the minimum.
  *
- * @package Thelia\Module
  * @author Thelia <info@thelia.net>
  */
 abstract class BasePaymentModuleController extends BaseFrontController
@@ -51,9 +50,9 @@ abstract class BasePaymentModuleController extends BaseFrontController
 
             $logFilePath = $this->getLogFilePath();
 
-            $this->log->setPrefix("#LEVEL: #DATE #HOUR: ");
-            $this->log->setDestinations("\\Thelia\\Log\\Destination\\TlogDestinationFile");
-            $this->log->setConfig("\\Thelia\\Log\\Destination\\TlogDestinationFile", 0, $logFilePath);
+            $this->log->setPrefix('#LEVEL: #DATE #HOUR: ');
+            $this->log->setDestinations('\\Thelia\\Log\\Destination\\TlogDestinationFile');
+            $this->log->setConfig('\\Thelia\\Log\\Destination\\TlogDestinationFile', 0, $logFilePath);
             $this->log->setLevel(Tlog::INFO);
         }
 
@@ -61,11 +60,11 @@ abstract class BasePaymentModuleController extends BaseFrontController
     }
 
     /**
-     * @return string The path to the module's log file.
+     * @return string the path to the module's log file
      */
     protected function getLogFilePath()
     {
-        return sprintf(THELIA_LOG_DIR . "%s.log", strtolower($this->getModuleCode()));
+        return sprintf(THELIA_LOG_DIR.'%s.log', strtolower($this->getModuleCode()));
     }
 
     /**
@@ -73,6 +72,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      * once the module has performed the required checks to confirm a valid payment.
      *
      * @param int $orderId the order ID
+     *
      * @throws \Exception
      */
     public function confirmPayment($orderId)
@@ -83,7 +83,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
             if (null !== $order = $this->getOrder($orderId)) {
                 $this->getLog()->addInfo(
                     $this->getTranslator()->trans(
-                        "Processing confirmation of order ref. %ref, ID %id",
+                        'Processing confirmation of order ref. %ref, ID %id',
                         ['%ref' => $order->getRef(), '%id' => $order->getId()]
                     )
                 );
@@ -96,7 +96,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
 
                 $this->getLog()->addInfo(
                     $this->getTranslator()->trans(
-                        "Order ref. %ref, ID %id has been successfully paid.",
+                        'Order ref. %ref, ID %id has been successfully paid.',
                         ['%ref' => $order->getRef(), '%id' => $order->getId()]
                     )
                 );
@@ -104,11 +104,11 @@ abstract class BasePaymentModuleController extends BaseFrontController
         } catch (\Exception $ex) {
             $this->getLog()->addError(
                 $this->getTranslator()->trans(
-                    "Error occured while processing order ref. %ref, ID %id: %err",
+                    'Error occured while processing order ref. %ref, ID %id: %err',
                     [
                         '%err' => $ex->getMessage(),
-                        '%ref' => !isset($order) ? "?" : $order->getRef(),
-                        '%id' => !isset($order) ? "?" : $order->getId()
+                        '%ref' => !isset($order) ? '?' : $order->getRef(),
+                        '%id' => !isset($order) ? '?' : $order->getId(),
                     ]
                 )
             );
@@ -118,9 +118,9 @@ abstract class BasePaymentModuleController extends BaseFrontController
     }
 
     /**
-     * Save the transaction/payment ref in the order
+     * Save the transaction/payment ref in the order.
      *
-     * @param int $orderId the order ID
+     * @param int $orderId        the order ID
      * @param int $transactionRef the transaction reference
      *
      * @throws \Exception
@@ -139,11 +139,11 @@ abstract class BasePaymentModuleController extends BaseFrontController
 
                 $this->getLog()->addInfo(
                     $this->getTranslator()->trans(
-                        "Payment transaction %transaction_ref for order ref. %ref, ID %id has been successfully saved.",
+                        'Payment transaction %transaction_ref for order ref. %ref, ID %id has been successfully saved.',
                         [
                             '%transaction_ref' => $transactionRef,
                             '%ref' => $order->getRef(),
-                            '%id' => $order->getId()
+                            '%id' => $order->getId(),
                         ]
                     )
                 );
@@ -151,10 +151,10 @@ abstract class BasePaymentModuleController extends BaseFrontController
         } catch (\Exception $ex) {
             $this->getLog()->addError(
                 $this->getTranslator()->trans(
-                    "Error occurred while saving payment transaction %transaction_ref for order ID %id.",
+                    'Error occurred while saving payment transaction %transaction_ref for order ID %id.',
                     [
                         '%transaction_ref' => $transactionRef,
-                        '%id' => $orderId
+                        '%id' => $orderId,
                     ]
                 )
             );
@@ -177,7 +177,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
             if (null !== $order = $this->getOrder($orderId)) {
                 $this->getLog()->addInfo(
                     $this->getTranslator()->trans(
-                        "Processing cancelation of payment for order ref. %ref",
+                        'Processing cancelation of payment for order ref. %ref',
                         ['%ref' => $order->getRef()]
                     )
                 );
@@ -190,7 +190,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
 
                 $this->getLog()->addInfo(
                     $this->getTranslator()->trans(
-                        "Order ref. %ref is now unpaid.",
+                        'Order ref. %ref is now unpaid.',
                         ['%ref' => $order->getRef()]
                     )
                 );
@@ -198,11 +198,11 @@ abstract class BasePaymentModuleController extends BaseFrontController
         } catch (\Exception $ex) {
             $this->getLog()->addError(
                 $this->getTranslator()->trans(
-                    "Error occurred while cancelling order ref. %ref, ID %id: %err",
+                    'Error occurred while cancelling order ref. %ref, ID %id: %err',
                     [
                         '%err' => $ex->getMessage(),
-                        '%ref' => !isset($order) ? "?" : $order->getRef(),
-                        '%id' => !isset($order) ? "?" : $order->getId()
+                        '%ref' => !isset($order) ? '?' : $order->getRef(),
+                        '%id' => !isset($order) ? '?' : $order->getId(),
                     ]
                 )
             );
@@ -215,13 +215,14 @@ abstract class BasePaymentModuleController extends BaseFrontController
      * Get an order and issue a log message if not found.
      *
      * @param $orderId
-     * @return null|\Thelia\Model\Order
+     *
+     * @return \Thelia\Model\Order|null
      */
     protected function getOrder($orderId)
     {
         if (null == $order = OrderQuery::create()->findPk($orderId)) {
             $this->getLog()->addError(
-                $this->getTranslator()->trans("Unknown order ID:  %id", ['%id' => $orderId])
+                $this->getTranslator()->trans('Unknown order ID:  %id', ['%id' => $orderId])
             );
         }
 
@@ -235,14 +236,14 @@ abstract class BasePaymentModuleController extends BaseFrontController
      */
     public function redirectToSuccessPage($orderId)
     {
-        $this->getLog()->addInfo("Redirecting customer to payment success page");
+        $this->getLog()->addInfo('Redirecting customer to payment success page');
 
         throw new RedirectException(
             $this->retrieveUrlFromRouteId(
                 'order.placed',
                 [],
                 [
-                    'order_id' => $orderId
+                    'order_id' => $orderId,
                 ],
                 Router::ABSOLUTE_PATH
             )
@@ -252,12 +253,12 @@ abstract class BasePaymentModuleController extends BaseFrontController
     /**
      * Redirect the customer to the failure payment page. if $message is null, a generic message is displayed.
      *
-     * @param int $orderId the order ID
-     * @param string|null $message an error message.
+     * @param int         $orderId the order ID
+     * @param string|null $message an error message
      */
     public function redirectToFailurePage($orderId, $message)
     {
-        $this->getLog()->addInfo("Redirecting customer to payment failure page");
+        $this->getLog()->addInfo('Redirecting customer to payment failure page');
 
         throw new RedirectException(
             $this->retrieveUrlFromRouteId(
@@ -265,7 +266,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
                 [],
                 [
                     'order_id' => $orderId,
-                    'message' => $message
+                    'message' => $message,
                 ],
                 Router::ABSOLUTE_PATH
             )

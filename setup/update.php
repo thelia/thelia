@@ -23,7 +23,7 @@ foreach ($argv as $arg) {
     }
 
     if ($bootstrapToggle) {
-        require __DIR__ . DIRECTORY_SEPARATOR . $arg;
+        require __DIR__.DIRECTORY_SEPARATOR.$arg;
 
         $bootstraped = true;
     }
@@ -32,9 +32,9 @@ foreach ($argv as $arg) {
 if (!$bootstraped) {
     if (isset($bootstrapFile)) {
         require $bootstrapFile;
-    } elseif (is_file($file = __DIR__ . '/../core/vendor/autoload.php')) {
+    } elseif (is_file($file = __DIR__.'/../core/vendor/autoload.php')) {
         require $file;
-    } elseif (is_file($file = __DIR__ . '/../../bootstrap.php')) {
+    } elseif (is_file($file = __DIR__.'/../../bootstrap.php')) {
         // Here we are on a thelia/thelia-project
         require $file;
     } else {
@@ -68,40 +68,40 @@ try {
  ***************************************************/
 
 if ($update->isLatestVersion()) {
-    cliOutput("You already have the latest version of Thelia : " . $update->getCurrentVersion(), 'success');
+    cliOutput('You already have the latest version of Thelia : '.$update->getCurrentVersion(), 'success');
     exit(3);
 }
 
 $current = $update->getCurrentVersion();
-$files   = $update->getLatestVersion();
-$web     = $update->getWebVersion();
+$files = $update->getLatestVersion();
+$web = $update->getWebVersion();
 
 while (1) {
     if ($web !== null && $files != $web) {
         cliOutput(sprintf(
-            "Thelia server is reporting the current stable release version is %s ",
+            'Thelia server is reporting the current stable release version is %s ',
             $web
         ), 'warning');
     }
 
     cliOutput(sprintf(
-        "You are going to update Thelia from version %s to version %s.",
+        'You are going to update Thelia from version %s to version %s.',
         $current,
         $files
     ), 'info');
 
     if ($web !== null && $files < $web) {
         cliOutput(sprintf(
-            "Your files belongs to version %s, which is not the latest stable release.",
+            'Your files belongs to version %s, which is not the latest stable release.',
             $files
         ), 'warning');
         cliOutput(sprintf(
-            "It is recommended to upgrade your files first then run this script again." . PHP_EOL
-            . "The latest version is available at http://thelia.net/#download ."
+            'It is recommended to upgrade your files first then run this script again.'.PHP_EOL
+            .'The latest version is available at http://thelia.net/#download .'
         ), 'warning');
-        cliOutput("Continue update process anyway ? (Y/n)");
+        cliOutput('Continue update process anyway ? (Y/n)');
     } else {
-        cliOutput("Continue update process ? (Y/n)");
+        cliOutput('Continue update process ? (Y/n)');
     }
 
     $rep = readStdin(true);
@@ -109,14 +109,14 @@ while (1) {
         break;
     }
     if ($rep == 'n') {
-        cliOutput("Update aborted", 'warning');
+        cliOutput('Update aborted', 'warning');
         exit(0);
     }
 }
 
 $backup = false;
 while (1) {
-    cliOutput(sprintf("Would you like to backup the current database before proceeding ? (Y/n)"));
+    cliOutput(sprintf('Would you like to backup the current database before proceeding ? (Y/n)'));
 
     $rep = readStdin(true);
     if ($rep == 'y') {
@@ -142,7 +142,7 @@ try {
             $update->backupDb();
             cliOutput(sprintf('Your database has been backed up. The sql file : %s', $update->getBackupFile()), 'info');
         } catch (\Exception $e) {
-            cliOutput('Sorry, your database can\'t be backed up. Reason : ' . $e->getMessage(), 'error');
+            cliOutput('Sorry, your database can\'t be backed up. Reason : '.$e->getMessage(), 'error');
             exit(4);
         }
     }
@@ -165,19 +165,19 @@ if (null === $updateError) {
     }
 } else {
     cliOutput(sprintf('Sorry, an unexpected error has occured : %s', $updateError->getMessage()), 'error');
-    print $updateError->getTraceAsString() . PHP_EOL;
-    print "Trace: " . PHP_EOL;
+    echo $updateError->getTraceAsString().PHP_EOL;
+    echo 'Trace: '.PHP_EOL;
     foreach ($update->getLogs() as $log) {
-        cliOutput(sprintf('[%s] %s' . PHP_EOL, $log[0], $log[1]), 'error');
+        cliOutput(sprintf('[%s] %s'.PHP_EOL, $log[0], $log[1]), 'error');
     }
 
     if (true === $backup) {
         while (1) {
-            cliOutput("Would you like to restore the backup database ? (Y/n)");
+            cliOutput('Would you like to restore the backup database ? (Y/n)');
 
             $rep = readStdin(true);
             if ($rep == 'y') {
-                cliOutput("Database restore started. Wait, it could take a while...");
+                cliOutput('Database restore started. Wait, it could take a while...');
 
                 if (false === $update->restoreDb()) {
                     cliOutput(sprintf(
@@ -186,8 +186,8 @@ if (null === $updateError) {
                     ), 'error');
                     exit(5);
                 }
-                    cliOutput("Database successfully restore.");
-                    exit(5);
+                cliOutput('Database successfully restore.');
+                exit(5);
 
                 break;
             }
@@ -208,7 +208,7 @@ $hasDeleteError = false;
 
 $finder->files()->in(THELIA_CACHE_DIR);
 
-cliOutput(sprintf("Try to delete cache in : %s", THELIA_CACHE_DIR), 'info');
+cliOutput(sprintf('Try to delete cache in : %s', THELIA_CACHE_DIR), 'info');
 
 foreach ($finder as $file) {
     try {
@@ -219,11 +219,11 @@ foreach ($finder as $file) {
 }
 
 if (true === $hasDeleteError) {
-    cliOutput("The cache has not been cleared properly. Try to run the command manually : " .
-        "(sudo) php Thelia cache:clear (--env=prod).");
+    cliOutput('The cache has not been cleared properly. Try to run the command manually : '.
+        '(sudo) php Thelia cache:clear (--env=prod).');
 }
 
-cliOutput("Update process finished.", 'info');
+cliOutput('Update process finished.', 'info');
 exit(0);
 
 /***************************************************
@@ -232,7 +232,7 @@ exit(0);
 
 function readStdin($normalize = false)
 {
-    $fr = fopen("php://stdin", "r");
+    $fr = fopen('php://stdin', 'r');
     $input = fgets($fr, 128);
     $input = rtrim($input);
     fclose($fr);
@@ -255,7 +255,7 @@ function joinPaths()
 
     $path = join(DIRECTORY_SEPARATOR, $paths);
     if (substr($args[0], 0, 1) === '/') {
-        $path = DIRECTORY_SEPARATOR . $path;
+        $path = DIRECTORY_SEPARATOR.$path;
     }
 
     return $path;
@@ -280,5 +280,5 @@ function cliOutput($message, $type = null)
             $color = "\033[0m";
     }
 
-    echo PHP_EOL . $color . $message . "\033[0m" . PHP_EOL;
+    echo PHP_EOL.$color.$message."\033[0m".PHP_EOL;
 }

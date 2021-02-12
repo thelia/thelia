@@ -24,37 +24,37 @@ class TranslationEvent extends ActionEvent
     public const WALK_MODE_PHP = 'php';
     public const WALK_MODE_TEMPLATE = 'tpl';
 
-    /** @var  string */
+    /** @var string */
     protected $directory;
 
-    /** @var  string */
+    /** @var string */
     protected $mode;
 
-    /** @var  string */
+    /** @var string */
     protected $locale;
 
-    /** @var  string */
+    /** @var string */
     protected $domain;
 
-    /** @var  array */
+    /** @var array */
     protected $translatableStrings;
 
-    /** @var  array */
+    /** @var array */
     protected $customFallbackStrings;
 
-    /** @var  array */
+    /** @var array */
     protected $globalFallbackStrings;
 
-    /** @var  int */
+    /** @var int */
     protected $translatableStringCount;
 
-    /** @var  string */
+    /** @var string */
     protected $translationFilePath;
 
-    /** @var  array */
+    /** @var array */
     protected $translatedStrings;
 
-    /** @var  bool */
+    /** @var bool */
     protected $createFileIfNotExists;
 
     public static function createGetStringsEvent($directory, $mode, $locale, $domain)
@@ -95,11 +95,13 @@ class TranslationEvent extends ActionEvent
 
     /**
      * @param string $directory
+     *
      * @return $this
      */
     public function setDirectory($directory)
     {
         $this->directory = $directory;
+
         return $this;
     }
 
@@ -113,11 +115,13 @@ class TranslationEvent extends ActionEvent
 
     /**
      * @param string $mode
+     *
      * @return $this
      */
     public function setMode($mode)
     {
         $this->mode = $mode;
+
         return $this;
     }
 
@@ -131,11 +135,13 @@ class TranslationEvent extends ActionEvent
 
     /**
      * @param string $locale
+     *
      * @return $this
      */
     public function setLocale($locale)
     {
         $this->locale = $locale;
+
         return $this;
     }
 
@@ -149,11 +155,13 @@ class TranslationEvent extends ActionEvent
 
     /**
      * @param string $domain
+     *
      * @return $this
      */
     public function setDomain($domain)
     {
         $this->domain = $domain;
+
         return $this;
     }
 
@@ -167,11 +175,13 @@ class TranslationEvent extends ActionEvent
 
     /**
      * @param array $translatableStrings
+     *
      * @return $this
      */
     public function setTranslatableStrings($translatableStrings)
     {
         $this->translatableStrings = $translatableStrings;
+
         return $this;
     }
 
@@ -185,11 +195,13 @@ class TranslationEvent extends ActionEvent
 
     /**
      * @param int $translatableStringCount
+     *
      * @return $this
      */
     public function setTranslatableStringCount($translatableStringCount)
     {
         $this->translatableStringCount = $translatableStringCount;
+
         return $this;
     }
 
@@ -203,11 +215,13 @@ class TranslationEvent extends ActionEvent
 
     /**
      * @param string $translationFilePath
+     *
      * @return $this
      */
     public function setTranslationFilePath($translationFilePath)
     {
         $this->translationFilePath = $translationFilePath;
+
         return $this;
     }
 
@@ -221,16 +235,18 @@ class TranslationEvent extends ActionEvent
 
     /**
      * @param array $translatedStrings
+     *
      * @return $this
      */
     public function setTranslatedStrings($translatedStrings)
     {
         $this->translatedStrings = $translatedStrings;
+
         return $this;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isCreateFileIfNotExists()
     {
@@ -238,12 +254,14 @@ class TranslationEvent extends ActionEvent
     }
 
     /**
-     * @param boolean $createFileIfNotExists
+     * @param bool $createFileIfNotExists
+     *
      * @return $this
      */
     public function setCreateFileIfNotExists($createFileIfNotExists)
     {
         $this->createFileIfNotExists = $createFileIfNotExists;
+
         return $this;
     }
 
@@ -261,6 +279,7 @@ class TranslationEvent extends ActionEvent
     public function setCustomFallbackStrings($customFallbackStrings)
     {
         $this->customFallbackStrings = $customFallbackStrings;
+
         return $this;
     }
 
@@ -278,6 +297,7 @@ class TranslationEvent extends ActionEvent
     public function setGlobalFallbackStrings($globalFallbackStrings)
     {
         $this->globalFallbackStrings = $globalFallbackStrings;
+
         return $this;
     }
 }

@@ -28,8 +28,8 @@ use Thelia\Tools\Password;
 use Thelia\Tools\TokenProvider;
 
 /**
- * Class CustomerController
- * @package Thelia\Controller\Admin
+ * Class CustomerController.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CustomerController extends AbstractCrudController
@@ -94,6 +94,7 @@ class CustomerController extends AbstractCrudController
 
     /**
      * @param Customer $object
+     *
      * @return \Thelia\Form\BaseForm
      */
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
@@ -103,27 +104,27 @@ class CustomerController extends AbstractCrudController
 
         // Prepare the data that will hydrate the form
         $data = [
-                'id'        => $object->getId(),
+                'id' => $object->getId(),
                 'firstname' => $object->getFirstname(),
-                'lastname'  => $object->getLastname(),
-                'email'     => $object->getEmail(),
-                'lang_id'   => $object->getLangId(),
-                'title'     => $object->getTitleId(),
-                'discount'  => $object->getDiscount(),
-                'reseller'  => $object->getReseller() ? true : false,
+                'lastname' => $object->getLastname(),
+                'email' => $object->getEmail(),
+                'lang_id' => $object->getLangId(),
+                'title' => $object->getTitleId(),
+                'discount' => $object->getDiscount(),
+                'reseller' => $object->getReseller() ? true : false,
         ];
 
         if ($address !== null) {
-            $data['company']   = $address->getCompany();
-            $data['address1']  = $address->getAddress1();
-            $data['address2']  = $address->getAddress2();
-            $data['address3']  = $address->getAddress3();
-            $data['phone']     = $address->getPhone();
+            $data['company'] = $address->getCompany();
+            $data['address1'] = $address->getAddress1();
+            $data['address2'] = $address->getAddress2();
+            $data['address3'] = $address->getAddress3();
+            $data['phone'] = $address->getPhone();
             $data['cellphone'] = $address->getCellphone();
-            $data['zipcode']   = $address->getZipcode();
-            $data['city']      = $address->getCity();
-            $data['country']   = $address->getCountryId();
-            $data['state']     = $address->getStateId();
+            $data['zipcode'] = $address->getZipcode();
+            $data['city'] = $address->getCity();
+            $data['country'] = $address->getCountryId();
+            $data['state'] = $address->getStateId();
         }
 
         // A loop is used in the template
@@ -137,36 +138,37 @@ class CustomerController extends AbstractCrudController
 
     /**
      * @param $data
+     *
      * @return \Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent
      */
     private function createEventInstance($data)
     {
         // Use current language if it is not defined in the form
-        if (empty($data["lang_id"])) {
-            $data["lang_id"] = $this->getSession()->getLang()->getId();
+        if (empty($data['lang_id'])) {
+            $data['lang_id'] = $this->getSession()->getLang()->getId();
         }
 
         $customerCreateEvent = new CustomerCreateOrUpdateEvent(
-            $data["title"],
-            $data["firstname"],
-            $data["lastname"],
-            $data["address1"],
-            $data["address2"],
-            $data["address3"],
-            $data["phone"],
-            $data["cellphone"],
-            $data["zipcode"],
-            $data["city"],
-            $data["country"],
-            $data["email"]??null,
-            isset($data["password"]) && ! empty($data["password"]) ? $data["password"]:null,
-            $data["lang_id"],
-            $data["reseller"]??null,
-            $data["sponsor"]??null,
-            $data["discount"]??null,
-            $data["company"]??null,
+            $data['title'],
+            $data['firstname'],
+            $data['lastname'],
+            $data['address1'],
+            $data['address2'],
+            $data['address3'],
+            $data['phone'],
+            $data['cellphone'],
+            $data['zipcode'],
+            $data['city'],
+            $data['country'],
+            $data['email'] ?? null,
+            isset($data['password']) && !empty($data['password']) ? $data['password'] : null,
+            $data['lang_id'],
+            $data['reseller'] ?? null,
+            $data['sponsor'] ?? null,
+            $data['discount'] ?? null,
+            $data['company'] ?? null,
             null,
-            $data["state"]
+            $data['state']
         );
 
         return $customerCreateEvent;
@@ -179,15 +181,17 @@ class CustomerController extends AbstractCrudController
 
     /**
      * @param Customer $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
     {
-        return $object->getRef() . "(".$object->getLastname()." ".$object->getFirstname().")";
+        return $object->getRef().'('.$object->getLastname().' '.$object->getFirstname().')';
     }
 
     /**
      * @param Customer $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -199,8 +203,8 @@ class CustomerController extends AbstractCrudController
     {
         return [
                 'customer_id' => $this->getRequest()->get('customer_id', 0),
-                'page'        => $this->getRequest()->get('page', 1),
-                'page_order'  => $this->getRequest()->get('page_order', 1)
+                'page' => $this->getRequest()->get('page', 1),
+                'page_order' => $this->getRequest()->get('page_order', 1),
         ];
     }
 
@@ -209,8 +213,8 @@ class CustomerController extends AbstractCrudController
         return $this->render(
             'customers',
             array_merge([
-                'customer_order'   => $currentOrder,
-                'page'             => $this->getRequest()->get('page', 1)
+                'customer_order' => $currentOrder,
+                'page' => $this->getRequest()->get('page', 1),
             ], $customParams)
         );
     }
@@ -220,7 +224,7 @@ class CustomerController extends AbstractCrudController
         return $this->generateRedirectFromRoute(
             'admin.customers',
             [
-                'page' => $this->getRequest()->get('page', 1)
+                'page' => $this->getRequest()->get('page', 1),
             ]
         );
     }
@@ -233,7 +237,7 @@ class CustomerController extends AbstractCrudController
     protected function redirectToEditionTemplate()
     {
         return $this->generateRedirectFromRoute(
-            "admin.customer.update.view",
+            'admin.customer.update.view',
             $this->getEditionArguments()
         );
     }
@@ -243,9 +247,8 @@ class CustomerController extends AbstractCrudController
         TokenProvider $tokenProvider,
         EventDispatcherInterface $eventDispatcher,
         ParserContext $parserContext
-    )
-    {
-        $errorMsg = "No error.";
+    ) {
+        $errorMsg = 'No error.';
         $removalError = false;
 
         try {
@@ -262,8 +265,8 @@ class CustomerController extends AbstractCrudController
         }
 
         return $this->renderListTemplate($this->getCurrentListOrder(), [
-            "removal_error" => $removalError,
-            "error_message" => $errorMsg
+            'removal_error' => $removalError,
+            'error_message' => $errorMsg,
         ]);
     }
 }

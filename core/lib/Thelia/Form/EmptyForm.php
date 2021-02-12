@@ -13,16 +13,15 @@
 namespace Thelia\Form;
 
 /**
- * Class EmptyForm
- * @package Thelia\Form
+ * Class EmptyForm.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class EmptyForm extends BaseForm
 {
     /**
-     *
      * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
+     * Form this you have to call add method on $this->formBuilder attribute :.
      *
      * $this->formBuilder->add("name", TextType::class)
      *   ->add("email", EmailType::class, array(
@@ -48,6 +47,6 @@ class EmptyForm extends BaseForm
      */
     public static function getName()
     {
-        return "empty";
+        return 'empty';
     }
 }

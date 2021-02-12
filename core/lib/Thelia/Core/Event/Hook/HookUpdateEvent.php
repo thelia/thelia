@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Hook;
 
 /**
- * Class HookUpdateEvent
- * @package Thelia\Core\Event\Hook
+ * Class HookUpdateEvent.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookUpdateEvent extends HookCreateEvent
@@ -34,7 +34,8 @@ class HookUpdateEvent extends HookCreateEvent
     }
 
     /**
-     * @param  int   $hook_id
+     * @param int $hook_id
+     *
      * @return $this
      */
     public function setHookId($hook_id)
@@ -52,8 +53,6 @@ class HookUpdateEvent extends HookCreateEvent
         return $this->hook_id;
     }
 
-    /**
-     */
     public function setBlock($block)
     {
         $this->block = $block;
@@ -61,15 +60,11 @@ class HookUpdateEvent extends HookCreateEvent
         return $this;
     }
 
-    /**
-     */
     public function getBlock()
     {
         return $this->block;
     }
 
-    /**
-     */
     public function setByModule($by_module)
     {
         $this->by_module = $by_module;
@@ -77,15 +72,11 @@ class HookUpdateEvent extends HookCreateEvent
         return $this;
     }
 
-    /**
-     */
     public function getByModule()
     {
         return $this->by_module;
     }
 
-    /**
-     */
     public function setChapo($chapo)
     {
         $this->chapo = $chapo;
@@ -93,15 +84,11 @@ class HookUpdateEvent extends HookCreateEvent
         return $this;
     }
 
-    /**
-     */
     public function getChapo()
     {
         return $this->chapo;
     }
 
-    /**
-     */
     public function setDescription($description)
     {
         $this->description = $description;
@@ -109,8 +96,6 @@ class HookUpdateEvent extends HookCreateEvent
         return $this;
     }
 
-    /**
-     */
     public function getDescription()
     {
         return $this->description;

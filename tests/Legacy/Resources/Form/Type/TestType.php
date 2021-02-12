@@ -18,8 +18,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class TestType
- * @package Thelia\Tests\Resources\Form\Type
+ * Class TestType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class TestType extends AbstractType
@@ -27,13 +27,13 @@ class TestType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add("test_a", TextType::class)
-            ->add("test_b", IntegerType::class)
+            ->add('test_a', TextType::class)
+            ->add('test_b', IntegerType::class)
         ;
     }
 
     public function getName()
     {
-        return "test_type";
+        return 'test_type';
     }
 }

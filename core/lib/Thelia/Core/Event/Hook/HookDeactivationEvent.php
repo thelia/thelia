@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Hook;
 
 /**
- * Class HookToggleActivationEvent
- * @package Thelia\Core\Event\Hook
+ * Class HookToggleActivationEvent.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookDeactivationEvent extends HookEvent
@@ -40,8 +40,6 @@ class HookDeactivationEvent extends HookEvent
         return $this;
     }
 
-    /**
-     */
     public function getHookId()
     {
         return $this->hook_id;

@@ -25,8 +25,8 @@ use Thelia\Model\FolderQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
- * Class FolderTest
- * @package Thelia\Tests\Action
+ * Class FolderTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FolderTest extends TestCaseWithURLToolSetup
@@ -34,7 +34,7 @@ class FolderTest extends TestCaseWithURLToolSetup
     use RewrittenUrlTestTrait;
     use I18nTestTrait;
 
-    /** @var int folder id used in position tests  */
+    /** @var int folder id used in position tests */
     protected static $folderIdForPositionTest = null;
 
     public function getUpdateEvent(&$folder)
@@ -82,6 +82,7 @@ class FolderTest extends TestCaseWithURLToolSetup
 
     /**
      * @param FolderUpdateEvent $event
+     *
      * @return FolderModel
      */
     public function processUpdateAction($event)
@@ -93,8 +94,9 @@ class FolderTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * test folder creation
-     * @covers Thelia\Action\Folder::create
+     * test folder creation.
+     *
+     * @covers \Thelia\Action\Folder::create
      */
     public function testCreateFolder()
     {
@@ -118,8 +120,9 @@ class FolderTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * test update creation
-     * @covers Thelia\Action\Folder::update
+     * test update creation.
+     *
+     * @covers \Thelia\Action\Folder::update
      */
     public function testUpdateFolder()
     {
@@ -152,8 +155,9 @@ class FolderTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * test folder removal
-     * @covers Thelia\Action\Folder::delete
+     * test folder removal.
+     *
+     * @covers \Thelia\Action\Folder::delete
      */
     public function testDeleteFolder()
     {
@@ -170,8 +174,9 @@ class FolderTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * test folder toggle visibility
-     * @covers Thelia\Action\Folder::toggleVisibility
+     * test folder toggle visibility.
+     *
+     * @covers \Thelia\Action\Folder::toggleVisibility
      */
     public function testToggleVisibility()
     {
@@ -200,7 +205,7 @@ class FolderTest extends TestCaseWithURLToolSetup
             $this->fail('use fixtures before launching test, there is no folder in database');
         }
 
-        $newPosition = $folder->getPosition()-1;
+        $newPosition = $folder->getPosition() - 1;
 
         $event = new UpdatePositionEvent($folder->getId(), UpdatePositionEvent::POSITION_UP);
 
@@ -209,7 +214,7 @@ class FolderTest extends TestCaseWithURLToolSetup
 
         $updatedFolder = FolderQuery::create()->findPk($folder->getId());
 
-        $this->assertEquals($newPosition, $updatedFolder->getPosition(), sprintf("new position is %d, new position expected is %d for folder %d", $newPosition, $updatedFolder->getPosition(), $updatedFolder->getId()));
+        $this->assertEquals($newPosition, $updatedFolder->getPosition(), sprintf('new position is %d, new position expected is %d for folder %d', $newPosition, $updatedFolder->getPosition(), $updatedFolder->getId()));
     }
 
     public function testUpdatePositionDown()
@@ -232,7 +237,7 @@ class FolderTest extends TestCaseWithURLToolSetup
             $this->fail('use fixtures before launching test, there is not enough folder in database');
         }
 
-        $newPosition = $folder->getPosition()+1;
+        $newPosition = $folder->getPosition() + 1;
 
         $event = new UpdatePositionEvent($folder->getId(), UpdatePositionEvent::POSITION_DOWN);
 
@@ -241,7 +246,7 @@ class FolderTest extends TestCaseWithURLToolSetup
 
         $updatedFolder = FolderQuery::create()->findPk($folder->getId());
 
-        $this->assertEquals($newPosition, $updatedFolder->getPosition(), sprintf("new position is %d, new position expected is %d for folder %d", $newPosition, $updatedFolder->getPosition(), $updatedFolder->getId()));
+        $this->assertEquals($newPosition, $updatedFolder->getPosition(), sprintf('new position is %d, new position expected is %d for folder %d', $newPosition, $updatedFolder->getPosition(), $updatedFolder->getId()));
     }
 
     public function testUpdatePositionWithSpecificPosition()
@@ -262,11 +267,11 @@ class FolderTest extends TestCaseWithURLToolSetup
 
         $updatedFolder = FolderQuery::create()->findPk($folder->getId());
 
-        $this->assertEquals(1, $updatedFolder->getPosition(), sprintf("new position is 1, new position expected is %d for folder %d", $updatedFolder->getPosition(), $updatedFolder->getId()));
+        $this->assertEquals(1, $updatedFolder->getPosition(), sprintf('new position is 1, new position expected is %d for folder %d', $updatedFolder->getPosition(), $updatedFolder->getId()));
     }
 
     /**
-     * generates a folder and its sub folders to be used in Position tests
+     * generates a folder and its sub folders to be used in Position tests.
      *
      * @return int the parent folder id
      */
@@ -283,7 +288,7 @@ class FolderTest extends TestCaseWithURLToolSetup
 
             $folder->save();
 
-            for ($i = 0; $i < 4; $i++) {
+            for ($i = 0; $i < 4; ++$i) {
                 $subFolder = new FolderModel();
 
                 $subFolder->setParent($folder->getId());

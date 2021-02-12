@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Router;
 interface BreadcrumbInterface
 {
     /**
-     * Create a breadcrumb from the current object, that will be displayed to the file management UI
+     * Create a breadcrumb from the current object, that will be displayed to the file management UI.
      *
      * @param Router             $router    the router where to find routes
      * @param ContainerInterface $container the container

@@ -26,23 +26,22 @@ use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * Country loop
- *
+ * Country loop.
  *
  * Class Country
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[] getArea()
- * @method int[] getExcludeArea()
- * @method int[] getExclude()
- * @method int[] getWithArea()
+ *
+ * @method int[]       getId()
+ * @method int[]       getArea()
+ * @method int[]       getExcludeArea()
+ * @method int[]       getExclude()
+ * @method int[]       getWithArea()
  * @method bool|string getHasStates()
  * @method bool|string getVisible()
- * @method string[] getOrder()
+ * @method string[]    getOrder()
  */
 class Country extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -69,7 +68,7 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
                             'id', 'id_reverse',
                             'alpha', 'alpha_reverse',
                             'visible', 'visible_reverse',
-                            'random'
+                            'random',
                         ]
                     )
                 ),
@@ -107,7 +106,7 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
             // select * from country where id not in (select country_id from country_area where area in (...))
             $countries = CountryAreaQuery::create()
                 ->filterByAreaId($excludeArea, Criteria::IN)
-                ->select([ 'country_id' ])
+                ->select(['country_id'])
                 ->find()
             ;
 
@@ -120,11 +119,11 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
             $search
                 ->distinct()
                 ->joinCountryArea('with_area', Criteria::LEFT_JOIN)
-                ->where('`with_area`.country_id ' . Criteria::ISNOTNULL);
+                ->where('`with_area`.country_id '.Criteria::ISNOTNULL);
         } elseif (false === $withArea) {
             $search
                 ->joinCountryArea('with_area', Criteria::LEFT_JOIN)
-                ->where('`with_area`.country_id ' . Criteria::ISNULL);
+                ->where('`with_area`.country_id '.Criteria::ISNULL);
         }
 
         $exclude = $this->getExclude();
@@ -143,31 +142,31 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByVisible($visible ? 1 : 0);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
         foreach ($orders as $order) {
             switch ($order) {
-                case "id":
+                case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case "id_reverse":
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha_reverse":
+                case 'alpha_reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "visible":
+                case 'visible':
                     $search->orderByVisible(Criteria::ASC);
                     break;
-                case "visible_reverse":
+                case 'visible_reverse':
                     $search->orderByVisible(Criteria::DESC);
                     break;
-                case "random":
+                case 'random':
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
-                    break(2);
+                    break 2;
                     break;
             }
         }
@@ -181,22 +180,22 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $country) {
             $loopResultRow = new LoopResultRow($country);
             $loopResultRow
-                ->set("ID", $country->getId())
-                ->set("VISIBLE", $country->getVisible())
-                ->set("IS_TRANSLATED", $country->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("TITLE", $country->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $country->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $country->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $country->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("ISOCODE", sprintf("%03d", $country->getIsocode()))
-                ->set("ISOALPHA2", $country->getIsoalpha2())
-                ->set("ISOALPHA3", $country->getIsoalpha3())
-                ->set("IS_DEFAULT", $country->getByDefault() ? "1" : "0")
-                ->set("IS_SHOP_COUNTRY", $country->getShopCountry() ? "1" : "0")
-                ->set("HAS_STATES", $country->getHasStates() ? "1" : "0")
-                ->set("NEED_ZIP_CODE", $country->getNeedZipCode() ? "1" : "0")
-                ->set("ZIP_CODE_FORMAT", $country->getZipCodeFormat())
+                ->set('ID', $country->getId())
+                ->set('VISIBLE', $country->getVisible())
+                ->set('IS_TRANSLATED', $country->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('TITLE', $country->getVirtualColumn('i18n_TITLE'))
+                ->set('CHAPO', $country->getVirtualColumn('i18n_CHAPO'))
+                ->set('DESCRIPTION', $country->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $country->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set('ISOCODE', sprintf('%03d', $country->getIsocode()))
+                ->set('ISOALPHA2', $country->getIsoalpha2())
+                ->set('ISOALPHA3', $country->getIsoalpha3())
+                ->set('IS_DEFAULT', $country->getByDefault() ? '1' : '0')
+                ->set('IS_SHOP_COUNTRY', $country->getShopCountry() ? '1' : '0')
+                ->set('HAS_STATES', $country->getHasStates() ? '1' : '0')
+                ->set('NEED_ZIP_CODE', $country->getNeedZipCode() ? '1' : '0')
+                ->set('ZIP_CODE_FORMAT', $country->getZipCodeFormat())
             ;
 
             $this->addOutputFields($loopResultRow, $country);

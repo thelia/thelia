@@ -34,7 +34,8 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @param  bool      $append
+     * @param bool $append
+     *
      * @return CartEvent
      */
     public function setAppend($append)
@@ -63,7 +64,7 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * Clear the current cart item
+     * Clear the current cart item.
      *
      * @return CartEvent
      */
@@ -82,8 +83,6 @@ class CartEvent extends ActionEvent
         return $this->cartItem;
     }
 
-    /**
-     */
     public function getCartItemId()
     {
         return $this->cartItemId;
@@ -100,7 +99,8 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @param  bool      $newness
+     * @param bool $newness
+     *
      * @return CartEvent
      */
     public function setNewness($newness)
@@ -119,7 +119,8 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @param  int       $product the product ID
+     * @param int $product the product ID
+     *
      * @return CartEvent
      */
     public function setProduct($product)
@@ -138,7 +139,8 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @param  int       $productSaleElementsId
+     * @param int $productSaleElementsId
+     *
      * @return CartEvent
      */
     public function setProductSaleElementsId($productSaleElementsId)
@@ -157,7 +159,8 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @param  int       $quantity
+     * @param int $quantity
+     *
      * @return CartEvent
      */
     public function setQuantity($quantity)

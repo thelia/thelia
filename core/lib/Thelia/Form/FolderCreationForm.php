@@ -22,37 +22,37 @@ class FolderCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("title", TextType::class, [
-                "constraints" => [
+            ->add('title', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
                 ],
-                "label" => Translator::getInstance()->trans("Folder title *"),
-                "label_attr" => [
-                    "for" => "title",
+                'label' => Translator::getInstance()->trans('Folder title *'),
+                'label_attr' => [
+                    'for' => 'title',
                 ],
             ])
-            ->add("parent", TextType::class, [
-                "label" => Translator::getInstance()->trans("Parent folder *"),
-                "constraints" => [
+            ->add('parent', TextType::class, [
+                'label' => Translator::getInstance()->trans('Parent folder *'),
+                'constraints' => [
                     new NotBlank(),
                 ],
-                "label_attr" => ["for" => "parent_create"],
+                'label_attr' => ['for' => 'parent_create'],
             ])
-            ->add("locale", TextType::class, [
-                "constraints" => [
+            ->add('locale', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
                 ],
-                "label_attr" => ["for" => "locale_create"],
+                'label_attr' => ['for' => 'locale_create'],
             ])
-            ->add("visible", IntegerType::class, [
-                "label" => Translator::getInstance()->trans("This folder is online."),
-                "label_attr" => ["for" => "visible_create"],
+            ->add('visible', IntegerType::class, [
+                'label' => Translator::getInstance()->trans('This folder is online.'),
+                'label_attr' => ['for' => 'visible_create'],
             ])
         ;
     }
 
     public static function getName()
     {
-        return "thelia_folder_creation";
+        return 'thelia_folder_creation';
     }
 }

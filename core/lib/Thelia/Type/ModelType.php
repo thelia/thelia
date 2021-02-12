@@ -16,9 +16,7 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Exception\TypeException;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class ModelType extends BaseType
 {
@@ -26,13 +24,14 @@ class ModelType extends BaseType
 
     /**
      * @param $expectedModelActiveRecord
+     *
      * @throws TypeException
      */
     public function __construct($expectedModelActiveRecord)
     {
-        $class = '\\Thelia\\Model\\' . $expectedModelActiveRecord;
+        $class = '\\Thelia\\Model\\'.$expectedModelActiveRecord;
 
-        if (!(class_exists($class) && new $class instanceof ActiveRecordInterface)) {
+        if (!(class_exists($class) && new $class() instanceof ActiveRecordInterface)) {
             throw new TypeException('MODEL NOT FOUND', TypeException::MODEL_NOT_FOUND);
         }
 

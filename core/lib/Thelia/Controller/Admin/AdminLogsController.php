@@ -42,15 +42,15 @@ class AdminLogsController extends BaseAdminController
             null
         ) as $entry) {
             $entries[] = [
-                "head" => sprintf(
-                    "%s|%s|%s:%s%s",
+                'head' => sprintf(
+                    '%s|%s|%s:%s%s',
                     date('Y-m-d H:i:s', $entry->getCreatedAt()->getTimestamp()),
                     $entry->getAdminLogin(),
                     $entry->getResource(),
                     $entry->getAction(),
-                    (null !== $entry->getResourceId()) ? ":" . $entry->getResourceId() : ""
+                    (null !== $entry->getResourceId()) ? ':'.$entry->getResourceId() : ''
                 ),
-                "data" => $entry->getMessage(),
+                'data' => $entry->getMessage(),
             ];
         }
 

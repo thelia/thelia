@@ -16,8 +16,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
-use Thelia\Core\Event\Customer\CustomerEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Role\Role;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Translation\Translator;
@@ -28,38 +26,35 @@ use Thelia\Model\Map\CustomerTableMap;
 /**
  * Skeleton subclass for representing a row from the 'customer' table.
  *
- *
- *
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
- *
- * @package    propel.generator.Thelia.Model
  */
 class Customer extends BaseCustomer implements UserInterface
 {
     /**
-     * @param  int                                       $titleId          customer title id (from customer_title table)
-     * @param  string                                    $firstname        customer first name
-     * @param  string                                    $lastname         customer last name
-     * @param  string                                    $address1         customer address
-     * @param  string                                    $address2         customer adress complement 1
-     * @param  string                                    $address3         customer adress complement 2
-     * @param  string                                    $phone            customer phone number
-     * @param  string                                    $cellphone        customer cellphone number
-     * @param  string                                    $zipcode          customer zipcode
-     * @param  string                                    $city
-     * @param  int                                       $countryId        customer country id (from Country table)
-     * @param  string                                    $email            customer email, must be unique
-     * @param  string                                    $plainPassword    customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
-     * @param  int                                       $lang
-     * @param  int                                       $reseller
-     * @param  null                                      $sponsor
-     * @param  int                                       $discount
-     * @param  null                                      $company
-     * @param  null                                      $ref
-     * @param  bool                                      $forceEmailUpdate true if the email address could be updated.
-     * @param  int                                       $stateId          customer state id (from State table)
+     * @param int    $titleId          customer title id (from customer_title table)
+     * @param string $firstname        customer first name
+     * @param string $lastname         customer last name
+     * @param string $address1         customer address
+     * @param string $address2         customer adress complement 1
+     * @param string $address3         customer adress complement 2
+     * @param string $phone            customer phone number
+     * @param string $cellphone        customer cellphone number
+     * @param string $zipcode          customer zipcode
+     * @param string $city
+     * @param int    $countryId        customer country id (from Country table)
+     * @param string $email            customer email, must be unique
+     * @param string $plainPassword    customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
+     * @param int    $lang
+     * @param int    $reseller
+     * @param null   $sponsor
+     * @param int    $discount
+     * @param null   $company
+     * @param null   $ref
+     * @param bool   $forceEmailUpdate true if the email address could be updated
+     * @param int    $stateId          customer state id (from State table)
+     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -109,7 +104,7 @@ class Customer extends BaseCustomer implements UserInterface
                 $address = new Address();
 
                 $address
-                    ->setLabel(Translator::getInstance()->trans("Main address"))
+                    ->setLabel(Translator::getInstance()->trans('Main address'))
                     ->setCompany($company)
                     ->setTitleId($titleId)
                     ->setFirstname($firstname)
@@ -170,7 +165,7 @@ class Customer extends BaseCustomer implements UserInterface
         $lang = $this->getLangModel();
 
         if ($lang === null) {
-            $lang = (new LangQuery)
+            $lang = (new LangQuery())
                 ->filterByByDefault(1)
                 ->findOne()
             ;
@@ -180,12 +175,11 @@ class Customer extends BaseCustomer implements UserInterface
     }
 
     /**
-     * Get lang identifier
+     * Get lang identifier.
      *
-     * @return integer Lang id
+     * @return int Lang id
      *
      * @deprecated 2.3.0 It's not the good way to get lang identifier
-     *
      * @see \Thelia\Model\Customer::getLangId()
      * @see \Thelia\Model\Customer::getLangModel()
      */
@@ -195,14 +189,13 @@ class Customer extends BaseCustomer implements UserInterface
     }
 
     /**
-     * Set lang identifier
+     * Set lang identifier.
      *
-     * @param integer $langId Lang identifier
+     * @param int $langId Lang identifier
      *
      * @return $this Return $this, allow chaining
      *
      * @deprecated 2.3.0 It's not the good way to set lang identifier
-     *
      * @see \Thelia\Model\Customer::setLangId()
      * @see \Thelia\Model\Customer::setLangModel()
      */
@@ -247,44 +240,47 @@ class Customer extends BaseCustomer implements UserInterface
     }
 
     /**
-     * create hash for plain password and set it in Customer object
+     * create hash for plain password and set it in Customer object.
      *
-     * @param  string                             $password plain password before hashing
+     * @param string $password plain password before hashing
+     *
      * @throws Exception\InvalidArgumentException
+     *
      * @return $this|Customer
      */
     public function setPassword($password)
     {
-        if ($this->isNew() && ($password === null || trim($password) == "")) {
-            throw new InvalidArgumentException("customer password is mandatory on creation");
+        if ($this->isNew() && ($password === null || trim($password) == '')) {
+            throw new InvalidArgumentException('customer password is mandatory on creation');
         }
 
-        if ($password !== null && trim($password) != "") {
-            $this->setAlgo("PASSWORD_BCRYPT");
+        if ($password !== null && trim($password) != '') {
+            $this->setAlgo('PASSWORD_BCRYPT');
 
             parent::setPassword(password_hash($password, PASSWORD_BCRYPT));
         }
 
         return $this;
     }
-/*
-    public function setRef($ref)
-    {
-        if (null === $ref && null === $this->ref) {
-            parent::setRef($this->generateRef());
-        } elseif (null !== $ref) {
-            parent::setRef($ref);
-        }
 
-        return $this;
-    }*/
+    /*
+        public function setRef($ref)
+        {
+            if (null === $ref && null === $this->ref) {
+                parent::setRef($this->generateRef());
+            } elseif (null !== $ref) {
+                parent::setRef($ref);
+            }
+
+            return $this;
+        }*/
 
     public function setEmail($email, $force = false)
     {
         $email = trim($email);
 
-        if (($this->isNew() || $force === true) && ($email === null || $email == "")) {
-            throw new InvalidArgumentException("customer email is mandatory");
+        if (($this->isNew() || $force === true) && ($email === null || $email == '')) {
+            throw new InvalidArgumentException('customer email is mandatory');
         }
 
         if (!$this->isNew() && $force === false) {
@@ -353,6 +349,7 @@ class Customer extends BaseCustomer implements UserInterface
 
     /**
      * @return string
+     *
      * @throws PropelException
      */
     public function getLocale()

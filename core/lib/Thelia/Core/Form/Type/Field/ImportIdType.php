@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\ImportQuery;
 
 /**
- * Class ImportIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class ImportIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ImportIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class ImportIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "import_id";
+        return 'import_id';
     }
 }

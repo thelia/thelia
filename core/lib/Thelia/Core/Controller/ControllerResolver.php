@@ -19,7 +19,7 @@ use Thelia\Controller\BaseController;
 
 /**
  * ControllerResolver that supports "a:b:c", "service:method" and class::method" notations in routes definition
- * thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)
+ * thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html).
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Franck Allimant <franck@cqfdev.fr>
@@ -58,7 +58,7 @@ class ControllerResolver extends BaseControllerResolver
             if (2 == $count) {
                 // controller in the a:b:c notation then
                 [$moduleName, $controllerName, $method] = explode(':', $controller, 3);
-                $class = $moduleName . '\\Controller\\' . $controllerName . 'Controller';
+                $class = $moduleName.'\\Controller\\'.$controllerName.'Controller';
                 $method .= 'Action';
             } elseif (1 == $count) {
                 // controller in the service:method notation

@@ -15,10 +15,10 @@ namespace Thelia\Core;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * extends Symfony\Component\DependencyInjection\ContainerBuilder for changing some behavior
+ * extends Symfony\Component\DependencyInjection\ContainerBuilder for changing some behavior.
  *
  * Class TheliaContainerBuilder
- * @package Thelia\Core
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class TheliaContainerBuilder extends ContainerBuilder

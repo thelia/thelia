@@ -17,8 +17,8 @@ use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Thelia\Core\HttpFoundation\Request;
 
 /**
- * Class Client
- * @package Thelia\Core\HttpKernel
+ * Class Client.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Client extends HttpKernelBrowser

@@ -12,15 +12,13 @@
 
 namespace Thelia\ImportExport\Export\Type;
 
-use PDO;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 use Thelia\Model\Product;
 
 /**
- * Class ProductSEOExport
+ * Class ProductSEOExport.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  * @author Florian Bernard <fbernard@openstudio.fr>
@@ -33,7 +31,7 @@ class ProductSEOExport extends JsonFileAbstractExport
         'product_ref' => 'ref',
         'product_i18n_title' => 'product_title',
         'product_visible' => 'visible',
-        'rewriting_url_url'  => 'url',
+        'rewriting_url_url' => 'url',
         'product_i18n_meta_title' => 'page_title',
         'product_i18n_meta_description' => 'meta_description',
         'product_i18n_meta_keywords' => 'meta_keywords',

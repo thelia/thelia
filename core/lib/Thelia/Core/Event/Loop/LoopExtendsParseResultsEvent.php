@@ -16,8 +16,8 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 
 /**
- * Class LoopExtendsParseResultsEvent
- * @package Thelia\Core\Event\Loop
+ * Class LoopExtendsParseResultsEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class LoopExtendsParseResultsEvent extends LoopExtendsEvent

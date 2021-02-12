@@ -22,7 +22,7 @@ use TheliaSmarty\Template\SmartyPluginDescriptor;
 /**
  * Plugin for smarty defining blocks allowing to get flash message
  * A flash message is a variable, array, object stored in session under the flashMessage key
- * ex $SESSION['flashMessage']['myType']
+ * ex $SESSION['flashMessage']['myType'].
  *
  * blocks :
  *
@@ -33,7 +33,6 @@ use TheliaSmarty\Template\SmartyPluginDescriptor;
  * ```
  * Class Form
  *
- * @package Thelia\Core\Template\Smarty\Plugins
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
@@ -55,18 +54,18 @@ class FlashMessage extends AbstractSmartyPlugin
     }
 
     /**
-     * Process the count function: executes a loop and return the number of items found
+     * Process the count function: executes a loop and return the number of items found.
      *
-     * @param array $params parameters array
+     * @param array                     $params   parameters array
      * @param \Smarty_Internal_Template $template
      *
-     * @return int                       the item count
-     * @throws \InvalidArgumentException if a parameter is missing
+     * @return int the item count
      *
+     * @throws \InvalidArgumentException if a parameter is missing
      */
     public function hasFlashMessage(
         $params,
-        /** @noinspection PhpUnusedParameterInspection */
+        /* @noinspection PhpUnusedParameterInspection */
         $template
     ) {
         $type = $this->getParam($params, 'type', null);
@@ -82,14 +81,13 @@ class FlashMessage extends AbstractSmartyPlugin
 
     /**
      * Get FlashMessage
-     * And clean session from this key
+     * And clean session from this key.
      *
-     * @param array $params Block parameters
-     * @param mixed $content Block content
+     * @param array                     $params   Block parameters
+     * @param mixed                     $content  Block content
      * @param \Smarty_Internal_Template $template Template
-     * @param bool $repeat Control how many times
+     * @param bool                      $repeat   Control how many times
      *                                            the block is displayed
-     *
      */
     public function getFlashMessage($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
@@ -116,15 +114,15 @@ class FlashMessage extends AbstractSmartyPlugin
 
         if ($this->results->valid()) {
             $message = $this->results->current();
-            $template->assign("TYPE", $message["type"]);
-            $template->assign("MESSAGE", $message["message"]);
+            $template->assign('TYPE', $message['type']);
+            $template->assign('MESSAGE', $message['message']);
 
             $repeat = true;
         }
 
         if ($content !== null) {
             if ($this->results->isEmpty()) {
-                $content = "";
+                $content = '';
             }
 
             return $content;
@@ -139,8 +137,8 @@ class FlashMessage extends AbstractSmartyPlugin
     public function getPluginDescriptors()
     {
         return [
-            new SmartyPluginDescriptor("function", "hasflash", $this, "hasFlashMessage"),
-            new SmartyPluginDescriptor("block", "flash", $this, "getFlashMessage")
+            new SmartyPluginDescriptor('function', 'hasflash', $this, 'hasFlashMessage'),
+            new SmartyPluginDescriptor('block', 'flash', $this, 'getFlashMessage'),
         ];
     }
 

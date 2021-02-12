@@ -16,15 +16,15 @@ use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Response;
 
 /**
- * Class TestController
- * @package TheliaSmarty\Tests\Template\Plugin\Controller
+ * Class TestController.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class TestController extends BaseFrontController
 {
     public function testAction()
     {
-        return new Response("world");
+        return new Response('world');
     }
 
     public function testParamsAction($paramA, $paramB)
@@ -39,11 +39,11 @@ class TestController extends BaseFrontController
 
     public function testQueryAction()
     {
-        return $this->getRequest()->query->get("foo");
+        return $this->getRequest()->query->get('foo');
     }
 
     public function testRequestAction()
     {
-        return $this->getRequest()->request->get("foo").$this->getRequest()->getMethod();
+        return $this->getRequest()->request->get('foo').$this->getRequest()->getMethod();
     }
 }

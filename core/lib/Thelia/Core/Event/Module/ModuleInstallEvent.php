@@ -17,8 +17,8 @@ use Thelia\Model\Module;
 use Thelia\Module\Validator\ModuleDefinition;
 
 /**
- * Class ModuleEvent
- * @package Thelia\Core\Event\Module
+ * Class ModuleEvent.
+ *
  * @author  Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleInstallEvent extends ActionEvent
@@ -28,10 +28,10 @@ class ModuleInstallEvent extends ActionEvent
      */
     protected $module;
 
-    /** @var  ModuleDefinition $moduleDefinition */
+    /** @var ModuleDefinition $moduleDefinition */
     protected $moduleDefinition;
 
-    /** @var  string $modulePath */
+    /** @var string $modulePath */
     protected $modulePath;
 
     public function __construct(Module $module = null)
@@ -40,7 +40,6 @@ class ModuleInstallEvent extends ActionEvent
     }
 
     /**
-     *
      * @return $this
      */
     public function setModule(Module $module)

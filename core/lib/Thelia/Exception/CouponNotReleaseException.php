@@ -16,14 +16,14 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 
 /**
- * Class CouponNotReleaseException
- * @package Thelia\Exception
+ * Class CouponNotReleaseException.
+ *
  * @author Baixas Alban <abaixas@openstudio.fr>
  */
 class CouponNotReleaseException extends \Exception
 {
     /**
-     * CouponNotReleaseException thrown when a Coupon is not release
+     * CouponNotReleaseException thrown when a Coupon is not release.
      *
      * @param string $couponCode Coupon code
      */

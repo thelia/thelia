@@ -20,8 +20,8 @@ use Propel\Runtime\ServiceContainer\ServiceContainerInterface;
 use Thelia\Log\Tlog;
 
 /**
- * Class Database
- * @package Thelia\Install
+ * Class Database.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Database
@@ -35,8 +35,9 @@ class Database
      * Create a new instance, using the provided connection information, either none for
      * automatically a connection, a ConnectionWrapper instance (through ConnectionInterface) or a PDO connection.
      *
-     * @param  ConnectionInterface|\PDO|null $connection the connection object
-     * @throws \InvalidArgumentException     if $connection is not of the suitable type.
+     * @param ConnectionInterface|\PDO|null $connection the connection object
+     *
+     * @throws \InvalidArgumentException if $connection is not of the suitable type
      */
     public function __construct($connection = null)
     {
@@ -51,7 +52,7 @@ class Database
         }
 
         if (!$connection instanceof \PDO && !$connection instanceof ConnectionInterface) {
-            throw new \InvalidArgumentException("A PDO connection should be provided");
+            throw new \InvalidArgumentException('A PDO connection should be provided');
         }
 
         $this->connection = $connection;
@@ -59,7 +60,7 @@ class Database
 
     /**
      * Insert all sql needed in database
-     * Default insert /install/thelia.sql and /install/insert.sql
+     * Default insert /install/thelia.sql and /install/insert.sql.
      *
      * @param string $dbName        Database name
      * @param array  $extraSqlFiles SQL Files uri to insert
@@ -67,7 +68,7 @@ class Database
     public function insertSql($dbName = null, array $extraSqlFiles = null)
     {
         if ($dbName) {
-            $this->connection->query(sprintf("use `%s`", $dbName));
+            $this->connection->query(sprintf('use `%s`', $dbName));
         }
 
         $sql = [];
@@ -75,8 +76,8 @@ class Database
         if (null === $extraSqlFiles) {
             $sql = array_merge(
                 $sql,
-                $this->prepareSql(file_get_contents(THELIA_SETUP_DIRECTORY . 'thelia.sql')),
-                $this->prepareSql(file_get_contents(THELIA_SETUP_DIRECTORY . 'insert.sql'))
+                $this->prepareSql(file_get_contents(THELIA_SETUP_DIRECTORY.'thelia.sql')),
+                $this->prepareSql(file_get_contents(THELIA_SETUP_DIRECTORY.'insert.sql'))
             );
         } else {
             foreach ($extraSqlFiles as $fileToInsert) {
@@ -87,7 +88,7 @@ class Database
             }
         }
         $size = \count($sql);
-        for ($i = 0; $i < $size; $i++) {
+        for ($i = 0; $i < $size; ++$i) {
             if (!empty($sql[$i])) {
                 $this->execute($sql[$i]);
             }
@@ -95,11 +96,13 @@ class Database
     }
 
     /**
-     * A simple wrapper around PDO::exec
+     * A simple wrapper around PDO::exec.
      *
-     * @param  string                          $sql  SQL query
-     * @param  array                           $args SQL request parameters (PDO style)
-     * @throws \RuntimeException|\PDOException if something goes wrong.
+     * @param string $sql  SQL query
+     * @param array  $args SQL request parameters (PDO style)
+     *
+     * @throws \RuntimeException|\PDOException if something goes wrong
+     *
      * @return \PDOStatement
      */
     public function execute($sql, $args = [])
@@ -107,27 +110,28 @@ class Database
         $stmt = $this->connection->prepare($sql);
 
         if ($stmt === false) {
-            throw new \RuntimeException("Failed to prepare statement for $sql: " . print_r($this->connection->errorInfo(), 1));
+            throw new \RuntimeException("Failed to prepare statement for $sql: ".print_r($this->connection->errorInfo(), 1));
         }
 
         $success = $stmt->execute($args);
 
         if ($success === false || $stmt->errorCode() != 0) {
-            throw new \RuntimeException("Failed to execute SQL '$sql', arguments:" . print_r($args, 1).", error:".print_r($stmt->errorInfo(), 1));
+            throw new \RuntimeException("Failed to execute SQL '$sql', arguments:".print_r($args, 1).', error:'.print_r($stmt->errorInfo(), 1));
         }
 
         return $stmt;
     }
 
     /**
-     * Separate each sql instruction in an array
+     * Separate each sql instruction in an array.
      *
      * @param $sql
+     *
      * @return array
      */
     protected function prepareSql($sql)
     {
-        $sql = str_replace(";',", "-CODE-", $sql);
+        $sql = str_replace(";',", '-CODE-', $sql);
         $sql = trim($sql);
         preg_match_all('#DELIMITER (.+?)\n(.+?)DELIMITER ;#s', $sql, $m);
         foreach ($m[0] as $k => $v) {
@@ -142,9 +146,9 @@ class Database
 
         $tab = explode(";\n", $sql);
         $size = \count($tab);
-        for ($i = 0; $i < $size; $i++) {
-            $queryTemp = str_replace("-CODE-", ";',", $tab[$i]);
-            $queryTemp = str_replace("|", ";", $queryTemp);
+        for ($i = 0; $i < $size; ++$i) {
+            $queryTemp = str_replace('-CODE-', ";',", $tab[$i]);
+            $queryTemp = str_replace('|', ';', $queryTemp);
             $query[] = $queryTemp;
         }
 
@@ -152,7 +156,7 @@ class Database
     }
 
     /**
-     * Backup the db OR just a table
+     * Backup the db OR just a table.
      *
      * @param string $filename
      * @param string $tables
@@ -189,13 +193,13 @@ class Database
                 continue;
             }
 
-            $result = $this->execute('SELECT * FROM `' . $table . '`');
+            $result = $this->execute('SELECT * FROM `'.$table.'`');
 
             $fieldCount = $result->columnCount();
 
-            $data[] = 'DROP TABLE `' . $table . '`;';
+            $data[] = 'DROP TABLE `'.$table.'`;';
 
-            $resultStruct = $this->execute('SHOW CREATE TABLE `' . $table . '`');
+            $resultStruct = $this->execute('SHOW CREATE TABLE `'.$table.'`');
 
             $rowStruct = $resultStruct->fetch(PDO::FETCH_NUM);
 
@@ -203,14 +207,14 @@ class Database
             $data[] = $rowStruct[1];
             $data[] = ";\n\n";
 
-            for ($i = 0; $i < $fieldCount; $i++) {
+            for ($i = 0; $i < $fieldCount; ++$i) {
                 while ($row = $result->fetch(PDO::FETCH_NUM)) {
-                    $data[] = 'INSERT INTO `' . $table . '` VALUES(';
-                    for ($j = 0; $j < $fieldCount; $j++) {
+                    $data[] = 'INSERT INTO `'.$table.'` VALUES(';
+                    for ($j = 0; $j < $fieldCount; ++$j) {
                         $row[$j] = addslashes($row[$j]);
-                        $row[$j] = str_replace("\n", "\\n", $row[$j]);
+                        $row[$j] = str_replace("\n", '\\n', $row[$j]);
                         if (isset($row[$j])) {
-                            $data[] = '"' . $row[$j] . '"';
+                            $data[] = '"'.$row[$j].'"';
                         } else {
                             $data[] = '""';
                         }
@@ -231,7 +235,7 @@ class Database
     }
 
     /**
-     * Restore a file in the current db
+     * Restore a file in the current db.
      *
      * @param string $filename the file containing sql queries
      */
@@ -241,21 +245,21 @@ class Database
     }
 
     /**
-     * Save an array of data to a filename
+     * Save an array of data to a filename.
      *
      * @param string $filename
-     * @param array $data
+     * @param array  $data
      */
     private function writeFilename($filename, $data)
     {
-        $f = fopen($filename, "w+");
+        $f = fopen($filename, 'w+');
 
         fwrite($f, implode('', $data));
         fclose($f);
     }
 
     /**
-     * create database if not exists
+     * create database if not exists.
      *
      * @param $dbName
      */
@@ -263,7 +267,7 @@ class Database
     {
         $this->execute(
             sprintf(
-                "CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8",
+                'CREATE DATABASE IF NOT EXISTS `%s` CHARACTER SET utf8',
                 $dbName
             )
         );

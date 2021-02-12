@@ -21,14 +21,12 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 
 /**
- *
- * @package Thelia\Core\Template\Loop
- *
  * @author Franck Allimant <franck@cqfdev.fr>
  *
  * {@inheritdoc}
+ *
  * @method string getUrl()
- * @method int getTimeout()
+ * @method int    getTimeout()
  */
 class Feed extends BaseLoop implements ArraySearchLoopInterface
 {
@@ -45,7 +43,7 @@ class Feed extends BaseLoop implements ArraySearchLoopInterface
         /** @var AdapterInterface $cacheAdapter */
         $cacheAdapter = $this->container->get('thelia.cache');
 
-        $cacheItem = $cacheAdapter->getItem('feed_' . md5($this->getUrl()));
+        $cacheItem = $cacheAdapter->getItem('feed_'.md5($this->getUrl()));
 
         if (!$cacheItem->isHit()) {
             $feed = new \SimplePie();
@@ -70,11 +68,11 @@ class Feed extends BaseLoop implements ArraySearchLoopInterface
             $loopResultRow = new LoopResultRow();
 
             $loopResultRow
-                ->set("URL", $item->get_permalink())
-                ->set("TITLE", $item->get_title())
-                ->set("AUTHOR", $item->get_author())
-                ->set("DESCRIPTION", $item->get_description())
-                ->set("DATE", $item->get_date('U'))
+                ->set('URL', $item->get_permalink())
+                ->set('TITLE', $item->get_title())
+                ->set('AUTHOR', $item->get_author())
+                ->set('DESCRIPTION', $item->get_description())
+                ->set('DATE', $item->get_date('U'))
             ;
             $this->addOutputFields($loopResultRow, $item);
 

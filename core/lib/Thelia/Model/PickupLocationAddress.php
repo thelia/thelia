@@ -14,10 +14,10 @@ namespace Thelia\Model;
 
 class PickupLocationAddress
 {
-    /** @var integer */
+    /** @var int */
     protected $id;
 
-    /** @var boolean */
+    /** @var bool */
     protected $isDefault;
 
     /** @var string */
@@ -78,6 +78,7 @@ class PickupLocationAddress
     public function setId($id)
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -97,6 +98,7 @@ class PickupLocationAddress
     public function setIsDefault($isDefault)
     {
         $this->isDefault = $isDefault;
+
         return $this;
     }
 
@@ -116,6 +118,7 @@ class PickupLocationAddress
     public function setLabel($label)
     {
         $this->label = $label;
+
         return $this;
     }
 
@@ -135,6 +138,7 @@ class PickupLocationAddress
     public function setTitle($title)
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -154,6 +158,7 @@ class PickupLocationAddress
     public function setFirstName($firstName)
     {
         $this->firstName = $firstName;
+
         return $this;
     }
 
@@ -173,6 +178,7 @@ class PickupLocationAddress
     public function setLastName($lastName)
     {
         $this->lastName = $lastName;
+
         return $this;
     }
 
@@ -192,6 +198,7 @@ class PickupLocationAddress
     public function setCellphoneNumber($cellphoneNumber)
     {
         $this->cellphoneNumber = $cellphoneNumber;
+
         return $this;
     }
 
@@ -211,6 +218,7 @@ class PickupLocationAddress
     public function setPhoneNumber($phoneNumber)
     {
         $this->phoneNumber = $phoneNumber;
+
         return $this;
     }
 
@@ -230,6 +238,7 @@ class PickupLocationAddress
     public function setCompany($company)
     {
         $this->company = $company;
+
         return $this;
     }
 
@@ -249,6 +258,7 @@ class PickupLocationAddress
     public function setAddress1($address1)
     {
         $this->address1 = $address1;
+
         return $this;
     }
 
@@ -268,6 +278,7 @@ class PickupLocationAddress
     public function setAddress2($address2)
     {
         $this->address2 = $address2;
+
         return $this;
     }
 
@@ -287,6 +298,7 @@ class PickupLocationAddress
     public function setAddress3($address3)
     {
         $this->address3 = $address3;
+
         return $this;
     }
 
@@ -306,6 +318,7 @@ class PickupLocationAddress
     public function setZipCode($zipCode)
     {
         $this->zipCode = $zipCode;
+
         return $this;
     }
 
@@ -325,6 +338,7 @@ class PickupLocationAddress
     public function setCity($city)
     {
         $this->city = $city;
+
         return $this;
     }
 
@@ -344,6 +358,7 @@ class PickupLocationAddress
     public function setCountryCode($countryCode)
     {
         $this->countryCode = $countryCode;
+
         return $this;
     }
 
@@ -363,6 +378,7 @@ class PickupLocationAddress
     public function setAdditionalData($additionalData)
     {
         $this->additionalData = $additionalData;
+
         return $this;
     }
 }

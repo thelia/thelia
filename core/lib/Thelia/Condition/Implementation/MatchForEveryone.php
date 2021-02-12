@@ -15,16 +15,14 @@ namespace Thelia\Condition\Implementation;
 use Thelia\Coupon\FacadeInterface;
 
 /**
- * Allow every one, perform no check
+ * Allow every one, perform no check.
  *
- * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class MatchForEveryone extends ConditionAbstract
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(FacadeInterface $facade)
     {
@@ -35,7 +33,7 @@ class MatchForEveryone extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getServiceId()
     {
@@ -43,7 +41,7 @@ class MatchForEveryone extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setValidatorsFromForm(array $operators, array $values)
     {
@@ -54,7 +52,7 @@ class MatchForEveryone extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isMatching()
     {
@@ -62,7 +60,7 @@ class MatchForEveryone extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -73,7 +71,7 @@ class MatchForEveryone extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getToolTip()
     {
@@ -86,7 +84,7 @@ class MatchForEveryone extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getSummary()
     {
@@ -99,15 +97,15 @@ class MatchForEveryone extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
-    */
+     * {@inheritdoc}
+     */
     protected function generateInputs()
     {
         return [];
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function drawBackOfficeInputs()
     {

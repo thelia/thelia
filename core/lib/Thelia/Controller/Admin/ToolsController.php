@@ -16,8 +16,8 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 
 /**
- * Class ToolsController
- * @package Thelia\Controller\Admin
+ * Class ToolsController.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ToolsController extends BaseAdminController

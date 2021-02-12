@@ -16,9 +16,8 @@ use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\CartItem;
 
 /**
- * Allow to remove an amount from the checkout total
+ * Allow to remove an amount from the checkout total.
  *
- * @package Coupon
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 abstract class AbstractRemove extends CouponAbstract implements AmountAndPercentageCouponInterface
@@ -33,13 +32,14 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
     /**
      * Get the discount for a specific cart item.
      *
-     * @param  CartItem $cartItem the cart item
-     * @return float    the discount value
+     * @param CartItem $cartItem the cart item
+     *
+     * @return float the discount value
      */
     abstract public function getCartItemDiscount(CartItem $cartItem);
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function set(
         FacadeInterface $facade,
@@ -82,7 +82,7 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function drawBaseBackOfficeInputs($templateName, $otherFields)
     {
@@ -90,7 +90,7 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getBaseFieldList($otherFields)
     {
@@ -98,7 +98,7 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function checkBaseCouponFieldValue($fieldName, $fieldValue)
     {

@@ -20,23 +20,22 @@ class MessageSendSampleForm extends BaseForm
 {
     public static function getName()
     {
-        return "thelia_message_send_sample";
+        return 'thelia_message_send_sample';
     }
 
     protected function buildForm()
     {
         $this->formBuilder
             ->add(
-                "recipient_email",
+                'recipient_email',
                 EmailType::class,
                 [
-                    "constraints" => [new NotBlank()],
-                    "label" => Translator::getInstance()->trans('Send test e-mail to:'),
-                    "attr" => [
-                        'placeholder' => Translator::getInstance()->trans('Recipient e-mail address')
-                    ]
+                    'constraints' => [new NotBlank()],
+                    'label' => Translator::getInstance()->trans('Send test e-mail to:'),
+                    'attr' => [
+                        'placeholder' => Translator::getInstance()->trans('Recipient e-mail address'),
+                    ],
                 ]
             );
-        ;
     }
 }

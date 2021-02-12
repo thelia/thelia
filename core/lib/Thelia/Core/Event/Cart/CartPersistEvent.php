@@ -16,8 +16,8 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Cart;
 
 /**
- * Class CartPersistEvent
- * @package Thelia\Core\Event\Cart
+ * Class CartPersistEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class CartPersistEvent extends ActionEvent
@@ -44,11 +44,12 @@ class CartPersistEvent extends ActionEvent
     public function setCart($cart)
     {
         $this->cart = $cart;
+
         return $this;
     }
 
     /**
-     * check if cart exists
+     * check if cart exists.
      *
      * @return bool
      */

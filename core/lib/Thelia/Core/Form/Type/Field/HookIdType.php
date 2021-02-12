@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\HookQuery;
 
 /**
- * Class HookIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class HookIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class HookIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "hook_id";
+        return 'hook_id';
     }
 }

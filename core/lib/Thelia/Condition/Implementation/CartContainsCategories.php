@@ -20,11 +20,9 @@ use Thelia\Model\Category;
 use Thelia\Model\CategoryQuery;
 
 /**
- * Check a Checkout against its Product number
+ * Check a Checkout against its Product number.
  *
- * @package Condition
  * @author  Franck Allimant <franck@cqfdev.fr>
- *
  */
 class CartContainsCategories extends ConditionAbstract
 {
@@ -32,22 +30,22 @@ class CartContainsCategories extends ConditionAbstract
     public const CATEGORIES_LIST = 'categories';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(FacadeInterface $facade)
     {
         $this->availableOperators = [
             self::CATEGORIES_LIST => [
                 Operators::IN,
-                Operators::OUT
-            ]
+                Operators::OUT,
+            ],
         ];
 
         parent::__construct($facade);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getServiceId()
     {
@@ -55,20 +53,20 @@ class CartContainsCategories extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setValidatorsFromForm(array $operators, array $values)
     {
         $this->checkComparisonOperatorValue($operators, self::CATEGORIES_LIST);
 
         // Use default values if data is not defined.
-        if (! isset($operators[self::CATEGORIES_LIST]) || ! isset($values[self::CATEGORIES_LIST])) {
+        if (!isset($operators[self::CATEGORIES_LIST]) || !isset($values[self::CATEGORIES_LIST])) {
             $operators[self::CATEGORIES_LIST] = Operators::IN;
             $values[self::CATEGORIES_LIST] = [];
         }
 
         // Be sure that the value is an array, make one if required
-        if (! \is_array($values[self::CATEGORIES_LIST])) {
+        if (!\is_array($values[self::CATEGORIES_LIST])) {
             $values[self::CATEGORIES_LIST] = [$values[self::CATEGORIES_LIST]];
         }
 
@@ -80,14 +78,14 @@ class CartContainsCategories extends ConditionAbstract
             );
         }
 
-        $this->operators = [ self::CATEGORIES_LIST => $operators[self::CATEGORIES_LIST] ];
-        $this->values    = [ self::CATEGORIES_LIST => $values[self::CATEGORIES_LIST] ];
+        $this->operators = [self::CATEGORIES_LIST => $operators[self::CATEGORIES_LIST]];
+        $this->values = [self::CATEGORIES_LIST => $values[self::CATEGORIES_LIST]];
 
         return $this;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isMatching()
     {
@@ -108,11 +106,12 @@ class CartContainsCategories extends ConditionAbstract
                 }
             }
         }
+
         return false;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -123,7 +122,7 @@ class CartContainsCategories extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getToolTip()
     {
@@ -136,7 +135,7 @@ class CartContainsCategories extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getSummary()
     {
@@ -152,7 +151,7 @@ class CartContainsCategories extends ConditionAbstract
         if (null !== $catList = CategoryQuery::create()->findPks($catIds)) {
             /** @var Category $cat */
             foreach ($catList as $cat) {
-                $catStrList .= $cat->setLocale($this->getCurrentLocale())->getTitle() . ', ';
+                $catStrList .= $cat->setLocale($this->getCurrentLocale())->getTitle().', ';
             }
 
             $catStrList = rtrim($catStrList, ', ');
@@ -162,7 +161,7 @@ class CartContainsCategories extends ConditionAbstract
             'At least one of cart products categories is %op% <strong>%categories_list%</strong>',
             [
                 '%categories_list%' => $catStrList,
-                '%op%' => $i18nOperator
+                '%op%' => $i18nOperator,
             ]
         );
 
@@ -170,7 +169,7 @@ class CartContainsCategories extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function generateInputs()
     {
@@ -178,22 +177,22 @@ class CartContainsCategories extends ConditionAbstract
             self::CATEGORIES_LIST => [
                 'availableOperators' => $this->availableOperators[self::CATEGORIES_LIST],
                 'value' => '',
-                'selectedOperator' => Operators::IN
-            ]
+                'selectedOperator' => Operators::IN,
+            ],
         ];
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function drawBackOfficeInputs()
     {
         return $this->facade->getParser()->render(
             'coupon/condition-fragments/cart-contains-categories-condition.html',
             [
-                'operatorSelectHtml'    => $this->drawBackOfficeInputOperators(self::CATEGORIES_LIST),
+                'operatorSelectHtml' => $this->drawBackOfficeInputOperators(self::CATEGORIES_LIST),
                 'categories_field_name' => self::CATEGORIES_LIST,
-                'values'                => $this->values[self::CATEGORIES_LIST] ?? []
+                'values' => $this->values[self::CATEGORIES_LIST] ?? [],
             ]
         );
     }

@@ -25,10 +25,10 @@ use Thelia\Tools\TokenProvider;
 
 class Administrator extends BaseAction implements EventSubscriberInterface
 {
-    /** @var MailerFactory  */
+    /** @var MailerFactory */
     protected $mailer;
 
-    /** @var  TokenProvider */
+    /** @var TokenProvider */
     protected $tokenProvider;
 
     public function __construct(MailerFactory $mailer, TokenProvider $tokenProvider)
@@ -84,8 +84,6 @@ class Administrator extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     */
     public function delete(AdministratorEvent $event)
     {
         if (null !== $administrator = AdminQuery::create()->findPk($event->getId())) {
@@ -113,7 +111,7 @@ class Administrator extends BaseAction implements EventSubscriberInterface
 
         $email = $admin->getEmail();
 
-        if (! empty($email)) {
+        if (!empty($email)) {
             $renewToken = $this->tokenProvider->getToken();
 
             $admin
@@ -122,11 +120,11 @@ class Administrator extends BaseAction implements EventSubscriberInterface
 
             $this->mailer->sendEmailMessage(
                 'new_admin_password',
-                [ ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName() ],
-                [ $email => $admin->getFirstname() . ' ' . $admin->getLastname() ],
+                [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
+                [$email => $admin->getFirstname().' '.$admin->getLastname()],
                 [
-                    'token'     => $renewToken,
-                    'admin'     => $admin
+                    'token' => $renewToken,
+                    'admin' => $admin,
                 ]
             );
         }
@@ -138,11 +136,11 @@ class Administrator extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::ADMINISTRATOR_CREATE                        => ['create', 128],
-            TheliaEvents::ADMINISTRATOR_UPDATE                        => ['update', 128],
-            TheliaEvents::ADMINISTRATOR_DELETE                        => ['delete', 128],
-            TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD                => ['updatePassword', 128],
-            TheliaEvents::ADMINISTRATOR_CREATEPASSWORD                => ['createPassword', 128]
+            TheliaEvents::ADMINISTRATOR_CREATE => ['create', 128],
+            TheliaEvents::ADMINISTRATOR_UPDATE => ['update', 128],
+            TheliaEvents::ADMINISTRATOR_DELETE => ['delete', 128],
+            TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD => ['updatePassword', 128],
+            TheliaEvents::ADMINISTRATOR_CREATEPASSWORD => ['createPassword', 128],
         ];
     }
 }

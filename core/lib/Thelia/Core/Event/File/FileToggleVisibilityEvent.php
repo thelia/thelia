@@ -16,8 +16,8 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Event\ToggleVisibilityEvent;
 
 /**
- * Class FileToggleVisibilityEvent
- * @package Thelia\Core\Event\File
+ * Class FileToggleVisibilityEvent.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class FileToggleVisibilityEvent extends ToggleVisibilityEvent
@@ -25,7 +25,7 @@ class FileToggleVisibilityEvent extends ToggleVisibilityEvent
     protected $query;
 
     /**
-     * @param               $object_id
+     * @param $object_id
      */
     public function __construct(ModelCriteria $query, $object_id)
     {
@@ -34,8 +34,6 @@ class FileToggleVisibilityEvent extends ToggleVisibilityEvent
         $this->setQuery($query);
     }
 
-    /**
-     */
     public function setQuery(ModelCriteria $query)
     {
         $this->query = $query;

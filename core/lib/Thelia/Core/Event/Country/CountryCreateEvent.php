@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Country;
 
 /**
- * Class CountryCreateEvent
- * @package Thelia\Core\Event\Country
+ * Class CountryCreateEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CountryCreateEvent extends CountryEvent
@@ -32,8 +32,6 @@ class CountryCreateEvent extends CountryEvent
 
     protected $area;
 
-    /**
-     */
     public function setIsoAlpha2($isoAlpha2)
     {
         $this->isoAlpha2 = $isoAlpha2;
@@ -41,15 +39,11 @@ class CountryCreateEvent extends CountryEvent
         return $this;
     }
 
-    /**
-     */
     public function getIsoAlpha2()
     {
         return $this->isoAlpha2;
     }
 
-    /**
-     */
     public function setIsoAlpha3($isoAlpha3)
     {
         $this->isoAlpha3 = $isoAlpha3;
@@ -57,15 +51,11 @@ class CountryCreateEvent extends CountryEvent
         return $this;
     }
 
-    /**
-     */
     public function getIsoAlpha3()
     {
         return $this->isoAlpha3;
     }
 
-    /**
-     */
     public function setIsocode($isocode)
     {
         $this->isocode = $isocode;
@@ -73,15 +63,11 @@ class CountryCreateEvent extends CountryEvent
         return $this;
     }
 
-    /**
-     */
     public function getIsocode()
     {
         return $this->isocode;
     }
 
-    /**
-     */
     public function setLocale($locale)
     {
         $this->locale = $locale;
@@ -89,15 +75,11 @@ class CountryCreateEvent extends CountryEvent
         return $this;
     }
 
-    /**
-     */
     public function getLocale()
     {
         return $this->locale;
     }
 
-    /**
-     */
     public function setTitle($title)
     {
         $this->title = $title;
@@ -105,8 +87,6 @@ class CountryCreateEvent extends CountryEvent
         return $this;
     }
 
-    /**
-     */
     public function getTitle()
     {
         return $this->title;
@@ -131,7 +111,7 @@ class CountryCreateEvent extends CountryEvent
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isVisible()
     {
@@ -139,16 +119,17 @@ class CountryCreateEvent extends CountryEvent
     }
 
     /**
-     * @param boolean $visible
+     * @param bool $visible
      */
     public function setVisible($visible)
     {
         $this->visible = $visible;
+
         return $this;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isHasStates()
     {
@@ -156,11 +137,12 @@ class CountryCreateEvent extends CountryEvent
     }
 
     /**
-     * @param boolean $hasStates
+     * @param bool $hasStates
      */
     public function setHasStates($hasStates)
     {
         $this->hasStates = $hasStates;
+
         return $this;
     }
 }

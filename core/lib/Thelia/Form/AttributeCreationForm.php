@@ -22,30 +22,30 @@ class AttributeCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("title", TextType::class, [
-                "constraints" => [
+            ->add('title', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
                 ],
-                "label"       => Translator::getInstance()->trans("Title *"),
-                "label_attr"  => [
-                    "for" => "title",
-                ]
+                'label' => Translator::getInstance()->trans('Title *'),
+                'label_attr' => [
+                    'for' => 'title',
+                ],
             ])
-            ->add("locale", TextType::class, [
-                "constraints" => [
+            ->add('locale', TextType::class, [
+                'constraints' => [
                     new NotBlank(),
-                ]
+                ],
             ])
-            ->add("add_to_all", CheckboxType::class, [
-                "label"      => Translator::getInstance()->trans("Add to all product templates"),
-                "label_attr" => [
-                    "for" => "add_to_all",
-                ]
+            ->add('add_to_all', CheckboxType::class, [
+                'label' => Translator::getInstance()->trans('Add to all product templates'),
+                'label_attr' => [
+                    'for' => 'add_to_all',
+                ],
             ]);
     }
 
     public static function getName()
     {
-        return "thelia_attribute_creation";
+        return 'thelia_attribute_creation';
     }
 }

@@ -24,46 +24,46 @@ class ConfigCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("name", TextType::class, [
-                "constraints" => [
+            ->add('name', TextType::class, [
+                'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, "checkDuplicateName"])
+                    new Constraints\Callback([$this, 'checkDuplicateName']),
                 ],
-                "label" => Translator::getInstance()->trans('Name *'),
-                "label_attr" => [
-                    "for" => "name",
+                'label' => Translator::getInstance()->trans('Name *'),
+                'label_attr' => [
+                    'for' => 'name',
                 ],
             ])
-            ->add("title", TextType::class, [
-                "constraints" => [
-                    new Constraints\NotBlank(),
-                ],
-                "label" => Translator::getInstance()->trans('Purpose *'),
-                "label_attr" => [
-                    "for" => "purpose",
-                ],
-            ])
-            ->add("locale", HiddenType::class, [
-                "constraints" => [
+            ->add('title', TextType::class, [
+                'constraints' => [
                     new Constraints\NotBlank(),
                 ],
-            ])
-            ->add("value", TextType::class, [
-                "label" => Translator::getInstance()->trans('Value *'),
-                "label_attr" => [
-                    "for" => "value",
+                'label' => Translator::getInstance()->trans('Purpose *'),
+                'label_attr' => [
+                    'for' => 'purpose',
                 ],
             ])
-            ->add("hidden", HiddenType::class, [])
-            ->add("secured", HiddenType::class, [
-                "label" => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin'),
+            ->add('locale', HiddenType::class, [
+                'constraints' => [
+                    new Constraints\NotBlank(),
+                ],
+            ])
+            ->add('value', TextType::class, [
+                'label' => Translator::getInstance()->trans('Value *'),
+                'label_attr' => [
+                    'for' => 'value',
+                ],
+            ])
+            ->add('hidden', HiddenType::class, [])
+            ->add('secured', HiddenType::class, [
+                'label' => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin'),
             ])
         ;
     }
 
     public static function getName()
     {
-        return "thelia_config_creation";
+        return 'thelia_config_creation';
     }
 
     public function checkDuplicateName($value, ExecutionContextInterface $context)

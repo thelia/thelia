@@ -16,7 +16,8 @@ use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Thelia\Core\Serializer\AbstractSerializer;
 
 /**
- * Class XMLSerializer
+ * Class XMLSerializer.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class XMLSerializer extends AbstractSerializer
@@ -27,7 +28,7 @@ class XMLSerializer extends AbstractSerializer
     private $xmlEncoder;
 
     /**
-     * @var integer Position of data start
+     * @var int Position of data start
      */
     private $xmlDataStart;
 
@@ -48,7 +49,7 @@ class XMLSerializer extends AbstractSerializer
     {
         $this->xmlEncoder = new XmlEncoder(
             [
-                XmlEncoder::ROOT_NODE_NAME => 'data'
+                XmlEncoder::ROOT_NODE_NAME => 'data',
             ]
         );
     }
@@ -74,7 +75,7 @@ class XMLSerializer extends AbstractSerializer
     }
 
     /**
-     * Get data node name
+     * Get data node name.
      *
      * @return string Root node name
      */
@@ -84,7 +85,7 @@ class XMLSerializer extends AbstractSerializer
     }
 
     /**
-     * Set data node name
+     * Set data node name.
      *
      * @param string $dataNodeName Root node name
      *
@@ -102,7 +103,7 @@ class XMLSerializer extends AbstractSerializer
         $this->xmlDataStart = null;
 
         $fileObject->fwrite(
-            '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL . '<' . $this->rootNodeName . '>' . PHP_EOL
+            '<?xml version="1.0" encoding="UTF-8"?>'.PHP_EOL.'<'.$this->rootNodeName.'>'.PHP_EOL
         );
     }
 
@@ -111,7 +112,7 @@ class XMLSerializer extends AbstractSerializer
         $xml = $this->xmlEncoder->encode($data, 'array');
 
         if ($this->xmlDataStart === null) {
-            $this->xmlDataStart = strpos($xml, '<' . $this->dataNodeName . '>');
+            $this->xmlDataStart = strpos($xml, '<'.$this->dataNodeName.'>');
         }
 
         return substr($xml, $this->xmlDataStart, -1);
@@ -124,7 +125,7 @@ class XMLSerializer extends AbstractSerializer
 
     public function finalizeFile(\SplFileObject $fileObject)
     {
-        $fileObject->fwrite(PHP_EOL . '</' . $this->rootNodeName . '>');
+        $fileObject->fwrite(PHP_EOL.'</'.$this->rootNodeName.'>');
     }
 
     public function unserialize(\SplFileObject $fileObject)

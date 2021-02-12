@@ -25,9 +25,7 @@ use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\URL;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 abstract class BaseLoopTestor extends TestCase
 {
@@ -51,9 +49,9 @@ abstract class BaseLoopTestor extends TestCase
         $this->container = new ContainerBuilder();
 
         $this->container->setParameter(
-            "Thelia.parser.loops",
+            'Thelia.parser.loops',
             [
-                "tested-loop" => $this->getTestedClassName()
+                'tested-loop' => $this->getTestedClassName(),
             ]
         );
 
@@ -139,9 +137,9 @@ abstract class BaseLoopTestor extends TestCase
         $this->instance->initializeArgs(array_merge(
             $this->getMandatoryArguments(),
             [
-                "type" => "foo",
-                "name" => "foo",
-                "id" => $id,
+                'type' => 'foo',
+                'name' => 'foo',
+                'id' => $id,
             ],
             $other_args
         ));
@@ -161,9 +159,9 @@ abstract class BaseLoopTestor extends TestCase
         $this->instance->initializeArgs(array_merge(
             $this->getMandatoryArguments(),
             [
-                "type" => "foo",
-                "name" => "foo",
-                "limit" => $limit,
+                'type' => 'foo',
+                'name' => 'foo',
+                'limit' => $limit,
             ]
         ));
 
@@ -179,10 +177,10 @@ abstract class BaseLoopTestor extends TestCase
 
         return new $className(
             $this->container,
-            $this->container->get("request_stack"),
-            $this->container->get("event_dispatcher"),
-            $this->container->get("thelia.securityContext"),
-            $this->container->get("thelia.translator"),
+            $this->container->get('request_stack'),
+            $this->container->get('event_dispatcher'),
+            $this->container->get('thelia.securityContext'),
+            $this->container->get('thelia.translator'),
             []
         );
     }

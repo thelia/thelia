@@ -15,7 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\ProductQuery;
 
 /**
- * Class ProductIdType
+ * Class ProductIdType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class ProductIdType extends AbstractIdType
@@ -37,6 +38,6 @@ class ProductIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "product_id";
+        return 'product_id';
     }
 }

@@ -24,8 +24,6 @@ use Thelia\Model\TaxRuleQuery;
 
 class TaxRule extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     */
     public function create(TaxRuleEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $taxRule = new TaxRuleModel();
@@ -41,8 +39,6 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
         $event->setTaxRule($taxRule)->setId($taxRule->getId());
     }
 
-    /**
-     */
     public function update(TaxRuleEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
@@ -57,8 +53,6 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     */
     public function updateTaxes(TaxRuleEvent $event)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
@@ -103,7 +97,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
                             ->setPosition($position);
                         $taxModel->save();
                     }
-                    $position++;
+                    ++$position;
                 }
             }
 
@@ -125,7 +119,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * This method ensures compatibility with the 2.2.x country arrays passed throught the TaxRuleEvent
+     * This method ensures compatibility with the 2.2.x country arrays passed throught the TaxRuleEvent.
      *
      * In 2.2.x, the TaxRuleEvent::getXXXCountryList() methods returned an array of country IDs. [ country ID, country ID ...].
      * From 2.3.0-alpha1, these functions are expected to return an array of arrays, each one containing a country ID and
@@ -142,7 +136,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     {
         $obj = $this->getArrayFromJson($obj);
 
-        if (isset($obj[0]) && ! \is_array($obj[0])) {
+        if (isset($obj[0]) && !\is_array($obj[0])) {
             $objEx = [];
             foreach ($obj as $item) {
                 $objEx[] = [$item, 0];
@@ -154,8 +148,6 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
         return $obj;
     }
 
-    /**
-     */
     public function delete(TaxRuleEvent $event)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
@@ -167,13 +159,11 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     */
     public function setDefault(TaxRuleEvent $event)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
             TaxRuleQuery::create()->update([
-                "IsDefault" => 0
+                'IsDefault' => 0,
             ]);
 
             $taxRule->setIsDefault(1)->save();
@@ -188,11 +178,11 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::TAX_RULE_CREATE            => ["create", 128],
-            TheliaEvents::TAX_RULE_UPDATE            => ["update", 128],
-            TheliaEvents::TAX_RULE_TAXES_UPDATE      => ["updateTaxes", 128],
-            TheliaEvents::TAX_RULE_DELETE            => ["delete", 128],
-            TheliaEvents::TAX_RULE_SET_DEFAULT       => ["setDefault", 128],
+            TheliaEvents::TAX_RULE_CREATE => ['create', 128],
+            TheliaEvents::TAX_RULE_UPDATE => ['update', 128],
+            TheliaEvents::TAX_RULE_TAXES_UPDATE => ['updateTaxes', 128],
+            TheliaEvents::TAX_RULE_DELETE => ['delete', 128],
+            TheliaEvents::TAX_RULE_SET_DEFAULT => ['setDefault', 128],
         ];
     }
 }

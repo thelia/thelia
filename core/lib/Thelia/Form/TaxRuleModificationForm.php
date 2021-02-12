@@ -25,12 +25,12 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", HiddenType::class, [
-                    "required" => true,
-                    "constraints" => [
+            ->add('id', HiddenType::class, [
+                    'required' => true,
+                    'constraints' => [
                         new Constraints\NotBlank(),
                         new Constraints\Callback(
-                                    [$this, "verifyTaxRuleId"]
+                                    [$this, 'verifyTaxRuleId']
                         ),
                     ],
             ])
@@ -39,7 +39,7 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
 
     public static function getName()
     {
-        return "thelia_tax_rule_modification";
+        return 'thelia_tax_rule_modification';
     }
 
     public function verifyTaxRuleId($value, ExecutionContextInterface $context)
@@ -48,7 +48,7 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
             ->findPk($value);
 
         if (null === $taxRule) {
-            $context->addViolation(Translator::getInstance()->trans("Tax rule ID not found"));
+            $context->addViolation(Translator::getInstance()->trans('Tax rule ID not found'));
         }
     }
 }

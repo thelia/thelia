@@ -15,7 +15,8 @@ namespace Thelia\Core\Archiver;
 use Thelia\Core\Translation\Translator;
 
 /**
- * Class AbstractArchiver
+ * Class AbstractArchiver.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 abstract class AbstractArchiver implements ArchiverInterface
@@ -35,9 +36,9 @@ abstract class AbstractArchiver implements ArchiverInterface
         if ($checkIsAvailable && !$this->isAvailable()) {
             throw new \Exception(
           Translator::getInstance()->trans(
-            "The archiver :name is not available. Please install the php extension :extension first.",
+            'The archiver :name is not available. Please install the php extension :extension first.',
             [
-              ':name'      => $this->getName(),
+              ':name' => $this->getName(),
               ':extension' => $this->getExtension(),
             ]
           )
@@ -61,7 +62,7 @@ abstract class AbstractArchiver implements ArchiverInterface
     {
         $path = realpath($path);
         if (!file_exists($path)) {
-            throw new \RuntimeException('File ' . $path . ' doesn\'t exists');
+            throw new \RuntimeException('File '.$path.' doesn\'t exists');
         }
 
         if ($pathInArchive === null) {
@@ -73,7 +74,7 @@ abstract class AbstractArchiver implements ArchiverInterface
                 if ($dirItem->isDot()) {
                     continue;
                 }
-                $this->add($dirItem->getPathname(), $pathInArchive . DS . $dirItem->getFilename());
+                $this->add($dirItem->getPathname(), $pathInArchive.DS.$dirItem->getFilename());
             }
         } else {
             $this->archive->addFile($path, $pathInArchive);

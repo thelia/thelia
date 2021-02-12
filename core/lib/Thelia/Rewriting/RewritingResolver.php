@@ -16,8 +16,8 @@ use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\RewritingUrlQuery;
 
 /**
- * Class RewritingResolver
- * @package Thelia\Rewriting
+ * Class RewritingResolver.
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * This class provides methods to resolve rewritten URL as a query

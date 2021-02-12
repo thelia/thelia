@@ -13,8 +13,8 @@
 namespace Thelia\Exception;
 
 /**
- * Class FileNotReadableException
- * @package Thelia\Exception
+ * Class FileNotReadableException.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class FileNotReadableException extends \Exception

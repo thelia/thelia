@@ -16,8 +16,8 @@ use Thelia\Model\RewritingUrlQuery;
 use Thelia\Tools\URL;
 
 /**
- * Class RewritingRetriever
- * @package Thelia\Rewriting
+ * Class RewritingRetriever.
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * This class provides methods to retrieve a rewritten URL from a query
@@ -49,7 +49,7 @@ class RewritingRetriever
             $allParametersWithoutView['lang'] = $viewLocale;
         }
         if (null !== $viewId) {
-            $allParametersWithoutView[$view . '_id'] = $viewId;
+            $allParametersWithoutView[$view.'_id'] = $viewId;
         }
 
         $this->rewrittenUrl = null;
@@ -80,7 +80,7 @@ class RewritingRetriever
         $allParametersWithoutView = $viewOtherParameters;
         $allParametersWithoutView['lang'] = $viewLocale;
         if (null !== $viewId) {
-            $allParametersWithoutView[$view . '_id'] = $viewId;
+            $allParametersWithoutView[$view.'_id'] = $viewId;
         }
 
         $this->rewrittenUrl = null;
@@ -90,8 +90,6 @@ class RewritingRetriever
         }
     }
 
-    /**
-     */
     public function toString()
     {
         return $this->rewrittenUrl === null ? $this->url : $this->rewrittenUrl;

@@ -28,22 +28,22 @@ use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * Brand loop
+ * Brand loop.
  *
  * Class Brand
- * @package Thelia\Core\Template\Loop
+ *
  * @author Franck Allimant <franck@cqfdev.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int getProduct()
+ *
+ * @method int[]       getId()
+ * @method int         getProduct()
  * @method bool|string getVisible()
- * @method string getTitle()
- * @method bool getCurrent()
- * @method int[] getExclude()
- * @method string[] getOrder()
- * @method bool getWithPrevNextInfo()
+ * @method string      getTitle()
+ * @method bool        getCurrent()
+ * @method int[]       getExclude()
+ * @method string[]    getOrder()
+ * @method bool        getWithPrevNextInfo()
  */
 class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -80,7 +80,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                             'updated',
                             'updated-reverse',
                             'visible',
-                            'visible-reverse'
+                            'visible-reverse',
                         ]
                     )
                 ),
@@ -100,9 +100,9 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
 
     /**
      * @param BrandQuery $search
-     * @param string $searchTerm
-     * @param array $searchIn
-     * @param string $searchCriteria
+     * @param string     $searchTerm
+     * @param array      $searchIn
+     * @param string     $searchCriteria
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
@@ -125,7 +125,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                 'POSTSCRIPTUM',
                 'META_TITLE',
                 'META_DESCRIPTION',
-                'META_KEYWORDS'
+                'META_KEYWORDS',
             ]
         );
 
@@ -150,18 +150,18 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
         $title = $this->getTitle();
 
         if (!\is_null($title)) {
-            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%'.$title.'%');
         }
 
         $current = $this->getCurrent();
 
         if ($current === true) {
-            $search->filterById($this->getCurrentRequest()->get("brand_id"));
+            $search->filterById($this->getCurrentRequest()->get('brand_id'));
         } elseif ($current === false) {
-            $search->filterById($this->getCurrentRequest()->get("brand_id"), Criteria::NOT_IN);
+            $search->filterById($this->getCurrentRequest()->get('brand_id'), Criteria::NOT_IN);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
@@ -171,38 +171,38 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                 case 'id-reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha-reverse":
+                case 'alpha-reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "manual":
+                case 'manual':
                     $search->orderByPosition(Criteria::ASC);
                     break;
-                case "manual-reverse":
+                case 'manual-reverse':
                     $search->orderByPosition(Criteria::DESC);
                     break;
-                case "random":
+                case 'random':
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
-                    break(2);
-                case "created":
+                    break 2;
+                case 'created':
                     $search->addAscendingOrderByColumn('created_at');
                     break;
-                case "created-reverse":
+                case 'created-reverse':
                     $search->addDescendingOrderByColumn('created_at');
                     break;
-                case "updated":
+                case 'updated':
                     $search->addAscendingOrderByColumn('updated_at');
                     break;
-                case "updated-reverse":
+                case 'updated-reverse':
                     $search->addDescendingOrderByColumn('updated_at');
                     break;
-                case "visible":
+                case 'visible':
                     $search->orderByVisible(Criteria::ASC);
                     break;
-                case "visible-reverse":
+                case 'visible-reverse':
                     $search->orderByVisible(Criteria::DESC);
                     break;
             }
@@ -223,20 +223,20 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
         foreach ($loopResult->getResultDataCollection() as $brand) {
             $loopResultRow = new LoopResultRow($brand);
 
-            $loopResultRow->set("ID", $brand->getId())
-                ->set("IS_TRANSLATED", $brand->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("TITLE", $brand->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $brand->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $brand->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $brand->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL", $this->getReturnUrl() ? $brand->getUrl($this->locale) : null)
-                ->set("META_TITLE", $brand->getVirtualColumn('i18n_META_TITLE'))
-                ->set("META_DESCRIPTION", $brand->getVirtualColumn('i18n_META_DESCRIPTION'))
-                ->set("META_KEYWORDS", $brand->getVirtualColumn('i18n_META_KEYWORDS'))
-                ->set("POSITION", $brand->getPosition())
-                ->set("VISIBLE", $brand->getVisible())
-                ->set("LOGO_IMAGE_ID", $brand->getLogoImageId() ?: 0);
+            $loopResultRow->set('ID', $brand->getId())
+                ->set('IS_TRANSLATED', $brand->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('TITLE', $brand->getVirtualColumn('i18n_TITLE'))
+                ->set('CHAPO', $brand->getVirtualColumn('i18n_CHAPO'))
+                ->set('DESCRIPTION', $brand->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $brand->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set('URL', $this->getReturnUrl() ? $brand->getUrl($this->locale) : null)
+                ->set('META_TITLE', $brand->getVirtualColumn('i18n_META_TITLE'))
+                ->set('META_DESCRIPTION', $brand->getVirtualColumn('i18n_META_DESCRIPTION'))
+                ->set('META_KEYWORDS', $brand->getVirtualColumn('i18n_META_KEYWORDS'))
+                ->set('POSITION', $brand->getPosition())
+                ->set('VISIBLE', $brand->getVisible())
+                ->set('LOGO_IMAGE_ID', $brand->getLogoImageId() ?: 0);
 
             $isBackendContext = $this->getBackendContext();
 
@@ -245,7 +245,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                 $previousQuery = BrandQuery::create()
                     ->filterByPosition($brand->getPosition(), Criteria::LESS_THAN);
 
-                if (! $isBackendContext) {
+                if (!$isBackendContext) {
                     $previousQuery->filterByVisible(true);
                 }
 
@@ -256,7 +256,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                 $nextQuery = BrandQuery::create()
                     ->filterByPosition($brand->getPosition(), Criteria::GREATER_THAN);
 
-                if (! $isBackendContext) {
+                if (!$isBackendContext) {
                     $nextQuery->filterByVisible(true);
                 }
 
@@ -265,10 +265,10 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                     ->findOne();
 
                 $loopResultRow
-                    ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
-                    ->set("HAS_NEXT", $next != null ? 1 : 0)
-                    ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
-                    ->set("NEXT", $next != null ? $next->getId() : -1);
+                    ->set('HAS_PREVIOUS', $previous != null ? 1 : 0)
+                    ->set('HAS_NEXT', $next != null ? 1 : 0)
+                    ->set('PREVIOUS', $previous != null ? $previous->getId() : -1)
+                    ->set('NEXT', $next != null ? $next->getId() : -1);
             }
 
             $this->addOutputFields($loopResultRow, $brand);

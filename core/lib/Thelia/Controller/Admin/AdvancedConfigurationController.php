@@ -21,8 +21,8 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 /**
- * Class CacheController
- * @package Thelia\Controller\Admin
+ * Class CacheController.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AdvancedConfigurationController extends BaseAdminController
@@ -46,10 +46,10 @@ class AdvancedConfigurationController extends BaseAdminController
         try {
             $this->validateForm($form);
 
-            $event = new CacheEvent($this->container->getParameter("kernel.cache_dir"));
+            $event = new CacheEvent($this->container->getParameter('kernel.cache_dir'));
             $this->dispatch(TheliaEvents::CACHE_CLEAR, $event);
         } catch (\Exception $e) {
-            Tlog::getInstance()->addError(sprintf("Flush cache error: %s", $e->getMessage()));
+            Tlog::getInstance()->addError(sprintf('Flush cache error: %s', $e->getMessage()));
         }
 
         return $this->generateRedirectFromRoute('admin.configuration.advanced');
@@ -65,10 +65,10 @@ class AdvancedConfigurationController extends BaseAdminController
         try {
             $this->validateForm($form);
 
-            $event = new CacheEvent(THELIA_WEB_DIR . "assets");
+            $event = new CacheEvent(THELIA_WEB_DIR.'assets');
             $this->dispatch(TheliaEvents::CACHE_CLEAR, $event);
         } catch (\Exception $e) {
-            Tlog::getInstance()->addError(sprintf("Flush assets error: %s", $e->getMessage()));
+            Tlog::getInstance()->addError(sprintf('Flush assets error: %s', $e->getMessage()));
         }
 
         return $this->generateRedirectFromRoute('admin.configuration.advanced');
@@ -85,22 +85,22 @@ class AdvancedConfigurationController extends BaseAdminController
             $this->validateForm($form);
 
             $event = new CacheEvent(
-                THELIA_WEB_DIR . ConfigQuery::read(
+                THELIA_WEB_DIR.ConfigQuery::read(
                     'image_cache_dir_from_web_root',
-                    'cache' . DS . 'images'
+                    'cache'.DS.'images'
                 )
             );
             $this->dispatch(TheliaEvents::CACHE_CLEAR, $event);
 
             $event = new CacheEvent(
-                THELIA_WEB_DIR . ConfigQuery::read(
+                THELIA_WEB_DIR.ConfigQuery::read(
                     'document_cache_dir_from_web_root',
-                    'cache' . DS . 'documents'
+                    'cache'.DS.'documents'
                 )
             );
             $this->dispatch(TheliaEvents::CACHE_CLEAR, $event);
         } catch (\Exception $e) {
-            Tlog::getInstance()->addError(sprintf("Flush images and document error: %s", $e->getMessage()));
+            Tlog::getInstance()->addError(sprintf('Flush images and document error: %s', $e->getMessage()));
         }
 
         return $this->generateRedirectFromRoute('admin.configuration.advanced');

@@ -18,12 +18,8 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\Tools\ModelCriteriaTools;
 
 /**
- *
  * Class BaseI18nLoop, imlplemented by loops providing internationalized data, such as title, description, etc.
  *
- * @package Thelia\Core\Template\Element
- *
- * {@inheritdoc}
  * @method string getLang()
  */
 abstract class BaseI18nLoop extends BaseLoop
@@ -31,7 +27,7 @@ abstract class BaseI18nLoop extends BaseLoop
     protected $locale;
 
     /**
-     * Define common loop arguments
+     * Define common loop arguments.
      *
      * @return Argument[]
      */
@@ -45,7 +41,7 @@ abstract class BaseI18nLoop extends BaseLoop
     }
 
     /**
-     * Setup ModelCriteria for proper i18n processing
+     * Setup ModelCriteria for proper i18n processing.
      *
      * @param ModelCriteria $search       the Propel Criteria to configure
      * @param array         $columns      the i18n columns
@@ -81,18 +77,18 @@ abstract class BaseI18nLoop extends BaseLoop
      * not defined in the backEnd I18N context.
      *
      * @param ModelCriteria $search
-     * @param string $columnName the column to search into, such as TITLE
-     * @param string $searchCriteria the search criteria, such as Criterial::LIKE, Criteria::EQUAL, etc.
-     * @param string $searchTerm the searched term
+     * @param string        $columnName     the column to search into, such as TITLE
+     * @param string        $searchCriteria the search criteria, such as Criterial::LIKE, Criteria::EQUAL, etc
+     * @param string        $searchTerm     the searched term
      */
     public function addSearchInI18nColumn($search, $columnName, $searchCriteria, $searchTerm)
     {
-        if (! $this->getBackendContext()) {
+        if (!$this->getBackendContext()) {
             $search->where(
                 "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID)
                         THEN `requested_locale_i18n`.`$columnName`
                         ELSE `default_locale_i18n`.`$columnName`
-                        END " . $searchCriteria . " ?",
+                        END ".$searchCriteria.' ?',
                 $searchTerm,
                 \PDO::PARAM_STR
             );

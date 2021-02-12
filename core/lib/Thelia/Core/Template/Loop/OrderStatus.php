@@ -23,17 +23,15 @@ use Thelia\Model\OrderStatus as OrderStatusModel;
 use Thelia\Model\OrderStatusQuery;
 
 /**
- *
- * OrderStatus loop
- *
+ * OrderStatus loop.
  *
  * Class OrderStatus
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  * @author Gilles Bourgeat <gbourgeat@gmail.com>
  *
- * @method int[] getId()
- * @method string getCode()
+ * @method int[]    getId()
+ * @method string   getCode()
  * @method string[] getOrder()
  */
 class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -54,7 +52,7 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
                     'alpha',
                     'alpha_reverse',
                     'manual',
-                    'manual_reverse'
+                    'manual_reverse',
                 ],
                 'manual'
             )
@@ -76,20 +74,20 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByCode($code, Criteria::EQUAL);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha_reverse":
+                case 'alpha_reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "manual":
+                case 'manual':
                     $search->orderByPosition(Criteria::ASC);
                     break;
-                case "manual_reverse":
+                case 'manual_reverse':
                     $search->orderByPosition(Criteria::DESC);
                     break;
             }
@@ -103,17 +101,17 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
         /** @var OrderStatusModel $orderStatus */
         foreach ($loopResult->getResultDataCollection() as $orderStatus) {
             $loopResultRow = new LoopResultRow($orderStatus);
-            $loopResultRow->set("ID", $orderStatus->getId())
-                ->set("IS_TRANSLATED", $orderStatus->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("CODE", $orderStatus->getCode())
-                ->set("COLOR", $orderStatus->getColor())
-                ->set("POSITION", $orderStatus->getPosition())
-                ->set("PROTECTED_STATUS", $orderStatus->getProtectedStatus())
-                ->set("TITLE", $orderStatus->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $orderStatus->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $orderStatus->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $orderStatus->getVirtualColumn('i18n_POSTSCRIPTUM'))
+            $loopResultRow->set('ID', $orderStatus->getId())
+                ->set('IS_TRANSLATED', $orderStatus->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('CODE', $orderStatus->getCode())
+                ->set('COLOR', $orderStatus->getColor())
+                ->set('POSITION', $orderStatus->getPosition())
+                ->set('PROTECTED_STATUS', $orderStatus->getProtectedStatus())
+                ->set('TITLE', $orderStatus->getVirtualColumn('i18n_TITLE'))
+                ->set('CHAPO', $orderStatus->getVirtualColumn('i18n_CHAPO'))
+                ->set('DESCRIPTION', $orderStatus->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $orderStatus->getVirtualColumn('i18n_POSTSCRIPTUM'))
             ;
             $this->addOutputFields($loopResultRow, $orderStatus);
 

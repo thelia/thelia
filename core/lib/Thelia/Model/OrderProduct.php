@@ -14,7 +14,6 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\Order\OrderProductEvent;
-use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\OrderProduct as BaseOrderProduct;
 
@@ -33,8 +32,6 @@ class OrderProduct extends BaseOrderProduct
         return $this;
     }
 
-    /**
-     */
     public function getCartItemId()
     {
         return $this->cartItemId;

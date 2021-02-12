@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event;
 
 /**
- * Class PdfEvent
- * @package Thelia\Core\Event
+ * Class PdfEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class PdfEvent extends ActionEvent
@@ -48,7 +48,7 @@ class PdfEvent extends ActionEvent
         $lang = 'fr',
         $unicode = true,
         $encoding = 'UTF-8',
-        array $marges = [ 0, 0, 0, 0],
+        array $marges = [0, 0, 0, 0],
         $fontName = 'freesans'
     ) {
         $this->content = $content;
@@ -71,8 +71,6 @@ class PdfEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     */
     public function getContent()
     {
         return $this->content;
@@ -105,8 +103,6 @@ class PdfEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     */
     public function getEncoding()
     {
         return $this->encoding;
@@ -122,8 +118,6 @@ class PdfEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     */
     public function getFormat()
     {
         return $this->format;
@@ -139,8 +133,6 @@ class PdfEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     */
     public function getLang()
     {
         return $this->lang;
@@ -148,6 +140,7 @@ class PdfEvent extends ActionEvent
 
     /**
      * @param array $marges
+     *
      * @return $this
      */
     public function setMarges($marges)
@@ -175,8 +168,6 @@ class PdfEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     */
     public function getOrientation()
     {
         return $this->orientation;
@@ -192,15 +183,11 @@ class PdfEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     */
     public function getUnicode()
     {
         return $this->unicode;
     }
 
-    /**
-     */
     public function getFontName()
     {
         return $this->fontName;
@@ -208,11 +195,13 @@ class PdfEvent extends ActionEvent
 
     /**
      * @param string $fontName
+     *
      * @return $this
      */
     public function setFontName($fontName)
     {
         $this->fontName = $fontName;
+
         return $this;
     }
 }

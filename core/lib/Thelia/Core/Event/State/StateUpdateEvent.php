@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\State;
 
 /**
- * Class StateUpdateEvent
- * @package Thelia\Core\Event\State
+ * Class StateUpdateEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class StateUpdateEvent extends StateCreateEvent
@@ -32,6 +32,7 @@ class StateUpdateEvent extends StateCreateEvent
 
     /**
      * @param int $state_id
+     *
      * @return $this
      */
     public function setStateId($state_id)

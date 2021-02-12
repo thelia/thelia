@@ -48,19 +48,19 @@ class ConfigurationController extends BaseAdminController
             HookAdminHome::setConfigValue(HookAdminHome::ACTIVATE_INFO, 0);
             HookAdminHome::setConfigValue(HookAdminHome::ACTIVATE_STATS, 0);
 
-            if($data['enabled-news']){
+            if ($data['enabled-news']) {
                 HookAdminHome::setConfigValue(HookAdminHome::ACTIVATE_NEWS, 1);
             }
 
-            if($data['enabled-sales']){
+            if ($data['enabled-sales']) {
                 HookAdminHome::setConfigValue(HookAdminHome::ACTIVATE_SALES, 1);
             }
 
-            if($data['enabled-info']){
+            if ($data['enabled-info']) {
                 HookAdminHome::setConfigValue(HookAdminHome::ACTIVATE_INFO, 1);
             }
 
-            if($data['enabled-stats']){
+            if ($data['enabled-stats']) {
                 HookAdminHome::setConfigValue(HookAdminHome::ACTIVATE_STATS, 1);
             }
 
@@ -75,8 +75,9 @@ class ConfigurationController extends BaseAdminController
                 $error_message,
                 $form
             );
-            $response = $this->render("module-configure", ['module_code' => 'HookAdminHome']);
+            $response = $this->render('module-configure', ['module_code' => 'HookAdminHome']);
         }
+
         return $response;
     }
 }

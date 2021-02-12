@@ -18,8 +18,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 
 /**
- * Class ConfigurationForm
- * @package Cheque\Form
+ * Class ConfigurationForm.
+ *
  * @author Thelia <info@thelia.net>
  */
 class ConfigurationForm extends BaseForm
@@ -36,16 +36,16 @@ class ConfigurationForm extends BaseForm
                 'payable_to',
                 'text',
                 [
-                    'constraints' => [ new NotBlank() ],
-                    'label'       => $this->trans('Cheque is payable to: '),
+                    'constraints' => [new NotBlank()],
+                    'label' => $this->trans('Cheque is payable to: '),
                     'label_attr' => [
                         'for' => 'payable_to',
-                        'help' => $this->trans('The name to which the cheque shoud be payable to.')
+                        'help' => $this->trans('The name to which the cheque shoud be payable to.'),
                     ],
                     'attr' => [
-                        'rows'        => 10,
-                        'placeholder' => $this->trans('Pay cheque to')
-                    ]
+                        'rows' => 10,
+                        'placeholder' => $this->trans('Pay cheque to'),
+                    ],
                 ]
             )
             ->add(
@@ -53,16 +53,16 @@ class ConfigurationForm extends BaseForm
                 'textarea',
                 [
                     'constraints' => [],
-                    'required'    => false,
-                    'label'       => $this->trans('Cheque instructions'),
+                    'required' => false,
+                    'label' => $this->trans('Cheque instructions'),
                     'label_attr' => [
                         'for' => 'namefield',
-                        'help' => $this->trans('Please enter here the payment by cheque instructions')
+                        'help' => $this->trans('Please enter here the payment by cheque instructions'),
                     ],
                     'attr' => [
-                        'rows'        => 10,
-                        'placeholder' => $this->trans('Payment instruction')
-                    ]
+                        'rows' => 10,
+                        'placeholder' => $this->trans('Payment instruction'),
+                    ],
                 ]
             )
          ;

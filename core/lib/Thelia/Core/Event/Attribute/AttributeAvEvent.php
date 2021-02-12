@@ -29,7 +29,7 @@ class AttributeAvEvent extends ActionEvent
 
     public function hasAttributeAv()
     {
-        return ! \is_null($this->attributeAv);
+        return !\is_null($this->attributeAv);
     }
 
     public function getAttributeAv()

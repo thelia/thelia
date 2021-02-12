@@ -16,10 +16,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * base class for testing command line command
+ * base class for testing command line command.
  *
  * Class BaseCommandTest
- * @package Thelia\Tests\Command
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 abstract class BaseCommandTest extends TestCase

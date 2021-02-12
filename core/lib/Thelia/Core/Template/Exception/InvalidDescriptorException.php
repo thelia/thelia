@@ -13,8 +13,8 @@
 namespace Thelia\Core\Template\Exception;
 
 /**
- * Class InvalidXmlDocumentException
- * @package Thelia\Template\Exception
+ * Class InvalidXmlDocumentException.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class InvalidDescriptorException extends \RuntimeException

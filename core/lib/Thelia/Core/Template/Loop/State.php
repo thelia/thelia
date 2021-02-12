@@ -25,20 +25,19 @@ use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * Country loop
- *
+ * Country loop.
  *
  * Class Country
- * @package Thelia\Core\Template\Loop
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[] getCountry()
- * @method int[] getExclude()
+ *
+ * @method int[]       getId()
+ * @method int[]       getCountry()
+ * @method int[]       getExclude()
  * @method bool|string getVisible()
- * @method string[] getOrder()
+ * @method string[]    getOrder()
  */
 class State extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -66,7 +65,7 @@ class State extends BaseI18nLoop implements PropelSearchLoopInterface
                             'alpha_reverse',
                             'visible',
                             'visible_reverse',
-                            'random'
+                            'random',
                         ]
                     )
                 ),
@@ -105,28 +104,28 @@ class State extends BaseI18nLoop implements PropelSearchLoopInterface
         $orders = $this->getOrder();
         foreach ($orders as $order) {
             switch ($order) {
-                case "id":
+                case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case "id_reverse":
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha_reverse":
+                case 'alpha_reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "visible":
+                case 'visible':
                     $search->orderByVisible(Criteria::ASC);
                     break;
-                case "visible_reverse":
+                case 'visible_reverse':
                     $search->orderByVisible(Criteria::DESC);
                     break;
-                case "random":
+                case 'random':
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
-                    break(2);
+                    break 2;
                     break;
             }
         }
@@ -140,13 +139,13 @@ class State extends BaseI18nLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $state) {
             $loopResultRow = new LoopResultRow($state);
             $loopResultRow
-                ->set("ID", $state->getId())
-                ->set("COUNTRY", $state->getCountryId())
-                ->set("VISIBLE", $state->getVisible())
-                ->set("IS_TRANSLATED", $state->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("TITLE", $state->getVirtualColumn('i18n_TITLE'))
-                ->set("ISOCODE", $state->getIsocode())
+                ->set('ID', $state->getId())
+                ->set('COUNTRY', $state->getCountryId())
+                ->set('VISIBLE', $state->getVisible())
+                ->set('IS_TRANSLATED', $state->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('TITLE', $state->getVirtualColumn('i18n_TITLE'))
+                ->set('ISOCODE', $state->getIsocode())
             ;
 
             $this->addOutputFields($loopResultRow, $state);

@@ -24,12 +24,10 @@ use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
-use Thelia\Model\OrderPostage;
-use Thelia\Module\Exception\DeliveryException;
 
 /**
- * Class CouponController
- * @package Thelia\Controller\Front
+ * Class CouponController.
+ *
  * @author Guillaume MOREL <gmorel@openstudio.fr>
  */
 class CouponController extends BaseFrontController
@@ -44,7 +42,7 @@ class CouponController extends BaseFrontController
     }
 
     /**
-     * Coupon consuming
+     * Coupon consuming.
      */
     public function consumeAction()
     {
@@ -119,7 +117,7 @@ class CouponController extends BaseFrontController
         } catch (FormValidationException $e) {
             $message = $this->getTranslator()->trans(
                 'Please check your coupon code: %message',
-                ["%message" => $e->getMessage()],
+                ['%message' => $e->getMessage()],
                 Front::MESSAGE_DOMAIN
             );
         } catch (UnmatchableConditionException $e) {
@@ -136,14 +134,14 @@ class CouponController extends BaseFrontController
         } catch (\Exception $e) {
             $message = $this->getTranslator()->trans(
                 'Sorry, an error occurred: %message',
-                ["%message" => $e->getMessage()],
+                ['%message' => $e->getMessage()],
                 Front::MESSAGE_DOMAIN
             );
         }
 
         if ($message !== false) {
             Tlog::getInstance()->error(
-                sprintf("Error during order delivery process : %s. Exception was %s", $message, $e->getMessage())
+                sprintf('Error during order delivery process : %s. Exception was %s', $message, $e->getMessage())
             );
 
             $couponCodeForm->setErrorMessage($message);

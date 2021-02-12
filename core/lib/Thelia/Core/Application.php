@@ -21,9 +21,7 @@ use Thelia\Command\Install;
 
 /**
  * cli application for Thelia
- * Class Application
- * @package Thelia\Core
- * mfony\Component\HttpFoundation\Session\Session
+ * Class Application.
  */
 class Application extends BaseApplication
 {
@@ -33,7 +31,7 @@ class Application extends BaseApplication
     {
         $this->kernel = $kernel;
 
-        parent::__construct("Thelia", Thelia::THELIA_VERSION);
+        parent::__construct('Thelia', Thelia::THELIA_VERSION);
 
         $this->kernel->boot();
 
@@ -62,12 +60,13 @@ class Application extends BaseApplication
     {
         if (!Thelia::isInstalled()) {
             $this->add(new Install());
+
             return;
         }
 
         $container = $this->kernel->getContainer();
 
-        foreach ($container->getParameter("command.definition") as $command) {
+        foreach ($container->getParameter('command.definition') as $command) {
             $r = new \ReflectionClass($command);
 
             if (!$r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command')) {
@@ -78,7 +77,7 @@ class Application extends BaseApplication
                 continue;
             }
 
-            if (!$r->hasMethod("configure")) {
+            if (!$r->hasMethod('configure')) {
                 continue;
             }
 

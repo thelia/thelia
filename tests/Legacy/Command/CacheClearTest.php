@@ -23,10 +23,10 @@ use Thelia\Core\Application;
 use Thelia\Tests\ContainerAwareTestCase;
 
 /**
- * test the cache:clear command
+ * test the cache:clear command.
  *
  * Class CacheClearTest
- * @package Thelia\Tests\Command
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CacheClearTest extends ContainerAwareTestCase
@@ -35,12 +35,12 @@ class CacheClearTest extends ContainerAwareTestCase
 
     public function setUp(): void
     {
-        $this->cache_dir = THELIA_CACHE_DIR . 'test_cache';
+        $this->cache_dir = THELIA_CACHE_DIR.'test_cache';
 
         $fs = new Filesystem();
 
         $fs->mkdir($this->cache_dir);
-        $fs->mkdir(THELIA_WEB_DIR . "/assets");
+        $fs->mkdir(THELIA_WEB_DIR.'/assets');
     }
 
     public function tearDown(): void
@@ -67,11 +67,11 @@ class CacheClearTest extends ContainerAwareTestCase
 
         $application->add($cacheClear);
 
-        $command = $application->find("cache:clear");
+        $command = $application->find('cache:clear');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
-            "command" => $command->getName(),
-            "--env" => "test"
+            'command' => $command->getName(),
+            '--env' => 'test',
         ]);
 
         $fs = new Filesystem();
@@ -96,13 +96,13 @@ class CacheClearTest extends ContainerAwareTestCase
 
         $application->add($cacheClear);
 
-        $command = $application->find("cache:clear");
+        $command = $application->find('cache:clear');
         $commandTester = new CommandTester($command);
 
         $this->expectException(\RuntimeException::class);
         $commandTester->execute([
-            "command" => $command->getName(),
-            "--env" => "test"
+            'command' => $command->getName(),
+            '--env' => 'test',
         ]);
     }
 
@@ -114,8 +114,8 @@ class CacheClearTest extends ContainerAwareTestCase
         $eventDispatcher = new EventDispatcher();
         $eventDispatcher->addSubscriber(new Cache(new ArrayAdapter()));
 
-        $container->set("event_dispatcher", $eventDispatcher);
+        $container->set('event_dispatcher', $eventDispatcher);
 
-        $container->setParameter("kernel.cache_dir", $this->cache_dir);
+        $container->setParameter('kernel.cache_dir', $this->cache_dir);
     }
 }

@@ -19,17 +19,15 @@ use Thelia\Model\Base\FeatureProductQuery as BaseFeatureProductQuery;
 /**
  * Skeleton subclass for performing query and update operations on the 'feature_product' table.
  *
- *
- *
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
- *
  */
 class FeatureProductQuery extends BaseFeatureProductQuery
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since version 2.4.0, to be removed in 3.0.
      *                      Please use  filterByIsFreeText() instead
      */
@@ -37,11 +35,13 @@ class FeatureProductQuery extends BaseFeatureProductQuery
     {
         $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
+
         return parent::filterByFreeTextValue($freeTextValue, $comparison);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since version 2.4.0, to be removed in 3.0.
      *                      Please use  orderByIsFreeText() instead
      */
@@ -49,11 +49,13 @@ class FeatureProductQuery extends BaseFeatureProductQuery
     {
         $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
+
         return parent::orderByFreeTextValue($order);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since version 2.4.0, to be removed in 3.0.
      *                      Please use  groupByIsFreeText() instead
      */
@@ -61,11 +63,13 @@ class FeatureProductQuery extends BaseFeatureProductQuery
     {
         $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
+
         return parent::groupByFreeTextValue();
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since version 2.4.0, to be removed in 3.0.
      *                      Please use  findByIsFreeText() instead
      */
@@ -73,11 +77,13 @@ class FeatureProductQuery extends BaseFeatureProductQuery
     {
         $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
+
         return parent::findByFreeTextValue($free_text_value);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since version 2.4.0, to be removed in 3.0.
      *                      Please use  findOneByIsFreeText() instead
      */
@@ -85,6 +91,7 @@ class FeatureProductQuery extends BaseFeatureProductQuery
     {
         $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
+
         return parent::findOneByFreeTextValue($free_text_value);
     }
 }

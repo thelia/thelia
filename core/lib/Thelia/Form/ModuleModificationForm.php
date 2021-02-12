@@ -27,16 +27,16 @@ class ModuleModificationForm extends BaseForm
         $this->addStandardDescFields();
 
         $this->formBuilder
-            ->add("id", HiddenType::class, [
-                "required" => true,
-                "constraints" => [
+            ->add('id', HiddenType::class, [
+                'required' => true,
+                'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                        [$this, "verifyModuleId"]
+                        [$this, 'verifyModuleId']
                     ),
                 ],
-                "attr" => [
-                    "id" => "module_update_id",
+                'attr' => [
+                    'id' => 'module_update_id',
                 ],
             ])
         ;
@@ -47,7 +47,7 @@ class ModuleModificationForm extends BaseForm
      */
     public static function getName()
     {
-        return "thelia_admin_module_modification";
+        return 'thelia_admin_module_modification';
     }
 
     public function verifyModuleId($value, ExecutionContextInterface $context)
@@ -56,7 +56,7 @@ class ModuleModificationForm extends BaseForm
             ->findPk($value);
 
         if (null === $module) {
-            $context->addViolation(Translator::getInstance()->trans("Module ID not found"));
+            $context->addViolation(Translator::getInstance()->trans('Module ID not found'));
         }
     }
 }

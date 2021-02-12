@@ -18,15 +18,14 @@ use Thelia\Core\Event\Payment\IsValidPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 
 /**
- * Class Payment
- * @package Thelia\Action
+ * Class Payment.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class Payment implements EventSubscriberInterface
 {
     /**
-     * Check if a module is valid
-     *
+     * Check if a module is valid.
      */
     public function isValid(IsValidPaymentEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -52,7 +51,7 @@ class Payment implements EventSubscriberInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

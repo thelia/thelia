@@ -17,8 +17,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Order;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Module\AbstractPaymentModule;
-use Thelia\Module\BaseModule;
-use Thelia\Module\PaymentModuleInterface;
 
 class FreeOrder extends AbstractPaymentModule
 {

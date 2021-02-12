@@ -34,7 +34,7 @@ use Thelia\Model\Template;
 use Thelia\Model\TemplateQuery;
 
 /**
- * Manages product templates
+ * Manages product templates.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
@@ -71,7 +71,7 @@ class TemplateController extends AbstractCrudController
 
         $createEvent
             ->setTemplateName($formData['name'])
-            ->setLocale($formData["locale"])
+            ->setLocale($formData['locale'])
         ;
 
         return $createEvent;
@@ -83,7 +83,7 @@ class TemplateController extends AbstractCrudController
 
         // Create and dispatch the change event
         $changeEvent
-            ->setLocale($formData["locale"])
+            ->setLocale($formData['locale'])
             ->setTemplateName($formData['name'])
         ;
 
@@ -104,9 +104,9 @@ class TemplateController extends AbstractCrudController
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
-            'id'      => $object->getId(),
-            'locale'  => $object->getLocale(),
-            'name'    => $object->getName()
+            'id' => $object->getId(),
+            'locale' => $object->getLocale(),
+            'name' => $object->getName(),
         ];
 
         // Setup the object form
@@ -132,6 +132,7 @@ class TemplateController extends AbstractCrudController
 
     /**
      * @param Template $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
@@ -141,6 +142,7 @@ class TemplateController extends AbstractCrudController
 
     /**
      * @param Template $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -165,13 +167,14 @@ class TemplateController extends AbstractCrudController
 
     /**
      * @param Request $request
-     * @param int $id
+     * @param int     $id
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function redirectToEditionTemplate($request = null, $id = null)
     {
         return $this->generateRedirectFromRoute(
-            "admin.configuration.templates.update",
+            'admin.configuration.templates.update',
             [
                 'template_id' => $id ?: $this->getRequest()->get('template_id'),
             ]
@@ -187,14 +190,15 @@ class TemplateController extends AbstractCrudController
      * Process delete failure, which may occurs if template is in use.
      *
      * @param TemplateDeleteEvent $deleteEvent
-     * @return null|\Thelia\Core\HttpFoundation\Response
+     *
+     * @return \Thelia\Core\HttpFoundation\Response|null
      */
     protected function performAdditionalDeleteAction($deleteEvent)
     {
         if ($deleteEvent->getProductCount() > 0) {
             $this->getParserContext()->setGeneralError(
                 $this->getTranslator()->trans(
-                    "This template is in use in some of your products, and cannot be deleted. Delete it from all your products and try again."
+                    'This template is in use in some of your products, and cannot be deleted. Delete it from all your products and try again.'
                 )
             );
 
@@ -299,8 +303,7 @@ class TemplateController extends AbstractCrudController
     public function updateAttributePositionAction(
         Request $request,
         EventDispatcherInterface $eventDispatcher
-    )
-    {
+    ) {
         // Find attribute_template
         $attributeTemplate = AttributeTemplateQuery::create()
             ->filterByTemplateId($request->get('template_id', null))
@@ -367,8 +370,7 @@ class TemplateController extends AbstractCrudController
     public function updateFeaturePositionAction(
         Request $request,
         EventDispatcherInterface $eventDispatcher
-    )
-    {
+    ) {
         // Find feature_template
         $featureTemplate = FeatureTemplateQuery::create()
             ->filterByTemplateId($request->get('template_id', null))

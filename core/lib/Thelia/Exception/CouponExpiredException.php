@@ -16,22 +16,20 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 
 /**
- * Thrown when an Expired Coupon is tried
+ * Thrown when an Expired Coupon is tried.
  *
- * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class CouponExpiredException extends \Exception
 {
     /**
-     * CouponExpiredException thrown when a Coupon is expired
+     * CouponExpiredException thrown when a Coupon is expired.
      *
      * @param string $couponCode Coupon code
      */
     public function __construct($couponCode)
     {
-        $message = Translator::getInstance()->trans('Coupon %code is expired.', ['%code' => $couponCode ]);
+        $message = Translator::getInstance()->trans('Coupon %code is expired.', ['%code' => $couponCode]);
 
         Tlog::getInstance()->addWarning($message);
 

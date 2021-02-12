@@ -19,11 +19,9 @@ use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\Currency;
 
 /**
- * Unit Test MatchForEveryone Class
+ * Unit Test MatchForEveryone Class.
  *
- * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class MatchForEveryoneTest extends TestCase
 {
@@ -31,7 +29,7 @@ class MatchForEveryoneTest extends TestCase
     protected $stubTheliaAdapter;
 
     /**
-     * Generate adapter stub
+     * Generate adapter stub.
      *
      * @param int    $cartTotalPrice   Cart total price
      * @param string $checkoutCurrency Checkout currency
@@ -80,10 +78,9 @@ class MatchForEveryoneTest extends TestCase
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForEveryone::setValidators
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForEveryone::setValidators
      */
     public function testValidBackOfficeInputOperator()
     {
@@ -98,15 +95,14 @@ class MatchForEveryoneTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if condition is always matching
+     * Check if condition is always matching.
      *
-     * @covers Thelia\Condition\Implementation\MatchForEveryone::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForEveryone::isMatching
      */
     public function testIsMatching()
     {
@@ -123,10 +119,9 @@ class MatchForEveryoneTest extends TestCase
     }
 
     /**
-     * Check getName i18n
+     * Check getName i18n.
      *
-     * @covers Thelia\Condition\Implementation\MatchForEveryone::getName
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForEveryone::getName
      */
     public function testGetName()
     {
@@ -141,10 +136,9 @@ class MatchForEveryoneTest extends TestCase
     }
 
     /**
-     * Check tooltip i18n
+     * Check tooltip i18n.
      *
-     * @covers Thelia\Condition\Implementation\MatchForEveryone::getToolTip
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForEveryone::getToolTip
      */
     public function testGetToolTip()
     {
@@ -159,10 +153,10 @@ class MatchForEveryoneTest extends TestCase
     }
 
     /**
-     * Check validator
+     * Check validator.
      *
-     * @covers Thelia\Condition\Implementation\MatchForEveryone::generateInputs
-     * @covers Thelia\Condition\Implementation\MatchForEveryone::setValidatorsFromForm
+     * @covers \Thelia\Condition\Implementation\MatchForEveryone::generateInputs
+     * @covers \Thelia\Condition\Implementation\MatchForEveryone::setValidatorsFromForm
      */
     public function testGetValidator()
     {

@@ -12,14 +12,11 @@
 
 namespace Thelia\ImportExport\Export\Type;
 
-use PDO;
-use Propel\Runtime\Connection\StatementInterface;
 use Propel\Runtime\Propel;
-use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
 /**
- * Class OrderExport
+ * Class OrderExport.
  *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  * @author Florian Bernard <fbernard@openstudio.fr>

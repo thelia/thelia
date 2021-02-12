@@ -16,19 +16,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Core\HttpFoundation\Response;
-use Thelia\Model;
 
 /**
- *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-
 class TheliaHttpKernel extends HttpKernel
 {
     protected static $session;
@@ -59,16 +55,15 @@ class TheliaHttpKernel extends HttpKernel
      * and do its best to convert them to a Response instance.
      *
      * @param Request $request A Request instance
-     * @param integer $type    The type of the request
+     * @param int     $type    The type of the request
      *                         (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
-     * @param Boolean $catch   Whether to catch exceptions or not
+     * @param bool    $catch   Whether to catch exceptions or not
      *
      * @return Response A Response instance
      *
      * @throws \Exception When an Exception occurs during processing
      *
      * @api
-     *
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {

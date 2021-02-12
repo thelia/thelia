@@ -16,8 +16,8 @@ use Thelia\Form\BaseForm;
 use Tinymce\Tinymce;
 
 /**
- * Class ConfigurationForm
- * @package Cheque\Form
+ * Class ConfigurationForm.
+ *
  * @author Thelia <info@thelia.net>
  */
 class ConfigurationForm extends BaseForm
@@ -30,8 +30,8 @@ class ConfigurationForm extends BaseForm
                 'integer',
                 [
                     'required' => false,
-                    'data'     => Tinymce::getConfigValue('editor_height', 0),
-                    'label'    => $this->translator->trans('Height of the editor area, in pixels. Enter 0 for default ', [], Tinymce::MODULE_DOMAIN),
+                    'data' => Tinymce::getConfigValue('editor_height', 0),
+                    'label' => $this->translator->trans('Height of the editor area, in pixels. Enter 0 for default ', [], Tinymce::MODULE_DOMAIN),
                 ]
             )
             ->add(
@@ -39,68 +39,68 @@ class ConfigurationForm extends BaseForm
                 'checkbox',
                 [
                     'required' => false,
-                    'data'     =>\intval(Tinymce::getConfigValue('show_menu_bar', 0)) != 0,
-                    'label'    => $this->translator->trans('Show the TinyMCE menu bar', [], Tinymce::MODULE_DOMAIN),
+                    'data' => \intval(Tinymce::getConfigValue('show_menu_bar', 0)) != 0,
+                    'label' => $this->translator->trans('Show the TinyMCE menu bar', [], Tinymce::MODULE_DOMAIN),
                 ]
             )
             ->add(
                 'force_pasting_as_text',
                 'checkbox',
                 [
-                    'required'   => false,
-                    'data'       => \intval(Tinymce::getConfigValue('force_pasting_as_text', 0)) != 0,
-                    'label'      => $this->translator->trans('Force pasting as text', [], Tinymce::MODULE_DOMAIN),
+                    'required' => false,
+                    'data' => \intval(Tinymce::getConfigValue('force_pasting_as_text', 0)) != 0,
+                    'label' => $this->translator->trans('Force pasting as text', [], Tinymce::MODULE_DOMAIN),
                     'label_attr' => [
-                        'help' => $this->translator->trans('If checked, all pasted data will be converted as plain text, removing tags and styles.', [], Tinymce::MODULE_DOMAIN)
-                    ]
+                        'help' => $this->translator->trans('If checked, all pasted data will be converted as plain text, removing tags and styles.', [], Tinymce::MODULE_DOMAIN),
+                    ],
                 ]
             )
             ->add(
                 'set_images_as_responsive',
                 'checkbox',
                 [
-                    'required'   => false,
-                    'data'       => \intval(Tinymce::getConfigValue('set_images_as_responsive', 1)) != 0,
-                    'label'      => $this->translator->trans('Add responsive class to images', [], Tinymce::MODULE_DOMAIN),
+                    'required' => false,
+                    'data' => \intval(Tinymce::getConfigValue('set_images_as_responsive', 1)) != 0,
+                    'label' => $this->translator->trans('Add responsive class to images', [], Tinymce::MODULE_DOMAIN),
                     'label_attr' => [
-                        'help' => $this->translator->trans('If checked, the "img-responsive" class is added by default to inserted images', [], Tinymce::MODULE_DOMAIN)
-                    ]
+                        'help' => $this->translator->trans('If checked, the "img-responsive" class is added by default to inserted images', [], Tinymce::MODULE_DOMAIN),
+                    ],
                 ]
             )
             ->add(
                 'custom_css',
                 'textarea',
                 [
-                    'required'   => false,
-                    'data'       => Tinymce::getConfigValue('custom_css', '/* Enter here CSS or LESS code */'),
-                    'label'      => $this->translator->trans('Custom CSS available in the editor', [], Tinymce::MODULE_DOMAIN),
+                    'required' => false,
+                    'data' => Tinymce::getConfigValue('custom_css', '/* Enter here CSS or LESS code */'),
+                    'label' => $this->translator->trans('Custom CSS available in the editor', [], Tinymce::MODULE_DOMAIN),
                     'label_attr' => [
-                        'help' => $this->translator->trans('Enter CSS or LESS code. You may also customize the editor.less file in the plugin template directory.', [], Tinymce::MODULE_DOMAIN)
+                        'help' => $this->translator->trans('Enter CSS or LESS code. You may also customize the editor.less file in the plugin template directory.', [], Tinymce::MODULE_DOMAIN),
                     ],
                     'attr' => [
                         'rows' => 10,
-                        'style' => 'font-family: \'Courier New\', Courier, monospace;'
-                    ]
+                        'style' => 'font-family: \'Courier New\', Courier, monospace;',
+                    ],
                 ]
             )
             ->add(
                 'test_zone',
                 'textarea',
                 [
-                    'required'   => false,
-                    'label'      => $this->translator->trans('Sample editor', [], Tinymce::MODULE_DOMAIN),
+                    'required' => false,
+                    'label' => $this->translator->trans('Sample editor', [], Tinymce::MODULE_DOMAIN),
                     'label_attr' => [
-                        'help' => $this->translator->trans('This is a sample text editor, to view actual configuration.', [], Tinymce::MODULE_DOMAIN)
-                    ]
+                        'help' => $this->translator->trans('This is a sample text editor, to view actual configuration.', [], Tinymce::MODULE_DOMAIN),
+                    ],
                 ]
             )->add(
                 'available_text_areas',
                 'text',
                 [
                     'disabled' => true,
-                    'required'   => false,
+                    'required' => false,
                     'label_attr' => [],
-                    'data' => Tinymce::getConfigValue('available_text_areas')
+                    'data' => Tinymce::getConfigValue('available_text_areas'),
                 ]
             );
 
@@ -129,12 +129,12 @@ class ConfigurationForm extends BaseForm
     {
         $this->formBuilder->add(
             $key,
-            "checkbox",
+            'checkbox',
             [
-                "label_attr" => [],
-                "required" => false,
-                "constraints" => [],
-                "data" => \intval(Tinymce::getConfigValue($key, 0)) != 0,
+                'label_attr' => [],
+                'required' => false,
+                'constraints' => [],
+                'data' => \intval(Tinymce::getConfigValue($key, 0)) != 0,
             ]
         );
     }

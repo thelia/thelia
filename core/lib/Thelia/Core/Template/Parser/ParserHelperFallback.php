@@ -15,8 +15,8 @@ namespace Thelia\Core\Template\Parser;
 use Thelia\Core\Template\ParserHelperInterface;
 
 /**
- * Class ParserHelperFallback
- * @package Thelia\Core\Template\Parser
+ * Class ParserHelperFallback.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class ParserHelperFallback implements ParserHelperInterface
@@ -24,10 +24,8 @@ class ParserHelperFallback implements ParserHelperInterface
     /**
      * Parse a string and get all parser's function and block with theirs arguments.
      *
-     *
-     *
-     * @param string $content the template content
-     * @param array $functions the only functions we want to parse
+     * @param string $content   the template content
+     * @param array  $functions the only functions we want to parse
      *
      * @return array array of functions with 2 index name and attributes an array of name, value
      */

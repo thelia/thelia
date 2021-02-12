@@ -15,8 +15,8 @@ namespace Thelia\Model\Tools;
 use Propel\Runtime\Connection\ConnectionInterface;
 
 /**
- * Trait I18nTimestampableTrait
- * @package Thelia\Model\Tools
+ * Trait I18nTimestampableTrait.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 trait I18nTimestampableTrait
@@ -36,13 +36,13 @@ trait I18nTimestampableTrait
      */
     protected function getBaseQueryObject()
     {
-        $parentClass = preg_replace("#^([\w\_\\\\]+)I18n$#", "$1Query", __CLASS__);
+        $parentClass = preg_replace("#^([\w\_\\\\]+)I18n$#", '$1Query', __CLASS__);
 
-        return (new $parentClass());
+        return new $parentClass();
     }
 
     protected function getUpdatedAtColumnName()
     {
-        return "UpdatedAt";
+        return 'UpdatedAt';
     }
 }

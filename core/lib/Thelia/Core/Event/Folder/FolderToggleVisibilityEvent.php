@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Folder;
 
 /**
- * Class FolderToggleVisibilityEvent
- * @package Thelia\Core\Event
+ * Class FolderToggleVisibilityEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FolderToggleVisibilityEvent extends FolderEvent

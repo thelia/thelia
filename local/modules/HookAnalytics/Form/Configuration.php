@@ -18,11 +18,12 @@ use Thelia\Form\BaseForm;
 use Thelia\Model\LangQuery;
 
 /**
- * Class Configuration
- * @package HookSocial\Form
+ * Class Configuration.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class Configuration extends BaseForm {
+class Configuration extends BaseForm
+{
     protected function buildForm()
     {
         $form = $this->formBuilder;
@@ -34,13 +35,13 @@ class Configuration extends BaseForm {
 
         $value = HookAnalytics::getConfigValue("hookanalytics_trackingcode", "", $lang->getLocale());
         $form->add(
-            "trackingcode",
-            "text",
+            'trackingcode',
+            'text',
             [
-                'data'  => $value,
-                'label' => Translator::getInstance()->trans("Tracking Code"),
+                'data' => $value,
+                'label' => Translator::getInstance()->trans('Tracking Code'),
                 'label_attr' => [
-                    'for' => "trackingcode"
+                    'for' => 'trackingcode',
                 ],
             ]
         );
@@ -51,6 +52,6 @@ class Configuration extends BaseForm {
      */
     public static function getName()
     {
-        return "hookanalytics";
+        return 'hookanalytics';
     }
 }

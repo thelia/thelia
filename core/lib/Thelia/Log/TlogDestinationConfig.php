@@ -32,7 +32,7 @@ class TlogDestinationConfig
         $this->title = $title;
         $this->label = $label;
         $this->default = $default;
-        $this->type= $type;
+        $this->type = $type;
         $this->value = ConfigQuery::read($this->name, $this->default);
     }
 

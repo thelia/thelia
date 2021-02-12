@@ -38,7 +38,7 @@ class ImageEvent extends CachedFileEvent
     protected $category;
 
     /**
-     * @var integer the required image width
+     * @var int the required image width
      */
     protected $width;
 
@@ -77,11 +77,11 @@ class ImageEvent extends CachedFileEvent
      */
     protected $imageObject;
 
-    /** @var  bool */
+    /** @var bool */
     protected $allowZoom;
 
     /**
-     * @return boolean true if the required image is the original image (resize_mode and background_color are not significant)
+     * @return bool true if the required image is the original image (resize_mode and background_color are not significant)
      */
     public function isOriginalImage()
     {
@@ -95,8 +95,8 @@ class ImageEvent extends CachedFileEvent
     public function getOptionsHash()
     {
         return md5(
-            $this->width . $this->height . $this->resize_mode . $this->background_color . implode(',', $this->effects)
-            . $this->rotation . $this->allowZoom
+            $this->width.$this->height.$this->resize_mode.$this->background_color.implode(',', $this->effects)
+            .$this->rotation.$this->allowZoom
         );
     }
 
@@ -221,7 +221,8 @@ class ImageEvent extends CachedFileEvent
     }
 
     /**
-     * @param  ImageInterface $imageObject
+     * @param ImageInterface $imageObject
+     *
      * @return $this
      */
     public function setImageObject($imageObject)
@@ -249,6 +250,7 @@ class ImageEvent extends CachedFileEvent
 
     /**
      * @param bool $allowZoom
+     *
      * @return $this
      */
     public function setAllowZoom($allowZoom)

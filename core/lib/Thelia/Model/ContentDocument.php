@@ -16,11 +16,9 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
-use Thelia\Form\ContentDocumentModification;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\ContentDocument as BaseContentDocument;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
@@ -33,7 +31,7 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
     use FolderBreadcrumbTrait;
 
     /**
-     * Calculate next position relative to our parent
+     * Calculate next position relative to our parent.
      *
      * @param ContentDocumentQuery $query
      */
@@ -55,7 +53,7 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setParentId($parentId)
     {
@@ -65,7 +63,7 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getParentId()
     {
@@ -78,7 +76,7 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
 
         $this->reorderBeforeDelete(
             [
-                "content_id" => $this->getContentId(),
+                'content_id' => $this->getContentId(),
             ]
         );
 
@@ -86,7 +84,7 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
@@ -102,7 +100,7 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
     }
 
     /**
-     * Get the ID of the form used to change this object information
+     * Get the ID of the form used to change this object information.
      *
      * @return BaseForm the form
      */
@@ -118,25 +116,24 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
     {
         $uploadDir = ConfigQuery::read('documents_library_path');
         if ($uploadDir === null) {
-            $uploadDir = THELIA_LOCAL_DIR . 'media' . DS . 'documents';
+            $uploadDir = THELIA_LOCAL_DIR.'media'.DS.'documents';
         } else {
-            $uploadDir = THELIA_ROOT . $uploadDir;
+            $uploadDir = THELIA_ROOT.$uploadDir;
         }
 
-        return $uploadDir . DS . 'content';
+        return $uploadDir.DS.'content';
     }
 
     /**
-     *
      * @return string the URL to redirect to after update from the back-office
      */
     public function getRedirectionUrl()
     {
-        return '/admin/content/update/' . $this->getContentId();
+        return '/admin/content/update/'.$this->getContentId();
     }
 
     /**
-     * Get the Query instance for this object
+     * Get the Query instance for this object.
      *
      * @return ModelCriteria
      */

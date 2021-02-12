@@ -28,8 +28,8 @@ use Thelia\Tests\ContainerAwareTestCase;
 use TheliaSmarty\Template\SmartyParser;
 
 /**
- * Class SmartyPluginTestCase
- * @package TheliaSmarty\Tests\Template\Plugin
+ * Class SmartyPluginTestCase.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 abstract class SmartyPluginTestCase extends ContainerAwareTestCase
@@ -38,13 +38,13 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
     protected $smarty;
 
     /**
-     * @param ContainerBuilder $container
-     * Use this method to build the container with the services that you need.
+     * @param containerBuilder $container
+     *                                    Use this method to build the container with the services that you need
      */
     protected function buildContainer(ContainerBuilder $container)
     {
         /** @var Request $request */
-        $request = $container->get("request_stack")->getCurrentRequest();
+        $request = $container->get('request_stack')->getCurrentRequest();
         if (null === $request->getSession()) {
             $request->setSession(new Session());
         }
@@ -52,10 +52,10 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $container->set("Thelia.parser.forms", [
-            "thelia.empty" => "Thelia\\Form\\EmptyForm",
-            "thelia.empty.2" => "Thelia\\Form\\EmptyForm",
-            "thelia.api.empty" => "Thelia\\Form\\Api\\ApiEmptyForm",
+        $container->set('Thelia.parser.forms', [
+            'thelia.empty' => 'Thelia\\Form\\EmptyForm',
+            'thelia.empty.2' => 'Thelia\\Form\\EmptyForm',
+            'thelia.api.empty' => 'Thelia\\Form\\Api\\ApiEmptyForm',
         ]);
         $translator = new Translator($requestStack);
 
@@ -64,11 +64,11 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
         $formFactoryBuilder = (new FormFactoryBuilder())->addExtension(new CoreExtension());
         $validatorBuilder = new ValidatorBuilder();
 
-        $container->set("thelia.form_factory_builder", $formFactoryBuilder);
-        $container->set("thelia.forms.validator_builder", $validatorBuilder);
+        $container->set('thelia.form_factory_builder', $formFactoryBuilder);
+        $container->set('thelia.forms.validator_builder', $validatorBuilder);
 
         $container->set(
-            "thelia.form_factory",
+            'thelia.form_factory',
             new TheliaFormFactory(
                 $requestStack,
                 $dispatcher,
@@ -79,20 +79,20 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
             )
         );
 
-        $container->set("thelia.parser.context", new ParserContext(
+        $container->set('thelia.parser.context', new ParserContext(
             $requestStack,
-            $container->get("thelia.form_factory"),
+            $container->get('thelia.form_factory'),
             new TheliaFormValidator(new Translator($container), 'dev')
         ));
 
         $this->smarty = new SmartyParser(
             $requestStack,
-            $container->get("event_dispatcher"),
-            $container->get("thelia.parser.context"),
+            $container->get('event_dispatcher'),
+            $container->get('thelia.parser.context'),
             $templateHelper = new TheliaTemplateHelper()
         );
 
-        $container->set("thelia.parser", $this->smarty);
+        $container->set('thelia.parser', $this->smarty);
 
         $this->smarty->addPlugins($this->getPlugin($container));
         $this->smarty->registerPlugins();
@@ -100,7 +100,7 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
 
     protected function render($template, $data = [])
     {
-        return $this->internalRender('file', __DIR__.DS."fixtures".DS.$template, $data);
+        return $this->internalRender('file', __DIR__.DS.'fixtures'.DS.$template, $data);
     }
 
     protected function renderString($template, $data = [])
@@ -114,7 +114,7 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
             $this->smarty->assign($key, $value);
         }
 
-        return $this->smarty->fetch(sprintf("%s:%s", $resourceType, $resourceContent));
+        return $this->smarty->fetch(sprintf('%s:%s', $resourceType, $resourceContent));
     }
 
     /**

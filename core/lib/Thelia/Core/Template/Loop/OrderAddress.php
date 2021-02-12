@@ -23,15 +23,14 @@ use Thelia\Model\OrderAddress as OrderAddressModel;
 use Thelia\Model\OrderAddressQuery;
 
 /**
- *
- * OrderAddress loop
- *
+ * OrderAddress loop.
  *
  * Class OrderAddress
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
+ *
  * @method int getId()
  */
 class OrderAddress extends BaseLoop implements PropelSearchLoopInterface
@@ -65,20 +64,20 @@ class OrderAddress extends BaseLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $orderAddress) {
             $loopResultRow = new LoopResultRow($orderAddress);
             $loopResultRow
-                ->set("ID", $orderAddress->getId())
-                ->set("TITLE", $orderAddress->getCustomerTitleId())
-                ->set("COMPANY", $orderAddress->getCompany())
-                ->set("FIRSTNAME", $orderAddress->getFirstname())
-                ->set("LASTNAME", $orderAddress->getLastname())
-                ->set("ADDRESS1", $orderAddress->getAddress1())
-                ->set("ADDRESS2", $orderAddress->getAddress2())
-                ->set("ADDRESS3", $orderAddress->getAddress3())
-                ->set("ZIPCODE", $orderAddress->getZipcode())
-                ->set("CITY", $orderAddress->getCity())
-                ->set("COUNTRY", $orderAddress->getCountryId())
-                ->set("STATE", $orderAddress->getStateId())
-                ->set("PHONE", $orderAddress->getPhone())
-                ->set("CELLPHONE", $orderAddress->getCellphone())
+                ->set('ID', $orderAddress->getId())
+                ->set('TITLE', $orderAddress->getCustomerTitleId())
+                ->set('COMPANY', $orderAddress->getCompany())
+                ->set('FIRSTNAME', $orderAddress->getFirstname())
+                ->set('LASTNAME', $orderAddress->getLastname())
+                ->set('ADDRESS1', $orderAddress->getAddress1())
+                ->set('ADDRESS2', $orderAddress->getAddress2())
+                ->set('ADDRESS3', $orderAddress->getAddress3())
+                ->set('ZIPCODE', $orderAddress->getZipcode())
+                ->set('CITY', $orderAddress->getCity())
+                ->set('COUNTRY', $orderAddress->getCountryId())
+                ->set('STATE', $orderAddress->getStateId())
+                ->set('PHONE', $orderAddress->getPhone())
+                ->set('CELLPHONE', $orderAddress->getCellphone())
             ;
             $this->addOutputFields($loopResultRow, $orderAddress);
 

@@ -14,7 +14,6 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
-use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
@@ -22,23 +21,23 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Area as AreaModel;
 use Thelia\Model\AreaQuery;
-use Thelia\Model\CountryAreaQuery;
 use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**
- * Class Area
- * @package Thelia\Core\Template\Loop
+ * Class Area.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[] getCountry()
- * @method int getWithZone()
- * @method int getWithoutZone()
+ *
+ * @method int[]       getId()
+ * @method int[]       getCountry()
+ * @method int         getWithZone()
+ * @method int         getWithoutZone()
  * @method bool|string getUnassigned()
- * @method int[] getModuleId()
- * @method string[] getOrder()
+ * @method int[]       getModuleId()
+ * @method string[]    getOrder()
  */
 class Area extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -61,7 +60,7 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
                 new TypeCollection(
                     new EnumListType([
                         'id', 'id_reverse',
-                        'alpha', 'name', 'name_reverse'
+                        'alpha', 'name', 'name_reverse',
                     ])
                 ),
                 'name'
@@ -99,7 +98,7 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
         if ($notAssigned) {
             $search
                 ->joinAreaDeliveryModule('unassigned', Criteria::LEFT_JOIN)
-                ->where('`unassigned`.delivery_module_id ' . Criteria::ISNULL);
+                ->where('`unassigned`.delivery_module_id '.Criteria::ISNULL);
         }
 
         $modules = $this->getModuleId();
@@ -120,7 +119,7 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->endUse();
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
@@ -139,6 +138,7 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
                     break;
             }
         }
+
         return $search;
     }
 

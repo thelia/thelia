@@ -15,8 +15,8 @@ namespace Thelia\Tests\Rewriting;
 use Thelia\Model\Category;
 
 /**
- * Class CategoryRewritingTest
- * @package Thelia\Tests\Rewriting
+ * Class CategoryRewritingTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CategoryRewritingTest extends BaseRewritingObject

@@ -28,15 +28,15 @@ use Thelia\Model\Customer;
 use Thelia\Tools\TokenProvider;
 
 /**
- * Test the helpers adding in Session class
+ * Test the helpers adding in Session class.
  *
  * Class SessionTest
- * @package Thelia\Tests\Core\HttpFoundation\Session
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class SessionTest extends TestCase
 {
-    /** @var  Session */
+    /** @var Session */
     protected $session;
 
     /** @var RequestStack */
@@ -75,7 +75,7 @@ class SessionTest extends TestCase
 
         $request->setSession($this->session);
 
-        /** @var \Thelia\Action\Cart  cartAction */
+        /* @var \Thelia\Action\Cart  cartAction */
         $this->cartAction = new \Thelia\Action\Cart(
             $this->requestStack,
             new TokenProvider($this->requestStack, $translator, 'baba au rhum')
@@ -144,8 +144,8 @@ class SessionTest extends TestCase
 
         //create a fake customer just for test. If not persists test fails !
         $customer = new Customer();
-        $customer->setFirstname("john test session");
-        $customer->setLastname("doe");
+        $customer->setFirstname('john test session');
+        $customer->setLastname('doe');
         $customer->setTitleId(1);
         $customer->save();
 
@@ -166,18 +166,18 @@ class SessionTest extends TestCase
 
         // create a fake customer just for test. If not persists test fails !
         $customer = new Customer();
-        $customer->setFirstname("john test session");
-        $customer->setLastname("doe");
+        $customer->setFirstname('john test session');
+        $customer->setLastname('doe');
         $customer->setTitleId(1);
         $customer->save();
 
         $session->setCustomerUser($customer);
 
         $testCart = new Cart();
-        $testCart->setToken(uniqid("testSessionGetCart2", true));
+        $testCart->setToken(uniqid('testSessionGetCart2', true));
         $testCart->save();
 
-        $this->requestStack->getCurrentRequest()->cookies->set(ConfigQuery::read("cart.cookie_name", 'thelia_cart'), $testCart->getToken());
+        $this->requestStack->getCurrentRequest()->cookies->set(ConfigQuery::read('cart.cookie_name', 'thelia_cart'), $testCart->getToken());
 
         $cart = $session->getSessionCart($this->dispatcher);
 
@@ -194,19 +194,19 @@ class SessionTest extends TestCase
 
         //create a fake customer just for test. If not persists test fails !
         $customer = new Customer();
-        $customer->setFirstname("john test session");
-        $customer->setLastname("doe");
+        $customer->setFirstname('john test session');
+        $customer->setLastname('doe');
         $customer->setTitleId(1);
         $customer->save();
 
         $session->setCustomerUser($customer);
 
         $testCart = new Cart();
-        $testCart->setToken(uniqid("testSessionGetCart3", true));
+        $testCart->setToken(uniqid('testSessionGetCart3', true));
         $testCart->setCustomerId($customer->getId());
         $testCart->save();
 
-        $this->requestStack->getCurrentRequest()->cookies->set(ConfigQuery::read("cart.cookie_name", 'thelia_cart'), $testCart->getToken());
+        $this->requestStack->getCurrentRequest()->cookies->set(ConfigQuery::read('cart.cookie_name', 'thelia_cart'), $testCart->getToken());
 
         $cart = $session->getSessionCart($this->dispatcher);
 

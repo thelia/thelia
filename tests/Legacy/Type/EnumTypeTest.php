@@ -16,15 +16,13 @@ use PHPUnit\Framework\TestCase;
 use Thelia\Type\EnumType;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class EnumTypeTest extends TestCase
 {
     public function testEnumType()
     {
-        $enumType = new EnumType(["cat", "dog"]);
+        $enumType = new EnumType(['cat', 'dog']);
         $this->assertTrue($enumType->isValid('cat'));
         $this->assertTrue($enumType->isValid('dog'));
         $this->assertFalse($enumType->isValid('monkey'));

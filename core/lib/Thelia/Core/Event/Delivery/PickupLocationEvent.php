@@ -19,8 +19,8 @@ use Thelia\Model\PickupLocation;
 use Thelia\Model\State;
 
 /**
- * Class PickupLocationEvent
- * @package Thelia\Core\Event\Delivery
+ * Class PickupLocationEvent.
+ *
  * @author Damien Foulhoux <dfoulhoux@openstudio.com>
  */
 class PickupLocationEvent extends ActionEvent
@@ -46,15 +46,15 @@ class PickupLocationEvent extends ActionEvent
      */
     protected $country;
     /**
-     * @var integer|null
+     * @var int|null
      */
     protected $radius;
     /**
-     * @var integer|null
+     * @var int|null
      */
     protected $maxRelays;
     /**
-     * @var integer|null
+     * @var int|null
      */
     protected $orderWeight;
     /**
@@ -69,12 +69,13 @@ class PickupLocationEvent extends ActionEvent
     /**
      * PickupLocationEvent constructor.
      *
-     * @param integer|null $radius
-     * @param integer|null $maxRelays
+     * @param int|null    $radius
+     * @param int|null    $maxRelays
      * @param string|null $address
      * @param string|null $city
      * @param string|null $zipCode
-     * @param integer|null $orderWeight
+     * @param int|null    $orderWeight
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function __construct(
@@ -108,7 +109,7 @@ class PickupLocationEvent extends ActionEvent
         }
 
         if ($this->address === null && $this->city === null && $this->zipCode === null) {
-            throw new \Exception("Not enough informations to retrieve pickup locations");
+            throw new \Exception('Not enough informations to retrieve pickup locations');
         }
     }
 
@@ -232,11 +233,13 @@ class PickupLocationEvent extends ActionEvent
 
     /**
      * @param $locations PickupLocation[]
+     *
      * @return PickupLocationEvent
      */
     public function setLocations($locations)
     {
         $this->locations = $locations;
+
         return $this;
     }
 
@@ -246,11 +249,12 @@ class PickupLocationEvent extends ActionEvent
     public function appendLocation($location)
     {
         $this->locations[] = $location;
+
         return $this;
     }
 
     /**
-     * @return integer|null
+     * @return int|null
      */
     public function getOrderWeight()
     {
@@ -258,7 +262,8 @@ class PickupLocationEvent extends ActionEvent
     }
 
     /**
-     * @param integer|null $orderWeight
+     * @param int|null $orderWeight
+     *
      * @return PickupLocationEvent
      */
     public function setOrderWeight($orderWeight)
@@ -278,6 +283,7 @@ class PickupLocationEvent extends ActionEvent
 
     /**
      * @param int|null $maxRelays
+     *
      * @return PickupLocationEvent
      */
     public function setMaxRelays($maxRelays)

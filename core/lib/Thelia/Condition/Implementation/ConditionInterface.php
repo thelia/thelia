@@ -18,30 +18,28 @@ use Thelia\Exception\InvalidConditionOperatorException;
 use Thelia\Exception\InvalidConditionValueException;
 
 /**
- * Manage how the application checks its state in order to check if it matches the implemented condition
+ * Manage how the application checks its state in order to check if it matches the implemented condition.
  *
- * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 interface ConditionInterface
 {
     /**
-     * Constructor
+     * Constructor.
      *
      * @param FacadeInterface $adapter Service adapter
      */
     public function __construct(FacadeInterface $adapter);
 
     /**
-     * Get Condition Service id
+     * Get Condition Service id.
      *
      * @return string
      */
     public function getServiceId();
 
     /**
-     * Check validators relevancy and store them
+     * Check validators relevancy and store them.
      *
      * @param array $operators an array of operators (greater than, less than, etc.) entered in the condition parameter input form, one for each condition defined by the Condition
      * @param array $values    an array of values entered in in the condition parameter input form, one for each condition defined by the Condition
@@ -54,14 +52,14 @@ interface ConditionInterface
     public function setValidatorsFromForm(array $operators, array $values);
 
     /**
-     * Test if the current application state matches conditions
+     * Test if the current application state matches conditions.
      *
      * @return bool
      */
     public function isMatching();
 
     /**
-     * Get I18n name
+     * Get I18n name.
      *
      * @return string
      */
@@ -69,7 +67,7 @@ interface ConditionInterface
 
     /**
      * Get I18n tooltip
-     * Explain in detail what the Condition checks
+     * Explain in detail what the Condition checks.
      *
      * @return string
      */
@@ -77,21 +75,21 @@ interface ConditionInterface
 
     /**
      * Get I18n summary
-     * Explain briefly the condition with given values
+     * Explain briefly the condition with given values.
      *
      * @return string
      */
     public function getSummary();
 
     /**
-     * Return all validators
+     * Return all validators.
      *
      * @return array
      */
     public function getValidators();
 
     /**
-     * Return a serializable Condition
+     * Return a serializable Condition.
      *
      * @return SerializableCondition
      */
@@ -99,7 +97,7 @@ interface ConditionInterface
 
     /**
      * Draw the input displayed in the BackOffice
-     * allowing Admin to set its Coupon Conditions
+     * allowing Admin to set its Coupon Conditions.
      *
      * @return string HTML string
      */

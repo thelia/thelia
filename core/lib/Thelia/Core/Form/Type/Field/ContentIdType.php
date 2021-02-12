@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\ContentQuery;
 
 /**
- * Class ContentIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class ContentIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ContentIdType extends AbstractIdType

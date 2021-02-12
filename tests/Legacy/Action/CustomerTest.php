@@ -23,8 +23,8 @@ use Thelia\Mailer\MailerFactory;
 use Thelia\Model\CustomerQuery;
 
 /**
- * Class CustomerTest
- * @package Thelia\Tests\Action\ImageTest
+ * Class CustomerTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CustomerTest extends BaseAction
@@ -68,17 +68,17 @@ class CustomerTest extends BaseAction
     {
         $customerCreateEvent = new CustomerCreateOrUpdateEvent(
             1,
-            "thelia",
-            "thelia",
-            "street address 1",
-            "street address 2",
-            "street address 3",
-            "0102030405",
-            "0607080910",
-            "63000",
-            "clermont-ferrand",
+            'thelia',
+            'thelia',
+            'street address 1',
+            'street address 2',
+            'street address 3',
+            '0102030405',
+            '0607080910',
+            '63000',
+            'clermont-ferrand',
             64,
-            sprintf("%s@thelia.fr", uniqid()),
+            sprintf('%s@thelia.fr', uniqid()),
             uniqid(),
             1,
             0,
@@ -128,17 +128,17 @@ class CustomerTest extends BaseAction
     {
         $customerCreateEvent = new CustomerCreateOrUpdateEvent(
             1,
-            "thelia",
-            "thelia",
-            "street address 1",
-            "street address 2",
-            "street address 3",
-            "0102030405",
-            "0607080910",
-            "63000",
-            "clermont-ferrand",
+            'thelia',
+            'thelia',
+            'street address 1',
+            'street address 2',
+            'street address 3',
+            '0102030405',
+            '0607080910',
+            '63000',
+            'clermont-ferrand',
             64,
-            sprintf("%s@thelia.fr", uniqid()),
+            sprintf('%s@thelia.fr', uniqid()),
             uniqid(),
             1,
             0,

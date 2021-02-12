@@ -10,7 +10,6 @@
  * file that was distributed with this source code.
  */
 
-use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ProductAssociatedContent;
 
 if (php_sapi_name() != 'cli') {
@@ -30,7 +29,7 @@ foreach ($argv as $arg) {
     }
 
     if ($bootstrapToggle) {
-        require __DIR__ . DIRECTORY_SEPARATOR . $arg;
+        require __DIR__.DIRECTORY_SEPARATOR.$arg;
 
         $bootstraped = true;
     }
@@ -39,22 +38,22 @@ foreach ($argv as $arg) {
 if (!$bootstraped) {
     if (isset($bootstrapFile)) {
         require $bootstrapFile;
-    } elseif (is_file($file = __DIR__ . '/../vendor/autoload.php')) {
+    } elseif (is_file($file = __DIR__.'/../vendor/autoload.php')) {
         require $file;
-    } elseif (is_file($file = __DIR__ . '/../../bootstrap.php')) {
+    } elseif (is_file($file = __DIR__.'/../../bootstrap.php')) {
         // Here we are on a thelia/thelia-project
         require $file;
     } else {
-        echo "No autoload file found. Please use the -b argument to include yours";
+        echo 'No autoload file found. Please use the -b argument to include yours';
         exit(1);
     }
 }
 
-$thelia = new Thelia\Core\Thelia("dev", true);
+$thelia = new Thelia\Core\Thelia('dev', true);
 $thelia->boot();
 
 // Load the translator
-$thelia->getContainer()->get("thelia.translator");
+$thelia->getContainer()->get('thelia.translator');
 
 $faker = Faker\Factory::create();
 // Intialize URL management
@@ -65,10 +64,10 @@ $con = \Propel\Runtime\Propel::getConnection(
 $con->beginTransaction();
 
 try {
-    $stmt = $con->prepare("SET foreign_key_checks = 0");
+    $stmt = $con->prepare('SET foreign_key_checks = 0');
     $stmt->execute();
     clearTables($con);
-    $stmt = $con->prepare("SET foreign_key_checks = 1");
+    $stmt = $con->prepare('SET foreign_key_checks = 1');
     $stmt->execute();
 
     $material = createMaterials($con);
@@ -117,7 +116,7 @@ try {
 
     $con->commit();
 } catch (Exception $e) {
-    echo "error : ".$e->getMessage()."\n";
+    echo 'error : '.$e->getMessage()."\n";
     $con->rollBack();
 }
 
@@ -125,11 +124,13 @@ function createProduct($faker, $categories, $brands, $contents, $template, $attr
 {
     echo "start creating products\n";
     $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/products.csv', "r")) !== FALSE) {
-        $row=0;
-        while (($data = fgetcsv($handle, 100000, ";")) !== FALSE) {
-            $row++;
-            if($row == 1) continue;
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/products.csv', 'r')) !== false) {
+        $row = 0;
+        while (($data = fgetcsv($handle, 100000, ';')) !== false) {
+            ++$row;
+            if ($row == 1) {
+                continue;
+            }
             $product = new \Thelia\Model\Product();
 
             $product
@@ -176,31 +177,35 @@ function createProduct($faker, $categories, $brands, $contents, $template, $attr
 
             foreach ($images as $image) {
                 $image = trim($image);
-                if(empty($image)) continue;
+                if (empty($image)) {
+                    continue;
+                }
                 $productImage = new \Thelia\Model\ProductImage();
                 $productImage
                     ->setProduct($product)
                     ->setFile($image)
                     ->save($con);
-                $fileSystem->copy(THELIA_SETUP_DIRECTORY . 'import/images/'.$image, THELIA_LOCAL_DIR . 'media/images/product/'.$image, true);
+                $fileSystem->copy(THELIA_SETUP_DIRECTORY.'import/images/'.$image, THELIA_LOCAL_DIR.'media/images/product/'.$image, true);
             }
 
-            $pses = explode(";", $data[12]);
+            $pses = explode(';', $data[12]);
 
             foreach ($pses as $pse) {
-                if(empty($pse)) continue;
+                if (empty($pse)) {
+                    continue;
+                }
                 $stock = new \Thelia\Model\ProductSaleElements();
                 $stock->setProduct($product);
-                $stock->setRef($product->getId() . '_' . uniqid('', true));
-                $stock->setQuantity($faker->numberBetween(1,50));
+                $stock->setRef($product->getId().'_'.uniqid('', true));
+                $stock->setQuantity($faker->numberBetween(1, 50));
                 if (!empty($data[9])) {
                     $stock->setPromo(1);
                 } else {
                     $stock->setPromo(0);
                 }
 
-                $stock->setNewness($faker->numberBetween(0,1));
-                $stock->setWeight($faker->randomFloat(2, 1,30));
+                $stock->setNewness($faker->numberBetween(0, 1));
+                $stock->setWeight($faker->randomFloat(2, 1, 30));
                 $stock->save($con);
 
                 $productPrice = new \Thelia\Model\ProductPrice();
@@ -227,10 +232,10 @@ function createProduct($faker, $categories, $brands, $contents, $template, $attr
             $productSaleElements->setIsDefault(1)->save($con);
 
             // associated content
-            $associatedContents = explode(";", $data[14]);
+            $associatedContents = explode(';', $data[14]);
             foreach ($associatedContents as $associatedContent) {
                 $content = new ProductAssociatedContent();
-                if ( ! array_key_exists($associatedContent, $contents)){
+                if (!array_key_exists($associatedContent, $contents)) {
                     continue;
                 }
 
@@ -242,7 +247,7 @@ function createProduct($faker, $categories, $brands, $contents, $template, $attr
             }
 
             // feature
-            $features = explode(";", $data[13]);
+            $features = explode(';', $data[13]);
 
             foreach ($features as $aFeature) {
                 $featurAv = \Thelia\Model\FeatureAvI18nQuery::create()
@@ -262,44 +267,46 @@ function createProduct($faker, $categories, $brands, $contents, $template, $attr
     echo "end creating products\n";
 }
 
-function createConfig($faker, $folders, $contents, $con){
+function createConfig($faker, $folders, $contents, $con)
+{
     // Store
-    \Thelia\Model\ConfigQuery::write("store_name", "Thelia");
-    \Thelia\Model\ConfigQuery::write("store_description", "E-commerce solution based on Symfony");
-    \Thelia\Model\ConfigQuery::write("store_email", "Thelia");
-    \Thelia\Model\ConfigQuery::write("store_address1", "5 rue Rochon");
-    \Thelia\Model\ConfigQuery::write("store_city", "Clermont-Ferrrand");
-    \Thelia\Model\ConfigQuery::write("store_phone", "+(33)444053102");
-    \Thelia\Model\ConfigQuery::write("store_email", "contact@thelia.net");
+    \Thelia\Model\ConfigQuery::write('store_name', 'Thelia');
+    \Thelia\Model\ConfigQuery::write('store_description', 'E-commerce solution based on Symfony 5');
+    \Thelia\Model\ConfigQuery::write('store_email', 'Thelia');
+    \Thelia\Model\ConfigQuery::write('store_address1', '5 rue Rochon');
+    \Thelia\Model\ConfigQuery::write('store_city', 'Clermont-Ferrrand');
+    \Thelia\Model\ConfigQuery::write('store_phone', '+(33)444053102');
+    \Thelia\Model\ConfigQuery::write('store_email', 'contact@thelia.net');
     // Contents
-    \Thelia\Model\ConfigQuery::write("information_folder_id", $folders['Information']->getId());
-    \Thelia\Model\ConfigQuery::write("terms_conditions_content_id", $contents["Terms and Conditions"]->getId());
+    \Thelia\Model\ConfigQuery::write('information_folder_id', $folders['Information']->getId());
+    \Thelia\Model\ConfigQuery::write('terms_conditions_content_id', $contents['Terms and Conditions']->getId());
 }
 
-function createCustomer($faker, $con){
+function createCustomer($faker, $con)
+{
     echo "Creating customer\n";
 
     //customer
     $customer = new Thelia\Model\Customer();
     $customer->createOrUpdate(
         1,
-        "thelia",
-        "thelia",
-        "5 rue rochon",
-        "",
-        "",
-        "0102030405",
-        "0601020304",
-        "63000",
-        "Clermont-Ferrand",
+        'thelia',
+        'thelia',
+        '5 rue rochon',
+        '',
+        '',
+        '0102030405',
+        '0601020304',
+        '63000',
+        'Clermont-Ferrand',
         64,
-        "test@thelia.net",
-        "thelia"
+        'test@thelia.net',
+        'thelia'
     );
-    for ($j = 0; $j <= 2; $j++) {
+    for ($j = 0; $j <= 2; ++$j) {
         $address = new Thelia\Model\Address();
         $address->setLabel($faker->text(20))
-            ->setTitleId(rand(1,3))
+            ->setTitleId(rand(1, 3))
             ->setFirstname($faker->firstname)
             ->setLastname($faker->lastname)
             ->setAddress1($faker->streetAddress)
@@ -325,8 +332,8 @@ function createMaterials($con)
     $feature = null;
     $features = [];
 
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/materials.csv', "r")) !== FALSE) {
-        $row=0;
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/materials.csv', 'r')) !== false) {
+        $row = 0;
         $feature = new \Thelia\Model\Feature();
         $feature
             ->setPosition(1)
@@ -335,8 +342,8 @@ function createMaterials($con)
             ->setLocale('en_US')
                 ->setTitle('Material');
 
-        while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
-            $row++;
+        while (($data = fgetcsv($handle, 1000, ';')) !== false) {
+            ++$row;
             $featureAv = new \Thelia\Model\FeatureAv();
             $featureAv
                 ->setPosition($row)
@@ -365,16 +372,18 @@ function createBrands($faker, $con)
     $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
 
     $brands = [];
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/brand.csv', "r")) !== FALSE) {
-        $row=0;
-        while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
-            $row++;
-            if ($row == 1) continue;
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/brand.csv', 'r')) !== false) {
+        $row = 0;
+        while (($data = fgetcsv($handle, 1000, ';')) !== false) {
+            ++$row;
+            if ($row == 1) {
+                continue;
+            }
             $brand = new \Thelia\Model\Brand();
 
             $brand
                 ->setVisible(1)
-                ->setPosition($row-1)
+                ->setPosition($row - 1)
                 ->setLocale('fr_FR')
                     ->setTitle(trim($data[0]))
                     ->setChapo($faker->text(20))
@@ -391,7 +400,9 @@ function createBrands($faker, $con)
             $logoId = null;
             foreach ($images as $image) {
                 $image = trim($image);
-                if(empty($image)) continue;
+                if (empty($image)) {
+                    continue;
+                }
                 $brandImage = new \Thelia\Model\BrandImage();
                 $brandImage
                     ->setBrandId($brand->getId())
@@ -400,10 +411,10 @@ function createBrands($faker, $con)
                 if ($logoId === null) {
                     $logoId = $brandImage->getId();
                 }
-                $fileSystem->copy(THELIA_SETUP_DIRECTORY . 'import/images/'.$image, THELIA_LOCAL_DIR . 'media/images/brand/'.$image, true);
+                $fileSystem->copy(THELIA_SETUP_DIRECTORY.'import/images/'.$image, THELIA_LOCAL_DIR.'media/images/brand/'.$image, true);
             }
 
-            if ($logoId !== null){
+            if ($logoId !== null) {
                 $brand->setLogoImageId($logoId);
                 $brand->save($con);
             }
@@ -422,16 +433,18 @@ function createCategories($faker, $templateId, $con)
     $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
 
     $categories = [];
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/categories.csv', "r")) !== FALSE) {
-        $row=0;
-        while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
-            $row++;
-            if($row==1) continue;
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/categories.csv', 'r')) !== false) {
+        $row = 0;
+        while (($data = fgetcsv($handle, 1000, ';')) !== false) {
+            ++$row;
+            if ($row == 1) {
+                continue;
+            }
             $category = new \Thelia\Model\Category();
             $category
                 ->setDefaultTemplateId($templateId)
                 ->setVisible(1)
-                ->setPosition($row-1)
+                ->setPosition($row - 1)
                 ->setParent(0)
                 ->setLocale('fr_FR')
                     ->setTitle(trim($data[0]))
@@ -469,22 +482,24 @@ function createSales($faker, $con)
 {
     echo "start creating sales\n";
     $sales = [];
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/sales.csv', "r")) !== FALSE) {
-        $row=0;
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/sales.csv', 'r')) !== false) {
+        $row = 0;
         $start = new \DateTime();
         $end = new \DateTime();
         $currencies = \Thelia\Model\CurrencyQuery::create()->find();
 
         $products = \Thelia\Model\ProductQuery::create()->find();
 
-        while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
-            $row++;
-            if($row==1) continue;
+        while (($data = fgetcsv($handle, 1000, ';')) !== false) {
+            ++$row;
+            if ($row == 1) {
+                continue;
+            }
             $sale = new \Thelia\Model\Sale();
             $sale
                 ->setActive(0)
-                ->setStartDate($start->setTimestamp(strtotime("today - 1 month")))
-                ->setEndDate($end->setTimestamp(strtotime("today + 1 month")))
+                ->setStartDate($start->setTimestamp(strtotime('today - 1 month')))
+                ->setEndDate($end->setTimestamp(strtotime('today + 1 month')))
                 ->setPriceOffsetType($data[2])
                 ->setDisplayInitialPrice(true)
                 ->setLocale('fr_FR')
@@ -497,7 +512,7 @@ function createSales($faker, $con)
                 ->setDescription($faker->text(100))
                 ->save($con);
 
-            foreach($currencies as $currency) {
+            foreach ($currencies as $currency) {
                 $saleOffset = new \Thelia\Model\SaleOffsetCurrency();
 
                 $saleOffset
@@ -510,7 +525,9 @@ function createSales($faker, $con)
 
             $count = 5;
             foreach ($products as $product) {
-                if ( --$count < 0) break;
+                if (--$count < 0) {
+                    break;
+                }
                 $saleProduct = new \Thelia\Model\SaleProduct();
 
                 $saleProduct
@@ -518,7 +535,6 @@ function createSales($faker, $con)
                     ->setProductId($product->getId())
                     ->setAttributeAvId(null)
                     ->save();
-                ;
             }
 
             $sales[trim($data[1])] = $sale;
@@ -537,16 +553,18 @@ function createFolders($faker, $con)
     $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
 
     $folders = [];
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/folders.csv', "r")) !== FALSE) {
-        $row=0;
-        while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
-            $row++;
-            if ($row == 1) continue;
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/folders.csv', 'r')) !== false) {
+        $row = 0;
+        while (($data = fgetcsv($handle, 1000, ';')) !== false) {
+            ++$row;
+            if ($row == 1) {
+                continue;
+            }
             $folder = new \Thelia\Model\Folder();
 
             $folder
                 ->setVisible(1)
-                ->setPosition($row-1)
+                ->setPosition($row - 1)
                 ->setLocale('fr_FR')
                     ->setTitle(trim($data[0]))
                     ->setChapo($faker->text(20))
@@ -562,13 +580,15 @@ function createFolders($faker, $con)
             $images = explode(';', $data[6]);
             foreach ($images as $image) {
                 $image = trim($image);
-                if(empty($image)) continue;
+                if (empty($image)) {
+                    continue;
+                }
                 $folderImage = new \Thelia\Model\FolderImage();
                 $folderImage
                     ->setFolderId($folder->getId())
                     ->setFile($image)
                     ->save($con);
-                $fileSystem->copy(THELIA_SETUP_DIRECTORY . 'import/images/'.$image, THELIA_LOCAL_DIR . 'media/images/folder/'.$image, true);
+                $fileSystem->copy(THELIA_SETUP_DIRECTORY.'import/images/'.$image, THELIA_LOCAL_DIR.'media/images/folder/'.$image, true);
             }
         }
         fclose($handle);
@@ -585,16 +605,18 @@ function createContents($faker, $folders, $con)
     $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
 
     $contents = [];
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/contents.csv', "r")) !== FALSE) {
-        $row=0;
-        while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
-            $row++;
-            if ($row == 1) continue;
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/contents.csv', 'r')) !== false) {
+        $row = 0;
+        while (($data = fgetcsv($handle, 1000, ';')) !== false) {
+            ++$row;
+            if ($row == 1) {
+                continue;
+            }
             $content = new \Thelia\Model\Content();
 
             $content
                 ->setVisible(1)
-                ->setPosition($row-1)
+                ->setPosition($row - 1)
                 ->setLocale('fr_FR')
                     ->setTitle(trim($data[0]))
                     ->setChapo($faker->text(20))
@@ -629,13 +651,15 @@ function createContents($faker, $folders, $con)
             $images = explode(';', $data[6]);
             foreach ($images as $image) {
                 $image = trim($image);
-                if(empty($image)) continue;
+                if (empty($image)) {
+                    continue;
+                }
                 $contentImage = new \Thelia\Model\ContentImage();
                 $contentImage
                     ->setContentId($content->getId())
                     ->setFile($image)
                     ->save($con);
-                $fileSystem->copy(THELIA_SETUP_DIRECTORY . 'import/images/'.$image, THELIA_LOCAL_DIR . 'media/images/content/'.$image, true);
+                $fileSystem->copy(THELIA_SETUP_DIRECTORY.'import/images/'.$image, THELIA_LOCAL_DIR.'media/images/content/'.$image, true);
             }
 
             $contents[trim($data[1])] = $content;
@@ -650,8 +674,8 @@ function createContents($faker, $folders, $con)
 function createColors($con)
 {
     echo "start creating colors attributes\n";
-    if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/colors.csv', "r")) !== FALSE) {
-        $row=0;
+    if (($handle = fopen(THELIA_SETUP_DIRECTORY.'import/colors.csv', 'r')) !== false) {
+        $row = 0;
         $attribute = new \Thelia\Model\Attribute();
         $attribute
             ->setPosition(1)
@@ -660,8 +684,8 @@ function createColors($con)
             ->setLocale('en_US')
                 ->setTitle('Colors');
 
-        while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
-            $row++;
+        while (($data = fgetcsv($handle, 1000, ';')) !== false) {
+            ++$row;
             $attributeAv = new \Thelia\Model\AttributeAv();
             $attributeAv
                 ->setPosition($row)

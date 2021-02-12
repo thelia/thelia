@@ -17,9 +17,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TypeException;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class ModelValidIdType extends BaseType
 {
@@ -27,13 +25,14 @@ class ModelValidIdType extends BaseType
 
     /**
      * @param $expectedModelActiveRecord
+     *
      * @throws TypeException
      */
     public function __construct($expectedModelActiveRecord)
     {
-        $class = '\\Thelia\\Model\\' . $expectedModelActiveRecord . 'Query';
+        $class = '\\Thelia\\Model\\'.$expectedModelActiveRecord.'Query';
 
-        if (!(class_exists($class) || !new $class instanceof ModelCriteria)) {
+        if (!(class_exists($class) || !new $class() instanceof ModelCriteria)) {
             throw new TypeException('MODEL NOT FOUND', TypeException::MODEL_NOT_FOUND);
         }
 
@@ -70,7 +69,7 @@ class ModelValidIdType extends BaseType
 
         $query = $queryClass::create();
 
-        if (method_exists($query, "joinWithI18n")) {
+        if (method_exists($query, 'joinWithI18n')) {
             if (null !== $locale = Translator::getInstance()->getLocale()) {
                 $query->joinWithI18n($locale);
             }
@@ -78,12 +77,12 @@ class ModelValidIdType extends BaseType
 
         $choices = [];
         foreach ($query->find() as $item) {
-            $label = method_exists($item, "getTitle") ? $item->getTitle() : $item->getId();
+            $label = method_exists($item, 'getTitle') ? $item->getTitle() : $item->getId();
             $choices[$label] = $item->getId();
         }
 
         return [
-            "choices" => $choices,
+            'choices' => $choices,
         ];
     }
 }

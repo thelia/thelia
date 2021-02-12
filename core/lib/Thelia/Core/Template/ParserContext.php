@@ -42,7 +42,7 @@ class ParserContext implements \IteratorAggregate
     /** @var TheliaFormValidatorInterface */
     private $formValidator;
 
-    /** @var  RequestStack */
+    /** @var RequestStack */
     private $requestStack;
 
     public function __construct(
@@ -62,7 +62,7 @@ class ParserContext implements \IteratorAggregate
     }
 
     /**
-     * Set the current form
+     * Set the current form.
      *
      * @return $this
      */
@@ -76,7 +76,8 @@ class ParserContext implements \IteratorAggregate
     /**
      * Set the current form.
      *
-     * @param null|BaseForm $default
+     * @param BaseForm|null $default
+     *
      * @return BaseForm|null
      */
     public function popCurrentForm($default = null)
@@ -96,7 +97,7 @@ class ParserContext implements \IteratorAggregate
 
         if (false === $form) {
             throw new SmartyPluginException(
-                "There is currently no defined form"
+                'There is currently no defined form'
             );
         }
 
@@ -106,7 +107,7 @@ class ParserContext implements \IteratorAggregate
     // -- Error form -----------------------------------------------------------
 
     /**
-     * Remove all objects in data, because they are probably not serializable
+     * Remove all objects in data, because they are probably not serializable.
      *
      * @return array
      */
@@ -124,9 +125,10 @@ class ParserContext implements \IteratorAggregate
     }
 
     /**
-     * Add a new form to the error form context
+     * Add a new form to the error form context.
      *
      * @param BaseForm $form the errored form
+     *
      * @return $this
      */
     public function addForm(BaseForm $form)
@@ -149,23 +151,23 @@ class ParserContext implements \IteratorAggregate
                         'message' => $error->getMessage(),
                         'template' => $error->getMessageTemplate(),
                         'parameters' => $error->getMessageParameters(),
-                        'pluralization' => $error->getMessagePluralization()
+                        'pluralization' => $error->getMessagePluralization(),
                     ];
                 }
             }
         }
 
-        $this->set(\get_class($form) . ":" . $form->getType(), $form);
+        $this->set(\get_class($form).':'.$form->getType(), $form);
 
         // Set form error information
-        $formErrorInformation[\get_class($form) . ":" . $form->getType()] = [
-            'data'              => $this->cleanFormData($form->getForm()->getData()),
-            'hasError'          => $form->hasError(),
-            'errorMessage'      => $form->getErrorMessage(),
-            'method'            => $this->requestStack->getCurrentRequest()->getMethod(),
-            'timestamp'         => time(),
+        $formErrorInformation[\get_class($form).':'.$form->getType()] = [
+            'data' => $this->cleanFormData($form->getForm()->getData()),
+            'hasError' => $form->hasError(),
+            'errorMessage' => $form->getErrorMessage(),
+            'method' => $this->requestStack->getCurrentRequest()->getMethod(),
+            'timestamp' => time(),
             'validation_groups' => $form->getForm()->getConfig()->getOption('validation_groups'),
-            'field_errors'      => $formFieldErrors
+            'field_errors' => $formFieldErrors,
         ];
 
         $this->getSession()->setFormErrorInformation($formErrorInformation);
@@ -176,21 +178,22 @@ class ParserContext implements \IteratorAggregate
     /**
      * Check if the specified form has errors, and return an instance of this form if it's the case.
      *
-     * @param string $formId the form ID, as defined in the container
+     * @param string $formId    the form ID, as defined in the container
      * @param string $formClass the form full qualified class name
-     * @param string $formType the form type, something like 'form'
-     * @return null|BaseForm null if no error information is available
+     * @param string $formType  the form type, something like 'form'
+     *
+     * @return BaseForm|null null if no error information is available
      */
     public function getForm($formId, $formClass, $formType)
     {
-        if (isset($this->store[$formClass . ":" . $formType]) && $this->store[$formClass . ":" . $formType] instanceof BaseForm) {
-            return $this->store[$formClass . ":" . $formType];
+        if (isset($this->store[$formClass.':'.$formType]) && $this->store[$formClass.':'.$formType] instanceof BaseForm) {
+            return $this->store[$formClass.':'.$formType];
         }
 
         $formErrorInformation = $this->getSession()->getFormErrorInformation();
 
-        if (isset($formErrorInformation[$formClass.":".$formType])) {
-            $formInfo = $formErrorInformation[$formClass.":".$formType];
+        if (isset($formErrorInformation[$formClass.':'.$formType])) {
+            $formInfo = $formErrorInformation[$formClass.':'.$formType];
 
             if (\is_array($formInfo['data'])) {
                 $form = $this->formFactory->createForm(
@@ -198,7 +201,7 @@ class ParserContext implements \IteratorAggregate
                     $formType,
                     $formInfo['data'],
                     [
-                        'validation_groups' => $formInfo['validation_groups']
+                        'validation_groups' => $formInfo['validation_groups'],
                     ]
                 );
 
@@ -219,7 +222,7 @@ class ParserContext implements \IteratorAggregate
                         /** @var Form $field */
                         $field = $form->getForm()->get($fieldName);
 
-                        if (null !==  $field && \count($field->getErrors()) == 0) {
+                        if (null !== $field && \count($field->getErrors()) == 0) {
                             foreach ($errors as $errorData) {
                                 $error = new FormError(
                                     $errorData['message'],
@@ -237,7 +240,7 @@ class ParserContext implements \IteratorAggregate
                 $form->setError($formInfo['hasError']);
 
                 // Check if error message is empty, as BaseForm::setErrorMessage() always set form error flag to true.
-                if (! empty($formInfo['errorMessage'])) {
+                if (!empty($formInfo['errorMessage'])) {
                     $form->setErrorMessage($formInfo['errorMessage']);
                 }
 
@@ -257,7 +260,7 @@ class ParserContext implements \IteratorAggregate
     {
         $formErrorInformation = $this->getSession()->getFormErrorInformation();
 
-        $formClass = \get_class($form) . ':' . $form->getType();
+        $formClass = \get_class($form).':'.$form->getType();
 
         if (isset($formErrorInformation[$formClass])) {
             unset($formErrorInformation[$formClass]);
@@ -274,7 +277,7 @@ class ParserContext implements \IteratorAggregate
     {
         $formErrorInformation = $this->getSession()->getFormErrorInformation();
 
-        if (! empty($formErrorInformation)) {
+        if (!empty($formErrorInformation)) {
             $now = time();
 
             // Cleanup obsolete form information, and try to find the form data

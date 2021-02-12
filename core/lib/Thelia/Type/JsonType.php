@@ -13,11 +13,8 @@
 namespace Thelia\Type;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
-
 class JsonType extends BaseType
 {
     public function getType()
@@ -29,7 +26,7 @@ class JsonType extends BaseType
     {
         json_decode($value, true);
 
-        return (json_last_error() == JSON_ERROR_NONE);
+        return json_last_error() == JSON_ERROR_NONE;
     }
 
     public function getFormattedValue($value)

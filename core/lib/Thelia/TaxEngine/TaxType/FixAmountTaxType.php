@@ -18,9 +18,7 @@ use Thelia\TaxEngine\TaxTypeRequirementDefinition;
 use Thelia\Type\FloatType;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class FixAmountTaxType extends BaseTaxType
 {
@@ -33,7 +31,7 @@ class FixAmountTaxType extends BaseTaxType
 
     public function fixAmountRetriever(\Thelia\Model\Product $product)
     {
-        return $this->getRequirement("amount");
+        return $this->getRequirement('amount');
     }
 
     public function getRequirementsDefinition()
@@ -42,13 +40,13 @@ class FixAmountTaxType extends BaseTaxType
             new TaxTypeRequirementDefinition(
                 'amount',
                 new FloatType(),
-                Translator::getInstance()->trans("Amount")
-            )
+                Translator::getInstance()->trans('Amount')
+            ),
         ];
     }
 
     public function getTitle()
     {
-        return Translator::getInstance()->trans("Constant amount");
+        return Translator::getInstance()->trans('Constant amount');
     }
 }

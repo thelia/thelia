@@ -27,11 +27,11 @@ class CategoryCreationForm extends BaseForm
                 'title',
                 TextType::class,
                 [
-                    'constraints' => [ new NotBlank() ],
+                    'constraints' => [new NotBlank()],
                     'label' => $this->translator->trans('Category title'),
                     'label_attr' => [
-                        'help' => $titleHelpText
-                    ]
+                        'help' => $titleHelpText,
+                    ],
                 ]
             )
             ->add(
@@ -39,17 +39,17 @@ class CategoryCreationForm extends BaseForm
                 IntegerType::class,
                 [
                     'label' => $this->translator->trans('Parent category'),
-                    'constraints' => [ new NotBlank() ],
+                    'constraints' => [new NotBlank()],
                     'label_attr' => [
                         'help' => $this->translator->trans('Select the parent category of this category.'),
-                    ]
+                    ],
                 ]
             )
             ->add(
                 'locale',
                 HiddenType::class,
                 [
-                    'constraints' =>  [ new NotBlank() ],
+                    'constraints' => [new NotBlank()],
                 ]
             )
             ->add(
@@ -57,7 +57,7 @@ class CategoryCreationForm extends BaseForm
                 IntegerType::class, // Should be checkbox, but this is not API compatible, see #1199
                 [
                     'required' => false,
-                    'label' => $this->translator->trans('This category is online')
+                    'label' => $this->translator->trans('This category is online'),
                 ]
             )
         ;
@@ -68,13 +68,13 @@ class CategoryCreationForm extends BaseForm
         $this->doBuilForm(
             $this->translator->trans(
                 'Enter here the category title in the default language (%title%)',
-                [ '%title%' => Lang::getDefaultLanguage()->getTitle()]
+                ['%title%' => Lang::getDefaultLanguage()->getTitle()]
             )
         );
     }
 
     public static function getName()
     {
-        return "thelia_category_creation";
+        return 'thelia_category_creation';
     }
 }

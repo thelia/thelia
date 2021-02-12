@@ -28,18 +28,18 @@ use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- * AttributeAvailability loop
- *
+ * AttributeAvailability loop.
  *
  * Class AttributeAvailability
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[] getAttribute()
- * @method int getProduct()
- * @method int[] getExclude()
+ *
+ * @method int[]    getId()
+ * @method int[]    getAttribute()
+ * @method int      getProduct()
+ * @method int[]    getExclude()
  * @method string[] getOrder()
  */
 class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -116,11 +116,11 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
                 ->leftJoinAttributeCombination('attribute_combination')
                 ->groupById()
                 ->addJoinObject($pseJoin)
-                ->where(ProductSaleElementsTableMap::COL_PRODUCT_ID."=?", $product, \PDO::PARAM_INT)
+                ->where(ProductSaleElementsTableMap::COL_PRODUCT_ID.'=?', $product, \PDO::PARAM_INT)
             ;
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
@@ -130,16 +130,16 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
                 case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha_reverse":
+                case 'alpha_reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "manual":
+                case 'manual':
                     $search->orderByPosition(Criteria::ASC);
                     break;
-                case "manual_reverse":
+                case 'manual_reverse':
                     $search->orderByPosition(Criteria::DESC);
                     break;
             }
@@ -154,15 +154,15 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
         foreach ($loopResult->getResultDataCollection() as $attributeAv) {
             $loopResultRow = new LoopResultRow($attributeAv);
             $loopResultRow
-                ->set("ID", $attributeAv->getId())
-                ->set("ATTRIBUTE_ID", $attributeAv->getAttributeId())
-                ->set("IS_TRANSLATED", $attributeAv->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("TITLE", $attributeAv->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $attributeAv->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $attributeAv->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $attributeAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("POSITION", $attributeAv->getPosition())
+                ->set('ID', $attributeAv->getId())
+                ->set('ATTRIBUTE_ID', $attributeAv->getAttributeId())
+                ->set('IS_TRANSLATED', $attributeAv->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('TITLE', $attributeAv->getVirtualColumn('i18n_TITLE'))
+                ->set('CHAPO', $attributeAv->getVirtualColumn('i18n_CHAPO'))
+                ->set('DESCRIPTION', $attributeAv->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $attributeAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set('POSITION', $attributeAv->getPosition())
             ;
             $this->addOutputFields($loopResultRow, $attributeAv);
 

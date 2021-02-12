@@ -17,56 +17,57 @@ use Thelia\Form\BaseForm;
 use Thelia\Model\ConfigQuery;
 
 /**
- * Class Configuration
- * @package HookSocial\Form
+ * Class Configuration.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class Configuration extends BaseForm {
+class Configuration extends BaseForm
+{
     protected function buildForm()
     {
         $form = $this->formBuilder;
 
         $definitions = [
             [
-                "id" => "twitter",
-                "label" => Translator::getInstance()->trans("Twitter username", [], 'hooksocial')
+                'id' => 'twitter',
+                'label' => Translator::getInstance()->trans('Twitter username', [], 'hooksocial'),
             ],
             [
-                "id" => "facebook",
-                "label" => Translator::getInstance()->trans("Facebook username", [], 'hooksocial')
+                'id' => 'facebook',
+                'label' => Translator::getInstance()->trans('Facebook username', [], 'hooksocial'),
             ],
             [
-                "id" => "google",
-                "label" => Translator::getInstance()->trans("Google + username", [], 'hooksocial')
+                'id' => 'google',
+                'label' => Translator::getInstance()->trans('Google + username', [], 'hooksocial'),
             ],
             [
-                "id" => "instagram",
-                "label" => Translator::getInstance()->trans("Instagram username", [], 'hooksocial')
+                'id' => 'instagram',
+                'label' => Translator::getInstance()->trans('Instagram username', [], 'hooksocial'),
             ],
             [
-                "id" => "pinterest",
-                "label" => Translator::getInstance()->trans("Pinterest username", [], 'hooksocial')
+                'id' => 'pinterest',
+                'label' => Translator::getInstance()->trans('Pinterest username', [], 'hooksocial'),
             ],
             [
-                "id" => "youtube",
-                "label" => Translator::getInstance()->trans("Youtube URL", [], 'hooksocial')
+                'id' => 'youtube',
+                'label' => Translator::getInstance()->trans('Youtube URL', [], 'hooksocial'),
             ],
             [
-                "id" => "rss",
-                "label" => Translator::getInstance()->trans("RSS URL", [], 'hooksocial')
-            ]
+                'id' => 'rss',
+                'label' => Translator::getInstance()->trans('RSS URL', [], 'hooksocial'),
+            ],
         ];
 
-        foreach ($definitions as $field){
-            $value = ConfigQuery::read("hooksocial_" . $field["id"], "");
+        foreach ($definitions as $field) {
+            $value = ConfigQuery::read('hooksocial_'.$field['id'], '');
             $form->add(
-                $field["id"],
-                "text",
+                $field['id'],
+                'text',
                 [
-                    'data'  => $value,
-                    'label' => $field["label"],
+                    'data' => $value,
+                    'label' => $field['label'],
                     'label_attr' => [
-                        'for' => $field["id"]
+                        'for' => $field['id'],
                     ],
                 ]
             );
@@ -78,6 +79,6 @@ class Configuration extends BaseForm {
      */
     public static function getName()
     {
-        return "hooksocial";
+        return 'hooksocial';
     }
 }

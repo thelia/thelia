@@ -34,21 +34,17 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     protected $updateSeoEventIdentifier;
 
     /**
-     * @param string $objectName the lower case object name. Example. "message"
-     *
-     * @param string $defaultListOrder          the default object list order, or null if list is not sortable. Example: manual
-     * @param string $orderRequestParameterName Name of the request parameter that set the list order (null if list is not sortable)
-     *
-     * @param string $resourceCode the 'resource' code. Example: "admin.configuration.message"
-     *
-     * @param string $createEventIdentifier the dispatched create TheliaEvent identifier. Example: TheliaEvents::MESSAGE_CREATE
-     * @param string $updateEventIdentifier the dispatched update TheliaEvent identifier. Example: TheliaEvents::MESSAGE_UPDATE
-     * @param string $deleteEventIdentifier the dispatched delete TheliaEvent identifier. Example: TheliaEvents::MESSAGE_DELETE
-     *
+     * @param string $objectName                      the lower case object name. Example. "message"
+     * @param string $defaultListOrder                the default object list order, or null if list is not sortable. Example: manual
+     * @param string $orderRequestParameterName       Name of the request parameter that set the list order (null if list is not sortable)
+     * @param string $resourceCode                    the 'resource' code. Example: "admin.configuration.message"
+     * @param string $createEventIdentifier           the dispatched create TheliaEvent identifier. Example: TheliaEvents::MESSAGE_CREATE
+     * @param string $updateEventIdentifier           the dispatched update TheliaEvent identifier. Example: TheliaEvents::MESSAGE_UPDATE
+     * @param string $deleteEventIdentifier           the dispatched delete TheliaEvent identifier. Example: TheliaEvents::MESSAGE_DELETE
      * @param string $visibilityToggleEventIdentifier the dispatched visibility toggle TheliaEvent identifier, or null if the object has no visible options. Example: TheliaEvents::MESSAGE_TOGGLE_VISIBILITY
      * @param string $changePositionEventIdentifier   the dispatched position change TheliaEvent identifier, or null if the object has no position. Example: TheliaEvents::MESSAGE_UPDATE_POSITION
      * @param string $updateSeoEventIdentifier        the dispatched update SEO change TheliaEvent identifier, or null if the object has no SEO. Example: TheliaEvents::MESSAGE_UPDATE_SEO
-     * @param string $moduleCode The module code for ACL
+     * @param string $moduleCode                      The module code for ACL
      */
     public function __construct(
         $objectName,
@@ -82,8 +78,9 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     /**
      * Put in this method post object update SEO processing if required.
      *
-     * @param  UpdateSeoEvent  $updateSeoEvent the update event
-     * @return null|Response a response, or null to continue normal processing
+     * @param UpdateSeoEvent $updateSeoEvent the update event
+     *
+     * @return Response|null a response, or null to continue normal processing
      */
     protected function performAdditionalUpdateSeoAction($updateSeoEvent)
     {
@@ -91,7 +88,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     }
 
     /**
-     * Return the update SEO form for this object
+     * Return the update SEO form for this object.
      */
     protected function getUpdateSeoForm()
     {
@@ -99,9 +96,10 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     }
 
     /**
-     * Creates the update SEO event with the provided form data
+     * Creates the update SEO event with the provided form data.
      *
      * @param $formData
+     *
      * @return UpdateSeoEvent
      */
     protected function getUpdateSeoEvent($formData)
@@ -121,20 +119,19 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     }
 
     /**
-     * Hydrate the SEO form for this object, before passing it to the update template
-     *
+     * Hydrate the SEO form for this object, before passing it to the update template.
      */
     protected function hydrateSeoForm(ParserContext $parserContext, $object)
     {
         // The "SEO" tab form
         $locale = $object->getLocale();
         $data = [
-            'id'               => $object->getId(),
-            'locale'           => $locale,
-            'url'              => $object->getRewrittenUrl($locale),
-            'meta_title'       => $object->getMetaTitle(),
+            'id' => $object->getId(),
+            'locale' => $locale,
+            'url' => $object->getRewrittenUrl($locale),
+            'meta_title' => $object->getMetaTitle(),
             'meta_description' => $object->getMetaDescription(),
-            'meta_keywords'     => $object->getMetaKeywords()
+            'meta_keywords' => $object->getMetaKeywords(),
         ];
 
         $seoForm = $this->createForm(AdminForm::SEO, FormType::class, $data);
@@ -153,8 +150,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         Request $request,
         ParserContext $parserContext,
         EventDispatcherInterface $eventDispatcher
-    )
-    {
+    ) {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
             return $response;
@@ -167,11 +163,11 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         $updateSeoForm = $this->getUpdateSeoForm();
 
         // Pass the object id to the request
-        $request->attributes->set($this->objectName . '_id', $request->get('current_id'));
+        $request->attributes->set($this->objectName.'_id', $request->get('current_id'));
 
         try {
             // Check the form against constraints violations
-            $form = $this->validateForm($updateSeoForm, "POST");
+            $form = $this->validateForm($updateSeoForm, 'POST');
 
             // Get the form field values
             $data = $form->getData();
@@ -195,7 +191,8 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
                 // Redirect to the success URL
                 return $this->generateSuccessRedirect($updateSeoForm);
             }
-                return $response;
+
+            return $response;
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
@@ -215,7 +212,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                Translator::getInstance()->trans("%obj SEO modification", ['%obj' => $this->objectName]),
+                Translator::getInstance()->trans('%obj SEO modification', ['%obj' => $this->objectName]),
                 $errorMessage,
                 $updateSeoForm,
                 $ex

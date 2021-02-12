@@ -20,8 +20,8 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 /**
- * Class LangController
- * @package Thelia\Controller\Admin
+ * Class LangController.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class SystemLogController extends BaseAdminController
@@ -36,14 +36,14 @@ class SystemLogController extends BaseAdminController
             $this->loadDefinedDestinations($dir, $destinations);
         }
 
-        $active_destinations = explode(";", ConfigQuery::read(Tlog::VAR_DESTINATIONS, Tlog::DEFAUT_DESTINATIONS));
+        $active_destinations = explode(';', ConfigQuery::read(Tlog::VAR_DESTINATIONS, Tlog::DEFAUT_DESTINATIONS));
 
         return $this->render(
             'system-logs',
             [
                 'ip_address' => $this->getRequest()->getClientIp(),
                 'destinations' => $destinations,
-                'active_destinations' => $active_destinations
+                'active_destinations' => $active_destinations,
             ]
         );
     }
@@ -61,8 +61,8 @@ class SystemLogController extends BaseAdminController
                 if (preg_match("/([^\.]+)\.php/", $fileInfo->getFilename(), $matches)) {
                     $classname = $matches[1];
 
-                    if (! isset($destinations[$classname])) {
-                        $full_class_name = "Thelia\\Log\\Destination\\".$classname;
+                    if (!isset($destinations[$classname])) {
+                        $full_class_name = 'Thelia\\Log\\Destination\\'.$classname;
 
                         $destinations[$classname] = new $full_class_name();
                     }
@@ -84,11 +84,11 @@ class SystemLogController extends BaseAdminController
 
         // Hydrate the general configuration form
         $systemLogForm = $this->createForm(AdminForm::SYSTEM_LOG_CONFIGURATION, FormType::class, [
-            'level'             => ConfigQuery::read(Tlog::VAR_LEVEL, Tlog::DEFAULT_LEVEL),
-            'format'            => ConfigQuery::read(Tlog::VAR_PREFIXE, Tlog::DEFAUT_PREFIXE),
+            'level' => ConfigQuery::read(Tlog::VAR_LEVEL, Tlog::DEFAULT_LEVEL),
+            'format' => ConfigQuery::read(Tlog::VAR_PREFIXE, Tlog::DEFAUT_PREFIXE),
             'show_redirections' => ConfigQuery::read(Tlog::VAR_SHOW_REDIRECT, Tlog::DEFAUT_SHOW_REDIRECT),
-            'files'             => ConfigQuery::read(Tlog::VAR_FILES, Tlog::DEFAUT_FILES),
-            'ip_addresses'      => ConfigQuery::read(Tlog::VAR_IP, Tlog::DEFAUT_IP),
+            'files' => ConfigQuery::read(Tlog::VAR_FILES, Tlog::DEFAUT_FILES),
+            'ip_addresses' => ConfigQuery::read(Tlog::VAR_IP, Tlog::DEFAUT_IP),
         ]);
 
         $this->getParserContext()->addForm($systemLogForm);
@@ -142,7 +142,7 @@ class SystemLogController extends BaseAdminController
             $this->adminLogAppend(
                 AdminResources::SYSTEM_LOG,
                 AccessManager::UPDATE,
-                "System log configuration changed"
+                'System log configuration changed'
             );
 
             $response = $this->generateRedirectFromRoute('admin.configuration.system-logs.default');
@@ -152,7 +152,7 @@ class SystemLogController extends BaseAdminController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("System log configuration failed."),
+                $this->getTranslator()->trans('System log configuration failed.'),
                 $error_msg,
                 $systemLogForm,
                 $ex

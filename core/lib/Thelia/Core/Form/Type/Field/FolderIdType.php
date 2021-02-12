@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\FolderQuery;
 
 /**
- * Class FolderIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class FolderIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class FolderIdType extends AbstractIdType

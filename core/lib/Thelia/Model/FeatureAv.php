@@ -13,8 +13,6 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\Feature\FeatureAvEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\FeatureAv as BaseFeatureAv;
 
 class FeatureAv extends BaseFeatureAv

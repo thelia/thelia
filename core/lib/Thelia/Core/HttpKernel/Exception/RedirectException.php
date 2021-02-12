@@ -13,8 +13,8 @@
 namespace Thelia\Core\HttpKernel\Exception;
 
 /**
- * Class RedirectException
- * @package Thelia\Core\HttpKernel\Exception
+ * Class RedirectException.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class RedirectException extends \RuntimeException
@@ -22,7 +22,7 @@ class RedirectException extends \RuntimeException
     private $url;
     private $statusCode;
 
-    public function __construct($url, $statusCode = 302, $message = "", $code = 0, \Exception $previous = null)
+    public function __construct($url, $statusCode = 302, $message = '', $code = 0, \Exception $previous = null)
     {
         $this->url = $url;
         $this->statusCode = $statusCode;

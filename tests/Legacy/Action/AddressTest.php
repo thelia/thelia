@@ -19,11 +19,10 @@ use Thelia\Model\AddressQuery;
 use Thelia\Model\CustomerQuery;
 
 /**
- *
- * test address eventListener
+ * test address eventListener.
  *
  * Class AddressTest
- * @package Thelia\Tests\Action
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AddressTest extends BaseAction
@@ -33,19 +32,19 @@ class AddressTest extends BaseAction
         $customer = CustomerQuery::create()->findOne();
 
         $AddressCreateOrUpdateEvent = new AddressCreateOrUpdateEvent(
-            "test address",
+            'test address',
             1,
-            "Thelia",
-            "Thelia",
-            "5 rue rochon",
-            "",
-            "",
-            "63000",
-            "clermont-ferrand",
+            'Thelia',
+            'Thelia',
+            '5 rue rochon',
+            '',
+            '',
+            '63000',
+            'clermont-ferrand',
             64,
-            "0102030405",
-            "",
-            ""
+            '0102030405',
+            '',
+            ''
         );
         $AddressCreateOrUpdateEvent->setCustomer($customer);
 
@@ -79,19 +78,19 @@ class AddressTest extends BaseAction
         $address = $customer->getAddresses()->getFirst();
 
         $addressEvent = new AddressCreateOrUpdateEvent(
-            "",
+            '',
             1,
-            "Thelia modif",
-            "Thelia modif",
-            "cour des étoiles",
-            "rue des miracles",
-            "",
-            "63000",
-            "clermont-ferrand",
+            'Thelia modif',
+            'Thelia modif',
+            'cour des étoiles',
+            'rue des miracles',
+            '',
+            '63000',
+            'clermont-ferrand',
             64,
-            "0102030405",
-            "",
-            ""
+            '0102030405',
+            '',
+            ''
         );
         $addressEvent->setAddress($address);
 
@@ -119,18 +118,18 @@ class AddressTest extends BaseAction
     }
 
     /**
-     * Bug found in Thelia 2.0.2
+     * Bug found in Thelia 2.0.2.
      */
     public function testUpdateDefaultAddress()
     {
-        /**
+        /*
          * Disable propel cache in order to get a new instance of the
          * active record in $updatedAddress
          */
         Propel::disableInstancePooling();
 
         /**
-         * Get a customer and it's default address
+         * Get a customer and it's default address.
          */
         $customer = CustomerQuery::create()->findOne();
         $defaultAddress = $customer->getDefaultAddress();
@@ -141,26 +140,26 @@ class AddressTest extends BaseAction
          * that should keep this address as the default one.
          */
         $addressEvent = new AddressCreateOrUpdateEvent(
-            "",
+            '',
             1,
-            "Thelia modif",
-            "Thelia modif",
-            "cour des étoiles",
-            "rue des miracles",
-            "",
-            "63000",
-            "clermont-ferrand",
+            'Thelia modif',
+            'Thelia modif',
+            'cour des étoiles',
+            'rue des miracles',
+            '',
+            '63000',
+            'clermont-ferrand',
             64,
-            "0102030405",
-            "",
-            "",
+            '0102030405',
+            '',
+            '',
             1
         );
 
         $addressEvent->setAddress($defaultAddress);
 
         /**
-         * Do the update
+         * Do the update.
          */
         $actionAddress = new Address();
         $actionAddress->update($addressEvent, null, $this->getMockEventDispatcher());
@@ -168,7 +167,7 @@ class AddressTest extends BaseAction
         $updatedAddress = AddressQuery::create()
             ->findPk($addressId);
 
-        /**
+        /*
          * This address should still be the default address
          */
         $this->assertEquals(
@@ -176,7 +175,7 @@ class AddressTest extends BaseAction
             $updatedAddress->getIsDefault()
         );
 
-        /**
+        /*
          * Renable it after
          */
         Propel::enableInstancePooling();

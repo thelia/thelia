@@ -16,8 +16,8 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\OrderStatus;
 
 /**
- * Class OrderStatusEvent
- * @package Thelia\Core\Event\OrderStatus
+ * Class OrderStatusEvent.
+ *
  * @author Gilles Bourgeat <gbourgeat@openstudio.fr>
  */
 class OrderStatusEvent extends ActionEvent
@@ -59,11 +59,13 @@ class OrderStatusEvent extends ActionEvent
 
     /**
      * @param int $position
+     *
      * @return OrderStatusEvent
      */
     public function setPosition($position)
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -85,11 +87,13 @@ class OrderStatusEvent extends ActionEvent
 
     /**
      * @param OrderStatus $orderStatus
+     *
      * @return OrderStatusEvent
      */
     public function setOrderStatus($orderStatus)
     {
         $this->orderStatus = $orderStatus;
+
         return $this;
     }
 
@@ -103,11 +107,13 @@ class OrderStatusEvent extends ActionEvent
 
     /**
      * @param string $locale
+     *
      * @return OrderStatusEvent
      */
     public function setLocale($locale)
     {
         $this->locale = $locale;
+
         return $this;
     }
 
@@ -121,11 +127,13 @@ class OrderStatusEvent extends ActionEvent
 
     /**
      * @param string $code
+     *
      * @return OrderStatusEvent
      */
     public function setCode($code)
     {
         $this->code = $code;
+
         return $this;
     }
 
@@ -139,11 +147,13 @@ class OrderStatusEvent extends ActionEvent
 
     /**
      * @param string $color
+     *
      * @return OrderStatusEvent
      */
     public function setColor($color)
     {
         $this->color = $color;
+
         return $this;
     }
 
@@ -157,11 +167,13 @@ class OrderStatusEvent extends ActionEvent
 
     /**
      * @param string $title
+     *
      * @return OrderStatusEvent
      */
     public function setTitle($title)
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -175,11 +187,13 @@ class OrderStatusEvent extends ActionEvent
 
     /**
      * @param string $description
+     *
      * @return OrderStatusEvent
      */
     public function setDescription($description)
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -193,11 +207,13 @@ class OrderStatusEvent extends ActionEvent
 
     /**
      * @param string $chapo
+     *
      * @return OrderStatusEvent
      */
     public function setChapo($chapo)
     {
         $this->chapo = $chapo;
+
         return $this;
     }
 
@@ -211,11 +227,13 @@ class OrderStatusEvent extends ActionEvent
 
     /**
      * @param string $postscriptum
+     *
      * @return OrderStatusEvent
      */
     public function setPostscriptum($postscriptum)
     {
         $this->postscriptum = $postscriptum;
+
         return $this;
     }
 }

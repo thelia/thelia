@@ -34,8 +34,8 @@ use Thelia\Model\ModuleHook;
 use Thelia\Model\ModuleHookQuery;
 
 /**
- * Class HookController
- * @package Thelia\Controller\Admin
+ * Class HookController.
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleHookController extends AbstractCrudController
@@ -82,7 +82,7 @@ class ModuleHookController extends AbstractCrudController
 
         if ($this->getRequest()->isXmlHttpRequest()) {
             if ($message) {
-                $response = $this->jsonResponse(json_encode([ "error" => $message]), 500);
+                $response = $this->jsonResponse(json_encode(['error' => $message]), 500);
             } else {
                 $response = $this->nullResponse();
             }
@@ -103,7 +103,7 @@ class ModuleHookController extends AbstractCrudController
     }
 
     /**
-     * Return the creation form for this object
+     * Return the creation form for this object.
      */
     protected function getCreationForm()
     {
@@ -111,7 +111,7 @@ class ModuleHookController extends AbstractCrudController
     }
 
     /**
-     * Return the update form for this object
+     * Return the update form for this object.
      */
     protected function getUpdateForm()
     {
@@ -119,20 +119,21 @@ class ModuleHookController extends AbstractCrudController
     }
 
     /**
-     * Hydrate the update form for this object, before passing it to the update template
+     * Hydrate the update form for this object, before passing it to the update template.
      *
      * @param ModuleHook $object
+     *
      * @return ModuleHookModificationForm
      */
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
-            'id'        => $object->getId(),
-            'hook_id'   => $object->getHookId(),
+            'id' => $object->getId(),
+            'hook_id' => $object->getHookId(),
             'module_id' => $object->getModuleId(),
             'classname' => $object->getClassname(),
-            'method'    => $object->getMethod(),
-            'active'    => $object->getActive(),
+            'method' => $object->getMethod(),
+            'active' => $object->getActive(),
             'templates' => $object->getTemplates(),
         ];
 
@@ -140,9 +141,10 @@ class ModuleHookController extends AbstractCrudController
     }
 
     /**
-     * Creates the creation event with the provided form data
+     * Creates the creation event with the provided form data.
      *
      * @param array $formData
+     *
      * @return ModuleHookCreateEvent
      */
     protected function getCreationEvent($formData)
@@ -153,9 +155,10 @@ class ModuleHookController extends AbstractCrudController
     }
 
     /**
-     * Creates the update event with the provided form data
+     * Creates the update event with the provided form data.
      *
      * @param array $formData
+     *
      * @return ModuleHookUpdateEvent
      */
     protected function getUpdateEvent($formData)
@@ -187,7 +190,7 @@ class ModuleHookController extends AbstractCrudController
     }
 
     /**
-     * Creates the delete event with the provided form data
+     * Creates the delete event with the provided form data.
      */
     protected function getDeleteEvent()
     {
@@ -198,6 +201,7 @@ class ModuleHookController extends AbstractCrudController
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
      * @param ModuleHookEvent $event
+     *
      * @return bool
      */
     protected function eventContainsObject($event)
@@ -209,7 +213,8 @@ class ModuleHookController extends AbstractCrudController
      * Get the created object from an event.
      *
      * @param ModuleHookEvent $event
-     * @return null|ModuleHook
+     *
+     * @return ModuleHook|null
      */
     protected function getObjectFromEvent($event)
     {
@@ -217,8 +222,9 @@ class ModuleHookController extends AbstractCrudController
     }
 
     /**
-     * Load an existing object from the database
-     * @return null|ModuleHook
+     * Load an existing object from the database.
+     *
+     * @return ModuleHook|null
      */
     protected function getExistingObject()
     {
@@ -229,28 +235,30 @@ class ModuleHookController extends AbstractCrudController
     }
 
     /**
-     * Returns the object label form the object event (name, title, etc.)
+     * Returns the object label form the object event (name, title, etc.).
      *
      * @param ModuleHook $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
     {
         try {
             return sprintf(
-                "%s on %s",
+                '%s on %s',
                 $object->getModule()->getTitle(),
                 $object->getHook()->getTitle()
             );
         } catch (\Exception $ex) {
-            return "Undefined module hook";
+            return 'Undefined module hook';
         }
     }
 
     /**
-     * Returns the object ID from the object
+     * Returns the object ID from the object.
      *
      * @param ModuleHook $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -259,9 +267,10 @@ class ModuleHookController extends AbstractCrudController
     }
 
     /**
-     * Render the main list template
+     * Render the main list template.
      *
-     * @param string $currentOrder , if any, null otherwise.
+     * @param string $currentOrder , if any, null otherwise
+     *
      * @return Response
      */
     protected function renderListTemplate($currentOrder)
@@ -273,7 +282,8 @@ class ModuleHookController extends AbstractCrudController
     }
 
     /**
-     * Render the edition template
+     * Render the edition template.
+     *
      * @return Response
      */
     protected function renderEditionTemplate()
@@ -287,29 +297,30 @@ class ModuleHookController extends AbstractCrudController
     protected function getEditionArgument()
     {
         return [
-            'module_hook_id' => $this->getRequest()->get('module_hook_id', 0)
+            'module_hook_id' => $this->getRequest()->get('module_hook_id', 0),
         ];
     }
 
     /**
-     * Redirect to the edition template
+     * Redirect to the edition template.
+     *
      * @return Response
      */
     protected function redirectToEditionTemplate($request = null, $country = null)
     {
         return $this->generateRedirectFromRoute(
-            "admin.module-hook.update",
+            'admin.module-hook.update',
             $this->getViewArguments(),
             $this->getRouteArguments()
         );
     }
 
     /**
-     * Redirect to the list template
+     * Redirect to the list template.
      */
     protected function redirectToListTemplate()
     {
-        return $this->generateRedirectFromRoute("admin.module-hook");
+        return $this->generateRedirectFromRoute('admin.module-hook');
     }
 
     protected function getViewArguments()
@@ -320,7 +331,7 @@ class ModuleHookController extends AbstractCrudController
     protected function getRouteArguments($module_hook_id = null)
     {
         return [
-            'module_hook_id' => $module_hook_id === null ? $this->getRequest()->get('module_hook_id') : $module_hook_id
+            'module_hook_id' => $module_hook_id === null ? $this->getRequest()->get('module_hook_id') : $module_hook_id,
         ];
     }
 
@@ -350,7 +361,7 @@ class ModuleHookController extends AbstractCrudController
         /** @var IgnoredModuleHook $moduleHook */
         foreach ($ignoredModuleHooks as $moduleHook) {
             $className = $moduleHook->getClassname();
-            if (null !== $className && ! \in_array($className, $result)) {
+            if (null !== $className && !\in_array($className, $result)) {
                 $result[] = $className;
             }
         }
@@ -376,7 +387,7 @@ class ModuleHookController extends AbstractCrudController
         /** @var ModuleHook $moduleHook */
         foreach ($moduleHooks as $moduleHook) {
             $method = $moduleHook->getMethod();
-            if (! \in_array($method, $result)) {
+            if (!\in_array($method, $result)) {
                 $result[] = $method;
             }
         }
@@ -389,7 +400,7 @@ class ModuleHookController extends AbstractCrudController
         /** @var IgnoredModuleHook $moduleHook */
         foreach ($ignoredModuleHooks as $moduleHook) {
             $method = $moduleHook->getMethod();
-            if (! \in_array($method, $result)) {
+            if (!\in_array($method, $result)) {
                 $result[] = $method;
             }
         }

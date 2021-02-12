@@ -16,12 +16,12 @@ namespace Thelia\Core\Event\Hook;
  * HookRenderEvent is used by the hook template engine plugin function.
  *
  * Class HookRenderEvent
- * @package Thelia\Core\Event\Hook
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookRenderEvent extends BaseHookRenderEvent
 {
-    /** @var  array $fragments an array of fragments collected during the event dispatch */
+    /** @var array $fragments an array of fragments collected during the event dispatch */
     protected $fragments;
 
     public function __construct($code, array $arguments = [], array $templateVariables = [])
@@ -31,9 +31,10 @@ class HookRenderEvent extends BaseHookRenderEvent
     }
 
     /**
-     * Add a new fragment
+     * Add a new fragment.
      *
-     * @param  string $content
+     * @param string $content
+     *
      * @return $this
      */
     public function add($content)
@@ -44,7 +45,7 @@ class HookRenderEvent extends BaseHookRenderEvent
     }
 
     /**
-     * Get an array of all the fragments
+     * Get an array of all the fragments.
      *
      * @return array
      */
@@ -56,16 +57,17 @@ class HookRenderEvent extends BaseHookRenderEvent
     /**
      * Concatenates all fragments in a string.
      *
-     * @param  string $glue   the glue between fragments
-     * @param  string $before the text before the concatenated string
-     * @param  string $after  the text after the concatenated string
+     * @param string $glue   the glue between fragments
+     * @param string $before the text before the concatenated string
+     * @param string $after  the text after the concatenated string
+     *
      * @return string the concatenate string
      */
     public function dump($glue = '', $before = '', $after = '')
     {
         $ret = '';
         if (0 !== \count($this->fragments)) {
-            $ret = $before . implode($glue, $this->fragments) . $after;
+            $ret = $before.implode($glue, $this->fragments).$after;
         }
 
         return $ret;

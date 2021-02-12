@@ -18,16 +18,15 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 
 /**
- * Class LangCreateForm
- * @package Thelia\Form\Lang
+ * Class LangCreateForm.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangCreateForm extends BaseForm
 {
     /**
-     *
      * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
+     * Form this you have to call add method on $this->formBuilder attribute :.
      *
      * $this->formBuilder->add("name", TextType::class)
      *   ->add("email", EmailType::class, array(

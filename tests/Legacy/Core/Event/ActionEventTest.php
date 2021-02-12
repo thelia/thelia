@@ -16,11 +16,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Forms;
-use Thelia\Core\HttpFoundation\Request;
 
 /**
- * Class ActionEventTest
- * @package Thelia\Tests\Core\Event
+ * Class ActionEventTest.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class ActionEventTest extends TestCase
@@ -38,8 +37,8 @@ class ActionEventTest extends TestCase
                 'text',
                 FormType::class,
                 null,
-                ['attr' =>[
-                    'thelia_name' => 'test'
+                ['attr' => [
+                    'thelia_name' => 'test',
                 ]]
             );
 
@@ -56,7 +55,7 @@ class ActionEventTest extends TestCase
 
         $form->submit([
             'foo' => 'fooValue',
-            'bar' => 'barValue'
+            'bar' => 'barValue',
         ]);
 
         $event = new FooEvent();

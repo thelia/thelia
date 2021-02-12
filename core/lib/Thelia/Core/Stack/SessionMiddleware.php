@@ -15,14 +15,13 @@ namespace Thelia\Core\Stack;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Core\Event\SessionEvent;
 use Thelia\Core\TheliaKernelEvents;
 
 /**
- * Class SessionMiddleware
- * @package Thelia\Core\Stack
+ * Class SessionMiddleware.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class SessionMiddleware implements HttpKernelInterface
@@ -46,6 +45,7 @@ class SessionMiddleware implements HttpKernelInterface
      * @param $cacheDir
      * @param $debug
      * @param $env
+     *
      * @internal param ContainerInterface $container
      */
     public function __construct(HttpKernelInterface $app, EventDispatcherInterface $eventDispatcherInterface, $cacheDir, $debug, $env)

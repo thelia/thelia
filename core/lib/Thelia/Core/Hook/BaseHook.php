@@ -36,12 +36,12 @@ use Thelia\Module\BaseModule;
  * template.
  *
  * Class BaseHook
- * @package Thelia\Core\Hook
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 abstract class BaseHook
 {
-    public const INJECT_TEMPLATE_METHOD_NAME = "insertTemplate";
+    public const INJECT_TEMPLATE_METHOD_NAME = 'insertTemplate';
 
     /** @var BaseModule */
     public $module;
@@ -58,7 +58,7 @@ abstract class BaseHook
     /** @var AssetResolverInterface $assetsResolver */
     public $assetsResolver;
 
-    /** @var EventDispatcherInterface  */
+    /** @var EventDispatcherInterface */
     public $dispatcher;
 
     /** @var Request $request */
@@ -99,22 +99,22 @@ abstract class BaseHook
             foreach ($templates as $template) {
                 [$type, $filepath] = $this->getTemplateParams($template);
 
-                if ("render" === $type) {
+                if ('render' === $type) {
                     $event->add($this->render($filepath, $allArguments));
                     continue;
                 }
 
-                if ("dump" === $type) {
+                if ('dump' === $type) {
                     $event->add($this->render($filepath));
                     continue;
                 }
 
-                if ("css" === $type) {
+                if ('css' === $type) {
                     $event->add($this->addCSS($filepath));
                     continue;
                 }
 
-                if ("js" === $type) {
+                if ('js' === $type) {
                     $event->add($this->addJS($filepath));
                     continue;
                 }
@@ -127,7 +127,7 @@ abstract class BaseHook
     }
 
     /**
-     * helper function allowing you to render a template using a template engine
+     * helper function allowing you to render a template using a template engine.
      *
      * @param string $templateName the template path of the template
      * @param array  $parameters   an array of parameters to assign to a template engine
@@ -140,16 +140,16 @@ abstract class BaseHook
 
         if (null !== $templateDir) {
             // retrieve the template
-            $content      = $this->parser->render($templateDir . DS . $templateName, $parameters);
+            $content = $this->parser->render($templateDir.DS.$templateName, $parameters);
         } else {
-            $content = sprintf("ERR: Unknown template %s for module %s", $templateName, $this->module->getCode());
+            $content = sprintf('ERR: Unknown template %s for module %s', $templateName, $this->module->getCode());
         }
 
         return $content;
     }
 
     /**
-     * helper function allowing you to get the content of a file
+     * helper function allowing you to get the content of a file.
      *
      * @param string $fileName the template path of the template
      *
@@ -160,74 +160,74 @@ abstract class BaseHook
         $fileDir = $this->assetsResolver->resolveAssetSourcePath($this->module->getCode(), false, $fileName, $this->parser);
 
         if (null !== $fileDir) {
-            $content = file_get_contents($fileDir . DS . $fileName);
+            $content = file_get_contents($fileDir.DS.$fileName);
             if (false === $content) {
-                $content = "";
+                $content = '';
             }
         } else {
-            $content = sprintf("ERR: Unknown file %s for module %s", $fileName, $this->module->getCode());
+            $content = sprintf('ERR: Unknown file %s for module %s', $fileName, $this->module->getCode());
         }
 
         return $content;
     }
 
     /**
-     * helper function allowing you to generate the HTML link tag
+     * helper function allowing you to generate the HTML link tag.
      *
      * @param string $fileName   the path to the css file
      * @param array  $attributes the attributes of the tag
-     * @param array  $filters an array of assets processing filters (less, sass, etc.)
+     * @param array  $filters    an array of assets processing filters (less, sass, etc.)
      *
      * @return string the link tag
      */
     public function addCSS($fileName, $attributes = [], $filters = [])
     {
-        $tag = "";
+        $tag = '';
 
-        $url = $this->assetsResolver->resolveAssetURL($this->module->getCode(), $fileName, "css", $this->parser, $filters);
+        $url = $this->assetsResolver->resolveAssetURL($this->module->getCode(), $fileName, 'css', $this->parser, $filters);
 
-        if ("" !== $url) {
-            $tags   = [];
+        if ('' !== $url) {
+            $tags = [];
             $tags[] = '<link rel="stylesheet" type="text/css" ';
-            $tags[] = ' href="' . $url . '" ';
+            $tags[] = ' href="'.$url.'" ';
             foreach ($attributes as $name => $val) {
-                if (\is_string($name) && !\in_array($name, [ "href", "rel", "type" ])) {
-                    $tags[] = $name . '="' . $val . '" ';
+                if (\is_string($name) && !\in_array($name, ['href', 'rel', 'type'])) {
+                    $tags[] = $name.'="'.$val.'" ';
                 }
             }
-            $tags[] = "/>";
-            $tag    = implode($tags);
+            $tags[] = '/>';
+            $tag = implode($tags);
         }
 
         return $tag;
     }
 
     /**
-     * helper function allowing you to generate the HTML script tag
+     * helper function allowing you to generate the HTML script tag.
      *
      * @param string $fileName   the path to the js file
      * @param array  $attributes the attributes of the tag
-     * @param array  $filters an array of assets processing filters (cofeescript, compress, etc.)
+     * @param array  $filters    an array of assets processing filters (cofeescript, compress, etc.)
      *
      * @return string the script tag
      */
     public function addJS($fileName, $attributes = [], $filters = [])
     {
-        $tag = "";
+        $tag = '';
 
-        $url = $this->assetsResolver->resolveAssetURL($this->module->getCode(), $fileName, "js", $this->parser, $filters);
+        $url = $this->assetsResolver->resolveAssetURL($this->module->getCode(), $fileName, 'js', $this->parser, $filters);
 
-        if ("" !== $url) {
-            $tags   = [];
+        if ('' !== $url) {
+            $tags = [];
             $tags[] = '<script type="text/javascript" ';
-            $tags[] = ' src="' . $url . '" ';
+            $tags[] = ' src="'.$url.'" ';
             foreach ($attributes as $name => $val) {
-                if (\is_string($name) && !\in_array($name, [ "src", "type" ])) {
-                    $tags[] = $name . '="' . $val . '" ';
+                if (\is_string($name) && !\in_array($name, ['src', 'type'])) {
+                    $tags[] = $name.'="'.$val.'" ';
                 }
             }
-            $tags[] = "></script>";
-            $tag    = implode($tags);
+            $tags[] = '></script>';
+            $tag = implode($tags);
         }
 
         return $tag;
@@ -249,8 +249,6 @@ abstract class BaseHook
         return $this->module;
     }
 
-    /**
-     */
     public function setParser(ParserInterface $parser)
     {
         $this->parser = $parser;
@@ -282,7 +280,7 @@ abstract class BaseHook
     }
 
     /**
-     * get the request
+     * get the request.
      *
      * @return Request
      */
@@ -296,7 +294,7 @@ abstract class BaseHook
     }
 
     /**
-     * get the session
+     * get the session.
      *
      * @return Session
      */
@@ -320,16 +318,16 @@ abstract class BaseHook
      */
     protected function getView()
     {
-        $ret = "";
+        $ret = '';
         if (null !== $this->getRequest()) {
-            $ret = $this->getRequest()->attributes->get("_view", "");
+            $ret = $this->getRequest()->attributes->get('_view', '');
         }
 
         return $ret;
     }
 
     /**
-     * Get the cart from the session
+     * Get the cart from the session.
      *
      * @return \Thelia\Model\Cart|null
      */
@@ -343,7 +341,7 @@ abstract class BaseHook
     }
 
     /**
-     * Get the order from the session
+     * Get the order from the session.
      *
      * @return \Thelia\Model\Order|null
      */
@@ -357,7 +355,7 @@ abstract class BaseHook
     }
 
     /**
-     * Get the current currency used or if not present the default currency for the shop
+     * Get the current currency used or if not present the default currency for the shop.
      *
      * @return \Thelia\Model\Currency
      */
@@ -371,7 +369,7 @@ abstract class BaseHook
     }
 
     /**
-     * Get the current customer logged in. If no customer is logged return null
+     * Get the current customer logged in. If no customer is logged return null.
      *
      * @return \Thelia\Model\Customer|null
      */
@@ -385,7 +383,7 @@ abstract class BaseHook
     }
 
     /**
-     * Get the current lang used or if not present the default lang for the shop
+     * Get the current lang used or if not present the default lang for the shop.
      *
      * @return \Thelia\Model\Lang
      */
@@ -399,11 +397,11 @@ abstract class BaseHook
     }
 
     /**
-     * Add a new template for automatic render
+     * Add a new template for automatic render.
      *
      * @param string $hookCode the code of the hook (the name of the event used to render) : 'hook.{type}.{hook code}'
-     * @param string $value list of the template to render or add.
-     *                      eg: 'render:mytemplate.html;css:assets/css/mycss.css;js:assets/js/myjs.js'
+     * @param string $value    list of the template to render or add.
+     *                         eg: 'render:mytemplate.html;css:assets/css/mycss.css;js:assets/js/myjs.js'
      */
     public function addTemplate($hookCode, $value)
     {
@@ -424,6 +422,7 @@ abstract class BaseHook
 
     /**
      * @param $template
+     *
      * @return array
      */
     protected function getTemplateParams($template)

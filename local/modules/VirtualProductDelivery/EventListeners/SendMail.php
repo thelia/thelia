@@ -23,8 +23,8 @@ use Thelia\Model\OrderProductQuery;
 use VirtualProductDelivery\Events\VirtualProductDeliveryEvents;
 
 /**
- * Class SendMail
- * @package VirtualProductDelivery\EventListeners
+ * Class SendMail.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class SendMail implements EventSubscriberInterface
@@ -54,7 +54,7 @@ class SendMail implements EventSubscriberInterface
     }
 
     /**
-     * Send email to notify customer that files for virtual products are available
+     * Send email to notify customer that files for virtual products are available.
      *
      * @throws \Exception
      */
@@ -80,7 +80,7 @@ class SendMail implements EventSubscriberInterface
                     'order_id' => $order->getId(),
                     'order_ref' => $order->getRef(),
                     'order_date' => $order->getCreatedAt(),
-                    'update_date' => $order->getUpdatedAt()
+                    'update_date' => $order->getUpdatedAt(),
                 ]
             );
         } else {
@@ -113,8 +113,8 @@ class SendMail implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::ORDER_UPDATE_STATUS => ["updateStatus", 128],
-            VirtualProductDeliveryEvents::ORDER_VIRTUAL_FILES_AVAILABLE => ["sendEmail", 128]
+            TheliaEvents::ORDER_UPDATE_STATUS => ['updateStatus', 128],
+            VirtualProductDeliveryEvents::ORDER_VIRTUAL_FILES_AVAILABLE => ['sendEmail', 128],
         ];
     }
 }

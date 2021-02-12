@@ -19,8 +19,8 @@ use Thelia\Model\Profile as ProfileModel;
 use Thelia\Model\ProfileQuery;
 
 /**
- * Class ProfileTest
- * @package Thelia\Tests\Action
+ * Class ProfileTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ProfileTest extends BaseAction
@@ -37,13 +37,12 @@ class ProfileTest extends BaseAction
         $event = new ProfileEvent();
 
         $event
-            ->setCode("Test")
+            ->setCode('Test')
             ->setLocale('en_US')
             ->setTitle('test profile')
             ->setChapo('test chapo')
             ->setDescription('test description')
             ->setPostscriptum('test postscriptum');
-        ;
 
         $action = new Profile($this->getMockEventDispatcher());
         $action->create($event, null, $this->getMockEventDispatcher());
@@ -65,6 +64,7 @@ class ProfileTest extends BaseAction
 
     /**
      * @depends testCreate
+     *
      * @return ProfileModel
      */
     public function testUpdate(ProfileModel $profile)
@@ -78,7 +78,6 @@ class ProfileTest extends BaseAction
             ->setChapo('test update chapo')
             ->setDescription('test update description')
             ->setPostscriptum('test update postscriptum');
-        ;
 
         $action = new Profile($this->getMockEventDispatcher());
         $action->update($event, null, $this->getMockEventDispatcher());
@@ -106,7 +105,7 @@ class ProfileTest extends BaseAction
         $event
             ->setId($profile->getId())
             ->setResourceAccess([
-                    'admin.address' => [AccessManager::CREATE]
+                    'admin.address' => [AccessManager::CREATE],
                 ])
         ;
 

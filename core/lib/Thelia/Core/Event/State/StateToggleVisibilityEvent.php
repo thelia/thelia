@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\State;
 
 /**
- * Class StateToggleVisibilityEvent
- * @package Thelia\Core\Event\State
+ * Class StateToggleVisibilityEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class StateToggleVisibilityEvent extends StateEvent

@@ -20,7 +20,6 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
 
 /**
- *
  * Document management actions. This class handles document processing an caching.
  *
  * Basically, documents are stored outside the web space (by default in local/media/documents),
@@ -36,9 +35,7 @@ use Thelia\Tools\URL;
  *
  * If a problem occurs, an DocumentException may be thrown.
  *
- * @package Thelia\Action
  * @author Franck Allimant <franck@cqfdev.fr>
- *
  */
 class Document extends BaseCachedFile implements EventSubscriberInterface
 {
@@ -52,7 +49,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      */
     protected function getCacheDirFromWebRoot()
     {
-        return ConfigQuery::read('document_cache_dir_from_web_root', 'cache' . DS . 'documents');
+        return ConfigQuery::read('document_cache_dir_from_web_root', 'cache'.DS.'documents');
     }
 
     /**
@@ -70,30 +67,30 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      */
     public function processDocument(DocumentEvent $event)
     {
-        $subdir     = $event->getCacheSubdirectory();
+        $subdir = $event->getCacheSubdirectory();
         $sourceFile = $event->getSourceFilepath();
 
         if (null == $subdir || null == $sourceFile) {
-            throw new \InvalidArgumentException("Cache sub-directory and source file path cannot be null");
+            throw new \InvalidArgumentException('Cache sub-directory and source file path cannot be null');
         }
 
         $originalDocumentPathInCache = $this->getCacheFilePath($subdir, $sourceFile, true);
 
-        if (! file_exists($originalDocumentPathInCache)) {
-            if (! file_exists($sourceFile)) {
-                throw new DocumentException(sprintf("Source document file %s does not exists.", $sourceFile));
+        if (!file_exists($originalDocumentPathInCache)) {
+            if (!file_exists($sourceFile)) {
+                throw new DocumentException(sprintf('Source document file %s does not exists.', $sourceFile));
             }
 
             $mode = ConfigQuery::read(self::CONFIG_DELIVERY_MODE, 'symlink');
 
             if ($mode == 'symlink') {
                 if (false === symlink($sourceFile, $originalDocumentPathInCache)) {
-                    throw new DocumentException(sprintf("Failed to create symbolic link for %s in %s document cache directory", basename($sourceFile), $subdir));
+                    throw new DocumentException(sprintf('Failed to create symbolic link for %s in %s document cache directory', basename($sourceFile), $subdir));
                 }
             } else {
                 // mode = 'copy'
                 if (false === @copy($sourceFile, $originalDocumentPathInCache)) {
-                    throw new DocumentException(sprintf("Failed to copy %s in %s document cache directory", basename($sourceFile), $subdir));
+                    throw new DocumentException(sprintf('Failed to copy %s in %s document cache directory', basename($sourceFile), $subdir));
                 }
             }
         }
@@ -112,15 +109,15 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::DOCUMENT_PROCESS => ["processDocument", 128],
+            TheliaEvents::DOCUMENT_PROCESS => ['processDocument', 128],
 
             // Implemented in parent class BaseCachedFile
-            TheliaEvents::DOCUMENT_CLEAR_CACHE => ["clearCache", 128],
-            TheliaEvents::DOCUMENT_DELETE => ["deleteFile", 128],
-            TheliaEvents::DOCUMENT_SAVE => ["saveFile", 128],
-            TheliaEvents::DOCUMENT_UPDATE => ["updateFile", 128],
-            TheliaEvents::DOCUMENT_UPDATE_POSITION => ["updatePosition", 128],
-            TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY => ["toggleVisibility", 128],
+            TheliaEvents::DOCUMENT_CLEAR_CACHE => ['clearCache', 128],
+            TheliaEvents::DOCUMENT_DELETE => ['deleteFile', 128],
+            TheliaEvents::DOCUMENT_SAVE => ['saveFile', 128],
+            TheliaEvents::DOCUMENT_UPDATE => ['updateFile', 128],
+            TheliaEvents::DOCUMENT_UPDATE_POSITION => ['updatePosition', 128],
+            TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY => ['toggleVisibility', 128],
         ];
     }
 }

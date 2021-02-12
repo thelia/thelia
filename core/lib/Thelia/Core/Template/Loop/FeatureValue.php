@@ -25,21 +25,20 @@ use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * FeatureValue loop
- *
+ * FeatureValue loop.
  *
  * Class FeatureValue
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int getFeature()
- * @method int getProduct()
+ *
+ * @method int      getFeature()
+ * @method int      getProduct()
  * @method string[] getFreeText()
- * @method int[] getFeatureAvailability()
- * @method bool getExcludeFeatureAvailability()
- * @method bool getExcludeFreeText()
+ * @method int[]    getFeatureAvailability()
+ * @method bool     getExcludeFeatureAvailability()
+ * @method bool     getExcludeFreeText()
  * @method string[] getOrder()
  */
 class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -73,7 +72,7 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
     {
         $search = FeatureProductQuery::create();
 
-         // manage featureAv translations
+        // manage featureAv translations
         $this->configureI18nProcessing(
             $search,
             ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'],
@@ -111,20 +110,20 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByIsFreeText(false);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "alpha":
-                    $search->addAscendingOrderByColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE');
+                case 'alpha':
+                    $search->addAscendingOrderByColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_TITLE');
                     break;
-                case "alpha_reverse":
-                    $search->addDescendingOrderByColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE');
+                case 'alpha_reverse':
+                    $search->addDescendingOrderByColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_TITLE');
                     break;
-                case "manual":
+                case 'manual':
                     $search->orderBy('feature_av_position', Criteria::ASC);
                     break;
-                case "manual_reverse":
+                case 'manual_reverse':
                     $search->orderBy('feature_av_position', Criteria::DESC);
                     break;
             }
@@ -140,19 +139,19 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($featureValue);
 
             $loopResultRow
-                ->set("ID", $featureValue->getId())
-                ->set("PRODUCT", $featureValue->getProductId())
-                ->set("PRODUCT_ID", $featureValue->getProductId())
-                ->set("FEATURE_AV_ID", $featureValue->getFeatureAvId())
-                ->set("FREE_TEXT_VALUE", $featureValue->getFreeTextValue())
-                ->set("IS_FREE_TEXT", \is_null($featureValue->getFeatureAvId()) ? 1 : 0)
-                ->set("IS_FEATURE_AV", \is_null($featureValue->getFeatureAvId()) ? 0 : 1)
-                ->set("LOCALE", $this->locale)
-                ->set("TITLE", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE'))
-                ->set("CHAPO", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
-                ->set("DESCRIPTION", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
-                ->set("POSITION", $featureValue->getPosition())
+                ->set('ID', $featureValue->getId())
+                ->set('PRODUCT', $featureValue->getProductId())
+                ->set('PRODUCT_ID', $featureValue->getProductId())
+                ->set('FEATURE_AV_ID', $featureValue->getFeatureAvId())
+                ->set('FREE_TEXT_VALUE', $featureValue->getFreeTextValue())
+                ->set('IS_FREE_TEXT', \is_null($featureValue->getFeatureAvId()) ? 1 : 0)
+                ->set('IS_FEATURE_AV', \is_null($featureValue->getFeatureAvId()) ? 0 : 1)
+                ->set('LOCALE', $this->locale)
+                ->set('TITLE', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_TITLE'))
+                ->set('CHAPO', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_CHAPO'))
+                ->set('DESCRIPTION', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME.'_i18n_POSTSCRIPTUM'))
+                ->set('POSITION', $featureValue->getPosition())
             ;
             $this->addOutputFields($loopResultRow, $featureValue);
 

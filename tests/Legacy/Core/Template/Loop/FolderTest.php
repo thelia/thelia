@@ -12,14 +12,11 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Core\Template\Loop\Folder;
 use Thelia\Model\FolderQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class FolderTest extends BaseLoopTestor
 {
@@ -45,7 +42,7 @@ class FolderTest extends BaseLoopTestor
         }
 
         $otherParameters = [
-            "visible" => "*",
+            'visible' => '*',
         ];
 
         $this->baseTestSearchById($folder->getId(), $otherParameters);

@@ -31,20 +31,18 @@ use Thelia\Model\Customer;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\State;
 use Thelia\Module\BaseModule;
-use Thelia\Module\BaseModuleInterface;
-use Thelia\Module\DeliveryModuleInterface;
 use Thelia\Module\Exception\DeliveryException;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 /**
- * Class CartPostage
- * @package Thelia\Core\Template\Smarty\Plugins
+ * Class CartPostage.
  */
 class CartPostage extends AbstractSmartyPlugin
 {
     /**
      * @var \Thelia\Core\HttpFoundation\Request The Request
+     *
      * @deprecated since 2.3, please use requestStack
      */
     protected $request;
@@ -58,10 +56,10 @@ class CartPostage extends AbstractSmartyPlugin
     /** @var ContainerInterface Service Container */
     protected $container;
 
-    /** @var integer $countryId the id of country */
+    /** @var int $countryId the id of country */
     protected $countryId;
 
-    /** @var integer $deliveryId the id of the cheapest delivery */
+    /** @var int $deliveryId the id of the cheapest delivery */
     protected $deliveryId;
 
     /** @var float $postage the postage amount with taxes */
@@ -73,11 +71,9 @@ class CartPostage extends AbstractSmartyPlugin
     /** @var string $postageTaxRuleTitle the postage tax rule title */
     protected $postageTaxRuleTitle;
 
-    /** @var boolean $isCustomizable indicate if customer can change the country */
+    /** @var bool $isCustomizable indicate if customer can change the country */
     protected $isCustomizable = true;
 
-    /**
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -90,19 +86,18 @@ class CartPostage extends AbstractSmartyPlugin
     }
 
     /**
-     * Get postage amount for cart
+     * Get postage amount for cart.
      *
-     * @param array $params Block parameters
-     * @param mixed $content Block content
+     * @param array                     $params   Block parameters
+     * @param mixed                     $content  Block content
      * @param \Smarty_Internal_Template $template Template
-     * @param bool $repeat Control how many times
+     * @param bool                      $repeat   Control how many times
      *                                            the block is displayed
-     *
      */
     public function postage($params, $content, $template, &$repeat)
     {
         if (!$repeat) {
-            return (null !== $this->countryId) ? $content : "";
+            return (null !== $this->countryId) ? $content : '';
         }
 
         $customer = $this->getCurrentRequest()->getSession()->getCustomerUser();
@@ -125,7 +120,7 @@ class CartPostage extends AbstractSmartyPlugin
     }
 
     /**
-     * Retrieve the delivery country for a customer
+     * Retrieve the delivery country for a customer.
      *
      * The rules :
      *  - the country of the delivery address of the customer related to the
@@ -134,8 +129,7 @@ class CartPostage extends AbstractSmartyPlugin
      *      the default country
      *  - the default country for the shop if it exists
      *
-     *
-     * @param  \Thelia\Model\Customer $customer
+     * @param \Thelia\Model\Customer $customer
      */
     protected function getDeliveryInformation(Customer $customer = null)
     {
@@ -144,6 +138,7 @@ class CartPostage extends AbstractSmartyPlugin
         if (null !== $addressId = $this->getCurrentRequest()->getSession()->getOrder()->getChoosenDeliveryAddress()) {
             if (null !== $address = AddressQuery::create()->findPk($addressId)) {
                 $this->isCustomizable = false;
+
                 return [$address, $address->getCountry(), $address->getState()];
             }
         }
@@ -186,17 +181,17 @@ class CartPostage extends AbstractSmartyPlugin
 
             return [null, $country, $firstCountryState];
         } catch (\LogicException $e) {
-            ;
         }
 
         return [null, null, null];
     }
 
     /**
-     * Retrieve the cheapest delivery for country
+     * Retrieve the cheapest delivery for country.
      *
      * @param Address $address
      * @param Country $country
+     *
      * @throws PropelException
      */
     protected function getCheapestDelivery(Address $address = null, Country $country = null, State $state = null)
@@ -250,19 +245,19 @@ class CartPostage extends AbstractSmartyPlugin
     }
 
     /**
-     * Defines the various smarty plugins handled by this class
+     * Defines the various smarty plugins handled by this class.
      *
      * @return \TheliaSmarty\Template\SmartyPluginDescriptor[] smarty plugin descriptors
      */
     public function getPluginDescriptors()
     {
         return [
-            new SmartyPluginDescriptor('block', 'postage', $this, 'postage')
+            new SmartyPluginDescriptor('block', 'postage', $this, 'postage'),
         ];
     }
 
     /**
-     * @return null|Request
+     * @return Request|null
      */
     protected function getCurrentRequest()
     {

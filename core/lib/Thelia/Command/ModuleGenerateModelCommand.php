@@ -23,10 +23,10 @@ use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\PropelInitService;
 
 /**
- * generate class model for a specific module
+ * generate class model for a specific module.
  *
  * Class ModuleGenerateModelCommand
- * @package Thelia\Command
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleGenerateModelCommand extends BaseModuleGenerate
@@ -34,35 +34,35 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
     protected function configure()
     {
         $this
-            ->setName("module:generate:model")
-            ->setDescription("generate model for a specific module")
+            ->setName('module:generate:model')
+            ->setDescription('generate model for a specific module')
             ->addArgument(
-                "name",
+                'name',
                 InputArgument::REQUIRED,
-                "module name"
+                'module name'
             )
             ->addOption(
-                "generate-sql",
+                'generate-sql',
                 null,
                 InputOption::VALUE_NONE,
-                "with this option generate sql file at the same time"
+                'with this option generate sql file at the same time'
             )
         ;
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->module = $this->formatModuleName($input->getArgument("name"));
-        $this->moduleDirectory = THELIA_MODULE_DIR . $this->module;
+        $this->module = $this->formatModuleName($input->getArgument('name'));
+        $this->moduleDirectory = THELIA_MODULE_DIR.$this->module;
 
         $fs = new Filesystem();
 
         if ($fs->exists($this->moduleDirectory) === false) {
-            throw new \RuntimeException(sprintf("%s module does not exists", $this->module));
+            throw new \RuntimeException(sprintf('%s module does not exists', $this->module));
         }
 
-        if ($fs->exists($this->moduleDirectory . DS . "Config" . DS . "schema.xml") === false) {
-            throw new \RuntimeException("schema.xml not found in Config directory. Needed file for generating model");
+        if ($fs->exists($this->moduleDirectory.DS.'Config'.DS.'schema.xml') === false) {
+            throw new \RuntimeException('schema.xml not found in Config directory. Needed file for generating model');
         }
 
         $this->checkModuleSchema();
@@ -77,7 +77,7 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
         );
         $output->writeln($formattedBlock);
 
-        if ($input->getOption("generate-sql")) {
+        if ($input->getOption('generate-sql')) {
             $output->writeln(' ');
             $this->generateSql($output);
         }
@@ -87,12 +87,12 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
 
     protected function generateSql(OutputInterface $output)
     {
-        $command = $this->getApplication()->find("module:generate:sql");
+        $command = $this->getApplication()->find('module:generate:sql');
 
         $command->run(
             new ArrayInput([
-                "command" => $command->getName(),
-                "name" => $this->module
+                'command' => $command->getName(),
+                'name' => $this->module,
             ]),
             $output
         );
@@ -108,8 +108,8 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
         $propelInitService->runCommand(
             new ModelBuildCommand(),
             [
-                "--config-dir" => $propelInitService->getPropelConfigDir(),
-                "--schema-dir" => $schemaDir,
+                '--config-dir' => $propelInitService->getPropelConfigDir(),
+                '--schema-dir' => $schemaDir,
             ],
             $output
         );

@@ -20,8 +20,8 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 /**
- * Class Configuration
- * @package HookSocial\Controller
+ * Class Configuration.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class Configuration extends BaseAdminController
@@ -34,25 +34,25 @@ class Configuration extends BaseAdminController
 
         $form = $this->createForm(Configuration::class);
         $resp = [
-            "error" =>  0,
-            "message" => ""
+            'error' => 0,
+            'message' => '',
         ];
-        $response=null;
+        $response = null;
 
         try {
             $vform = $this->validateForm($form);
             $data = $vform->getData();
 
             foreach ($data as $name => $value) {
-                if (! $form->isTemplateDefinedHiddenFieldName($name)) {
-                    ConfigQuery::write("hooksocial_" . $name, $value, false, true);
+                if (!$form->isTemplateDefinedHiddenFieldName($name)) {
+                    ConfigQuery::write('hooksocial_'.$name, $value, false, true);
                 }
 
-                Tlog::getInstance()->debug(sprintf("%s => %s", $name, $value));
+                Tlog::getInstance()->debug(sprintf('%s => %s', $name, $value));
             }
         } catch (\Exception $e) {
-            $resp["error"] = 1;
-            $resp["message"] = $e->getMessage();
+            $resp['error'] = 1;
+            $resp['message'] = $e->getMessage();
         }
 
         return JsonResponse::create($resp);

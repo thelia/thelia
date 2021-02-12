@@ -17,7 +17,8 @@ use PHPUnit\Framework\TestCase;
 use Thelia\Core\Serializer\Serializer\JSONSerializer as SUT;
 
 /**
- * Class JSONSerializerTest
+ * Class JSONSerializerTest.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class JSONSerializerTest extends TestCase
@@ -34,7 +35,7 @@ class JSONSerializerTest extends TestCase
 
     public function setUp(): void
     {
-        $this->sut = new SUT;
+        $this->sut = new SUT();
     }
 
     public function testGetId()
@@ -63,7 +64,7 @@ class JSONSerializerTest extends TestCase
 
     public function testSerialize()
     {
-        $stdClass = new \stdClass;
+        $stdClass = new \stdClass();
         $stdClass->key = 'value';
 
         $dataSet = [
@@ -84,7 +85,7 @@ class JSONSerializerTest extends TestCase
             [['simple string'], '["simple string"]'],
             [['simple string', 'simple string'], '["simple string","simple string"]'],
             [['key' => 'value'], '{"key":"value"}'],
-            [$stdClass, '{"key":"value"}']
+            [$stdClass, '{"key":"value"}'],
         ];
 
         foreach ($dataSet as $data) {
@@ -95,6 +96,6 @@ class JSONSerializerTest extends TestCase
     public function testSeparator()
     {
         $this->assertIsString($this->sut->separator());
-        $this->assertEquals(',' . PHP_EOL, $this->sut->separator());
+        $this->assertEquals(','.PHP_EOL, $this->sut->separator());
     }
 }

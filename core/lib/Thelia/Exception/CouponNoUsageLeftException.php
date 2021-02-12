@@ -16,21 +16,20 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 
 /**
- * Thrown when a Coupon with no usage lect (etiher overall or per customer usage) is tried
+ * Thrown when a Coupon with no usage lect (etiher overall or per customer usage) is tried.
  *
- * @package Coupon
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class CouponNoUsageLeftException extends \Exception
 {
     /**
-     * CouponExpiredException thrown when a Coupon is expired
+     * CouponExpiredException thrown when a Coupon is expired.
      *
      * @param string $couponCode Coupon code
      */
     public function __construct($couponCode)
     {
-        $message = Translator::getInstance()->trans('Maximum usage count reached for coupon %code', ['%code' => $couponCode ]);
+        $message = Translator::getInstance()->trans('Maximum usage count reached for coupon %code', ['%code' => $couponCode]);
 
         Tlog::getInstance()->addWarning($message);
 

@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\CartItemQuery;
 
 /**
- * Class CartItemIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class CartItemIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class CartItemIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class CartItemIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "cart_item_id";
+        return 'cart_item_id';
     }
 }

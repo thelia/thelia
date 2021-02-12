@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Content;
 
 /**
- * Class ContentUpdateEvent
- * @package Thelia\Core\Event\Content
+ * Class ContentUpdateEvent.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class ContentUpdateEvent extends ContentCreateEvent
@@ -35,7 +35,6 @@ class ContentUpdateEvent extends ContentCreateEvent
     }
 
     /**
-     *
      * @return $this
      */
     public function setChapo($chapo)
@@ -45,15 +44,12 @@ class ContentUpdateEvent extends ContentCreateEvent
         return $this;
     }
 
-    /**
-     */
     public function getChapo()
     {
         return $this->chapo;
     }
 
     /**
-     *
      * @return $this
      */
     public function setContentId($content_id)
@@ -63,15 +59,12 @@ class ContentUpdateEvent extends ContentCreateEvent
         return $this;
     }
 
-    /**
-     */
     public function getContentId()
     {
         return $this->content_id;
     }
 
     /**
-     *
      * @return $this
      */
     public function setDescription($description)
@@ -81,15 +74,12 @@ class ContentUpdateEvent extends ContentCreateEvent
         return $this;
     }
 
-    /**
-     */
     public function getDescription()
     {
         return $this->description;
     }
 
     /**
-     *
      * @return $this
      */
     public function setPostscriptum($postscriptum)
@@ -99,8 +89,6 @@ class ContentUpdateEvent extends ContentCreateEvent
         return $this;
     }
 
-    /**
-     */
     public function getPostscriptum()
     {
         return $this->postscriptum;

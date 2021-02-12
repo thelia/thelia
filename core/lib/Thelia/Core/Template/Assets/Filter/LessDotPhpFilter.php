@@ -22,7 +22,7 @@ use Thelia\Log\Tlog;
 /**
  * Loads LESS files using the oyejorge/less.php PHP implementation of less.
  *
- * @link http://lessphp.gpeasy.com
+ * @see http://lessphp.gpeasy.com
  *
  * @author David Buchmann <david@liip.ch>
  * @author Kris Wallsmith <kris.wallsmith@gmail.com>
@@ -36,9 +36,9 @@ class LessDotPhpFilter extends LessphpFilter implements EventSubscriberInterface
     public function __construct($kernelEnvironment = 'prod')
     {
         // Assign and create the cache directory, if required.
-        $this->cacheDir = THELIA_CACHE_DIR . $kernelEnvironment . DS . 'less.php';
+        $this->cacheDir = THELIA_CACHE_DIR.$kernelEnvironment.DS.'less.php';
 
-        if (! is_dir($this->cacheDir)) {
+        if (!is_dir($this->cacheDir)) {
             $fs = new Filesystem();
 
             $fs->mkdir($this->cacheDir);
@@ -47,7 +47,7 @@ class LessDotPhpFilter extends LessphpFilter implements EventSubscriberInterface
 
     public function filterLoad(AssetInterface $asset)
     {
-        $filePath = $asset->getSourceRoot() . DS . $asset->getSourcePath();
+        $filePath = $asset->getSourceRoot().DS.$asset->getSourcePath();
 
         Tlog::getInstance()->addDebug("Starting CSS processing: $filePath...");
 
@@ -62,15 +62,15 @@ class LessDotPhpFilter extends LessphpFilter implements EventSubscriberInterface
         }
 
         $options = [
-            'cache_dir'     => $this->cacheDir,
-            'relativeUrls'  => false, // Relative paths in less files will be left unchanged.
-            'compress'      => true,
-            'import_dirs'   => $importDirs
+            'cache_dir' => $this->cacheDir,
+            'relativeUrls' => false, // Relative paths in less files will be left unchanged.
+            'compress' => true,
+            'import_dirs' => $importDirs,
         ];
 
         $css_file_name = \Less_Cache::Get([$filePath => ''], $options);
 
-        $content = @file_get_contents($this->cacheDir . DS . $css_file_name);
+        $content = @file_get_contents($this->cacheDir.DS.$css_file_name);
 
         if ($content === false) {
             $content = '';
@@ -80,7 +80,7 @@ class LessDotPhpFilter extends LessphpFilter implements EventSubscriberInterface
 
         $asset->setContent($content);
 
-        Tlog::getInstance()->addDebug("CSS processing done.");
+        Tlog::getInstance()->addDebug('CSS processing done.');
     }
 
     public function clearCacheDir()
@@ -93,7 +93,7 @@ class LessDotPhpFilter extends LessphpFilter implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::CACHE_CLEAR => ["clearCacheDir", 128],
+            TheliaEvents::CACHE_CLEAR => ['clearCacheDir', 128],
         ];
     }
 }

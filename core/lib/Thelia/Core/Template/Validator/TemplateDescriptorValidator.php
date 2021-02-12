@@ -17,9 +17,8 @@ use Thelia\Core\Template\Exception\InvalidDescriptorException;
 use Thelia\Log\Tlog;
 
 /**
- * Class TemplateDescriptorValidator
+ * Class TemplateDescriptorValidator.
  *
- * @package Thelia\Template
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class TemplateDescriptorValidator
@@ -45,17 +44,18 @@ class TemplateDescriptorValidator
         $this->xsdFinder = new Finder();
         $this->xsdFinder
             ->name('*.xsd')
-            ->in(__DIR__ . '/schema/template/');
+            ->in(__DIR__.'/schema/template/');
     }
 
     /**
      * @param string $version the XSD version to use,, or null to use the latest version
+     *
      * @return $this
      * @throw InvalidDescriptorException
      */
     public function validate($version = null)
     {
-        $dom    = new \DOMDocument();
+        $dom = new \DOMDocument();
         $errors = [];
 
         if ($dom->load($this->xmlDescriptorPath)) {
@@ -77,18 +77,19 @@ class TemplateDescriptorValidator
 
         throw new InvalidDescriptorException(
             sprintf(
-                "%s file is not a valid template descriptor : %s",
+                '%s file is not a valid template descriptor : %s',
                 $this->xmlDescriptorPath,
-                implode(", ", $errors)
+                implode(', ', $errors)
             )
         );
     }
 
     /**
-     * Validate the schema of a XML file with a given xsd file
+     * Validate the schema of a XML file with a given xsd file.
      *
-     * @param \DOMDocument $dom The XML document
+     * @param \DOMDocument $dom     The XML document
      * @param \SplFileInfo $xsdFile The XSD file
+     *
      * @return array an array of errors if validation fails, otherwise an empty array
      */
     protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile)
@@ -103,7 +104,7 @@ class TemplateDescriptorValidator
 
                 foreach ($errors as $error) {
                     $errorMessages[] = sprintf(
-                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d' . "\n",
+                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d'."\n",
                         $error->message,
                         $error->level,
                         $error->code,

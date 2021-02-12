@@ -15,14 +15,14 @@ namespace Thelia\Form\Cache;
 use Thelia\Form\BaseForm;
 
 /**
- * Class CacheFlushForm
- * @package Thelia\Form\Cache
+ * Class CacheFlushForm.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AssetsFlushForm extends BaseForm
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function buildForm()
     {
@@ -30,10 +30,10 @@ class AssetsFlushForm extends BaseForm
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getName()
     {
-        return "assets_flush";
+        return 'assets_flush';
     }
 }

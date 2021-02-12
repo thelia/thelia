@@ -23,9 +23,8 @@ use Thelia\Module\BaseModule;
 use Thelia\Tests\ContainerAwareTestCase;
 
 /**
- * Class ModuleDeactivateCommandTest
+ * Class ModuleDeactivateCommandTest.
  *
- * @package Thelia\Tests\Command
  * @author Nicolas Villa <nicolas@libre-shop.com>
  */
 class ModuleDeactivateCommandTest extends ContainerAwareTestCase
@@ -47,11 +46,11 @@ class ModuleDeactivateCommandTest extends ContainerAwareTestCase
 
             $application->add($moduleDeactivate);
 
-            $command = $application->find("module:deactivate");
+            $command = $application->find('module:deactivate');
             $commandTester = new CommandTester($command);
             $commandTester->execute([
-                "command" => $command->getName(),
-                "module" => $module->getCode(),
+                'command' => $command->getName(),
+                'module' => $module->getCode(),
             ]);
 
             $deactivated = ModuleQuery::create()->findPk($module->getId())->getActivate();
@@ -75,14 +74,14 @@ class ModuleDeactivateCommandTest extends ContainerAwareTestCase
 
             $application->add($moduleDeactivate);
 
-            $command = $application->find("module:deactivate");
+            $command = $application->find('module:deactivate');
             $commandTester = new CommandTester($command);
 
             $this->expectException(\RuntimeException::class);
-            $this->expectExceptionMessage("module Letshopethismoduledoesnotexists not found");
+            $this->expectExceptionMessage('module Letshopethismoduledoesnotexists not found');
             $commandTester->execute([
-                "command" => $command->getName(),
-                "module" => "letshopethismoduledoesnotexists",
+                'command' => $command->getName(),
+                'module' => 'letshopethismoduledoesnotexists',
             ]);
 
             $out = true;
@@ -90,16 +89,16 @@ class ModuleDeactivateCommandTest extends ContainerAwareTestCase
     }
 
     /**
-     * @param ContainerBuilder $container
-     * Use this method to build the container with the services that you need.
+     * @param containerBuilder $container
+     *                                    Use this method to build the container with the services that you need
      */
     protected function buildContainer(ContainerBuilder $container)
     {
         $eventDispatcher = new EventDispatcher();
         $eventDispatcher->addSubscriber(new Module($container, $this->getMockEventDispatcher()));
 
-        $container->set("event_dispatcher", $eventDispatcher);
+        $container->set('event_dispatcher', $eventDispatcher);
 
-        $container->setParameter('kernel.cache_dir', THELIA_CACHE_DIR . 'dev');
+        $container->setParameter('kernel.cache_dir', THELIA_CACHE_DIR.'dev');
     }
 }

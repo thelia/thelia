@@ -17,8 +17,7 @@ use Thelia\Model\Order;
 use Thelia\Model\OrderStatus;
 
 /**
- * Class OrderEvent
- * @package Thelia\Core\Event\Order
+ * Class OrderEvent.
  */
 class GetStockUpdateOperationOnOrderStatusChangeEvent extends ActionEvent
 {
@@ -69,11 +68,13 @@ class GetStockUpdateOperationOnOrderStatusChangeEvent extends ActionEvent
 
     /**
      * @param int $operation
+     *
      * @return $this
      */
     public function setOperation($operation)
     {
         $this->operation = $operation;
+
         return $this;
     }
 }

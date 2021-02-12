@@ -16,9 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Thelia\Type\AnyType;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class AnyTypeTest extends TestCase
 {

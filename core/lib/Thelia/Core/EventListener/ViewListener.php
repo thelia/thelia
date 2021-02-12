@@ -13,13 +13,11 @@
 namespace Thelia\Core\EventListener;
 
 use Symfony\Cmf\Component\Routing\ChainRouterInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -33,14 +31,12 @@ use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Exception\OrderException;
 
 /**
- *
  * ViewSubscriber Main class subscribing to view http response.
  *
  * @TODO Look if it's possible to block this definition in dependency-injection
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-
 class ViewListener implements EventSubscriberInterface
 {
     /** @var ParserInterface */
@@ -79,7 +75,6 @@ class ViewListener implements EventSubscriberInterface
      * Launch the parser defined on the constructor and get the result.
      *
      * The result is transform id needed into a Response object
-     *
      */
     public function onKernelView(ViewEvent $event)
     {
@@ -88,11 +83,11 @@ class ViewListener implements EventSubscriberInterface
         try {
             $view = $this->request->attributes->get('_view');
 
-            $viewId = $this->request->attributes->get($view . '_id');
+            $viewId = $this->request->attributes->get($view.'_id');
 
             $this->eventDispatcher->dispatch(new ViewCheckEvent($view, $viewId), TheliaEvents::VIEW_CHECK);
 
-            $content = $this->parser->render($view . '.html');
+            $content = $this->parser->render($view.'.html');
 
             if ($content instanceof Response) {
                 $response = $content;
@@ -128,14 +123,14 @@ class ViewListener implements EventSubscriberInterface
             $request->attributes->set('_view', $this->findView($request));
         }
 
-        if (null === $request->attributes->get($view . '_id')) {
-            $request->attributes->set($view . '_id', $this->findViewId($request, $view));
+        if (null === $request->attributes->get($view.'_id')) {
+            $request->attributes->set($view.'_id', $this->findViewId($request, $view));
         }
     }
 
     public function findView(Request $request)
     {
-        if (! $view = $request->query->get('view')) {
+        if (!$view = $request->query->get('view')) {
             $view = 'index';
             if ($request->request->has('view')) {
                 $view = $request->request->get('view');
@@ -147,10 +142,10 @@ class ViewListener implements EventSubscriberInterface
 
     public function findViewId(Request $request, $view)
     {
-        if (! $viewId = $request->query->get($view . '_id')) {
+        if (!$viewId = $request->query->get($view.'_id')) {
             $viewId = 0;
-            if ($request->request->has($view . '_id')) {
-                $viewId = $request->request->get($view . '_id');
+            if ($request->request->has($view.'_id')) {
+                $viewId = $request->request->get($view.'_id');
             }
         }
 
@@ -159,15 +154,15 @@ class ViewListener implements EventSubscriberInterface
 
     /**
      * {@inheritdoc}
-     * api
+     * api.
      */
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::VIEW =>[
+            KernelEvents::VIEW => [
                 ['onKernelView', 0],
-                ['beforeKernelView', 5]
-            ]
+                ['beforeKernelView', 5],
+            ],
         ];
     }
 }

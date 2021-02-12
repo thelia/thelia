@@ -19,7 +19,7 @@ use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 /**
- * This class implements variour admin template utilities
+ * This class implements variour admin template utilities.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
@@ -36,9 +36,11 @@ class AdminUtilities extends AbstractSmartyPlugin
 
     /**
      * @param \Smarty $smarty
-     * @param string $templateName
-     * @param array $variablesArray
+     * @param string  $templateName
+     * @param array   $variablesArray
+     *
      * @return string
+     *
      * @throws \Exception
      * @throws \SmartyException
      */
@@ -46,7 +48,7 @@ class AdminUtilities extends AbstractSmartyPlugin
     {
         $snippet_content = file_get_contents(
             $this->templateHelper->getActiveAdminTemplate()->getTemplateFilePath(
-                $templateName . '.html'
+                $templateName.'.html'
             )
         );
 
@@ -61,8 +63,8 @@ class AdminUtilities extends AbstractSmartyPlugin
     {
         $label = $this->getParam($params, 'label', null);
 
-        if (null !== $level = $this->getParam($params, [ 'l', 'level'], null)) {
-            $label = str_repeat('&nbsp;', 4 * $level) . $label;
+        if (null !== $level = $this->getParam($params, ['l', 'level'], null)) {
+            $label = str_repeat('&nbsp;', 4 * $level).$label;
         }
 
         return $label;
@@ -71,7 +73,9 @@ class AdminUtilities extends AbstractSmartyPlugin
     /**
      * @param $params
      * @param $smarty
+     *
      * @return mixed|string
+     *
      * @throws \Exception
      * @throws \SmartyException
      */
@@ -104,29 +108,32 @@ class AdminUtilities extends AbstractSmartyPlugin
         */
 
         if ($this->securityContext->isGranted(
-            ["ADMIN"],
+            ['ADMIN'],
             $resource === null ? [] : [$resource],
             $module === null ? [] : [$module],
             [$access]
         )
         ) {
             return $this->fetchSnippet($smarty, 'includes/admin-utilities-position-block', [
-                    'admin_utilities_go_up_url'           => URL::getInstance()->absoluteUrl($path, ['mode' => 'up', $url_parameter => $id]),
+                    'admin_utilities_go_up_url' => URL::getInstance()->absoluteUrl($path, ['mode' => 'up', $url_parameter => $id]),
                     'admin_utilities_in_place_edit_class' => $in_place_edit_class,
-                    'admin_utilities_object_id'           => $id,
-                    'admin_utilities_current_position'    => $position,
-                    'admin_utilities_go_down_url'         => URL::getInstance()->absoluteUrl($path, ['mode' => 'down', $url_parameter => $id])
+                    'admin_utilities_object_id' => $id,
+                    'admin_utilities_current_position' => $position,
+                    'admin_utilities_go_down_url' => URL::getInstance()->absoluteUrl($path, ['mode' => 'down', $url_parameter => $id]),
             ]);
         }
-            return $position;
+
+        return $position;
     }
 
     /**
-     * Generates the link of a sortable column header
+     * Generates the link of a sortable column header.
      *
-     * @param  array   $params
-     * @param  \Smarty $smarty
-     * @return string  no text is returned.
+     * @param array   $params
+     * @param \Smarty $smarty
+     *
+     * @return string no text is returned
+     *
      * @throws \Exception
      * @throws \SmartyException
      */
@@ -162,13 +169,13 @@ class AdminUtilities extends AbstractSmartyPlugin
 
         return $this->fetchSnippet($smarty, 'includes/admin-utilities-sortable-column-header', [
                 'admin_utilities_sort_direction' => $sort_direction,
-                'admin_utilities_sorting_url'    => URL::getInstance()->absoluteUrl($path, [$request_parameter_name => $order_change]),
-                'admin_utilities_header_text'    => $label
+                'admin_utilities_sorting_url' => URL::getInstance()->absoluteUrl($path, [$request_parameter_name => $order_change]),
+                'admin_utilities_header_text' => $label,
         ]);
     }
 
     /**
-     * Define the various smarty plugins handled by this class
+     * Define the various smarty plugins handled by this class.
      *
      * @return array of smarty plugin descriptors
      */

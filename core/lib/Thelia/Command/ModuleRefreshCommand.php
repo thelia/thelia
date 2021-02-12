@@ -19,9 +19,8 @@ use Thelia\Module\ModuleManagement;
 
 /**
  * Class ModuleRefreshCommand
- * Refresh modules list
+ * Refresh modules list.
  *
- * @package Thelia\Command
  * @author  Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class ModuleRefreshCommand extends ContainerAwareCommand
@@ -53,7 +52,7 @@ class ModuleRefreshCommand extends ContainerAwareCommand
                 [
                     '',
                     'Modules list successfully refreshed',
-                    ''
+                    '',
                 ],
                 'bg=green;fg=black'
             );

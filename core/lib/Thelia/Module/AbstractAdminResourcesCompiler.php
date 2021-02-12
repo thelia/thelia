@@ -15,20 +15,21 @@ namespace Thelia\Module;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * Class AbastractAdminResourcesCompiler
- * @package Thelia\Module
+ * Class AbastractAdminResourcesCompiler.
+ *
  * @since 2.3
+ *
  * @author Penalver Antony <apenalver@openstudio.fr>
  */
 abstract class AbstractAdminResourcesCompiler implements CompilerPassInterface
 {
     /**
-     * @return Array of resources
-     * Exemple :
-     * [
-     *      "ADDRESS" => "admin.address",
-     *      ...
-     * ]
+     * @return array of resources
+     *               Exemple :
+     *               [
+     *               "ADDRESS" => "admin.address",
+     *               ...
+     *               ]
      */
     abstract public function getResources();
 
@@ -38,17 +39,17 @@ abstract class AbstractAdminResourcesCompiler implements CompilerPassInterface
     abstract public function getModuleCode();
 
     /**
-     * Allow module to add resources in AdminResources Service
+     * Allow module to add resources in AdminResources Service.
      */
     public function process(\Symfony\Component\DependencyInjection\ContainerBuilder $container)
     {
-        if (!$container->hasDefinition("thelia.admin.resources")) {
+        if (!$container->hasDefinition('thelia.admin.resources')) {
             return;
         }
 
         /** @var \Symfony\Component\DependencyInjection\Definition $adminResources */
-        $adminResources = $container->getDefinition("thelia.admin.resources");
+        $adminResources = $container->getDefinition('thelia.admin.resources');
 
-        $adminResources->addMethodCall("addModuleResources", [$this->getResources(), $this->getModuleCode()]);
+        $adminResources->addMethodCall('addModuleResources', [$this->getResources(), $this->getModuleCode()]);
     }
 }

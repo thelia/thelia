@@ -25,13 +25,14 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\LangQuery;
 
 /**
- * Class ExportController
+ * Class ExportController.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class ExportController extends BaseAdminController
 {
     /**
-     * Handle default action, that is, list available exports
+     * Handle default action, that is, list available exports.
      *
      * @param string $_view View to render
      *
@@ -39,7 +40,7 @@ class ExportController extends BaseAdminController
      */
     public function indexAction($_view = 'export')
     {
-        $authResponse  = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::VIEW]);
+        $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::VIEW]);
         if ($authResponse !== null) {
             return $authResponse;
         }
@@ -53,13 +54,13 @@ class ExportController extends BaseAdminController
     }
 
     /**
-     * Handle export position change action
+     * Handle export position change action.
      *
      * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function changeExportPositionAction()
     {
-        $authResponse  = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
+        $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
         if ($authResponse !== null) {
             return $authResponse;
         }
@@ -79,13 +80,13 @@ class ExportController extends BaseAdminController
     }
 
     /**
-     * Handle export category position change action
+     * Handle export category position change action.
      *
      * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function changeCategoryPositionAction()
     {
-        $authResponse  = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
+        $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
         if ($authResponse !== null) {
             return $authResponse;
         }
@@ -105,11 +106,11 @@ class ExportController extends BaseAdminController
     }
 
     /**
-     * Match position mode string against position mode constant value
+     * Match position mode string against position mode constant value.
      *
-     * @param null|string $mode Position mode string
+     * @param string|null $mode Position mode string
      *
-     * @return integer Position mode constant value
+     * @return int Position mode constant value
      */
     protected function matchPositionMode($mode)
     {
@@ -125,9 +126,9 @@ class ExportController extends BaseAdminController
     }
 
     /**
-     * Display export configuration view
+     * Display export configuration view.
      *
-     * @param integer $id An export identifier
+     * @param int $id An export identifier
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
@@ -153,15 +154,15 @@ class ExportController extends BaseAdminController
                 'exportId' => $id,
                 'hasImages' => $export->hasImages(),
                 'hasDocuments' => $export->hasDocuments(),
-                'useRange' => $export->useRangeDate()
+                'useRange' => $export->useRangeDate(),
             ]
         );
     }
 
     /**
-     * Handle export action
+     * Handle export action.
      *
-     * @param integer $id An export identifier
+     * @param int $id An export identifier
      *
      * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
      */
@@ -182,7 +183,7 @@ class ExportController extends BaseAdminController
 
             set_time_limit(0);
 
-            $lang = (new LangQuery)->findPk($validatedForm->get('language')->getData());
+            $lang = (new LangQuery())->findPk($validatedForm->get('language')->getData());
 
             /** @var \Thelia\Core\Serializer\SerializerManager $serializerManager */
             $serializerManager = $this->container->get(RegisterSerializerPass::MANAGER_SERVICE_ID);
@@ -201,7 +202,7 @@ class ExportController extends BaseAdminController
             ) {
                 $rangeDate = [
                     'start' => $validatedForm->get('range_date_start')->getData(),
-                    'end' =>$validatedForm->get('range_date_end')->getData()
+                    'end' => $validatedForm->get('range_date_end')->getData(),
                 ];
             }
 
@@ -230,7 +231,7 @@ class ExportController extends BaseAdminController
                     ResponseHeaderBag::DISPOSITION_ATTACHMENT,
                     $exportEvent->getExport()->getFileName(),
                     $fileExt
-                )
+                ),
             ];
 
             return new BinaryFileResponse($exportEvent->getFilePath(), 200, $header, false);

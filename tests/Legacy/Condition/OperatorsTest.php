@@ -16,11 +16,9 @@ use PHPUnit\Framework\TestCase;
 use Thelia\Core\Translation\Translator;
 
 /**
- * Unit Test Operators Class
+ * Unit Test Operators Class.
  *
- * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class OperatorsTest extends TestCase
 {

@@ -15,8 +15,8 @@ namespace Thelia\Core\Security\Exception;
 use Thelia\Model\Customer;
 
 /**
- * Class CustomerNotConfirmedException
- * @package Thelia\Core\Security\Exception
+ * Class CustomerNotConfirmedException.
+ *
  * @author Baixas Alban <abaixas@openstudio.fr>
  */
 class CustomerNotConfirmedException extends AuthenticationException
@@ -38,6 +38,7 @@ class CustomerNotConfirmedException extends AuthenticationException
     public function setUser(Customer $user)
     {
         $this->user = $user;
+
         return $this;
     }
 }

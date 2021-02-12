@@ -12,18 +12,16 @@
 
 namespace Thelia\ImportExport\Export\Type;
 
-use PDO;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
 
 /**
- * Class ProductPricesExport
- * @package Thelia\ImportExport\Export\Type
+ * Class ProductPricesExport.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  * @contributor Thomas Arnaud <tarnaud@openstudio.fr>
+ *
  * @author Florian Bernard <fbernard@openstudio.fr>
  */
 class ProductPricesExport extends JsonFileAbstractExport
@@ -39,7 +37,7 @@ class ProductPricesExport extends JsonFileAbstractExport
         'product_price_price' => 'price',
         'product_price_promo_price' => 'promo_price',
         'currency_code' => 'currency',
-        'product_sale_elements_promo' => 'promo'
+        'product_sale_elements_promo' => 'promo',
     ];
 
     protected function getData()

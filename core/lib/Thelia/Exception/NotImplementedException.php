@@ -15,11 +15,9 @@ namespace Thelia\Exception;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 
 /**
- * Thrown when an Abstract method has not been implemented
+ * Thrown when an Abstract method has not been implemented.
  *
- * @package Exception
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class NotImplementedException extends BadMethodCallException
 {

@@ -1,9 +1,9 @@
 <?php
 
-include("php_version_check.php");
+include 'php_version_check.php';
 
 $step = 1;
-include("header.php");
+include 'header.php';
 
 ?>
 					<div class="well">
@@ -32,4 +32,4 @@ include("header.php");
 					<div class="clearfix">
 						<a href="permission.php" class="pull-right btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('Continue'); ?></a>
 					</div>
-<?php include("footer.php"); ?>
+<?php include 'footer.php'; ?>

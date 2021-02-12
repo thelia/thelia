@@ -19,13 +19,11 @@ use Thelia\Coupon\CouponManager;
 
 /**
  * Class RegisterListenersPass
- * Source code come from Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass class
+ * Source code come from Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass class.
  *
  * Register all available Conditions for the coupon module
  *
- * @package Thelia\Core\DependencyInjection\Compiler
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class RegisterCouponConditionPass implements CompilerPassInterface
 {
@@ -43,13 +41,13 @@ class RegisterCouponConditionPass implements CompilerPassInterface
         }
 
         $couponManager = $container->getDefinition(CouponManager::class);
-        $services = $container->findTaggedServiceIds("thelia.coupon.addCondition");
+        $services = $container->findTaggedServiceIds('thelia.coupon.addCondition');
 
         foreach ($services as $id => $condition) {
             $couponManager->addMethodCall(
                 'addAvailableCondition',
                 [
-                    new Reference($id)
+                    new Reference($id),
                 ]
             );
         }

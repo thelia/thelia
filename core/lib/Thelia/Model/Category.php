@@ -12,11 +12,9 @@
 
 namespace Thelia\Model;
 
-use phpDocumentor\Reflection\Types\Parent_;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\Category\CategoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
@@ -47,8 +45,7 @@ class Category extends BaseCategory implements FileModelParentInterface
     }
 
     /**
-     *
-     * count all products for current category and sub categories
+     * count all products for current category and sub categories.
      *
      * /!\ the number of queries is exponential, use it with caution
      *
@@ -74,8 +71,7 @@ class Category extends BaseCategory implements FileModelParentInterface
     }
 
     /**
-     *
-     * count visible products only for current category and sub categories
+     * count visible products only for current category and sub categories.
      *
      * /!\ the number of queries is exponential, use it with caution
      *
@@ -87,8 +83,9 @@ class Category extends BaseCategory implements FileModelParentInterface
     }
 
     /**
-     * Get the root category
-     * @param  int   $categoryId
+     * Get the root category.
+     *
+     * @param int $categoryId
      */
     public function getRoot($categoryId)
     {
@@ -106,7 +103,8 @@ class Category extends BaseCategory implements FileModelParentInterface
     }
 
     /**
-     * Calculate next position relative to our parent
+     * Calculate next position relative to our parent.
+     *
      * @param CategoryQuery $query
      */
     protected function addCriteriaToPositionQuery($query)
@@ -156,7 +154,7 @@ class Category extends BaseCategory implements FileModelParentInterface
 
         $this->reorderBeforeDelete(
             [
-                "parent" => $this->getParent(),
+                'parent' => $this->getParent(),
             ]
         );
         $this->deleteProducts($con);
@@ -182,9 +180,10 @@ class Category extends BaseCategory implements FileModelParentInterface
     }
 
     /**
-     * Overload for the position management
+     * Overload for the position management.
+     *
      * @param Base\ProductCategory $productCategory
-     * @inheritdoc
+     *                                              {@inheritdoc}
      */
     protected function doAddProductCategory($productCategory)
     {

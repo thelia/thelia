@@ -21,14 +21,15 @@ use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 
 /**
- * Class ProductPricesImport
+ * Class ProductPricesImport.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class ProductPricesImport extends AbstractImport
 {
     protected $mandatoryColumns = [
         'id',
-        'price'
+        'price',
     ];
 
     public function importData(array $data)
@@ -39,48 +40,48 @@ class ProductPricesImport extends AbstractImport
             return Translator::getInstance()->trans(
                 'The product sale element id %id doesn\'t exist',
                 [
-                    '%id' => $data['id']
+                    '%id' => $data['id'],
                 ]
             );
         }
-            $currency = null;
-            if (isset($data['currency'])) {
-                $currency = CurrencyQuery::create()->findOneByCode($data['currency']);
-            }
-            if ($currency === null) {
-                $currency = Currency::getDefaultCurrency();
-            }
+        $currency = null;
+        if (isset($data['currency'])) {
+            $currency = CurrencyQuery::create()->findOneByCode($data['currency']);
+        }
+        if ($currency === null) {
+            $currency = Currency::getDefaultCurrency();
+        }
 
-            $price = ProductPriceQuery::create()
+        $price = ProductPriceQuery::create()
                 ->filterByProductSaleElementsId($pse->getId())
                 ->findOneByCurrencyId($currency->getId())
             ;
 
-            if ($price === null) {
-                $price = new ProductPrice;
+        if ($price === null) {
+            $price = new ProductPrice();
 
-                $price
+            $price
                     ->setProductSaleElements($pse)
                     ->setCurrency($currency)
                 ;
-            }
+        }
 
-            $price->setPrice($data['price']);
+        $price->setPrice($data['price']);
 
-            if (isset($data['promo_price'])) {
-                $price->setPromoPrice($data['promo_price']);
-            }
+        if (isset($data['promo_price'])) {
+            $price->setPromoPrice($data['promo_price']);
+        }
 
-            if (isset($data['promo'])) {
-                $price
+        if (isset($data['promo'])) {
+            $price
                     ->getProductSaleElements()
                     ->setPromo((int) $data['promo'])
                     ->save()
                 ;
-            }
+        }
 
-            $price->save();
-            $this->importedRows++;
+        $price->save();
+        ++$this->importedRows;
 
         return null;
     }

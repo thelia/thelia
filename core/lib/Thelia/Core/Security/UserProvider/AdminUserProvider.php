@@ -25,7 +25,7 @@ class AdminUserProvider implements UserProviderInterface
             ->findOne();
 
         // Try with email address
-        if (null == $admin && ! empty($key)) {
+        if (null == $admin && !empty($key)) {
             $admin = AdminQuery::create()
                 ->filterByEmail($key, Criteria::EQUAL)
                 ->findOne();

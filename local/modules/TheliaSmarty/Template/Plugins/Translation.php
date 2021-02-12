@@ -31,7 +31,7 @@ class Translation extends AbstractSmartyPlugin
         'js',
         'locale',
         'default',
-        'fallback'
+        'fallback',
     ];
 
     public function __construct(TranslatorInterface $translator)
@@ -40,8 +40,7 @@ class Translation extends AbstractSmartyPlugin
     }
 
     /**
-     * Set the default translation domain
-     *
+     * Set the default translation domain.
      */
     public function setDefaultTranslationDomain(array $params)
     {
@@ -49,8 +48,7 @@ class Translation extends AbstractSmartyPlugin
     }
 
     /**
-     * Set the default locale
-     *
+     * Set the default locale.
      */
     public function setDefaultLocale(array $params)
     {
@@ -58,8 +56,7 @@ class Translation extends AbstractSmartyPlugin
     }
 
     /**
-     * Process translate function
-     *
+     * Process translate function.
      */
     public function translate(array $params): string
     {
@@ -83,7 +80,7 @@ class Translation extends AbstractSmartyPlugin
         );
 
         if ($this->getParam($params, 'js', 0)) {
-            $string = preg_replace("/(['\"])/", "\\\\$1", $string);
+            $string = preg_replace("/(['\"])/", '\\\$1', $string);
         }
 
         return $string;
@@ -100,7 +97,7 @@ class Translation extends AbstractSmartyPlugin
     }
 
     /**
-     * Define the various smarty plugins handled by this class
+     * Define the various smarty plugins handled by this class.
      *
      * @return \TheliaSmarty\Template\SmartyPluginDescriptor[] an array of smarty plugin descriptors
      */

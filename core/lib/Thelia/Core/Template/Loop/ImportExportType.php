@@ -13,7 +13,6 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Exception\ClassNotFoundException;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -27,24 +26,26 @@ use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**
- * Class ImportExportType
- * @package Thelia\Core\Template\Loop
+ * Class ImportExportType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  *
  * {@inheritdoc}
- * @method null|int[] getId()
- * @method null|string[] getRef()
- * @method null|int[] getCategory()
- * @method string[] getOrder()
+ *
+ * @method int[]|null    getId()
+ * @method string[]|null getRef()
+ * @method int[]|null    getCategory()
+ * @method string[]      getOrder()
  */
 abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    public const DEFAULT_ORDER = "manual";
+    public const DEFAULT_ORDER = 'manual';
 
     protected $timestampable = true;
 
     /**
      * @return LoopResult
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function parseResults(LoopResult $loopResult)
@@ -54,19 +55,19 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
             $loopResultRow = new LoopResultRow($type);
 
             $url = URL::getInstance()->absoluteUrl(
-                $this->getBaseUrl() . "/" . $type->getId()
+                $this->getBaseUrl().'/'.$type->getId()
             );
 
             try {
                 $loopResultRow
-                    ->set("HANDLE_CLASS", $type->getHandleClass())
-                    ->set("ID", $type->getId())
-                    ->set("REF", $type->getRef())
-                    ->set("TITLE", $type->getVirtualColumn("i18n_TITLE"))
-                    ->set("DESCRIPTION", $type->getVirtualColumn("i18n_DESCRIPTION"))
-                    ->set("URL", $url)
-                    ->set("POSITION", $type->getPosition())
-                    ->set("CATEGORY_ID", $type->getByName($this->getCategoryName()))
+                    ->set('HANDLE_CLASS', $type->getHandleClass())
+                    ->set('ID', $type->getId())
+                    ->set('REF', $type->getRef())
+                    ->set('TITLE', $type->getVirtualColumn('i18n_TITLE'))
+                    ->set('DESCRIPTION', $type->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set('URL', $url)
+                    ->set('POSITION', $type->getPosition())
+                    ->set('CATEGORY_ID', $type->getByName($this->getCategoryName()))
                 ;
             } catch (\Exception $e) {
                 Tlog::getInstance()->error($e->getMessage());
@@ -80,7 +81,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
     }
 
     /**
-     * this method returns a Propel ModelCriteria
+     * this method returns a Propel ModelCriteria.
      *
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      */
@@ -106,28 +107,28 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
         if (null !== $orders = $this->getOrder()) {
             foreach ($orders as $order) {
                 switch ($order) {
-                    case "id":
+                    case 'id':
                         $query->orderById();
                         break;
-                    case "id_reverse":
+                    case 'id_reverse':
                         $query->orderById(Criteria::DESC);
                         break;
-                    case "ref":
+                    case 'ref':
                         $query->orderByRef();
                         break;
-                    case "ref_reverse":
+                    case 'ref_reverse':
                         $query->orderByRef(Criteria::DESC);
                         break;
-                    case "alpha":
-                        $query->addAscendingOrderByColumn("i18n_TITLE");
+                    case 'alpha':
+                        $query->addAscendingOrderByColumn('i18n_TITLE');
                         break;
-                    case "alpha_reverse":
-                        $query->addDescendingOrderByColumn("i18n_TITLE");
+                    case 'alpha_reverse':
+                        $query->addDescendingOrderByColumn('i18n_TITLE');
                         break;
-                    case "manual":
+                    case 'manual':
                         $query->orderByPosition();
                         break;
-                    case "manual_reverse":
+                    case 'manual_reverse':
                         $query->orderByPosition(Criteria::DESC);
                         break;
                 }
@@ -138,7 +139,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
     }
 
     /**
-     * Definition of loop arguments
+     * Definition of loop arguments.
      *
      * example :
      *
@@ -168,7 +169,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
             Argument::createIntListTypeArgument('category'),
             Argument::createAnyListTypeArgument('ref'),
             new Argument(
-                "order",
+                'order',
                 new TypeCollection(
                     new EnumListType(static::getAllowedOrders())
                 ),
@@ -179,7 +180,7 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
 
     public static function getAllowedOrders()
     {
-        return ["id", "id_reverse", "ref", "ref_reverse", "alpha", "alpha_reverse", "manual", "manual_reverse"];
+        return ['id', 'id_reverse', 'ref', 'ref_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse'];
     }
 
     /**

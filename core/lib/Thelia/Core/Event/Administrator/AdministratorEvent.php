@@ -34,7 +34,7 @@ class AdministratorEvent extends ActionEvent
 
     public function hasAdministrator()
     {
-        return ! \is_null($this->administrator);
+        return !\is_null($this->administrator);
     }
 
     public function getAdministrator()

@@ -15,8 +15,8 @@ namespace Thelia\Core\Event\Payment;
 use Thelia\Module\PaymentModuleInterface;
 
 /**
- * Class ManageStockOnCreationEvent
- * @package Thelia\Core\Event\Payment
+ * Class ManageStockOnCreationEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class ManageStockOnCreationEvent extends BasePaymentEvent
@@ -46,6 +46,7 @@ class ManageStockOnCreationEvent extends BasePaymentEvent
     public function setManageStock($manageStock)
     {
         $this->manageStock = $manageStock;
+
         return $this;
     }
 }

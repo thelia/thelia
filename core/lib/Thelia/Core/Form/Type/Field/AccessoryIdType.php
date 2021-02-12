@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\AccessoryQuery;
 
 /**
- * Class AccessoryIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class AccessoryIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class AccessoryIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class AccessoryIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "accessory_id";
+        return 'accessory_id';
     }
 }

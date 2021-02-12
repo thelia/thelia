@@ -24,13 +24,12 @@ use Thelia\Model\Category;
 use Thelia\Model\Product;
 
 /**
- * @package Coupon
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class CartContainsCategoriesTest extends TestCase
 {
     /**
-     * Generate adapter stub
+     * Generate adapter stub.
      *
      * @param int    $cartTotalPrice   Cart total price
      * @param string $checkoutCurrency Checkout currency
@@ -130,9 +129,9 @@ class CartContainsCategoriesTest extends TestCase
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\CartContainsCategories::setValidators
+     * @covers \Thelia\Condition\Implementation\CartContainsCategories::setValidators
      */
     public function testInValidBackOfficeInputOperator()
     {
@@ -141,10 +140,10 @@ class CartContainsCategoriesTest extends TestCase
 
         $condition1 = new CartContainsCategories($stubFacade);
         $operators = [
-            CartContainsCategories::CATEGORIES_LIST => Operators::INFERIOR_OR_EQUAL
+            CartContainsCategories::CATEGORIES_LIST => Operators::INFERIOR_OR_EQUAL,
         ];
         $values = [
-            CartContainsCategories::CATEGORIES_LIST => []
+            CartContainsCategories::CATEGORIES_LIST => [],
         ];
         $this->expectException(InvalidConditionOperatorException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -152,14 +151,14 @@ class CartContainsCategoriesTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\CartContainsCategories::setValidators
+     * @covers \Thelia\Condition\Implementation\CartContainsCategories::setValidators
      */
     public function testInValidBackOfficeInputValue()
     {
@@ -168,10 +167,10 @@ class CartContainsCategoriesTest extends TestCase
 
         $condition1 = new CartContainsCategories($stubFacade);
         $operators = [
-            CartContainsCategories::CATEGORIES_LIST => Operators::IN
+            CartContainsCategories::CATEGORIES_LIST => Operators::IN,
         ];
         $values = [
-            CartContainsCategories::CATEGORIES_LIST => []
+            CartContainsCategories::CATEGORIES_LIST => [],
         ];
 
         $this->expectException(InvalidConditionValueException::class);
@@ -179,10 +178,9 @@ class CartContainsCategoriesTest extends TestCase
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\CartContainsCategories::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\CartContainsCategories::isMatching
      */
     public function testMatchingRule()
     {
@@ -191,10 +189,10 @@ class CartContainsCategoriesTest extends TestCase
 
         $condition1 = new CartContainsCategories($stubFacade);
         $operators = [
-            CartContainsCategories::CATEGORIES_LIST => Operators::IN
+            CartContainsCategories::CATEGORIES_LIST => Operators::IN,
         ];
         $values = [
-            CartContainsCategories::CATEGORIES_LIST => [10, 20]
+            CartContainsCategories::CATEGORIES_LIST => [10, 20],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -202,15 +200,14 @@ class CartContainsCategoriesTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\CartContainsCategories::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\CartContainsCategories::isMatching
      */
     public function testNotMatching()
     {
@@ -220,10 +217,10 @@ class CartContainsCategoriesTest extends TestCase
         $condition1 = new CartContainsCategories($stubFacade);
 
         $operators = [
-            CartContainsCategories::CATEGORIES_LIST => Operators::IN
+            CartContainsCategories::CATEGORIES_LIST => Operators::IN,
         ];
         $values = [
-            CartContainsCategories::CATEGORIES_LIST => [50, 60]
+            CartContainsCategories::CATEGORIES_LIST => [50, 60],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -231,7 +228,7 @@ class CartContainsCategoriesTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
@@ -243,10 +240,10 @@ class CartContainsCategoriesTest extends TestCase
         $condition1 = new CartContainsCategories($stubFacade);
 
         $operators = [
-            CartContainsCategories::CATEGORIES_LIST => Operators::IN
+            CartContainsCategories::CATEGORIES_LIST => Operators::IN,
         ];
         $values = [
-            CartContainsCategories::CATEGORIES_LIST => [50, 60]
+            CartContainsCategories::CATEGORIES_LIST => [50, 60],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -264,10 +261,9 @@ class CartContainsCategoriesTest extends TestCase
     }
 
     /**
-     * Check getName i18n
+     * Check getName i18n.
      *
-     * @covers Thelia\Condition\Implementation\CartContainsCategories::getName
-     *
+     * @covers \Thelia\Condition\Implementation\CartContainsCategories::getName
      */
     public function testGetName()
     {
@@ -282,10 +278,9 @@ class CartContainsCategoriesTest extends TestCase
     }
 
     /**
-     * Check tooltip i18n
+     * Check tooltip i18n.
      *
-     * @covers Thelia\Condition\Implementation\CartContainsCategories::getToolTip
-     *
+     * @covers \Thelia\Condition\Implementation\CartContainsCategories::getToolTip
      */
     public function testGetToolTip()
     {
@@ -300,10 +295,9 @@ class CartContainsCategoriesTest extends TestCase
     }
 
     /**
-     * Check validator
+     * Check validator.
      *
-     * @covers Thelia\Condition\Implementation\CartContainsCategories::generateInputs
-     *
+     * @covers \Thelia\Condition\Implementation\CartContainsCategories::generateInputs
      */
     public function testGetValidator()
     {
@@ -313,10 +307,10 @@ class CartContainsCategoriesTest extends TestCase
         $condition1 = new CartContainsCategories($stubFacade);
 
         $operators = [
-            CartContainsCategories::CATEGORIES_LIST => Operators::IN
+            CartContainsCategories::CATEGORIES_LIST => Operators::IN,
         ];
         $values = [
-            CartContainsCategories::CATEGORIES_LIST => [50, 60]
+            CartContainsCategories::CATEGORIES_LIST => [50, 60],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -331,15 +325,15 @@ class CartContainsCategoriesTest extends TestCase
                         'out' => 'Price',
                     ],
                     'value' => '',
-                    'selectedOperator' => 'in'
-                ]
+                    'selectedOperator' => 'in',
+                ],
             ],
             'setOperators' => [
-                'categories' => 'in'
+                'categories' => 'in',
             ],
             'setValues' => [
-                'categories' => [50, 60]
-            ]
+                'categories' => [50, 60],
+            ],
         ];
         $expected = $validators;
 

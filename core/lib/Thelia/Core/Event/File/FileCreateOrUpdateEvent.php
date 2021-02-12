@@ -19,9 +19,7 @@ use Thelia\Files\FileModelInterface;
 /**
  * Event fired when a file is created or updated.
  *
- * @package Thelia\Core\Event\Document
  * @author  Franck Allimant <franck@cqfdev.fr>
- *
  */
 class FileCreateOrUpdateEvent extends ActionEvent
 {
@@ -41,17 +39,17 @@ class FileCreateOrUpdateEvent extends ActionEvent
     protected $parentName;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param int $parentId file parent id
      */
     public function __construct($parentId)
     {
-        $this->parentId  = $parentId;
+        $this->parentId = $parentId;
     }
 
     /**
-     * Set file to save
+     * Set file to save.
      *
      * @param FileModelInterface $model Document to save
      *
@@ -65,7 +63,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * Get file being saved
+     * Get file being saved.
      *
      * @return FileModelInterface
      */
@@ -75,7 +73,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * Set Document parent id
+     * Set Document parent id.
      *
      * @param int $parentId Document parent id
      *
@@ -89,7 +87,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * Get Document parent id
+     * Get Document parent id.
      *
      * @return int
      */
@@ -99,7 +97,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * Set uploaded file
+     * Set uploaded file.
      *
      * @param UploadedFile|null $uploadedFile File being uploaded
      *
@@ -113,7 +111,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * Get uploaded file
+     * Get uploaded file.
      *
      * @return UploadedFile|null
      */
@@ -123,7 +121,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * Set parent name
+     * Set parent name.
      *
      * @param string $parentName Parent name
      *
@@ -137,7 +135,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * Get parent name
+     * Get parent name.
      *
      * @return string
      */
@@ -147,7 +145,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * Set old model value
+     * Set old model value.
      *
      * @param FileModelInterface $oldModel
      */
@@ -157,7 +155,7 @@ class FileCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * Get old model value
+     * Get old model value.
      *
      * @return FileModelInterface
      */

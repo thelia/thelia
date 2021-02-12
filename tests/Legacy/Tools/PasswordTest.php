@@ -16,8 +16,8 @@ use PHPUnit\Framework\TestCase;
 use Thelia\Tools\Password;
 
 /**
- * Class PasswordTest
- * @package Thelia\Tests\Type
+ * Class PasswordTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class PasswordTest extends TestCase

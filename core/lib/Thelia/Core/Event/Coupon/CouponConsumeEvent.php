@@ -15,11 +15,9 @@ namespace Thelia\Core\Event\Coupon;
 use Thelia\Core\Event\ActionEvent;
 
 /**
- * Occurring when a Coupon is consumed
+ * Occurring when a Coupon is consumed.
  *
- * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class CouponConsumeEvent extends ActionEvent
 {
@@ -32,11 +30,11 @@ class CouponConsumeEvent extends ActionEvent
     /** @var bool If Coupon is valid or if Customer meets coupon conditions */
     protected $isValid;
 
-    /** @var bool true if coupon offers free shipping  */
+    /** @var bool true if coupon offers free shipping */
     protected $freeShipping = false;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $code         Coupon code
      * @param float  $discount     Total discount given by this coupon
@@ -53,7 +51,7 @@ class CouponConsumeEvent extends ActionEvent
     }
 
     /**
-     * @param boolean $freeShipping
+     * @param bool $freeShipping
      */
     public function setFreeShipping($freeShipping)
     {
@@ -63,7 +61,7 @@ class CouponConsumeEvent extends ActionEvent
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getFreeShipping()
     {
@@ -71,7 +69,7 @@ class CouponConsumeEvent extends ActionEvent
     }
 
     /**
-     * Set Coupon code
+     * Set Coupon code.
      *
      * @param string $code Coupon code
      *
@@ -85,7 +83,7 @@ class CouponConsumeEvent extends ActionEvent
     }
 
     /**
-     * Get Coupon code
+     * Get Coupon code.
      *
      * @return string
      */
@@ -95,7 +93,7 @@ class CouponConsumeEvent extends ActionEvent
     }
 
     /**
-     * Set total discount given by this coupon
+     * Set total discount given by this coupon.
      *
      * @param float $discount Total discount given by this coupon
      *
@@ -109,7 +107,7 @@ class CouponConsumeEvent extends ActionEvent
     }
 
     /**
-     * Get total discount given by this coupon
+     * Get total discount given by this coupon.
      *
      * @return float
      */
@@ -119,10 +117,10 @@ class CouponConsumeEvent extends ActionEvent
     }
 
     /**
-     * Set if Coupon is valid or if Customer meets coupon conditions
+     * Set if Coupon is valid or if Customer meets coupon conditions.
      *
-     * @param boolean $isValid if Coupon is valid or
-     *                         if Customer meets coupon conditions
+     * @param bool $isValid if Coupon is valid or
+     *                      if Customer meets coupon conditions
      *
      * @return $this
      */
@@ -134,9 +132,9 @@ class CouponConsumeEvent extends ActionEvent
     }
 
     /**
-     * Get if Coupon is valid or if Customer meets coupon conditions
+     * Get if Coupon is valid or if Customer meets coupon conditions.
      *
-     * @return boolean
+     * @return bool
      */
     public function getIsValid()
     {

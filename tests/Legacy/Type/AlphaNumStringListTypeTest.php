@@ -16,9 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Thelia\Type\AlphaNumStringListType;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class AlphaNumStringListTypeTest extends TestCase
 {

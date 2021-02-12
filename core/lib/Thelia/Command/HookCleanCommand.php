@@ -26,31 +26,29 @@ use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
 
 /**
- * Clean hook
+ * Clean hook.
  *
  * Class HookCleanCommand
- * @package Thelia\Command
  *
  * @author Julien Chanséaume <julien@thelia.net>
- *
  */
 class HookCleanCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName("hook:clean")
-            ->setDescription("Clean hooks. It will delete all hooks, then recreate it.")
+            ->setName('hook:clean')
+            ->setDescription('Clean hooks. It will delete all hooks, then recreate it.')
             ->addOption(
-                "assume-yes",
+                'assume-yes',
                 'y',
                 InputOption::VALUE_NONE,
                 'Assume to answer yes to all questions'
             )
             ->addArgument(
-                "module",
+                'module',
                 InputArgument::OPTIONAL,
-                "The module code to clean up"
+                'The module code to clean up'
             );
     }
 
@@ -65,11 +63,12 @@ class HookCleanCommand extends ContainerAwareCommand
 
             $this->deleteHooks($module);
 
-            $output->writeln("<info>Hooks have been successfully deleted</info>");
+            $output->writeln('<info>Hooks have been successfully deleted</info>');
 
             $this->clearCache($output);
         } catch (\Exception $ex) {
-            $output->writeln(sprintf("<error>%s</error>", $ex->getMessage()));
+            $output->writeln(sprintf('<error>%s</error>', $ex->getMessage()));
+
             return 1;
         }
 
@@ -79,11 +78,11 @@ class HookCleanCommand extends ContainerAwareCommand
     private function getModule(InputInterface $input)
     {
         $module = null;
-        $moduleCode = $input->getArgument("module");
+        $moduleCode = $input->getArgument('module');
 
         if (!empty($moduleCode)) {
             if (null === $module = ModuleQuery::create()->findOneByCode($moduleCode)) {
-                throw new \RuntimeException(sprintf("Module %s does not exist.", $moduleCode));
+                throw new \RuntimeException(sprintf('Module %s does not exist.', $moduleCode));
             }
         }
 
@@ -92,22 +91,23 @@ class HookCleanCommand extends ContainerAwareCommand
 
     private function askConfirmation(InputInterface $input, OutputInterface $output)
     {
-        $assumeYes = $input->getOption("assume-yes");
-        $moduleCode = $input->getArgument("module");
+        $assumeYes = $input->getOption('assume-yes');
+        $moduleCode = $input->getArgument('module');
 
         if (!$assumeYes) {
             /** @var QuestionHelper $helper */
             $helper = $this->getHelper('question');
-            $questionText = "Would you like to delete all hooks ";
+            $questionText = 'Would you like to delete all hooks ';
             $questionText .= (empty($moduleCode))
-                ? "of all modules"
-                : "of module " . $moduleCode;
-            $questionText .= " ? (yes, or no) ";
+                ? 'of all modules'
+                : 'of module '.$moduleCode;
+            $questionText .= ' ? (yes, or no) ';
 
             $question = new ConfirmationQuestion($questionText, false);
 
             if (!$helper->ask($input, $output, $question)) {
-                $output->writeln("<info>No hooks deleted</info>");
+                $output->writeln('<info>No hooks deleted</info>');
+
                 return false;
             }
         }
@@ -116,9 +116,10 @@ class HookCleanCommand extends ContainerAwareCommand
     }
 
     /**
-     * Delete module hooks
+     * Delete module hooks.
      *
-     * @param Module|null $module if specified it will only delete hooks related to this module.
+     * @param Module|null $module if specified it will only delete hooks related to this module
+     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -149,11 +150,11 @@ class HookCleanCommand extends ContainerAwareCommand
     protected function clearCache(OutputInterface $output)
     {
         try {
-            $cacheDir = $this->getContainer()->getParameter("kernel.cache_dir");
+            $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
             $cacheEvent = new CacheEvent($cacheDir);
             $this->getDispatcher()->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
         } catch (\Exception $ex) {
-            throw new \Exception(sprintf("Error during clearing of cache : %s", $ex->getMessage()));
+            throw new \Exception(sprintf('Error during clearing of cache : %s', $ex->getMessage()));
         }
     }
 }

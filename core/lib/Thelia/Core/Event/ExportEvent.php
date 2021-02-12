@@ -18,7 +18,8 @@ use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\ImportExport\Export\AbstractExport;
 
 /**
- * Class ExportEvent
+ * Class ExportEvent.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class ExportEvent extends Event
@@ -34,7 +35,7 @@ class ExportEvent extends Event
     protected $serializer;
 
     /**
-     * @var null|\Thelia\Core\Archiver\ArchiverInterface An archiver interface
+     * @var \Thelia\Core\Archiver\ArchiverInterface|null An archiver interface
      */
     protected $archiver;
 
@@ -44,7 +45,7 @@ class ExportEvent extends Event
     protected $filePath;
 
     /**
-     * Event constructor
+     * Event constructor.
      *
      * @param \Thelia\ImportExport\Export\AbstractExport  $export     An export
      * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface
@@ -61,7 +62,7 @@ class ExportEvent extends Event
     }
 
     /**
-     * Get export
+     * Get export.
      *
      * @return \Thelia\ImportExport\Export\AbstractExport An export
      */
@@ -71,7 +72,7 @@ class ExportEvent extends Event
     }
 
     /**
-     * Set export
+     * Set export.
      *
      * @param \Thelia\ImportExport\Export\AbstractExport $export An export
      *
@@ -85,7 +86,7 @@ class ExportEvent extends Event
     }
 
     /**
-     * Get serializer
+     * Get serializer.
      *
      * @return \Thelia\Core\Serializer\SerializerInterface A serializer interface
      */
@@ -95,7 +96,7 @@ class ExportEvent extends Event
     }
 
     /**
-     * Set serializer
+     * Set serializer.
      *
      * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface
      *
@@ -109,7 +110,7 @@ class ExportEvent extends Event
     }
 
     /**
-     * Get archiver
+     * Get archiver.
      *
      * @return mixed|\Thelia\Core\Archiver\ArchiverInterface An archiver interface
      */
@@ -119,7 +120,7 @@ class ExportEvent extends Event
     }
 
     /**
-     * Set archiver
+     * Set archiver.
      *
      * @param mixed|\Thelia\Core\Archiver\ArchiverInterface $archiver An archiver interface
      *
@@ -133,7 +134,7 @@ class ExportEvent extends Event
     }
 
     /**
-     * Get export file path
+     * Get export file path.
      *
      * @return string Export file path
      */
@@ -143,7 +144,7 @@ class ExportEvent extends Event
     }
 
     /**
-     * Set export file path
+     * Set export file path.
      *
      * @param string $filePath Export file path
      *

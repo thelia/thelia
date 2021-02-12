@@ -16,7 +16,7 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Files\FileModelInterface;
 
 /**
- * Event fired when a file is about to be deleted
+ * Event fired when a file is about to be deleted.
  *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
@@ -26,7 +26,7 @@ class FileDeleteEvent extends ActionEvent
     protected $fileToDelete;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param FileModelInterface $fileToDelete Image about to be deleted
      */
@@ -36,7 +36,7 @@ class FileDeleteEvent extends ActionEvent
     }
 
     /**
-     * Set Image about to be deleted
+     * Set Image about to be deleted.
      *
      * @param FileModelInterface $fileToDelete Image about to be deleted
      *
@@ -50,7 +50,7 @@ class FileDeleteEvent extends ActionEvent
     }
 
     /**
-     * Get Image about to be deleted
+     * Get Image about to be deleted.
      *
      * @return FileModelInterface
      */

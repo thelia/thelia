@@ -20,8 +20,8 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\State as StateModel;
 
 /**
- * Class StateTest
- * @package Thelia\Tests\Action
+ * Class StateTest.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class StateTest extends BaseAction
@@ -61,6 +61,7 @@ class StateTest extends BaseAction
 
     /**
      * @depends testCreate
+     *
      * @return StateModel
      */
     public function testUpdate(StateModel $state)

@@ -16,8 +16,8 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\Currency;
 
 /**
- * Class CurrencyChangeEvent
- * @package Thelia\Core\Event\Currency
+ * Class CurrencyChangeEvent.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class CurrencyChangeEvent extends CurrencyEvent

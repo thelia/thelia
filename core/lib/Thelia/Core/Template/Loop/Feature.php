@@ -32,23 +32,22 @@ use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * Feature loop
- *
+ * Feature loop.
  *
  * Class Feature
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[] getProduct()
- * @method int[] getTemplate()
- * @method int[] getExcludeTemplate()
+ *
+ * @method int[]       getId()
+ * @method int[]       getProduct()
+ * @method int[]       getTemplate()
+ * @method int[]       getExcludeTemplate()
  * @method bool|string getVisible()
- * @method int[] getExclude()
- * @method string getTitle()
- * @method string[] getOrder()
+ * @method int[]       getExclude()
+ * @method string      getTitle()
+ * @method string[]    getOrder()
  */
 class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -81,6 +80,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
     /**
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria|FeatureQuery
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function buildModelCriteria()
@@ -128,7 +128,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
             /** @var ProductModel $product */
             foreach ($products as $product) {
-                if (! $this->getBackendContext()) {
+                if (!$this->getBackendContext()) {
                     $search
                         ->useFeatureProductQuery()
                         ->filterByProduct($product)
@@ -138,7 +138,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
                 $tplId = $product->getTemplateId();
 
-                if (! empty($tplId)) {
+                if (!empty($tplId)) {
                     $template[] = $tplId;
                 }
             }
@@ -150,7 +150,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        if (! empty($template)) {
+        if (!empty($template)) {
             // Join with feature_template table to get position, if a manual order position is required
             if (\count(array_diff(['manual_reverse', 'manual'], $this->getOrder())) < 2) {
                 $search
@@ -192,30 +192,30 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "id":
+                case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case "id_reverse":
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha-reverse":
+                case 'alpha-reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "manual":
+                case 'manual':
                     if ($this->useFeaturePosition) {
                         $search->orderByPosition(Criteria::ASC);
                     } else {
                         $search->addAscendingOrderByColumn(FeatureTemplateTableMap::COL_POSITION);
                     }
                     break;
-                case "manual_reverse":
+                case 'manual_reverse':
                     if ($this->useFeaturePosition) {
                         $search->orderByPosition(Criteria::DESC);
                     } else {
@@ -230,6 +230,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
     /**
      * @return LoopResult
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function parseResults(LoopResult $loopResult)
@@ -237,14 +238,14 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         /** @var FeatureModel $feature */
         foreach ($loopResult->getResultDataCollection() as $feature) {
             $loopResultRow = new LoopResultRow($feature);
-            $loopResultRow->set("ID", $feature->getId())
-                ->set("IS_TRANSLATED", $feature->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("TITLE", $feature->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $feature->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $feature->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $feature->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("POSITION", $this->useFeaturePosition ? $feature->getPosition() : $feature->getVirtualColumn('position'))
+            $loopResultRow->set('ID', $feature->getId())
+                ->set('IS_TRANSLATED', $feature->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('TITLE', $feature->getVirtualColumn('i18n_TITLE'))
+                ->set('CHAPO', $feature->getVirtualColumn('i18n_CHAPO'))
+                ->set('DESCRIPTION', $feature->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $feature->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set('POSITION', $this->useFeaturePosition ? $feature->getPosition() : $feature->getVirtualColumn('position'))
             ;
             $this->addOutputFields($loopResultRow, $feature);
 

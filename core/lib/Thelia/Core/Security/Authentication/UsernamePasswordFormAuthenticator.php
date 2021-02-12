@@ -41,7 +41,7 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
         $defaults = [
             'required_method' => 'POST',
             'username_field_name' => 'username',
-            'password_field_name' => 'password'
+            'password_field_name' => 'password',
         ];
 
         $this->options = array_merge($defaults, $options);
@@ -61,8 +61,8 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
     public function getAuthentifiedUser()
     {
         if ($this->request->isMethod($this->options['required_method'])) {
-            if (! $this->loginForm->isValid()) {
-                throw new ValidatorException("Form is not valid.");
+            if (!$this->loginForm->isValid()) {
+                throw new ValidatorException('Form is not valid.');
             }
 
             // Retreive user
@@ -84,7 +84,7 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
 
             if (ConfigQuery::isCustomerEmailConfirmationEnable() && $user instanceof Customer) {
                 // Customer email confirmation feature is available since Thelia 2.3.4
-                if ($user->getConfirmationToken() !== null && ! $user->getEnable()) {
+                if ($user->getConfirmationToken() !== null && !$user->getEnable()) {
                     throw (new CustomerNotConfirmedException())->setUser($user);
                 }
             }
@@ -92,6 +92,6 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
             return $user;
         }
 
-        throw new \RuntimeException("Invalid method.");
+        throw new \RuntimeException('Invalid method.');
     }
 }

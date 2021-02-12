@@ -17,25 +17,21 @@ use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
 /**
  * Skeleton subclass for performing query and update operations on the 'config' table.
  *
- *
- *
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
- *
  */
 class ConfigQuery extends BaseConfigQuery
 {
     protected static $cache = [];
 
     /**
-     *
      * Find a config variable and return the value or default value if not founded.
      *
      * Use this method for better performance, a cache is created for each variable already searched
      *
      * @param $search
-     * @param  null  $default
+     * @param null $default
      */
     public static function read($search, $default = null)
     {
@@ -88,22 +84,22 @@ class ConfigQuery extends BaseConfigQuery
 
     public static function getConfiguredShopUrl()
     {
-        return ConfigQuery::read("url_site", '');
+        return ConfigQuery::read('url_site', '');
     }
 
     public static function getDefaultLangWhenNoTranslationAvailable()
     {
-        return ConfigQuery::read("default_lang_without_translation", 1);
+        return ConfigQuery::read('default_lang_without_translation', 1);
     }
 
     public static function isRewritingEnable()
     {
-        return self::read("rewriting_enable") == 1;
+        return self::read('rewriting_enable') == 1;
     }
 
     public static function getPageNotFoundView()
     {
-        return self::read("page_not_found_view", '404.html');
+        return self::read('page_not_found_view', '404.html');
     }
 
     public static function getObsoleteRewrittenUrlView()
@@ -143,6 +139,7 @@ class ConfigQuery extends BaseConfigQuery
 
     /**
      * @since 2.3.0-alpha2
+     *
      * @return int|null the store country id
      */
     public static function getStoreCountry()
@@ -152,6 +149,7 @@ class ConfigQuery extends BaseConfigQuery
 
     /**
      * @since 2.3.0-alpha2
+     *
      * @return bool
      */
     public static function getNotifyNewsletterSubscription()
@@ -161,6 +159,7 @@ class ConfigQuery extends BaseConfigQuery
 
     /**
      * @since 2.4
+     *
      * @return bool
      */
     public static function isCustomerEmailConfirmationEnable()
@@ -175,7 +174,7 @@ class ConfigQuery extends BaseConfigQuery
     {
         $contactEmail = self::getStoreEmail();
 
-        $list = preg_split("/[,;]/", self::read('store_notification_emails', $contactEmail));
+        $list = preg_split('/[,;]/', self::read('store_notification_emails', $contactEmail));
 
         $arr = [];
 
@@ -281,6 +280,7 @@ class ConfigQuery extends BaseConfigQuery
     {
         self::write('smtp.sourceip', $value, 1, 1);
     }
+
     /* end smtp config */
 
     /* Thelia version */
@@ -295,7 +295,7 @@ class ConfigQuery extends BaseConfigQuery
 
     public static function isShowingErrorMessage()
     {
-        return (bool) static::read("error_message.show", false);
+        return (bool) static::read('error_message.show', false);
     }
 
     /**
@@ -303,37 +303,37 @@ class ConfigQuery extends BaseConfigQuery
      */
     public static function setShowingErrorMessage($v)
     {
-        static::write("error_message.show", (int) (@(bool) $v));
+        static::write('error_message.show', (int) (@(bool) $v));
     }
 
     public static function getErrorMessagePageName()
     {
-        return static::read("error_message.page_name");
+        return static::read('error_message.page_name');
     }
 
     public static function setErrorMessagePageName($v)
     {
-        static::write("error_message.page_name", $v);
+        static::write('error_message.page_name', $v);
     }
 
     public static function getAdminCacheHomeStatsTTL()
     {
-        return \intval(static::read("admin_cache_home_stats_ttl", 600));
+        return \intval(static::read('admin_cache_home_stats_ttl', 600));
     }
 
     /**
-     * check if Thelia multi domain is activated. (Means one domain for each language)
+     * check if Thelia multi domain is activated. (Means one domain for each language).
      *
      * @return bool
      */
     public static function isMultiDomainActivated()
     {
-        return (bool) self::read("one_domain_foreach_lang", false);
+        return (bool) self::read('one_domain_foreach_lang', false);
     }
 
     public static function getMinimuAdminPasswordLength()
     {
-        return self::read("minimum_admin_password_length", 4);
+        return self::read('minimum_admin_password_length', 4);
     }
 }
 // ConfigQuery

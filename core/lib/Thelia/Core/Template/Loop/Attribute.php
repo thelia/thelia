@@ -30,20 +30,19 @@ use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * Attribute loop
- *
+ * Attribute loop.
  *
  * Class Attribute
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[] getProduct()
- * @method int[] getTemplate()
- * @method int[] getExcludeTemplate()
- * @method int[] getExclude()
+ *
+ * @method int[]    getId()
+ * @method int[]    getProduct()
+ * @method int[]    getTemplate()
+ * @method int[]    getExcludeTemplate()
+ * @method int[]    getExclude()
  * @method string[] getOrder()
  */
 class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -113,7 +112,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
                 foreach ($products as $product) {
                     $tplId = $product->getTemplateId();
 
-                    if (! \is_null($tplId)) {
+                    if (!\is_null($tplId)) {
                         $template[] = $tplId;
                     }
                 }
@@ -126,7 +125,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        if (! empty($template)) {
+        if (!empty($template)) {
             // Join with feature_template table to get position
             $search
                 ->withColumn(AttributeTemplateTableMap::COL_POSITION, 'position')
@@ -148,30 +147,30 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
             ;
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "id":
+                case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case "id_reverse":
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha_reverse":
+                case 'alpha_reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "manual":
+                case 'manual':
                     if ($this->useAttributePosistion) {
                         $search->orderByPosition(Criteria::ASC);
                     } else {
                         $search->addAscendingOrderByColumn(AttributeTemplateTableMap::COL_POSITION);
                     }
                     break;
-                case "manual_reverse":
+                case 'manual_reverse':
                     if ($this->useAttributePosistion) {
                         $search->orderByPosition(Criteria::DESC);
                     } else {
@@ -189,14 +188,14 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
         /** @var AttributeModel $attribute */
         foreach ($loopResult->getResultDataCollection() as $attribute) {
             $loopResultRow = new LoopResultRow($attribute);
-            $loopResultRow->set("ID", $attribute->getId())
-                ->set("IS_TRANSLATED", $attribute->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("TITLE", $attribute->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $attribute->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $attribute->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $attribute->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("POSITION", $this->useAttributePosistion ? $attribute->getPosition() : $attribute->getVirtualColumn('position'))
+            $loopResultRow->set('ID', $attribute->getId())
+                ->set('IS_TRANSLATED', $attribute->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('TITLE', $attribute->getVirtualColumn('i18n_TITLE'))
+                ->set('CHAPO', $attribute->getVirtualColumn('i18n_CHAPO'))
+                ->set('DESCRIPTION', $attribute->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $attribute->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set('POSITION', $this->useAttributePosistion ? $attribute->getPosition() : $attribute->getVirtualColumn('position'))
             ;
             $this->addOutputFields($loopResultRow, $attribute);
 

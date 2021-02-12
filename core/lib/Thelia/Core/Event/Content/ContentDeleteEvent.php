@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Content;
 
 /**
- * Class ContentDeleteEvent
- * @package Thelia\Core\Event\Content
+ * Class ContentDeleteEvent.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class ContentDeleteEvent extends ContentEvent
@@ -34,7 +34,6 @@ class ContentDeleteEvent extends ContentEvent
     }
 
     /**
-     *
      * @return $this
      */
     public function setContentId($content_id)
@@ -44,8 +43,6 @@ class ContentDeleteEvent extends ContentEvent
         return $this;
     }
 
-    /**
-     */
     public function getContentId()
     {
         return $this->content_id;

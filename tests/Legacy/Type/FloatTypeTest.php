@@ -16,9 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Thelia\Type\FloatType;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class FloatTypeTest extends TestCase
 {

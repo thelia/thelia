@@ -51,20 +51,20 @@ class BaseModule implements BaseModuleInterface
 {
     use ContainerAwareTrait;
 
-    public const CLASSIC_MODULE_TYPE  = 1;
+    public const CLASSIC_MODULE_TYPE = 1;
     public const DELIVERY_MODULE_TYPE = 2;
-    public const PAYMENT_MODULE_TYPE  = 3;
+    public const PAYMENT_MODULE_TYPE = 3;
 
     public const MODULE_CATEGORIES = 'classic,delivery,payment,marketplace,price,accounting,seo,administration,statistic';
 
-    public const IS_ACTIVATED     = 1;
+    public const IS_ACTIVATED = 1;
     public const IS_NOT_ACTIVATED = 0;
 
-    public const IS_MANDATORY       = 1;
-    public const IS_NOT_MANDATORY   = 0;
+    public const IS_MANDATORY = 1;
+    public const IS_NOT_MANDATORY = 0;
 
-    public const IS_HIDDEN        = 1;
-    public const IS_NOT_HIDDEN    = 0;
+    public const IS_HIDDEN = 1;
+    public const IS_NOT_HIDDEN = 0;
 
     protected $reflected;
 
@@ -76,6 +76,7 @@ class BaseModule implements BaseModuleInterface
 
     /**
      * @param Module $moduleModel
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      * @throws \Throwable
      */
@@ -147,7 +148,7 @@ class BaseModule implements BaseModuleInterface
     public function getContainer()
     {
         if ($this->hasContainer() === false) {
-            throw new \RuntimeException("Sorry, container is not available in this context");
+            throw new \RuntimeException('Sorry, container is not available in this context');
         }
 
         return $this->container;
@@ -164,7 +165,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @return \Thelia\Core\HttpFoundation\Request the request.
+     * @return \Thelia\Core\HttpFoundation\Request the request
      *
      * @throws \RuntimeException
      */
@@ -176,7 +177,7 @@ class BaseModule implements BaseModuleInterface
         }
 
         if ($this->hasRequest() === false) {
-            throw new \RuntimeException("Sorry, the request is not available in this context");
+            throw new \RuntimeException('Sorry, the request is not available in this context');
         }
 
         return $this->request;
@@ -194,6 +195,7 @@ class BaseModule implements BaseModuleInterface
 
     /**
      * @return EventDispatcherInterface
+     *
      * @throws \RuntimeException
      */
     public function getDispatcher()
@@ -204,14 +206,14 @@ class BaseModule implements BaseModuleInterface
         }
 
         if ($this->hasDispatcher() === false) {
-            throw new \RuntimeException("Sorry, the dispatcher is not available in this context");
+            throw new \RuntimeException('Sorry, the dispatcher is not available in this context');
         }
 
         return $this->dispatcher;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setTitle(Module $module, $titles)
     {
@@ -238,7 +240,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getConfigValue($variableName, $defaultValue = null, $valueLocale = null)
     {
@@ -247,7 +249,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function setConfigValue($variableName, $variableValue, $valueLocale = null, $createIfNotExists = true)
     {
@@ -256,7 +258,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function deployImageFolder(Module $module, $folderPath, ConnectionInterface $con = null)
     {
@@ -289,37 +291,37 @@ class BaseModule implements BaseModuleInterface
                     $image->setPosition($imagePosition);
                     $image->save($con);
 
-                    $imageDirectory = sprintf("%s/media/images/module", THELIA_LOCAL_DIR);
-                    $imageFileName = sprintf("%s-%d-%s", $module->getCode(), $image->getId(), $fileName);
+                    $imageDirectory = sprintf('%s/media/images/module', THELIA_LOCAL_DIR);
+                    $imageFileName = sprintf('%s-%d-%s', $module->getCode(), $image->getId(), $fileName);
 
                     $increment = 0;
-                    while (file_exists($imageDirectory . '/' . $imageFileName)) {
+                    while (file_exists($imageDirectory.'/'.$imageFileName)) {
                         $imageFileName = sprintf(
-                            "%s-%d-%d-%s",
+                            '%s-%d-%d-%s',
                             $module->getCode(),
                             $image->getId(),
                             $increment,
                             $fileName
                         );
-                        $increment++;
+                        ++$increment;
                     }
 
                     $imagePath = sprintf('%s/%s', $imageDirectory, $imageFileName);
 
-                    if (! is_dir($imageDirectory)) {
-                        if (! @mkdir($imageDirectory, 0777, true)) {
+                    if (!is_dir($imageDirectory)) {
+                        if (!@mkdir($imageDirectory, 0777, true)) {
                             $con->rollBack();
                             throw new ModuleException(
-                                sprintf("Cannot create directory : %s", $imageDirectory),
+                                sprintf('Cannot create directory : %s', $imageDirectory),
                                 ModuleException::CODE_NOT_FOUND
                             );
                         }
                     }
 
-                    if (! @copy($filePath, $imagePath)) {
+                    if (!@copy($filePath, $imagePath)) {
                         $con->rollBack();
                         throw new ModuleException(
-                            sprintf("Cannot copy file : %s to : %s", $filePath, $imagePath),
+                            sprintf('Cannot copy file : %s to : %s', $filePath, $imagePath),
                             ModuleException::CODE_NOT_FOUND
                         );
                     }
@@ -328,14 +330,14 @@ class BaseModule implements BaseModuleInterface
                     $image->save($con);
 
                     $con->commit();
-                    $imagePosition++;
+                    ++$imagePosition;
                 }
             }
         }
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getModuleModel()
     {
@@ -344,7 +346,7 @@ class BaseModule implements BaseModuleInterface
 
             if (null === $this->moduleModel) {
                 throw new ModuleException(
-                    sprintf("Module Code `%s` not found", $this->getCode()),
+                    sprintf('Module Code `%s` not found', $this->getCode()),
                     ModuleException::CODE_NOT_FOUND
                 );
             }
@@ -362,16 +364,16 @@ class BaseModule implements BaseModuleInterface
     private static $moduleIds = [];
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getModuleId()
     {
         $code = self::getModuleCode();
 
-        if (! isset(self::$moduleIds[$code])) {
+        if (!isset(self::$moduleIds[$code])) {
             if (null === $module = ModuleQuery::create()->findOneByCode($code)) {
                 throw new ModuleException(
-                    sprintf("Module Code `%s` not found", $code),
+                    sprintf('Module Code `%s` not found', $code),
                     ModuleException::CODE_NOT_FOUND
                 );
             }
@@ -383,7 +385,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getModuleCode()
     {
@@ -401,10 +403,11 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * Check if this module is the payment module for a given order
+     * Check if this module is the payment module for a given order.
      *
-     * @param  Order $order an order
-     * @return bool  true if this module is the payment module for the given order.
+     * @param Order $order an order
+     *
+     * @return bool true if this module is the payment module for the given order
      */
     public function isPaymentModuleFor(Order $order)
     {
@@ -414,10 +417,11 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * Check if this module is the delivery module for a given order
+     * Check if this module is the delivery module for a given order.
      *
-     * @param  Order $order an order
-     * @return bool  true if this module is the delivery module for the given order.
+     * @param Order $order an order
+     *
+     * @return bool true if this module is the delivery module for the given order
      */
     public function isDeliveryModuleFor(Order $order)
     {
@@ -434,9 +438,9 @@ class BaseModule implements BaseModuleInterface
      *
      * @param bool $with_tax      if true, to total price will include tax amount
      * @param bool $with_discount if true, the total price will include discount, if any
-     * @param bool $with_postage  if true, the total price will include the delivery costs, if any.
+     * @param bool $with_postage  if true, the total price will include the delivery costs, if any
      *
-     * @return float|int the current order amount.
+     * @return float|int the current order amount
      */
     public function getCurrentOrderTotalAmount($with_tax = true, $with_discount = true, $with_postage = true)
     {
@@ -450,7 +454,7 @@ class BaseModule implements BaseModuleInterface
         $order = $session->getOrder();
 
         /** @var TaxEngine $taxEngine */
-        $taxEngine = $this->getContainer()->get("thelia.taxEngine");
+        $taxEngine = $this->getContainer()->get('thelia.taxEngine');
 
         /** @var Country $country */
         $country = $taxEngine->getDeliveryCountry();
@@ -471,7 +475,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getCompilers()
     {
@@ -494,7 +498,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function install(ConnectionInterface $con = null)
     {
@@ -502,7 +506,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
     {
@@ -510,7 +514,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function preActivation(ConnectionInterface $con = null)
     {
@@ -519,7 +523,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function postActivation(ConnectionInterface $con = null)
     {
@@ -527,7 +531,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function preDeactivation(ConnectionInterface $con = null)
     {
@@ -536,7 +540,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function postDeactivation(ConnectionInterface $con = null)
     {
@@ -544,7 +548,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
     {
@@ -552,7 +556,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getHooks()
     {
@@ -560,7 +564,7 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function registerHooks()
     {
@@ -574,19 +578,19 @@ class BaseModule implements BaseModuleInterface
             /**
              * @var EventDispatcherInterface $dispatcher
              */
-            $dispatcher = $this->container->get("event_dispatcher");
+            $dispatcher = $this->container->get('event_dispatcher');
 
             foreach ($moduleHooks as $hook) {
                 $isValid = \is_array($hook) &&
-                    isset($hook["type"]) &&
-                    \array_key_exists($hook["type"], $allowedTypes) &&
-                    isset($hook["code"]) &&
-                    \is_string($hook["code"]) &&
-                    !empty($hook["code"])
+                    isset($hook['type']) &&
+                    \array_key_exists($hook['type'], $allowedTypes) &&
+                    isset($hook['code']) &&
+                    \is_string($hook['code']) &&
+                    !empty($hook['code'])
                 ;
 
                 if (!$isValid) {
-                    Tlog::getInstance()->notice("The module ".$this->getCode()." tried to register an invalid hook");
+                    Tlog::getInstance()->notice('The module '.$this->getCode().' tried to register an invalid hook');
 
                     continue;
                 }
@@ -599,7 +603,7 @@ class BaseModule implements BaseModuleInterface
                 [$hookModel, $updateData] = $this->createOrUpdateHook($hook, $dispatcher, $defaultLocale);
 
                 /**
-                 * Update translations
+                 * Update translations.
                  */
                 $event = new HookUpdateEvent($hookModel->getId());
 
@@ -613,9 +617,9 @@ class BaseModule implements BaseModuleInterface
                         ->setNative($hookModel->getNative())
                         ->setType($hookModel->getType())
                         ->setLocale($locale)
-                        ->setChapo($data["chapo"])
-                        ->setTitle($data["title"])
-                        ->setDescription($data["description"])
+                        ->setChapo($data['chapo'])
+                        ->setTitle($data['title'])
+                        ->setDescription($data['description'])
                     ;
 
                     $dispatcher->dispatch($event, TheliaEvents::HOOK_UPDATE);
@@ -626,7 +630,7 @@ class BaseModule implements BaseModuleInterface
 
     protected function createOrUpdateHook(array $hook, EventDispatcherInterface $dispatcher, $defaultLocale)
     {
-        $hookModel = HookQuery::create()->filterByCode($hook["code"])->findOne();
+        $hookModel = HookQuery::create()->filterByCode($hook['code'])->findOne();
 
         if ($hookModel === null) {
             $event = new HookCreateAllEvent();
@@ -635,13 +639,13 @@ class BaseModule implements BaseModuleInterface
         }
 
         /**
-         * Get used I18n variables
+         * Get used I18n variables.
          */
         $locale = $defaultLocale;
 
         [$titles, $descriptions, $chapos] = $this->getHookI18nInfo($hook, $defaultLocale);
 
-        /**
+        /*
          * If the default locale exists
          * extract it to save it in create action
          *
@@ -661,23 +665,23 @@ class BaseModule implements BaseModuleInterface
         $description = $this->arrayKeyPop($locale, $descriptions);
         $chapo = $this->arrayKeyPop($locale, $chapos);
 
-        /**
+        /*
          * Set data
          */
         $event
-            ->setBlock(isset($hook["block"]) && (bool) $hook["block"])
+            ->setBlock(isset($hook['block']) && (bool) $hook['block'])
             ->setLocale($locale)
             ->setTitle($title)
             ->setDescription($description)
             ->setChapo($chapo)
-            ->setType($hook["type"])
-            ->setCode($hook["code"])
+            ->setType($hook['type'])
+            ->setCode($hook['code'])
             ->setNative(false)
-            ->setByModule(isset($hook["module"]) && (bool) $hook["module"])
-            ->setActive(isset($hook["active"]) && (bool) $hook["active"])
+            ->setByModule(isset($hook['module']) && (bool) $hook['module'])
+            ->setActive(isset($hook['active']) && (bool) $hook['active'])
         ;
 
-        /**
+        /*
          * Dispatch the event
          */
         $dispatcher->dispatch(
@@ -691,7 +695,7 @@ class BaseModule implements BaseModuleInterface
 
         return [
             $event->getHook(),
-            $this->formatHookDataForI18n($titles, $descriptions, $chapos)
+            $this->formatHookDataForI18n($titles, $descriptions, $chapos),
         ];
     }
 
@@ -710,8 +714,8 @@ class BaseModule implements BaseModuleInterface
         foreach ($locales as $locale) {
             $data[$locale] = [
                 'title' => !isset($titles[$locale]) ? null : $titles[$locale],
-                'description' => !isset($descriptions[$locale]) ? null: $descriptions[$locale],
-                'chapo' => !isset($chapos[$locale]) ? null : $chapos[$locale]
+                'description' => !isset($descriptions[$locale]) ? null : $descriptions[$locale],
+                'chapo' => !isset($chapos[$locale]) ? null : $chapos[$locale],
             ];
         }
 
@@ -724,25 +728,25 @@ class BaseModule implements BaseModuleInterface
         $descriptions = [];
         $chapos = [];
 
-        /**
+        /*
          * Get the defined titles
          */
-        if (isset($hook["title"])) {
-            $titles = $this->extractI18nValues($hook["title"], $defaultLocale);
+        if (isset($hook['title'])) {
+            $titles = $this->extractI18nValues($hook['title'], $defaultLocale);
         }
 
-        /**
+        /*
          * Then the defined descriptions
          */
-        if (isset($hook["description"])) {
-            $descriptions = $this->extractI18nValues($hook["description"], $defaultLocale);
+        if (isset($hook['description'])) {
+            $descriptions = $this->extractI18nValues($hook['description'], $defaultLocale);
         }
 
-        /**
+        /*
          * Then the short descriptions
          */
-        if (isset($hook["chapo"])) {
-            $chapos = $this->extractI18nValues($hook["chapo"], $defaultLocale);
+        if (isset($hook['chapo'])) {
+            $chapos = $this->extractI18nValues($hook['chapo'], $defaultLocale);
         }
 
         return [$titles, $descriptions, $chapos];
@@ -782,15 +786,17 @@ class BaseModule implements BaseModuleInterface
 
     /**
      * @since 2.4
+     *
      * @return string
      */
     protected function getPropelSchemaDir()
     {
-        return THELIA_MODULE_DIR . $this->getCode() . DS . 'Config' . DS . 'schema.xml';
+        return THELIA_MODULE_DIR.$this->getCode().DS.'Config'.DS.'schema.xml';
     }
 
     /**
      * @since 2.4
+     *
      * @return bool
      */
     protected function hasPropelSchema()
@@ -800,7 +806,7 @@ class BaseModule implements BaseModuleInterface
 
     /**
      * Add core translations of the module to use in `preActivation` and `postActivation`
-     * when the module is not yest activated and translations are not available
+     * when the module is not yest activated and translations are not available.
      */
     private function initializeCoreI18n()
     {

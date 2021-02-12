@@ -26,9 +26,9 @@ class RegisterLoopPass implements CompilerPassInterface
 
         $smarty = $container->getDefinition(TheliaLoop::class);
 
-        foreach ($container->findTaggedServiceIds("thelia.loop") as $id => $tag) {
+        foreach ($container->findTaggedServiceIds('thelia.loop') as $id => $tag) {
             $loopDefinition = $container->getDefinition($id);
-            $smarty->addMethodCall("registerLoop", [$loopDefinition->getClass()]);
+            $smarty->addMethodCall('registerLoop', [$loopDefinition->getClass()]);
         }
     }
 }

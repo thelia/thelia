@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\ProductSaleElementsQuery;
 
 /**
- * Class ProductSaleElementsIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class ProductSaleElementsIdType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class ProductSaleElementsIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class ProductSaleElementsIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "product_sale_elements_id";
+        return 'product_sale_elements_id';
     }
 }

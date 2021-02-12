@@ -12,9 +12,7 @@
 
 namespace Thelia\Tests\Action;
 
-use Thelia\Action\Document;
 use Thelia\Action\Sale;
-use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
 use Thelia\Core\Event\Sale\SaleDeleteEvent;
@@ -29,8 +27,8 @@ use Thelia\Model\SaleQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
- * Class SaleTest
- * @package Thelia\Tests\Action
+ * Class SaleTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class SaleTest extends TestCaseWithURLToolSetup
@@ -56,7 +54,9 @@ class SaleTest extends TestCaseWithURLToolSetup
 
     /**
      * @param SaleUpdateEvent $event
+     *
      * @return SaleModel
+     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -97,12 +97,12 @@ class SaleTest extends TestCaseWithURLToolSetup
 
         $event = new SaleUpdateEvent($sale->getId());
         $event
-            ->setStartDate($date->setTimestamp(strtotime("today - 1 month")))
-            ->setEndDate($date->setTimestamp(strtotime("today + 1 month")))
+            ->setStartDate($date->setTimestamp(strtotime('today - 1 month')))
+            ->setEndDate($date->setTimestamp(strtotime('today + 1 month')))
             ->setActive(1)
             ->setDisplayInitialPrice(1)
             ->setPriceOffsetType(SaleModel::OFFSET_TYPE_AMOUNT)
-            ->setPriceOffsets([ CurrencyQuery::create()->findOne()->getId() => 10 ])
+            ->setPriceOffsets([CurrencyQuery::create()->findOne()->getId() => 10])
             ->setProducts([$product->getId()])
             ->setProductAttributes([])
             ->setLocale('en_US')
@@ -138,14 +138,14 @@ class SaleTest extends TestCaseWithURLToolSetup
 
         $event = new SaleUpdateEvent($sale->getId());
         $event
-            ->setStartDate($date->setTimestamp(strtotime("today - 1 month")))
-            ->setEndDate($date->setTimestamp(strtotime("today + 1 month")))
+            ->setStartDate($date->setTimestamp(strtotime('today - 1 month')))
+            ->setEndDate($date->setTimestamp(strtotime('today + 1 month')))
             ->setActive(1)
             ->setDisplayInitialPrice(1)
             ->setPriceOffsetType(SaleModel::OFFSET_TYPE_AMOUNT)
-            ->setPriceOffsets([ CurrencyQuery::create()->findOne()->getId() => 10 ])
+            ->setPriceOffsets([CurrencyQuery::create()->findOne()->getId() => 10])
             ->setProducts([$product->getId()])
-            ->setProductAttributes([$product->getId() => [ $attrAv->getId()] ])
+            ->setProductAttributes([$product->getId() => [$attrAv->getId()]])
             ->setLocale('en_US')
             ->setTitle('test update sale title')
             ->setChapo('test update sale short description')

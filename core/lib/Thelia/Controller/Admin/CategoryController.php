@@ -34,7 +34,7 @@ use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
 
 /**
- * Manages categories
+ * Manages categories.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
@@ -72,7 +72,7 @@ class CategoryController extends AbstractSeoCrudController
 
         $createEvent
             ->setTitle($formData['title'])
-            ->setLocale($formData["locale"])
+            ->setLocale($formData['locale'])
             ->setParent($formData['parent'])
             ->setVisible($formData['visible'])
         ;
@@ -120,6 +120,7 @@ class CategoryController extends AbstractSeoCrudController
 
     /**
      * @param \Thelia\Model\Category $object
+     *
      * @return \Thelia\Form\BaseForm
      */
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
@@ -129,15 +130,15 @@ class CategoryController extends AbstractSeoCrudController
 
         // The "General" tab form
         $data = [
-            'id'                    => $object->getId(),
-            'locale'                => $object->getLocale(),
-            'title'                 => $object->getTitle(),
-            'chapo'                 => $object->getChapo(),
-            'description'           => $object->getDescription(),
-            'postscriptum'          => $object->getPostscriptum(),
-            'visible'               => $object->getVisible(),
-            'parent'                => $object->getParent(),
-            'default_template_id'   => $object->getDefaultTemplateId()
+            'id' => $object->getId(),
+            'locale' => $object->getLocale(),
+            'title' => $object->getTitle(),
+            'chapo' => $object->getChapo(),
+            'description' => $object->getDescription(),
+            'postscriptum' => $object->getPostscriptum(),
+            'visible' => $object->getVisible(),
+            'parent' => $object->getParent(),
+            'default_template_id' => $object->getDefaultTemplateId(),
         ];
 
         // Setup the object form
@@ -163,6 +164,7 @@ class CategoryController extends AbstractSeoCrudController
 
     /**
      * @param Category $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
@@ -172,6 +174,7 @@ class CategoryController extends AbstractSeoCrudController
 
     /**
      * @param Category $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -185,7 +188,7 @@ class CategoryController extends AbstractSeoCrudController
                 'category_id' => $this->getRequest()->get('category_id', 0),
                 'folder_id' => $this->getRequest()->get('folder_id', 0),
                 'current_tab' => $this->getRequest()->get('current_tab', 'general'),
-                'page' => $this->getRequest()->get('page', 1)
+                'page' => $this->getRequest()->get('page', 1),
         ];
     }
 
@@ -200,7 +203,7 @@ class CategoryController extends AbstractSeoCrudController
                 'category_order' => $currentOrder,
                 'product_order' => $product_order,
                 'category_id' => $this->getRequest()->get('category_id', 0),
-                'page' => $this->getRequest()->get('page', 1)
+                'page' => $this->getRequest()->get('page', 1),
             ]
         );
     }
@@ -211,7 +214,7 @@ class CategoryController extends AbstractSeoCrudController
             'admin.categories.default',
             [
                 'category_id' => $this->getRequest()->get('category_id', 0),
-                'page' => $this->getRequest()->get('page', 1)
+                'page' => $this->getRequest()->get('page', 1),
             ]
         );
     }
@@ -239,18 +242,17 @@ class CategoryController extends AbstractSeoCrudController
     protected function redirectToEditionTemplate()
     {
         return $this->generateRedirectFromRoute(
-            "admin.categories.update",
+            'admin.categories.update',
             $this->getEditionArguments()
         );
     }
 
     /**
-     * Online status toggle category
+     * Online status toggle category.
      */
     public function setToggleVisibilityAction(
         EventDispatcherInterface $eventDispatcher
-    )
-    {
+    ) {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
@@ -259,7 +261,7 @@ class CategoryController extends AbstractSeoCrudController
         $event = new CategoryToggleVisibilityEvent($this->getExistingObject());
 
         try {
-            $eventDispatcher->dispatch($event,TheliaEvents::CATEGORY_TOGGLE_VISIBILITY);
+            $eventDispatcher->dispatch($event, TheliaEvents::CATEGORY_TOGGLE_VISIBILITY);
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
@@ -271,7 +273,8 @@ class CategoryController extends AbstractSeoCrudController
 
     /**
      * @param CategoryDeleteEvent $deleteEvent
-     * @return null|\Symfony\Component\HttpFoundation\Response
+     *
+     * @return \Symfony\Component\HttpFoundation\Response|null
      */
     protected function performAdditionalDeleteAction($deleteEvent)
     {
@@ -283,7 +286,8 @@ class CategoryController extends AbstractSeoCrudController
 
     /**
      * @param CategoryUpdateEvent $updateEvent
-     * @return null|\Symfony\Component\HttpFoundation\Response
+     *
+     * @return \Symfony\Component\HttpFoundation\Response|null
      */
     protected function performAdditionalUpdateAction($updateEvent)
     {
@@ -299,7 +303,8 @@ class CategoryController extends AbstractSeoCrudController
 
     /**
      * @param UpdatePositionEvent $event
-     * @return null|\Symfony\Component\HttpFoundation\Response
+     *
+     * @return \Symfony\Component\HttpFoundation\Response|null
      */
     protected function performAdditionalUpdatePositionAction($event)
     {
@@ -329,7 +334,6 @@ class CategoryController extends AbstractSeoCrudController
                     Criteria::NOT_IN
                 )
                 ->find();
-            ;
 
             if ($list !== null) {
                 foreach ($list as $item) {
@@ -368,7 +372,7 @@ class CategoryController extends AbstractSeoCrudController
     }
 
     /**
-     * Add category pictures
+     * Add category pictures.
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */

@@ -29,7 +29,7 @@ use Thelia\Model\TemplateQuery;
 class Feature extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * Create a new feature entry
+     * Create a new feature entry.
      *
      * @param $eventName
      */
@@ -54,7 +54,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Change a product feature
+     * Change a product feature.
      *
      * @param $eventName
      */
@@ -76,7 +76,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Delete a product feature entry
+     * Delete a product feature entry.
      *
      * @param $eventName
      */
@@ -136,13 +136,13 @@ class Feature extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::FEATURE_CREATE          => ["create", 128],
-            TheliaEvents::FEATURE_UPDATE          => ["update", 128],
-            TheliaEvents::FEATURE_DELETE          => ["delete", 128],
-            TheliaEvents::FEATURE_UPDATE_POSITION => ["updatePosition", 128],
+            TheliaEvents::FEATURE_CREATE => ['create', 128],
+            TheliaEvents::FEATURE_UPDATE => ['update', 128],
+            TheliaEvents::FEATURE_DELETE => ['delete', 128],
+            TheliaEvents::FEATURE_UPDATE_POSITION => ['updatePosition', 128],
 
-            TheliaEvents::FEATURE_REMOVE_FROM_ALL_TEMPLATES => ["removeFromAllTemplates", 128],
-            TheliaEvents::FEATURE_ADD_TO_ALL_TEMPLATES      => ["addToAllTemplates", 128],
+            TheliaEvents::FEATURE_REMOVE_FROM_ALL_TEMPLATES => ['removeFromAllTemplates', 128],
+            TheliaEvents::FEATURE_ADD_TO_ALL_TEMPLATES => ['addToAllTemplates', 128],
         ];
     }
 }

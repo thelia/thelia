@@ -13,7 +13,7 @@ return (new PhpCsFixer\Config)
     ->setCacheFile(__DIR__.'/var/cache-ci/.php_cs.cache')
     ->setRiskyAllowed(true)
     ->setRules([
-        '@Symfony' => false,
+        '@Symfony' => true,
         '@PHP71Migration' => true,
         'yoda_style' => false,
         'no_superfluous_phpdoc_tags' => true,

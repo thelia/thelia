@@ -26,11 +26,9 @@ use Thelia\Model\CouponModule;
 use Thelia\Model\Order;
 
 /**
- * Manage how Coupons could interact with a Checkout
+ * Manage how Coupons could interact with a Checkout.
  *
- * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class CouponManager
 {
@@ -63,8 +61,10 @@ class CouponManager
     }
 
     /**
-     * Get Discount for the given Coupons
+     * Get Discount for the given Coupons.
+     *
      * @api
+     *
      * @return float checkout discount
      */
     public function getDiscount()
@@ -90,7 +90,7 @@ class CouponManager
     }
 
     /**
-     * Return all Coupon given during the Checkout
+     * Return all Coupon given during the Checkout.
      *
      * @return array Array of CouponInterface
      */
@@ -113,7 +113,7 @@ class CouponManager
             } catch (\Exception $ex) {
                 // Just ignore the coupon and log the problem, just in case someone realize it.
                 Tlog::getInstance()->warning(
-                    sprintf("Coupon %s ignored, exception occurred: %s", $couponCode, $ex->getMessage())
+                    sprintf('Coupon %s ignored, exception occurred: %s', $couponCode, $ex->getMessage())
                 );
             }
         }
@@ -123,6 +123,7 @@ class CouponManager
 
     /**
      * @param $code
+     *
      * @return mixed|void
      */
     public function pushCouponInSession($code)
@@ -131,7 +132,7 @@ class CouponManager
     }
 
     /**
-     * Check if there is a Coupon removing Postage
+     * Check if there is a Coupon removing Postage.
      *
      * @param Order $order the order for which we have to check if postage is free
      *
@@ -154,7 +155,7 @@ class CouponManager
                 // If the list is empty, the shipping is free for all countries.
                 $couponCountries = $coupon->getFreeShippingForCountries();
 
-                if (! $couponCountries->isEmpty()) {
+                if (!$couponCountries->isEmpty()) {
                     if (null === $deliveryAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress())) {
                         continue;
                     }
@@ -171,7 +172,7 @@ class CouponManager
                         }
                     }
 
-                    if (! $countryValid) {
+                    if (!$countryValid) {
                         continue;
                     }
                 }
@@ -180,7 +181,7 @@ class CouponManager
                 // If the list is empty, the shipping is free for all methods.
                 $couponModules = $coupon->getFreeShippingForModules();
 
-                if (! $couponModules->isEmpty()) {
+                if (!$couponModules->isEmpty()) {
                     $moduleValid = false;
 
                     $shippingModuleId = $order->getDeliveryModuleId();
@@ -193,7 +194,7 @@ class CouponManager
                         }
                     }
 
-                    if (! $moduleValid) {
+                    if (!$moduleValid) {
                         continue;
                     }
                 }
@@ -216,7 +217,7 @@ class CouponManager
 
     /**
      * Sort Coupon to keep
-     * Coupon not cumulative cancels previous
+     * Coupon not cumulative cancels previous.
      *
      * @param array $coupons CouponInterface to process
      *
@@ -270,7 +271,7 @@ class CouponManager
     }
 
     /**
-     * Process given Coupon in order to get their cumulative effects
+     * Process given Coupon in order to get their cumulative effects.
      *
      * @param array $coupons CouponInterface to process
      *
@@ -288,7 +289,7 @@ class CouponManager
     }
 
     /**
-     * Add an available CouponManager (Services)
+     * Add an available CouponManager (Services).
      *
      * @param CouponInterface $coupon CouponManager
      */
@@ -298,7 +299,7 @@ class CouponManager
     }
 
     /**
-     * Get all available CouponManagers (Services)
+     * Get all available CouponManagers (Services).
      *
      * @return array
      */
@@ -308,7 +309,7 @@ class CouponManager
     }
 
     /**
-     * Add an available ConstraintManager (Services)
+     * Add an available ConstraintManager (Services).
      *
      * @param ConditionInterface $condition ConditionInterface
      */
@@ -318,7 +319,7 @@ class CouponManager
     }
 
     /**
-     * Get all available ConstraintManagers (Services)
+     * Get all available ConstraintManagers (Services).
      *
      * @return array
      */
@@ -328,7 +329,7 @@ class CouponManager
     }
 
     /**
-     * Clear all data kept by coupons
+     * Clear all data kept by coupons.
      */
     public function clear()
     {
@@ -341,7 +342,7 @@ class CouponManager
     }
 
     /**
-     * Decrement this coupon quantity
+     * Decrement this coupon quantity.
      *
      * To call when a coupon is consumed
      *
@@ -355,50 +356,50 @@ class CouponManager
         if ($coupon->isUsageUnlimited()) {
             return true;
         }
-            try {
-                $usageLeft = $coupon->getUsagesLeft($customerId);
+        try {
+            $usageLeft = $coupon->getUsagesLeft($customerId);
 
-                if ($usageLeft > 0) {
-                    // If the coupon usage is per user, add an entry to coupon customer usage count table
-                    if ($coupon->getPerCustomerUsageCount()) {
-                        if (null == $customerId) {
-                            throw new \LogicException("Customer should not be null at this time.");
-                        }
+            if ($usageLeft > 0) {
+                // If the coupon usage is per user, add an entry to coupon customer usage count table
+                if ($coupon->getPerCustomerUsageCount()) {
+                    if (null == $customerId) {
+                        throw new \LogicException('Customer should not be null at this time.');
+                    }
 
-                        $ccc = CouponCustomerCountQuery::create()
+                    $ccc = CouponCustomerCountQuery::create()
                             ->filterByCouponId($coupon->getId())
                             ->filterByCustomerId($customerId)
                             ->findOne()
                         ;
 
-                        if ($ccc === null) {
-                            $ccc = new CouponCustomerCount();
+                    if ($ccc === null) {
+                        $ccc = new CouponCustomerCount();
 
-                            $ccc
+                        $ccc
                                 ->setCustomerId($customerId)
                                 ->setCouponId($coupon->getId())
                                 ->setCount(0);
-                        }
+                    }
 
-                        $newCount = 1 + $ccc->getCount();
+                    $newCount = 1 + $ccc->getCount();
 
-                        $ccc
+                    $ccc
                             ->setCount($newCount)
                             ->save()
                         ;
 
-                        return $usageLeft - $newCount;
-                    }
-                        $coupon->setMaxUsage(--$usageLeft);
-
-                        $coupon->save();
-
-                        return $usageLeft;
+                    return $usageLeft - $newCount;
                 }
-            } catch (\Exception $ex) {
-                // Just log the problem.
-                Tlog::getInstance()->addError(sprintf("Failed to decrement coupon %s: %s", $coupon->getCode(), $ex->getMessage()));
+                $coupon->setMaxUsage(--$usageLeft);
+
+                $coupon->save();
+
+                return $usageLeft;
             }
+        } catch (\Exception $ex) {
+            // Just log the problem.
+            Tlog::getInstance()->addError(sprintf('Failed to decrement coupon %s: %s', $coupon->getCode(), $ex->getMessage()));
+        }
 
         return false;
     }
@@ -413,42 +414,42 @@ class CouponManager
         if ($coupon->isUsageUnlimited()) {
             return true;
         }
-            try {
-                $usageLeft = $coupon->getUsagesLeft($customerId);
+        try {
+            $usageLeft = $coupon->getUsagesLeft($customerId);
 
-                // If the coupon usage is per user, remove an entry from coupon customer usage count table
-                if ($coupon->getPerCustomerUsageCount()) {
-                    if (null == $customerId) {
-                        throw new \LogicException("Customer should not be null at this time.");
-                    }
+            // If the coupon usage is per user, remove an entry from coupon customer usage count table
+            if ($coupon->getPerCustomerUsageCount()) {
+                if (null == $customerId) {
+                    throw new \LogicException('Customer should not be null at this time.');
+                }
 
-                    $ccc = CouponCustomerCountQuery::create()
+                $ccc = CouponCustomerCountQuery::create()
                         ->filterByCouponId($coupon->getId())
                         ->filterByCustomerId($customerId)
                         ->findOne()
                     ;
 
-                    if ($ccc !== null && $ccc->getCount() > 0) {
-                        $newCount = $ccc->getCount() - 1;
+                if ($ccc !== null && $ccc->getCount() > 0) {
+                    $newCount = $ccc->getCount() - 1;
 
-                        $ccc
+                    $ccc
                             ->setCount($newCount)
                             ->save();
 
-                        return $usageLeft - $newCount;
-                    }
-                } else {
-                    // Ad one usage to coupon
-                    $coupon->setMaxUsage(++$usageLeft);
-
-                    $coupon->save();
-
-                    return $usageLeft;
+                    return $usageLeft - $newCount;
                 }
-            } catch (\Exception $ex) {
-                // Just log the problem.
-                Tlog::getInstance()->addError(sprintf("Failed to increment coupon %s: %s", $coupon->getCode(), $ex->getMessage()));
+            } else {
+                // Ad one usage to coupon
+                $coupon->setMaxUsage(++$usageLeft);
+
+                $coupon->save();
+
+                return $usageLeft;
             }
+        } catch (\Exception $ex) {
+            // Just log the problem.
+            Tlog::getInstance()->addError(sprintf('Failed to increment coupon %s: %s', $coupon->getCode(), $ex->getMessage()));
+        }
 
         return false;
     }

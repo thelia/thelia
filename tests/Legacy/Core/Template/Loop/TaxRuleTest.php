@@ -12,14 +12,11 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Core\Template\Loop\TaxRule;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class TaxRuleTest extends BaseLoopTestor
 {

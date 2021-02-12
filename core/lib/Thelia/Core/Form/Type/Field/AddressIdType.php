@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\AddressQuery;
 
 /**
- * Class AddressIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class AddressIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class AddressIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class AddressIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "address_id";
+        return 'address_id';
     }
 }

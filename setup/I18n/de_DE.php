@@ -86,7 +86,7 @@ return [
     'Attributes - table row' => 'Deklinationen - Tabellenzeile',
     'Attributes value - table header' => 'Deklinationenangaben - Tabellenkopf',
     'Attributes value - table row' => 'Deklinationenangaben - Tabellenzeile',
-    'Allow module installation from ZIP files.' => 'Modulinstallation aus ZIP-Dateien zulassen.' ,
+    'Allow module installation from ZIP files.' => 'Modulinstallation aus ZIP-Dateien zulassen.',
     'Australia' => 'Australien',
     'Austria' => 'Österreich',
     'Azerbaijan' => 'Aserbaidschan',

@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Module;
 
 /**
- * Class ModuleDeleteEvent
- * @package Thelia\Core\Event\Module
+ * Class ModuleDeleteEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleDeleteEvent extends ModuleEvent
@@ -65,7 +65,7 @@ class ModuleDeleteEvent extends ModuleEvent
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getAssumeDelete()
     {
@@ -78,6 +78,7 @@ class ModuleDeleteEvent extends ModuleEvent
     public function setAssumeDelete($assume_delete)
     {
         $this->assume_delete = $assume_delete;
+
         return $this;
     }
 }

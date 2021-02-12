@@ -39,9 +39,10 @@ class AsseticAssetManager implements AssetManagerInterface
     }
 
     /**
-     * Create a stamp form the modification time of the content of the given directory and all of its subdirectories
+     * Create a stamp form the modification time of the content of the given directory and all of its subdirectories.
      *
-     * @param  string $directory ther directory name
+     * @param string $directory ther directory name
+     *
      * @return string the stamp of this directory
      */
     protected function getStamp($directory)
@@ -61,8 +62,7 @@ class AsseticAssetManager implements AssetManagerInterface
     }
 
     /**
-     * Check if a file is a source asset file
-     *
+     * Check if a file is a source asset file.
      *
      * @return bool
      */
@@ -75,9 +75,10 @@ class AsseticAssetManager implements AssetManagerInterface
      * Recursively copy assets from the source directory to the destination
      * directory in the web space, omitting source files.
      *
-     * @param  string            $from_directory the source
-     * @param  string            $to_directory   the destination
-     * @throws \RuntimeException if a problem occurs.
+     * @param string $from_directory the source
+     * @param string $to_directory   the destination
+     *
+     * @throws \RuntimeException if a problem occurs
      */
     protected function copyAssets(Filesystem $fs, $from_directory, $to_directory)
     {
@@ -93,19 +94,19 @@ class AsseticAssetManager implements AssetManagerInterface
         /** @var \RecursiveDirectoryIterator $iterator */
         foreach ($iterator as $item) {
             if ($item->isDir()) {
-                $dest_dir = $to_directory . DS . $iterator->getSubPathName();
+                $dest_dir = $to_directory.DS.$iterator->getSubPathName();
 
-                if (! is_dir($dest_dir)) {
+                if (!is_dir($dest_dir)) {
                     if ($fs->exists($dest_dir)) {
                         $fs->remove($dest_dir);
                     }
 
                     $fs->mkdir($dest_dir, 0777);
                 }
-            } elseif (! $this->isSourceFile($item)) {
+            } elseif (!$this->isSourceFile($item)) {
                 // We don't copy source files
 
-                $dest_file = $to_directory . DS . $iterator->getSubPathName();
+                $dest_file = $to_directory.DS.$iterator->getSubPathName();
 
                 if ($fs->exists($dest_file)) {
                     $fs->remove($dest_file);
@@ -118,19 +119,20 @@ class AsseticAssetManager implements AssetManagerInterface
 
     /**
      * Compute the destination directory path, from the source directory and the
-     * base directory of the web assets
+     * base directory of the web assets.
      *
      * @param string $webAssetsDirectoryBase Base base directory of the web assets
      * @param string $webAssetsTemplate      The template directory, relative to '<thelia_root>/templates'
      * @param string $webAssetsKey           the assets key : module name or 0 for template assets
      *
      * @internal param string $source_assets_directory the source directory
+     *
      * @return string the full path of the destination directory
      */
     protected function getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey)
     {
         // Compute the absolute path of the output directory
-        return $webAssetsDirectoryBase . DS . $webAssetsTemplate . DS . $webAssetsKey;
+        return $webAssetsDirectoryBase.DS.$webAssetsTemplate.DS.$webAssetsKey;
     }
 
     /**
@@ -143,7 +145,7 @@ class AsseticAssetManager implements AssetManagerInterface
      * @param        $webAssetsTemplate
      * @param string $webAssetsKey           the assets key : module name or 0 for base template
      *
-     * @throws \RuntimeException if something goes wrong.
+     * @throws \RuntimeException if something goes wrong
      */
     public function prepareAssets($sourceAssetsDirectory, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey)
     {
@@ -151,7 +153,7 @@ class AsseticAssetManager implements AssetManagerInterface
         $to_directory = $this->getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey);
 
         // Get a path to the stamp file
-        $stamp_file_path = $to_directory . DS . '.source-stamp';
+        $stamp_file_path = $to_directory.DS.'.source-stamp';
 
         // Get the last stamp of source assets directory
         $prev_stamp = @file_get_contents($stamp_file_path);
@@ -186,16 +188,18 @@ class AsseticAssetManager implements AssetManagerInterface
     }
 
     /**
-     * Decode the filters names, and initialize the Assetic FilterManager
+     * Decode the filters names, and initialize the Assetic FilterManager.
      *
-     * @param  FilterManager             $filterManager the Assetic filter manager
-     * @param  string|array              $filters       a comma separated list of filter names
+     * @param FilterManager $filterManager the Assetic filter manager
+     * @param string|array  $filters       a comma separated list of filter names
+     *
      * @throws \InvalidArgumentException if a wrong filter is passed
-     * @return array                     an array of filter names
+     *
+     * @return array an array of filter names
      */
     protected function decodeAsseticFilters(FilterManager $filterManager, $filters)
     {
-        if (! empty($filters)) {
+        if (!empty($filters)) {
             $filter_list = \is_array($filters) ? $filters : explode(',', $filters);
 
             foreach ($filter_list as $filter_name) {
@@ -227,17 +231,14 @@ class AsseticAssetManager implements AssetManagerInterface
      * @param        $assetSource
      * @param        $assetDirectoryBase
      * @param string $webAssetsDirectoryBase the full path to the asset file (or file collection, e.g. *.less)
-     *
-     * @param string $webAssetsTemplate the full disk path to the base assets output directory in the web space
+     * @param string $webAssetsTemplate      the full disk path to the base assets output directory in the web space
      * @param        $webAssetsKey
-     * @param string $outputUrl         the URL to the base assets output directory in the web space
+     * @param string $outputUrl              the URL to the base assets output directory in the web space
+     * @param string $assetType              the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
+     * @param array  $filters                a list of filters, as defined below (see switch($filter_name) ...)
+     * @param bool   $debug                  true / false
      *
-     * @param string $assetType the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
-     * @param array  $filters   a list of filters, as defined below (see switch($filter_name) ...)
-     *
-     * @param boolean $debug true / false
-     *
-     * @return string The URL to the generated asset file.
+     * @return string the URL to the generated asset file
      */
     public function processAsset($assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug)
     {
@@ -262,7 +263,7 @@ class AsseticAssetManager implements AssetManagerInterface
         $factory->setAssetManager($am);
         $factory->setFilterManager($fm);
 
-        $factory->setDefaultOutput('*' . (!empty($assetType) ? '.' : '') . $assetType);
+        $factory->setDefaultOutput('*'.(!empty($assetType) ? '.' : '').$assetType);
 
         $factory->setDebug($debug);
 
@@ -271,7 +272,7 @@ class AsseticAssetManager implements AssetManagerInterface
         $outputDirectory = $this->getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey);
 
         // Get the URL part from the relative path
-        $outputRelativeWebPath = $webAssetsTemplate . DS . $webAssetsKey;
+        $outputRelativeWebPath = $webAssetsTemplate.DS.$webAssetsKey;
 
         $assetTargetFilename = $asset->getTargetPath();
 
@@ -279,15 +280,15 @@ class AsseticAssetManager implements AssetManagerInterface
          * This is the final name of the generated asset
          * We preserve file structure intending to keep - for example - relative css links working
          */
-        $assetDestinationPath = $outputDirectory . DS . $assetFileDirectoryInAssetDirectory . DS . $assetTargetFilename;
+        $assetDestinationPath = $outputDirectory.DS.$assetFileDirectoryInAssetDirectory.DS.$assetTargetFilename;
 
         Tlog::getInstance()->addDebug("Asset destination full path: $assetDestinationPath");
 
         // We generate an asset only if it does not exists, or if the asset processing is forced in development mode
-        if (! file_exists($assetDestinationPath) || ($this->debugMode && ConfigQuery::read('process_assets', true))) {
-            $writer = new AssetWriter($outputDirectory . DS . $assetFileDirectoryInAssetDirectory);
+        if (!file_exists($assetDestinationPath) || ($this->debugMode && ConfigQuery::read('process_assets', true))) {
+            $writer = new AssetWriter($outputDirectory.DS.$assetFileDirectoryInAssetDirectory);
 
-            Tlog::getInstance()->addDebug("Writing asset to $outputDirectory" . DS . "$assetFileDirectoryInAssetDirectory");
+            Tlog::getInstance()->addDebug("Writing asset to $outputDirectory".DS."$assetFileDirectoryInAssetDirectory");
 
             $writer->writeAsset($asset);
         }
@@ -299,11 +300,11 @@ class AsseticAssetManager implements AssetManagerInterface
             $assetTargetFilename = str_replace(DS, '/', $assetTargetFilename);
         }
 
-        return rtrim($outputUrl, '/') . '/' . trim($outputRelativeWebPath, '/') . '/' . trim($assetFileDirectoryInAssetDirectory, '/') . '/' . ltrim($assetTargetFilename, '/');
+        return rtrim($outputUrl, '/').'/'.trim($outputRelativeWebPath, '/').'/'.trim($assetFileDirectoryInAssetDirectory, '/').'/'.ltrim($assetTargetFilename, '/');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isDebugMode()
     {
@@ -311,7 +312,7 @@ class AsseticAssetManager implements AssetManagerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function registerAssetFilter($filterIdentifier, $filter)
     {

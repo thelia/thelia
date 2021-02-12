@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\AttributeAvQuery;
 
 /**
- * Class AttributeAvIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class AttributeAvIdType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class AttributeAvIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class AttributeAvIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "attribute_av";
+        return 'attribute_av';
     }
 }

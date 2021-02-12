@@ -23,8 +23,8 @@ use Tinymce\Form\ConfigurationForm;
 use Tinymce\Tinymce;
 
 /**
- * Class SetTransferConfig
- * @package WireTransfer\Controller
+ * Class SetTransferConfig.
+ *
  * @author Thelia <info@thelia.net>
  */
 class ConfigureController extends BaseAdminController
@@ -43,7 +43,7 @@ class ConfigureController extends BaseAdminController
 
         try {
             // Check the form against constraints violations
-            $form = $this->validateForm($configurationForm, "POST");
+            $form = $this->validateForm($configurationForm, 'POST');
 
             // Get the form field values
             $data = $form->getData();
@@ -69,22 +69,22 @@ class ConfigureController extends BaseAdminController
             Tinymce::setConfigValue('custom_css', $data['custom_css']);
 
             // Save Custom CSS in default assets
-            $customCss = __DIR__ .DS.'..'.DS.'templates'.DS.'backOffice'.DS.'default'.DS.'assets'.DS.'css'.DS.'custom-css.less';
+            $customCss = __DIR__.DS.'..'.DS.'templates'.DS.'backOffice'.DS.'default'.DS.'assets'.DS.'css'.DS.'custom-css.less';
 
             if (false === file_put_contents($customCss, $data['custom_css'])) {
                 throw new TheliaProcessException(
                     $this->getTranslator()->trans(
-                        "Failed to update custom CSS file \"%file\". Please check this file or parent folder write permissions.",
-                        [ '%file' => $customCss ]
+                        'Failed to update custom CSS file "%file". Please check this file or parent folder write permissions.',
+                        ['%file' => $customCss]
                     )
                 );
             }
 
             // Log configuration modification
             $this->adminLogAppend(
-                "tinymce.configuration.message",
+                'tinymce.configuration.message',
                 AccessManager::UPDATE,
-                sprintf("Tinymce configuration updated")
+                sprintf('Tinymce configuration updated')
             );
 
             // Everything is OK.
@@ -93,8 +93,7 @@ class ConfigureController extends BaseAdminController
             // Form cannot be validated. Create the error message using
             // the BaseAdminController helper method.
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -103,7 +102,7 @@ class ConfigureController extends BaseAdminController
         // just redisplay the same template.
         // Setup the Form error context, to make error information available in the template.
         $this->setupFormErrorContext(
-            $this->getTranslator()->trans("Tinymce configuration", [], Tinymce::MODULE_DOMAIN),
+            $this->getTranslator()->trans('Tinymce configuration', [], Tinymce::MODULE_DOMAIN),
             $error_msg,
             $configurationForm,
             $ex

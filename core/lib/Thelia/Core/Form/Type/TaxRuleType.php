@@ -18,8 +18,8 @@ use Symfony\Component\Validator\Constraints\Count;
 use Thelia\Core\Form\Type\Field\TaxRuleIdType;
 
 /**
- * Class TaxRuleType
- * @package Thelia\Core\Form\Type
+ * Class TaxRuleType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class TaxRuleType extends AbstractTheliaType
@@ -37,43 +37,43 @@ class TaxRuleType extends AbstractTheliaType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            "cascade_validation" => true,
+            'cascade_validation' => true,
         ]);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add("default", "checkbox")
-            ->add("country", "collection", [
-                "type" => "country_id",
-                "allow_add" => true,
-                "allow_delete" => true,
-                "cascade_validation" => "true",
-                "constraints" => [
-                    new Count(["min" => 1]),
+            ->add('default', 'checkbox')
+            ->add('country', 'collection', [
+                'type' => 'country_id',
+                'allow_add' => true,
+                'allow_delete' => true,
+                'cascade_validation' => 'true',
+                'constraints' => [
+                    new Count(['min' => 1]),
                 ],
             ])
-            ->add("tax", "collection", [
-                "type" => "tax_id",
-                "allow_add" => true,
-                "allow_delete" => true,
-                "cascade_validation" => "true",
-                "constraints" => [
-                    new Count(["min" => 1]),
+            ->add('tax', 'collection', [
+                'type' => 'tax_id',
+                'allow_add' => true,
+                'allow_delete' => true,
+                'cascade_validation' => 'true',
+                'constraints' => [
+                    new Count(['min' => 1]),
                 ],
             ])
-            ->add("i18n", "collection", [
-                "type" => "tax_rule_i18n",
-                "required" => true,
-                "allow_add" => true,
-                "cascade_validation" => true,
-                "constraints" => [
-                    new Count(["min" => 1]),
+            ->add('i18n', 'collection', [
+                'type' => 'tax_rule_i18n',
+                'required' => true,
+                'allow_add' => true,
+                'cascade_validation' => true,
+                'constraints' => [
+                    new Count(['min' => 1]),
                 ],
             ])
-            ->add("id", "tax_rule_id", [
-                "constraints" => $this->getConstraints($this->taxRuleIdType, "update"),
+            ->add('id', 'tax_rule_id', [
+                'constraints' => $this->getConstraints($this->taxRuleIdType, 'update'),
             ])
         ;
     }
@@ -85,6 +85,6 @@ class TaxRuleType extends AbstractTheliaType
      */
     public function getName()
     {
-        return "tax_rule";
+        return 'tax_rule';
     }
 }

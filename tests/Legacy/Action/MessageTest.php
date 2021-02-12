@@ -20,8 +20,8 @@ use Thelia\Model\Message as MessageModel;
 use Thelia\Model\MessageQuery;
 
 /**
- * Class MessageTest
- * @package Thelia\Tests\Action
+ * Class MessageTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class MessageTest extends BaseAction
@@ -61,6 +61,7 @@ class MessageTest extends BaseAction
 
     /**
      * @depends testCreate
+     *
      * @return MessageModel
      */
     public function testModify(MessageModel $message)

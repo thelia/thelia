@@ -31,13 +31,13 @@ trait UserPermissionsTrait
         }
 
         $userResourcePermissionsQuery = ProfileResourceQuery::create()
-            ->joinResource("resource", Criteria::LEFT_JOIN)
+            ->joinResource('resource', Criteria::LEFT_JOIN)
             ->withColumn('resource.code', 'code')
             ->filterByProfileId($profileId)
             ->find();
 
         $userModulePermissionsQuery = ProfileModuleQuery::create()
-            ->joinModule("module", Criteria::LEFT_JOIN)
+            ->joinModule('module', Criteria::LEFT_JOIN)
             ->withColumn('module.code', 'code')
             ->filterByProfileId($profileId)
             ->find();

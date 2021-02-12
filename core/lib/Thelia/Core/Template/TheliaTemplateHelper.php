@@ -28,9 +28,9 @@ class TheliaTemplateHelper implements TemplateHelperInterface
     }
 
     /**
-     * Check if a template definition is the current active template
+     * Check if a template definition is the current active template.
      *
-     * @return bool               true is the given template is the active template
+     * @return bool true is the given template is the active template
      */
     public function isActive(TemplateDefinition $tplDefinition)
     {
@@ -53,6 +53,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface
 
         return $tplDefinition->getName() == ConfigQuery::read($tplVar, 'default');
     }
+
     /**
      * @return TemplateDefinition
      */
@@ -87,7 +88,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface
     }
 
     /**
-     * Returns an array which contains all standard template definitions
+     * Returns an array which contains all standard template definitions.
      */
     public function getStandardTemplateDefinitions()
     {
@@ -100,10 +101,11 @@ class TheliaTemplateHelper implements TemplateHelperInterface
     }
 
     /**
-     * Return a list of existing templates for a given template type
+     * Return a list of existing templates for a given template type.
      *
-     * @param  int $templateType the template type
-     * @param string $base the template base (module or core, default to core).
+     * @param int    $templateType the template type
+     * @param string $base         the template base (module or core, default to core)
+     *
      * @return TemplateDefinition[] of \Thelia\Core\Template\TemplateDefinition
      */
     public function getList($templateType, $base = THELIA_TEMPLATE_DIR)
@@ -123,7 +125,7 @@ class TheliaTemplateHelper implements TemplateHelperInterface
                     /** @var \DirectoryIterator $file */
                     foreach ($di as $file) {
                         // Ignore 'dot' elements
-                        if ($file->isDot() || ! $file->isDir()) {
+                        if ($file->isDot() || !$file->isDir()) {
                             continue;
                         }
 

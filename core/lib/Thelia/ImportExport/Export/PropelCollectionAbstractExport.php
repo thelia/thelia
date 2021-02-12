@@ -24,6 +24,7 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
 
     /**
      * @return array|false|mixed|string
+     *
      * @throws \Exception
      */
     public function current()
@@ -40,6 +41,7 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
 
     /**
      * @return bool|float|int|string|null
+     *
      * @throws \Exception
      */
     public function key()
@@ -88,6 +90,7 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
 
     /**
      * @return bool
+     *
      * @throws \Exception
      */
     public function valid()

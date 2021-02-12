@@ -16,14 +16,12 @@ use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Product;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 abstract class BaseTaxType
 {
     /**
-     * A var <-> value array which contains TaxtType requirements (e.g. parameters)
+     * A var <-> value array which contains TaxtType requirements (e.g. parameters).
      *
      * @var array
      */
@@ -57,7 +55,7 @@ abstract class BaseTaxType
     /**
      * Returns the requirements definition of this tax type. This is an array of
      * TaxTypeRequirementDefinition, which defines the name and the type of
-     * the requirements. Example :
+     * the requirements. Example :.
      *
      * array(
      *    'percent' => new FloatType()
@@ -71,7 +69,7 @@ abstract class BaseTaxType
     }
 
     /**
-     * @return the name of this tax type.
+     * @return the name of this tax type
      */
     abstract public function getTitle();
 
@@ -82,7 +80,8 @@ abstract class BaseTaxType
 
     /**
      * @throws TaxEngineException
-     * @return array              Return the requirements array.
+     *
+     * @return array return the requirements array
      */
     public function getRequirements()
     {
@@ -100,12 +99,12 @@ abstract class BaseTaxType
         foreach ($requirements as $requirement) {
             $requirementName = $requirement->getName();
 
-            if (! \array_key_exists($requirementName, $requirementsValues)) {
-                throw new TaxEngineException('Cannot load requirements : requirement value for `' . $requirementName . '` not found', TaxEngineException::TAX_TYPE_REQUIREMENT_NOT_FOUND);
+            if (!\array_key_exists($requirementName, $requirementsValues)) {
+                throw new TaxEngineException('Cannot load requirements : requirement value for `'.$requirementName.'` not found', TaxEngineException::TAX_TYPE_REQUIREMENT_NOT_FOUND);
             }
 
-            if (! $requirement->isValueValid($requirementsValues[$requirementName])) {
-                throw new TaxEngineException('Requirement value for `' . $requirementName . '` does not match required type', TaxEngineException::TAX_TYPE_BAD_REQUIREMENT_VALUE);
+            if (!$requirement->isValueValid($requirementsValues[$requirementName])) {
+                throw new TaxEngineException('Requirement value for `'.$requirementName.'` does not match required type', TaxEngineException::TAX_TYPE_BAD_REQUIREMENT_VALUE);
             }
 
             $this->requirements[$requirementName] = $requirementsValues[$requirementName];
@@ -122,7 +121,7 @@ abstract class BaseTaxType
     public function getRequirement($key)
     {
         if (!\array_key_exists($key, $this->requirements)) {
-            throw new TaxEngineException('Requirement value for `' . $key . '` does not exists in BaseTaxType::$requirements', TaxEngineException::UNDEFINED_REQUIREMENT_VALUE);
+            throw new TaxEngineException('Requirement value for `'.$key.'` does not exists in BaseTaxType::$requirements', TaxEngineException::UNDEFINED_REQUIREMENT_VALUE);
         }
 
         return $this->requirements[$key];

@@ -31,15 +31,15 @@ class ProductCloneForm extends BaseForm
     {
         $this->formBuilder
             ->add('productId', IntegerType::class, [
-                'constraints' => [new NotBlank()]
+                'constraints' => [new NotBlank()],
             ])
             ->add('newRef', TextType::class, [
                 'constraints' => [
                     new NotBlank(),
-                    new Callback([$this, 'checkRefDifferent'])
+                    new Callback([$this, 'checkRefDifferent']),
                 ],
                 'label' => $this->translator->trans('Product reference (must be unique)'),
-                'label_attr'  => ['for' => 'newRef']
+                'label_attr' => ['for' => 'newRef'],
             ])
         ;
     }

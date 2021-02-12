@@ -21,16 +21,15 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Model\CustomerQuery;
 
 /**
- * Class CustomerLostPasswordForm
- * @package Thelia\Form
+ * Class CustomerLostPasswordForm.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CustomerLostPasswordForm extends FirewallForm
 {
     /**
-     *
      * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
+     * Form this you have to call add method on $this->formBuilder attribute :.
      *
      * $this->formBuilder->add("name", TextType::class)
      *   ->add("email", EmailType::class, array(
@@ -50,17 +49,17 @@ class CustomerLostPasswordForm extends FirewallForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("email", EmailType::class, [
-                "constraints" => [
+            ->add('email', EmailType::class, [
+                'constraints' => [
                     new NotBlank(),
                     new Email(),
                     new Callback(
-                            [$this, "verifyExistingEmail"]
+                            [$this, 'verifyExistingEmail']
                         ),
                 ],
-                "label" => Translator::getInstance()->trans("Please enter your email address"),
-                "label_attr" => [
-                    "for" => "forgot-email",
+                'label' => Translator::getInstance()->trans('Please enter your email address'),
+                'label_attr' => [
+                    'for' => 'forgot-email',
                 ],
             ]);
     }
@@ -69,7 +68,7 @@ class CustomerLostPasswordForm extends FirewallForm
     {
         $customer = CustomerQuery::create()->findOneByEmail($value);
         if (null === $customer) {
-            $context->addViolation(Translator::getInstance()->trans("This email does not exists"));
+            $context->addViolation(Translator::getInstance()->trans('This email does not exists'));
         }
     }
 
@@ -78,6 +77,6 @@ class CustomerLostPasswordForm extends FirewallForm
      */
     public static function getName()
     {
-        return "thelia_customer_lost_password";
+        return 'thelia_customer_lost_password';
     }
 }

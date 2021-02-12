@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Sale;
 
 /**
- * Class SaleDeleteEvent
- * @package Thelia\Core\Event\Sale
+ * Class SaleDeleteEvent.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class SaleDeleteEvent extends SaleEvent

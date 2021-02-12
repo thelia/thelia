@@ -20,18 +20,18 @@ use Thelia\Model\BrandQuery;
 trait BrandBreadcrumbTrait
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function getBreadcrumb(Router $router, /** @noinspection PhpUnusedParameterInspection */ ContainerInterface $container, $tab, $locale)
+    public function getBreadcrumb(Router $router, /* @noinspection PhpUnusedParameterInspection */ ContainerInterface $container, $tab, $locale)
     {
         $breadcrumb = [
             Translator::getInstance()->trans('Home') => $router->generate('admin.home.view', [], Router::ABSOLUTE_URL),
-            Translator::getInstance()->trans('Brand') => $router->generate('admin.brand.default', [], Router::ABSOLUTE_URL)
+            Translator::getInstance()->trans('Brand') => $router->generate('admin.brand.default', [], Router::ABSOLUTE_URL),
         ];
 
         if (null !== $brand = BrandQuery::create()->findPk($this->getBrandId())) {
             $breadcrumb[$brand->setLocale($locale)->getTitle()] = sprintf(
-                "%s?current_tab=%s",
+                '%s?current_tab=%s',
                 $router->generate('admin.brand.update', ['brand_id' => $brand->getId()], Router::ABSOLUTE_URL),
                 $tab
             );

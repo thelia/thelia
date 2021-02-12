@@ -13,8 +13,8 @@
 namespace Thelia\Core\Hook;
 
 /**
- * Class HookDefinition
- * @package Thelia\Core\Hook
+ * Class HookDefinition.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookDefinition

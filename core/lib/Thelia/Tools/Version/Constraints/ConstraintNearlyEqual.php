@@ -13,8 +13,8 @@
 namespace Thelia\Tools\Version\Constraints;
 
 /**
- * Class ConstraintNearlyEqual
- * @package Thelia\Tools\Version\Constraints
+ * Class ConstraintNearlyEqual.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ConstraintNearlyEqual extends BaseConstraint

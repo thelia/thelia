@@ -40,14 +40,11 @@ use Thelia\Model\OrderCoupon;
 use Thelia\Model\OrderCouponCountry;
 use Thelia\Model\OrderCouponModule;
 use Thelia\Model\OrderCouponQuery;
-use Thelia\Model\OrderStatusQuery;
 
 /**
- * Process Coupon Events
+ * Process Coupon Events.
  *
- * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>, Franck Allimant <franck@cqfdev.fr>
- *
  */
 class Coupon extends BaseAction implements EventSubscriberInterface
 {
@@ -80,11 +77,11 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $this->conditionFactory = $conditionFactory;
     }
 
-     /**
-     * Occurring when a Coupon is about to be created
+    /**
+     * Occurring when a Coupon is about to be created.
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon
-      * @param $eventName
+     * @param $eventName
      */
     public function create(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -94,7 +91,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Occurring when a Coupon is about to be updated
+     * Occurring when a Coupon is about to be updated.
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon
      * @param $eventName
@@ -112,7 +109,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
         if (null === $coupon) {
             throw new \InvalidArgumentException(
-                "The coupon should not be null"
+                'The coupon should not be null'
             );
         }
 
@@ -122,7 +119,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Occurring when a Coupon condition is about to be updated
+     * Occurring when a Coupon condition is about to be updated.
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon condition
      * @param $eventName
@@ -150,7 +147,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Occurring when a Coupon condition is about to be consumed
+     * Occurring when a Coupon condition is about to be consumed.
      *
      * @param CouponConsumeEvent $event Event consuming Coupon
      * @param $eventName
@@ -202,7 +199,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     /**
      * Call the Model and delegate the create or delete action
-     * Feed the Event with the updated model
+     * Feed the Event with the updated model.
      *
      * @param CouponModel               $coupon Model to save
      * @param CouponCreateOrUpdateEvent $event  Event containing data
@@ -246,7 +243,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     /**
      * Call the Model and delegate the create or delete action
-     * Feed the Event with the updated model
+     * Feed the Event with the updated model.
      *
      * @param CouponModel               $coupon Model to save
      * @param CouponCreateOrUpdateEvent $event  Event containing data
@@ -264,8 +261,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $event->setCouponModel($coupon);
     }
 
-    /**
-     */
     public function testFreePostage(OrderEvent $event)
     {
         $order = $event->getOrder();
@@ -280,8 +275,8 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * @throws \Exception if something goes wrong
      *
-     * @throws \Exception if something goes wrong.
      * @param $eventName
      */
     public function afterOrder(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -334,7 +329,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                             ->setCouponId($orderCoupon->getId())
                             ->setCountryId($couponCountry->getCountryId())
                             ->save();
-                        ;
                     }
 
                     $couponModules = CouponModuleQuery::create()->filterByCouponId($couponModel->getId())->find();
@@ -347,7 +341,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                             ->setCouponId($orderCoupon->getId())
                             ->setModuleId($couponModule->getModuleId())
                             ->save();
-                        ;
                     }
                 }
 
@@ -355,7 +348,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             } catch (\Exception  $ex) {
                 $con->rollBack();
 
-                throw($ex);
+                throw ($ex);
             }
         }
 
@@ -365,9 +358,10 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     /**
      * Cancels order coupons usage when order is canceled or refunded,
-     * or use canceled coupons again if the order is no longer canceled or refunded
+     * or use canceled coupons again if the order is no longer canceled or refunded.
      *
      * @param string $eventName
+     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -419,24 +413,24 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::COUPON_CREATE => ["create", 128],
-            TheliaEvents::COUPON_UPDATE => ["update", 128],
-            TheliaEvents::COUPON_DELETE => ["delete", 128],
-            TheliaEvents::COUPON_CONSUME => ["consume", 128],
-            TheliaEvents::COUPON_CLEAR_ALL => ["clearAllCoupons", 128],
-            TheliaEvents::COUPON_CONDITION_UPDATE => ["updateCondition", 128],
-            TheliaEvents::ORDER_SET_POSTAGE => ["testFreePostage", 132],
-            TheliaEvents::ORDER_BEFORE_PAYMENT => ["afterOrder", 128],
-            TheliaEvents::ORDER_UPDATE_STATUS => ["orderStatusChange", 10],
-            TheliaEvents::CART_ADDITEM => ["updateOrderDiscount", 10],
-            TheliaEvents::CART_UPDATEITEM => ["updateOrderDiscount", 10],
-            TheliaEvents::CART_DELETEITEM => ["updateOrderDiscount", 10],
-            TheliaEvents::CUSTOMER_LOGIN => ["updateOrderDiscount", 10]
+            TheliaEvents::COUPON_CREATE => ['create', 128],
+            TheliaEvents::COUPON_UPDATE => ['update', 128],
+            TheliaEvents::COUPON_DELETE => ['delete', 128],
+            TheliaEvents::COUPON_CONSUME => ['consume', 128],
+            TheliaEvents::COUPON_CLEAR_ALL => ['clearAllCoupons', 128],
+            TheliaEvents::COUPON_CONDITION_UPDATE => ['updateCondition', 128],
+            TheliaEvents::ORDER_SET_POSTAGE => ['testFreePostage', 132],
+            TheliaEvents::ORDER_BEFORE_PAYMENT => ['afterOrder', 128],
+            TheliaEvents::ORDER_UPDATE_STATUS => ['orderStatusChange', 10],
+            TheliaEvents::CART_ADDITEM => ['updateOrderDiscount', 10],
+            TheliaEvents::CART_UPDATEITEM => ['updateOrderDiscount', 10],
+            TheliaEvents::CART_DELETEITEM => ['updateOrderDiscount', 10],
+            TheliaEvents::CUSTOMER_LOGIN => ['updateOrderDiscount', 10],
         ];
     }
 
     /**
-     * Returns the session from the current request
+     * Returns the session from the current request.
      *
      * @return \Thelia\Core\HttpFoundation\Session\Session
      */

@@ -19,8 +19,8 @@ use Thelia\Core\Event\Attribute\AttributeUpdateEvent;
 use Thelia\Model\Attribute as AttributeModel;
 
 /**
- * Class AttributeTest
- * @package Thelia\Tests\Action
+ * Class AttributeTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AttributeTest extends BaseAction
@@ -47,6 +47,7 @@ class AttributeTest extends BaseAction
 
     /**
      * @depends testCreateSimple
+     *
      * @return AttributeModel
      */
     public function testUpdate(AttributeModel $attribute)

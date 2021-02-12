@@ -13,13 +13,12 @@
 namespace Thelia\Tests\Rewriting;
 
 use PHPUnit\Framework\TestCase;
-use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Propel;
 use Thelia\Model\Tools\UrlRewritingTrait;
 
 /**
- * Class BaseRewritingObject
- * @package Thelia\Tests\Rewriting
+ * Class BaseRewritingObject.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 abstract class BaseRewritingObject extends TestCase
@@ -30,7 +29,7 @@ abstract class BaseRewritingObject extends TestCase
     abstract public function getObject();
 
     /**
-     * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
+     * @covers \Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
      */
     public function testSimpleFrenchRewrittenUrl()
     {
@@ -46,7 +45,7 @@ abstract class BaseRewritingObject extends TestCase
 
         $con = Propel::getConnection();
         $rewrittenUrl = $object->generateRewrittenUrl('fr_FR', $con);
-        $this->assertNotNull($rewrittenUrl, "rewritten url can not be null");
+        $this->assertNotNull($rewrittenUrl, 'rewritten url can not be null');
         $this->assertMatchesRegularExpression('/^mon-super-titre-en-français(-[0-9]+)?\.html$/', $rewrittenUrl);
         //mon-super-titre-en-français-2.html
 
@@ -54,7 +53,7 @@ abstract class BaseRewritingObject extends TestCase
     }
 
     /**
-     * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
+     * @covers \Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
      */
     public function testSimpleEnglishRewrittenUrl()
     {
@@ -70,19 +69,19 @@ abstract class BaseRewritingObject extends TestCase
 
         $con = Propel::getConnection();
         $rewrittenUrl = $object->generateRewrittenUrl('en_US', $con);
-        $this->assertNotNull($rewrittenUrl, "rewritten url can not be null");
+        $this->assertNotNull($rewrittenUrl, 'rewritten url can not be null');
         $this->assertMatchesRegularExpression('/^my-english-super-title(-[0-9]+)?\.html$/', $rewrittenUrl);
 
         $object->delete();
     }
 
     /**
-     * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
+     * @covers \Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
      */
     public function testRewrittenWithoutTitle()
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage("Impossible to create an url if title is null");
+        $this->expectExceptionMessage('Impossible to create an url if title is null');
         $object = $this->getObject();
         $object->setVisible(1)
             ->setPosition(1)
@@ -92,7 +91,7 @@ abstract class BaseRewritingObject extends TestCase
     }
 
     /**
-     * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
+     * @covers \Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
      */
     public function testOnNotSavedObject()
     {

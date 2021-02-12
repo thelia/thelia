@@ -13,7 +13,6 @@
 namespace Thelia\Tests\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Collection\Collection;
 use Thelia\Action\Content;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
@@ -31,8 +30,8 @@ use Thelia\Model\FolderQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
- * Class ContentTest
- * @package Thelia\Tests\Action
+ * Class ContentTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ContentTest extends TestCaseWithURLToolSetup
@@ -64,7 +63,9 @@ class ContentTest extends TestCaseWithURLToolSetup
 
     /**
      * @param ContentUpdateEvent$event
+     *
      * @return ContentModel
+     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -172,7 +173,7 @@ class ContentTest extends TestCaseWithURLToolSetup
             $this->fail('use fixtures before launching test, there is no content in database');
         }
 
-        $newPosition = $contentFolderQuery->getPosition()-1;
+        $newPosition = $contentFolderQuery->getPosition() - 1;
 
         $event = new UpdatePositionEvent(
             $contentFolderQuery->getContentId(),
@@ -189,7 +190,7 @@ class ContentTest extends TestCaseWithURLToolSetup
             ->filterByContentId($contentFolderQuery->getContentId())
             ->findOne();
 
-        $this->assertEquals($newPosition, $updatedContent->getPosition(), sprintf("new position is %d, new position expected is %d for content %d", $newPosition, $updatedContent->getPosition(), $updatedContent->getContentId()));
+        $this->assertEquals($newPosition, $updatedContent->getPosition(), sprintf('new position is %d, new position expected is %d for content %d', $newPosition, $updatedContent->getPosition(), $updatedContent->getContentId()));
     }
 
     public function testUpdatePositionDown()
@@ -203,7 +204,7 @@ class ContentTest extends TestCaseWithURLToolSetup
             $this->fail('use fixtures before launching test, there is no content in database');
         }
 
-        $newPosition = $contentFolderQuery->getPosition()+1;
+        $newPosition = $contentFolderQuery->getPosition() + 1;
 
         $event = new UpdatePositionEvent(
             $contentFolderQuery->getContentId(),
@@ -219,9 +220,8 @@ class ContentTest extends TestCaseWithURLToolSetup
             ->filterByFolderId($contentFolderQuery->getFolderId())
             ->filterByContentId($contentFolderQuery->getContentId())
             ->findOne();
-        ;
 
-        $this->assertEquals($newPosition, $updatedContent->getPosition(), sprintf("new position is %d, new position expected is %d for content %d", $newPosition, $updatedContent->getPosition(), $updatedContent->getContentId()));
+        $this->assertEquals($newPosition, $updatedContent->getPosition(), sprintf('new position is %d, new position expected is %d for content %d', $newPosition, $updatedContent->getPosition(), $updatedContent->getContentId()));
     }
 
     public function testUpdatePositionWithSpecificPosition()
@@ -249,9 +249,8 @@ class ContentTest extends TestCaseWithURLToolSetup
             ->filterByFolderId($contentFolderQuery->getFolderId())
             ->filterByContentId($contentFolderQuery->getContentId())
             ->findOne();
-        ;
 
-        $this->assertEquals(1, $updatedContent->getPosition(), sprintf("new position is 1, new position expected is %d for content %d", $updatedContent->getPosition(), $updatedContent->getContentId()));
+        $this->assertEquals(1, $updatedContent->getPosition(), sprintf('new position is 1, new position expected is %d for content %d', $updatedContent->getPosition(), $updatedContent->getContentId()));
     }
 
     public function testAddFolderToContent()
@@ -319,7 +318,7 @@ class ContentTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * generates a folder and its contents to be used in Position tests
+     * generates a folder and its contents to be used in Position tests.
      *
      * @return Folder the parent folder
      */
@@ -336,7 +335,7 @@ class ContentTest extends TestCaseWithURLToolSetup
 
             $folder->save();
 
-            for ($i = 0; $i < 4; $i++) {
+            for ($i = 0; $i < 4; ++$i) {
                 $content = new ContentModel();
 
                 $content->setVisible(1);

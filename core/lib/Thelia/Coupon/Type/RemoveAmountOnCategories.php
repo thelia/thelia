@@ -13,16 +13,15 @@
 namespace Thelia\Coupon\Type;
 
 /**
- * Allow to remove an amount from the checkout total
+ * Allow to remove an amount from the checkout total.
  *
- * @package Coupon
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class RemoveAmountOnCategories extends AbstractRemoveOnCategories
 {
     use AmountCouponTrait;
 
-    /** @var string Service Id  */
+    /** @var string Service Id */
     protected $serviceId = 'thelia.coupon.type.remove_amount_on_categories';
 
     protected function getAmountFieldName()
@@ -30,8 +29,8 @@ class RemoveAmountOnCategories extends AbstractRemoveOnCategories
         return self::AMOUNT_FIELD_NAME;
     }
 
-     /**
-     * @inheritdoc
+    /**
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -41,7 +40,7 @@ class RemoveAmountOnCategories extends AbstractRemoveOnCategories
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getToolTip()
     {
@@ -56,7 +55,7 @@ class RemoveAmountOnCategories extends AbstractRemoveOnCategories
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function drawBackOfficeInputs()
     {

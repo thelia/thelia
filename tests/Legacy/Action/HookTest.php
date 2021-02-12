@@ -24,8 +24,8 @@ use Thelia\Model\Hook as HookModel;
 use Thelia\Model\LangQuery;
 
 /**
- * Class HookTest
- * @package Thelia\Tests\Action
+ * Class HookTest.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookTest extends BaseAction
@@ -49,12 +49,12 @@ class HookTest extends BaseAction
     {
         $event = new HookCreateEvent();
         $event
-            ->setCode('test.hook-' . uniqid())
+            ->setCode('test.hook-'.uniqid())
             ->setType(TemplateDefinition::FRONT_OFFICE)
             ->setLocale($this->locale)
             ->setActive(true)
             ->setNative(true)
-            ->setTitle("Hook Test");
+            ->setTitle('Hook Test');
 
         $this->action->create($event, null, $this->getMockEventDispatcher());
 
@@ -78,14 +78,14 @@ class HookTest extends BaseAction
     {
         $event = new HookCreateAllEvent();
         $event
-            ->setCode('test.hook-' . uniqid())
+            ->setCode('test.hook-'.uniqid())
             ->setType(TemplateDefinition::FRONT_OFFICE)
             ->setLocale($this->locale)
             ->setActive(true)
             ->setNative(true)
-            ->setTitle("Hook Test")
-            ->setDescription("Hook Description")
-            ->setChapo("Hook Chapo")
+            ->setTitle('Hook Test')
+            ->setDescription('Hook Description')
+            ->setChapo('Hook Chapo')
             ->setBlock(false)
             ->setByModule(false);
 
@@ -121,7 +121,7 @@ class HookTest extends BaseAction
             ->setLocale($this->locale)
             ->setActive(true)
             ->setNative(true)
-            ->setTitle("Hook Test");
+            ->setTitle('Hook Test');
 
         $this->expectException(\Propel\Runtime\Exception\PropelException::class);
 
@@ -135,6 +135,7 @@ class HookTest extends BaseAction
 
     /**
      * @depends testCreate
+     *
      * @return HookModel
      */
     public function testDeactivation(HookModel $hook)
@@ -151,6 +152,7 @@ class HookTest extends BaseAction
 
     /**
      * @depends testDeactivation
+     *
      * @return HookModel
      */
     public function testToggleActivation(HookModel $hook)
@@ -167,6 +169,7 @@ class HookTest extends BaseAction
 
     /**
      * @depends testToggleActivation
+     *
      * @return HookModel
      */
     public function testUpdate(HookModel $hook)
@@ -174,14 +177,14 @@ class HookTest extends BaseAction
         $event = new HookUpdateEvent($hook->getId());
 
         $event
-            ->setCode('test.hook.' . uniqid())
+            ->setCode('test.hook.'.uniqid())
             ->setType(TemplateDefinition::FRONT_OFFICE)
             ->setLocale($this->locale)
             ->setActive(false)
             ->setNative(false)
-            ->setTitle("Updated Hook Test")
-            ->setDescription("Updated Hook Description")
-            ->setChapo("Updated Hook Chapo")
+            ->setTitle('Updated Hook Test')
+            ->setDescription('Updated Hook Description')
+            ->setChapo('Updated Hook Chapo')
             ->setBlock(false)
             ->setByModule(false);
 

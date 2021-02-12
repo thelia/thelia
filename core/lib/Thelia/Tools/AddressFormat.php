@@ -25,8 +25,8 @@ use Thelia\Model\Lang;
 use Thelia\Model\OrderAddress;
 
 /**
- * Class AddressFormat
- * @package Thelia\Tools
+ * Class AddressFormat.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class AddressFormat
@@ -50,19 +50,20 @@ class AddressFormat
     }
 
     /**
-     * Format an address
+     * Format an address.
      *
-     * @param null $locale
-     * @param bool $html
+     * @param null   $locale
+     * @param bool   $html
      * @param string $htmlTag
-     * @param array $htmlAttributes
+     * @param array  $htmlAttributes
+     *
      * @return string
      */
     public function format(
         AddressInterface $address,
         $locale = null,
         $html = true,
-        $htmlTag = "p",
+        $htmlTag = 'p',
         $htmlAttributes = []
     ) {
         $locale = $this->normalizeLocale($locale);
@@ -75,34 +76,37 @@ class AddressFormat
             $addressFormatRepository,
             $countryRepository,
             $subdivisionRepository,
-            ["locale" => $locale]
+            ['locale' => $locale]
         );
 
-        return $formatter->format($address, ["html" => $html, "html_tag" => $htmlTag, "html_attributes" => $htmlAttributes]);
+        return $formatter->format($address, ['html' => $html, 'html_tag' => $htmlTag, 'html_attributes' => $htmlAttributes]);
     }
 
     /**
-     * Format a Thelia address (Address or OrderAddress)
+     * Format a Thelia address (Address or OrderAddress).
      *
      * @param \Thelia\Model\OrderAddress|OrderAddress $address
-     * @param null $locale
-     * @param bool $html
-     * @param string $htmlTag
-     * @param array $htmlAttributes
+     * @param null                                    $locale
+     * @param bool                                    $html
+     * @param string                                  $htmlTag
+     * @param array                                   $htmlAttributes
+     *
      * @return string
      */
-    public function formatTheliaAddress($address, $locale = null, $html = true, $htmlTag = "p", $htmlAttributes = [])
+    public function formatTheliaAddress($address, $locale = null, $html = true, $htmlTag = 'p', $htmlAttributes = [])
     {
         $address = $this->mapTheliaAddress($address, $locale);
+
         return $this->format($address, $locale, $html, $htmlTag, $htmlAttributes);
     }
 
     /**
-     * Format an address to a postal label
+     * Format an address to a postal label.
      *
-     * @param null $locale
-     * @param null $originCountry
+     * @param null  $locale
+     * @param null  $originCountry
      * @param array $options
+     *
      * @return string
      */
     public function postalLabelFormat(AddressInterface $address, $locale = null, $originCountry = null, $options = [])
@@ -122,7 +126,7 @@ class AddressFormat
             $originCountry = $country->getIsoalpha2();
         }
 
-        $options = array_merge($options, ["locale" => $locale, "origin_country" => $originCountry]);
+        $options = array_merge($options, ['locale' => $locale, 'origin_country' => $originCountry]);
 
         $formatter = new PostalLabelFormatter(
             $addressFormatRepository,
@@ -135,22 +139,24 @@ class AddressFormat
     }
 
     /**
-     * Format a Thelia address (Address or OrderAddress) to a postal label
+     * Format a Thelia address (Address or OrderAddress) to a postal label.
      *
      * @param \Thelia\Model\OrderAddress|OrderAddress $address
-     * @param null $locale
-     * @param null $originCountry
-     * @param array $options
+     * @param null                                    $locale
+     * @param null                                    $originCountry
+     * @param array                                   $options
+     *
      * @return string
      */
     public function postalLabelFormatTheliaAddress($address, $locale = null, $originCountry = null, $options = [])
     {
         $address = $this->mapTheliaAddress($address, $locale);
+
         return $this->postalLabelFormat($address, $locale, $originCountry, $options);
     }
 
     /**
-     * Convert a Thelia address (Address or OrderAddress) to ImmutableAddressInterface
+     * Convert a Thelia address (Address or OrderAddress) to ImmutableAddressInterface.
      *
      * @param \Thelia\Model\OrderAddress|OrderAddress $address
      */

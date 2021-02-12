@@ -24,7 +24,7 @@ class BaseFrontController extends BaseController
 {
     public const CONTROLLER_TYPE = 'front';
 
-    protected $currentRouter = "router.front";
+    protected $currentRouter = 'router.front';
 
     public function checkAuth()
     {
@@ -44,7 +44,7 @@ class BaseFrontController extends BaseController
     protected function checkCartNotEmpty()
     {
         $cart = $this->getSession()->getSessionCart($this->getDispatcher());
-        if ($cart===null || $cart->countCartItems() == 0) {
+        if ($cart === null || $cart->countCartItems() == 0) {
             throw new RedirectException($this->retrieveUrlFromRouteId('cart.view'));
         }
     }
@@ -88,7 +88,7 @@ class BaseFrontController extends BaseController
      */
     protected function getParser($template = null)
     {
-        $parser = $this->container->get("thelia.parser");
+        $parser = $this->container->get('thelia.parser');
 
         // Define the template that should be used
         $parser->setTemplateDefinition(
@@ -102,9 +102,10 @@ class BaseFrontController extends BaseController
     /**
      * Render the given template, and returns the result as an Http Response.
      *
-     * @param  string                               $templateName the complete template name, with extension
-     * @param  array                                $args         the template arguments
-     * @param  int                                  $status       http code status
+     * @param string $templateName the complete template name, with extension
+     * @param array  $args         the template arguments
+     * @param int    $status       http code status
+     *
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function render($templateName, $args = [], $status = 200)

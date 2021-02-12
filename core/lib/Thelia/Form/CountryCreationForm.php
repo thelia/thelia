@@ -29,7 +29,7 @@ class CountryCreationForm extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                     ],
-                    'label' => $this->translator->trans('Country title')
+                    'label' => $this->translator->trans('Country title'),
                 ]
             )
             ->add(
@@ -49,7 +49,7 @@ class CountryCreationForm extends BaseForm
                     'label' => $this->translator->trans('This country is online'),
                     'label_attr' => [
                         'for' => 'visible_create',
-                    ]
+                    ],
                 ]
             )
             ->add(
@@ -61,7 +61,7 @@ class CountryCreationForm extends BaseForm
                     ],
                     'label' => $this->translator->trans('Numerical ISO Code'),
                     'label_attr' => [
-                        'help' => $this->translator->trans('Check country iso codes <a href="http://en.wikipedia.org/wiki/ISO_3166-1#Current_codes" target="_blank">here</a>.')
+                        'help' => $this->translator->trans('Check country iso codes <a href="http://en.wikipedia.org/wiki/ISO_3166-1#Current_codes" target="_blank">here</a>.'),
                     ],
                 ]
             )
@@ -74,7 +74,7 @@ class CountryCreationForm extends BaseForm
                     ],
                     'label' => $this->translator->trans('ISO Alpha-2 code'),
                     'label_attr' => [
-                        'help' => $this->translator->trans('Check country iso codes <a href="http://en.wikipedia.org/wiki/ISO_3166-1#Current_codes" target="_blank">here</a>.')
+                        'help' => $this->translator->trans('Check country iso codes <a href="http://en.wikipedia.org/wiki/ISO_3166-1#Current_codes" target="_blank">here</a>.'),
                     ],
                 ]
             )
@@ -87,7 +87,7 @@ class CountryCreationForm extends BaseForm
                     ],
                     'label' => $this->translator->trans('ISO Alpha-3 code'),
                     'label_attr' => [
-                        'help' => $this->translator->trans('Check country iso codes <a href="http://en.wikipedia.org/wiki/ISO_3166-1#Current_codes" target="_blank">here</a>.')
+                        'help' => $this->translator->trans('Check country iso codes <a href="http://en.wikipedia.org/wiki/ISO_3166-1#Current_codes" target="_blank">here</a>.'),
                     ],
                 ]
             )
@@ -99,7 +99,7 @@ class CountryCreationForm extends BaseForm
                     'label' => $this->translator->trans('This country has states / provinces'),
                     'label_attr' => [
                         'for' => 'has_states_create',
-                    ]
+                    ],
                 ]
             )
         ;
@@ -107,6 +107,6 @@ class CountryCreationForm extends BaseForm
 
     public static function getName()
     {
-        return "thelia_country_creation";
+        return 'thelia_country_creation';
     }
 }

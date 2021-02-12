@@ -21,9 +21,8 @@ use Thelia\Model\Customer;
 use Thelia\Model\State;
 
 /**
- * Class TaxEngine
+ * Class TaxEngine.
  *
- * @package Thelia\TaxEngine
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class TaxEngine
@@ -42,7 +41,7 @@ class TaxEngine
         $this->requestStack = $requestStack;
 
         // Intialize the defaults Tax Types
-        $this->taxTypesDirectories['Thelia\\TaxEngine\\TaxType'] = __DIR__ . DS . "TaxType";
+        $this->taxTypesDirectories['Thelia\\TaxEngine\\TaxType'] = __DIR__.DS.'TaxType';
     }
 
     /**
@@ -61,7 +60,6 @@ class TaxEngine
      * Add a tax type to the current list.
      *
      * @param unknown $fullyQualifiedclassName the fully qualified classname, su chas MyTaxes\Taxes\MyTaxType
-     *
      */
     public function addTaxType($fullyQualifiedclassName)
     {
@@ -83,12 +81,12 @@ class TaxEngine
                             if (strtolower($extension) !== 'php') {
                                 continue;
                             }
-                            $className  = $fileinfo->getBaseName('.php');
+                            $className = $fileinfo->getBaseName('.php');
 
                             try {
                                 $fullyQualifiedClassName = "$namespace\\$className";
 
-                                $instance = new $fullyQualifiedClassName;
+                                $instance = new $fullyQualifiedClassName();
 
                                 if ($instance instanceof BaseTaxType) {
                                     $this->addTaxType(\get_class($instance));
@@ -111,9 +109,9 @@ class TaxEngine
      * Find Tax Country Id
      * First look for a picked delivery address country
      * Then look at the current customer default address country
-     * Else look at the default website country
-
-     * @return null|Country
+     * Else look at the default website country.
+     *
+     * @return Country|null
      */
     public function getDeliveryCountry()
     {
@@ -129,8 +127,8 @@ class TaxEngine
                 } else {
                     $customerDefaultAddress = $customer->getDefaultAddress();
                     if (isset($customerDefaultAddress)) {
-                      $this->taxCountry = $customerDefaultAddress->getCountry();
-                      $this->taxState = $customerDefaultAddress->getState();
+                        $this->taxCountry = $customerDefaultAddress->getCountry();
+                        $this->taxState = $customerDefaultAddress->getState();
                     }
                 }
             }
@@ -145,13 +143,15 @@ class TaxEngine
     }
 
     /**
-     * Find Tax State Id
+     * Find Tax State Id.
      *
      * First look for a picked delivery address state
      * Then look at the current customer default address state
      * Else null
 
-     * @return null|State
+     *
+     * @return State|null
+     *
      * @since 2.3.0-alpha1
      */
     public function getDeliveryState()

@@ -20,16 +20,14 @@ use Thelia\Module\BaseModule;
 /**
  * Skeleton subclass for performing query and update operations on the 'module' table.
  *
- *
- *
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
- *
  */
 class ModuleQuery extends BaseModuleQuery
 {
     protected static $activated = null;
+
     /**
      * @return array|mixed|\PropelObjectCollection
      */
@@ -51,8 +49,9 @@ class ModuleQuery extends BaseModuleQuery
     }
 
     /**
-     * @param  int         $moduleType the module type : classic, payment or delivery. Use BaseModule constant here.
-     * @param  int         $id         the module id
+     * @param int $moduleType the module type : classic, payment or delivery. Use BaseModule constant here.
+     * @param int $id         the module id
+     *
      * @return ModuleQuery
      */
     public function filterActivatedByTypeAndId($moduleType, $id)
@@ -64,13 +63,13 @@ class ModuleQuery extends BaseModuleQuery
     }
 
     /**
-     *
      * if the container is provided, this method will found the module in the container. Reflection is used instead.
      * If it's possible use it with the container.
      *
      * return false if no delivery modules are found, an array of BaseModule otherwise.
      *
      * @param ContainerInterface $container optional
+     *
      * @return false|\Thelia\Module\BaseModule[]
      */
     public function retrieveVirtualProductDelivery(ContainerInterface $container = null)
@@ -96,7 +95,7 @@ class ModuleQuery extends BaseModuleQuery
                     $result[] = $instance;
                 }
             } catch (\Exception $ex) {
-                Tlog::getInstance()->addError("Failed to instantiate module ".$module->getCode(), $ex);
+                Tlog::getInstance()->addError('Failed to instantiate module '.$module->getCode(), $ex);
             }
         }
 

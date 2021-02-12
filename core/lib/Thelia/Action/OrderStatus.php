@@ -27,22 +27,19 @@ use Thelia\Model\OrderStatus as OrderStatusModel;
 use Thelia\Model\OrderStatusQuery;
 
 /**
- * Class OrderStatus
- * @package Thelia\Action
+ * Class OrderStatus.
+ *
  * @author Gilles Bourgeat <gbourgeat@openstudio.fr>
+ *
  * @since 2.4
  */
 class OrderStatus extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     */
     public function create(OrderStatusCreateEvent $event)
     {
         $this->createOrUpdate($event, new OrderStatusModel());
     }
 
-    /**
-     */
     public function update(OrderStatusUpdateEvent $event)
     {
         $orderStatus = $this->getOrderStatus($event);
@@ -59,14 +56,14 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
         if ($orderStatus->getProtectedStatus()) {
             throw new \Exception(
                 Translator::getInstance()->trans('This status is protected.')
-                . ' ' . Translator::getInstance()->trans('You can not delete it.')
+                .' '.Translator::getInstance()->trans('You can not delete it.')
             );
         }
 
         if (null !== OrderQuery::create()->findOneByStatusId($orderStatus->getId())) {
             throw new \Exception(
                 Translator::getInstance()->trans('Some commands use this status.')
-                . ' ' . Translator::getInstance()->trans('You can not delete it.')
+                .' '.Translator::getInstance()->trans('You can not delete it.')
             );
         }
 
@@ -81,15 +78,13 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::ORDER_STATUS_CREATE => ["create", 128],
-            TheliaEvents::ORDER_STATUS_UPDATE => ["update", 128],
-            TheliaEvents::ORDER_STATUS_DELETE => ["delete", 128],
-            TheliaEvents::ORDER_STATUS_UPDATE_POSITION => ["updatePosition", 128]
+            TheliaEvents::ORDER_STATUS_CREATE => ['create', 128],
+            TheliaEvents::ORDER_STATUS_UPDATE => ['update', 128],
+            TheliaEvents::ORDER_STATUS_DELETE => ['delete', 128],
+            TheliaEvents::ORDER_STATUS_UPDATE_POSITION => ['updatePosition', 128],
         ];
     }
 
-    /**
-     */
     protected function createOrUpdate(OrderStatusEvent $event, OrderStatusModel $orderStatus)
     {
         $orderStatus
@@ -130,7 +125,7 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
     {
         if (null === $orderStatus = OrderStatusQuery::create()->findOneById($event->getId())) {
             throw new \LogicException(
-                "Order status not found"
+                'Order status not found'
             );
         }
 

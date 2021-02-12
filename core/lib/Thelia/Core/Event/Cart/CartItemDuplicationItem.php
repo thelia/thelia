@@ -16,8 +16,8 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\CartItem;
 
 /**
- * Class CartItemDuplicationItem
- * @package Thelia\Core\Event\Cart
+ * Class CartItemDuplicationItem.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CartItemDuplicationItem extends ActionEvent

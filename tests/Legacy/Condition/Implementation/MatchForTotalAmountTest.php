@@ -24,11 +24,9 @@ use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 
 /**
- * Unit Test MatchForTotalAmount Class
+ * Unit Test MatchForTotalAmount Class.
  *
- * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class MatchForTotalAmountTest extends TestCase
 {
@@ -36,7 +34,7 @@ class MatchForTotalAmountTest extends TestCase
     protected $stubTheliaAdapter;
 
     /**
-     * Generate adapter stub
+     * Generate adapter stub.
      *
      * @param int    $cartTotalPrice   Cart total price
      * @param string $checkoutCurrency Checkout currency
@@ -73,10 +71,9 @@ class MatchForTotalAmountTest extends TestCase
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
      */
     public function testInValidBackOfficeInputOperator()
     {
@@ -86,11 +83,11 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::IN,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => '400',
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -98,15 +95,14 @@ class MatchForTotalAmountTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
      */
     public function testInValidBackOfficeInputOperator2()
     {
@@ -116,11 +112,11 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::INFERIOR
+            MatchForTotalAmount::CART_CURRENCY => Operators::INFERIOR,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => '400',
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -128,15 +124,14 @@ class MatchForTotalAmountTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
      */
     public function testInValidBackOfficeInputValue()
     {
@@ -146,11 +141,11 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 'X',
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -158,15 +153,14 @@ class MatchForTotalAmountTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::setValidators
      */
     public function testInValidBackOfficeInputValue2()
     {
@@ -176,26 +170,25 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400,
-            MatchForTotalAmount::CART_CURRENCY => 'FLA'];
+            MatchForTotalAmount::CART_CURRENCY => 'FLA', ];
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
     public function testMatchingConditionInferior()
     {
@@ -205,25 +198,24 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
     public function testNotMatchingConditionInferior()
     {
@@ -233,25 +225,24 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
     public function testMatchingConditionInferiorEquals()
     {
@@ -261,25 +252,24 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR_OR_EQUAL,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
     public function testMatchingConditionInferiorEquals2()
     {
@@ -289,25 +279,24 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR_OR_EQUAL,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
     public function testNotMatchingConditionInferiorEquals()
     {
@@ -317,25 +306,24 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR_OR_EQUAL,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test equals operator is working
+     * Check if test equals operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
     public function testMatchingConditionEqual()
     {
@@ -345,25 +333,24 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test equals operator is working
+     * Check if test equals operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
     public function testNotMatchingConditionEqual()
     {
@@ -373,25 +360,24 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test superior operator is working
+     * Check if test superior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
     public function testMatchingConditionSuperiorEquals()
     {
@@ -401,25 +387,24 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR_OR_EQUAL,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test superior operator is working
+     * Check if test superior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
     public function testMatchingConditionSuperiorEquals2()
     {
@@ -429,25 +414,24 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR_OR_EQUAL,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test superior operator is working
+     * Check if test superior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
     public function testNotMatchingConditionSuperiorEquals()
     {
@@ -457,25 +441,24 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR_OR_EQUAL,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test superior operator is working
+     * Check if test superior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
     public function testMatchingConditionSuperior()
     {
@@ -485,25 +468,24 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test superior operator is working
+     * Check if test superior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
     public function testNotMatchingConditionSuperior()
     {
@@ -513,25 +495,24 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check currency is checked
+     * Check currency is checked.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
     public function testMatchingConditionCurrency()
     {
@@ -541,25 +522,24 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check currency is checked
+     * Check currency is checked.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::isMatching
      */
     public function testNotMatchingConditionCurrency()
     {
@@ -569,25 +549,24 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'USD'];
+            MatchForTotalAmount::CART_CURRENCY => 'USD', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check unknown currency
+     * Check unknown currency.
      *
-     * @covers Thelia\Condition\Implementation\ConditionAbstract::isCurrencyValid
-     *
+     * @covers \Thelia\Condition\Implementation\ConditionAbstract::isCurrencyValid
      */
     public function testUnknownCurrencyCode()
     {
@@ -616,11 +595,11 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'UNK'];
+            MatchForTotalAmount::CART_CURRENCY => 'UNK', ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -650,10 +629,9 @@ class MatchForTotalAmountTest extends TestCase
     }
 
     /**
-     * Check invalid currency
+     * Check invalid currency.
      *
-     * @covers Thelia\Condition\Implementation\ConditionAbstract::isPriceValid
-     *
+     * @covers \Thelia\Condition\Implementation\ConditionAbstract::isPriceValid
      */
     public function testInvalidCurrencyValue()
     {
@@ -682,11 +660,11 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 'notfloat',
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -716,10 +694,9 @@ class MatchForTotalAmountTest extends TestCase
     }
 
     /**
-     * Check invalid currency
+     * Check invalid currency.
      *
-     * @covers Thelia\Condition\Implementation\ConditionAbstract::isPriceValid
-     *
+     * @covers \Thelia\Condition\Implementation\ConditionAbstract::isPriceValid
      */
     public function testPriceAsZero()
     {
@@ -748,11 +725,11 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 0.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
         $condition1->setValidatorsFromForm($operators, $values);
@@ -782,7 +759,7 @@ class MatchForTotalAmountTest extends TestCase
     }
 
     /**
-     * Generate adapter stub
+     * Generate adapter stub.
      *
      * @param int    $cartTotalPrice   Cart total price
      * @param string $checkoutCurrency Checkout currency
@@ -831,10 +808,9 @@ class MatchForTotalAmountTest extends TestCase
     }
 
     /**
-     * Check getName i18n
+     * Check getName i18n.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::getName
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::getName
      */
     public function testGetName()
     {
@@ -849,10 +825,9 @@ class MatchForTotalAmountTest extends TestCase
     }
 
     /**
-     * Check tooltip i18n
+     * Check tooltip i18n.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::getToolTip
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::getToolTip
      */
     public function testGetToolTip()
     {
@@ -862,11 +837,11 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $actual = $condition1->getToolTip();
@@ -875,10 +850,9 @@ class MatchForTotalAmountTest extends TestCase
     }
 
     /**
-     * Check validator
+     * Check validator.
      *
-     * @covers Thelia\Condition\Implementation\MatchForTotalAmount::generateInputs
-     *
+     * @covers \Thelia\Condition\Implementation\MatchForTotalAmount::generateInputs
      */
     public function testGetValidator()
     {
@@ -888,11 +862,11 @@ class MatchForTotalAmountTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::EQUAL,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'];
+            MatchForTotalAmount::CART_CURRENCY => 'EUR', ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $actual = $condition1->getValidators();
@@ -905,11 +879,11 @@ class MatchForTotalAmountTest extends TestCase
                         '<=' => 'Price',
                         '==' => 'Price',
                         '>=' => 'Price',
-                        '>' => 'Price'
+                        '>' => 'Price',
                     ],
                     'availableValues' => '',
                     'value' => '',
-                    'selectedOperator' => ''
+                    'selectedOperator' => '',
                 ],
                 MatchForTotalAmount::CART_CURRENCY => [
                     'availableOperators' => ['==' => 'Price'],
@@ -919,17 +893,17 @@ class MatchForTotalAmountTest extends TestCase
                         'GBP' => '£',
                     ],
                     'value' => '',
-                    'selectedOperator' => Operators::EQUAL
-                ]
+                    'selectedOperator' => Operators::EQUAL,
+                ],
             ],
             'setOperators' => [
                 'price' => '==',
-                'currency' => '=='
+                'currency' => '==',
             ],
             'setValues' => [
                 'price' => 400,
-                'currency' => 'EUR'
-            ]
+                'currency' => 'EUR',
+            ],
         ];
         $expected = $validators;
 

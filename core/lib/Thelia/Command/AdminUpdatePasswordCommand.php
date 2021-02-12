@@ -26,12 +26,12 @@ use Thelia\Model\AdminQuery;
 use Thelia\Tools\Password;
 
 /**
- * command line for updating admin password
+ * command line for updating admin password.
  *
  * php Thelia admin:updatePassword
  *
  * Class AdminUpdatePasswordCommand
- * @package Thelia\Command
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AdminUpdatePasswordCommand extends ContainerAwareCommand
@@ -92,7 +92,7 @@ class AdminUpdatePasswordCommand extends ContainerAwareCommand
             '',
             sprintf('<info>admin %s password updated</info>', $login),
             sprintf('<info>new password is : %s</info>', $password),
-            ''
+            '',
         ]);
 
         return 0;

@@ -16,8 +16,8 @@ use Thelia\Model\Area;
 use Thelia\Model\Event\AreaEvent;
 
 /**
- * Class AreaAddCountryEvent
- * @package Thelia\Core\Event\Area
+ * Class AreaAddCountryEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AreaAddCountryEvent extends AreaEvent
@@ -33,7 +33,6 @@ class AreaAddCountryEvent extends AreaEvent
     }
 
     /**
-     *
      * @return $this
      */
     public function setCountryId($countryId)
@@ -43,8 +42,6 @@ class AreaAddCountryEvent extends AreaEvent
         return $this;
     }
 
-    /**
-     */
     public function getCountryId()
     {
         return $this->countryId;

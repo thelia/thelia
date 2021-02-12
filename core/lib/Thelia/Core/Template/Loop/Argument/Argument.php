@@ -16,9 +16,7 @@ use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class Argument
 {
@@ -30,13 +28,13 @@ class Argument
 
     private $value;
 
-    public function __construct($name, \Thelia\Type\TypeCollection $type, $default = null, $mandatory = false, $empty = true, $value = null)
+    public function __construct($name, TypeCollection $type, $default = null, $mandatory = false, $empty = true, $value = null)
     {
-        $this->name         = $name;
-        $this->type         = $type;
-        $this->mandatory    = $mandatory ? true : false;
-        $this->default      = $default;
-        $this->empty        = $empty;
+        $this->name = $name;
+        $this->type = $type;
+        $this->mandatory = $mandatory ? true : false;
+        $this->default = $default;
+        $this->empty = $empty;
 
         $this->setValue($value);
     }
@@ -148,7 +146,9 @@ class Argument
      * @param null $default
      * @param bool $mandatory
      * @param bool $empty
+     *
      * @return Argument
+     *
      * @since 2.2
      */
     public static function createAnyListTypeArgument($name, $default = null, $mandatory = false, $empty = true)
@@ -182,7 +182,9 @@ class Argument
      * @param null $default
      * @param bool $mandatory
      * @param bool $empty
+     *
      * @return Argument
+     *
      * @since 2.4.0
      */
     public static function createAlphaNumStringTypeArgument($name, $default = null, $mandatory = false, $empty = true)
@@ -203,7 +205,9 @@ class Argument
      * @param null $default
      * @param bool $mandatory
      * @param bool $empty
+     *
      * @return Argument
+     *
      * @since 2.4.0
      */
     public static function createAlphaNumStringListTypeArgument($name, $default = null, $mandatory = false, $empty = true)

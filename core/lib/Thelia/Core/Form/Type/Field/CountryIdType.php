@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\CountryQuery;
 
 /**
- * Class CountryIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class CountryIdType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class CountryIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class CountryIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "country_id";
+        return 'country_id';
     }
 }

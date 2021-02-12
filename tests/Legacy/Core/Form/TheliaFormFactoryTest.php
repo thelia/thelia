@@ -27,8 +27,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Tests\Resources\Form\Type\TestType;
 
 /**
- * Class TheliaFormFactoryTest
- * @package Thelia\Tests\Controller
+ * Class TheliaFormFactoryTest.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class TheliaFormFactoryTest extends TestCase
@@ -40,20 +40,20 @@ class TheliaFormFactoryTest extends TestCase
     {
         /**
          * Add the test type to the factory and
-         * the form to the container
+         * the form to the container.
          */
         $factory = new FormFactoryBuilder();
         $factory->addExtension(new CoreExtension());
         $factory->addType(new TestType());
 
         /**
-         * Construct the container
+         * Construct the container.
          */
         $container = new Container();
-        $container->set("thelia.form_factory_builder", $factory);
-        $formDefinitions = ["test_form" => "Thelia\\Tests\\Resources\\Form\\TestForm"];
+        $container->set('thelia.form_factory_builder', $factory);
+        $formDefinitions = ['test_form' => 'Thelia\\Tests\\Resources\\Form\\TestForm'];
         $container->setParameter(
-            "Thelia.parser.forms",
+            'Thelia.parser.forms',
             $formDefinitions
         );
 
@@ -68,11 +68,11 @@ class TheliaFormFactoryTest extends TestCase
         $validatorBuilder = new ValidatorBuilder();
 
         $request->setSession(new Session(new MockArraySessionStorage()));
-        $container->set("thelia.translator", $translator);
-        $container->set("request", $request);
-        $container->set("request_stack", $requestStack);
-        $container->set("thelia.forms.validator_builder", $validatorBuilder);
-        $container->set("event_dispatcher", $dispatcher);
+        $container->set('thelia.translator', $translator);
+        $container->set('request', $request);
+        $container->set('request_stack', $requestStack);
+        $container->set('thelia.forms.validator_builder', $validatorBuilder);
+        $container->set('event_dispatcher', $dispatcher);
 
         $this->factory = new TheliaFormFactory(
             $requestStack,
@@ -88,20 +88,20 @@ class TheliaFormFactoryTest extends TestCase
     {
         /**
          * If we build the form without type, we only have
-         * the defined fields
+         * the defined fields.
          */
-        $form = $this->factory->createForm("test_form");
+        $form = $this->factory->createForm('test_form');
 
         $this->assertTrue(
-            $form->getForm()->has("test_field")
+            $form->getForm()->has('test_field')
         );
 
         $this->assertFalse(
-            $form->getForm()->has("test_a")
+            $form->getForm()->has('test_a')
         );
 
         $this->assertFalse(
-            $form->getForm()->has("test_b")
+            $form->getForm()->has('test_b')
         );
     }
 
@@ -111,18 +111,18 @@ class TheliaFormFactoryTest extends TestCase
          * If we use a type, we have that type's fields.
          * -> The implementation is correct.
          */
-        $form = $this->factory->createForm("test_form", TestType::class);
+        $form = $this->factory->createForm('test_form', TestType::class);
 
         $this->assertTrue(
-            $form->getForm()->has("test_field")
+            $form->getForm()->has('test_field')
         );
 
         $this->assertTrue(
-            $form->getForm()->has("test_a")
+            $form->getForm()->has('test_a')
         );
 
         $this->assertTrue(
-            $form->getForm()->has("test_b")
+            $form->getForm()->has('test_b')
         );
     }
 }

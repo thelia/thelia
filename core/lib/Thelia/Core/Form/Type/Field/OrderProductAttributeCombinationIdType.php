@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\OrderProductAttributeCombinationQuery;
 
 /**
- * Class OrderProductAttributeCombinationIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class OrderProductAttributeCombinationIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class OrderProductAttributeCombinationIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class OrderProductAttributeCombinationIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "order_product_attribute_combination_id";
+        return 'order_product_attribute_combination_id';
     }
 }

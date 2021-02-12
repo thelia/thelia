@@ -25,6 +25,7 @@ class SchemaLocator
 {
     /**
      * Argument to Finder::name() used to filter schema files.
+     *
      * @var string
      */
     protected static $SCHEMA_FILE_PATTERN = '*schema.xml';
@@ -32,6 +33,7 @@ class SchemaLocator
     /**
      * Connection to the thelia database.
      * Used to query the module table for active modules.
+     *
      * @var ConnectionInterface
      */
     protected $theliaDatabaseConnection;
@@ -39,6 +41,7 @@ class SchemaLocator
     /**
      * Thelia configuration directory.
      * Used to find Thelia schema files.
+     *
      * @var string
      */
     protected $theliaConfDir;
@@ -46,13 +49,14 @@ class SchemaLocator
     /**
      * Thelia module directory.
      * Used to find modules schema files.
+     *
      * @var string
      */
     protected $theliaModuleDir;
 
     /**
-     * @param string $theliaConfDir Thelia configuration directory.
-     * @param string $theliaModuleDir Thelia module directory.
+     * @param string $theliaConfDir   thelia configuration directory
+     * @param string $theliaModuleDir thelia module directory
      */
     public function __construct($theliaConfDir, $theliaModuleDir)
     {
@@ -61,7 +65,7 @@ class SchemaLocator
     }
 
     /**
-     * @param ConnectionInterface $theliaDatabaseConnection Connection to the thelia database.
+     * @param ConnectionInterface $theliaDatabaseConnection connection to the thelia database
      */
     public function setTheliaDatabaseConnection(ConnectionInterface $theliaDatabaseConnection)
     {
@@ -70,7 +74,8 @@ class SchemaLocator
 
     /**
      * Get schema documents for Thelia core and active modules, as well as included external schemas.
-     * @return \DOMDocument[] Schema documents.
+     *
+     * @return \DOMDocument[] schema documents
      */
     public function findForActiveModules()
     {
@@ -80,7 +85,7 @@ class SchemaLocator
 
         foreach ($codes as $key => $code) {
             // test if the module exists on the file system
-            if (!$fs->exists(THELIA_MODULE_DIR . $code)) {
+            if (!$fs->exists(THELIA_MODULE_DIR.$code)) {
                 unset($codes[$key]);
             }
         }
@@ -94,10 +99,12 @@ class SchemaLocator
     /**
      * Get schema documents for specific modules and their dependencies (including Thelia), as well as included
      * external schemas.
-     * @param string[] $modules Codes of the modules to fetch schemas for. 'Thelia' can be used to include Thelia core
-     *     schemas.
-     * @param bool $withDependencies Whether to also return schemas for the specified modules dependencies.
-     * @return \DOMDocument[] Schema documents.
+     *
+     * @param string[] $modules          Codes of the modules to fetch schemas for. 'Thelia' can be used to include Thelia core
+     *                                   schemas.
+     * @param bool     $withDependencies whether to also return schemas for the specified modules dependencies
+     *
+     * @return \DOMDocument[] schema documents
      */
     public function findForModules(array $modules = [], $withDependencies = true)
     {
@@ -132,8 +139,10 @@ class SchemaLocator
 
     /**
      * Add dependencies of some modules.
-     * @param string[] $modules Module codes.
-     * @return string[] Modules codes with added dependencies.
+     *
+     * @param string[] $modules module codes
+     *
+     * @return string[] modules codes with added dependencies
      */
     protected function addModulesDependencies(array $modules = [])
     {
@@ -165,7 +174,7 @@ class SchemaLocator
     }
 
     /**
-     * @return Finder Thelia schema files.
+     * @return Finder thelia schema files
      */
     protected function getSchemaPathsForThelia()
     {
@@ -176,8 +185,9 @@ class SchemaLocator
     }
 
     /**
-     * @param string $module Module code.
-     * @return Finder Schema files for this module.
+     * @param string $module module code
+     *
+     * @return Finder schema files for this module
      */
     protected function getSchemaPathsForModule($module)
     {
@@ -197,8 +207,10 @@ class SchemaLocator
 
     /**
      * Add external schema documents not already included.
-     * @param \DOMDocument[] $schemaDocuments Schema documents.
-     * @return \DOMDocument[] Schema documents.
+     *
+     * @param \DOMDocument[] $schemaDocuments schema documents
+     *
+     * @return \DOMDocument[] schema documents
      */
     protected function addExternalSchemaDocuments(array $schemaDocuments)
     {
@@ -233,6 +245,7 @@ class SchemaLocator
 
     /**
      * @param \DOMDocument[][] $documentArrays
+     *
      * @return \DOMDocument[]
      */
     protected function mergeDOMDocumentsArrays(array $documentArrays)
@@ -255,12 +268,12 @@ class SchemaLocator
     }
 
     /**
-     * @return string[] Active module codes.
+     * @return string[] active module codes
      */
     protected function queryActiveModuleCodes()
     {
         if (!$this->theliaDatabaseConnection instanceof ConnectionInterface) {
-            throw new \RuntimeException("No connection to the Thelia database was provided.");
+            throw new \RuntimeException('No connection to the Thelia database was provided.');
         }
 
         $query = 'select code from module where module.activate;';

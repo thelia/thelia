@@ -18,9 +18,7 @@ use Symfony\Component\Routing\RequestContext;
 use Thelia\Tools\URL;
 
 /**
- * This class provides URL Tool class initialisation
- *
- * @package Thelia\Tests\TestCaseWithURLSetup
+ * This class provides URL Tool class initialisation.
  */
 class TestCaseWithURLToolSetup extends TestCase
 {
@@ -34,7 +32,7 @@ class TestCaseWithURLToolSetup extends TestCase
 
         $this->dispatcher = $this->createMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
-        $this->container->set("event_dispatcher", $this->dispatcher);
+        $this->container->set('event_dispatcher', $this->dispatcher);
 
         $this->setupURLTool();
     }
@@ -59,7 +57,7 @@ class TestCaseWithURLToolSetup extends TestCase
             ->method('getContext')
             ->will($this->returnValue($context));
 
-        $this->container->set("router.admin", $router);
+        $this->container->set('router.admin', $router);
 
         new URL($router);
     }

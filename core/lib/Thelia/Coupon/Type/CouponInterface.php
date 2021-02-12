@@ -17,37 +17,35 @@ use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\FacadeInterface;
 
 /**
- * Represents a Coupon ready to be processed in a Checkout process
+ * Represents a Coupon ready to be processed in a Checkout process.
  *
- * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 interface CouponInterface
 {
     /**
-     * Get I18n name
+     * Get I18n name.
      *
      * @return string
      */
     public function getName();
 
     /**
-     * Get I18n tooltip
+     * Get I18n tooltip.
      *
      * @return string
      */
     public function getToolTip();
 
     /**
-     * Get Coupon Manager service Id
+     * Get Coupon Manager service Id.
      *
      * @return string
      */
     public function getServiceId();
 
     /**
-     * Set Coupon
+     * Set Coupon.
      *
      * @param FacadeInterface  $facade                     Provides necessary value from Thelia
      * @param string           $code                       Coupon code (ex: XMAS)
@@ -85,28 +83,28 @@ interface CouponInterface
     );
 
     /**
-     * Return Coupon code (ex: XMAS)
+     * Return Coupon code (ex: XMAS).
      *
      * @return string
      */
     public function getCode();
 
     /**
-     * Return Coupon title (ex: Coupon for XMAS)
+     * Return Coupon title (ex: Coupon for XMAS).
      *
      * @return string
      */
     public function getTitle();
 
     /**
-     * Return Coupon short description
+     * Return Coupon short description.
      *
      * @return string
      */
     public function getShortDescription();
 
     /**
-     * Return Coupon description
+     * Return Coupon description.
      *
      * @return string
      */
@@ -115,21 +113,21 @@ interface CouponInterface
     /**
      * If Coupon is cumulative or prevent any accumulation
      * If is cumulative you can sum Coupon effects
-     * If not cancel all other Coupon and take the last given
+     * If not cancel all other Coupon and take the last given.
      *
      * @return bool
      */
     public function isCumulative();
 
     /**
-     * If Coupon is removing Checkout Postage
+     * If Coupon is removing Checkout Postage.
      *
      * @return bool
      */
     public function isRemovingPostage();
 
     /**
-     * Return condition to validate the Coupon or not
+     * Return condition to validate the Coupon or not.
      *
      * @return ConditionCollection A set of ConditionInterface
      */
@@ -137,17 +135,18 @@ interface CouponInterface
 
     /**
      * Replace the existing Conditions by those given in parameter
-     * If one Condition is badly implemented, no Condition will be added
+     * If one Condition is badly implemented, no Condition will be added.
      *
      * @param ConditionCollection $conditions ConditionInterface to add
      *
      * @return $this
+     *
      * @throws \Thelia\Exception\InvalidConditionException
      */
     public function setConditions(ConditionCollection $conditions);
 
     /**
-     * Return Coupon expiration date
+     * Return Coupon expiration date.
      *
      * @return \DateTime
      */
@@ -155,37 +154,37 @@ interface CouponInterface
 
     /**
      * Check if the Coupon can be used against a
-     * product already with a special offer price
+     * product already with a special offer price.
      *
-     * @return boolean
+     * @return bool
      */
     public function isAvailableOnSpecialOffers();
 
     /**
      * Check if the Coupon can be used against a
-     * product already with a special offer price
+     * product already with a special offer price.
      *
-     * @return boolean
+     * @return bool
      */
     public function getPerCustomerUsageCount();
 
     /**
-     * Check if Coupon has been disabled by admin
+     * Check if Coupon has been disabled by admin.
      *
-     * @return boolean
+     * @return bool
      */
     public function isEnabled();
 
     /**
      * Return how many time the Coupon can be used again
-     * Ex : -1 unlimited
+     * Ex : -1 unlimited.
      *
      * @return int
      */
     public function getMaxUsage();
 
     /**
-     * Check if the Coupon is already Expired
+     * Check if the Coupon is already Expired.
      *
      * @return bool
      */
@@ -206,7 +205,7 @@ interface CouponInterface
 
     /**
      * Check if the current Coupon is matching its conditions
-     * Thelia variables are given by the FacadeInterface
+     * Thelia variables are given by the FacadeInterface.
      *
      * @return bool
      */
@@ -214,7 +213,7 @@ interface CouponInterface
 
     /**
      * Draw the input displayed in the BackOffice
-     * allowing Admin to set its Coupon effect
+     * allowing Admin to set its Coupon effect.
      *
      * @return string HTML string
      */
@@ -231,7 +230,7 @@ interface CouponInterface
     public function getFreeShippingForModules();
 
     /**
-     * Create the effect array from the list of fields
+     * Create the effect array from the list of fields.
      *
      * @param array $data the input form data (e.g. $form->getData())
      *

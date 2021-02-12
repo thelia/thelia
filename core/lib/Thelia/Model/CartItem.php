@@ -25,8 +25,6 @@ class CartItem extends BaseCartItem
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    /**
-     */
     public function setDisptacher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -43,6 +41,7 @@ class CartItem extends BaseCartItem
             $cartItemEvent = new CartItemEvent($this);
             $this->dispatcher->dispatch($cartItemEvent, TheliaEvents::CART_ITEM_CREATE_BEFORE);
         }
+
         return true;
     }
 
@@ -57,6 +56,7 @@ class CartItem extends BaseCartItem
             $cartItemEvent = new CartItemEvent($this);
             $this->dispatcher->dispatch($cartItemEvent, TheliaEvents::CART_ITEM_UPDATE_BEFORE);
         }
+
         return true;
     }
 
@@ -70,7 +70,7 @@ class CartItem extends BaseCartItem
         if ($this->dispatcher) {
             $cartEvent = new CartEvent($this->getCart());
 
-            $this->dispatcher->dispatch($cartEvent,TheliaEvents::AFTER_CARTADDITEM);
+            $this->dispatcher->dispatch($cartEvent, TheliaEvents::AFTER_CARTADDITEM);
         }
     }
 
@@ -90,7 +90,9 @@ class CartItem extends BaseCartItem
 
     /**
      * @param $value
+     *
      * @return $this
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function updateQuantity($value)
@@ -119,7 +121,9 @@ class CartItem extends BaseCartItem
 
     /**
      * @param $value
+     *
      * @return $this
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function addQuantity($value)
@@ -153,7 +157,9 @@ class CartItem extends BaseCartItem
 
     /**
      * @param null $locale
+     *
      * @return Product
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getProduct(ConnectionInterface $con = null, $locale = null)
@@ -175,6 +181,7 @@ class CartItem extends BaseCartItem
 
     /**
      * @return float
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getRealTaxedPrice(Country $country, State $state = null)
@@ -184,6 +191,7 @@ class CartItem extends BaseCartItem
 
     /**
      * @return float
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTaxedPrice(Country $country, State $state = null)
@@ -195,6 +203,7 @@ class CartItem extends BaseCartItem
 
     /**
      * @return float
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTaxedPromoPrice(Country $country, State $state = null)
@@ -206,7 +215,9 @@ class CartItem extends BaseCartItem
 
     /**
      * @since Version 2.3
+     *
      * @return float
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTotalRealTaxedPrice(Country $country, State $state = null)
@@ -216,7 +227,9 @@ class CartItem extends BaseCartItem
 
     /**
      * @since Version 2.3
+     *
      * @return float
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTotalTaxedPrice(Country $country, State $state = null)
@@ -226,6 +239,7 @@ class CartItem extends BaseCartItem
 
     /**
      * @since Version 2.3
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getTotalTaxedPromoPrice(Country $country, State $state = null)
@@ -235,6 +249,7 @@ class CartItem extends BaseCartItem
 
     /**
      * @since Version 2.4
+     *
      * @return float
      */
     public function getTotalPrice()
@@ -244,6 +259,7 @@ class CartItem extends BaseCartItem
 
     /**
      * @since Version 2.4
+     *
      * @return float
      */
     public function getTotalPromoPrice()
@@ -253,6 +269,7 @@ class CartItem extends BaseCartItem
 
     /**
      * @since Version 2.4
+     *
      * @return float
      */
     public function getTotalRealPrice()

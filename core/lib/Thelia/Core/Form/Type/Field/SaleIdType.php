@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\SaleQuery;
 
 /**
- * Class SaleIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class SaleIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class SaleIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class SaleIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "sale_id";
+        return 'sale_id';
     }
 }

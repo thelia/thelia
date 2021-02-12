@@ -21,8 +21,8 @@ use Thelia\Model\Country as CountryModel;
 use Thelia\Model\CountryQuery;
 
 /**
- * Class CountryTest
- * @package Thelia\Tests\Action
+ * Class CountryTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CountryTest extends BaseAction
@@ -63,6 +63,7 @@ class CountryTest extends BaseAction
 
     /**
      * @depends testCreate
+     *
      * @return CountryModel
      */
     public function testUpdate(CountryModel $country)

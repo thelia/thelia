@@ -29,7 +29,7 @@ class FeatureEvent extends ActionEvent
 
     public function hasFeature()
     {
-        return ! \is_null($this->feature);
+        return !\is_null($this->feature);
     }
 
     public function getFeature()

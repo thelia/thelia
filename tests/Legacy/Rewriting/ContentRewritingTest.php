@@ -15,8 +15,8 @@ namespace Thelia\Tests\Rewriting;
 use Thelia\Model\Content;
 
 /**
- * Class ContentRewritingTest
- * @package Thelia\Tests\Rewriting
+ * Class ContentRewritingTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ContentRewritingTest extends BaseRewritingObject

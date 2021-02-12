@@ -23,8 +23,8 @@ use Thelia\Model\OrderStatusQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
- * Class OrderStatusTest
- * @package Thelia\Tests\Action
+ * Class OrderStatusTest.
+ *
  * @author Gilles Bourgeat <gbourgeat@openstudio.fr>
  */
 class OrderStatusTest extends TestCaseWithURLToolSetup
@@ -50,6 +50,7 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
 
     /**
      * @param OrderStatusUpdateEvent $event
+     *
      * @return OrderStatusModel
      */
     public function processUpdateAction($event)
@@ -61,8 +62,9 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * test order status creation
-     * @covers Thelia\Action\OrderStatus::create
+     * test order status creation.
+     *
+     * @covers \Thelia\Action\OrderStatus::create
      */
     public function testCreateOrderStatus()
     {
@@ -88,8 +90,9 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * test update creation
-     * @covers Thelia\Action\OrderStatus::update
+     * test update creation.
+     *
+     * @covers \Thelia\Action\OrderStatus::update
      */
     public function testUpdateOrderStatusProtected()
     {
@@ -117,8 +120,9 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * test update creation
-     * @covers Thelia\Action\OrderStatus::update
+     * test update creation.
+     *
+     * @covers \Thelia\Action\OrderStatus::update
      * @depends testCreateOrderStatus
      */
     public function testUpdateOrderStatusNotProtected()
@@ -139,8 +143,9 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * test order status removal
-     * @covers Thelia\Action\OrderStatus::delete
+     * test order status removal.
+     *
+     * @covers \Thelia\Action\OrderStatus::delete
      * @depends testUpdateOrderStatusNotProtected
      */
     public function testDeleteOrderStatus()
@@ -158,8 +163,9 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * test order status removal
-     * @covers Thelia\Action\OrderStatus::delete
+     * test order status removal.
+     *
+     * @covers \Thelia\Action\OrderStatus::delete
      * @depends testUpdateOrderStatusProtected
      */
     public function testDeleteOrderStatusProtected()
@@ -171,15 +177,16 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
 
         try {
             $orderStatusAction->delete($event);
-            $this->fail("A protected order status has been removed");
+            $this->fail('A protected order status has been removed');
         } catch (\Exception $e) {
             $this->assertTrue(true);
         }
     }
 
     /**
-     * test order status removal
-     * @covers Thelia\Action\OrderStatus::delete
+     * test order status removal.
+     *
+     * @covers \Thelia\Action\OrderStatus::delete
      * @depends testUpdateOrderStatusNotProtected
      */
     public function testDeleteOrderStatusWithOrders()
@@ -191,15 +198,16 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
 
         try {
             $orderStatusAction->delete($event);
-            $this->fail("A protected order status with orders has been removed");
+            $this->fail('A protected order status with orders has been removed');
         } catch (\Exception $e) {
             $this->assertTrue(true);
         }
     }
 
     /**
-     * test order status update position
-     * @covers Thelia\Action\OrderStatus::updatePosition
+     * test order status update position.
+     *
+     * @covers \Thelia\Action\OrderStatus::updatePosition
      */
     public function testUpdatePositionUp()
     {
@@ -211,7 +219,7 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
             $this->fail('Use fixtures before launching test, there is not enough folder in database');
         }
 
-        $newPosition = $orderStatus->getPosition()-1;
+        $newPosition = $orderStatus->getPosition() - 1;
 
         $event = new UpdatePositionEvent($orderStatus->getId(), UpdatePositionEvent::POSITION_UP);
 
@@ -220,6 +228,6 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
 
         $orderStatusUpdated = OrderStatusQuery::create()->findOneById($orderStatus->getId());
 
-        $this->assertEquals($newPosition, $orderStatusUpdated->getPosition(), sprintf("new position is %d, new position expected is %d for order status %d", $newPosition, $orderStatusUpdated->getPosition(), $orderStatusUpdated->getCode()));
+        $this->assertEquals($newPosition, $orderStatusUpdated->getPosition(), sprintf('new position is %d, new position expected is %d for order status %d', $newPosition, $orderStatusUpdated->getPosition(), $orderStatusUpdated->getCode()));
     }
 }

@@ -20,7 +20,7 @@ class HookAdminManager extends BaseHook
     public function onModuleConfiguration(HookRenderEvent $event)
     {
         $event->add(
-            $this->render("admin-home-config.html")
+            $this->render('admin-home-config.html')
         );
     }
 }

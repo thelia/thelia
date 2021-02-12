@@ -13,8 +13,8 @@
 namespace Thelia\Files;
 
 /**
- * Class FileConfiguration
- * @package Thelia\Files
+ * Class FileConfiguration.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class FileConfiguration
@@ -24,11 +24,11 @@ class FileConfiguration
         return [
             'objectType' => 'image',
             'validMimeTypes' => [
-                'image/jpeg' => ["jpg", "jpeg"],
-                'image/png' => ["png"],
-                'image/gif' => ["gif"],
+                'image/jpeg' => ['jpg', 'jpeg'],
+                'image/png' => ['png'],
+                'image/gif' => ['gif'],
             ],
-            'extBlackList' => []
+            'extBlackList' => [],
         ];
     }
 
@@ -38,14 +38,14 @@ class FileConfiguration
             'objectType' => 'document',
             'validMimeTypes' => [],
             'extBlackList' => [
-                "php",
-                "php3",
-                "php4",
-                "php5",
-                "php6",
-                "asp",
-                "aspx",
-            ]
+                'php',
+                'php3',
+                'php4',
+                'php5',
+                'php6',
+                'asp',
+                'aspx',
+            ],
         ];
     }
 }

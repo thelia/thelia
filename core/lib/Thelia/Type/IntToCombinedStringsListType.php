@@ -61,7 +61,7 @@ class IntToCombinedStringsListType extends BaseType
                 $parts = preg_split('/(?<!\\\):/', $intToCombinedStrings);
 
                 $return[trim($parts[0])] = [
-                    "values" =>  array_map(
+                    'values' => array_map(
                         function ($item) {
                             return trim(self::unescape($item));
                         },
@@ -74,20 +74,22 @@ class IntToCombinedStringsListType extends BaseType
                             )
                         )
                     ),
-                    "expression" =>  trim(self::unescape($parts[1])),
+                    'expression' => trim(self::unescape($parts[1])),
                 ];
             }
 
             return $return;
         }
-            return null;
+
+        return null;
     }
 
     /**
      * Escape a string to use it safely in an expression. abc:def => abc\:def.
-     * Escapes characters are , : ( ) | &
+     * Escapes characters are , : ( ) | &.
      *
      * @param $string
+     *
      * @return string
      */
     public static function escape($string)
@@ -99,6 +101,7 @@ class IntToCombinedStringsListType extends BaseType
      * Unescape a string and remove avai escape symbols. abc\:def => abc:def.
      *
      * @param $string
+     *
      * @return string
      */
     public static function unescape($string)
@@ -124,7 +127,7 @@ class IntToCombinedStringsListType extends BaseType
         $closingParenthesesCount = 0;
 
         $length = \strlen($noSpaceString);
-        for ($i=0; $i< $length; $i++) {
+        for ($i = 0; $i < $length; ++$i) {
             $char = $noSpaceString[$i];
             if ($char == '(') {
                 /* must be :
@@ -133,10 +136,10 @@ class IntToCombinedStringsListType extends BaseType
                  * must not be :
                  * - at the end of expression
                  */
-                if (($i!=0 && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i-1])) || !isset($noSpaceString[$i+1]) || !preg_match('#[\(\)a-zA-Z0-9_\-]#', $noSpaceString[$i+1])) {
+                if (($i != 0 && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i - 1])) || !isset($noSpaceString[$i + 1]) || !preg_match('#[\(\)a-zA-Z0-9_\-]#', $noSpaceString[$i + 1])) {
                     return false;
                 }
-                $openingParenthesesCount++;
+                ++$openingParenthesesCount;
             } elseif ($char == ')') {
                 /* must be :
                  * - after a number or ()
@@ -145,10 +148,10 @@ class IntToCombinedStringsListType extends BaseType
                  * - at the begining of expression
                  * - if no ( remain unclose
                  */
-                if ($i == 0 || !preg_match('#[\(\)a-zA-Z0-9_\-]#', $noSpaceString[$i-1]) || (isset($noSpaceString[$i+1]) && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i+1])) || $openingParenthesesCount-$closingParenthesesCount==0) {
+                if ($i == 0 || !preg_match('#[\(\)a-zA-Z0-9_\-]#', $noSpaceString[$i - 1]) || (isset($noSpaceString[$i + 1]) && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i + 1])) || $openingParenthesesCount - $closingParenthesesCount == 0) {
                     return false;
                 }
-                $closingParenthesesCount++;
+                ++$closingParenthesesCount;
             }
         }
 

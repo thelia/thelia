@@ -18,11 +18,9 @@ use Iterator;
 use Thelia\Condition\Implementation\ConditionInterface;
 
 /**
- * Manage a set of ConditionInterface
+ * Manage a set of ConditionInterface.
  *
- * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class ConditionCollection implements Iterator, Countable, ArrayAccess
 {
@@ -31,10 +29,11 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
 
     /**
      * (PHP 5 &gt;= 5.0.0)
-     * Return the current element
-     * @link http://php.net/manual/en/iterator.current.php
+     * Return the current element.
      *
-     * @return mixed Can return any type.
+     * @see http://php.net/manual/en/iterator.current.php
+     *
+     * @return mixed can return any type
      */
     public function current()
     {
@@ -45,10 +44,11 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
 
     /**
      * (PHP 5 &gt;= 5.0.0)
-     * Move forward to next element
-     * @link http://php.net/manual/en/iterator.next.php
+     * Move forward to next element.
      *
-     * @return void Any returned value is ignored.
+     * @see http://php.net/manual/en/iterator.next.php
+     *
+     * @return void any returned value is ignored
      */
     public function next()
     {
@@ -57,10 +57,11 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
 
     /**
      * (PHP 5 &gt;= 5.0.0)
-     * Return the key of the current element
-     * @link http://php.net/manual/en/iterator.key.php
+     * Return the key of the current element.
      *
-     * @return mixed scalar on success, or null on failure.
+     * @see http://php.net/manual/en/iterator.key.php
+     *
+     * @return mixed scalar on success, or null on failure
      */
     public function key()
     {
@@ -71,11 +72,12 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
 
     /**
      * (PHP 5 &gt;= 5.0.0)
-     * Checks if current position is valid
-     * @link http://php.net/manual/en/iterator.valid.php
+     * Checks if current position is valid.
      *
-     * @return boolean The return value will be casted to boolean and then evaluated.
-     *                 Returns true on success or false on failure.
+     * @see http://php.net/manual/en/iterator.valid.php
+     *
+     * @return bool The return value will be casted to boolean and then evaluated.
+     *              Returns true on success or false on failure.
      */
     public function valid()
     {
@@ -87,10 +89,11 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
 
     /**
      * (PHP 5 &gt;= 5.0.0)
-     * Rewind the Iterator to the first element
-     * @link http://php.net/manual/en/iterator.rewind.php
+     * Rewind the Iterator to the first element.
      *
-     * @return void Any returned value is ignored.
+     * @see http://php.net/manual/en/iterator.rewind.php
+     *
+     * @return void any returned value is ignored
      */
     public function rewind()
     {
@@ -99,8 +102,9 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
 
     /**
      * (PHP 5 &gt;= 5.1.0)
-     * Count elements of an object
-     * @link http://php.net/manual/en/countable.count.php
+     * Count elements of an object.
+     *
+     * @see http://php.net/manual/en/countable.count.php
      *
      * @return int The custom count as an integer.
      *             The return value is cast to an integer.
@@ -112,13 +116,15 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
 
     /**
      * (PHP 5 >= 5.0.0)
-     * Whether a offset exists
-     * @link http://php.net/manual/en/arrayaccess.offsetexists.php
-     * @param mixed $offset
-     *                      An offset to check for.
+     * Whether a offset exists.
      *
-     * @return boolean true on success or false on failure.
-     *                 The return value will be casted to boolean if non-boolean was returned.
+     * @see http://php.net/manual/en/arrayaccess.offsetexists.php
+     *
+     * @param mixed $offset
+     *                      An offset to check for
+     *
+     * @return bool true on success or false on failure.
+     *              The return value will be casted to boolean if non-boolean was returned.
      */
     public function offsetExists($offset)
     {
@@ -127,12 +133,14 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
 
     /**
      * (PHP 5 >= 5.0.0)
-     * Offset to retrieve
-     * @link http://php.net/manual/en/arrayaccess.offsetget.php
-     * @param mixed $offset
-     *                      The offset to retrieve.
+     * Offset to retrieve.
      *
-     * @return mixed Can return all value types.
+     * @see http://php.net/manual/en/arrayaccess.offsetget.php
+     *
+     * @param mixed $offset
+     *                      The offset to retrieve
+     *
+     * @return mixed can return all value types
      */
     public function offsetGet($offset)
     {
@@ -141,12 +149,14 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
 
     /**
      * (PHP 5 >= 5.0.0)
-     * Offset to set
-     * @link http://php.net/manual/en/arrayaccess.offsetset.php
+     * Offset to set.
+     *
+     * @see http://php.net/manual/en/arrayaccess.offsetset.php
+     *
      * @param mixed $offset
-     *                      The offset to assign the value to.
+     *                      The offset to assign the value to
      * @param mixed $value
-     *                      The value to set.
+     *                      The value to set
      *
      * @return void
      */
@@ -161,10 +171,12 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
 
     /**
      * (PHP 5 >= 5.0.0)
-     * Offset to unset
-     * @link http://php.net/manual/en/arrayaccess.offsetunset.php
+     * Offset to unset.
+     *
+     * @see http://php.net/manual/en/arrayaccess.offsetunset.php
+     *
      * @param mixed $offset
-     *                      The offset to unset.
+     *                      The offset to unset
      *
      * @return void
      */
@@ -174,7 +186,7 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
     }
 
     /**
-     * Allow to compare 2 set of conditions
+     * Allow to compare 2 set of conditions.
      *
      * @return string Jsoned data
      */

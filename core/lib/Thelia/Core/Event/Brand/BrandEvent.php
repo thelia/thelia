@@ -16,9 +16,10 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Brand;
 
 /**
- * Class BrandEvent
- * @package Thelia\Core\Event\Brand
+ * Class BrandEvent.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
+ *
  * @deprecated since 2.4, please use \Thelia\Model\Event\BrandEvent
  */
 class BrandEvent extends ActionEvent
@@ -52,7 +53,7 @@ class BrandEvent extends ActionEvent
     }
 
     /**
-     * check if brand exists
+     * check if brand exists.
      *
      * @return bool
      */

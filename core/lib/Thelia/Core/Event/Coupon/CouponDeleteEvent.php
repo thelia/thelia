@@ -16,8 +16,8 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Coupon;
 
 /**
- * Class CouponDeleteEvent
- * @package Thelia\Core\Event\Coupon
+ * Class CouponDeleteEvent.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class CouponDeleteEvent extends ActionEvent
@@ -40,11 +40,13 @@ class CouponDeleteEvent extends ActionEvent
 
     /**
      * @param Coupon $coupon
+     *
      * @return $this
      */
     public function setCoupon(Coupon $coupon = null)
     {
         $this->coupon = $coupon;
+
         return $this;
     }
 }

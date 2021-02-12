@@ -18,13 +18,11 @@ use Thelia\Model\Lang;
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
- * Time: 3:24 PM
+ * Time: 3:24 PM.
  *
  * Helper for translations
  *
- * @package I18n
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class I18n
 {
@@ -33,7 +31,7 @@ class I18n
     /**
      * Create a \DateTime from a date picker form input
      * The date format is the same as the one from the current User Session
-     * Ex : $lang = $session->getLang()
+     * Ex : $lang = $session->getLang().
      *
      * @param Lang   $lang Object containing date format
      * @param string $date String to convert
@@ -49,8 +47,8 @@ class I18n
 
     public static function forceI18nRetrieving($askedLocale, $modelName, $id, $needed = ['Title'])
     {
-        $i18nQueryClass = sprintf("\\Thelia\\Model\\%sI18nQuery", $modelName);
-        $i18nClass = sprintf("\\Thelia\\Model\\%sI18n", $modelName);
+        $i18nQueryClass = sprintf('\\Thelia\\Model\\%sI18nQuery', $modelName);
+        $i18nClass = sprintf('\\Thelia\\Model\\%sI18n', $modelName);
 
         /* get customer language translation */
         $i18n = $i18nQueryClass::create()
@@ -69,14 +67,14 @@ class I18n
         if (null === $i18n) {
             // @todo something else ?
             $i18n = new $i18nClass();
-            ;
+
             $i18n->setId($id);
             foreach ($needed as $need) {
                 $method = sprintf('set%s', $need);
                 if (method_exists($i18n, $method)) {
-                    $i18n->$method('DEFAULT ' . strtoupper($need));
+                    $i18n->$method('DEFAULT '.strtoupper($need));
                 }
-                    // @todo throw sg ?
+                // @todo throw sg ?
             }
         }
 
@@ -101,40 +99,41 @@ class I18n
         $query
             ->_and()
             ->where(
-                "CASE WHEN ".$tableIdColumn." IN".
-                "(SELECT DISTINCT ".$i18nIdColumn." ".
-                "FROM `".$i18nTableName."` ".
+                'CASE WHEN '.$tableIdColumn.' IN'.
+                '(SELECT DISTINCT '.$i18nIdColumn.' '.
+                'FROM `'.$i18nTableName.'` '.
                 "WHERE locale=$locale) ".
-                "THEN ".$localeColumn." = $locale ".
-                "ELSE ".$localeColumn." = $defaultLocale ".
-                "END"
+                'THEN '.$localeColumn." = $locale ".
+                'ELSE '.$localeColumn." = $defaultLocale ".
+                'END'
             )
         ;
     }
 
     /**
      * @param $str
+     *
      * @return string
      *
-     * Really escapes a string for SQL query.
+     * Really escapes a string for SQL query
      */
     public static function realEscape($str)
     {
         $str = trim($str, "\"'");
 
-        $return = "CONCAT(";
+        $return = 'CONCAT(';
         $len = \strlen($str);
 
         for ($i = 0; $i < $len; ++$i) {
-            $return .= "CHAR(".\ord($str[$i])."),";
+            $return .= 'CHAR('.\ord($str[$i]).'),';
         }
 
         if ($i > 0) {
             $return = substr($return, 0, -1);
         } else {
-            $return = "\"\"";
+            $return = '""';
         }
-        $return .= ")";
+        $return .= ')';
 
         return $return;
     }

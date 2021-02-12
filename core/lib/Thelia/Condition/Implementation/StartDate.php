@@ -18,32 +18,30 @@ use Thelia\Exception\InvalidConditionValueException;
 use Thelia\Tools\DateTimeFormat;
 
 /**
- * Check a Checkout against its Product number
+ * Check a Checkout against its Product number.
  *
- * @package Condition
  * @author  Franck Allimant <franck@cqfdev.fr>
- *
  */
 class StartDate extends ConditionAbstract
 {
     public const START_DATE = 'start_date';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(FacadeInterface $facade)
     {
         $this->availableOperators = [
             self::START_DATE => [
-                Operators::SUPERIOR_OR_EQUAL
-            ]
+                Operators::SUPERIOR_OR_EQUAL,
+            ],
         ];
 
         parent::__construct($facade);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getServiceId()
     {
@@ -51,13 +49,13 @@ class StartDate extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setValidatorsFromForm(array $operators, array $values)
     {
         $this->checkComparisonOperatorValue($operators, self::START_DATE);
 
-        if (! isset($values[self::START_DATE])) {
+        if (!isset($values[self::START_DATE])) {
             $values[self::START_DATE] = time();
         }
 
@@ -78,14 +76,14 @@ class StartDate extends ConditionAbstract
             $timestamp = $values[self::START_DATE];
         }
 
-        $this->operators = [ self::START_DATE => $operators[self::START_DATE] ];
-        $this->values    = [ self::START_DATE => $timestamp ];
+        $this->operators = [self::START_DATE => $operators[self::START_DATE]];
+        $this->values = [self::START_DATE => $timestamp];
 
         return $this;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isMatching()
     {
@@ -97,7 +95,7 @@ class StartDate extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -108,7 +106,7 @@ class StartDate extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getToolTip()
     {
@@ -121,7 +119,7 @@ class StartDate extends ConditionAbstract
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getSummary()
     {
@@ -142,11 +140,11 @@ class StartDate extends ConditionAbstract
 
     private function getDateFormat()
     {
-        return DateTimeFormat::getInstance($this->facade->getRequest())->getFormat("date");
+        return DateTimeFormat::getInstance($this->facade->getRequest())->getFormat('date');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function generateInputs()
     {
@@ -154,13 +152,13 @@ class StartDate extends ConditionAbstract
             self::START_DATE => [
                 'availableOperators' => $this->availableOperators[self::START_DATE],
                 'value' => '',
-                'selectedOperator' => Operators::SUPERIOR_OR_EQUAL
-            ]
+                'selectedOperator' => Operators::SUPERIOR_OR_EQUAL,
+            ],
         ];
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function drawBackOfficeInputs()
     {
@@ -175,10 +173,10 @@ class StartDate extends ConditionAbstract
         }
 
         return $this->facade->getParser()->render('coupon/condition-fragments/start-date-condition.html', [
-                'fieldName'    => self::START_DATE,
-                'criteria'     => Operators::SUPERIOR_OR_EQUAL,
-                'dateFormat'   => $this->getDateFormat(),
-                'currentValue' => $strDate
+                'fieldName' => self::START_DATE,
+                'criteria' => Operators::SUPERIOR_OR_EQUAL,
+                'dateFormat' => $this->getDateFormat(),
+                'currentValue' => $strDate,
         ]);
     }
 }

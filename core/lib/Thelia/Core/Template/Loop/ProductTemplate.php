@@ -23,15 +23,14 @@ use Thelia\Model\Template as TemplateModel;
 use Thelia\Model\TemplateQuery;
 
 /**
- *
- * Template loop
- *
+ * Template loop.
  *
  * Class Template
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
+ *
  * @method int[] getId()
  * @method int[] getExclude()
  */
@@ -40,8 +39,8 @@ class ProductTemplate extends BaseI18nLoop implements PropelSearchLoopInterface
     protected $timestampable = true;
 
     /**
-    * @return ArgumentCollection
-    */
+     * @return ArgumentCollection
+     */
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
@@ -79,10 +78,10 @@ class ProductTemplate extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($template);
 
             $loopResultRow
-                ->set("ID", $template->getId())
-                ->set("IS_TRANSLATED", $template->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("NAME", $template->getVirtualColumn('i18n_NAME'))
+                ->set('ID', $template->getId())
+                ->set('IS_TRANSLATED', $template->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('NAME', $template->getVirtualColumn('i18n_NAME'))
             ;
             $this->addOutputFields($loopResultRow, $template);
 

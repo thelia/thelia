@@ -29,24 +29,23 @@ use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * Module loop
- *
+ * Module loop.
  *
  * Class Module
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int getProfile()
- * @method int[] getArea()
- * @method string[] getCode()
- * @method string[] getModuleType()
- * @method string[] getModuleCategory()
- * @method int[] getExclude()
+ *
+ * @method int[]       getId()
+ * @method int         getProfile()
+ * @method int[]       getArea()
+ * @method string[]    getCode()
+ * @method string[]    getModuleType()
+ * @method string[]    getModuleCategory()
+ * @method int[]       getExclude()
  * @method bool|string getActive()
- * @method string[] getOrder()
+ * @method string[]    getOrder()
  * @method bool|string getMandatory()
  * @method bool|string getHidden()
  */
@@ -100,7 +99,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                         'manual',
                         'manual_reverse',
                         'enabled',
-                        'enabled_reverse'
+                        'enabled_reverse',
                     ])
                 ),
                 'manual'
@@ -188,40 +187,40 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "id":
+                case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case "id_reverse":
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "title":
+                case 'title':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "title_reverse":
+                case 'title_reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "code":
+                case 'code':
                     $search->orderByCode(Criteria::ASC);
                     break;
-                case "code_reverse":
+                case 'code_reverse':
                     $search->orderByCode(Criteria::DESC);
                     break;
-                case "type":
+                case 'type':
                     $search->orderByType(Criteria::ASC);
                     break;
-                case "type_reverse":
+                case 'type_reverse':
                     $search->orderByType(Criteria::DESC);
                     break;
-                case "manual":
+                case 'manual':
                     $search->orderByPosition(Criteria::ASC);
                     break;
-                case "manual_reverse":
+                case 'manual_reverse':
                     $search->orderByPosition(Criteria::DESC);
                     break;
-                case "enabled":
+                case 'enabled':
                     $search->orderByActivate(Criteria::ASC);
                     break;
-                case "enabled_reverse":
+                case 'enabled_reverse':
                     $search->orderByActivate(Criteria::DESC);
                     break;
             }
@@ -246,23 +245,23 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResultRow = new LoopResultRow($module);
 
                 $loopResultRow
-                    ->set("ID", $module->getId())
-                    ->set("IS_TRANSLATED", $module->getVirtualColumn('IS_TRANSLATED'))
-                    ->set("LOCALE", $this->locale)
-                    ->set("TITLE", $module->getVirtualColumn('i18n_TITLE'))
-                    ->set("CHAPO", $module->getVirtualColumn('i18n_CHAPO'))
-                    ->set("DESCRIPTION", $module->getVirtualColumn('i18n_DESCRIPTION'))
-                    ->set("POSTSCRIPTUM", $module->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                    ->set("CODE", $module->getCode())
-                    ->set("TYPE", $module->getType())
-                    ->set("CATEGORY", $module->getCategory())
-                    ->set("ACTIVE", $module->getActivate())
-                    ->set("VERSION", $module->getVersion())
-                    ->set("CLASS", $module->getFullNamespace())
-                    ->set("POSITION", $module->getPosition())
-                    ->set("MANDATORY", $module->getMandatory())
-                    ->set("HIDDEN", $module->getHidden())
-                    ->set("EXISTS", $exists);
+                    ->set('ID', $module->getId())
+                    ->set('IS_TRANSLATED', $module->getVirtualColumn('IS_TRANSLATED'))
+                    ->set('LOCALE', $this->locale)
+                    ->set('TITLE', $module->getVirtualColumn('i18n_TITLE'))
+                    ->set('CHAPO', $module->getVirtualColumn('i18n_CHAPO'))
+                    ->set('DESCRIPTION', $module->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set('POSTSCRIPTUM', $module->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                    ->set('CODE', $module->getCode())
+                    ->set('TYPE', $module->getType())
+                    ->set('CATEGORY', $module->getCategory())
+                    ->set('ACTIVE', $module->getActivate())
+                    ->set('VERSION', $module->getVersion())
+                    ->set('CLASS', $module->getFullNamespace())
+                    ->set('POSITION', $module->getPosition())
+                    ->set('MANDATORY', $module->getMandatory())
+                    ->set('HIDDEN', $module->getHidden())
+                    ->set('EXISTS', $exists);
 
                 $hasConfigurationInterface = false;
 
@@ -281,10 +280,10 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
                     if (false === $hasConfigurationInterface) {
                         // Works only fo activated modules - see Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass
-                        $routerId = "router." . $module->getBaseDir();
+                        $routerId = 'router.'.$module->getBaseDir();
                         if ($this->container->has($routerId)) {
                             try {
-                                if ($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
+                                if ($this->container->get($routerId)->match('/admin/module/'.$module->getCode())) {
                                     $hasConfigurationInterface = true;
                                 }
                             } catch (ResourceNotFoundException $e) {
@@ -295,13 +294,13 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
                     /* if not ; test if it uses admin inclusion : module_configuration.html */
                     if (false === $hasConfigurationInterface) {
-                        if (file_exists($module->getAbsoluteAdminIncludesPath() . DS . "module_configuration.html")) {
+                        if (file_exists($module->getAbsoluteAdminIncludesPath().DS.'module_configuration.html')) {
                             $hasConfigurationInterface = true;
                         }
                     }
                 } else {
                     // Make a quick and dirty test on the module's config.xml file
-                    $configContent = @file_get_contents($module->getAbsoluteConfigPath() . DS . "config.xml");
+                    $configContent = @file_get_contents($module->getAbsoluteConfigPath().DS.'config.xml');
 
                     $hasConfigurationInterface = $configContent &&
                         preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent) === 1
@@ -309,18 +308,18 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
                     if (false === $hasConfigurationInterface) {
                         // Make a quick and dirty test on the module's routing.xml file
-                        $routing = @file_get_contents($module->getAbsoluteConfigPath() . DS . "routing.xml");
+                        $routing = @file_get_contents($module->getAbsoluteConfigPath().DS.'routing.xml');
 
                         if ($routing && strpos($routing, '/admin/module/') !== false) {
                             $hasConfigurationInterface = true;
                         } else {
-                            if (file_exists($module->getAbsoluteAdminIncludesPath() . DS . "module_configuration.html")) {
+                            if (file_exists($module->getAbsoluteAdminIncludesPath().DS.'module_configuration.html')) {
                                 $hasConfigurationInterface = true;
                             }
                         }
                     }
                 }
-                $loopResultRow->set("CONFIGURABLE", $hasConfigurationInterface ? 1 : 0);
+                $loopResultRow->set('CONFIGURABLE', $hasConfigurationInterface ? 1 : 0);
 
                 // Does module have hook(s)
                 $hookable = false;
@@ -330,16 +329,16 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 ;
                 $hookable = ($moduleHookCount > 0);
 
-                $loopResultRow->set("HOOKABLE", $hookable ? 1 : 0);
+                $loopResultRow->set('HOOKABLE', $hookable ? 1 : 0);
 
                 if (null !== $this->getProfile()) {
                     $accessValue = $module->getVirtualColumn('access');
                     $manager = new AccessManager($accessValue);
 
-                    $loopResultRow->set("VIEWABLE", $manager->can(AccessManager::VIEW) ? 1 : 0)
-                        ->set("CREATABLE", $manager->can(AccessManager::CREATE) ? 1 : 0)
-                        ->set("UPDATABLE", $manager->can(AccessManager::UPDATE) ? 1 : 0)
-                        ->set("DELETABLE", $manager->can(AccessManager::DELETE) ? 1 : 0);
+                    $loopResultRow->set('VIEWABLE', $manager->can(AccessManager::VIEW) ? 1 : 0)
+                        ->set('CREATABLE', $manager->can(AccessManager::CREATE) ? 1 : 0)
+                        ->set('UPDATABLE', $manager->can(AccessManager::UPDATE) ? 1 : 0)
+                        ->set('DELETABLE', $manager->can(AccessManager::DELETE) ? 1 : 0);
                 }
 
                 $this->addOutputFields($loopResultRow, $module);

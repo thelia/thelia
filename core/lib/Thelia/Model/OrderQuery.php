@@ -15,26 +15,23 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Model\Base\OrderQuery as BaseOrderQuery;
-use Thelia\Model\Map\OrderProductTableMap;
-use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Map\OrderTableMap;
 
 /**
  * Skeleton subclass for performing query and update operations on the 'order' table.
  *
- *
- *
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
- *
  */
 class OrderQuery extends BaseOrderQuery
 {
     /**
      * @param $month
      * @param $year
+     *
      * @return array
+     *
      * @throws \Exception
      */
     public static function getMonthlySaleStats($month, $year, $includeShipping = true, $withTaxes = true)
@@ -42,14 +39,14 @@ class OrderQuery extends BaseOrderQuery
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
         $stats = [];
-        for ($day=1; $day<=$numberOfDay; $day++) {
+        for ($day = 1; $day <= $numberOfDay; ++$day) {
             $dayAmount = self::getSaleStats(
                 new \DateTime(sprintf('%s-%s-%s', $year, $month, $day)),
                 new \DateTime(sprintf('%s-%s-%s', $year, $month, $day)),
                 $includeShipping,
                 $withTaxes
             );
-            $stats[] = [$day-1, $dayAmount];
+            $stats[] = [$day - 1, $dayAmount];
         }
 
         return $stats;
@@ -60,15 +57,15 @@ class OrderQuery extends BaseOrderQuery
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
         $stats = [];
-        for ($day=1; $day<=$numberOfDay; $day++) {
+        for ($day = 1; $day <= $numberOfDay; ++$day) {
             $dayOrdersQuery = self::create()
-                ->filterByInvoiceDate(sprintf("%s-%s-%s 00:00:00", $year, $month, $day), Criteria::GREATER_EQUAL)
-                ->filterByInvoiceDate(sprintf("%s-%s-%s 23:59:59", $year, $month, $day), Criteria::LESS_EQUAL);
+                ->filterByInvoiceDate(sprintf('%s-%s-%s 00:00:00', $year, $month, $day), Criteria::GREATER_EQUAL)
+                ->filterByInvoiceDate(sprintf('%s-%s-%s 23:59:59', $year, $month, $day), Criteria::LESS_EQUAL);
             if (null !== $status) {
                 $dayOrdersQuery->filterByStatusId($status, Criteria::IN);
             }
             $dayOrders = $dayOrdersQuery->count();
-            $stats[] = [$day-1, $dayOrders];
+            $stats[] = [$day - 1, $dayOrders];
         }
 
         return $stats;
@@ -77,7 +74,9 @@ class OrderQuery extends BaseOrderQuery
     /**
      * @param $month
      * @param $year
+     *
      * @return array
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public static function getFirstOrdersStats($month, $year)
@@ -85,10 +84,10 @@ class OrderQuery extends BaseOrderQuery
         $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
         $stats = [];
-        for ($day=1; $day<=$numberOfDay; $day++) {
+        for ($day = 1; $day <= $numberOfDay; ++$day) {
             $dayOrdersQuery = self::create()
-                ->filterByCreatedAt(sprintf("%s-%s-%s 00:00:00", $year, $month, $day), Criteria::GREATER_EQUAL)
-                ->filterByCreatedAt(sprintf("%s-%s-%s 23:59:59", $year, $month, $day), Criteria::LESS_EQUAL);
+                ->filterByCreatedAt(sprintf('%s-%s-%s 00:00:00', $year, $month, $day), Criteria::GREATER_EQUAL)
+                ->filterByCreatedAt(sprintf('%s-%s-%s 23:59:59', $year, $month, $day), Criteria::LESS_EQUAL);
 
             $otherOrderJoin = new Join();
             $otherOrderJoin->addExplicitCondition(OrderTableMap::TABLE_NAME, 'CUSTOMER_ID', null, OrderTableMap::TABLE_NAME, 'CUSTOMER_ID', 'other_order');
@@ -101,7 +100,7 @@ class OrderQuery extends BaseOrderQuery
             $dayOrdersQuery->where('ISNULL(`other_order`.`ID`)');
 
             $dayOrders = $dayOrdersQuery->count();
-            $stats[] = [$day-1, $dayOrders];
+            $stats[] = [$day - 1, $dayOrders];
         }
 
         return $stats;
@@ -112,6 +111,7 @@ class OrderQuery extends BaseOrderQuery
      * @param bool $withTaxes
      *
      * @return float|int
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping, $withTaxes = true)
@@ -119,7 +119,7 @@ class OrderQuery extends BaseOrderQuery
         $amount = \floatval(
             self::baseSaleStats($startDate, $endDate, 'o')
                 ->innerJoinOrderProduct()
-                ->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE,`order_product`.PRICE)))", 'TOTAL')
+                ->withColumn('SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE,`order_product`.PRICE)))', 'TOTAL')
                 ->select(['TOTAL'])
                 ->findOne()
         );
@@ -129,7 +129,7 @@ class OrderQuery extends BaseOrderQuery
                 self::baseSaleStats($startDate, $endDate, 'o')
                     ->useOrderProductQuery()
                         ->useOrderProductTaxQuery()
-                            ->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product_tax`.PROMO_AMOUNT,`order_product_tax`.AMOUNT)))", 'TAX')
+                            ->withColumn('SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product_tax`.PROMO_AMOUNT,`order_product_tax`.AMOUNT)))', 'TAX')
                         ->endUse()
                     ->endUse()
                     ->select(['TAX'])
@@ -139,7 +139,7 @@ class OrderQuery extends BaseOrderQuery
 
         $amount -= \floatval(
             self::baseSaleStats($startDate, $endDate)
-                ->withColumn("SUM(`order`.discount)", 'DISCOUNT')
+                ->withColumn('SUM(`order`.discount)', 'DISCOUNT')
                 ->select('DISCOUNT')
                 ->findOne()
         );
@@ -147,7 +147,7 @@ class OrderQuery extends BaseOrderQuery
         if ($includeShipping) {
             $amount += \floatval(
                 self::baseSaleStats($startDate, $endDate)
-                    ->withColumn("SUM(`order`.postage)", 'POSTAGE')
+                    ->withColumn('SUM(`order`.postage)', 'POSTAGE')
                     ->select('POSTAGE')
                     ->findOne()
             );
@@ -158,19 +158,20 @@ class OrderQuery extends BaseOrderQuery
 
     /**
      * @param string $modelAlias
+     *
      * @return OrderQuery
      */
     protected static function baseSaleStats(\DateTime $startDate, \DateTime $endDate, $modelAlias = null)
     {
         // The sales are considered at invoice date, not order creation date
         return self::create($modelAlias)
-            ->filterByInvoiceDate(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
-            ->filterByInvoiceDate(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
+            ->filterByInvoiceDate(sprintf('%s 00:00:00', $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
+            ->filterByInvoiceDate(sprintf('%s 23:59:59', $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
             ->filterByStatusId(OrderStatusQuery::getPaidStatusIdList(), Criteria::IN);
     }
 
     /**
-     * @param int[]     $status
+     * @param int[] $status
      *
      * @return int
      */
@@ -182,8 +183,8 @@ class OrderQuery extends BaseOrderQuery
 
         return self::create()
             ->filterByStatusId($status, Criteria::IN)
-            ->filterByCreatedAt(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
-            ->filterByCreatedAt(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
+            ->filterByCreatedAt(sprintf('%s 00:00:00', $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
+            ->filterByCreatedAt(sprintf('%s 23:59:59', $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
             ->count();
     }
 }

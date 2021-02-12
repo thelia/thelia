@@ -30,7 +30,7 @@ use Thelia\Model\CurrencyQuery;
 
 class Currency extends BaseAction implements EventSubscriberInterface
 {
-    /** @var CurrencyConverter  */
+    /** @var CurrencyConverter */
     protected $currencyConverter;
 
     public function __construct(CurrencyConverter $currencyConverter)
@@ -39,7 +39,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Create a new currencyuration entry
+     * Create a new currencyuration entry.
      *
      * @param $eventName
      */
@@ -65,7 +65,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Change a currency
+     * Change a currency.
      *
      * @param $eventName
      */
@@ -88,7 +88,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Set the default currency
+     * Set the default currency.
      *
      * @param $eventName
      */
@@ -116,8 +116,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     */
     public function setVisible(CurrencyUpdateEvent $event)
     {
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
@@ -128,7 +126,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Delete a currencyuration entry
+     * Delete a currencyuration entry.
      *
      * @param $eventName
      */
@@ -172,7 +170,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 $currency->setRate($rate->getNumber(-1))->save();
             } catch (CurrencyNotFoundException $ex) {
                 Tlog::getInstance()->addError(
-                    sprintf("Unable to find exchange rate for currency %s, ID %d", $currency->getCode(), $currency->getId())
+                    sprintf('Unable to find exchange rate for currency %s, ID %d', $currency->getCode(), $currency->getId())
                 );
                 $event->addUndefinedRate($currency->getId());
             }
@@ -195,13 +193,13 @@ class Currency extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::CURRENCY_CREATE          => ["create", 128],
-            TheliaEvents::CURRENCY_UPDATE          => ["update", 128],
-            TheliaEvents::CURRENCY_DELETE          => ["delete", 128],
-            TheliaEvents::CURRENCY_SET_DEFAULT     => ["setDefault", 128],
-            TheliaEvents::CURRENCY_SET_VISIBLE     => ["setVisible", 128],
-            TheliaEvents::CURRENCY_UPDATE_RATES    => ["updateRates", 128],
-            TheliaEvents::CURRENCY_UPDATE_POSITION => ["updatePosition", 128]
+            TheliaEvents::CURRENCY_CREATE => ['create', 128],
+            TheliaEvents::CURRENCY_UPDATE => ['update', 128],
+            TheliaEvents::CURRENCY_DELETE => ['delete', 128],
+            TheliaEvents::CURRENCY_SET_DEFAULT => ['setDefault', 128],
+            TheliaEvents::CURRENCY_SET_VISIBLE => ['setVisible', 128],
+            TheliaEvents::CURRENCY_UPDATE_RATES => ['updateRates', 128],
+            TheliaEvents::CURRENCY_UPDATE_POSITION => ['updatePosition', 128],
         ];
     }
 }

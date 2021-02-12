@@ -19,6 +19,7 @@ abstract class SchemaCombineExpectation
 {
     /**
      * Get expectations for SchemaCombinerInterface::combine.
+     *
      * @return array
      */
     public static function getCombineExpectations()
@@ -142,7 +143,7 @@ abstract class SchemaCombineExpectation
                 [
                     'foo' => $fooTableExpectations,
                     'bar' => array_merge($bar1TableExpectations, $bar2TableExpectations),
-                ]
+                ],
             ],
         ];
     }

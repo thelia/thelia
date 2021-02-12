@@ -17,11 +17,9 @@ use Symfony\Component\Form\Form;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- *
- * Class thrown on Thelia.action event
+ * Class thrown on Thelia.action event.
  *
  * call setAction if action match yours
- *
  */
 abstract class ActionEvent extends Event
 {
@@ -47,9 +45,9 @@ abstract class ActionEvent extends Event
 
         /** @var \Symfony\Component\Form\Form $field */
         foreach ($fields as $field) {
-            $functionName = sprintf("set%s", Container::camelize($field->getName()));
+            $functionName = sprintf('set%s', Container::camelize($field->getName()));
             if (method_exists($this, $functionName)) {
-                $getFunctionName = sprintf("get%s", Container::camelize($field->getName()));
+                $getFunctionName = sprintf('get%s', Container::camelize($field->getName()));
                 if (method_exists($this, $getFunctionName)) {
                     if (null === $this->{$getFunctionName}()) {
                         $this->{$functionName}($field->getData());

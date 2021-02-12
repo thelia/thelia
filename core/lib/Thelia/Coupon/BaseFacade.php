@@ -27,11 +27,9 @@ use Thelia\Model\CurrencyQuery;
 use Thelia\TaxEngine\TaxEngine;
 
 /**
- * Allow to assist in getting relevant data on the current application state
+ * Allow to assist in getting relevant data on the current application state.
  *
- * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class BaseFacade implements FacadeInterface
 {
@@ -69,8 +67,7 @@ class BaseFacade implements FacadeInterface
     protected $eventDispatcher;
 
     /**
-     * Constructor
-     *
+     * Constructor.
      */
     public function __construct(
         SecurityContext $securityContext,
@@ -80,8 +77,7 @@ class BaseFacade implements FacadeInterface
         RequestStack $requestStack,
         ConditionEvaluator $conditionEvaluator,
         EventDispatcher $eventDispatcher
-    )
-    {
+    ) {
         $this->securityContext = $securityContext;
         $this->taxEngine = $taxEngine;
         $this->translator = $translator;
@@ -92,7 +88,7 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return a Cart a CouponManager can process
+     * Return a Cart a CouponManager can process.
      *
      * @return \Thelia\Model\Cart
      */
@@ -102,7 +98,7 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return an Address a CouponManager can process
+     * Return an Address a CouponManager can process.
      *
      * @return \Thelia\Model\Address
      */
@@ -113,12 +109,12 @@ class BaseFacade implements FacadeInterface
                 $this->getRequest()->getSession()->getOrder()->getChoosenDeliveryAddress()
             );
         } catch (\Exception $ex) {
-            throw new \LogicException("Failed to get delivery address (" . $ex->getMessage() . ")");
+            throw new \LogicException('Failed to get delivery address ('.$ex->getMessage().')');
         }
     }
 
     /**
-     * Return an Customer a CouponManager can process
+     * Return an Customer a CouponManager can process.
      *
      * @return \Thelia\Model\Customer
      */
@@ -128,7 +124,7 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return Checkout total price
+     * Return Checkout total price.
      *
      * @return float
      */
@@ -138,7 +134,7 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return Checkout total postage (only) price
+     * Return Checkout total postage (only) price.
      *
      * @return float
      */
@@ -148,7 +144,7 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return Products total price
+     * Return Products total price.
      *
      * @param bool $withItemsInPromo if true, the discounted items are included in the total
      *
@@ -161,7 +157,7 @@ class BaseFacade implements FacadeInterface
         $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems();
 
         foreach ($cartItems as $cartItem) {
-            if ($withItemsInPromo || ! $cartItem->getPromo()) {
+            if ($withItemsInPromo || !$cartItem->getPromo()) {
                 $total += $cartItem->getTotalRealPrice();
             }
         }
@@ -171,7 +167,9 @@ class BaseFacade implements FacadeInterface
 
     /**
      * @param bool $withItemsInPromo
+     *
      * @return float|int
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getCartTotalTaxPrice($withItemsInPromo = true)
@@ -182,7 +180,7 @@ class BaseFacade implements FacadeInterface
         $total = 0;
 
         foreach ($cartItems as $cartItem) {
-            if ($withItemsInPromo || ! $cartItem->getPromo()) {
+            if ($withItemsInPromo || !$cartItem->getPromo()) {
                 $total += $cartItem->getTotalRealTaxedPrice($taxCountry);
             }
         }
@@ -199,7 +197,7 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return the Checkout currency EUR|USD
+     * Return the Checkout currency EUR|USD.
      *
      * @return string
      */
@@ -209,7 +207,7 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return the number of Products in the Cart
+     * Return the number of Products in the Cart.
      *
      * @return int
      */
@@ -231,7 +229,7 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Find one Coupon in the database from its code
+     * Find one Coupon in the database from its code.
      *
      * @param string $code Coupon code
      *
@@ -245,7 +243,7 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return platform TranslatorInterface
+     * Return platform TranslatorInterface.
      *
      * @return TranslatorInterface
      */
@@ -255,7 +253,7 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return platform Parser
+     * Return platform Parser.
      *
      * @return ParserInterface
      */
@@ -273,7 +271,7 @@ class BaseFacade implements FacadeInterface
 
     /**
      * Return the main currency
-     * THe one used to set prices in BackOffice
+     * THe one used to set prices in BackOffice.
      *
      * @return string
      */
@@ -283,7 +281,7 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return request
+     * Return request.
      *
      * @return Request
      */
@@ -293,7 +291,7 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return Constraint Validator
+     * Return Constraint Validator.
      *
      * @return ConditionEvaluator
      */
@@ -303,7 +301,7 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return all available currencies
+     * Return all available currencies.
      *
      * @return array of Currency
      */
@@ -315,7 +313,7 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Return the event dispatcher,
+     * Return the event dispatcher,.
      *
      * @return \Symfony\Component\EventDispatcher\EventDispatcher
      */
@@ -325,8 +323,10 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Add a coupon in session
+     * Add a coupon in session.
+     *
      * @param $couponCode
+     *
      * @return mixed|void
      */
     public function pushCouponInSession($couponCode)

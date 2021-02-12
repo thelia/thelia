@@ -23,16 +23,14 @@ use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\CurrencyQuery;
 
 /**
- * Unit Test ConditionFactory Class
+ * Unit Test ConditionFactory Class.
  *
- * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 class ConditionFactoryTest extends TestCase
 {
     /**
-     * Check the Rules serialization module
+     * Check the Rules serialization module.
      */
     public function testBuild()
     {
@@ -72,11 +70,11 @@ class ConditionFactoryTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+            MatchForTotalAmount::CART_CURRENCY => 'EUR',
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -95,7 +93,7 @@ class ConditionFactoryTest extends TestCase
     }
 
     /**
-     * Check the Rules serialization module
+     * Check the Rules serialization module.
      */
     public function testBuildFail()
     {
@@ -135,11 +133,11 @@ class ConditionFactoryTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+            MatchForTotalAmount::CART_CURRENCY => 'EUR',
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -156,7 +154,7 @@ class ConditionFactoryTest extends TestCase
     }
 
     /**
-     * Check the Rules serialization module
+     * Check the Rules serialization module.
      */
     public function testRuleSerialisation()
     {
@@ -196,22 +194,22 @@ class ConditionFactoryTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+            MatchForTotalAmount::CART_CURRENCY => 'EUR',
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+            MatchForTotalAmount::CART_CURRENCY => 'EUR',
         ];
         $condition2->setValidatorsFromForm($operators, $values);
 
@@ -234,7 +232,7 @@ class ConditionFactoryTest extends TestCase
     }
 
     /**
-     * Check the getInputs method
+     * Check the getInputs method.
      */
     public function testGetInputs()
     {
@@ -274,11 +272,11 @@ class ConditionFactoryTest extends TestCase
 
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+            MatchForTotalAmount::CART_CURRENCY => 'EUR',
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -297,7 +295,7 @@ class ConditionFactoryTest extends TestCase
     }
 
     /**
-     * Check the getInputs method
+     * Check the getInputs method.
      */
     public function testGetInputsFalse()
     {
@@ -337,11 +335,11 @@ class ConditionFactoryTest extends TestCase
 
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+            MatchForTotalAmount::CART_CURRENCY => 'EUR',
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
@@ -360,9 +358,9 @@ class ConditionFactoryTest extends TestCase
     }
 
     /**
-     * Test condition serialization if collection is empty
+     * Test condition serialization if collection is empty.
      *
-     * @covers Thelia\Condition\ConditionFactory::serializeConditionCollection
+     * @covers \Thelia\Condition\ConditionFactory::serializeConditionCollection
      */
     public function testSerializeConditionCollectionEmpty()
     {

@@ -39,37 +39,39 @@ class TemplateDefinition
 
     protected static $standardTemplatesSubdirs = [
         self::FRONT_OFFICE => self::FRONT_OFFICE_SUBDIR,
-        self::BACK_OFFICE  => self::BACK_OFFICE_SUBDIR,
-        self::PDF          => self::PDF_SUBDIR,
-        self::EMAIL        => self::EMAIL_SUBDIR,
+        self::BACK_OFFICE => self::BACK_OFFICE_SUBDIR,
+        self::PDF => self::PDF_SUBDIR,
+        self::EMAIL => self::EMAIL_SUBDIR,
     ];
 
-    /**  @var array|null the parent list cache */
+    /** @var array|null the parent list cache */
     protected $parentList;
 
     /**
      * TemplateDefinition constructor.
+     *
      * @param string $name the template name (= directory name)
-     * @param int $type the remplate type (see $standardTemplatesSubdirs)
+     * @param int    $type the remplate type (see $standardTemplatesSubdirs)
+     *
      * @throws \Exception
      */
     public function __construct($name, $type)
     {
         switch ($type) {
             case TemplateDefinition::FRONT_OFFICE:
-                $this->path = self::FRONT_OFFICE_SUBDIR . DS . $name;
+                $this->path = self::FRONT_OFFICE_SUBDIR.DS.$name;
                 $this->translationDomainPrefix = 'fo.';
                 break;
             case TemplateDefinition::BACK_OFFICE:
-                $this->path = self::BACK_OFFICE_SUBDIR . DS . $name;
+                $this->path = self::BACK_OFFICE_SUBDIR.DS.$name;
                 $this->translationDomainPrefix = 'bo.';
                 break;
             case TemplateDefinition::PDF:
-                $this->path = self::PDF_SUBDIR . DS . $name;
+                $this->path = self::PDF_SUBDIR.DS.$name;
                 $this->translationDomainPrefix = 'pdf.';
                 break;
             case TemplateDefinition::EMAIL:
-                $this->path = self::EMAIL_SUBDIR . DS . $name;
+                $this->path = self::EMAIL_SUBDIR.DS.$name;
                 $this->translationDomainPrefix = 'email.';
                 break;
             default:
@@ -84,7 +86,7 @@ class TemplateDefinition
 
     public function getTranslationDomain()
     {
-        return $this->translationDomainPrefix . strtolower($this->getName());
+        return $this->translationDomainPrefix.strtolower($this->getName());
     }
 
     /**
@@ -104,12 +106,12 @@ class TemplateDefinition
 
     public function getI18nPath()
     {
-        return $this->getPath() . DS . 'I18n';
+        return $this->getPath().DS.'I18n';
     }
 
     public function getAbsoluteI18nPath()
     {
-        return THELIA_TEMPLATE_DIR . $this->getI18nPath();
+        return THELIA_TEMPLATE_DIR.$this->getI18nPath();
     }
 
     public function getPath()
@@ -119,17 +121,17 @@ class TemplateDefinition
 
     public function getAbsolutePath()
     {
-        return THELIA_TEMPLATE_DIR . $this->getPath();
+        return THELIA_TEMPLATE_DIR.$this->getPath();
     }
 
     public function getConfigPath()
     {
-        return $this->getPath() . DS . 'configs';
+        return $this->getPath().DS.'configs';
     }
 
     public function getAbsoluteConfigPath()
     {
-        return THELIA_TEMPLATE_DIR . $this->getConfigPath();
+        return THELIA_TEMPLATE_DIR.$this->getConfigPath();
     }
 
     public function setPath($path)
@@ -155,7 +157,7 @@ class TemplateDefinition
     }
 
     /**
-     * Get teh template descriptor
+     * Get teh template descriptor.
      *
      * @return TemplateDescriptor
      */
@@ -165,7 +167,7 @@ class TemplateDefinition
     }
 
     /**
-     * Returns an iterator on the standard templates subdir names
+     * Returns an iterator on the standard templates subdir names.
      */
     public static function getStandardTemplatesSubdirsIterator()
     {
@@ -173,7 +175,7 @@ class TemplateDefinition
     }
 
     /**
-     * Return the template parent list
+     * Return the template parent list.
      *
      * @return array|null
      */
@@ -184,8 +186,8 @@ class TemplateDefinition
 
             $parent = $this->getDescriptor()->getParent();
 
-            for ($index = 1; null !== $parent; $index++) {
-                $this->parentList[$parent->getName() . '-'] = $parent;
+            for ($index = 1; null !== $parent; ++$index) {
+                $this->parentList[$parent->getName().'-'] = $parent;
 
                 $parent = $parent->getDescriptor()->getParent();
             }
@@ -198,13 +200,15 @@ class TemplateDefinition
      * Find a template file path, considering the template parents, if any.
      *
      * @param string $templateName the template name, with path
+     *
      * @return string
+     *
      * @throws TemplateException
      */
     public function getTemplateFilePath($templateName)
     {
         $templateList = array_merge(
-            [ $this ],
+            [$this],
             $this->getParentList()
         );
 

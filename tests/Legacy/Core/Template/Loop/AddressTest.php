@@ -12,13 +12,10 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Core\Template\Loop\Address;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class AddressTest extends BaseLoopTestor
 {

@@ -20,7 +20,7 @@ use Thelia\TaxEngine\BaseTaxType;
 class Tax extends BaseTax
 {
     /**
-     * Provides a form-and-javascript-safe version of the type, which is a fully qualified classname, with \
+     * Provides a form-and-javascript-safe version of the type, which is a fully qualified classname, with \.
      */
     public static function escapeTypeName($name)
     {
@@ -37,7 +37,7 @@ class Tax extends BaseTax
         try {
             $taxRuleCountryPosition = $this->getVirtualColumn(TaxRuleQuery::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION);
         } catch (PropelException $e) {
-            throw new PropelException("Virtual column `" . TaxRuleQuery::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION . "` does not exist in Tax::getTaxRuleCountryPosition");
+            throw new PropelException('Virtual column `'.TaxRuleQuery::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION.'` does not exist in Tax::getTaxRuleCountryPosition');
         }
 
         return $taxRuleCountryPosition;
@@ -49,13 +49,13 @@ class Tax extends BaseTax
 
         /* test type */
         if (!class_exists($class)) {
-            throw new TaxEngineException('Recorded type `' . $class . '` does not exists', TaxEngineException::BAD_RECORDED_TYPE);
+            throw new TaxEngineException('Recorded type `'.$class.'` does not exists', TaxEngineException::BAD_RECORDED_TYPE);
         }
-    /** @var \Thelia\TaxEngine\BaseTaxType $instance */
-        $instance = new $class;
+        /** @var \Thelia\TaxEngine\BaseTaxType $instance */
+        $instance = new $class();
 
         if (!$instance instanceof BaseTaxType) {
-            throw new TaxEngineException('Recorded type `' . $class . '` does not extends BaseTaxType', TaxEngineException::BAD_RECORDED_TYPE);
+            throw new TaxEngineException('Recorded type `'.$class.'` does not extends BaseTaxType', TaxEngineException::BAD_RECORDED_TYPE);
         }
 
         $instance->loadRequirements($this->getRequirements());

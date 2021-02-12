@@ -13,7 +13,8 @@
 namespace Thelia\Core\Archiver\Archiver;
 
 /**
- * Class TarGzArchiver
+ * Class TarGzArchiver.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class TarGzArchiver extends TarArchiver

@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Hook;
 
 /**
- * Class ModuleHookDeleteEvent
- * @package Thelia\Core\Event\Hook
+ * Class ModuleHookDeleteEvent.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleHookDeleteEvent extends ModuleHookEvent
@@ -40,8 +40,6 @@ class ModuleHookDeleteEvent extends ModuleHookEvent
         return $this;
     }
 
-    /**
-     */
     public function getModuleHookId()
     {
         return $this->module_hook_id;

@@ -19,7 +19,7 @@ use Thelia\Core\Security\User\UserInterface;
 use Thelia\Model\Customer;
 
 /**
- * A simple security manager, in charge of checking user
+ * A simple security manager, in charge of checking user.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
@@ -41,17 +41,17 @@ class SecurityContext
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
         if ($session === null) {
-            throw new \LogicException("No session found.");
+            throw new \LogicException('No session found.');
         }
 
         return $session;
     }
 
     /**
-    * Gets the currently authenticated user in  the admin, or null if none is defined
-    *
-    * @return UserInterface|null A UserInterface instance or null if no user is available
-    */
+     * Gets the currently authenticated user in  the admin, or null if none is defined.
+     *
+     * @return UserInterface|null A UserInterface instance or null if no user is available
+     */
     public function getAdminUser()
     {
         return $this->getSession()->getAdminUser();
@@ -60,7 +60,7 @@ class SecurityContext
     /**
      * Check if an admin user is logged in.
      *
-     * @return true if an admin user is logged in, false otherwise.
+     * @return true if an admin user is logged in, false otherwise
      */
     public function hasAdminUser()
     {
@@ -68,7 +68,7 @@ class SecurityContext
     }
 
     /**
-     * Gets the currently authenticated customer, or null if none is defined
+     * Gets the currently authenticated customer, or null if none is defined.
      *
      * @return Customer|null A UserInterface instance or null if no user is available
      */
@@ -80,7 +80,7 @@ class SecurityContext
     /**
      * Check if a customer user is logged in.
      *
-     * @return true if a customer is logged in, false otherwise.
+     * @return true if a customer is logged in, false otherwise
      */
     public function hasCustomerUser()
     {
@@ -88,7 +88,7 @@ class SecurityContext
     }
 
     /**
-     * @return bool true if a user (either admin or customer) is logged in, false otherwise.
+     * @return bool true if a user (either admin or customer) is logged in, false otherwise
      */
     final public function hasLoggedInUser()
     {
@@ -96,11 +96,12 @@ class SecurityContext
     }
 
     /**
-     * Check if a user has at least one of the required roles
+     * Check if a user has at least one of the required roles.
      *
-     * @param  UserInterface $user  the user
-     * @param  array         $roles the roles
-     * @return boolean       true if the user has the required role, false otherwise
+     * @param UserInterface $user  the user
+     * @param array         $roles the roles
+     *
+     * @return bool true if the user has the required role, false otherwise
      */
     final public function hasRequiredRole(UserInterface $user = null, array $roles = [])
     {
@@ -120,7 +121,7 @@ class SecurityContext
 
     final public function isUserGranted(array $roles, array $resources, array $modules, array $accesses, UserInterface $user)
     {
-        if (! $this->hasRequiredRole($user, $roles)) {
+        if (!$this->hasRequiredRole($user, $roles)) {
             return false;
         }
 
@@ -182,10 +183,10 @@ class SecurityContext
     }
 
     /**
-    * Checks if the current user is allowed
-    *
-    * @return Boolean
-    */
+     * Checks if the current user is allowed.
+     *
+     * @return bool
+     */
     final public function isGranted(array $roles, array $resources, array $modules, array $accesses)
     {
         // Find a user which matches the required roles.
@@ -194,23 +195,24 @@ class SecurityContext
         if (null === $user) {
             return false;
         }
-            return $this->isUserGranted($roles, $resources, $modules, $accesses, $user);
+
+        return $this->isUserGranted($roles, $resources, $modules, $accesses, $user);
     }
 
     /**
      * look if a user has the required role.
      *
-     * @return null|UserInterface
+     * @return UserInterface|null
      */
     public function checkRole(array $roles)
     {
         // Find a user which matches the required roles.
         $user = $this->getCustomerUser();
 
-        if (! $this->hasRequiredRole($user, $roles)) {
+        if (!$this->hasRequiredRole($user, $roles)) {
             $user = $this->getAdminUser();
 
-            if (! $this->hasRequiredRole($user, $roles)) {
+            if (!$this->hasRequiredRole($user, $roles)) {
                 $user = null;
             }
         }
@@ -219,10 +221,10 @@ class SecurityContext
     }
 
     /**
-    * Sets the authenticated admin user.
-    *
-    * @param UserInterface $user A UserInterface, or null if no further user should be stored
-    */
+     * Sets the authenticated admin user.
+     *
+     * @param UserInterface $user A UserInterface, or null if no further user should be stored
+     */
     public function setAdminUser(UserInterface $user)
     {
         $user->eraseCredentials();
@@ -243,7 +245,7 @@ class SecurityContext
     }
 
     /**
-     * Clear the customer from the security context
+     * Clear the customer from the security context.
      */
     public function clearCustomerUser()
     {
@@ -251,7 +253,7 @@ class SecurityContext
     }
 
     /**
-     * Clear the admin from the security context
+     * Clear the admin from the security context.
      */
     public function clearAdminUser()
     {

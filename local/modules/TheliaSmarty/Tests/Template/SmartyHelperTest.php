@@ -15,8 +15,8 @@ namespace TheliaSmarty\Tests\Template;
 use TheliaSmarty\Template\SmartyHelper;
 
 /**
- * Class SmartyHelperTest
- * @package Thelia\Tests\Core\Smarty
+ * Class SmartyHelperTest.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class SmartyHelperTest extends \PHPUnit_Framework_TestCase
@@ -45,11 +45,11 @@ EOT;
         $functions = self::$smartyParserHelper->getFunctionsDefinition($content);
 
         $this->assertCount(1, $functions);
-        $this->assertArrayHasKey("name", $functions[0]);
-        $this->assertEquals("hook", $functions[0]["name"]);
-        $this->assertArrayHasKey("attributes", $functions[0]);
-        $this->assertArrayHasKey("name", $functions[0]["attributes"]);
-        $this->assertEquals("test", $functions[0]["attributes"]["name"]);
+        $this->assertArrayHasKey('name', $functions[0]);
+        $this->assertEquals('hook', $functions[0]['name']);
+        $this->assertArrayHasKey('attributes', $functions[0]);
+        $this->assertArrayHasKey('name', $functions[0]['attributes']);
+        $this->assertEquals('test', $functions[0]['attributes']['name']);
     }
 
     public function testfunctionsDefinitionVar()
@@ -67,17 +67,17 @@ EOT;
 
         $this->assertCount(2, $functions);
 
-        $this->assertArrayHasKey("name", $functions[0]);
-        $this->assertEquals("hook", $functions[0]["name"]);
-        $this->assertArrayHasKey("attributes", $functions[0]);
-        $this->assertArrayHasKey("name", $functions[0]["attributes"]);
-        $this->assertEquals("\$test", $functions[0]["attributes"]["name"]);
+        $this->assertArrayHasKey('name', $functions[0]);
+        $this->assertEquals('hook', $functions[0]['name']);
+        $this->assertArrayHasKey('attributes', $functions[0]);
+        $this->assertArrayHasKey('name', $functions[0]['attributes']);
+        $this->assertEquals('$test', $functions[0]['attributes']['name']);
 
-        $this->assertArrayHasKey("name", $functions[1]);
-        $this->assertEquals("function", $functions[1]["name"]);
-        $this->assertArrayHasKey("attributes", $functions[1]);
-        $this->assertArrayHasKey("name", $functions[1]["attributes"]);
-        $this->assertEquals("{\$test}", $functions[1]["attributes"]["name"]);
+        $this->assertArrayHasKey('name', $functions[1]);
+        $this->assertEquals('function', $functions[1]['name']);
+        $this->assertArrayHasKey('attributes', $functions[1]);
+        $this->assertArrayHasKey('name', $functions[1]['attributes']);
+        $this->assertEquals('{$test}', $functions[1]['attributes']['name']);
     }
 
     public function testfunctionsDefinitionInnerFunction()
@@ -95,12 +95,12 @@ EOT;
 
         $this->assertCount(2, $functions);
 
-        for ($i = 0; $i <= 1; $i++) {
-            $this->assertArrayHasKey("name", $functions[$i]);
-            $this->assertEquals("hook", $functions[$i]["name"]);
-            $this->assertArrayHasKey("attributes", $functions[$i]);
-            $this->assertArrayHasKey("name", $functions[$i]["attributes"]);
-            $this->assertEquals("{intl l=\"test\"}", $functions[$i]["attributes"]["name"]);
+        for ($i = 0; $i <= 1; ++$i) {
+            $this->assertArrayHasKey('name', $functions[$i]);
+            $this->assertEquals('hook', $functions[$i]['name']);
+            $this->assertArrayHasKey('attributes', $functions[$i]);
+            $this->assertArrayHasKey('name', $functions[$i]['attributes']);
+            $this->assertEquals('{intl l="test"}', $functions[$i]['attributes']['name']);
         }
     }
 
@@ -115,14 +115,14 @@ cillum dolore {function name={intl l="test"}} eu fugiat nulla pariatur. Excepteu
 proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 EOT;
 
-        $functions = self::$smartyParserHelper->getFunctionsDefinition($content, ["hook"]);
+        $functions = self::$smartyParserHelper->getFunctionsDefinition($content, ['hook']);
 
         $this->assertCount(1, $functions);
 
-        $this->assertArrayHasKey("name", $functions[0]);
-        $this->assertEquals("hook", $functions[0]["name"]);
-        $this->assertArrayHasKey("attributes", $functions[0]);
-        $this->assertArrayHasKey("name", $functions[0]["attributes"]);
-        $this->assertEquals("hello world", $functions[0]["attributes"]["name"]);
+        $this->assertArrayHasKey('name', $functions[0]);
+        $this->assertEquals('hook', $functions[0]['name']);
+        $this->assertArrayHasKey('attributes', $functions[0]);
+        $this->assertArrayHasKey('name', $functions[0]['attributes']);
+        $this->assertEquals('hello world', $functions[0]['attributes']['name']);
     }
 }

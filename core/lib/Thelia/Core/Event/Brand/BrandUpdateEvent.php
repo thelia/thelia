@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Brand;
 
 /**
- * Class BrandUpdateEvent
- * @package Thelia\Core\Event\Brand
+ * Class BrandUpdateEvent.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class BrandUpdateEvent extends BrandCreateEvent
@@ -115,7 +115,8 @@ class BrandUpdateEvent extends BrandCreateEvent
     }
 
     /**
-     * @param  int   $logo_image_id
+     * @param int $logo_image_id
+     *
      * @return $this
      */
     public function setLogoImageId($logo_image_id)

@@ -21,13 +21,12 @@ use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\Address;
 
 /**
- * @package Coupon
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class MatchBillingCountriesTest extends TestCase
 {
     /**
-     * Generate adapter stub
+     * Generate adapter stub.
      *
      * @param int    $cartTotalPrice   Cart total price
      * @param string $checkoutCurrency Checkout currency
@@ -75,9 +74,9 @@ class MatchBillingCountriesTest extends TestCase
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\MatchBillingCountries::setValidators
+     * @covers \Thelia\Condition\Implementation\MatchBillingCountries::setValidators
      */
     public function testInValidBackOfficeInputOperator()
     {
@@ -86,10 +85,10 @@ class MatchBillingCountriesTest extends TestCase
 
         $condition1 = new MatchBillingCountries($stubFacade);
         $operators = [
-            MatchBillingCountries::COUNTRIES_LIST => Operators::INFERIOR_OR_EQUAL
+            MatchBillingCountries::COUNTRIES_LIST => Operators::INFERIOR_OR_EQUAL,
         ];
         $values = [
-            MatchBillingCountries::COUNTRIES_LIST => []
+            MatchBillingCountries::COUNTRIES_LIST => [],
         ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
@@ -98,14 +97,14 @@ class MatchBillingCountriesTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\MatchBillingCountries::setValidators
+     * @covers \Thelia\Condition\Implementation\MatchBillingCountries::setValidators
      */
     public function testInValidBackOfficeInputValue()
     {
@@ -114,10 +113,10 @@ class MatchBillingCountriesTest extends TestCase
 
         $condition1 = new MatchBillingCountries($stubFacade);
         $operators = [
-            MatchBillingCountries::COUNTRIES_LIST => Operators::IN
+            MatchBillingCountries::COUNTRIES_LIST => Operators::IN,
         ];
         $values = [
-            MatchBillingCountries::COUNTRIES_LIST => []
+            MatchBillingCountries::COUNTRIES_LIST => [],
         ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
@@ -125,10 +124,9 @@ class MatchBillingCountriesTest extends TestCase
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchBillingCountries::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchBillingCountries::isMatching
      */
     public function testMatchingRule()
     {
@@ -137,10 +135,10 @@ class MatchBillingCountriesTest extends TestCase
 
         $condition1 = new MatchBillingCountries($stubFacade);
         $operators = [
-            MatchBillingCountries::COUNTRIES_LIST => Operators::IN
+            MatchBillingCountries::COUNTRIES_LIST => Operators::IN,
         ];
         $values = [
-            MatchBillingCountries::COUNTRIES_LIST => [10, 20]
+            MatchBillingCountries::COUNTRIES_LIST => [10, 20],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -148,15 +146,14 @@ class MatchBillingCountriesTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchBillingCountries::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchBillingCountries::isMatching
      */
     public function testNotMatching()
     {
@@ -166,10 +163,10 @@ class MatchBillingCountriesTest extends TestCase
         $condition1 = new MatchBillingCountries($stubFacade);
 
         $operators = [
-            MatchBillingCountries::COUNTRIES_LIST => Operators::IN
+            MatchBillingCountries::COUNTRIES_LIST => Operators::IN,
         ];
         $values = [
-            MatchBillingCountries::COUNTRIES_LIST => [50, 60]
+            MatchBillingCountries::COUNTRIES_LIST => [50, 60],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -177,7 +174,7 @@ class MatchBillingCountriesTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
@@ -189,10 +186,10 @@ class MatchBillingCountriesTest extends TestCase
         $condition1 = new MatchBillingCountries($stubFacade);
 
         $operators = [
-            MatchBillingCountries::COUNTRIES_LIST => Operators::IN
+            MatchBillingCountries::COUNTRIES_LIST => Operators::IN,
         ];
         $values = [
-            MatchBillingCountries::COUNTRIES_LIST => [50, 60]
+            MatchBillingCountries::COUNTRIES_LIST => [50, 60],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -210,10 +207,9 @@ class MatchBillingCountriesTest extends TestCase
     }
 
     /**
-     * Check getName i18n
+     * Check getName i18n.
      *
-     * @covers Thelia\Condition\Implementation\MatchBillingCountries::getName
-     *
+     * @covers \Thelia\Condition\Implementation\MatchBillingCountries::getName
      */
     public function testGetName()
     {
@@ -228,10 +224,9 @@ class MatchBillingCountriesTest extends TestCase
     }
 
     /**
-     * Check tooltip i18n
+     * Check tooltip i18n.
      *
-     * @covers Thelia\Condition\Implementation\MatchBillingCountries::getToolTip
-     *
+     * @covers \Thelia\Condition\Implementation\MatchBillingCountries::getToolTip
      */
     public function testGetToolTip()
     {
@@ -246,10 +241,9 @@ class MatchBillingCountriesTest extends TestCase
     }
 
     /**
-     * Check validator
+     * Check validator.
      *
-     * @covers Thelia\Condition\Implementation\MatchBillingCountries::generateInputs
-     *
+     * @covers \Thelia\Condition\Implementation\MatchBillingCountries::generateInputs
      */
     public function testGetValidator()
     {
@@ -259,10 +253,10 @@ class MatchBillingCountriesTest extends TestCase
         $condition1 = new MatchBillingCountries($stubFacade);
 
         $operators = [
-            MatchBillingCountries::COUNTRIES_LIST => Operators::IN
+            MatchBillingCountries::COUNTRIES_LIST => Operators::IN,
         ];
         $values = [
-            MatchBillingCountries::COUNTRIES_LIST => [50, 60]
+            MatchBillingCountries::COUNTRIES_LIST => [50, 60],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -277,15 +271,15 @@ class MatchBillingCountriesTest extends TestCase
                         'out' => 'Price',
                     ],
                     'value' => '',
-                    'selectedOperator' => 'in'
-                ]
+                    'selectedOperator' => 'in',
+                ],
             ],
             'setOperators' => [
-                'countries' => 'in'
+                'countries' => 'in',
             ],
             'setValues' => [
-                'countries' => [50, 60]
-            ]
+                'countries' => [50, 60],
+            ],
         ];
         $expected = $validators;
 

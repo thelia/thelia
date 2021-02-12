@@ -26,20 +26,19 @@ use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * Tax loop
- *
+ * Tax loop.
  *
  * Class Tax
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[] getExclude()
- * @method int[] getTaxRule()
- * @method int[] getExcludeTaxRule()
- * @method int getCountry()
+ *
+ * @method int[]    getId()
+ * @method int[]    getExclude()
+ * @method int[]    getTaxRule()
+ * @method int[]    getExcludeTaxRule()
+ * @method int      getCountry()
  * @method string[] getOrder()
  */
 class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -115,20 +114,20 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "id":
+                case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case "id_reverse":
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha_reverse":
+                case 'alpha_reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
             }
@@ -144,14 +143,14 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($tax);
 
             $loopResultRow
-                ->set("ID", $tax->getId())
-                ->set("TYPE", $tax->getType())
-                ->set("ESCAPED_TYPE", TaxModel::escapeTypeName($tax->getType()))
-                ->set("REQUIREMENTS", $tax->getRequirements())
-                ->set("IS_TRANSLATED", $tax->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("TITLE", $tax->getVirtualColumn('i18n_TITLE'))
-                ->set("DESCRIPTION", $tax->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('ID', $tax->getId())
+                ->set('TYPE', $tax->getType())
+                ->set('ESCAPED_TYPE', TaxModel::escapeTypeName($tax->getType()))
+                ->set('REQUIREMENTS', $tax->getRequirements())
+                ->set('IS_TRANSLATED', $tax->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('TITLE', $tax->getVirtualColumn('i18n_TITLE'))
+                ->set('DESCRIPTION', $tax->getVirtualColumn('i18n_DESCRIPTION'))
             ;
             $this->addOutputFields($loopResultRow, $tax);
 

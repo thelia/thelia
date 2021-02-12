@@ -23,9 +23,8 @@ use Thelia\Exception\AdminAccessDenied;
 use Thelia\Model\ConfigQuery;
 
 /**
+ * Class HttpException.
  *
- * Class HttpException
- * @package Thelia\Action
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  * @author Manuel Raynaud  <manu@raynaud.io>
  */
@@ -68,7 +67,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
             $this->parser->render(
                 'general_error.html',
                 [
-                    "error_message" => $message
+                    'error_message' => $message,
                 ]
             ),
             403
@@ -108,7 +107,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::EXCEPTION => ["checkHttpException", 128],
+            KernelEvents::EXCEPTION => ['checkHttpException', 128],
         ];
     }
 }

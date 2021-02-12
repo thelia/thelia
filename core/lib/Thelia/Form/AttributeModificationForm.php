@@ -13,7 +13,6 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 
 class AttributeModificationForm extends AttributeCreationForm
@@ -23,8 +22,8 @@ class AttributeModificationForm extends AttributeCreationForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("id", HiddenType::class, [
-                    "constraints" => [
+            ->add('id', HiddenType::class, [
+                    'constraints' => [
                         new GreaterThan(
                             ['value' => 0]
                         ),
@@ -38,6 +37,6 @@ class AttributeModificationForm extends AttributeCreationForm
 
     public static function getName()
     {
-        return "thelia_attribute_modification";
+        return 'thelia_attribute_modification';
     }
 }

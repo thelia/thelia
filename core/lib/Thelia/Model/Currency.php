@@ -14,8 +14,6 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Core\Event\Currency\CurrencyEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Currency as BaseCurrency;
 
 class Currency extends BaseCurrency
@@ -30,7 +28,7 @@ class Currency extends BaseCurrency
             self::$defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
 
             if (null === self::$defaultCurrency) {
-                throw new \RuntimeException("No default currency is defined. Please define one.");
+                throw new \RuntimeException('No default currency is defined. Please define one.');
             }
         }
 
@@ -53,7 +51,8 @@ class Currency extends BaseCurrency
     /**
      * Get the [rate] column value.
      *
-     * @return double
+     * @return float
+     *
      * @throws PropelException
      */
     public function getRate()

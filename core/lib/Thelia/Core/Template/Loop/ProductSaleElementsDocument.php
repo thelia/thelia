@@ -22,20 +22,20 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\ProductSaleElementsProductDocumentQuery;
 
 /**
- * Class ProductSaleElementsDocument
- * @package Thelia\Core\Template\Loop
+ * Class ProductSaleElementsDocument.
+ *
  * @author Benjamin Perche <benjamin@thelia.net>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[] getProductSaleElementsId()
- * @method int[] getProductDocumentId()
+ *
+ * @method int[]    getId()
+ * @method int[]    getProductSaleElementsId()
+ * @method int[]    getProductDocumentId()
  * @method string[] getOrder()
  */
 class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopInterface
 {
     /**
-     *
      * @return LoopResult
      */
     public function parseResults(LoopResult $loopResult)
@@ -45,9 +45,9 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
             $row = new LoopResultRow($productSaleElementDocument);
 
             $row
-                ->set("ID", $productSaleElementDocument->getId())
-                ->set("PRODUCT_SALE_ELEMENTS_ID", $productSaleElementDocument->getProductSaleElementsId())
-                ->set("PRODUCT_DOCUMENT_ID", $productSaleElementDocument->getProductDocumentId())
+                ->set('ID', $productSaleElementDocument->getId())
+                ->set('PRODUCT_SALE_ELEMENTS_ID', $productSaleElementDocument->getProductSaleElementsId())
+                ->set('PRODUCT_DOCUMENT_ID', $productSaleElementDocument->getProductDocumentId())
             ;
 
             $this->addOutputFields($row, $productSaleElementDocument);
@@ -58,7 +58,7 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
     }
 
     /**
-     * Definition of loop arguments
+     * Definition of loop arguments.
      *
      * example :
      *
@@ -84,22 +84,22 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument("id"),
-            Argument::createIntListTypeArgument("product_sale_elements_id"),
-            Argument::createIntListTypeArgument("product_document_id"),
+            Argument::createIntListTypeArgument('id'),
+            Argument::createIntListTypeArgument('product_sale_elements_id'),
+            Argument::createIntListTypeArgument('product_document_id'),
             Argument::createEnumListTypeArgument(
-                "order",
+                'order',
                 [
-                    "position",
-                    "position-reverse"
+                    'position',
+                    'position-reverse',
                 ],
-                "position"
+                'position'
             )
         );
     }
 
     /**
-     * this method returns a Propel ModelCriteria
+     * this method returns a Propel ModelCriteria.
      *
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      */
@@ -121,14 +121,14 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
 
         foreach ($this->getOrder() as $order) {
             switch ($order) {
-                case "position":
+                case 'position':
                     $query
                         ->useProductDocumentQuery()
                             ->orderByPosition(Criteria::ASC)
                         ->endUse()
                     ;
                     break;
-                case "position-reverse":
+                case 'position-reverse':
                     $query
                         ->useProductDocumentQuery()
                             ->orderByPosition(Criteria::DESC)

@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Customer;
 
 /**
- * Class CustomerCreateOrUpdateEvent
- * @package Thelia\Core\Event
+ * Class CustomerCreateOrUpdateEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CustomerCreateOrUpdateEvent extends CustomerEvent
@@ -42,9 +42,9 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     protected $ref;
     protected $emailUpdateAllowed;
 
-    /** @var  bool */
+    /** @var bool */
     protected $notifyCustomerOfAccountCreation;
-    /** @var  bool */
+    /** @var bool */
     protected $notifyCustomerOfAccountModification = true;
 
     /**
@@ -62,12 +62,12 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
      * @param string $email
      * @param string $password  plain password, don't put hash password, it will hashes again
      * @param $langId
-     * @param int    $reseller  if customer is a reseller
-     * @param int    $sponsor   customer's id sponsor
+     * @param int    $reseller if customer is a reseller
+     * @param int    $sponsor  customer's id sponsor
      * @param float  $discount
      * @param string $company
      * @param string $ref
-     * @param int $state thre State ID
+     * @param int    $state    thre State ID
      */
     public function __construct(
         $title,
@@ -115,8 +115,6 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         $this->ref = $ref;
     }
 
-    /**
-     */
     public function getCompany()
     {
         return $this->company;
@@ -178,8 +176,6 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         return $this->firstname;
     }
 
-    /**
-     */
     public function getLangId()
     {
         return $this->langId;
@@ -202,7 +198,8 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     }
 
     /**
-     * @param  string $password
+     * @param string $password
+     *
      * @return $this
      */
     public function setPassword($password)
@@ -294,15 +291,14 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         return $this;
     }
 
-    /**
-     */
     public function getEmailUpdateAllowed()
     {
         return $this->emailUpdateAllowed;
     }
 
     /**
-     * @param  bool  $notifyCustomerOfAccountCreation
+     * @param bool $notifyCustomerOfAccountCreation
+     *
      * @return $this
      */
     public function setNotifyCustomerOfAccountCreation($notifyCustomerOfAccountCreation)
@@ -330,11 +326,13 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
 
     /**
      * @param bool $notifyCustomerOfAccountModification
+     *
      * @return $this
      */
     public function setNotifyCustomerOfAccountModification($notifyCustomerOfAccountModification)
     {
         $this->notifyCustomerOfAccountModification = $notifyCustomerOfAccountModification;
+
         return $this;
     }
 }

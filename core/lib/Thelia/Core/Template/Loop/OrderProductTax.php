@@ -23,15 +23,14 @@ use Thelia\Model\OrderProductTax as OrderProductTaxModel;
 use Thelia\Model\OrderProductTaxQuery;
 
 /**
- *
- * OrderProductTax loop
- *
+ * OrderProductTax loop.
  *
  * Class OrderProductTax
- * @package Thelia\Core\Template\Loop
+ *
  * @author Zzuutt
  *
  * {@inheritdoc}
+ *
  * @method int getOrderProduct()
  */
 class OrderProductTax extends BaseLoop implements PropelSearchLoopInterface
@@ -64,11 +63,11 @@ class OrderProductTax extends BaseLoop implements PropelSearchLoopInterface
         /** @var OrderProductTaxModel $orderProductTax */
         foreach ($loopResult->getResultDataCollection() as $orderProductTax) {
             $loopResultRow = new LoopResultRow($orderProductTax);
-            $loopResultRow->set("ID", $orderProductTax->getId())
-                ->set("TITLE", $orderProductTax->getTitle())
-                ->set("DESCRIPTION", $orderProductTax->getDescription())
-                ->set("AMOUNT", $orderProductTax->getAmount())
-                ->set("PROMO_AMOUNT", $orderProductTax->getPromoAmount())
+            $loopResultRow->set('ID', $orderProductTax->getId())
+                ->set('TITLE', $orderProductTax->getTitle())
+                ->set('DESCRIPTION', $orderProductTax->getDescription())
+                ->set('AMOUNT', $orderProductTax->getAmount())
+                ->set('PROMO_AMOUNT', $orderProductTax->getPromoAmount())
             ;
             $this->addOutputFields($loopResultRow, $orderProductTax);
 

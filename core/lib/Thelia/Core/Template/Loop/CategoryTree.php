@@ -25,23 +25,22 @@ use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 
 /**
- *
  * Category tree loop, to get a category tree from a given category to a given depth.
  *
  * - category is the category id
  * - depth is the maximum depth to go, default unlimited
  * - visible if true or missing, only visible categories will be displayed. If false, all categories (visible or not) are returned.
  *
- * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  *
  * {@inheritdoc}
- * @method int getCategory()
- * @method int getDepth()
- * @method bool getNeedCountChild()
+ *
+ * @method int         getCategory()
+ * @method int         getDepth()
+ * @method bool        getNeedCountChild()
  * @method bool|string getVisible()
- * @method int[] getExclude()
- * @method string[] getOrder()
+ * @method int[]       getExclude()
+ * @method string[]    getOrder()
  */
 class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
 {
@@ -86,26 +85,26 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "position":
+                case 'position':
                     $search->orderByPosition(Criteria::ASC);
                     break;
-                case "position_reverse":
+                case 'position_reverse':
                     $search->orderByPosition(Criteria::DESC);
                     break;
-                case "id":
+                case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case "id_reverse":
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha_reverse":
+                case 'alpha_reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
             }
@@ -117,12 +116,12 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
 
         foreach ($results as $result) {
             $row = [
-                "ID" => $result->getId(),
-                "TITLE" => $result->getVirtualColumn('i18n_TITLE'),
-                "PARENT" => $result->getParent(),
-                "URL" => $this->getReturnUrl() ? $result->getUrl($this->locale) : null,
-                "VISIBLE" => $result->getVisible() ? "1" : "0",
-                "LEVEL" => $level,
+                'ID' => $result->getId(),
+                'TITLE' => $result->getVirtualColumn('i18n_TITLE'),
+                'PARENT' => $result->getParent(),
+                'URL' => $this->getReturnUrl() ? $result->getUrl($this->locale) : null,
+                'VISIBLE' => $result->getVisible() ? '1' : '0',
+                'LEVEL' => $level,
                 'PREV_LEVEL' => $previousLevel,
             ];
 

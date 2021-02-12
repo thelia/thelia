@@ -13,9 +13,10 @@
 namespace Thelia\ImportExport;
 
 /**
- * Class AbstractHandler
- * @package Thelia\ImportExport
+ * Class AbstractHandler.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
+ *
  * @deprecated since 2.3
  */
 abstract class AbstractHandler

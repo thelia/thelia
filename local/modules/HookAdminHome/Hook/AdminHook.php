@@ -18,8 +18,8 @@ use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
 
 /**
- * Class AdminHook
- * @package HookAdminHome\Hook
+ * Class AdminHook.
+ *
  * @author Gilles Bourgeat <gilles@thelia.net>
  */
 class AdminHook extends BaseHook
@@ -43,12 +43,12 @@ class AdminHook extends BaseHook
     public function blockSalesStatistics(HookRenderBlockEvent $event)
     {
         if (1 == HookAdminHome::getConfigValue(HookAdminHome::ACTIVATE_SALES, 1)) {
-            $content = trim($this->render("block-sales-statistics.html"));
+            $content = trim($this->render('block-sales-statistics.html'));
             if (!empty($content)) {
                 $event->add([
-                    "id" => "block-sales-statistics",
-                    "title" => $this->trans("Sales statistics", [], HookAdminHome::DOMAIN_NAME),
-                    "content" => $content
+                    'id' => 'block-sales-statistics',
+                    'title' => $this->trans('Sales statistics', [], HookAdminHome::DOMAIN_NAME),
+                    'content' => $content,
                 ]);
             }
         }
@@ -57,12 +57,12 @@ class AdminHook extends BaseHook
     public function blockNews(HookRenderBlockEvent $event)
     {
         if (1 == HookAdminHome::getConfigValue(HookAdminHome::ACTIVATE_NEWS, 1)) {
-            $content = trim($this->render("block-news.html"));
+            $content = trim($this->render('block-news.html'));
             if (!empty($content)) {
                 $event->add([
-                    "id" => "block-news",
-                    "title" => $this->trans("Thelia Github activity", [], HookAdminHome::DOMAIN_NAME),
-                    "content" => $content
+                    'id' => 'block-news',
+                    'title' => $this->trans('Thelia Github activity', [], HookAdminHome::DOMAIN_NAME),
+                    'content' => $content,
                 ]);
             }
         }
@@ -71,12 +71,12 @@ class AdminHook extends BaseHook
     public function blockTheliaInformation(HookRenderBlockEvent $event)
     {
         if (1 == HookAdminHome::getConfigValue(HookAdminHome::ACTIVATE_INFO, 1)) {
-            $content = trim($this->render("block-thelia-information.html"));
+            $content = trim($this->render('block-thelia-information.html'));
             if (!empty($content)) {
                 $event->add([
-                    "id" => "block-thelia-information",
-                    "title" => $this->trans("Thelia news", [], HookAdminHome::DOMAIN_NAME),
-                    "content" => $content
+                    'id' => 'block-thelia-information',
+                    'title' => $this->trans('Thelia news', [], HookAdminHome::DOMAIN_NAME),
+                    'content' => $content,
                 ]);
             }
         }

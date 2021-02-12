@@ -16,8 +16,8 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\CustomerTitle;
 
 /**
- * Class CustomerTitleEvent
- * @package Thelia\Core\Event\CustomerTitle
+ * Class CustomerTitleEvent.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class CustomerTitleEvent extends ActionEvent
@@ -43,7 +43,7 @@ class CustomerTitleEvent extends ActionEvent
     protected $locale;
 
     /**
-     * @var null|\Thelia\Model\CustomerTitle
+     * @var \Thelia\Model\CustomerTitle|null
      */
     protected $customerTitle;
 
@@ -66,7 +66,7 @@ class CustomerTitleEvent extends ActionEvent
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isDefault()
     {
@@ -74,7 +74,8 @@ class CustomerTitleEvent extends ActionEvent
     }
 
     /**
-     * @param boolean $default
+     * @param bool $default
+     *
      * @return $this
      */
     public function setDefault($default)
@@ -94,6 +95,7 @@ class CustomerTitleEvent extends ActionEvent
 
     /**
      * @param string $locale
+     *
      * @return $this
      */
     public function setLocale($locale)
@@ -113,6 +115,7 @@ class CustomerTitleEvent extends ActionEvent
 
     /**
      * @param string $long
+     *
      * @return $this
      */
     public function setLong($long)
@@ -132,6 +135,7 @@ class CustomerTitleEvent extends ActionEvent
 
     /**
      * @param string $short
+     *
      * @return $this
      */
     public function setShort($short)

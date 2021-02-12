@@ -17,11 +17,11 @@ use Thelia\Model\CartItem;
 
 /**
  * A trait to manage a coupon which removes a percentage of cart items from the order total.
- * Should be used on coupons classes which implements AmountAndPercentageCouponInterface
+ * Should be used on coupons classes which implements AmountAndPercentageCouponInterface.
  *
  * Class PercentageCouponTrait
+ *
  * @author Franck Allimant <franck@cqfdev.fr>
- * @package Thelia\Coupon\Type
  */
 trait PercentageCouponTrait
 {
@@ -35,7 +35,7 @@ trait PercentageCouponTrait
     abstract protected function getPercentageFieldName();
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setFieldsValue($effects)
     {
@@ -43,7 +43,7 @@ trait PercentageCouponTrait
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCartItemDiscount(CartItem $cartItem)
     {
@@ -51,26 +51,26 @@ trait PercentageCouponTrait
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function callDrawBackOfficeInputs($templateName)
     {
         return $this->drawBaseBackOfficeInputs($templateName, [
-                'percentage_field_name'  => $this->makeCouponFieldName($this->getPercentageFieldName()),
-                'percentage_value'       => $this->percentage,
+                'percentage_field_name' => $this->makeCouponFieldName($this->getPercentageFieldName()),
+                'percentage_value' => $this->percentage,
             ]);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getFieldList()
     {
-        return  $this->getBaseFieldList([$this->getPercentageFieldName()]);
+        return $this->getBaseFieldList([$this->getPercentageFieldName()]);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function checkCouponFieldValue($fieldName, $fieldValue)
     {
@@ -83,7 +83,7 @@ trait PercentageCouponTrait
                 throw new \InvalidArgumentException(
                     Translator::getInstance()->trans(
                         'Value %val for Percent Discount is invalid. Please enter a positive value between 1 and 100.',
-                        [ '%val' => $fieldValue]
+                        ['%val' => $fieldValue]
                     )
                 );
             }

@@ -15,7 +15,8 @@ namespace Thelia\Core\Archiver;
 use Thelia\Core\Translation\Translator;
 
 /**
- * Class ArchiverManager
+ * Class ArchiverManager.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class ArchiverManager
@@ -26,7 +27,7 @@ class ArchiverManager
     protected $archivers = [];
 
     /**
-     * Reset manager
+     * Reset manager.
      *
      * @return $this Return $this, allow chaining
      */
@@ -38,9 +39,9 @@ class ArchiverManager
     }
 
     /**
-     * Get all archivers or only those match availability
+     * Get all archivers or only those match availability.
      *
-     * @param null|boolean $isAvailable Filter archivers by availability
+     * @param bool|null $isAvailable Filter archivers by availability
      *
      * @return array All, or filtered by availability, archivers
      */
@@ -63,14 +64,14 @@ class ArchiverManager
     }
 
     /**
-     * Determine if an archiver exists under the given identifier
+     * Determine if an archiver exists under the given identifier.
      *
-     * @param string  $archiverId     An archiver identifier
-     * @param boolean $throwException Throw exception if archiver doesn't exists or not
+     * @param string $archiverId     An archiver identifier
+     * @param bool   $throwException Throw exception if archiver doesn't exists or not
      *
      * @throws \InvalidArgumentException if the archiver identifier does not exist
      *
-     * @return boolean True if the archiver exists, false otherwise
+     * @return bool True if the archiver exists, false otherwise
      */
     public function has($archiverId, $throwException = false)
     {
@@ -81,7 +82,7 @@ class ArchiverManager
                 Translator::getInstance()->trans(
                     'The archiver identifier "%archiverId" doesn\’t exist',
                     [
-                        '%archiverId' => $archiverId
+                        '%archiverId' => $archiverId,
                     ]
                 )
             );
@@ -91,12 +92,12 @@ class ArchiverManager
     }
 
     /**
-     * Get an archiver
+     * Get an archiver.
      *
-     * @param string       $archiverId  An archiver identifier
-     * @param null|boolean $isAvailable Filter archiver by availability
+     * @param string    $archiverId  An archiver identifier
+     * @param bool|null $isAvailable Filter archiver by availability
      *
-     * @return null|\Thelia\Core\Archiver\ArchiverInterface Return an archiver or null depends on availability
+     * @return \Thelia\Core\Archiver\ArchiverInterface|null Return an archiver or null depends on availability
      */
     public function get($archiverId, $isAvailable = null)
     {
@@ -114,7 +115,7 @@ class ArchiverManager
     }
 
     /**
-     * Set archivers
+     * Set archivers.
      *
      * @param array $archivers An array of archiver
      *
@@ -128,7 +129,7 @@ class ArchiverManager
 
         foreach ($archivers as $archiver) {
             if (!($archiver instanceof ArchiverInterface)) {
-                throw new \Exception('ArchiverManager manage only ' . __NAMESPACE__ . '\\ArchiverInterface');
+                throw new \Exception('ArchiverManager manage only '.__NAMESPACE__.'\\ArchiverInterface');
             }
 
             $this->archivers[$archiver->getId()] = $archiver;
@@ -138,7 +139,7 @@ class ArchiverManager
     }
 
     /**
-     * Add an archiver
+     * Add an archiver.
      *
      * @param \Thelia\Core\Archiver\ArchiverInterface $archiver An archiver
      *
@@ -152,7 +153,7 @@ class ArchiverManager
     }
 
     /**
-     * Remove an archiver
+     * Remove an archiver.
      *
      * @param string $archiverId An archiver identifier
      */

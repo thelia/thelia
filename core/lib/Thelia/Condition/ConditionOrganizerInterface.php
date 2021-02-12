@@ -13,16 +13,14 @@
 namespace Thelia\Condition;
 
 /**
- * Manage how Condition could interact with each other
+ * Manage how Condition could interact with each other.
  *
- * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
  */
 interface ConditionOrganizerInterface
 {
     /**
-     * Organize ConditionInterface
+     * Organize ConditionInterface.
      *
      * @param array $conditions Array of ConditionInterface
      *

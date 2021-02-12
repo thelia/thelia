@@ -17,8 +17,8 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\OrderProduct;
 
 /**
- * Class VirtualProductOrderDownloadResponseEvent
- * @package Thelia\Core\Event\Product
+ * Class VirtualProductOrderDownloadResponseEvent.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class VirtualProductOrderDownloadResponseEvent extends ActionEvent
@@ -26,11 +26,9 @@ class VirtualProductOrderDownloadResponseEvent extends ActionEvent
     /** @var OrderProduct */
     protected $orderProduct;
 
-    /**@var Response */
+    /** @var Response */
     protected $response;
 
-    /**
-     */
     public function __construct(OrderProduct $orderProduct)
     {
         $this->orderProduct = $orderProduct;

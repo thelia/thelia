@@ -17,8 +17,8 @@ use Thelia\Model\Address;
 use Thelia\Model\Customer;
 
 /**
- * Class AddressCreateOrUpdateEvent
- * @package Thelia\Core\Event
+ * Class AddressCreateOrUpdateEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AddressCreateOrUpdateEvent extends ActionEvent
@@ -183,7 +183,7 @@ class AddressCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getCompany()
     {
@@ -262,8 +262,6 @@ class AddressCreateOrUpdateEvent extends ActionEvent
         return $this->isDefault;
     }
 
-    /**
-     */
     public function setCustomer(Customer $customer)
     {
         $this->customer = $customer;
@@ -277,8 +275,6 @@ class AddressCreateOrUpdateEvent extends ActionEvent
         return $this->customer;
     }
 
-    /**
-     */
     public function setAddress(Address $address)
     {
         $this->address = $address;

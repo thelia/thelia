@@ -24,8 +24,8 @@ class TemplateModificationForm extends TemplateCreationForm
         parent::buildForm();
 
         $this->formBuilder
-            ->add("id", HiddenType::class, [
-                    "constraints" => [
+            ->add('id', HiddenType::class, [
+                    'constraints' => [
                         new GreaterThan(
                             ['value' => 0]
                         ),
@@ -36,6 +36,6 @@ class TemplateModificationForm extends TemplateCreationForm
 
     public static function getName()
     {
-        return "thelia_template_modification";
+        return 'thelia_template_modification';
     }
 }

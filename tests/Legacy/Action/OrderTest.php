@@ -45,8 +45,8 @@ use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Module\BaseModule;
 
 /**
- * Class CustomerTest
- * @package Thelia\Tests\Action
+ * Class CustomerTest.
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class OrderTest extends BaseAction
@@ -103,7 +103,7 @@ class OrderTest extends BaseAction
 
         $this->container = new ContainerBuilder();
 
-        $this->container->set("event_dispatcher", $this->getMockEventDispatcher());
+        $this->container->set('event_dispatcher', $this->getMockEventDispatcher());
         $this->container->set('request', $request);
 
         $this->requestStack = new RequestStack();
@@ -156,14 +156,14 @@ class OrderTest extends BaseAction
 
         //create a fake cart in database;
         $cart = new Cart();
-        $cart->setToken(uniqid("createorder", true))
+        $cart->setToken(uniqid('createorder', true))
             ->setCustomer($this->customer)
             ->setCurrency($currency)
             ->save();
 
         /* add 3 items */
         $productList = [];
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < 3; ++$i) {
             $pse = ProductSaleElementsQuery::create()
                 ->filterByProduct(
                     ProductQuery::create()
@@ -194,7 +194,7 @@ class OrderTest extends BaseAction
             $this->cartItems[] = $cartItem;
         }
 
-        $this->requestStack->getCurrentRequest()->getSession()->set("thelia.cart_id", $cart->getId());
+        $this->requestStack->getCurrentRequest()->getSession()->set('thelia.cart_id', $cart->getId());
 
         return $cart;
     }
@@ -399,6 +399,7 @@ class OrderTest extends BaseAction
 
     /**
      * @depends testCreate
+     *
      * @return OrderModel
      */
     public function testCreateManual(OrderModel $order)
@@ -582,7 +583,6 @@ class OrderTest extends BaseAction
 
     /**
      * @depends testCreate
-     *
      */
     public function testModelUpdateStatusPaidWithHelpers(OrderModel $order)
     {
@@ -600,7 +600,6 @@ class OrderTest extends BaseAction
 
     /**
      * @depends testCreate
-     *
      */
     public function testModelUpdateStatusNotPaidWithHelpers(OrderModel $order)
     {
@@ -618,7 +617,6 @@ class OrderTest extends BaseAction
 
     /**
      * @depends testCreate
-     *
      */
     public function testModelUpdateStatusProcessedWithHelpers(OrderModel $order)
     {
@@ -636,7 +634,6 @@ class OrderTest extends BaseAction
 
     /**
      * @depends testCreate
-     *
      */
     public function testModelUpdateStatusSentWithHelpers(OrderModel $order)
     {
@@ -654,7 +651,6 @@ class OrderTest extends BaseAction
 
     /**
      * @depends testCreate
-     *
      */
     public function testModelUpdateStatusCanceledWithHelpers(OrderModel $order)
     {
@@ -672,7 +668,6 @@ class OrderTest extends BaseAction
 
     /**
      * @depends testCreate
-     *
      */
     public function testUpdateTransactionRef(OrderModel $order)
     {
@@ -694,7 +689,6 @@ class OrderTest extends BaseAction
 
     /**
      * @depends testCreate
-     *
      */
     public function testUpdateDeliveryRef(OrderModel $order)
     {
@@ -716,7 +710,6 @@ class OrderTest extends BaseAction
 
     /**
      * @depends testCreate
-     *
      */
     public function testUpdateAddress(OrderModel $order)
     {

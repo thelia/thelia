@@ -25,48 +25,48 @@ class MessageCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("name", TextType::class, [
-                "constraints" => [
+            ->add('name', TextType::class, [
+                'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Callback([$this, "checkDuplicateName"])
+                    new Constraints\Callback([$this, 'checkDuplicateName']),
                 ],
-                "label" => Translator::getInstance()->trans('Name'),
-                "label_attr" => [
-                    "for" => "name",
-                    'help' => Translator::getInstance()->trans("This is an identifier that will be used in the code to get this message"),
+                'label' => Translator::getInstance()->trans('Name'),
+                'label_attr' => [
+                    'for' => 'name',
+                    'help' => Translator::getInstance()->trans('This is an identifier that will be used in the code to get this message'),
                 ],
                 'attr' => [
-                    'placeholder' => Translator::getInstance()->trans("Mail template name"),
+                    'placeholder' => Translator::getInstance()->trans('Mail template name'),
                 ],
             ])
-            ->add("title", TextType::class, [
-                "constraints" => [
+            ->add('title', TextType::class, [
+                'constraints' => [
                     new Constraints\NotBlank(),
                 ],
-                "label" => Translator::getInstance()->trans('Purpose'),
-                "label_attr" => [
-                    "for" => "purpose",
+                'label' => Translator::getInstance()->trans('Purpose'),
+                'label_attr' => [
+                    'for' => 'purpose',
                     'help' => Translator::getInstance()->trans(
-                        "Enter here the mail template purpose in the default language (%title%)",
-                        [ '%title%' => Lang::getDefaultLanguage()->getTitle() ]
+                        'Enter here the mail template purpose in the default language (%title%)',
+                        ['%title%' => Lang::getDefaultLanguage()->getTitle()]
                     ),
                 ],
                 'attr' => [
-                    'placeholder' => Translator::getInstance()->trans("Mail template purpose"),
+                    'placeholder' => Translator::getInstance()->trans('Mail template purpose'),
                 ],
             ])
-            ->add("locale", HiddenType::class, [
-                "constraints" => [
+            ->add('locale', HiddenType::class, [
+                'constraints' => [
                     new Constraints\NotBlank(),
                 ],
             ])
-            ->add("secured", HiddenType::class, [])
+            ->add('secured', HiddenType::class, [])
         ;
     }
 
     public static function getName()
     {
-        return "thelia_message_creation";
+        return 'thelia_message_creation';
     }
 
     public function checkDuplicateName($value, ExecutionContextInterface $context)

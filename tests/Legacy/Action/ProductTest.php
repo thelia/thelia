@@ -67,8 +67,8 @@ use Thelia\Model\TemplateQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
- * Class ProductTest
- * @package Thelia\Tests\Action
+ * Class ProductTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ProductTest extends TestCaseWithURLToolSetup
@@ -149,7 +149,7 @@ class ProductTest extends TestCaseWithURLToolSetup
             $templateId = TemplateQuery::create()->addAscendingOrderByColumn('RAND()')->findOne()->getId();
         }
 
-        $newRef = 'testCreateWithOptionalParameters' . uniqid('_');
+        $newRef = 'testCreateWithOptionalParameters'.uniqid('_');
         $event
             ->setRef($newRef)
             ->setLocale('fr_FR')
@@ -203,6 +203,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testCreate
+     *
      * @return ProductModel
      */
     public function testUpdate(ProductModel $product)
@@ -210,7 +211,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $event = new ProductUpdateEvent($product->getId());
         $defaultCategory = CategoryQuery::create()->select('id')->addAscendingOrderByColumn('RAND()')->findOne();
         $brandId = BrandQuery::create()->findOne()->getId();
-        $newRef = $product->getRef() . '-new' . uniqid('_');
+        $newRef = $product->getRef().'-new'.uniqid('_');
         $event
             ->setLocale('fr_FR')
             ->setTitle('test MAJ titre en français')
@@ -244,13 +245,14 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         /** @var ProductSaleElements $defaultPSE */
         $defaultPSE = $product->getDefaultSaleElements();
-        $this->assertEquals($newRef, $defaultPSE->getRef(), "Default PSE Ref was not change when product ref is changed.");
+        $this->assertEquals($newRef, $defaultPSE->getRef(), 'Default PSE Ref was not change when product ref is changed.');
 
         return $updatedProduct;
     }
 
     /**
      * @depends testUpdate
+     *
      * @return ProductModel
      */
     public function testToggleVisibility(ProductModel $product)
@@ -260,7 +262,6 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $event
             ->setProduct($product);
-        ;
 
         $action = new Product($this->getMockEventDispatcher());
         $action->toggleVisibility($event);
@@ -274,6 +275,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testToggleVisibility
+     *
      * @return ProductModel
      */
     public function testAddContent(ProductModel $product)
@@ -299,6 +301,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testAddContent
+     *
      * @return ProductModel
      */
     public function testRemoveContent(ProductModel $product)
@@ -324,6 +327,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testRemoveContent
+     *
      * @return array
      */
     public function testAddCategory(ProductModel $product)
@@ -353,13 +357,14 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         return [
             'product' => $product,
-            'category' => $category
+            'category' => $category,
         ];
     }
 
     /**
      * @param ProductCategory[] $productCategory
      * @depends testAddCategory
+     *
      * @return Product
      */
     public function testRemoveCategory(array $productCategory)
@@ -388,6 +393,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testRemoveCategory
+     *
      * @return ProductModel
      */
     public function testAddAccessory(ProductModel $product)
@@ -415,6 +421,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testAddAccessory
+     *
      * @return ProductModel
      */
     public function testRemoveAccessory(ProductModel $product)
@@ -435,6 +442,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testRemoveAccessory
+     *
      * @return ProductModel
      */
     public function testSetProductTemplate(ProductModel $product)
@@ -447,7 +455,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $currencyId = CurrencyQuery::create()->select('id')->addAscendingOrderByColumn('RAND()')->findOne();
 
         $oldProductSaleElements = $product->getDefaultSaleElements();
-        $this->assertEquals("Thelia\Model\ProductSaleElements", \get_class($oldProductSaleElements), "There is no default pse for this product");
+        $this->assertEquals("Thelia\Model\ProductSaleElements", \get_class($oldProductSaleElements), 'There is no default pse for this product');
 
         $event = new ProductSetTemplateEvent($product, $templateId, $currencyId);
 
@@ -460,23 +468,23 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $productSaleElements = $updatedProduct->getProductSaleElementss();
 
-        $this->assertEquals(1, \count($productSaleElements), "after setting a new template, only 1 product_sale_elements must be present");
+        $this->assertEquals(1, \count($productSaleElements), 'after setting a new template, only 1 product_sale_elements must be present');
 
         /** @var \Thelia\Model\ProductSaleElements $newProductSaleElements */
         $newProductSaleElements = $productSaleElements->getFirst();
 
-        $this->assertEquals($updatedProduct->getRef(), $newProductSaleElements->getRef(), sprintf("PSE ref must be %s", $updatedProduct->getRef()));
+        $this->assertEquals($updatedProduct->getRef(), $newProductSaleElements->getRef(), sprintf('PSE ref must be %s', $updatedProduct->getRef()));
         $this->assertTrue($newProductSaleElements->getIsDefault(), 'new PSE must be the default one for this product');
 
         $productPrice = $newProductSaleElements->getProductPrices()->getFirst();
 
         $oldProductPrice = $oldProductSaleElements->getProductPrices()->getFirst();
 
-        $this->assertEquals($oldProductSaleElements->getWeight(), $newProductSaleElements->getWeight(), sprintf("->testSetProductTemplate new PSE weight must be %s", $oldProductSaleElements->getWeight()));
+        $this->assertEquals($oldProductSaleElements->getWeight(), $newProductSaleElements->getWeight(), sprintf('->testSetProductTemplate new PSE weight must be %s', $oldProductSaleElements->getWeight()));
 
-        $this->assertEquals($oldProductPrice->getPrice(), $productPrice->getPrice(), sprintf("->testSetProductTemplate price must be %s", $oldProductPrice->getPrice()));
-        $this->assertEquals($oldProductPrice->getPromoPrice(), $productPrice->getPromoPrice(), sprintf("->testSetProductTemplate promo price must be %s", $oldProductPrice->getPromoPrice()));
-        $this->assertEquals($oldProductPrice->getCurrencyId(), $productPrice->getCurrencyId(), sprintf("->testSetProductTemplate currency_id must be %s", $oldProductPrice->getCurrencyId()));
+        $this->assertEquals($oldProductPrice->getPrice(), $productPrice->getPrice(), sprintf('->testSetProductTemplate price must be %s', $oldProductPrice->getPrice()));
+        $this->assertEquals($oldProductPrice->getPromoPrice(), $productPrice->getPromoPrice(), sprintf('->testSetProductTemplate promo price must be %s', $oldProductPrice->getPromoPrice()));
+        $this->assertEquals($oldProductPrice->getCurrencyId(), $productPrice->getCurrencyId(), sprintf('->testSetProductTemplate currency_id must be %s', $oldProductPrice->getCurrencyId()));
 
         return $updatedProduct;
     }
@@ -558,6 +566,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testCreateClone
+     *
      * @return ProductCloneEvent
      */
     public function testUpdateClone(ProductCloneEvent $event)
@@ -645,6 +654,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testUpdateClone
+     *
      * @return ProductCloneEvent
      */
     public function testCloneFeatureCombination(ProductCloneEvent $event)
@@ -706,6 +716,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testCloneFeatureCombination
+     *
      * @return ProductCloneEvent
      */
     public function testCloneAssociatedContent(ProductCloneEvent $event)
@@ -752,6 +763,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testCloneAssociatedContent
+     *
      * @return ProductCloneEvent
      */
     public function testCloneAccessories(ProductCloneEvent $event)
@@ -799,6 +811,7 @@ class ProductTest extends TestCaseWithURLToolSetup
     /**
      * @covers \Thelia\Action\File::cloneFile
      * @depends testCloneAccessories
+     *
      * @return ProductCloneEvent
      */
     public function testCloneFile(ProductCloneEvent $event)
@@ -844,7 +857,7 @@ class ProductTest extends TestCaseWithURLToolSetup
             // Check each file
             /** @var ProductDocument $originalProductFile */
             foreach ($originalProductFiles as $originalProductFile) {
-                $srcPath = $originalProductFile->getUploadDir() . DS . $originalProductFile->getFile();
+                $srcPath = $originalProductFile->getUploadDir().DS.$originalProductFile->getFile();
 
                 // Check if original file exists
                 $this->assertFileExists($srcPath, 'Original file doesn\'t exist');
@@ -908,12 +921,14 @@ class ProductTest extends TestCaseWithURLToolSetup
                 }
             }
         }
+
         return $event;
     }
 
     /**
-     * @covers Thelia\Action\ProductSaleElement::createClonePSE
+     * @covers \Thelia\Action\ProductSaleElement::createClonePSE
      * @depends testCloneFile
+     *
      * @return ProductCloneEvent
      */
     public function testCreateClonePSE(ProductCloneEvent $event)
@@ -968,12 +983,14 @@ class ProductTest extends TestCaseWithURLToolSetup
             $this->assertEquals($originalAttributeCombination->getAttributeAvId(), $cloneAttributeCombination->getAttributeAvId(), 'AttributeAvID must be equal');
             $this->assertEquals($clonedProductPSEId, $cloneAttributeCombination->getProductSaleElementsId(), 'PSE ID must be equal');
         }
+
         return ['event' => $event, 'originalPSE' => $originalProductPSE, 'clonePSE' => $cloneProductPSE];
     }
 
     /**
      * @covers \Thelia\Action\ProductSaleElement::updateClonePSE
      * @depends testCreateClonePSE
+     *
      * @return array
      */
     public function testUpdateClonePSE(array $params)
@@ -1035,7 +1052,7 @@ class ProductTest extends TestCaseWithURLToolSetup
             'event' => $event,
             'cloneProductId' => $event->getClonedProduct()->getId(),
             'clonePSEId' => $clonePSE->getId(),
-            'originalPSE' => $originalPSE
+            'originalPSE' => $originalPSE,
         ];
     }
 
@@ -1086,7 +1103,7 @@ class ProductTest extends TestCaseWithURLToolSetup
                         $this->assertEquals($clonePSEId, $clonePSEImage->getProductSaleElementsId(), 'PSE ID must be equal');
                     }
                     break;
-                case 'documents';
+                case 'documents':
                     $originalPSEFiles = ProductSaleElementsProductDocumentQuery::create()
                         ->findByProductSaleElementsId($originalPSE->getId());
 

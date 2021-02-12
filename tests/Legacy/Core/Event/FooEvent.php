@@ -15,8 +15,8 @@ namespace Thelia\Tests\Core\Event;
 use Thelia\Core\Event\ActionEvent;
 
 /**
- * Class FooEvent
- * @package Thelia\Tests\Core\Event
+ * Class FooEvent.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class FooEvent extends ActionEvent
@@ -24,8 +24,6 @@ class FooEvent extends ActionEvent
     protected $foo;
     protected $bar;
 
-    /**
-     */
     public function getBar()
     {
         return $this->bar;
@@ -41,8 +39,6 @@ class FooEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     */
     public function getFoo()
     {
         return $this->foo;

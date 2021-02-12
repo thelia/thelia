@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\OrderProductQuery;
 
 /**
- * Class OrderProductIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class OrderProductIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class OrderProductIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class OrderProductIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "order_product_id";
+        return 'order_product_id';
     }
 }

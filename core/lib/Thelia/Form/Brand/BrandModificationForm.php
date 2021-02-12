@@ -19,8 +19,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Form\StandardDescriptionFieldsTrait;
 
 /**
- * Class BrandModificationForm
- * @package Thelia\Form\Brand
+ * Class BrandModificationForm.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class BrandModificationForm extends BrandCreationForm
@@ -37,18 +37,18 @@ class BrandModificationForm extends BrandCreationForm
             'id',
             HiddenType::class,
             [
-                'constraints' => [ new GreaterThan(['value' => 0]) ],
-                'required'    => true,
+                'constraints' => [new GreaterThan(['value' => 0])],
+                'required' => true,
             ]
         )
-        ->add("logo_image_id", IntegerType::class, [
-                'constraints' => [ ],
-                'required'    => false,
-                'label'       => Translator::getInstance()->trans('Select the brand logo'),
-                'label_attr'  => [
+        ->add('logo_image_id', IntegerType::class, [
+                'constraints' => [],
+                'required' => false,
+                'label' => Translator::getInstance()->trans('Select the brand logo'),
+                'label_attr' => [
                     'for' => 'logo_image_id',
-                    'help' => Translator::getInstance()->trans("Select the brand logo amongst the brand images"),
-                ]
+                    'help' => Translator::getInstance()->trans('Select the brand logo amongst the brand images'),
+                ],
             ])
         ;
 
@@ -58,6 +58,6 @@ class BrandModificationForm extends BrandCreationForm
 
     public static function getName()
     {
-        return "thelia_brand_modification";
+        return 'thelia_brand_modification';
     }
 }

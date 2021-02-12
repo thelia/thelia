@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Lang;
 
 /**
- * Class LangToggleVisibleEvent
- * @package Thelia\Core\Event\Lang
+ * Class LangToggleVisibleEvent.
+ *
  * @author Gilles Bourgeat <gbourgeat@openstudio.fr>
  */
 class LangToggleVisibleEvent extends LangToggleDefaultEvent

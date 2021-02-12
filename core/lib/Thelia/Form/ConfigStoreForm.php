@@ -31,49 +31,49 @@ class ConfigStoreForm extends BaseForm
                 'store_name',
                 TextType::class,
                 [
-                    'data'        => ConfigQuery::getStoreName(),
+                    'data' => ConfigQuery::getStoreName(),
                     'constraints' => [new Constraints\NotBlank()],
-                    'label'       => $tr->trans('Store name'),
-                    'attr'        => [
+                    'label' => $tr->trans('Store name'),
+                    'attr' => [
                         'placeholder' => $tr->trans('Used in your store front'),
-                    ]
+                    ],
                 ]
             )
             ->add(
                 'store_description',
                 TextType::class,
                 [
-                    'data'     => ConfigQuery::getStoreDescription(),
+                    'data' => ConfigQuery::getStoreDescription(),
                     'required' => false,
-                    'label'    => $tr->trans('Store description'),
-                    'attr'     => [
+                    'label' => $tr->trans('Store description'),
+                    'attr' => [
                         'placeholder' => $tr->trans('Used in your store front'),
-                    ]
+                    ],
                 ]
             )
             ->add(
                 'store_email',
                 TextType::class,
                 [
-                    'data'        => ConfigQuery::getStoreEmail(),
+                    'data' => ConfigQuery::getStoreEmail(),
                     'constraints' => [
                         new Constraints\NotBlank(),
                         new Constraints\Email(),
                     ],
-                    'label'       => $tr->trans('Store email address'),
-                    'attr'        => [
+                    'label' => $tr->trans('Store email address'),
+                    'attr' => [
                         'placeholder' => $tr->trans('Contact and sender email address'),
                     ],
-                    'label_attr'  => [
+                    'label_attr' => [
                         'help' => $tr->trans('This is the contact email address, and the sender email of all e-mails sent by your store.'),
-                    ]
+                    ],
                 ]
             )
             ->add(
                 'store_notification_emails',
                 TextType::class,
                 [
-                    'data'        => ConfigQuery::read('store_notification_emails'),
+                    'data' => ConfigQuery::read('store_notification_emails'),
                     'constraints' => [
                         new Constraints\NotBlank(),
                         new Constraints\Callback([
@@ -82,127 +82,127 @@ class ConfigStoreForm extends BaseForm
                             ],
                         ]),
                     ],
-                    'label'       => $tr->trans('Email addresses of notification recipients'),
-                    'attr'        => [
+                    'label' => $tr->trans('Email addresses of notification recipients'),
+                    'attr' => [
                         'placeholder' => $tr->trans('A comma separated list of email addresses'),
                     ],
-                    'label_attr'  => [
+                    'label_attr' => [
                         'help' => $tr->trans('This is a comma separated list of email addresses where store notifications (such as order placed) are sent.'),
-                    ]
+                    ],
                 ]
             )
             ->add(
                 'store_business_id',
                 TextType::class,
                 [
-                    'data'     => ConfigQuery::read('store_business_id'),
-                    'label'    => $tr->trans('Business ID'),
+                    'data' => ConfigQuery::read('store_business_id'),
+                    'label' => $tr->trans('Business ID'),
                     'required' => false,
-                    'attr'     => [
+                    'attr' => [
                         'placeholder' => $tr->trans('Store Business Identification Number (SIRET, etc).'),
-                    ]
+                    ],
                 ]
             )
             ->add(
                 'store_phone',
                 TextType::class,
                 [
-                    'data'     => ConfigQuery::read('store_phone'),
-                    'label'    => $tr->trans('Phone'),
+                    'data' => ConfigQuery::read('store_phone'),
+                    'label' => $tr->trans('Phone'),
                     'required' => false,
-                    'attr'     => [
+                    'attr' => [
                         'placeholder' => $tr->trans('The store phone number.'),
-                    ]
+                    ],
                 ]
             )
             ->add(
                 'store_fax',
                 TextType::class,
                 [
-                    'data'     => ConfigQuery::read('store_fax'),
-                    'label'    => $tr->trans('Fax'),
+                    'data' => ConfigQuery::read('store_fax'),
+                    'label' => $tr->trans('Fax'),
                     'required' => false,
-                    'attr'     => [
+                    'attr' => [
                         'placeholder' => $tr->trans('The store fax number.'),
-                    ]
+                    ],
                 ]
             )
             ->add(
                 'store_address1',
                 TextType::class,
                 [
-                    'data'        => ConfigQuery::read('store_address1'),
+                    'data' => ConfigQuery::read('store_address1'),
                     'constraints' => [
                         new Constraints\NotBlank(),
                     ],
-                    'label'       => $tr->trans('Street Address'),
-                    'attr'        => [
+                    'label' => $tr->trans('Street Address'),
+                    'attr' => [
                         'placeholder' => $tr->trans('Address.'),
-                    ]
+                    ],
                 ]
             )
             ->add(
                 'store_address2',
                 TextType::class,
                 [
-                    'data'     => ConfigQuery::read('store_address2'),
+                    'data' => ConfigQuery::read('store_address2'),
                     'required' => false,
-                    'attr'     => [
+                    'attr' => [
                         'placeholder' => $tr->trans('Additional address information'),
-                    ]
+                    ],
                 ]
             )
             ->add(
                 'store_address3',
                 TextType::class,
                 [
-                    'data'     => ConfigQuery::read('store_address3'),
+                    'data' => ConfigQuery::read('store_address3'),
                     'required' => false,
-                    'attr'     => [
+                    'attr' => [
                         'placeholder' => $tr->trans('Additional address information'),
-                    ]
+                    ],
                 ]
             )
             ->add(
                 'store_zipcode',
                 TextType::class,
                 [
-                    'data'        => ConfigQuery::read('store_zipcode'),
+                    'data' => ConfigQuery::read('store_zipcode'),
                     'constraints' => [
                         new Constraints\NotBlank(),
                     ],
-                    'label'       => $tr->trans('Zip code'),
-                    'attr'        => [
+                    'label' => $tr->trans('Zip code'),
+                    'attr' => [
                         'placeholder' => $tr->trans('Zip code'),
-                    ]
+                    ],
                 ]
             )
             ->add(
                 'store_city',
                 TextType::class,
                 [
-                    'data'        => ConfigQuery::read('store_city'),
+                    'data' => ConfigQuery::read('store_city'),
                     'constraints' => [
                         new Constraints\NotBlank(),
                     ],
-                    'label'       => $tr->trans('City'),
-                    'attr'        => [
+                    'label' => $tr->trans('City'),
+                    'attr' => [
                         'placeholder' => $tr->trans('City'),
-                    ]
+                    ],
                 ]
             )
             ->add(
                 'store_country',
                 IntegerType::class,
                 [
-                    'data'        => ConfigQuery::read('store_country'),
+                    'data' => ConfigQuery::read('store_country'),
                     'constraints' => [
                         new Constraints\NotBlank(),
                     ],
-                    'label'       => $tr->trans('Country'),
-                    'attr'        => [
+                    'label' => $tr->trans('Country'),
+                    'attr' => [
                         'placeholder' => $tr->trans('Country'),
-                    ]
+                    ],
                 ]
             )
             ->add(
@@ -212,14 +212,14 @@ class ConfigStoreForm extends BaseForm
                     'required' => false,
                     'constraints' => [
                         new Constraints\Image([
-                            'mimeTypes' => ['image/png', 'image/x-icon']
-                        ])
+                            'mimeTypes' => ['image/png', 'image/x-icon'],
+                        ]),
                     ],
                     'label' => $tr->trans('Favicon image'),
                     'label_attr' => [
                         'for' => 'favicon_file',
                         'help' => $tr->trans('Icon of the website. Only PNG and ICO files are allowed.'),
-                    ]
+                    ],
                 ]
             )
             ->add(
@@ -228,12 +228,12 @@ class ConfigStoreForm extends BaseForm
                 [
                     'required' => false,
                     'constraints' => [
-                        new Constraints\Image()
+                        new Constraints\Image(),
                     ],
                     'label' => $tr->trans('Store logo'),
                     'label_attr' => [
-                        'for' => 'logo_file'
-                    ]
+                        'for' => 'logo_file',
+                    ],
                 ]
             )
             ->add(
@@ -242,13 +242,13 @@ class ConfigStoreForm extends BaseForm
                 [
                     'required' => false,
                     'constraints' => [
-                        new Constraints\Image()
+                        new Constraints\Image(),
                     ],
                     'label' => $tr->trans('Banner'),
                     'label_attr' => [
                         'for' => 'banner_file',
                         'help' => $tr->trans('Banner of the website. Used in the e-mails send to the customers.'),
-                    ]
+                    ],
                 ]
             );
     }

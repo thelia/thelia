@@ -32,7 +32,7 @@ class Module extends AbstractSmartyPlugin
     }
 
     /**
-     * Process theliaModule template inclusion function
+     * Process theliaModule template inclusion function.
      *
      * This function accepts two parameters:
      *
@@ -40,7 +40,8 @@ class Module extends AbstractSmartyPlugin
      *   AdminIncludes/<location>.html file, and fetch it as a Smarty template.
      * - countvar : this is the name of a template variable where the number of found modules includes will be assigned.
      *
-     * @param array                     $params
+     * @param array $params
+     *
      * @internal param \Thelia\Core\Template\Smarty\Plugins\unknown $smarty
      *
      * @return string
@@ -67,15 +68,15 @@ class Module extends AbstractSmartyPlugin
                     continue;
                 }
 
-                $file = $module->getAbsoluteAdminIncludesPath() . DS . $location . '.html';
+                $file = $module->getAbsoluteAdminIncludesPath().DS.$location.'.html';
 
                 if (file_exists($file)) {
                     $output = trim(file_get_contents($file));
 
-                    if (! empty($output)) {
+                    if (!empty($output)) {
                         $content .= $output;
 
-                        $count++;
+                        ++$count;
                     }
                 }
             }
@@ -85,15 +86,15 @@ class Module extends AbstractSmartyPlugin
             $parser->assign($countvarname, $count);
         }
 
-        if (! empty($content)) {
-            return $parser->fetch(sprintf("string:%s", $content));
+        if (!empty($content)) {
+            return $parser->fetch(sprintf('string:%s', $content));
         }
 
-        return "";
+        return '';
     }
 
     /**
-     * Define the various smarty plugins hendled by this class
+     * Define the various smarty plugins hendled by this class.
      *
      * @return array of smarty plugin descriptors
      */

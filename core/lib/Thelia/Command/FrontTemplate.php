@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
@@ -8,36 +18,31 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Model\ConfigQuery;
 
 /**
-* change the front template
-*
-* Class FrontTemplate
-* @package Thelia\Command
-* @author Damien Foulhoux <dfoulhoux@openstudio.fr>
-*
-*/
+ * change the front template.
+ *
+ * Class FrontTemplate
+ *
+ * @author Damien Foulhoux <dfoulhoux@openstudio.fr>
+ */
 class FrontTemplate extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-        ->setName("template:front")
-        ->setDescription("set front template")
+        ->setName('template:front')
+        ->setDescription('set front template')
         ->addArgument(
-            "template",
+            'template',
             InputArgument::REQUIRED,
-            "template to activate"
+            'template to activate'
         );
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $template = $input->getArgument("template");
-        
-        $templateExists = is_dir(THELIA_TEMPLATE_DIR  . 'frontOffice' . DS . $template);
+        $template = $input->getArgument('template');
+
+        $templateExists = is_dir(THELIA_TEMPLATE_DIR.'frontOffice'.DS.$template);
 
         if ($templateExists) {
             ConfigQuery::write('active-front-template', $template);

@@ -24,8 +24,8 @@ use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\StateQuery;
 
 /**
- * Class StateController
- * @package Thelia\Controller\Admin
+ * Class StateController.
+ *
  * @author Julien Chanséaume <manu@raynaud.io>
  */
 class StateController extends AbstractCrudController
@@ -45,7 +45,7 @@ class StateController extends AbstractCrudController
     }
 
     /**
-     * Return the creation form for this object
+     * Return the creation form for this object.
      */
     protected function getCreationForm()
     {
@@ -53,7 +53,7 @@ class StateController extends AbstractCrudController
     }
 
     /**
-     * Return the update form for this object
+     * Return the update form for this object.
      */
     protected function getUpdateForm()
     {
@@ -61,7 +61,7 @@ class StateController extends AbstractCrudController
     }
 
     /**
-     * Hydrate the update form for this object, before passing it to the update template
+     * Hydrate the update form for this object, before passing it to the update template.
      *
      * @param \Thelia\Model\State $object
      */
@@ -80,7 +80,7 @@ class StateController extends AbstractCrudController
     }
 
     /**
-     * Creates the creation event with the provided form data
+     * Creates the creation event with the provided form data.
      *
      * @param unknown $formData
      */
@@ -92,7 +92,7 @@ class StateController extends AbstractCrudController
     }
 
     /**
-     * Creates the update event with the provided form data
+     * Creates the update event with the provided form data.
      *
      * @param unknown $formData
      */
@@ -117,7 +117,7 @@ class StateController extends AbstractCrudController
     }
 
     /**
-     * Creates the delete event with the provided form data
+     * Creates the delete event with the provided form data.
      */
     protected function getDeleteEvent()
     {
@@ -136,7 +136,6 @@ class StateController extends AbstractCrudController
 
     /**
      * Get the created object from an event.
-     *
      */
     protected function getObjectFromEvent($event)
     {
@@ -144,7 +143,7 @@ class StateController extends AbstractCrudController
     }
 
     /**
-     * Load an existing object from the database
+     * Load an existing object from the database.
      */
     protected function getExistingObject()
     {
@@ -160,7 +159,7 @@ class StateController extends AbstractCrudController
     }
 
     /**
-     * Returns the object label form the object event (name, title, etc.)
+     * Returns the object label form the object event (name, title, etc.).
      *
      * @param \Thelia\Model\State $object
      */
@@ -170,7 +169,7 @@ class StateController extends AbstractCrudController
     }
 
     /**
-     * Returns the object ID from the object
+     * Returns the object ID from the object.
      *
      * @param \Thelia\Model\State $object
      */
@@ -180,24 +179,24 @@ class StateController extends AbstractCrudController
     }
 
     /**
-     * Render the main list template
+     * Render the main list template.
      *
-     * @param unknown $currentOrder , if any, null otherwise.
+     * @param unknown $currentOrder , if any, null otherwise
      */
     protected function renderListTemplate($currentOrder)
     {
         return $this->render(
-            "states",
+            'states',
             [
                 'page' => $this->getRequest()->get('page', 1),
-                "page_limit" => $this->getRequest()->get('page_limit', 50),
-                'page_order' => $this->getRequest()->get('page_order', 1)
+                'page_limit' => $this->getRequest()->get('page_limit', 50),
+                'page_order' => $this->getRequest()->get('page_order', 1),
             ]
         );
     }
 
     /**
-     * Render the edition template
+     * Render the edition template.
      */
     protected function renderEditionTemplate()
     {
@@ -209,12 +208,12 @@ class StateController extends AbstractCrudController
         return [
             'state_id' => $this->getRequest()->get('state_id', 0),
             'page' => $this->getRequest()->get('page', 1),
-            'page_order' => $this->getRequest()->get('page_order', 1)
+            'page_order' => $this->getRequest()->get('page_order', 1),
         ];
     }
 
     /**
-     * Redirect to the edition template
+     * Redirect to the edition template.
      */
     protected function redirectToEditionTemplate()
     {
@@ -222,13 +221,13 @@ class StateController extends AbstractCrudController
             'admin.configuration.states.update',
             [],
             [
-                "state_id" => $this->getRequest()->get('state_id', 0)
+                'state_id' => $this->getRequest()->get('state_id', 0),
             ]
         );
     }
 
     /**
-     * Redirect to the list template
+     * Redirect to the list template.
      */
     protected function redirectToListTemplate()
     {

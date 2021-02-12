@@ -15,7 +15,6 @@ namespace Thelia\Model\Tools;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\GenerateRewrittenUrlEvent;
-use Thelia\Core\Event\Order\OrderProductEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\UrlRewritingException;
@@ -27,7 +26,7 @@ use Thelia\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 
 /**
- * A trait for managing Rewritten URLs from model classes
+ * A trait for managing Rewritten URLs from model classes.
  */
 trait UrlRewritingTrait
 {
@@ -51,10 +50,11 @@ trait UrlRewritingTrait
     }
 
     /**
-     * Generate a rewritten URL from the object title, and store it in the rewriting table
+     * Generate a rewritten URL from the object title, and store it in the rewriting table.
      *
-     * @param string $locale a valid locale (e.g. en_US)
+     * @param string                   $locale a valid locale (e.g. en_US)
      * @param ConnectionInterface|null $con
+     *
      * @throws PropelException
      */
     public function generateRewrittenUrl(string $locale, ConnectionInterface $con): string
@@ -88,13 +88,13 @@ trait UrlRewritingTrait
         // Only allow one dash separator at a time (and make string lowercase)
         $cleanString = mb_strtolower(preg_replace('/--+/u', '-', $string), 'UTF-8');
 
-        $urlFilePart = rtrim($cleanString, '.-~_') . ".html";
+        $urlFilePart = rtrim($cleanString, '.-~_').'.html';
 
         try {
-            $i=0;
+            $i = 0;
             while (URL::getInstance()->resolve($urlFilePart)) {
-                $i++;
-                $urlFilePart = sprintf("%s-%d.html", $cleanString, $i);
+                ++$i;
+                $urlFilePart = sprintf('%s-%d.html', $cleanString, $i);
             }
         } catch (UrlRewritingException $e) {
             $rewritingUrl = new RewritingUrl();
@@ -110,9 +110,10 @@ trait UrlRewritingTrait
     }
 
     /**
-     * return the rewritten URL for the given locale
+     * return the rewritten URL for the given locale.
      *
-     * @param  string $locale a valid locale (e.g. en_US)
+     * @param string $locale a valid locale (e.g. en_US)
+     *
      * @return null
      */
     public function getRewrittenUrl($locale)
@@ -135,7 +136,7 @@ trait UrlRewritingTrait
     }
 
     /**
-     * Mark the current URL as obseolete
+     * Mark the current URL as obseolete.
      */
     public function markRewrittenUrlObsolete()
     {
@@ -143,16 +144,18 @@ trait UrlRewritingTrait
             ->filterByView($this->getRewrittenUrlViewName())
             ->filterByViewId($this->getId())
             ->update([
-                "View" => ConfigQuery::getObsoleteRewrittenUrlView()
+                'View' => ConfigQuery::getObsoleteRewrittenUrlView(),
             ]);
     }
 
     /**
-     * Set the rewritten URL for the given locale
+     * Set the rewritten URL for the given locale.
      *
-     * @param  string                                  $locale a valid locale (e.g. en_US)
+     * @param string $locale a valid locale (e.g. en_US)
      * @param $url
+     *
      * @return $this
+     *
      * @throws UrlRewritingException
      * @throws \Thelia\Exception\UrlRewritingException
      */

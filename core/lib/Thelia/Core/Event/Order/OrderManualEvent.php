@@ -26,8 +26,6 @@ class OrderManualEvent extends OrderEvent
     protected $customer;
     protected $useOrderDefinedAddresses = false;
 
-    /**
-     */
     public function __construct(Order $order, Currency $currency, Lang $lang, Cart $cart, Customer $customer)
     {
         parent::__construct($order);
@@ -47,6 +45,7 @@ class OrderManualEvent extends OrderEvent
 
     /**
      * @param Currency $currency
+     *
      * @return $this
      */
     public function setCurrency($currency)
@@ -66,6 +65,7 @@ class OrderManualEvent extends OrderEvent
 
     /**
      * @param Lang $lang
+     *
      * @return $this
      */
     public function setLang($lang)
@@ -85,6 +85,7 @@ class OrderManualEvent extends OrderEvent
 
     /**
      * @param Cart $cart
+     *
      * @return $this
      */
     public function setCart($cart)
@@ -104,6 +105,7 @@ class OrderManualEvent extends OrderEvent
 
     /**
      * @param Customer $customer
+     *
      * @return $this
      */
     public function setCustomer($customer)
@@ -114,7 +116,7 @@ class OrderManualEvent extends OrderEvent
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getUseOrderDefinedAddresses()
     {
@@ -125,12 +127,14 @@ class OrderManualEvent extends OrderEvent
      * If true, the order will be created using the delivery and invoice addresses defined in $this->order instead of
      * creating new OrderAdresses using the Order::getChoosenXXXAddress().
      *
-     * @param boolean $useOrderDefinedAddresses
+     * @param bool $useOrderDefinedAddresses
+     *
      * @return $this
      */
     public function setUseOrderDefinedAddresses($useOrderDefinedAddresses)
     {
         $this->useOrderDefinedAddresses = $useOrderDefinedAddresses;
+
         return $this;
     }
 }

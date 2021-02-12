@@ -18,20 +18,17 @@ use Thelia\Model\Base\CategoryQuery as BaseCategoryQuery;
 /**
  * Skeleton subclass for performing query and update operations on the 'category' table.
  *
- *
- *
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
- *
  */
 class CategoryQuery extends BaseCategoryQuery
 {
     /**
+     * count how many direct children have a category.
      *
-     * count how many direct children have a category
+     * @param int $parent category parent id
      *
-     * @param  int $parent category parent id
      * @return int
      */
     public static function countChild($parent)
@@ -40,12 +37,12 @@ class CategoryQuery extends BaseCategoryQuery
     }
 
     /**
+     * find all category children for a given category. an array of \Thelia\Model\Category is return.
      *
-     * find all category children for a given category. an array of \Thelia\Model\Category is return
+     * @param int|int[] $categoryId the category id or an array of id
+     * @param int       $depth      max depth you want to search
+     * @param int       $currentPos don't change this param, it is used for recursion
      *
-     * @param int|int[]                 $categoryId the category id or an array of id
-     * @param  int                      $depth      max depth you want to search
-     * @param  int                      $currentPos don't change this param, it is used for recursion
      * @return \Thelia\Model\Category[]
      */
     public static function findAllChild($categoryId, $depth = 0, $currentPos = 0)
@@ -57,7 +54,7 @@ class CategoryQuery extends BaseCategoryQuery
                 $result = array_merge($result, (array) self::findAllChild($categorySingleId, $depth, $currentPos));
             }
         } else {
-            $currentPos++;
+            ++$currentPos;
 
             if ($depth == $currentPos && $depth != 0) {
                 return [];
@@ -77,12 +74,14 @@ class CategoryQuery extends BaseCategoryQuery
     }
 
     /**
-     * Find all IDs of child categories of a given category
+     * Find all IDs of child categories of a given category.
      *
      * @param int|int[] $categoryId
-     * @param int $depth
-     * @param int $currentPos
+     * @param int       $depth
+     * @param int       $currentPos
+     *
      * @return array
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public static function findAllChildId($categoryId, $depth = 0, $currentPos = 0)
@@ -96,8 +95,8 @@ class CategoryQuery extends BaseCategoryQuery
                 $result = array_merge($result, self::findAllChildId($categorySingleId, $depth, $currentPos));
             }
         } else {
-            if (! isset($cache[$categoryId])) {
-                $currentPos++;
+            if (!isset($cache[$categoryId])) {
+                ++$currentPos;
 
                 if ($depth == $currentPos && $depth != 0) {
                     return [];
@@ -124,15 +123,16 @@ class CategoryQuery extends BaseCategoryQuery
     }
 
     /**
-     * Return all category IDs of a category tree, starting at $categoryId, up to a depth of $depth
+     * Return all category IDs of a category tree, starting at $categoryId, up to a depth of $depth.
      *
-     * @param  int|int[] $categoryId the category id or an array of category ids
-     * @param  int $depth max tree traversal depth
+     * @param int|int[] $categoryId the category id or an array of category ids
+     * @param int       $depth      max tree traversal depth
+     *
      * @return int[]
      */
     public static function getCategoryTreeIds($categoryId, $depth = 1)
     {
-        $result = \is_array($categoryId) ? $categoryId : [ $categoryId ];
+        $result = \is_array($categoryId) ? $categoryId : [$categoryId];
 
         if ($depth > 1) {
             $categories = self::create()
@@ -152,9 +152,9 @@ class CategoryQuery extends BaseCategoryQuery
     }
 
     /**
-     * Get categories from root to child
+     * Get categories from root to child.
      *
-     * @param integer $categoryId Category ID
+     * @param int $categoryId Category ID
      *
      * @since 2.3.0
      *
@@ -165,7 +165,7 @@ class CategoryQuery extends BaseCategoryQuery
     {
         $path = [];
 
-        $category = (new CategoryQuery)->findPk($categoryId);
+        $category = (new CategoryQuery())->findPk($categoryId);
         if ($category !== null) {
             $path[] = $category;
 

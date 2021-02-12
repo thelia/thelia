@@ -17,8 +17,8 @@ use SplFileObject;
 use Thelia\Core\Translation\Translator;
 
 /**
- * Class JsonFileAbstractExport
- * @package Thelia\ImportExport\Export
+ * Class JsonFileAbstractExport.
+ *
  * @author Florian Bernard <fbernard@openstudio.fr>
  */
 abstract class JsonFileAbstractExport extends AbstractExport
@@ -82,7 +82,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
     }
 
     /**
-     * Apply order and aliases on data
+     * Apply order and aliases on data.
      *
      * @param array $data Raw data
      *
@@ -116,10 +116,10 @@ abstract class JsonFileAbstractExport extends AbstractExport
 
     protected function getDataJsonCache(StatementInterface $statement, $exportName)
     {
-        $filename = THELIA_CACHE_DIR . '/export/' . $exportName .'.json';
+        $filename = THELIA_CACHE_DIR.'/export/'.$exportName.'.json';
 
         if ($statement->rowCount() === 0) {
-            throw new \Exception(Translator::getInstance()->trans("No data found for your export."));
+            throw new \Exception(Translator::getInstance()->trans('No data found for your export.'));
         }
 
         if (file_exists($filename)) {
@@ -127,7 +127,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
         }
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            file_put_contents($filename, json_encode($row) . "\r\n", FILE_APPEND);
+            file_put_contents($filename, json_encode($row)."\r\n", FILE_APPEND);
         }
 
         return $filename;

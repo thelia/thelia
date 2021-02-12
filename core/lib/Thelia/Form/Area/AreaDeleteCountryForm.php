@@ -22,8 +22,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 
 /**
- * Class AreaDeleteCountryForm
- * @package Thelia\Form\Area
+ * Class AreaDeleteCountryForm.
+ *
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class AreaDeleteCountryForm extends BaseForm
@@ -31,7 +31,7 @@ class AreaDeleteCountryForm extends BaseForm
     use CountryListValidationTrait;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function buildForm()
     {
@@ -45,7 +45,7 @@ class AreaDeleteCountryForm extends BaseForm
                     'constraints' => [
                         new GreaterThan(['value' => 0]),
                         new NotBlank(),
-                    ]
+                    ],
                 ]
             )
             ->add(
@@ -55,7 +55,7 @@ class AreaDeleteCountryForm extends BaseForm
                     'entry_type' => TextType::class,
                     'constraints' => [
                         new NotBlank(),
-                        new Callback([$this, "verifyCountryList"])
+                        new Callback([$this, 'verifyCountryList']),
                     ],
                     'allow_add' => true,
                     'allow_delete' => true,
@@ -65,7 +65,7 @@ class AreaDeleteCountryForm extends BaseForm
                         'help' => Translator::getInstance()->trans(
                             'Select the countries to delete from this shipping zone'
                         ),
-                    ]
+                    ],
                 ]
             )
         ;

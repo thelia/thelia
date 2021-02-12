@@ -22,15 +22,16 @@ use Thelia\Model\FolderQuery;
 use Thelia\Type\BooleanOrBothType;
 
 /**
- * Class FolderPath
- * @package Thelia\Core\Template\Loop
+ * Class FolderPath.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  *
  * {@inheritdoc}
- * @method int getFolder()
+ *
+ * @method int         getFolder()
  * @method bool|string getVisible()
- * @method int getDepth()
- * @method string[] getOrder()
+ * @method int         getDepth()
+ * @method string[]    getOrder()
  */
 class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
 {
@@ -71,10 +72,10 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
 
             if ($folder != null) {
                 $results[] = [
-                    "ID" => $folder->getId(),
-                    "TITLE" => $folder->getVirtualColumn('i18n_TITLE'),
-                    "URL" => $folder->getUrl($this->locale),
-                    "LOCALE" => $this->locale,
+                    'ID' => $folder->getId(),
+                    'TITLE' => $folder->getVirtualColumn('i18n_TITLE'),
+                    'URL' => $folder->getUrl($this->locale),
+                    'LOCALE' => $this->locale,
                 ];
 
                 $currentId = $folder->getParent();
@@ -84,7 +85,7 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
                     if (\in_array($currentId, $ids)) {
                         throw new \LogicException(
                             sprintf(
-                                "Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)",
+                                'Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)',
                                 $originalId,
                                 $currentId
                             )

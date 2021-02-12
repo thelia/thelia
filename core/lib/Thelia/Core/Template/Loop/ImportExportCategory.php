@@ -25,14 +25,15 @@ use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**
- * Class ImportExportCategory
- * @package Thelia\Core\Template\Loop
+ * Class ImportExportCategory.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  *
  * {@inheritdoc}
- * @method null|int[] getId()
- * @method null|string[] getRef()
- * @method string[] getOrder()
+ *
+ * @method int[]|null    getId()
+ * @method string[]|null getRef()
+ * @method string[]      getOrder()
  */
 abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -40,6 +41,7 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
 
     /**
      * @return LoopResult
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function parseResults(LoopResult $loopResult)
@@ -49,10 +51,10 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
             $loopResultRow = new LoopResultRow($category);
 
             $loopResultRow
-                ->set("ID", $category->getId())
-                ->set("REF", $category->getRef())
-                ->set("TITLE", $category->getVirtualColumn("i18n_TITLE"))
-                ->set("POSITION", $category->getPosition())
+                ->set('ID', $category->getId())
+                ->set('REF', $category->getRef())
+                ->set('TITLE', $category->getVirtualColumn('i18n_TITLE'))
+                ->set('POSITION', $category->getPosition())
             ;
 
             $this->addOutputFields($loopResultRow, $category);
@@ -63,7 +65,7 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
     }
 
     /**
-     * this method returns a Propel ModelCriteria
+     * this method returns a Propel ModelCriteria.
      *
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      */
@@ -85,28 +87,28 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
         if (null !== $orders = $this->getOrder()) {
             foreach ($orders as $order) {
                 switch ($order) {
-                    case "id":
+                    case 'id':
                         $query->orderById();
                         break;
-                    case "id_reverse":
+                    case 'id_reverse':
                         $query->orderById(Criteria::DESC);
                         break;
-                    case "ref":
+                    case 'ref':
                         $query->orderByRef();
                         break;
-                    case "ref_reverse":
+                    case 'ref_reverse':
                         $query->orderByRef(Criteria::DESC);
                         break;
-                    case "alpha":
-                        $query->addAscendingOrderByColumn("i18n_TITLE");
+                    case 'alpha':
+                        $query->addAscendingOrderByColumn('i18n_TITLE');
                         break;
-                    case "alpha_reverse":
-                        $query->addDescendingOrderByColumn("i18n_TITLE");
+                    case 'alpha_reverse':
+                        $query->addDescendingOrderByColumn('i18n_TITLE');
                         break;
-                    case "manual":
+                    case 'manual':
                         $query->orderByPosition();
                         break;
-                    case "manual_reverse":
+                    case 'manual_reverse':
                         $query->orderByPosition(Criteria::DESC);
                         break;
                 }
@@ -125,11 +127,11 @@ abstract class ImportExportCategory extends BaseI18nLoop implements PropelSearch
             Argument::createIntListTypeArgument('id'),
             Argument::createAnyListTypeArgument('ref'),
             new Argument(
-                "order",
+                'order',
                 new TypeCollection(
-                    new EnumListType(["id", "id_reverse", "ref", "ref_reverse", "alpha", "alpha_reverse", "manual", "manual_reverse"])
+                    new EnumListType(['id', 'id_reverse', 'ref', 'ref_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse'])
                 ),
-                "manual"
+                'manual'
             )
         );
     }

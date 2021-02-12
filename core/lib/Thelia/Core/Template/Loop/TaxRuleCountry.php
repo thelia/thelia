@@ -26,22 +26,22 @@ use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * TaxRuleCountry loop
+ * TaxRuleCountry loop.
  *
  * Two functions provided by this loop depending of the attribute `ask` :
  * - `country` : list all country/state having the same taxes configuration (same tax rule, same taxes, same order)
  * - `taxes` : list taxes for this tax rule and country/state
  *
  * Class TaxRuleCountry
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int getCountry()
+ *
+ * @method int      getCountry()
  * @method int|null getState()
- * @method int getTaxRule()
- * @method string getAsk()
+ * @method int      getTaxRule()
+ * @method string   getAsk()
  */
 class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -68,7 +68,7 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function buildModelCriteria()
     {
@@ -102,7 +102,7 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function parseResults(LoopResult $loopResult)
     {
@@ -114,15 +114,15 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $taxRuleCountry) {
             $loopResultRow = new LoopResultRow($taxRuleCountry);
             $loopResultRow
-                ->set("TAX_RULE", $taxRuleCountry->getTaxRuleId())
-                ->set("COUNTRY", $taxRuleCountry->getCountryId())
-                ->set("STATE", $taxRuleCountry->getStateId())
-                ->set("TAX", $taxRuleCountry->getTaxId())
-                ->set("POSITION", $taxRuleCountry->getPosition())
-                ->set("TAX_TITLE", $taxRuleCountry->getVirtualColumn(TaxTableMap::TABLE_NAME . '_i18n_TITLE'))
+                ->set('TAX_RULE', $taxRuleCountry->getTaxRuleId())
+                ->set('COUNTRY', $taxRuleCountry->getCountryId())
+                ->set('STATE', $taxRuleCountry->getStateId())
+                ->set('TAX', $taxRuleCountry->getTaxId())
+                ->set('POSITION', $taxRuleCountry->getPosition())
+                ->set('TAX_TITLE', $taxRuleCountry->getVirtualColumn(TaxTableMap::TABLE_NAME.'_i18n_TITLE'))
                 ->set(
-                    "TAX_DESCRIPTION",
-                    $taxRuleCountry->getVirtualColumn(TaxTableMap::TABLE_NAME . '_i18n_DESCRIPTION')
+                    'TAX_DESCRIPTION',
+                    $taxRuleCountry->getVirtualColumn(TaxTableMap::TABLE_NAME.'_i18n_DESCRIPTION')
                 )
             ;
 

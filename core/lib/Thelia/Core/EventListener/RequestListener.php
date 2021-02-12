@@ -41,8 +41,8 @@ use Thelia\Model\LangQuery;
 use Thelia\Tools\RememberMeTrait;
 
 /**
- * Class RequestListener
- * @package Thelia\Core\EventListener
+ * Class RequestListener.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class RequestListener implements EventSubscriberInterface
@@ -67,8 +67,8 @@ class RequestListener implements EventSubscriberInterface
         $request = $event->getRequest();
         $lang = $request->getSession()->getLang();
 
-        $vendorFormDir = THELIA_VENDOR . 'symfony' . DS . 'form';
-        $vendorValidatorDir = THELIA_VENDOR . 'symfony' . DS . 'validator';
+        $vendorFormDir = THELIA_VENDOR.'symfony'.DS.'form';
+        $vendorValidatorDir = THELIA_VENDOR.'symfony'.DS.'validator';
 
         $this->translator->addResource(
             'xlf',
@@ -114,7 +114,7 @@ class RequestListener implements EventSubscriberInterface
 
                     if (null === $data) {
                         $event->setResponse(
-                            new JsonResponse(["error" => "The given data is not a valid json"], 400)
+                            new JsonResponse(['error' => 'The given data is not a valid json'], 400)
                         );
 
                         $event->stopPropagation();
@@ -132,13 +132,11 @@ class RequestListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     */
     protected function getRememberMeCustomer(Request $request, Session $session, EventDispatcherInterface $dispatcher)
     {
         // try to get the remember me cookie
         $cookieCustomerName = ConfigQuery::read('customer_remember_me_cookie_name', 'crmcn');
-        $cookie             = $this->getRememberMeKeyFromCookie(
+        $cookie = $this->getRememberMeKeyFromCookie(
             $request,
             $cookieCustomerName
         );
@@ -173,7 +171,7 @@ class RequestListener implements EventSubscriberInterface
     {
         // try to get the remember me cookie
         $cookieAdminName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
-        $cookie          = $this->getRememberMeKeyFromCookie(
+        $cookie = $this->getRememberMeKeyFromCookie(
             $request,
             $cookieAdminName
         );
@@ -190,9 +188,9 @@ class RequestListener implements EventSubscriberInterface
 
                 $this->applyUserLocale($user, $session);
 
-                AdminLog::append("admin", "LOGIN", "Authentication successful", $request, $user, false);
+                AdminLog::append('admin', 'LOGIN', 'Authentication successful', $request, $user, false);
             } catch (TokenAuthenticationException $ex) {
-                AdminLog::append("admin", "LOGIN", "Token based authentication failed.", $request);
+                AdminLog::append('admin', 'LOGIN', 'Token based authentication failed.', $request);
 
                 // Clear the cookie
                 $this->clearRememberMeCookie($cookieAdminName);
@@ -220,9 +218,8 @@ class RequestListener implements EventSubscriberInterface
      * the _previous_url request attribute, if defined.
      *
      * If the value of _previous_url is "dont-save", the current referrer is not saved.
-     *
      */
-    public function registerPreviousUrl(TerminateEvent  $event)
+    public function registerPreviousUrl(TerminateEvent $event)
     {
         $request = $event->getRequest();
 
@@ -252,7 +249,7 @@ class RequestListener implements EventSubscriberInterface
                 if (ConfigQuery::isMultiDomainActivated()) {
                     $components = parse_url($referrer);
                     $lang = LangQuery::create()
-                        ->filterByUrl(sprintf("%s://%s", $components["scheme"], $components["host"]), ModelCriteria::LIKE)
+                        ->filterByUrl(sprintf('%s://%s', $components['scheme'], $components['host']), ModelCriteria::LIKE)
                         ->findOne();
 
                     if (null !== $lang) {
@@ -280,11 +277,11 @@ class RequestListener implements EventSubscriberInterface
         /** @var Request $request */
         $request = $event->getRequest();
 
-        if ($request->query->has("currency")) {
+        if ($request->query->has('currency')) {
             if (null !== $find = CurrencyQuery::create()
                     ->filterById($request->getSession()->getCurrency(true)->getId(), Criteria::NOT_EQUAL)
                     ->filterByVisible(true)
-                    ->filterByCode($request->query->get("currency"))
+                    ->filterByCode($request->query->get('currency'))
                     ->findOne()
             ) {
                 $request->getSession()->setCurrency($find);
@@ -299,20 +296,20 @@ class RequestListener implements EventSubscriberInterface
 
     /**
      * {@inheritdoc}
-     * api
+     * api.
      */
     public static function getSubscribedEvents()
     {
         return [
             KernelEvents::REQUEST => [
                 ['checkCurrency', 256],
-                ["registerValidatorTranslator", 128],
-                ["rememberMeLoader", 128],
-                ['jsonBody', 128]
+                ['registerValidatorTranslator', 128],
+                ['rememberMeLoader', 128],
+                ['jsonBody', 128],
             ],
             KernelEvents::TERMINATE => [
-                ["registerPreviousUrl", 128]
-            ]
+                ['registerPreviousUrl', 128],
+            ],
         ];
     }
 }

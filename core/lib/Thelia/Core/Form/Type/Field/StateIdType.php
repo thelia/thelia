@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\StateQuery;
 
 /**
- * Class StateIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class StateIdType.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class StateIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class StateIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "state_id";
+        return 'state_id';
     }
 }

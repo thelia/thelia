@@ -13,13 +13,13 @@
 namespace Thelia\Tools\Version\Constraints;
 
 /**
- * Class BaseConstraint
- * @package Thelia\Tools\Version\Constraints
+ * Class BaseConstraint.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 abstract class BaseConstraint implements ConstraintInterface
 {
-    protected $operator = "=";
+    protected $operator = '=';
 
     protected $expression;
 

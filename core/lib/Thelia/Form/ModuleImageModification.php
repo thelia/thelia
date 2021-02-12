@@ -18,7 +18,7 @@ class ModuleImageModification extends ImageModification
 {
     /**
      * Get form name
-     * This name must be unique
+     * This name must be unique.
      *
      * @return string
      */

@@ -29,8 +29,8 @@ use Thelia\Module\DeliveryModuleWithStateInterface;
 use Thelia\Module\Exception\DeliveryException;
 
 /**
- * Class Delivery
- * @package Thelia\Core\Template\Loop
+ * Class Delivery.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  * @author Etienne Roudeix <eroudeix@gmail.com>
  *
@@ -39,7 +39,6 @@ use Thelia\Module\Exception\DeliveryException;
  * @method int getAddress()
  * @method int getCountry()
  * @method int getState()
- *
  */
 class Delivery extends BaseSpecificModule
 {
@@ -48,9 +47,9 @@ class Delivery extends BaseSpecificModule
         $collection = parent::getArgDefinitions();
 
         $collection
-            ->addArgument(Argument::createIntTypeArgument("address"))
-            ->addArgument(Argument::createIntTypeArgument("country"))
-            ->addArgument(Argument::createIntTypeArgument("state"))
+            ->addArgument(Argument::createIntTypeArgument('address'))
+            ->addArgument(Argument::createIntTypeArgument('country'))
+            ->addArgument(Argument::createIntTypeArgument('state'))
         ;
 
         return $collection;
@@ -104,7 +103,7 @@ class Delivery extends BaseSpecificModule
             try {
                 // Check if module is valid, by calling isValidDelivery(),
                 // or catching a DeliveryException.
-                /** @var CartModel $cart */
+                /* @var CartModel $cart */
                 $cart->getAddressDeliveryId();
                 $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $address, $country, $state);
                 $this->dispatcher->dispatch(
@@ -162,8 +161,9 @@ class Delivery extends BaseSpecificModule
         if (null !== $countryId) {
             $country = CountryQuery::create()->findPk($countryId);
             if (null === $country) {
-                throw new \InvalidArgumentException('Cannot found country id: `' . $countryId . '` in delivery loop');
+                throw new \InvalidArgumentException('Cannot found country id: `'.$countryId.'` in delivery loop');
             }
+
             return $country;
         }
 
@@ -179,8 +179,9 @@ class Delivery extends BaseSpecificModule
         if (null !== $stateId) {
             $state = StateQuery::create()->findPk($stateId);
             if (null === $state) {
-                throw new \InvalidArgumentException('Cannot found state id: `' . $stateId . '` in delivery loop');
+                throw new \InvalidArgumentException('Cannot found state id: `'.$stateId.'` in delivery loop');
             }
+
             return $state;
         }
 

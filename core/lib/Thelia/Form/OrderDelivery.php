@@ -21,8 +21,8 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
 /**
- * Class OrderDelivery
- * @package Thelia\Form
+ * Class OrderDelivery.
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class OrderDelivery extends BaseForm
@@ -30,21 +30,21 @@ class OrderDelivery extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("delivery-address", IntegerType::class, [
-                "required" => true,
-                "constraints" => [
+            ->add('delivery-address', IntegerType::class, [
+                'required' => true,
+                'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                            [$this, "verifyDeliveryAddress"]
+                            [$this, 'verifyDeliveryAddress']
                     ),
                 ],
             ])
-            ->add("delivery-module", IntegerType::class, [
-                "required" => true,
-                "constraints" => [
+            ->add('delivery-module', IntegerType::class, [
+                'required' => true,
+                'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                            [$this, "verifyDeliveryModule"]
+                            [$this, 'verifyDeliveryModule']
                     ),
                 ],
             ]);
@@ -56,7 +56,7 @@ class OrderDelivery extends BaseForm
             ->findPk($value);
 
         if (null === $address) {
-            $context->addViolation(Translator::getInstance()->trans("Address ID not found"));
+            $context->addViolation(Translator::getInstance()->trans('Address ID not found'));
         }
     }
 
@@ -67,8 +67,8 @@ class OrderDelivery extends BaseForm
             ->findOne();
 
         if (null === $module) {
-            $context->addViolation(Translator::getInstance()->trans("Delivery module ID not found"));
-        } elseif (! $module->isDeliveryModule()) {
+            $context->addViolation(Translator::getInstance()->trans('Delivery module ID not found'));
+        } elseif (!$module->isDeliveryModule()) {
             $context->addViolation(
                 sprintf(Translator::getInstance()->trans("delivery module %s is not a Thelia\Module\DeliveryModuleInterface"), $module->getCode())
             );
@@ -77,6 +77,6 @@ class OrderDelivery extends BaseForm
 
     public static function getName()
     {
-        return "thelia_order_delivery";
+        return 'thelia_order_delivery';
     }
 }

@@ -21,16 +21,16 @@ use Thelia\Log\Tlog;
 use Thelia\Tools\URL;
 
 /**
- * Class FileDownloader
- * @package Thelia\Tools\FileDownload
+ * Class FileDownloader.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class FileDownloader implements FileDownloaderInterface
 {
-    /** @var  LoggerInterface */
+    /** @var LoggerInterface */
     protected $logger;
 
-    /** @var  Translator */
+    /** @var Translator */
     protected $translator;
 
     public function __construct(LoggerInterface $logger, Translator $translator)
@@ -46,8 +46,9 @@ class FileDownloader implements FileDownloaderInterface
     }
 
     /**
-     * @param  string                                  $url
-     * @param  string                                  $pathToStore
+     * @param string $url
+     * @param string $pathToStore
+     *
      * @throws \Thelia\Exception\FileNotFoundException
      * @throws \ErrorException
      * @throws \HttpUrlException
@@ -57,21 +58,21 @@ class FileDownloader implements FileDownloaderInterface
     public function download($url, $pathToStore)
     {
         if (!URL::checkUrl($url)) {
-            /**
+            /*
              * The URL is not valid
              */
             throw new HttpUrlException(
                 $this->translator->trans(
-                    "Tried to download a file, but the URL was not valid: %url",
+                    'Tried to download a file, but the URL was not valid: %url',
                     [
-                        "%url" => $url
+                        '%url' => $url,
                     ]
                 )
             );
         }
 
         /**
-         * Try to get the file if it is online
+         * Try to get the file if it is online.
          */
         $con = curl_init($url);
         curl_setopt($con, CURLOPT_RETURNTRANSFER, true);
@@ -86,18 +87,18 @@ class FileDownloader implements FileDownloaderInterface
         curl_close($con);
 
         if (false === $response || $errno !== 0 ||
-            ($httpCode != "200" && $httpCode != "204")
+            ($httpCode != '200' && $httpCode != '204')
             ) {
             /**
              * The server is down ? The file doesn't exist ? Anything else ?
              */
             $errorMessage = $this->translator->trans(
-                "cURL errno %errno, http code %http_code on link \"%path\": %error",
+                'cURL errno %errno, http code %http_code on link "%path": %error',
                 [
-                    "%errno" => $errno,
-                    "%path" => $url,
-                    "%error" => $curlErrorMessage,
-                    "%http_code" => $httpCode,
+                    '%errno' => $errno,
+                    '%path' => $url,
+                    '%error' => $curlErrorMessage,
+                    '%http_code' => $httpCode,
                 ]
             );
 
@@ -108,30 +109,30 @@ class FileDownloader implements FileDownloaderInterface
             throw new FileNotFoundException($errorMessage);
         }
 
-        /**
+        /*
          * Inform that you've downloaded a file
          */
         $this->logger
             ->info(
                 $this->translator->trans(
-                    "The file %path has been successfully downloaded",
+                    'The file %path has been successfully downloaded',
                     [
-                        "%path" => $url
+                        '%path' => $url,
                     ]
                 )
             )
         ;
 
         /**
-         * Then try to write it on the disk
+         * Then try to write it on the disk.
          */
-        $file = @fopen($pathToStore, "w");
+        $file = @fopen($pathToStore, 'w');
 
         if ($file === false) {
             $translatedErrorMessage = $this->translator->trans(
-                "Failed to open a writing stream on the file: %file",
+                'Failed to open a writing stream on the file: %file',
                 [
-                    "%file" => $pathToStore
+                    '%file' => $pathToStore,
                 ]
             );
 

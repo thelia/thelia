@@ -114,7 +114,7 @@ class OrderAddressEvent extends ActionEvent
         $this->city = $city;
         $this->company = $company;
         $this->country = $country;
-        $this->state= $state;
+        $this->state = $state;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
         $this->phone = $phone;
@@ -156,7 +156,7 @@ class OrderAddressEvent extends ActionEvent
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getCompany()
     {
@@ -227,15 +227,11 @@ class OrderAddressEvent extends ActionEvent
         return $this->zipcode;
     }
 
-    /**
-     */
     public function setOrderAddress(OrderAddress $orderAddress)
     {
         $this->orderAddress = $orderAddress;
     }
 
-    /**
-     */
     public function setOrder(Order $order)
     {
         $this->order = $order;

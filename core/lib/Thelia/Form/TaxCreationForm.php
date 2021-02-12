@@ -25,8 +25,8 @@ use Thelia\TaxEngine\TaxTypeRequirementDefinition;
 use Thelia\Type\TypeInterface;
 
 /**
- * Class TaxCreationForm
- * @package Thelia\Form
+ * Class TaxCreationForm.
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class TaxCreationForm extends BaseForm
@@ -40,7 +40,7 @@ class TaxCreationForm extends BaseForm
         if (!$this->container) {
             throw new \LogicException(
                 Translator::getInstance()->trans(
-                    "The container should not be null in this form. Please use the FormFactory to get an instance."
+                    'The container should not be null in this form. Please use the FormFactory to get an instance.'
                 )
             );
         }
@@ -63,23 +63,23 @@ class TaxCreationForm extends BaseForm
 
         $this->formBuilder
             ->add(
-                "locale",
+                'locale',
                 HiddenType::class,
                 [
-                    "constraints" => [new NotBlank()],
+                    'constraints' => [new NotBlank()],
                 ]
             )
             ->add(
-                "type",
+                'type',
                 ChoiceType::class,
                 [
-                    "choices" => $typeList,
-                    "required" => true,
-                    "constraints" => [
+                    'choices' => $typeList,
+                    'required' => true,
+                    'constraints' => [
                         new Constraints\NotBlank(),
                     ],
-                    "label" => Translator::getInstance()->trans("Type"),
-                    "label_attr" => ["for" => "type_field"],
+                    'label' => Translator::getInstance()->trans('Type'),
+                    'label_attr' => ['for' => 'type_field'],
                 ]
             )
         ;
@@ -95,22 +95,22 @@ class TaxCreationForm extends BaseForm
                     // Replace the '\' in the class name by hyphens
                     // See TaxController::getRequirements if some changes are made about this.
                     ->add(
-                        Tax::escapeTypeName($name) . ':' . $requirement->getName(),
+                        Tax::escapeTypeName($name).':'.$requirement->getName(),
                         new TheliaType(),
                         [
-                            "constraints" => [
-                                new Constraints\Callback([$this, "checkRequirementField"]),
+                            'constraints' => [
+                                new Constraints\Callback([$this, 'checkRequirementField']),
                             ],
-                            "attr" => [
-                                "tag" => "requirements",
-                                "tax_type" => Tax::escapeTypeName($name)
+                            'attr' => [
+                                'tag' => 'requirements',
+                                'tax_type' => Tax::escapeTypeName($name),
                             ],
-                            "label_attr" => [
-                                "type" => $requirement->getName()
+                            'label_attr' => [
+                                'type' => $requirement->getName(),
                             ],
-                            "label" => Translator::getInstance()->trans($requirement->getTitle()),
-                            "type" => $requirement->getType()->getFormType(),
-                            "options" => $requirement->getType()->getFormOptions(),
+                            'label' => Translator::getInstance()->trans($requirement->getTitle()),
+                            'type' => $requirement->getType()->getFormType(),
+                            'options' => $requirement->getType()->getFormOptions(),
                         ]
                     );
             }
@@ -122,7 +122,7 @@ class TaxCreationForm extends BaseForm
     public function checkRequirementField($value, ExecutionContextInterface $context)
     {
         $data = $context->getRoot()->getData();
-        $type = $data["type"];
+        $type = $data['type'];
 
         if (false !== strpos($context->getPropertyPath(), $type)) {
             // extract requirement type
@@ -139,10 +139,10 @@ class TaxCreationForm extends BaseForm
 
             $context->addViolation(
                 Translator::getInstance()->trans(
-                    "Impossible to check value `%value` for `%type` type",
+                    'Impossible to check value `%value` for `%type` type',
                     [
                         '%value' => $value,
-                        '%type' => $type
+                        '%type' => $type,
                     ]
                 )
             );
@@ -151,6 +151,6 @@ class TaxCreationForm extends BaseForm
 
     public static function getName()
     {
-        return "thelia_tax_creation";
+        return 'thelia_tax_creation';
     }
 }

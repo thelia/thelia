@@ -39,7 +39,7 @@ class AdministratorController extends AbstractCrudController
     public function viewAction()
     {
         // Open the update dialog for the current administrator
-        return $this->render('administrators', [ 'show_update_dialog' => true ]);
+        return $this->render('administrators', ['show_update_dialog' => true]);
     }
 
     public function setEmailAction()
@@ -49,7 +49,7 @@ class AdministratorController extends AbstractCrudController
             'administrators',
             [
                 'show_update_dialog' => true,
-                'show_email_change_notice' => true
+                'show_email_change_notice' => true,
             ]
         );
     }
@@ -72,7 +72,7 @@ class AdministratorController extends AbstractCrudController
         $event->setFirstname($formData['firstname']);
         $event->setLastname($formData['lastname']);
         $event->setPassword($formData['password']);
-        $event->setProfile($formData['profile'] ? : null);
+        $event->setProfile($formData['profile'] ?: null);
         $event->setLocale($formData['locale']);
         $event->setEmail($formData['email']);
 
@@ -88,7 +88,7 @@ class AdministratorController extends AbstractCrudController
         $event->setFirstname($formData['firstname']);
         $event->setLastname($formData['lastname']);
         $event->setPassword($formData['password']);
-        $event->setProfile($formData['profile'] ? : null);
+        $event->setProfile($formData['profile'] ?: null);
         $event->setLocale($formData['locale']);
         $event->setEmail($formData['email']);
 
@@ -119,13 +119,13 @@ class AdministratorController extends AbstractCrudController
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
-            'id'                => $object->getId(),
-            'firstname'         => $object->getFirstname(),
-            'lastname'          => $object->getLastname(),
-            'login'             => $object->getLogin(),
-            'profile'           => $object->getProfileId(),
-            'locale'            => $object->getLocale(),
-            'email'             => $object->getEmail()
+            'id' => $object->getId(),
+            'firstname' => $object->getFirstname(),
+            'lastname' => $object->getLastname(),
+            'login' => $object->getLogin(),
+            'profile' => $object->getProfileId(),
+            'locale' => $object->getLocale(),
+            'email' => $object->getEmail(),
         ];
 
         // Setup the object form
@@ -145,6 +145,7 @@ class AdministratorController extends AbstractCrudController
 
     /**
      * @param Admin $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
@@ -154,6 +155,7 @@ class AdministratorController extends AbstractCrudController
 
     /**
      * @param Admin $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -197,7 +199,7 @@ class AdministratorController extends AbstractCrudController
     protected function redirectToListTemplate()
     {
         return $this->generateRedirectFromRoute(
-            "admin.configuration.administrators.view"
+            'admin.configuration.administrators.view'
         );
     }
 }

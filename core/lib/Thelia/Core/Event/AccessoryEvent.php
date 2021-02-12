@@ -28,7 +28,7 @@ class AccessoryEvent extends ActionEvent
 
     public function hasAccessory()
     {
-        return ! \is_null($this->accessory);
+        return !\is_null($this->accessory);
     }
 
     public function getAccessory()

@@ -27,7 +27,8 @@ use Thelia\Model\ExportQuery;
 use Thelia\Model\LangQuery;
 
 /**
- * Class ExportCommand
+ * Class ExportCommand.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class ExportCommand extends ContainerAwareCommand
@@ -105,7 +106,7 @@ class ExportCommand extends ContainerAwareCommand
         $serializer = $input->getArgument('serializer');
         if ($exportRef === null || $serializer === null) {
             throw new \RuntimeException(
-                'Not enough arguments.' . PHP_EOL . 'If no options are provided, ref and serializer arguments are required.'
+                'Not enough arguments.'.PHP_EOL.'If no options are provided, ref and serializer arguments are required.'
             );
         }
 
@@ -115,7 +116,7 @@ class ExportCommand extends ContainerAwareCommand
         $export = $exportHandler->getExportByRef($exportRef);
         if ($export === null) {
             throw new \RuntimeException(
-                $exportRef . ' export doesn\'t exist.'
+                $exportRef.' export doesn\'t exist.'
             );
         }
 
@@ -133,7 +134,7 @@ class ExportCommand extends ContainerAwareCommand
             $export,
             $serializer,
             $archiver,
-            (new LangQuery)->findOneByLocale($input->getOption('locale'))
+            (new LangQuery())->findOneByLocale($input->getOption('locale'))
         );
 
         $formattedLine = $this->getHelper('formatter')->formatBlock(
@@ -143,13 +144,13 @@ class ExportCommand extends ContainerAwareCommand
         );
         $output->writeln($formattedLine);
         $output->writeln('<info>Export available at path:</info>');
-        $output->writeln('<comment>' . $exportEvent->getFilePath() . '</comment>');
+        $output->writeln('<comment>'.$exportEvent->getFilePath().'</comment>');
 
         return 0;
     }
 
     /**
-     * Output available exports
+     * Output available exports.
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output An output interface
      */
@@ -157,11 +158,11 @@ class ExportCommand extends ContainerAwareCommand
     {
         $table = new Table($output);
 
-        foreach ((new ExportQuery)->find() as $export) {
+        foreach ((new ExportQuery())->find() as $export) {
             $table->addRow([
                 $export->getRef(),
                 $export->getTitle(),
-                $export->getDescription()
+                $export->getDescription(),
             ]);
         }
 
@@ -169,14 +170,14 @@ class ExportCommand extends ContainerAwareCommand
             ->setHeaders([
                 'Reference',
                 'Title',
-                'Description'
+                'Description',
             ])
             ->render()
         ;
     }
 
     /**
-     * Output available serializers
+     * Output available serializers.
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output An output interface
      */
@@ -193,7 +194,7 @@ class ExportCommand extends ContainerAwareCommand
                 $serializer->getId(),
                 $serializer->getName(),
                 $serializer->getExtension(),
-                $serializer->getMimeType()
+                $serializer->getMimeType(),
             ]);
         }
 
@@ -202,14 +203,14 @@ class ExportCommand extends ContainerAwareCommand
                 'Id',
                 'Name',
                 'Extension',
-                'MIME type'
+                'MIME type',
             ])
             ->render()
         ;
     }
 
     /**
-     * Output available archivers
+     * Output available archivers.
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output An output interface
      */
@@ -226,7 +227,7 @@ class ExportCommand extends ContainerAwareCommand
                 $archiver->getId(),
                 $archiver->getName(),
                 $archiver->getExtension(),
-                $archiver->getMimeType()
+                $archiver->getMimeType(),
             ]);
         }
 
@@ -235,7 +236,7 @@ class ExportCommand extends ContainerAwareCommand
                 'Id',
                 'Name',
                 'Extension',
-                'MIME type'
+                'MIME type',
             ])
             ->render()
         ;

@@ -20,8 +20,8 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
 
 /**
- * Class CustomerPasswordUpdateForm
- * @package Thelia\Form
+ * Class CustomerPasswordUpdateForm.
+ *
  * @author Christophe Laffont <claffont@openstudio.fr>
  */
 class CustomerPasswordUpdateForm extends BaseForm
@@ -31,35 +31,35 @@ class CustomerPasswordUpdateForm extends BaseForm
         $this->formBuilder
 
             // Login Information
-            ->add("password_old", PasswordType::class, [
-                    "constraints" => [
+            ->add('password_old', PasswordType::class, [
+                    'constraints' => [
                         new Constraints\NotBlank(),
-                        new Constraints\Callback([$this, "verifyCurrentPasswordField"]),
+                        new Constraints\Callback([$this, 'verifyCurrentPasswordField']),
                     ],
-                    "label" => Translator::getInstance()->trans("Current Password"),
-                    "label_attr" => [
-                        "for" => "password_old",
+                    'label' => Translator::getInstance()->trans('Current Password'),
+                    'label_attr' => [
+                        'for' => 'password_old',
                     ],
                 ])
-            ->add("password", PasswordType::class, [
-                "constraints" => [
+            ->add('password', PasswordType::class, [
+                'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Length(["min" => ConfigQuery::read("password.length", 4)]),
+                    new Constraints\Length(['min' => ConfigQuery::read('password.length', 4)]),
                 ],
-                "label" => Translator::getInstance()->trans("New Password"),
-                "label_attr" => [
-                    "for" => "password",
+                'label' => Translator::getInstance()->trans('New Password'),
+                'label_attr' => [
+                    'for' => 'password',
                 ],
             ])
-            ->add("password_confirm", PasswordType::class, [
-                "constraints" => [
+            ->add('password_confirm', PasswordType::class, [
+                'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Length(["min" => ConfigQuery::read("password.length", 4)]),
-                    new Constraints\Callback([$this, "verifyPasswordField"]),
+                    new Constraints\Length(['min' => ConfigQuery::read('password.length', 4)]),
+                    new Constraints\Callback([$this, 'verifyPasswordField']),
                 ],
-                "label" => Translator::getInstance()->trans('Password confirmation'),
-                "label_attr" => [
-                    "for" => "password_confirmation",
+                'label' => Translator::getInstance()->trans('Password confirmation'),
+                'label_attr' => [
+                    'for' => 'password_confirmation',
                 ],
             ]);
     }
@@ -67,14 +67,14 @@ class CustomerPasswordUpdateForm extends BaseForm
     public function verifyCurrentPasswordField($value, ExecutionContextInterface $context)
     {
         /**
-         * Retrieve the user recording, because after the login action, the password is deleted in the session
+         * Retrieve the user recording, because after the login action, the password is deleted in the session.
          */
         $userId = $this->getRequest()->getSession()->getCustomerUser()->getId();
         $user = CustomerQuery::create()->findPk($userId);
 
         // Check if value of the old password match the password of the current user
         if (!password_verify($value, $user->getPassword())) {
-            $context->addViolation(Translator::getInstance()->trans("Your current password does not match."));
+            $context->addViolation(Translator::getInstance()->trans('Your current password does not match.'));
         }
     }
 
@@ -82,13 +82,13 @@ class CustomerPasswordUpdateForm extends BaseForm
     {
         $data = $context->getRoot()->getData();
 
-        if ($data["password"] != $data["password_confirm"]) {
-            $context->addViolation(Translator::getInstance()->trans("password confirmation is not the same as password field"));
+        if ($data['password'] != $data['password_confirm']) {
+            $context->addViolation(Translator::getInstance()->trans('password confirmation is not the same as password field'));
         }
     }
 
     public static function getName()
     {
-        return "thelia_customer_password_update";
+        return 'thelia_customer_password_update';
     }
 }

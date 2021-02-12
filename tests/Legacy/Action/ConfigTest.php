@@ -20,13 +20,13 @@ use Thelia\Model\Config as ConfigModel;
 use Thelia\Model\ConfigQuery;
 
 /**
- * Class ConfigTest
- * @package Thelia\Tests\Action
+ * Class ConfigTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ConfigTest extends BaseAction
 {
-    public static function setUpBeforeClass():void
+    public static function setUpBeforeClass(): void
     {
         ConfigQuery::create()
             ->filterByName('foo')
@@ -67,6 +67,7 @@ class ConfigTest extends BaseAction
 
     /**
      * @depends testCreate
+     *
      * @return ConfigModel
      */
     public function testSetValue(ConfigModel $config)
@@ -94,6 +95,7 @@ class ConfigTest extends BaseAction
 
     /**
      * @depends testSetValue
+     *
      * @return ConfigModel
      */
     public function testModify(ConfigModel $config)

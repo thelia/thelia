@@ -28,8 +28,8 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
 /**
- * Class HookCreationForm
- * @package Thelia\Form
+ * Class HookCreationForm.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleHookCreationForm extends BaseForm
@@ -41,84 +41,84 @@ class ModuleHookCreationForm extends BaseForm
     {
         $this->formBuilder
             ->add(
-                "module_id",
+                'module_id',
                 ChoiceType::class,
                 [
-                    "choices" => $this->getModuleChoices(),
-                    "constraints" => [
+                    'choices' => $this->getModuleChoices(),
+                    'constraints' => [
                         new NotBlank(),
                     ],
-                    "label" => $this->trans("Module"),
-                    "label_attr" => [
-                        "for" => "module_id",
-                        "help" => $this->trans(
-                            "Only hookable modules are displayed in this menu."
+                    'label' => $this->trans('Module'),
+                    'label_attr' => [
+                        'for' => 'module_id',
+                        'help' => $this->trans(
+                            'Only hookable modules are displayed in this menu.'
                         ),
                     ],
                 ]
             )
             ->add(
-                "hook_id",
+                'hook_id',
                 ChoiceType::class,
                 [
-                    "choices" => $this->getHookChoices(),
-                    "constraints" => [
+                    'choices' => $this->getHookChoices(),
+                    'constraints' => [
                         new NotBlank(),
                     ],
-                    "label" => $this->trans("Hook"),
-                    "label_attr" => ["for" => "hook_id"],
+                    'label' => $this->trans('Hook'),
+                    'label_attr' => ['for' => 'hook_id'],
                 ]
             )
             ->add(
-                "classname",
+                'classname',
                 TextType::class,
                 [
-                    "constraints" => [
+                    'constraints' => [
                         new NotBlank(),
                     ],
-                    "label" => $this->trans("Service ID"),
-                    "label_attr" => [
-                        "for" => "classname",
-                        "help" => $this->trans(
-                            "The service id that will handle the hook (defined in the config.xml file of the module)."
+                    'label' => $this->trans('Service ID'),
+                    'label_attr' => [
+                        'for' => 'classname',
+                        'help' => $this->trans(
+                            'The service id that will handle the hook (defined in the config.xml file of the module).'
                         ),
                     ],
                 ]
             )
             ->add(
-                "method",
+                'method',
                 TextType::class,
                 [
-                    "label" => $this->trans("Method Name"),
-                    "constraints" => [
-                        new NotBlank()
+                    'label' => $this->trans('Method Name'),
+                    'constraints' => [
+                        new NotBlank(),
                     ],
-                    "label_attr" => [
-                        "for" => "method",
-                        "help" => $this->trans(
-                            "The method name that will handle the hook event."
+                    'label_attr' => [
+                        'for' => 'method',
+                        'help' => $this->trans(
+                            'The method name that will handle the hook event.'
                         ),
                     ],
                 ]
             )
             ->add(
-                "templates",
+                'templates',
                 TextType::class,
                 [
-                    "label" => $this->trans("Automatic rendered templates"),
-                    "constraints" => [
+                    'label' => $this->trans('Automatic rendered templates'),
+                    'constraints' => [
                         new Callback(
-                            [$this, "verifyTemplates"]
+                            [$this, 'verifyTemplates']
                         ),
                     ],
-                    "label_attr" => [
-                        "for" => "templates",
-                        "help" => $this->trans(
-                            "When using the %method% method you can automatically render or dump templates or add CSS and JS files (e.g.: render:mytemplate.html;js:assets/js/myjs.js)",
-                            ["%method%" => BaseHook::INJECT_TEMPLATE_METHOD_NAME]
+                    'label_attr' => [
+                        'for' => 'templates',
+                        'help' => $this->trans(
+                            'When using the %method% method you can automatically render or dump templates or add CSS and JS files (e.g.: render:mytemplate.html;js:assets/js/myjs.js)',
+                            ['%method%' => BaseHook::INJECT_TEMPLATE_METHOD_NAME]
                         ),
                     ],
-                    "required" => false
+                    'required' => false,
                 ]
             )
         ;
@@ -185,9 +185,9 @@ class ModuleHookCreationForm extends BaseForm
         if (!empty($data['templates']) && $data['method'] !== BaseHook::INJECT_TEMPLATE_METHOD_NAME) {
             $context->addViolation(
                 $this->trans(
-                    "If you use automatic insert templates, you should use the method %method%",
+                    'If you use automatic insert templates, you should use the method %method%',
                     [
-                        '%method%' => BaseHook::INJECT_TEMPLATE_METHOD_NAME
+                        '%method%' => BaseHook::INJECT_TEMPLATE_METHOD_NAME,
                     ]
                 )
             );
@@ -196,6 +196,6 @@ class ModuleHookCreationForm extends BaseForm
 
     public static function getName()
     {
-        return "thelia_module_hook_creation";
+        return 'thelia_module_hook_creation';
     }
 }

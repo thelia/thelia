@@ -15,9 +15,8 @@ namespace Thelia\Core\Event\Loop;
 use Thelia\Core\Template\Element\BaseLoop;
 
 /**
- * Class LoopExtendsBuildArrayEvent
+ * Class LoopExtendsBuildArrayEvent.
  *
- * @package Thelia\Core\Event\Loop
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class LoopExtendsBuildArrayEvent extends LoopExtendsEvent
@@ -28,7 +27,7 @@ class LoopExtendsBuildArrayEvent extends LoopExtendsEvent
     protected $array;
 
     /**
-     * Class constructor
+     * Class constructor.
      *
      * @param \Thelia\Core\Template\Element\BaseLoop $loop  Loop object
      * @param array                                  $array Build array base results
@@ -41,7 +40,7 @@ class LoopExtendsBuildArrayEvent extends LoopExtendsEvent
     }
 
     /**
-     * Get build array results
+     * Get build array results.
      *
      * @return array Build array results
      */
@@ -51,8 +50,7 @@ class LoopExtendsBuildArrayEvent extends LoopExtendsEvent
     }
 
     /**
-     * Set build array results
-     *
+     * Set build array results.
      *
      * @return $this Return $this, allow chaining
      */

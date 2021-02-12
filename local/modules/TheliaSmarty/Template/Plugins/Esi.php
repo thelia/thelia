@@ -19,8 +19,8 @@ use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 /**
- * Class Esi
- * @package Thelia\Core\Template\Smarty\Plugins
+ * Class Esi.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Esi extends AbstractSmartyPlugin
@@ -51,7 +51,7 @@ class Esi extends AbstractSmartyPlugin
         $response = $this->esiFragmentRender->render($path, $this->requestStack->getCurrentRequest(), [
             'alt' => $alt,
             'ignore_errors' => $ignore_errors,
-            'comment' => $comment
+            'comment' => $comment,
         ]);
 
         if (!$response->isSuccessful()) {
@@ -67,7 +67,7 @@ class Esi extends AbstractSmartyPlugin
     public function getPluginDescriptors()
     {
         return [
-            new SmartyPluginDescriptor('function', 'render_esi', $this, 'renderEsi')
+            new SmartyPluginDescriptor('function', 'render_esi', $this, 'renderEsi'),
         ];
     }
 }

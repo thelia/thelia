@@ -21,7 +21,7 @@ use Thelia\Model\Config;
 use Thelia\Model\ConfigQuery;
 
 /**
- * command line for managing configuration variables
+ * command line for managing configuration variables.
  *
  * php Thelia thelia:config COMMAND [name] [value] [--secured] [--visible]
  *
@@ -33,7 +33,7 @@ use Thelia\Model\ConfigQuery;
  * --secured and/or --visible arguments.
  *
  * Class ConfigCommand
- * @package Thelia\Command
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ConfigCommand extends ContainerAwareCommand
@@ -41,8 +41,8 @@ class ConfigCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName("thelia:config")
-            ->setDescription("Manage configuration variables")
+            ->setName('thelia:config')
+            ->setDescription('Manage configuration variables')
             ->addArgument(
                 'COMMAND',
                 InputArgument::REQUIRED,
@@ -75,19 +75,20 @@ class ConfigCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $command = $input->getArgument("COMMAND");
+        $command = $input->getArgument('COMMAND');
 
         switch ($command) {
-            case "list":
+            case 'list':
                 return $this->listConfig($input, $output);
-            case "get":
+            case 'get':
                 return $this->getConfig($input, $output);
-            case "set":
+            case 'set':
                 return $this->setConfig($input, $output);
-            case "delete":
+            case 'delete':
                 return $this->deleteConfig($input, $output);
             default:
                 $output->writeln("<error>Unknown argument 'COMMAND' : list, get, set, delete</error>");
+
                 return 1;
         }
     }
@@ -95,9 +96,9 @@ class ConfigCommand extends ContainerAwareCommand
     private function listConfig(InputInterface $input, OutputInterface $output)
     {
         $output->writeln([
-            "",
-            "<error>Variables list</error>",
-            ""
+            '',
+            '<error>Variables list</error>',
+            '',
         ]);
 
         $vars = ConfigQuery::create()
@@ -112,8 +113,8 @@ class ConfigCommand extends ContainerAwareCommand
             $rows[] = [
                 $var->getName(),
                 $var->getValue(),
-                $var->getSecured() !== 0 ? "yes" : "no",
-                $var->getHidden() !== 0 ? "yes" : "no"
+                $var->getSecured() !== 0 ? 'yes' : 'no',
+                $var->getHidden() !== 0 ? 'yes' : 'no',
             ];
         }
 
@@ -129,12 +130,13 @@ class ConfigCommand extends ContainerAwareCommand
 
     private function getConfig(InputInterface $input, OutputInterface $output)
     {
-        $varName = $input->getArgument("name");
+        $varName = $input->getArgument('name');
 
         if (null === $varName) {
             $output->writeln(
                 "<error>Need argument 'name' for get command</error>"
             );
+
             return 1;
         }
 
@@ -149,12 +151,12 @@ class ConfigCommand extends ContainerAwareCommand
             );
         } else {
             $out = [
-                sprintf('%12s: <%3$s>%s</%3$s>', "Name", $var->getName(), "info"),
-                sprintf('%12s: <%3$s>%s</%3$s>', "Value", $var->getValue(), "info"),
-                sprintf('%12s: <%3$s>%s</%3$s>', "Secured", $var->getSecured() ? "yes" : "no", "info"),
-                sprintf('%12s: <%3$s>%s</%3$s>', "Hidden", $var->getHidden() ? "yes" : "no", "info"),
-                sprintf('%12s: <%3$s>%s</%3$s>', "Title", $var->getTitle(), "info"),
-                sprintf('%12s: <%3$s>%s</%3$s>', "Description", $var->getDescription(), "info"),
+                sprintf('%12s: <%3$s>%s</%3$s>', 'Name', $var->getName(), 'info'),
+                sprintf('%12s: <%3$s>%s</%3$s>', 'Value', $var->getValue(), 'info'),
+                sprintf('%12s: <%3$s>%s</%3$s>', 'Secured', $var->getSecured() ? 'yes' : 'no', 'info'),
+                sprintf('%12s: <%3$s>%s</%3$s>', 'Hidden', $var->getHidden() ? 'yes' : 'no', 'info'),
+                sprintf('%12s: <%3$s>%s</%3$s>', 'Title', $var->getTitle(), 'info'),
+                sprintf('%12s: <%3$s>%s</%3$s>', 'Description', $var->getDescription(), 'info'),
             ];
         }
 
@@ -165,36 +167,38 @@ class ConfigCommand extends ContainerAwareCommand
 
     private function setConfig(InputInterface $input, OutputInterface $output)
     {
-        $varName = $input->getArgument("name");
-        $varValue = $input->getArgument("value");
+        $varName = $input->getArgument('name');
+        $varValue = $input->getArgument('value');
 
         if (null === $varName || null === $varValue) {
             $output->writeln(
                 "<error>Need argument 'name' and 'value' for set command</error>"
             );
+
             return 1;
         }
 
         ConfigQuery::write(
             $varName,
             $varValue,
-            $input->getOption("secured"),
-            !$input->getOption("visible")
+            $input->getOption('secured'),
+            !$input->getOption('visible')
         );
 
-        $output->writeln("<info>Variable has been set</info>");
+        $output->writeln('<info>Variable has been set</info>');
 
         return 0;
     }
 
     private function deleteConfig(InputInterface $input, OutputInterface $output)
     {
-        $varName = $input->getArgument("name");
+        $varName = $input->getArgument('name');
 
         if (null === $varName) {
             $output->writeln(
                 "<error>Need argument 'name' for get command</error>"
             );
+
             return 1;
         }
 

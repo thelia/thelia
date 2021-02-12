@@ -18,7 +18,6 @@ use Propel\Generator\Command\MigrationUpCommand;
 use Propel\Generator\Command\ModelBuildCommand;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
-use Symfony\Component\ClassLoader\ClassLoader;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Console\Application as SymfonyConsoleApplication;
@@ -37,45 +36,51 @@ use Thelia\Log\Tlog;
 
 /**
  * Propel cache and initialization service.
+ *
  * @since 2.4
  */
 class PropelInitService
 {
     /**
      * Name of the Propel initialization file.
+     *
      * @var string
      */
     protected static $PROPEL_CONFIG_CACHE_FILENAME = 'propel.init.php';
 
     /**
      * Application environment.
+     *
      * @var string
      */
     protected $environment;
 
     /**
      * Whether the application is in debug mode.
+     *
      * @var bool
      */
     protected $debug;
 
     /**
      * Map of environment parameters.
+     *
      * @var array
      */
     protected $envParameters = [];
 
     /**
      * Propel schema locator service.
+     *
      * @var SchemaLocator
      */
     protected $schemaLocator;
 
     /**
-     * @param string $environment Application environment.
-     * @param bool $debug Whether the application is in debug mode.
-     * @param array $envParameters Map of environment parameters.
-     * @param SchemaLocator $schemaLocator Propel schema locator service.
+     * @param string        $environment   application environment
+     * @param bool          $debug         whether the application is in debug mode
+     * @param array         $envParameters map of environment parameters
+     * @param SchemaLocator $schemaLocator propel schema locator service
      */
     public function __construct(
         $environment,
@@ -90,62 +95,62 @@ class PropelInitService
     }
 
     /**
-     * @return string Thelia database configuration file.
+     * @return string thelia database configuration file
      */
     protected function getTheliaDatabaseConfigFile()
     {
         $fs = new Filesystem();
 
-        $databaseConfigFile = THELIA_CONF_DIR . 'database_' . $this->environment . '.yml';
+        $databaseConfigFile = THELIA_CONF_DIR.'database_'.$this->environment.'.yml';
         if (!$fs->exists($databaseConfigFile)) {
-            $databaseConfigFile = THELIA_CONF_DIR . 'database.yml';
+            $databaseConfigFile = THELIA_CONF_DIR.'database.yml';
         }
 
         return $databaseConfigFile;
     }
 
     /**
-     * @return string Propel subdirectory in the Thelia cache directory.
+     * @return string propel subdirectory in the Thelia cache directory
      */
     public function getPropelCacheDir()
     {
-        return THELIA_CACHE_DIR . $this->environment . DS . 'propel' . DS;
+        return THELIA_CACHE_DIR.$this->environment.DS.'propel'.DS;
     }
 
     /**
-     * @return string Propel configuration directory.
+     * @return string propel configuration directory
      */
     public function getPropelConfigDir()
     {
-        return $this->getPropelCacheDir() . 'config' . DS;
+        return $this->getPropelCacheDir().'config'.DS;
     }
 
     /**
-     * @return string Propel cached configuration file.
+     * @return string propel cached configuration file
      */
     public function getPropelConfigFile()
     {
-        return $this->getPropelConfigDir() . 'propel.yml';
+        return $this->getPropelConfigDir().'propel.yml';
     }
 
     /**
-     * @return string Propel cached initialization file.
+     * @return string propel cached initialization file
      */
     public function getPropelInitFile()
     {
-        return $this->getPropelConfigDir() . static::$PROPEL_CONFIG_CACHE_FILENAME;
+        return $this->getPropelConfigDir().static::$PROPEL_CONFIG_CACHE_FILENAME;
     }
 
     /**
-     * @return string Generated global Propel schema(s) directory.
+     * @return string generated global Propel schema(s) directory
      */
     public function getPropelSchemaDir()
     {
-        return $this->getPropelCacheDir() . 'schema' . DS;
+        return $this->getPropelCacheDir().'schema'.DS;
     }
 
     /**
-     * @return string Generated Propel models directory.
+     * @return string generated Propel models directory
      */
     public function getPropelModelDir()
     {
@@ -153,7 +158,7 @@ class PropelInitService
     }
 
     /**
-     * @return string Generated Propel models directory.
+     * @return string generated Propel models directory
      */
     public function getPropelDatabaseDir()
     {
@@ -161,19 +166,22 @@ class PropelInitService
     }
 
     /**
-     * @return string Generated Propel migrations directory.
+     * @return string generated Propel migrations directory
      */
     public function getPropelMigrationDir()
     {
-        return $this->getPropelCacheDir() . 'migration' . DS;
+        return $this->getPropelCacheDir().'migration'.DS;
     }
 
     /**
      * Run a Propel command.
-     * @param Command $command Command to run.
-     * @param array $parameters Command parameters.
-     * @param OutputInterface|null $output Command output.
-     * @return int Command exit code.
+     *
+     * @param Command              $command    command to run
+     * @param array                $parameters command parameters
+     * @param OutputInterface|null $output     command output
+     *
+     * @return int command exit code
+     *
      * @throws \Exception
      */
     public function runCommand(Command $command, array $parameters = [], OutputInterface $output = null)
@@ -213,29 +221,19 @@ class PropelInitService
 
         $propelConfig['propel']['paths']['phpDir'] = THELIA_ROOT;
         $propelConfig['propel']['generator']['objectModel']['builders'] = [
-            'object'
-            => '\Thelia\Core\Propel\Generator\Builder\Om\ObjectBuilder',
-            'objectstub'
-            => '\Thelia\Core\Propel\Generator\Builder\Om\ExtensionObjectBuilder',
-            'objectmultiextend'
-            => '\Thelia\Core\Propel\Generator\Builder\Om\MultiExtendObjectBuilder',
-            'query'
-            => '\Thelia\Core\Propel\Generator\Builder\Om\QueryBuilder',
-            'querystub'
-            => '\Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryBuilder',
-            'queryinheritance'
-            => '\Thelia\Core\Propel\Generator\Builder\Om\QueryInheritanceBuilder',
-            'queryinheritancestub'
-            => '\Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryInheritanceBuilder',
-            'tablemap'
-            => '\Thelia\Core\Propel\Generator\Builder\Om\TableMapBuilder',
-            'event'
-            => '\Thelia\Core\Propel\Generator\Builder\Om\EventBuilder'
+            'object' => '\Thelia\Core\Propel\Generator\Builder\Om\ObjectBuilder',
+            'objectstub' => '\Thelia\Core\Propel\Generator\Builder\Om\ExtensionObjectBuilder',
+            'objectmultiextend' => '\Thelia\Core\Propel\Generator\Builder\Om\MultiExtendObjectBuilder',
+            'query' => '\Thelia\Core\Propel\Generator\Builder\Om\QueryBuilder',
+            'querystub' => '\Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryBuilder',
+            'queryinheritance' => '\Thelia\Core\Propel\Generator\Builder\Om\QueryInheritanceBuilder',
+            'queryinheritancestub' => '\Thelia\Core\Propel\Generator\Builder\Om\ExtensionQueryInheritanceBuilder',
+            'tablemap' => '\Thelia\Core\Propel\Generator\Builder\Om\TableMapBuilder',
+            'event' => '\Thelia\Core\Propel\Generator\Builder\Om\EventBuilder',
         ];
 
         $propelConfig['propel']['generator']['builders'] = [
-            'resolver'
-            => '\Thelia\Core\Propel\Generator\Builder\ResolverBuilder'
+            'resolver' => '\Thelia\Core\Propel\Generator\Builder\ResolverBuilder',
         ];
 
         $configOptions['propel']['paths']['migrationDir'] = $this->getPropelConfigDir();
@@ -248,6 +246,7 @@ class PropelInitService
 
     /**
      * Generate the Propel initialization file.
+     *
      * @throws \Exception
      */
     public function buildPropelInitFile()
@@ -266,7 +265,7 @@ class PropelInitService
             [
                 '--config-dir' => $this->getPropelConfigDir(),
                 '--output-dir' => $this->getPropelConfigDir(),
-                '--output-file' => static::$PROPEL_CONFIG_CACHE_FILENAME
+                '--output-file' => static::$PROPEL_CONFIG_CACHE_FILENAME,
             ]
         );
 
@@ -314,16 +313,17 @@ class PropelInitService
                 $databaseSchemaResources
             );
 
-            $hash .= md5(file_get_contents($this->getPropelSchemaDir() . $database .'.schema.xml'));
+            $hash .= md5(file_get_contents($this->getPropelSchemaDir().$database.'.schema.xml'));
         }
 
-        $fs->dumpFile($this->getPropelCacheDir() . 'hash', $hash);
+        $fs->dumpFile($this->getPropelCacheDir().'hash', $hash);
 
         return true;
     }
 
     /**
      * Generate the base Propel models.
+     *
      * @throws \Exception
      */
     public function buildPropelModels()
@@ -331,8 +331,8 @@ class PropelInitService
         $fs = new Filesystem();
 
         // cache testing
-        if ($fs->exists($this->getPropelModelDir() . 'hash')
-            && file_get_contents($this->getPropelCacheDir() . 'hash') === file_get_contents($this->getPropelModelDir() . 'hash')) {
+        if ($fs->exists($this->getPropelModelDir().'hash')
+            && file_get_contents($this->getPropelCacheDir().'hash') === file_get_contents($this->getPropelModelDir().'hash')) {
             return false;
         }
 
@@ -342,13 +342,13 @@ class PropelInitService
             new ModelBuildCommand(),
             [
                 '--config-dir' => $this->getPropelConfigDir(),
-                '--schema-dir' => $this->getPropelSchemaDir()
+                '--schema-dir' => $this->getPropelSchemaDir(),
             ]
         );
 
         $fs->copy(
-            $this->getPropelCacheDir() . 'hash',
-            $this->getPropelModelDir() . 'hash'
+            $this->getPropelCacheDir().'hash',
+            $this->getPropelModelDir().'hash'
         );
 
         return true;
@@ -360,7 +360,7 @@ class PropelInitService
             new MigrationUpCommand(),
             [
                 '--config-dir' => $this->getPropelConfigDir(),
-                '--output-dir' => THELIA_CACHE_DIR . 'propel-migrations' . DS
+                '--output-dir' => THELIA_CACHE_DIR.'propel-migrations'.DS,
             ]
         );
 
@@ -370,7 +370,7 @@ class PropelInitService
                 '--config-dir' => $this->getPropelConfigDir(),
                 '--schema-dir' => $this->getPropelSchemaDir(),
                 '--skip-removed-table' => true,
-                '--output-dir' => THELIA_CACHE_DIR . 'propel-migrations' . DS
+                '--output-dir' => THELIA_CACHE_DIR.'propel-migrations'.DS,
             ]
         );
 
@@ -378,17 +378,21 @@ class PropelInitService
             new MigrationUpCommand(),
             [
                 '--config-dir' => $this->getPropelConfigDir(),
-                '--output-dir' => THELIA_CACHE_DIR . 'propel-migrations' . DS
+                '--output-dir' => THELIA_CACHE_DIR.'propel-migrations'.DS,
             ]
         );
     }
 
     /**
      * Initialize the Propel environment and connection.
-     * @return bool Whether a Propel connection is available.
-     * @param bool $force force cache generation
+     *
+     * @return bool whether a Propel connection is available
+     *
+     * @param bool $force        force cache generation
      * @param bool $cacheRefresh
+     *
      * @throws \Throwable
+     *
      * @internal
      */
     public function init($force = false, &$cacheRefresh = false)
@@ -436,7 +440,7 @@ class PropelInitService
             }
         } catch (\Throwable $th) {
             $fs = new Filesystem();
-            $fs->remove(THELIA_CACHE_DIR . $this->environment);
+            $fs->remove(THELIA_CACHE_DIR.$this->environment);
             $fs->remove($this->getPropelModelDir());
             throw $th;
         } finally {

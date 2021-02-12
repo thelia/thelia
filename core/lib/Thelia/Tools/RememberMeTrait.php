@@ -17,8 +17,8 @@ use Thelia\Core\Security\Token\CookieTokenProvider;
 use Thelia\Core\Security\User\UserInterface;
 
 /**
- * Trait RememberMeTrait
- * @package Thelia\Tools
+ * Trait RememberMeTrait.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 trait RememberMeTrait
@@ -26,7 +26,7 @@ trait RememberMeTrait
     /**
      * Get the remember me key from the cookie.
      *
-     * @return string hte key found, or null if no key was found.
+     * @return string hte key found, or null if no key was found
      */
     protected function getRememberMeKeyFromCookie(Request $request, $cookieName)
     {

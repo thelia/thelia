@@ -13,11 +13,8 @@
 namespace Thelia\Core\Template\Loop\Argument;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
-
 class ArgumentCollection implements \Iterator
 {
     private $arguments = [];
@@ -29,6 +26,7 @@ class ArgumentCollection implements \Iterator
 
     /**
      * @param $key
+     *
      * @return bool
      */
     public function hasKey($key)
@@ -38,6 +36,7 @@ class ArgumentCollection implements \Iterator
 
     /**
      * @param $key
+     *
      * @return Argument|null
      */
     public function get($key)
@@ -54,7 +53,7 @@ class ArgumentCollection implements \Iterator
     }
 
     /**
-     * @param       $force
+     * @param $force
      *
      * @return ArgumentCollection
      */
@@ -68,13 +67,13 @@ class ArgumentCollection implements \Iterator
     }
 
     /**
-     * @param          $force
+     * @param $force
      *
      * @return ArgumentCollection
      */
     public function addArgument(Argument $argument, $force = true)
     {
-        if (isset($this->arguments[$argument->name]) && ! $force) {
+        if (isset($this->arguments[$argument->name]) && !$force) {
             return $this;
         }
 
@@ -84,9 +83,10 @@ class ArgumentCollection implements \Iterator
     }
 
     /**
-     * @param array $argumentNames Array with names of arguments to remove.
+     * @param array $argumentNames array with names of arguments to remove
      *
      * @return ArgumentCollection
+     *
      * @since 2.2.0-beta1
      */
     public function removeArguments(array $argumentNames)
@@ -99,9 +99,10 @@ class ArgumentCollection implements \Iterator
     }
 
     /**
-     * @param string $argumentName Name of the argument to remove.
+     * @param string $argumentName name of the argument to remove
      *
      * @return ArgumentCollection
+     *
      * @since 2.2.0-beta1
      */
     public function removeArgument($argumentName)
@@ -120,8 +121,10 @@ class ArgumentCollection implements \Iterator
 
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
-     * Return the current element
-     * @link http://php.net/manual/en/iterator.current.php
+     * Return the current element.
+     *
+     * @see http://php.net/manual/en/iterator.current.php
+     *
      * @return Argument
      */
     public function current()
@@ -131,9 +134,11 @@ class ArgumentCollection implements \Iterator
 
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
-     * Move forward to next element
-     * @link http://php.net/manual/en/iterator.next.php
-     * @return void Any returned value is ignored.
+     * Move forward to next element.
+     *
+     * @see http://php.net/manual/en/iterator.next.php
+     *
+     * @return void any returned value is ignored
      */
     public function next()
     {
@@ -142,9 +147,11 @@ class ArgumentCollection implements \Iterator
 
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
-     * Return the key of the current element
-     * @link http://php.net/manual/en/iterator.key.php
-     * @return mixed scalar on success, or null on failure.
+     * Return the key of the current element.
+     *
+     * @see http://php.net/manual/en/iterator.key.php
+     *
+     * @return mixed scalar on success, or null on failure
      */
     public function key()
     {
@@ -153,10 +160,12 @@ class ArgumentCollection implements \Iterator
 
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
-     * Checks if current position is valid
-     * @link http://php.net/manual/en/iterator.valid.php
-     * @return boolean The return value will be casted to boolean and then evaluated.
-     *                 Returns true on success or false on failure.
+     * Checks if current position is valid.
+     *
+     * @see http://php.net/manual/en/iterator.valid.php
+     *
+     * @return bool The return value will be casted to boolean and then evaluated.
+     *              Returns true on success or false on failure.
      */
     public function valid()
     {
@@ -165,9 +174,11 @@ class ArgumentCollection implements \Iterator
 
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
-     * Rewind the Iterator to the first element
-     * @link http://php.net/manual/en/iterator.rewind.php
-     * @return void Any returned value is ignored.
+     * Rewind the Iterator to the first element.
+     *
+     * @see http://php.net/manual/en/iterator.rewind.php
+     *
+     * @return void any returned value is ignored
      */
     public function rewind()
     {

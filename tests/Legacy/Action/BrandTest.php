@@ -24,8 +24,8 @@ use Thelia\Model\BrandQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
- * Class BrandTest
- * @package Thelia\Tests\Action
+ * Class BrandTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class BrandTest extends TestCaseWithURLToolSetup
@@ -59,6 +59,7 @@ class BrandTest extends TestCaseWithURLToolSetup
 
     /**
      * @param BrandUpdateEvent $event
+     *
      * @return Brand
      */
     public function processUpdateAction($event)
@@ -159,7 +160,7 @@ class BrandTest extends TestCaseWithURLToolSetup
             $this->fail('use fixtures before launching test, there is no brand in database');
         }
 
-        $newPosition = $brand->getPosition()-1;
+        $newPosition = $brand->getPosition() - 1;
 
         $event = new UpdatePositionEvent($brand->getId(), UpdatePositionEvent::POSITION_UP);
 
@@ -168,7 +169,7 @@ class BrandTest extends TestCaseWithURLToolSetup
 
         $updatedBrand = BrandQuery::create()->findPk($brand->getId());
 
-        $this->assertEquals($newPosition, $updatedBrand->getPosition(), sprintf("new position is %d, new position expected is %d for brand %d", $newPosition, $updatedBrand->getPosition(), $updatedBrand->getId()));
+        $this->assertEquals($newPosition, $updatedBrand->getPosition(), sprintf('new position is %d, new position expected is %d for brand %d', $newPosition, $updatedBrand->getPosition(), $updatedBrand->getId()));
     }
 
     public function testUpdatePositionDown()
@@ -183,7 +184,7 @@ class BrandTest extends TestCaseWithURLToolSetup
             $this->fail('use fixtures before launching test, there is no brand in database');
         }
 
-        $newPosition = $brand->getPosition()+1;
+        $newPosition = $brand->getPosition() + 1;
 
         $event = new UpdatePositionEvent($brand->getId(), UpdatePositionEvent::POSITION_DOWN);
 
@@ -192,7 +193,7 @@ class BrandTest extends TestCaseWithURLToolSetup
 
         $updatedBrand = BrandQuery::create()->findPk($brand->getId());
 
-        $this->assertEquals($newPosition, $updatedBrand->getPosition(), sprintf("new position is %d, new position expected is %d for brand %d", $newPosition, $updatedBrand->getPosition(), $updatedBrand->getId()));
+        $this->assertEquals($newPosition, $updatedBrand->getPosition(), sprintf('new position is %d, new position expected is %d for brand %d', $newPosition, $updatedBrand->getPosition(), $updatedBrand->getId()));
     }
 
     public function testUpdatePositionWithSpecificPosition()
@@ -214,11 +215,11 @@ class BrandTest extends TestCaseWithURLToolSetup
 
         $updatedBrand = BrandQuery::create()->findPk($brand->getId());
 
-        $this->assertEquals(1, $updatedBrand->getPosition(), sprintf("new position is 1, new position expected is %d for brand %d", $updatedBrand->getPosition(), $updatedBrand->getId()));
+        $this->assertEquals(1, $updatedBrand->getPosition(), sprintf('new position is 1, new position expected is %d for brand %d', $updatedBrand->getPosition(), $updatedBrand->getId()));
     }
 
     /**
-     * Reorder brand to have proper position
+     * Reorder brand to have proper position.
      */
     protected function resetBrandPosition()
     {
@@ -229,7 +230,7 @@ class BrandTest extends TestCaseWithURLToolSetup
         foreach ($brands as $brand) {
             $brand->setPosition($counter);
             $brand->save();
-            $counter++;
+            ++$counter;
         }
     }
 

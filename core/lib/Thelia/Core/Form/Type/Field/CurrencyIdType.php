@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\CurrencyQuery;
 
 /**
- * Class CurrencyIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class CurrencyIdType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class CurrencyIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class CurrencyIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "currency_id";
+        return 'currency_id';
     }
 }

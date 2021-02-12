@@ -21,14 +21,14 @@ use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 /**
- * Class ContactController
- * @package Thelia\Controller\Front
+ * Class ContactController.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ContactController extends BaseFrontController
 {
     /**
-     * send contact message
+     * send contact message.
      */
     public function sendAction()
     {
@@ -42,14 +42,14 @@ class ContactController extends BaseFrontController
             $this->dispatch(TheliaEvents::CONTACT_SUBMIT, $event);
 
             $this->getMailer()->sendSimpleEmailMessage(
-                [ ConfigQuery::getStoreEmail() => $event->getName() ],
-                [ ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName() ],
+                [ConfigQuery::getStoreEmail() => $event->getName()],
+                [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
                 $event->getSubject(),
                 '',
                 $event->getMessage(),
                 [],
                 [],
-                [ $event->getEmail() => $event->getName() ]
+                [$event->getEmail() => $event->getName()]
             );
 
             if ($contactForm->hasSuccessUrl()) {

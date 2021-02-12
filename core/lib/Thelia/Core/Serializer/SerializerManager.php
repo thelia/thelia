@@ -15,7 +15,8 @@ namespace Thelia\Core\Serializer;
 use Thelia\Core\Translation\Translator;
 
 /**
- * Class SerializerManager
+ * Class SerializerManager.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class SerializerManager
@@ -26,7 +27,7 @@ class SerializerManager
     protected $serializers = [];
 
     /**
-     * Reset manager
+     * Reset manager.
      *
      * @return $this Return $this, allow chaining
      */
@@ -38,7 +39,7 @@ class SerializerManager
     }
 
     /**
-     * Get all serializers
+     * Get all serializers.
      *
      * @return array All serializers
      */
@@ -48,14 +49,14 @@ class SerializerManager
     }
 
     /**
-     * Determine if a serializer exists under the given identifier
+     * Determine if a serializer exists under the given identifier.
      *
-     * @param string  $serializerId   A serializer identifier
-     * @param boolean $throwException Throw exception if serializer doesn't exists or not
+     * @param string $serializerId   A serializer identifier
+     * @param bool   $throwException Throw exception if serializer doesn't exists or not
      *
      * @throws \InvalidArgumentException if the serializer identifier does not exist
      *
-     * @return boolean True if the serializer exists, false otherwise
+     * @return bool True if the serializer exists, false otherwise
      */
     public function has($serializerId, $throwException = false)
     {
@@ -66,7 +67,7 @@ class SerializerManager
                 Translator::getInstance()->trans(
                     'The serializer identifier "%serializerId" doesn\’t exist',
                     [
-                        '%serializerId' => $serializerId
+                        '%serializerId' => $serializerId,
                     ]
                 )
             );
@@ -76,7 +77,7 @@ class SerializerManager
     }
 
     /**
-     * Get a serializer
+     * Get a serializer.
      *
      * @param string $serializerId A serializer identifier
      *
@@ -90,7 +91,7 @@ class SerializerManager
     }
 
     /**
-     * Set serializers
+     * Set serializers.
      *
      * @param array $serializers An array of serializer
      *
@@ -104,7 +105,7 @@ class SerializerManager
 
         foreach ($serializers as $serializer) {
             if (!($serializer instanceof SerializerInterface)) {
-                throw new \Exception('SerializerManager manage only ' . __NAMESPACE__ . '\\SerializerInterface');
+                throw new \Exception('SerializerManager manage only '.__NAMESPACE__.'\\SerializerInterface');
             }
 
             $this->serializers[$serializer->getId()] = $serializer;
@@ -114,7 +115,7 @@ class SerializerManager
     }
 
     /**
-     * Add a serializer
+     * Add a serializer.
      *
      * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer
      *
@@ -128,7 +129,7 @@ class SerializerManager
     }
 
     /**
-     * Remove a serializer
+     * Remove a serializer.
      *
      * @param string $serializerId A serializer identifier
      */

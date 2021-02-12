@@ -22,58 +22,57 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
 /**
- * activates a module
+ * activates a module.
  *
  * Class ModuleActivateCommand
- * @package Thelia\Command
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class ModuleActivateCommand extends BaseModuleGenerate
 {
     protected function configure()
     {
         $this
-            ->setName("module:activate")
-            ->setDescription("Activates a module")
+            ->setName('module:activate')
+            ->setDescription('Activates a module')
             ->addOption(
-                "with-dependencies",
+                'with-dependencies',
                 null,
                 InputOption::VALUE_NONE,
                 'activate module recursively'
             )
             ->addArgument(
-                "module",
+                'module',
                 InputArgument::REQUIRED,
-                "module to activate"
+                'module to activate'
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $moduleCode = $this->formatModuleName($input->getArgument("module"));
+        $moduleCode = $this->formatModuleName($input->getArgument('module'));
 
         $module = ModuleQuery::create()->findOneByCode($moduleCode);
 
         if (null === $module) {
-            throw new \RuntimeException(sprintf("module %s not found", $moduleCode));
+            throw new \RuntimeException(sprintf('module %s not found', $moduleCode));
         }
 
         if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
-            throw new \RuntimeException(sprintf("module %s is already actived", $moduleCode));
+            throw new \RuntimeException(sprintf('module %s is already actived', $moduleCode));
         }
 
         try {
             $event = new ModuleToggleActivationEvent($module->getId());
-            if ($input->getOption("with-dependencies")) {
+            if ($input->getOption('with-dependencies')) {
                 $event->setRecursive(true);
             }
 
-            $this->getDispatcher()->dispatch($event,TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+            $this->getDispatcher()->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
         } catch (\Exception $e) {
             throw new \RuntimeException(
                 sprintf(
-                    "Activation fail with Exception : [%d] %s",
+                    'Activation fail with Exception : [%d] %s',
                     $e->getCode(),
                     $e->getMessage()
                 )
@@ -81,12 +80,12 @@ class ModuleActivateCommand extends BaseModuleGenerate
         }
 
         //impossible to change output class in CommandTester...
-        if (method_exists($output, "renderBlock")) {
+        if (method_exists($output, 'renderBlock')) {
             $output->renderBlock([
                 '',
-                sprintf("Activation succeed for module %s", $moduleCode),
-                ''
-            ], "bg=green;fg=black");
+                sprintf('Activation succeed for module %s', $moduleCode),
+                '',
+            ], 'bg=green;fg=black');
         }
 
         return 0;

@@ -21,28 +21,26 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\LangQuery;
 use Thelia\Type;
-use Thelia\Type\TypeCollection;
-use TheliaSmarty\Template\Plugins\TheliaLoop;
 
 /**
- * Language loop, to get a list of available languages
+ * Language loop, to get a list of available languages.
  *
  * - id is the language id
  * - exclude is a comma separated list of lang IDs that will be excluded from output
  * - default if 1, the loop return only default lang. If 0, return all but the default language
  *
- * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
+ *
+ * @method int[]    getId()
  * @method string[] getCode()
  * @method string[] getLocale()
- * @method int[] getExclude()
- * @method bool getActive()
- * @method bool getVisible()
- * @method bool getDefaultOnly()
- * @method bool getExcludeDefault()
+ * @method int[]    getExclude()
+ * @method bool     getActive()
+ * @method bool     getVisible()
+ * @method bool     getDefaultOnly()
+ * @method bool     getExcludeDefault()
  * @method string[] getOrder()
  */
 class Lang extends BaseLoop implements PropelSearchLoopInterface
@@ -68,7 +66,7 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
                 [
                     'id', 'id_reverse',
                     'alpha', 'alpha_reverse',
-                    'position', 'position_reverse'
+                    'position', 'position_reverse',
                 ],
                 'position'
             )
@@ -111,26 +109,26 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "id":
+                case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case "id_reverse":
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "alpha":
+                case 'alpha':
                     $search->orderByTitle(Criteria::ASC);
                     break;
-                case "alpha_reverse":
+                case 'alpha_reverse':
                     $search->orderByTitle(Criteria::DESC);
                     break;
-                case "position":
+                case 'position':
                     $search->orderByPosition(Criteria::ASC);
                     break;
-                case "position_reverse":
+                case 'position_reverse':
                     $search->orderByPosition(Criteria::DESC);
                     break;
             }
@@ -146,20 +144,20 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($result);
 
             $loopResultRow
-                ->set("ID", $result->getId())
-                ->set("TITLE", $result->getTitle())
-                ->set("CODE", $result->getCode())
-                ->set("LOCALE", $result->getLocale())
-                ->set("URL", $result->getUrl())
-                ->set("ACTIVE", $result->getActive())
-                ->set("VISIBLE", $result->getVisible())
-                ->set("IS_DEFAULT", $result->getByDefault())
-                ->set("DATE_FORMAT", $result->getDateFormat())
-                ->set("TIME_FORMAT", $result->getTimeFormat())
-                ->set("DECIMAL_SEPARATOR", $result->getDecimalSeparator())
-                ->set("THOUSANDS_SEPARATOR", $result->getThousandsSeparator())
-                ->set("DECIMAL_COUNT", $result->getDecimals())
-                ->set("POSITION", $result->getPosition())
+                ->set('ID', $result->getId())
+                ->set('TITLE', $result->getTitle())
+                ->set('CODE', $result->getCode())
+                ->set('LOCALE', $result->getLocale())
+                ->set('URL', $result->getUrl())
+                ->set('ACTIVE', $result->getActive())
+                ->set('VISIBLE', $result->getVisible())
+                ->set('IS_DEFAULT', $result->getByDefault())
+                ->set('DATE_FORMAT', $result->getDateFormat())
+                ->set('TIME_FORMAT', $result->getTimeFormat())
+                ->set('DECIMAL_SEPARATOR', $result->getDecimalSeparator())
+                ->set('THOUSANDS_SEPARATOR', $result->getThousandsSeparator())
+                ->set('DECIMAL_COUNT', $result->getDecimals())
+                ->set('POSITION', $result->getPosition())
             ;
 
             $this->addOutputFields($loopResultRow, $result);

@@ -16,7 +16,6 @@ use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
@@ -24,13 +23,14 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\LangQuery;
 
 /**
- * Class ImportController
+ * Class ImportController.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class ImportController extends BaseAdminController
 {
     /**
-     * Handle default action, that is, list available imports
+     * Handle default action, that is, list available imports.
      *
      * @param string $_view View to render
      *
@@ -38,7 +38,7 @@ class ImportController extends BaseAdminController
      */
     public function indexAction($_view = 'import')
     {
-        $authResponse  = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::VIEW]);
+        $authResponse = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::VIEW]);
         if ($authResponse !== null) {
             return $authResponse;
         }
@@ -52,13 +52,13 @@ class ImportController extends BaseAdminController
     }
 
     /**
-     * Handle import position change action
+     * Handle import position change action.
      *
      * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function changeImportPositionAction()
     {
-        $authResponse  = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE]);
+        $authResponse = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE]);
         if ($authResponse !== null) {
             return $authResponse;
         }
@@ -78,13 +78,13 @@ class ImportController extends BaseAdminController
     }
 
     /**
-     * Handle import category position change action
+     * Handle import category position change action.
      *
      * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function changeCategoryPositionAction()
     {
-        $authResponse  = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE]);
+        $authResponse = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE]);
         if ($authResponse !== null) {
             return $authResponse;
         }
@@ -104,11 +104,11 @@ class ImportController extends BaseAdminController
     }
 
     /**
-     * Match position mode string against position mode constant value
+     * Match position mode string against position mode constant value.
      *
-     * @param null|string $mode Position mode string
+     * @param string|null $mode Position mode string
      *
-     * @return integer Position mode constant value
+     * @return int Position mode constant value
      */
     protected function matchPositionMode($mode)
     {
@@ -124,9 +124,9 @@ class ImportController extends BaseAdminController
     }
 
     /**
-     * Display import configuration view
+     * Display import configuration view.
      *
-     * @param integer $id An import identifier
+     * @param int $id An import identifier
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
@@ -172,9 +172,9 @@ class ImportController extends BaseAdminController
     }
 
     /**
-     * Handle import action
+     * Handle import action.
      *
-     * @param integer $id An import identifier
+     * @param int $id An import identifier
      *
      * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\Response
      */
@@ -196,11 +196,11 @@ class ImportController extends BaseAdminController
             /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
             $file = $validatedForm->get('file_upload')->getData();
             $file = $file->move(
-                THELIA_CACHE_DIR . 'import' . DS . (new \DateTime)->format('Ymd'),
-                uniqid() . '-' . $file->getClientOriginalName()
+                THELIA_CACHE_DIR.'import'.DS.(new \DateTime())->format('Ymd'),
+                uniqid().'-'.$file->getClientOriginalName()
             );
 
-            $lang = (new LangQuery)->findPk($validatedForm->get('language')->getData());
+            $lang = (new LangQuery())->findPk($validatedForm->get('language')->getData());
 
             $importEvent = $importHandler->import($import, $file, $lang);
 
@@ -210,7 +210,7 @@ class ImportController extends BaseAdminController
                     $this->getTranslator()->trans(
                         'Error(s) in import&nbsp;:<br />%errors',
                         [
-                            '%errors' => implode('<br />', $importEvent->getErrors())
+                            '%errors' => implode('<br />', $importEvent->getErrors()),
                         ]
                     )
                 );
@@ -221,7 +221,7 @@ class ImportController extends BaseAdminController
                 $this->getTranslator()->trans(
                     'Import successfully done, %count row(s) have been changed',
                     [
-                        '%count' => $importEvent->getImport()->getImportedRows()
+                        '%count' => $importEvent->getImport()->getImportedRows(),
                     ]
                 )
             );

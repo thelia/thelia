@@ -18,9 +18,8 @@ use Thelia\Model\CartItem;
 use Thelia\Model\Category;
 
 /**
- * Allow to remove an amount from the checkout total
+ * Allow to remove an amount from the checkout total.
  *
- * @package Coupon
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 abstract class AbstractRemoveOnCategories extends CouponAbstract implements AmountAndPercentageCouponInterface
@@ -39,13 +38,14 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
     /**
      * Get the discount for a specific cart item.
      *
-     * @param  CartItem $cartItem the cart item
-     * @return float    the discount value
+     * @param CartItem $cartItem the cart item
+     *
+     * @return float the discount value
      */
     abstract public function getCartItemDiscount(CartItem $cartItem);
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function set(
         FacadeInterface $facade,
@@ -84,7 +84,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
 
         $this->category_list = $effects[self::CATEGORIES_LIST] ?? [];
 
-        if (! \is_array($this->category_list)) {
+        if (!\is_array($this->category_list)) {
             $this->category_list = [$this->category_list];
         }
 
@@ -92,8 +92,9 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
 
         return $this;
     }
+
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function exec()
     {
@@ -105,7 +106,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
 
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
-            if (! $cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
+            if (!$cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
                 $categories = $cartItem->getProduct()->getCategories();
 
                 /** @var Category $category */
@@ -123,19 +124,19 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function drawBaseBackOfficeInputs($templateName, $otherFields)
     {
         return $this->facade->getParser()->render($templateName, array_merge($otherFields, [
                 // The categories list field
                 'categories_field_name' => $this->makeCouponFieldName(self::CATEGORIES_LIST),
-                'categories_values'     => $this->category_list
+                'categories_values' => $this->category_list,
             ]));
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getBaseFieldList($otherFields)
     {
@@ -143,7 +144,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function checkBaseCouponFieldValue($fieldName, $fieldValue)
     {

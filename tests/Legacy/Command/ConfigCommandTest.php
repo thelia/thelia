@@ -20,8 +20,8 @@ use Thelia\Model\Config;
 use Thelia\Model\ConfigQuery;
 
 /**
- * Class ConfigCommandTest
- * @package Command
+ * Class ConfigCommandTest.
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ConfigCommandTest extends BaseCommandTest
@@ -29,10 +29,10 @@ class ConfigCommandTest extends BaseCommandTest
     /** @var ConfigCommand */
     protected $command;
 
-    /** @var  CommandTester */
+    /** @var CommandTester */
     protected $commandTester;
 
-    public const PREFIX_NAME = "config_command_test_";
+    public const PREFIX_NAME = 'config_command_test_';
 
     public static function setUpBeforeClass(): void
     {
@@ -47,12 +47,12 @@ class ConfigCommandTest extends BaseCommandTest
     public function setUp(): void
     {
         if (null === $this->commandTester) {
-            $application   = new Application($this->getKernel());
+            $application = new Application($this->getKernel());
             $configCommand = new ConfigCommand();
 
             $application->add($configCommand);
 
-            $this->command       = $application->find("thelia:config");
+            $this->command = $application->find('thelia:config');
             $this->commandTester = new CommandTester($this->command);
         }
     }
@@ -66,15 +66,15 @@ class ConfigCommandTest extends BaseCommandTest
         foreach ($commands as $command) {
             $arguments = array_merge(
                 $command['args'],
-                ["command" => $this->command->getName()]
+                ['command' => $this->command->getName()]
             );
 
             $tester->execute($arguments);
 
             $this->assertStringContains(
                 $tester->getDisplay(),
-                $command["out"],
-                "Should display : " . $command["out"]
+                $command['out'],
+                'Should display : '.$command['out']
             );
         }
     }
@@ -84,8 +84,8 @@ class ConfigCommandTest extends BaseCommandTest
         $tester = $this->commandTester;
 
         $tester->execute([
-            "command" => $this->command->getName(),
-            "COMMAND" => "list"
+            'command' => $this->command->getName(),
+            'COMMAND' => 'list',
         ]);
 
         $out = $tester->getDisplay();
@@ -97,7 +97,7 @@ class ConfigCommandTest extends BaseCommandTest
             $this->assertStringContains(
                 $out,
                 $var->getName(),
-                "Should display : " . $var->getName()
+                'Should display : '.$var->getName()
             );
         }
     }
@@ -110,9 +110,9 @@ class ConfigCommandTest extends BaseCommandTest
 
         // Get
         $tester->execute([
-            "command" => $this->command->getName(),
-            "COMMAND" => "get",
-            "name"    => $varName
+            'command' => $this->command->getName(),
+            'COMMAND' => 'get',
+            'name' => $varName,
         ]);
 
         $expected = sprintf("Unknown variable '%s'", $varName);
@@ -120,54 +120,54 @@ class ConfigCommandTest extends BaseCommandTest
         $this->assertStringContains(
             $tester->getDisplay(),
             $expected,
-            "Should display : " . $expected
+            'Should display : '.$expected
         );
 
         // Set
         $tester->execute([
-            "command" => $this->command->getName(),
-            "COMMAND" => "set",
-            "name"    => $varName,
-            "value"   => "0"
+            'command' => $this->command->getName(),
+            'COMMAND' => 'set',
+            'name' => $varName,
+            'value' => '0',
         ]);
 
-        $this->assertVariableEqual($varName, "0");
+        $this->assertVariableEqual($varName, '0');
 
         $tester->execute([
-            "command" => $this->command->getName(),
-            "COMMAND" => "set",
-            "name"    => $varName,
-            "value"   => "Thelia"
+            'command' => $this->command->getName(),
+            'COMMAND' => 'set',
+            'name' => $varName,
+            'value' => 'Thelia',
         ]);
 
-        $this->assertVariableEqual($varName, "Thelia");
+        $this->assertVariableEqual($varName, 'Thelia');
 
         $tester->execute([
-            "command"   => $this->command->getName(),
-            "COMMAND"   => "set",
-            "name"      => $varName,
-            "value"     => "Thelia",
-            "--secured" => true,
-            "--visible" => true,
+            'command' => $this->command->getName(),
+            'COMMAND' => 'set',
+            'name' => $varName,
+            'value' => 'Thelia',
+            '--secured' => true,
+            '--visible' => true,
         ]);
 
-        $this->assertVariableEqual($varName, "Thelia", 1, 0);
+        $this->assertVariableEqual($varName, 'Thelia', 1, 0);
 
         $tester->execute([
-            "command"   => $this->command->getName(),
-            "COMMAND"   => "set",
-            "name"      => $varName,
-            "value"     => "THELIA",
-            "--visible" => true
+            'command' => $this->command->getName(),
+            'COMMAND' => 'set',
+            'name' => $varName,
+            'value' => 'THELIA',
+            '--visible' => true,
         ]);
 
-        $this->assertVariableEqual($varName, "THELIA", 0, 0);
+        $this->assertVariableEqual($varName, 'THELIA', 0, 0);
 
         // DELETE
         $tester->execute([
-            "command" => $this->command->getName(),
-            "COMMAND" => "delete",
-            "name"    => $varName
+            'command' => $this->command->getName(),
+            'COMMAND' => 'delete',
+            'name' => $varName,
         ]);
 
         $this->assertNull(
@@ -179,16 +179,16 @@ class ConfigCommandTest extends BaseCommandTest
     public static function clearTest()
     {
         ConfigQuery::create()
-            ->filterByName(self::PREFIX_NAME . '%', Criteria::LIKE)
+            ->filterByName(self::PREFIX_NAME.'%', Criteria::LIKE)
             ->delete();
     }
 
     protected function getRandomVariableName()
     {
         return sprintf(
-            "%s%s",
+            '%s%s',
             self::PREFIX_NAME,
-            substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 10)
+            substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 10)
         );
     }
 
@@ -228,12 +228,12 @@ class ConfigCommandTest extends BaseCommandTest
         );
     }
 
-    protected function assertStringContains($data, $needle, $message = "")
+    protected function assertStringContains($data, $needle, $message = '')
     {
         $this->assertTrue((false !== strpos($data, $needle)), $message);
     }
 
-    protected function assertStringNotContains($data, $needle, $message = "")
+    protected function assertStringNotContains($data, $needle, $message = '')
     {
         $this->assertTrue((false === strpos($data, $needle)), $message);
     }
@@ -242,38 +242,38 @@ class ConfigCommandTest extends BaseCommandTest
     {
         $commands = [
             [
-                "args" => [
+                'args' => [
                     'COMMAND' => 'hello',
                 ],
-                'out'  => "Unknown argument 'COMMAND'"
+                'out' => "Unknown argument 'COMMAND'",
             ],
             [
-                "args" => [
+                'args' => [
                     'COMMAND' => 'get',
                 ],
-                'out'  => "Need argument 'name'"
+                'out' => "Need argument 'name'",
             ],
             [
-                "args" => [
+                'args' => [
                     'COMMAND' => 'get',
-                    'name'    => 'unknown_var_name',
+                    'name' => 'unknown_var_name',
                 ],
-                'out'  => "Unknown variable 'unknown_var_name'"
+                'out' => "Unknown variable 'unknown_var_name'",
             ],
             [
-                "args" => [
+                'args' => [
                     'COMMAND' => 'delete',
-                    'name'    => 'unknown_var_name',
+                    'name' => 'unknown_var_name',
                 ],
-                'out'  => "Unknown variable 'unknown_var_name'"
+                'out' => "Unknown variable 'unknown_var_name'",
             ],
             [
-                "args" => [
+                'args' => [
                     'COMMAND' => 'set',
-                    'name'    => 'unknown_var_name',
+                    'name' => 'unknown_var_name',
                 ],
-                'out'  => "Need argument 'name' and 'value'"
-            ]
+                'out' => "Need argument 'name' and 'value'",
+            ],
         ];
 
         return $commands;

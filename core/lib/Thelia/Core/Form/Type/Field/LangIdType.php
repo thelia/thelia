@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\LangQuery;
 
 /**
- * Class LangIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class LangIdType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class LangIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class LangIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "lang_id";
+        return 'lang_id';
     }
 }

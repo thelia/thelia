@@ -29,27 +29,27 @@ class ProductModificationForm extends ProductCreationForm
         parent::doBuildForm(true);
 
         $this->formBuilder
-            ->add("id", IntegerType::class, [
-                    "label"       => Translator::getInstance()->trans("Prodcut ID *"),
-                    "label_attr"  => ["for" => "product_id_field"],
-                    "constraints" => [new GreaterThan(['value' => 0])],
+            ->add('id', IntegerType::class, [
+                    'label' => Translator::getInstance()->trans('Prodcut ID *'),
+                    'label_attr' => ['for' => 'product_id_field'],
+                    'constraints' => [new GreaterThan(['value' => 0])],
             ])
-            ->add("template_id", IntegerType::class, [
-                    "label"       => Translator::getInstance()->trans("Product template"),
-                    "label_attr"  => ["for" => "product_template_field"],
+            ->add('template_id', IntegerType::class, [
+                    'label' => Translator::getInstance()->trans('Product template'),
+                    'label_attr' => ['for' => 'product_template_field'],
             ])
-            ->add("brand_id", IntegerType::class, [
-                'constraints' => [ new NotBlank() ],
-                'required'    => true,
-                'label'       => Translator::getInstance()->trans('Brand / Supplier'),
-                'label_attr'  => [
+            ->add('brand_id', IntegerType::class, [
+                'constraints' => [new NotBlank()],
+                'required' => true,
+                'label' => Translator::getInstance()->trans('Brand / Supplier'),
+                'label_attr' => [
                     'for' => 'mode',
-                    'help' => Translator::getInstance()->trans("Select the product brand, or supplier."),
+                    'help' => Translator::getInstance()->trans('Select the product brand, or supplier.'),
                 ],
             ])
-            ->add("virtual_document_id", IntegerType::class, [
-                "label"      => Translator::getInstance()->trans("Virtual document"),
-                "label_attr" => ["for" => "virtual_document_id_field"],
+            ->add('virtual_document_id', IntegerType::class, [
+                'label' => Translator::getInstance()->trans('Virtual document'),
+                'label_attr' => ['for' => 'virtual_document_id_field'],
             ])
         ;
 
@@ -68,7 +68,7 @@ class ProductModificationForm extends ProductCreationForm
         if ($count > 0) {
             $context->addViolation(
                 Translator::getInstance()->trans(
-                    "A product with reference %ref already exists. Please choose another reference.",
+                    'A product with reference %ref already exists. Please choose another reference.',
                     ['%ref' => $value]
                 )
             );
@@ -77,6 +77,6 @@ class ProductModificationForm extends ProductCreationForm
 
     public static function getName()
     {
-        return "thelia_product_modification";
+        return 'thelia_product_modification';
     }
 }

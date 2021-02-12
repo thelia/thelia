@@ -20,15 +20,14 @@ use Thelia\Module\AbstractDeliveryModule;
 use Thelia\Module\DeliveryModuleWithStateInterface;
 
 /**
- * Class Delivery
- * @package Thelia\Action
+ * Class Delivery.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class Delivery implements EventSubscriberInterface
 {
     /**
-     * Get postage from module using the classical module functions
-     *
+     * Get postage from module using the classical module functions.
      */
     public function getPostage(DeliveryPostageEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -67,12 +66,12 @@ class Delivery implements EventSubscriberInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::MODULE_DELIVERY_GET_POSTAGE => ['getPostage', 128]
+            TheliaEvents::MODULE_DELIVERY_GET_POSTAGE => ['getPostage', 128],
         ];
     }
 }

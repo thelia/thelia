@@ -20,8 +20,8 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
 /**
- * Class ModuleListCommand
- * @package Thelia\Command
+ * Class ModuleListCommand.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class ModuleListCommand extends ContainerAwareCommand
@@ -35,7 +35,7 @@ class ModuleListCommand extends ContainerAwareCommand
     }
 
     /**
-     * @return int|null|void
+     * @return int|void|null
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -43,7 +43,7 @@ class ModuleListCommand extends ContainerAwareCommand
         $helper->addRows($this->getModulesData());
 
         $helper
-            ->setHeaders(["Code", "Active", "Type", "Version"])
+            ->setHeaders(['Code', 'Active', 'Type', 'Version'])
             ->render()
         ;
 
@@ -54,30 +54,30 @@ class ModuleListCommand extends ContainerAwareCommand
     {
         $moduleData = ModuleQuery::create()
             ->orderByType()
-            ->addAsColumn("code", ModuleTableMap::COL_CODE)
-            ->addAsColumn("active", "IF(".ModuleTableMap::COL_ACTIVATE.", \"Yes\", \"No\")")
-            ->addAsColumn("type", ModuleTableMap::COL_TYPE)
-            ->addAsColumn("version", ModuleTableMap::COL_VERSION)
+            ->addAsColumn('code', ModuleTableMap::COL_CODE)
+            ->addAsColumn('active', 'IF('.ModuleTableMap::COL_ACTIVATE.', "Yes", "No")')
+            ->addAsColumn('type', ModuleTableMap::COL_TYPE)
+            ->addAsColumn('version', ModuleTableMap::COL_VERSION)
             ->select([
-                "code",
-                "active",
-                "type",
-                "version",
+                'code',
+                'active',
+                'type',
+                'version',
             ])
             ->find()
             ->toArray()
         ;
 
         foreach ($moduleData as &$row) {
-            switch ($row["type"]) {
+            switch ($row['type']) {
                 case BaseModule::CLASSIC_MODULE_TYPE:
-                    $row["type"] = "classic";
+                    $row['type'] = 'classic';
                     break;
                 case BaseModule::DELIVERY_MODULE_TYPE:
-                    $row["type"] = "delivery";
+                    $row['type'] = 'delivery';
                     break;
                 case BaseModule::PAYMENT_MODULE_TYPE:
-                    $row["type"] = "payment";
+                    $row['type'] = 'payment';
                     break;
             }
         }

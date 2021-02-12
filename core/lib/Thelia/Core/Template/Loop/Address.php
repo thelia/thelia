@@ -25,19 +25,18 @@ use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * Address loop
- *
+ * Address loop.
  *
  * Class Address
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
+ *
+ * @method int[]       getId()
  * @method bool|string getDefault()
- * @method string getCustomer()
- * @method int[] getExclude()
+ * @method string      getCustomer()
+ * @method int[]       getExclude()
  */
 class Address extends BaseLoop implements PropelSearchLoopInterface
 {
@@ -92,7 +91,7 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
             if ($currentCustomer === null) {
                 return null;
             }
-                $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
+            $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
         } else {
             $search->filterByCustomerId($customer, Criteria::EQUAL);
         }
@@ -120,23 +119,23 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $address) {
             $loopResultRow = new LoopResultRow($address);
             $loopResultRow
-                ->set("ID", $address->getId())
-                ->set("LABEL", $address->getLabel())
-                ->set("CUSTOMER", $address->getCustomerId())
-                ->set("TITLE", $address->getTitleId())
-                ->set("COMPANY", $address->getCompany())
-                ->set("FIRSTNAME", $address->getFirstname())
-                ->set("LASTNAME", $address->getLastname())
-                ->set("ADDRESS1", $address->getAddress1())
-                ->set("ADDRESS2", $address->getAddress2())
-                ->set("ADDRESS3", $address->getAddress3())
-                ->set("ZIPCODE", $address->getZipcode())
-                ->set("CITY", $address->getCity())
-                ->set("COUNTRY", $address->getCountryId())
-                ->set("STATE", $address->getStateId())
-                ->set("PHONE", $address->getPhone())
-                ->set("CELLPHONE", $address->getCellphone())
-                ->set("DEFAULT", $address->getIsDefault())
+                ->set('ID', $address->getId())
+                ->set('LABEL', $address->getLabel())
+                ->set('CUSTOMER', $address->getCustomerId())
+                ->set('TITLE', $address->getTitleId())
+                ->set('COMPANY', $address->getCompany())
+                ->set('FIRSTNAME', $address->getFirstname())
+                ->set('LASTNAME', $address->getLastname())
+                ->set('ADDRESS1', $address->getAddress1())
+                ->set('ADDRESS2', $address->getAddress2())
+                ->set('ADDRESS3', $address->getAddress3())
+                ->set('ZIPCODE', $address->getZipcode())
+                ->set('CITY', $address->getCity())
+                ->set('COUNTRY', $address->getCountryId())
+                ->set('STATE', $address->getStateId())
+                ->set('PHONE', $address->getPhone())
+                ->set('CELLPHONE', $address->getCellphone())
+                ->set('DEFAULT', $address->getIsDefault())
             ;
             $this->addOutputFields($loopResultRow, $address);
 

@@ -16,8 +16,8 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 
 /**
- * Class LanguageController
- * @package Thelia\Controller\Admin
+ * Class LanguageController.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LanguageController extends BaseAdminController
@@ -27,6 +27,7 @@ class LanguageController extends BaseAdminController
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::VIEW)) {
             return $response;
         }
-        return $this->render("languages");
+
+        return $this->render('languages');
     }
 }

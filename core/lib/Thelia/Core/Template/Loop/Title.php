@@ -23,15 +23,14 @@ use Thelia\Model\CustomerTitle as CustomerTitleModel;
 use Thelia\Model\CustomerTitleQuery;
 
 /**
- *
- * Title loop
- *
+ * Title loop.
  *
  * Class Title
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
+ *
  * @method int[] getId()
  */
 class Title extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -71,13 +70,13 @@ class Title extends BaseI18nLoop implements PropelSearchLoopInterface
         /** @var CustomerTitleModel $title */
         foreach ($loopResult->getResultDataCollection() as $title) {
             $loopResultRow = new LoopResultRow($title);
-            $loopResultRow->set("ID", $title->getId())
-                ->set("IS_TRANSLATED", $title->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("DEFAULT", $title->getByDefault())
-                ->set("SHORT", $title->getVirtualColumn('i18n_SHORT'))
-                ->set("LONG", $title->getVirtualColumn('i18n_LONG'))
-                ->set("POSITION", $title->getPosition());
+            $loopResultRow->set('ID', $title->getId())
+                ->set('IS_TRANSLATED', $title->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('DEFAULT', $title->getByDefault())
+                ->set('SHORT', $title->getVirtualColumn('i18n_SHORT'))
+                ->set('LONG', $title->getVirtualColumn('i18n_LONG'))
+                ->set('POSITION', $title->getPosition());
             $this->addOutputFields($loopResultRow, $title);
 
             $loopResult->addRow($loopResultRow);

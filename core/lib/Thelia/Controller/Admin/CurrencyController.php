@@ -27,7 +27,7 @@ use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 
 /**
- * Manages currencies
+ * Manages currencies.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
@@ -64,7 +64,7 @@ class CurrencyController extends AbstractCrudController
 
         $createEvent
         ->setCurrencyName($formData['name'])
-        ->setLocale($formData["locale"])
+        ->setLocale($formData['locale'])
         ->setSymbol($formData['symbol'])
         ->setFormat($formData['format'])
         ->setCode($formData['code'])
@@ -81,7 +81,7 @@ class CurrencyController extends AbstractCrudController
         // Create and dispatch the change event
         $changeEvent
         ->setCurrencyName($formData['name'])
-        ->setLocale($formData["locale"])
+        ->setLocale($formData['locale'])
         ->setSymbol($formData['symbol'])
         ->setFormat($formData['format'])
         ->setCode($formData['code'])
@@ -114,13 +114,13 @@ class CurrencyController extends AbstractCrudController
     {
         // Prepare the data that will hydrate the form
         $data = [
-                'id'     => $object->getId(),
-                'name'   => $object->getName(),
+                'id' => $object->getId(),
+                'name' => $object->getName(),
                 'locale' => $object->getLocale(),
-                'code'   => $object->getCode(),
+                'code' => $object->getCode(),
                 'symbol' => $object->getSymbol(),
                 'format' => $object->getFormat(),
-                'rate'   => $object->getRate()
+                'rate' => $object->getRate(),
         ];
 
         // Setup the object form
@@ -134,7 +134,7 @@ class CurrencyController extends AbstractCrudController
 
     protected function getExistingObject()
     {
-        $currency =  CurrencyQuery::create()
+        $currency = CurrencyQuery::create()
         ->findOneById($this->getRequest()->get('currency_id'));
 
         if (null !== $currency) {
@@ -146,6 +146,7 @@ class CurrencyController extends AbstractCrudController
 
     /**
      * @param Currency $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
@@ -155,6 +156,7 @@ class CurrencyController extends AbstractCrudController
 
     /**
      * @param Currency $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -175,7 +177,7 @@ class CurrencyController extends AbstractCrudController
     protected function redirectToEditionTemplate()
     {
         return $this->generateRedirectFromRoute(
-            "admin.configuration.currencies.update",
+            'admin.configuration.currencies.update',
             [
                 'currency_id' => $this->getRequest()->get('currency_id'),
             ]
@@ -188,7 +190,7 @@ class CurrencyController extends AbstractCrudController
     }
 
     /**
-     * Update currencies rates
+     * Update currencies rates.
      */
     public function updateRatesAction()
     {
@@ -204,7 +206,7 @@ class CurrencyController extends AbstractCrudController
 
             if ($event->hasUndefinedRates()) {
                 return $this->render('currencies', [
-                    'undefined_rates' => $event->getUndefinedRates()
+                    'undefined_rates' => $event->getUndefinedRates(),
                 ]);
             }
         } catch (\Exception $ex) {
@@ -216,7 +218,7 @@ class CurrencyController extends AbstractCrudController
     }
 
     /**
-     * Sets the default currency
+     * Sets the default currency.
      */
     public function setDefaultAction()
     {
@@ -241,7 +243,7 @@ class CurrencyController extends AbstractCrudController
     }
 
     /**
-     * Sets if the currency is visible for Front
+     * Sets if the currency is visible for Front.
      */
     public function setVisibleAction()
     {

@@ -15,13 +15,13 @@ namespace Thelia\Core\Event\Area;
 use Thelia\Model\Area;
 
 /**
- * Class AreaRemoveCountryEvent
- * @package Thelia\Core\Event\Area
+ * Class AreaRemoveCountryEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AreaRemoveCountryEvent extends AreaAddCountryEvent
 {
-    /** @var int|null  */
+    /** @var int|null */
     protected $stateId;
 
     public function __construct(Area $area, $countryId, $stateId = null)
@@ -45,6 +45,7 @@ class AreaRemoveCountryEvent extends AreaAddCountryEvent
     public function setStateId($stateId)
     {
         $this->stateId = $stateId;
+
         return $this;
     }
 }

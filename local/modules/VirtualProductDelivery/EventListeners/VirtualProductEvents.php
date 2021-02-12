@@ -14,12 +14,10 @@ namespace VirtualProductDelivery\EventListeners;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Thelia\Core\Event\Product\VirtualProductOrderDownloadResponseEvent;
 use Thelia\Core\Event\Product\VirtualProductOrderHandleEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\MetaData as MetaDataModel;
@@ -28,8 +26,8 @@ use Thelia\Model\ProductDocumentQuery;
 use VirtualProductDelivery\VirtualProductDelivery;
 
 /**
- * Class VirtualProductEvents
- * @package VirtualProductDelivery\EventListeners
+ * Class VirtualProductEvents.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class VirtualProductEvents implements EventSubscriberInterface
@@ -57,20 +55,20 @@ class VirtualProductEvents implements EventSubscriberInterface
         if ($orderProduct->getVirtualDocument()) {
             $baseSourceFilePath = ConfigQuery::read('documents_library_path');
             if ($baseSourceFilePath === null) {
-                $baseSourceFilePath = THELIA_LOCAL_DIR . 'media' . DS . 'documents';
+                $baseSourceFilePath = THELIA_LOCAL_DIR.'media'.DS.'documents';
             } else {
-                $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
+                $baseSourceFilePath = THELIA_ROOT.$baseSourceFilePath;
             }
 
             // try to get the file
-            $path = $baseSourceFilePath . DS . 'product' . DS . $orderProduct->getVirtualDocument();
+            $path = $baseSourceFilePath.DS.'product'.DS.$orderProduct->getVirtualDocument();
 
             if (!is_file($path) || !is_readable($path)) {
                 throw new \ErrorException(
                     Translator::getInstance()->trans(
-                        "The file [%file] does not exist",
+                        'The file [%file] does not exist',
                         [
-                            "%file" => $orderProduct->getId()
+                            '%file' => $orderProduct->getId(),
                         ],
                         VirtualProductDelivery::MESSAGE_DOMAIN
                     )
@@ -107,7 +105,7 @@ class VirtualProductEvents implements EventSubscriberInterface
     {
         return [
             TheliaEvents::VIRTUAL_PRODUCT_ORDER_HANDLE => ['handleOrder', 128],
-            TheliaEvents::VIRTUAL_PRODUCT_ORDER_DOWNLOAD_RESPONSE => ['download', 128]
+            TheliaEvents::VIRTUAL_PRODUCT_ORDER_DOWNLOAD_RESPONSE => ['download', 128],
         ];
     }
 }

@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event;
 
 /**
- * Class MailTransporterEvent
- * @package Thelia\Core\Event
+ * Class MailTransporterEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class MailTransporterEvent extends ActionEvent

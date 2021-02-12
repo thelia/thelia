@@ -18,8 +18,8 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\StateQuery;
 
 /**
- * Class AddressCountryValidationTrait
- * @package Thelia\Form
+ * Class AddressCountryValidationTrait.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 trait AddressCountryValidationTrait
@@ -35,7 +35,7 @@ trait AddressCountryValidationTrait
                     if (!preg_match($zipCodeRegExp, $data['zipcode'])) {
                         $context->addViolation(
                             Translator::getInstance()->trans(
-                                "This zip code should respect the following format : %format.",
+                                'This zip code should respect the following format : %format.',
                                 ['%format' => $country->getZipCodeFormat()]
                             )
                         );
@@ -62,7 +62,7 @@ trait AddressCountryValidationTrait
                 } else {
                     $context->addViolation(
                         Translator::getInstance()->trans(
-                            "You should select a state for this country."
+                            'You should select a state for this country.'
                         )
                     );
                 }

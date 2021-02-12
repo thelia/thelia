@@ -95,11 +95,11 @@ class TaxController extends AbstractCrudController
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
-            'id'           => $object->getId(),
-            'locale'       => $object->getLocale(),
-            'title'        => $object->getTitle(),
-            'description'  => $object->getDescription(),
-            'type'         => Tax::escapeTypeName($object->getType()),
+            'id' => $object->getId(),
+            'locale' => $object->getLocale(),
+            'title' => $object->getTitle(),
+            'description' => $object->getDescription(),
+            'type' => Tax::escapeTypeName($object->getType()),
         ];
 
         // Setup the object form
@@ -129,6 +129,7 @@ class TaxController extends AbstractCrudController
 
     /**
      * @param Tax $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
@@ -138,6 +139,7 @@ class TaxController extends AbstractCrudController
 
     /**
      * @param Tax $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -174,7 +176,7 @@ class TaxController extends AbstractCrudController
     protected function redirectToEditionTemplate($request = null, $country = null)
     {
         return $this->generateRedirectFromRoute(
-            "admin.configuration.taxes.update",
+            'admin.configuration.taxes.update',
             $this->getViewArguments(),
             $this->getRouteArguments()
         );
@@ -183,13 +185,14 @@ class TaxController extends AbstractCrudController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param  TaxEvent $createEvent the create event
+     * @param TaxEvent $createEvent the create event
+     *
      * @return Response a response, or null to continue normal processing
      */
     protected function performAdditionalCreateAction($createEvent)
     {
         return $this->generateRedirectFromRoute(
-            "admin.configuration.taxes.update",
+            'admin.configuration.taxes.update',
             $this->getViewArguments(),
             $this->getRouteArguments($createEvent->getTax()->getId())
         );
@@ -197,7 +200,7 @@ class TaxController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        return $this->generateRedirectFromRoute("admin.configuration.taxes-rules.list");
+        return $this->generateRedirectFromRoute('admin.configuration.taxes-rules.list');
     }
 
     protected function getRequirements($type, $formData)

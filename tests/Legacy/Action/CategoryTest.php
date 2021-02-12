@@ -25,8 +25,8 @@ use Thelia\Model\Template;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
- * Class CategoryTest
- * @package Thelia\Tests\Action
+ * Class CategoryTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CategoryTest extends TestCaseWithURLToolSetup
@@ -87,6 +87,7 @@ class CategoryTest extends TestCaseWithURLToolSetup
 
     /**
      * @depends testCreate
+     *
      * @return CategoryModel
      */
     public function testUpdate(CategoryModel $category)
@@ -123,12 +124,13 @@ class CategoryTest extends TestCaseWithURLToolSetup
         $this->assertEquals($template->getId(), $updatedCategory->getDefaultTemplateId());
         $this->assertEquals(0, $updatedCategory->getParent());
 
-        return [ $updatedCategory, $template ];
+        return [$updatedCategory, $template];
     }
 
     /**
      * @param array $argArray
      * @depends testUpdate
+     *
      * @return CategoryModel
      */
     public function testRemoveTemplate($argArray)

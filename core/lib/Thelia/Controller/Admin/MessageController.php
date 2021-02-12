@@ -32,7 +32,7 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
 /**
- * Manages messages sent by mail
+ * Manages messages sent by mail.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
@@ -69,7 +69,7 @@ class MessageController extends AbstractCrudController
 
         $createEvent
             ->setMessageName($formData['name'])
-            ->setLocale($formData["locale"])
+            ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
             ->setSecured($formData['secured'] ? true : false)
         ;
@@ -85,7 +85,7 @@ class MessageController extends AbstractCrudController
         $changeEvent
             ->setMessageName($formData['name'])
             ->setSecured($formData['secured'])
-            ->setLocale($formData["locale"])
+            ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
             ->setSubject($formData['subject'])
             ->setHtmlLayoutFileName($formData['html_layout_file_name'])
@@ -113,18 +113,18 @@ class MessageController extends AbstractCrudController
     {
         // Prepare the data that will hydrate the form
         $data = [
-            'id'            => $object->getId(),
-            'name'          => $object->getName(),
-            'secured'       => $object->getSecured() ? true : false,
-            'locale'        => $object->getLocale(),
-            'title'         => $object->getTitle(),
-            'subject'       => $object->getSubject(),
-            'html_message'  => $object->getHtmlMessage(),
-            'text_message'  => $object->getTextMessage(),
+            'id' => $object->getId(),
+            'name' => $object->getName(),
+            'secured' => $object->getSecured() ? true : false,
+            'locale' => $object->getLocale(),
+            'title' => $object->getTitle(),
+            'subject' => $object->getSubject(),
+            'html_message' => $object->getHtmlMessage(),
+            'text_message' => $object->getTextMessage(),
 
-            'html_layout_file_name'   => $object->getHtmlLayoutFileName(),
+            'html_layout_file_name' => $object->getHtmlLayoutFileName(),
             'html_template_file_name' => $object->getHtmlTemplateFileName(),
-            'text_layout_file_name'   => $object->getTextLayoutFileName(),
+            'text_layout_file_name' => $object->getTextLayoutFileName(),
             'text_template_file_name' => $object->getTextTemplateFileName(),
         ];
 
@@ -151,6 +151,7 @@ class MessageController extends AbstractCrudController
 
     /**
      * @param Message $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
@@ -160,6 +161,7 @@ class MessageController extends AbstractCrudController
 
     /**
      * @param Message $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -197,7 +199,7 @@ class MessageController extends AbstractCrudController
         $modules = ModuleQuery::getActivated();
         /** @var Module $module */
         foreach ($modules as $module) {
-            $dir = $module->getAbsoluteTemplateBasePath() . DS . TemplateDefinition::EMAIL_SUBDIR . DS . 'default';
+            $dir = $module->getAbsoluteTemplateBasePath().DS.TemplateDefinition::EMAIL_SUBDIR.DS.'default';
 
             if (file_exists($dir)) {
                 $finder = Finder::create()
@@ -222,19 +224,19 @@ class MessageController extends AbstractCrudController
     protected function renderEditionTemplate()
     {
         return $this->render('message-edit', [
-            'message_id'         => $this->getRequest()->get('message_id'),
-            'layout_list'        => $this->listDirectoryContent('tpl'),
-            'html_template_list' =>  $this->listDirectoryContent('html'),
-            'text_template_list' =>  $this->listDirectoryContent('txt'),
+            'message_id' => $this->getRequest()->get('message_id'),
+            'layout_list' => $this->listDirectoryContent('tpl'),
+            'html_template_list' => $this->listDirectoryContent('html'),
+            'text_template_list' => $this->listDirectoryContent('txt'),
         ]);
     }
 
     protected function redirectToEditionTemplate()
     {
         return $this->generateRedirectFromRoute(
-            "admin.configuration.messages.update",
+            'admin.configuration.messages.update',
             [
-                'message_id' => $this->getRequest()->get('message_id')
+                'message_id' => $this->getRequest()->get('message_id'),
             ]
         );
     }
@@ -277,7 +279,7 @@ class MessageController extends AbstractCrudController
     public function previewAsTextAction($messageId)
     {
         $response = $this->previewAction($messageId, false);
-        $response->headers->add(["Content-Type" => "text/plain"]);
+        $response->headers->add(['Content-Type' => 'text/plain']);
 
         return $response;
     }
@@ -293,7 +295,7 @@ class MessageController extends AbstractCrudController
             $baseForm = $this->createForm(AdminForm::MESSAGE_SEND_SAMPLE, 'form', [], ['csrf_protection' => false]);
 
             try {
-                $form = $this->validateForm($baseForm, "POST");
+                $form = $this->validateForm($baseForm, 'POST');
 
                 $data = $form->getData();
 
@@ -306,22 +308,22 @@ class MessageController extends AbstractCrudController
                 $this->getMailer()->sendEmailMessage(
                     $message->getName(),
                     [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
-                    [ $data['recipient_email'] => $data['recipient_email'] ],
+                    [$data['recipient_email'] => $data['recipient_email']],
                     $messageParameters,
                     $this->getCurrentEditionLocale()
                 );
 
                 return new Response(
                     $this->getTranslator()->trans(
-                        "The message has been successfully sent to %recipient.",
-                        [ '%recipient' => $data['recipient_email'] ]
+                        'The message has been successfully sent to %recipient.',
+                        ['%recipient' => $data['recipient_email']]
                     )
                 );
             } catch (\Exception $ex) {
                 return new Response(
                     $this->getTranslator()->trans(
-                        "Something goes wrong, the message was not sent to recipient. Error is : %err",
-                        [ '%err' => $ex->getMessage() ]
+                        'Something goes wrong, the message was not sent to recipient. Error is : %err',
+                        ['%err' => $ex->getMessage()]
                     )
                 );
             }

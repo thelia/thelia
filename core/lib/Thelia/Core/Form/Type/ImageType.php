@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class ImageType
- * @package Thelia\Core\Form\Type
+ * Class ImageType.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class ImageType extends AbstractTheliaType
@@ -24,11 +24,11 @@ class ImageType extends AbstractTheliaType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add("i18n", "collection", [
-                "type" => "standard_fields",
-                "allow_add" => true,
-                "allow_delete" => true,
-                "cascade_validation" => true,
+            ->add('i18n', 'collection', [
+                'type' => 'standard_fields',
+                'allow_add' => true,
+                'allow_delete' => true,
+                'cascade_validation' => true,
             ])
         ;
     }
@@ -40,6 +40,6 @@ class ImageType extends AbstractTheliaType
      */
     public function getName()
     {
-        return "image";
+        return 'image';
     }
 }

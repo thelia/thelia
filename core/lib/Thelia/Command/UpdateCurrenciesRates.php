@@ -21,8 +21,8 @@ use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 
 /**
- * Class UpdateCurrenciesRates
- * @package Thelia\Command
+ * Class UpdateCurrenciesRates.
+ *
  * @author Franck Allimant <thelia@cqfdev.fr>
  */
 class UpdateCurrenciesRates extends ContainerAwareCommand
@@ -30,21 +30,21 @@ class UpdateCurrenciesRates extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName("currency:update-rates")
-            ->setDescription("Update currency rates")
+            ->setName('currency:update-rates')
+            ->setDescription('Update currency rates')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var EventDispatcherInterface $dispatcher */
+        /* @var EventDispatcherInterface $dispatcher */
         try {
             $event = new CurrencyUpdateRateEvent();
 
             $this->getDispatcher()->dispatch($event, TheliaEvents::CURRENCY_UPDATE_RATES);
 
             if ($event->hasUndefinedRates()) {
-                $output->writeln("<comment>Rate was not found for the following currencies:");
+                $output->writeln('<comment>Rate was not found for the following currencies:');
 
                 $undefinedCurrencies = CurrencyQuery::create()
                     ->filterById($event->getUndefinedRates())
@@ -52,20 +52,22 @@ class UpdateCurrenciesRates extends ContainerAwareCommand
 
                 /** @var Currency $currency */
                 foreach ($undefinedCurrencies as $currency) {
-                    $output->writeln("  -" . $currency->getName() . " (".$currency->getCode()."), current rate is " . $currency->getRate());
+                    $output->writeln('  -'.$currency->getName().' ('.$currency->getCode().'), current rate is '.$currency->getRate());
                 }
 
-                $output->writeln("Update done with errors</comment>");
+                $output->writeln('Update done with errors</comment>');
+
                 return 1;
             }
         } catch (\Exception $ex) {
             // Any error
-            $output->writeln("<error>Update failed: " . $ex->getMessage() . "</error>");
+            $output->writeln('<error>Update failed: '.$ex->getMessage().'</error>');
 
             return 1;
         }
 
-        $output->writeln("<info>Update done withourt errors</info>");
+        $output->writeln('<info>Update done withourt errors</info>');
+
         return 0;
     }
 }

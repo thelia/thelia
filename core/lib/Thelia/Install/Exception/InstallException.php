@@ -13,7 +13,8 @@
 namespace Thelia\Install\Exception;
 
 /**
- * Class InstallException
+ * Class InstallException.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class InstallException extends \RuntimeException

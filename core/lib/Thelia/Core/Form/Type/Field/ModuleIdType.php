@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\ModuleQuery;
 
 /**
- * Class ModuleIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class ModuleIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class ModuleIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "module_id";
+        return 'module_id';
     }
 }

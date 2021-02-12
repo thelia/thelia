@@ -16,8 +16,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Form\BaseForm;
 
 /**
- * Class TheliaFormEvent
- * @package Thelia\Core\Event
+ * Class TheliaFormEvent.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class TheliaFormEvent extends Event

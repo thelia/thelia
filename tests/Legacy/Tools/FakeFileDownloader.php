@@ -16,8 +16,8 @@ use Thelia\Exception\FileNotFoundException;
 use Thelia\Tools\FileDownload\FileDownloader;
 
 /**
- * Class FakeFileDownloader
- * @package Thelia\Tests\Type
+ * Class FakeFileDownloader.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class FakeFileDownloader extends FileDownloader

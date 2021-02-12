@@ -35,8 +35,8 @@ use Thelia\Model\HookQuery;
 use Thelia\Model\Lang;
 
 /**
- * Class HookController
- * @package Thelia\Controller\Admin
+ * Class HookController.
+ *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookController extends AbstractCrudController
@@ -69,23 +69,23 @@ class HookController extends AbstractCrudController
             return $response;
         }
 
-        $templateType = \intval($this->getRequest()->get("template_type", TemplateDefinition::FRONT_OFFICE));
+        $templateType = \intval($this->getRequest()->get('template_type', TemplateDefinition::FRONT_OFFICE));
 
         $json_data = [];
         try {
             // parse the current template
-            $hookHelper = $this->container->get("thelia.hookHelper");
-            $hooks      = $hookHelper->parseActiveTemplate($templateType);
+            $hookHelper = $this->container->get('thelia.hookHelper');
+            $hooks = $hookHelper->parseActiveTemplate($templateType);
 
             // official hook
             $allHooks = $this->getAllHooks($templateType);
 
             // diff
-            $newHooks      = [];
+            $newHooks = [];
             $existingHooks = [];
             foreach ($hooks as $hook) {
-                if (\array_key_exists($hook["code"], $allHooks)) {
-                    $existingHooks[] = $hook["code"];
+                if (\array_key_exists($hook['code'], $allHooks)) {
+                    $existingHooks[] = $hook['code'];
                 } else {
                     $newHooks[] = $hook;
                 }
@@ -96,14 +96,14 @@ class HookController extends AbstractCrudController
             }
 
             $json_data = [
-                "success" => true,
-                "new"     => $newHooks,
-                "missing" => $allHooks
+                'success' => true,
+                'new' => $newHooks,
+                'missing' => $allHooks,
             ];
 
             $response = JsonResponse::create($json_data);
         } catch (\Exception $e) {
-            $response = JsonResponse::create(["error" => $e->getMessage()], 500);
+            $response = JsonResponse::create(['error' => $e->getMessage()], 500);
         }
 
         return $response;
@@ -117,10 +117,10 @@ class HookController extends AbstractCrudController
 
         $errors = [];
 
-        $templateType = $this->getRequest()->request->get("templateType");
+        $templateType = $this->getRequest()->request->get('templateType');
 
         // new hooks in the template
-        if (null !== $newHooks = $this->getRequest()->request->get("new", null)) {
+        if (null !== $newHooks = $this->getRequest()->request->get('new', null)) {
             foreach ($newHooks as $hook) {
                 $event = $this->getDiscoverCreationEvent($hook, $templateType);
 
@@ -128,15 +128,15 @@ class HookController extends AbstractCrudController
 
                 if (!$event->hasHook()) {
                     $errors[] = sprintf(
-                        Translator::getInstance()->trans("Failed to create new hook %s"),
-                        $hook["code"]
+                        Translator::getInstance()->trans('Failed to create new hook %s'),
+                        $hook['code']
                     );
                 }
             }
         }
 
         // missing official hooks
-        if (null !== $missingHooks = $this->getRequest()->request->get("missing")) {
+        if (null !== $missingHooks = $this->getRequest()->request->get('missing')) {
             foreach ($missingHooks as $hookId) {
                 $event = new HookDeactivationEvent($hookId);
 
@@ -144,7 +144,7 @@ class HookController extends AbstractCrudController
 
                 if (!$event->hasHook()) {
                     $errors[] = sprintf(
-                        Translator::getInstance()->trans("Failed to deactivate hook with id %s"),
+                        Translator::getInstance()->trans('Failed to deactivate hook with id %s'),
                         $hookId
                     );
                 }
@@ -152,11 +152,11 @@ class HookController extends AbstractCrudController
         }
 
         $json_data = [
-            "success" => true
+            'success' => true,
         ];
 
         if (\count($errors)) {
-            $response = JsonResponse::create(["error" => $errors], 500);
+            $response = JsonResponse::create(['error' => $errors], 500);
         } else {
             $response = JsonResponse::create($json_data);
         }
@@ -174,11 +174,11 @@ class HookController extends AbstractCrudController
             ->setCode($data['code'])
             ->setNative(false)
             ->setActive(true)
-            ->setTitle(($data['title'] != "") ? $data['title'] : $data['code'])
+            ->setTitle(($data['title'] != '') ? $data['title'] : $data['code'])
             ->setByModule($data['module'])
             ->setBlock($data['block'])
-            ->setChapo("")
-            ->setDescription("");
+            ->setChapo('')
+            ->setDescription('');
 
         return $event;
     }
@@ -191,7 +191,7 @@ class HookController extends AbstractCrudController
             ->filterByActivate(true, Criteria::EQUAL)
             ->filterByType($type, Criteria::EQUAL)
             ->filterByCode($code, Criteria::EQUAL)
-            ->select("Id")
+            ->select('Id')
             ->findOne();
 
         if (null !== $hook_id) {
@@ -212,11 +212,11 @@ class HookController extends AbstractCrudController
         /** @var Hook $hook */
         foreach ($hooks as $hook) {
             $ret[$hook->getCode()] = [
-                "id"       => $hook->getId(),
-                "code"     => $hook->getCode(),
-                "native"   => $hook->getNative(),
-                "activate" => $hook->getActivate(),
-                "title"    => $hook->getTitle()
+                'id' => $hook->getId(),
+                'code' => $hook->getCode(),
+                'native' => $hook->getNative(),
+                'activate' => $hook->getActivate(),
+                'title' => $hook->getTitle(),
             ];
         }
 
@@ -224,7 +224,7 @@ class HookController extends AbstractCrudController
     }
 
     /**
-     * Return the creation form for this object
+     * Return the creation form for this object.
      */
     protected function getCreationForm()
     {
@@ -232,7 +232,7 @@ class HookController extends AbstractCrudController
     }
 
     /**
-     * Return the update form for this object
+     * Return the update form for this object.
      */
     protected function getUpdateForm()
     {
@@ -240,7 +240,7 @@ class HookController extends AbstractCrudController
     }
 
     /**
-     * Hydrate the update form for this object, before passing it to the update template
+     * Hydrate the update form for this object, before passing it to the update template.
      *
      * @param \Thelia\Model\Hook $object
      *
@@ -249,16 +249,16 @@ class HookController extends AbstractCrudController
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
     {
         $data = [
-            'id'          => $object->getId(),
-            'code'        => $object->getCode(),
-            'type'        => $object->getType(),
-            'native'      => $object->getNative(),
-            'by_module'   => $object->getByModule(),
-            'block'       => $object->getBlock(),
-            'active'      => $object->getActivate(),
-            'locale'      => $object->getLocale(),
-            'title'       => $object->getTitle(),
-            'chapo'       => $object->getChapo(),
+            'id' => $object->getId(),
+            'code' => $object->getCode(),
+            'type' => $object->getType(),
+            'native' => $object->getNative(),
+            'by_module' => $object->getByModule(),
+            'block' => $object->getBlock(),
+            'active' => $object->getActivate(),
+            'locale' => $object->getLocale(),
+            'title' => $object->getTitle(),
+            'chapo' => $object->getChapo(),
             'description' => $object->getDescription(),
         ];
 
@@ -266,7 +266,7 @@ class HookController extends AbstractCrudController
     }
 
     /**
-     * Creates the creation event with the provided form data
+     * Creates the creation event with the provided form data.
      *
      * @param unknown $formData
      */
@@ -278,7 +278,7 @@ class HookController extends AbstractCrudController
     }
 
     /**
-     * Creates the update event with the provided form data
+     * Creates the update event with the provided form data.
      *
      * @param unknown $formData
      */
@@ -310,7 +310,7 @@ class HookController extends AbstractCrudController
     }
 
     /**
-     * Creates the delete event with the provided form data
+     * Creates the delete event with the provided form data.
      */
     protected function getDeleteEvent()
     {
@@ -333,6 +333,7 @@ class HookController extends AbstractCrudController
      * @param unknown $event
      *
      * @return
+     *
      * @internal param \Thelia\Controller\Admin\unknown $createEvent
      */
     protected function getObjectFromEvent($event)
@@ -341,7 +342,7 @@ class HookController extends AbstractCrudController
     }
 
     /**
-     * Load an existing object from the database
+     * Load an existing object from the database.
      */
     protected function getExistingObject()
     {
@@ -356,7 +357,7 @@ class HookController extends AbstractCrudController
     }
 
     /**
-     * Returns the object label form the object event (name, title, etc.)
+     * Returns the object label form the object event (name, title, etc.).
      *
      * @param \Thelia\Model\Hook $object
      *
@@ -368,7 +369,7 @@ class HookController extends AbstractCrudController
     }
 
     /**
-     * Returns the object ID from the object
+     * Returns the object ID from the object.
      *
      * @param \Thelia\Model\Hook $object
      *
@@ -380,17 +381,17 @@ class HookController extends AbstractCrudController
     }
 
     /**
-     * Render the main list template
+     * Render the main list template.
      *
-     * @param unknown $currentOrder , if any, null otherwise.
+     * @param unknown $currentOrder , if any, null otherwise
      */
     protected function renderListTemplate($currentOrder)
     {
-        return $this->render("hooks", ['order' => $currentOrder]);
+        return $this->render('hooks', ['order' => $currentOrder]);
     }
 
     /**
-     * Render the edition template
+     * Render the edition template.
      */
     protected function renderEditionTemplate()
     {
@@ -400,12 +401,12 @@ class HookController extends AbstractCrudController
     protected function getEditionArgument()
     {
         return [
-            'hook_id' => $this->getRequest()->get('hook_id', 0)
+            'hook_id' => $this->getRequest()->get('hook_id', 0),
         ];
     }
 
     /**
-     * Redirect to the edition template
+     * Redirect to the edition template.
      */
     protected function redirectToEditionTemplate()
     {
@@ -413,13 +414,13 @@ class HookController extends AbstractCrudController
             'admin.hook.update',
             [],
             [
-                "hook_id" => $this->getRequest()->get('hook_id', 0),
+                'hook_id' => $this->getRequest()->get('hook_id', 0),
             ]
         );
     }
 
     /**
-     * Redirect to the list template
+     * Redirect to the list template.
      */
     protected function redirectToListTemplate()
     {
@@ -443,7 +444,7 @@ class HookController extends AbstractCrudController
                 }
             } catch (\Exception $ex) {
                 $content = $ex->getMessage();
-                Tlog::getInstance()->debug(sprintf("%s", $content));
+                Tlog::getInstance()->debug(sprintf('%s', $content));
             }
         }
 
@@ -467,7 +468,7 @@ class HookController extends AbstractCrudController
                 }
             } catch (\Exception $ex) {
                 $content = $ex->getMessage();
-                Tlog::getInstance()->debug(sprintf("%s", $content));
+                Tlog::getInstance()->debug(sprintf('%s', $content));
             }
         }
 

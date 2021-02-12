@@ -15,11 +15,8 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
-use Thelia\Core\Event\Content\ContentEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Content as BaseContent;
-use Thelia\Model\Map\ContentFolderTableMap;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Model\Tools\UrlRewritingTrait;
@@ -39,9 +36,10 @@ class Content extends BaseContent implements FileModelParentInterface
     }
 
     /**
-     * Calculate next position relative to our parent
+     * Calculate next position relative to our parent.
      *
      * @param ContentQuery $query
+     *
      * @deprecated since 2.3, and will be removed in 2.4
      */
     protected function addCriteriaToPositionQuery($query)
@@ -74,6 +72,7 @@ class Content extends BaseContent implements FileModelParentInterface
 
     /**
      * @param int $defaultFolderId
+     *
      * @return $this
      */
     public function setDefaultFolder($defaultFolderId)
@@ -118,7 +117,9 @@ class Content extends BaseContent implements FileModelParentInterface
 
     /**
      * @deprecated since 2.3, and will be removed in 2.4, please use Content::setDefaultFolder
+     *
      * @param int $defaultFolderId
+     *
      * @return $this
      */
     public function updateDefaultFolder($defaultFolderId)
@@ -166,7 +167,8 @@ class Content extends BaseContent implements FileModelParentInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolder::setPosition
      */
     public function setPosition($v)
@@ -175,7 +177,8 @@ class Content extends BaseContent implements FileModelParentInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolder::getPosition
      */
     public function getPosition()
@@ -202,9 +205,10 @@ class Content extends BaseContent implements FileModelParentInterface
     }
 
     /**
-     * Overload for the position management
+     * Overload for the position management.
+     *
      * @param ContentFolder $contentFolder
-     * @inheritdoc
+     *                                     {@inheritdoc}
      */
     protected function doAddContentFolder($contentFolder)
     {

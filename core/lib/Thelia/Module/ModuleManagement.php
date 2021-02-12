@@ -16,7 +16,6 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use SplFileInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -27,8 +26,8 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
 /**
- * Class ModuleManagement
- * @package Thelia\Module
+ * Class ModuleManagement.
+ *
  * @author  Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleManagement
@@ -53,7 +52,7 @@ class ModuleManagement
 
         $finder
             ->name('module.xml')
-            ->in($this->baseModuleDir . '*' . DS . 'Config')
+            ->in($this->baseModuleDir.'*'.DS.'Config')
         ;
 
         $errors = [];
@@ -84,7 +83,7 @@ class ModuleManagement
      * Update module information, and invoke install() for new modules (e.g. modules
      * just discovered), or update() modules for which version number ha changed.
      *
-     * @param SplFileInfo $file the module.xml file descriptor
+     * @param SplFileInfo        $file      the module.xml file descriptor
      * @param ContainerInterface $container the container
      *
      * @return Module
@@ -97,9 +96,9 @@ class ModuleManagement
         $descriptorValidator = $this->getDescriptorValidator();
 
         $content = $descriptorValidator->getDescriptor($file->getRealPath());
-        $reflected = new \ReflectionClass((string)$content->fullnamespace);
+        $reflected = new \ReflectionClass((string) $content->fullnamespace);
         $code = basename(\dirname($reflected->getFileName()));
-        $version = (string)$content->version;
+        $version = (string) $content->version;
         $currentVersion = $version;
         $mandatory = \intval($content->mandatory);
         $hidden = \intval($content->hidden);
@@ -125,9 +124,9 @@ class ModuleManagement
             $module
                 ->setCode($code)
                 ->setVersion($version)
-                ->setFullNamespace((string)$content->fullnamespace)
+                ->setFullNamespace((string) $content->fullnamespace)
                 ->setType($this->getModuleType($reflected))
-                ->setCategory((string)$content->type)
+                ->setCategory((string) $content->type)
                 ->setMandatory($mandatory)
                 ->setHidden($hidden)
                 ->save($con)
@@ -138,10 +137,10 @@ class ModuleManagement
             if ('install' === $action) {
                 $this->saveDescription($module, $content, $con);
 
-                if (isset($content->{"images-folder"}) && !$module->isModuleImageDeployed($con)) {
+                if (isset($content->{'images-folder'}) && !$module->isModuleImageDeployed($con)) {
                     /** @var \Thelia\Module\BaseModule $moduleInstance */
                     $moduleInstance = $reflected->newInstance();
-                    $imagesFolder = THELIA_MODULE_DIR . $code . DS . (string)$content->{"images-folder"};
+                    $imagesFolder = THELIA_MODULE_DIR.$code.DS.(string) $content->{'images-folder'};
                     $moduleInstance->deployImageFolder($module, $imagesFolder, $con);
                 }
             }
@@ -163,7 +162,7 @@ class ModuleManagement
 
             $con->commit();
         } catch (\Exception $ex) {
-            Tlog::getInstance()->addError("Failed to update module " . $module->getCode(), $ex);
+            Tlog::getInstance()->addError('Failed to update module '.$module->getCode(), $ex);
 
             $con->rollBack();
             throw $ex;
@@ -205,13 +204,14 @@ class ModuleManagement
         if ($reflected->implementsInterface('Thelia\Module\PaymentModuleInterface')) {
             return BaseModule::PAYMENT_MODULE_TYPE;
         }
-            return BaseModule::CLASSIC_MODULE_TYPE;
+
+        return BaseModule::CLASSIC_MODULE_TYPE;
     }
 
     private function saveDescription(Module $module, \SimpleXMLElement $content, ConnectionInterface $con)
     {
         foreach ($content->descriptive as $description) {
-            $locale = (string)$description->attributes()->locale;
+            $locale = (string) $description->attributes()->locale;
 
             $module
                 ->setLocale($locale)

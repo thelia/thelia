@@ -19,11 +19,9 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\CategoryQuery;
-use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 
 /**
- *
  * Category path loop, to get the path to a given category.
  *
  * - category is the category id
@@ -32,12 +30,13 @@ use Thelia\Type\BooleanOrBothType;
  * - visible if true or missing, only visible categories will be displayed. If false, all categories (visible or not) are returned.
  *
  * Class CategoryPath
- * @package Thelia\Core\Template\Loop
+ *
  * @author Franck Allimant <franck@cqfdev.fr>
  *
  * {@inheritdoc}
- * @method int getCategory()
- * @method int getDepth()
+ *
+ * @method int         getCategory()
+ * @method int         getDepth()
  * @method bool|string getVisible()
  */
 class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
@@ -79,11 +78,11 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
 
             if ($category != null) {
                 $results[] = [
-                    "ID" => $category->getId(),
-                    "TITLE" => $category->getVirtualColumn('i18n_TITLE'),
-                    "PARENT" => $category->getParent(),
-                    "URL" => $category->getUrl($this->locale),
-                    "LOCALE" => $this->locale,
+                    'ID' => $category->getId(),
+                    'TITLE' => $category->getVirtualColumn('i18n_TITLE'),
+                    'PARENT' => $category->getParent(),
+                    'URL' => $category->getUrl($this->locale),
+                    'LOCALE' => $this->locale,
                 ];
 
                 $currentId = $category->getParent();
@@ -93,7 +92,7 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
                     if (\in_array($currentId, $ids)) {
                         throw new \LogicException(
                             sprintf(
-                                "Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)",
+                                'Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)',
                                 $originalId,
                                 $currentId
                             )

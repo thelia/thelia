@@ -24,13 +24,12 @@ use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Product;
 
 /**
- * @package Coupon
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class RemoveAmountOnProductsTest extends TestCase
 {
     /**
-     * Generate adapter stub
+     * Generate adapter stub.
      *
      * @param int    $cartTotalPrice   Cart total price
      * @param string $checkoutCurrency Checkout currency
@@ -186,7 +185,7 @@ class RemoveAmountOnProductsTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false
@@ -195,22 +194,22 @@ class RemoveAmountOnProductsTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 40.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+            MatchForTotalAmount::CART_CURRENCY => 'EUR',
         ];
         $condition1->setValidatorsFromForm($operators, $values);
 
         $condition2 = new MatchForTotalAmount($stubFacade);
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::INFERIOR,
-            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL
+            MatchForTotalAmount::CART_CURRENCY => Operators::EQUAL,
         ];
         $values = [
             MatchForTotalAmount::CART_TOTAL => 400.00,
-            MatchForTotalAmount::CART_CURRENCY => 'EUR'
+            MatchForTotalAmount::CART_CURRENCY => 'EUR',
         ];
         $condition2->setValidatorsFromForm($operators, $values);
 
@@ -253,7 +252,7 @@ class RemoveAmountOnProductsTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false
@@ -284,7 +283,7 @@ class RemoveAmountOnProductsTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false
@@ -315,7 +314,7 @@ class RemoveAmountOnProductsTest extends TestCase
             true,
             true,
             254,
-            $date->setTimestamp(strtotime("today + 3 months")),
+            $date->setTimestamp(strtotime('today + 3 months')),
             new ObjectCollection(),
             new ObjectCollection(),
             false

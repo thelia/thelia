@@ -22,13 +22,12 @@ use Thelia\Model\Address;
 use Thelia\Model\Customer;
 
 /**
- * @package Coupon
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class MatchDeliveryCountriesTest extends TestCase
 {
     /**
-     * Generate adapter stub
+     * Generate adapter stub.
      *
      * @param int    $cartTotalPrice   Cart total price
      * @param string $checkoutCurrency Checkout currency
@@ -72,9 +71,9 @@ class MatchDeliveryCountriesTest extends TestCase
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\MatchDeliveryCountries::setValidators
+     * @covers \Thelia\Condition\Implementation\MatchDeliveryCountries::setValidators
      */
     public function testInValidBackOfficeInputOperator()
     {
@@ -83,10 +82,10 @@ class MatchDeliveryCountriesTest extends TestCase
 
         $condition1 = new MatchDeliveryCountries($stubFacade);
         $operators = [
-            MatchDeliveryCountries::COUNTRIES_LIST => Operators::INFERIOR_OR_EQUAL
+            MatchDeliveryCountries::COUNTRIES_LIST => Operators::INFERIOR_OR_EQUAL,
         ];
         $values = [
-            MatchDeliveryCountries::COUNTRIES_LIST => []
+            MatchDeliveryCountries::COUNTRIES_LIST => [],
         ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
@@ -95,14 +94,14 @@ class MatchDeliveryCountriesTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\MatchDeliveryCountries::setValidators
+     * @covers \Thelia\Condition\Implementation\MatchDeliveryCountries::setValidators
      */
     public function testInValidBackOfficeInputValue()
     {
@@ -111,10 +110,10 @@ class MatchDeliveryCountriesTest extends TestCase
 
         $condition1 = new MatchDeliveryCountries($stubFacade);
         $operators = [
-            MatchDeliveryCountries::COUNTRIES_LIST => Operators::IN
+            MatchDeliveryCountries::COUNTRIES_LIST => Operators::IN,
         ];
         $values = [
-            MatchDeliveryCountries::COUNTRIES_LIST => []
+            MatchDeliveryCountries::COUNTRIES_LIST => [],
         ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
@@ -122,10 +121,9 @@ class MatchDeliveryCountriesTest extends TestCase
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchDeliveryCountries::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchDeliveryCountries::isMatching
      */
     public function testMatchingRule()
     {
@@ -134,10 +132,10 @@ class MatchDeliveryCountriesTest extends TestCase
 
         $condition1 = new MatchDeliveryCountries($stubFacade);
         $operators = [
-            MatchDeliveryCountries::COUNTRIES_LIST => Operators::IN
+            MatchDeliveryCountries::COUNTRIES_LIST => Operators::IN,
         ];
         $values = [
-            MatchDeliveryCountries::COUNTRIES_LIST => [10, 20]
+            MatchDeliveryCountries::COUNTRIES_LIST => [10, 20],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -145,15 +143,14 @@ class MatchDeliveryCountriesTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\MatchDeliveryCountries::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\MatchDeliveryCountries::isMatching
      */
     public function testNotMatching()
     {
@@ -163,10 +160,10 @@ class MatchDeliveryCountriesTest extends TestCase
         $condition1 = new MatchDeliveryCountries($stubFacade);
 
         $operators = [
-            MatchDeliveryCountries::COUNTRIES_LIST => Operators::IN
+            MatchDeliveryCountries::COUNTRIES_LIST => Operators::IN,
         ];
         $values = [
-            MatchDeliveryCountries::COUNTRIES_LIST => [50, 60]
+            MatchDeliveryCountries::COUNTRIES_LIST => [50, 60],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -174,7 +171,7 @@ class MatchDeliveryCountriesTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
@@ -186,10 +183,10 @@ class MatchDeliveryCountriesTest extends TestCase
         $condition1 = new MatchDeliveryCountries($stubFacade);
 
         $operators = [
-            MatchDeliveryCountries::COUNTRIES_LIST => Operators::IN
+            MatchDeliveryCountries::COUNTRIES_LIST => Operators::IN,
         ];
         $values = [
-            MatchDeliveryCountries::COUNTRIES_LIST => [50, 60]
+            MatchDeliveryCountries::COUNTRIES_LIST => [50, 60],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -207,10 +204,9 @@ class MatchDeliveryCountriesTest extends TestCase
     }
 
     /**
-     * Check getName i18n
+     * Check getName i18n.
      *
-     * @covers Thelia\Condition\Implementation\MatchDeliveryCountries::getName
-     *
+     * @covers \Thelia\Condition\Implementation\MatchDeliveryCountries::getName
      */
     public function testGetName()
     {
@@ -225,10 +221,9 @@ class MatchDeliveryCountriesTest extends TestCase
     }
 
     /**
-     * Check tooltip i18n
+     * Check tooltip i18n.
      *
-     * @covers Thelia\Condition\Implementation\MatchDeliveryCountries::getToolTip
-     *
+     * @covers \Thelia\Condition\Implementation\MatchDeliveryCountries::getToolTip
      */
     public function testGetToolTip()
     {
@@ -243,10 +238,9 @@ class MatchDeliveryCountriesTest extends TestCase
     }
 
     /**
-     * Check validator
+     * Check validator.
      *
-     * @covers Thelia\Condition\Implementation\MatchDeliveryCountries::generateInputs
-     *
+     * @covers \Thelia\Condition\Implementation\MatchDeliveryCountries::generateInputs
      */
     public function testGetValidator()
     {
@@ -256,10 +250,10 @@ class MatchDeliveryCountriesTest extends TestCase
         $condition1 = new MatchDeliveryCountries($stubFacade);
 
         $operators = [
-            MatchDeliveryCountries::COUNTRIES_LIST => Operators::IN
+            MatchDeliveryCountries::COUNTRIES_LIST => Operators::IN,
         ];
         $values = [
-            MatchDeliveryCountries::COUNTRIES_LIST => [50, 60]
+            MatchDeliveryCountries::COUNTRIES_LIST => [50, 60],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -274,15 +268,15 @@ class MatchDeliveryCountriesTest extends TestCase
                         'out' => 'Price',
                     ],
                     'value' => '',
-                    'selectedOperator' => 'in'
-                ]
+                    'selectedOperator' => 'in',
+                ],
             ],
             'setOperators' => [
-                'countries' => 'in'
+                'countries' => 'in',
             ],
             'setValues' => [
-                'countries' => [50, 60]
-            ]
+                'countries' => [50, 60],
+            ],
         ];
         $expected = $validators;
 

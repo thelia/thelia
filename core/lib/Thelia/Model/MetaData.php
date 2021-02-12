@@ -16,16 +16,16 @@ use Thelia\Model\Base\MetaData as BaseMetaData;
 
 class MetaData extends BaseMetaData
 {
-    public const CATEGORY_KEY     = 'category';
-    public const PRODUCT_KEY      = 'product';
-    public const PSE_KEY          = 'pse';
-    public const FEATURE_KEY      = 'feature';
-    public const FEATURE_AV_KEY   = 'feature_av';
-    public const ATTRIBUTE_KEY    = 'attribute';
+    public const CATEGORY_KEY = 'category';
+    public const PRODUCT_KEY = 'product';
+    public const PSE_KEY = 'pse';
+    public const FEATURE_KEY = 'feature';
+    public const FEATURE_AV_KEY = 'feature_av';
+    public const ATTRIBUTE_KEY = 'attribute';
     public const ATTRIBUTE_AV_KEY = 'attribute_av';
-    public const BRAND_KEY        = 'brand_av';
+    public const BRAND_KEY = 'brand_av';
 
-    public const FOLDER_KEY  = 'folder';
+    public const FOLDER_KEY = 'folder';
     public const CONTENT_KEY = 'content';
 
     public const ORDER_KEY = 'order';
@@ -34,11 +34,11 @@ class MetaData extends BaseMetaData
     public const MODULE_KEY = 'module';
 
     public const CUSTOMER_KEY = 'customer';
-    public const ADDRESS_KEY  = 'address';
+    public const ADDRESS_KEY = 'address';
 
     public const CURRENCY_KEY = 'currency';
-    public const COUNTRY_KEY  = 'country';
-    public const LANG_KEY     = 'lang';
+    public const COUNTRY_KEY = 'country';
+    public const LANG_KEY = 'lang';
 
     public function getValue()
     {
@@ -54,10 +54,10 @@ class MetaData extends BaseMetaData
     public function setValue($v)
     {
         $isSerialized = false;
-        $data         = $v;
+        $data = $v;
         if (null !== $data) {
             if (\is_array($data) || \is_object($data)) {
-                $data         = serialize($data);
+                $data = serialize($data);
                 $isSerialized = true;
             }
         }

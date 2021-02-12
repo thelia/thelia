@@ -40,28 +40,28 @@ use Thelia\Model\SaleQuery;
 use Thelia\TaxEngine\Calculator;
 
 /**
- * Class Sale
+ * Class Sale.
  *
- * @package Thelia\Action
  * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class Sale extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * Update PSE for a given product
+     * Update PSE for a given product.
      *
-     * @param array               $pseList              an array of priduct sale elements
-     * @param bool                $promoStatus          true if the PSEs are on sale, false otherwise
-     * @param int                 $offsetType           the offset type, see SaleModel::OFFSET_* constants
-     * @param Calculator          $taxCalculator        the tax calculator
-     * @param array               $saleOffsetByCurrency an array of price offset for each currency (currency ID => offset_amount)
+     * @param array      $pseList              an array of priduct sale elements
+     * @param bool       $promoStatus          true if the PSEs are on sale, false otherwise
+     * @param int        $offsetType           the offset type, see SaleModel::OFFSET_* constants
+     * @param Calculator $taxCalculator        the tax calculator
+     * @param array      $saleOffsetByCurrency an array of price offset for each currency (currency ID => offset_amount)
+     *
      * @throws PropelException
      */
     protected function updateProductSaleElementsPrices($pseList, $promoStatus, $offsetType, Calculator $taxCalculator, $saleOffsetByCurrency, ConnectionInterface $con)
     {
         /** @var ProductSaleElements $pse */
         foreach ($pseList as $pse) {
-            if ($pse->getPromo()!= $promoStatus) {
+            if ($pse->getPromo() != $promoStatus) {
                 $pse
                     ->setPromo($promoStatus)
                     ->save($con)
@@ -102,8 +102,9 @@ class Sale extends BaseAction implements EventSubscriberInterface
             }
         }
     }
+
     /**
-     * Update the promo status of the sale's selected products and combinations
+     * Update the promo status of the sale's selected products and combinations.
      *
      * @throws \RuntimeException
      * @throws \Exception
@@ -131,7 +132,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     // Reset all sale status on product's PSE
                     ProductSaleElementsQuery::create()
                         ->filterByProductId($saleProduct->getProductId())
-                        ->update([ 'Promo' => false], $con)
+                        ->update(['Promo' => false], $con)
                     ;
 
                     $taxCalculator->load(
@@ -146,7 +147,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     ;
 
                     // If no attribute AV id is defined, consider ALL product combinations
-                    if (! \is_null($attributeAvId)) {
+                    if (!\is_null($attributeAvId)) {
                         // Find PSE attached to combination containing this attribute av :
                         // SELECT * from product_sale_elements pse
                         // left join attribute_combination ac on ac.product_sale_elements_id = pse.id
@@ -184,8 +185,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Create a new Sale
-     *
+     * Create a new Sale.
      */
     public function create(SaleCreateEvent $event)
     {
@@ -202,9 +202,10 @@ class Sale extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Process update sale
+     * Process update sale.
      *
      * @param $eventName
+     *
      * @throws PropelException
      */
     public function update(SaleUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -302,9 +303,10 @@ class Sale extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Toggle Sale activity
+     * Toggle Sale activity.
      *
      * @param $eventName
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function toggleActivity(SaleToggleActivityEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -336,9 +338,10 @@ class Sale extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Delete a sale
+     * Delete a sale.
      *
      * @param $eventName
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function delete(SaleDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -373,11 +376,11 @@ class Sale extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Clear all sales
+     * Clear all sales.
      *
      * @throws \Exception
      */
-    public function clearStatus(/** @noinspection PhpUnusedParameterInspection */ SaleClearStatusEvent $event)
+    public function clearStatus(/* @noinspection PhpUnusedParameterInspection */ SaleClearStatusEvent $event)
     {
         $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
         $con->beginTransaction();
@@ -386,13 +389,13 @@ class Sale extends BaseAction implements EventSubscriberInterface
             // Set the active status of all Sales to false
             SaleQuery::create()
                 ->filterByActive(true)
-                ->update([ 'Active' => false ], $con)
+                ->update(['Active' => false], $con)
             ;
 
             // Reset all sale status on PSE
             ProductSaleElementsQuery::create()
                 ->filterByPromo(true)
-                ->update([ 'Promo' => false], $con)
+                ->update(['Promo' => false], $con)
             ;
 
             $con->commit();
@@ -407,6 +410,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
      * the required action depending on the current date.
      *
      * @param $eventName
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function checkSaleActivation(SaleActiveStatusCheckEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -460,14 +464,14 @@ class Sale extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::SALE_CREATE     => ['create', 128],
-            TheliaEvents::SALE_UPDATE     => ['update', 128],
-            TheliaEvents::SALE_DELETE     => ['delete', 128],
+            TheliaEvents::SALE_CREATE => ['create', 128],
+            TheliaEvents::SALE_UPDATE => ['update', 128],
+            TheliaEvents::SALE_DELETE => ['delete', 128],
 
             TheliaEvents::SALE_TOGGLE_ACTIVITY => ['toggleActivity', 128],
 

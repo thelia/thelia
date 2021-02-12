@@ -26,7 +26,7 @@ use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**
- * Config loop, to access configuration variables
+ * Config loop, to access configuration variables.
  *
  * - id is the config id
  * - name is the config name
@@ -34,16 +34,16 @@ use Thelia\Type\TypeCollection;
  * - secured filters by secured status (yes, no, both)
  * - exclude is a comma separated list of config IDs that will be excluded from output
  *
- * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method string getVariable()
+ *
+ * @method int[]       getId()
+ * @method string      getVariable()
  * @method bool|string getHidden()
  * @method bool|string getSecured()
- * @method int[] getExclude()
- * @method string[] getOrder()
+ * @method int[]       getExclude()
+ * @method string[]    getOrder()
  */
 class Config extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -79,8 +79,8 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function buildModelCriteria()
     {
-        $id      = $this->getId();
-        $name    = $this->getVariable();
+        $id = $this->getId();
+        $name = $this->getVariable();
         $secured = $this->getSecured();
         $exclude = $this->getExclude();
 
@@ -88,15 +88,15 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $this->configureI18nProcessing($search);
 
-        if (! \is_null($id)) {
+        if (!\is_null($id)) {
             $search->filterById($id);
         }
 
-        if (! \is_null($name)) {
+        if (!\is_null($name)) {
             $search->filterByName($name);
         }
 
-        if (! \is_null($exclude)) {
+        if (!\is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
@@ -104,11 +104,11 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByHidden($this->getHidden() ? 1 : 0);
         }
 
-        if (! \is_null($secured) && $secured != BooleanOrBothType::ANY) {
+        if (!\is_null($secured) && $secured != BooleanOrBothType::ANY) {
             $search->filterBySecured($secured ? 1 : 0);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
@@ -149,17 +149,17 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($result);
 
             $loopResultRow
-                ->set("ID", $result->getId())
-                ->set("NAME", $result->getName())
-                ->set("VALUE", $result->getValue())
-                ->set("IS_TRANSLATED", $result->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE", $this->locale)
-                ->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $result->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $result->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("HIDDEN", $result->getHidden())
-                ->set("SECURED", $result->getSecured())
+                ->set('ID', $result->getId())
+                ->set('NAME', $result->getName())
+                ->set('VALUE', $result->getValue())
+                ->set('IS_TRANSLATED', $result->getVirtualColumn('IS_TRANSLATED'))
+                ->set('LOCALE', $this->locale)
+                ->set('TITLE', $result->getVirtualColumn('i18n_TITLE'))
+                ->set('CHAPO', $result->getVirtualColumn('i18n_CHAPO'))
+                ->set('DESCRIPTION', $result->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set('HIDDEN', $result->getHidden())
+                ->set('SECURED', $result->getSecured())
             ;
 
             $this->addOutputFields($loopResultRow, $result);

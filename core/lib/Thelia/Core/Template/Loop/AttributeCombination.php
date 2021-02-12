@@ -24,19 +24,17 @@ use Thelia\Model\Map\AttributeAvTableMap;
 use Thelia\Model\Map\AttributeTableMap;
 use Thelia\Model\Map\AttributeTemplateTableMap;
 use Thelia\Model\Map\ProductTableMap;
-use Thelia\Type;
-use Thelia\Type\TypeCollection;
 
 /**
- *
- * Attribute Combination loop
+ * Attribute Combination loop.
  *
  * Class AttributeCombination
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int getProductSaleElements()
+ *
+ * @method int      getProductSaleElements()
  * @method string[] getOrder()
  */
 class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -53,7 +51,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
             Argument::createEnumListTypeArgument(
                 'order',
                 [
-                    'alpha', 'alpha_reverse', 'manual', 'manual_reverse'
+                    'alpha', 'alpha_reverse', 'manual', 'manual_reverse',
                 ],
                 'alpha'
             )
@@ -84,20 +82,20 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
 
         $search->filterByProductSaleElementsId($productSaleElements, Criteria::EQUAL);
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "alpha":
-                    $search->addAscendingOrderByColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE');
+                case 'alpha':
+                    $search->addAscendingOrderByColumn(AttributeTableMap::TABLE_NAME.'_i18n_TITLE');
                     break;
-                case "alpha_reverse":
-                    $search->addDescendingOrderByColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE');
+                case 'alpha_reverse':
+                    $search->addDescendingOrderByColumn(AttributeTableMap::TABLE_NAME.'_i18n_TITLE');
                     break;
-                case "manual":
+                case 'manual':
                     $this->orderByTemplateAttributePosition($search, Criteria::ASC);
                     break;
-                case "manual_reverse":
+                case 'manual_reverse':
                     $this->orderByTemplateAttributePosition($search, Criteria::DESC);
                     break;
             }
@@ -113,19 +111,19 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
             $loopResultRow = new LoopResultRow($attributeCombination);
 
             $loopResultRow
-                ->set("LOCALE", $this->locale)
+                ->set('LOCALE', $this->locale)
 
-                ->set("ATTRIBUTE_ID", $attributeCombination->getAttributeId())
-                ->set("ATTRIBUTE_TITLE", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE'))
-                ->set("ATTRIBUTE_CHAPO", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_CHAPO'))
-                ->set("ATTRIBUTE_DESCRIPTION", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
-                ->set("ATTRIBUTE_POSTSCRIPTUM", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
+                ->set('ATTRIBUTE_ID', $attributeCombination->getAttributeId())
+                ->set('ATTRIBUTE_TITLE', $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME.'_i18n_TITLE'))
+                ->set('ATTRIBUTE_CHAPO', $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME.'_i18n_CHAPO'))
+                ->set('ATTRIBUTE_DESCRIPTION', $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME.'_i18n_DESCRIPTION'))
+                ->set('ATTRIBUTE_POSTSCRIPTUM', $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME.'_i18n_POSTSCRIPTUM'))
 
-                ->set("ATTRIBUTE_AVAILABILITY_ID", $attributeCombination->getAttributeAvId())
-                ->set("ATTRIBUTE_AVAILABILITY_TITLE", $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_TITLE'))
-                ->set("ATTRIBUTE_AVAILABILITY_CHAPO", $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
-                ->set("ATTRIBUTE_AVAILABILITY_DESCRIPTION", $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
-                ->set("ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM", $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'));
+                ->set('ATTRIBUTE_AVAILABILITY_ID', $attributeCombination->getAttributeAvId())
+                ->set('ATTRIBUTE_AVAILABILITY_TITLE', $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME.'_i18n_TITLE'))
+                ->set('ATTRIBUTE_AVAILABILITY_CHAPO', $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME.'_i18n_CHAPO'))
+                ->set('ATTRIBUTE_AVAILABILITY_DESCRIPTION', $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME.'_i18n_DESCRIPTION'))
+                ->set('ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM', $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME.'_i18n_POSTSCRIPTUM'));
             $this->addOutputFields($loopResultRow, $attributeCombination);
             $loopResult->addRow($loopResultRow);
         }
@@ -135,6 +133,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
 
     /**
      * @param string $order Criteria::ASC|Criteria::DESC
+     *
      * @return AttributeCombinationQuery
      */
     protected function orderByTemplateAttributePosition(AttributeCombinationQuery $search, $order)
@@ -147,7 +146,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
                 ->joinAttributeTemplate(AttributeTemplateTableMap::TABLE_NAME)
                 ->addJoinCondition(
                     AttributeTemplateTableMap::TABLE_NAME,
-                    AttributeTemplateTableMap::COL_TEMPLATE_ID . Criteria::EQUAL . ProductTableMap::COL_TEMPLATE_ID
+                    AttributeTemplateTableMap::COL_TEMPLATE_ID.Criteria::EQUAL.ProductTableMap::COL_TEMPLATE_ID
                 )
             ->endUse()
             ->orderBy(AttributeTemplateTableMap::COL_POSITION, $order);

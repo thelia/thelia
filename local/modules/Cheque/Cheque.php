@@ -17,12 +17,10 @@ use Thelia\Install\Database;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\Order;
 use Thelia\Module\AbstractPaymentModule;
-use Thelia\Module\BaseModule;
-use Thelia\Module\PaymentModuleInterface;
 
 class Cheque extends AbstractPaymentModule
 {
-    public const MESSAGE_DOMAIN = "Cheque";
+    public const MESSAGE_DOMAIN = 'Cheque';
 
     public function pay(Order $order)
     {
@@ -30,13 +28,12 @@ class Cheque extends AbstractPaymentModule
     }
 
     /**
-     *
      * This method is call on Payment loop.
      *
      * If you return true, the payment method will de display
      * If you return false, the payment method will not be display
      *
-     * @return boolean
+     * @return bool
      */
     public function isValidPayment()
     {
@@ -48,7 +45,7 @@ class Cheque extends AbstractPaymentModule
         $database = new Database($con);
 
         // Insert email message
-        $database->insertSql(null, [__DIR__ . "/Config/setup.sql"]);
+        $database->insertSql(null, [__DIR__.'/Config/setup.sql']);
     }
 
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
@@ -63,7 +60,7 @@ class Cheque extends AbstractPaymentModule
 
     /**
      * if you want, you can manage stock in your module instead of order process.
-     * Return false if you want to manage yourself the stock
+     * Return false if you want to manage yourself the stock.
      *
      * @return bool
      */

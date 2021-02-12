@@ -15,8 +15,8 @@ namespace Thelia\Core\Event\ShippingZone;
 use Thelia\Core\Event\ActionEvent;
 
 /**
- * Class ShippingZoneAddAreaEvent
- * @package Thelia\Core\Event\ShippingZone
+ * Class ShippingZoneAddAreaEvent.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ShippingZoneAddAreaEvent extends ActionEvent
@@ -31,7 +31,6 @@ class ShippingZoneAddAreaEvent extends ActionEvent
     }
 
     /**
-     *
      * @return $this
      */
     public function setAreaId($area_id)
@@ -41,15 +40,12 @@ class ShippingZoneAddAreaEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     */
     public function getAreaId()
     {
         return $this->area_id;
     }
 
     /**
-     *
      * @return $this
      */
     public function setShippingZoneId($shipping_zone_id)
@@ -59,8 +55,6 @@ class ShippingZoneAddAreaEvent extends ActionEvent
         return $this;
     }
 
-    /**
-     */
     public function getShippingZoneId()
     {
         return $this->shipping_zone_id;

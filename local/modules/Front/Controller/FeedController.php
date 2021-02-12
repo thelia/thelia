@@ -24,33 +24,35 @@ use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 
 /**
- * Controller uses to generate RSS Feeds
+ * Controller uses to generate RSS Feeds.
  *
  * A default cache of 2 hours is used to avoid attack. You can flush cache if you have `ADMIN` role and pass flush=1 in
  * query string parameter.
  *
- * @package Front\Controller
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class FeedController extends BaseFrontController {
+class FeedController extends BaseFrontController
+{
     /**
-     * Folder name for feeds cache
+     * Folder name for feeds cache.
      */
-    public const FEED_CACHE_DIR = "feeds";
+    public const FEED_CACHE_DIR = 'feeds';
 
     /**
-     * Key prefix for feed cache
+     * Key prefix for feed cache.
      */
-    public const FEED_CACHE_KEY = "feed";
+    public const FEED_CACHE_KEY = 'feed';
 
     /**
-     * render the RSS feed
+     * render the RSS feed.
      *
      * @param $context string   The context of the feed : catalog, content. default: catalog
      * @param $lang string      The lang of the feed : fr_FR, en_US, ... default: default language of the site
      * @param $id string        The id of the parent element. The id of the main parent category for catalog context.
      *                          The id of the content folder for content context
+     *
      * @return Response
+     *
      * @throws \RuntimeException
      */
     public function generateAction($context, $lang, $id)
@@ -59,63 +61,63 @@ class FeedController extends BaseFrontController {
         $request = $this->getRequest();
 
         // context
-        if ("" === $context){
-            $context = "catalog";
-        } else if (! \in_array($context, ["catalog", "content", "brand"]) ){
+        if ('' === $context) {
+            $context = 'catalog';
+        } elseif (!\in_array($context, ['catalog', 'content', 'brand'])) {
             $this->pageNotFound();
         }
 
         // the locale : fr_FR, en_US,
-        if ("" !== $lang) {
-            if (! $this->checkLang($lang)){
+        if ('' !== $lang) {
+            if (!$this->checkLang($lang)) {
                 $this->pageNotFound();
             }
         } else {
-            try{
+            try {
                 $lang = Lang::getDefaultLanguage();
                 $lang = $lang->getLocale();
-            } catch (\RuntimeException $ex){
+            } catch (\RuntimeException $ex) {
                 // @todo generate error page
-                throw new \RuntimeException("No default language is defined. Please define one.");
+                throw new \RuntimeException('No default language is defined. Please define one.');
             }
         }
-        if (null === $lang = LangQuery::create()->findOneByLocale($lang)){
+        if (null === $lang = LangQuery::create()->findOneByLocale($lang)) {
             $this->pageNotFound();
         }
         $lang = $lang->getId();
 
         // check if element exists and is visible
-        if ("" !== $id){
-            if (false === $this->checkId($context, $id)){
+        if ('' !== $id) {
+            if (false === $this->checkId($context, $id)) {
                 $this->pageNotFound();
             }
         }
 
-        $flush = $request->query->get("flush", "");
+        $flush = $request->query->get('flush', '');
 
         // check if feed already in cache
         $cacheContent = false;
 
         $cacheDir = $this->getCacheDir();
-        $cacheKey = self::FEED_CACHE_KEY . $lang . $context . $id;
-        $cacheExpire = \intval(ConfigQuery::read("feed_ttl", '7200')) ?: 7200;
+        $cacheKey = self::FEED_CACHE_KEY.$lang.$context.$id;
+        $cacheExpire = \intval(ConfigQuery::read('feed_ttl', '7200')) ?: 7200;
 
         $cacheDriver = new FilesystemCache($cacheDir);
-        if (!($this->checkAdmin() && "" !== $flush)){
+        if (!($this->checkAdmin() && '' !== $flush)) {
             $cacheContent = $cacheDriver->fetch($cacheKey);
         } else {
             $cacheDriver->delete($cacheKey);
         }
 
         // if not in cache
-        if (false === $cacheContent){
+        if (false === $cacheContent) {
             // render the view
             $cacheContent = $this->renderRaw(
-                "feed",
+                'feed',
                 [
-                    "_context_" => $context,
-                    "_lang_"    => $lang,
-                    "_id_"      => $id
+                    '_context_' => $context,
+                    '_lang_' => $lang,
+                    '_id_' => $id,
                 ]
             );
             // save cache
@@ -130,33 +132,35 @@ class FeedController extends BaseFrontController {
     }
 
     /**
-     * get the cache directory for feeds
+     * get the cache directory for feeds.
      *
      * @return mixed|string
      */
     protected function getCacheDir()
     {
-        $cacheDir = $this->container->getParameter("kernel.cache_dir");
+        $cacheDir = $this->container->getParameter('kernel.cache_dir');
         $cacheDir = rtrim($cacheDir, '/');
-        $cacheDir .= '/' . self::FEED_CACHE_DIR . '/';
+        $cacheDir .= '/'.self::FEED_CACHE_DIR.'/';
 
         return $cacheDir;
     }
 
     /**
-     * Check if current user has ADMIN role
+     * Check if current user has ADMIN role.
      *
      * @return bool
      */
-    protected function checkAdmin(){
+    protected function checkAdmin()
+    {
         return $this->getSecurityContext()->hasAdminUser();
     }
 
     /**
-     * Check if a lang is used
+     * Check if a lang is used.
      *
      * @param $lang string  The lang code. e.g.: fr
-     * @return bool         true if the language is used, otherwise false
+     *
+     * @return bool true if the language is used, otherwise false
      */
     private function checkLang($lang)
     {
@@ -164,24 +168,25 @@ class FeedController extends BaseFrontController {
         $lang = LangQuery::create()
             ->findOneByLocale($lang);
 
-        return (null !== $lang);
+        return null !== $lang;
     }
 
     /**
-     * Check if the element exists and is visible
+     * Check if the element exists and is visible.
      *
      * @param $context string   catalog or content
      * @param $id string        id of the element
+     *
      * @return bool
      */
     private function checkId($context, $id)
     {
         $ret = false;
-        if (is_numeric($id)){
-            if ("catalog" === $context){
+        if (is_numeric($id)) {
+            if ('catalog' === $context) {
                 $cat = CategoryQuery::create()->findPk($id);
                 $ret = (null !== $cat && $cat->getVisible());
-            } elseif ("brand" === $context) {
+            } elseif ('brand' === $context) {
                 $brand = BrandQuery::create()->findPk($id);
                 $ret = (null !== $brand && $brand->getVisible());
             } else {
@@ -189,6 +194,7 @@ class FeedController extends BaseFrontController {
                 $ret = (null !== $folder && $folder->getVisible());
             }
         }
+
         return $ret;
     }
 }

@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\Country;
 
 /**
- * Class CountryToggleDefaultEvent
- * @package Thelia\Core\Event\Country
+ * Class CountryToggleDefaultEvent.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class CountryToggleDefaultEvent extends CountryEvent
@@ -30,8 +30,6 @@ class CountryToggleDefaultEvent extends CountryEvent
         $this->country_id = $country_id;
     }
 
-    /**
-     */
     public function getCountryId()
     {
         return $this->country_id;

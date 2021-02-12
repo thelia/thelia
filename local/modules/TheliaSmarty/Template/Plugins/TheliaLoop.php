@@ -56,7 +56,7 @@ class TheliaLoop extends AbstractSmartyPlugin
     /** @var Translator */
     protected $translator;
 
-    /** @var LoopResult[]  */
+    /** @var LoopResult[] */
     protected $loopstack = [];
 
     protected $varstack = [];
@@ -91,8 +91,10 @@ class TheliaLoop extends AbstractSmartyPlugin
     }
 
     /**
-     * @param  string                    $loopName
+     * @param string $loopName
+     *
      * @return PropelModelPager
+     *
      * @throws \InvalidArgumentException if no pagination was found for loop
      */
     public static function getPagination($loopName)
@@ -100,22 +102,22 @@ class TheliaLoop extends AbstractSmartyPlugin
         if (\array_key_exists($loopName, self::$pagination)) {
             return self::$pagination[$loopName];
         }
-            throw new \InvalidArgumentException(
-                Translator::getInstance()->trans("No pagination currently defined for loop name '%name'", ['%name' => $loopName ])
+        throw new \InvalidArgumentException(
+                Translator::getInstance()->trans("No pagination currently defined for loop name '%name'", ['%name' => $loopName])
             );
     }
 
     /**
-     * Process the count function: executes a loop and return the number of items found
+     * Process the count function: executes a loop and return the number of items found.
      *
      * @param array                     $params   parameters array
      * @param \Smarty_Internal_Template $template
      *
-     * @return int                       the item count
-     * @throws \InvalidArgumentException if a parameter is missing
+     * @return int the item count
      *
+     * @throws \InvalidArgumentException if a parameter is missing
      */
-    public function theliaCount($params, /** @noinspection PhpUnusedParameterInspection */ $template)
+    public function theliaCount($params, /* @noinspection PhpUnusedParameterInspection */ $template)
     {
         $type = $this->getParam($params, 'type');
 
@@ -143,12 +145,12 @@ class TheliaLoop extends AbstractSmartyPlugin
     }
 
     /**
-     * Process {loop name="loop name" type="loop type" ... } ... {/loop} block
+     * Process {loop name="loop name" type="loop type" ... } ... {/loop} block.
      *
      * @param array                     $params
      * @param string                    $content
      * @param \Smarty_Internal_Template $template
-     * @param boolean                   $repeat
+     * @param bool                      $repeat
      *
      * @throws \InvalidArgumentException
      *
@@ -187,7 +189,7 @@ class TheliaLoop extends AbstractSmartyPlugin
 
                 // We have to clone the result, as exec() returns a cached LoopResult object, which may cause side effects
                 // if loops with the same argument set are nested (see https://github.com/thelia/thelia/issues/2213)
-                $loopResults = clone($loop->exec(self::$pagination[$name]));
+                $loopResults = clone $loop->exec(self::$pagination[$name]);
 
                 $loopResults->rewind();
             } catch (ElementNotFoundException $ex) {
@@ -219,7 +221,7 @@ class TheliaLoop extends AbstractSmartyPlugin
             $loopResultRow = $loopResults->current();
 
             // On first iteration, save variables that may be overwritten by this loop
-            if (! isset($this->varstack[$name])) {
+            if (!isset($this->varstack[$name])) {
                 $saved_vars = [];
 
                 $varlist = $loopResultRow->getVars();
@@ -239,7 +241,7 @@ class TheliaLoop extends AbstractSmartyPlugin
         }
 
         // Loop is terminated. Cleanup.
-        if (! $repeat) {
+        if (!$repeat) {
             // Restore previous variables values before terminating
             if (isset($this->varstack[$name])) {
                 foreach ($this->varstack[$name] as $var => $value) {
@@ -252,7 +254,7 @@ class TheliaLoop extends AbstractSmartyPlugin
 
         if ($content !== null) {
             if ($loopResults->isEmpty()) {
-                $content = "";
+                $content = '';
             }
 
             return $content;
@@ -262,19 +264,20 @@ class TheliaLoop extends AbstractSmartyPlugin
     }
 
     /**
-     * Process {elseloop rel="loopname"} ... {/elseloop} block
+     * Process {elseloop rel="loopname"} ... {/elseloop} block.
      *
-     * @param  array                     $params   loop parameters
-     * @param  string                    $content  loop text content
-     * @param  \Smarty_Internal_Template $template the Smarty object
-     * @param  boolean                   $repeat   repeat indicator (see Smarty doc.)
-     * @return string                    the loop output
+     * @param array                     $params   loop parameters
+     * @param string                    $content  loop text content
+     * @param \Smarty_Internal_Template $template the Smarty object
+     * @param bool                      $repeat   repeat indicator (see Smarty doc.)
+     *
+     * @return string the loop output
      */
-    public function theliaElseloop($params, $content, /** @noinspection PhpUnusedParameterInspection */ $template, &$repeat)
+    public function theliaElseloop($params, $content, /* @noinspection PhpUnusedParameterInspection */ $template, &$repeat)
     {
         //Block the smarty interpretation in the elseloop
         if ($content === null) {
-            if (! $this->checkEmptyLoop($params)) {
+            if (!$this->checkEmptyLoop($params)) {
                 $repeat = false;
 
                 return '';
@@ -285,15 +288,16 @@ class TheliaLoop extends AbstractSmartyPlugin
     }
 
     /**
-     * Process {ifloop rel="loopname"} ... {/ifloop} block
+     * Process {ifloop rel="loopname"} ... {/ifloop} block.
      *
-     * @param  array                     $params   loop parameters
-     * @param  string                    $content  loop text content
-     * @param  \Smarty_Internal_Template $template the Smarty object
-     * @param  boolean                   $repeat   repeat indicator (see Smarty doc.)
-     * @return string                    the loop output
+     * @param array                     $params   loop parameters
+     * @param string                    $content  loop text content
+     * @param \Smarty_Internal_Template $template the Smarty object
+     * @param bool                      $repeat   repeat indicator (see Smarty doc.)
+     *
+     * @return string the loop output
      */
-    public function theliaIfLoop($params, $content, /** @noinspection PhpUnusedParameterInspection */ $template, &$repeat)
+    public function theliaIfLoop($params, $content, /* @noinspection PhpUnusedParameterInspection */ $template, &$repeat)
     {
         // When encountering close tag, check if loop has results.
         if ($repeat === false) {
@@ -304,13 +308,15 @@ class TheliaLoop extends AbstractSmartyPlugin
     }
 
     /**
-     * Process {pageloop rel="loopname"} ... {/pageloop} block
+     * Process {pageloop rel="loopname"} ... {/pageloop} block.
      *
-     * @param  array                     $params   loop parameters
-     * @param  string                    $content  loop text content
-     * @param  \Smarty_Internal_Template $template the Smarty object
-     * @param  boolean                   $repeat   repeat indicator (see Smarty doc.)
-     * @return string                    the loop output
+     * @param array                     $params   loop parameters
+     * @param string                    $content  loop text content
+     * @param \Smarty_Internal_Template $template the Smarty object
+     * @param bool                      $repeat   repeat indicator (see Smarty doc.)
+     *
+     * @return string the loop output
+     *
      * @throws \InvalidArgumentException
      */
     public function theliaPageLoop($params, $content, $template, &$repeat)
@@ -329,7 +335,7 @@ class TheliaLoop extends AbstractSmartyPlugin
             return '';
         }
 
-        $startPage          = \intval($this->getParam($params, 'start-page', 1));
+        $startPage = \intval($this->getParam($params, 'start-page', 1));
         $displayedPageCount = \intval($this->getParam($params, 'limit', 10));
 
         if (\intval($displayedPageCount) == 0) {
@@ -364,9 +370,9 @@ class TheliaLoop extends AbstractSmartyPlugin
             // The first displayed page number
             $template->assign('START', $startPage);
             // The previous page number
-            $template->assign('PREV', $currentPage > 1 ? $currentPage-1 : $currentPage);
+            $template->assign('PREV', $currentPage > 1 ? $currentPage - 1 : $currentPage);
             // The next page number
-            $template->assign('NEXT', $currentPage < $totalPageCount ? $currentPage+1 : $totalPageCount);
+            $template->assign('NEXT', $currentPage < $totalPageCount ? $currentPage + 1 : $totalPageCount);
             // The last displayed page number
             $template->assign('END', $endPage);
             // The overall last page
@@ -374,7 +380,7 @@ class TheliaLoop extends AbstractSmartyPlugin
         } else {
             $iterationPage = $template->getTemplateVars('PAGE');
 
-            $iterationPage++;
+            ++$iterationPage;
         }
 
         if ($iterationPage <= $template->getTemplateVars('END')) {
@@ -396,11 +402,12 @@ class TheliaLoop extends AbstractSmartyPlugin
 
     /**
      * Check if a loop has returned results. The loop shoud have been executed before, or an
-     * InvalidArgumentException is thrown
+     * InvalidArgumentException is thrown.
      *
      * @param array $params
      *
-     * @return boolean                   true if the loop is empty
+     * @return bool true if the loop is empty
+     *
      * @throws \InvalidArgumentException
      */
     protected function checkEmptyLoop($params)
@@ -413,7 +420,7 @@ class TheliaLoop extends AbstractSmartyPlugin
             );
         }
 
-        if (! isset($this->loopstack[$loopName])) {
+        if (!isset($this->loopstack[$loopName])) {
             throw new \InvalidArgumentException(
                 $this->translator->trans("Related loop name '%name'' is not defined.", ['%name' => $loopName])
             );
@@ -426,6 +433,7 @@ class TheliaLoop extends AbstractSmartyPlugin
      * @param $smartyParams
      *
      * @return BaseLoop
+     *
      * @throws \Thelia\Core\Template\Element\Exception\InvalidElementException
      * @throws \Thelia\Core\Template\Element\Exception\ElementNotFoundException
      * @throws \ReflectionException
@@ -434,7 +442,7 @@ class TheliaLoop extends AbstractSmartyPlugin
     {
         $type = strtolower($smartyParams['type']);
 
-        if (! isset($this->loopDefinition[$type])) {
+        if (!isset($this->loopDefinition[$type])) {
             throw new ElementNotFoundException(
                 $this->translator->trans("Loop type '%type' is not defined.", ['%type' => $type])
             );
@@ -464,8 +472,7 @@ class TheliaLoop extends AbstractSmartyPlugin
     }
 
     /**
-     *
-     * Injects an associative array containing information for loop execution
+     * Injects an associative array containing information for loop execution.
      *
      * key is loop name
      * value is the class implementing/extending base loop classes
@@ -502,7 +509,7 @@ class TheliaLoop extends AbstractSmartyPlugin
             throw new \InvalidArgumentException(
                 $this->translator->trans("The loop name '%name' is already defined in %className class", [
                     '%name' => $name,
-                    '%className' => $className
+                    '%className' => $className,
                 ])
             );
         }
@@ -511,7 +518,7 @@ class TheliaLoop extends AbstractSmartyPlugin
     }
 
     /**
-     * Defines the various smarty plugins hendled by this class
+     * Defines the various smarty plugins hendled by this class.
      *
      * @return \TheliaSmarty\Template\SmartyPluginDescriptor[] smarty plugin descriptors
      */

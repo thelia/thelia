@@ -21,13 +21,12 @@ use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\Customer;
 
 /**
- * @package Coupon
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class ForSomeCustomersTest extends TestCase
 {
     /**
-     * Generate adapter stub
+     * Generate adapter stub.
      *
      * @param int    $cartTotalPrice   Cart total price
      * @param string $checkoutCurrency Checkout currency
@@ -67,9 +66,9 @@ class ForSomeCustomersTest extends TestCase
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\ForSomeCustomers::setValidators
+     * @covers \Thelia\Condition\Implementation\ForSomeCustomers::setValidators
      */
     public function testInValidBackOfficeInputOperator()
     {
@@ -78,10 +77,10 @@ class ForSomeCustomersTest extends TestCase
 
         $condition1 = new ForSomeCustomers($stubFacade);
         $operators = [
-            ForSomeCustomers::CUSTOMERS_LIST => Operators::INFERIOR_OR_EQUAL
+            ForSomeCustomers::CUSTOMERS_LIST => Operators::INFERIOR_OR_EQUAL,
         ];
         $values = [
-            ForSomeCustomers::CUSTOMERS_LIST => []
+            ForSomeCustomers::CUSTOMERS_LIST => [],
         ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionOperatorException::class);
@@ -90,14 +89,14 @@ class ForSomeCustomersTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if validity test on BackOffice inputs are working
+     * Check if validity test on BackOffice inputs are working.
      *
-     * @covers Thelia\Condition\Implementation\ForSomeCustomers::setValidators
+     * @covers \Thelia\Condition\Implementation\ForSomeCustomers::setValidators
      */
     public function testInValidBackOfficeInputValue()
     {
@@ -106,10 +105,10 @@ class ForSomeCustomersTest extends TestCase
 
         $condition1 = new ForSomeCustomers($stubFacade);
         $operators = [
-            ForSomeCustomers::CUSTOMERS_LIST => Operators::IN
+            ForSomeCustomers::CUSTOMERS_LIST => Operators::IN,
         ];
         $values = [
-            ForSomeCustomers::CUSTOMERS_LIST => []
+            ForSomeCustomers::CUSTOMERS_LIST => [],
         ];
 
         $this->expectException(\Thelia\Exception\InvalidConditionValueException::class);
@@ -117,10 +116,9 @@ class ForSomeCustomersTest extends TestCase
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\ForSomeCustomers::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\ForSomeCustomers::isMatching
      */
     public function testMatchingRule()
     {
@@ -129,10 +127,10 @@ class ForSomeCustomersTest extends TestCase
 
         $condition1 = new ForSomeCustomers($stubFacade);
         $operators = [
-            ForSomeCustomers::CUSTOMERS_LIST => Operators::IN
+            ForSomeCustomers::CUSTOMERS_LIST => Operators::IN,
         ];
         $values = [
-            ForSomeCustomers::CUSTOMERS_LIST => [10, 20]
+            ForSomeCustomers::CUSTOMERS_LIST => [10, 20],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -140,15 +138,14 @@ class ForSomeCustomersTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = true;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * Check if test inferior operator is working
+     * Check if test inferior operator is working.
      *
-     * @covers Thelia\Condition\Implementation\ForSomeCustomers::isMatching
-     *
+     * @covers \Thelia\Condition\Implementation\ForSomeCustomers::isMatching
      */
     public function testNotMatching()
     {
@@ -158,10 +155,10 @@ class ForSomeCustomersTest extends TestCase
         $condition1 = new ForSomeCustomers($stubFacade);
 
         $operators = [
-            ForSomeCustomers::CUSTOMERS_LIST => Operators::IN
+            ForSomeCustomers::CUSTOMERS_LIST => Operators::IN,
         ];
         $values = [
-            ForSomeCustomers::CUSTOMERS_LIST => [50, 60]
+            ForSomeCustomers::CUSTOMERS_LIST => [50, 60],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -169,7 +166,7 @@ class ForSomeCustomersTest extends TestCase
         $isValid = $condition1->isMatching();
 
         $expected = false;
-        $actual =$isValid;
+        $actual = $isValid;
         $this->assertEquals($expected, $actual);
     }
 
@@ -181,10 +178,10 @@ class ForSomeCustomersTest extends TestCase
         $condition1 = new ForSomeCustomers($stubFacade);
 
         $operators = [
-            ForSomeCustomers::CUSTOMERS_LIST => Operators::IN
+            ForSomeCustomers::CUSTOMERS_LIST => Operators::IN,
         ];
         $values = [
-            ForSomeCustomers::CUSTOMERS_LIST => [50, 60]
+            ForSomeCustomers::CUSTOMERS_LIST => [50, 60],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -202,10 +199,9 @@ class ForSomeCustomersTest extends TestCase
     }
 
     /**
-     * Check getName i18n
+     * Check getName i18n.
      *
-     * @covers Thelia\Condition\Implementation\ForSomeCustomers::getName
-     *
+     * @covers \Thelia\Condition\Implementation\ForSomeCustomers::getName
      */
     public function testGetName()
     {
@@ -220,10 +216,9 @@ class ForSomeCustomersTest extends TestCase
     }
 
     /**
-     * Check tooltip i18n
+     * Check tooltip i18n.
      *
-     * @covers Thelia\Condition\Implementation\ForSomeCustomers::getToolTip
-     *
+     * @covers \Thelia\Condition\Implementation\ForSomeCustomers::getToolTip
      */
     public function testGetToolTip()
     {
@@ -238,10 +233,9 @@ class ForSomeCustomersTest extends TestCase
     }
 
     /**
-     * Check validator
+     * Check validator.
      *
-     * @covers Thelia\Condition\Implementation\ForSomeCustomers::generateInputs
-     *
+     * @covers \Thelia\Condition\Implementation\ForSomeCustomers::generateInputs
      */
     public function testGetValidator()
     {
@@ -251,10 +245,10 @@ class ForSomeCustomersTest extends TestCase
         $condition1 = new ForSomeCustomers($stubFacade);
 
         $operators = [
-            ForSomeCustomers::CUSTOMERS_LIST => Operators::IN
+            ForSomeCustomers::CUSTOMERS_LIST => Operators::IN,
         ];
         $values = [
-            ForSomeCustomers::CUSTOMERS_LIST => [50, 60]
+            ForSomeCustomers::CUSTOMERS_LIST => [50, 60],
         ];
 
         $condition1->setValidatorsFromForm($operators, $values);
@@ -269,15 +263,15 @@ class ForSomeCustomersTest extends TestCase
                         'out' => 'Price',
                     ],
                     'value' => '',
-                    'selectedOperator' => 'in'
-                ]
+                    'selectedOperator' => 'in',
+                ],
             ],
             'setOperators' => [
-                'customers' => 'in'
+                'customers' => 'in',
             ],
             'setValues' => [
-                'customers' => [50, 60]
-            ]
+                'customers' => [50, 60],
+            ],
         ];
         $expected = $validators;
 

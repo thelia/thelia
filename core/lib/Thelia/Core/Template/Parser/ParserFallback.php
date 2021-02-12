@@ -17,7 +17,8 @@ use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 
 /**
- * Class ParserFallback
+ * Class ParserFallback.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class ParserFallback implements ParserInterface
@@ -44,7 +45,6 @@ class ParserFallback implements ParserInterface
 
     /**
      * Setup the parser with a template definition, which provides a template description.
-     *
      */
     public function setTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
     {
@@ -52,7 +52,7 @@ class ParserFallback implements ParserInterface
     }
 
     /**
-     * Get template definition
+     * Get template definition.
      *
      * @param bool $webAssetTemplate Allow to load asset from another template
      *                               If the name of the template if provided
@@ -65,9 +65,9 @@ class ParserFallback implements ParserInterface
     }
 
     /**
-     * Check if template definition is not null
+     * Check if template definition is not null.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasTemplateDefinition()
     {
@@ -75,14 +75,13 @@ class ParserFallback implements ParserInterface
     }
 
     /**
-     * Add a template directory to the current template list
+     * Add a template directory to the current template list.
      *
-     * @param int $templateType the template type (
-     *
-     * @param string $templateName the template name
+     * @param int    $templateType      the template type (
+     * @param string $templateName      the template name
      * @param string $templateDirectory path to the template dirtectory
-     * @param string $key ???
-     * @param bool $unshift ??? Etienne ?
+     * @param string $key               ???
+     * @param bool   $unshift           ??? Etienne ?
      */
     public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false)
     {
@@ -90,11 +89,13 @@ class ParserFallback implements ParserInterface
     }
 
     /**
-     * Return the registeted template directories for a givent template type
+     * Return the registeted template directories for a givent template type.
      *
-     * @param  int $templateType
+     * @param int $templateType
+     *
      * @throws \InvalidArgumentException if the templateType is not defined
-     * @return array:                    an array of defined templates directories for the given template type
+     *
+     * @return array: an array of defined templates directories for the given template type
      */
     public function getTemplateDirectories($templateType)
     {
@@ -102,10 +103,10 @@ class ParserFallback implements ParserInterface
     }
 
     /**
-     * Create a variable that will be available in the templates
+     * Create a variable that will be available in the templates.
      *
      * @param string $variable the variable name
-     * @param mixed $value the value of the variable
+     * @param mixed  $value    the value of the variable
      */
     public function assign($variable, $value = null)
     {
@@ -126,7 +127,7 @@ class ParserFallback implements ParserInterface
     }
 
     /**
-     * Returns the request used by the parser
+     * Returns the request used by the parser.
      *
      * @return Request
      */
@@ -136,9 +137,10 @@ class ParserFallback implements ParserInterface
     }
 
     /**
-     * Set a new template definition, and save the current one
+     * Set a new template definition, and save the current one.
      *
      * @param bool $fallbackToDefaultTemplate if true, resources will be also searched in the "default" template
+     *
      * @throws \SmartyException
      */
     public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
@@ -157,7 +159,7 @@ class ParserFallback implements ParserInterface
     }
 
     /**
-     * Get the current status of the fallback to "default" feature
+     * Get the current status of the fallback to "default" feature.
      *
      * @return bool
      */

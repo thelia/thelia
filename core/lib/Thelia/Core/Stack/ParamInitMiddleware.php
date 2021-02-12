@@ -12,27 +12,22 @@
 
 namespace Thelia\Core\Stack;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Thelia\Core\Event\Currency\CurrencyChangeEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
-use Thelia\Tools\URL;
 
 /**
- * Class ParamInitMiddleware
- * @package Thelia\Core\Stack
+ * Class ParamInitMiddleware.
+ *
  * @author manuel raynaud <manu@raynaud.io>
  */
 class ParamInitMiddleware implements HttpKernelInterface
@@ -52,8 +47,6 @@ class ParamInitMiddleware implements HttpKernelInterface
      */
     protected $eventDispatcher;
 
-    /**
-     */
     public function __construct(HttpKernelInterface $app, Translator $translator, EventDispatcherInterface $eventDispatcher)
     {
         $this->app = $app;
@@ -62,7 +55,7 @@ class ParamInitMiddleware implements HttpKernelInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
@@ -93,16 +86,16 @@ class ParamInitMiddleware implements HttpKernelInterface
     }
 
     /**
-     * @return null|\Thelia\Model\Lang
+     * @return \Thelia\Model\Lang|null
      */
     protected function detectLang(TheliaRequest $request)
     {
         // first priority => lang parameter present in request (get or post)
-        $requestedLangCodeOrLocale = $request->query->get("lang");
+        $requestedLangCodeOrLocale = $request->query->get('lang');
 
         // add a fallback on locale parameter
         if (null === $requestedLangCodeOrLocale) {
-            $requestedLangCodeOrLocale = $request->query->get("locale");
+            $requestedLangCodeOrLocale = $request->query->get('locale');
         }
 
         // The lang parameter may contains a lang code (fr, en, ru) for Thelia < 2.2,
@@ -122,21 +115,21 @@ class ParamInitMiddleware implements HttpKernelInterface
             if (ConfigQuery::isMultiDomainActivated()) {
                 $domainUrl = $lang->getUrl();
 
-                if (! empty($domainUrl)) {
+                if (!empty($domainUrl)) {
                     // if lang domain is different from current domain, redirect to the proper one
-                    if (rtrim($domainUrl, "/") != $request->getSchemeAndHttpHost()) {
+                    if (rtrim($domainUrl, '/') != $request->getSchemeAndHttpHost()) {
                         return new RedirectResponse($domainUrl, 301);
                     }
-                        //the user is currently on the proper domain, nothing to change
-                        return null;
+                    //the user is currently on the proper domain, nothing to change
+                    return null;
                 }
 
-                Tlog::getInstance()->warning("The domain URL for language ".$lang->getTitle()." (id ".$lang->getId().") is not defined.");
+                Tlog::getInstance()->warning('The domain URL for language '.$lang->getTitle().' (id '.$lang->getId().') is not defined.');
 
                 return Lang::getDefaultLanguage();
             }
-                // one domain for all languages, the lang has to be set into session
-                return $lang;
+            // one domain for all languages, the lang has to be set into session
+            return $lang;
         }
 
         // Next, check if lang is defined in the current session. If not we have to set one.

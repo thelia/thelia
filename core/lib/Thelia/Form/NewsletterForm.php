@@ -22,16 +22,15 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Model\NewsletterQuery;
 
 /**
- * Class NewsletterForm
- * @package Thelia\Form
+ * Class NewsletterForm.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class NewsletterForm extends BaseForm
 {
     /**
-     *
      * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
+     * Form this you have to call add method on $this->formBuilder attribute :.
      *
      * $this->formBuilder->add("name", TextType::class)
      *   ->add("email", EmailType::class, array(
@@ -56,7 +55,7 @@ class NewsletterForm extends BaseForm
                     new NotBlank(),
                     new Email(),
                     new Callback(
-                            [$this, "verifyExistingEmail"]
+                            [$this, 'verifyExistingEmail']
                         ),
                 ],
                 'label' => Translator::getInstance()->trans('Email address'),
@@ -82,7 +81,7 @@ class NewsletterForm extends BaseForm
     {
         $customer = NewsletterQuery::create()->filterByUnsubscribed(false)->findOneByEmail($value);
         if ($customer) {
-            $context->addViolation(Translator::getInstance()->trans("You are already registered!"));
+            $context->addViolation(Translator::getInstance()->trans('You are already registered!'));
         }
     }
 

@@ -31,8 +31,8 @@ class CountryModificationForm extends CountryCreationForm
                 'need_zip_code',
                 CheckboxType::class,
                 [
-                    'required'    => false,
-                    'label'       => $this->translator->trans('Addresses for this country need a zip code'),
+                    'required' => false,
+                    'label' => $this->translator->trans('Addresses for this country need a zip code'),
                     'label_attr' => [
                         'for' => 'need_zip_code',
                     ],
@@ -42,13 +42,13 @@ class CountryModificationForm extends CountryCreationForm
                 'zip_code_format',
                 TextType::class,
                 [
-                    'required'    => false,
+                    'required' => false,
                     'constraints' => [],
                     'label' => $this->translator->trans('The zip code format'),
                     'label_attr' => [
                         'help' => $this->translator->trans(
                             'Use a N for a number, L for Letter, C for an iso code for the state.'
-                        )
+                        ),
                     ],
                 ]
             )
@@ -60,6 +60,6 @@ class CountryModificationForm extends CountryCreationForm
 
     public static function getName()
     {
-        return "thelia_country_modification";
+        return 'thelia_country_modification';
     }
 }

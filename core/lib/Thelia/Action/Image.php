@@ -25,12 +25,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\ImageException;
-use Thelia\Files\FileManager;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
 
 /**
- *
  * Image management actions. This class handles image processing and caching.
  *
  * Basically, images are stored outside of the web space (by default in local/media/images),
@@ -59,9 +57,7 @@ use Thelia\Tools\URL;
  *
  * If a problem occurs, an ImageException may be thrown.
  *
- * @package Thelia\Action
  * @author Franck Allimant <franck@cqfdev.fr>
- *
  */
 class Image extends BaseCachedFile implements EventSubscriberInterface
 {
@@ -75,7 +71,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      */
     protected function getCacheDirFromWebRoot()
     {
-        return ConfigQuery::read('image_cache_dir_from_web_root', 'cache' . DS . 'images');
+        return ConfigQuery::read('image_cache_dir_from_web_root', 'cache'.DS.'images');
     }
 
     /**
@@ -94,11 +90,11 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      */
     public function processImage(ImageEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $subdir      = $event->getCacheSubdirectory();
+        $subdir = $event->getCacheSubdirectory();
         $source_file = $event->getSourceFilepath();
 
         if (null == $subdir || null == $source_file) {
-            throw new \InvalidArgumentException("Cache sub-directory and source file path cannot be null");
+            throw new \InvalidArgumentException('Cache sub-directory and source file path cannot be null');
         }
 
         // Find cached file path
@@ -106,30 +102,30 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
         $originalImagePathInCache = $this->getCacheFilePath($subdir, $source_file, true);
 
-        if (! file_exists($cacheFilePath)) {
-            if (! file_exists($source_file)) {
-                throw new ImageException(sprintf("Source image file %s does not exists.", $source_file));
+        if (!file_exists($cacheFilePath)) {
+            if (!file_exists($source_file)) {
+                throw new ImageException(sprintf('Source image file %s does not exists.', $source_file));
             }
 
             // Create a cached version of the original image in the web space, if not exists
 
-            if (! file_exists($originalImagePathInCache)) {
+            if (!file_exists($originalImagePathInCache)) {
                 $mode = ConfigQuery::read('original_image_delivery_mode', 'symlink');
 
                 if ($mode == 'symlink') {
                     if (false === symlink($source_file, $originalImagePathInCache)) {
-                        throw new ImageException(sprintf("Failed to create symbolic link for %s in %s image cache directory", basename($source_file), $subdir));
+                        throw new ImageException(sprintf('Failed to create symbolic link for %s in %s image cache directory', basename($source_file), $subdir));
                     }
                 } else {
                     // mode = 'copy'
                     if (false === @copy($source_file, $originalImagePathInCache)) {
-                        throw new ImageException(sprintf("Failed to copy %s in %s image cache directory", basename($source_file), $subdir));
+                        throw new ImageException(sprintf('Failed to copy %s in %s image cache directory', basename($source_file), $subdir));
                     }
                 }
             }
 
             // Process image only if we have some transformations to do.
-            if (! $event->isOriginalImage()) {
+            if (!$event->isOriginalImage()) {
                 // We have to process the image.
                 $imagine = $this->createImagineInstance();
 
@@ -235,7 +231,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                         ['quality' => $quality]
                     );
                 } else {
-                    throw new ImageException(sprintf("Source file %s cannot be opened.", basename($source_file)));
+                    throw new ImageException(sprintf('Source file %s cannot be opened.', basename($source_file)));
                 }
             }
         }
@@ -258,14 +254,15 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      * Process image resizing, with borders or cropping. If $dest_width and $dest_height
      * are both null, no resize is performed.
      *
-     * @param  ImagineInterface $imagine     the Imagine instance
-     * @param  ImageInterface   $image       the image to process
-     * @param  int              $dest_width  the required width
-     * @param  int              $dest_height the required height
-     * @param  int              $resize_mode the resize mode (crop / bands / keep image ratio)p
-     * @param  string           $bg_color    the bg_color used for bands
-     * @param  bool             $allow_zoom  if true, image may be zoomed to matchrequired size. If false, image is not zoomed.
-     * @return ImageInterface   the resized image.
+     * @param ImagineInterface $imagine     the Imagine instance
+     * @param ImageInterface   $image       the image to process
+     * @param int              $dest_width  the required width
+     * @param int              $dest_height the required height
+     * @param int              $resize_mode the resize mode (crop / bands / keep image ratio)p
+     * @param string           $bg_color    the bg_color used for bands
+     * @param bool             $allow_zoom  if true, image may be zoomed to matchrequired size. If false, image is not zoomed.
+     *
+     * @return ImageInterface the resized image
      */
     protected function applyResize(
         ImagineInterface $imagine,
@@ -276,7 +273,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $bg_color,
         $allow_zoom = false
     ) {
-        if (! (\is_null($dest_width) && \is_null($dest_height))) {
+        if (!(\is_null($dest_width) && \is_null($dest_height))) {
             $width_orig = $image->getSize()->getWidth();
             $height_orig = $image->getSize()->getHeight();
 
@@ -348,7 +345,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                 if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
                     $resize_height = $dest_height;
-                    $resize_width  = \intval(($width_orig * $resize_height) / $height_orig);
+                    $resize_width = \intval(($width_orig * $resize_height) / $height_orig);
                     $delta_x = ($resize_width - $dest_width) / 2;
                 } elseif ($resize_mode != self::EXACT_RATIO_WITH_BORDERS) {
                     $dest_height = $resize_height;
@@ -378,13 +375,13 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     }
 
     /**
-     * Create a new Imagine object using current driver configuration
+     * Create a new Imagine object using current driver configuration.
      *
      * @return ImagineInterface
      */
     protected function createImagineInstance()
     {
-        $driver = ConfigQuery::read("imagine_graphic_driver", "gd");
+        $driver = ConfigQuery::read('imagine_graphic_driver', 'gd');
 
         switch ($driver) {
             case 'imagick':
@@ -407,15 +404,15 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::IMAGE_PROCESS => ["processImage", 128],
+            TheliaEvents::IMAGE_PROCESS => ['processImage', 128],
 
             // Implemented in parent class BaseCachedFile
-            TheliaEvents::IMAGE_CLEAR_CACHE => ["clearCache", 128],
-            TheliaEvents::IMAGE_DELETE => ["deleteFile", 128],
-            TheliaEvents::IMAGE_SAVE => ["saveFile", 128],
-            TheliaEvents::IMAGE_UPDATE => ["updateFile", 128],
-            TheliaEvents::IMAGE_UPDATE_POSITION => ["updatePosition", 128],
-            TheliaEvents::IMAGE_TOGGLE_VISIBILITY => ["toggleVisibility", 128],
+            TheliaEvents::IMAGE_CLEAR_CACHE => ['clearCache', 128],
+            TheliaEvents::IMAGE_DELETE => ['deleteFile', 128],
+            TheliaEvents::IMAGE_SAVE => ['saveFile', 128],
+            TheliaEvents::IMAGE_UPDATE => ['updateFile', 128],
+            TheliaEvents::IMAGE_UPDATE_POSITION => ['updatePosition', 128],
+            TheliaEvents::IMAGE_TOGGLE_VISIBILITY => ['toggleVisibility', 128],
         ];
     }
 }

@@ -16,8 +16,8 @@ use PHPUnit\Framework\TestCase;
 use Thelia\Tools\Version\Version as Tester;
 
 /**
- * Class Version
- * @package Thelia\Tests\Tools\Version
+ * Class Version.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class Version extends TestCase
@@ -82,43 +82,43 @@ class Version extends TestCase
     public function parseProvider()
     {
         return [
-            [ '2.1.0', [
-                'version'         => '2.1.0',
-                'major'           => '2',
-                'minus'           => '1',
-                'release'         => '0',
-                'extra'           => '',
-            ] ],
-            [ '2.5.0', [
+            ['2.1.0', [
+                'version' => '2.1.0',
+                'major' => '2',
+                'minus' => '1',
+                'release' => '0',
+                'extra' => '',
+            ]],
+            ['2.5.0', [
                 'version' => '2.5.0',
-                'major'   => '2',
-                'minus'   => '5',
+                'major' => '2',
+                'minus' => '5',
                 'release' => '0',
-                'extra'   => '',
-            ], ],
-            [ '2.3.0-alpha2', [
+                'extra' => '',
+            ]],
+            ['2.3.0-alpha2', [
                 'version' => '2.3.0-alpha2',
-                'major'   => '2',
-                'minus'   => '3',
+                'major' => '2',
+                'minus' => '3',
                 'release' => '0',
-                'extra'   => 'alpha2',
-            ], ],
+                'extra' => 'alpha2',
+            ]],
         ];
     }
 
     public function exceptionParseProvider()
     {
         return [
-            ['x.3.1',         ],
-            ['2.x.1',         ],
-            ['2.3.x',         ],
-            ['2.3.1-alpha.2', ],
-            ['2.1',           ],
-            ['a.4',           ],
-            ['2.1.2.4',       ],
-            ['2.1.2.4.5',     ],
-            ['1.alpha.8',     ],
-            ['.1.2',          ],
+            ['x.3.1'],
+            ['2.x.1'],
+            ['2.3.x'],
+            ['2.3.1-alpha.2'],
+            ['2.1'],
+            ['a.4'],
+            ['2.1.2.4'],
+            ['2.1.2.4.5'],
+            ['1.alpha.8'],
+            ['.1.2'],
         ];
     }
 
@@ -129,10 +129,10 @@ class Version extends TestCase
     {
         if (null === $message) {
             $message = sprintf(
-                "Version: %s, expression: %s, expected: %s",
+                'Version: %s, expression: %s, expected: %s',
                 $version,
                 $expression,
-                $result ? "true" : "false"
+                $result ? 'true' : 'false'
             );
         }
 

@@ -25,8 +25,8 @@ abstract class AbstractTlogDestination
         // Initialiser les variables de configuration
         $this->configs = $this->getConfigs();
 
-         // Appliquer la configuration
-         $this->configure();
+        // Appliquer la configuration
+        $this->configure();
     }
 
     //Affecte une valeur à une configuration de la destination
@@ -40,6 +40,7 @@ abstract class AbstractTlogDestination
                 if ($apply_changes) {
                     $this->configure();
                 }
+
                 return true;
             }
         }
@@ -74,8 +75,8 @@ abstract class AbstractTlogDestination
     {
         $match = [];
 
-        if (preg_match("/(<body[^>]*>)/i", $res, $match)) {
-            $res = str_replace($match[0], $match[0] . "\n" . $logdata, $res);
+        if (preg_match('/(<body[^>]*>)/i', $res, $match)) {
+            $res = str_replace($match[0], $match[0]."\n".$logdata, $res);
         }
     }
 

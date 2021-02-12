@@ -13,8 +13,8 @@
 namespace Thelia\Core\Event\OrderStatus;
 
 /**
- * Class OrderStatusCreateEvent
- * @package Thelia\Core\Event\OrderStatus
+ * Class OrderStatusCreateEvent.
+ *
  * @author Gilles Bourgeat <gbourgeat@openstudio.fr>
  */
 class OrderStatusCreateEvent extends OrderStatusEvent

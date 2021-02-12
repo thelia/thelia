@@ -41,54 +41,53 @@ use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
 /**
- *
- * Product loop
+ * Product loop.
  *
  * Class Product
- * @package Thelia\Core\Template\Loop
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method bool getComplex()
- * @method string[] getRef()
- * @method int[] getCategory()
- * @method int[] getBrand()
- * @method int[] getSale()
- * @method int[] getCategoryDefault()
- * @method int[] getContent()
- * @method bool getNew()
- * @method bool getPromo()
- * @method float getMinPrice()
- * @method float getMaxPrice()
- * @method int getMinStock()
- * @method float getMinWeight()
- * @method float getMaxWeight()
- * @method bool getWithPrevNextInfo()
+ *
+ * @method int[]       getId()
+ * @method bool        getComplex()
+ * @method string[]    getRef()
+ * @method int[]       getCategory()
+ * @method int[]       getBrand()
+ * @method int[]       getSale()
+ * @method int[]       getCategoryDefault()
+ * @method int[]       getContent()
+ * @method bool        getNew()
+ * @method bool        getPromo()
+ * @method float       getMinPrice()
+ * @method float       getMaxPrice()
+ * @method int         getMinStock()
+ * @method float       getMinWeight()
+ * @method float       getMaxWeight()
+ * @method bool        getWithPrevNextInfo()
  * @method bool|string getWithPrevNextVisible()
- * @method bool getCurrent()
- * @method bool getCurrentCategory()
- * @method bool getDepth()
+ * @method bool        getCurrent()
+ * @method bool        getCurrentCategory()
+ * @method bool        getDepth()
  * @method bool|string getVirtual()
  * @method bool|string getVisible()
- * @method int getCurrency()
- * @method string getTitle()
- * @method string[] getOrder()
- * @method int[] getExclude()
- * @method int[] getExcludeCategory()
- * @method int[] getFeatureAvailability()
- * @method string[] getFeatureValues()
- * @method string[] getAttributeNonStrictMatch()
- * @method int[] getTemplateId()
- * @method int[] getTaxRuleId()
- * @method int[] getExcludeTaxRuleId()
+ * @method int         getCurrency()
+ * @method string      getTitle()
+ * @method string[]    getOrder()
+ * @method int[]       getExclude()
+ * @method int[]       getExcludeCategory()
+ * @method int[]       getFeatureAvailability()
+ * @method string[]    getFeatureValues()
+ * @method string[]    getAttributeNonStrictMatch()
+ * @method int[]       getTemplateId()
+ * @method int[]       getTaxRuleId()
+ * @method int[]       getExcludeTaxRuleId()
  */
 class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
+    use StandardI18nFieldsSearchTrait;
     protected $timestampable = true;
     protected $versionable = true;
-
-    use StandardI18nFieldsSearchTrait;
 
     /**
      * @return ArgumentCollection
@@ -140,7 +139,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                             'promo',
                             'new',
                             'random',
-                            'given_id'
+                            'given_id',
                         ]
                     )
                 ),
@@ -186,7 +185,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     public function getSearchIn()
     {
         return array_merge(
-            [ 'ref' ],
+            ['ref'],
             $this->getStandardI18nSearchFields()
         );
     }
@@ -206,7 +205,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 $search->_or();
             }
             switch ($searchInElement) {
-                case "ref":
+                case 'ref':
                     $search->filterByRef($searchTerm, $searchCriteria);
                     break;
             }
@@ -217,6 +216,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     /**
      * @return LoopResult
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function parseResults(LoopResult $loopResult)
@@ -226,11 +226,13 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         if (true === $complex) {
             return $this->parseComplexResults($loopResult);
         }
-            return $this->parseSimpleResults($loopResult);
+
+        return $this->parseSimpleResults($loopResult);
     }
 
     /**
      * @return LoopResult
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function parseSimpleResults(LoopResult $loopResult)
@@ -251,7 +253,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             if (!$this->getBackendContext()
                 && $securityContext->hasCustomerUser()
                 && $securityContext->getCustomerUser()->getDiscount() > 0) {
-                $price = $price * (1-($securityContext->getCustomerUser()->getDiscount()/100));
+                $price = $price * (1 - ($securityContext->getCustomerUser()->getDiscount() / 100));
             }
 
             try {
@@ -268,7 +270,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             if (!$this->getBackendContext()
                 && $securityContext->hasCustomerUser()
                 && $securityContext->getCustomerUser()->getDiscount() > 0) {
-                $promoPrice = $promoPrice * (1-($securityContext->getCustomerUser()->getDiscount()/100));
+                $promoPrice = $promoPrice * (1 - ($securityContext->getCustomerUser()->getDiscount() / 100));
             }
             try {
                 $taxedPromoPrice = $product->getTaxedPromoPrice(
@@ -283,22 +285,22 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $defaultCategoryId = $this->getDefaultCategoryId($product);
 
             $loopResultRow
-                ->set("WEIGHT", $product->getVirtualColumn('weight'))
-                ->set("QUANTITY", $product->getVirtualColumn('quantity'))
-                ->set("EAN_CODE", $product->getVirtualColumn('ean_code'))
-                ->set("BEST_PRICE", $product->getVirtualColumn('is_promo') ? $promoPrice : $price)
-                ->set("BEST_PRICE_TAX", $taxedPrice - $product->getVirtualColumn('is_promo') ? $taxedPromoPrice - $promoPrice : $taxedPrice - $price)
-                ->set("BEST_TAXED_PRICE", $product->getVirtualColumn('is_promo') ? $taxedPromoPrice : $taxedPrice)
-                ->set("PRICE", $price)
-                ->set("PRICE_TAX", $taxedPrice - $price)
-                ->set("TAXED_PRICE", $taxedPrice)
-                ->set("PROMO_PRICE", $promoPrice)
-                ->set("PROMO_PRICE_TAX", $taxedPromoPrice - $promoPrice)
-                ->set("TAXED_PROMO_PRICE", $taxedPromoPrice)
-                ->set("IS_PROMO", $product->getVirtualColumn('is_promo'))
-                ->set("IS_NEW", $product->getVirtualColumn('is_new'))
-                ->set("PRODUCT_SALE_ELEMENT", $product->getVirtualColumn('pse_id'))
-                ->set("PSE_COUNT", $product->getVirtualColumn('pse_count'));
+                ->set('WEIGHT', $product->getVirtualColumn('weight'))
+                ->set('QUANTITY', $product->getVirtualColumn('quantity'))
+                ->set('EAN_CODE', $product->getVirtualColumn('ean_code'))
+                ->set('BEST_PRICE', $product->getVirtualColumn('is_promo') ? $promoPrice : $price)
+                ->set('BEST_PRICE_TAX', $taxedPrice - $product->getVirtualColumn('is_promo') ? $taxedPromoPrice - $promoPrice : $taxedPrice - $price)
+                ->set('BEST_TAXED_PRICE', $product->getVirtualColumn('is_promo') ? $taxedPromoPrice : $taxedPrice)
+                ->set('PRICE', $price)
+                ->set('PRICE_TAX', $taxedPrice - $price)
+                ->set('TAXED_PRICE', $taxedPrice)
+                ->set('PROMO_PRICE', $promoPrice)
+                ->set('PROMO_PRICE_TAX', $taxedPromoPrice - $promoPrice)
+                ->set('TAXED_PROMO_PRICE', $taxedPromoPrice)
+                ->set('IS_PROMO', $product->getVirtualColumn('is_promo'))
+                ->set('IS_NEW', $product->getVirtualColumn('is_new'))
+                ->set('PRODUCT_SALE_ELEMENT', $product->getVirtualColumn('pse_id'))
+                ->set('PSE_COUNT', $product->getVirtualColumn('pse_count'));
 
             $this->associateValues($loopResultRow, $product, $defaultCategoryId);
 
@@ -312,6 +314,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     /**
      * @return LoopResult
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function parseComplexResults(LoopResult $loopResult)
@@ -331,7 +334,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $price = $product->getRealLowestPrice();
 
             if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
-                $price = $price * (1-($securityContext->getCustomerUser()->getDiscount()/100));
+                $price = $price * (1 - ($securityContext->getCustomerUser()->getDiscount() / 100));
             }
 
             try {
@@ -347,11 +350,11 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $defaultCategoryId = $this->getDefaultCategoryId($product);
 
             $loopResultRow
-                ->set("BEST_PRICE", $price)
-                ->set("BEST_PRICE_TAX", $taxedPrice - $price)
-                ->set("BEST_TAXED_PRICE", $taxedPrice)
-                ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
-                ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'));
+                ->set('BEST_PRICE', $price)
+                ->set('BEST_PRICE_TAX', $taxedPrice - $price)
+                ->set('BEST_TAXED_PRICE', $taxedPrice)
+                ->set('IS_PROMO', $product->getVirtualColumn('main_product_is_promo'))
+                ->set('IS_NEW', $product->getVirtualColumn('main_product_is_new'));
 
             $this->associateValues($loopResultRow, $product, $defaultCategoryId);
 
@@ -364,9 +367,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * @param  LoopResultRow $loopResultRow the current result row
-     * @param  \Thelia\Model\Product $product
+     * @param LoopResultRow         $loopResultRow the current result row
+     * @param \Thelia\Model\Product $product
      * @param $defaultCategoryId
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     private function associateValues($loopResultRow, $product, $defaultCategoryId)
@@ -378,26 +382,26 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         $loopResultRow
-            ->set("ID", $product->getId())
-            ->set("REF", $product->getRef())
-            ->set("IS_TRANSLATED", $product->getVirtualColumn('IS_TRANSLATED'))
-            ->set("LOCALE", $this->locale)
-            ->set("TITLE", $product->getVirtualColumn('i18n_TITLE'))
-            ->set("CHAPO", $product->getVirtualColumn('i18n_CHAPO'))
-            ->set("DESCRIPTION", $product->getVirtualColumn('i18n_DESCRIPTION'))
-            ->set("POSTSCRIPTUM", $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
-            ->set("URL", $this->getReturnUrl() ? $product->getUrl($this->locale) : null)
-            ->set("META_TITLE", $product->getVirtualColumn('i18n_META_TITLE'))
-            ->set("META_DESCRIPTION", $product->getVirtualColumn('i18n_META_DESCRIPTION'))
-            ->set("META_KEYWORDS", $product->getVirtualColumn('i18n_META_KEYWORDS'))
-            ->set("POSITION", $product->getVirtualColumn('position_delegate'))
-            ->set("VIRTUAL", $product->getVirtual() ? "1" : "0")
-            ->set("VISIBLE", $product->getVisible() ? "1" : "0")
-            ->set("TEMPLATE", $product->getTemplateId())
-            ->set("DEFAULT_CATEGORY", $defaultCategoryId)
-            ->set("TAX_RULE_ID", $product->getTaxRuleId())
-            ->set("BRAND_ID", $product->getBrandId() ?: 0)
-            ->set("SHOW_ORIGINAL_PRICE", $display_initial_price);
+            ->set('ID', $product->getId())
+            ->set('REF', $product->getRef())
+            ->set('IS_TRANSLATED', $product->getVirtualColumn('IS_TRANSLATED'))
+            ->set('LOCALE', $this->locale)
+            ->set('TITLE', $product->getVirtualColumn('i18n_TITLE'))
+            ->set('CHAPO', $product->getVirtualColumn('i18n_CHAPO'))
+            ->set('DESCRIPTION', $product->getVirtualColumn('i18n_DESCRIPTION'))
+            ->set('POSTSCRIPTUM', $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
+            ->set('URL', $this->getReturnUrl() ? $product->getUrl($this->locale) : null)
+            ->set('META_TITLE', $product->getVirtualColumn('i18n_META_TITLE'))
+            ->set('META_DESCRIPTION', $product->getVirtualColumn('i18n_META_DESCRIPTION'))
+            ->set('META_KEYWORDS', $product->getVirtualColumn('i18n_META_KEYWORDS'))
+            ->set('POSITION', $product->getVirtualColumn('position_delegate'))
+            ->set('VIRTUAL', $product->getVirtual() ? '1' : '0')
+            ->set('VISIBLE', $product->getVisible() ? '1' : '0')
+            ->set('TEMPLATE', $product->getTemplateId())
+            ->set('DEFAULT_CATEGORY', $defaultCategoryId)
+            ->set('TAX_RULE_ID', $product->getTaxRuleId())
+            ->set('BRAND_ID', $product->getBrandId() ?: 0)
+            ->set('SHOW_ORIGINAL_PRICE', $display_initial_price);
 
         $this->findNextPrev($loopResultRow, $product, $defaultCategoryId);
 
@@ -443,16 +447,17 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->findOne();
 
             $loopResultRow
-                ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
-                ->set("HAS_NEXT", $next != null ? 1 : 0)
-                ->set("PREVIOUS", $previous != null ? $previous->getProductId() : -1)
-                ->set("NEXT", $next != null ? $next->getProductId() : -1);
+                ->set('HAS_PREVIOUS', $previous != null ? 1 : 0)
+                ->set('HAS_NEXT', $next != null ? 1 : 0)
+                ->set('PREVIOUS', $previous != null ? $previous->getProductId() : -1)
+                ->set('NEXT', $next != null ? $next->getProductId() : -1);
         }
     }
 
     /**
      * @param ProductQuery $search
-     * @param array $feature_availability
+     * @param array        $feature_availability
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     protected function manageFeatureAv(&$search, $feature_availability)
@@ -460,9 +465,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         if (null !== $feature_availability) {
             foreach ($feature_availability as $feature => $feature_choice) {
                 foreach ($feature_choice['values'] as $feature_av) {
-                    $featureAlias = 'fa_' . $feature;
+                    $featureAlias = 'fa_'.$feature;
                     if ($feature_av != '*') {
-                        $featureAlias .= '_' . $feature_av;
+                        $featureAlias .= '_'.$feature_av;
                     }
                     $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
                         ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
@@ -474,21 +479,22 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 /* format for mysql */
                 $sqlWhereString = $feature_choice['expression'];
                 if ($sqlWhereString == '*') {
-                    $sqlWhereString = 'NOT ISNULL(`fa_' . $feature . '`.ID)';
+                    $sqlWhereString = 'NOT ISNULL(`fa_'.$feature.'`.ID)';
                 } else {
-                    $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`fa_' . $feature . '_' . '\1`.ID)', $sqlWhereString);
+                    $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`fa_'.$feature.'_'.'\1`.ID)', $sqlWhereString);
                     $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
                     $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
                 }
 
-                $search->where("(" . $sqlWhereString . ")");
+                $search->where('('.$sqlWhereString.')');
             }
         }
     }
 
     /**
      * @param ProductQuery $search
-     * @param array $feature_values
+     * @param array        $feature_values
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     protected function manageFeatureValue(&$search, $feature_values)
@@ -498,24 +504,24 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 $aliasMatches = [];
 
                 foreach ($feature_choice['values'] as $feature_value) {
-                    $featureAlias = 'fv_' . $feature;
+                    $featureAlias = 'fv_'.$feature;
                     if ($feature_value != '*') {
                         // Generate a unique alias for this value
-                        $featureAlias .= '_' . hash('crc32', $feature_value) . '_' . preg_replace("/[^[:alnum:]_]/", '_', $feature_value);
+                        $featureAlias .= '_'.hash('crc32', $feature_value).'_'.preg_replace('/[^[:alnum:]_]/', '_', $feature_value);
                     }
 
                     $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
                         ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
 
                     if ($feature_value != '*') {
-                        $featureAliasI18n = $featureAlias . '_i18n';
-                        $featureAliasI18nJoin = $featureAlias . '_i18n_join';
+                        $featureAliasI18n = $featureAlias.'_i18n';
+                        $featureAliasI18nJoin = $featureAlias.'_i18n_join';
 
                         $featureAvValueJoin = new Join();
                         $featureAvValueJoin->setJoinType(Criteria::LEFT_JOIN);
                         $featureAvValueJoin->addExplicitCondition(
                             $featureAlias,
-                            "FEATURE_AV_ID",
+                            'FEATURE_AV_ID',
                             null,
                             FeatureAvI18nTableMap::TABLE_NAME,
                             'ID',
@@ -536,7 +542,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 $sqlWhereString = $feature_choice['expression'];
 
                 if ($sqlWhereString == '*') {
-                    $sqlWhereString = 'NOT ISNULL(`fv_' . $feature . '`.ID)';
+                    $sqlWhereString = 'NOT ISNULL(`fv_'.$feature.'`.ID)';
                 } else {
                     foreach ($aliasMatches as $value => $alias) {
                         $sqlWhereString = str_replace($value, 'NOT ISNULL(`'.$alias.'`.ID)', $sqlWhereString);
@@ -545,24 +551,25 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
                 }
 
-                $search->where("(" . $sqlWhereString . ")");
+                $search->where('('.$sqlWhereString.')');
             }
         }
     }
 
     /**
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria|ProductQuery
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function buildModelCriteria()
     {
-        Tlog::getInstance()->debug("-- Starting new product build criteria");
+        Tlog::getInstance()->debug('-- Starting new product build criteria');
 
         $currencyId = $this->getCurrency();
         if (null !== $currencyId) {
             $currency = CurrencyQuery::create()->findOneById($currencyId);
             if (null === $currency) {
-                throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
+                throw new \InvalidArgumentException('Cannot found currency id: `'.$currency.'` in product_sale_elements loop');
             }
         } else {
             $currency = $this->getCurrentRequest()->getSession()->getCurrency();
@@ -579,7 +586,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $complex = $this->getComplex();
 
-        if (! $complex) {
+        if (!$complex) {
             $search->innerJoinProductSaleElements('pse');
             $search->addJoinCondition('pse', '`pse`.IS_DEFAULT=1');
 
@@ -594,24 +601,24 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             if ($defaultCurrency->getId() != $currency->getId()) {
                 $priceJoinDefaultCurrency = new Join();
-                $priceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'price' . $defaultCurrencySuffix);
+                $priceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'price'.$defaultCurrencySuffix);
                 $priceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);
 
-                $search->addJoinObject($priceJoinDefaultCurrency, 'price_join' . $defaultCurrencySuffix)
-                    ->addJoinCondition('price_join' . $defaultCurrencySuffix, '`price' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+                $search->addJoinObject($priceJoinDefaultCurrency, 'price_join'.$defaultCurrencySuffix)
+                    ->addJoinCondition('price_join'.$defaultCurrencySuffix, '`price'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
                 /**
                  * rate value is checked as a float in overloaded getRate method.
                  */
                 $priceToCompareAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN
-                    CASE WHEN `pse`.PROMO=1 THEN `price' . $defaultCurrencySuffix . '`.PROMO_PRICE ELSE `price' . $defaultCurrencySuffix . '`.PRICE END * ' . $currency->getRate() . '
+                    CASE WHEN `pse`.PROMO=1 THEN `price'.$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `price'.$defaultCurrencySuffix.'`.PRICE END * '.$currency->getRate().'
                 ELSE
                     CASE WHEN `pse`.PROMO=1 THEN `price`.PROMO_PRICE ELSE `price`.PRICE END
                 END';
 
                 $search->withColumn($priceToCompareAsSQL, 'real_price');
-                $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price' . $defaultCurrencySuffix . '`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END', 'price');
-                $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price' . $defaultCurrencySuffix . '`.PROMO_PRICE * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END', 'promo_price');
+                $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price'.$defaultCurrencySuffix.'`.PRICE * '.$currency->getRate().' ELSE `price`.PRICE END', 'price');
+                $search->withColumn('CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price'.$defaultCurrencySuffix.'`.PROMO_PRICE * '.$currency->getRate().' ELSE `price`.PROMO_PRICE END', 'promo_price');
             } else {
                 $priceToCompareAsSQL = 'CASE WHEN `pse`.PROMO=1 THEN `price`.PROMO_PRICE ELSE `price`.PRICE END';
 
@@ -639,7 +646,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $title = $this->getTitle();
 
         if (!\is_null($title)) {
-            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, "%".$title."%");
+            $this->addSearchInI18nColumn($search, 'TITLE', Criteria::LIKE, '%'.$title.'%');
         }
 
         $templateIdList = $this->getTemplateId();
@@ -683,7 +690,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         $search->withColumn(
-            'CASE WHEN ISNULL(`CategorySelect`.POSITION) THEN ' . PHP_INT_MAX . ' ELSE CAST(`CategorySelect`.POSITION as SIGNED) END',
+            'CASE WHEN ISNULL(`CategorySelect`.POSITION) THEN '.PHP_INT_MAX.' ELSE CAST(`CategorySelect`.POSITION as SIGNED) END',
             'position_delegate'
         );
         $search->withColumn('`CategorySelect`.CATEGORY_ID', 'default_category_id');
@@ -692,9 +699,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $current = $this->getCurrent();
 
         if ($current === true) {
-            $search->filterById($this->getCurrentRequest()->get("product_id"), Criteria::EQUAL);
+            $search->filterById($this->getCurrentRequest()->get('product_id'), Criteria::EQUAL);
         } elseif ($current === false) {
-            $search->filterById($this->getCurrentRequest()->get("product_id"), Criteria::NOT_IN);
+            $search->filterById($this->getCurrentRequest()->get('product_id'), Criteria::NOT_IN);
         }
 
         $brand_id = $this->getBrand();
@@ -715,7 +722,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $sale_id = $this->getSale();
 
         if ($sale_id !== null) {
-            $search->useSaleProductQuery("SaleProductSelect")
+            $search->useSaleProductQuery('SaleProductSelect')
                 ->filterBySaleId($sale_id)
                 ->groupByProductId()
                 ->endUse()
@@ -727,7 +734,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         if ($current_category === true) {
             $search->filterByCategory(
                 CategoryQuery::create()->filterByProduct(
-                    ProductCategoryQuery::create()->findPk($this->getCurrentRequest()->get("product_id")),
+                    ProductCategoryQuery::create()->findPk($this->getCurrentRequest()->get('product_id')),
                     Criteria::IN
                 )->find(),
                 Criteria::IN
@@ -735,7 +742,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         } elseif ($current_category === false) {
             $search->filterByCategory(
                 CategoryQuery::create()->filterByProduct(
-                    ProductCategoryQuery::create()->findPk($this->getCurrentRequest()->get("product_id")),
+                    ProductCategoryQuery::create()->findPk($this->getCurrentRequest()->get('product_id')),
                     Criteria::IN
                 )->find(),
                 Criteria::NOT_IN
@@ -778,57 +785,57 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->filterByTaxRuleId($taxRuleIdList, Criteria::NOT_IN);
         }
 
-        $new        = $this->getNew();
-        $promo      = $this->getPromo();
-        $min_stock  = $this->getMinStock();
+        $new = $this->getNew();
+        $promo = $this->getPromo();
+        $min_stock = $this->getMinStock();
         $min_weight = $this->getMinWeight();
         $max_weight = $this->getMaxWeight();
-        $min_price  = $this->getMinPrice();
-        $max_price  = $this->getMaxPrice();
+        $min_price = $this->getMinPrice();
+        $max_price = $this->getMaxPrice();
 
         if ($complex) {
             if ($new === true) {
                 $isPSELeftJoinList[] = 'is_new';
                 $search->joinProductSaleElements('is_new', Criteria::LEFT_JOIN)
-                    ->where('`is_new`.NEWNESS' . Criteria::EQUAL . '1')
+                    ->where('`is_new`.NEWNESS'.Criteria::EQUAL.'1')
                     ->where('NOT ISNULL(`is_new`.ID)');
             } elseif ($new === false) {
                 $isPSELeftJoinList[] = 'is_new';
                 $search->joinProductSaleElements('is_new', Criteria::LEFT_JOIN)
-                    ->where('`is_new`.NEWNESS' . Criteria::EQUAL . '0')
+                    ->where('`is_new`.NEWNESS'.Criteria::EQUAL.'0')
                     ->where('NOT ISNULL(`is_new`.ID)');
             }
 
             if ($promo === true) {
                 $isPSELeftJoinList[] = 'is_promo';
                 $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
-                    ->where('`is_promo`.PROMO' . Criteria::EQUAL . '1')
+                    ->where('`is_promo`.PROMO'.Criteria::EQUAL.'1')
                     ->where('NOT ISNULL(`is_promo`.ID)');
             } elseif ($promo === false) {
                 $isPSELeftJoinList[] = 'is_promo';
                 $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
-                    ->where('`is_promo`.PROMO' . Criteria::EQUAL . '0')
+                    ->where('`is_promo`.PROMO'.Criteria::EQUAL.'0')
                     ->where('NOT ISNULL(`is_promo`.ID)');
             }
 
             if (null != $min_stock) {
                 $isPSELeftJoinList[] = 'is_min_stock';
                 $search->joinProductSaleElements('is_min_stock', Criteria::LEFT_JOIN)
-                    ->where('`is_min_stock`.QUANTITY' . Criteria::GREATER_EQUAL . '?', $min_stock, \PDO::PARAM_INT)
+                    ->where('`is_min_stock`.QUANTITY'.Criteria::GREATER_EQUAL.'?', $min_stock, \PDO::PARAM_INT)
                     ->where('NOT ISNULL(`is_min_stock`.ID)');
             }
 
             if (null != $min_weight) {
                 $isPSELeftJoinList[] = 'is_min_weight';
                 $search->joinProductSaleElements('is_min_weight', Criteria::LEFT_JOIN)
-                    ->where('`is_min_weight`.WEIGHT' . Criteria::GREATER_EQUAL . '?', $min_weight, \PDO::PARAM_STR)
+                    ->where('`is_min_weight`.WEIGHT'.Criteria::GREATER_EQUAL.'?', $min_weight, \PDO::PARAM_STR)
                     ->where('NOT ISNULL(`is_min_weight`.ID)');
             }
 
             if (null != $max_weight) {
                 $isPSELeftJoinList[] = 'is_max_weight';
                 $search->joinProductSaleElements('is_max_weight', Criteria::LEFT_JOIN)
-                    ->where('`is_max_weight`.WEIGHT' . Criteria::LESS_EQUAL . '?', $max_weight, \PDO::PARAM_STR)
+                    ->where('`is_max_weight`.WEIGHT'.Criteria::LESS_EQUAL.'?', $max_weight, \PDO::PARAM_STR)
                     ->where('NOT ISNULL(`is_max_weight`.ID)');
             }
 
@@ -845,7 +852,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     if ($key == 0) {
                         continue;
                     }
-                    $search->where('`' . $actuallyUsedAttributeNonStrictMatch . '`.ID=' . '`' . $actuallyUsedAttributeNonStrictMatchList[$key-1] . '`.ID');
+                    $search->where('`'.$actuallyUsedAttributeNonStrictMatch.'`.ID='.'`'.$actuallyUsedAttributeNonStrictMatchList[$key - 1].'`.ID');
                 }
             }
 
@@ -867,18 +874,18 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
                 if ($defaultCurrency->getId() != $currency->getId()) {
                     $minPriceJoinDefaultCurrency = new Join();
-                    $minPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_min_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'min_price_data' . $defaultCurrencySuffix);
+                    $minPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_min_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'min_price_data'.$defaultCurrencySuffix);
                     $minPriceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);
 
-                    $search->addJoinObject($minPriceJoinDefaultCurrency, 'is_min_price_join' . $defaultCurrencySuffix)
-                        ->addJoinCondition('is_min_price_join' . $defaultCurrencySuffix, '`min_price_data' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+                    $search->addJoinObject($minPriceJoinDefaultCurrency, 'is_min_price_join'.$defaultCurrencySuffix)
+                        ->addJoinCondition('is_min_price_join'.$defaultCurrencySuffix, '`min_price_data'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
                     /**
                      * In propel we trust : $currency->getRate() always returns a float.
                      * Or maybe not : rate value is checked as a float in overloaded getRate method.
                      */
                     $MinPriceToCompareAsSQL = 'CASE WHEN ISNULL(CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data`.PROMO_PRICE ELSE `min_price_data`.PRICE END) OR `min_price_data`.FROM_DEFAULT_CURRENCY = 1 THEN
-                    CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data' . $defaultCurrencySuffix . '`.PROMO_PRICE ELSE `min_price_data' . $defaultCurrencySuffix . '`.PRICE END * ' . $currency->getRate() . '
+                    CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data'.$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `min_price_data'.$defaultCurrencySuffix.'`.PRICE END * '.$currency->getRate().'
                 ELSE
                     CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data`.PROMO_PRICE ELSE `min_price_data`.PRICE END
                 END';
@@ -886,7 +893,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $MinPriceToCompareAsSQL = 'CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data`.PROMO_PRICE ELSE `min_price_data`.PRICE END';
                 }
 
-                $search->where($MinPriceToCompareAsSQL . ' >= ?', $min_price, \PDO::PARAM_STR);
+                $search->where($MinPriceToCompareAsSQL.' >= ?', $min_price, \PDO::PARAM_STR);
             }
 
             if (null !== $max_price) {
@@ -903,18 +910,18 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
                 if ($defaultCurrency->getId() != $currency->getId()) {
                     $maxPriceJoinDefaultCurrency = new Join();
-                    $maxPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_max_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'max_price_data' . $defaultCurrencySuffix);
+                    $maxPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_max_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'max_price_data'.$defaultCurrencySuffix);
                     $maxPriceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);
 
-                    $search->addJoinObject($maxPriceJoinDefaultCurrency, 'is_max_price_join' . $defaultCurrencySuffix)
-                        ->addJoinCondition('is_max_price_join' . $defaultCurrencySuffix, '`max_price_data' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+                    $search->addJoinObject($maxPriceJoinDefaultCurrency, 'is_max_price_join'.$defaultCurrencySuffix)
+                        ->addJoinCondition('is_max_price_join'.$defaultCurrencySuffix, '`max_price_data'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
                     /**
                      * In propel we trust : $currency->getRate() always returns a float.
                      * Or maybe not : rate value is checked as a float in overloaded getRate method.
                      */
                     $MaxPriceToCompareAsSQL = 'CASE WHEN ISNULL(CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data`.PROMO_PRICE ELSE `max_price_data`.PRICE END) OR `min_price_data`.FROM_DEFAULT_CURRENCY = 1 THEN
-                    CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data' . $defaultCurrencySuffix . '`.PROMO_PRICE ELSE `max_price_data' . $defaultCurrencySuffix . '`.PRICE END * ' . $currency->getRate() . '
+                    CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data'.$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `max_price_data'.$defaultCurrencySuffix.'`.PRICE END * '.$currency->getRate().'
                 ELSE
                     CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data`.PROMO_PRICE ELSE `max_price_data`.PRICE END
                 END';
@@ -922,7 +929,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $MaxPriceToCompareAsSQL = 'CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data`.PROMO_PRICE ELSE `max_price_data`.PRICE END';
                 }
 
-                $search->where($MaxPriceToCompareAsSQL . '<=?', $max_price, \PDO::PARAM_STR);
+                $search->where($MaxPriceToCompareAsSQL.'<=?', $max_price, \PDO::PARAM_STR);
             }
 
             /*
@@ -934,7 +941,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             /* if we don't have any join yet, let's make a global one */
             if (empty($isProductPriceFirstLeftJoin)) {
                 if (\count($isPSELeftJoinList) == 0) {
-                    $joiningTable = "global";
+                    $joiningTable = 'global';
                     $isPSELeftJoinList[] = $joiningTable;
                     $search->joinProductSaleElements('global', Criteria::LEFT_JOIN);
                 } else {
@@ -952,10 +959,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
                 if ($defaultCurrency->getId() != $currency->getId()) {
                     $globalPriceJoinDefaultCurrency = new Join();
-                    $globalPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', $joiningTable, ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'global_price_data' . $defaultCurrencySuffix);
+                    $globalPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', $joiningTable, ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'global_price_data'.$defaultCurrencySuffix);
                     $globalPriceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);
-                    $search->addJoinObject($globalPriceJoinDefaultCurrency, 'global_price_join' . $defaultCurrencySuffix)
-                        ->addJoinCondition('global_price_join' . $defaultCurrencySuffix, '`global_price_data' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+                    $search->addJoinObject($globalPriceJoinDefaultCurrency, 'global_price_join'.$defaultCurrencySuffix)
+                        ->addJoinCondition('global_price_join'.$defaultCurrencySuffix, '`global_price_data'.$defaultCurrencySuffix.'`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
                 }
             }
 
@@ -977,18 +984,18 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $booleanMatchedNewnessList = [];
 
             foreach ($isPSELeftJoinList as $isPSELeftJoin) {
-                $booleanMatchedPromoList[] = '`' . $isPSELeftJoin . '`.PROMO';
-                $booleanMatchedNewnessList[] = '`' . $isPSELeftJoin . '`.NEWNESS';
+                $booleanMatchedPromoList[] = '`'.$isPSELeftJoin.'`.PROMO';
+                $booleanMatchedNewnessList[] = '`'.$isPSELeftJoin.'`.NEWNESS';
             }
 
-            $search->withColumn('(' . implode(' OR ', $booleanMatchedPromoList) . ')', 'main_product_is_promo');
-            $search->withColumn('(' . implode(' OR ', $booleanMatchedNewnessList) . ')', 'main_product_is_new');
+            $search->withColumn('('.implode(' OR ', $booleanMatchedPromoList).')', 'main_product_is_promo');
+            $search->withColumn('('.implode(' OR ', $booleanMatchedNewnessList).')', 'main_product_is_new');
 
             $booleanMatchedPrice =
-                'CASE WHEN `' . $isProductPriceFirstLeftJoin[0] . '`.PROMO=1 THEN `'
-                . $isProductPriceFirstLeftJoin[1] . '`.PROMO_PRICE ELSE `'
-                . $isProductPriceFirstLeftJoin[1] . '`.PRICE END';
-            $booleanMatchedPriceDefaultCurrency = 'CASE WHEN `' . $isProductPriceFirstLeftJoin[0] . '`.PROMO=1 THEN `' . $isProductPriceFirstLeftJoin[1] . $defaultCurrencySuffix . '`.PROMO_PRICE ELSE `' . $isProductPriceFirstLeftJoin[1] . $defaultCurrencySuffix . '`.PRICE END';
+                'CASE WHEN `'.$isProductPriceFirstLeftJoin[0].'`.PROMO=1 THEN `'
+                .$isProductPriceFirstLeftJoin[1].'`.PROMO_PRICE ELSE `'
+                .$isProductPriceFirstLeftJoin[1].'`.PRICE END';
+            $booleanMatchedPriceDefaultCurrency = 'CASE WHEN `'.$isProductPriceFirstLeftJoin[0].'`.PROMO=1 THEN `'.$isProductPriceFirstLeftJoin[1].$defaultCurrencySuffix.'`.PROMO_PRICE ELSE `'.$isProductPriceFirstLeftJoin[1].$defaultCurrencySuffix.'`.PRICE END';
 
             if ($defaultCurrency->getId() != $currency->getId()) {
                 /**
@@ -996,38 +1003,38 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                  * Or maybe not : rate value is checked as a float in overloaded getRate method.
                  */
                 $priceToCompareAsSQL =
-                    'CASE WHEN ISNULL(' . $booleanMatchedPrice .') THEN '
-                    . $booleanMatchedPriceDefaultCurrency . ' * ' . $currency->getRate()
-                    . ' ELSE ' . $booleanMatchedPrice . ' END';
+                    'CASE WHEN ISNULL('.$booleanMatchedPrice.') THEN '
+                    .$booleanMatchedPriceDefaultCurrency.' * '.$currency->getRate()
+                    .' ELSE '.$booleanMatchedPrice.' END';
             } else {
                 $priceToCompareAsSQL = $booleanMatchedPrice;
             }
 
-            $search->withColumn('MAX(' . $priceToCompareAsSQL . ')', 'real_highest_price');
-            $search->withColumn('MIN(' . $priceToCompareAsSQL . ')', 'real_lowest_price');
+            $search->withColumn('MAX('.$priceToCompareAsSQL.')', 'real_highest_price');
+            $search->withColumn('MIN('.$priceToCompareAsSQL.')', 'real_lowest_price');
         } else {
             if ($new === true) {
-                $search->where('`pse`.NEWNESS' . Criteria::EQUAL . '1');
+                $search->where('`pse`.NEWNESS'.Criteria::EQUAL.'1');
             } elseif ($new === false) {
-                $search->where('`pse`.NEWNESS' . Criteria::EQUAL . '0');
+                $search->where('`pse`.NEWNESS'.Criteria::EQUAL.'0');
             }
 
             if ($promo === true) {
-                $search->where('`pse`.PROMO' . Criteria::EQUAL . '1');
+                $search->where('`pse`.PROMO'.Criteria::EQUAL.'1');
             } elseif ($promo === false) {
-                $search->where('`pse`.PROMO' . Criteria::EQUAL . '0');
+                $search->where('`pse`.PROMO'.Criteria::EQUAL.'0');
             }
 
             if (null != $min_stock) {
-                $search->where('`pse`.QUANTITY' . Criteria::GREATER_EQUAL . '?', $min_stock, \PDO::PARAM_INT);
+                $search->where('`pse`.QUANTITY'.Criteria::GREATER_EQUAL.'?', $min_stock, \PDO::PARAM_INT);
             }
 
             if (null != $min_weight) {
-                $search->where('`pse`.WEIGHT' . Criteria::GREATER_EQUAL . '?', $min_weight, \PDO::PARAM_STR);
+                $search->where('`pse`.WEIGHT'.Criteria::GREATER_EQUAL.'?', $min_weight, \PDO::PARAM_STR);
             }
 
             if (null != $max_weight) {
-                $search->where('`is_max_weight`.WEIGHT' . Criteria::LESS_EQUAL . '?', $max_weight, \PDO::PARAM_STR);
+                $search->where('`is_max_weight`.WEIGHT'.Criteria::LESS_EQUAL.'?', $max_weight, \PDO::PARAM_STR);
             }
 
             if (null !== $min_price) {
@@ -1035,7 +1042,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     // @todo
                 }
 
-                $search->where($priceToCompareAsSQL . '>=?', $min_price, \PDO::PARAM_STR);
+                $search->where($priceToCompareAsSQL.'>=?', $min_price, \PDO::PARAM_STR);
             }
 
             if (null !== $max_price) {
@@ -1043,7 +1050,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     // @todo
                 }
 
-                $search->where($priceToCompareAsSQL . '<=?', $max_price, \PDO::PARAM_STR);
+                $search->where($priceToCompareAsSQL.'<=?', $max_price, \PDO::PARAM_STR);
             }
         }
 
@@ -1081,7 +1088,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $search->groupBy(ProductTableMap::COL_ID);
 
-        if (! $complex) {
+        if (!$complex) {
             $search->withColumn('`pse`.ID', 'pse_id');
 
             $search->withColumn('`pse`.NEWNESS', 'is_new');
@@ -1093,106 +1100,106 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->withColumn('COUNT(`pse_count`.ID)', 'pse_count');
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
-                case "id":
+                case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case "id_reverse":
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha_reverse":
+                case 'alpha_reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "min_price":
+                case 'min_price':
                     if ($complex) {
                         $search->addAscendingOrderByColumn('real_lowest_price');
                     } else {
                         $search->addAscendingOrderByColumn('real_price');
                     }
                     break;
-                case "max_price":
+                case 'max_price':
                     if ($complex) {
                         $search->addDescendingOrderByColumn('real_lowest_price');
                     } else {
                         $search->addDescendingOrderByColumn('real_price');
                     }
                     break;
-                case "manual":
-                    if (! $manualOrderAllowed) {
+                case 'manual':
+                    if (!$manualOrderAllowed) {
                         throw new \InvalidArgumentException('Manual order require a *single* category ID or category_default ID, and a depth <= 1');
                     }
                     $search->addAscendingOrderByColumn('position_delegate');
                     break;
-                case "manual_reverse":
-                    if (! $manualOrderAllowed) {
+                case 'manual_reverse':
+                    if (!$manualOrderAllowed) {
                         throw new \InvalidArgumentException('Manual reverse order require a *single* category ID or category_default ID, and a depth <= 1');
                     }
                     $search->addDescendingOrderByColumn('position_delegate');
                     break;
-                case "ref":
+                case 'ref':
                     $search->orderByRef(Criteria::ASC);
                     break;
-                case "ref_reverse":
+                case 'ref_reverse':
                     $search->orderByRef(Criteria::DESC);
                     break;
-                case "visible":
+                case 'visible':
                     $search->orderByVisible(Criteria::ASC);
                     break;
-                case "visible_reverse":
+                case 'visible_reverse':
                     $search->orderByVisible(Criteria::DESC);
                     break;
-                case "promo":
+                case 'promo':
                     if ($complex) {
                         $search->addDescendingOrderByColumn('main_product_is_promo');
                     } else {
                         $search->addDescendingOrderByColumn('is_promo');
                     }
                     break;
-                case "new":
+                case 'new':
                     if ($complex) {
                         $search->addDescendingOrderByColumn('main_product_is_new');
                     } else {
                         $search->addDescendingOrderByColumn('is_new');
                     }
                     break;
-                case "created":
+                case 'created':
                     $search->addAscendingOrderByColumn('created_at');
                     break;
-                case "created_reverse":
+                case 'created_reverse':
                     $search->addDescendingOrderByColumn('created_at');
                     break;
-                case "updated":
+                case 'updated':
                     $search->addAscendingOrderByColumn('updated_at');
                     break;
-                case "updated_reverse":
+                case 'updated_reverse':
                     $search->addDescendingOrderByColumn('updated_at');
                     break;
-                case "position":
+                case 'position':
                     $search->addAscendingOrderByColumn('position_delegate');
                     break;
-                case "position_reverse":
+                case 'position_reverse':
                     $search->addDescendingOrderByColumn('position_delegate');
                     break;
-                case "given_id":
+                case 'given_id':
                     if (null === $id) {
                         throw new \InvalidArgumentException('Given_id order cannot be set without `id` argument');
                     }
                     foreach ($id as $singleId) {
-                        $givenIdMatched = 'given_id_matched_' . $singleId;
-                        $search->withColumn(ProductTableMap::COL_ID . "='$singleId'", $givenIdMatched);
+                        $givenIdMatched = 'given_id_matched_'.$singleId;
+                        $search->withColumn(ProductTableMap::COL_ID."='$singleId'", $givenIdMatched);
                         $search->orderBy($givenIdMatched, Criteria::DESC);
                     }
                     break;
-                case "random":
+                case 'random':
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
-                    break(2);
+                    break 2;
             }
         }
 
@@ -1200,10 +1207,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * Get the default category id for a product
+     * Get the default category id for a product.
      *
      * @param \Thelia\Model\Product $product
-     * @return null|int
+     *
+     * @return int|null
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     protected function getDefaultCategoryId($product)
@@ -1214,6 +1223,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         } else {
             $defaultCategoryId = $product->getDefaultCategoryId();
         }
+
         return $defaultCategoryId;
     }
 }

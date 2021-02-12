@@ -32,8 +32,8 @@ use Thelia\Model\Message as ModelMessage;
 use TheliaSmarty\Template\SmartyParser;
 
 /**
- * Class CustomerTest
- * @package Thelia\Tests\Model
+ * Class CustomerTest.
+ *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class MessageTest extends TestCase
@@ -67,7 +67,7 @@ class MessageTest extends TestCase
         $requestStack->push($request);
 
         $dispatcher = new EventDispatcher();
-        $container->set("event_dispatcher", $dispatcher);
+        $container->set('event_dispatcher', $dispatcher);
 
         $request->setSession($session);
 
@@ -80,7 +80,7 @@ class MessageTest extends TestCase
             $requestStack,
             new TheliaFormFactory(
                 $requestStack,
-                $container->get("event_dispatcher"),
+                $container->get('event_dispatcher'),
                 $translator,
                 $formFactoryBuilder,
                 $validatorBuilder,
@@ -100,7 +100,7 @@ class MessageTest extends TestCase
     }
 
     /**
-     * Create message with HTML and TEXT body from message HTMl and TEXT fields
+     * Create message with HTML and TEXT body from message HTMl and TEXT fields.
      */
     public function testMessageWithTextAndHtmlBody()
     {
@@ -108,21 +108,21 @@ class MessageTest extends TestCase
 
         $message->setLocale('fr_FR');
 
-        $message->setSubject("The subject");
-        $message->setHtmlMessage("The HTML content");
-        $message->setTextMessage("The TEXT content");
+        $message->setSubject('The subject');
+        $message->setHtmlMessage('The HTML content');
+        $message->setTextMessage('The TEXT content');
 
         $instance = \Swift_Message::newInstance();
 
         $message->buildMessage($this->parser, $instance);
 
-        $this->assertEquals("The subject", $instance->getSubject());
-        $this->assertEquals("The HTML content", $instance->getBody());
-        $this->assertEquals("The TEXT content", $instance->getChildren()[0]->getBody());
+        $this->assertEquals('The subject', $instance->getSubject());
+        $this->assertEquals('The HTML content', $instance->getBody());
+        $this->assertEquals('The TEXT content', $instance->getChildren()[0]->getBody());
     }
 
     /**
-     * Create message with TEXT body only from message HTMl and TEXT fields
+     * Create message with TEXT body only from message HTMl and TEXT fields.
      */
     public function testMessageWithTextOnlyBody()
     {
@@ -130,21 +130,21 @@ class MessageTest extends TestCase
 
         $message->setLocale('fr_FR');
 
-        $message->setSubject("The subject");
-        $message->setTextMessage("The TEXT content");
+        $message->setSubject('The subject');
+        $message->setTextMessage('The TEXT content');
 
         $instance = \Swift_Message::newInstance();
 
         $message->buildMessage($this->parser, $instance);
 
-        $this->assertEquals("The subject", $instance->getSubject());
-        $this->assertEquals("The TEXT content", $instance->getBody());
+        $this->assertEquals('The subject', $instance->getSubject());
+        $this->assertEquals('The TEXT content', $instance->getBody());
         $this->assertEquals(0, \count($instance->getChildren()));
     }
 
     /**
      * Create message with HTML and TEXT body from message HTMl and TEXT fields
-     * using a text and a html layout
+     * using a text and a html layout.
      */
     public function testMessageWithTextAndHtmlBodyAndTextAndHtmlLayout()
     {
@@ -152,9 +152,9 @@ class MessageTest extends TestCase
 
         $message->setLocale('fr_FR');
 
-        $message->setSubject("The subject");
-        $message->setTextMessage("The TEXT content");
-        $message->setHtmlMessage("The HTML content");
+        $message->setSubject('The subject');
+        $message->setTextMessage('The TEXT content');
+        $message->setHtmlMessage('The HTML content');
 
         $message->setHtmlLayoutFileName('layout.html.tpl');
         $message->setTextLayoutFileName('layout.text.tpl');
@@ -168,14 +168,14 @@ class MessageTest extends TestCase
 
         $message->buildMessage($this->parser, $instance);
 
-        $this->assertEquals("The subject", $instance->getSubject());
-        $this->assertEquals("HTML Layout: The HTML content", $instance->getBody());
-        $this->assertEquals("TEXT Layout: The TEXT content", $instance->getChildren()[0]->getBody());
+        $this->assertEquals('The subject', $instance->getSubject());
+        $this->assertEquals('HTML Layout: The HTML content', $instance->getBody());
+        $this->assertEquals('TEXT Layout: The TEXT content', $instance->getChildren()[0]->getBody());
     }
 
     /**
      * Create message with TEXT only body from message HTMl and TEXT fields
-     * using a text only layout
+     * using a text only layout.
      */
     public function testMessageWithTextOnlyBodyAndTextOnlyLayout()
     {
@@ -183,8 +183,8 @@ class MessageTest extends TestCase
 
         $message->setLocale('fr_FR');
 
-        $message->setSubject("The subject");
-        $message->setTextMessage("The <TEXT> & content");
+        $message->setSubject('The subject');
+        $message->setTextMessage('The <TEXT> & content');
 
         $message->setTextLayoutFileName('layout3.text.tpl');
 
@@ -196,14 +196,14 @@ class MessageTest extends TestCase
 
         $message->buildMessage($this->parser, $instance);
 
-        $this->assertEquals("The subject", $instance->getSubject());
-        $this->assertEquals("TEXT Layout 3: The <TEXT> & content :-) <>", $instance->getBody());
+        $this->assertEquals('The subject', $instance->getSubject());
+        $this->assertEquals('TEXT Layout 3: The <TEXT> & content :-) <>', $instance->getBody());
         $this->assertEquals(0, \count($instance->getChildren()));
     }
 
     /**
      * Create message with TEXT and HTML body from message HTMl and TEXT fields
-     * using a text only layout
+     * using a text only layout.
      */
     public function testMessageWithTextAndHtmlBodyAndTextOnlyLayout()
     {
@@ -211,9 +211,9 @@ class MessageTest extends TestCase
 
         $message->setLocale('fr_FR');
 
-        $message->setSubject("The subject");
-        $message->setTextMessage("The <TEXT> & content");
-        $message->setHtmlMessage("The <HTML> & content");
+        $message->setSubject('The subject');
+        $message->setTextMessage('The <TEXT> & content');
+        $message->setHtmlMessage('The <HTML> & content');
 
         $message->setTextLayoutFileName('layout3.text.tpl');
 
@@ -225,14 +225,14 @@ class MessageTest extends TestCase
 
         $message->buildMessage($this->parser, $instance);
 
-        $this->assertEquals("The subject", $instance->getSubject());
-        $this->assertEquals("The <HTML> & content", $instance->getBody());
-        $this->assertEquals("TEXT Layout 3: The <TEXT> & content :-) <>", $instance->getChildren()[0]->getBody());
+        $this->assertEquals('The subject', $instance->getSubject());
+        $this->assertEquals('The <HTML> & content', $instance->getBody());
+        $this->assertEquals('TEXT Layout 3: The <TEXT> & content :-) <>', $instance->getChildren()[0]->getBody());
     }
 
     /**
      * Create message with HTML and TEXT body from template HTMl and TEXT fields
-     * using a text and a html layout
+     * using a text and a html layout.
      */
     public function testMessageWithTextAndHtmlBodyAndTextAndHtmlLayoutAndTextAndHtmlTemplate()
     {
@@ -240,9 +240,9 @@ class MessageTest extends TestCase
 
         $message->setLocale('fr_FR');
 
-        $message->setSubject("The subject");
-        $message->setTextMessage("The TEXT content");
-        $message->setHtmlMessage("The HTML content");
+        $message->setSubject('The subject');
+        $message->setTextMessage('The TEXT content');
+        $message->setHtmlMessage('The HTML content');
 
         $message->setTextTemplateFileName('template4-text.txt');
         $message->setHtmlTemplateFileName('template4-html.html');
@@ -264,14 +264,14 @@ class MessageTest extends TestCase
 
         $message->buildMessage($this->parser, $instance);
 
-        $this->assertEquals("The subject", $instance->getSubject());
-        $this->assertEquals("HTML Layout 4: HTML <template> & content v=my-value", $instance->getBody());
-        $this->assertEquals("TEXT Layout 4: TEXT <template> & content v=my-value", $instance->getChildren()[0]->getBody());
+        $this->assertEquals('The subject', $instance->getSubject());
+        $this->assertEquals('HTML Layout 4: HTML <template> & content v=my-value', $instance->getBody());
+        $this->assertEquals('TEXT Layout 4: TEXT <template> & content v=my-value', $instance->getChildren()[0]->getBody());
     }
 
     /**
      * Create message with HTML and TEXT body from template HTMl and TEXT fields
-     * using a text and a html layout
+     * using a text and a html layout.
      */
     public function testMessageWithTextAndHtmlBodyAndTextAndHtmlLayoutAndTextAndHtmlTemplateWichExtendsLayout()
     {
@@ -279,9 +279,9 @@ class MessageTest extends TestCase
 
         $message->setLocale('fr_FR');
 
-        $message->setSubject("The subject");
-        $message->setTextMessage("The TEXT content");
-        $message->setHtmlMessage("The HTML content");
+        $message->setSubject('The subject');
+        $message->setTextMessage('The TEXT content');
+        $message->setHtmlMessage('The HTML content');
 
         $message->setTextTemplateFileName('template5-text.txt');
         $message->setHtmlTemplateFileName('template5-html.html');
@@ -303,14 +303,14 @@ class MessageTest extends TestCase
 
         $message->buildMessage($this->parser, $instance);
 
-        $this->assertEquals("The subject", $instance->getSubject());
-        $this->assertEquals("HTML Layout 5: HTML <template> & content v=my-value", $instance->getBody());
-        $this->assertEquals("TEXT Layout 5: TEXT <template> & content v=my-value", $instance->getChildren()[0]->getBody());
+        $this->assertEquals('The subject', $instance->getSubject());
+        $this->assertEquals('HTML Layout 5: HTML <template> & content v=my-value', $instance->getBody());
+        $this->assertEquals('TEXT Layout 5: TEXT <template> & content v=my-value', $instance->getChildren()[0]->getBody());
     }
 
     /**
      * Create message with HTML and TEXT body from template HTMl and TEXT fields
-     * using a text and a html layout
+     * using a text and a html layout.
      */
     public function testMessageWithTextAndHtmlBodyAndTextAndHtmlExtendableLayout()
     {
@@ -318,7 +318,7 @@ class MessageTest extends TestCase
 
         $message->setLocale('fr_FR');
 
-        $message->setSubject("The subject");
+        $message->setSubject('The subject');
         $message->setTextMessage('TEXT <template> & content v={$myvar}');
         $message->setHtmlMessage('HTML <template> & content v={$myvar}');
 
@@ -336,9 +336,9 @@ class MessageTest extends TestCase
 
         $message->buildMessage($this->parser, $instance);
 
-        $this->assertEquals("The subject", $instance->getSubject());
-        $this->assertEquals("HTML Layout 6: HTML <template> & content v=my-value", $instance->getBody());
-        $this->assertEquals("TEXT Layout 6: TEXT <template> & content v=my-value", $instance->getChildren()[0]->getBody());
+        $this->assertEquals('The subject', $instance->getSubject());
+        $this->assertEquals('HTML Layout 6: HTML <template> & content v=my-value', $instance->getBody());
+        $this->assertEquals('TEXT Layout 6: TEXT <template> & content v=my-value', $instance->getChildren()[0]->getBody());
     }
 
     protected function tearDown(): void

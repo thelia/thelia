@@ -12,16 +12,14 @@
 
 namespace Thelia\Install;
 
-use PDO;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Translation\Translator;
 
 /**
- * Class CheckDatabaseConnection
+ * Class CheckDatabaseConnection.
  *
  * Take care of integration tests (database connection)
  *
- * @package Thelia\Install
  * @author  Manuel Raynaud <manu@raynaud.io>
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  */
@@ -35,16 +33,16 @@ class CheckDatabaseConnection extends BaseInstall
     /** @var TranslatorInterface Translator Service */
     protected $translator;
 
-    /** @var string Database host information  */
+    /** @var string Database host information */
     protected $host;
 
-    /** @var string Database user information  */
+    /** @var string Database user information */
     protected $user;
 
-    /** @var string Database password information  */
+    /** @var string Database password information */
     protected $password;
 
-    /** @var int Database port information  */
+    /** @var int Database port information */
     protected $port;
 
     /**
@@ -53,7 +51,7 @@ class CheckDatabaseConnection extends BaseInstall
     protected $connection;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string     $host          Database host information
      * @param string     $user          Database user information
@@ -75,13 +73,13 @@ class CheckDatabaseConnection extends BaseInstall
     }
 
     /**
-     * Perform database connection check
+     * Perform database connection check.
      *
      * @return bool
      */
     public function exec()
     {
-        $dsn = "mysql:host=%s;port=%s";
+        $dsn = 'mysql:host=%s;port=%s';
 
         try {
             $this->connection = new \PDO(

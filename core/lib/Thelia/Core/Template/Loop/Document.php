@@ -31,25 +31,26 @@ use Thelia\Type\EnumListType;
 use Thelia\Type\TypeCollection;
 
 /**
- * The document loop
+ * The document loop.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  *
  * {@inheritdoc}
- * @method int[] getId()
- * @method int[] getExclude()
+ *
+ * @method int[]       getId()
+ * @method int[]       getExclude()
  * @method bool|string getVisible()
- * @method int getLang()
- * @method int getCategory()
- * @method int getProduct()
- * @method int getFolder()
- * @method int getContent()
- * @method string getSource()
- * @method int getSourceId()
- * @method bool getNewsletter()
- * @method string getQueryNamespace()
- * @method bool getWithPrevNextInfo()
- * @method string[] getOrder()
+ * @method int         getLang()
+ * @method int         getCategory()
+ * @method int         getProduct()
+ * @method int         getFolder()
+ * @method int         getContent()
+ * @method string      getSource()
+ * @method int         getSourceId()
+ * @method bool        getNewsletter()
+ * @method string      getQueryNamespace()
+ * @method bool        getWithPrevNextInfo()
+ * @method string[]    getOrder()
  */
 class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -100,10 +101,11 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * Dynamically create the search query, and set the proper filter and order
+     * Dynamically create the search query, and set the proper filter and order.
      *
-     * @param  string        $source    a valid source identifier (@see $possible_sources)
-     * @param  int           $object_id the source object ID
+     * @param string $source    a valid source identifier (@see $possible_sources)
+     * @param int    $object_id the source object ID
+     *
      * @return ModelCriteria the propel Query object
      */
     protected function createSearchQuery($source, $object_id)
@@ -116,40 +118,40 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             $ns = '\\'.$ns;
         }
 
-        $queryClass   = sprintf("%s\\%sDocumentQuery", $ns, $object);
-        $filterMethod = sprintf("filterBy%sId", $object);
+        $queryClass = sprintf('%s\\%sDocumentQuery', $ns, $object);
+        $filterMethod = sprintf('filterBy%sId', $object);
 
         // xxxDocumentQuery::create()
         $method = new \ReflectionMethod($queryClass, 'create');
         $search = $method->invoke(null); // Static !
 
         // $query->filterByXXX(id)
-        if (! \is_null($object_id)) {
+        if (!\is_null($object_id)) {
             $method = new \ReflectionMethod($queryClass, $filterMethod);
             $method->invoke($search, $object_id);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         // Results ordering
         foreach ($orders as $order) {
             switch ($order) {
-                case "alpha":
+                case 'alpha':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha-reverse":
+                case 'alpha-reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "manual-reverse":
+                case 'manual-reverse':
                     $search->orderByPosition(Criteria::DESC);
                     break;
-                case "manual":
+                case 'manual':
                     $search->orderByPosition(Criteria::ASC);
                     break;
-                case "random":
+                case 'random':
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
-                    break(2);
+                    break 2;
                     break;
             }
         }
@@ -158,10 +160,11 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * Dynamically create the search query, and set the proper filter and order
+     * Dynamically create the search query, and set the proper filter and order.
      *
-     * @param  string        $object_type (returned) the a valid source identifier (@see $possible_sources)
-     * @param  string        $object_id   (returned) the ID of the source object
+     * @param string $object_type (returned) the a valid source identifier (@see $possible_sources)
+     * @param string $object_id   (returned) the ID of the source object
+     *
      * @return ModelCriteria the propel Query object
      */
     protected function getSearchQuery(&$object_type, &$object_id)
@@ -171,7 +174,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         // Check form source="product" source_id="123" style arguments
         $source = $this->getSource();
 
-        if (! \is_null($source)) {
+        if (!\is_null($source)) {
             $source_id = $this->getSourceId();
             $id = $this->getId();
 
@@ -182,7 +185,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             $search = $this->createSearchQuery($source, $source_id);
 
             $object_type = $source;
-            $object_id   = $source_id;
+            $object_id = $source_id;
         } else {
             // Check for product="id" folder="id", etc. style arguments
             foreach ($this->possible_sources as $source) {
@@ -192,7 +195,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search = $this->createSearchQuery($source, $argValue);
 
                     $object_type = $source;
-                    $object_id   = $argValue;
+                    $object_id = $argValue;
 
                     break;
                 }
@@ -200,7 +203,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         if ($search == null) {
-            throw new \InvalidArgumentException(sprintf("Unable to find document source. Valid sources are %s", implode(',', $this->possible_sources)));
+            throw new \InvalidArgumentException(sprintf('Unable to find document source. Valid sources are %s', implode(',', $this->possible_sources)));
         }
 
         return $search;
@@ -219,7 +222,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $id = $this->getId();
 
-        if (! \is_null($id)) {
+        if (!\is_null($id)) {
             $search->filterById($id, Criteria::IN);
         }
 
@@ -240,9 +243,9 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
     {
         $baseSourceFilePath = ConfigQuery::read('documents_library_path');
         if ($baseSourceFilePath === null) {
-            $baseSourceFilePath = THELIA_LOCAL_DIR . 'media' . DS . 'documents';
+            $baseSourceFilePath = THELIA_LOCAL_DIR.'media'.DS.'documents';
         } else {
-            $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
+            $baseSourceFilePath = THELIA_ROOT.$baseSourceFilePath;
         }
 
         /** @var ProductDocument $result */
@@ -268,27 +271,27 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResultRow = new LoopResultRow($result);
 
                 $loopResultRow
-                    ->set("ID", $result->getId())
-                    ->set("LOCALE", $this->locale)
-                    ->set("DOCUMENT_FILE", $result->getFile())
-                    ->set("DOCUMENT_URL", $event->getDocumentUrl())
-                    ->set("DOCUMENT_PATH", $event->getDocumentPath())
-                    ->set("ORIGINAL_DOCUMENT_PATH", $sourceFilePath)
-                    ->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
-                    ->set("CHAPO", $result->getVirtualColumn('i18n_CHAPO'))
-                    ->set("DESCRIPTION", $result->getVirtualColumn('i18n_DESCRIPTION'))
-                    ->set("POSTSCRIPTUM", $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                    ->set("VISIBLE", $result->getVisible())
-                    ->set("POSITION", $result->getPosition())
-                    ->set("OBJECT_TYPE", $this->objectType)
-                    ->set("OBJECT_ID", $this->objectId)
+                    ->set('ID', $result->getId())
+                    ->set('LOCALE', $this->locale)
+                    ->set('DOCUMENT_FILE', $result->getFile())
+                    ->set('DOCUMENT_URL', $event->getDocumentUrl())
+                    ->set('DOCUMENT_PATH', $event->getDocumentPath())
+                    ->set('ORIGINAL_DOCUMENT_PATH', $sourceFilePath)
+                    ->set('TITLE', $result->getVirtualColumn('i18n_TITLE'))
+                    ->set('CHAPO', $result->getVirtualColumn('i18n_CHAPO'))
+                    ->set('DESCRIPTION', $result->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set('POSTSCRIPTUM', $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                    ->set('VISIBLE', $result->getVisible())
+                    ->set('POSITION', $result->getPosition())
+                    ->set('OBJECT_TYPE', $this->objectType)
+                    ->set('OBJECT_ID', $this->objectId)
                 ;
 
                 $isBackendContext = $this->getBackendContext();
                 if ($this->getWithPrevNextInfo()) {
                     $previousQuery = $this->getSearchQuery($this->objectType, $this->objectId)
                         ->filterByPosition($result->getPosition(), Criteria::LESS_THAN);
-                    if (! $isBackendContext) {
+                    if (!$isBackendContext) {
                         $previousQuery->filterByVisible(true);
                     }
                     $previous = $previousQuery
@@ -296,17 +299,17 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                         ->findOne();
                     $nextQuery = $this->getSearchQuery($this->objectType, $this->objectId)
                         ->filterByPosition($result->getPosition(), Criteria::GREATER_THAN);
-                    if (! $isBackendContext) {
+                    if (!$isBackendContext) {
                         $nextQuery->filterByVisible(true);
                     }
                     $next = $nextQuery
                         ->orderByPosition(Criteria::ASC)
                         ->findOne();
                     $loopResultRow
-                        ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
-                        ->set("HAS_NEXT", $next != null ? 1 : 0)
-                        ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
-                        ->set("NEXT", $next != null ? $next->getId() : -1);
+                        ->set('HAS_PREVIOUS', $previous != null ? 1 : 0)
+                        ->set('HAS_NEXT', $next != null ? 1 : 0)
+                        ->set('PREVIOUS', $previous != null ? $previous->getId() : -1)
+                        ->set('NEXT', $next != null ? $next->getId() : -1);
                 }
 
                 $this->addOutputFields($loopResultRow, $result);
@@ -314,7 +317,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResult->addRow($loopResultRow);
             } catch (\Exception $ex) {
                 // Ignore the result and log an error
-                Tlog::getInstance()->addError(sprintf("Failed to process document in document loop: %s", $ex->getMessage()));
+                Tlog::getInstance()->addError(sprintf('Failed to process document in document loop: %s', $ex->getMessage()));
             }
         }
 

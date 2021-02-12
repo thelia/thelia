@@ -15,8 +15,8 @@ namespace TheliaMigrateCountry\Events;
 use Thelia\Core\Event\ActionEvent;
 
 /**
- * Class MigrateCountryEvent
- * @package TheliaMigrateCountry\Events
+ * Class MigrateCountryEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class MigrateCountryEvent extends ActionEvent
@@ -35,6 +35,7 @@ class MigrateCountryEvent extends ActionEvent
 
     /**
      * MigrateCountryEvent constructor.
+     *
      * @param $country
      * @param int $newCountry
      * @param int $newState
@@ -46,18 +47,15 @@ class MigrateCountryEvent extends ActionEvent
         $this->newState = $newState;
     }
 
-    /**
-     */
     public function getCountry()
     {
         return $this->country;
     }
 
-    /**
-     */
     public function setCountry($country)
     {
         $this->country = $country;
+
         return $this;
     }
 
@@ -75,6 +73,7 @@ class MigrateCountryEvent extends ActionEvent
     public function setNewCountry($newCountry)
     {
         $this->newCountry = $newCountry;
+
         return $this;
     }
 
@@ -92,6 +91,7 @@ class MigrateCountryEvent extends ActionEvent
     public function setNewState($newState)
     {
         $this->newState = $newState;
+
         return $this;
     }
 
@@ -109,6 +109,7 @@ class MigrateCountryEvent extends ActionEvent
     public function setCounter($counter)
     {
         $this->counter = $counter;
+
         return $this;
     }
 }

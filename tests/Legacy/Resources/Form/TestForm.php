@@ -16,16 +16,15 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Thelia\Form\BaseForm;
 
 /**
- * Class TestForm
- * @package Thelia\Tests\Form
+ * Class TestForm.
+ *
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class TestForm extends BaseForm
 {
     /**
-     *
      * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
+     * Form this you have to call add method on $this->formBuilder attribute :.
      *
      * $this->formBuilder->add("name", "text")
      *   ->add("email", "email", array(
@@ -45,7 +44,7 @@ class TestForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("test_field", TextType::class)
+            ->add('test_field', TextType::class)
         ;
     }
 
@@ -54,6 +53,6 @@ class TestForm extends BaseForm
      */
     public static function getName()
     {
-        return "";
+        return '';
     }
 }

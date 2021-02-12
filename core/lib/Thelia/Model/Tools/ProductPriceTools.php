@@ -16,7 +16,7 @@ namespace Thelia\Model\Tools;
  * Utility class used to store price and promo price for a carte item.
  *
  * Class ProductPriceTools
- * @package Thelia\Model\Tools
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ProductPriceTools
@@ -24,14 +24,14 @@ class ProductPriceTools
     /**
      * The value for the price field.
      *
-     * @var        double
+     * @var float
      */
     protected $price;
 
     /**
      * The value for the promoPrice field.
      *
-     * @var        double
+     * @var float
      */
     protected $promoPrice;
 

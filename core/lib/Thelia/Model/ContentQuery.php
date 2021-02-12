@@ -21,12 +21,12 @@ use Thelia\Model\Base\ContentQuery as BaseContentQuery;
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
- *
  */
 class ContentQuery extends BaseContentQuery
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolderQuery::filterByPosition
      */
     public function filterByPosition($position = null, $comparison = null)
@@ -35,7 +35,8 @@ class ContentQuery extends BaseContentQuery
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolderQuery::orderByPosition
      */
     public function orderByPosition($order = Criteria::ASC)
@@ -44,7 +45,8 @@ class ContentQuery extends BaseContentQuery
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolderQuery::groupByPosition
      */
     public function groupByPosition()
@@ -53,7 +55,8 @@ class ContentQuery extends BaseContentQuery
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolderQuery::findOneByPosition
      */
     public function findOneByPosition($position)
@@ -62,7 +65,8 @@ class ContentQuery extends BaseContentQuery
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolderQuery::findByPosition
      */
     public function findByPosition($position)

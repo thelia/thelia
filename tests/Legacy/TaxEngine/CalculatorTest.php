@@ -24,9 +24,7 @@ use Thelia\Model\Tax;
 use Thelia\TaxEngine\Calculator;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class CalculatorTest extends TestCase
 {

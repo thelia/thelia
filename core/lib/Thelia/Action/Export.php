@@ -21,7 +21,8 @@ use Thelia\Model\ExportCategoryQuery;
 use Thelia\Model\ExportQuery;
 
 /**
- * Class Export
+ * Class Export.
+ *
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class Export extends BaseAction implements EventSubscriberInterface
@@ -43,33 +44,33 @@ class Export extends BaseAction implements EventSubscriberInterface
     {
         return [
             TheliaEvents::EXPORT_CHANGE_POSITION => [
-                ['exportChangePosition', 128]
+                ['exportChangePosition', 128],
             ],
             TheliaEvents::EXPORT_CATEGORY_CHANGE_POSITION => [
-                ['exportCategoryChangePosition', 128]
-            ]
+                ['exportCategoryChangePosition', 128],
+            ],
         ];
     }
 
     /**
-     * Handle export change position event
+     * Handle export change position event.
      *
      * @param $eventName
      */
     public function exportChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher)
     {
         $this->handler->getExport($updatePositionEvent->getObjectId(), true);
-        $this->genericUpdatePosition(new ExportQuery, $updatePositionEvent, $dispatcher);
+        $this->genericUpdatePosition(new ExportQuery(), $updatePositionEvent, $dispatcher);
     }
 
     /**
-     * Handle export category change position event
+     * Handle export category change position event.
      *
      * @param $eventName
      */
     public function exportCategoryChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher)
     {
         $this->handler->getCategory($updatePositionEvent->getObjectId(), true);
-        $this->genericUpdatePosition(new ExportCategoryQuery, $updatePositionEvent, $dispatcher);
+        $this->genericUpdatePosition(new ExportCategoryQuery(), $updatePositionEvent, $dispatcher);
     }
 }

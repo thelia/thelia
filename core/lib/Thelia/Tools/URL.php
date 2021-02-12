@@ -12,13 +12,11 @@
 
 namespace Thelia\Tools;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\UrlValidator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\LangQuery;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Rewriting\RewritingRetriever;
 
@@ -30,7 +28,7 @@ class URL
     /** @var RewritingRetriever $retriever */
     protected $retriever;
 
-    /** @var  RequestContext $requestContext */
+    /** @var RequestContext $requestContext */
     protected $requestContext;
 
     public const PATH_TO_FILE = true;
@@ -38,7 +36,7 @@ class URL
 
     protected static $instance = null;
 
-    /** @var string $baseUrlScheme a cache for the base URL scheme  */
+    /** @var string $baseUrlScheme a cache for the base URL scheme */
     private $baseUrlScheme;
 
     public function __construct(RouterInterface $router = null)
@@ -67,14 +65,16 @@ class URL
     /**
      * Return this class instance, only once instanciated.
      *
-     * @throws \RuntimeException if the class has not been instanciated.
-     * @return \Thelia\Tools\URL the instance.
+     * @throws \RuntimeException if the class has not been instanciated
+     *
+     * @return \Thelia\Tools\URL the instance
      */
     public static function getInstance()
     {
         if (self::$instance == null) {
-            throw new \RuntimeException("URL instance is not initialized.");
+            throw new \RuntimeException('URL instance is not initialized.');
         }
+
         return self::$instance;
     }
 
@@ -89,7 +89,7 @@ class URL
     public function getBaseUrl($scheme_only = false)
     {
         if (null === $this->baseUrlScheme) {
-            $scheme = "http";
+            $scheme = 'http';
             $port = 80;
 
             if ($host = $this->requestContext->getHost()) {
@@ -107,11 +107,11 @@ class URL
             $this->baseUrlScheme = "$scheme://$host"."$port";
         }
 
-        return $scheme_only ? $this->baseUrlScheme : $this->baseUrlScheme . $this->requestContext->getBaseUrl();
+        return $scheme_only ? $this->baseUrlScheme : $this->baseUrlScheme.$this->requestContext->getBaseUrl();
     }
 
     /**
-     * @return string the index page, which is in fact the base URL.
+     * @return string the index page, which is in fact the base URL
      */
     public function getIndexPage()
     {
@@ -124,10 +124,10 @@ class URL
      * the script name (index_dev.php) is added to the URL in dev_environment, use
      * $path_only = true to get a path without the index script.
      *
-     * @param string  $path       the relative path
-     * @param array   $parameters An array of parameters
-     * @param boolean $path_only  if true (PATH_TO_FILE), getIndexPage() will  not be added
-     * @param string $alternateBaseUrl  if not null, this URL is unsed instead of the base URL. Useful for creating CDN URLs
+     * @param string $path             the relative path
+     * @param array  $parameters       An array of parameters
+     * @param bool   $path_only        if true (PATH_TO_FILE), getIndexPage() will  not be added
+     * @param string $alternateBaseUrl if not null, this URL is unsed instead of the base URL. Useful for creating CDN URLs
      *
      * @return string The generated URL
      */
@@ -159,7 +159,7 @@ class URL
             }
 
             // Normalize the given path
-            $base = rtrim($base_url, '/') . '/' . ltrim($path, '/');
+            $base = rtrim($base_url, '/').'/'.ltrim($path, '/');
         } else {
             $base = $path;
         }
@@ -167,18 +167,18 @@ class URL
         $base = str_replace('&amp;', '&', $base);
 
         $queryString = '';
-        $anchor      = '';
+        $anchor = '';
 
-        if (! \is_null($parameters)) {
+        if (!\is_null($parameters)) {
             foreach ($parameters as $name => $value) {
                 // Remove this parameter from base URL to prevent duplicate parameters
                 $base = preg_replace('`([?&])'.preg_quote($name, '`').'=(?:[^&]*)(?:&|$)`', '$1', $base);
 
-                $queryString .= sprintf("%s=%s&", urlencode($name), urlencode($value));
+                $queryString .= sprintf('%s=%s&', urlencode($name), urlencode($value));
             }
         }
 
-        if ('' !== $queryString = rtrim($queryString, "&")) {
+        if ('' !== $queryString = rtrim($queryString, '&')) {
             // url could contain anchor
             $pos = strrpos($base, '#');
             if ($pos !== false) {
@@ -186,18 +186,18 @@ class URL
                 $base = substr($base, 0, $pos);
             }
 
-            $base = rtrim($base, "?&");
+            $base = rtrim($base, '?&');
 
             $sepChar = strstr($base, '?') === false ? '?' : '&';
 
-            $queryString = $sepChar . $queryString;
+            $queryString = $sepChar.$queryString;
         }
 
-        return $base . $queryString . $anchor;
+        return $base.$queryString.$anchor;
     }
 
     /**
-     * Returns the Absolute URL to a administration view
+     * Returns the Absolute URL to a administration view.
      *
      * @param string $viewName   the view name (e.g. login for login.html)
      * @param mixed  $parameters An array of parameters
@@ -206,28 +206,28 @@ class URL
      */
     public function adminViewUrl($viewName, array $parameters = [])
     {
-        $path = sprintf("%s/admin/%s", $this->getIndexPage(), $viewName);
+        $path = sprintf('%s/admin/%s', $this->getIndexPage(), $viewName);
 
         return $this->absoluteUrl($path, $parameters);
     }
 
     /**
-     * Returns the Absolute URL to a view
+     * Returns the Absolute URL to a view.
      *
-     * @param string $viewName the view name (e.g. login for login.html)
-     * @param mixed $parameters An array of parameters
+     * @param string $viewName   the view name (e.g. login for login.html)
+     * @param mixed  $parameters An array of parameters
      *
      * @return string The generated URL
      */
     public function viewUrl($viewName, array $parameters = [])
     {
-        $path = sprintf("?view=%s", $viewName);
+        $path = sprintf('?view=%s', $viewName);
 
         return $this->absoluteUrl($path, $parameters);
     }
 
     /**
-     * Retrieve a rewritten URL from a view, a view id and a locale
+     * Retrieve a rewritten URL from a view, a view id and a locale.
      *
      * @param $view
      * @param $viewId
@@ -243,7 +243,7 @@ class URL
             $allParametersWithoutView = [];
             $allParametersWithoutView['lang'] = $viewLocale;
             if (null !== $viewId) {
-                $allParametersWithoutView[$view . '_id'] = $viewId;
+                $allParametersWithoutView[$view.'_id'] = $viewId;
             }
             $this->retriever->rewrittenUrl = null;
             $this->retriever->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);
@@ -253,8 +253,7 @@ class URL
     }
 
     /**
-     * Retrieve a rewritten URL from the current GET parameters
-     *
+     * Retrieve a rewritten URL from the current GET parameters.
      *
      * @return RewritingRetriever You can access $url and $rewrittenUrl properties or use toString method
      */
@@ -267,12 +266,12 @@ class URL
 
             $viewLocale = $this->getViewLocale($request);
 
-            $viewId = $view === null ? null : $request->query->get($view . '_id', null);
+            $viewId = $view === null ? null : $request->query->get($view.'_id', null);
 
             if ($view !== null) {
                 unset($allOtherParameters['view']);
                 if ($viewId !== null) {
-                    unset($allOtherParameters[$view . '_id']);
+                    unset($allOtherParameters[$view.'_id']);
                 }
             }
             if ($viewLocale !== null) {
@@ -295,7 +294,7 @@ class URL
     }
 
     /**
-     * Retrieve a rewritten URL from the current GET parameters or use toString method
+     * Retrieve a rewritten URL from the current GET parameters or use toString method.
      *
      * @param $url
      *
@@ -310,15 +309,15 @@ class URL
 
     protected function sanitize($string, $force_lowercase = true, $alphabetic_only = false)
     {
-        static $strip = ["~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]",
-                 "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
-                 "â€”", "â€“", ",", "<", ".", ">", "/", "?"];
+        static $strip = ['~', '`', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '=', '+', '[', '{', ']',
+                 '}', '\\', '|', ';', ':', '"', "'", '&#8216;', '&#8217;', '&#8220;', '&#8221;', '&#8211;', '&#8212;',
+                 'â€”', 'â€“', ',', '<', '.', '>', '/', '?', ];
 
-        $clean = trim(str_replace($strip, "", strip_tags($string)));
+        $clean = trim(str_replace($strip, '', strip_tags($string)));
 
-        $clean = preg_replace('/\s+/', "-", $clean);
+        $clean = preg_replace('/\s+/', '-', $clean);
 
-        $clean = ($alphabetic_only) ? preg_replace("/[^a-zA-Z0-9]/", "", $clean) : $clean ;
+        $clean = ($alphabetic_only) ? preg_replace('/[^a-zA-Z0-9]/', '', $clean) : $clean;
 
         return ($force_lowercase) ?
              (\function_exists('mb_strtolower')) ?
@@ -327,7 +326,7 @@ class URL
              $clean;
     }
 
-    public static function checkUrl($url, array $protocols = ["http", "https"])
+    public static function checkUrl($url, array $protocols = ['http', 'https'])
     {
         $pattern = sprintf(UrlValidator::PATTERN, implode('|', $protocols));
 
@@ -337,7 +336,7 @@ class URL
     /**
      * Get the locale code from the lang attribute in URL.
      *
-     * @return null|string
+     * @return string|null
      */
     private function getViewLocale(Request $request)
     {

@@ -12,14 +12,11 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Core\Template\Loop\Category;
 use Thelia\Model\CategoryQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**
- *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
 class CategoryTest extends BaseLoopTestor
 {
@@ -45,7 +42,7 @@ class CategoryTest extends BaseLoopTestor
         }
 
         $otherParameters = [
-            "visible" => "*",
+            'visible' => '*',
         ];
 
         $this->baseTestSearchById($category->getId(), $otherParameters);

@@ -12,7 +12,7 @@
 
 namespace Thelia\Core;
 
-/**
+/*
  * Root class of Thelia
  *
  * It extends Symfony\Component\HttpKernel\Kernel for changing some features
@@ -21,7 +21,6 @@ namespace Thelia\Core;
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 
-use Assetic\Contracts\Filter\FilterInterface;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\DataFetcher\PDODataFetcher;
 use Propel\Runtime\Propel;
@@ -85,14 +84,14 @@ class Thelia extends Kernel
 
     public static function isInstalled()
     {
-        return file_exists(THELIA_CONF_DIR . 'database.yml');
+        return file_exists(THELIA_CONF_DIR.'database.yml');
     }
 
     protected function checkMySQLConfigurations(ConnectionInterface $con)
     {
         // TODO : add cache for this test
-        /** @var  PDODataFetcher $result */
-        $result = $con->query("SELECT VERSION() as version, @@SESSION.sql_mode as session_sql_mode");
+        /** @var PDODataFetcher $result */
+        $result = $con->query('SELECT VERSION() as version, @@SESSION.sql_mode as session_sql_mode');
 
         if ($result && $data = $result->fetch(\PDO::FETCH_ASSOC)) {
             $sessionSqlMode = explode(',', $data['session_sql_mode']);
@@ -109,21 +108,21 @@ class Thelia extends Kernel
                     if (!\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
                         $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
                         $canUpdate = true;
-                        Tlog::getInstance()->addWarning("Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.");
+                        Tlog::getInstance()->addWarning('Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.');
                     }
 
                     // remove STRICT_TRANS_TABLES
                     if (($key = array_search('STRICT_TRANS_TABLES', $sessionSqlMode)) !== false) {
                         unset($sessionSqlMode[$key]);
                         $canUpdate = true;
-                        Tlog::getInstance()->addWarning("Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.");
+                        Tlog::getInstance()->addWarning('Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.');
                     }
 
                     // remove ONLY_FULL_GROUP_BY
                     if (($key = array_search('ONLY_FULL_GROUP_BY', $sessionSqlMode)) !== false) {
                         unset($sessionSqlMode[$key]);
                         $canUpdate = true;
-                        Tlog::getInstance()->addWarning("Remove sql_mode ONLY_FULL_GROUP_BY. Please configure your MySQL server.");
+                        Tlog::getInstance()->addWarning('Remove sql_mode ONLY_FULL_GROUP_BY. Please configure your MySQL server.');
                     }
                 }
             } else {
@@ -133,7 +132,7 @@ class Thelia extends Kernel
                     if (($key = array_search('STRICT_TRANS_TABLES', $sessionSqlMode)) !== false) {
                         unset($sessionSqlMode[$key]);
                         $canUpdate = true;
-                        Tlog::getInstance()->addWarning("Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.");
+                        Tlog::getInstance()->addWarning('Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.');
                     }
                 }
 
@@ -141,18 +140,18 @@ class Thelia extends Kernel
                     if (!\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
                         $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
                         $canUpdate = true;
-                        Tlog::getInstance()->addWarning("Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.");
+                        Tlog::getInstance()->addWarning('Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.');
                     }
                 }
             }
 
-            if (! empty($canUpdate)) {
-                if (null === $con->query("SET SESSION sql_mode='" . implode(',', $sessionSqlMode) . "';")) {
+            if (!empty($canUpdate)) {
+                if (null === $con->query("SET SESSION sql_mode='".implode(',', $sessionSqlMode)."';")) {
                     throw new \RuntimeException('Failed to set MySQL global and session sql_mode');
                 }
             }
         } else {
-            Tlog::getInstance()->addWarning("Failed to get MySQL version and sql_mode");
+            Tlog::getInstance()->addWarning('Failed to get MySQL version and sql_mode');
         }
     }
 
@@ -193,7 +192,8 @@ class Thelia extends Kernel
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @throws \Exception
      */
     public function boot()
@@ -222,7 +222,9 @@ class Thelia extends Kernel
     /**
      * @param $forcePropelCacheGeneration
      * @param $cacheRefresh
+     *
      * @return bool
+     *
      * @throws \Throwable
      */
     public function initializePropelService($forcePropelCacheGeneration, &$cacheRefresh)
@@ -246,10 +248,10 @@ class Thelia extends Kernel
     }
 
     /**
-     * Add all module's standard templates to the parser environment
+     * Add all module's standard templates to the parser environment.
      *
      * @param Definition $parser the parser
-     * @param Module     $module the Module.
+     * @param Module     $module the Module
      */
     protected function addStandardModuleTemplatesToParserEnvironment($parser, $module)
     {
@@ -261,10 +263,10 @@ class Thelia extends Kernel
     }
 
     /**
-     * Add a module template directory to the parser environment
+     * Add a module template directory to the parser environment.
      *
      * @param Definition $parser             the parser
-     * @param Module     $module             the Module.
+     * @param Module     $module             the Module
      * @param string     $templateType       the template type (one of the TemplateDefinition type constants)
      * @param string     $templateSubdirName the template subdirectory name (one of the TemplateDefinition::XXX_SUBDIR constants)
      */
@@ -280,14 +282,14 @@ class Thelia extends Kernel
             /* browse the directory */
             foreach ($templateDirBrowser as $templateDirContent) {
                 /* is it a directory which is not . or .. ? */
-                if ($templateDirContent->isDir() && ! $templateDirContent->isDot()) {
+                if ($templateDirContent->isDir() && !$templateDirContent->isDot()) {
                     $parser->addMethodCall(
                         'addTemplateDirectory',
                         [
                             $templateType,
                             $templateDirContent->getFilename(),
                             $templateDirContent->getPathName(),
-                            $code
+                            $code,
                         ]
                     );
                 }
@@ -299,28 +301,28 @@ class Thelia extends Kernel
 
     /**
      * Load some configuration
-     * Initialize all plugins
+     * Initialize all plugins.
      *
      * @throws \Exception
      */
     protected function loadConfiguration(ContainerBuilder $container)
     {
-        $fileLocator = new FileLocator(__DIR__ . "/../Config/Resources");
+        $fileLocator = new FileLocator(__DIR__.'/../Config/Resources');
         $phpLoader = new PhpFileLoader($container, $fileLocator);
         $phpLoader->load('services.php');
 
         $autoconfiguredInterfaces = [
-            EventSubscriberInterface::class => "kernel.event_subscriber",
-            SerializerInterface::class => "thelia.serializer",
-            ArchiverInterface::class => "thelia.archiver",
-            FormExtensionInterface::class => "thelia.forms.extension",
-            BaseLoopInterface::class => "thelia.loop",
-            ContainerAwareInterface::class => "thelia.command",
-            FormInterface::class => "thelia.form",
-            CouponInterface::class => "thelia.coupon.addCoupon",
-            ConditionInterface::class => "thelia.coupon.addCondition",
-            ControllerInterface::class => "controller.service_arguments",
-            ArgumentValueResolverInterface::class => "controller.argument_value_resolver"
+            EventSubscriberInterface::class => 'kernel.event_subscriber',
+            SerializerInterface::class => 'thelia.serializer',
+            ArchiverInterface::class => 'thelia.archiver',
+            FormExtensionInterface::class => 'thelia.forms.extension',
+            BaseLoopInterface::class => 'thelia.loop',
+            ContainerAwareInterface::class => 'thelia.command',
+            FormInterface::class => 'thelia.form',
+            CouponInterface::class => 'thelia.coupon.addCoupon',
+            ConditionInterface::class => 'thelia.coupon.addCondition',
+            ControllerInterface::class => 'controller.service_arguments',
+            ArgumentValueResolverInterface::class => 'controller.argument_value_resolver',
         ];
 
         foreach ($autoconfiguredInterfaces as $interfaceClass => $tag) {
@@ -332,14 +334,14 @@ class Thelia extends Kernel
         $finder = Finder::create()
             ->name('*.xml')
             ->depth(0)
-            ->in(__DIR__ . "/../Config/Resources");
+            ->in(__DIR__.'/../Config/Resources');
 
         /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
             $loader->load($file->getBaseName());
         }
 
-        if (\defined("THELIA_INSTALL_MODE") === false) {
+        if (\defined('THELIA_INSTALL_MODE') === false) {
             $modules = ModuleQuery::getActivated();
 
             $translationDirs = [];
@@ -352,11 +354,11 @@ class Thelia extends Kernel
 
                     $definition = new Definition();
                     $definition->setClass($module->getFullNamespace());
-                    $definition->addMethodCall("setContainer", [new Reference('service_container')]);
+                    $definition->addMethodCall('setContainer', [new Reference('service_container')]);
                     $definition->setPublic(true);
 
                     $container->setDefinition(
-                        "module." . $module->getCode(),
+                        'module.'.$module->getCode(),
                         $definition
                     );
 
@@ -371,17 +373,17 @@ class Thelia extends Kernel
                     }
 
                     $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
-                    $loader->load("config.xml", "module." . $module->getCode());
+                    $loader->load('config.xml', 'module.'.$module->getCode());
 
-                    $envConfigFileName = sprintf("config_%s.xml", $this->environment);
+                    $envConfigFileName = sprintf('config_%s.xml', $this->environment);
                     $envConfigFile = sprintf('%s%s%s', $module->getAbsoluteConfigPath(), DS, $envConfigFileName);
 
                     if (is_file($envConfigFile) && is_readable($envConfigFile)) {
-                        $loader->load($envConfigFileName, "module." . $module->getCode());
+                        $loader->load($envConfigFileName, 'module.'.$module->getCode());
                     }
                 } catch (\Exception $e) {
                     Tlog::getInstance()->addError(
-                        sprintf("Failed to load module %s: %s", $module->getCode(), $e->getMessage()),
+                        sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
                         $e
                     );
                 }
@@ -400,17 +402,17 @@ class Thelia extends Kernel
                     $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
                 } catch (\Exception $e) {
                     Tlog::getInstance()->addError(
-                        sprintf("Failed to load module %s: %s", $module->getCode(), $e->getMessage()),
+                        sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
                         $e
                     );
                 }
             }
 
             // Load core translation
-            $translationDirs['core'] = THELIA_LIB . 'Config' . DS . 'I18n';
+            $translationDirs['core'] = THELIA_LIB.'Config'.DS.'I18n';
 
             // Load core translation
-            $translationDirs[Translator::GLOBAL_FALLBACK_DOMAIN] = THELIA_LOCAL_DIR . 'I18n';
+            $translationDirs[Translator::GLOBAL_FALLBACK_DOMAIN] = THELIA_LOCAL_DIR.'I18n';
 
             // Standard templates (front, back, pdf, mail)
             /** @var TemplateDefinition $templateDefinition */
@@ -418,7 +420,7 @@ class Thelia extends Kernel
                 // Load parent templates transaltions, the current template translations.
                 $templateList = array_merge(
                     $templateDefinition->getParentList(),
-                    [ $templateDefinition ]
+                    [$templateDefinition]
                 );
 
                 /** @var TemplateDefinition $tplDef */
@@ -524,11 +526,9 @@ class Thelia extends Kernel
     }
 
     /**
-     *
-     * initialize session in Request object
+     * initialize session in Request object.
      *
      * All param must be change in Config table
-     *
      */
 
     /**
@@ -545,6 +545,7 @@ class Thelia extends Kernel
      * Builds the service container.
      *
      * @return ContainerBuilder The compiled service container
+     *
      * @throws \Exception
      */
     protected function buildContainer()
@@ -568,7 +569,7 @@ class Thelia extends Kernel
     public function getCacheDir()
     {
         if (\defined('THELIA_ROOT')) {
-            return THELIA_CACHE_DIR . $this->environment;
+            return THELIA_CACHE_DIR.$this->environment;
         }
 
         return parent::getCacheDir();
@@ -600,21 +601,21 @@ class Thelia extends Kernel
         $parameters = parent::getKernelParameters();
 
         //Todo replace this by real runtime env
-        $parameters["kernel.runtime_environment"] = $this->environment;
+        $parameters['kernel.runtime_environment'] = $this->environment;
 
-        $parameters["thelia.root_dir"] = THELIA_ROOT;
-        $parameters["thelia.core_dir"] = \dirname(__DIR__); // This class is in core/lib/Thelia/Core.
-        $parameters["thelia.module_dir"] = THELIA_MODULE_DIR;
+        $parameters['thelia.root_dir'] = THELIA_ROOT;
+        $parameters['thelia.core_dir'] = \dirname(__DIR__); // This class is in core/lib/Thelia/Core.
+        $parameters['thelia.module_dir'] = THELIA_MODULE_DIR;
 
         return $parameters;
     }
 
     /**
-     * return available bundle
+     * return available bundle.
      *
      * Part of Symfony\Component\HttpKernel\KernelInterface
      *
-     * @return Bundle\TheliaBundle[] An array of bundle instances.
+     * @return Bundle\TheliaBundle[] an array of bundle instances
      */
     public function registerBundles()
     {
@@ -623,7 +624,7 @@ class Thelia extends Kernel
             new Bundle\TheliaBundle(),
         ];
 
-        /**
+        /*
          * OTHER CORE BUNDLE CAN BE DECLARE HERE AND INITIALIZE WITH SPECIFIC CONFIGURATION
          *
          * HOW TO DECLARE OTHER BUNDLE ? ETC
@@ -633,7 +634,7 @@ class Thelia extends Kernel
     }
 
     /**
-     * Loads the container configuration
+     * Loads the container configuration.
      *
      * part of Symfony\Component\HttpKernel\KernelInterface
      *

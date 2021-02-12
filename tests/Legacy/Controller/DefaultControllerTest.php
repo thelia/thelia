@@ -12,15 +12,13 @@
 
 namespace Thelia\Tests\Controller;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Thelia\Controller\Admin\ProductController;
 use Thelia\Controller\Front\DefaultController;
 use Thelia\Core\HttpFoundation\Request;
 
 /**
- * Class DefaultControllerTest
- * @package Thelia\Tests\Controller
+ * Class DefaultControllerTest.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class DefaultControllerTest extends ControllerTestBase
@@ -30,13 +28,13 @@ class DefaultControllerTest extends ControllerTestBase
         $request = $this->buildRequest();
         $this->getController()->noAction($request);
 
-        $this->assertEquals($request->attributes->get('_view'), "index");
+        $this->assertEquals($request->attributes->get('_view'), 'index');
     }
 
     public function testNoActionWithGetParam()
     {
         $request = $this->buildRequest(
-            ["view" => "foo"]
+            ['view' => 'foo']
         );
 
         $this->getController()->noAction($request);
@@ -48,7 +46,7 @@ class DefaultControllerTest extends ControllerTestBase
     {
         $request = $this->buildRequest(
             [],
-            ["view" => "foo"]
+            ['view' => 'foo']
         );
 
         $this->getController()->noAction($request);
@@ -61,7 +59,7 @@ class DefaultControllerTest extends ControllerTestBase
         $request = $this->buildRequest(
             [],
             [],
-            ["_view" => "foo"]
+            ['_view' => 'foo']
         );
 
         $this->getController()->noAction($request);
@@ -72,9 +70,9 @@ class DefaultControllerTest extends ControllerTestBase
     public function testNoActionWithAttributeAndQuery()
     {
         $request = $this->buildRequest(
-            ["view" => "bar"],
+            ['view' => 'bar'],
             [],
-            ["_view" => "foo"]
+            ['_view' => 'foo']
         );
 
         $this->getController()->noAction($request);
@@ -86,8 +84,8 @@ class DefaultControllerTest extends ControllerTestBase
     {
         $request = $this->buildRequest(
             [],
-            ["view" => "bar"],
-            ["_view" => "foo"]
+            ['view' => 'bar'],
+            ['_view' => 'foo']
         );
 
         $this->getController()->noAction($request);
@@ -111,12 +109,12 @@ class DefaultControllerTest extends ControllerTestBase
      */
     protected function buildContainer(ContainerBuilder $container)
     {
-        $parser = $this->getMockBuilder("Thelia\\Core\\Template\\ParserInterface")
+        $parser = $this->getMockBuilder('Thelia\\Core\\Template\\ParserInterface')
             ->disableOriginalConstructor()
             ->getMock()
         ;
 
-        $container->set("thelia.parser", $parser);
+        $container->set('thelia.parser', $parser);
     }
 
     /**

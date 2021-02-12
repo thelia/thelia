@@ -15,8 +15,8 @@ namespace Thelia\Core\Form\Type\Field;
 use Thelia\Model\ExportQuery;
 
 /**
- * Class ExportIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class ExportIdType.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ExportIdType extends AbstractIdType
@@ -38,6 +38,6 @@ class ExportIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "export_id";
+        return 'export_id';
     }
 }

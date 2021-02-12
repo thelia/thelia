@@ -52,9 +52,8 @@ use Thelia\Model\TaxRuleI18n;
 use Thelia\Tools\I18n;
 
 /**
+ * Class Order.
  *
- * Class Order
- * @package Thelia\Action
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  * @author Franck Allimant <thelia@cqfdev.fr>
  */
@@ -76,8 +75,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         $this->securityContext = $securityContext;
     }
 
-    /**
-     */
     public function setDeliveryAddress(OrderEvent $event)
     {
         $order = $event->getOrder();
@@ -87,8 +84,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setOrder($order);
     }
 
-    /**
-     */
     public function setDeliveryModule(OrderEvent $event)
     {
         $order = $event->getOrder();
@@ -107,8 +102,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setOrder($order);
     }
 
-    /**
-     */
     public function setPostage(OrderEvent $event)
     {
         $order = $event->getOrder();
@@ -120,8 +113,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setOrder($order);
     }
 
-    /**
-     */
     public function setInvoiceAddress(OrderEvent $event)
     {
         $order = $event->getOrder();
@@ -131,8 +122,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setOrder($order);
     }
 
-    /**
-     */
     public function setPaymentModule(OrderEvent $event)
     {
         $order = $event->getOrder();
@@ -143,9 +132,11 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param bool $unusedArgument deprecated argument. Will be removed in 2.5
+     * @param bool $unusedArgument           deprecated argument. Will be removed in 2.5
      * @param bool $useOrderDefinedAddresses if true, the delivery and invoice OrderAddresses will be used instead of creating new OrderAdresses using Order::getChoosenXXXAddress()
+     *
      * @return ModelOrder
+     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -279,7 +270,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             if ($cartItem->getQuantity() > $pse->getQuantity()
                 && true === ConfigQuery::checkAvailableStock()
                 && $useStock) {
-                throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
+                throw new TheliaProcessException('Not enough stock', TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
             }
 
             if ($useStock && $manageStock) {
@@ -372,7 +363,9 @@ class Order extends BaseAction implements EventSubscriberInterface
 
     /**
      * Create an order outside of the front-office context, e.g. manually from the back-office.
+     *
      * @param $eventName
+     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -395,9 +388,10 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     *
      * @throws \Thelia\Exception\TheliaProcessException
+     *
      * @param $eventName
+     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -449,7 +443,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      *
      * @param $eventName
      */
-    public function orderCartClear(/** @noinspection PhpUnusedParameterInspection */ OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function orderCartClear(/* @noinspection PhpUnusedParameterInspection */ OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         // Empty cart and clear current order
         $session = $this->getSession();
@@ -460,8 +454,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     *
-     * @throws \Exception if the message cannot be loaded.
+     * @throws \Exception if the message cannot be loaded
      */
     public function sendConfirmationEmail(OrderEvent $event)
     {
@@ -470,14 +463,13 @@ class Order extends BaseAction implements EventSubscriberInterface
             $event->getOrder()->getCustomer(),
             [
                 'order_id' => $event->getOrder()->getId(),
-                'order_ref' => $event->getOrder()->getRef()
+                'order_ref' => $event->getOrder()->getRef(),
             ]
         );
     }
 
     /**
-     *
-     * @throws \Exception if the message cannot be loaded.
+     * @throws \Exception if the message cannot be loaded
      */
     public function sendNotificationEmail(OrderEvent $event)
     {
@@ -485,13 +477,14 @@ class Order extends BaseAction implements EventSubscriberInterface
             'order_notification',
             [
                 'order_id' => $event->getOrder()->getId(),
-                'order_ref' => $event->getOrder()->getRef()
+                'order_ref' => $event->getOrder()->getRef(),
             ]
         );
     }
 
     /**
      * @param $eventName
+     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -525,6 +518,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      * the stock should be decreased or increased.
      *
      * @param $eventName
+     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function getStockUpdateOnOrderStatusChange(GetStockUpdateOperationOnOrderStatusChangeEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -567,22 +561,23 @@ class Order extends BaseAction implements EventSubscriberInterface
             }
 
             Tlog::getInstance()->addInfo(
-                "Checking stock operation for status change of order : " . $order->getRef()
-                . ", version: " . $order->getVersion()
-                . ", manageStockOnCreation: " . ($manageStockOnCreation ? 0 : 1)
-                . ", paid:" . ($order->isPaid(false) ? 1 : 0)
-                . ", is not paid:" . ($order->isNotPaid(false) ? 1 : 0)
-                . ", new status paid:" . ($newStatus->isPaid(false) ? 1 : 0)
-                . ", new status is not paid:" . ($newStatus->isNotPaid(false) ? 1 : 0)
-                . " = operation: " . $event->getOperation()
+                'Checking stock operation for status change of order : '.$order->getRef()
+                .', version: '.$order->getVersion()
+                .', manageStockOnCreation: '.($manageStockOnCreation ? 0 : 1)
+                .', paid:'.($order->isPaid(false) ? 1 : 0)
+                .', is not paid:'.($order->isNotPaid(false) ? 1 : 0)
+                .', new status paid:'.($newStatus->isPaid(false) ? 1 : 0)
+                .', new status is not paid:'.($newStatus->isNotPaid(false) ? 1 : 0)
+                .' = operation: '.$event->getOperation()
             );
         }
     }
 
     /**
-     * Update order products stock after an order status change
+     * Update order products stock after an order status change.
      *
      * @param int $newStatus the new status ID
+     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -613,13 +608,13 @@ class Order extends BaseAction implements EventSubscriberInterface
                             } elseif ($operationEvent->getOperation() == $operationEvent::DECREASE_STOCK) {
                                 /* Check if we have enough stock */
                                 if ($orderProduct->getQuantity() > $productSaleElements->getQuantity() && true === ConfigQuery::checkAvailableStock()) {
-                                    throw new TheliaProcessException($productSaleElements->getRef() . " : Not enough stock 2");
+                                    throw new TheliaProcessException($productSaleElements->getRef().' : Not enough stock 2');
                                 }
 
                                 $offset = -$orderProduct->getQuantity();
                             }
 
-                            Tlog::getInstance()->addError("Product stock: " . $productSaleElements->getQuantity() . " -> " . ($productSaleElements->getQuantity() + $offset));
+                            Tlog::getInstance()->addError('Product stock: '.$productSaleElements->getQuantity().' -> '.($productSaleElements->getQuantity() + $offset));
 
                             $productSaleElements
                                 ->setQuantity($productSaleElements->getQuantity() + $offset)
@@ -688,27 +683,27 @@ class Order extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::ORDER_SET_DELIVERY_ADDRESS => [ "setDeliveryAddress", 128 ],
-            TheliaEvents::ORDER_SET_DELIVERY_MODULE => [ "setDeliveryModule", 128 ],
-            TheliaEvents::ORDER_SET_POSTAGE => [ "setPostage", 128 ],
-            TheliaEvents::ORDER_SET_INVOICE_ADDRESS => [ "setInvoiceAddress", 128 ],
-            TheliaEvents::ORDER_SET_PAYMENT_MODULE => [ "setPaymentModule", 128 ],
-            TheliaEvents::ORDER_PAY => [ "create", 128 ],
-            TheliaEvents::ORDER_CART_CLEAR => [ "orderCartClear", 128 ],
-            TheliaEvents::ORDER_BEFORE_PAYMENT => [ "orderBeforePayment", 128 ],
-            TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL => [ "sendConfirmationEmail", 128 ],
-            TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL => [ "sendNotificationEmail", 128 ],
-            TheliaEvents::ORDER_UPDATE_STATUS => [ "updateStatus", 128 ],
-            TheliaEvents::ORDER_UPDATE_DELIVERY_REF => [ "updateDeliveryRef", 128 ],
-            TheliaEvents::ORDER_UPDATE_TRANSACTION_REF => [ "updateTransactionRef", 128 ],
-            TheliaEvents::ORDER_UPDATE_ADDRESS => [ "updateAddress", 128 ],
-            TheliaEvents::ORDER_CREATE_MANUAL => [ "createManual", 128 ],
-            TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE => [ "getStockUpdateOnOrderStatusChange", 128 ],
+            TheliaEvents::ORDER_SET_DELIVERY_ADDRESS => ['setDeliveryAddress', 128],
+            TheliaEvents::ORDER_SET_DELIVERY_MODULE => ['setDeliveryModule', 128],
+            TheliaEvents::ORDER_SET_POSTAGE => ['setPostage', 128],
+            TheliaEvents::ORDER_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
+            TheliaEvents::ORDER_SET_PAYMENT_MODULE => ['setPaymentModule', 128],
+            TheliaEvents::ORDER_PAY => ['create', 128],
+            TheliaEvents::ORDER_CART_CLEAR => ['orderCartClear', 128],
+            TheliaEvents::ORDER_BEFORE_PAYMENT => ['orderBeforePayment', 128],
+            TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL => ['sendConfirmationEmail', 128],
+            TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL => ['sendNotificationEmail', 128],
+            TheliaEvents::ORDER_UPDATE_STATUS => ['updateStatus', 128],
+            TheliaEvents::ORDER_UPDATE_DELIVERY_REF => ['updateDeliveryRef', 128],
+            TheliaEvents::ORDER_UPDATE_TRANSACTION_REF => ['updateTransactionRef', 128],
+            TheliaEvents::ORDER_UPDATE_ADDRESS => ['updateAddress', 128],
+            TheliaEvents::ORDER_CREATE_MANUAL => ['createManual', 128],
+            TheliaEvents::ORDER_GET_STOCK_UPDATE_OPERATION_ON_ORDER_STATUS_CHANGE => ['getStockUpdateOnOrderStatusChange', 128],
         ];
     }
 
     /**
-     * Returns the session from the current request
+     * Returns the session from the current request.
      *
      * @return \Thelia\Core\HttpFoundation\Session\Session
      */

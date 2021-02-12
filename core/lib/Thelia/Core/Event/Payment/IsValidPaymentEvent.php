@@ -16,8 +16,8 @@ use Thelia\Model\Cart;
 use Thelia\Module\AbstractPaymentModule;
 
 /**
- * Class IsValidPaymentEvent
- * @package Thelia\Core\Event\Payment
+ * Class IsValidPaymentEvent.
+ *
  * @author Julien Chanséaume <julien@thelia.net>
  */
 class IsValidPaymentEvent extends BasePaymentEvent
@@ -36,7 +36,6 @@ class IsValidPaymentEvent extends BasePaymentEvent
 
     /**
      * IsValidPaymentEvent constructor.
-     *
      */
     public function __construct(AbstractPaymentModule $module, Cart $cart)
     {
@@ -58,11 +57,12 @@ class IsValidPaymentEvent extends BasePaymentEvent
     public function setCart($cart)
     {
         $this->cart = $cart;
+
         return $this;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isValidModule()
     {
@@ -70,11 +70,12 @@ class IsValidPaymentEvent extends BasePaymentEvent
     }
 
     /**
-     * @param boolean $validModule
+     * @param bool $validModule
      */
     public function setValidModule($validModule)
     {
         $this->validModule = $validModule;
+
         return $this;
     }
 
@@ -92,6 +93,7 @@ class IsValidPaymentEvent extends BasePaymentEvent
     public function setMinimumAmount($minimumAmount)
     {
         $this->minimumAmount = $minimumAmount;
+
         return $this;
     }
 
@@ -109,6 +111,7 @@ class IsValidPaymentEvent extends BasePaymentEvent
     public function setMaximumAmount($maximumAmount)
     {
         $this->maximumAmount = $maximumAmount;
+
         return $this;
     }
 }

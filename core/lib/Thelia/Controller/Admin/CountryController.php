@@ -32,8 +32,8 @@ use Thelia\Model\State;
 use Thelia\Model\StateQuery;
 
 /**
- * Class CustomerController
- * @package Thelia\Controller\Admin
+ * Class CustomerController.
+ *
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CountryController extends AbstractCrudController
@@ -53,7 +53,7 @@ class CountryController extends AbstractCrudController
     }
 
     /**
-     * Return the creation form for this object
+     * Return the creation form for this object.
      */
     protected function getCreationForm()
     {
@@ -61,7 +61,7 @@ class CountryController extends AbstractCrudController
     }
 
     /**
-     * Return the update form for this object
+     * Return the update form for this object.
      */
     protected function getUpdateForm()
     {
@@ -69,9 +69,10 @@ class CountryController extends AbstractCrudController
     }
 
     /**
-     * Hydrate the update form for this object, before passing it to the update template
+     * Hydrate the update form for this object, before passing it to the update template.
      *
      * @param \Thelia\Model\Country $object
+     *
      * @return BaseForm
      */
     protected function hydrateObjectForm(ParserContext $parserContext, $object)
@@ -96,9 +97,10 @@ class CountryController extends AbstractCrudController
     }
 
     /**
-     * Creates the creation event with the provided form data
+     * Creates the creation event with the provided form data.
      *
      * @param array $formData
+     *
      * @return CountryCreateEvent
      */
     protected function getCreationEvent($formData)
@@ -109,9 +111,10 @@ class CountryController extends AbstractCrudController
     }
 
     /**
-     * Creates the update event with the provided form data
+     * Creates the update event with the provided form data.
      *
      * @param array $formData
+     *
      * @return CountryUpdateEvent
      */
     protected function getUpdateEvent($formData)
@@ -147,7 +150,7 @@ class CountryController extends AbstractCrudController
     }
 
     /**
-     * Creates the delete event with the provided form data
+     * Creates the delete event with the provided form data.
      */
     protected function getDeleteEvent()
     {
@@ -175,7 +178,7 @@ class CountryController extends AbstractCrudController
     }
 
     /**
-     * Load an existing object from the database
+     * Load an existing object from the database.
      */
     protected function getExistingObject()
     {
@@ -190,9 +193,10 @@ class CountryController extends AbstractCrudController
     }
 
     /**
-     * Returns the object label form the object event (name, title, etc.)
+     * Returns the object label form the object event (name, title, etc.).
      *
      * @param \Thelia\Model\Country $object
+     *
      * @return string
      */
     protected function getObjectLabel($object)
@@ -201,9 +205,10 @@ class CountryController extends AbstractCrudController
     }
 
     /**
-     * Returns the object ID from the object
+     * Returns the object ID from the object.
      *
      * @param \Thelia\Model\Country $object
+     *
      * @return int
      */
     protected function getObjectId($object)
@@ -212,17 +217,17 @@ class CountryController extends AbstractCrudController
     }
 
     /**
-     * Render the main list template
+     * Render the main list template.
      *
      * @return Response
      */
     protected function renderListTemplate($currentOrder)
     {
-        return $this->render("countries", ["display_country" => 20]);
+        return $this->render('countries', ['display_country' => 20]);
     }
 
     /**
-     * Render the edition template
+     * Render the edition template.
      */
     protected function renderEditionTemplate()
     {
@@ -232,12 +237,12 @@ class CountryController extends AbstractCrudController
     protected function getEditionArgument()
     {
         return [
-            'country_id'  => $this->getRequest()->get('country_id', 0)
+            'country_id' => $this->getRequest()->get('country_id', 0),
         ];
     }
 
     /**
-     * Redirect to the edition template
+     * Redirect to the edition template.
      */
     protected function redirectToEditionTemplate()
     {
@@ -245,13 +250,13 @@ class CountryController extends AbstractCrudController
             'admin.configuration.countries.update',
             [],
             [
-                "country_id" => $this->getRequest()->get('country_id', 0)
+                'country_id' => $this->getRequest()->get('country_id', 0),
             ]
         );
     }
 
     /**
-     * Redirect to the list template
+     * Redirect to the list template.
      */
     protected function redirectToListTemplate()
     {
@@ -315,7 +320,7 @@ class CountryController extends AbstractCrudController
                 'id' => $country->getId(),
                 'title' => $country->getTitle(),
                 'hasStates' => $country->getHasStates(),
-                'states' => []
+                'states' => [],
             ];
 
             if ($country->getHasStates()) {

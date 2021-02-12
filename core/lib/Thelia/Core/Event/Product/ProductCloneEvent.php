@@ -17,19 +17,20 @@ use Thelia\Model\Product;
 
 class ProductCloneEvent extends ActionEvent
 {
-    /** @var  string */
+    /** @var string */
     protected $ref;
-    /** @var  string */
+    /** @var string */
     protected $lang;
-    /** @var  Product */
+    /** @var Product */
     protected $originalProduct;
-    /** @var  Product */
+    /** @var Product */
     protected $clonedProduct;
     /** @var array */
     protected $types = ['images', 'documents'];
 
     /**
      * ProductCloneEvent constructor.
+     *
      * @param string $ref
      * @param string $lang the locale (such as fr_FR)
      * @param $originalProduct
