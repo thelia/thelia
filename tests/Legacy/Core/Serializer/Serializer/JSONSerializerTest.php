@@ -33,7 +33,7 @@ class JSONSerializerTest extends TestCase
      */
     protected $stubArchiver;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->sut = new SUT();
     }
@@ -96,6 +96,6 @@ class JSONSerializerTest extends TestCase
     public function testSeparator(): void
     {
         $this->assertIsString($this->sut->separator());
-        $this->assertEquals(','.PHP_EOL, $this->sut->separator());
+        $this->assertEquals(','.\PHP_EOL, $this->sut->separator());
     }
 }

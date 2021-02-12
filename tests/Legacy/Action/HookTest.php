@@ -35,7 +35,7 @@ class HookTest extends BaseAction
 
     protected $locale;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->locale = LangQuery::create()->findOne()->getLocale();
 

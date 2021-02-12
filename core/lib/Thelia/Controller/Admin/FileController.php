@@ -123,7 +123,7 @@ class FileController extends BaseAdminController
         $validMimeTypes = [],
         $extBlackList = []
     ) {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 2.6. Please use the process method File present in the same class.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 2.6. Please use the process method File present in the same class.', \E_USER_DEPRECATED);
 
         return $this->processFile($fileBeingUploaded, $parentId, $parentType, $objectType, $validMimeTypes, $extBlackList);
     }

@@ -23,7 +23,7 @@ foreach ($argv as $arg) {
     }
 
     if ($bootstrapToggle) {
-        require __DIR__.DIRECTORY_SEPARATOR.$arg;
+        require __DIR__.\DIRECTORY_SEPARATOR.$arg;
 
         $bootstraped = true;
     }
@@ -43,7 +43,7 @@ if (!$bootstraped) {
     }
 }
 
-if (php_sapi_name() != 'cli') {
+if (PHP_SAPI != 'cli') {
     cliOutput('this script can only be launched with cli sapi', 'error');
     exit(1);
 }
@@ -95,10 +95,9 @@ while (1) {
             'Your files belongs to version %s, which is not the latest stable release.',
             $files
         ), 'warning');
-        cliOutput(sprintf(
-            'It is recommended to upgrade your files first then run this script again.'.PHP_EOL
-            .'The latest version is available at http://thelia.net/#download .'
-        ), 'warning');
+        cliOutput(
+            'It is recommended to upgrade your files first then run this script again.'.\PHP_EOL
+            .'The latest version is available at http://thelia.net/#download .', 'warning');
         cliOutput('Continue update process anyway ? (Y/n)');
     } else {
         cliOutput('Continue update process ? (Y/n)');
@@ -116,7 +115,7 @@ while (1) {
 
 $backup = false;
 while (1) {
-    cliOutput(sprintf('Would you like to backup the current database before proceeding ? (Y/n)'));
+    cliOutput('Would you like to backup the current database before proceeding ? (Y/n)');
 
     $rep = readStdin(true);
     if ($rep == 'y') {
@@ -165,10 +164,10 @@ if (null === $updateError) {
     }
 } else {
     cliOutput(sprintf('Sorry, an unexpected error has occured : %s', $updateError->getMessage()), 'error');
-    echo $updateError->getTraceAsString().PHP_EOL;
-    echo 'Trace: '.PHP_EOL;
+    echo $updateError->getTraceAsString().\PHP_EOL;
+    echo 'Trace: '.\PHP_EOL;
     foreach ($update->getLogs() as $log) {
-        cliOutput(sprintf('[%s] %s'.PHP_EOL, $log[0], $log[1]), 'error');
+        cliOutput(sprintf('[%s] %s'.\PHP_EOL, $log[0], $log[1]), 'error');
     }
 
     if (true === $backup) {
@@ -253,9 +252,9 @@ function joinPaths()
         $paths[] = trim($arg, '/\\');
     }
 
-    $path = join(DIRECTORY_SEPARATOR, $paths);
+    $path = implode(\DIRECTORY_SEPARATOR, $paths);
     if (substr($args[0], 0, 1) === '/') {
-        $path = DIRECTORY_SEPARATOR.$path;
+        $path = \DIRECTORY_SEPARATOR.$path;
     }
 
     return $path;
@@ -280,5 +279,5 @@ function cliOutput($message, $type = null): void
             $color = "\033[0m";
     }
 
-    echo PHP_EOL.$color.$message."\033[0m".PHP_EOL;
+    echo \PHP_EOL.$color.$message."\033[0m".\PHP_EOL;
 }

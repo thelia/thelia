@@ -24,7 +24,7 @@ class IntType extends BaseType
 
     public function isValid($value)
     {
-        return filter_var($value, FILTER_VALIDATE_INT) === false ? false : true;
+        return filter_var($value, \FILTER_VALIDATE_INT) === false ? false : true;
     }
 
     public function getFormattedValue($value)

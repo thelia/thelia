@@ -33,7 +33,7 @@ class CacheClearTest extends ContainerAwareTestCase
 {
     public $cache_dir;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->cache_dir = THELIA_CACHE_DIR.'test_cache';
 
@@ -43,7 +43,7 @@ class CacheClearTest extends ContainerAwareTestCase
         $fs->mkdir(THELIA_WEB_DIR.'/assets');
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $fs = new Filesystem();
 
@@ -56,7 +56,7 @@ class CacheClearTest extends ContainerAwareTestCase
     public function testCacheClear(): void
     {
         // Fails on windows - do not execute this test on windows
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        if (strtoupper(substr(\PHP_OS, 0, 3)) === 'WIN') {
             $this->markTestSkipped('Fails on windows');
         }
 
@@ -82,7 +82,7 @@ class CacheClearTest extends ContainerAwareTestCase
     public function testCacheClearWithoutWritePermission(): void
     {
         // Fails on windows - mock this test on windows
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        if (strtoupper(substr(\PHP_OS, 0, 3)) === 'WIN') {
             $this->markTestSkipped('Fails on windows');
         }
 

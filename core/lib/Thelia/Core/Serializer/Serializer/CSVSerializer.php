@@ -101,7 +101,7 @@ class CSVSerializer extends AbstractSerializer
             }
         }
 
-        $fd = fopen('php://memory', 'w+b');
+        $fd = fopen('php://memory', 'w+');
         fputcsv($fd, $data, $this->delimiter, $this->enclosure);
         rewind($fd);
         $csvRow = stream_get_contents($fd);
@@ -114,7 +114,7 @@ class CSVSerializer extends AbstractSerializer
     {
         if ($this->headers !== null) {
             // Create tmp file with header
-            $fd = fopen('php://temp', 'w+b');
+            $fd = fopen('php://temp', 'w+');
             fputcsv($fd, $this->headers, $this->delimiter, $this->enclosure);
 
             // Copy file content into tmp file

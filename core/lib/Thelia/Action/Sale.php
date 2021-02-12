@@ -147,7 +147,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     ;
 
                     // If no attribute AV id is defined, consider ALL product combinations
-                    if (!\is_null($attributeAvId)) {
+                    if (null !== $attributeAvId) {
                         // Find PSE attached to combination containing this attribute av :
                         // SELECT * from product_sale_elements pse
                         // left join attribute_combination ac on ac.product_sale_elements_id = pse.id

@@ -40,7 +40,7 @@ class IntToCombinedStringsListType extends BaseType
                 return false;
             }
 
-            if (filter_var($parts[0], FILTER_VALIDATE_INT) === false) {
+            if (filter_var($parts[0], \FILTER_VALIDATE_INT) === false) {
                 return false;
             }
 

@@ -116,7 +116,7 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->setCacheDir($cache_dir);
 
         // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
-        $this->error_reporting = E_ALL ^ E_NOTICE;
+        $this->error_reporting = \E_ALL ^ \E_NOTICE;
 
         // The default HTTP status
         $this->status = 200;
@@ -172,7 +172,7 @@ class SmartyParser extends Smarty implements ParserInterface
                 '/(^[\n]*|[\n]+)[\s\t]*[\n]+/' => "\n",
             ];
         } elseif ($compressionMode >= 2) {
-            if (preg_match_all('#<!--\[[^\]]+\]>.*?<!\[[^\]]+\]-->#is', $source, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
+            if (preg_match_all('#<!--\[[^\]]+\]>.*?<!\[[^\]]+\]-->#is', $source, $matches, \PREG_OFFSET_CAPTURE | \PREG_SET_ORDER)) {
                 foreach ($matches as $match) {
                     $store[] = $match[0][0];
                     $_length = \strlen($match[0][0]);
@@ -205,7 +205,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
         // capture html elements not to be messed with
         $_offset = 0;
-        if (preg_match_all('#<(script|pre|textarea)[^>]*>.*?</\\1>#is', $source, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
+        if (preg_match_all('#<(script|pre|textarea)[^>]*>.*?</\\1>#is', $source, $matches, \PREG_OFFSET_CAPTURE | \PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $store[] = $match[0][0];
                 $_length = \strlen($match[0][0]);
@@ -221,7 +221,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
         // capture html elements not to be messed with
         $_offset = 0;
-        if (preg_match_all('#@!@SMARTY:([0-9]+):SMARTY@!@#is', $source, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
+        if (preg_match_all('#@!@SMARTY:([0-9]+):SMARTY@!@#is', $source, $matches, \PREG_OFFSET_CAPTURE | \PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $store[] = $match[0][0];
                 $_length = \strlen($match[0][0]);
@@ -280,7 +280,7 @@ class SmartyParser extends Smarty implements ParserInterface
     public static function theliaEscape($content, /* @noinspection PhpUnusedParameterInspection */ $smarty)
     {
         if (is_scalar($content)) {
-            return htmlspecialchars($content, ENT_QUOTES, Smarty::$_CHARSET);
+            return htmlspecialchars($content, \ENT_QUOTES, Smarty::$_CHARSET);
         }
 
         return $content;

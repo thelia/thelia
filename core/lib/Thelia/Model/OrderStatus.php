@@ -38,7 +38,7 @@ class OrderStatus extends BaseOrderStatus
     {
         //return $this->hasStatusHelper(OrderStatus::CODE_NOT_PAID);
         if ($exact) {
-            return $this->hasStatusHelper(OrderStatus::CODE_NOT_PAID);
+            return $this->hasStatusHelper(self::CODE_NOT_PAID);
         }
 
         return !$this->isPaid(false);
@@ -56,8 +56,8 @@ class OrderStatus extends BaseOrderStatus
     {
         return $this->hasStatusHelper(
             $exact ?
-            OrderStatus::CODE_PAID :
-            [OrderStatus::CODE_PAID, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT]
+            self::CODE_PAID :
+            [self::CODE_PAID, self::CODE_PROCESSING, self::CODE_SENT]
         );
     }
 
@@ -71,7 +71,7 @@ class OrderStatus extends BaseOrderStatus
      */
     public function isProcessing($exact = true)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_PROCESSING);
+        return $this->hasStatusHelper(self::CODE_PROCESSING);
     }
 
     /**
@@ -84,7 +84,7 @@ class OrderStatus extends BaseOrderStatus
      */
     public function isSent($exact = true)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_SENT);
+        return $this->hasStatusHelper(self::CODE_SENT);
     }
 
     /**
@@ -97,7 +97,7 @@ class OrderStatus extends BaseOrderStatus
      */
     public function isCancelled($exact = true)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_CANCELED);
+        return $this->hasStatusHelper(self::CODE_CANCELED);
     }
 
     /**
@@ -110,7 +110,7 @@ class OrderStatus extends BaseOrderStatus
      */
     public function isRefunded($exact = true)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_REFUNDED);
+        return $this->hasStatusHelper(self::CODE_REFUNDED);
     }
 
     /**

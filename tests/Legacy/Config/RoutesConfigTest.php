@@ -113,7 +113,7 @@ class RoutesConfigTest extends ContainerAwareTestCase
         ];
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         foreach (static::$routingFiles as $filePath => $fileNames) {
             $this->routerFileLocators[$filePath] = new FileLocator($filePath);

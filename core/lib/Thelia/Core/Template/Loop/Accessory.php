@@ -86,7 +86,7 @@ class Accessory extends Product
         foreach ($accessories as $accessory) {
             $accessoryProductId = $accessory->getAccessory();
 
-            array_push($accessoryIdList, $accessoryProductId);
+            $accessoryIdList[] = $accessoryProductId;
 
             $this->accessoryPosition[$accessoryProductId] = $accessory->getPosition();
             $this->accessoryId[$accessoryProductId] = $accessory->getId();

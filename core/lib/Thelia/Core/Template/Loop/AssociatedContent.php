@@ -127,7 +127,7 @@ class AssociatedContent extends Content
         foreach ($associatedContents as $associatedContent) {
             $associatedContentId = $associatedContent->getContentId();
 
-            array_push($associatedContentIdList, $associatedContentId);
+            $associatedContentIdList[] = $associatedContentId;
             $this->contentPosition[$associatedContentId] = $associatedContent->getPosition();
             $this->contentId[$associatedContentId] = $associatedContent->getId();
         }

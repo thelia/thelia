@@ -369,7 +369,7 @@ class ModuleValidator
         /** @var Module $module */
         foreach ($modules as $module) {
             try {
-                $validator = new ModuleValidator($module->getAbsoluteBaseDir());
+                $validator = new self($module->getAbsoluteBaseDir());
 
                 $definition = $validator->getModuleDefinition();
                 $dependencies = $definition->getDependencies();
@@ -417,7 +417,7 @@ class ModuleValidator
             }
 
             if ($recursive) {
-                $recursiveModuleValidator = new ModuleValidator(THELIA_MODULE_DIR.'/'.(string) $dependency);
+                $recursiveModuleValidator = new self(THELIA_MODULE_DIR.'/'.(string) $dependency);
                 array_merge(
                     $dependencies,
                     $recursiveModuleValidator->getCurrentModuleDependencies(true)

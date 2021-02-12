@@ -29,7 +29,7 @@ class CacheTest extends TestCase
     protected $dir;
     protected $dir2;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->dir = __DIR__.'/test';
         $this->dir2 = __DIR__.'/test2';

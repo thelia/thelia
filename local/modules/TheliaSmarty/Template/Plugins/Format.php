@@ -138,11 +138,11 @@ class Format extends AbstractSmartyPlugin
             // for backward compatibility
             if (\function_exists('setlocale')) {
                 // Save the current locale
-                $systemLocale = setlocale(LC_TIME, 0);
-                setlocale(LC_TIME, $locale);
+                $systemLocale = setlocale(\LC_TIME, 0);
+                setlocale(\LC_TIME, $locale);
                 $localizedDate = strftime($format, $date->getTimestamp());
                 // Restore the locale
-                setlocale(LC_TIME, $systemLocale);
+                setlocale(\LC_TIME, $systemLocale);
             } else {
                 // setlocale() function not available => error
                 throw new SmartyPluginException('The setlocale() function is not available on your system.');
@@ -386,12 +386,12 @@ class Format extends AbstractSmartyPlugin
     {
         $postal = filter_var(
             $this->getParam($params, 'postal', null),
-            FILTER_VALIDATE_BOOLEAN
+            \FILTER_VALIDATE_BOOLEAN
         );
 
         $html = filter_var(
             $this->getParam($params, 'html', true),
-            FILTER_VALIDATE_BOOLEAN
+            \FILTER_VALIDATE_BOOLEAN
         );
 
         $htmlTag = $this->getParam($params, 'html_tag', 'p');

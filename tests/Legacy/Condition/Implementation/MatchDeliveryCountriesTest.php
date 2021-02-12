@@ -46,26 +46,26 @@ class MatchDeliveryCountriesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getCustomer')
-            ->will($this->returnValue(new Customer()));
+            ->willReturn(new Customer());
 
         $stubFacade->expects($this->any())
             ->method('getDeliveryAddress')
-            ->will($this->returnValue($address));
+            ->willReturn($address);
 
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
         $stubTranslator->expects($this->any())
             ->method('trans')
-            ->will($this->returnValue($i18nOutput));
+            ->willReturn($i18nOutput);
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
 
         return $stubFacade;
     }

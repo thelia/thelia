@@ -54,7 +54,7 @@ class Category extends BaseCategory implements FileModelParentInterface
     public function countAllProducts($productVisibility = true)
     {
         $children = CategoryQuery::findAllChild($this->getId());
-        array_push($children, $this);
+        $children[] = $this;
 
         $query = ProductQuery::create();
 

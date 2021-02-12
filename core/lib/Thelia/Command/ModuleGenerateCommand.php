@@ -85,15 +85,15 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         }
 
         foreach ($this->neededDirectories as $directory) {
-            if (!$fs->exists($this->moduleDirectory.DIRECTORY_SEPARATOR.$directory)) {
-                $fs->mkdir($this->moduleDirectory.DIRECTORY_SEPARATOR.$directory);
+            if (!$fs->exists($this->moduleDirectory.\DIRECTORY_SEPARATOR.$directory)) {
+                $fs->mkdir($this->moduleDirectory.\DIRECTORY_SEPARATOR.$directory);
             }
         }
     }
 
     protected function copyConfigFile($filename, $skeletonDir, Filesystem $fs): void
     {
-        $filename = $this->moduleDirectory.DIRECTORY_SEPARATOR.'Config'.DIRECTORY_SEPARATOR.$filename;
+        $filename = $this->moduleDirectory.\DIRECTORY_SEPARATOR.'Config'.\DIRECTORY_SEPARATOR.$filename;
         if (!$fs->exists($filename)) {
             $configContent = file_get_contents($skeletonDir.'config.xml');
 
@@ -113,7 +113,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         $fs = new Filesystem();
 
         try {
-            $skeletonDir = str_replace('/', DIRECTORY_SEPARATOR, __DIR__.'/Skeleton/Module/');
+            $skeletonDir = str_replace('/', \DIRECTORY_SEPARATOR, __DIR__.'/Skeleton/Module/');
 
             // config.xml file
             $this->copyConfigFile('config.xml', $skeletonDir, $fs);
@@ -122,7 +122,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
             $this->copyConfigFile('config_test.xml', $skeletonDir, $fs);
 
             // Readme.md file
-            $filename = $this->moduleDirectory.DIRECTORY_SEPARATOR.'Readme.md';
+            $filename = $this->moduleDirectory.\DIRECTORY_SEPARATOR.'Readme.md';
             if (!$fs->exists($filename)) {
                 $readmeContent = file_get_contents($skeletonDir.'Readme.md');
 
@@ -138,7 +138,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
             }
 
             // composer.json file
-            $filename = $this->moduleDirectory.DIRECTORY_SEPARATOR.'composer.json';
+            $filename = $this->moduleDirectory.\DIRECTORY_SEPARATOR.'composer.json';
             if (!$fs->exists($filename)) {
                 $composerContent = file_get_contents($skeletonDir.'composer.json');
 
@@ -152,7 +152,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
             }
 
             // module.xml file
-            $filename = $this->moduleDirectory.DIRECTORY_SEPARATOR.'Config'.DIRECTORY_SEPARATOR.'module.xml';
+            $filename = $this->moduleDirectory.\DIRECTORY_SEPARATOR.'Config'.\DIRECTORY_SEPARATOR.'module.xml';
             if (!$fs->exists($filename)) {
                 $moduleContent = file_get_contents($skeletonDir.'module.xml');
 
@@ -163,7 +163,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
             }
 
             // PHP Class template
-            $filename = $this->moduleDirectory.DIRECTORY_SEPARATOR.$this->module.'.php';
+            $filename = $this->moduleDirectory.\DIRECTORY_SEPARATOR.$this->module.'.php';
             if (!$fs->exists($filename)) {
                 $classContent = file_get_contents($skeletonDir.'Class.php.template');
 
@@ -175,7 +175,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
             }
 
             // schema.xml file
-            $filename = $this->moduleDirectory.DIRECTORY_SEPARATOR.'Config'.DIRECTORY_SEPARATOR.'schema.xml';
+            $filename = $this->moduleDirectory.\DIRECTORY_SEPARATOR.'Config'.\DIRECTORY_SEPARATOR.'schema.xml';
             if (!$fs->exists($filename)) {
                 $schemaContent = file_get_contents($skeletonDir.'schema.xml');
 
@@ -202,7 +202,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
             }
 
             // routing.xml file
-            $filename = $this->moduleDirectory.DIRECTORY_SEPARATOR.'Config'.DIRECTORY_SEPARATOR.'routing.xml';
+            $filename = $this->moduleDirectory.\DIRECTORY_SEPARATOR.'Config'.\DIRECTORY_SEPARATOR.'routing.xml';
             if (!$fs->exists($filename)) {
                 $routingContent = file_get_contents($skeletonDir.'routing.xml');
 
@@ -213,19 +213,19 @@ class ModuleGenerateCommand extends BaseModuleGenerate
             }
 
             // I18n sample files
-            $filename = $this->moduleDirectory.DIRECTORY_SEPARATOR.'I18n'.DIRECTORY_SEPARATOR.'fr_FR.php';
+            $filename = $this->moduleDirectory.\DIRECTORY_SEPARATOR.'I18n'.\DIRECTORY_SEPARATOR.'fr_FR.php';
             if (!$fs->exists($filename)) {
                 $fs->copy(
-                    $skeletonDir.DIRECTORY_SEPARATOR.'I18n'.DIRECTORY_SEPARATOR.'fr_FR.php',
+                    $skeletonDir.\DIRECTORY_SEPARATOR.'I18n'.\DIRECTORY_SEPARATOR.'fr_FR.php',
                     $filename
                 );
             }
 
-            $filename = $this->moduleDirectory.DIRECTORY_SEPARATOR.'I18n'.DIRECTORY_SEPARATOR.'en_US.php';
+            $filename = $this->moduleDirectory.\DIRECTORY_SEPARATOR.'I18n'.\DIRECTORY_SEPARATOR.'en_US.php';
             if (!$fs->exists($filename)) {
                 $fs->copy(
-                    $skeletonDir.DIRECTORY_SEPARATOR.'I18n'.DIRECTORY_SEPARATOR.'en_US.php',
-                    $this->moduleDirectory.DIRECTORY_SEPARATOR.'I18n'.DIRECTORY_SEPARATOR.'en_US.php'
+                    $skeletonDir.\DIRECTORY_SEPARATOR.'I18n'.\DIRECTORY_SEPARATOR.'en_US.php',
+                    $this->moduleDirectory.\DIRECTORY_SEPARATOR.'I18n'.\DIRECTORY_SEPARATOR.'en_US.php'
                 );
             }
         } catch (\Exception $ex) {

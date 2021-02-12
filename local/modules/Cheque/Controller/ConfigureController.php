@@ -53,7 +53,7 @@ class ConfigureController extends BaseAdminController
             $this->adminLogAppend(
                 'cheque.configuration.message',
                 AccessManager::UPDATE,
-                sprintf('Cheque instructions configuration updated')
+                'Cheque instructions configuration updated'
             );
 
             // Everything is OK.

@@ -29,7 +29,7 @@ class ProductAssociatedContentEvent extends ActionEvent
 
     public function hasProductAssociatedContent()
     {
-        return !\is_null($this->content);
+        return null !== $this->content;
     }
 
     public function getProductAssociatedContent()

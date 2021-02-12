@@ -47,7 +47,7 @@ class Cart extends BaseCart
 
         $cartItems = $this->getCartItems();
 
-        $cart = new Cart();
+        $cart = new self();
         $cart->setAddressDeliveryId($this->getAddressDeliveryId());
         $cart->setAddressInvoiceId($this->getAddressInvoiceId());
         $cart->setToken($token);

@@ -32,7 +32,7 @@ class Configuration extends BaseAdminController
             return $response;
         }
 
-        $form = $this->createForm(Configuration::class);
+        $form = $this->createForm(self::class);
         $resp = [
             'error' => 0,
             'message' => '',

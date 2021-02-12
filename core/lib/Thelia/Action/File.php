@@ -64,7 +64,7 @@ class File extends BaseAction implements EventSubscriberInterface
                 $srcPath = $originalProductFile->getUploadDir().DS.$originalProductFile->getFile();
 
                 if (file_exists($srcPath)) {
-                    $ext = pathinfo($srcPath, PATHINFO_EXTENSION);
+                    $ext = pathinfo($srcPath, \PATHINFO_EXTENSION);
 
                     $clonedProductFile = [];
                     $fileName = '';
@@ -74,7 +74,7 @@ class File extends BaseAction implements EventSubscriberInterface
                             $clonedProductFile = new ProductImage();
                             break;
                         case 'documents':
-                            $fileName = pathinfo($originalProductFile->getFile(), PATHINFO_FILENAME).'-'.$clonedProduct->getRef().'.'.$ext;
+                            $fileName = pathinfo($originalProductFile->getFile(), \PATHINFO_FILENAME).'-'.$clonedProduct->getRef().'.'.$ext;
                             $clonedProductFile = new ProductDocument();
                             break;
                     }
@@ -85,7 +85,7 @@ class File extends BaseAction implements EventSubscriberInterface
 
                     // Get file mimeType
                     $finfo = new \finfo();
-                    $fileMimeType = $finfo->file($srcPath, FILEINFO_MIME_TYPE);
+                    $fileMimeType = $finfo->file($srcPath, \FILEINFO_MIME_TYPE);
 
                     // Get file event's parameters
                     $clonedProductFile

@@ -25,7 +25,7 @@ abstract class BaseModuleTestor extends TestCase
 
     abstract public function getTestedInstance();
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->instance = $this->getTestedInstance();
     }

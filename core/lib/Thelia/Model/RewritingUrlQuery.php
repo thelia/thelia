@@ -60,7 +60,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
      */
     public function getViewUrlQuery($view, $viewLocale, $viewId)
     {
-        return RewritingUrlQuery::create()
+        return self::create()
             ->joinRewritingArgument('ra', Criteria::LEFT_JOIN)
             ->where('ISNULL(`ra`.REWRITING_URL_ID)')
             ->filterByView($view)
@@ -81,7 +81,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
      */
     public function getSpecificUrlQuery($view, $viewLocale, $viewId, $viewOtherParameters)
     {
-        $urlQuery = RewritingUrlQuery::create()
+        $urlQuery = self::create()
             ->joinRewritingArgument('ra', Criteria::LEFT_JOIN)
             ->withColumn('`ra`.REWRITING_URL_ID', 'ra_REWRITING_URL_ID')
             ->filterByView($view)

@@ -36,7 +36,7 @@ class OrderQuery extends BaseOrderQuery
      */
     public static function getMonthlySaleStats($month, $year, $includeShipping = true, $withTaxes = true)
     {
-        $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $numberOfDay = cal_days_in_month(\CAL_GREGORIAN, $month, $year);
 
         $stats = [];
         for ($day = 1; $day <= $numberOfDay; ++$day) {
@@ -54,7 +54,7 @@ class OrderQuery extends BaseOrderQuery
 
     public static function getMonthlyOrdersStats($month, $year, $status = null)
     {
-        $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $numberOfDay = cal_days_in_month(\CAL_GREGORIAN, $month, $year);
 
         $stats = [];
         for ($day = 1; $day <= $numberOfDay; ++$day) {
@@ -81,7 +81,7 @@ class OrderQuery extends BaseOrderQuery
      */
     public static function getFirstOrdersStats($month, $year)
     {
-        $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $numberOfDay = cal_days_in_month(\CAL_GREGORIAN, $month, $year);
 
         $stats = [];
         for ($day = 1; $day <= $numberOfDay; ++$day) {
@@ -116,7 +116,7 @@ class OrderQuery extends BaseOrderQuery
      */
     public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping, $withTaxes = true)
     {
-        $amount = \floatval(
+        $amount = (float) (
             self::baseSaleStats($startDate, $endDate, 'o')
                 ->innerJoinOrderProduct()
                 ->withColumn('SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE,`order_product`.PRICE)))', 'TOTAL')
@@ -125,7 +125,7 @@ class OrderQuery extends BaseOrderQuery
         );
 
         if ($withTaxes) {
-            $amount += \floatval(
+            $amount += (float) (
                 self::baseSaleStats($startDate, $endDate, 'o')
                     ->useOrderProductQuery()
                         ->useOrderProductTaxQuery()
@@ -137,7 +137,7 @@ class OrderQuery extends BaseOrderQuery
             );
         }
 
-        $amount -= \floatval(
+        $amount -= (float) (
             self::baseSaleStats($startDate, $endDate)
                 ->withColumn('SUM(`order`.discount)', 'DISCOUNT')
                 ->select('DISCOUNT')
@@ -145,7 +145,7 @@ class OrderQuery extends BaseOrderQuery
         );
 
         if ($includeShipping) {
-            $amount += \floatval(
+            $amount += (float) (
                 self::baseSaleStats($startDate, $endDate)
                     ->withColumn('SUM(`order`.postage)', 'POSTAGE')
                     ->select('POSTAGE')

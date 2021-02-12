@@ -2,7 +2,7 @@
 $time = time();
 $config = include 'config/config.php';
 //TODO switch to array
-extract($config, EXTR_OVERWRITE);
+extract($config, \EXTR_OVERWRITE);
 
 if (USE_ACCESS_KEYS == true) {
     if (!isset($_GET['akey'], $access_keys) || empty($access_keys)) {
@@ -423,7 +423,7 @@ $get_params = http_build_query($get_params);
 	<input type="hidden" id="file_number_limit_js" value="<?php echo $file_number_limit_js; ?>" />
 	<input type="hidden" id="sort_by" value="<?php echo $sort_by; ?>" />
 	<input type="hidden" id="descending" value="<?php echo $descending ? 1 : 0; ?>" />
-	<input type="hidden" id="current_url" value="<?php echo str_replace(['&filter='.$filter, '&sort_by='.$sort_by, '&descending='.intval($descending)], [''], $base_url.$_SERVER['REQUEST_URI']); ?>" />
+	<input type="hidden" id="current_url" value="<?php echo str_replace(['&filter='.$filter, '&sort_by='.$sort_by, '&descending='.(int) $descending], [''], $base_url.$_SERVER['REQUEST_URI']); ?>" />
 	<input type="hidden" id="lang_show_url" value="<?php echo trans('Show_url'); ?>" />
 	<input type="hidden" id="copy_cut_files_allowed" value="<?php if ($copy_cut_files) {
                 echo 1;
@@ -732,23 +732,23 @@ $files = $sorted;
 			<div class="span6 entire types">
 				<span><?php echo trans('Filters'); ?>:</span>
 				<?php if ($_GET['type'] != 1 && $_GET['type'] != 3 && $show_filter_buttons) { ?>
-					<?php if (count($ext_file) > 0 or false) { ?>
+					<?php if (count($ext_file) > 0 || false) { ?>
 				<input id="select-type-1" name="radio-sort" type="radio" data-item="ff-item-type-1" checked="checked"  class="hide"  />
 				<label id="ff-item-type-1" title="<?php echo trans('Files'); ?>" for="select-type-1" class="tip btn ff-label-type-1"><i class="icon-file"></i></label>
 					<?php } ?>
-					<?php if (count($ext_img) > 0 or false) { ?>
+					<?php if (count($ext_img) > 0 || false) { ?>
 				<input id="select-type-2" name="radio-sort" type="radio" data-item="ff-item-type-2" class="hide"  />
 				<label id="ff-item-type-2" title="<?php echo trans('Images'); ?>" for="select-type-2" class="tip btn ff-label-type-2"><i class="icon-picture"></i></label>
 					<?php } ?>
-					<?php if (count($ext_misc) > 0 or false) { ?>
+					<?php if (count($ext_misc) > 0 || false) { ?>
 				<input id="select-type-3" name="radio-sort" type="radio" data-item="ff-item-type-3" class="hide"  />
 				<label id="ff-item-type-3" title="<?php echo trans('Archives'); ?>" for="select-type-3" class="tip btn ff-label-type-3"><i class="icon-inbox"></i></label>
 					<?php } ?>
-					<?php if (count($ext_video) > 0 or false) { ?>
+					<?php if (count($ext_video) > 0 || false) { ?>
 				<input id="select-type-4" name="radio-sort" type="radio" data-item="ff-item-type-4" class="hide"  />
 				<label id="ff-item-type-4" title="<?php echo trans('Videos'); ?>" for="select-type-4" class="tip btn ff-label-type-4"><i class="icon-film"></i></label>
 					<?php } ?>
-					<?php if (count($ext_music) > 0 or false) { ?>
+					<?php if (count($ext_music) > 0 || false) { ?>
 				<input id="select-type-5" name="radio-sort" type="radio" data-item="ff-item-type-5" class="hide"  />
 				<label id="ff-item-type-5" title="<?php echo trans('Music'); ?>" for="select-type-5" class="tip btn ff-label-type-5"><i class="icon-music"></i></label>
 					<?php } ?>

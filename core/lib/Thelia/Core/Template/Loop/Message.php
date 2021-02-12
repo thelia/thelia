@@ -79,19 +79,19 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
             ]
         );
 
-        if (!\is_null($id)) {
+        if (null !== $id) {
             $search->filterById($id);
         }
 
-        if (!\is_null($name)) {
+        if (null !== $name) {
             $search->filterByName($name);
         }
 
-        if (!\is_null($exclude)) {
+        if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        if (!\is_null($secured) && $secured != BooleanOrBothType::ANY) {
+        if (null !== $secured && $secured != BooleanOrBothType::ANY) {
             $search->filterBySecured($secured ? 1 : 0);
         }
 

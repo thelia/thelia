@@ -77,7 +77,7 @@ trait PercentageCouponTrait
         $this->checkBaseCouponFieldValue($fieldName, $fieldValue);
 
         if ($fieldName === $this->getPercentageFieldName()) {
-            $pcent = \floatval($fieldValue);
+            $pcent = (float) $fieldValue;
 
             if ($pcent <= 0 || $pcent > 100) {
                 throw new \InvalidArgumentException(

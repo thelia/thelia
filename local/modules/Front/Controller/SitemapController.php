@@ -74,7 +74,7 @@ class SitemapController extends BaseFrontController
 
         $cacheDir = $this->getCacheDir();
         $cacheKey = self::SITEMAP_CACHE_KEY.$lang.$context;
-        $cacheExpire = \intval(ConfigQuery::read('sitemap_ttl', '7200')) ?: 7200;
+        $cacheExpire = (int) (ConfigQuery::read('sitemap_ttl', '7200')) ?: 7200;
 
         $cacheDriver = new FilesystemCache($cacheDir);
         if (!($this->checkAdmin() && '' !== $flush)) {

@@ -186,8 +186,7 @@ class ModuleValidatorTest extends TestCase
 
         $stubTranslator->expects($this->any())
             ->method('trans')
-            ->will(
-                $this->returnCallback(
+            ->willReturnCallback(
                     function ($l, $p) {
                         foreach ($p as $pk => $pv) {
                             $l = str_replace($pk, $pv, $l);
@@ -195,7 +194,6 @@ class ModuleValidatorTest extends TestCase
 
                         return $l;
                     }
-                )
             )
         ;
 

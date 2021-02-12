@@ -41,10 +41,10 @@ class MatchForXArticlesTest extends TestCase
         /* @var FacadeInterface $stubFacade */
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
+            ->willReturn(4);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
@@ -78,10 +78,10 @@ class MatchForXArticlesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
+            ->willReturn(4);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
@@ -115,10 +115,10 @@ class MatchForXArticlesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
+            ->willReturn(4);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
@@ -150,10 +150,10 @@ class MatchForXArticlesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
+            ->willReturn(4);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
@@ -185,10 +185,10 @@ class MatchForXArticlesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
+            ->willReturn(4);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
@@ -220,10 +220,10 @@ class MatchForXArticlesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
+            ->willReturn(4);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
@@ -255,10 +255,10 @@ class MatchForXArticlesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
+            ->willReturn(4);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
@@ -290,10 +290,10 @@ class MatchForXArticlesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
+            ->willReturn(4);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
@@ -325,10 +325,10 @@ class MatchForXArticlesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
+            ->willReturn(4);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
@@ -360,10 +360,10 @@ class MatchForXArticlesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
+            ->willReturn(4);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
@@ -395,10 +395,10 @@ class MatchForXArticlesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
+            ->willReturn(4);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
@@ -430,10 +430,10 @@ class MatchForXArticlesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
+            ->willReturn(4);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
@@ -465,10 +465,10 @@ class MatchForXArticlesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
+            ->willReturn(4);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
@@ -500,10 +500,10 @@ class MatchForXArticlesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
+            ->willReturn(4);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
@@ -530,10 +530,10 @@ class MatchForXArticlesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
+            ->willReturn(4);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $condition1 = new MatchForXArticles($stubFacade);
         $operators = [
@@ -573,26 +573,26 @@ class MatchForXArticlesTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getCartTotalPrice')
-            ->will($this->returnValue($cartTotalPrice));
+            ->willReturn($cartTotalPrice);
 
         $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
-            ->will($this->returnValue($checkoutCurrency));
+            ->willReturn($checkoutCurrency);
 
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
         $stubTranslator->expects($this->any())
             ->method('trans')
-            ->will($this->returnValue($i18nOutput));
+            ->willReturn($i18nOutput);
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
 
         return $stubFacade;
     }

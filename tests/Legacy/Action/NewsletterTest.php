@@ -27,7 +27,7 @@ class NewsletterTest extends BaseAction
     protected $mailerFactory;
     protected $dispatcher;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->mailerFactory = $this->getMockBuilder('Thelia\\Mailer\\MailerFactory')
             ->disableOriginalConstructor()

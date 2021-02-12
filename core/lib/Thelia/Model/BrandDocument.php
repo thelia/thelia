@@ -25,8 +25,8 @@ use Thelia\Model\Tools\PositionManagementTrait;
 
 class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, FileModelInterface
 {
-    use PositionManagementTrait;
     use BrandBreadcrumbTrait;
+    use PositionManagementTrait;
 
     /**
      * Calculate next position relative to our parent.

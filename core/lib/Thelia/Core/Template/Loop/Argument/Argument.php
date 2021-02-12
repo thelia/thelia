@@ -65,7 +65,7 @@ class Argument
 
     public static function createAnyTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
-        return new Argument(
+        return new self(
             $name,
             new TypeCollection(
                 new Type\AnyType()
@@ -78,7 +78,7 @@ class Argument
 
     public static function createIntTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
-        return new Argument(
+        return new self(
             $name,
             new TypeCollection(
                 new Type\IntType()
@@ -91,7 +91,7 @@ class Argument
 
     public static function createFloatTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
-        return new Argument(
+        return new self(
             $name,
             new TypeCollection(
                 new Type\FloatType()
@@ -104,7 +104,7 @@ class Argument
 
     public static function createBooleanTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
-        return new Argument(
+        return new self(
             $name,
             new TypeCollection(
                 new Type\BooleanType()
@@ -117,7 +117,7 @@ class Argument
 
     public static function createBooleanOrBothTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
-        return new Argument(
+        return new self(
             $name,
             new TypeCollection(
                 new Type\BooleanOrBothType()
@@ -130,7 +130,7 @@ class Argument
 
     public static function createIntListTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
-        return new Argument(
+        return new self(
             $name,
             new TypeCollection(
                 new Type\IntListType()
@@ -153,7 +153,7 @@ class Argument
      */
     public static function createAnyListTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
-        return new Argument(
+        return new self(
             $name,
             new TypeCollection(
                 new Type\AnyListType()
@@ -166,7 +166,7 @@ class Argument
 
     public static function createEnumListTypeArgument($name, array $entries, $default = null, $mandatory = false, $empty = true)
     {
-        return new Argument(
+        return new self(
             $name,
             new TypeCollection(
                 new Type\EnumListType($entries)
@@ -189,7 +189,7 @@ class Argument
      */
     public static function createAlphaNumStringTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
-        return new Argument(
+        return new self(
             $name,
             new TypeCollection(
                 new Type\AlphaNumStringType()
@@ -212,7 +212,7 @@ class Argument
      */
     public static function createAlphaNumStringListTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
-        return new Argument(
+        return new self(
             $name,
             new TypeCollection(
                 new Type\AlphaNumStringListType()

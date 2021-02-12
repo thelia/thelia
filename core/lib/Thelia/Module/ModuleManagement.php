@@ -100,8 +100,8 @@ class ModuleManagement
         $code = basename(\dirname($reflected->getFileName()));
         $version = (string) $content->version;
         $currentVersion = $version;
-        $mandatory = \intval($content->mandatory);
-        $hidden = \intval($content->hidden);
+        $mandatory = (int) ($content->mandatory);
+        $hidden = (int) ($content->hidden);
 
         $module = ModuleQuery::create()->filterByCode($code)->findOne();
 

@@ -68,7 +68,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         // Check that at least one category is selected
         if (empty($values[self::COUNTRIES_LIST])) {
             throw new InvalidConditionValueException(
-                \get_class(),
+                __CLASS__,
                 self::COUNTRIES_LIST
             );
         }

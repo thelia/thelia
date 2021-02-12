@@ -72,7 +72,7 @@ class ImportCommand extends ContainerAwareCommand
         $path = $input->getArgument('filePath');
         if ($importRef === null || $path === null) {
             throw new \RuntimeException(
-                'Not enough arguments.'.PHP_EOL.'If no options are provided, ref and filePath arguments are required.'
+                'Not enough arguments.'.\PHP_EOL.'If no options are provided, ref and filePath arguments are required.'
             );
         }
 

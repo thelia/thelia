@@ -117,7 +117,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->getMock();
         $stubConditionFactory->expects($this->any())
             ->method('unserializeConditionCollection')
-            ->will($this->returnValue($conditions));
+            ->willReturn($conditions);
 
         $couponManager = new RemoveXAmount($stubFacade);
         $stubContainer->expects($this->any())
@@ -125,7 +125,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->will($this->onConsecutiveCalls($stubFacade, $couponManager, $stubConditionFactory, clone $couponManager, $stubConditionFactory, $stubFacade));
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $couponFactory = new CouponFactory($stubContainer);
         $model1 = $this->generateCouponModel($stubFacade, $conditionFactory);
@@ -138,13 +138,13 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue([$coupon1, $coupon2]));
+            ->willReturn([$coupon1, $coupon2]);
         $stubFacade->expects($this->any())
             ->method('getCheckoutPostagePrice')
-            ->will($this->returnValue(8.30));
+            ->willReturn(8.30);
         $stubFacade->expects($this->any())
             ->method('getCartTotalTaxPrice')
-            ->will($this->returnValue(122.53));
+            ->willReturn(122.53);
 
         $couponManager = new CouponManager($stubContainer);
 
@@ -185,7 +185,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->getMock();
         $stubConditionFactory->expects($this->any())
             ->method('unserializeConditionCollection')
-            ->will($this->returnValue($conditions));
+            ->willReturn($conditions);
 
         $couponManager = new RemoveXAmount($stubFacade);
         $stubContainer->expects($this->any())
@@ -193,7 +193,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->will($this->onConsecutiveCalls($stubFacade, $couponManager, $stubConditionFactory, clone $couponManager, $stubConditionFactory, $stubFacade));
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $couponFactory = new CouponFactory($stubContainer);
         $model1 = $this->generateCouponModel($stubFacade, $conditionFactory);
@@ -206,13 +206,13 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue([$coupon1, $coupon2]));
+            ->willReturn([$coupon1, $coupon2]);
         $stubFacade->expects($this->any())
             ->method('getCheckoutPostagePrice')
-            ->will($this->returnValue(8.30));
+            ->willReturn(8.30);
         $stubFacade->expects($this->any())
             ->method('getCartTotalTaxPrice')
-            ->will($this->returnValue(122.53));
+            ->willReturn(122.53);
 
         $couponManager = new CouponManager($stubContainer);
         $couponManager->addAvailableCoupon($coupon1);
@@ -236,7 +236,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $stubFacade = $this->generateFacadeStub(12.25);
         $stubFacade->expects($this->any())
             ->method('getCheckoutPostagePrice')
-            ->will($this->returnValue(8.30));
+            ->willReturn(8.30);
 
         $stubContainer = $this->createMock('\Symfony\Component\DependencyInjection\Container');
 
@@ -248,7 +248,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->getMock();
         $stubConditionFactory->expects($this->any())
             ->method('unserializeConditionCollection')
-            ->will($this->returnValue($conditions));
+            ->willReturn($conditions);
 
         $couponManager = new RemoveXAmount($stubFacade);
         $stubContainer->expects($this->any())
@@ -256,7 +256,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->will($this->onConsecutiveCalls($stubFacade, $couponManager, $stubConditionFactory, clone $couponManager, $stubConditionFactory, $stubFacade));
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $couponFactory = new CouponFactory($stubContainer);
         $model1 = $this->generateCouponModel($stubFacade, $conditionFactory);
@@ -269,7 +269,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue([$coupon1, $coupon2]));
+            ->willReturn([$coupon1, $coupon2]);
 
         $couponManager = new CouponManager($stubContainer);
         $couponManager->addAvailableCoupon($coupon1);
@@ -295,7 +295,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $conditions = new ConditionCollection();
         $stubConditionFactory = $this->getMockBuilder('\Thelia\Condition\ConditionFactory')
@@ -303,7 +303,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->getMock();
         $stubConditionFactory->expects($this->any())
             ->method('unserializeConditionCollection')
-            ->will($this->returnValue($conditions));
+            ->willReturn($conditions);
 
         $couponManager = new RemoveXAmount($stubFacade);
         $stubContainer->expects($this->any())
@@ -311,7 +311,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->will($this->onConsecutiveCalls($stubFacade, $couponManager, $stubConditionFactory, $stubFacade));
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $couponFactory = new CouponFactory($stubContainer);
         $model1 = $this->generateCouponModel($stubFacade, $conditionFactory);
@@ -366,7 +366,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $stubContainer->expects($this->any())
             ->method('get')
@@ -440,7 +440,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue([$coupon]));
+            ->willReturn([$coupon]);
 
         $stubContainer->expects($this->any())
             ->method('get')
@@ -453,10 +453,10 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->getMock();
         $stubModel->expects($this->any())
             ->method('getUsagesLeft')
-            ->will($this->returnValue(21));
+            ->willReturn(21);
         $stubModel->expects($this->any())
             ->method('setMaxUsage')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $actual = $couponManager->decrementQuantity($stubModel, null);
         $expected = 20;
@@ -523,7 +523,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue([$coupon]));
+            ->willReturn([$coupon]);
 
         $stubContainer->expects($this->any())
             ->method('get')
@@ -536,10 +536,10 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->getMock();
         $stubModel->expects($this->any())
             ->method('getUsagesLeft')
-            ->will($this->returnValue(21));
+            ->willReturn(21);
         $stubModel->expects($this->any())
             ->method('setMaxUsage')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $actual = $couponManager->incrementQuantity($stubModel, null);
         $expected = 22;
@@ -606,7 +606,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue([$coupon]));
+            ->willReturn([$coupon]);
 
         $stubContainer->expects($this->any())
             ->method('get')
@@ -625,7 +625,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->willReturn(true);
         $stubModel->expects($this->any())
             ->method('setMaxUsage')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $actual = $couponManager->decrementQuantity($stubModel, null);
         $expected = true;
@@ -692,7 +692,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $stubFacade->expects($this->any())
             ->method('getCurrentCoupons')
-            ->will($this->returnValue([$coupon]));
+            ->willReturn([$coupon]);
 
         $stubContainer->expects($this->any())
             ->method('get')
@@ -711,7 +711,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             ->willReturn(true);
         $stubModel->expects($this->any())
             ->method('setMaxUsage')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $actual = $couponManager->incrementQuantity($stubModel, null);
         $expected = true;
@@ -740,30 +740,30 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $currencies = $currencies->find();
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
+            ->willReturn($currencies);
 
         $stubFacade->expects($this->any())
             ->method('getCartTotalTaxPrice')
-            ->will($this->returnValue($cartTotalPrice));
+            ->willReturn($cartTotalPrice);
 
         $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
-            ->will($this->returnValue($checkoutCurrency));
+            ->willReturn($checkoutCurrency);
 
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
         $stubTranslator->expects($this->any())
             ->method('trans')
-            ->will($this->returnValue($i18nOutput));
+            ->willReturn($i18nOutput);
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
 
         return $stubFacade;
     }

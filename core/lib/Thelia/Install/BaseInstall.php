@@ -34,7 +34,7 @@ abstract class BaseInstall
     public function __construct($verifyInstall = true)
     {
         // Check if install wizard is launched via CLI
-        if (php_sapi_name() == 'cli') {
+        if (PHP_SAPI == 'cli') {
             $this->isConsoleMode = true;
         } else {
             $this->isConsoleMode = false;

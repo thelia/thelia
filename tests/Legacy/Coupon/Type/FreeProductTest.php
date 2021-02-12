@@ -81,30 +81,30 @@ class FreeProductTest extends TestCase
         $currencies = $currencies->find();
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
+            ->willReturn($currencies);
 
         $stubFacade->expects($this->any())
             ->method('getCartTotalPrice')
-            ->will($this->returnValue($cartTotalPrice));
+            ->willReturn($cartTotalPrice);
 
         $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
-            ->will($this->returnValue($checkoutCurrency));
+            ->willReturn($checkoutCurrency);
 
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
         $stubTranslator->expects($this->any())
             ->method('trans')
-            ->will($this->returnValue($i18nOutput));
+            ->willReturn($i18nOutput);
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
 
         $stubDispatcher = $this->getMockBuilder('\Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
@@ -112,7 +112,7 @@ class FreeProductTest extends TestCase
 
         $stubDispatcher->expects($this->any())
             ->method('dispatch')
-            ->will($this->returnCallback(function ($cartEvent, $dummy): void {
+            ->willReturnCallback(function ($cartEvent, $dummy): void {
                 $ci = new CartItem();
                 $ci
                     ->setId(3)
@@ -122,11 +122,11 @@ class FreeProductTest extends TestCase
                 ;
 
                 $cartEvent->setCartItem($ci);
-            }));
+            });
 
         $stubFacade->expects($this->any())
             ->method('getDispatcher')
-            ->will($this->returnValue($stubDispatcher));
+            ->willReturn($stubDispatcher);
 
         $stubSession = $this->getMockBuilder('\Thelia\Core\HttpFoundation\Session\Session')
             ->disableOriginalConstructor()
@@ -142,18 +142,18 @@ class FreeProductTest extends TestCase
 
         $stubRequest->expects($this->any())
             ->method('getSession')
-            ->will($this->returnValue($stubSession));
+            ->willReturn($stubSession);
 
         $stubFacade->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($stubRequest));
+            ->willReturn($stubRequest);
 
         $country = CountryQuery::create()
             ->findOneByByDefault(1);
 
         $stubFacade->expects($this->any())
             ->method('getDeliveryCountry')
-            ->will($this->returnValue($country));
+            ->willReturn($country);
 
         return $stubFacade;
     }
@@ -171,17 +171,17 @@ class FreeProductTest extends TestCase
         $cartItem1Stub
             ->expects($this->any())
             ->method('getProduct')
-            ->will($this->returnValue($product1))
+            ->willReturn($product1)
         ;
         $cartItem1Stub
             ->expects($this->any())
             ->method('getQuantity')
-            ->will($this->returnValue(1))
+            ->willReturn(1)
         ;
         $cartItem1Stub
             ->expects($this->any())
             ->method('getPrice')
-            ->will($this->returnValue(100))
+            ->willReturn(100)
         ;
 
         $cartItem2Stub = $this->getMockBuilder('\Thelia\Model\CartItem')
@@ -191,17 +191,17 @@ class FreeProductTest extends TestCase
         $cartItem2Stub
             ->expects($this->any())
             ->method('getProduct')
-            ->will($this->returnValue($product2));
+            ->willReturn($product2);
 
         $cartItem2Stub
             ->expects($this->any())
             ->method('getQuantity')
-            ->will($this->returnValue(2))
+            ->willReturn(2)
         ;
         $cartItem2Stub
             ->expects($this->any())
             ->method('getPrice')
-            ->will($this->returnValue(150))
+            ->willReturn(150)
 
         ;
 
@@ -218,11 +218,11 @@ class FreeProductTest extends TestCase
         $cartStub
             ->expects($this->any())
             ->method('getCartItems')
-            ->will($this->returnValue($ret));
+            ->willReturn($ret);
 
         $stubFacade->expects($this->any())
             ->method('getCart')
-            ->will($this->returnValue($cartStub));
+            ->willReturn($cartStub);
 
         return [$product1->getId(), $product2->getId()];
     }
@@ -238,16 +238,16 @@ class FreeProductTest extends TestCase
 
         $cartItem2Stub->expects($this->any())
             ->method('getProduct')
-            ->will($this->returnValue($product2))
+            ->willReturn($product2)
         ;
         $cartItem2Stub->expects($this->any())
             ->method('getQuantity')
-            ->will($this->returnValue(2))
+            ->willReturn(2)
         ;
         $cartItem2Stub
             ->expects($this->any())
             ->method('getPrice')
-            ->will($this->returnValue(11000))
+            ->willReturn(11000)
         ;
 
         $cartStub = $this->getMockBuilder('\Thelia\Model\Cart')
@@ -257,11 +257,11 @@ class FreeProductTest extends TestCase
         $cartStub
             ->expects($this->any())
             ->method('getCartItems')
-            ->will($this->returnValue([$cartItem2Stub]));
+            ->willReturn([$cartItem2Stub]);
 
         $stubFacade->expects($this->any())
             ->method('getCart')
-            ->will($this->returnValue($cartStub));
+            ->willReturn($cartStub);
     }
 
     public function testSet(): void
@@ -322,10 +322,10 @@ class FreeProductTest extends TestCase
         $this->assertEquals('This is a test coupon title', $coupon->getShortDescription());
         $this->assertEquals('This is a test coupon description', $coupon->getDescription());
 
-        $this->assertEquals(true, $coupon->isCumulative());
-        $this->assertEquals(true, $coupon->isRemovingPostage());
-        $this->assertEquals(true, $coupon->isAvailableOnSpecialOffers());
-        $this->assertEquals(true, $coupon->isEnabled());
+        $this->assertTrue($coupon->isCumulative());
+        $this->assertTrue($coupon->isRemovingPostage());
+        $this->assertTrue($coupon->isAvailableOnSpecialOffers());
+        $this->assertTrue($coupon->isEnabled());
 
         $this->assertEquals(254, $coupon->getMaxUsage());
         $this->assertEquals($date, $coupon->getExpirationDate());

@@ -35,7 +35,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
      */
     protected $stubArchiver;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->sut = new SUT();
         $this->stubArchiver = $this->createMock('Thelia\\Core\\Archiver\\ArchiverInterface');
@@ -178,7 +178,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
         $this->stubArchiver
             ->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue('archiver1'))
+            ->willReturn('archiver1')
         ;
 
         $this->assertFalse($this->sut->has('archiver1'));
@@ -207,7 +207,7 @@ class ArchiverManagerTest extends ContainerAwareTestCase
         $this->stubArchiver
             ->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue('archiver1'))
+            ->willReturn('archiver1')
         ;
 
         $this->sut->add($this->stubArchiver);
@@ -226,11 +226,11 @@ class ArchiverManagerTest extends ContainerAwareTestCase
             ->method('getId')
             ->will($this->onConsecutiveCalls('archiver1', 'archiver3'))
         ;
-        $this->stubArchiver->expects($this->any())->method('isAvailable')->will($this->returnValue(true));
+        $this->stubArchiver->expects($this->any())->method('isAvailable')->willReturn(true);
 
         $unavailableMock = $this->createMock('Thelia\\Core\\Archiver\\ArchiverInterface');
-        $unavailableMock->expects($this->any())->method('getId')->will($this->returnValue('archiver2'));
-        $unavailableMock->expects($this->any())->method('isAvailable')->will($this->returnValue(false));
+        $unavailableMock->expects($this->any())->method('getId')->willReturn('archiver2');
+        $unavailableMock->expects($this->any())->method('isAvailable')->willReturn(false);
 
         $this->sut->add($this->stubArchiver);
         $this->sut->add($this->stubArchiver);

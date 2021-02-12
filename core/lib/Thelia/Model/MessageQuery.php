@@ -34,7 +34,7 @@ class MessageQuery extends BaseMessageQuery
      */
     public static function getFromName($messageName)
     {
-        if (false === $message = MessageQuery::create()->filterByName($messageName)->findOne()) {
+        if (false === $message = self::create()->filterByName($messageName)->findOne()) {
             throw new \Exception("Failed to load message $messageName.");
         }
 

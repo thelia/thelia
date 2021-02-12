@@ -98,7 +98,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
             ->select(['maxPos'])
             ->findOne();
 
-        return \intval($result) + 1;
+        return (int) $result + 1;
     }
 
     public function createModuleHook(ModuleHookCreateEvent $event): void

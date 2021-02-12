@@ -58,7 +58,7 @@ class MetaDataTest extends BaseAction
         $this->assertEquals(\get_class($product), $created->getElementKey());
         $this->assertEquals($product->getId(), $created->getElementId());
         $this->assertEquals('test', $created->getValue());
-        $this->assertEquals(false, $created->getIsSerialized());
+        $this->assertFalse($created->getIsSerialized());
 
         // complex
         $event = new MetaDataCreateOrUpdateEvent();
@@ -80,7 +80,7 @@ class MetaDataTest extends BaseAction
         $this->assertEquals(\get_class($product), $created->getElementKey());
         $this->assertEquals($product->getId(), $created->getElementId());
         $this->assertEquals(['fr_FR' => 'bonjour', 'en_US' => 'Hello'], $created->getValue());
-        $this->assertEquals(true, $created->getIsSerialized());
+        $this->assertTrue($created->getIsSerialized());
 
         return $product;
     }
@@ -111,7 +111,7 @@ class MetaDataTest extends BaseAction
         $this->assertEquals($product->getId(), $metaData->getElementId());
         $this->assertEquals('test', $metaData->getValue());
 
-        $this->assertEquals(false, $metaData->getIsSerialized());
+        $this->assertFalse($metaData->getIsSerialized());
 
         $datas = MetaDataQuery::getAllVal(\get_class($product), $product->getId());
         $this->assertEquals(\count($datas), 2);
@@ -156,7 +156,7 @@ class MetaDataTest extends BaseAction
         $this->assertEquals(\get_class($product), $updated->getElementKey());
         $this->assertEquals($product->getId(), $updated->getElementId());
         $this->assertEquals(['fr_FR' => 'bonjour', 'en_US' => 'Hello'], $updated->getValue());
-        $this->assertEquals(true, $updated->getIsSerialized());
+        $this->assertTrue($updated->getIsSerialized());
 
         return $product;
     }

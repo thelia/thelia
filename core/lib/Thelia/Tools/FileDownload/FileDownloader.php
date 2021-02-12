@@ -75,14 +75,14 @@ class FileDownloader implements FileDownloaderInterface
          * Try to get the file if it is online.
          */
         $con = curl_init($url);
-        curl_setopt($con, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($con, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($con, \CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($con, \CURLOPT_FOLLOWLOCATION, true);
 
         $response = curl_exec($con);
         $errno = curl_errno($con);
         $curlErrorMessage = curl_error($con);
 
-        $httpCode = curl_getinfo($con, CURLINFO_HTTP_CODE);
+        $httpCode = curl_getinfo($con, \CURLINFO_HTTP_CODE);
 
         curl_close($con);
 
@@ -140,7 +140,7 @@ class FileDownloader implements FileDownloaderInterface
             throw new \ErrorException($translatedErrorMessage);
         }
 
-        fputs($file, $response);
+        fwrite($file, $response);
         fclose($file);
     }
 }

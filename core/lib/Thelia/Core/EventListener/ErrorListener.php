@@ -101,9 +101,9 @@ class ErrorListener implements EventSubscriberInterface
 
         do {
             $logMessage .=
-                ($logMessage ? PHP_EOL.'Caused by' : 'Uncaught exception')
+                ($logMessage ? \PHP_EOL.'Caused by' : 'Uncaught exception')
                 .$exception->getMessage()
-                .PHP_EOL
+                .\PHP_EOL
                 .'Stack Trace: '.$exception->getTraceAsString()
             ;
         } while (null !== $exception = $exception->getPrevious());

@@ -128,7 +128,7 @@ class Order extends BaseOrder
 
     public function generateRef()
     {
-        return sprintf('ORD%s', str_pad($this->getId(), 12, 0, STR_PAD_LEFT));
+        return sprintf('ORD%s', str_pad($this->getId(), 12, 0, \STR_PAD_LEFT));
     }
 
     /**
@@ -162,12 +162,12 @@ class Order extends BaseOrder
             // Shoud be the same rounding method as in CartItem::getTotalTaxedPrice()
             // For each order line, we round quantity x taxed price.
             $query = '
-                SELECT 
+                SELECT
                     SUM(
                         '.OrderProductTableMap::COL_QUANTITY.'
                         *
                         ROUND(
-                            ( 
+                            (
                                 IF('.OrderProductTableMap::COL_WAS_IN_PROMO.'=1, '.OrderProductTableMap::COL_PROMO_PRICE.', '.OrderProductTableMap::COL_PRICE.')
                                 +
                                 (
@@ -189,7 +189,7 @@ class Order extends BaseOrder
                             ), 2
                         )
                     ) as total_untaxed_price
-                from 
+                from
                     '.OrderProductTableMap::TABLE_NAME.'
                 where
                     '.OrderProductTableMap::COL_ORDER_ID.'=:order_id
@@ -283,8 +283,8 @@ class Order extends BaseOrder
         }
 
         if (false !== $includePostage) {
-            $total += \floatval($this->getPostage());
-            $tax += \floatval($this->getPostageTax());
+            $total += (float) ($this->getPostage());
+            $tax += (float) ($this->getPostageTax());
         }
 
         return $total;

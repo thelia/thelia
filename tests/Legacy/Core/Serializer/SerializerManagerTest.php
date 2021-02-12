@@ -38,7 +38,7 @@ class SerializerManagerTest extends TestCase
      */
     protected $stubSerializer;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->sut = new SUT();
         $this->stubSerializer = $this->createMock('Thelia\\Core\\Serializer\\SerializerInterface');
@@ -175,7 +175,7 @@ class SerializerManagerTest extends TestCase
         $this->stubSerializer
             ->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue('serializer1'))
+            ->willReturn('serializer1')
         ;
 
         $this->assertFalse($this->sut->has('serializer1'));
@@ -204,7 +204,7 @@ class SerializerManagerTest extends TestCase
         $this->stubSerializer
             ->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue('serializer1'))
+            ->willReturn('serializer1')
         ;
 
         $this->sut->add($this->stubSerializer);

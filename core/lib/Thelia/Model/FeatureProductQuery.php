@@ -33,7 +33,7 @@ class FeatureProductQuery extends BaseFeatureProductQuery
      */
     public function filterByFreeTextValue($freeTextValue = null, $comparison = null)
     {
-        $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $bt = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
 
         return parent::filterByFreeTextValue($freeTextValue, $comparison);
@@ -47,7 +47,7 @@ class FeatureProductQuery extends BaseFeatureProductQuery
      */
     public function orderByFreeTextValue($order = Criteria::ASC)
     {
-        $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $bt = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
 
         return parent::orderByFreeTextValue($order);
@@ -61,7 +61,7 @@ class FeatureProductQuery extends BaseFeatureProductQuery
      */
     public function groupByFreeTextValue()
     {
-        $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $bt = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
 
         return parent::groupByFreeTextValue();
@@ -75,7 +75,7 @@ class FeatureProductQuery extends BaseFeatureProductQuery
      */
     public function findByFreeTextValue($free_text_value)
     {
-        $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $bt = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
 
         return parent::findByFreeTextValue($free_text_value);
@@ -89,7 +89,7 @@ class FeatureProductQuery extends BaseFeatureProductQuery
      */
     public function findOneByFreeTextValue($free_text_value)
     {
-        $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $bt = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         Tlog::getInstance()->warning(sprintf('Using `free_text_value` is deprecated. Use `is_free_text` instead. Used in %s:%d', $bt[0]['file'], $bt[0]['line']));
 
         return parent::findOneByFreeTextValue($free_text_value);

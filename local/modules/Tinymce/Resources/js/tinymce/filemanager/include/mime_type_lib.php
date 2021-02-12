@@ -258,7 +258,7 @@ if (!function_exists('get_file_mime_type')) {
     function get_file_mime_type($filename, $debug = false)
     {
         if (function_exists('finfo_open') && function_exists('finfo_file') && function_exists('finfo_close')) {
-            $fileinfo = finfo_open(FILEINFO_MIME_TYPE);
+            $fileinfo = finfo_open(\FILEINFO_MIME_TYPE);
             $mime_type = finfo_file($fileinfo, $filename);
             finfo_close($fileinfo);
 

@@ -92,7 +92,7 @@ class CartAdd extends BaseForm
     {
         $product = ProductQuery::create()->findPk($value);
 
-        if (\is_null($product) || $product->getVisible() == 0) {
+        if (null === $product || $product->getVisible() == 0) {
             throw new ProductNotFoundException(sprintf(Translator::getInstance()->trans('this product id does not exists : %d'), $value));
         }
     }

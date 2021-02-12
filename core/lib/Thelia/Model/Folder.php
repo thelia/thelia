@@ -50,7 +50,7 @@ class Folder extends BaseFolder implements FileModelParentInterface
     public function countAllContents($contentVisibility = true)
     {
         $children = FolderQuery::findAllChild($this->getId());
-        array_push($children, $this);
+        $children[] = $this;
 
         $query = ContentQuery::create()->filterByFolder(new ObjectCollection($children), Criteria::IN);
 

@@ -75,7 +75,7 @@ class CalculatorTest extends TestCase
         $taxRuleQuery->expects($this->once())
             ->method('getTaxCalculatorCollection')
             ->with($productQuery->getTaxRule(), $countryQuery)
-            ->will($this->returnValue('foo'));
+            ->willReturn('foo');
 
         $taxRuleQueryReflectedProperty = $this->getProperty('taxRuleQuery');
         $taxRuleQueryReflectedProperty->setValue($calculator, $taxRuleQuery);

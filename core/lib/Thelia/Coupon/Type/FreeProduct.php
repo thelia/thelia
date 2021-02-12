@@ -259,7 +259,7 @@ class FreeProduct extends AbstractRemoveOnProducts
         $this->checkBaseCouponFieldValue($fieldName, $fieldValue);
 
         if ($fieldName === self::OFFERED_PRODUCT_ID) {
-            if (\floatval($fieldValue) < 0) {
+            if ((float) $fieldValue < 0) {
                 throw new \InvalidArgumentException(
                     Translator::getInstance()->trans(
                         'Please select the offered product'

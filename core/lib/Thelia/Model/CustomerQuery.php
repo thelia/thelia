@@ -31,7 +31,7 @@ class CustomerQuery extends BaseCustomerQuery
 
     public static function getMonthlyNewCustomersStats($month, $year)
     {
-        $numberOfDay = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $numberOfDay = cal_days_in_month(\CAL_GREGORIAN, $month, $year);
 
         $stats = [];
         for ($day = 1; $day <= $numberOfDay; ++$day) {

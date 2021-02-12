@@ -84,7 +84,7 @@ class ConfigureController extends BaseAdminController
             $this->adminLogAppend(
                 'tinymce.configuration.message',
                 AccessManager::UPDATE,
-                sprintf('Tinymce configuration updated')
+                'Tinymce configuration updated'
             );
 
             // Everything is OK.

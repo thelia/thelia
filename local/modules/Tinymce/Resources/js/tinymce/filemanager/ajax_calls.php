@@ -2,7 +2,7 @@
 
 $config = include 'config/config.php';
 //TODO switch to array
-extract($config, EXTR_OVERWRITE);
+extract($config, \EXTR_OVERWRITE);
 
 require_once 'include/utils.php';
 
@@ -100,10 +100,10 @@ if (isset($_GET['action'])) {
                 $temp .= '.'.substr(strrchr($_POST['url'], '.'), 1);
                 file_put_contents($temp, $image_data);
 
-                $ftp->put($ftp_base_folder.$upload_dir.$_POST['path'].$_POST['name'], $temp, FTP_BINARY);
+                $ftp->put($ftp_base_folder.$upload_dir.$_POST['path'].$_POST['name'], $temp, \FTP_BINARY);
 
                 create_img($temp, $temp, 122, 91);
-                $ftp->put($ftp_base_folder.$ftp_thumbs_dir.$_POST['path'].$_POST['name'], $temp, FTP_BINARY);
+                $ftp->put($ftp_base_folder.$ftp_thumbs_dir.$_POST['path'].$_POST['name'], $temp, \FTP_BINARY);
 
                 unlink($temp);
             } else {
@@ -230,7 +230,7 @@ if (isset($_GET['action'])) {
 
             if ($ftp) {
                 unlink($path);
-                $ftp->putAll($base_folder, '/'.$ftp_base_folder.$upload_dir.fix_dirname($_POST['path']), FTP_BINARY);
+                $ftp->putAll($base_folder, '/'.$ftp_base_folder.$upload_dir.fix_dirname($_POST['path']), \FTP_BINARY);
                 deleteDir($base_folder);
             }
 

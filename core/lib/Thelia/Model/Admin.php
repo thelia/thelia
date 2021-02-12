@@ -51,7 +51,7 @@ class Admin extends BaseAdmin implements UserInterface
         if ($password !== null && trim($password) != '') {
             $this->setAlgo('PASSWORD_BCRYPT');
 
-            return parent::setPassword(password_hash($password, PASSWORD_BCRYPT));
+            return parent::setPassword(password_hash($password, \PASSWORD_BCRYPT));
         }
 
         return $this;

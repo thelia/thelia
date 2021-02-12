@@ -78,7 +78,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
     public function confirmPayment($orderId): void
     {
         try {
-            $orderId = \intval($orderId);
+            $orderId = (int) $orderId;
 
             if (null !== $order = $this->getOrder($orderId)) {
                 $this->getLog()->addInfo(
@@ -128,7 +128,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
     public function saveTransactionRef($orderId, $transactionRef): void
     {
         try {
-            $orderId = \intval($orderId);
+            $orderId = (int) $orderId;
 
             if (null !== $order = $this->getOrder($orderId)) {
                 $event = new OrderEvent($order);
@@ -172,7 +172,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
     public function cancelPayment($orderId): void
     {
         try {
-            $orderId = \intval($orderId);
+            $orderId = (int) $orderId;
 
             if (null !== $order = $this->getOrder($orderId)) {
                 $this->getLog()->addInfo(

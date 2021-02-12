@@ -55,7 +55,7 @@ class TestCaseWithURLToolSetup extends TestCase
 
         $router->expects($this->any())
             ->method('getContext')
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
         $this->container->set('router.admin', $router);
 

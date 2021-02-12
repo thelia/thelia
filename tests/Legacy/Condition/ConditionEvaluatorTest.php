@@ -108,7 +108,7 @@ class ConditionEvaluatorTest extends TestCase
         $conditionEvaluator = new ConditionEvaluator();
         $this->expectException(\Exception::class);
         $actual = $conditionEvaluator->variableOpComparison(1, 'bad', 1);
-        $this->assertEquals(true, $actual);
+        $this->assertTrue($actual);
     }
 
     /**
@@ -123,14 +123,14 @@ class ConditionEvaluatorTest extends TestCase
             ->getMock();
         $stubConditionTrue1->expects($this->any())
             ->method('isMatching')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $stubConditionTrue2 = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticles')
             ->disableOriginalConstructor()
             ->getMock();
         $stubConditionTrue2->expects($this->any())
             ->method('isMatching')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $collection = new ConditionCollection();
         $collection[] = $stubConditionTrue1;
@@ -154,14 +154,14 @@ class ConditionEvaluatorTest extends TestCase
             ->getMock();
         $stubConditionTrue->expects($this->any())
             ->method('isMatching')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $stubConditionFalse = $this->getMockBuilder('\Thelia\Condition\Implementation\MatchForXArticles')
             ->disableOriginalConstructor()
             ->getMock();
         $stubConditionFalse->expects($this->any())
             ->method('isMatching')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $collection = new ConditionCollection();
         $collection[] = $stubConditionTrue;

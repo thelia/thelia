@@ -10,6 +10,6 @@
  * file that was distributed with this source code.
  */
 
-if (version_compare(PHP_VERSION, '5.5', '<')) {
-    exit('Your server is running PHP '.PHP_VERSION.'. Thelia 2 requires PHP 5.5 or better.');
+if (version_compare(\PHP_VERSION, '5.5', '<')) {
+    exit('Your server is running PHP '.\PHP_VERSION.'. Thelia 2 requires PHP 5.5 or better.');
 }

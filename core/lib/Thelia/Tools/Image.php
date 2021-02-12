@@ -19,7 +19,7 @@ class Image
         $imageFile = getimagesize($filePath);
         $imageType = $imageFile[2];
 
-        if (!\is_array($allowedImageTypes) && $imageType != IMAGETYPE_UNKNOWN) {
+        if (!\is_array($allowedImageTypes) && $imageType != \IMAGETYPE_UNKNOWN) {
             return true;
         }
 

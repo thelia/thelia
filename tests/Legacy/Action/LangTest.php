@@ -47,7 +47,7 @@ class LangTest extends ContainerAwareTestCase
         self::$defaultId = $lang->getId();
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

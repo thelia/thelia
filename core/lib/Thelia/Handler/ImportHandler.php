@@ -174,7 +174,7 @@ class ImportHandler
                 Translator::getInstance()->trans(
                     'The extension "%extension" is not allowed',
                     [
-                        '%extension' => pathinfo($file->getFilename(), PATHINFO_EXTENSION),
+                        '%extension' => pathinfo($file->getFilename(), \PATHINFO_EXTENSION),
                     ]
                 )
             );

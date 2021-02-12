@@ -47,7 +47,7 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('folder', null, true),
-            Argument::createIntTypeArgument('depth', PHP_INT_MAX),
+            Argument::createIntTypeArgument('depth', \PHP_INT_MAX),
             Argument::createBooleanOrBothTypeArgument('visible', true, false),
             Argument::createIntListTypeArgument('exclude', [])
         );

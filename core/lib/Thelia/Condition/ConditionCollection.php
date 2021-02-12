@@ -157,12 +157,10 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
      *                      The offset to assign the value to
      * @param mixed $value
      *                      The value to set
-     *
-     * @return void
      */
     public function offsetSet($offset, $value): void
     {
-        if (\is_null($offset)) {
+        if (null === $offset) {
             $this->conditions[] = $value;
         } else {
             $this->conditions[$offset] = $value;
@@ -177,8 +175,6 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
      *
      * @param mixed $offset
      *                      The offset to unset
-     *
-     * @return void
      */
     public function offsetUnset($offset): void
     {

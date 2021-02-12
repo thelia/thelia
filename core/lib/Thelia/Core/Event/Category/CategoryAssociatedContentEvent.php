@@ -29,7 +29,7 @@ class CategoryAssociatedContentEvent extends ActionEvent
 
     public function hasCategoryAssociatedContent()
     {
-        return !\is_null($this->content);
+        return null !== $this->content;
     }
 
     public function getCategoryAssociatedContent()

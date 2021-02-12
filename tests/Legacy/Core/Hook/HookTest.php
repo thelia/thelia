@@ -256,7 +256,7 @@ class HookTest extends WebTestCase
             if ($item == '.' || $item == '..') {
                 continue;
             }
-            if (!self::deleteDirectory($dir.DIRECTORY_SEPARATOR.$item)) {
+            if (!self::deleteDirectory($dir.\DIRECTORY_SEPARATOR.$item)) {
                 return false;
             }
         }
@@ -279,7 +279,7 @@ class HookTest extends WebTestCase
             if ($item == '.' || $item == '..') {
                 continue;
             }
-            if (!self::copyDirectory($sourceDir.DIRECTORY_SEPARATOR.$item, $targetDir.DIRECTORY_SEPARATOR.$item)) {
+            if (!self::copyDirectory($sourceDir.\DIRECTORY_SEPARATOR.$item, $targetDir.\DIRECTORY_SEPARATOR.$item)) {
                 return false;
             }
         }

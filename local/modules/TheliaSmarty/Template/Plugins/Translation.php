@@ -88,7 +88,7 @@ class Translation extends AbstractSmartyPlugin
 
     protected function getBoolean($value, $default = false)
     {
-        $val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        $val = filter_var($value, \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE);
         if (null === $val) {
             $val = $default;
         }

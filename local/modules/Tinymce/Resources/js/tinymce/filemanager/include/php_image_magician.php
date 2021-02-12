@@ -169,7 +169,7 @@
 //
 // ========================================================================#
 
-class imageLib
+class php_image_magician
 {
     private $fileName;
     private $image;
@@ -263,8 +263,8 @@ class imageLib
 
     private function initialise(): void
     {
-        $this->psdReaderPath = dirname(__FILE__).'/classPhpPsdReader.php';
-        $this->filterOverlayPath = dirname(__FILE__).'/filters';
+        $this->psdReaderPath = __DIR__.'/classPhpPsdReader.php';
+        $this->filterOverlayPath = __DIR__.'/filters';
 
         // *** Set if image should be interlaced or not.
         $this->isInterlace = false;
@@ -570,7 +570,7 @@ class imageLib
         //               4 = Resize the image as much as possible, then crop the
         //         remainder.
     {
-        switch (strval($option)) {
+        switch ((string) $option) {
             case '0':
             case 'exact':
                 $optimalWidth = $newWidth;
@@ -772,7 +772,7 @@ class imageLib
         // Notes:
         // Credit:   Incorporates Joe Lencioni (August 6, 2008) code
     {
-        if (version_compare(PHP_VERSION, '5.1.0') >= 0) {
+        if (version_compare(\PHP_VERSION, '5.1.0') >= 0) {
             // ***
             if ($this->aggresiveSharpening) { // A more aggressive sharpening solution
                 $sharpenMatrix = [[-1, -1, -1],
@@ -935,7 +935,7 @@ class imageLib
         //
     {
         if ($this->imageResized) {
-            imagefilter($this->imageResized, IMG_FILTER_GRAYSCALE);
+            imagefilter($this->imageResized, \IMG_FILTER_GRAYSCALE);
         }
     }
 
@@ -952,9 +952,9 @@ class imageLib
         //
     {
         if ($this->imageResized) {
-            imagefilter($this->imageResized, IMG_FILTER_GRAYSCALE);
-            imagefilter($this->imageResized, IMG_FILTER_CONTRAST, -15);
-            imagefilter($this->imageResized, IMG_FILTER_BRIGHTNESS, 2);
+            imagefilter($this->imageResized, \IMG_FILTER_GRAYSCALE);
+            imagefilter($this->imageResized, \IMG_FILTER_CONTRAST, -15);
+            imagefilter($this->imageResized, \IMG_FILTER_BRIGHTNESS, 2);
             $this->sharpen($this->width);
         }
     }
@@ -982,8 +982,8 @@ class imageLib
         //
     {
         if ($this->imageResized) {
-            imagefilter($this->imageResized, IMG_FILTER_GRAYSCALE);
-            imagefilter($this->imageResized, IMG_FILTER_CONTRAST, -1000);
+            imagefilter($this->imageResized, \IMG_FILTER_GRAYSCALE);
+            imagefilter($this->imageResized, \IMG_FILTER_CONTRAST, -1000);
         }
     }
 
@@ -1002,7 +1002,7 @@ class imageLib
         //
     {
         if ($this->imageResized) {
-            imagefilter($this->imageResized, IMG_FILTER_NEGATE);
+            imagefilter($this->imageResized, \IMG_FILTER_NEGATE);
         }
     }
 
@@ -1021,10 +1021,10 @@ class imageLib
         //
     {
         if ($this->imageResized) {
-            imagefilter($this->imageResized, IMG_FILTER_GRAYSCALE);
-            imagefilter($this->imageResized, IMG_FILTER_BRIGHTNESS, -10);
-            imagefilter($this->imageResized, IMG_FILTER_CONTRAST, -20);
-            imagefilter($this->imageResized, IMG_FILTER_COLORIZE, 60, 30, -15);
+            imagefilter($this->imageResized, \IMG_FILTER_GRAYSCALE);
+            imagefilter($this->imageResized, \IMG_FILTER_BRIGHTNESS, -10);
+            imagefilter($this->imageResized, \IMG_FILTER_CONTRAST, -20);
+            imagefilter($this->imageResized, \IMG_FILTER_COLORIZE, 60, 30, -15);
         }
     }
 
@@ -1062,9 +1062,9 @@ class imageLib
     public function gd_filter_monopin(): void
     {
         if ($this->imageResized) {
-            imagefilter($this->imageResized, IMG_FILTER_GRAYSCALE);
-            imagefilter($this->imageResized, IMG_FILTER_BRIGHTNESS, -15);
-            imagefilter($this->imageResized, IMG_FILTER_CONTRAST, -15);
+            imagefilter($this->imageResized, \IMG_FILTER_GRAYSCALE);
+            imagefilter($this->imageResized, \IMG_FILTER_BRIGHTNESS, -15);
+            imagefilter($this->imageResized, \IMG_FILTER_CONTRAST, -15);
             $this->imageResized = $this->gd_apply_overlay($this->imageResized, 'vignette', 100);
         }
     }
@@ -1075,10 +1075,10 @@ class imageLib
     {
         if ($this->imageResized) {
             $this->imageResized = $this->gd_apply_overlay($this->imageResized, 'vignette', 45);
-            imagefilter($this->imageResized, IMG_FILTER_BRIGHTNESS, 20);
-            imagefilter($this->imageResized, IMG_FILTER_CONTRAST, -35);
-            imagefilter($this->imageResized, IMG_FILTER_COLORIZE, 60, -10, 35);
-            imagefilter($this->imageResized, IMG_FILTER_SMOOTH, 7);
+            imagefilter($this->imageResized, \IMG_FILTER_BRIGHTNESS, 20);
+            imagefilter($this->imageResized, \IMG_FILTER_CONTRAST, -35);
+            imagefilter($this->imageResized, \IMG_FILTER_COLORIZE, 60, -10, 35);
+            imagefilter($this->imageResized, \IMG_FILTER_SMOOTH, 7);
             $this->imageResized = $this->gd_apply_overlay($this->imageResized, 'scratch', 10);
         }
     }
@@ -1244,7 +1244,7 @@ class imageLib
         //
     {
         if ($this->imageResized) {
-            if (is_integer($value)) {
+            if (is_int($value)) {
                 $degrees = $value;
             }
 
@@ -1462,10 +1462,10 @@ class imageLib
             $intensity = 255 * $t * $t;
 
             $colour = imagecolorallocate($shadow, $intensity, $intensity, $intensity);
-            imagefilledarc($shadow, $blurWidth - 1, $blurHeight - 1, 2 * (1 - $t) * $blurWidth, 2 * (1 - $t) * $blurHeight, 180, 268, $colour, IMG_ARC_PIE);
-            imagefilledarc($shadow, $width, $blurHeight - 1, 2 * (1 - $t) * $blurWidth, 2 * (1 - $t) * $blurHeight, 270, 358, $colour, IMG_ARC_PIE);
-            imagefilledarc($shadow, $width, $height, 2 * (1 - $t) * $blurWidth, 2 * (1 - $t) * $blurHeight, 0, 90, $colour, IMG_ARC_PIE);
-            imagefilledarc($shadow, $blurWidth - 1, $height, 2 * (1 - $t) * $blurWidth, 2 * (1 - $t) * $blurHeight, 90, 180, $colour, IMG_ARC_PIE);
+            imagefilledarc($shadow, $blurWidth - 1, $blurHeight - 1, 2 * (1 - $t) * $blurWidth, 2 * (1 - $t) * $blurHeight, 180, 268, $colour, \IMG_ARC_PIE);
+            imagefilledarc($shadow, $width, $blurHeight - 1, 2 * (1 - $t) * $blurWidth, 2 * (1 - $t) * $blurHeight, 270, 358, $colour, \IMG_ARC_PIE);
+            imagefilledarc($shadow, $width, $height, 2 * (1 - $t) * $blurWidth, 2 * (1 - $t) * $blurHeight, 0, 90, $colour, \IMG_ARC_PIE);
+            imagefilledarc($shadow, $blurWidth - 1, $height, 2 * (1 - $t) * $blurWidth, 2 * (1 - $t) * $blurHeight, 90, 180, $colour, \IMG_ARC_PIE);
         }
 
         $colour = imagecolorallocate($shadow, 255, 255, 255);
@@ -1680,7 +1680,7 @@ class imageLib
         $ev = $exifData['ApertureValue'];
         $apPeicesArray = explode('/', $ev);
         if (count($apPeicesArray) == 2) {
-            $apertureValue = round($apPeicesArray[0] / $apPeicesArray[1], 2, PHP_ROUND_HALF_DOWN).' EV';
+            $apertureValue = round($apPeicesArray[0] / $apPeicesArray[1], 2, \PHP_ROUND_HALF_DOWN).' EV';
         } else {
             $apertureValue = '';
         }
@@ -2086,7 +2086,7 @@ class imageLib
     private function getTextFont($font)
     {
         // *** Font path (shou
-        $fontPath = dirname(__FILE__).'/'.$this->fontDir;
+        $fontPath = __DIR__.'/'.$this->fontDir;
 
         // *** The below is/may be needed depending on your version (see ref)
         putenv('GDFONTPATH='.realpath('.'));
@@ -2439,7 +2439,7 @@ class imageLib
             case '.jpg':
             case '.jpeg':
                 $this->checkInterlaceImage($this->isInterlace);
-                if (imagetypes() & IMG_JPG) {
+                if (imagetypes() & \IMG_JPG) {
                     imagejpeg($this->imageResized, $savePath, $imageQuality);
                 } else {
                     $error = 'jpg';
@@ -2447,7 +2447,7 @@ class imageLib
                 break;
             case '.gif':
                 $this->checkInterlaceImage($this->isInterlace);
-                if (imagetypes() & IMG_GIF) {
+                if (imagetypes() & \IMG_GIF) {
                     imagegif($this->imageResized, $savePath);
                 } else {
                     $error = 'gif';
@@ -2461,7 +2461,7 @@ class imageLib
                 $invertScaleQuality = 9 - $scaleQuality;
 
                 $this->checkInterlaceImage($this->isInterlace);
-                if (imagetypes() & IMG_PNG) {
+                if (imagetypes() & \IMG_PNG) {
                     imagepng($this->imageResized, $savePath, $invertScaleQuality);
                 } else {
                     $error = 'png';
@@ -3035,7 +3035,7 @@ class imageLib
             $number >>= 8;
         }
 
-        return str_pad($intstring, $minbytes, "\x00", STR_PAD_RIGHT);
+        return str_pad($intstring, $minbytes, "\x00", \STR_PAD_RIGHT);
     }
 
     /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -3057,7 +3057,7 @@ class imageLib
         //
     {
         //Ouverture du fichier en mode binaire
-        if (!$f1 = fopen($filename, 'rb')) {
+        if (!$f1 = fopen($filename, 'r')) {
             return false;
         }
 

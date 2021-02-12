@@ -536,13 +536,13 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     public function statsAccess($params, $smarty)
     {
         if (false === \array_key_exists('key', $params)) {
-            throw new \InvalidArgumentException(sprintf('missing key attribute in stats access function'));
+            throw new \InvalidArgumentException('missing key attribute in stats access function');
         }
         if (false === \array_key_exists('startDate', $params) || $params['startDate'] === '') {
-            throw new \InvalidArgumentException(sprintf('missing startDate attribute in stats access function'));
+            throw new \InvalidArgumentException('missing startDate attribute in stats access function');
         }
         if (false === \array_key_exists('endDate', $params) || $params['endDate'] === '') {
-            throw new \InvalidArgumentException(sprintf('missing endDate attribute in stats access function'));
+            throw new \InvalidArgumentException('missing endDate attribute in stats access function');
         }
 
         if (false !== \array_key_exists('includeShipping', $params) && $params['includeShipping'] == 'false') {
@@ -867,7 +867,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 }
 
                 if ($type == 'favicon') {
-                    $extension = pathinfo($imageSourcePath, PATHINFO_EXTENSION);
+                    $extension = pathinfo($imageSourcePath, \PATHINFO_EXTENSION);
                     if ($extension == 'ico') {
                         $mime_type = 'image/x-icon';
 
@@ -904,14 +904,14 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 $height = $this->getParam($params, 'height', null);
                 $rotation = $this->getParam($params, 'rotation', null);
 
-                if (!\is_null($width)) {
+                if (null !== $width) {
                     $event->setWidth($width);
                 }
-                if (!\is_null($height)) {
+                if (null !== $height) {
                     $event->setHeight($height);
                 }
                 $event->setResizeMode($resize_mode);
-                if (!\is_null($rotation)) {
+                if (null !== $rotation) {
                     $event->setRotation($rotation);
                 }
             }

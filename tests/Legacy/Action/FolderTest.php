@@ -31,8 +31,8 @@ use Thelia\Tests\TestCaseWithURLToolSetup;
  */
 class FolderTest extends TestCaseWithURLToolSetup
 {
-    use RewrittenUrlTestTrait;
     use I18nTestTrait;
+    use RewrittenUrlTestTrait;
 
     /** @var int folder id used in position tests */
     protected static $folderIdForPositionTest = null;

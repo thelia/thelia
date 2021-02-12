@@ -29,7 +29,7 @@ class TheliaContainer extends Container
     public function set(string $id, ?object $service): void
     {
         if ($id === 'request'
-            && php_sapi_name() === 'cli'
+            && PHP_SAPI === 'cli'
         ) {
             if (!isset($this->services['request_stack'])) {
                 $this->services['request_stack'] = new RequestStack();

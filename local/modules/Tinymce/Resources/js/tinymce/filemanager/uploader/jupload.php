@@ -10,13 +10,13 @@
  * file that was distributed with this source code.
  */
 
-class JUpload
+class jupload
 {
     public $appletparams;
     public $classparams;
     public $files;
 
-    public function JUpload($appletparams = [], $classparams = []): void
+    public function __construct($appletparams = [], $classparams = []): void
     {
         if (gettype($classparams) != 'array') {
             $this->abort('Invalid type of parameter classparams: Expecting an array');
@@ -445,7 +445,7 @@ class JUpload
      */
     public function defaultAfterUploadManagement()
     {
-        $flist = '[defaultAfterUploadManagement] Nb uploaded files is: '.sizeof($this->files);
+        $flist = '[defaultAfterUploadManagement] Nb uploaded files is: '.count($this->files);
         $flist = $this->classparams['http_flist_start'];
         foreach ($this->files as $f) {
             //$f is an array, that contains all info about the uploaded file.
@@ -638,7 +638,7 @@ class JUpload
                 if ($classparams['verbose_errors']) {
                     $this->abort("Unable to move uploaded file (from ${files_data['tmp_name']} to $tmpname)");
                 } else {
-                    trigger_error("Unable to move uploaded file (from ${files_data['tmp_name']} to $tmpname)", E_USER_WARNING);
+                    trigger_error("Unable to move uploaded file (from ${files_data['tmp_name']} to $tmpname)", \E_USER_WARNING);
                     $this->abort('Unable to move uploaded file');
                 }
             }
@@ -652,7 +652,7 @@ class JUpload
                         $files_data['size'] = filesize($tmpname);
                     }
                     $files_data['fullName'] = 'Demo mode<BR>No file storing';
-                    array_push($this->files, $files_data);
+                    $this->files[] = $files_data;
                 }
                 unlink($tmpname);
                 ++$cnt;
@@ -664,7 +664,7 @@ class JUpload
                 $len = filesize($tmpname);
                 $_SESSION['RF'][$this->classparams['var_prefix'].'size'] += $len;
                 if ($len > 0) {
-                    $src = fopen($tmpname, 'rb');
+                    $src = fopen($tmpname, 'r');
                     $dst = fopen($dstname, ($jupart == 1) ? 'wb' : 'ab');
                     while ($len > 0) {
                         $rlen = ($len > 8192) ? 8192 : $len;
@@ -713,7 +713,7 @@ class JUpload
                         $files_data['size'] = filesize($dstfinal);
                         $files_data['fullName'] = $dstfinal;
                         $files_data['path'] = fix_dirname($dstfinal);
-                        array_push($this->files, $files_data);
+                        $this->files[] = $files_data;
                     } else {
                         unlink($dstname);
                     }
@@ -739,7 +739,7 @@ class JUpload
                 $files_data['size'] = filesize($dstfinal);
                 $files_data['fullName'] = $dstfinal;
                 $files_data['path'] = fix_dirname($dstfinal);
-                array_push($this->files, $files_data);
+                $this->files[] = $files_data;
             }
             ++$cnt;
         }

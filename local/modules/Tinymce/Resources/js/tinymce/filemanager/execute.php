@@ -12,7 +12,7 @@
 
 $config = include 'config/config.php';
 //TODO switch to array
-extract($config, EXTR_OVERWRITE);
+extract($config, \EXTR_OVERWRITE);
 
 include 'include/utils.php';
 
@@ -229,7 +229,7 @@ if (isset($_GET['action'])) {
             if ($ftp) {
                 $tmp = time().$name;
                 file_put_contents($tmp, $content);
-                $ftp->put('/'.$path.$name, $tmp, FTP_BINARY);
+                $ftp->put('/'.$path.$name, $tmp, \FTP_BINARY);
                 unlink($tmp);
                 response(trans('File_Save_OK'))->send();
             } else {
@@ -334,13 +334,13 @@ if (isset($_GET['action'])) {
 
             if ($ftp) {
                 if ($_POST['path'] != '') {
-                    $path .= DIRECTORY_SEPARATOR;
-                    $path_thumb .= DIRECTORY_SEPARATOR;
+                    $path .= \DIRECTORY_SEPARATOR;
+                    $path_thumb .= \DIRECTORY_SEPARATOR;
                 }
                 $path_thumb .= basename($data['path']);
                 $path .= basename($data['path']);
-                $data['path_thumb'] = DIRECTORY_SEPARATOR.$config['ftp_base_folder'].$config['ftp_thumbs_dir'].$data['path'];
-                $data['path'] = DIRECTORY_SEPARATOR.$config['ftp_base_folder'].$config['upload_dir'].$data['path'];
+                $data['path_thumb'] = \DIRECTORY_SEPARATOR.$config['ftp_base_folder'].$config['ftp_thumbs_dir'].$data['path'];
+                $data['path'] = \DIRECTORY_SEPARATOR.$config['ftp_base_folder'].$config['upload_dir'].$data['path'];
             } else {
                 $data['path_thumb'] = $thumbs_base_path.$data['path'];
                 $data['path'] = $current_path.$data['path'];
@@ -349,7 +349,7 @@ if (isset($_GET['action'])) {
             $pinfo = pathinfo($data['path']);
 
             // user wants to paste to the same dir. nothing to do here...
-            if ($pinfo['dirname'] == rtrim($path, DIRECTORY_SEPARATOR)) {
+            if ($pinfo['dirname'] == rtrim($path, \DIRECTORY_SEPARATOR)) {
                 response()->send();
                 exit;
             }
@@ -368,20 +368,20 @@ if (isset($_GET['action'])) {
             if ($ftp) {
                 if ($action == 'copy') {
                     $tmp = time().basename($data['path']);
-                    $ftp->get($tmp, $data['path'], FTP_BINARY);
-                    $ftp->put(DIRECTORY_SEPARATOR.$path, $tmp, FTP_BINARY);
+                    $ftp->get($tmp, $data['path'], \FTP_BINARY);
+                    $ftp->put(\DIRECTORY_SEPARATOR.$path, $tmp, \FTP_BINARY);
                     unlink($tmp);
 
                     if (url_exists($data['path_thumb'])) {
                         $tmp = time().basename($data['path_thumb']);
-                        @$ftp->get($tmp, $data['path_thumb'], FTP_BINARY);
-                        @$ftp->put(DIRECTORY_SEPARATOR.$path_thumb, $tmp, FTP_BINARY);
+                        @$ftp->get($tmp, $data['path_thumb'], \FTP_BINARY);
+                        @$ftp->put(\DIRECTORY_SEPARATOR.$path_thumb, $tmp, \FTP_BINARY);
                         unlink($tmp);
                     }
                 } elseif ($action == 'cut') {
-                    $ftp->rename($data['path'], DIRECTORY_SEPARATOR.$path);
+                    $ftp->rename($data['path'], \DIRECTORY_SEPARATOR.$path);
                     if (url_exists($data['path_thumb'])) {
-                        @$ftp->rename($data['path_thumb'], DIRECTORY_SEPARATOR.$path_thumb);
+                        @$ftp->rename($data['path_thumb'], \DIRECTORY_SEPARATOR.$path_thumb);
                     }
                 }
             } else {
@@ -466,7 +466,7 @@ if (isset($_GET['action'])) {
                 $tmp = time();
                 file_put_contents($tmp, $content);
                 try {
-                    $ftp->put('/'.$path, $tmp, FTP_BINARY);
+                    $ftp->put('/'.$path, $tmp, \FTP_BINARY);
                 } catch (FtpClient\FtpException $e) {
                     echo $e->getMessage();
                 }

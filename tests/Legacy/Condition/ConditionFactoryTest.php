@@ -45,27 +45,27 @@ class ConditionFactoryTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $currencies = CurrencyQuery::create();
         $currencies = $currencies->find();
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
+            ->willReturn($currencies);
 
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
             ->disableOriginalConstructor()
             ->getMock();
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue(new MatchForTotalAmount($stubFacade)));
+            ->willReturn(new MatchForTotalAmount($stubFacade));
 
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
@@ -108,27 +108,27 @@ class ConditionFactoryTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $currencies = CurrencyQuery::create();
         $currencies = $currencies->find();
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
+            ->willReturn($currencies);
 
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
             ->disableOriginalConstructor()
             ->getMock();
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue(new MatchForTotalAmount($stubFacade)));
+            ->willReturn(new MatchForTotalAmount($stubFacade));
 
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValueMap(['unset.service', false]));
+            ->willReturnMap(['unset.service', false]);
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
@@ -169,27 +169,27 @@ class ConditionFactoryTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $currencies = CurrencyQuery::create();
         $currencies = $currencies->find();
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
+            ->willReturn($currencies);
 
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
             ->disableOriginalConstructor()
             ->getMock();
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue(new MatchForTotalAmount($stubFacade)));
+            ->willReturn(new MatchForTotalAmount($stubFacade));
 
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $condition1 = new MatchForTotalAmount($stubFacade);
         $operators = [
@@ -247,16 +247,16 @@ class ConditionFactoryTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $currencies = CurrencyQuery::create();
         $currencies = $currencies->find();
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
+            ->willReturn($currencies);
 
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
             ->disableOriginalConstructor()
@@ -264,11 +264,11 @@ class ConditionFactoryTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue($condition1));
+            ->willReturn($condition1);
 
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
@@ -310,16 +310,16 @@ class ConditionFactoryTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $currencies = CurrencyQuery::create();
         $currencies = $currencies->find();
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
+            ->willReturn($currencies);
 
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
             ->disableOriginalConstructor()
@@ -327,11 +327,11 @@ class ConditionFactoryTest extends TestCase
         $condition1 = new MatchForTotalAmount($stubFacade);
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue($condition1));
+            ->willReturn($condition1);
 
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $operators = [
             MatchForTotalAmount::CART_TOTAL => Operators::SUPERIOR,
@@ -375,27 +375,27 @@ class ConditionFactoryTest extends TestCase
 
         $stubFacade->expects($this->any())
             ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));
+            ->willReturn($stubTranslator);
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
-            ->will($this->returnValue(new ConditionEvaluator()));
+            ->willReturn(new ConditionEvaluator());
 
         $currencies = CurrencyQuery::create();
         $currencies = $currencies->find();
         $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
-            ->will($this->returnValue($currencies));
+            ->willReturn($currencies);
 
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
             ->disableOriginalConstructor()
             ->getMock();
         $stubContainer->expects($this->any())
             ->method('get')
-            ->will($this->returnValue(new MatchForEveryone($stubFacade)));
+            ->willReturn(new MatchForEveryone($stubFacade));
 
         $stubContainer->expects($this->any())
             ->method('has')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $conditions = new ConditionCollection();
 

@@ -31,7 +31,7 @@ class FileDownloaderTest extends TestCase
     /** @var FileDownloader */
     protected $downloader;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $logger = Tlog::getNewInstance();
 

@@ -132,7 +132,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
 
         $id = $this->getId();
 
-        if (!\is_null($id)) {
+        if (null !== $id) {
             $search->filterById($id, Criteria::IN);
         }
 
@@ -144,13 +144,13 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
 
         $exclude = $this->getExclude();
 
-        if (!\is_null($exclude)) {
+        if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
         $productIdList = $this->getProduct();
 
-        if (!\is_null($productIdList)) {
+        if (null !== $productIdList) {
             $search
                 ->useSaleProductQuery()
                     ->filterByProductId($productIdList, Criteria::IN)
