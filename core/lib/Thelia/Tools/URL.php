@@ -33,8 +33,8 @@ class URL
     /** @var  RequestContext $requestContext */
     protected $requestContext;
 
-    const PATH_TO_FILE = true;
-    const WITH_INDEX_PAGE = false;
+    public const PATH_TO_FILE = true;
+    public const WITH_INDEX_PAGE = false;
 
     protected static $instance = null;
 

@@ -110,6 +110,6 @@ class OrderProductTaxCollection implements \Iterator
 
     public function getKey($key)
     {
-        return isset($this->taxes[$key]) ? $this->taxes[$key] : null;
+        return $this->taxes[$key] ?? null;
     }
 }

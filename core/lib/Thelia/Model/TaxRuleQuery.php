@@ -28,7 +28,7 @@ use Thelia\Model\Map\TaxRuleCountryTableMap;
  */
 class TaxRuleQuery extends BaseTaxRuleQuery
 {
-    const ALIAS_FOR_TAX_RULE_COUNTRY_POSITION = 'taxRuleCountryPosition';
+    public const ALIAS_FOR_TAX_RULE_COUNTRY_POSITION = 'taxRuleCountryPosition';
 
     protected static $caches = [];
 

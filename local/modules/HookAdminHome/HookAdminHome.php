@@ -19,19 +19,19 @@ use Thelia\Module\BaseModule;
 class HookAdminHome extends BaseModule
 {
     /** @var string */
-    const DOMAIN_NAME = 'hookadminhome';
+    public const DOMAIN_NAME = 'hookadminhome';
 
     /** @var string */
-    const ACTIVATE_NEWS = 'activate_home_news';
+    public const ACTIVATE_NEWS = 'activate_home_news';
 
     /** @var string */
-    const ACTIVATE_SALES= 'activate_home_sales';
+    public const ACTIVATE_SALES= 'activate_home_sales';
 
     /** @var string */
-    const ACTIVATE_INFO= 'activate_home_info';
+    public const ACTIVATE_INFO= 'activate_home_info';
 
     /** @var string */
-    const ACTIVATE_STATS= 'activate_stats';
+    public const ACTIVATE_STATS= 'activate_stats';
 
     public function getHooks()
     {

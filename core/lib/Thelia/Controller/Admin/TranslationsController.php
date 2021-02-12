@@ -117,7 +117,7 @@ class TranslationsController extends BaseAdminController
                     } elseif (! empty($modulePart)) {
                         // Front, back, pdf or email office template,
                         // form of $module_part is [bo|fo|pdf|email].subdir-name
-                        list($type, $subdir) = explode('.', $modulePart);
+                        [$type, $subdir] = explode('.', $modulePart);
 
                         switch ($type) {
                             case 'bo':
@@ -357,7 +357,7 @@ class TranslationsController extends BaseAdminController
 
             /** @var \DirectoryIterator $file */
             foreach ($finder as $file) {
-                list($locale, $format) = explode('.', $file->getBaseName(), 2);
+                [$locale, $format] = explode('.', $file->getBaseName(), 2);
 
                 Translator::getInstance()->addResource($format, $file->getPathname(), $locale, $domain);
             }

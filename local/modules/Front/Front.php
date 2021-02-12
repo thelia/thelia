@@ -16,5 +16,5 @@ use Thelia\Module\BaseModule;
 
 class Front extends BaseModule
 {
-    const MESSAGE_DOMAIN = 'front';
+    public const MESSAGE_DOMAIN = 'front';
 }

@@ -22,7 +22,7 @@ use Thelia\Model\ModuleQuery;
 
 class BaseFrontController extends BaseController
 {
-    const CONTROLLER_TYPE = 'front';
+    public const CONTROLLER_TYPE = 'front';
 
     protected $currentRouter = "router.front";
 

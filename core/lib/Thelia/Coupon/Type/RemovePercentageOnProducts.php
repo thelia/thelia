@@ -22,7 +22,7 @@ use Thelia\Model\Product;
  */
 class RemovePercentageOnProducts extends AbstractRemoveOnProducts
 {
-    const PERCENTAGE = 'percentage';
+    public const PERCENTAGE = 'percentage';
 
     use PercentageCouponTrait;
 

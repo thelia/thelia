@@ -1254,7 +1254,7 @@ class ProductController extends AbstractSeoCrudController
             $combinations = $attributes_av_list = $tmp = [];
 
             foreach ($data['attribute_av'] as $item) {
-                list($attribute_id, $attribute_av_id) = explode(':', $item);
+                [$attribute_id, $attribute_av_id] = explode(':', $item);
 
                 if (! isset($attributes_av_list[$attribute_id])) {
                     $attributes_av_list[$attribute_id] = [];

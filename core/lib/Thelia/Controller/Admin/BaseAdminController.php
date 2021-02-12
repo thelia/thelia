@@ -31,9 +31,9 @@ use Thelia\Tools\URL;
 
 class BaseAdminController extends BaseController
 {
-    const CONTROLLER_TYPE = 'admin';
+    public const CONTROLLER_TYPE = 'admin';
 
-    const TEMPLATE_404 = "404";
+    public const TEMPLATE_404 = "404";
 
     /**
      * The current router identifier. The default is router.admin. Modules may use

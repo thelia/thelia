@@ -418,7 +418,7 @@ if (isset($_GET['action']))
 				}
 				if ($action == 'copy')
 				{
-					list($sizeFolderToCopy,$fileNum,$foldersCount) = folder_info($path,false);
+					[$sizeFolderToCopy,$fileNum,$foldersCount] = folder_info($path,false);
 					if (!checkresultingsize($sizeFolderToCopy)) {
 						response(sprintf(trans('max_size_reached'),$MaxSizeTotal).AddErrorLocation())->send();
 						exit;

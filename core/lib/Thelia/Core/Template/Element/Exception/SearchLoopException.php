@@ -14,7 +14,7 @@ namespace Thelia\Core\Template\Element\Exception;
 
 class SearchLoopException extends \RuntimeException
 {
-    const UNKNOWN_EXCEPTION = 0;
+    public const UNKNOWN_EXCEPTION = 0;
 
     public function __construct($message, $code = null, $arguments = [], $previous = null)
     {

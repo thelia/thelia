@@ -11,9 +11,9 @@
  */
 
 class JUpload {
-	var $appletparams;
-	var $classparams;
-	var $files;
+	public $appletparams;
+	public $classparams;
+	public $files;
 
 	public function JUpload($appletparams = [], $classparams = []) {
 		if (gettype($classparams) != 'array')

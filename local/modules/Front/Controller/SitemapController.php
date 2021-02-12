@@ -39,12 +39,12 @@ class SitemapController extends BaseFrontController {
     /**
      * Folder name for sitemap cache
      */
-    const SITEMAP_CACHE_DIR = "sitemap";
+    public const SITEMAP_CACHE_DIR = "sitemap";
 
     /**
      * Key prefix for sitemap cache
      */
-    const SITEMAP_CACHE_KEY = "sitemap";
+    public const SITEMAP_CACHE_KEY = "sitemap";
 
     /**
      * @return Response

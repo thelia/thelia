@@ -21,8 +21,8 @@ use Thelia\Core\Event\ActionEvent;
 
 class TranslationEvent extends ActionEvent
 {
-    const WALK_MODE_PHP = 'php';
-    const WALK_MODE_TEMPLATE = 'tpl';
+    public const WALK_MODE_PHP = 'php';
+    public const WALK_MODE_TEMPLATE = 'tpl';
 
     /** @var  string */
     protected $directory;

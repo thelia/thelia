@@ -30,8 +30,8 @@ abstract class FirewallForm extends BaseForm
      *
      * Time is in minutes
      */
-    const DEFAULT_TIME_TO_WAIT = 60; // 1 hour
-    const DEFAULT_ATTEMPTS = 6;
+    public const DEFAULT_TIME_TO_WAIT = 60; // 1 hour
+    public const DEFAULT_ATTEMPTS = 6;
 
     public function isFirewallOk($env)
     {

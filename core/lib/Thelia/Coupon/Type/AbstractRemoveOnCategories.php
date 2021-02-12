@@ -25,7 +25,7 @@ use Thelia\Model\Category;
  */
 abstract class AbstractRemoveOnCategories extends CouponAbstract implements AmountAndPercentageCouponInterface
 {
-    const CATEGORIES_LIST = 'categories';
+    public const CATEGORIES_LIST = 'categories';
 
     protected $category_list = [];
 
@@ -82,7 +82,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
             $perCustomerUsageCount
         );
 
-        $this->category_list = isset($effects[self::CATEGORIES_LIST]) ? $effects[self::CATEGORIES_LIST] : [];
+        $this->category_list = $effects[self::CATEGORIES_LIST] ?? [];
 
         if (! \is_array($this->category_list)) {
             $this->category_list = [$this->category_list];

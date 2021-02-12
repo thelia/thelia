@@ -46,89 +46,89 @@ class AdminResources
             throw new ResourceException(sprintf('Resource `%s` not found', $constantName), ResourceException::RESOURCE_NOT_FOUND);
     }
 
-    const SUPERADMINISTRATOR = "SUPERADMINISTRATOR";
+    public const SUPERADMINISTRATOR = "SUPERADMINISTRATOR";
 
-    const ADDRESS = "admin.address";
+    public const ADDRESS = "admin.address";
 
-    const ADMINISTRATOR = "admin.configuration.administrator";
+    public const ADMINISTRATOR = "admin.configuration.administrator";
 
-    const ADVANCED_CONFIGURATION = "admin.configuration.advanced";
+    public const ADVANCED_CONFIGURATION = "admin.configuration.advanced";
 
-    const AREA = "admin.configuration.area";
+    public const AREA = "admin.configuration.area";
 
-    const ATTRIBUTE = "admin.configuration.attribute";
+    public const ATTRIBUTE = "admin.configuration.attribute";
 
-    const BRAND = "admin.brand";
+    public const BRAND = "admin.brand";
 
-    const CATEGORY = "admin.category";
+    public const CATEGORY = "admin.category";
 
-    const CONFIG = "admin.configuration";
+    public const CONFIG = "admin.configuration";
 
-    const CONTENT = "admin.content";
+    public const CONTENT = "admin.content";
 
-    const COUNTRY = "admin.configuration.country";
+    public const COUNTRY = "admin.configuration.country";
 
-    const STATE = "admin.configuration.state";
+    public const STATE = "admin.configuration.state";
 
-    const COUPON = "admin.coupon";
+    public const COUPON = "admin.coupon";
 
-    const CURRENCY = "admin.configuration.currency";
+    public const CURRENCY = "admin.configuration.currency";
 
-    const CUSTOMER = "admin.customer";
+    public const CUSTOMER = "admin.customer";
 
-    const FEATURE = "admin.configuration.feature";
+    public const FEATURE = "admin.configuration.feature";
 
-    const FOLDER = "admin.folder";
+    public const FOLDER = "admin.folder";
 
-    const HOME = "admin.home";
+    public const HOME = "admin.home";
 
-    const LANGUAGE = "admin.configuration.language";
+    public const LANGUAGE = "admin.configuration.language";
 
-    const MAILING_SYSTEM = "admin.configuration.mailing-system";
+    public const MAILING_SYSTEM = "admin.configuration.mailing-system";
 
-    const MESSAGE = "admin.configuration.message";
+    public const MESSAGE = "admin.configuration.message";
 
-    const MODULE = "admin.module";
+    public const MODULE = "admin.module";
 
-    const HOOK = "admin.hook";
+    public const HOOK = "admin.hook";
 
-    const MODULE_HOOK = "admin.module-hook";
+    public const MODULE_HOOK = "admin.module-hook";
 
-    const ORDER = "admin.order";
+    public const ORDER = "admin.order";
 
-    const ORDER_STATUS = "admin.configuration.order-status";
+    public const ORDER_STATUS = "admin.configuration.order-status";
 
-    const PRODUCT = "admin.product";
+    public const PRODUCT = "admin.product";
 
-    const PROFILE = "admin.configuration.profile";
+    public const PROFILE = "admin.configuration.profile";
 
-    const SHIPPING_ZONE = "admin.configuration.shipping-zone";
+    public const SHIPPING_ZONE = "admin.configuration.shipping-zone";
 
-    const TAX = "admin.configuration.tax";
+    public const TAX = "admin.configuration.tax";
 
-    const TEMPLATE = "admin.configuration.template";
+    public const TEMPLATE = "admin.configuration.template";
 
-    const SYSTEM_LOG = "admin.configuration.system-logs";
+    public const SYSTEM_LOG = "admin.configuration.system-logs";
 
-    const ADMIN_LOG = "admin.configuration.admin-logs";
+    public const ADMIN_LOG = "admin.configuration.admin-logs";
 
-    const STORE = "admin.configuration.store";
+    public const STORE = "admin.configuration.store";
 
-    const TRANSLATIONS = "admin.configuration.translations";
+    public const TRANSLATIONS = "admin.configuration.translations";
 
-    const UPDATE = "admin.configuration.update";
+    public const UPDATE = "admin.configuration.update";
 
-    const EXPORT = "admin.export";
+    public const EXPORT = "admin.export";
 
-    const IMPORT = "admin.import";
+    public const IMPORT = "admin.import";
 
-    const TOOLS = "admin.tools";
+    public const TOOLS = "admin.tools";
 
-    const SALES = "admin.sales";
+    public const SALES = "admin.sales";
 
-    const API = "admin.configuration.api";
+    public const API = "admin.configuration.api";
 
-    const TITLE = "admin.customer.title";
+    public const TITLE = "admin.customer.title";
 
     /**
      * Stock all resources by modules

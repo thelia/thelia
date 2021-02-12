@@ -28,10 +28,10 @@ use Thelia\Model\CurrencyQuery;
 class MatchForTotalAmount extends ConditionAbstract
 {
     /** Condition 1st parameter : price */
-    const CART_TOTAL = 'price';
+    public const CART_TOTAL = 'price';
 
     /** Condition 1st parameter : currency */
-    const CART_CURRENCY = 'currency';
+    public const CART_CURRENCY = 'currency';
 
     public function __construct(FacadeInterface $facade)
     {
@@ -213,7 +213,7 @@ class MatchForTotalAmount extends ConditionAbstract
             [
                 'label' => $label,
                 'inputKey' => $inputKey,
-                'value' => isset($this->values[$inputKey]) ? $this->values[$inputKey] : '',
+                'value' => $this->values[$inputKey] ?? '',
                 'field_1_name' => self::CART_TOTAL,
                 'field_2_name' => self::CART_CURRENCY,
                 'operatorSelectHtml' => $this->drawBackOfficeInputOperators(self::CART_TOTAL),

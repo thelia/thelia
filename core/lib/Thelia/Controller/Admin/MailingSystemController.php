@@ -22,7 +22,7 @@ use Thelia\Model\ConfigQuery;
 
 class MailingSystemController extends BaseAdminController
 {
-    const RESOURCE_CODE = "admin.configuration.mailing-system";
+    public const RESOURCE_CODE = "admin.configuration.mailing-system";
 
     public function defaultAction()
     {

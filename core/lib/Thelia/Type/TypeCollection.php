@@ -136,6 +136,6 @@ class TypeCollection implements \Iterator
 
     public function getKey($key)
     {
-        return isset($this->types[$key]) ? $this->types[$key] : null;
+        return $this->types[$key] ?? null;
     }
 }

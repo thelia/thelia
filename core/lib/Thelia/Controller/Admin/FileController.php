@@ -45,7 +45,7 @@ use Thelia\Tools\URL;
  */
 class FileController extends BaseAdminController
 {
-    const MODULE_RIGHT = "thelia";
+    public const MODULE_RIGHT = "thelia";
 
     /**
      * Get the FileManager

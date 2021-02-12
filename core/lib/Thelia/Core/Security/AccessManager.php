@@ -19,10 +19,10 @@ namespace Thelia\Core\Security;
  */
 class AccessManager
 {
-    const VIEW = 'VIEW';
-    const CREATE = 'CREATE';
-    const UPDATE = 'UPDATE';
-    const DELETE = 'DELETE';
+    public const VIEW = 'VIEW';
+    public const CREATE = 'CREATE';
+    public const UPDATE = 'UPDATE';
+    public const DELETE = 'DELETE';
 
     protected $accessGranted = [
         self::VIEW      =>  false,

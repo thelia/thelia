@@ -29,7 +29,7 @@ use Thelia\Model\CategoryQuery;
 class CartContainsCategories extends ConditionAbstract
 {
     /** Condition 1st parameter : quantity */
-    const CATEGORIES_LIST = 'categories';
+    public const CATEGORIES_LIST = 'categories';
 
     /**
      * @inheritdoc
@@ -193,7 +193,7 @@ class CartContainsCategories extends ConditionAbstract
             [
                 'operatorSelectHtml'    => $this->drawBackOfficeInputOperators(self::CATEGORIES_LIST),
                 'categories_field_name' => self::CATEGORIES_LIST,
-                'values'                => isset($this->values[self::CATEGORIES_LIST]) ? $this->values[self::CATEGORIES_LIST] : []
+                'values'                => $this->values[self::CATEGORIES_LIST] ?? []
             ]
         );
     }

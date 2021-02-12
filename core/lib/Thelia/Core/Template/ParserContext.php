@@ -31,7 +31,7 @@ use TheliaSmarty\Template\Exception\SmartyPluginException;
 class ParserContext implements \IteratorAggregate
 {
     // Lifetime, in seconds, of form error data
-    const FORM_ERROR_LIFETIME_SECONDS = 60;
+    public const FORM_ERROR_LIFETIME_SECONDS = 60;
 
     private $formStore = [];
     private $store = [];
@@ -315,7 +315,7 @@ class ParserContext implements \IteratorAggregate
 
     public function get($name, $default = null)
     {
-        return isset($this->store[$name]) ? $this->store[$name] : $default;
+        return $this->store[$name] ?? $default;
     }
 
     public function getIterator()

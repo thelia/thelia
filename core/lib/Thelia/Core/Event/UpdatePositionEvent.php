@@ -14,9 +14,9 @@ namespace Thelia\Core\Event;
 
 class UpdatePositionEvent extends ActionEvent
 {
-    const POSITION_UP = 1;
-    const POSITION_DOWN = 2;
-    const POSITION_ABSOLUTE = 3;
+    public const POSITION_UP = 1;
+    public const POSITION_DOWN = 2;
+    public const POSITION_ABSOLUTE = 3;
 
     /**
      * @var int

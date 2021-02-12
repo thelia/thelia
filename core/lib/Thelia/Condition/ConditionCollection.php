@@ -136,7 +136,7 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return isset($this->conditions[$offset]) ? $this->conditions[$offset] : null;
+        return $this->conditions[$offset] ?? null;
     }
 
     /**

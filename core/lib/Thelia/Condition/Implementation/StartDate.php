@@ -26,7 +26,7 @@ use Thelia\Tools\DateTimeFormat;
  */
 class StartDate extends ConditionAbstract
 {
-    const START_DATE = 'start_date';
+    public const START_DATE = 'start_date';
 
     /**
      * @inheritdoc

@@ -21,7 +21,7 @@ $sql = 'SELECT id FROM `order` ORDER BY `id` DESC LIMIT 1';
 $stmt = $pdo->query($sql);
 $queryResult = $stmt->fetch(\PDO::FETCH_OBJ);
 
-$lastOrderId = isset($queryResult->id) ? $queryResult->id : 0;
+$lastOrderId = $queryResult->id ?? 0;
 
 // Store it in an hidden configuration variable
 $sql = "INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES ('last_legacy_rounding_order_id', ?, 1, 1, ?, ?)";

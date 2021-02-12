@@ -17,6 +17,6 @@ namespace HookNavigation\Model\Config\Base;
  */
 class HookNavigationConfigValue
 {
-    const FOOTER_BODY_FOLDER_ID = 'footer_body_folder_id';
-    const FOOTER_BOTTOM_FOLDER_ID = 'footer_bottom_folder_id';
+    public const FOOTER_BODY_FOLDER_ID = 'footer_body_folder_id';
+    public const FOOTER_BOTTOM_FOLDER_ID = 'footer_bottom_folder_id';
 }

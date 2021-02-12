@@ -21,11 +21,11 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
     // Nom des variables de configuration
     // ----------------------------------
 
-    const VAR_MAX_FILE_SIZE_KB = "tlog_destinationfile_max_file_size";
-    const VAR_MAX_FILE_COUNT = "tlog_destinationfile_max_file_count";
+    public const VAR_MAX_FILE_SIZE_KB = "tlog_destinationfile_max_file_size";
+    public const VAR_MAX_FILE_COUNT = "tlog_destinationfile_max_file_count";
 
-    const MAX_FILE_SIZE_KB_DEFAULT = 1024; // 1 Mb
-    const MAX_FILE_COUNT_DEFAULT = 10;
+    public const MAX_FILE_SIZE_KB_DEFAULT = 1024; // 1 Mb
+    public const MAX_FILE_COUNT_DEFAULT = 10;
 
     public function __construct($maxFileSize = self::MAX_FILE_SIZE_KB_DEFAULT)
     {

@@ -28,7 +28,7 @@ use Thelia\Model\CustomerQuery;
  */
 class ForSomeCustomers extends ConditionAbstract
 {
-    const CUSTOMERS_LIST = 'customers';
+    public const CUSTOMERS_LIST = 'customers';
 
     /**
      * @inheritdoc
@@ -183,7 +183,7 @@ class ForSomeCustomers extends ConditionAbstract
             [
                 'operatorSelectHtml'   => $this->drawBackOfficeInputOperators(self::CUSTOMERS_LIST),
                 'customers_field_name' => self::CUSTOMERS_LIST,
-                'values'               => isset($this->values[self::CUSTOMERS_LIST]) ? $this->values[self::CUSTOMERS_LIST] : []
+                'values'               => $this->values[self::CUSTOMERS_LIST] ?? []
             ]
         );
     }

@@ -21,9 +21,9 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
  */
 interface SearchLoopInterface
 {
-    const MODE_ANY_WORD = 'any_word';
-    const MODE_SENTENCE = 'sentence';
-    const MODE_STRICT_SENTENCE = 'strict_sentence';
+    public const MODE_ANY_WORD = 'any_word';
+    public const MODE_SENTENCE = 'sentence';
+    public const MODE_STRICT_SENTENCE = 'strict_sentence';
 
     /**
      * @return array of available field to search in

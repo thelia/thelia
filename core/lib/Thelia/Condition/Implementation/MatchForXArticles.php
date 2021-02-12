@@ -26,7 +26,7 @@ use Thelia\Exception\InvalidConditionValueException;
 class MatchForXArticles extends ConditionAbstract
 {
     /** Condition 1st parameter : quantity */
-    const CART_QUANTITY = 'quantity';
+    public const CART_QUANTITY = 'quantity';
 
     /**
      * @inheritdoc

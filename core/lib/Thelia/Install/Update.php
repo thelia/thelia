@@ -33,11 +33,11 @@ use Thelia\Tools\Version\Version;
  */
 class Update
 {
-    const SQL_DIR = 'update/sql/';
+    public const SQL_DIR = 'update/sql/';
 
-    const PHP_DIR = 'update/php/';
+    public const PHP_DIR = 'update/php/';
 
-    const INSTRUCTION_DIR = 'update/instruction/';
+    public const INSTRUCTION_DIR = 'update/instruction/';
 
     protected $version;
 

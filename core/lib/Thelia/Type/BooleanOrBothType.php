@@ -21,7 +21,7 @@ namespace Thelia\Type;
 
 class BooleanOrBothType extends BaseType
 {
-    const ANY = '*';
+    public const ANY = '*';
 
     public function getType()
     {

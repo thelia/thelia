@@ -302,7 +302,7 @@ class SmartyParser extends Smarty implements ParserInterface
     public function popTemplateDefinition()
     {
         if (\count($this->tplStack) > 0) {
-            list ($templateDefinition, $fallbackToDefaultTemplate) = array_pop($this->tplStack);
+             [$templateDefinition, $fallbackToDefaultTemplate] = array_pop($this->tplStack);
 
             $this->setTemplateDefinition($templateDefinition, $fallbackToDefaultTemplate);
         }

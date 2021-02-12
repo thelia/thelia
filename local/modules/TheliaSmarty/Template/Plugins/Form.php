@@ -62,7 +62,7 @@ use TheliaSmarty\Template\SmartyPluginDescriptor;
  */
 class Form extends AbstractSmartyPlugin
 {
-    const COLLECTION_TYPE_NAME = "collection";
+    public const COLLECTION_TYPE_NAME = "collection";
 
     private static $taggedFieldsStack = null;
     private static $taggedFieldsStackPosition = null;
@@ -175,13 +175,13 @@ class Form extends AbstractSmartyPlugin
 
         $template->assign("type", $fieldType);
 
-        $template->assign("checked", isset($fieldVars['data']) ? $fieldVars['data'] : false);
-        $template->assign("choices", isset($fieldVars['choices']) ? $fieldVars['choices'] : false);
-        $template->assign("multiple", isset($fieldVars['multiple']) ? $fieldVars['multiple'] : false);
-        $template->assign("disabled", isset($fieldVars['disabled']) ? $fieldVars['disabled'] : false);
-        $template->assign("read_only", isset($fieldVars['read_only']) ? $fieldVars['read_only'] : false);
-        $template->assign("max_length", isset($fieldVars['max_length']) ? $fieldVars['max_length'] : false);
-        $template->assign('required', isset($fieldVars['required']) ? $fieldVars['required'] : false);
+        $template->assign("checked", $fieldVars['data'] ?? false);
+        $template->assign("choices", $fieldVars['choices'] ?? false);
+        $template->assign("multiple", $fieldVars['multiple'] ?? false);
+        $template->assign("disabled", $fieldVars['disabled'] ?? false);
+        $template->assign("read_only", $fieldVars['read_only'] ?? false);
+        $template->assign("max_length", $fieldVars['max_length'] ?? false);
+        $template->assign('required', $fieldVars['required'] ?? false);
 
         $template->assign("label", $fieldVars["label"]);
         $template->assign("label_attr", $fieldVars["label_attr"]);

@@ -14,9 +14,9 @@ namespace Thelia\Exception;
 
 class ModuleException extends \RuntimeException
 {
-    const UNKNOWN_EXCEPTION = 0;
+    public const UNKNOWN_EXCEPTION = 0;
 
-    const CODE_NOT_FOUND = 404;
+    public const CODE_NOT_FOUND = 404;
 
     public function __construct($message, $code = null, $previous = null)
     {

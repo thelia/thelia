@@ -39,12 +39,12 @@ abstract class CouponAbstract implements CouponInterface
       *
      * use the makeCouponField() method to do that safely.
      */
-    const COUPON_DATASET_NAME = 'coupon_specific';
+    public const COUPON_DATASET_NAME = 'coupon_specific';
 
     /**
      * A standard 'amount' filed name, thant can be used in coupons which extends this class
      */
-    const AMOUNT_FIELD_NAME = 'amount';
+    public const AMOUNT_FIELD_NAME = 'amount';
 
     /** @var  FacadeInterface Provide necessary value from Thelia */
     protected $facade;
@@ -174,7 +174,7 @@ abstract class CouponAbstract implements CouponInterface
 
         $this->effects = $effects;
         // Amount is now optional.
-        $this->amount = isset($effects[self::AMOUNT_FIELD_NAME]) ? $effects[self::AMOUNT_FIELD_NAME] : 0;
+        $this->amount = $effects[self::AMOUNT_FIELD_NAME] ?? 0;
 
         $this->freeShippingForCountries = $freeShippingForCountries;
         $this->freeShippingForModules = $freeShippingForModules;

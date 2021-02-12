@@ -19,15 +19,15 @@ class TlogDestinationPopup extends AbstractTlogDestination
 {
     // Nom des variables de configuration
     // ----------------------------------
-    const VAR_POPUP_WIDTH = "tlog_destinationpopup_width";
-    const VALEUR_POPUP_WIDTH_DEFAUT = "600";
+    public const VAR_POPUP_WIDTH = "tlog_destinationpopup_width";
+    public const VALEUR_POPUP_WIDTH_DEFAUT = "600";
 
-    const VAR_POPUP_HEIGHT = "tlog_destinationpopup_height";
-    const VALEUR_POPUP_HEIGHT_DEFAUT = "600";
+    public const VAR_POPUP_HEIGHT = "tlog_destinationpopup_height";
+    public const VALEUR_POPUP_HEIGHT_DEFAUT = "600";
 
-    const VAR_POPUP_TPL = "tlog_destinationpopup_template";
+    public const VAR_POPUP_TPL = "tlog_destinationpopup_template";
     // Ce fichier doit se trouver dans le même répertoire que TlogDestinationPopup.class.php
-    const VALEUR_POPUP_TPL_DEFAUT = "TlogDestinationPopup.tpl";
+    public const VALEUR_POPUP_TPL_DEFAUT = "TlogDestinationPopup.tpl";
 
     public function getTitle()
     {

@@ -66,9 +66,9 @@ use Thelia\Tools\URL;
 class Image extends BaseCachedFile implements EventSubscriberInterface
 {
     // Resize mode constants
-    const EXACT_RATIO_WITH_BORDERS = 1;
-    const EXACT_RATIO_WITH_CROP = 2;
-    const KEEP_IMAGE_RATIO = 3;
+    public const EXACT_RATIO_WITH_BORDERS = 1;
+    public const EXACT_RATIO_WITH_CROP = 2;
+    public const KEEP_IMAGE_RATIO = 3;
 
     /**
      * @return string root of the image cache directory in web space

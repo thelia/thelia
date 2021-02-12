@@ -37,8 +37,8 @@ use Thelia\Model\Sale;
 class SaleModificationForm extends SaleCreationForm
 {
     // The date format for the start and end date
-    const PHP_DATE_FORMAT = "Y-m-d H:i:s";
-    const MOMENT_JS_DATE_FORMAT = "YYYY-MM-DD HH:mm:ss";
+    public const PHP_DATE_FORMAT = "Y-m-d H:i:s";
+    public const MOMENT_JS_DATE_FORMAT = "YYYY-MM-DD HH:mm:ss";
 
     use StandardDescriptionFieldsTrait;
 

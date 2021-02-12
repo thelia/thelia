@@ -25,7 +25,7 @@ class TarArchiver extends AbstractArchiver
     /**
      * @var integer Compression method
      */
-    const COMPRESSION_METHOD = \Phar::NONE;
+    public const COMPRESSION_METHOD = \Phar::NONE;
 
     public function getId()
     {

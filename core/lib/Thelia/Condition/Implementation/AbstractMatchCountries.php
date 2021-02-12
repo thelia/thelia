@@ -28,7 +28,7 @@ use Thelia\Model\CountryQuery;
 abstract class AbstractMatchCountries extends ConditionAbstract
 {
     /** Condition 1st parameter : quantity */
-    const COUNTRIES_LIST = 'countries';
+    public const COUNTRIES_LIST = 'countries';
 
     /**
      * @inheritdoc
@@ -147,7 +147,7 @@ abstract class AbstractMatchCountries extends ConditionAbstract
             [
                 'operatorSelectHtml'   => $this->drawBackOfficeInputOperators(self::COUNTRIES_LIST),
                 'countries_field_name' => self::COUNTRIES_LIST,
-                'values'               => isset($this->values[self::COUNTRIES_LIST]) ? $this->values[self::COUNTRIES_LIST] : [],
+                'values'               => $this->values[self::COUNTRIES_LIST] ?? [],
                 'countryLabel'         => $this->getFormLabel()
             ]
         );

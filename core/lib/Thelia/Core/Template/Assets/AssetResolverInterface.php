@@ -18,10 +18,10 @@ use Thelia\Core\Template\TemplateDefinition;
 interface AssetResolverInterface
 {
     /** The name of the subdirectory in a template asset directory in which modules assets can be overridden */
-    const MODULE_OVERRIDE_DIRECTORY_NAME = 'modules';
+    public const MODULE_OVERRIDE_DIRECTORY_NAME = 'modules';
 
     /** The name of the default template */
-    const DEFAULT_TEMPLATE_NAME = 'default';
+    public const DEFAULT_TEMPLATE_NAME = 'default';
 
     /**
      * Generate an asset URL

@@ -75,7 +75,7 @@ if(count($hidden_folders)){
 }
 
 if ($show_total_size) {
-	list($sizeCurrentFolder,$fileCurrentNum,$foldersCurrentCount) = folder_info($current_path,false);
+	[$sizeCurrentFolder,$fileCurrentNum,$foldersCurrentCount] = folder_info($current_path,false);
 }
 /***
 *SUB-DIR CODE
@@ -274,7 +274,7 @@ $get_params = [
 ];
 if(isset($_GET['CKEditorFuncNum'])){
 	$get_params['CKEditorFuncNum'] = $_GET['CKEditorFuncNum'];
-	$get_params['CKEditor'] = (isset($_GET['CKEditor'])? $_GET['CKEditor'] : '');
+	$get_params['CKEditor'] = ($_GET['CKEditor'] ?? '');
 }
 $get_params['fldr'] ='';
 
@@ -575,7 +575,7 @@ foreach($files as $k=>$file){
 				$date=filemtime($current_path.$rfm_subfolder.$subdir. $file);
 				$current_folders_number++;
 				if($show_folder_size){
-					list($size,$nfiles,$nfolders) = folder_info($current_path.$rfm_subfolder.$subdir.$file,false);
+					[$size,$nfiles,$nfolders] = folder_info($current_path.$rfm_subfolder.$subdir.$file,false);
 				} else {
 					$size=0;
 				}
@@ -953,7 +953,7 @@ $files=$sorted;
 							}
 						}
 						//check if is smaller than thumb
-						list($img_width, $img_height, $img_type, $attr)=@getimagesize($file_path);
+						[$img_width, $img_height, $img_type, $attr]=@getimagesize($file_path);
 						if($img_width<122 && $img_height<91){
 							$src_thumb=$file_path;
 							$show_original=true;

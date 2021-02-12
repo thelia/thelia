@@ -158,13 +158,13 @@ class CustomerController extends AbstractCrudController
             $data["zipcode"],
             $data["city"],
             $data["country"],
-            isset($data["email"])?$data["email"]:null,
+            $data["email"]??null,
             isset($data["password"]) && ! empty($data["password"]) ? $data["password"]:null,
             $data["lang_id"],
-            isset($data["reseller"])?$data["reseller"]:null,
-            isset($data["sponsor"])?$data["sponsor"]:null,
-            isset($data["discount"])?$data["discount"]:null,
-            isset($data["company"])?$data["company"]:null,
+            $data["reseller"]??null,
+            $data["sponsor"]??null,
+            $data["discount"]??null,
+            $data["company"]??null,
             null,
             $data["state"]
         );

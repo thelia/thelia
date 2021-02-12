@@ -19,5 +19,5 @@ namespace TheliaMigrateCountry\Events;
  */
 class MigrateCountryEvents
 {
-    const MIGRATE_COUNTRY = 'action.migrate-country.migrate';
+    public const MIGRATE_COUNTRY = 'action.migrate-country.migrate';
 }

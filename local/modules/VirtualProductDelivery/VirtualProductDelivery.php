@@ -25,7 +25,7 @@ use Thelia\Module\Exception\DeliveryException;
 
 class VirtualProductDelivery extends AbstractDeliveryModuleWithState
 {
-    const MESSAGE_DOMAIN = 'virtualproductdelivery';
+    public const MESSAGE_DOMAIN = 'virtualproductdelivery';
 
     /** @var Translator */
     protected $translator;

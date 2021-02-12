@@ -28,8 +28,8 @@ use Thelia\Model\ProductQuery;
  */
 class FreeProduct extends AbstractRemoveOnProducts
 {
-    const OFFERED_PRODUCT_ID  = 'offered_product_id';
-    const OFFERED_CATEGORY_ID = 'offered_category_id';
+    public const OFFERED_PRODUCT_ID  = 'offered_product_id';
+    public const OFFERED_CATEGORY_ID = 'offered_category_id';
 
     /** @var string Service Id  */
     protected $serviceId = 'thelia.coupon.type.free_product';
@@ -41,7 +41,7 @@ class FreeProduct extends AbstractRemoveOnProducts
      * This constant is user to mark a free product as in the process of being added to the cart,
      * but the CartItem ID is not yet been defined.
      */
-    const ADD_TO_CART_IN_PROCESS = -1;
+    public const ADD_TO_CART_IN_PROCESS = -1;
 
     /**
      * @inheritdoc

@@ -39,7 +39,7 @@ use Thelia\Type\TypeCollection;
  */
 abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    const DEFAULT_ORDER = "manual";
+    public const DEFAULT_ORDER = "manual";
 
     protected $timestampable = true;
 

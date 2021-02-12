@@ -375,7 +375,7 @@ function folder_info($path,$count_hidden=true)
 				$currentFile = $cleanPath . $t;
 				if (is_dir($currentFile))
 				{
-					list($size,$tmp,$tmp1) = folder_info($currentFile);
+					[$size,$tmp,$tmp1] = folder_info($currentFile);
 					$total_size += $size;
 					$folders_count ++;
 				}
@@ -438,7 +438,7 @@ function checkresultingsize($sizeAdded)
 {
 	global $MaxSizeTotal,$current_path;
 	if ($MaxSizeTotal !== false && is_int($MaxSizeTotal)) {
-		list($sizeCurrentFolder,$fileCurrentNum,$foldersCurrentCount) = folder_info($current_path,false);
+		[$sizeCurrentFolder,$fileCurrentNum,$foldersCurrentCount] = folder_info($current_path,false);
 		// overall size over limit
 		if (($MaxSizeTotal * 1024 * 1024) < ($sizeCurrentFolder + $sizeAdded)) {
 			return false;

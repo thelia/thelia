@@ -22,12 +22,12 @@ class OrderException extends \RuntimeException
 
     public $arguments = [];
 
-    const UNKNOWN_EXCEPTION = 0;
+    public const UNKNOWN_EXCEPTION = 0;
 
-    const CART_EMPTY = 100;
+    public const CART_EMPTY = 100;
 
-    const UNDEFINED_DELIVERY = 200;
-    const DELIVERY_MODULE_UNAVAILABLE = 201;
+    public const UNDEFINED_DELIVERY = 200;
+    public const DELIVERY_MODULE_UNAVAILABLE = 201;
 
     public function __construct($message, $code = null, $arguments = [], $previous = null)
     {

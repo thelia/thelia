@@ -22,7 +22,7 @@ use Thelia\Module\PaymentModuleInterface;
 
 class Cheque extends AbstractPaymentModule
 {
-    const MESSAGE_DOMAIN = "Cheque";
+    public const MESSAGE_DOMAIN = "Cheque";
 
     public function pay(Order $order)
     {

@@ -20,11 +20,11 @@ class TlogDestinationFile extends AbstractTlogDestination
 {
     // Nom des variables de configuration
     // ----------------------------------
-    const VAR_PATH_FILE = "tlog_destinationfile_path";
-    const TLOG_DEFAULT_NAME = "log-thelia.txt";
+    public const VAR_PATH_FILE = "tlog_destinationfile_path";
+    public const TLOG_DEFAULT_NAME = "log-thelia.txt";
 
-    const VAR_MODE = "tlog_destinationfile_mode";
-    const VALEUR_MODE_DEFAULT = "A";
+    public const VAR_MODE = "tlog_destinationfile_mode";
+    public const VALEUR_MODE_DEFAULT = "A";
 
     protected $path_defaut = false;
     protected $fh = false;

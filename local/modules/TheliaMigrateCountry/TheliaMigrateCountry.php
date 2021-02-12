@@ -17,7 +17,7 @@ use Thelia\Module\BaseModule;
 class TheliaMigrateCountry extends BaseModule
 {
     /** @var string */
-    const DOMAIN_NAME = 'theliamigratecountry';
+    public const DOMAIN_NAME = 'theliamigratecountry';
 
     /*
      * You may now override BaseModuleInterface methods, such as:

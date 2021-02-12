@@ -57,19 +57,19 @@ class ControllerResolver extends BaseControllerResolver
             $count = substr_count($controller, ':');
             if (2 == $count) {
                 // controller in the a:b:c notation then
-                list($moduleName, $controllerName, $method) = explode(':', $controller, 3);
+                [$moduleName, $controllerName, $method] = explode(':', $controller, 3);
                 $class = $moduleName . '\\Controller\\' . $controllerName . 'Controller';
                 $method .= 'Action';
             } elseif (1 == $count) {
                 // controller in the service:method notation
-                list($service, $method) = explode(':', $controller, 2);
+                [$service, $method] = explode(':', $controller, 2);
 
                 return [$this->container->get($service), $method];
             } else {
                 throw new \LogicException(sprintf('Unable to parse the controller name "%s".', $controller));
             }
         } else {
-            list($class, $method) = explode('::', $controller, 2);
+            [$class, $method] = explode('::', $controller, 2);
         }
 
         if (!class_exists($class)) {

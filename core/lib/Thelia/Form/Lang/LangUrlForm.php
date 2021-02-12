@@ -24,7 +24,7 @@ use Thelia\Model\LangQuery;
  */
 class LangUrlForm extends BaseForm
 {
-    const LANG_PREFIX = 'url_';
+    public const LANG_PREFIX = 'url_';
 
     /**
      *

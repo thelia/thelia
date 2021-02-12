@@ -19,7 +19,7 @@ namespace Thelia\Coupon\Type;
  */
 class RemoveXPercent extends AbstractRemove
 {
-    const INPUT_PERCENTAGE_NAME = 'percentage';
+    public const INPUT_PERCENTAGE_NAME = 'percentage';
 
     use PercentageCouponTrait;
 

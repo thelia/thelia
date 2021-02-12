@@ -189,7 +189,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
 
             $cache[$hash] = [ $pathList, $templateList ];
         } else {
-            list($pathList, $templateList) = $cache[$hash];
+            [$pathList, $templateList] = $cache[$hash];
         }
 
         // Normalize path separator if required (e.g., / becomes \ on windows)
@@ -208,7 +208,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
         foreach ($pathOrigin as $origin) {
             if (isset($pathList[$origin])) {
                 foreach ($pathList[$origin] as $pathInfo) {
-                    list($tplName, $path) = $pathInfo;
+                    [$tplName, $path] = $pathInfo;
 
                     if ($this->filesExist($path, $fileName)) {
                         // Got it ! Save the template where the asset was found and return !
