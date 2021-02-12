@@ -74,7 +74,7 @@ class CategoryModificationForm extends CategoryCreationForm
         $this->addStandardDescFields([ 'title' ]);
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_category_modification";
     }

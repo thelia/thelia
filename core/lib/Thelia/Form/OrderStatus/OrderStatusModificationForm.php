@@ -37,7 +37,7 @@ class OrderStatusModificationForm extends OrderStatusCreationForm
         $this->addStandardDescFields();
     }
 
-    public function getName()
+    public static function getName()
     {
         return 'thelia_order_status_modification';
     }

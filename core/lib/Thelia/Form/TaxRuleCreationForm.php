@@ -31,7 +31,7 @@ class TaxRuleCreationForm extends BaseForm
         $this->addStandardDescFields(['postscriptum', 'chapo', 'locale']);
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_tax_rule_creation";
     }

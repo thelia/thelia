@@ -66,9 +66,6 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
         $this->formDefinition = $formDefinition;
     }
 
-    /**
-     * @param  string                $type
-     */
     public function createForm(
         string $name,
         $type = "Symfony\Component\Form\Extension\Core\Type\FormType",

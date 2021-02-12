@@ -18,7 +18,7 @@ use Thelia\Core\Translation\Translator;
 
 class MessageSendSampleForm extends BaseForm
 {
-    public function getName()
+    public static function getName()
     {
         return "thelia_message_send_sample";
     }

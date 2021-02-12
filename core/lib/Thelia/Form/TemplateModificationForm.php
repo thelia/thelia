@@ -34,7 +34,7 @@ class TemplateModificationForm extends TemplateCreationForm
             ;
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_template_modification";
     }

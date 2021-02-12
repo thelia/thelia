@@ -22,7 +22,7 @@ class ModuleImageModification extends ImageModification
      *
      * @return string
      */
-    public function getName()
+    public static function getName()
     {
         return 'thelia_module_image_modification';
     }

@@ -182,7 +182,7 @@ class ModuleInstallForm extends BaseForm
         return $out;
     }
 
-    public function getName()
+    public static function getName()
     {
         return "module_install";
     }

@@ -33,7 +33,7 @@ class FolderDocumentModification extends DocumentModification
      *
      * @return string
      */
-    public function getName()
+    public static function getName()
     {
         return 'thelia_folder_document_modification';
     }

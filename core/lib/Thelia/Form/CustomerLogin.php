@@ -113,7 +113,7 @@ class CustomerLogin extends BruteforceForm
         }
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_customer_login";
     }

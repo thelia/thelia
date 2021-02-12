@@ -41,14 +41,14 @@ abstract class FirewallForm extends BaseForm
              */
             $deleteTime = date("Y-m-d G:i:s", time() - $this->getConfigTime() * 60);
             $collection = FormFirewallQuery::create()
-                ->filterByFormName($this->getName())
+                ->filterByFormName(self::getName())
                 ->filterByUpdatedAt($deleteTime, Criteria::LESS_THAN)
                 ->find();
 
             $collection->delete();
 
             $firewallInstance = FormFirewallQuery::create()
-                ->filterByFormName($this->getName())
+                ->filterByFormName(self::getName())
                 ->filterByIpAddress($this->request->getClientIp())
                 ->findOne()
             ;
@@ -65,7 +65,7 @@ abstract class FirewallForm extends BaseForm
             } else {
                 $firewallInstance = (new FormFirewall())
                     ->setIpAddress($this->request->getClientIp())
-                    ->setFormName($this->getName())
+                    ->setFormName(self::getName())
                 ;
                 $firewallInstance->save();
             }

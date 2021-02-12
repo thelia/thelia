@@ -44,7 +44,7 @@ class AttributeCreationForm extends BaseForm
             ]);
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_attribute_creation";
     }

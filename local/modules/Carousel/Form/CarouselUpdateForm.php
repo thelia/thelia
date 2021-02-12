@@ -223,7 +223,7 @@ class CarouselUpdateForm extends BaseForm
     /**
      * @inheritdoc
      */
-    public function getName()
+    public static function getName()
     {
         return "carousel_update";
     }

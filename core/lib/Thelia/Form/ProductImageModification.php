@@ -33,7 +33,7 @@ class ProductImageModification extends ImageModification
      *
      * @return string
      */
-    public function getName()
+    public static function getName()
     {
         return 'thelia_product_image_modification';
     }

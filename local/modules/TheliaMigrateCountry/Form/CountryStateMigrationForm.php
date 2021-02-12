@@ -45,7 +45,7 @@ class CountryStateMigrationForm extends BaseForm
         ;
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_country_state_migration";
     }

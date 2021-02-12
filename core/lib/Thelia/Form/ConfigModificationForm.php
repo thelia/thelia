@@ -57,7 +57,7 @@ class ConfigModificationForm extends BaseForm
         $this->addStandardDescFields();
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_config_modification";
     }

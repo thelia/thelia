@@ -26,6 +26,7 @@ use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Form\TheliaFormFactoryInterface;
 use Thelia\Core\Form\Type\TheliaType;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
@@ -75,6 +76,9 @@ class Form extends AbstractSmartyPlugin
     /** @var  ParserInterface $parser */
     protected $parser;
 
+    /** @var  TranslatorInterface $translator */
+    protected $translator;
+
     protected $formDefinition = [];
 
     /** @var array|TheliaFormFactoryInterface */
@@ -89,22 +93,18 @@ class Form extends AbstractSmartyPlugin
     public function __construct(
         TheliaFormFactoryInterface $formFactory,
         ParserContext $parserContext,
-        ParserInterface $parser
+        ParserInterface $parser,
+        TranslatorInterface $translator
     ) {
         $this->formFactory = $formFactory;
         $this->parserContext = $parserContext;
         $this->parser = $parser;
+        $this->translator = $translator;
     }
 
     public function setFormDefinition($formDefinition)
     {
         foreach ($formDefinition as $name => $className) {
-            if (\array_key_exists($name, $this->formDefinition)) {
-                throw new \InvalidArgumentException(
-                    sprintf("%s form name already exists for %s class", $name, $className)
-                );
-            }
-
             $this->formDefinition[$name] = $className;
         }
     }
@@ -120,7 +120,10 @@ class Form extends AbstractSmartyPlugin
             }
 
             if (!isset($this->formDefinition[$name])) {
-                throw new ElementNotFoundException(sprintf("%s form does not exists", $name));
+                $name = array_search($name, $this->formDefinition);
+                if (false === $name) {
+                    throw new ElementNotFoundException(sprintf("%s form does not exists", $name));
+                }
             }
 
             $formClass = $this->formDefinition[$name];
@@ -139,7 +142,7 @@ class Form extends AbstractSmartyPlugin
             $instance->createView();
 
             $template->assign("form", $instance);
-            $template->assign("form_name", $instance->getName());
+            $template->assign("form_name", $instance::getName());
 
             $template->assign("form_error", $instance->hasError() ? true : false);
             $template->assign("form_error_message", $instance->getErrorMessage());
@@ -591,7 +594,7 @@ class Form extends AbstractSmartyPlugin
         $view = $this->retrieveField(
             $fieldName,
             $instance->getView(),
-            $instance->getName()
+            $instance::getName()
         );
 
         return $view;
@@ -639,7 +642,7 @@ class Form extends AbstractSmartyPlugin
         $fieldData = $this->retrieveField(
             $fieldName,
             $instance->getForm()->all(),
-            $instance->getName()
+            $instance::getName()
         );
 
         if (empty($fieldData)) {
@@ -647,7 +650,7 @@ class Form extends AbstractSmartyPlugin
                 sprintf(
                     "Field name '%s' not found in form %s children",
                     $fieldName,
-                    $instance->getName()
+                    $instance::getName()
                 )
             );
         }
@@ -853,7 +856,7 @@ class Form extends AbstractSmartyPlugin
                 sprintf(
                     "Field name '%s' not found in form %s children",
                     $collection,
-                    $form->getName()
+                    $form::getName()
                 )
             );
         }
@@ -864,7 +867,7 @@ class Form extends AbstractSmartyPlugin
         $collectionConfig = $this->retrieveField(
             $collection,
             $sfForm->all(),
-            $form->getName()
+            $form::getName()
         );
 
         $fieldType = $collectionConfig->getConfig()->getType();
@@ -886,7 +889,7 @@ class Form extends AbstractSmartyPlugin
                         "You can't use it with the function 'form_collection' in form '%s'",
                         $collection,
                         $baseFieldType->getName(),
-                        $form->getName()
+                        $form::getName()
                     )
                 );
             }
@@ -914,7 +917,7 @@ class Form extends AbstractSmartyPlugin
         $row = $this->getSymfonyFormFromParams($params, "row", true);
         $field = $this->getParam($params, "field");
 
-        $formField = $this->retrieveField($field, $row->all(), $form->getName());
+        $formField = $this->retrieveField($field, $row->all(), $form::getName());
 
         $formFieldConfig = $formField->getConfig();
 

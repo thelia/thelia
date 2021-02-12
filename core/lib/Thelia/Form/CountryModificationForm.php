@@ -58,7 +58,7 @@ class CountryModificationForm extends CountryCreationForm
         $this->addStandardDescFields(['title', 'locale']);
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_country_modification";
     }

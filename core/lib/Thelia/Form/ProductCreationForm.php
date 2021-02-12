@@ -115,7 +115,7 @@ class ProductCreationForm extends BaseForm
         }
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_product_creation";
     }

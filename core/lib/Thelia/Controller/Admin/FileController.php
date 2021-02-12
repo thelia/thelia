@@ -509,7 +509,7 @@ class FileController extends BaseAdminController
 
             $files = $this->getRequest()->files;
 
-            $fileForm = $files->get($fileUpdateForm->getName());
+            $fileForm = $files->get($fileUpdateForm::getName());
 
             if (isset($fileForm['file'])) {
                 $event->setUploadedFile($fileForm['file']);

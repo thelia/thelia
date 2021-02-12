@@ -88,7 +88,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
         ;
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_tax_rule_taxlistupdate";
     }

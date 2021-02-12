@@ -22,7 +22,7 @@ use Thelia\Core\Translation\Translator;
 
 class MessageModificationForm extends BaseForm
 {
-    public function getName()
+    public static function getName()
     {
         return "thelia_message_modification";
     }

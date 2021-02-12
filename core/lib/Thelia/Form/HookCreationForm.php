@@ -110,7 +110,7 @@ class HookCreationForm extends BaseForm
         }
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_hook_creation";
     }

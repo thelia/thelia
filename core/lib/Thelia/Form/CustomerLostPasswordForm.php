@@ -76,7 +76,7 @@ class CustomerLostPasswordForm extends FirewallForm
     /**
      * @return string the name of you form. This name must be unique
      */
-    public function getName()
+    public static function getName()
     {
         return "thelia_customer_lost_password";
     }

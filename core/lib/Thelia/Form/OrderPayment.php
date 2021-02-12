@@ -86,7 +86,7 @@ class OrderPayment extends FirewallForm
         }
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_order_payment";
     }

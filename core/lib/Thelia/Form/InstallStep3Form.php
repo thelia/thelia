@@ -95,7 +95,7 @@ class InstallStep3Form extends BaseForm
      *
      * @return string
      */
-    public function getName()
+    public static function getName()
     {
         return 'thelia_install_step3';
     }

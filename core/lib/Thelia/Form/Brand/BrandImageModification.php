@@ -22,7 +22,7 @@ class BrandImageModification extends ImageModification
     /**
      * @inheritdoc
      */
-    public function getName()
+    public static function getName()
     {
         return 'thelia_brand_image_modification';
     }

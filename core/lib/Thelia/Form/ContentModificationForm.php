@@ -36,7 +36,7 @@ class ContentModificationForm extends ContentCreationForm
         $this->addStandardDescFields(['title', 'locale']);
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_content_modification";
     }

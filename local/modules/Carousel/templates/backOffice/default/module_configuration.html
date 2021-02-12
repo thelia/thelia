@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="form-container">
-                {form name="carousel.image"}
+                {form name=Carousel\Form\CarouselImageForm::getName()}
                     <form method="POST" action="{url path="/admin/module/carousel/upload"}" {form_enctype} class="clearfix">
 
                         {form_hidden_fields}
@@ -40,7 +40,7 @@
         <div class="col-md-12">
             <div class="form-container">
                 {ifloop rel="carousel.image"}
-                    {form name="carousel.update"}
+                    {form name="Carousel\Form\CarouselUpdateForm"}
                     <form method="post" action="{url path="/admin/module/carousel/update"}" {form_enctype} class="clearfix">
 
                         {include

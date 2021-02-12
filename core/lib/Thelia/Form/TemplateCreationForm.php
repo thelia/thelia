@@ -45,7 +45,7 @@ class TemplateCreationForm extends BaseForm
         ;
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_template_creation";
     }

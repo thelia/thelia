@@ -31,7 +31,7 @@ class FolderModificationForm extends FolderCreationForm
         $this->addStandardDescFields(['title', 'locale']);
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_folder_modification";
     }

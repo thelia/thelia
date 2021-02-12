@@ -168,7 +168,7 @@ class OrderUpdateAddress extends BaseForm
     /**
      * @return string the name of you form. This name must be unique
      */
-    public function getName()
+    public static function getName()
     {
         return "thelia_order_address_update";
     }

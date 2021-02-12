@@ -49,7 +49,7 @@ class ProfileCreationForm extends BaseForm
         $this->addStandardDescFields(['locale']);
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_profile_creation";
     }

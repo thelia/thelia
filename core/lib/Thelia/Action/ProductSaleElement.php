@@ -402,7 +402,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             ->find();
 
         $clonedProductCreatePSEEvent = new ProductSaleElementCreateEvent($event->getClonedProduct(), $attributeCombinationList, $currencyId);
-        $this->eventDispatcher->dispatch($clonedProductCreatePSEEvent,TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT, );
+        $this->eventDispatcher->dispatch($clonedProductCreatePSEEvent,TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT);
 
         return $clonedProductCreatePSEEvent->getProductSaleElement()->getId();
     }
