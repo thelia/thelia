@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9002839e8f9addb5a0c40a1415d5fb4f",
+    "content-hash": "134774e3242d81093e2444ad28231889",
     "packages": [
         {
             "name": "assetic/framework",
@@ -1306,20 +1306,24 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "v3.1.33",
+            "version": "v3.1.38",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smarty-php/smarty.git",
-                "reference": "dd55b23121e55a3b4f1af90a707a6c4e5969530f"
+                "reference": "63b3c0aed0f614880cda21a5c08c606e97b489bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/dd55b23121e55a3b4f1af90a707a6c4e5969530f",
-                "reference": "dd55b23121e55a3b4f1af90a707a6c4e5969530f",
+                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/63b3c0aed0f614880cda21a5c08c606e97b489bb",
+                "reference": "63b3c0aed0f614880cda21a5c08c606e97b489bb",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.5 || ^6.5 || ^5.7 || ^4.8",
+                "smarty/smarty-lexer": "^3.1"
             },
             "type": "library",
             "extra": {
@@ -1328,8 +1332,8 @@
                 }
             },
             "autoload": {
-                "files": [
-                    "libs/bootstrap.php"
+                "classmap": [
+                    "libs/"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1359,9 +1363,9 @@
                 "forum": "http://www.smarty.net/forums/",
                 "irc": "irc://irc.freenode.org/smarty",
                 "issues": "https://github.com/smarty-php/smarty/issues",
-                "source": "https://github.com/smarty-php/smarty/tree/master"
+                "source": "https://github.com/smarty-php/smarty/tree/v3.1.38"
             },
-            "time": "2018-09-12T20:54:16+00:00"
+            "time": "2021-01-08T14:05:42+00:00"
         },
         {
             "name": "spipu/html2pdf",
