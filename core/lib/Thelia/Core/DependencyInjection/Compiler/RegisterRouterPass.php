@@ -60,22 +60,21 @@ class RegisterRouterPass implements CompilerPassInterface
                 $routingConfigFilePath = $module->getAbsoluteBaseDir() . DS . "Config" . DS . "routing.xml";
 
                 if (file_exists($routingConfigFilePath)) {
-                    $definition = new Definition(
+                    $moduleRouter = new Definition(
                         $container->getParameter("router.class"),
                         [
                             new Reference("router.module.xmlLoader"),
                             $routingConfigFilePath,
-                            [
-                                "cache_dir" => $container->getParameter("kernel.cache_dir"),
-                                "debug" => $container->getParameter("kernel.debug")
-                            ],
+                            [],
                             new Reference("request.context")
                         ]
                     );
 
-                    $container->setDefinition("router.".$moduleBaseDir, $definition);
+                    $routerId ="router.".$moduleBaseDir;
+                    $container->setDefinition($routerId, $moduleRouter);
 
-                    $chainRouter->addMethodCall("add", [new Reference("router.".$moduleBaseDir), 150 + $module->getPosition()]);
+                    $moduleRouter->addMethodCall("setOption", ["cache_dir", THELIA_CACHE_DIR . $container->getParameter("kernel.environment") . DS . "routing" . DS . $routerId]);
+                    $chainRouter->addMethodCall("add", [new Reference($routerId), 150 + $module->getPosition()]);
                 }
             }
         }
