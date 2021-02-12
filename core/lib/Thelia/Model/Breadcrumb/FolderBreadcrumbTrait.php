@@ -13,7 +13,11 @@
 namespace Thelia\Model\Breadcrumb;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Template\Loop\CategoryPath;
 use Thelia\Core\Template\Loop\FolderPath;
 use Thelia\Core\Translation\Translator;
 
@@ -28,7 +32,15 @@ trait FolderBreadcrumbTrait
             $translator->trans('Folder') => $foldersUrl,
         ];
 
-        $folderPath = new FolderPath($container);
+        // Todo stop using loop in php
+        $folderPath = new FolderPath(
+            $container,
+            $container->get(RequestStack::class),
+            $container->get(EventDispatcherInterface::class),
+            $container->get(SecurityContext::class),
+            $container->get(Translator::getInstance()),
+            $container->getParameter('thelia.parser.loops')
+        );
         $folderPath->initializeArgs([
                 'folder' => $folderId,
                 'visible' => '*'
@@ -53,6 +65,10 @@ trait FolderBreadcrumbTrait
 
     public function getFolderBreadcrumb(Router $router, $container, $tab, $locale)
     {
+        if (!method_exists($this, "getFolder")) {
+            return null;
+        }
+
         /** @var \Thelia\Model\Folder $folder */
         $folder = $this->getFolder();
         $breadcrumb = $this->getBaseBreadcrumb($router, $container, $this->getParentId());
@@ -74,6 +90,10 @@ trait FolderBreadcrumbTrait
 
     public function getContentBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
+        if (!method_exists($this, "getContent")) {
+            return null;
+        }
+
         /** @var \Thelia\Model\Content $content */
         $content = $this->getContent();
 

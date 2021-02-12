@@ -175,7 +175,7 @@ class TaxController extends AbstractCrudController
     {
         return $this->generateRedirectFromRoute(
             "admin.configuration.taxes.update",
-            $this->getViewArguments($country),
+            $this->getViewArguments(),
             $this->getRouteArguments()
         );
     }

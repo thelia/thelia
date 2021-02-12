@@ -120,11 +120,11 @@
     "autoload": {
         "psr-4": {
             "Thelia\\": "core/lib/Thelia",
-            "Thelia\\Model\\": "var/cache/propel/model/Thelia/Model",
+            "": [
+                "local/modules/",
+                "var/cache/propel/model"
+            ],
             "TheliaMain\\": "var/cache/propel/database/TheliaMain"
-        },
-        "psr-0": {
-            "": "local/modules/"
         },
         "files": [
             "core/bootstrap.php"

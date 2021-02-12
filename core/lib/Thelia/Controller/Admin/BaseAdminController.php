@@ -156,7 +156,7 @@ class BaseAdminController extends BaseController
         }
 
          // Log the problem
-         $this->adminLogAppend(implode(",", $resources), implode(",", $accesses), "User is not granted for resources %s with accesses %s", implode(", ", $resources), implode(", ", $accesses));
+         $this->adminLogAppend(implode(",", $resources), implode(",", $accesses), "User is not granted for resources %s with accesses %s", implode(", ", $resources));
 
         return $this->errorPage($this->getTranslator()->trans("Sorry, you're not allowed to perform this action"), 403);
     }

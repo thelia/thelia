@@ -76,9 +76,7 @@ class ResponseRest extends Response
     {
         $serializer = $this->getSerializer();
 
-        if (isset($data)) {
-            $this->setContent($serializer->serialize($data, $this->format));
-        }
+        $this->setContent($serializer->serialize($data, $this->format));
 
         return $this;
     }

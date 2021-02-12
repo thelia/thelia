@@ -21,11 +21,11 @@ use Thelia\Core\Translation\Translator;
  * @package Thelia\Core\HttpFoundation
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class JsonResponse extends BaseJsonResponse
+final class JsonResponse extends BaseJsonResponse
 {
     public static function createError($errorMessage, $statusCode = 500)
     {
-        return new static(["error" => $errorMessage], $statusCode);
+        return new self(["error" => $errorMessage], $statusCode);
     }
 
     public static function createAuthError($access)

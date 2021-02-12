@@ -12,7 +12,7 @@
 
 namespace Thelia\Core\Template\Assets\Filter;
 
-use Assetic\Asset\AssetInterface;
+use Assetic\Contracts\Asset\AssetInterface;
 use Assetic\Filter\LessphpFilter;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;

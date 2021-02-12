@@ -99,7 +99,7 @@ class ShippingZoneController extends BaseAdminController
             return $response;
         }
 
-        $shippingAreaForm = new ShippingZoneRemoveArea($this->getRequest());
+        $shippingAreaForm = $this->createForm(ShippingZoneRemoveArea::class);
         $error_msg = null;
 
         try {

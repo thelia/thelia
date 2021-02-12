@@ -449,9 +449,6 @@ abstract class AbstractCrudController extends BaseAdminController
             return $response;
         }
 
-        // Error (Default: false)
-        $error_msg = false;
-
         // Create the Form from the request
         $changeForm = $this->getUpdateForm();
 
@@ -502,7 +499,7 @@ abstract class AbstractCrudController extends BaseAdminController
                 // If we have to stay on the same page, do not redirect to the successUrl,
                 // just redirect to the edit page again.
                 if ($request->get('save_mode') == 'stay') {
-                    return $this->redirectToEditionTemplate($request);
+                    return $this->redirectToEditionTemplate();
                 }
 
                 // Redirect to the success URL

@@ -32,21 +32,6 @@ class Tax extends BaseTax
         return str_replace('-', '\\', $name);
     }
 
-    public function calculateTax($amount)
-    {
-        if (false === filter_var($amount, FILTER_VALIDATE_FLOAT)) {
-            throw new TaxEngineException('BAD AMOUNT FORMAT', TaxEngineException::BAD_AMOUNT_FORMAT);
-        }
-
-        $rate = $this->getRate();
-
-        if ($rate === null) {
-            return 0;
-        }
-
-        return $amount * $rate * 0.01;
-    }
-
     public function getTaxRuleCountryPosition()
     {
         try {

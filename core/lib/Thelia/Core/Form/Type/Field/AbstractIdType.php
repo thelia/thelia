@@ -69,6 +69,8 @@ abstract class AbstractIdType extends AbstractType
         return $this->getName();
     }
 
+    abstract public function getName();
+
     /**
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      *

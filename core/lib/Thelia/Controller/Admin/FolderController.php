@@ -141,7 +141,7 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function getDeleteEvent()
     {
-        return new FolderDeleteEvent($this->getRequest()->get('folder_id'), 0);
+        return new FolderDeleteEvent($this->getRequest()->get('folder_id'));
     }
 
     /**

@@ -201,10 +201,10 @@ class Product extends BaseAction implements EventSubscriberInterface
         // Get original product's I18ns
         $originalProductI18ns = ProductI18nQuery::create()
             ->findById($event->getOriginalProduct()->getId());
+        $clonedProductUpdateEvent = new ProductUpdateEvent($event->getClonedProduct()->getId());
 
         /** @var ProductI18n $originalProductI18n */
         foreach ($originalProductI18ns as $originalProductI18n) {
-            $clonedProductUpdateEvent = new ProductUpdateEvent($event->getClonedProduct()->getId());
             $clonedProductUpdateEvent
                 ->setRef($event->getClonedProduct()->getRef())
                 ->setVisible($event->getClonedProduct()->getVisible())

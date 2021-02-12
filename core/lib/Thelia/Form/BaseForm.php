@@ -30,6 +30,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\TheliaFormEvent;
 use Thelia\Core\EventDispatcher\EventDispatcher;
+use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
@@ -101,8 +102,9 @@ abstract class BaseForm implements FormInterface
      * @param string $type
      * @param array $data
      * @param array $options
-     * @deprecated Thelia forms should not be instantiated directly. Please use BaseController::createForm() instead
+     * @deprecated Thelia forms should not be instantiated directly. Please use BaseController::createForm() instead or form factory
      * @see BaseController::createForm()
+     * @see TheliaFormFactory::createForm()
      */
     public function __construct(
         Request $request,

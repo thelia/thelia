@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentI18n;
@@ -41,6 +42,10 @@ class File extends BaseAction implements EventSubscriberInterface
         $clonedProduct = $event->getClonedProduct();
 
         foreach ($event->getTypes() as $type) {
+            if (!in_array($type, ['images', 'documents'])) {
+                throw new \Exception(Translator::getInstance()->trans("Cloning files of type %type is not allowed.", ['%type' => $type], "core"));
+            }
+
             $originalProductFiles = [];
 
             switch ($type) {
@@ -63,7 +68,7 @@ class File extends BaseAction implements EventSubscriberInterface
                     $ext = pathinfo($srcPath, PATHINFO_EXTENSION);
 
                     $clonedProductFile = [];
-
+                    $fileName = "";
                     switch ($type) {
                         case 'images':
                             $fileName = $clonedProduct->getRef().'.'.$ext;

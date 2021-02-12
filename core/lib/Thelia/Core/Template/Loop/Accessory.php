@@ -81,13 +81,13 @@ class Accessory extends Product
 
         $accessories = $this->search($search);
 
-        $this->accessoryIdList = [0];
+        $accessoryIdList = [0];
         $this->accessoryPosition = $this->accessoryId = [];
 
         foreach ($accessories as $accessory) {
             $accessoryProductId = $accessory->getAccessory();
 
-            array_push($this->accessoryIdList, $accessoryProductId);
+            array_push($accessoryIdList, $accessoryProductId);
 
             $this->accessoryPosition[$accessoryProductId] = $accessory->getPosition();
             $this->accessoryId[$accessoryProductId] = $accessory->getId();
@@ -97,9 +97,9 @@ class Accessory extends Product
 
         /* if an Id list is receive, loop will only match accessories from this list */
         if ($receivedIdList === null) {
-            $this->args->get('id')->setValue(implode(',', $this->accessoryIdList));
+            $this->args->get('id')->setValue(implode(',', $accessoryIdList));
         } else {
-            $this->args->get('id')->setValue(implode(',', array_intersect($receivedIdList, $this->accessoryIdList)));
+            $this->args->get('id')->setValue(implode(',', array_intersect($receivedIdList, $accessoryIdList)));
         }
 
         return parent::buildModelCriteria();

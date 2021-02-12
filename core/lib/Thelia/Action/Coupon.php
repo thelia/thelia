@@ -112,10 +112,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
         if (null === $coupon) {
             throw new \InvalidArgumentException(
-                sprintf(
-                    "The coupon id '%d' doesn't exist",
-                    $event->getCouponId()
-                )
+                "The coupon should not be null"
             );
         }
 

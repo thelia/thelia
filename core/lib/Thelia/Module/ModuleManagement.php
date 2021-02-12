@@ -100,6 +100,7 @@ class ModuleManagement
         $reflected = new \ReflectionClass((string)$content->fullnamespace);
         $code = basename(\dirname($reflected->getFileName()));
         $version = (string)$content->version;
+        $currentVersion = $version;
         $mandatory = \intval($content->mandatory);
         $hidden = \intval($content->hidden);
 

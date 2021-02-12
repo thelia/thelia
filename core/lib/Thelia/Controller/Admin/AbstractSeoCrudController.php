@@ -189,7 +189,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
                 // If we have to stay on the same page, do not redirect to the successUrl,
                 // just redirect to the edit page again.
                 if ($request->get('save_mode') == 'stay') {
-                    return $this->redirectToEditionTemplate($request);
+                    return $this->redirectToEditionTemplate();
                 }
 
                 // Redirect to the success URL
