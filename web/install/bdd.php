@@ -101,7 +101,7 @@ try {
     </div>
     <?php
 } catch (\Exception $ex) {
-    ?>
+        ?>
     <div class="alert alert-danger">
         <?php echo $trans->trans(
             '<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>',
@@ -112,6 +112,6 @@ try {
         ); ?>
     </div>
 <?php
-}
+    }
 
 include 'footer.php';

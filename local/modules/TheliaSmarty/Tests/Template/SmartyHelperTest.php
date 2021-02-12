@@ -19,7 +19,7 @@ use TheliaSmarty\Template\SmartyHelper;
  *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class SmartyHelperTest extends \PHPUnit_Framework_TestCase
+class SmartyHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var SmartyHelper

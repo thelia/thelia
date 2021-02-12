@@ -81,8 +81,10 @@ class FormTest extends SmartyPluginTestCase
         $this->assertNull($parserContext->popCurrentForm());
 
         // Let's even predict an exception
-        $this->setExpectedException(
-            'TheliaSmarty\\Template\\Exception\\SmartyPluginException',
+        $this->expectException(
+            'TheliaSmarty\\Template\\Exception\\SmartyPluginException'
+        );
+        $this->expectExceptionMessage(
             'There is currently no defined form'
         );
 
@@ -165,8 +167,10 @@ class FormTest extends SmartyPluginTestCase
         );
 
         // The exception
-        $this->setExpectedException(
-            'TheliaSmarty\\Template\\Exception\\SmartyPluginException',
+        $this->expectException(
+            'TheliaSmarty\\Template\\Exception\\SmartyPluginException'
+        );
+        $this->expectExceptionMessage(
             'There is currently no defined form'
         );
 
