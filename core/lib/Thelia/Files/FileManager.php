@@ -109,21 +109,26 @@ class FileManager
      * @throws \Thelia\Exception\ImageException
      * @return UploadedFile|null
      */
-    public function copyUploadedFile(FileModelInterface $model, UploadedFile $uploadedFile, ConnectionInterface $con = null)
+    public function copyUploadedFile(FileModelInterface $model, UploadedFile $uploadedFile)
     {
         $newUploadedFile = null;
 
         if ($uploadedFile !== null) {
+            $fileSystem = new Filesystem();
+
             $directory = $model->getUploadDir();
+
+            if (!$fileSystem->exists($directory)) {
+                $fileSystem->mkdir($directory);
+            }
 
             $fileName = $this->renameFile($model->getId(), $uploadedFile);
 
-            $fileSystem = new Filesystem();
             $fileSystem->rename($uploadedFile->getPathname(), $directory. DS .$fileName);
             $newUploadedFile = new UploadedFile($directory. DS .$fileName, $fileName);
             $model->setFile($fileName);
 
-            if (!$model->save($con)) {
+            if (!$model->save()) {
                 throw new ImageException(
                     sprintf(
                         'Failed to update model after copy of uploaded file %s to %s',

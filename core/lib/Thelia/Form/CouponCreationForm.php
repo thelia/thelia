@@ -334,7 +334,7 @@ class CouponCreationForm extends BaseForm
      *
      * @return string
      */
-    public function getName()
+    public static function getName()
     {
         return self::COUPON_CREATION_FORM_NAME;
     }

@@ -26,7 +26,7 @@ class CurrencyModificationForm extends CurrencyCreationForm
         ;
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_currency_modification";
     }

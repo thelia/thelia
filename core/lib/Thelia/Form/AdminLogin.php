@@ -53,7 +53,7 @@ class AdminLogin extends BruteforceForm
             ;
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_admin_login";
     }

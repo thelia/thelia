@@ -22,9 +22,6 @@ use Thelia\Form\BaseForm;
  */
 interface TheliaFormFactoryInterface
 {
-    /**
-     * @param  string                $type
-     */
     public function createForm(
         string $name,
         $type = FormType::class,

@@ -36,7 +36,7 @@ class AttributeModificationForm extends AttributeCreationForm
         $this->addStandardDescFields();
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_attribute_modification";
     }

@@ -34,7 +34,7 @@ class StateModificationForm extends StateCreationForm
         ;
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_state_modification";
     }

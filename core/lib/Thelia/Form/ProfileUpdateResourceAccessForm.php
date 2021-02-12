@@ -67,7 +67,7 @@ class ProfileUpdateResourceAccessForm extends BaseForm
         }
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_profile_resource_access_modification";
     }

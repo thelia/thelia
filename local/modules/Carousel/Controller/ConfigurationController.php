@@ -12,13 +12,19 @@
 
 namespace Carousel\Controller;
 
+use Carousel\Form\CarouselImageForm;
+use Carousel\Form\CarouselUpdateForm;
 use Carousel\Model\Carousel;
 use Carousel\Model\CarouselQuery;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\EventDispatcher\EventDispatcher;
+use Thelia\Core\Form\TheliaFormFactory;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Exception\FormValidationException;
@@ -33,20 +39,22 @@ use Thelia\Tools\URL;
  */
 class ConfigurationController extends BaseAdminController
 {
-    public function uploadImage()
-    {
+    public function uploadImage(
+        Request $request,
+        TheliaFormFactory $formFactory,
+        EventDispatcher $eventDispatcher
+    ) {
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, ['carousel'], AccessManager::CREATE)) {
             return $response;
         }
 
-        $request = $this->getRequest();
-        $form = $this->createForm('carousel.image');
+        $form = $formFactory->createForm(CarouselImageForm::class);
         $error_message = null;
         try {
-            $this->validateForm($form);
+            $formData = $this->validateForm($form)->getData();
 
-            /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $fileBeingUploaded */
-            $fileBeingUploaded = $request->files->get(sprintf('%s[file]', $form->getName()), null, true);
+            /** @var UploadedFile $fileBeingUploaded */
+            $fileBeingUploaded = $formData['file'];
 
             $fileModel = new Carousel();
 
@@ -54,9 +62,9 @@ class ConfigurationController extends BaseAdminController
             $fileCreateOrUpdateEvent->setModel($fileModel);
             $fileCreateOrUpdateEvent->setUploadedFile($fileBeingUploaded);
 
-            $this->dispatch(
-                TheliaEvents::IMAGE_SAVE,
-                $fileCreateOrUpdateEvent
+            $eventDispatcher->dispatch(
+                $fileCreateOrUpdateEvent,
+                TheliaEvents::IMAGE_SAVE
             );
 
             // Compensate issue #1005
@@ -103,13 +111,14 @@ class ConfigurationController extends BaseAdminController
         return $value;
     }
 
-    public function updateAction()
-    {
+    public function updateAction(
+        TheliaFormFactory $formFactory
+    ){
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, ['carousel'], AccessManager::UPDATE)) {
             return $response;
         }
 
-        $form = $this->createForm('carousel.update');
+        $form = $formFactory->createForm(CarouselUpdateForm::class);
 
         $error_message = null;
 
@@ -159,13 +168,15 @@ class ConfigurationController extends BaseAdminController
         return $response;
     }
 
-    public function deleteAction()
+    public function deleteAction(
+        Request $request
+    )
     {
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, ['carousel'], AccessManager::DELETE)) {
             return $response;
         }
 
-        $imageId = $this->getRequest()->request->get('image_id');
+        $imageId = $request->get('image_id');
 
         if ($imageId != "") {
             $carousel = CarouselQuery::create()->findPk($imageId);
@@ -180,6 +191,6 @@ class ConfigurationController extends BaseAdminController
 
     protected function redirectToConfigurationPage()
     {
-        return RedirectResponse::create(URL::getInstance()->absoluteUrl('/admin/module/Carousel'));
+        return new RedirectResponse(URL::getInstance()->absoluteUrl('/admin/module/Carousel'));
     }
 }

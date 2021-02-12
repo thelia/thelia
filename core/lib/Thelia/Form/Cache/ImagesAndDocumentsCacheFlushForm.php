@@ -32,7 +32,7 @@ class ImagesAndDocumentsCacheFlushForm extends BaseForm
     /**
      * @inheritdoc
      */
-    public function getName()
+    public static function getName()
     {
         return "images_and_documents_cache_flush";
     }

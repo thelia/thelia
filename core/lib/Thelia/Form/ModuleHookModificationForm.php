@@ -40,7 +40,7 @@ class ModuleHookModificationForm extends ModuleHookCreationForm
         ;
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_module_hook_modification";
     }

@@ -76,7 +76,7 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
         }
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_customer_profile_update";
     }

@@ -33,7 +33,7 @@ class FolderImageModification extends ImageModification
      *
      * @return string
      */
-    public function getName()
+    public static function getName()
     {
         return 'thelia_folder_image_modification';
     }

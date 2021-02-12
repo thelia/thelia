@@ -55,7 +55,7 @@ class FeatureCreationForm extends BaseForm
         ;
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_feature_creation";
     }

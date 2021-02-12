@@ -80,7 +80,7 @@ class MailingSystemModificationForm extends BaseForm
         ;
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_mailing_system_modification";
     }

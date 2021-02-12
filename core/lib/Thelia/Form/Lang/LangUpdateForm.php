@@ -36,7 +36,7 @@ class LangUpdateForm extends LangCreateForm
             ]);
     }
 
-    public function getName()
+    public static function getName()
     {
         return 'thelia_lang_update';
     }

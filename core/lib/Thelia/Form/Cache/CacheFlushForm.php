@@ -32,7 +32,7 @@ class CacheFlushForm extends BaseForm
     /**
      * @inheritdoc
      */
-    public function getName()
+    public static function getName()
     {
         return "cache_flush";
     }

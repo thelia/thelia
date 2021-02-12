@@ -110,7 +110,7 @@ class CurrencyCreationForm extends BaseForm
         ;
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_currency_creation";
     }

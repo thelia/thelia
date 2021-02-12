@@ -33,7 +33,7 @@ class ContentDocumentModification extends DocumentModification
      *
      * @return string
      */
-    public function getName()
+    public static function getName()
     {
         return 'thelia_content_document_modification';
     }

@@ -97,7 +97,7 @@ class ProductDefaultSaleElementUpdateForm extends ProductSaleElementUpdateForm
         ;
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_product_default_sale_element_update_form";
     }

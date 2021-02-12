@@ -22,7 +22,7 @@ class BrandDocumentModification extends DocumentModification
     /**
      * @inheritdoc
      */
-    public function getName()
+    public static function getName()
     {
         return 'thelia_brand_document_modification';
     }

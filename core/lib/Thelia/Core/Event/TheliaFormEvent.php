@@ -52,6 +52,6 @@ class TheliaFormEvent extends Event
 
     public function getName()
     {
-        return $this->form->getName();
+        return $this->form::getName();
     }
 }

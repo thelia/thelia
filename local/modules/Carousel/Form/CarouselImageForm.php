@@ -46,12 +46,4 @@ class CarouselImageForm extends BaseForm
                 ]
             );
     }
-
-    /**
-     * @return string the name of you form. This name must be unique
-     */
-    public function getName()
-    {
-        return 'carousel_image';
-    }
 }

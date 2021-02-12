@@ -41,7 +41,7 @@ use Thelia\Tools\URL;
  * @package Thelia\Form
  * @author Manuel Raynaud <manu@raynaud.io>
  */
-abstract class BaseForm
+abstract class BaseForm implements FormInterface
 {
     /**
      * @var FormBuilderInterface
@@ -98,11 +98,11 @@ abstract class BaseForm
     private $type;
 
     /**
-     * @var string The form name
-     */
-    private $formUniqueIdentifier;
-
-    /**
+     * @param Request $request
+     * @param EventDispatcher $eventDispatcher
+     * @param TranslatorInterface $translator
+     * @param FormFactoryBuilderInterface $formFactoryBuilder
+     * @param ValidatorBuilder $validationBuilder
      * @param string $type
      * @param array $data
      * @param array $options
@@ -119,9 +119,6 @@ abstract class BaseForm
         $data = [],
         $options = []
     ) {
-        // Generate the form name from the complete class name
-        $this->formUniqueIdentifier = strtolower(str_replace('\\', '_', \get_class($this)));
-
         $this->request = $request;
         $this->type = $type;
 
@@ -147,13 +144,13 @@ abstract class BaseForm
         $this->formBuilder = $this->formFactoryBuilder
             ->addExtension(new ValidatorExtension($this->validatorBuilder->getValidator()))
             ->getFormFactory()
-            ->createNamedBuilder($this->getName(), $type, $data, $this->cleanOptions($options))
+            ->createNamedBuilder(self::getName(), $type, $data, $this->cleanOptions($options))
         ;
 
         /**
          * Build the form
          */
-        $name = $this->getName();
+        $name = self::getName();
 
         $event = null;
         $event = new TheliaFormEvent($this);
@@ -401,10 +398,19 @@ abstract class BaseForm
      * Override this method if you don't want to use the standard name, which is created from the full class name.
      *
      * @return string the name of you form. This name must be unique
+     *
      */
-    public function getName()
+    public static function getName()
     {
-        return $this->formUniqueIdentifier;
+        $classParts = explode('\\', get_called_class());
+        $nameParts = array_map(function ($classPart, $index) use ($classParts) {
+            if ($index !== count($classParts) -1) {
+                return strtolower($classPart);
+            }
+            return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $classPart));
+        }, $classParts, array_keys($classParts));
+
+        return implode('_', $nameParts);
     }
 
     /**

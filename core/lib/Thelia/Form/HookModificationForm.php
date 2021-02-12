@@ -58,7 +58,7 @@ class HookModificationForm extends HookCreationForm
         $this->addStandardDescFields(['title', 'postscriptum', 'locale']);
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_hook_modification";
     }

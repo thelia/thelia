@@ -33,7 +33,7 @@ class ContentImageModification extends ImageModification
      *
      * @return string
      */
-    public function getName()
+    public static function getName()
     {
         return 'thelia_content_image_modification';
     }

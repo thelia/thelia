@@ -585,6 +585,8 @@ abstract class BaseController implements ControllerInterface
      * @return BaseForm
      *
      * This method builds a thelia form with its name
+     *
+     * @deprecated since Thelia 2.5, use autowiring to get form factory and create your form.
      */
     public function createForm($name, $type = "Symfony\Component\Form\Extension\Core\Type\FormType", array $data = [], array $options = [])
     {

@@ -87,7 +87,7 @@ class CustomerPasswordUpdateForm extends BaseForm
         }
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_customer_password_update";
     }

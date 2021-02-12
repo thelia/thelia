@@ -65,7 +65,7 @@ class CouponCode extends BaseForm
      *
      * @return string
      */
-    public function getName()
+    public static function getName()
     {
         return "thelia_coupon_code";
     }

@@ -33,7 +33,7 @@ class CategoryDocumentModification extends DocumentModification
      *
      * @return string
      */
-    public function getName()
+    public static function getName()
     {
         return 'thelia_category_document_modification';
     }

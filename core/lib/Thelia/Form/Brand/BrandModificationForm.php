@@ -56,7 +56,7 @@ class BrandModificationForm extends BrandCreationForm
         $this->addStandardDescFields(['title', 'locale']);
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_brand_modification";
     }

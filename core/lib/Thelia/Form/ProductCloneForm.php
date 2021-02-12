@@ -22,7 +22,7 @@ use Thelia\Model\ProductQuery;
 
 class ProductCloneForm extends BaseForm
 {
-    public function getName()
+    public static function getName()
     {
         return 'thelia_product_clone';
     }

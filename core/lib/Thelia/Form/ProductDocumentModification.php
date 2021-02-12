@@ -33,7 +33,7 @@ class ProductDocumentModification extends DocumentModification
      *
      * @return string
      */
-    public function getName()
+    public static function getName()
     {
         return 'thelia_product_document_modification';
     }

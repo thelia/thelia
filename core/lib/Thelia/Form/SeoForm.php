@@ -49,7 +49,7 @@ class SeoForm extends BaseForm
         $this->addSeoFields();
     }
 
-    public function getName()
+    public static function getName()
     {
         return "thelia_seo";
     }

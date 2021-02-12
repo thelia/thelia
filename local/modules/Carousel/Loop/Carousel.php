@@ -153,7 +153,7 @@ class Carousel extends Image
             $event->setAllowZoom($this->getAllowZoom());
 
             // Dispatch image processing event
-            $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
+            $this->dispatcher->dispatch($event, TheliaEvents::IMAGE_PROCESS);
 
             if ($startDate) {
                 $startDate = $startDate->format('Y-m-d').'T'.$startDate->format('H:i');

@@ -23,7 +23,7 @@ use Thelia\Form\BaseForm;
  */
 class HookNavigationConfigForm extends BaseForm
 {
-    public function getName()
+    public static function getName()
     {
         return 'hooknavigation_configuration';
     }

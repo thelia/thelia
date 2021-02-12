@@ -104,7 +104,7 @@ class OrderStatusCreationForm extends BaseForm
         $this->addStandardDescFields(['title', 'description', 'chapo', 'postscriptum']);
     }
 
-    public function getName()
+    public static function getName()
     {
         return 'thelia_order_status_creation';
     }

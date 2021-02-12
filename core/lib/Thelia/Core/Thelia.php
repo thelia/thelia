@@ -53,6 +53,7 @@ use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Form\FormInterface;
 use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -315,6 +316,7 @@ class Thelia extends Kernel
             FormExtensionInterface::class => "thelia.forms.extension",
             BaseLoopInterface::class => "thelia.loop",
             ContainerAwareInterface::class => "thelia.command",
+            FormInterface::class => "thelia.form",
             CouponInterface::class => "thelia.coupon.addCoupon",
             ConditionInterface::class => "thelia.coupon.addCondition",
             ControllerInterface::class => "controller.service_arguments",
