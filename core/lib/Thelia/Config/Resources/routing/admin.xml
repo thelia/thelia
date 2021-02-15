@@ -15,7 +15,7 @@
         <default key="not-logged">1</default>
     </route>
 
-    <route id="admin.password-create" path="/admin/password-create-request">
+    <route id="admin.password-create" path="/admin/password-create-request" methods="GET">
         <default key="_controller">Thelia\Controller\Admin\SessionController::passwordCreateRequestAction</default>
         <default key="not-logged">1</default>
     </route>
