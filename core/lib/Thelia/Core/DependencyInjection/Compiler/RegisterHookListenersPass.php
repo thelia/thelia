@@ -382,8 +382,8 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 HookDefinition::RENDER_BLOCK_EVENT :
                 HookDefinition::RENDER_FUNCTION_EVENT;
 
-            if (!($parameters[0]->getClass()->getName() == $eventType || is_subclass_of($parameters[0]->getClass()->getName(), $eventType))) {
-                $this->logAlertMessage(sprintf('Method %s should use an event of type %s. found: %s', $methodName, $eventType, $parameters[0]->getClass()->getName()));
+            if (!($parameters[0]->getType() == $eventType || is_subclass_of($parameters[0]->getType(), $eventType))) {
+                $this->logAlertMessage(sprintf('Method %s should use an event of type %s. found: %s', $methodName, $eventType, $parameters[0]->getType()));
 
                 return false;
             }
