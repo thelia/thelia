@@ -21,11 +21,9 @@ class SecurityTest extends WebTestCase
      */
     public function testAccessSecuredUrl(string $method, string $url): void
     {
-        $client = static::createClient();
+        self::$client->request($method, $url);
 
-        $client->request($method, $url);
-
-        self::assertEquals(403, $client->getResponse()->getStatusCode());
+        self::assertEquals(403, self::$client->getResponse()->getStatusCode());
     }
 
     public function protectedUrls(): array

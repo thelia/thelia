@@ -51,14 +51,14 @@ abstract class AbstractArchiver implements ArchiverInterface
         return $this->archivePath;
     }
 
-    public function setArchivePath($archivePath)
+    public function setArchivePath(string $archivePath): self
     {
         $this->archivePath = $archivePath;
 
         return $this;
     }
 
-    public function add($path, $pathInArchive = null)
+    public function add(string $path, string $pathInArchive = null): self
     {
         $path = realpath($path);
         if (!file_exists($path)) {

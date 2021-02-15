@@ -16,6 +16,7 @@ use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Thelia\Install\Database;
 use Thelia\Model\Map\ProductTableMap;
 
@@ -31,17 +32,24 @@ class ReloadDatabaseCommand extends BaseModuleGenerate
         $this
             ->setName('thelia:dev:reloadDB')
             ->setDescription('erase current database and create new one')
-/*            ->addOption(
-                "load-fixtures",
-                null,
-                InputOption::VALUE_NONE,
-                "load fixtures in databases"
-            )*/
         ;
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $helper = $this->getHelper('question');
+        $question = new ConfirmationQuestion('<question>Confirm database reset ?<question> (y/N)', false);
+
+        if (!$helper->ask($input, $output, $question)) {
+            return self::FAILURE;
+        }
+
+        $question = new ConfirmationQuestion('<question>Are you really sure ?<question> (y/N)', false);
+
+        if (!$helper->ask($input, $output, $question)) {
+            return self::FAILURE;
+        }
+
         /** @var ConnectionWrapper $connection */
         $connection = Propel::getConnection(ProductTableMap::DATABASE_NAME);
         $connection = $connection->getWrappedConnection();

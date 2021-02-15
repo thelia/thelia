@@ -18,28 +18,21 @@ class LoginTest extends WebTestCase
 {
     public function testRedirectionToLogin(): void
     {
-        $client = static::createClient();
+        self::$client->request('GET', '/admin');
 
-        $client->request('GET', '/admin');
+        $this->assertHeaderLocationUrl('/admin/login');
 
-        $this->assertTrue($client->getResponse()->isRedirection());
+        self::$client->followRedirect();
 
-        //$this->assertTrue($client->getResponse()->isRedirect('/admin/login'));
-        $this->assertMatchesRegularExpression('/\/admin\/login$/', $client->getResponse()->headers->get('location'));
+        self::assertResponseIsSuccessful();
 
-        $client->followRedirect();
-
-        self::assertEquals(200, $client->getResponse()->getStatusCode());
-
-        $this->assertMatchesRegularExpression('/\/admin\/login$/', $client->getRequest()->getUri());
+        $this->assertRequestUrl('/admin/login');
     }
 
     public function testLogin(): void
     {
-        $client = static::createClient();
+        self::$client->request('GET', '/admin/login');
 
-        $client->request('GET', '/admin/login');
-
-        self::assertEquals(200, $client->getResponse()->getStatusCode());
+        self::assertResponseIsSuccessful();
     }
 }

@@ -10,15 +10,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Tests\Functional\Front;
+namespace Functional\Back;
 
 use Thelia\Tests\Functional\WebTestCase;
 
-class IndexTest extends WebTestCase
+class ConfigurationTranslationTest extends WebTestCase
 {
-    public function testIndex(): void
+    public function testOpen(): void
     {
-        self::$client->request('GET', '/');
+        $this->loginAdmin();
+
+        self::$client->request('GET', '/admin/configuration/translations');
 
         self::assertResponseIsSuccessful();
     }

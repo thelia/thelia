@@ -308,14 +308,14 @@ class BaseAdminController extends BaseController
      * Return the current list order identifier for a given object name,
      * updating in using the current request.
      *
-     * @param string $objectName           the object name (e.g. 'attribute', 'message')
-     * @param string $requestParameterName the name of the request parameter that defines the list order
-     * @param string $defaultListOrder     the default order to use, if none is defined
-     * @param bool   $updateSession        if true, the session will be updated with the current order
+     * @param string      $objectName           the object name (e.g. 'attribute', 'message')
+     * @param string|null $requestParameterName the name of the request parameter that defines the list order
+     * @param string|null $defaultListOrder     the default order to use, if none is defined
+     * @param bool        $updateSession        if true, the session will be updated with the current order
      *
      * @return string the current list order
      */
-    protected function getListOrderFromSession(string $objectName, string $requestParameterName, string $defaultListOrder, bool $updateSession = true)
+    protected function getListOrderFromSession(string $objectName, ?string $requestParameterName, ?string $defaultListOrder, bool $updateSession = true)
     {
         $orderSessionIdentifier = sprintf('admin.%s.currentListOrder', $objectName);
 

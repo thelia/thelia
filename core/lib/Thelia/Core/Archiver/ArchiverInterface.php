@@ -68,7 +68,7 @@ interface ArchiverInterface
      *
      * @return $this Return $this, allow chaining
      */
-    public function setArchivePath(string $archivePath): self;
+    public function setArchivePath(string $archivePath);
 
     /**
      * Create a new archive.
@@ -77,7 +77,7 @@ interface ArchiverInterface
      *
      * @return $this Return $this, allow chaining
      */
-    public function create(string $baseName): self;
+    public function create(string $baseName);
 
     /**
      * Open an archive.
@@ -86,14 +86,14 @@ interface ArchiverInterface
      *
      * @return $this Return $this, allow chaining
      */
-    public function open(string $path): self;
+    public function open(string $path);
 
     /**
      * Add directory or file to archive.
      *
      * @return $this Return $this, allow chaining
      */
-    public function add(string $path, string $pathInArchive = null): self;
+    public function add(string $path, string $pathInArchive = null);
 
     /**
      * Save archive.
@@ -107,5 +107,5 @@ interface ArchiverInterface
      *
      * @param string $toPath Where to extract
      */
-    public function extract(string $toPath): File;
+    public function extract(string $toPath): void;
 }
