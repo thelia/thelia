@@ -12,7 +12,7 @@
 
 namespace Front\Controller;
 
-use Doctrine\Common\Cache\FilesystemCache;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
@@ -61,6 +61,7 @@ class SitemapController extends BaseFrontController
                 $this->pageNotFound();
             }
         }
+
         // specific content : product, category, cms
         $context = $request->query->get('context', '');
         if (!\in_array($context, ['', 'catalog', 'content'])) {
@@ -69,22 +70,16 @@ class SitemapController extends BaseFrontController
 
         $flush = $request->query->get('flush', '');
 
-        // check if sitemap already in cache
-        $cacheContent = false;
+        /** @var AdapterInterface $cacheAdapter */
+        $cacheAdapter = $this->container->get('thelia.cache');
 
-        $cacheDir = $this->getCacheDir();
         $cacheKey = self::SITEMAP_CACHE_KEY.$lang.$context;
-        $cacheExpire = (int) (ConfigQuery::read('sitemap_ttl', '7200')) ?: 7200;
 
-        $cacheDriver = new FilesystemCache($cacheDir);
-        if (!($this->checkAdmin() && '' !== $flush)) {
-            $cacheContent = $cacheDriver->fetch($cacheKey);
-        } else {
-            $cacheDriver->delete($cacheKey);
-        }
+        $cacheItem = $cacheAdapter->getItem($cacheKey);
 
-        // if not in cache
-        if (false === $cacheContent) {
+        if (!$cacheItem->isHit() || $flush) {
+            $cacheExpire = (int) (ConfigQuery::read('sitemap_ttl', '7200')) ?: 7200;
+
             // Render the view. Compression causes problems and is deactivated.
             $cacheContent = $this->getParser(null)->render(
                 'sitemap.html',
@@ -95,12 +90,13 @@ class SitemapController extends BaseFrontController
                 false
             );
 
-            // save cache
-            $cacheDriver->save($cacheKey, $cacheContent, $cacheExpire);
+            $cacheItem->expiresAfter($cacheExpire);
+            $cacheItem->set($cacheContent);
+            $cacheAdapter->save($cacheItem);
         }
 
         $response = new Response();
-        $response->setContent($cacheContent);
+        $response->setContent($cacheItem->get());
         $response->headers->set('Content-Type', 'application/xml');
 
         return $response;
