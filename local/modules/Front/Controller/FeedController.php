@@ -12,7 +12,7 @@
 
 namespace Front\Controller;
 
-use Doctrine\Common\Cache\FilesystemCache;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
@@ -95,22 +95,16 @@ class FeedController extends BaseFrontController
 
         $flush = $request->query->get('flush', '');
 
-        // check if feed already in cache
-        $cacheContent = false;
+        /** @var AdapterInterface $cacheAdapter */
+        $cacheAdapter = $this->container->get('thelia.cache');
 
-        $cacheDir = $this->getCacheDir();
-        $cacheKey = self::FEED_CACHE_KEY.$lang.$context.$id;
-        $cacheExpire = (int) (ConfigQuery::read('feed_ttl', '7200')) ?: 7200;
+        $cacheKey = self::FEED_CACHE_KEY.$lang.$context;
 
-        $cacheDriver = new FilesystemCache($cacheDir);
-        if (!($this->checkAdmin() && '' !== $flush)) {
-            $cacheContent = $cacheDriver->fetch($cacheKey);
-        } else {
-            $cacheDriver->delete($cacheKey);
-        }
+        $cacheItem = $cacheAdapter->getItem($cacheKey);
 
-        // if not in cache
-        if (false === $cacheContent) {
+        if (!$cacheItem->isHit() || $flush) {
+            $cacheExpire = (int) (ConfigQuery::read('feed_ttl', '7200')) ?: 7200;
+
             // render the view
             $cacheContent = $this->renderRaw(
                 'feed',
@@ -120,12 +114,14 @@ class FeedController extends BaseFrontController
                     '_id_' => $id,
                 ]
             );
-            // save cache
-            $cacheDriver->save($cacheKey, $cacheContent, $cacheExpire);
+
+            $cacheItem->expiresAfter($cacheExpire);
+            $cacheItem->set($cacheContent);
+            $cacheAdapter->save($cacheItem);
         }
 
         $response = new Response();
-        $response->setContent($cacheContent);
+        $response->setContent($cacheItem->get());
         $response->headers->set('Content-Type', 'application/rss+xml');
 
         return $response;

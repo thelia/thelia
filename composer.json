@@ -47,7 +47,6 @@
         "symfony/dotenv": "5.2.*",
         "stack/builder": "1.0.*",
         "thelia/currency-converter": "~1.0",
-        "doctrine/cache": "1.5.*",
         "ptachoire/cssembed": "1.0.*",
         "simplepie/simplepie": "1.5.*",
         "imagine/imagine": "0.7.1",
