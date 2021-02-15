@@ -37,9 +37,6 @@ class CountryUpdateEvent extends CountryCreateEvent
     /** @var string */
     protected $postscriptum;
 
-    /**
-     * @param int $country_id
-     */
     public function __construct(int $country_id)
     {
         $this->country_id = $country_id;

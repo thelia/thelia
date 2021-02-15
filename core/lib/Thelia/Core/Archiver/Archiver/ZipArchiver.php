@@ -46,7 +46,7 @@ class ZipArchiver extends AbstractArchiver
         return class_exists('\\ZipArchive');
     }
 
-    public function create($baseName)
+    public function create(string $baseName): self
     {
         $this->archive = new \ZipArchive();
 
@@ -57,7 +57,7 @@ class ZipArchiver extends AbstractArchiver
         return $this;
     }
 
-    public function open($path)
+    public function open(string $path): self
     {
         $this->archive = new \ZipArchive();
 
@@ -68,12 +68,12 @@ class ZipArchiver extends AbstractArchiver
         return $this;
     }
 
-    public function save()
+    public function save(): bool
     {
         return $this->close();
     }
 
-    public function close()
+    public function close(): bool
     {
         return $this->archive->close();
     }

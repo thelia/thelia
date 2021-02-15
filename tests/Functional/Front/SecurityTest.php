@@ -16,33 +16,16 @@ use Thelia\Tests\Functional\WebTestCase;
 
 class SecurityTest extends WebTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // pour éviter que les tests marche les un sur les autres
-        // dans le cas ou des tests modifie la bdd, il serait bien d'ouvrir une transaction SQL ici
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        // et ici, rollback les changements
-    }
-
     /**
      * @dataProvider protectedUrls
      */
     public function testAccessSecuredUrl(string $method, string $url): void
     {
-        $client = static::createClient();
+        self::$client->request($method, $url);
 
-        $client->request($method, $url);
+        self::assertEquals(302, self::$client->getResponse()->getStatusCode());
 
-        self::assertEquals(302, $client->getResponse()->getStatusCode());
-
-        $client->followRedirect();
+        self::$client->followRedirect();
 
         /*
          c'est la merde dans thelia

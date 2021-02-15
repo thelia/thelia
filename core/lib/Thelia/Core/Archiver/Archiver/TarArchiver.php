@@ -51,7 +51,7 @@ class TarArchiver extends AbstractArchiver
         return class_exists('\\PharData');
     }
 
-    public function create($baseName)
+    public function create($baseName): self
     {
         $this->archivePath = $baseName.'.'.$this->getExtension();
 
@@ -60,7 +60,7 @@ class TarArchiver extends AbstractArchiver
         return $this;
     }
 
-    public function open($path)
+    public function open($path): self
     {
         $this->archivePath = $path;
 
@@ -69,7 +69,8 @@ class TarArchiver extends AbstractArchiver
         return $this;
     }
 
-    public function save(): void
+    public function save(): bool
     {
+        return true;
     }
 }

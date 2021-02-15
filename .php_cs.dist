@@ -19,6 +19,7 @@ return (new PhpCsFixer\Config)
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'yoda_style' => false,
+        'no_superfluous_phpdoc_tags' => true,
         'header_comment' => [
             'header' => implode("\n", [
                 'This file is part of the Thelia package.',

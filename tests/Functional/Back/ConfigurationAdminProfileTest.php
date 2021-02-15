@@ -10,16 +10,25 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Tests\Functional\Front;
+namespace Functional\Back;
 
 use Thelia\Tests\Functional\WebTestCase;
 
-class IndexTest extends WebTestCase
+class ConfigurationAdminProfileTest extends WebTestCase
 {
     public function testIndex(): void
     {
-        self::$client->request('GET', '/');
+        $this->loginAdmin();
+
+        self::$client->request('GET', '/admin/configuration/profiles');
 
         self::assertResponseIsSuccessful();
+    }
+
+    public function testOpen(): void
+    {
+        $this->loginAdmin();
+
+        // todo
     }
 }
