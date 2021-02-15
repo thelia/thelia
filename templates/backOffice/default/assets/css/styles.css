@@ -13908,16 +13908,32 @@ fieldset[disabled] .has-switch span.switch-default.active {
     display: none;
   }
 }
-.login-page {
-  border-top: 4px solid #f39922;
+.login-page .container {
+  background-color: white;
+  margin-top: 85px;
+  padding: 0;
+  width: 670px;
+  min-height: 600px;
+  padding-bottom: 25px;
 }
 .login-page #logo {
-  margin-top: 100px;
-  margin-bottom: 15px;
+  background-color: #f39922;
+  padding: 0;
+  margin-bottom: 55px;
   text-align: center;
+  font-family: rezland, serif;
+  color: white;
+  font-size: 4em;
 }
 .login-page form {
   margin-top: 30px;
+  margin-bottom: 30px;
+}
+.login-page form .form-group {
+  margin-bottom: 3em;
+}
+.login-page form input {
+  filter: none;
 }
 .login-page .form-control,
 .login-page .input-group-addon {
@@ -13931,34 +13947,6 @@ fieldset[disabled] .has-switch span.switch-default.active {
 .login-page .btn-lg {
   font-size: 13px;
   font-weight: normal;
-}
-.login-page .or {
-  text-align: center;
-  position: relative;
-}
-.login-page .or:before,
-.login-page .or:after {
-  content: '';
-  width: 35%;
-  position: absolute;
-  top: 50%;
-  border-top: 1px solid #646464;
-}
-@media (max-width: 767px) {
-  .login-page .or:before,
-  .login-page .or:after {
-    width: 29%;
-  }
-}
-.login-page .or:before {
-  left: 10px;
-}
-.login-page .or:after {
-  right: 10px;
-}
-.login-page .or span {
-  overflow: hidden;
-  padding: 0 10px;
 }
 #wrapper {
   width: 100%;

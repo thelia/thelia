@@ -1,14 +1,32 @@
 .login-page {
-    border-top: 4px solid @brand-primary;
+    .container {
+        background-color: white;
+        margin-top: 85px;
+        padding: 0;
+        width: 670px;
+        min-height: 600px;
+        padding-bottom: 25px;
+    }
 
     #logo {
-        margin-top: 100px;
-        margin-bottom: 15px;
+        background-color: @brand-primary;
+        padding: 0;
+        margin-bottom: 55px;
         text-align: center;
+        font-family: rezland, serif;
+        color: white;
+        font-size: 4em;
     }
 
     form {
         margin-top: 30px;
+        margin-bottom: 30px;
+        .form-group {
+            margin-bottom: 3em;
+        }
+        input {
+            filter: none;
+        }
     }
 
     .form-control,
@@ -24,37 +42,6 @@
     .btn-lg {
         font-size: @font-size-base;
         font-weight: normal;
-    }
-
-    .or {
-        text-align: center;
-        position: relative;
-
-        &:before,
-        &:after {
-            content: '';
-            width: 35%;
-            position: absolute;
-            top: 50%;
-            border-top: 1px solid @text-color;
-
-            @media (max-width: @screen-xs-max) {
-                width: 29%;
-            }
-        }
-
-        &:before {
-            left: 10px;
-        }
-
-        &:after {
-            right: 10px;
-        }
-
-        span {
-            overflow: hidden;
-            padding: 0 10px;
-        }
     }
 }
 

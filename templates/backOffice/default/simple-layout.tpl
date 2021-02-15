@@ -64,11 +64,9 @@
         {* -- Main page content section ----------------------------------------- *}
         {hook name="main.before-content" location="before_content"}
 
-        {images file='assets/img/logo-dark.png'}
-            <div id="logo">
-                <img src="{$asset_url}" alt="Thelia">
-            </div>
-        {/images}
+        <div id="logo">
+            thelia
+        </div>
 
         <p class="text-center">{block name="main-title"}{intl l="Welcome to Thelia administration !"}{/block}</p>
 
@@ -88,16 +86,12 @@
 {hook name="main.before-footer" location="before_footer" }
 
 <footer class="footer">
-    <div class="container">
         <p class="text-center">&copy; Thelia <time datetime="{'Y-m-d'|date}">{'Y'|date}</time>
-            - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Published by OpenStudio'}</a>
-            - <a href="http://thelia.net/forum" target="_blank">{intl l='Thelia support forum'}</a>
-            - <a href="http://thelia.net/modules" target="_blank">{intl l='Thelia contributions'}</a>
+            - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Made with 💙 by OpenStudio'}</a>
+            - <a href="http://thelia.net/forum" target="_blank">{intl l='Need help ?'}</a>
         </p>
 
         {hook name="main.in-footer" location="in_footer" }
-
-    </div>
 </footer>
 
 {hook name="main.after-footer" location="after_footer" }
