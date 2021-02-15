@@ -21,7 +21,7 @@ A repository containing all thelia modules is available at this address : https:
 Compatibility
 ------------
 
-|  | Thelia 2.1 | Thelia 2.2 | Thelia 2.3 | Thelia 2.4 | (Soon) Thelia 2.5 |
+|  | Thelia 2.1 | Thelia 2.2 | Thelia 2.3 | Thelia 2.4 | Thelia 2.5 |
 | ------------- |:-------------:| -----:| -----:| -----:| -----:|
 | PHP      | 5.4 5.5 5.6 | 5.4 5.5 5.6 | 5.5 5.6 7.0 7.1 | 7.0 7.1 7.2 7.3 | 7.2 7.3 7.4 8.0 |
 | MySQL    | 5.5 5.6 | 5.5 5.6 | 5.5 5.6 | 5.5 5.6 5.7 | 5.5 5.6 5.7 8.0 |
@@ -140,7 +140,7 @@ You just have to follow all instructions.
 
 ### Docker and docker compose
 
-This repo contains all the configuration needed to run Thelia with docker and docker-compose.    
+This repo contains all the configuration needed to run Thelia with docker and docker-compose.
 Warning, this docker configuration is not ready for production.
 
 It requires obviously [docker](https://docker.com/) and [docker-compose](https://docs.docker.com/compose/)

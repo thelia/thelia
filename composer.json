@@ -85,16 +85,16 @@
     },
     "scripts": {
         "cs-diff": [
-            "./bin/php-cs-fixer fix --dry-run --stop-on-violation --diff"
+            "./vendor/bin/php-cs-fixer fix --dry-run --stop-on-violation --diff"
         ],
         "cs": [
-            "./bin/php-cs-fixer fix"
+            "./vendor/bin/php-cs-fixer fix"
         ],
         "phpstan": [
-            "php -d memory_limit=-1 ./bin/phpstan analyse -c phpstan.neon"
+            "php -d memory_limit=-1 ./vendor/bin/phpstan analyse -c phpstan.neon"
         ],
         "test-unit": [
-            "./bin/phpunit --configuration phpunit.xml.dist --testsuit unit"
+            "./vendor/bin/phpunit --configuration phpunit.xml.dist --testsuit unit"
         ],
         "reset-database": [
             "php Thelia thelia:dev:reloadDB",
@@ -102,13 +102,13 @@
             "php Thelia admin:create --login_name thelia --password thelia --last_name thelia --first_name thelia --email thelia@example.com"
         ],
         "test-functional": [
-            "./bin/phpunit --configuration phpunit.xml.dist --testsuit functional"
+            "./vendor/bin/phpunit --configuration phpunit.xml.dist --testsuit functional"
         ],
         "test-legacy": [
             "php Thelia module:activate Colissimo",
             "php Thelia module:activate Cheque",
             "php Thelia module:activate HookTest",
-            "./bin/phpunit --configuration phpunit.legacy.xml"
+            "./vendor/bin/phpunit --configuration phpunit.legacy.xml"
         ],
         "test": [
             "@reset-database",
@@ -123,9 +123,6 @@
         ]
     },
     "minimum-stability": "stable",
-    "config": {
-        "bin-dir": "bin"
-    },
     "autoload": {
         "psr-4": {
             "Thelia\\": "core/lib/Thelia",

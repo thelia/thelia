@@ -1,3 +1,14 @@
+###> symfony/framework-bundle ###
+/var/
+/vendor/
+/.env.local
+/.env.local.php
+/.env.*.local
+composer.lock
+phpunit.xml
+###< symfony/framework-bundle ###
+
+###> thelia/thelia ###
 local/config/build.properties
 local/config/config_db.php
 local/config/build
@@ -5,13 +16,6 @@ local/config/database.yml
 local/config/database.yml.sample.save
 local/config/key
 local/config/runtime-conf.xml
-bin/*
-local/session/*
-coverage
-.idea
-.buildpath
-.project
-.settings/
 local/media/documents/*
 local/media/images/*
 !local/media/images/store/favicon.png
@@ -28,13 +32,10 @@ phpunit.phar
 .DS_Store
 phpmyadmin
 composer.phar
-composer.lock
 web/.htaccess
 local/I18n/*.php
 .docker/mysql-data/*
 !.docker/mysql-data/.gitkeep
-/vendor/
-/var/
 .env
 
 # Ignore everything in the "modules" directory, except the "default modules"
@@ -71,14 +72,9 @@ templates/email/*
 templates/pdf/*
 !templates/pdf/default
 
-#Ignore CodeKit
-codekit-config.json
-config.codekit
-.codekit-cache
+###< thelia/thelia ###
 
-#MacOS
+#other
 .DS_Store
-
-# Ignore casperjs screenshots
-tests/functionnal/casperjs/screenshot/
-tests/phpunit/Thelia/Tests/Api/fixtures/visuel*.png
+.idea/
+composer.phar
