@@ -18,7 +18,6 @@
         "ext-pdo": "*",
         "ext-json": "*",
         "ext-intl": "*",
-        "ircmaxell/password-compat": "1.0.*",
         "psr/log": "1.1.*",
         "symfony/config": "5.2.*",
         "symfony/console": "5.2.*",
@@ -68,12 +67,10 @@
         "thelia/custom-delivery-module": "~2.1.0",
         "thelia/store-seo-module": "~1.2.0",
         "symfony/mime": "5.2.*",
-        "zircote/swagger-php": "3.1.*",
         "symfony/framework-bundle": "5.2.*",
-        "friendsofphp/php-cs-fixer": "^2.18"
+        "wikimedia/less.php": "^3.1"
     },
     "require-dev": {
-        "fzaninotto/faker": "1.5.*",
         "thelia/hooktest-module": "~1.1",
         "thelia/hooktest-template": "~1.1",
         "phpunit/phpunit": "9.5.*",
@@ -81,7 +78,8 @@
         "symfony/phpunit-bridge": "^5.2",
         "phpstan/phpstan": "^0.12.75",
         "phpstan/extension-installer": "^1.1",
-        "symfony/css-selector": "^5.2"
+        "symfony/css-selector": "^5.2",
+        "friendsofphp/php-cs-fixer": "^2.18"
     },
     "scripts": {
         "cs-diff": [
