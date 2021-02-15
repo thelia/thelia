@@ -55,7 +55,6 @@ $thelia->boot();
 // Load the translator
 $thelia->getContainer()->get('thelia.translator');
 
-$faker = Faker\Factory::create();
 // Intialize URL management
 $url = new Thelia\Tools\URL();
 $con = \Propel\Runtime\Propel::getConnection(
@@ -73,10 +72,10 @@ try {
     $material = createMaterials($con);
 
     $color = createColors($con);
-    $brands = createBrands($faker, $con);
+    $brands = createBrands($con);
 
-    $folders = createFolders($faker, $con);
-    $contents = createContents($faker, $folders, $con);
+    $folders = createFolders($con);
+    $contents = createContents($folders, $con);
 
 
     echo "creating templates\n";
@@ -88,7 +87,7 @@ try {
             ->setName('demo template')
         ->save($con);
 
-    $categories = createCategories($faker, $template->getId(), $con);
+    $categories = createCategories($template->getId(), $con);
 
     $at = new Thelia\Model\AttributeTemplate();
 
@@ -105,14 +104,14 @@ try {
         ->save($con);
     echo "end creating templates\n";
 
-    createProduct($faker, $categories, $brands, $contents, $template, $color, $material, $con);
+    createProduct($categories, $brands, $contents, $template, $color, $material, $con);
 
-    $sales = createSales($faker, $con);
+    $sales = createSales($con);
 
-    createCustomer($faker, $con);
+    createCustomer($con);
 
     // set some config key
-    createConfig($faker, $folders, $contents, $con);
+    createConfig($folders, $contents, $con);
 
     $con->commit();
 } catch (Exception $e) {
@@ -120,7 +119,7 @@ try {
     $con->rollBack();
 }
 
-function createProduct($faker, $categories, $brands, $contents, $template, $attribute, $feature, $con): void
+function createProduct($categories, $brands, $contents, $template, $attribute, $feature, $con): void
 {
     echo "start creating products\n";
     $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
@@ -197,15 +196,15 @@ function createProduct($faker, $categories, $brands, $contents, $template, $attr
                 $stock = new \Thelia\Model\ProductSaleElements();
                 $stock->setProduct($product);
                 $stock->setRef($product->getId().'_'.uniqid('', true));
-                $stock->setQuantity($faker->numberBetween(1, 50));
+                $stock->setQuantity(rand(1, 50));
                 if (!empty($data[9])) {
                     $stock->setPromo(1);
                 } else {
                     $stock->setPromo(0);
                 }
 
-                $stock->setNewness($faker->numberBetween(0, 1));
-                $stock->setWeight($faker->randomFloat(2, 1, 30));
+                $stock->setNewness(rand(0, 1));
+                $stock->setWeight((float) rand(100, 3000) / 100);
                 $stock->save($con);
 
                 $productPrice = new \Thelia\Model\ProductPrice();
@@ -267,7 +266,7 @@ function createProduct($faker, $categories, $brands, $contents, $template, $attr
     echo "end creating products\n";
 }
 
-function createConfig($faker, $folders, $contents, $con): void
+function createConfig($folders, $contents, $con): void
 {
     // Store
     \Thelia\Model\ConfigQuery::write('store_name', 'Thelia');
@@ -282,7 +281,7 @@ function createConfig($faker, $folders, $contents, $con): void
     \Thelia\Model\ConfigQuery::write('terms_conditions_content_id', $contents['Terms and Conditions']->getId());
 }
 
-function createCustomer($faker, $con): void
+function createCustomer($con): void
 {
     echo "Creating customer\n";
 
@@ -303,24 +302,40 @@ function createCustomer($faker, $con): void
         'test@thelia.net',
         'thelia'
     );
-    for ($j = 0; $j <= 2; ++$j) {
-        $address = new Thelia\Model\Address();
-        $address->setLabel($faker->text(20))
-            ->setTitleId(random_int(1, 3))
-            ->setFirstname($faker->firstname)
-            ->setLastname($faker->lastname)
-            ->setAddress1($faker->streetAddress)
-            ->setAddress2($faker->streetAddress)
-            ->setAddress3($faker->streetAddress)
-            ->setCellphone($faker->phoneNumber)
-            ->setPhone($faker->phoneNumber)
-            ->setZipcode($faker->postcode)
-            ->setCity($faker->city)
-            ->setCountryId(64)
-            ->setCustomer($customer)
-            ->save($con)
-        ;
-    }
+
+    $address = new Thelia\Model\Address();
+    $address->setLabel('Address n°2')
+        ->setTitleId(rand(1, 3))
+        ->setFirstname('thelia')
+        ->setLastname('thelia')
+        ->setAddress1('4 rue du Pensionnat Notre Dame de France')
+        ->setAddress2('')
+        ->setAddress3('')
+        ->setCellphone('')
+        ->setPhone('')
+        ->setZipcode('43000')
+        ->setCity('Le Puy-en-velay')
+        ->setCountryId(64)
+        ->setCustomer($customer)
+        ->save($con)
+    ;
+
+    $address = new Thelia\Model\Address();
+    $address->setLabel('Address n°3')
+        ->setTitleId(rand(1, 3))
+        ->setFirstname('thelia')
+        ->setLastname('thelia')
+        ->setAddress1("43 rue d'Alsace-Lorrainee")
+        ->setAddress2('')
+        ->setAddress3('')
+        ->setCellphone('')
+        ->setPhone('')
+        ->setZipcode('31000')
+        ->setCity('Toulouse')
+        ->setCountryId(64)
+        ->setCustomer($customer)
+        ->save($con)
+    ;
 
     echo "End creating customer\n";
 }
@@ -365,7 +380,7 @@ function createMaterials($con)
     return $feature;
 }
 
-function createBrands($faker, $con)
+function createBrands($con)
 {
     echo "start creating brands\n";
 
@@ -386,12 +401,12 @@ function createBrands($faker, $con)
                 ->setPosition($row - 1)
                 ->setLocale('fr_FR')
                     ->setTitle(trim($data[0]))
-                    ->setChapo($faker->text(20))
-                    ->setDescription($faker->text(100))
+                    ->setChapo('Aut voluptas.')
+                    ->setDescription('Et in ea corrupti sequi enim et. Et nobis similique velit occaecati.')
                 ->setLocale('en_US')
                     ->setTitle(trim($data[0]))
-                    ->setChapo($faker->text(20))
-                    ->setDescription($faker->text(100))
+                    ->setChapo('Eos perspiciatis.')
+                    ->setDescription('Eos velit enim autem eum nihil sunt ut. Porro ipsa deleniti dolore molestiae aut omnis autem.')
                 ->save($con);
 
             $brands[trim($data[0])] = $brand;
@@ -427,7 +442,7 @@ function createBrands($faker, $con)
 }
 
 
-function createCategories($faker, $templateId, $con)
+function createCategories($templateId, $con)
 {
     echo "start creating categories\n";
     $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
@@ -447,13 +462,13 @@ function createCategories($faker, $templateId, $con)
                 ->setPosition($row - 1)
                 ->setParent(0)
                 ->setLocale('fr_FR')
-                    ->setTitle(trim($data[0]))
-                    ->setChapo($faker->text(20))
-                    ->setDescription($faker->text(100))
+                    ->setTitle(trim($data[1]))
+                    ->setChapo('Aut voluptas.')
+                    ->setDescription('Et in ea corrupti sequi enim et. Et nobis similique velit occaecati.')
                 ->setLocale('en_US')
                     ->setTitle(trim($data[1]))
-                    ->setChapo($faker->text(20))
-                    ->setDescription($faker->text(100))
+                    ->setChapo('Eos perspiciatis.')
+                    ->setDescription('Eos velit enim autem eum nihil sunt ut. Porro ipsa deleniti dolore molestiae aut omnis autem.')
                 ->save($con);
             $categories[trim($data[1])] = $category;
 
@@ -478,7 +493,7 @@ function createCategories($faker, $templateId, $con)
     return $categories;
 }
 
-function createSales($faker, $con)
+function createSales($con)
 {
     echo "start creating sales\n";
     $sales = [];
@@ -503,13 +518,13 @@ function createSales($faker, $con)
                 ->setPriceOffsetType($data[2])
                 ->setDisplayInitialPrice(true)
                 ->setLocale('fr_FR')
-                ->setTitle(trim($data[0]))
-                ->setChapo($faker->text(20))
-                ->setDescription($faker->text(100))
+                    ->setTitle(trim($data[0]))
+                    ->setChapo('Aut voluptas.')
+                    ->setDescription('Et in ea corrupti sequi enim et. Et nobis similique velit occaecati.')
                 ->setLocale('en_US')
-                ->setTitle(trim($data[1]))
-                ->setChapo($faker->text(20))
-                ->setDescription($faker->text(100))
+                    ->setTitle(trim($data[1]))
+                    ->setChapo('Aut voluptas.')
+                    ->setDescription('Et in ea corrupti sequi enim et. Et nobis similique velit occaecati.')
                 ->save($con);
 
             foreach ($currencies as $currency) {
@@ -546,7 +561,7 @@ function createSales($faker, $con)
     return $sales;
 }
 
-function createFolders($faker, $con)
+function createFolders($con)
 {
     echo "start creating folders\n";
 
@@ -567,12 +582,12 @@ function createFolders($faker, $con)
                 ->setPosition($row - 1)
                 ->setLocale('fr_FR')
                     ->setTitle(trim($data[0]))
-                    ->setChapo($faker->text(20))
-                    ->setDescription($faker->text(100))
+                    ->setChapo('Aut voluptas.')
+                    ->setDescription('Et in ea corrupti sequi enim et. Et nobis similique velit occaecati.')
                 ->setLocale('en_US')
                     ->setTitle(trim($data[1]))
-                    ->setChapo($faker->text(20))
-                    ->setDescription($faker->text(100))
+                    ->setChapo('Aut voluptas.')
+                    ->setDescription('Et in ea corrupti sequi enim et. Et nobis similique velit occaecati.')
                 ->save($con);
 
             $folders[trim($data[1])] = $folder;
@@ -598,7 +613,7 @@ function createFolders($faker, $con)
     return $folders;
 }
 
-function createContents($faker, $folders, $con)
+function createContents($folders, $con)
 {
     echo "start creating contents\n";
 
@@ -616,15 +631,15 @@ function createContents($faker, $folders, $con)
 
             $content
                 ->setVisible(1)
-                ->setPosition($row - 1)
                 ->setLocale('fr_FR')
                     ->setTitle(trim($data[0]))
-                    ->setChapo($faker->text(20))
-                    ->setDescription($faker->text(200))
+                ->setChapo('Aut voluptas.')
+                ->setDescription('Et in ea corrupti sequi enim et. Et nobis similique velit occaecati.')
                 ->setLocale('en_US')
                     ->setTitle(trim($data[1]))
-                    ->setChapo($faker->text(20))
-                    ->setDescription($faker->text(200));
+                    ->setChapo('Aut voluptas.')
+                    ->setDescription('Et in ea corrupti sequi enim et. Et nobis similique velit occaecati.')
+            ;
 
             // folder
             $contentFolders = explode(';', $data[7]);
