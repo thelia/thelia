@@ -13,7 +13,7 @@
 namespace Thelia\Install;
 
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CheckPermission.
@@ -47,10 +47,10 @@ class CheckPermission extends BaseInstall
         'upload_max_filesize' => 2097152,
     ];
 
-    protected $phpExpectedVerions = array(
-        'min' => '5.6',
-        'max' => '8.0'
-    );
+    protected $phpExpectedVerions = [
+        'min' => '7.2',
+        'max' => '8.0',
+    ];
 
     protected $extensions = [
         'curl',
@@ -121,7 +121,8 @@ class CheckPermission extends BaseInstall
      */
     public function exec()
     {
-        if (version_compare(\PHP_VERSION, $this->phpExpectedVerions['min'], '<') || version_compare(\PHP_VERSION, $this->phpExpectedVerions['max'], '>=')) {
+        $currentVersion = substr(\PHP_VERSION, 0, strrpos(\PHP_VERSION, "."));
+        if (!version_compare($currentVersion, $this->phpExpectedVerions['min'], '>=') && version_compare($currentVersion, $this->phpExpectedVerions['max'], '<=')) {
             $this->isValid = false;
             $this->validationMessages['php_version']['text'] = $this->getI18nPhpVersionText(\PHP_VERSION, false);
             $this->validationMessages['php_version']['status'] = false;
@@ -256,7 +257,7 @@ class CheckPermission extends BaseInstall
      */
     protected function getI18nPhpVersionText($currentValue, $isValid)
     {
-        $sentence = $isValid ? 'PHP version %currentValue% matches the version required (> %minExpectedValue% < %maxExpectedValue%).'
+        $sentence = $isValid ? 'PHP version %currentValue% matches the version required (>= %minExpectedValue% <= %maxExpectedValue%).'
             : 'The installer detected PHP version %currentValue%, but Thelia 2 requires PHP between %minExpectedValue% and %maxExpectedValue%.';
 
         return $this->formatString(

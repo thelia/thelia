@@ -32,8 +32,7 @@ services:
     working_dir: /application
     volumes:
       - .:/application
-      - .docker/php-fpm/php-ini-overrides.ini:/etc/php/7.4/fpm/conf.d/99-overrides.ini
-      - .docker/php-fpm/php-ini-overrides.ini:/etc/php/7.4/cli/conf.d/99-overrides.ini
+      - .docker/php-fpm/php-ini-overrides.ini:/usr/local/etc/php/conf.d/99-overrides.ini
     environment:
       - "PHP_IDE_CONFIG:serverName=thelia"
       - "XDEBUG_CONFIG:idekey=PHPSTORM"

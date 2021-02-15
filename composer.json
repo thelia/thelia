@@ -55,12 +55,10 @@
         "smarty/smarty": "3.1.*",
         "commerceguys/addressing": "1.1.*",
         "symfony/cache": "5.2.*",
-        "spipu/html2pdf": "^5.0",
         "symfony/polyfill-php73": "^1.0",
         "symfony/lock": "5.2.*",
         "thelia/propel": "dev-thelia-2.5",
         "symfony/var-dumper": "^2.0|^3.0|^4.0",
-        "assetic/framework": "^2.0",
         "thelia/open-api-module": "~1.0.1",
         "thelia/smarty-redirection-module": "~1.0.0",
         "thelia/choice-filter-module": "~1.0.0",
@@ -68,7 +66,8 @@
         "thelia/store-seo-module": "~1.2.0",
         "symfony/mime": "5.2.*",
         "symfony/framework-bundle": "5.2.*",
-        "wikimedia/less.php": "^3.1"
+        "wikimedia/less.php": "^3.1",
+        "assetic/framework": "dev-develop#b067e1779fc18db43031a4dc9a80308465febcfd"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",
