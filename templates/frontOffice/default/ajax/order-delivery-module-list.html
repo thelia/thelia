@@ -13,7 +13,7 @@
             <td>
                 <div class="radio">
                     {form_field field='delivery-module'}
-                    {if $isPost}
+                    {if isset($isPost) && $isPost}
                         {if $value == $ID}
                             {assign var="isDeliveryMethodChecked" value="1"}
                         {/if}
