@@ -63,7 +63,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         string $address1,
         string $address2 = null,
         string $address3 = null,
-        string $phone,
+        string $phone = null,
         string $cellphone = null,
         string $zipcode,
         string $city,
