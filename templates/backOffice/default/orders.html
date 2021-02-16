@@ -10,9 +10,9 @@
 {block name="check-access"}view{/block}
 
 {block name="main-content"}
-    {assign order_page {$smarty.get.page|default:1}}
-    {assign view_status {$smarty.get.status}}
-    {assign status_filter {$smarty.get.status|assertType:'IntListType'}}
+    {$order_page = $smarty.get.page|default:1}
+    {$view_status = $smarty.get.status|default:null}
+    {$status_filter = $smarty.get.status|default:null|assertType:'IntListType'}
 <div class="orders">
 
     <div id="wrapper" class="container">
@@ -107,7 +107,7 @@
 
                             <tbody>
 
-                                {loop type="order" name="order-list" customer="*" order=$orders_order backend_context="1" page={$order_page} limit={config key="number_default_results_per_page.order_list" default=20} status=$status_filter|default:'*' search_term=$search_term search_in="$search_in"}
+                                {loop type="order" name="order-list" customer="*" order=$orders_order backend_context="1" page={$order_page} limit={config key="number_default_results_per_page.order_list" default=20} status=$status_filter|default:'*' search_term=$search_term|default:null search_in=$search_in|default:""}
 
                                     {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                                         {assign "orderInvoiceFirstName" $FIRSTNAME}
@@ -172,7 +172,7 @@
 
                                             loop_ref       = "order-list"
                                             max_page_count = 10
-                                            page_url       = {url path="/admin/orders" status=$status_filter orders_order=$orders_order search_term=$search_term search_in="$search_in"}
+                                            page_url       = {url path="/admin/orders" status=$status_filter orders_order=$orders_order search_term=$search_term|default:null search_in=$search_in|default:""}
                                         }
 
                                     </td>

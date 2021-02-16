@@ -4,7 +4,7 @@
     {$admin_current_location = 'tools'}
 {/block}
 
-{block name="page-title"}{intl l='Export'}: {$TITLE}{/block}
+{block name="page-title"}{intl l='Export'}: {$TITLE|default:""}{/block}
 
 {block name="check-resource"}admin.export{/block}
 {block name="check-access"}view{/block}
@@ -29,7 +29,7 @@
                 </ul>
             </nav>
 
-            {if $general_error}
+            {if isset($general_error)}
                 <div class="row">
                     <div class="col-md-12">
                         <div class="alert alert-danger">{$general_error}</div>

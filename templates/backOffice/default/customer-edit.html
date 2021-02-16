@@ -240,7 +240,7 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {loop type="order" name="order-list" customer="{$customer_id}" backend_context="1" status='*' page={$page_order} limit={config key="number_default_results_per_page.order_list" default=20}}
+                                        {loop type="order" name="order-list" customer="{$customer_id}" backend_context="1" status='*' page=$page_order|default:1 limit={config key="number_default_results_per_page.order_list" default=20}}
                                         {loop type="order-status" name="order-status" id=$STATUS}
                                         {assign "orderStatus" $TITLE}
                                         {assign "orderStatusLabel" "order_$CODE"}
@@ -341,7 +341,7 @@
 
 {* -- Update an Address ----------------------------------------------------- *}
 
-{if $address_id > 0}
+{if isset($address_id) && $address_id > 0}
 	{form name="thelia.admin.address.update"}
 
 	    {* Capture the dialog body, to pass it to the generic dialog *}
@@ -442,7 +442,7 @@
                 });
 
                 // If $address_id is defined, show the edit dialog
-                {if $address_id > 0}
+                {if isset($address_id) && $address_id > 0}
 
                     // JS stuff for update form
                     {include

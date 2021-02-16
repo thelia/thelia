@@ -31,8 +31,8 @@ Parameters:
     <div class="existing-document">
         {include file='includes/document-upload-list-ajax.html'
             documentType=$documentType
-            parentId=$parentId
-            resource=$resource
+            parentId=$parentId|default:null
+            resource=$resource|default:null
         }
     </div>
 

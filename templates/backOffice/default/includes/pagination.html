@@ -17,7 +17,7 @@ $page_url : the URL of the page. The parameter page=x is appended to this URL.
     {$page_url="$page_url?"}
 {/if}
 
-{if !$page_param_name}
+{if !isset($page_param_name)}
     {assign var="page_param_name" value="page"}
 {/if}
 

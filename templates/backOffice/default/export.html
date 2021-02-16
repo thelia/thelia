@@ -61,7 +61,7 @@
                                                     {elseif $export_order == "id_reverse"}
                                                         <i class="glyphicon glyphicon-chevron-down"></i>
                                                     {/if}
-                                                    <a href="{url path="/admin/export"}?{if $url_category}{$url_category nofilter}&{/if}export_order=id{if $export_order == "id"}_reverse{/if}#category_{$category_title}">
+                                                    <a href="{url path="/admin/export"}?{if isset($url_category)}{$url_category nofilter}&{/if}export_order=id{if $export_order == "id"}_reverse{/if}#category_{$category_title}">
                                                         {intl l="ID"}
                                                     </a>
                                                 </th>
@@ -71,7 +71,7 @@
                                                     {elseif $export_order == "alpha_reverse"}
                                                         <i class="glyphicon glyphicon-chevron-down"></i>
                                                     {/if}
-                                                    <a href="{url path="/admin/export"}?{if $url_category}{$url_category nofilter}&{/if}export_order=alpha{if $export_order == "alpha"}_reverse{/if}#category_{$category_title}">
+                                                    <a href="{url path="/admin/export"}?{if isset($url_category)}{$url_category nofilter}&{/if}export_order=alpha{if $export_order == "alpha"}_reverse{/if}#category_{$category_title}">
                                                         {intl l="Name"}
                                                     </a>
                                                 </th>
@@ -84,7 +84,7 @@
                                                     {elseif $export_order == "manual_reverse"}
                                                         <i class="glyphicon glyphicon-chevron-down"></i>
                                                     {/if}
-                                                    <a href="{url path="/admin/export"}?{if $url_category}{$url_category nofilter}&{/if}export_order=manual{if $export_order == "manual"}_reverse{/if}#category_{$category_title}">
+                                                    <a href="{url path="/admin/export"}?{if isset($url_category)}{$url_category nofilter}&{/if}export_order=manual{if $export_order == "manual"}_reverse{/if}#category_{$category_title}">
                                                         {intl l="Position"}
                                                     </a>
                                                 </th>

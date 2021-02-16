@@ -327,6 +327,16 @@ class TheliaLoop extends AbstractSmartyPlugin
             throw new \InvalidArgumentException($this->translator->trans("Missing 'rel' parameter in page loop"));
         }
 
+        // To be sure all variables was set
+        $template->assign('START', 1);
+        $template->assign('PREV', 1);
+        $template->assign('NEXT', 1);
+        $template->assign('END', 1);
+        $template->assign('LAST', 1);
+        $template->assign('PAGE', 1);
+        $template->assign('CURRENT', 1);
+
+
         // Find pagination
         $pagination = self::getPagination($loopName);
 

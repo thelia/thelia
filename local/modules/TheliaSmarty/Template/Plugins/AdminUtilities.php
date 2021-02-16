@@ -157,6 +157,7 @@ class AdminUtilities extends AbstractSmartyPlugin
         // The request parameter
         $request_parameter_name = $this->getParam($params, 'request_parameter_name', 'order');
 
+        $sort_direction = null;
         if ($current_order == $order) {
             $sort_direction = 'up';
             $order_change = $reverse_order;

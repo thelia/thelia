@@ -23,7 +23,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="general-block-decorator">
-                        {if $removal_error }
+                        {if isset($removal_error) && true === $removal_error }
                             <div class="alert alert-danger">
                                 {$error_message}
                             </div>
@@ -129,7 +129,7 @@
                                     </thead>
 
                                     <tbody>
-                                    {loop name="customer_list" type="customer" current="false" visible="*" order=$customer_order backend_context="1" page=$page limit={config key="number_default_results_per_page.customer_list" default=20} search_term=$search search_in="ref,firstname,lastname,email"}
+                                    {loop name="customer_list" type="customer" current="false" visible="*" order=$customer_order backend_context="1" page=$page limit={config key="number_default_results_per_page.customer_list" default=20} search_term=$search|default:null search_in="ref,firstname,lastname,email"}
                                         {$lastOrderDate = ''}
                                         {$lastOrderAmount = ''}
                                         {$lastOrderCurrency = ''}
@@ -217,7 +217,7 @@
 
                                             loop_ref       = "customer_list"
                                             max_page_count = 10
-                                            page_url       = {url path="/admin/customers" search_term=$search search_in="ref,firstname,lastname,email" customer_order=$customer_order}
+                                            page_url       = {url path="/admin/customers" search_term=$search|default:null search_in="ref,firstname,lastname,email" customer_order=$customer_order}
                                             }
 
                                         </td>

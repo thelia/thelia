@@ -13,23 +13,23 @@
         <tbody>
         <tr>
             <th>{intl l="Overall sales" d='hookadminhome.bo.default'}</th>
-            <td>{format_money number={stats key="sales" startDate=$startDate endDate=$endDate} symbol=$defaultCurrency}</td>
+            <td>{format_money number={stats key="sales" startDate=$startDate endDate=$endDate|default:null} symbol=$defaultCurrency}</td>
         </tr>
         <tr>
             <th>{intl l="Sales excluding shipping" d='hookadminhome.bo.default'}</th>
             <td>
-                {$salesNoShipping = {stats key="sales" startDate=$startDate endDate=$endDate includeShipping="false"}}
+                {$salesNoShipping = {stats key="sales" startDate=$startDate endDate=$endDate|default:null includeShipping="false"}}
                 {format_money number=$salesNoShipping symbol=$defaultCurrency}
             </td>
         </tr>
         <tr>
             <th>{intl l="Previous month sales" d='hookadminhome.bo.default'}</th>
-            <td>{format_money number={stats key="sales" startDate=$prevMonthStartDate endDate=$prevMonthEndDate} symbol=$defaultCurrency}</td>
+            <td>{format_money number={stats key="sales" startDate=$prevMonthStartDate endDate=$prevMonthEndDate|default:null} symbol=$defaultCurrency}</td>
         </tr>
         <tr>
             <th>{intl l="Orders" d='hookadminhome.bo.default'}</th>
             <td>
-                {$orderCount =  {stats key="orders" startDate=$startDate endDate=$endDate}}
+                {$orderCount =  {stats key="orders" startDate=$startDate endDate=$endDate|default:null}}
                 {$orderCount}
             </td>
         </tr>

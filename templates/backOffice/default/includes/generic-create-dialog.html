@@ -26,7 +26,7 @@ A generic modal creation dialog template. Parameters
                 <h3>{$dialog_title nofilter}</h3>
             </div>
 
-            <form method="POST" action="{$form_action nofilter}" {$form_enctype nofilter} {$form_attributes nofilter}>
+            <form method="POST" action="{$form_action nofilter}" {$form_enctype nofilter} {$form_attributes|default:null nofilter}>
 
                 <div class="modal-body">
                     {if ! empty($form_error_message)}<div class="alert alert-danger" id="{$dialog_id}_error">{$form_error_message nofilter}</div>{/if}

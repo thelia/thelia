@@ -17,6 +17,9 @@ fragment uses the following additional variables :
 {* see form-field-attributes-renderer.html *}
 
 {* Use the provided id if any *}
+{if (!isset($label_attr.for))}
+    {$label_attr.for = ""}
+{/if}
 {if (! empty($field_id))}
     {$label_attr.for = $field_id}
 {elseif empty({$label_attr.for})}
@@ -54,7 +57,7 @@ Use the optionnal $field_value parameter if no value is defined
             {if $show_label}
                 {form_error field=$field_name}
                     <br />
-                    <span class="error">{$message}</span>
+                    <span class="error">{$message|default:null}</span>
                 {/form_error}
             {/if}
         </label>
@@ -78,7 +81,7 @@ Use the optionnal $field_value parameter if no value is defined
             {if $show_label}
                 {form_error field=$field_name}
                     <br />
-                    <span class="error">{$message}</span>
+                    <span class="error">{$message|default:null}</span>
                 {/form_error}
             {/if}
         </label>
@@ -93,12 +96,12 @@ Use the optionnal $field_value parameter if no value is defined
     <div class="form-group {if $error}has-error{/if}">
 
         {if $show_label}
-            <label for="{$label_attr.for}" class="control-label">
+            <label for="{$label_attr.for|default:""}" class="control-label">
                 {$label} {if $required} <span class="required">*</span>{/if}
 
                 {form_error field=$field_name}
                     <br />
-                    <span class="error">{$message}</span>
+                    <span class="error">{$message|default:null}</span>
                 {/form_error}
             </label>
 
@@ -143,7 +146,7 @@ Use the optionnal $field_value parameter if no value is defined
                     {else}
                         {* You should implement the auto completion *}
                         <input type="hidden" {$attributes nofilter} />
-                        <input type="text" data-widget="{$type}" data-rel="#{$label_attr.for}" class="form-control" />
+                        <input type="text" data-widget="{$type}" data-rel="#{$label_attr.for|default:""}" class="form-control" />
                     {/if}
                 {else}
                     <div class="alert alert-danger">{intl l="Unsupported field type '%type' in form-field.html" type={$type}}</div>
