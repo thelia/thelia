@@ -166,9 +166,9 @@
                                 {include file="includes/seo-tab.html"
                                     formAction  = "{url path='/admin/folders/seo/save'}"
                                     pageUrl     = "{url path='/admin/folders/update'}/$folder_id"
-                                    closeUrl    = $close_url
-                                    success_url = $close_url
-                                    current_id  = $folder_id
+                                    closeUrl    = $close_url|default:null
+                                    success_url = $close_url|default:null
+                                    current_id  = $folder_id|default:null
                                     seoType     = 'folder'
                                 }
                             </div>
@@ -188,8 +188,8 @@
                                     {include
                                     file = "includes/inner-form-toolbar.html"
                                     hide_submit_buttons = true
-                                    page_url  = {$pageUrl}
-                                    close_url = {$closeUrl}
+                                    page_url  = $pageUrl|default:null
+                                    close_url = $closeUrl|default:null
                                     current_tab = "modules"
                                     }
                                 </div>

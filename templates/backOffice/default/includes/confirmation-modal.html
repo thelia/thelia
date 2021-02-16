@@ -5,12 +5,12 @@
     - message : modal message (default Do you really want to delete this element ?)
 *}
 {block name="confirmation-modal"}
-<aside id="{if $id}{$id}{else}delete{/if}" class="modal fade" role="dialog">
+<aside id="{if isset($id)}{$id}{else}delete{/if}" class="modal fade" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>
-                    {if $title}
+                    {if isset($title)}
                         {$title}
                     {else}
                         {intl l='Confirmation'}
@@ -19,7 +19,7 @@
             </div>
             <div class="modal-body">
                 <p>
-                {if $message}
+                {if isset($message)}
                     {$message}
                 {else}
                     {intl l='Do you really want to delete this element ?'}

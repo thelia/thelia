@@ -35,7 +35,7 @@
             {/loop}
 
             <div class="col-md-12">
-            {if $error_message}<div class="alert alert-danger">{$error_message}</div>{/if}
+            {if isset($error_message)}<div class="alert alert-danger">{$error_message}</div>{/if}
 
             {include file="includes/module-block.html" module_type="2" caption_title={intl l='Delivery modules'}}
             {include file="includes/module-block.html" module_type="3" caption_title={intl l='Payment modules'}}

@@ -459,7 +459,7 @@
                 {render_form_field field="locale" value=$LOCALE}
             {/loop}
         {/custom_render_form_field}
-        
+
         {form_field field="visible"}
 
         <label class="checkbox">
@@ -564,15 +564,18 @@
                 {* If there are some templates, display select template field *}
                 {ifloop rel="product_template"}
 
+                    {$product_template=0}
+                    {$parent_category=0}
+
                     {* Get category template *}
                     {loop type="category" name="new_product_category" visible="*" id=$category_id}
-                        {assign var="product_template" value=$TEMPLATE}
-                        {assign var="parent_category" value=$PARENT}
+                        {$product_template=$TEMPLATE}
+                        {$parent_category=$PARENT}
                     {/loop}
 
                     {* If current category has no template, get a parent's one *}
-                    {if !$product_template}
-                        {while $parent_category != 0 && !$product_template}
+                    {if $product_template === 0}
+                        {while $parent_category != 0 && !isset($product_template)}
                             {loop type="category" name="parent_category" backend_context=1 visible="*" id=$parent_category}
                                 {$parent_category = $PARENT}
                                 {$product_template = $TEMPLATE}

@@ -166,16 +166,19 @@ class ExportHandler
         }
 
         if ($rangeDate['start'] && !($rangeDate['start'] instanceof \DateTime)) {
+            $startYear = $rangeDate['start']['year'] !== "" ? $rangeDate['start']['year'] : (new \DateTime())->format("Y");
+            $startMonth = $rangeDate['start']['month'] !== "" ? $rangeDate['start']['month'] : (new \DateTime())->format("m");
             $rangeDate['start'] = \DateTime::createFromFormat(
                 'Y-m-d H:i:s',
-                $rangeDate['start']['year'].'-'.$rangeDate['start']['month'].'-1 00:00:00'
+                $startYear.'-'.$startMonth.'-1 00:00:00'
             );
         }
         if ($rangeDate['end'] && !($rangeDate['end'] instanceof \DateTime)) {
-            // To get the last day of selected month, go to the first day of next month and substract 1 day
+            $endYear = $rangeDate['end']['year'] !== "" ? $rangeDate['end']['year'] : (new \DateTime())->format("Y");
+            $endMonth = $rangeDate['end']['month'] !== "" ? $rangeDate['end']['month'] : (new \DateTime())->format("m");
             $rangeDate['end'] = \DateTime::createFromFormat(
                 'Y-m-d H:i:s',
-                $rangeDate['end']['year'].'-'.$rangeDate['end']['month'].'-1 23:59:59'
+                $endYear.'-'.$endMonth.'-1 23:59:59'
             )
             ->add(new \DateInterval('P1M'))
             ->sub(new \DateInterval('P1D'));

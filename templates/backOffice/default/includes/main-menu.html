@@ -2,9 +2,9 @@
 <ul class="nav in" id="side-menu">
     <li class="sidebar-search">
         {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search" access="VIEW"}
-            <form action="{url path='/admin/search'}">                                        
+            <form action="{url path='/admin/search'}">
                 <div class="input-group">
-                    <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}" value="{trim($smarty.get.search_term)}">
+                    <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}" value="{if isset($smarty.get.search_term)}{trim($smarty.get.search_term)}{/if}">
                     <span class="input-group-btn">
                         <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
                     </span>
@@ -280,9 +280,9 @@
 
 
     {hook name="main.in-top-menu-items" location="in_top_menu_items" admin_current_location=$admin_current_location}
-                                               
+
 </ul>
 
-{hook name="main.topbar-bottom" } 
+{hook name="main.topbar-bottom" }
 
 {hook name="main.after-top-menu" location="after_top_menu" }

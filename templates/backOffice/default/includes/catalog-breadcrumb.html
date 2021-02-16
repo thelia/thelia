@@ -6,9 +6,9 @@
 
 	{ifloop rel="category_path"}
 		{loop name="category_path" type="category-path" visible="*" category=$category_id}
-			{if $ID == $category_id && $editing_product == false}
+			{if $ID == $category_id && $editing_product|default:false == false}
 				<li class="active">
-				   {if $editing_category == true}
+				   {if $editing_category|default:false == true}
                        {intl l='Editing %cat' cat="{$TITLE}"} <a href="{url path='/admin/categories' category_id=$ID}" title="{intl l='Browse this category'}">{intl l="(browse)"}</a>
 				   {else}
                        {$TITLE} <a href="{url path='/admin/categories/update' category_id=$ID}" title="{intl l='Edit this category'}">{intl l="(edit)"}</a>
@@ -20,7 +20,7 @@
 	   {/loop}
 	{/ifloop}
 
-	{if $editing_product == true}
+	{if $editing_product|default:false == true}
         {loop name="product_path" type="product" visible="*" id=$product_id}
             <li>{intl l="Editing %title" title="{$TITLE}"}</li>
         {/loop}

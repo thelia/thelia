@@ -5,6 +5,7 @@ RUN apk --update --no-cache add git
 RUN apk add bash
 RUN apk add --no-cache zip libzip-dev
 RUN docker-php-ext-install zip
+RUN docker-php-ext-install calendar
 RUN apk add --no-cache freetype libpng libjpeg-turbo freetype-dev libpng-dev libjpeg-turbo-dev && \
   docker-php-ext-configure gd \
     --with-freetype \

@@ -56,17 +56,17 @@
                                         <thead>
                                             <tr>
                                                 <th class="col-md-1">
-                                                    <a href="{url path="/admin/import"}?{if $url_category}{$url_category nofilter}&{/if}import_order=id{if $import_order == "id"}_reverse{/if}">
+                                                    <a href="{url path="/admin/import"}?{if isset($url_category)}{$url_category nofilter}&{/if}import_order=id{if $import_order == "id"}_reverse{/if}">
                                                         {intl l="ID"}
                                                     </a>
                                                 </th>
                                                 <th class="col-md-8">
-                                                    <a href="{url path="/admin/import"}?{if $url_category}{$url_category nofilter}&{/if}import_order=alpha{if $import_order == "alpha"}_reverse{/if}">
+                                                    <a href="{url path="/admin/import"}?{if isset($url_category)}{$url_category nofilter}&{/if}import_order=alpha{if $import_order == "alpha"}_reverse{/if}">
                                                         {intl l="Name"}
                                                     </a>
                                                 </th>
                                                 <th class="col-md-2">
-                                                    <a href="{url path="/admin/import"}?{if $url_category}{$url_category nofilter}&{/if}import_order=manual{if $import_order == "manual"}_reverse{/if}">
+                                                    <a href="{url path="/admin/import"}?{if isset($url_category)}{$url_category nofilter}&{/if}import_order=manual{if $import_order == "manual"}_reverse{/if}">
                                                         {intl l="Position"}
                                                     </a>
                                                 </th>

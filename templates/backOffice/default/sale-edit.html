@@ -144,8 +144,13 @@
                                         <label for="cat_source" class="control-label">{intl l='Selected categories'}</label>
                                         <select id="categories" name="{$name}" class="form-control" size="10" multiple aria-required="true" required>
                                         {* protect ourselves against empty $value, which causes all categories to be displayed *}
-                                        {if empty($value)}{$value = [ 0 ]}{/if}
-                                        {loop type="category" category=0 name="selected-of-categories" id={$value|default:0|implode:','} backend_context=1 return_url=false}
+                                        {if is_array($value)}
+                                            {if empty($value)}
+                                                {$value = [ 0 ]}
+                                            {/if}
+                                            {$value = implode(',', $value)}
+                                        {/if}
+                                        {loop type="category" category=0 name="selected-of-categories" id={$value|default:0} backend_context=1 return_url=false}
                                             <option value="{$ID}">{$TITLE}</option>
                                         {/loop}
                                         </select>
@@ -402,7 +407,11 @@
 
             {form_field field="products"}
                 // This is the products IDs as hydrated in the controller.
-                var selected_product_ids_at_page_load = [ {$value|implode:','} ];
+                {if isset($value) && is_array($value)}
+                    var selected_product_ids_at_page_load = [ {implode(',', $value)} ];
+                {else}
+                    var selected_product_ids_at_page_load = [ {$value|default:"0"} ];
+                {/if}
             {/form_field}
 
             {form_field field="product_attributes"}

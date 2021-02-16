@@ -48,7 +48,7 @@
                         <div class="form-group">
                             <div class="checkbox">
                                 <label for="{$label_attr.for}">
-                                    <input type="checkbox" name="{$name}" id="{$label_attr.for}" value="{$value}" {$attr} {if $options.checked}checked="checked"{/if}/> {$label}
+                                    <input type="checkbox" name="{$name}" id="{$label_attr.for}" value="{$value}" {$attr} {if isset($options.checked) && $options.checked}checked="checked"{/if}/> {$label}
                                 </label>
                             </div>
                         </div>

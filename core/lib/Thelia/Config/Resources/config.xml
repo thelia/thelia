@@ -252,14 +252,14 @@
         <service id="error.listener" alias="Thelia\Core\EventListener\ErrorListener" />
 
         <!-- Serializers -->
-        <service id="Thelia\Core\Serializer\SerializerManager" />
+        <service id="Thelia\Core\Serializer\SerializerManager" public="true"/>
         <service id="thelia.serializer.manager" alias="Thelia\Core\Serializer\SerializerManager" public="true" />
         <service id="thelia.serializer.csv" alias="Thelia\Core\Serializer\Serializer\CSVSerializer"/>
         <service id="thelia.serializer.xml" alias="Thelia\Core\Serializer\Serializer\XMLSerializer"/>
         <service id="thelia.serializer.json" alias="Thelia\Core\Serializer\Serializer\JSONSerializer"/>
 
         <!-- Archivers -->
-        <service id="Thelia\Core\Archiver\ArchiverManager" />
+        <service id="Thelia\Core\Archiver\ArchiverManager" public="true"/>
         <service id="thelia.archiver.manager" alias="Thelia\Core\Archiver\ArchiverManager" public="true"/>
         <service id="thelia.archiver.zip" alias="Thelia\Core\Archiver\Archiver\ZipArchiver"/>
         <service id="thelia.archiver.tar" alias="Thelia\Core\Archiver\Archiver\TarArchiver"/>

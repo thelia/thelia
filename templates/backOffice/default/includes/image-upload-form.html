@@ -44,15 +44,15 @@ Parameters:
         </div>
     </form>
 
-    {if !$successUrl}
+    {if !$successUrl|default:false}
         {$successUrl = {navigate to="current"}}
     {/if}
     <div class="existing-image">
         {include file='includes/image-upload-list-ajax.html'
-            imageType=$imageType
-            parentId=$parentId
-            resource=$resource
-            successUrl=$successUrl
+            imageType=$imageType|default:null
+            parentId=$parentId|default:null
+            resource=$resource|default:null
+            successUrl=$successUrl|default:null
         }
     </div>
 

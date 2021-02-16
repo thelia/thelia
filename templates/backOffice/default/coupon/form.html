@@ -1,5 +1,5 @@
 {$thelia_page_css_file = "assets/bootstrap-editable/css/bootstrap-editable.css"}
-{include file='includes/notifications.html' message=$general_error}
+{include file='includes/notifications.html' message=$general_error|default:null}
 
 <div class="row">
     <div class="col-md-12 general-block-decorator">
@@ -64,7 +64,7 @@
                                     <select required name="{$name}" id="type" class="col-md-12 form-control">
                                         <option value="" data-description="" data-inputName="">{intl l='Please select a coupon type'}</option>
                                         {foreach from=$availableCoupons item=availableCoupon}
-                                            <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}" data-inputName="{$availableCoupon.inputName}" {if $value == $availableCoupon.serviceId}selected{/if}>
+                                            <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}" data-inputName="{$availableCoupon.inputName|default:null}" {if $value == $availableCoupon.serviceId}selected{/if}>
                                                 {$availableCoupon.name}
                                             </option>
                                         {/foreach}
@@ -112,7 +112,7 @@
                         {form_field field='startDate'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="expiration-date" class="control-label">{intl l='Start Date'} :</label>
-                                <input type="text" id="expiration-date" name="{$name}" class="form-control" value="{if $nowDate}{$nowDate}{else}{$value}{/if}" placeholder="{intl l='Format: %fmt, e.g. %date' fmt=$dateFormat date={$smarty.now|date_format:$dateFormat}}">
+                                <input type="text" id="expiration-date" name="{$name}" class="form-control" value="{if isset($nowDate)}{$nowDate}{else}{$value}{/if}" placeholder="{intl l='Format: %fmt, e.g. %date' fmt=$dateFormat date={$smarty.now|date_format:$dateFormat}}">
                                 {if $error}{$message}{/if}
                             </div>
                         {/form_field}
@@ -121,7 +121,7 @@
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="expiration-date" class="control-label">{intl l='Expiration date * :'}</label>
                                 {* Do not use 'date' input type, as some browsers enforce RFC339 date formats, which is not what we want *}
-                                <input required type="text" id="expiration-date" name="{$name}" class="form-control" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}" placeholder="{intl l='Format: %fmt, e.g. %date' fmt=$dateFormat date={$smarty.now|date_format:$dateFormat}}">
+                                <input required type="text" id="expiration-date" name="{$name}" class="form-control" value="{if isset($defaultDate)}{$defaultDate}{else}{$value}{/if}" placeholder="{intl l='Format: %fmt, e.g. %date' fmt=$dateFormat date={$smarty.now|date_format:$dateFormat}}">
                                 {if $error}{$message}{/if}
                             </div>
                         {/form_field}
@@ -197,7 +197,7 @@
                     <div class="col-md-3">
                         <div id="coupon-inputs">
                             <div class="inputs">
-                                {$couponInputsHtml nofilter}
+                                {$couponInputsHtml|default:null nofilter}
                             </div>
                         </div>
                     </div>

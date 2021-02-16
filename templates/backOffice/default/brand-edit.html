@@ -189,8 +189,8 @@
                                         {include
                                             file = "includes/inner-form-toolbar.html"
                                             hide_submit_buttons = true
-                                            page_url = $pageUrl
-                                            close_url = {$closeUrl}
+                                            page_url = $pageUrl|default:null
+                                            close_url = $closeUrl|default:null
                                             current_tab = "modules"
                                         }
                                     </div>

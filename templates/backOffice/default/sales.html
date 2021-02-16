@@ -67,7 +67,7 @@
 
                                         <th class="text-center">
                                             {admin_sortable_header
-                                            current_order=$content_order
+                                            current_order=$content_order|default:null
                                             order='active'
                                             reverse_order='active-reverse'
                                             path={url path='/admin/sales'}
@@ -77,7 +77,7 @@
 
                                         <th class="text-center">
                                             {admin_sortable_header
-                                            current_order=$content_order
+                                            current_order=$content_order|default:null
                                             order='start-date'
                                             reverse_order='start-date-reverse'
                                             path={url path='/admin/sales'}
@@ -87,7 +87,7 @@
 
                                         <th class="text-center">
                                             {admin_sortable_header
-                                            current_order=$content_order
+                                            current_order=$content_order|default:null
                                             order='end-date'
                                             reverse_order='end-date-reverse'
                                             path={url path='/admin/sales'}

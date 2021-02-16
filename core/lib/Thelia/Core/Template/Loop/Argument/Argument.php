@@ -57,6 +57,8 @@ class Argument
             if (false === $value) {
                 /* (string) $value = "" */
                 $this->value = 0;
+            } elseif (is_array($value)) {
+                $this->value = implode(',', $value);
             } else {
                 $this->value = (string) $value;
             }

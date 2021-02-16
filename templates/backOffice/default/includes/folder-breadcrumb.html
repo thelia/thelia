@@ -6,9 +6,9 @@
 
 	{ifloop rel="folder_path"}
 		{loop name="folder_path" type="folder-path" visible="*" folder=$folder_id}
-			{if $ID == $parent}
+			{if $ID == $parent|default:null}
 				<li class="active">
-				   {if $editing_folder == true}
+				   {if $editing_folder|default:false == true}
                        {intl l='Editing %fold' fold="{$TITLE}"}
 				   {else}
                        {$TITLE} <a href="{url path="/admin/folders/update/%id" id=$ID}" title="{intl l='Edit this folder'}">{intl l="(edit)"}</a>
@@ -20,7 +20,7 @@
 	   {/loop}
 	{/ifloop}
 
-    {if $editing_content == true}
+    {if $editing_content|default:false == true}
         {loop name="content_path" type="content" visible="*" id=$content_id}
             <li>{intl l="Editing %title" title="{$TITLE}"}</li>
         {/loop}
