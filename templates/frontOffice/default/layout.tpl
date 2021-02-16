@@ -46,14 +46,28 @@ GNU General Public License : http://www.gnu.org/licenses/
     <meta charset="utf-8">
 
     {* Page Title *}
-    <title>{block name="page-title"}{strip}{if $page_title}{$page_title}{elseif $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title|unescape} - {/foreach}{$store_name}{else}{$store_name}{/if}{/strip}{/block}</title>
+    <title>{block name="page-title"}
+            {strip}
+                {if isset($page_title)}
+                    {$page_title}
+                {elseif isset($breadcrumbs)}
+                    {foreach from=$breadcrumbs|array_reverse item=breadcrumb}
+                        {$breadcrumb.title|unescape} -
+                    {/foreach}
+                    {$store_name}
+                {else}
+                    {$store_name}
+                {/if}
+            {/strip}
+        {/block}
+    </title>
 
     {* Meta Tags *}
     <meta name="generator" content="{intl l='Thelia V2'}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     {block name="meta"}
-        <meta name="description" content="{if $page_description}{$page_description}{else}{$store_description|strip|truncate:120}{/if}">
+        <meta name="description" content="{if isset($page_description)}{$page_description}{else}{$store_description|strip|truncate:120}{/if}">
     {/block}
 
     {stylesheets file='assets/dist/css/thelia.min.css'}
@@ -85,7 +99,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     <![endif]-->
 
     {local_media type="favicon" width=32 height=32}
-    <link rel="icon" type="{$MEDIA_MIME_TYPE}" href="{$MEDIA_URL}" />
+    <link rel="icon" {if isset($MEDIA_MIME_TYPE)}type="{$MEDIA_MIME_TYPE}"{/if} href="{$MEDIA_URL}" />
     {/local_media}
 
     {* Feeds *}

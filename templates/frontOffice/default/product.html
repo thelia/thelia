@@ -34,10 +34,10 @@
         {/if}
         {$pse_combination=[]}
         {loop name="combi" type="attribute_combination" product_sale_elements="$ID" order="manual"}
-            {if ! $combination_label[$ATTRIBUTE_ID]}
+            {if !isset($combination_label[$ATTRIBUTE_ID])}
                 {$combination_label[$ATTRIBUTE_ID]=["name" => {$ATTRIBUTE_TITLE}, "values" => []]}
             {/if}
-            {if ! $combination_values[$ATTRIBUTE_AVAILABILITY_ID]}
+            {if !isset($combination_values[$ATTRIBUTE_AVAILABILITY_ID])}
                 {$combination_label[$ATTRIBUTE_ID]["values"][]=$ATTRIBUTE_AVAILABILITY_ID}
                 {$combination_values[$ATTRIBUTE_AVAILABILITY_ID]=[{$ATTRIBUTE_AVAILABILITY_TITLE}, $ATTRIBUTE_ID]}
             {/if}
