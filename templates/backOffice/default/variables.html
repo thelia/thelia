@@ -122,6 +122,7 @@
   	                                    {if $SECURED}
   	                                        {$VALUE}
   	                                    {else}
+                                            {$typeTemplate = ""}
                                             {if preg_match('/^(active-)([a-z]{3,5})(-template)$/',$NAME, $typeTemplate) }
                                                 <select id="cancelable_edit_{$ID}" name="variable[{$ID}]" data-id="{$ID}" class="js-edit form-control">
                                                     {loop type="template" name="list_template" template-type=$typeTemplate[2]}

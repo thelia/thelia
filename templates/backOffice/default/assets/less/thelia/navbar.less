@@ -23,7 +23,7 @@
         .menu-links();
     }
 
-    .glyphicon-menu-collapse {
+    .menu-collapse {
         .transition(transform 0.3s ease-in-out);
     }
 
@@ -32,7 +32,7 @@
             .rotate(-180deg);
         }
 
-        .glyphicon-menu-collapse {
+        .menu-collapse {
             .rotate(90deg);
         }
     }
@@ -128,15 +128,41 @@
             margin-top: 16px;
         }
     }
+    .navbar-search {
+        padding-top: 10px;
+        padding-left: 25px;
+        input {
+            border-radius: 15px 0 0 15px;
+            height: 34px;
+            padding: 6px 12px;
+            background-color: #f9f9f9;
+            border: 1px solid #e5e5e5;
+            width: 200px;
+            transition: width ease-in-out .15s, border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+            &:focus {
+                width: 600px;
+            }
+        }
+        button {
+            border-radius: 0 15px 15px 0;
+            height: 34px;
+            padding: 6px 12px;
+            background-color: #fff;
+            border: 1px solid #e5e5e5;
+            border-left: none;
+            transition: background-color ease-in-out .15s;
+            &:hover {
+                background-color: #d9d9d9;
+            }
+        }
+    }
     #side-menu {
-        .glyphicon {
-            top: 5px;
+        i {
             font-size: 20px;
-            &.glyphicon-menu-collapse {
-                font-weight: lighter;
-                font-size: 13px;
+            vertical-align: top;
+            &.menu-collapse {
+                font-size: 19px;
                 float: right;
-                top: 6px;
             }
         }
     }
