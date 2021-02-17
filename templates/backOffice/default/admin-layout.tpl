@@ -81,35 +81,49 @@
                     </div>
                     <!-- /.navbar-header -->
 
+                    {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search" access="VIEW"}
+                        <div class="nav navbar-search navbar-left">
+                            {strip}
+                                <form action="{url path='/admin/search'}">
+                                    <input type="text" id="search_term" name="search_term" placeholder="{intl l='Search...'}" value="{if isset($smarty.get.search_term)}{trim($smarty.get.search_term)}{/if}">
+                                    <button type="submit"><i class="fas fa-search"></i></button>
+                                </form>
+                            {/strip}
+                        </div>
+                    {/loop}
+
                     <ul class="nav navbar-top-links navbar-right">
                         {hook name="main.topbar-top" }
-
-                        <li>
-                            <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
-                        </li>
-                        <li class="dropdown">
-                            <button class="dropdown-toggle" data-toggle="dropdown">
-                                <span class="glyphicon glyphicon-user"></span> {admin attr="firstname"} {admin attr="lastname"}
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-right">
-                                <li><a class="profile" href="{url path='admin/configuration/administrators/view'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
-                                <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
-                            </ul>
-                        </li>
                         <li class="dropdown">
                             {loop type="lang" name="ui-lang" id={lang attr='id'} backend_context="1"}
                                 <button class="dropdown-toggle" data-toggle="dropdown">
-                                    <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}
-                                    <span class="caret"></span>
+                                    <img class="flags" src="{image file="assets/img/svgFlags/{$CODE}.svg"}" alt="{$TITLE}" />
                                 </button>
                             {/loop}
 
                             <ul class="dropdown-menu">
                                 {loop type="lang" name="ui-lang" backend_context="1"}
-                                    <li><a href="{url path="{navigate to="current"}" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
+                                    <li>
+                                        <a href="{url path="{navigate to="current"}" lang={$CODE}}">
+                                            <img class="flags" src="{image file="assets/img/svgFlags/{$CODE}.svg"}" alt="{$TITLE}" />
+                                        </a>
+                                    </li>
                                 {/loop}
                             </ul>
+                        </li>
+
+                        <li>
+                            <a href="{url path='admin/configuration/administrators/view'}" title="{intl l="Edit profile"}">
+                                {admin attr="firstname"} {admin attr="lastname"}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank"><i class="far fa-eye"></i></a>
+                        </li>
+                        <li>
+                            <a class="logout" href="{url path='admin/logout'}" title="{intl l="Logout"}">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </a>
                         </li>
                     </ul>
                     <!-- /.navbar-top-links -->

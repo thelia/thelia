@@ -246,7 +246,7 @@
 
     {form_hidden_fields}
 
-    {if $show_email_change_notice}
+    {if $show_email_change_notice|default:false}
         <div class="alert alert-warning">
             {intl l="From Thelia 2.3, you have to <strong>add an email address</strong> to your administrator profile. Please enter your email address below."}
         </div>
@@ -260,7 +260,7 @@
         </div>
         <div class="col-md-6">
             {custom_render_form_field field='email'}
-                <input type="email" {form_field_attributes field="email" extra_classes='js-email'}{if $show_email_change_notice} autofocus{/if}>
+                <input type="email" {form_field_attributes field="email" extra_classes='js-email'}{if $show_email_change_notice|default:false} autofocus{/if}>
             {/custom_render_form_field}
             {render_form_field field='lastname' extra_classes='js-lastname'}
         </div>
@@ -411,10 +411,10 @@ jQuery(function($) {
 {block name="javascript-last-call"}
     {hook name="administrators.js" location="administrators-js" }
 
-    {if $show_update_dialog}
+    {if $show_update_dialog|default:false}
         <script>
             jQuery(function($) {
-                {if $show_email_change_notice}
+                {if $show_email_change_notice|default:false}
                     {* We have to change email, highlight the field and set focus *}
                     $('#administrator_update_dialog').on('shown.bs.modal', function (e) {
                         var $emailInput = $('.js-email', $(this));

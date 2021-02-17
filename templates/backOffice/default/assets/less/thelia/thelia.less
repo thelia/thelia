@@ -79,9 +79,12 @@
         padding-top: 0;
         padding-bottom: 0;
         border-radius: @border-radius-base;
-        background: @navbar-default-bg;
-
-        .menu-links();
+        background: white;
+        min-width: inherit;
+        li  a {
+          padding: 13px;
+          text-align: center;
+        }
     }
 
     .open {
@@ -632,6 +635,10 @@ ul.document-list {
 
 footer {
     position: relative;
+}
+
+.flags {
+    height: 1em;
 }
 
 #follow-us {

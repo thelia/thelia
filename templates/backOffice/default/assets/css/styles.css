@@ -897,12 +897,12 @@ textarea {
   line-height: inherit;
 }
 a {
-  color: #FF9805;
+  color: #f39922;
   text-decoration: none;
 }
 a:hover,
 a:focus {
-  color: #f39922;
+  color: #b77928;
   text-decoration: underline;
 }
 a:focus {
@@ -3154,7 +3154,7 @@ fieldset[disabled] .btn-danger.active {
   background-color: #fff;
 }
 .btn-link {
-  color: #FF9805;
+  color: #f39922;
   font-weight: normal;
   cursor: pointer;
   border-radius: 0;
@@ -3175,7 +3175,7 @@ fieldset[disabled] .btn-link {
 }
 .btn-link:hover,
 .btn-link:focus {
-  color: #f39922;
+  color: #b77928;
   text-decoration: underline;
   background-color: transparent;
 }
@@ -3748,7 +3748,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .nav .open > a:hover,
 .nav .open > a:focus {
   background-color: #eeeeee;
-  border-color: #FF9805;
+  border-color: #f39922;
 }
 .nav .nav-divider {
   height: 1px;
@@ -4460,7 +4460,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
   padding: 6px 12px;
   line-height: 1.42857143;
   text-decoration: none;
-  color: #FF9805;
+  color: #f39922;
   background-color: #fff;
   border: 1px solid #ddd;
   margin-left: -1px;
@@ -4480,7 +4480,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 .pagination > li > span:hover,
 .pagination > li > a:focus,
 .pagination > li > span:focus {
-  color: #f39922;
+  color: #b77928;
   background-color: #eeeeee;
   border-color: #ddd;
 }
@@ -4675,7 +4675,7 @@ a.badge:focus {
 }
 a.list-group-item.active > .badge,
 .nav-pills > .active > a > .badge {
-  color: #FF9805;
+  color: #f39922;
   background-color: #fff;
 }
 .nav-pills > li > a > .badge {
@@ -4739,7 +4739,7 @@ a.list-group-item.active > .badge,
 a.thumbnail:hover,
 a.thumbnail:focus,
 a.thumbnail.active {
-  border-color: #FF9805;
+  border-color: #f39922;
 }
 .thumbnail .caption {
   padding: 9px;
@@ -6400,7 +6400,7 @@ button.close {
   text-decoration: none;
   background-color: #2a2a2a;
 }
-.sidebar .glyphicon-menu-collapse {
+.sidebar .menu-collapse {
   -webkit-transition: transform 0.3s ease-in-out;
   -o-transition: transform 0.3s ease-in-out;
   transition: transform 0.3s ease-in-out;
@@ -6411,7 +6411,7 @@ button.close {
   -o-transform: rotate(-180deg);
   transform: rotate(-180deg);
 }
-.sidebar .active .glyphicon-menu-collapse {
+.sidebar .active .menu-collapse {
   -webkit-transform: rotate(90deg);
   -ms-transform: rotate(90deg);
   -o-transform: rotate(90deg);
@@ -6492,15 +6492,41 @@ button.close {
   margin-left: 10px;
   margin-top: 16px;
 }
-.navbar-default #side-menu .glyphicon {
-  top: 5px;
-  font-size: 20px;
+.navbar-default .navbar-search {
+  padding-top: 10px;
+  padding-left: 25px;
 }
-.navbar-default #side-menu .glyphicon.glyphicon-menu-collapse {
-  font-weight: lighter;
-  font-size: 13px;
+.navbar-default .navbar-search input {
+  border-radius: 15px 0 0 15px;
+  height: 34px;
+  padding: 6px 12px;
+  background-color: #f9f9f9;
+  border: 1px solid #e5e5e5;
+  width: 200px;
+  transition: width ease-in-out 0.15s, border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+}
+.navbar-default .navbar-search input:focus {
+  width: 600px;
+}
+.navbar-default .navbar-search button {
+  border-radius: 0 15px 15px 0;
+  height: 34px;
+  padding: 6px 12px;
+  background-color: #fff;
+  border: 1px solid #e5e5e5;
+  border-left: none;
+  transition: background-color ease-in-out 0.15s;
+}
+.navbar-default .navbar-search button:hover {
+  background-color: #d9d9d9;
+}
+.navbar-default #side-menu i {
+  font-size: 20px;
+  vertical-align: top;
+}
+.navbar-default #side-menu i.menu-collapse {
+  font-size: 19px;
   float: right;
-  top: 6px;
 }
 @media (min-width: 1200px) {
   .sidebar {
@@ -7211,7 +7237,7 @@ th.tablesorter-headerDesc {
   border-left: 14px solid #f3f4f5;
 }
 .wizard li.active {
-  color: #FF9805;
+  color: #f39922;
   background: #fff;
 }
 .wizard li.active .chevron:before {
@@ -13470,6 +13496,22 @@ fieldset[disabled] .has-switch span.switch-default.active {
   font-family: 'Font Awesome 5 Brands';
   font-weight: 400;
 }
+/*!
+ * Font Awesome Free 5.15.2 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+ */
+@font-face {
+  font-family: 'Font Awesome 5 Free';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('../fonts/fontawesome/fa-regular-400.eot');
+  src: url('../fonts/fontawesome/fa-regular-400.eot?#iefix') format('embedded-opentype'), url('../fonts/fontawesome/fa-regular-400.woff2') format('woff2'), url('../fonts/fontawesome/fa-regular-400.woff') format('woff'), url('../fonts/fontawesome/fa-regular-400.ttf') format('truetype'), url('../fonts/fontawesome/fa-regular-400.svg#fontawesome') format('svg');
+}
+.far {
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 400;
+}
 @font-face {
   font-family: 'thelia';
   src: url('../fonts/thelia/thelia.eot');
@@ -13913,7 +13955,6 @@ fieldset[disabled] .has-switch span.switch-default.active {
   margin-top: 85px;
   padding: 0;
   width: 670px;
-  min-height: 600px;
   padding-bottom: 25px;
 }
 .login-page #logo {
@@ -14004,75 +14045,12 @@ fieldset[disabled] .has-switch span.switch-default.active {
   padding-top: 0;
   padding-bottom: 0;
   border-radius: 0;
-  background: #333;
+  background: white;
+  min-width: inherit;
 }
-.navbar-top-links .dropdown-menu > li,
-.navbar-top-links .dropdown-menu > li > ul > li {
-  border-bottom: 1px solid #222;
-  -webkit-transition: border-top-color 0.3s ease-in-out;
-  -o-transition: border-top-color 0.3s ease-in-out;
-  transition: border-top-color 0.3s ease-in-out;
-}
-.navbar-top-links .dropdown-menu > li.active,
-.navbar-top-links .dropdown-menu > li > ul > li.active,
-.navbar-top-links .dropdown-menu > li:active,
-.navbar-top-links .dropdown-menu > li > ul > li:active,
-.navbar-top-links .dropdown-menu > li:hover,
-.navbar-top-links .dropdown-menu > li > ul > li:hover {
-  border-top-color: #222;
-}
-.navbar-top-links .dropdown-menu > li.sidebar-search.active,
-.navbar-top-links .dropdown-menu > li > ul > li.sidebar-search.active,
-.navbar-top-links .dropdown-menu > li.sidebar-search:active,
-.navbar-top-links .dropdown-menu > li > ul > li.sidebar-search:active,
-.navbar-top-links .dropdown-menu > li.sidebar-search:hover,
-.navbar-top-links .dropdown-menu > li > ul > li.sidebar-search:hover {
-  border-top-color: #3c3c3c;
-}
-.navbar-top-links .dropdown-menu > li > a,
-.navbar-top-links .dropdown-menu > li > ul > li > a {
-  padding: 15px;
-  display: block;
-  color: #dedede;
-  -webkit-transition: all 0.3s ease-in-out;
-  -o-transition: all 0.3s ease-in-out;
-  transition: all 0.3s ease-in-out;
-}
-.navbar-top-links .dropdown-menu > li > a:hover,
-.navbar-top-links .dropdown-menu > li > ul > li > a:hover,
-.navbar-top-links .dropdown-menu > li > a:focus,
-.navbar-top-links .dropdown-menu > li > ul > li > a:focus {
-  color: #f39922;
-  background-color: #222222;
-}
-.navbar-top-links .dropdown-menu > li > a .item-text,
-.navbar-top-links .dropdown-menu > li > ul > li > a .item-text {
-  margin-left: 35px;
-}
-.navbar-top-links .dropdown-menu > li.active > a,
-.navbar-top-links .dropdown-menu > li > ul > li.active > a {
-  color: #f39922;
-  background-color: #222222;
-}
-.navbar-top-links .dropdown-menu > li > ul {
-  padding-left: 0;
-  background: #3b3b3b;
-  -webkit-box-shadow: inset 0px 15px 15px -15px #000;
-  box-shadow: inset 0px 15px 15px -15px #000;
-}
-.navbar-top-links .dropdown-menu > li > ul > li {
-  display: block;
-}
-.navbar-top-links .dropdown-menu > li > ul > li:last-child {
-  border-bottom: none;
-}
-.navbar-top-links .dropdown-menu > li > ul > li > a {
-  padding: 12px 15px;
-}
-.navbar-top-links .dropdown-menu > li > ul > li > a:hover,
-.navbar-top-links .dropdown-menu > li > ul > li > a:focus {
-  text-decoration: none;
-  background-color: #2a2a2a;
+.navbar-top-links .dropdown-menu li a {
+  padding: 13px;
+  text-align: center;
 }
 .navbar-top-links .open .caret {
   -webkit-transform: rotate(-180deg);
@@ -14483,6 +14461,9 @@ ul.document-list > li:nth-child(odd) {
 }
 footer {
   position: relative;
+}
+.flags {
+  height: 1em;
 }
 #follow-us {
   text-align: center;
