@@ -11,30 +11,33 @@
  */
 
 use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\ErrorHandler\Debug;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\Thelia;
 
-$env = 'dev';
-require __DIR__.'/../vendor/autoload.php';
+require dirname(__DIR__).'/vendor/autoload.php';
 
-if (file_exists(THELIA_ROOT.'.env')) {
-    (new Dotenv())->load(THELIA_ROOT.'.env');
-}
+$_SERVER['APP_ENV'] = 'dev';
+$_SERVER['APP_DEBUG'] = '1';
 
-// List of allowed IP
-$trustedIp = [
-  '::1',
-  '127.0.0.1',
-];
+(new Dotenv())->loadEnv(dirname(__DIR__).'/.env');
 
-$request = Request::createFromGlobals();
+$trustedIp = array_filter(
+    explode(',', $_SERVER['DEBUG_TRUSTED_IP'] ?? ''),
+    static function ($ip): bool {
+        return filter_var($ip, \FILTER_VALIDATE_IP);
+    }
+);
 
-if (false && false === in_array($request->getClientIp(), $trustedIp)) {
+if (false === in_array(Request::createFromGlobals()->getClientIp(), $trustedIp)) {
     header('HTTP/1.0 403 Forbidden');
     exit('You are not allowed to access this file.');
 }
 
-$thelia = new Thelia('dev', true);
+umask(0000);
+Debug::enable();
 
-$response = $thelia->handle($request)->prepare($request)->send();
+$thelia = new Thelia($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
+$request = Request::createFromGlobals();
+$response = $thelia->handle($request);
+$response->send();
 $thelia->terminate($request, $response);

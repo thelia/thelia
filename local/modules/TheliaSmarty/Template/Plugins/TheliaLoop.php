@@ -336,7 +336,6 @@ class TheliaLoop extends AbstractSmartyPlugin
         $template->assign('PAGE', 1);
         $template->assign('CURRENT', 1);
 
-
         // Find pagination
         $pagination = self::getPagination($loopName);
 
