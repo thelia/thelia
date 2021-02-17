@@ -11,25 +11,22 @@
  */
 
 use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\ErrorHandler\Debug;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Thelia;
 
-$env = 'prod';
-$loader = require __DIR__.'/../vendor/autoload.php';
+require dirname(__DIR__).'/vendor/autoload.php';
 
-if (file_exists(THELIA_ROOT.'.env')) {
-    (new Dotenv())->load(THELIA_ROOT.'.env');
+(new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
+
+if ($_SERVER['APP_DEBUG']) {
+    umask(0000);
+
+    Debug::enable();
 }
 
+$thelia = new Thelia($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
 $request = Request::createFromGlobals();
-
-$thelia = new Thelia('prod', false);
-
-//$thelia = new HttpCache($thelia);
-
-// When using the HttpCache, you need to call the method in your front controller instead of relying on the configuration parameter
-//Request::enableHttpMethodParameterOverride();
-
-$response = $thelia->handle($request)->prepare($request)->send();
-
+$response = $thelia->handle($request);
+$response->send();
 $thelia->terminate($request, $response);

@@ -322,7 +322,7 @@ class Form extends AbstractSmartyPlugin
             // If the field is not found, use an empty value
             $name = sprintf('%s[%s]', $formFieldView->vars['full_name'], $key);
 
-            $val = $value[$key]?? null;
+            $val = $value[$key] ?? null;
 
             // For collection types, the type of field is defined in the 'type' option.
             // We will use this instead of the 'collection' type

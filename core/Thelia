@@ -1,63 +1,47 @@
 <?php
 
-if (php_sapi_name() != 'cli') {
-    throw new \Exception('this script can only be launched with cli sapi');
-}
-set_time_limit(0);
-
-// allow cache to be cleared by php client or web
-umask(0002);
-
-$bootstrapToggle = false;
-$bootstraped = false;
-
-// Autoload bootstrap
-
-foreach ($argv as $arg) {
-    if ($arg === '-b') {
-        $bootstrapToggle = true;
-
-        continue;
-    }
-
-    if ($bootstrapToggle) {
-        require __DIR__ . DIRECTORY_SEPARATOR . $arg;
-
-        $bootstraped = true;
-    }
-}
-
-if (!$bootstraped) {
-    if (isset($bootstrapFile)) {
-        require $bootstrapFile;
-    } elseif (is_file($file = __DIR__ . '/vendor/autoload.php')) {
-        require $file;
-    } else {
-        echo "No autoload file found. Please use the -b argument to include yours";
-        exit(1);
-    }
-}
-
 use Thelia\Core\Thelia;
-use Thelia\Core\Application;
-use Thelia\Command\Output\TheliaConsoleOutput;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Dotenv\Dotenv;
-
-if (file_exists(THELIA_ROOT.'.env')) {
-    (new Dotenv())->load(THELIA_ROOT.'.env');
-}
-
-$input = new ArgvInput();
-$env = $input->getParameterOption(array('--env', '-e'), getenv('THELIA_ENV') ?: 'dev');
-$debug = getenv('THELIA_DEBUG') !== '0' && !$input->hasParameterOption(array('--no-debug', '')) && $env !== 'prod';
-
+use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Thelia\Command\Install;
+use Thelia\Core\Application;
 
+if (!in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
+    echo 'Warning: The console should be invoked via the CLI version of PHP, not the '.PHP_SAPI.' SAPI'.PHP_EOL;
+}
+
+set_time_limit(0);
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+if (!class_exists(Application::class) || !class_exists(Dotenv::class)) {
+    throw new LogicException('You need to add "symfony/framework-bundle" and "symfony/dotenv" as Composer dependencies.');
+}
+
+$input = new ArgvInput();
+if (null !== $env = $input->getParameterOption(['--env', '-e'], null, true)) {
+    putenv('APP_ENV='.$_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = $env);
+}
+
+if ($input->hasParameterOption('--no-debug', true)) {
+    putenv('APP_DEBUG='.$_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0');
+}
+
+(new Dotenv())->bootEnv(dirname(__DIR__) . '/.env');
+
+if ($_SERVER['APP_DEBUG']) {
+    umask(0000);
+
+    if (class_exists(Debug::class)) {
+        Debug::enable();
+    }
+}
+
+// for Thelia not installed
 function getTheliaDatabaseConfigFile(string $env)
 {
     $fs = new Filesystem();
@@ -70,7 +54,7 @@ function getTheliaDatabaseConfigFile(string $env)
     return $databaseConfigFile;
 }
 
-if (!file_exists(getTheliaDatabaseConfigFile($env))) {
+if (!file_exists(getTheliaDatabaseConfigFile($_SERVER['APP_DEBUG']))) {
     $kernel = new class($env, true) extends Kernel {
         use MicroKernelTrait;
 
@@ -106,12 +90,12 @@ if (!file_exists(getTheliaDatabaseConfigFile($env))) {
     };
 
     $application = new Application($kernel);
-    $application->run($input, new TheliaConsoleOutput());
+    $application->run($input);
 
     exit;
 }
+// end for Thelia not installed
 
-$thelia = new Thelia($env, $debug);
+$thelia = new Thelia($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
 $application = new Application($thelia);
-$application->getContainer()->get('thelia.translator');
-$application->run($input, new TheliaConsoleOutput());
+$application->run($input);

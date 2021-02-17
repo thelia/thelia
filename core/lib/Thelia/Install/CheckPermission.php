@@ -121,7 +121,7 @@ class CheckPermission extends BaseInstall
      */
     public function exec()
     {
-        $currentVersion = substr(\PHP_VERSION, 0, strrpos(\PHP_VERSION, "."));
+        $currentVersion = substr(\PHP_VERSION, 0, strrpos(\PHP_VERSION, '.'));
         if (!version_compare($currentVersion, $this->phpExpectedVerions['min'], '>=') && version_compare($currentVersion, $this->phpExpectedVerions['max'], '<=')) {
             $this->isValid = false;
             $this->validationMessages['php_version']['text'] = $this->getI18nPhpVersionText(\PHP_VERSION, false);
