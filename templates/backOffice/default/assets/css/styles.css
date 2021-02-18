@@ -14025,13 +14025,6 @@ fieldset[disabled] .has-switch span.switch-default.active {
   -webkit-transition: all 0.3s ease-in-out;
   -o-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
-}
-.navbar-top-links > li > a,
-.navbar-top-links > li > button,
-.navbar-top-links > li > a:hover,
-.navbar-top-links > li > button:hover,
-.navbar-top-links > li > a:focus,
-.navbar-top-links > li > button:focus {
   background: none;
   border: none;
 }
@@ -14039,7 +14032,9 @@ fieldset[disabled] .has-switch span.switch-default.active {
 .navbar-top-links > li > button:hover,
 .navbar-top-links > li > a:focus,
 .navbar-top-links > li > button:focus {
-  color: #f39922;
+  background: whitesmoke;
+  border: none;
+  color: #444;
 }
 .navbar-top-links .dropdown-menu {
   padding-top: 0;
