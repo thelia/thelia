@@ -1,0 +1,101 @@
+{extends file="layout.tpl"}
+
+{block name="init"}
+    {$product_id={product attr="id"}}
+    {$product_virtual={product attr="virtual"}}
+    {$gtins=[8,12,13,14]}
+
+{/block}
+
+{block name="css" append}
+  {getAssetsFromEntrypoints entry="product" type="css"}
+{/block}
+
+{block name="javascript" append}
+  {getAssetsFromEntrypoints entry="product" type="js"}
+{/block}
+
+{* Body Class *}
+{block name="body-class"}page-product{/block}
+
+{* Page Title *}
+{block name='no-return-functions' append}
+    {loop name="product.seo.title" type="product" id=$product_id limit="1" with_prev_next_info="1"}
+    {$page_title = $META_TITLE}
+    {/loop}
+{/block}
+
+{* Meta *}
+{block name="meta"}
+    {loop name="product.seo.meta" type="product" id=$product_id limit="1" with_prev_next_info="1"}
+    {include file="includes/meta-seo.html"}
+    {/loop}
+{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = []}
+    {loop type="product" name="product_breadcrumb" id=$product_id limit="1" with_prev_next_info="1"}
+        {loop name="category_path" type="category-path" category={$DEFAULT_CATEGORY}}
+            {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
+        {/loop}
+        {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
+    {/loop}
+{/block}
+
+{* Content *}
+{block name="main-content"}
+    {if $product_id}
+
+
+        {include file="components/smarty/BreadCrumb/BreadCrumb.html"}
+
+        {loop name="product.details" type="product" id=$product_id limit="1" with_prev_next_info="1" with_prev_next_visible="1"}
+        {include file="microdata/product.html"}
+        <article role="main">
+
+            {hook name="product.top" product={$ID}}
+
+            <div class="lg:container lg:mx-auto">
+              <div class="lg:grid lg:grid-cols-2 gap-8">
+                <div class="mb-8 mt-8 -mx-8 lg:mx-auto">
+                  {include file="components/smarty/ProductGallery/ProductGallery.html"}
+                </div>
+
+                {include file="components/smarty/ProductFormPanel/ProductFormPanel.html" product_id=$product_id}
+              </div>
+            </div>
+
+
+            <div class="mt-16 -mx-8">
+              {include file="components/smarty/ProductAccessories/ProductAccessories.html" product_id=$product_id}
+            </div>
+
+            {hook name="product.bottom" product={$ID}}
+
+        </article><!-- /#product -->
+
+
+        {/loop}
+
+
+    {else}
+    <div class="container mx-auto">
+        <article id="content-main" class="col-main" role="main" aria-labelledby="main-label">
+            {include file="includes/empty.html"}
+        </article>
+    </div><!-- /.layout -->
+    {/if}
+{/block}
+
+{block name="stylesheet"}
+{hook name="product.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="product.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="product.javascript-initialization"}
+{/block}

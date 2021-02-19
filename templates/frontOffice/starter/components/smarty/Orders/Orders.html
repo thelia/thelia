@@ -1,0 +1,32 @@
+<div class="Orders">
+
+      {ifloop rel="customer.orders"}
+        <div class="Orders-header">
+          <strong class="Orders-header-text">{intl l="Order"}</strong>
+          <strong class="Orders-header-text">{intl l="Date"}</strong>
+          <strong class="Orders-header-text">{intl l="Status"}</strong>
+          <strong class="Orders-header-text is-last">{intl l="Amount"}</strong>
+        </div>
+
+        {loop type="order" name="customer.orders"}
+        <div class="Order">
+
+            <div>{intl l="N° %ref" ref=$REF}</div>
+            <div>{format_date date=$CREATE_DATE output="date"}</div>
+            {include file="components/smarty/OrderStatusLabel/OrderStatusLabel.html"}
+            <div>
+              {format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}
+            </div>
+            <div>
+              <a href="{url path="/account/order/pdf/invoice/%id" id=$ID}">{intl l="Invoice"}</a>
+            </div>
+
+        </div>
+        {/loop}
+      {/ifloop}
+
+      {elseloop rel="customer.orders"}
+        <div class="alert alert-warning" role="alert">{intl l="You don't have any order"}</div>
+      {/elseloop}
+
+  </div>

@@ -1,0 +1,26 @@
+<div class="container mx-auto">
+  <div class="NewsAndPromo">
+    <div class="lg:flex items-center justify-between my-12">
+      <div class="flex-1 text-center lg:text-left mb-2 lg:mb-0 font-bold text-lg text-main">
+        <a href="{url path="/view_all" type="new"}" class="hover:underline">{intl l="All new products"}</a>
+      </div>
+      <div class="flex-1 text-center flex items-center justify-center lg:justify-start">
+        <button class="NewsAndPromo-btn focus:outline-none px-10 py-4 font-bold text-2xl bg-main text-white" data-target="#NewsAndPromo-news">{intl l="New products"}</button>
+        <button class="NewsAndPromo-btn focus:outline-none px-10 py-3 font-bold text-lg bg-purple-300 text-main" data-target="#NewsAndPromo-promo">{intl l="Promotions"}</button>
+      </div>
+      <div class="flex-1 text-center lg:text-right mb-2 lg:mb-0 font-bold text-lg text-main">
+        <a href="{url path="/view_all" type="promo"}" class="hover:underline">{intl l="All promotions"}</a>
+      </div>
+    </div>
+    <div id="NewsAndPromo-news" class="NewsAndPromo-content grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      {loop type="product" name="random.products" limit=4 new=true order="random"}
+        {include file="components/smarty/SingleProduct/SingleProduct.html"}
+      {/loop}
+    </div>
+    <div id="NewsAndPromo-promo" class="NewsAndPromo-content grid sm:grid-cols-2 lg:grid-cols-4 gap-8 hidden">
+      {loop type="product" name="random.products" limit=4 promo=true order="random"}
+        {include file="components/smarty/SingleProduct/SingleProduct.html"}
+      {/loop}
+    </div>
+  </div>
+</div>

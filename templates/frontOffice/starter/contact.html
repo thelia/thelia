@@ -1,0 +1,117 @@
+{extends file="layout.tpl"}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [['title' => {intl l="Contact Us"}, 'url'=>{url path="/contact"}]]}
+{/block}
+
+{block name="main-content"}
+
+
+    {loop name="brand.info" type="brand" id=$brand_id limit="1"}
+      {include file="components/smarty/PageHeader/PageHeader.html" TITLE={intl l="Contact Us"}}
+    {/loop}
+
+    <div class="container mx-auto mb-24">
+
+        {block name="contact-form"}
+            {form name="thelia.front.contact"}
+            <form class="max-w-xl mx-auto" action="{url path="/contact"}" method="post">
+                {form_hidden_fields}
+
+                {hook name="contact.form-top"}
+
+                <fieldset id="contact-info" class="mt-5">
+
+                    <div class="">
+                        <div>
+                        {form_field field="name"}
+                            <div class="form-group">
+                                <label for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                                <div >
+                                    <input type="text" name="{$name}" id="{$label_attr.for}"  maxlength="255" placeholder="{intl l="Placeholder contact name"}" value="{$value}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                                    {if $error}
+                                        <span class="help-block">{$message}</span>
+                                        {assign var="error_focus" value="true"}
+                                    {elseif $value != "" && !$error}
+                                        <span class="help-block"><i class="fa fa-check"></i></span>
+                                    {/if}
+                                </div>
+                            </div>
+                        {/form_field}
+                        {form_field field="email"}
+                          <div class="form-group">
+                                <label for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                                <div>
+                                    <input type="email" name="{$name}" id="{$label_attr.for}" maxlength="255" placeholder="{intl l="Placeholder contact email"}" value="{$value}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                                    {if $error}
+                                        <span class="help-block">{$message}</span>
+                                        {assign var="error_focus" value="true"}
+                                    {/if}
+                                </div>
+                            </div>
+                        {/form_field}
+                        </div>
+                        {form_field field="subject"}
+                            <div class="form-group">
+                                <label for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                                  <input type="text" name="{$name}" id="{$label_attr.for}" maxlength="255" placeholder="{intl l="Placeholder contact subject"}" value="{$value}" {if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                                  {if $error}
+                                      <span class="help-block">{$message}</span>
+                                      {assign var="error_focus" value="true"}
+                                  {/if}
+                            </div>
+                        {/form_field}
+                        {form_field field="message"}
+                          <div class="form-group">
+                              <label for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                                <textarea name="{$name}" id="{$label_attr.for}" placeholder="{intl l="Placeholder contact message"}" rows="6" {if $required} aria-required="true" required{/if}>{$value}</textarea>
+                                {if $error}
+                                    <span class="help-block">{$message}</span>
+                                    {assign var="error_focus" value="true"}
+                                {/if}
+                            </div>
+                        {/form_field}
+                    </div>
+                </fieldset>
+
+                {hook name="contact.form-bottom"}
+
+                <div class="mt-5">
+                    <div class="text-center">
+                        <button type="submit" class="btn">{intl l="Send"}</button>
+                    </div>
+                </div>
+
+            </form>
+            {/form}
+        {/block}
+
+        {ifhook rel="contact.top"}
+          {hook name="contact.top"}
+        {/ifhook}
+        {elsehook rel="contact.top"}
+
+        <div id="google-map" class="my-24">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d1389.508399592125!2d3.5392823!3d45.8509631!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x6351f1db71ab0407!2sEPROSE%20SARL!5e0!3m2!1sfr!2sfr!4v1605691610286!5m2!1sfr!2sfr" width="100%" height="350" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+        </div>
+        {/elsehook}
+
+        {hook name="contact.bottom"}
+
+
+    </div>
+
+{/block}
+
+{block name="stylesheet"}
+{hook name="contact.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="contact.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="contact.javascript-initialization"}
+{/block}

@@ -1,0 +1,32 @@
+:root {
+  --Header-height: 4.25rem;
+}
+
+.Header {
+  height: var(--Header-height);
+
+  &-Hamburger {
+    .Navigation--active & {
+      span {
+        &:nth-child(1) {
+          top: 8px;
+          width: 0%;
+          left: 50%;
+        }
+        &:nth-child(2) {
+          transform: rotate(45deg);
+        }
+
+        &:nth-child(3) {
+          transform: rotate(-45deg);
+        }
+
+        &:nth-child(4) {
+          top: 8px;
+          width: 0%;
+          left: 50%;
+        }
+      }
+    }
+  }
+}

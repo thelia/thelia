@@ -1,0 +1,16 @@
+.MiniCart {
+  max-width: 90%;
+  transform: translateX(150%);
+  transition: transform 250ms linear;
+  top: var(--Header-height);
+  bottom: 0;
+  right: 0;
+  @apply w-full fixed shadow-md;
+
+  @screen md {
+    @apply max-w-lg;
+  }
+  &--visible {
+    transform: translateX(0);
+  }
+}

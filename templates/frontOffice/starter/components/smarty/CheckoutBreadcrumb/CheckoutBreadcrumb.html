@@ -1,0 +1,15 @@
+<nav class="font-bold my-auto" aria-label="Breadcrumb">
+  <ol class="list-none p-0 inline-flex">
+    <li class="flex items-center">
+      <a href="{url path="/order/delivery"}" class="{if {navigate to="current"} == {url path="/order/delivery"}}{else}text-gray-100{/if}">
+        {intl l="Delivery Mode"}
+      </a>
+      {renderIconSvg icon="breadcrumb-arrow" class="text-gray-100 w-3 h-3 mx-3 fill-current"}
+    </li>
+    <li>
+      <a href="{url path="/order/invoice"}" class="{if {navigate to="current"} == {url path="/order/invoice"}}{else}text-gray-100{/if}" aria-current="page">
+        {intl l="Billing Mode"}
+      </a>
+    </li>
+  </ol>
+</nav>

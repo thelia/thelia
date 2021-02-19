@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@components/smarty/*": ["./components/*"],
+      "@js/*": ["./assets/js/*"],
+      "@redux/*": ["./assets/js/redux/*"],
+      "@utils/*": ["./assets/js/utils/*"],
+      "@css/*": ["./assets/css/*"],
+      "@images/*": ["./assets/images/*"],
+      "@icons/*": ["./assets/svg-icons/*"],
+      "@fonts/*": ["./assets/fonts/*"],
+      "@favicons/*": ["./assets/favicons/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

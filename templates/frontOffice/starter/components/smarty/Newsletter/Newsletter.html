@@ -1,0 +1,24 @@
+{form name="thelia.front.newsletter"}
+  <form class="Newsletter-form" id="form-newsletter" action="{url path="newsletter"}" method="post">
+    {form_hidden_fields}
+    <div class="Newsletter-field">
+      {form_field field="email"}
+      <div class="flex">
+        <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" placeholder="{$label}" class="w-full" {if $required} aria-required="true" required{/if} />
+      </div>
+      <div class="invalid-feedback text-red-500 hidden py-2">
+          {intl l="Error during registration"}
+      </div>
+      <div class="valid-feedback text-green-500 hidden py-2">
+          {intl l="Successful registration"}
+      </div>
+      {/form_field}
+
+      <button type="submit" class="btn whitespace-no-wrap mt-6">
+        {intl l="Validate"}
+      </button>
+
+    </div>
+  </form>
+{/form}
+

@@ -1,4 +1,4 @@
-version: "3.1"
+version: "3.7"
 
 services:
   mariadb:
@@ -32,5 +32,22 @@ services:
     working_dir: /application
     volumes:
       - .:/application
-      - .docker/php-fpm/php-ini-overrides.ini:/etc/php/7.3/fpm/conf.d/99-overrides.ini
-      - .docker/php-fpm/php-ini-overrides.ini:/etc/php/7.3/cli/conf.d/99-overrides.ini
+      - .docker/php-fpm/php-ini-overrides.ini:/etc/php/7.4/fpm/conf.d/99-overrides.ini
+      - .docker/php-fpm/php-ini-overrides.ini:/etc/php/7.4/cli/conf.d/99-overrides.ini
+    environment:
+      PHP_IDE_CONFIG: "serverName=thelia"
+      XDEBUG_CONFIG: "idekey=PHPSTORM"
+
+  encore:
+    build:
+      context: ./templates/frontOffice/starter
+      target: thelia_encore
+    container_name: docker-thelia-encore
+    working_dir: /application/templates/frontOffice/starter
+    environment:
+      BROWSERSYNC_PROXY: http://localhost:8081
+    volumes:
+      - ./templates/frontOffice/starter:/application/templates/frontOffice/starter:delegated
+      - ./templates/frontOffice/starter/node_modules:/application/templates/frontOffice/starter/node_modules
+    ports:
+      - 8081:8081

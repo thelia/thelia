@@ -1,0 +1,151 @@
+<div class="RecapInvoice">
+    {loop type="cart" name="cartloop"}
+
+      <div class="flex -mx-3 p-4 items-center">
+        <div class="w-3/12 px-3">
+          <a href="{$PRODUCT_URL}" class="block">
+              {assign "cart_count" $LOOP_COUNT}
+              {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="300" height="120" resize_mode="borders" force_return="true"}
+                  <img src="{$IMAGE_URL}" alt="Product #{$cart_count}" class="img-responsive">
+              {/loop}
+              {elseloop rel="product-image"}
+                <img src="//placehold.it/300x120" alt="Product #{$cart_count}" class="img-responsive">
+              {/elseloop}
+          </a>
+        </div>
+        <div class="w-6/12 px-3">
+          <div class="leading-tight text-sm"><a href="{$PRODUCT_URL}">{$TITLE}</a></div>
+          <div class="product-options">
+            {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID"}
+                {$ATTRIBUTE_TITLE} :
+                {$ATTRIBUTE_AVAILABILITY_TITLE}
+            {/loop}
+          </div>
+        </div>
+        <div class="w-3/12 px-3 text-right">
+            <div class="">
+              {if $IS_PROMO == 1} {assign "real_price" $PROMO_PRICE} {else} {assign "real_price" $PRICE} {/if}
+              <div class="flex justify-end">
+                {$QUANTITY} x <span class="ml-2"><div class="my-auto ml-auto  text-md font-bold">{format_money number={$real_price} symbol={currency attr="symbol"}}</div></span>
+              </div>
+            </div>
+        </div>
+      </div>
+    {/loop}
+    <div class="border-t border-b border-gray-300 mt-4">
+      {$discount={order attr="discount"}}
+      {$postage={order attr="postage"}}
+      <div class="flex items-center p-4 border-b border-gray-300">
+        <div class="font-bold">{intl l="Shipping fees"}</div>
+        <div class="my-auto ml-auto  text-lg font-bold">
+          {if $postage == 0}
+            {intl l="Offered"}
+          {else}
+            {format_money number=$postage}
+          {/if}
+        </div>
+      </div>
+      {if $discount > 0}
+       <div class="flex items-center p-4 border-b border-gray-300">
+         <div class="font-bold" colspan="2">{intl l="Discount incl. VAT"}</div>
+         <div class="my-auto ml-auto  text-lg font-bold">- {format_money number=$discount}</div>
+       </div>
+       {/if}
+       <div class="flex items-center p-4 border-b border-gray-300">
+          <div class="font-bold">{intl l="VAT"}</div>
+          <div class="my-auto ml-auto  text-lg font-bold">{format_money number={{cart attr="total_taxed_price"} - {cart attr="total_price"}}}</div>
+       </div>
+       <div class="flex items-center p-4 border-b border-gray-300">
+          <div class="font-bold">{intl l="Total excluding VAT"}</div>
+          <div class="my-auto ml-auto  text-lg font-bold">{format_money number={{cart attr="total_price"} + {order attr="postage"}}}</div>
+       </div>
+       <div class="flex items-center p-4">
+        <div class="font-bold">{intl l="Total incl. VAT"}</div>
+        <div class="my-auto ml-auto  text-lg font-bold">{format_money number={{cart attr="total_taxed_price"} + {order attr="postage"}}}</div>
+       </div>
+    </div>
+  </div>
+
+
+  <div class="flex -mx-6 px-4 mt-4">
+      <div class="w-6/12 px-6">
+          <div class="mb-1"><strong>{intl l="Delivery address"}</strong></div>
+          {ifhook rel="order-invoice.delivery-address"}
+              {* delivery module can customize the delivery address *}
+              {hook name="order-invoice.delivery-address" module={order attr="delivery_module"}}
+          {/ifhook}
+          {elsehook rel="order-invoice.delivery-address"}
+          {loop type="address" name="delivery-address" id={order attr="delivery_address"}}
+              <div>
+
+                  <address>
+                  {$COMPANY}
+                  {$FIRSTNAME} {$LASTNAME}
+                          <span>{$ADDRESS1}</span><br>
+                          {if $ADDRESS2 != ""}
+                              <span>{$ADDRESS2}</span><br>
+                          {/if}
+                          {if $ADDRESS3 != ""}
+                              <span>{$ADDRESS3}</span><br>
+                          {/if}
+                          <span>{$ZIPCODE}</span>
+                          <span>{$CITY},
+                          <span>{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                          {if $STATE}, <span>{loop type="state" name="customer.state.info" id=$STATE}{$TITLE}{/loop}</span></span>{/if}
+                      </address>
+              </div>
+          {/loop}
+          {/elsehook}
+      </div>
+      <div class="w-6/12 px-6">
+          <div class="mb-1">
+              <strong>{intl l="Invoice address"}</strong>
+          </div>
+
+          {form_field field='invoice-address'}
+              {loop type="address" name="invoice-address"}
+                  {assign var="isInvoiceAddressChecked" value="0"}
+                  {if $isPost}
+                      {if $value == $ID && $value != ""}
+                          {assign var="isInvoiceAddressChecked" value="1"}
+                      {elseif $DEFAULT}
+                          {assign var="isInvoiceAddressChecked" value="1"}
+                      {/if}
+                  {elseif $DEFAULT}
+                      {assign var="isInvoiceAddressChecked" value="1"}
+                  {/if}
+
+                  <div>
+                        {capture name="address"}
+                        <address>
+                          {if $COMPANY}{$COMPANY} <br>{/if}
+                          {$FIRSTNAME} {$LASTNAME}
+                                  <span>{$ADDRESS1}</span><br>
+                                  {if $ADDRESS2 != ""}
+                                      <span>{$ADDRESS2}</span><br>
+                                  {/if}
+                                  {if $ADDRESS3 != ""}
+                                      <span>{$ADDRESS3}</span><br>
+                                  {/if}
+                                  <span>{$ZIPCODE}</span>
+                                  <span>{$CITY},
+                                  <span>{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                  {if $STATE}, <span>{loop type="state" name="customer.state.info" id=$STATE}{$TITLE}{/loop}</span></span>{/if}
+                          </address>
+                        {/capture}
+
+                        {include
+                          file="components/Checkbox/Checkbox.html"
+                          name=$name
+                          value=$value
+                          id="invoice-address_{$ID}"
+                          type="radio"
+                          checked=$isInvoiceAddressChecked
+                          label=$smarty.capture.address
+                        }
+                  </div>
+              {/loop}
+          {/form_field}
+      </div>
+  </div>
+

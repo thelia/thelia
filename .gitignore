@@ -24,6 +24,7 @@ web/assets/*
 web/cache/*
 web/tinymce
 web/media
+web/dist
 phpdoc*.log
 xhprof/
 phpunit.phar
@@ -55,6 +56,9 @@ templates/*
 !templates/frontOffice
 templates/frontOffice/*
 !templates/frontOffice/default
+!templates/frontOffice/starter
+templates/frontOffice/starter/node_modules
+templates/frontOffice/starter/dist
 !templates/backOffice
 templates/backOffice/*
 !templates/backOffice/default

@@ -1,0 +1,24 @@
+body.CategoryMenu--active {
+  overflow-y: hidden;
+  @screen lg{
+    overflow-y: auto;
+  }
+}
+
+.CategoryMenu {
+  label {
+    @apply text-base;
+  }
+}
+
+.CategoryMenu-wrapper {
+  display: none;
+  @screen lg {
+    display: block;
+    top: var(--Header-height) !important;
+  }
+  .CategoryMenu--active & {
+    display: block;
+  }
+
+}

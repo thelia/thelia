@@ -1,0 +1,26 @@
+{assign var="categoryTitle" value="{$TITLE}"}
+
+<article class="SingleCategory w-full flex flex-col p-4 bg-white">
+    <a href="{$URL}" itemprop="url">
+      <div class="SingleCategory-image text-center">
+
+        {loop name="category_thumbnail" type="image" quality="100" category=$ID width={$width|default:270} height={$height|default:270} resize_mode="borders" limit="1"}
+            <img class="mx-auto object-cover" itemprop="image" src="{$IMAGE_URL}" alt="{$categoryTitle}" width="270" height="270" loading="lazy">
+        {/loop}
+        {elseloop rel="category_thumbnail"}
+            <img class="mx-auto object-cover" itemprop="image" src="//placehold.it/{$width|default:270}x{$height|default:270}" alt="{$categoryTitle}">
+        {/elseloop}
+      </div>
+
+
+    <div class="SingleCategory-info text-center my-6">
+        <h3 class="SingleCategory-title text-2xl text-gray-300 "><span {if $microData}itemprop="name"{/if}>{$categoryTitle}</span></h3>
+    </div>
+
+    {if $PRODUCT_COUNT}
+    <div class="flex justify-center">
+      <div class="text-white tex-center bg-main rounded inline-block px-4 py-2 mx-auto">{$PRODUCT_COUNT} {intl l="tools"}</div>
+    </div>
+    {/if}
+  </a>
+</article><!-- /product -->

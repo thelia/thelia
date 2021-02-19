@@ -1,0 +1,63 @@
+
+{set_previous_url ignore_current="1"}
+<div class="Login lg:grid grid-cols-2 gap-6 max-w-6xl mx-auto">
+    <div class="panel  mb-8">
+      {form name="thelia.front.customer.login"}
+        <form action="{url path="/login"}" method="post" {form_enctype}>
+            <div class=" uppercase text-2xl font-bold mb-8">{intl l="Do you have an account?"}</div>
+            {form_hidden_fields}
+
+            {form_field field="success_url"}
+            <input type="hidden" name="{$name}" value="{if $success}{$success}{else}{navigate to="current"}{/if}">
+            {/form_field}
+
+            {form_field field="email"}
+            {include
+              file="components/smarty/Input/Input.html"
+              type="email"
+              name=$name
+              label=$label
+              value=$value
+              placeholder=""
+              id="{$label_attr.for}-mini"
+              required=true
+            }
+            {/form_field}
+
+            {form_field field="password"}
+            {include
+              file="components/smarty/Input/Input.html"
+              type="password"
+              name=$name
+              label=$label
+              value=$value
+              placeholder=""
+              id="{$label_attr.for}-mini"
+              required=true
+            }
+            {/form_field}
+
+            {form_field field="account"}
+            <input type="hidden" name="{$name}" value="1">
+            {/form_field}
+
+
+            {if $form_error}
+                {include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$form_error_message}
+              {/if}
+
+            <div class="flex justify-between items-center mt-8">
+              <a href="{url path="/password"}" class="mini-forgot-password inline-block align-baseline font-bold text-sm text-gray-100 hover:">{intl l="Forgot your Password?" }</a>
+              <button type="submit" class="btn">{intl l="Login"}</button>
+            </div>
+        </form>
+      {/form}
+    </div>
+    <div class="panel mb-8 flex flex-col justify-center">
+        <div class=" uppercase text-2xl font-bold mb-8 text-center">{intl l="No, I am a new customer"}</div>
+        <div class="text-center my-auto">
+          <a href="{url path="/register"}" class="btn"></i> {intl l="Create an account"}</a>
+        </div>
+    </div>
+</div>
+

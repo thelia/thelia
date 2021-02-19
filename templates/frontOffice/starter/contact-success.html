@@ -1,0 +1,13 @@
+{extends file="contact.html"}
+
+{block name="contact-form"}
+    <div class="text-center my-12 mb-12">
+        {ifhook rel="contact.success"}
+           {hook name="contact.success"}
+        {/ifhook}
+        {elsehook rel="contact.success"}
+        <h2 class="text-3xl ">{intl l="Thanks !"}</h2>
+        <p>{intl l="Thanks for your message, we will contact as soon as possible."}</p>
+        {/elsehook}
+    </div>
+{/block}
