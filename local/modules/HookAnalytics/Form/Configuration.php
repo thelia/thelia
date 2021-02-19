@@ -12,9 +12,10 @@
 
 namespace HookAnalytics\Form;
 
+use HookAnalytics\HookAnalytics;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
-use Thelia\Model\ConfigQuery;
+use Thelia\Model\LangQuery;
 
 /**
  * Class Configuration
@@ -27,7 +28,12 @@ class Configuration extends BaseForm {
     {
         $form = $this->formBuilder;
 
-        $value = ConfigQuery::read("hookanalytics_trackingcode", "");
+        $lang = $this->getRequest()->getSession()->get("thelia.admin.edition.lang");
+        if (!$lang){
+            $lang = LangQuery::create()->filterByByDefault(1)->findOne();
+        }
+
+        $value = HookAnalytics::getConfigValue("hookanalytics_trackingcode", "", $lang->getLocale());
         $form->add(
             "trackingcode",
             "text",

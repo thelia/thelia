@@ -29,6 +29,16 @@
 
                     {form_hidden_fields}
 
+                    <div class="tab-pane">
+                        <div class="form-container">
+                            {include
+                            file = "includes/inner-form-toolbar.html"
+                            hide_submit_buttons = true
+                            page_url = {url path=$smarty.server.REQUEST_URI}
+                            }
+                        </div>
+                    </div>
+
                     {form_field field='trackingcode'}
                     <div class="form-group {if $error}has-error{/if}">
                         <label for="{$label_attr.for}" class="control-label">{$label} : </label>
