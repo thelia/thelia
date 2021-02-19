@@ -432,7 +432,7 @@ body,#bodyTable{
                                                         {/block}
                                                         <tr>
                                                             <td valign="top" class="bodyContent" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;color: #505050;font-family: Helvetica;font-size: 14px;line-height: 150%;padding-top: 0px;padding-bottom: 20px;text-align: left;border-collapse: collapse !important;">
-                                                                {block name="email-content"}{/block}
+                                                                {block name="email-content"}{$message_body nofilter}{/block}
                                                             </td>
                                                         </tr>
                                                     </table>
