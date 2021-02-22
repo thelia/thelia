@@ -52,7 +52,7 @@ class CheckPermission extends BaseInstall
 
     protected $phpExpectedVerions = array(
         'min' => '5.5',
-        'max' => '7.4'
+        'max' => '8.0'
     );
 
     protected $extensions = array(

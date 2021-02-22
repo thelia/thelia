@@ -61,11 +61,14 @@ class FrontAssets extends AbstractSmartyPlugin
         $this->taxEngine = $taxEngine;
         $this->securityContext = $securityContext;
 
-        $assetsPublicPath = THELIA_FRONT_ASSETS_PUBLIC_DIR;
+        $assetsPublicPath = rtrim(THELIA_FRONT_ASSETS_PUBLIC_DIR, '/');
 
         if (!is_dir($assetsPublicPath)) {
             $fileSystem = new Filesystem();
             $origin = THELIA_TEMPLATE_DIR . 'frontOffice' . DS . ConfigQuery::read('active-front-template') . DS . THELIA_FRONT_ASSETS_BUILD_DIR_NAME;
+            if (!is_dir($origin)) {
+                return;
+            }
             $fileSystem->symlink($origin, $assetsPublicPath);
         }
 
