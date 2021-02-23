@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\TranslationsCustomerTitleForm;
 use Thelia\Model\CustomerTitleQuery;
 
@@ -28,47 +29,42 @@ class TranslationsCustomerTitleController extends BaseAdminController
     {
         $request = $this->getRequest();
 
-        $myTranslationForm = new TranslationsCustomerTitleForm($request);
-        $error_msg = false;
+        $translationForm =$this->createForm('thelia.admin.translations.customer_title');
 
         try {
-            $myForm = $this->validateForm($myTranslationForm);
+            $form = $this->validateForm($translationForm);
 
-            $myData = $myForm->getData();
+            $data = $form->getData();
 
-            $local = $myData['locale'];
+            $local = $data['locale'];
 
             $myCustomersTitle = CustomerTitleQuery::create()->find();
 
             foreach($myCustomersTitle as $aCustomerTitle){
                 $aCustomerTitle->setLocale($local)
-                    ->setShort($myData['short_title_'.$aCustomerTitle->getId()])
-                    ->setLong($myData['long_title_'.$aCustomerTitle->getId()])
+                    ->setShort($data['short_title_'.$aCustomerTitle->getId()])
+                    ->setLong($data['long_title_'.$aCustomerTitle->getId()])
                     ->save();
             }
 
+            if($request->get('save_mode')==='close'){
+                return $this->generateRedirectFromRoute('admin.configuration.index');
+            }
+            return $this->generateRedirectFromRoute('admin.configuration.translations-customers-title');
         } catch (FormValidationException $ex) {
             // Form cannot be validated
-            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+            $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
         } catch (\Exception $ex) {
             // Any other error
-            $error_msg = $ex->getMessage();
+            $errorMessage = $ex->getMessage();
         }
 
-        if(false !== $error_msg){
-
-            $this->setupFormErrorContext(
-                "customer title i18n",
-                $error_msg,
-                $myTranslationForm,
-                $ex
-            );
-            return $this->generateRedirectFromRoute('admin.configuration.translations-customers-title');
-        }
-
-        if($request->get('save_mode')==='close'){
-            return $this->generateRedirectFromRoute('admin.configuration.index');
-        }
+        $this->setupFormErrorContext(
+            "customer title i18n",
+            $errorMessage,
+            $translationForm,
+            $ex
+        );
         return $this->generateRedirectFromRoute('admin.configuration.translations-customers-title');
     }
 }
