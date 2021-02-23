@@ -120,9 +120,9 @@ class ParamInitMiddleware implements HttpKernelInterface
         // or a locale (fr_FR, en_US, etc.) for Thelia > 2.2.beta1
         if (null !== $requestedLangCodeOrLocale) {
             if (\strlen($requestedLangCodeOrLocale) > 2) {
-                $lang = LangQuery::create()->findOneByLocale($requestedLangCodeOrLocale);
+                $lang = LangQuery::create()->filterByActive(true)->findOneByLocale($requestedLangCodeOrLocale);
             } else {
-                $lang = LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
+                $lang = LangQuery::create()->filterByActive(true)->findOneByCode($requestedLangCodeOrLocale);
             }
 
             if (\is_null($lang)) {

@@ -298,7 +298,7 @@ class SessionController extends BaseAdminController
         // Set the current language according to locale preference
         $locale = $user->getLocale();
 
-        if (null === $lang = LangQuery::create()->findOneByLocale($locale)) {
+        if (null === $lang = LangQuery::create()->filterByActive(true)->findOneByLocale($locale)) {
             $lang = Lang::getDefaultLanguage();
         }
 
