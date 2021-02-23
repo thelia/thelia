@@ -19,7 +19,7 @@ local/media/documents/*
 local/media/images/*
 !local/media/images/store/favicon.png
 !local/media/images/store/logo.png
-!local/media/images/store/banner.jpg
+!local/media/images/store/banner.png
 web/assets/*
 web/cache/*
 web/tinymce
@@ -56,9 +56,10 @@ templates/*
 !templates/frontOffice
 templates/frontOffice/*
 !templates/frontOffice/default
-!templates/frontOffice/starter
-templates/frontOffice/starter/node_modules
-templates/frontOffice/starter/dist
+!templates/frontOffice/modern
+templates/frontOffice/modern/node_modules
+templates/frontOffice/modern/dist
+templates/frontOffice/modern/core
 !templates/backOffice
 templates/backOffice/*
 !templates/backOffice/default

@@ -1,5 +1,5 @@
 {
-  "name": "thelia/frontoffice-starter-template",
+  "name": "thelia/frontoffice-modern-template",
   "type": "thelia-frontoffice-template",
   "require": {
     "thelia/installer": "~1.1"

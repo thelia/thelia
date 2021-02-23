@@ -828,7 +828,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                     break;
                 case 'banner':
                     $configKey = 'banner_file';
-                    $defaultImageName = 'banner.svg';
+                    $defaultImageName = 'banner.png';
                     break;
             }
 

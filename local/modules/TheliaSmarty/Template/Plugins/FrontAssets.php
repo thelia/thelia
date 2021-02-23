@@ -61,7 +61,7 @@ class FrontAssets extends AbstractSmartyPlugin
         $this->taxEngine = $taxEngine;
         $this->securityContext = $securityContext;
 
-        $assetsPublicPath = rtrim(THELIA_FRONT_ASSETS_PUBLIC_DIR, '/');
+        $assetsPublicPath = rtrim(THELIA_FRONT_ASSETS_PUBLIC_DIR, '/');;
 
         if (!is_dir($assetsPublicPath)) {
             $fileSystem = new Filesystem();

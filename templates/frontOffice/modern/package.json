@@ -1,6 +1,6 @@
 {
-	"name": "thelia-starter",
-	"description": "Stack front Thelia",
+	"name": "thelia-modern",
+	"description": "Modern front stack for Thelia",
 	"version": "1.0.0",
 	"private": true,
 	"main": "./src/index.js",
