@@ -1,3 +1,23 @@
+# 2.4.4
+- #2821 Fix can set not active lang in front office
+- #2820 Add translations page for customer titles
+- #2819 Add a more modern template for Thelia front office
+- #2818 Update Smarty and Markdown
+- #2817 Update email-layout.tpl
+- #2815 Fix license to be detectable by github
+- #2814 Fix export end date calculation
+- #2813 Fix csv export for multiline
+- #2812 Export locale
+- #2810 Removed wrong parameter in findOne()
+- #2808 Add localPickup as delivery mode allowed list
+- #2807 Add i18n for HookAnalytics configurations
+- #2801 Add a command to switch the front template from CLI
+- #2800 Fix missing state in CartPostage getDeliveryInformation
+- #2799 Deep cloning of template definition
+- #2797 Added template type to template paths cache cache key
+- #2796 Fix delivery when state is null
+- #2795 Fix new delivery with state interface
+- #2794 Fix filter by product_image_id loop parameter
 # 2.4.3
 - #2792 Add GithubActions
 - #2791 Fix compatibility to composer 2
