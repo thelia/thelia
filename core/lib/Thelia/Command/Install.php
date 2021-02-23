@@ -135,10 +135,6 @@ class Install extends ContainerAwareCommand
 
         $this->createConfigFile($connectionInfo);
 
-        $command = $this->getApplication()->find('module:refresh');
-        $refreshInput = new ArrayInput([]);
-        $command->run($refreshInput, $output);
-
         $helper = $this->getHelper('question');
         $frontTemplate = null !== $input->getOption("front_template") ? $input->getOption("front_template") : "unknown";
         while (false === is_dir(THELIA_TEMPLATE_DIR. 'frontOffice' . DS . $frontTemplate)) {
@@ -152,9 +148,15 @@ class Install extends ContainerAwareCommand
                 "modern"
             );
         }
-        ConfigQuery::write('active-front-template', $frontTemplate);
+
+        if ($frontTemplate !== "default") {
+            ConfigQuery::write('active-front-template', $frontTemplate);
+        }
 
         if ($frontTemplate === "modern") {
+            $command = $this->getApplication()->find('module:refresh');
+            $refreshInput = new ArrayInput([]);
+            $command->run($refreshInput, $output);
             $this->initModernTemplatesRequirements($output);
         }
 
