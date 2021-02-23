@@ -313,6 +313,20 @@
                                     </tr>
                                 {/loop}
 
+                                {loop type="auth" name="pcc5.2" role="ADMIN" resource="admin.configuration.translations" access="VIEW"}
+                                <tr>
+                                    <td><a href="{url path='/admin/configuration/translations-customers-title'}">{intl l='Translations-customers-titles'}</a></td>
+                                    <td>
+                                        {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
+                                        [
+                                        'type' => 'edit',
+                                        'href' => {url path='/admin/configuration/translations-customers-title'}
+                                        ]
+                                        ]}
+                                    </td>
+                                </tr>
+                                {/loop}
+
                                 {loop type="auth" name="pcc6" role="ADMIN" resource="admin.configuration.mailing-system" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/mailingSystem'}">{intl l='Mailing system'}</a></td>
