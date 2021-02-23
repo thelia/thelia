@@ -1,0 +1,39 @@
+{extends file="layout.tpl"}
+
+{* Body Class *}
+{block name="body-class"}page-language{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [
+        ['title' => {intl l="Language"}, 'url'=>{url path="/language"}]
+    ]}
+{/block}
+
+
+{block name="main-content"}
+    <div class="main">
+        <article class="col-main" role="main" aria-labelledby="main-label">
+            <h1 id="main-label" class="page-header">{intl l="SELECT YOUR LANGUAGE"}</h1>
+            {hook name="language.top"}
+            <ul class="nav nav-tabs nav-justified" style="margin-bottom:60px;">
+            {loop type="lang" name="lang_available"}
+              <li{if $ID eq {lang attr="id"}} class="active"{/if}><a href="{url current="1" lang={$CODE}}">{$TITLE}</a></li>
+            {/loop}
+            </ul>
+            {hook name="language.bottom"}
+        </article>
+    </div>
+{/block}
+
+{block name="stylesheet"}
+{hook name="language.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="language.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="language.javascript-initialization"}
+{/block}

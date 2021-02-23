@@ -153,6 +153,13 @@
             <tag name="thelia.parser.register_plugin"/>
             <argument >%kernel.debug%</argument>
         </service>
+
+        <service id="smarty.plugin.front_assets" class="TheliaSmarty\Template\Plugins\FrontAssets">
+            <tag name="thelia.parser.register_plugin"/>
+            <argument type="service" id="request_stack"/>
+            <argument type="service" id="thelia.taxEngine"/>
+            <argument type="service" id="thelia.securityContext" />
+        </service>
     </services>
 
 </config>

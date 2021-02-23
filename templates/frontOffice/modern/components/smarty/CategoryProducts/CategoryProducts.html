@@ -1,0 +1,69 @@
+{$categories=$categories|default:$smarty.get.categories|default:[]}
+{$product_page={$page|default:{$smarty.get.page|default:1}}}
+{$product_order={$order|default:{$smarty.get.order|default:"alpha"}}}
+{$types = $types|default:$smarty.get.types|default:[]}
+{$brands=$brands|default:$smarty.get.brands|default: []}
+{$features=$features|default:$smarty.get.features|default: []}
+{$min_price=$min_price|default:$smarty.get.min_price|default: 0}
+{$max_price=$max_price|default:$smarty.get.max_price|default: 9999999}
+
+{$limit=32}
+
+{extractOptions features=$features brands=$brands categories=$categories}
+
+
+{if $types|is_string}
+    {$types = ','|explode:$types}
+{/if}
+
+
+{$amount={count
+  type="product"
+  category=$categories|default:$category_id
+  depth=5
+  limit=$limit
+  order=$product_order
+  page=$product_page
+  brand=$brands
+  new={'new'|in_array:$types}
+  promo={'promo'|in_array:$types}
+  title={$smarty.get.query}
+  feature_availability=$features
+  min_price=$min_price
+  max_price=$max_price
+}}
+
+<div class="CategoryProducts">
+  {ifloop rel="product_list"}
+
+    <div class="grid grid-flow-row-dense grid-rows-1 gap-8 lg:grid-cols-2 xl:grid-cols-4 xxl:grid-cols-5">
+      {loop
+        type="product"
+        name="product_list"
+        category=$categories|default:$category_id
+        depth=5
+        limit=$limit
+        order=$product_order
+        page=$product_page
+        brand=$brands
+        new={'new'|in_array:$types}
+        promo={'promo'|in_array:$types}
+        title={$smarty.get.query}
+        feature_availability=$features
+        min_price=$min_price
+        max_price=$max_price
+        }
+          {include file="components/smarty/SingleProduct/SingleProduct.html" withMicroData=true}
+    {/loop}
+
+    </div>
+
+    {if $amount > $limit}
+    {include file="components/smarty/Pagination/Pagination.html" current_page=$product_page loop_name="product_list"}
+    {/if}
+
+  {/ifloop}
+  {elseloop rel="product_list"}
+    {include file="components/smarty/Alert/Alert.html" type="warning" title={intl l="No results"}}
+  {/elseloop}
+</div>

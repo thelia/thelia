@@ -1,0 +1,365 @@
+{* ------------------------------ Label ----------------------------- *}
+
+
+{function name="fn_address_field_label"}
+  {include
+    file="components/smarty/Input/Input.html"
+    type="text"
+    name=$name
+    id="{$label_attr.for}"
+    value={$value|default:{$LABEL} nofilter}
+    label=$label
+    placeholder=""
+    required=$required
+  }
+{/function}
+
+
+{* -------------------------- Title (Mr, Mrs ...) ------------------------- *}
+
+
+{function name="fn_address_field_title"}
+    {assign var="value" value={$value|default:$TITLE}}
+    {$titleOptions = []}
+
+    {loop type="title" name="title.list"}
+    {$titleOptions[$ID] = [
+      'value' => $ID,
+      'label' => $LONG
+      ]}
+    {/loop}
+
+    {include
+      file="components/smarty/Select/Select.html"
+      name=$name
+      id="{$label_attr.for}"
+      value=$value
+      label=$label
+      defaultValue=""
+      defaultLabel={intl l="Select Title"}
+      required=$required
+      options=$titleOptions
+    }
+{/function}
+
+
+{* ------------------------------ Firstname ----------------------------- *}
+
+
+{function name="fn_address_field_firstname"}
+  {include
+    file="components/smarty/Input/Input.html"
+    type="text"
+    name=$name
+    id="{$label_attr.for}"
+    value={$value|default:{$FIRSTNAME} nofilter}
+    label=$label
+    placeholder={intl l="First name"}
+    required=$required
+  }
+{/function}
+
+
+{* ------------------------------ Lastname ----------------------------- *}
+
+
+{function name="fn_address_field_lastname"}
+  {include
+    file="components/smarty/Input/Input.html"
+    type="text"
+    name=$name
+    id="{$label_attr.for}"
+    value={$value|default:{$LASTNAME} nofilter}
+    label=$label
+    placeholder={intl l="Last name"}
+    required=$required
+  }
+{/function}
+
+{* ------------------------------ Email ----------------------------- *}
+
+{function name="fn_field_email"}
+  {include
+    file="components/smarty/Input/Input.html"
+    type="email"
+    name=$name
+    id="{$label_attr.for}"
+    value={$smarty.get.email|default:$value}
+    label=$label
+    placeholder=""
+    required=$required
+  }
+{/function}
+
+{* ------------------------------ Email Confirm ----------------------------- *}
+
+{function name="fn_field_email_confirm"}
+  {include
+    file="components/smarty/Input/Input.html"
+    type="email"
+    name=$name
+    id="{$label_attr.for}"
+    value={$smarty.get.email|default:$value}
+    label=$label
+    placeholder={intl l="Email confirmation"}
+    required=$required
+  }
+{/function}
+
+{* ------------------------------ Company ----------------------------- *}
+
+
+{function name="fn_address_field_company"}
+  {include
+    file="components/smarty/Input/Input.html"
+    type="text"
+    name=$name
+    id="{$label_attr.for}"
+    value={$value|default:{$COMPANY} nofilter}
+    label=$label
+    placeholder=""
+    required=$required
+  }
+{/function}
+
+{* ------------------------------ SIRET ----------------------------- *}
+
+
+{function name="fn_address_field_siret"}
+  {include
+    file="components/smarty/Input/Input.html"
+    type="text"
+    name=$name
+    id="{$label_attr.for}"
+    value={$value|default:{$SIRET} nofilter}
+    label=$label
+    placeholder=""
+    required=$required
+  }
+{/function}
+
+
+{* ------------------------------ VAT ----------------------------- *}
+
+
+{function name="fn_address_field_vat"}
+  {include
+    file="components/smarty/Input/Input.html"
+    type="text"
+    name=$name
+    id="{$label_attr.for}"
+    value={$value|default:{$VAT} nofilter}
+    label=$label
+    placeholder=""
+    required=$required
+  }
+{/function}
+
+
+{* ------------------------------ Address 1 ----------------------------- *}
+
+
+{function name="fn_address_field_address1"}
+  {include
+    file="components/smarty/Input/Input.html"
+    type="text"
+    name=$name
+    id="{$label_attr.for}"
+    value={$value|default:{$ADDRESS1} nofilter}
+    label=$label
+    placeholder=""
+    required=$required
+  }
+{/function}
+
+
+{* ------------------------------ Address 2 ----------------------------- *}
+
+
+{function name="fn_address_field_address2"}
+  {include
+    file="components/smarty/Input/Input.html"
+    type="text"
+    name=$name
+    id="{$label_attr.for}"
+    value={$value|default:{$ADDRESS2} nofilter}
+    label=$label
+    placeholder=""
+    required=$required
+  }
+{/function}
+
+
+{* ------------------------------ Zipcode ----------------------------- *}
+
+
+{function name="fn_address_field_zipcode"}
+  {include
+    file="components/smarty/Input/Input.html"
+    type="text"
+    name=$name
+    id="{$label_attr.for}"
+    value={$value|default:{$ZIPCODE} nofilter}
+    label=$label
+    placeholder=""
+    required=$required
+  }
+{/function}
+
+
+{* ------------------------------ City ----------------------------- *}
+
+
+{function name="fn_address_field_city"}
+  {include
+    file="components/smarty/Input/Input.html"
+    type="text"
+    name=$name
+    id="{$label_attr.for}"
+    value={$value|default:{$CITY} nofilter}
+    label=$label
+    placeholder=""
+    required=$required
+  }
+{/function}
+
+
+{* ------------------------------ Country ----------------------------- *}
+
+
+{function name="fn_address_field_country"}
+
+    {assign var="value" value={$value|default:$COUNTRY}}
+    {$countriesOptions = []}
+
+    {$countriesOptions['default'] = [
+      'value' => '',
+      'label' => {intl l="Choose a country"}
+    ]}
+
+    {loop type="country" name="country.list" order="alpha"}
+    {$countriesOptions[$ID] = [
+      'value' => $ID,
+      'label' => $TITLE
+      ]}
+    {/loop}
+
+    {include
+      file="components/smarty/Select/Select.html"
+      name=$name
+      id="{$label_attr.for}"
+      value=$value
+      label=$label
+      required=$required
+      options=$countriesOptions
+    }
+{/function}
+
+
+{* ------------------------------ State ----------------------------- *}
+
+
+{function name="fn_address_field_state"}
+  {include file="components/smarty/StateSelect/StateSelect.html"}
+{/function}
+
+
+{* ------------------------------ Phone ----------------------------- *}
+
+
+{function name="fn_address_field_phone"}
+  {include
+    file="components/smarty/Input/Input.html"
+    type="text"
+    name=$name
+    id="{$label_attr.for}"
+    value={$value|default:{$PHONE} nofilter}
+    label=$label
+    placeholder=""
+    required=$required
+  }
+{/function}
+
+
+{* ------------------------------ Cellphone ----------------------------- *}
+
+
+{function name="fn_address_field_cellphone"}
+  {include
+    file="components/smarty/Input/Input.html"
+    type="text"
+    name=$name
+    id="{$label_attr.for}"
+    value={$value|default:{$CELLPHONE} nofilter}
+    label=$label
+    placeholder=""
+    required=$required
+  }
+{/function}
+
+{* ------------------------------ Password ----------------------------- *}
+
+{function name="fn_password_field"}
+  {include
+    file="components/smarty/Input/Input.html"
+    type="password"
+    name=$name
+    id="{$label_attr.for}"
+    value={$value}
+    label=$label
+    placeholder=""
+    required=$required
+  }
+{/function}
+
+{* ------------------------------ Password Confirm ----------------------------- *}
+
+{function name="fn_password_confirm_field"}
+{include
+  file="components/smarty/Input/Input.html"
+  type="password"
+  name=$name
+  id="{$label_attr.for}"
+  value={$value}
+  label=$label
+  placeholder=""
+  required=$required
+}
+{/function}
+
+
+{* ------------------------------ Newsletter ----------------------------- *}
+
+{function name="fn_newsletter"}
+  {include file="components/smarty/Checkbox/Checkbox.html" value=$value id=$label_attr.for type="checkbox" checked=$checked label=$label}
+{/function}
+
+{* ------------------------------ Is Default ----------------------------- *}
+
+{function name="fn_is_default"}
+  {include file="components/smarty/Checkbox/Checkbox.html" value=$value id=$label_attr.for type="checkbox" checked=$checked label=$label}
+{/function}
+
+
+{* ------------------------------ lang Id ----------------------------- *}
+
+{function name="fn_lang_id"}
+  {$langOptions = []}
+  {loop type="lang" name="lang.list" visible="*" order="alpha"}
+    {$langOptions[$ID] = [
+      'value' => $ID,
+      'label' => $TITLE
+    ]}
+  {/loop}
+
+  {include
+    file="components/smarty/Select/Select.html"
+    name=$name
+    id="{$label_attr.for}"
+    value=$value
+    label=$label
+    required=$required
+    options=$langOptions
+  }
+
+{/function}

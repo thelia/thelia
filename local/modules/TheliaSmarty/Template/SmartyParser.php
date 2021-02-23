@@ -101,7 +101,7 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->env = $env;
         $this->debug = $debug;
 
-        // Use methos call coamptibility wrapper ?
+        // Use method call compatibility wrapper ?
         $this->useMethodCallWrapper = version_compare(self::SMARTY_VERSION, "3.1.33", '>=');
 
         // Configure basic Smarty parameters

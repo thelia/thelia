@@ -1,0 +1,110 @@
+{extends file="layout.tpl"}
+
+{block name="body-class"}page-view-sale{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {loop name="sale-details" type="sale" id={$product_sale}}
+        {$breadcrumbs = [
+            ['title' => "{$SALE_LABEL}", 'url'=>{url path="/sale" sale={$ID}}]
+        ]}
+    {/loop}
+{/block}
+
+{block name="main-content"}
+
+    {* Parameters *}
+    {$limit={$smarty.get.limit|default:8}}
+    {$product_page={$smarty.get.page|default:1}}
+    {$product_sale={$smarty.get.sale|default:''}}
+
+    {hook name="sale.top" sale={$product_sale}}
+
+    <div class="main">
+    {hook name="sale.main-top" sale={$product_sale}}
+    <article id="sale-details" class="col-main {$smarty.get.mode|default:"grid"}"  role="main" aria-labelledby="main-label">
+        {hook name="sale.content-top" sale={$product_sale}}
+
+        {loop name="sale-details" type="sale" id={$product_sale}}
+            <h1 id="main-label" class="page-header">{$SALE_LABEL}</h1>
+
+            <div class="sale-discount-information">
+                <p class="sale-saving"> {intl l="Save %amount%sign on these products" amount={$PRICE_OFFSET_VALUE} sign={$PRICE_OFFSET_SYMBOL}}</p>
+                {if $HAS_END_DATE}
+                    <p class="sale-period">{intl l="This offer is valid until %date" date={format_date date=$END_DATE output="date"}}</p>
+                {/if}
+            </div>
+
+            <div class="sale-information">
+                {if $CHAPO}
+                    <div class="chapo">
+                        {$CHAPO}
+                    </div>
+                {/if}
+
+                {if $DESCRIPTION}
+                    <div class="description">
+                        {$DESCRIPTION nofilter}
+                    </div>
+                {/if}
+            </div>
+
+            {assign var="amount" value={count type="product" sale=$ID}}
+
+
+
+            {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order amount={$amount}}
+
+            <div id="category-products">
+                <div class="products-content">
+                    {ifloop rel="product_list"}
+                        <ul class="list-unstyled row">
+                        {loop type="product" sale={$ID} name="product_list" limit=$limit page=$product_page order=$product_order}
+                            {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="700" height="320"}
+                        {/loop}
+                        </ul>
+                    {/ifloop}
+
+                    {elseloop  rel="product_list"}
+                        <h2 class="text-center">{intl l="No results found"} </h2>
+                    {/elseloop}
+                </div>
+            </div><!-- /#category-products -->
+
+            {ifloop rel="product_list"}
+                {include file="includes/toolbar.html" toolbar="bottom" amount={$amount}}
+            {/ifloop}
+
+            {if $POSTSCRIPTUM}
+            <small class="postscriptum">
+                {$POSTSCRIPTUM}
+            </small>
+            {/if}
+        {/loop}
+
+        {elseloop  rel="sale-details"}
+            <h2 class="text-center">{intl l="Sale was not found"} </h2>
+        {/elseloop}
+
+        {hook name="sale.content-bottom" sale={$product_sale}}
+
+    </article>
+
+    {hook name="sale.main-bottom" sale={$product_sale}}
+
+</div><!-- /.layout -->
+{hook name="sale.bottom" sale={$product_sale}}
+{/block}
+
+
+{block name="stylesheet"}
+    {hook name="sale.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+    {hook name="sale.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+    {hook name="sale.javascript-initialization"}
+{/block}

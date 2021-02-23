@@ -1,0 +1,20 @@
+{loop name="image.carousel" type="image" product=$product_id width=1000 height=1000 resize_mode="borders"}
+{$images[] = [
+  'url' => $IMAGE_URL,
+  'alt' => $TITLE
+]}
+{/loop}
+
+<div class="ProductGallery splide">
+	<div class="splide__track">
+		<ul class="splide__list">
+
+      {foreach from=$images item=image}
+			<li class="splide__slide mx-4 lg:mx-0 lg:mb-8">
+        <img src="{$image['url']}" title="{$image['alt']}" class="object-contain w-full h-full" width="1000" height="1000" loading="lazy" />
+      </li>
+      {/foreach}
+
+		</ul>
+	</div>
+</div>

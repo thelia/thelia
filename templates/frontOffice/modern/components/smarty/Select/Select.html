@@ -1,0 +1,24 @@
+
+<label for="{$id}" class="block text-sm mb-2 text-gray-600 {$class}">
+  {if $label}
+    <div class="font-bold text-sm {if $error}text-red-500{else}text-gray-700{/if}">
+      {$label}
+    </div>
+  {/if}
+  <select name="{$name}" id="{$name}-select" class="block w-full mt-0 px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black {$selectClass}">
+    {foreach from=$options item=option}
+    <option value="{$option['value']}" {if $option['data-label']}{$option['data-label']}="{$option['data-value']}"{/if} {if $option['value'] == $value}selected{/if}>{$option['label']}</option>
+    {/foreach}
+  </select>
+
+  {if $error}
+    <div class="mt-1">
+      <span class="text-red-500 text-xs font-normal italic mb-4 block">
+        {$message}
+      </span>
+    </div>
+  {/if}
+</label>
+
+
+

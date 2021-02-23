@@ -1,0 +1,50 @@
+{extends file="layout.tpl"}
+
+{* Security *}
+{block name="no-return-functions" prepend}
+    {check_auth role="CUSTOMER" login_tpl="login"}
+{/block}
+
+{* Body Class *}
+{block name="body-class"}page-address{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [
+        ['title' => {intl l="Account"}, 'url'=>{url path="/account"}],
+        ['title' => {intl l="Address"}, 'url'=>{url path="/address/create"}]
+    ]}
+{/block}
+
+{block name="main-content"}
+
+  {include file="components/smarty/BreadCrumb/BreadCrumb.html"}
+
+  {include file="components/smarty/HeaderAccount/HeaderAccount.html" title="My Addresses"}
+
+  <div class="container mx-auto my-24">
+    <div class="">
+      <div class="grid lg:grid-cols-3 gap-6">
+        {loop type="address" name="address.loop"}
+          {include file="components/smarty/Address/Address.html" }
+        {/loop}
+        <div class="flex items-center justify-center ">
+          <a href="{url path='/address'}" class="btn text-2xl">{intl l="New address"}</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+{/block}
+
+{block name="stylesheet"}
+{hook name="address-create.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="address-create.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="address-create.javascript-initialization"}
+{/block}

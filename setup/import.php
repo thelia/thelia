@@ -432,6 +432,8 @@ function createBrands($faker, $con)
 function createCategories($faker, $con)
 {
     echo "start creating categories\n";
+    $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
+
     $categories = array();
     if (($handle = fopen(THELIA_SETUP_DIRECTORY . 'import/categories.csv', "r")) !== FALSE) {
         $row=0;
@@ -453,6 +455,20 @@ function createCategories($faker, $con)
                     ->setDescription($faker->text(100))
                 ->save($con);
             $categories[trim($data[1])] = $category;
+
+            $images = explode(';', $data[6]);
+
+            foreach ($images as $image) {
+                $image = trim($image);
+                if(empty($image)) continue;
+                $categoryImage = new \Thelia\Model\CategoryImage();
+                $categoryImage
+                    ->setCategory($category)
+                    ->setFile($image)
+                    ->save($con);
+                $fileSystem->copy(THELIA_SETUP_DIRECTORY . 'import/images/'.$image, THELIA_LOCAL_DIR . 'media/images/category/'.$image, true);
+            }
+
         }
         fclose($handle);
     }

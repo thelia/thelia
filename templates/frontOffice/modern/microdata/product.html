@@ -1,0 +1,51 @@
+{if $product_id}
+
+  {$images = []}
+
+  {loop type="image" name="microdata.product.img" product=$product_id}
+    {append 'images' $IMAGE_URL}
+  {/loop}
+
+  {assign var="current_stock_href" value = "http://schema.org/InStock"}
+  {if {config key="check-available-stock"} != 0}
+      {if $QUANTITY == 0}
+          {assign var="current_stock_href" value = "http://schema.org/OutOfStock"}
+      {/if}
+  {/if}
+
+
+  {$microdata = [
+    '@context' => "https://schema.org/",
+    "@type" => "Product",
+    "name" => $TITLE,
+    "image" => $images,
+    "description" => "{$DESCRIPTION|strip_tags}",
+    "sku" => $REF,
+    "offers" => [
+      "@type" => "Offer",
+      "url" => $URL,
+      "priceCurrency" => {currency attr="code"},
+      "price" => $BEST_TAXED_PRICE,
+      "itemCondition" => "https://schema.org/NewCondition",
+      "availability" => $current_stock_href
+    ]
+
+  ]}
+
+  {if $EAN_CODE}
+    {$microdata["gtin13"] = $EAN_CODE}
+  {/if}
+
+  {loop type="brand" name="microdata.product.brand" product=$product_id}
+    {$microdata["brand"]["@type"] = "Brand"}
+    {$microdata["brand"]["name"] = $TITLE}
+  {/loop}
+
+  {if $isRelatedTo}
+    {$microdata["isRelatedTo"] = []}
+  {/if}
+
+  <script type="application/ld+json">
+    {$microdata|json_encode nofilter}
+  </script>
+{/if}

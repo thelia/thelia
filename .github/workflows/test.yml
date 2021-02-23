@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['5.6', '7.0', '7.1', '7.2', '7.3']
+        php-versions: ['7.0', '7.1', '7.2', '7.3', '7.4']
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -53,10 +53,10 @@ jobs:
           composer update --no-interaction --prefer-dist
       - name: Install Thelia
         run: |
-          php Thelia thelia:install --db_host=127.0.0.1:${{ job.services.mysql.ports['3306'] }} --db_username=root --db_name=thelia --db_password=thelia
+          php Thelia thelia:install --db_host=127.0.0.1:${{ job.services.mysql.ports['3306'] }} --db_username=root --db_name=thelia --db_password=thelia --front_template=default
           php setup/faker.php -r 0
           php Thelia module:refresh
-          php Thelia module:activate Colissimo
+          php Thelia module:activate CustomDelivery
           php Thelia module:activate Cheque
           php Thelia module:activate HookTest
           php Thelia module:activate VirtualProductDelivery

@@ -1,0 +1,88 @@
+{extends file="layout.tpl"}
+
+{* Security *}
+{block name="no-return-functions" prepend}
+    {check_auth role="CUSTOMER" login_tpl="login"}
+    {check_cart_not_empty}
+    {$is_checkout = true}
+{/block}
+
+{block name="css" append}
+  {getAssetsFromEntrypoints entry="delivery" type="css"}
+{/block}
+
+{block name="javascript" append}
+  {getAssetsFromEntrypoints entry="delivery" type="js"}
+{/block}
+
+{* Body Class *}
+{block name="body-class"}page-order-delivery{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [
+        ['title' => {intl l="Billing and delivery"}, 'url'=>{url path="/order/delivery"}]
+    ]}
+{/block}
+
+{block name="tags"}
+    {* {include file="tags/checkout-progress.html" step="delivery"} *}
+{/block}
+
+{block name="header"}
+  {include file="components/smarty/Header/Header.html" lite=true}
+{/block}
+
+{block name="navigation"}
+  {* hide nav *}
+{/block}
+
+{block name="minicart"}
+{* hide minicart *}
+{/block}
+
+
+{block name="main-content"}
+  {hook name="order-delivery.top"}
+
+  <div class="py-8">
+    <div class="container mx-auto">
+        {include file="components/smarty/Checkout/Checkout.html"}
+    </div>
+  </div>
+
+  {hook name="order-delivery.bottom"}
+{/block}
+
+{block name="javascript-data"}
+  <script type="text/javascript">
+  {$customerTitles = []}
+  {loop type="title" name="getTitles"}
+    {$customerTitles[] = [
+      'id' => $ID,
+      'long' => $LONG,
+      'short' => $SHORT,
+      'isDefault' => $DEFAULT
+    ]}
+  {/loop}
+
+  var CUSTOMER_TITLES = {$customerTitles|json_encode nofilter}
+  </script>
+
+  <script type="text/javascript">
+  {$countries = []}
+  {loop type="country" name="getCountry" order="alpha"}
+    {$countries[] = [
+      'id' => $ISOALPHA2,
+      'title' => $TITLE
+    ]}
+  {/loop}
+
+  var COUNTRIES = {$countries|json_encode nofilter}
+
+  </script>
+
+{/block}
+
+{block name="footer"}
+{/block}

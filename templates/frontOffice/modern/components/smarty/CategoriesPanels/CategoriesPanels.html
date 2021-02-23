@@ -1,0 +1,24 @@
+
+  <div class="CategoriesPanels container mx-auto">
+    {if $title}
+      {include file="components/smarty/Title/Title.html" type="h2" title=$title}
+    {/if}
+    <div class="flex justify-center flex-wrap flex-row -mx-1 -mt-1">
+      {loop type="category" name="CategoriesPanels" parent={$parent|default:0} limit=7}
+      <div class="p-1 w-6/12 md:w-4/12 xl:w-2/12 ">
+        <a href="{$URL}" class="CategoriesPanels-panel block hover:shadow-xl">
+          {loop type="image" name="CategoriesPanels.img" source="category" source_id=$ID width=280 height=450 resize_mode="crop" limit=1}
+            <img src="{$IMAGE_URL}" class="CategoriesPanels-panel-img object-cover object-center w-full h-full" />
+          {/loop}
+          {elseloop rel="CategoriesPanels.img"}
+            <img src="//placehold.it/280x450" class="CategoriesPanels-panel-img object-cover object-center w-full h-full" />
+          {/elseloop}
+          <div class="CategoriesPanels-panel-content">
+            <div class="CategoriesPanels-panel-title text-2xl text-white text-center px-4 mb-6">{$TITLE}</div>
+          </div>
+        </a>
+        </div>
+      {/loop}
+    </div>
+  </div>
+

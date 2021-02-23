@@ -1,0 +1,55 @@
+{extends file="layout.tpl"}
+
+{block name="css" append}
+  {getAssetsFromEntrypoints entry="home" type="css"}
+{/block}
+
+{block name="javascript" append}
+  {getAssetsFromEntrypoints entry="home" type="js"}
+{/block}
+
+
+{* Body Class *}
+{block name="body-class"}page-home{/block}
+
+{* Page Title *}
+{block name='no-return-functions' append}
+{/block}
+
+{* Hide breadcrumb *}
+{block name='breadcrumb'}{/block}
+
+{* Main content *}
+{block name="main-content"}
+  <div class="-mx-8">
+
+  {local_media type="banner"}
+    {$bannerUrl = $MEDIA_URL}
+  {/local_media}
+  {include
+    file="components/smarty/HeroImage/HeroImage.html"
+    title={config key="store_name"}
+    subtitle={config key="store_description"}
+    description=""
+    img=$bannerUrl
+    }
+
+  {include file="components/smarty/NewProducts/NewProducts.html"}
+  <div class="px-8 pt-20 pb-32">
+    {include file="components/smarty/CategoriesPanels/CategoriesPanels.html" title={intl l="Our product categories"}}
+  </div>
+  {include file="components/smarty/BestSellers/BestSellers.html"}
+
+  {loop type="content" name="home.content" id=14}
+    {loop type="image" name="home.content.FolderPreview.img" source="content" source_id=$ID width=590 height=625 limit=1}
+      {$image = $IMAGE_URL}
+    {/loop}
+    {loop type="content" name="home.content.FolderPreview.url" id=7}
+      {$url = $URL}
+    {/loop}
+    {include file="components/smarty/FolderPreview/FolderPreview.html" image=$image url=$url}
+  {/loop}
+
+  {include file="components/smarty/Reassurance/Reassurance.html"}
+  </div>
+{/block}

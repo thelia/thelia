@@ -14,7 +14,7 @@
         "wiki": "http://doc.thelia.net"
     },
     "require": {
-        "php": ">=5.6 <7.4",
+        "php": ">5.6 <8.0",
         "ircmaxell/password-compat": "1.0.*",
         "psr/log": "1.0",
         "symfony/config": "2.8.*",
@@ -46,7 +46,7 @@
         "doctrine/cache": "1.5.*",
         "kriswallsmith/assetic": "1.3.*",
         "ptachoire/cssembed": "1.0.*",
-        "simplepie/simplepie": "1.3.*",
+        "simplepie/simplepie": "1.5.*",
         "imagine/imagine": "0.7.1",
         "swiftmailer/swiftmailer": "5.4.*",
         "oyejorge/less.php": "1.7.*",
@@ -62,7 +62,12 @@
         "symfony/polyfill-php73": "^1.0",
         "symfony/lock": "^3.4|^4.0",
         "thelia/propel": "dev-thelia-2.4",
-        "symfony/var-dumper": "^2.0|^3.0|^4.0"
+        "symfony/var-dumper": "^2.0|^3.0|^4.0",
+        "thelia/open-api-module": "dev-master",
+        "thelia/smarty-redirection-module": "~1.0.0",
+        "thelia/choice-filter-module": "0.1.*",
+        "thelia/custom-delivery-module": "~2.1.0",
+        "thelia/store-seo-module": "~1.2.0"
     },
     "require-dev": {
         "fzaninotto/faker": "1.5.*",

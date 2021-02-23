@@ -86,7 +86,6 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `hidden`, `mandatory`, `created_at`, `updated_at`) VALUES
 (1, 'Carousel', 1, 0, 1, 'Carousel\\Carousel', 0, 0, NOW(), NOW()),
-(2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', 0, 0, NOW(), NOW()),
 (3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', 0, 0, NOW(), NOW()),
 (4, 'Front', 1, 1, 2, 'Front\\Front', 1, 0, NOW(), NOW()),
 (5, 'Tinymce', 1, 0, 16, 'Tinymce\\Tinymce', 0, 1, NOW(), NOW()),
@@ -928,14 +927,6 @@ INSERT INTO `area` (`id`, `name`, `postage`, `created_at`, `updated_at`) VALUES
 (12, 'South America', NULL, NOW(), NOW()),
 (13, 'Europe (non-EU)', NULL, NOW(), NOW()),
 (14, 'Central America/Antilla', NULL, NOW(), NOW());
-
-INSERT INTO `area_delivery_module` (`id`, `area_id`, `delivery_module_id`, `created_at`, `updated_at`) VALUES
-(1, 1, 2, NOW(), NOW()),
-(2, 2, 2, NOW(), NOW()),
-(3, 3, 2, NOW(), NOW()),
-(4, 4, 2, NOW(), NOW()),
-(5, 5, 2, NOW(), NOW()),
-(6, 6, 2, NOW(), NOW());
 
 INSERT INTO `country` (`id`, `visible`, `isocode`, `isoalpha2`, `isoalpha3`, `by_default`, `shop_country`, `has_states`, `need_zip_code`, `zip_code_format`, `created_at`, `updated_at`) VALUES
 (1, 1, '4', 'AF', 'AFG', 0, 0, '0', '0', '', NOW(), NOW()),
@@ -2376,7 +2367,6 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
 
 INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
     (1, 'cs_CZ', NULL, NULL, NULL, NULL),
-    (2, 'cs_CZ', NULL, NULL, NULL, NULL),
     (3, 'cs_CZ', NULL, NULL, NULL, NULL),
     (4, 'cs_CZ', NULL, NULL, NULL, NULL),
     (5, 'cs_CZ', NULL, NULL, NULL, NULL),
@@ -2396,7 +2386,6 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (19, 'cs_CZ', NULL, NULL, NULL, NULL),
     (20, 'cs_CZ', NULL, NULL, NULL, NULL),
     (21, 'cs_CZ', NULL, NULL, NULL, NULL),    (1, 'de_DE', 'Ein Bilder-Karussel auf Ihre Startseite', NULL, NULL, NULL),
-    (2, 'de_DE', '72Std Lieferung ', NULL, NULL, NULL),
     (3, 'de_DE', 'Per Cheque bezahlen', NULL, NULL, NULL),
     (4, 'de_DE', 'Front office Modul ', NULL, NULL, NULL),
     (5, 'de_DE', 'TinyMCE WYSIWYG Editor', NULL, NULL, NULL),
@@ -2416,7 +2405,6 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (19, 'de_DE', 'Smarty Template Engine Integration', NULL, NULL, NULL),
     (20, 'de_DE', 'Steuerung für virtuelle Produkte', NULL, NULL, NULL),
     (21, 'de_DE', NULL, NULL, NULL, NULL),    (1, 'en_US', 'An image carousel on your home page', NULL, NULL, NULL),
-    (2, 'en_US', '72h delivery', NULL, NULL, NULL),
     (3, 'en_US', 'Pay by cheque', NULL, NULL, NULL),
     (4, 'en_US', 'Front office integration', NULL, NULL, NULL),
     (5, 'en_US', 'TinyMCE WYSIWYG editor', NULL, NULL, NULL),
@@ -2436,7 +2424,6 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (19, 'en_US', 'Smarty template engine integration', NULL, NULL, NULL),
     (20, 'en_US', 'Virtual Product Controller', NULL, NULL, NULL),
     (21, 'en_US', 'Back-office Home page content', NULL, NULL, NULL),    (1, 'es_ES', 'Un carrusel de imágenes en la página de inicio', NULL, NULL, NULL),
-    (2, 'es_ES', 'entrega 72h', NULL, NULL, NULL),
     (3, 'es_ES', 'Pagar con Cheque', NULL, NULL, NULL),
     (4, 'es_ES', 'Front office integración', NULL, NULL, NULL),
     (5, 'es_ES', 'Editor TinyMCE WYSIWYG', NULL, NULL, NULL),
@@ -2456,7 +2443,6 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (19, 'es_ES', 'Integración del motor de plantillas Smarty', NULL, NULL, NULL),
     (20, 'es_ES', 'Controlador de producto virtual', NULL, NULL, NULL),
     (21, 'es_ES', NULL, NULL, NULL, NULL),    (1, 'fr_FR', 'Un carrousel d\'images sur votre page d\'accueil', NULL, NULL, NULL),
-    (2, 'fr_FR', 'Livraison par colissimo en 72h', NULL, NULL, NULL),
     (3, 'fr_FR', 'Payer par chèque', NULL, NULL, NULL),
     (4, 'fr_FR', 'Module Front office', NULL, NULL, NULL),
     (5, 'fr_FR', 'Editeur visuel TinyMCE', NULL, NULL, NULL),
@@ -2476,7 +2462,6 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (19, 'fr_FR', 'Intégration du moteur de template Smarty', NULL, NULL, NULL),
     (20, 'fr_FR', 'Contôle de produit virtuel', NULL, NULL, NULL),
     (21, 'fr_FR', 'Contenu de la page d\'accueil de l\'administration', NULL, NULL, NULL),    (1, 'it_IT', NULL, NULL, NULL, NULL),
-    (2, 'it_IT', NULL, NULL, NULL, NULL),
     (3, 'it_IT', NULL, NULL, NULL, NULL),
     (4, 'it_IT', NULL, NULL, NULL, NULL),
     (5, 'it_IT', NULL, NULL, NULL, NULL),
@@ -2496,7 +2481,6 @@ INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (19, 'it_IT', NULL, NULL, NULL, NULL),
     (20, 'it_IT', NULL, NULL, NULL, NULL),
     (21, 'it_IT', NULL, NULL, NULL, NULL),    (1, 'ru_RU', 'Слайдер на главной', NULL, NULL, NULL),
-    (2, 'ru_RU', '72h delivery', NULL, NULL, NULL),
     (3, 'ru_RU', 'Оплата чеком', NULL, NULL, NULL),
     (4, 'ru_RU', 'Отображение магазина', NULL, NULL, NULL),
     (5, 'ru_RU', 'Редактор TinyMCE', NULL, NULL, NULL),

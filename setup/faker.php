@@ -617,8 +617,8 @@ try {
 
     echo "Creating orders\n";
 
-    $colissimo_id = ModuleQuery::create()->
-    filterByCode("Colissimo")
+    $custom_delivery_id = ModuleQuery::create()->
+    filterByCode("CustomDelivery")
         ->findOne()
         ->getId();
 
@@ -678,7 +678,7 @@ try {
         $placedOrder
             ->setDeliveryOrderAddressId($deliveryOrderAddress->getId())
             ->setInvoiceOrderAddressId($invoiceOrderAddress->getId())
-            ->setDeliveryModuleId($colissimo_id)
+            ->setDeliveryModuleId($custom_delivery_id)
             ->setPaymentModuleId($cheque_id)
             ->setStatusId(mt_rand(1, 5))
             ->setCurrencyRate($currency->getRate())

@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<rss version="2.0">
+{* @todo order item by create date desc *}
+{assign var="store_name" value="{config key="store_name"}"}
+{loop type="lang" name="lang" id=$_lang_}
+    {assign var="locale" value="{$LOCALE}"}
+{/loop}
+{if $_context_ == "catalog"}
+    <channel>
+        {if $_id_ == "" }
+            <title>{intl l="All products in"} {$store_name}</title>
+            <link>{url path="/"}</link>
+            <description>{$store_name}</description>
+            <language>{$locale|replace:'_':'-'|lower}</language>
+            <lastBuildDate>{$smarty.now|date_format:'r'}</lastBuildDate>
+            <generator>Thelia 2.0</generator>
+        {else}
+            {loop type="category" name="category" id=$_id_ lang=$_lang_ }
+                <title>{intl l="All products in"} {$TITLE} - {$store_name}</title>
+                <link>{$URL nofilter}</link>
+                <description>{$CHAPO}</description>
+                <language>{$LOCALE|replace:'_':'-'|lower}</language>
+                <pubDate>{format_date date=$UPDATE_DATE format="r"}</pubDate>
+                <lastBuildDate>{$smarty.now|date_format:'r'}</lastBuildDate>
+                <generator>Thelia 2.0</generator>
+            {/loop}
+        {/if}
+        {loop type="product" name="product" category_default=$_id_ lang=$_lang_ order="id_reverse" }
+            <item>
+                <title>{$TITLE}</title>
+                <link>{$URL nofilter}</link>
+                <description>{$CHAPO}</description>
+                <pubDate>{format_date date=$CREATE_DATE format="r"}</pubDate>
+                <guid>{$URL nofilter}</guid>
+            </item>
+        {/loop}
+    </channel>
+{elseif $_context_ == "brand"}
+    <channel>
+        {if $_id_ == "" }
+            <title>{intl l="All brands in %store" store="$store_name"}</title>
+            <link>{url path="/"}</link>
+            <description>{$store_name}</description>
+            <language>{$locale|replace:'_':'-'|lower}</language>
+            <lastBuildDate>{$smarty.now|date_format:'r'}</lastBuildDate>
+            <generator>Thelia 2.0</generator>
+            {loop type="brand" name="brand-list" lang=$_lang_ order="id-reverse" }
+                <item>
+                    <title>{$TITLE}</title>
+                    <link>{$URL nofilter}</link>
+                    <description>{$CHAPO}</description>
+                    <pubDate>{format_date date=$CREATE_DATE format="r"}</pubDate>
+                    <guid>{$URL nofilter}</guid>
+                </item>
+            {/loop}
+        {else}
+            {loop type="brand" name="brand-desc" lang=$_lang_ id=$_id_}
+            <title>{intl l="All products for brand %title in %store" title="{$TITLE}" store="{$store_name}"}</title>
+            <link>{$URL nofilter}</link>
+            <description>{$CHAPO}</description>
+            <language>{$locale|replace:'_':'-'|lower}</language>
+            <lastBuildDate>{$smarty.now|date_format:'r'}</lastBuildDate>
+            <generator>Thelia 2.0</generator>
+            {/loop}
+        {/if}
+
+        {loop type="product" name="products-in-brand" brand=$_id_ lang=$_lang_ order="id_reverse" }
+            <item>
+                <title>{$TITLE}</title>
+                <link>{$URL nofilter}</link>
+                <description>{$CHAPO}</description>
+                <pubDate>{format_date date=$CREATE_DATE format="r"}</pubDate>
+                <guid>{$URL nofilter}</guid>
+            </item>
+        {/loop}
+    </channel>
+{else}
+    <channel>
+    {if $_id_ == "" }
+        <title>{intl l="All contents in"} {$store_name}</title>
+        <link>{url path="/"}</link>
+        <description>{$store_name}</description>
+        <language>{$locale|replace:'_':'-'|lower}</language>
+        <lastBuildDate>{$smarty.now|date_format:'r'}</lastBuildDate>
+        <generator>Thelia 2.0</generator>
+    {else}
+        {loop type="folder" name="folder" id=$_id_ lang=$_lang_ }
+        <title>{intl l="All contents in"} {$TITLE} - {$store_name}</title>
+        <link>{$URL nofilter}</link>
+        <description>{$CHAPO}</description>
+        <language>{$LOCALE|replace:'_':'-'|lower}</language>
+        <pubDate>{format_date date=$UPDATE_DATE format="r"}</pubDate>
+        <lastBuildDate>{$smarty.now|date_format:'r'}</lastBuildDate>
+        <generator>Thelia 2.0</generator>
+        {/loop}
+    {/if}
+    {loop type="content" name="content" folder_default=$_id_ lang=$_lang_ }
+        <item>
+            <title>{$TITLE}</title>
+            <link>{$URL nofilter}</link>
+            <description>{$CHAPO}</description>
+            <pubDate>{format_date date=$CREATE_DATE format="r"}</pubDate>
+            <guid>{$URL nofilter}</guid>
+        </item>
+    {/loop}
+    </channel>
+{/if}
+</rss>

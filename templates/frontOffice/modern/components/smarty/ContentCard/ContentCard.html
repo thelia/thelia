@@ -1,0 +1,21 @@
+<a href="{$URL}" class="group shadow rounded overflow-hidden relative">
+  <div class="relative">
+    {loop type="image" name="info.img" source="content" source_id=$ID limit=1 width=620 height=350 resize_mode="crop"}
+      <img class="object-cover w-full" src="{$IMAGE_URL}" alt="" loading="lazy" width="620" height="350">
+    {/loop}
+    {elseloop rel="info.img"}
+      <img class="object-cover w-full" src="//placehold.it/620x350" alt="" loading="lazy" width="620" height="350">
+    {/elseloop}
+
+    <div class="absolute text-white text-center opacity-0 group-hover:opacity-100 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all inset-0  duration-150 ease-in-out z-10 text-white flex flex-col items-center justify-center p-8">
+      <div class="btn">
+        {intl l="View content"}
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-main p-8 pb-16 text-white w-full">
+    <div class="text-2xl font-bold mb-2">{$TITLE}</div>
+    <div>{$CHAPO nofilter}</div>
+  </div>
+</a>

@@ -19,11 +19,12 @@ local/media/documents/*
 local/media/images/*
 !local/media/images/store/favicon.png
 !local/media/images/store/logo.png
-!local/media/images/store/banner.jpg
+!local/media/images/store/banner.png
 web/assets/*
 web/cache/*
 web/tinymce
 web/media
+web/dist
 phpdoc*.log
 xhprof/
 phpunit.phar
@@ -55,6 +56,10 @@ templates/*
 !templates/frontOffice
 templates/frontOffice/*
 !templates/frontOffice/default
+!templates/frontOffice/modern
+templates/frontOffice/modern/node_modules
+templates/frontOffice/modern/dist
+templates/frontOffice/modern/core
 !templates/backOffice
 templates/backOffice/*
 !templates/backOffice/default

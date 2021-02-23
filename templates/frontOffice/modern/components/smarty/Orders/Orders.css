@@ -1,0 +1,19 @@
+.Orders {
+  @apply w-full mb-6 mt-6 border border-gray-100 border-opacity-25 bg-gray-400;
+
+  .Orders-header {
+    @apply text-xl bg-gray-500;
+  }
+
+  .Order:nth-child(odd) {
+    @apply bg-gray-300;
+  }
+
+  .Orders-header, .Order {
+    @apply grid grid-cols-5;
+    @apply border-b border-gray-100 border-opacity-25 p-4;
+  }
+}
+
+
+

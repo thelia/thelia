@@ -1,0 +1,167 @@
+{extends file="layout.tpl"}
+
+{* Security *}
+{block name="no-return-functions" prepend}
+    {check_auth role="CUSTOMER" login_tpl="login"}
+    {check_cart_not_empty}
+    {check_valid_delivery}
+    {$is_checkout = true}
+{/block}
+
+{block name="init"}
+  {$checkoutLayout = true}
+{/block}
+
+{* Body Class *}
+{block name="body-class"}page-order-invoice{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [
+        ['title' => {intl l="Billing"}, 'url'=>{url path="/order/invoice"}]
+    ]}
+{/block}
+
+{block name="main-content"}
+
+
+<div class="container mx-auto my-24" role="main" aria-labelledby="main-label">
+
+          {include file="components/smarty/Title/Title.html" title={intl l="Billing Mode"}}
+
+          {form name="thelia.order.payment"}
+          {assign var="isPost" value=$smarty.post|count}
+          <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" {form_enctype}>
+              <div class="grid lg:grid-cols-2 gap-8">
+                <div>
+                  <div class="panel">
+                      <div class="font-bold text-lg mb-4">{intl l="Your payment method"}</div>
+                      <div class="">
+                          <div class="">
+                          {form_hidden_fields}
+                              {if $form_error}
+                                {include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$form_error_message}
+                              {/if}
+
+                              {form_field field='payment-module'}
+                                  <div id="payment-method" class="">
+                                  {if $error}
+                                    {include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$message}
+                                  {/if}
+
+
+                                  {loop type="payment" name="payments" force_return="true"}
+                                      {assign "paymentModuleId" $ID}
+                                      {assign "paymentModuleCode" $CODE}
+                                      <div class="odd:bg-gray-100 cursor-pointer divide-y-0 divide-gray-200">
+                                        <div class="flex flex-wrap items-center">
+
+                                            <div class="mr-8" >
+                                                <label for="payment_{$paymentModuleId}" >
+                                                {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width=50 height=50}
+                                                    <img src="{$IMAGE_URL nofilter}" alt="{intl l="Pay with %module_title" module_title={$TITLE}}">
+                                                {/loop}
+                                                {elseloop rel="paymentspicture"}
+                                                  <img src="//placehold.it/50x50" alt="{intl l="Pay with %module_title" module_title={$TITLE}}">
+                                                {/elseloop}
+                                                </label>
+                                            </div>
+
+                                            <div class="">
+                                              {if ($LOOP_TOTAL == 1 && $LOOP_COUNT == 1)}
+                                                {$checked = true}
+                                              {elseif $LOOP_COUNT == 1}
+                                                {$checked = true}
+                                              {else}
+                                                {$checked = false}
+                                              {/if}
+                                              <div>
+                                                {include
+                                                  file="components/smarty/Checkbox/Checkbox.html"
+                                                  name=$name
+                                                  value=$paymentModuleId
+                                                  id="payment_{$paymentModuleId}"
+                                                  type="radio"
+                                                  checked=$checked
+                                                  label=$TITLE
+                                                }
+                                                <div class="text-md text-gray-500">{$DESCRIPTION|strip_tags nofilter}</div>
+                                              </div>
+                                            </div>
+
+                                        </div>
+                                      </div>
+                                      {hook name="order-invoice.payment-extra" module={$paymentModuleId}}
+                                  {/loop}
+
+
+                                  </div>
+                              {/form_field}
+
+                              <div class="mt-16">
+                                {form_field field="agreed"}
+                                  {loop name="content-terms" type="folder" id=24}
+                                      {$termsAndConditionsUrl=$URL}
+                                  {/loop}
+
+                                  {include
+                                    file="components/smarty/Checkbox/Checkbox.html"
+                                    name=$name
+                                    value=$value
+                                    id=$label_attr.for
+                                    type="checkbox"
+                                    checked=$checked
+                                    label={intl l="By validating my order, I understand that I must make a payment and declare that I have read and accepted without reservation the <a href='%link' class=' underline' data-target-modal='#cgvModal'>General Sales Conditions</a> of %store" store={config key="store_name"} link=$termsAndConditionsUrl}
+                                  }
+                                {/form_field}
+                              </div>
+
+                              <div class="mt-16">
+                                  <button type="submit" class="btn"><span>{intl l="Next step"}</span></button>
+                              </div>
+
+
+                          </div>
+                      </div>
+                  </div>
+                </div>
+                <div class="panel">
+                    <div class="font-bold text-lg mb-4">{intl l="Order Summary"}</div>
+                    <div class="">
+                        <div class="">
+                            {include file="components/smarty/RecapInvoice/RecapInvoice.html"}
+                        </div>
+                    </div>
+                </div>
+              </div>
+          </form>
+          {/form}
+      </div>
+{/block}
+
+{block name="javascript-initialization"}
+
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="order-invoice.after-javascript-include"}
+{/block}
+
+
+{block name="modals"}
+
+
+
+{loop name="folder-terms" type="content" id={config key="terms_conditions_content_id"}}
+  {capture "modalContent"}
+    <div class="">
+      {$DESCRIPTION nofilter}
+    </div>
+  {/capture}
+  {capture "modalTitle"}
+      {$TITLE nofilter}
+  {/capture}
+{/loop}
+
+    {include file="components/smarty/Modal/Modal.html" id="cgvModal" content=$smarty.capture.modalContent title=$smarty.capture.modalTitle}
+{/block}

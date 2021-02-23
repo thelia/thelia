@@ -1,0 +1,141 @@
+{$categoriesSelected=$categories|default:$smarty.get.categories|default:[]}
+{$product_page={$page|default:{$smarty.get.page|default:1}}}
+{$product_order={$order|default:{$smarty.get.order|default:"alpha"}}}
+{$types = $types|default:$smarty.get.types|default:[]}
+{$brands=$brands|default:$smarty.get.brands|default: []}
+{$featuresSelected=$features|default:$smarty.get.features|default: []}
+{$min_price=$min_price|default:$smarty.get.min_price|default: 0}
+{$max_price=$max_price|default:$smarty.get.max_price|default: 9999999}
+
+{foreach from=$featuresSelected key=featureKey item=featureValue}
+    {if !is_array($featureValue)}
+        {$featuresSelected[$featureKey] = [$featureValue]}
+    {/if}
+{/foreach}
+{$min_price={$min_price|default:{$smarty.get.min_price|default: 0}}}
+{$max_price={$max_price|default:{$smarty.get.max_price|default: 5000}}}
+
+<div class="fixed inset-0 z-10 p-8 overflow-x-auto bg-gray-200 bg-opacity-75 CategoryMenu-wrapper lg:bg-transparent lg:p-0 lg:pt-8 lg:sticky max-h-screen-header lg:max-h-none lg:overflow-x-visible">
+  <div class="px-6 pt-6 mb-8 shadow panel CategoryMenu lg:py-2">
+
+    <div class="mb-8 lg:hidden">
+      <button class="block w-full btn btn--dark" data-toggle-form-filters>{intl l="Close filters"}</button>
+    </div>
+
+      <form action="{url path="/filters/product"}" class="" data-form-filters>
+
+          <input type="hidden" name="category_id" id="CategoryMenu-categories" value="{$category_id}">
+
+          {* on désactive  le cache quand filtre  actif *}
+          {if $min_price != 0 || $max_price != 5000 || $featuresSelected|count || $brands|count || $categoriesSelected|count}
+              {$ttl = 0}
+          {else}
+              {$ttl = 36000}
+          {/if}
+
+          {cache key="category-sidebar" ttl=0 product_order=$product_order category_id=$category_id categoriesSelected=$categoriesSelected brands=$brands featuresSelected=$featuresSelected}
+          <div class="divide-y divide-gray-400">
+          {loop name="choice_filter" type="choice_filter" category_id=$category_id}
+              {if $TYPE == "feature" and $VISIBLE}
+                  {loop type="feature" name="feature-$ID" id=$ID}
+                      {$show = false}
+                      {$featureID = $ID}
+
+                      {loop type="feature-availability" name="feature.avail.category" feature=$ID order="alpha"}
+                        {if {count type="product" name="test" category=$category_id depth=5 feature_availability="{$featureID}:{$ID}"} > 0}
+                          {$show = true}
+                        {/if}
+                      {/loop}
+
+                      {ifloop rel="feature.avail.category"}
+                      {if $show}
+                      <div class="py-4">
+                          <div class="mb-4 text-lg font-bold">
+                              {$TITLE}
+                          </div>
+                          <div class="">
+                              {loop type="feature-availability" name="feature.avail.category" feature=$ID order="alpha"}
+                                  <div>
+                                    {include
+                                      file="components/Checkbox/Checkbox.html"
+                                      id="customCheckbox-{$featureID}-{$ID}"
+                                      name="features[{$featureID}][]"
+                                      value=$ID
+                                      label=$TITLE
+                                      CheckboxClass="mb-4"
+                                      checked=$featuresSelected[$featureID] && $ID|in_array:$featuresSelected[$featureID]
+                                    }
+                                  </div>
+                              {/loop}
+                            </div>
+                        </div>
+                          {/if}
+                      {/ifloop}
+                  {/loop}
+              {elseif $TYPE == "brand" and $VISIBLE}
+                  {ifloop rel="brands-list"}
+                  <div class="py-4">
+                    <div class="mb-4 text-lg font-bold">
+                          {intl l="Brands"}
+                    </div>
+                      <div class="collapse">
+                          {loop type="brand" name="brands-list" categories=$category_id order="alpha"}
+                          <div>
+                            {include
+                              file="components/Checkbox/Checkbox.html"
+                              id="customBrand-{$ID}"
+                              name="brands[]"
+                              value=$ID
+                              label=$TITLE
+                              CheckboxClass="mb-4"
+                              checked=$ID|in_array:$brands
+                            }
+                          </div>
+                          {/loop}
+                      </div>
+                  </div>
+                  {/ifloop}
+              {elseif $TYPE == "category" and $VISIBLE}
+                  {ifloop rel="categoryFilter"}
+                      <div class="py-4">
+                          <div class="mb-4 text-lg font-bold">
+                                {intl l="Categories"}
+                          </div>
+                          <div class="collapse ">
+                              {loop type="category" name="categoryFilter" parent=$category_id order="alpha"}
+                              <div>
+                                {include
+                                  file="components/Checkbox/Checkbox.html"
+                                  id="customCheckbox-{$ID}"
+                                  name="categories[]"
+                                  value=$ID
+                                  label=$TITLE
+                                  CheckboxClass="mb-4"
+                                  checked=$ID|in_array:$categoriesSelected
+                                }
+                              </div>
+                              {/loop}
+                          </div>
+                      </div>
+                  {/ifloop}
+              {elseif $TYPE == "price" and $VISIBLE}
+                  <div class="py-4">
+                      <div class="flex justify-between mb-4 text-lg font-bold">
+                          <span>{intl l="Price"}</span> <span class="text-sm text-gray-100" {literal}onclick="document.getElementById('min_price').value = ''; document.getElementById('max_price').value = ''; document.getElementById('CategoryMenu-categories').dispatchEvent(new Event('change', {'bubbles': true}))" {/literal}>{intl l="Reset"}</span>
+                      </div>
+                      <div class="flex -mx-4">
+                        <div class="w-16 mx-4">
+                          {include file="components/smarty/Input/Input.html" small=true name="min_price" id="min_price" value=$min_price label={intl l="Min price"}}
+                        </div>
+                        <div class="w-16 mx-4">
+                          {include file="components/smarty/Input/Input.html" small=true name="max_price" id="max_price" value=$max_price label={intl l="Max price"}}
+                        </div>
+                      </div>
+                  </div>
+              {/if}
+          {/loop}
+          </div>
+          {/cache}
+      </form>
+  </div>
+</div>

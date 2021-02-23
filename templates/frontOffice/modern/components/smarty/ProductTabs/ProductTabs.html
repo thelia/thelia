@@ -1,0 +1,31 @@
+<section class="ProductTabs">
+{hookblock name="product.additional" product=$product_id fields="id,class,title,content"}
+<ul class="nav" role="tablist">
+    {if $DESCRIPTION}
+      <li class="nav-item" role="presentation"><a class="nav-link active" id="tab1" href="#tab_description" data-toggle="tab" role="tab">{intl l="Description"}</a></li>
+    {/if}
+    {loop name="tabs" type="tabs" product="$ID" order="manual_reverse"}
+      <li class="nav-item" role="presentation"><a class="nav-link" id="tab1" href="#tab_{$ID}" data-toggle="tab" role="tab">{$TITLE}</a></li>
+    {/loop}
+</ul>
+<div class="tab-content">
+    {if $DESCRIPTION}
+    <div class="tab-pane fade show active" id="tab_description" itemprop="description" role="tabpanel" aria-labelledby="tab_description">
+        <div>{$DESCRIPTION|default:'N/A' nofilter}</div>
+    </div>
+    {/if}
+
+    {loop name="tabs" type="tabs" product="$ID" order="manual_reverse"}
+    <div class="tab-pane fade" id="tab_{$ID}" itemprop="description" role="tabpanel" aria-labelledby="tab_{$ID}">
+        <div>{$DESCRIPTION nofilter}</div>
+    </div>
+    {/loop}
+
+    {forhook rel="product.additional"}
+    <div class="tab-pane fade" id="{$id}" role="tabpanel" aria-labelledby="tab{$id}">
+        {$content nofilter}
+    </div>
+    {/forhook}
+</div>
+{/hookblock}
+</section>

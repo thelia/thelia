@@ -1,0 +1,17 @@
+<div class="HeroImage relative overflow-hidden">
+  <img src="{$img}" class="object-cover w-full h-half-screen" alt="" loading="lazy" width="1960" height="50vh">
+  <div class="absolute inset-0 flex items-center justify-center flex-col">
+    {if $title}
+      <h1 class="text-5xl text-gray-700 font-bold">{$title}</h1>
+    {/if}
+    {if $subtitle}
+      <div class="uppercase text-gray-700 font-medium">{$subtitle}</div>
+    {/if}
+    {if $description}
+    <hr class="border-main w-full my-8 max-w-lg">
+    <div class="text-center text-gray-700 font-light max-w-2xl px-8">
+      {$description nofilter}
+    </div>
+    {/if}
+  </div>
+</div>

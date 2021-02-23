@@ -1,0 +1,22 @@
+<nav class="hidden lg:block w-full py-6" role="navigation" aria-labelledby="BreadCrumb-label">
+
+    <ol class="BreadCrumb list-reset flex" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <li class="BreadCrumb-item px-1 inline-block text-gray-500" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+          <a href="{navigate to="index"}" title="{intl l="Home"}" itemprop="item" itemscope itemtype="http://schema.org/Thing" itemid="{navigate to="index"}">
+                <span itemprop="name">{intl l="Home"}</span>
+            </a>
+            <meta itemprop="position" content="0" />
+        </li>
+        {foreach from=$breadcrumbs item='breadcrumb' name="breadcrumbsItems" }
+            {if $breadcrumb.title}
+                <li class="BreadCrumb-item px-1 inline-block {if $breadcrumb@last}active{/if}" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                  <a href="{$breadcrumb.url|default:'#' nofilter}" title="{$breadcrumb.title|unescape}" itemprop="item" itemscope itemtype="http://schema.org/Thing" itemid="{$breadcrumb.url|default:'#' nofilter}">
+                    <span itemprop="name">{$breadcrumb.title|unescape}</span>
+                    <meta itemprop="url" content="{$breadcrumb.url|default:'#' nofilter}" />
+                  </a>
+                  <meta itemprop="position" content="{$smarty.foreach.breadcrumbsItems.index + 1}" />
+                </li>
+            {/if}
+        {/foreach}
+    </ol>
+</nav>

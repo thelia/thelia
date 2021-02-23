@@ -1,0 +1,39 @@
+{extends file="layout.tpl"}
+
+{* Body Class *}
+{block name="body-class"}page-currency{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [
+        ['title' => {intl l="Currency"}, 'url'=>{url path="/currency"}]
+    ]}
+{/block}
+
+
+{block name="main-content"}
+    <div class="main">
+        <article class="col-main" role="main" aria-labelledby="main-label">
+            <h1 id="main-label" class="page-header">{intl l="SELECT YOUR CURRENCY"}</h1>
+            {hook name="currency.top"}
+            <ul class="nav nav-tabs nav-justified" style="margin-bottom:60px;">
+            {loop type="currency" name="currency_available"}
+              <li{if $ID eq {currency attr="id"}} class="active"{/if}><a href="{url current="1" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
+            {/loop}
+            </ul>
+            {hook name="currency.bottom"}
+        </article>
+    </div>
+{/block}
+
+{block name="stylesheet"}
+{hook name="currency.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="currency.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="currency.javascript-initialization"}
+{/block}
