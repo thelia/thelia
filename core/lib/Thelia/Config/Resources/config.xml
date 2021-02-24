@@ -196,6 +196,10 @@
         <service id="stack_factory" alias="Stack\Builder" public="true" />
 
         <service id="base_http_kernel" alias="Thelia\Core\TheliaHttpKernel" public="true"/>
+        <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel" public="true">
+          <factory service="stack_factory" method="resolve" />
+          <argument type="service" id="base_http_kernel" />
+        </service>
 
         <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory" />
 
@@ -231,10 +235,7 @@
           <tag name="controller.argument_value_resolver" priority="-150" />
         </service>
 <!--      end todo-->
-        <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel" public="true">
-            <factory service="stack_factory" method="resolve" />
-            <argument type="service" id="base_http_kernel" />
-        </service>
+
 
         <service id="request" alias="Thelia\Core\HttpFoundation\Request" />
 

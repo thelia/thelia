@@ -24,17 +24,7 @@
 
         <service id="smarty.plugin.format" alias="TheliaSmarty\Template\Plugins\Format"/>
 
-        <service id="TheliaSmarty\Template\Plugins\TheliaLoop" public="true">
-            <tag name="thelia.parser.register_plugin"/>
-            <argument type="service" id="service_container" />
-            <argument type="service" id="request_stack" />
-            <argument type="service" id="event_dispatcher" />
-            <argument type="service" id="thelia.securityContext" />
-            <argument type="service" id="thelia.translator" />
-            <argument>%kernel.debug%</argument>
-            <argument>%Thelia.parser.loops%</argument>
-        </service>
-        <service id="smarty.plugin.thelialoop" alias="TheliaSmarty\Template\Plugins\TheliaLoop"/>
+        <service id="smarty.plugin.thelialoop" alias="TheliaSmarty\Template\Plugins\TheliaLoop" public="true"/>
 
         <service id="smarty.plugin.cartpostage" alias="TheliaSmarty\Template\Plugins\CartPostage"/>
 

@@ -25,6 +25,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Model\ProductQuery;
 use Thelia\Tools\TokenProvider;
 
 /**
@@ -328,9 +329,6 @@ abstract class AbstractCrudController extends BaseAdminController
             return $response;
         }
 
-        // Error (Default: false)
-        $error_msg = false;
-
         // Create the Creation Form
         $creationForm = $this->getCreationForm();
 
@@ -388,23 +386,24 @@ abstract class AbstractCrudController extends BaseAdminController
             return $response;
         } catch (FormValidationException $ex) {
             // Form cannot be validated
-            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+            $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
+            $errorCode = 400;
         } catch (\Exception $ex) {
             // Any other error
-            $error_msg = $ex->getMessage();
+            $errorMessage = $ex->getMessage();
+            $errorCode = 500;
         }
 
-        if (false !== $error_msg) {
-            $this->setupFormErrorContext(
-                $translator->trans('%obj creation', ['%obj' => $this->objectName]),
-                $error_msg,
-                $creationForm,
-                $ex
-            );
+        // At this point, the form has error, and should be redisplayed.
+        $this->setupFormErrorContext(
+            $translator->trans('%obj creation', ['%obj' => $this->objectName]),
+            $errorMessage,
+            $creationForm,
+            $ex
+        );
 
-            // At this point, the form has error, and should be redisplayed.
-            return $this->renderList();
-        }
+        return $this->renderList()
+            ->setStatusCode($errorCode);
     }
 
     /**
@@ -508,23 +507,24 @@ abstract class AbstractCrudController extends BaseAdminController
             return $response;
         } catch (FormValidationException $ex) {
             // Form cannot be validated
-            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+            $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
+            $errorCode = 500;
         } catch (\Exception $ex) {
             // Any other error
-            $error_msg = $ex->getMessage();
+            $errorMessage = $ex->getMessage();
+            $errorCode = 400;
         }
 
-        if (false !== $error_msg) {
-            // At this point, the form has errors, and should be redisplayed.
-            $this->setupFormErrorContext(
-                $translator->trans('%obj modification', ['%obj' => $this->objectName]),
-                $error_msg,
-                $changeForm,
-                $ex
-            );
+        // At this point, the form has errors, and should be redisplayed.
+        $this->setupFormErrorContext(
+            $translator->trans('%obj modification', ['%obj' => $this->objectName]),
+            $errorMessage,
+            $changeForm,
+            $ex
+        );
 
-            return $this->renderEditionTemplate();
-        }
+        return $this->renderEditionTemplate()
+            ->setStatusCode($errorCode);
     }
 
     /**
@@ -680,7 +680,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             return $response;
         } catch (\Exception $e) {
-            return $this->renderAfterDeleteError($parserContext, $e);
+            return $this->renderAfterDeleteError($parserContext, $e)->setStatusCode(400);
         }
     }
 

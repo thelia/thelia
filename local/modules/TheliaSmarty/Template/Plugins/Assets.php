@@ -104,3 +104,5 @@ class Assets extends AbstractSmartyPlugin
         ];
     }
 }
+
+
