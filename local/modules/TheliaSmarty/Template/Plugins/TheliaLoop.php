@@ -67,6 +67,9 @@ class TheliaLoop extends AbstractSmartyPlugin
     /** @var array */
     protected $theliaParserLoops;
 
+    /** @var string */
+    protected $kernelEnvironment;
+
     /**
      * TheliaLoop constructor.
      */
@@ -77,7 +80,8 @@ class TheliaLoop extends AbstractSmartyPlugin
         SecurityContext $securityContext,
         TranslatorInterface $translator,
         bool $kernelDebug,
-        array $theliaParserLoops
+        array $theliaParserLoops,
+        string $kernelEnvironment
     ) {
         $this->container = $container;
         $this->requestStack = $requestStack;
@@ -88,6 +92,7 @@ class TheliaLoop extends AbstractSmartyPlugin
         $this->isDebugActive = $kernelDebug;
         $this->theliaParserLoops = $theliaParserLoops;
         $this->setLoopList($theliaParserLoops);
+        $this->kernelEnvironment = $kernelEnvironment;
     }
 
     /**
@@ -472,7 +477,8 @@ class TheliaLoop extends AbstractSmartyPlugin
             $this->dispatcher,
             $this->securityContext,
             $this->translator,
-            $this->theliaParserLoops
+            $this->theliaParserLoops,
+            $this->kernelEnvironment
         );
 
         $loop->initializeArgs($smartyParams);

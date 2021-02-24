@@ -45,13 +45,12 @@ class WebTestCase extends BaseWebTestCase
         /** @var ConnectionWrapper $connection */
         $connection = Propel::getConnection(ProductTableMap::DATABASE_NAME);
         self::$connection = $connection->getWrappedConnection();
-
-        self::$connection->beginTransaction();
+//        self::$connection->beginTransaction();
     }
 
     protected function tearDown(): void
     {
-        self::$connection->rollBack();
+//        self::$connection->rollBack();
 
         if (self::$session === null) {
             self::$session = self::$client->getRequest()->getSession();

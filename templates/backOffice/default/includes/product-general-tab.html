@@ -117,7 +117,7 @@
                         <option value="0">{intl l="No brand"}</option>
 
                         {loop name="brand-list" type="brand" visible="*" return_url=false}
-                            <option value="{$ID}" {if $BRAND_ID == $ID}selected="selected"{/if}>{$TITLE}</option>
+                            <option value="{$ID}" {if $BRAND_ID == $ID}selected{/if}>{$TITLE}</option>
                         {/loop}
                     </select>
                 {/custom_render_form_field}
