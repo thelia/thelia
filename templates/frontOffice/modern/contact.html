@@ -7,13 +7,12 @@
 
 {block name="main-content"}
 
-    {include file="components/smarty/PageHeader/PageHeader.html" TITLE={intl l="Contact Us"}}
+
+    {loop name="brand.info" type="brand" id=$brand_id limit="1"}
+      {include file="components/smarty/PageHeader/PageHeader.html" TITLE={intl l="Contact Us"}}
+    {/loop}
 
     <div class="container mx-auto mb-24">
-
-        {ifhook rel="contact.top"}
-          {hook name="contact.top"}
-        {/ifhook}
 
         {block name="contact-form"}
             {form name="thelia.front.contact"}
@@ -23,58 +22,68 @@
                 {hook name="contact.form-top"}
 
                 <fieldset id="contact-info" class="mt-5">
-                    {if $form_error}
-                        <span class="bg-red-400 p-4 w-full text-white block">{$form_error_message}</span>
-                    {/if}
-                    <div class="mt-5">
-                        <div>
+
+                    <div class="grid gap-4">
+
                         {form_field field="name"}
-                            <div class="form-group">
-                                <label for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
-                                <div >
-                                    <input type="text" name="{$name}" id="{$label_attr.for}"  maxlength="255" placeholder="{intl l="Placeholder contact name"}" value="{$value}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
-                                    {if $error}
-                                        <span class="help-block">{$message}</span>
-                                        {assign var="error_focus" value="true"}
-                                    {elseif $value != "" && !$error}
-                                        <span class="help-block"><i class="fa fa-check"></i></span>
-                                    {/if}
-                                </div>
-                            </div>
+                          {include
+                            file="components/smarty/Input/Input.html"
+                            type="text"
+                            name=$name
+                            label=$label
+                            value=$value
+                            placeholder={intl l="Placeholder contact name"}
+                            id="{$label_attr.for}-mini"
+                            required=true
+                          }
                         {/form_field}
                         {form_field field="email"}
-                          <div class="form-group">
-                                <label for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
-                                <div>
-                                    <input type="email" name="{$name}" id="{$label_attr.for}" maxlength="255" placeholder="{intl l="Placeholder contact email"}" value="{$value}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
-                                    {if $error}
-                                        <span class="help-block">{$message}</span>
-                                        {assign var="error_focus" value="true"}
-                                    {/if}
-                                </div>
-                            </div>
+                          {include
+                            file="components/smarty/Input/Input.html"
+                            type="password"
+                            name=$name
+                            label=$label
+                            value=$value
+                            placeholder={intl l="Placeholder contact password"}
+                            id="{$label_attr.for}-mini"
+                            required=true
+                          }
                         {/form_field}
-                        </div>
                         {form_field field="subject"}
-                            <div class="form-group">
-                                <label for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
-                                  <input type="text" name="{$name}" id="{$label_attr.for}" maxlength="255" placeholder="{intl l="Placeholder contact subject"}" value="{$value}" {if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
-                                  {if $error}
-                                      <span class="help-block">{$message}</span>
-                                      {assign var="error_focus" value="true"}
-                                  {/if}
-                            </div>
+                          {include
+                            file="components/smarty/Input/Input.html"
+                            type="text"
+                            name=$name
+                            label=$label
+                            value=$value
+                            placeholder={intl l="Placeholder contact subject"}
+                            id="{$label_attr.for}-mini"
+                            required=true
+                          }
                         {/form_field}
                         {form_field field="message"}
-                          <div class="form-group">
-                              <label for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
-                                <textarea name="{$name}" id="{$label_attr.for}" placeholder="{intl l="Placeholder contact message"}" rows="6" {if $required} aria-required="true" required{/if}>{$value}</textarea>
-                                {if $error}
-                                    <span class="help-block">{$message}</span>
-                                    {assign var="error_focus" value="true"}
-                                {/if}
+                        <div for="{$id}" class="block mb-2 text-sm text-gray-600">
+                          <label class="font-bold text-sm {if $error}text-red-500{else}text-gray-700{/if}">
+                            {$label}
+                          </label>
+                          <textarea
+                            name="{$name}"
+                            id="{$label_attr.for}"
+                            placeholder="{intl l="Placeholder contact message"}"
+                            rows="6"
+                            class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if $error}border-red-500{else}border-gray-200{/if} {$inputClass}"
+                            {if $required} aria-required="true" required{/if}>
+                            {$value}
+                          </textarea>
+                          {if $error}
+                            <div class="mt-1">
+                              <span class="block mb-4 text-xs italic font-normal text-red-500">
+                                {$message}
+                              </span>
                             </div>
+                          {/if}
                         {/form_field}
+                      </div>
                     </div>
                 </fieldset>
 
@@ -90,6 +99,12 @@
             {/form}
         {/block}
 
+        {ifhook rel="contact.top"}
+          {hook name="contact.top"}
+        {/ifhook}
+        {elsehook rel="contact.top"}
+
+        {/elsehook}
 
         {hook name="contact.bottom"}
 

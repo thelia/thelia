@@ -274,7 +274,7 @@ function createConfig($faker, $folders, $contents, $con){
 
     // Store
     \Thelia\Model\ConfigQuery::write("store_name", "Thelia");
-    \Thelia\Model\ConfigQuery::write("store_description", "E-commerce solution based on Symfony 2");
+    \Thelia\Model\ConfigQuery::write("store_description", "E-commerce solution based on Symfony");
     \Thelia\Model\ConfigQuery::write("store_email", "Thelia");
     \Thelia\Model\ConfigQuery::write("store_address1", "5 rue Rochon");
     \Thelia\Model\ConfigQuery::write("store_city", "Clermont-Ferrrand");
