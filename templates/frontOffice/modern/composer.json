@@ -5,6 +5,6 @@
     "thelia/installer": "~1.1"
   },
   "extra": {
-    "installer-name": "default"
+    "installer-name": "modern"
   }
 }
