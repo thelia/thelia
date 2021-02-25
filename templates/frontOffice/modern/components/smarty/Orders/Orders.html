@@ -1,11 +1,14 @@
 <div class="Orders">
 
       {ifloop rel="customer.orders"}
-        <div class="Orders-header">
+        <div class="Orders-header text-white">
           <strong class="Orders-header-text">{intl l="Order"}</strong>
           <strong class="Orders-header-text">{intl l="Date"}</strong>
           <strong class="Orders-header-text">{intl l="Status"}</strong>
-          <strong class="Orders-header-text is-last">{intl l="Amount"}</strong>
+          <strong class="Orders-header-text">{intl l="Amount"}</strong>
+          <strong class="Orders-header-text">{intl l="Invoice REF"}</strong>
+          <strong class="Orders-header-text">{intl l="PDF invoice"}</strong>
+          <strong class="Orders-header-text is-last">{intl l="Delivery REF"}</strong>
         </div>
 
         {loop type="order" name="customer.orders"}
@@ -17,10 +20,15 @@
             <div>
               {format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}
             </div>
+          {if $IS_PAID}
+            <div>
+              {$INVOICE_REF}
+            </div>
             <div>
               <a href="{url path="/account/order/pdf/invoice/%id" id=$ID}">{intl l="Invoice"}</a>
             </div>
-
+            <div>{$DELIVERY_REF}</div>
+          {/if}
         </div>
         {/loop}
       {/ifloop}

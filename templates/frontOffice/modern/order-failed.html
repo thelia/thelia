@@ -18,40 +18,22 @@
 
 {block name="main-content"}
     <div class="main">
-        <article class="col-main clearfix" role="main" aria-labelledby="main-label">
-
-            <h1 id="main-label" class="page-header">{intl l="Your Cart"}</h1>
+      <article class="container mx-auto my-24" role="main" aria-labelledby="main-label">
 
             {hook name="order-failed.top"}
 
-            {include file="misc/checkout-progress.tpl" step="last"}
-
             <div id="payment-failure">
-                <div>
-                    <h3>
-                        {loop type="order" name="failed-order" id=$failed_order_id}
-                            {intl l="You choose to pay by"} : <span class="payment-method label label-primary">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span>
-                        {/loop}
-                        {elseloop rel="failed-order"}
-                            {intl l="Your order payment"}
-                        {/elseloop}
-                    </h3>
-                </div>
-
-                <div>
-                    <h3>{intl l="We're sorry, a problem occured and your payment was not successful."}</h3>
-                    {if null !== $failed_order_message}
-                        <p>{$failed_order_message}</p>
-                    {/if}
-
-                    <a href="{url path="/order/invoice"}" role="button" class="Button">{intl l="Try again"}</a>
-                </div>
+                  {include file="components/smarty/Alert/Alert.html" type="warning" title={intl l="We're sorry, a problem occured and your payment was not successful."} message=$failed_order_message}
             </div>
 
             {hook name="order-failed.bottom"}
 
-            <a href="{navigate to="index"}" role="button" class="Button">{intl l="Go home"}</a>
-
+            <div class="text-center">
+              <a href="{url path="/order/invoice"}" role="button" class="btn mt-5">{intl l="Try again"}</a>
+            </div>
+            <div class="text-center">
+                <a href="{navigate to="index"}" role="button" class="btn btn--secondary mt-5">{intl l="Go home"}</a>
+            </div>
         </article>
     </div>
 {/block}

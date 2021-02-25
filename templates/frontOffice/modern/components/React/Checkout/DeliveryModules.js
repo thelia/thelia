@@ -96,9 +96,9 @@ export default function DeliveryModules() {
 	)
 		return (
 			<Alert
-				title="warning"
-				message="No delivery mode available"
-				type="warning"
+        title={intl.formatMessage({ id: 'WARNING' })}
+        message={intl.formatMessage({ id: 'NO_DELIVERY_MODE_AVAILABLE' })}
+        type="warning"
 			/>
 		);
 

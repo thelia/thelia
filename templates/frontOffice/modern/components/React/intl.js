@@ -14,7 +14,8 @@ const messages = {
 		CLOSE: 'Fermer',
 		CHOOSE: 'Choisir',
 		UNDERSTOOD: "J'ai compris",
-		CHOOSE_DELIVERY_MODE: 'Choisir mon mode de livraison',
+    YOUR_ORDER: "Votre commande",
+    CHOOSE_DELIVERY_MODE: 'Choisir mon mode de livraison',
 		HOME_DELIVERY: 'Livraison à domicile',
 		PICKUP_DELIVERY: 'Livraison en point relais',
 		CHOOSE_DELIVERY_ADDRESS: 'Choisir mon adresse de livraison',
@@ -50,11 +51,6 @@ const messages = {
 		ADD_TO_CART: 'Ajouter au panier',
 		ERROR_ADD_CART: "Erreur lors de l'ajour au panier",
 		PRODUCT_UNAVAILABLE: 'Produit indisponible',
-		GUILLOCHAGE: 'guillochage',
-		ETCHING: 'Gravure',
-		WARNING_ETCHING: 'Avertissement gravure',
-		WARNING_ETCHING_MESSAGE:
-			'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
 		HELLO: 'Bonjour',
 		ACCOUNT: 'Mon profil',
 		MY_ORDERS: 'Mes commandes',
@@ -73,7 +69,22 @@ const messages = {
 		PICKUP: 'Livraison en point relais',
 		FREE: 'Offert',
 		FORGET_PASSWORD: 'Mot de passe oublié',
-		LOADING: 'Chargement'
+    LABEL_LABEL: 'Libellé',
+    CIVILITY_TITLE_LABEL: 'Titre',
+    FIRSTNAME_LABEL: 'Prénom',
+    LASTNAME_LABEL: 'Nom',
+    COMPANY_LABEL: 'Société',
+    ADDRESS_1_LABEL: 'Adresse',
+    ADDRESS_2_LABEL: 'Adresse suite',
+    ADDRESS_3_LABEL: 'Adresse fin',
+    ZIPCODE_LABEL: 'Code postal',
+    CITY_LABEL: 'Ville',
+    COUNTRY_LABEL: 'Pays',
+    CELLPHONE_LABEL: 'Numéro de portable',
+    PHONE_LABEL: 'Téléphone',
+    WARNING: "Attention",
+    NO_PAYMENT_MODE_AVAILABLE: "Aucun moyen de paiement n'est disponible",
+    NO_DELIVERY_MODE_AVAILABLE: "Aucun moyen de livraison n'est disponible"
 	},
 	'en-US': {
 		OK: 'OK',
@@ -121,12 +132,6 @@ const messages = {
 		ADD_TO_CART: 'add to cart',
 		ERROR_ADD_CART: 'Cannot add this product to your cart',
 		PRODUCT_UNAVAILABLE: 'Unavailable product',
-		GUILLOCHAGE: 'guilloche',
-		ETCHING: 'etching',
-		WARNING_ETCHING: 'Etching warning',
-		UNDERSTOOD: 'understood',
-		WARNING_ETCHING_MESSAGE:
-			'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
 		HELLO: 'Hello',
 		ACCOUNT: 'My Account',
 		MY_ORDERS: 'My orders',
@@ -146,8 +151,24 @@ const messages = {
 		FREE: 'Free',
 		FORGET_PASSWORD: 'I forgot my password',
 		LOADING: 'Loading',
-		YOUR_ORDER: 'Your order'
-	}
+		YOUR_ORDER: 'Your order',
+    LABEL_LABEL: 'Label',
+    CIVILITY_TITLE_LABEL: 'Title',
+    FIRSTNAME_LABEL: 'Firstname',
+    LASTNAME_LABEL: 'Name',
+    COMPANY_LABEL: 'Company',
+    ADDRESS_1_LABEL: 'Address',
+    ADDRESS_2_LABEL: 'Address next',
+    ADDRESS_3_LABEL: 'Address end',
+    ZIPCODE_LABEL: 'Zip code',
+    CITY_LABEL: 'City',
+    COUNTRY_LABEL: 'Country',
+    CELLPHONE_LABEL: 'Cellphone',
+    PHONE_LABEL: 'Phone',
+    WARNING: "Warning",
+    NO_PAYMENT_MODE_AVAILABLE: "No payment mode available",
+    NO_DELIVERY_MODE_AVAILABLE: "No delivery mode available"
+  }
 };
 
 export default messages;

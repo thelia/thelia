@@ -32,14 +32,14 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
 			onSubmit={handleSubmit(onSubmit)}
 		>
 			<Input
-				label="Label"
+				label={intl.formatMessage({ id: 'LABEL_LABEL' })}
 				name="label"
 				defaultValue={address.label}
 				ref={register({ required: 'Mandatory' })}
 				error={errors.label?.message}
 			/>
 			<Select
-				label="Title"
+				label={intl.formatMessage({ id: 'CIVILITY_TITLE_LABEL' })}
 				name="civilityTitle.id"
 				defaultValue={address.title}
 				options={titles}
@@ -47,21 +47,21 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
 				error={errors.title?.message}
 			/>
 			<Input
-				label="Firstname"
+				label={intl.formatMessage({ id: 'FIRSTNAME_LABEL' })}
 				name="firstName"
 				defaultValue={address.firstName}
 				ref={register({ required: 'Mandatory' })}
 				error={errors.firstName?.message}
 			/>
 			<Input
-				label="Lastname"
+				label={intl.formatMessage({ id: 'LASTNAME_LABEL' })}
 				name="lastName"
 				defaultValue={address.lastName}
 				ref={register({ required: 'Mandatory' })}
 				error={errors.lastName?.message}
 			/>
 			<Input
-				label="Company"
+				label={intl.formatMessage({ id: 'COMPANY_LABEL' })}
 				name="company"
 				defaultValue={address.company}
 				ref={register({ required: 'Mandatory' })}
@@ -69,7 +69,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
 			/>
 
 			<Input
-				label="Address"
+				label={intl.formatMessage({ id: 'ADDRESS_1_LABEL' })}
 				name="address1"
 				defaultValue={address.address1}
 				ref={register({ required: 'Mandatory' })}
@@ -77,14 +77,14 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
 			/>
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 				<Input
-					label="Complementary address"
+					label={intl.formatMessage({ id: 'ADDRESS_2_LABEL' })}
 					name="address2"
 					defaultValue={address.address2}
 					ref={register()}
 					error={errors.address2?.message}
 				/>
 				<Input
-					label="Complementary address 2"
+					label={intl.formatMessage({ id: 'ADDRESS_3_LABEL' })}
 					name="address3"
 					defaultValue={address.address3}
 					ref={register()}
@@ -92,7 +92,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
 				/>
 			</div>
 			<Input
-				label="Zipcode"
+				label={intl.formatMessage({ id: 'ZIPCODE_LABEL' })}
 				name="zipCode"
 				defaultValue={address.zipCode}
 				ref={register({ required: 'Mandatory' })}
@@ -100,7 +100,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
 			/>
 
 			<Input
-				label="City"
+				label={intl.formatMessage({ id: 'CITY_LABEL' })}
 				name="city"
 				defaultValue={address.city}
 				ref={register({ required: 'Mandatory' })}
@@ -108,7 +108,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
 			/>
 
 			<Select
-				label="Country"
+				label={intl.formatMessage({ id: 'COUNTRY_LABEL' })}
 				name="countryCode"
 				options={countries}
 				defaultValue={address.countryCode}
@@ -118,14 +118,14 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
 
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 				<Input
-					label="Cellphone number"
+					label={intl.formatMessage({ id: 'CELLPHONE_LABEL' })}
 					name="cellphoneNumber"
 					defaultValue={address.cellphoneNumber}
 					ref={register({ required: 'Mandatory' })}
 					error={errors.cellphoneNumber?.message}
 				/>
 				<Input
-					label="Landline phone number"
+					label={intl.formatMessage({ id: 'PHONE_LABEL' })}
 					name="phoneNumber"
 					defaultValue={address.phoneNumber}
 					ref={register()}
@@ -139,7 +139,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
 				ref={register()}
 			/>
 
-			<div className="mt-8 text-center">
+			<div className="mt-8 mb-3 text-center">
 				<SubmitButton
 					label={intl.formatMessage({ id: 'SUBMIT' })}
 					isSubmitting={formState.isSubmitting}

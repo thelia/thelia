@@ -8,9 +8,7 @@
 {block name="main-content"}
 
 
-    {loop name="brand.info" type="brand" id=$brand_id limit="1"}
-      {include file="components/smarty/PageHeader/PageHeader.html" TITLE={intl l="Contact Us"}}
-    {/loop}
+    {include file="components/smarty/PageHeader/PageHeader.html" TITLE={intl l="Contact Us"}}
 
     <div class="container mx-auto mb-24">
 
@@ -32,7 +30,7 @@
                             name=$name
                             label=$label
                             value=$value
-                            placeholder={intl l="Placeholder contact name"}
+                            placeholder={intl l="You name"}
                             id="{$label_attr.for}-mini"
                             required=true
                           }
@@ -40,11 +38,11 @@
                         {form_field field="email"}
                           {include
                             file="components/smarty/Input/Input.html"
-                            type="password"
+                            type="text"
                             name=$name
                             label=$label
                             value=$value
-                            placeholder={intl l="Placeholder contact password"}
+                            placeholder={intl l="Your email"}
                             id="{$label_attr.for}-mini"
                             required=true
                           }
@@ -56,7 +54,7 @@
                             name=$name
                             label=$label
                             value=$value
-                            placeholder={intl l="Placeholder contact subject"}
+                            placeholder={intl l="The subject of your message"}
                             id="{$label_attr.for}-mini"
                             required=true
                           }
@@ -69,7 +67,7 @@
                           <textarea
                             name="{$name}"
                             id="{$label_attr.for}"
-                            placeholder="{intl l="Placeholder contact message"}"
+                            placeholder="{intl l="Your message"}"
                             rows="6"
                             class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if $error}border-red-500{else}border-gray-200{/if} {$inputClass}"
                             {if $required} aria-required="true" required{/if}>

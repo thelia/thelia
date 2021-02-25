@@ -10,7 +10,7 @@
   }
 
   .Orders-header, .Order {
-    @apply grid grid-cols-5;
+    @apply grid grid-cols-7;
     @apply border-b border-gray-100 border-opacity-25 p-4;
   }
 }

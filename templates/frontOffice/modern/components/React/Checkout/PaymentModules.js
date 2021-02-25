@@ -17,8 +17,8 @@ export default function PaymentModules() {
 	if (modules?.length === 0)
 		return (
 			<Alert
-				title="warning"
-				message="No payment mode available"
+        title={intl.formatMessage({ id: 'WARNING' })}
+        message={intl.formatMessage({ id: 'NO_PAYMENT_MODE_AVAILABLE' })}
 				type="warning"
 			/>
 		);

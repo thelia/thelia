@@ -11,16 +11,20 @@
 {/block}
 
 {block name="main-content"}
-<div class="main flex items-center justify-center h-full">
-    <article class="col-main" role="main" aria-labelledby="main-label">
+  <div class="main">
+    <article class="container mx-auto my-24" role="main" aria-labelledby="main-label">
+
         {ifhook rel="404.content"}
             {hook name="404.content"}
         {/ifhook}
         {elsehook rel="404.content"}
         <h1 id="main-label" class="text-center">
-            <div class="font-bold  text-3xl">404</div>
-            <div class="text-3xl">{intl l="The page cannot be found"}</div>
+            <div class="font-bold  text-9xl">404</div>
+            <div class="text-5xl">{intl l="The page cannot be found"}</div>
         </h1>
+        <div class="text-center">
+          <a href="{navigate to="index"}" role="button" class="btn mt-5">{intl l="Go home"}</a>
+        </div>
         {/elsehook}
     </article>
 </div>

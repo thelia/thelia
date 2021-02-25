@@ -824,7 +824,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                     break;
                 case 'logo':
                     $configKey = 'logo_file';
-                    $defaultImageName = 'logo.png';
+                    $defaultImageName = 'thelia.svg';
                     break;
                 case 'banner':
                     $configKey = 'banner_file';
