@@ -53,7 +53,7 @@ jobs:
           composer update --no-interaction --prefer-dist
       - name: Install Thelia
         run: |
-          php Thelia thelia:install --db_host=127.0.0.1:${{ job.services.mysql.ports['3306'] }} --db_username=root --db_name=thelia --db_password=thelia --front_template=default
+          php Thelia thelia:install --db_host=127.0.0.1:${{ job.services.mysql.ports['3306'] }} --db_username=root --db_name=thelia --db_password=thelia
           php setup/faker.php -r 0
           php Thelia module:refresh
           php Thelia module:activate CustomDelivery

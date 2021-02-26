@@ -57,7 +57,7 @@
                               {loop type="feature-availability" name="feature.avail.category" feature=$ID order="alpha"}
                                   <div>
                                     {include
-                                      file="components/Checkbox/Checkbox.html"
+                                      file="components/smarty/Checkbox/Checkbox.html"
                                       id="customCheckbox-{$featureID}-{$ID}"
                                       name="features[{$featureID}][]"
                                       value=$ID
@@ -82,7 +82,7 @@
                           {loop type="brand" name="brands-list" categories=$category_id order="alpha"}
                           <div>
                             {include
-                              file="components/Checkbox/Checkbox.html"
+                              file="components/smarty/Checkbox/Checkbox.html"
                               id="customBrand-{$ID}"
                               name="brands[]"
                               value=$ID
@@ -105,7 +105,7 @@
                               {loop type="category" name="categoryFilter" parent=$category_id order="alpha"}
                               <div>
                                 {include
-                                  file="components/Checkbox/Checkbox.html"
+                                  file="components/smarty/Checkbox/Checkbox.html"
                                   id="customCheckbox-{$ID}"
                                   name="categories[]"
                                   value=$ID

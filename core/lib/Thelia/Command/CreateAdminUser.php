@@ -78,8 +78,6 @@ class CreateAdminUser extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Please enter the admin user information:');
-
         /** @var Admin $admin */
         $admin = $this->getAdminInfo($input, $output);
 
