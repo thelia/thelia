@@ -119,6 +119,7 @@ function Item({
 	id,
 	images,
 	product,
+	productSaleElement,
 	price,
 	promo,
 	promoPrice,
@@ -144,10 +145,24 @@ function Item({
 				) : null}
 			</div>
 			<div className="flex-1 ml-6">
-				<div className="flex items-center justify-between mb-4">
-					<a href={product.url} className="font-bold">
-						{product.i18n.title}
-					</a>
+				<div className="flex items-start justify-between mb-4">
+					<div>
+						<a href={product.url} className="font-bold block">
+							{product.i18n.title}
+						</a>
+						<div className="text-sm text-gray-600">
+							{productSaleElement?.attributes?.map((attribute) => {
+								return (
+									<div key={attribute.id}>
+										{attribute?.i18n?.title}:{' '}
+										{attribute?.values
+											?.map((value) => value?.i18n?.title || '')
+											.join(' - ')}
+									</div>
+								);
+							})}
+						</div>
+					</div>
 					{canDelete ? <Delete id={id} /> : null}
 				</div>
 				<div className="flex flex-wrap items-center justify-between">

@@ -1,19 +1,37 @@
 .Orders {
-  @apply w-full mb-6 mt-6 border border-gray-100 border-opacity-25 bg-gray-400;
+	@apply w-full mb-6 mt-6 border border-gray-200 border-opacity-50;
 
-  .Orders-header {
-    @apply text-xl bg-gray-500;
-  }
+	.Orders-header {
+		@apply text-xl bg-gray-100;
+	}
 
-  .Order:nth-child(odd) {
-    @apply bg-gray-300;
-  }
+	.Orders-header {
+		display: none;
+	}
+	.OrderStatusLabel {
+		@apply: inline-flex;
+	}
 
-  .Orders-header, .Order {
-    @apply grid grid-cols-7;
-    @apply border-b border-gray-100 border-opacity-25 p-4;
-  }
+	.Orders-header,
+	.Order {
+		@apply border-gray-200 border-opacity-50 p-4 mb-2;
+		> div {
+			@apply mb-2 flex items-baseline divide-y divide-gray-100;
+		}
+
+		@screen xl {
+			@apply border-b grid grid-cols-7;
+			> div {
+				@apply mb-0 divide-y-0;
+			}
+		}
+	}
+
+	.Order-mobile-Label {
+		@apply font-bold inline-block mr-4;
+		min-width: 150px;
+		@screen xl {
+			@apply hidden;
+		}
+	}
 }
-
-
-

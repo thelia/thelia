@@ -1,7 +1,7 @@
 <div class="Orders">
 
       {ifloop rel="customer.orders"}
-        <div class="Orders-header text-white">
+        <div class="Orders-header ">
           <strong class="Orders-header-text">{intl l="Order"}</strong>
           <strong class="Orders-header-text">{intl l="Date"}</strong>
           <strong class="Orders-header-text">{intl l="Status"}</strong>
@@ -14,20 +14,33 @@
         {loop type="order" name="customer.orders"}
         <div class="Order">
 
-            <div>{intl l="N° %ref" ref=$REF}</div>
-            <div>{format_date date=$CREATE_DATE output="date"}</div>
-            {include file="components/smarty/OrderStatusLabel/OrderStatusLabel.html"}
             <div>
+              <div class="Order-mobile-Label">{intl l="Order"}</div>
+              {intl l="N° %ref" ref=$REF}
+            </div>
+            <div>
+              <div class="Order-mobile-Label">{intl l="Date"}</div>
+              {format_date date=$CREATE_DATE output="date"}
+            </div>
+            <div>
+              <div class="Order-mobile-Label">{intl l="Status"}</div>
+              {include file="components/smarty/OrderStatusLabel/OrderStatusLabel.html"}
+            </div>
+            <div>
+              <div class="Order-mobile-Label">{intl l="Amount"}</div>
               {format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}
             </div>
           {if $IS_PAID}
             <div>
-              {$INVOICE_REF}
+              <div class="Order-mobile-Label">{intl l="Invoice REF"}</div> {$INVOICE_REF}
             </div>
             <div>
+              <div class="Order-mobile-Label">{intl l="PDF invoice"}</div>
               <a href="{url path="/account/order/pdf/invoice/%id" id=$ID}">{intl l="Invoice"}</a>
             </div>
-            <div>{$DELIVERY_REF}</div>
+            <div>
+              <div class="Order-mobile-Label">{intl l="Delivery REF"}</div>
+              {$DELIVERY_REF}</div>
           {/if}
         </div>
         {/loop}

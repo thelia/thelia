@@ -40,7 +40,7 @@ function AttributeSelector({
 					return (
 						<div key={attribute.id} className="mb-4">
 							<div className="text-lg font-bold">{attribute.title}</div>
-							<div className="flex gap-2 mt-2">
+							<div className="flex gap-2 mt-2 flex-wrap">
 								{attribute.values.map((attrAv) => {
 									return (
 										<button
