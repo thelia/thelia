@@ -12,6 +12,7 @@
 
 namespace Thelia\Command;
 
+use Propel\Runtime\Propel;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,6 +22,8 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Propel\Schema\SchemaLocator;
+use Thelia\Core\PropelInitService;
 use Thelia\Core\Translation\Translator;
 use Thelia\Install\CheckPermission;
 use Thelia\Install\Database;
@@ -79,12 +82,6 @@ class Install extends ContainerAwareCommand
                 "database port",
                 "3306"
             )
-            ->addOption(
-                "front_template",
-                null,
-                InputOption::VALUE_OPTIONAL,
-                "Front template"
-            )
         ;
     }
 
@@ -110,6 +107,8 @@ class Install extends ContainerAwareCommand
             "port" => $input->getOption("db_port")
         );
 
+        var_dump($connectionInfo);
+
         while (false === $connection = $this->tryConnection($connectionInfo, $output)) {
             $connectionInfo = $this->getConnectionInfo($input, $output);
         }
@@ -134,31 +133,6 @@ class Install extends ContainerAwareCommand
         ));
 
         $this->createConfigFile($connectionInfo);
-
-        $helper = $this->getHelper('question');
-        $frontTemplate = null !== $input->getOption("front_template") ? $input->getOption("front_template") : "unknown";
-        while (false === is_dir(THELIA_TEMPLATE_DIR. 'frontOffice' . DS . $frontTemplate)) {
-            $frontTemplate = $this->enterData(
-                $helper,
-                $input,
-                $output,
-                "Which template do you want to use modern or default [default: modern] : ",
-                "You must choose a valid template",
-                false,
-                "modern"
-            );
-        }
-
-        if ($frontTemplate !== "default") {
-            ConfigQuery::write('active-front-template', $frontTemplate);
-        }
-
-        if ($frontTemplate === "modern") {
-            $command = $this->getApplication()->find('module:refresh');
-            $refreshInput = new ArrayInput([]);
-            $command->run($refreshInput, $output);
-            $this->initModernTemplatesRequirements($output);
-        }
 
         $output->writeln(array(
             "",

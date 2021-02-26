@@ -9,10 +9,10 @@ services:
       - .:/application
       - .docker/mysql-data:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=thelia
-      - MYSQL_USER=thelia
-      - MYSQL_PASSWORD=thelia
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
     ports:
       - "8086:3306"
 
@@ -35,19 +35,20 @@ services:
       - .docker/php-fpm/php-ini-overrides.ini:/etc/php/7.4/fpm/conf.d/99-overrides.ini
       - .docker/php-fpm/php-ini-overrides.ini:/etc/php/7.4/cli/conf.d/99-overrides.ini
     environment:
-      PHP_IDE_CONFIG: "serverName=thelia"
-      XDEBUG_CONFIG: "idekey=PHPSTORM"
+      - "PHP_IDE_CONFIG:serverName=thelia"
+      - "XDEBUG_CONFIG:idekey=PHPSTORM"
+      - TEMPLATE_NAME
 
   encore:
     build:
-      context: ./templates/frontOffice/modern
+      context: ./templates/frontOffice/${TEMPLATE_NAME}
       target: thelia_encore
     container_name: docker-thelia-encore
-    working_dir: /application/templates/frontOffice/modern
+    working_dir: /application/templates/frontOffice/${TEMPLATE_NAME}
     environment:
       BROWSERSYNC_PROXY: http://localhost:8081
     volumes:
-      - ./templates/frontOffice/modern:/application/templates/frontOffice/modern:delegated
-      - ./templates/frontOffice/modern/node_modules:/application/templates/frontOffice/modern/node_modules
+      - ./templates/frontOffice/${TEMPLATE_NAME}:/application/templates/frontOffice/${TEMPLATE_NAME}:delegated
+      - ./templates/frontOffice/${TEMPLATE_NAME}/node_modules:/application/templates/frontOffice/${TEMPLATE_NAME}/node_modules
     ports:
       - 8081:8081

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
 
 import React from 'react';
-import { setTerms } from '@js/redux/modules/checkout';
+import { setAcceptedTermsAndConditions } from '@js/redux/modules/checkout';
 import { useIntl } from 'react-intl';
 
 function createCheckoutResquest(checkout, addressCustomerId) {
@@ -11,7 +11,7 @@ function createCheckoutResquest(checkout, addressCustomerId) {
 		deliveryModuleId: checkout?.deliveryModule?.id,
 		paymentModuleId: checkout?.paymentModule?.id,
 		billingAddressId: checkout?.billingAddress?.id,
-		terms: checkout?.terms
+    acceptedTermsAndConditions: checkout?.acceptedTermsAndConditions
 	};
 
 	if (
@@ -51,7 +51,7 @@ export default function CheckoutBtn() {
 					className={`border-gray-300 border text-main focus:border-gray-300 focus:ring-main mt-1`}
 					id="validTerms"
 					onChange={() => {
-						dispatch(setTerms());
+						dispatch(setAcceptedTermsAndConditions());
 						btnRef?.current?.scrollIntoView({
 							behavior: 'smooth',
 							block: 'center'
@@ -72,7 +72,7 @@ export default function CheckoutBtn() {
 				disabled={
 					!checkout.deliveryModuleOption ||
 					!checkout.paymentModule ||
-					!checkout.terms
+					!checkout.acceptedTermsAndConditions
 				}
 			>
 				{intl.formatMessage({ id: 'VALIDATE_CHECKOUT' })}

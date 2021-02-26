@@ -7,7 +7,7 @@ const initialState = {
 	paymentModule: null,
 	deliveryAddress: null,
 	billingAddress: null,
-	terms: false,
+	acceptedTermsAndConditions: false,
 	comment: null
 };
 
@@ -41,8 +41,8 @@ export const checkoutSlice = createSlice({
 		setBillingAddress: (state, action) => {
 			state.billingAddress = action.payload;
 		},
-		setTerms: (state) => {
-			state.terms = !state.terms;
+		setAcceptedTermsAndConditions: (state) => {
+			state.acceptedTermsAndConditions = !state.acceptedTermsAndConditions;
 		}
 	}
 });
@@ -54,7 +54,7 @@ export const {
 	setPaymentModule,
 	setDeliveryAddress,
 	setBillingAddress,
-	setTerms
+	setAcceptedTermsAndConditions
 } = checkoutSlice.actions;
 
 export default checkoutSlice.reducer;

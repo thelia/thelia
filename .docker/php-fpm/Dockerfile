@@ -15,5 +15,7 @@ RUN apt-get update \
     && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
 RUN apt-get update \
-    &&  apt-get -y install vim \
+    && apt-get -y install vim \
     && apt-get clean;
+
+COPY docker-init.sh /usr/local/bin/docker-init

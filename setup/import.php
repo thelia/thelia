@@ -89,7 +89,6 @@ try {
     $folders = createFolders($faker, $con);
     $contents = createContents($faker, $folders, $con);
 
-    $categories = createCategories($faker, $con);
 
     echo "creating templates\n";
     $template = new \Thelia\Model\Template();
@@ -99,6 +98,8 @@ try {
         ->setLocale('en_US')
             ->setName('demo template')
         ->save($con);
+
+    $categories = createCategories($faker, $template->getId(), $con);
 
     $at = new Thelia\Model\AttributeTemplate();
 
@@ -429,7 +430,7 @@ function createBrands($faker, $con)
 }
 
 
-function createCategories($faker, $con)
+function createCategories($faker, $templateId, $con)
 {
     echo "start creating categories\n";
     $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
@@ -442,6 +443,7 @@ function createCategories($faker, $con)
             if($row==1) continue;
             $category = new \Thelia\Model\Category();
             $category
+                ->setDefaultTemplateId($templateId)
                 ->setVisible(1)
                 ->setPosition($row-1)
                 ->setParent(0)
