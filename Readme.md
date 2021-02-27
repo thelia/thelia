@@ -21,11 +21,11 @@ A repository containing all thelia modules is available at this address : https:
 Compatibility
 ------------
 
-|  | Thelia 2.1 | Thelia 2.2 | Thelia 2.3 | Thelia 2.4 |
-| ------------- |:-------------:| -----:| -----:| -----:|
-| PHP      | 5.4 5.5 5.6 | 5.4 5.5 5.6 | 5.5 5.6 7.0 7.1 | 7.0 7.1 7.2 7.3 |
-| MySQL    | 5.5 5.6 | 5.5 5.6 | 5.5 5.6 | 5.5 5.6 5.7 |
-| Symfony  | 2.3 | 2.3 | 2.8 | 2.8 |
+|  | Thelia 2.1 | Thelia 2.2 | Thelia 2.3 | Thelia 2.4 | (Soon) Thelia 2.5 |
+| ------------- |:-------------:| -----:| -----:| -----:| -----:|
+| PHP      | 5.4 5.5 5.6 | 5.4 5.5 5.6 | 5.5 5.6 7.0 7.1 | 7.0 7.1 7.2 7.3 | 7.2 7.3 7.4 8.0 |
+| MySQL    | 5.5 5.6 | 5.5 5.6 | 5.5 5.6 | 5.5 5.6 5.7 | 5.5 5.6 5.7 8.0 |
+| Symfony  | 2.3 | 2.3 | 2.8 | 2.8 | 5.2 |
 
 Requirements
 ------------
@@ -44,7 +44,6 @@ Requirements
     * upload\_max\_filesize 2M
     * date.timezone must be defined
 * Web Server Apache 2 or Nginx
-* MySQL 5
 
 
 ### MySQL 5.6
@@ -111,7 +110,7 @@ the following command : `php composer.phar run-script post-create-project-cmd`
 
 ## Install it
 
-You can install Thelia by two different way
+You can install Thelia by different way
 
 ### Using install wizard
 
@@ -137,12 +136,6 @@ https://thelia.net/install
 $ php Thelia thelia:install
 ```
 
-or if you use a Thelia project :
-
-``` bash
-$ php composer.phar run-script post-create-project-cmd
-```
-
 You just have to follow all instructions.
 
 ### Docker and docker compose
@@ -154,48 +147,24 @@ It requires obviously [docker](https://docker.com/) and [docker-compose](https:/
 
 To install Thelia within Docker, run :
 
-```
-docker-compose up -d
-docker-compose exec php-fpm composer install
-docker-compose exec php-fpm php Thelia thelia:install
+``` bash
+./start-docker.sh
 ```
 
-By default if you haven't changed the `docker-compose.yml` you'll have to answer these questions like this
+It will ask you for a template name (usually your project name) if you don't have a .env file but you can create the .env by yourself, take a look at .env.docker to make your own.
 
-``` 
-Database host [default: localhost] : mariadb
-``` 
-``` 
-Database port [default: 3306] : 3306
-```
-``` 
-Database name (if database does not exist, Thelia will try to create it) : thelia
-```
-
-``` 
-Database username : thelia
-```
-
-``` 
-Database pasword : thelia
-```
+If your folder template does not exist it will copy the "modern" template.
 
 Next just go to http://localhost:8080 and you should see your Thelia installed !
 
-tip : create an alias for docker-compose, it's boring to write it all the time
+And run the same command everytime you want launch your Thelia.
 
-If you want add some sample data just execute this command (still in your container)
+If you want add some sample data just add the option `-demo`
 ``` bash
-docker-compose exec php-fpm php setup/import.php
+./start-docker.sh -demo
 ```
 
-If you want to access your database from your computer (with DBeaver, Sequel Pro or anything else) by default the host is `localhost` and the port is `8086` 
-
-Obviously you can modify all the configuration for your own case, for example the php version or add environment variable for the database configuration. Each time you modify the configuration, you have to rebuild it :
-
-```
-docker-compose build --no-cache
-```
+If you want to access your database from your computer (with DBeaver, Sequel Pro or anything else) by default the host is `localhost` and the port is `8086`
 
 Documentation
 -------------
@@ -210,18 +179,3 @@ See the documentation : http://doc.thelia.net/en/documentation/contribute.html
 
 
 If you submit modifications that adds new data or change the structure of the database, take a look to https://doc.thelia.net/en/documentation/contribute.html#sql-scripts-modification
-
-Usage
------
-
-Consult the page : https://localhost/thelia/web/index_dev.php
-
-You can create a virtual host and choose the web folder for root directory.
-
-To run tests (phpunit required) :
-
-``` bash
-$ phpunit
-```
-
-We still have a lot of work to achieve but enjoy this part.

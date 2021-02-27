@@ -106,9 +106,7 @@ class Install extends ContainerAwareCommand
             "password" => $input->getOption("db_password"),
             "port" => $input->getOption("db_port")
         );
-
-        var_dump($connectionInfo);
-
+        
         while (false === $connection = $this->tryConnection($connectionInfo, $output)) {
             $connectionInfo = $this->getConnectionInfo($input, $output);
         }
