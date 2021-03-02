@@ -41,7 +41,7 @@
     {$microdata["brand"]["name"] = $TITLE}
   {/loop}
 
-  {if $isRelatedTo}
+  {if $isRelatedTo|default:null}
     {$microdata["isRelatedTo"] = []}
   {/if}
 

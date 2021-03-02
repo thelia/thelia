@@ -105,7 +105,7 @@
         </service>
         <service id="thelia.url.manager" alias="Thelia\Tools\URL"/>
 
-        <service id="event_dispatcher" alias="Thelia\Core\EventDispatcher\EventDispatcher"/>
+        <service id="event_dispatcher" alias="Thelia\Core\EventDispatcher\EventDispatcher" public="true"/>
         <service id="Symfony\Component\EventDispatcher\EventDispatcherInterface" alias="Thelia\Core\EventDispatcher\EventDispatcher"/>
         <service id="Symfony\Contracts\EventDispatcher\EventDispatcherInterface" alias="Thelia\Core\EventDispatcher\EventDispatcher"/>
 

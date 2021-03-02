@@ -1,5 +1,5 @@
-<header role="banner" class="Header bg-white shadow-md flex {if !$lite}pl-8{/if} sticky top-0 z-40 uppercase">
-  {if !$lite}
+<header role="banner" class="Header bg-white shadow-md flex {if !$lite|default:false}pl-8{/if} sticky top-0 z-40 uppercase">
+  {if !$lite|default:false}
   <button class="lg:hidden focus:outline-none hover:" data-toggle-navigation>
     {include file="components/smarty/Hamburger/Hamburger.html" HamburgerClass="pointer-events-none Header-Hamburger"}
   </button>
@@ -19,7 +19,7 @@
 
     <div class="mx-4 my-auto hidden sm:block">{include file="components/smarty/LangSelect/LangSelect.html"}</div>
 
-    {if $isConnected}
+    {if $isConnected|default:false}
     <a href="{url path="/account"}" class="hover:bg-gray-200 pr-4 lg:px-5 xl:px-8 flex items-center h-full">
     <div class="lg:mr-4">{renderIconSvg icon="user" class="w-4 h-4  mx-auto fill-current "}</div>
     <div class="hidden lg:block">{intl l="Account"}</div>

@@ -20,6 +20,22 @@
   {assign var="isConnected" value=true}
 {/loop}
 
+{* Build a clean page title *}
+{$seoPageTitle = ""}
+{if $page_title|default:null}
+  {$seoPageTitle = $page_title}
+{elseif $breadcrumbs|default:null}
+  {foreach from=$breadcrumbs|array_reverse item=breadcrumb}
+    {$seoPageTitle = $seoPageTitle|cat: $breadcrumb.title|cat:" - "}
+  {/foreach}
+  {$seoPageTitle = $seoPageTitle|cat: $store_name}
+{else}
+  {$seoPageTitle = $store_name}
+{/if}
+
+{* Build a clean page descritpion *}
+
+
 <html lang="{$lang_locale|replace:'_':'-'}" class="no-js">
 <head>
   <meta charset="utf-8">
@@ -27,7 +43,13 @@
     {store_seo_meta locale=$lang_locale}
 
     {* Page Title *}
-    <title>{block name="page-title"}{strip}{if $page_title}{$page_title}{elseif $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title|unescape} - {/foreach}{$store_name}{else}{$store_name}{/if}{/strip}{/block}</title>
+    {strip}
+      <title>
+        {block name="page-title"}
+          {$seoPageTitle}
+        {/block}
+      </title>
+    {/strip}
 
 
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
@@ -40,20 +62,20 @@
 
     <meta property="og:url" content="{navigate to='current'}">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="{block name="page-title"}{strip}{if $page_title}{$page_title}{elseif $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title|unescape} - {/foreach}{$store_name}{else}{$store_name}{/if}{/strip}{/block}">
-    <meta property="og:description" content="{if $page_description}{$page_description}{else}{$store_description}{/if}">
+    <meta property="og:title" content="{$seoPageTitle}">
+    <meta property="og:description" content="{$page_description|default:$store_description|default:""}">
     <meta property="og:site_name" content="{$store_name}">
     <meta property="og:locale" content="{lang attr="locale"}">
 
     <meta name="twitter:card" content="summary">
     <meta name="twitter:url" content="{navigate to='current'}">
-    <meta name="twitter:title" content="{block name="page-title"}{strip}{if $page_title}{$page_title}{elseif $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title|unescape} - {/foreach}{$store_name}{else}{$store_name}{/if}{/strip}{/block}">
-    <meta name="twitter:description" content="{if $page_description}{$page_description}{else}{$store_description}{/if}">
+    <meta name="twitter:title" content="{$seoPageTitle}">
+    <meta name="twitter:description" content="{$page_description|default:$store_description|default:""}">
 
     {block name="meta"}
-        <meta name="description" content="{if $page_description}{$page_description}{else}{$store_description}{/if}">
+        <meta name="description" content="{$page_description|default:$store_description|default:""}">
 
-        {if $page_keywords}
+        {if isset($page_keywords)}
           <meta name="keywords" content="{$page_keywords}">
         {else}
           <meta name="keywords" content="{$default_keywords}">

@@ -1831,7 +1831,8 @@ class ProductController extends AbstractSeoCrudController
             $this->getDispatcher(),
             $this->getSecurityContext(),
             $this->getTranslator(),
-            $this->container->getParameter('thelia.parser.loops')
+            $this->container->getParameter('Thelia.parser.loops'),
+            $this->container->getParameter('kernel.environment')
         );
     }
 

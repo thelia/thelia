@@ -9,12 +9,12 @@
     type="{$type}"
     name="{$name}"
     id="{$id}"
-    value="{$value}"
-    placeholder="{$placeholder}"
-    class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if $error}border-red-500{else}border-gray-200{/if} {$inputClass}"
-    {if $required}required{/if}
-    {if $autofocus}autofocus{/if}
-    {if $readonly}readonly{/if}
+    value="{$value|default:null}"
+    placeholder="{$placeholder|default:null}"
+    class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if $error}border-red-500{else}border-gray-200{/if} {$inputClass|default:null}"
+    {if $required|default:false}required{/if}
+    {if $autofocus|default:false}autofocus{/if}
+    {if $readonly|default:false}readonly{/if}
   />
 
 

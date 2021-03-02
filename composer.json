@@ -50,7 +50,6 @@
         "simplepie/simplepie": "1.5.*",
         "imagine/imagine": "0.7.1",
         "swiftmailer/swiftmailer": "5.4.*",
-        "oyejorge/less.php": "1.7.*",
         "michelf/php-markdown": "1.9.*",
         "smarty/smarty": "3.1.*",
         "commerceguys/addressing": "1.1.*",
@@ -59,15 +58,16 @@
         "symfony/lock": "5.2.*",
         "thelia/propel": "dev-thelia-2.5",
         "symfony/var-dumper": "^2.0|^3.0|^4.0",
-        "thelia/open-api-module": "~1.0.1",
-        "thelia/smarty-redirection-module": "~1.0.0",
-        "thelia/choice-filter-module": "~1.0.0",
-        "thelia/custom-delivery-module": "~2.1.0",
-        "thelia/store-seo-module": "~1.2.0",
         "symfony/mime": "5.2.*",
         "symfony/framework-bundle": "5.2.*",
         "wikimedia/less.php": "^3.1",
-        "assetic/framework": "dev-develop#b067e1779fc18db43031a4dc9a80308465febcfd"
+        "assetic/framework": "dev-develop#b067e1779fc18db43031a4dc9a80308465febcfd",
+        "thelia/open-api-module": "dev-main",
+        "thelia/smarty-redirection-module": "dev-master",
+        "thelia/choice-filter-module": "dev-main",
+        "thelia/custom-delivery-module": "dev-main",
+        "thelia/store-seo-module": "dev-main",
+        "doctrine/cache": "~1.0"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",
@@ -93,7 +93,7 @@
         "test-unit": [
             "./vendor/bin/phpunit --configuration phpunit.xml.dist --testsuit unit"
         ],
-        "reset-database": [
+        "demo-database": [
             "php Thelia thelia:dev:reloadDB",
             "php setup/import.php",
             "php Thelia admin:create --login_name thelia --password thelia --last_name thelia --first_name thelia --email thelia@example.com"
@@ -108,7 +108,7 @@
             "./vendor/bin/phpunit --configuration phpunit.legacy.xml"
         ],
         "test": [
-            "@reset-database",
+            "@demo-database",
             "@test-unit",
             "@test-functional",
             "@test-legacy"

@@ -14,6 +14,7 @@ namespace Thelia\Core\Event\Payment;
 
 use Thelia\Model\Cart;
 use Thelia\Module\AbstractPaymentModule;
+use Thelia\Module\PaymentModuleInterface;
 
 /**
  * Class IsValidPaymentEvent.
@@ -37,7 +38,7 @@ class IsValidPaymentEvent extends BasePaymentEvent
     /**
      * IsValidPaymentEvent constructor.
      */
-    public function __construct(AbstractPaymentModule $module, Cart $cart)
+    public function __construct(PaymentModuleInterface $module, Cart $cart)
     {
         parent::__construct($module);
         $this->cart = $cart;

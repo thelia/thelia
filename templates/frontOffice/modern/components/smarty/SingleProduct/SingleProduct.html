@@ -1,6 +1,7 @@
 {$product_id = $product_id|default:$ID}
 {$width = $width|default:360}
 {$height = $height|default:360}
+{$productTitle = $productTitle|default:""}
 
 <a href="{$URL}" class="SingleProduct relative flex flex-col">
 
@@ -17,7 +18,7 @@
 
       <div class="SingleProduct-info text-center mt-6 mb-4">
           <div class="SingleProduct-title text-xl">{$productTitle|default:$TITLE}</div>
-          {if $chapo}<div class="SingleProduct-chapo">{$CHAPO nofilter}</div>{/if}
+          {if $CHAPO}<div class="SingleProduct-chapo">{$CHAPO nofilter}</div>{/if}
       </div>
 
       <div class="SingleProduct-price mt-auto text-center">
@@ -28,8 +29,6 @@
               <span class="">{format_money number=$BEST_TAXED_PRICE symbol={currency attr="symbol"}}</span>
           {/if}
       </div>
-
-
     </div>
 
     {if $IS_PROMO }

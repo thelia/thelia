@@ -61,13 +61,9 @@ class OrderStatusCreationForm extends BaseForm
                 TextType::class,
                 [
                     'constraints' => [
-                        new Callback([
-                            'methods' => [
-                                [$this, 'checkUniqueCode'],
-                                [$this, 'checkFormatCode'],
-                                [$this, 'checkIsRequiredCode'],
-                            ],
-                        ]),
+                        new Callback([$this, 'checkUniqueCode']),
+                        new Callback([$this, 'checkFormatCode']),
+                        new Callback([$this, 'checkIsRequiredCode'])
                     ],
                     'required' => true,
                     'label' => Translator::getInstance()->trans('Order status code'),
@@ -86,9 +82,7 @@ class OrderStatusCreationForm extends BaseForm
                 [
                     'constraints' => [
                         new NotBlank(),
-                        new Callback([
-                            'methods' => [[$this, 'checkColor']],
-                        ]),
+                        new Callback([$this, 'checkColor'])
                     ],
                     'required' => false,
                     'label' => Translator::getInstance()->trans('Order status color'),

@@ -34,7 +34,7 @@
         <service id="request.context" class="%router.request_context.class%" public="true" />
 
 
-        <service id="router.fileLocator" class="Symfony\Component\Config\FileLocator">
+        <service id="router.fileLocator" class="Symfony\Component\Config\FileLocator" public="true">
             <argument>%thelia.core_dir%/Config/Resources/routing</argument>
         </service>
 

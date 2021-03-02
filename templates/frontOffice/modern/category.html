@@ -49,6 +49,9 @@
             {$product_page={$smarty.get.page|default:1}}
             {$product_order={$smarty.get.order|default:'manual'}}
 
+            {if !isset($showFilters)}
+              {$showFilters = false}
+            {/if}
             {loop name="choice_filter" type="choice_filter" category_id=$category_id }
               {$showFilters = true}
             {/loop}

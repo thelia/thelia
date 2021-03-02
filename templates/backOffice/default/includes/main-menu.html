@@ -1,3 +1,4 @@
+{$admin_current_location = $admin_current_location|default:null}
 {hook name="main.before-top-menu" location="before_top_menu" }
 <ul class="nav in" id="side-menu">
     <li class="sidebar-search">
@@ -81,7 +82,7 @@
                 {$count = {count type="order" customer="*" backend_context="1" status={$ID}}}
                 {if $count}
                 <li role="menuitem">
-                    <a class="clearfix" data-target="{url path="admin/orders/$LABEL"}" href="{url path="admin/orders" status={$ID}}">
+                    <a class="clearfix" data-target="{url path="admin/orders/"}{$LABEL|default:null}" href="{url path="admin/orders" status={$ID}}">
                         <span class="pull-left">{$TITLE}</span>
                         <span class="label label-lg pull-right" style="background-color: {$COLOR};">{$count}</span>
                     </a>

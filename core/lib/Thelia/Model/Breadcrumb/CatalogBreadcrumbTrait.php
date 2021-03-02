@@ -19,6 +19,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Loop\CategoryPath;
 use Thelia\Core\Translation\Translator;
+use Thelia\Tools\URL;
 
 trait CatalogBreadcrumbTrait
 {
@@ -27,18 +28,19 @@ trait CatalogBreadcrumbTrait
         $translator = Translator::getInstance();
         $catalogUrl = $router->generate('admin.catalog', [], Router::ABSOLUTE_URL);
         $breadcrumb = [
-            $translator->trans('Home') => $router->generate('admin.home.view', [], Router::ABSOLUTE_URL),
+            $translator->trans('Home') => URL::getInstance()->absoluteUrl('/admin'),
             $translator->trans('Catalog') => $catalogUrl,
         ];
 
         // Todo stop using loop in php
         $categoryPath = new CategoryPath(
             $container,
-            $container->get(RequestStack::class),
-            $container->get(EventDispatcherInterface::class),
-            $container->get(SecurityContext::class),
-            $container->get(Translator::getInstance()),
-            $container->getParameter('thelia.parser.loops')
+            $container->get("request_stack"),
+            $container->get("event_dispatcher"),
+            $container->get("thelia.securityContext"),
+            Translator::getInstance(),
+            $container->getParameter('Thelia.parser.loops'),
+            $container->getParameter('kernel.environment')
         );
         $categoryPath->initializeArgs([
                 'category' => $categoryId,

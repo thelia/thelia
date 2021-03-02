@@ -24,12 +24,9 @@
 
 
     <article class="col-main" role="main" aria-labelledby="main-label">
-
         <div class="container mx-auto my-24">
-          {hook name="account-order.top" order={$order_id}}
-
-            {include file="components/smarty/Orders/Orders.html"}
-
+          {hook name="account-order.top" order={$order_id|default:null}}
+          {include file="components/smarty/Orders/Orders.html"}
         </div>
     </article>
 

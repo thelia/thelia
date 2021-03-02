@@ -31,7 +31,7 @@ class AssetsManager
     public function getAssets($entry, $type)
     {
         $assets = [];
-        if ($this->entrypoints[$entry][$type]) {
+        if (isset($this->entrypoints[$entry][$type])) {
             $assets = array_diff($this->entrypoints[$entry][$type], $this->processed);
             $this->processed = array_merge($this->processed, $assets);
         };

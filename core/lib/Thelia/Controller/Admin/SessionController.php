@@ -28,6 +28,7 @@ use Thelia\Model\AdminQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Tools\URL;
 
 class SessionController extends BaseAdminController
 {
@@ -40,7 +41,7 @@ class SessionController extends BaseAdminController
         // Check if user is already authenticate
         if ($this->getSecurityContext()->hasAdminUser()) {
             // Redirect to the homepage
-            return new RedirectResponse($this->retrieveUrlFromRouteId('admin.home.view'));
+            return new RedirectResponse(URL::getInstance()->absoluteUrl('/admin'));
         }
 
         return null;

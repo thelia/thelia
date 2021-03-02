@@ -21,6 +21,7 @@ use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Model\Base\ModuleImage as BaseModuleImage;
 use Thelia\Model\Tools\PositionManagementTrait;
+use Thelia\Tools\URL;
 
 class ModuleImage extends BaseModuleImage implements FileModelInterface
 {
@@ -104,7 +105,7 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
         /** @var \Thelia\Model\Module */
         $module = $this->getModule();
         $breadcrumb = [
-            $translator->trans('Home') => $router->generate('admin.home.view', [], Router::ABSOLUTE_URL),
+            $translator->trans('Home') => URL::getInstance()->absoluteUrl('/admin'),
             $translator->trans('Module') => $router->generate('admin.module', [], Router::ABSOLUTE_URL),
         ];
 

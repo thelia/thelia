@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\BrandQuery;
+use Thelia\Tools\URL;
 
 trait BrandBreadcrumbTrait
 {
@@ -25,7 +26,7 @@ trait BrandBreadcrumbTrait
     public function getBreadcrumb(Router $router, /* @noinspection PhpUnusedParameterInspection */ ContainerInterface $container, $tab, $locale)
     {
         $breadcrumb = [
-            Translator::getInstance()->trans('Home') => $router->generate('admin.home.view', [], Router::ABSOLUTE_URL),
+            Translator::getInstance()->trans('Home') => URL::getInstance()->absoluteUrl('/admin'),
             Translator::getInstance()->trans('Brand') => $router->generate('admin.brand.default', [], Router::ABSOLUTE_URL),
         ];
 

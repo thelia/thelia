@@ -63,7 +63,7 @@
                                       value=$ID
                                       label=$TITLE
                                       CheckboxClass="mb-4"
-                                      checked=$featuresSelected[$featureID] && $ID|in_array:$featuresSelected[$featureID]
+                                      checked=isset($featuresSelected[$featureID]) && $ID|in_array:$featuresSelected[$featureID]
                                     }
                                   </div>
                               {/loop}

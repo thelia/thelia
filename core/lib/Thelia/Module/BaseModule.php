@@ -497,6 +497,12 @@ class BaseModule implements BaseModuleInterface
         // Override this method load more configuration for your module
     }
 
+    public static function getAnnotationRoutePrefix(): string
+    {
+        // Override to add a prefix to all your module annotated routes
+        return '';
+    }
+
     /**
      * {@inheritdoc}
      */

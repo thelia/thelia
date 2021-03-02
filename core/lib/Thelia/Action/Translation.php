@@ -39,6 +39,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
     public function getTranslatableStrings(TranslationEvent $event): void
     {
+        $strings = [];
         $stringCount = $this->walkDir(
             $event->getDirectory(),
             $event->getMode(),

@@ -119,7 +119,7 @@
                                         {hook name="order-edit.cart-top" location="order-edit-cart-top" order_id=$order_id}
 
                                         <div class="table-responsive">
-                                            {if $smarty.get.update_status_error_message}
+                                            {if $smarty.get.update_status_error_message|default:null}
                                                 <div class='alert alert-danger'>
                                                     {$smarty.get.update_status_error_message}
                                                 </div>
@@ -442,7 +442,7 @@
                                             </div>
                                         </div>
 
-                                        {if $smarty.get.update_status_error_message}
+                                        {if $smarty.get.update_status_error_message|default:null}
                                             <div class='alert alert-danger'>
                                                 {$smarty.get.update_status_error_message}
                                             </div>
@@ -745,7 +745,7 @@
             {form_hidden_fields}
 
             {form_field field='id'}
-                <input type="hidden" id="{$label_attr.for}" name="{$name}" class="js-order-address-id" value="{$value}">
+                <input type="hidden" id="{$label_attr.for|default:null}" name="{$name}" class="js-order-address-id" value="{$value}">
             {/form_field}
 
             {render_form_field field='company' extra_class="js-company"}
