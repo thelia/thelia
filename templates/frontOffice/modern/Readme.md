@@ -1,8 +1,11 @@
-Readme
-======
+> ⚠ This is the repository of Thelia default frontoffice template. All the pull requests on this repo will be ignored.
+> If you want to create a project, please take a look at [thelia/thelia-project](https://github.com/thelia/thelia-project)
+> If you want to contribute to Thelia, please take a look at [thelia/thelia](https://github.com/thelia/thelia)
 
+
+
+# About
 This Thelia template is based on [Symfony Encore](https://symfony.com/doc/current/frontend.html), it uses Smarty (Thelia default templating engine) for static content and [React](https://reactjs.org) for managing dynamic components (eg:cart).
-
 Styling is done with [Tailwind](https://tailwindcss.com) and PostCSS, but can be overrided or switched, to use any other css preprocessor/ css framework.
 
 
