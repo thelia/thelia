@@ -56,8 +56,16 @@ class AnnotationRouter extends BaseRouter
                 continue;
             }
 
+            $moduleRoutes = $loader->load($moduleControllerPath, 'annotation');
+
+            $moduleAnnotationRoutePrefix = \call_user_func([$module->getFullNamespace(), 'getAnnotationRoutePrefix']);
+
+            foreach ($moduleRoutes as $moduleRoute) {
+                $moduleRoute->setPath($moduleAnnotationRoutePrefix.$moduleRoute->getPath());
+            }
+
             $routes->addCollection(
-                $loader->load($moduleControllerPath, 'annotation')
+                $moduleRoutes
             );
         }
 

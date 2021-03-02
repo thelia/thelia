@@ -64,3 +64,6 @@ RUN docker-php-ext-install pdo_mysql
 # Composer copy and run
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 CMD composer install ;  php-fpm
+
+# Copy script used at docker-start
+COPY docker-init.sh /usr/local/bin/docker-init

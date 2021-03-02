@@ -28,7 +28,7 @@ class CategoryModificationForm extends CategoryCreationForm
         );
 
         // Create countries and shipping modules list
-        $templateList = ['   ' => 0];
+        $templateList = [$this->translator->trans('None') => 0];
 
         $list = TemplateQuery::create()->find();
 
@@ -41,8 +41,6 @@ class CategoryModificationForm extends CategoryCreationForm
         }
 
         asort($templateList);
-
-        $templateList[0] = $this->translator->trans('None');
 
         $this->formBuilder
             ->add(

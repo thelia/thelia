@@ -27,7 +27,7 @@
   brand=$brands
   new={'new'|in_array:$types}
   promo={'promo'|in_array:$types}
-  title={$smarty.get.query}
+  title={$smarty.get.query|default:null}
   feature_availability=$features
   min_price=$min_price
   max_price=$max_price
@@ -48,7 +48,7 @@
         brand=$brands
         new={'new'|in_array:$types}
         promo={'promo'|in_array:$types}
-        title={$smarty.get.query}
+        title={$smarty.get.query|default:null}
         feature_availability=$features
         min_price=$min_price
         max_price=$max_price

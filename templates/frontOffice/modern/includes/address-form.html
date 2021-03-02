@@ -19,7 +19,7 @@
 
 
 {function name="fn_address_field_title"}
-    {assign var="value" value={$value|default:$TITLE}}
+    {assign var="value" value={$value|default:$TITLE|default:null}}
     {$titleOptions = []}
 
     {loop type="title" name="title.list"}
@@ -52,7 +52,7 @@
     type="text"
     name=$name
     id="{$label_attr.for}"
-    value={$value|default:{$FIRSTNAME} nofilter}
+    value={$value|default:{$FIRSTNAME|default:null} nofilter}
     label=$label
     placeholder={intl l="First name"}
     required=$required
@@ -69,7 +69,7 @@
     type="text"
     name=$name
     id="{$label_attr.for}"
-    value={$value|default:{$LASTNAME} nofilter}
+    value={$value|default:{$LASTNAME|default:null} nofilter}
     label=$label
     placeholder={intl l="Last name"}
     required=$required
@@ -115,7 +115,7 @@
     type="text"
     name=$name
     id="{$label_attr.for}"
-    value={$value|default:{$COMPANY} nofilter}
+    value={$value|default:{$COMPANY|default:null} nofilter}
     label=$label
     placeholder=""
     required=$required
@@ -131,7 +131,7 @@
     type="text"
     name=$name
     id="{$label_attr.for}"
-    value={$value|default:{$SIRET} nofilter}
+    value={$value|default:{$SIRET|default:null} nofilter}
     label=$label
     placeholder=""
     required=$required
@@ -148,7 +148,7 @@
     type="text"
     name=$name
     id="{$label_attr.for}"
-    value={$value|default:{$VAT} nofilter}
+    value={$value|default:{$VAT|default:null} nofilter}
     label=$label
     placeholder=""
     required=$required
@@ -165,7 +165,7 @@
     type="text"
     name=$name
     id="{$label_attr.for}"
-    value={$value|default:{$ADDRESS1} nofilter}
+    value={$value|default:{$ADDRESS1|default:null} nofilter}
     label=$label
     placeholder=""
     required=$required
@@ -182,7 +182,7 @@
     type="text"
     name=$name
     id="{$label_attr.for}"
-    value={$value|default:{$ADDRESS2} nofilter}
+    value={$value|default:{$ADDRESS2|default:null} nofilter}
     label=$label
     placeholder=""
     required=$required
@@ -199,7 +199,7 @@
     type="text"
     name=$name
     id="{$label_attr.for}"
-    value={$value|default:{$ZIPCODE} nofilter}
+    value={$value|default:{$ZIPCODE|default:null} nofilter}
     label=$label
     placeholder=""
     required=$required
@@ -216,7 +216,7 @@
     type="text"
     name=$name
     id="{$label_attr.for}"
-    value={$value|default:{$CITY} nofilter}
+    value={$value|default:{$CITY|default:null} nofilter}
     label=$label
     placeholder=""
     required=$required
@@ -229,7 +229,7 @@
 
 {function name="fn_address_field_country"}
 
-    {assign var="value" value={$value|default:$COUNTRY}}
+    {assign var="value" value={$value|default:$COUNTRY|default:null}}
     {$countriesOptions = []}
 
     {$countriesOptions['default'] = [
@@ -273,7 +273,7 @@
     type="text"
     name=$name
     id="{$label_attr.for}"
-    value={$value|default:{$PHONE} nofilter}
+    value={$value|default:{$PHONE|default:null} nofilter}
     label=$label
     placeholder=""
     required=$required
@@ -290,7 +290,7 @@
     type="text"
     name=$name
     id="{$label_attr.for}"
-    value={$value|default:{$CELLPHONE} nofilter}
+    value={$value|default:{$CELLPHONE|default:null} nofilter}
     label=$label
     placeholder=""
     required=$required

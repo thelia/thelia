@@ -1,4 +1,4 @@
-{assign var="value" value={$value|default:$STATE}}
+{assign var="value" value={$value|default:$STATE|default:null}}
 {$statesOptions = []}
 {$statesOptions['default'] = [
   'value' => '',
@@ -8,9 +8,9 @@
 {loop type="state" name="state.list" order="alpha"}
 {$statesOptions[$ID] = [
     'value' => $ID,
-    'label' => $TITLE,
+    'label' => $TITLE|default:null,
     'data-label' => 'data-country',
-    'data-value' => $COUNTRY
+    'data-value' => $COUNTRY|default:null
   ]}
 {/loop}
 

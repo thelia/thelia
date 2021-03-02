@@ -33,11 +33,7 @@ class CountryStateMigrationType extends AbstractTheliaType
             [
                 'cascade_validation' => true,
                 'constraints' => [
-                    new Callback([
-                        'methods' => [
-                            [$this, 'checkStateId'],
-                        ],
-                    ]),
+                    new Callback([$this, 'checkStateId']),
                 ],
             ]
         );

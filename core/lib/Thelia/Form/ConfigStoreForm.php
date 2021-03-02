@@ -76,11 +76,9 @@ class ConfigStoreForm extends BaseForm
                     'data' => ConfigQuery::read('store_notification_emails'),
                     'constraints' => [
                         new Constraints\NotBlank(),
-                        new Constraints\Callback([
-                            'methods' => [
-                                [$this, 'checkEmailList'],
-                            ],
-                        ]),
+                        new Constraints\Callback(
+                            [$this, 'checkEmailList']
+                        ),
                     ],
                     'label' => $tr->trans('Email addresses of notification recipients'),
                     'attr' => [

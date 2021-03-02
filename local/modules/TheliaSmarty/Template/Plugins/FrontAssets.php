@@ -155,7 +155,7 @@ class FrontAssets extends AbstractSmartyPlugin
 
     public function getFileFromManifest($arg)
     {
-        if (isset($arg['file']) && $this->manifest != null) {
+        if (isset($arg['file']) && $this->manifest != null && isset($this->manifest[$arg['file']])) {
             return $this->manifest[$arg['file']];
         }
 

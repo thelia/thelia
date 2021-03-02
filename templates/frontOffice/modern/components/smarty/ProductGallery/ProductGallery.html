@@ -9,7 +9,7 @@
 	<div class="splide__track">
 		<ul class="splide__list">
 
-      {foreach from=$images item=image}
+      {foreach from=$images|default:[] item=image}
 			<li class="splide__slide mx-4 lg:mx-0 lg:mb-8">
         <img src="{$image['url']}" title="{$image['alt']}" class="object-contain w-full h-full" width="1000" height="1000" loading="lazy" />
       </li>

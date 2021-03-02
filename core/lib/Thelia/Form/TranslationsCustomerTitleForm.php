@@ -61,7 +61,7 @@ class TranslationsCustomerTitleForm extends BaseForm
                 ));
         }
     }
-    public function getName()
+    public static function getName()
     {
         return 'thelia_translation_customer_title';
     }

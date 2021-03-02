@@ -19,7 +19,7 @@ use Thelia\Module\BaseModule;
 
 class HookAnalytics extends BaseModule
 {
-    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
     {
         if (($config = ConfigQuery::read("hookanalytics_trackingcode", "")) &&
             version_compare($newVersion, "2.4.4", ">=") &&
