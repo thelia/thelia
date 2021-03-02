@@ -94,7 +94,7 @@ class Cart extends BaseCart
                     ->setPromo($productSaleElements->getPromo());
 
                 $item->save();
-                $dispatcher->dispatch(new CartItemDuplicationItem($item, $cartItem), TheliaEvents::CART_ITEM_DUPLICATE, );
+                $dispatcher->dispatch(new CartItemDuplicationItem($item, $cartItem), TheliaEvents::CART_ITEM_DUPLICATE);
             }
         }
 
