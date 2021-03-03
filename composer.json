@@ -63,7 +63,7 @@
         "wikimedia/less.php": "^3.1",
         "assetic/framework": "dev-develop#b067e1779fc18db43031a4dc9a80308465febcfd",
         "thelia/open-api-module": "dev-main",
-        "thelia/smarty-redirection-module": "dev-master",
+        "thelia/smarty-redirection-module": "dev-main",
         "thelia/choice-filter-module": "dev-main",
         "thelia/custom-delivery-module": "dev-main",
         "thelia/store-seo-module": "dev-main",
