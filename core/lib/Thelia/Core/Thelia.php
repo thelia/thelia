@@ -246,7 +246,7 @@ class Thelia extends Kernel
         }
     }
 
-    protected function initCacheConfigs(bool $force = false): void
+    public function initCacheConfigs(bool $force = false): void
     {
         if ($force || !file_exists($this->getCacheDir() . DS . 'thelia_configs.php')) {
             $caches = [];
