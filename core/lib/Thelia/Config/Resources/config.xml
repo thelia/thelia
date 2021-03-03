@@ -327,12 +327,11 @@
         <service id="thelia.import.handler" alias="Thelia\Handler\ImportHandler" public="true"/>
 
         <!-- Cache -->
-        <service id="Symfony\Component\Cache\Adapter\FilesystemAdapter" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
+        <service id="Symfony\Component\Cache\Adapter\AdapterInterface" class="Symfony\Component\Cache\Adapter\FilesystemAdapter" public="true">
             <argument>%thelia.cache.namespace%</argument>
             <argument>600</argument>
             <argument>%kernel.cache_dir%</argument>
         </service>
-        <service id="Symfony\Component\Cache\Adapter\AdapterInterface" alias="Symfony\Component\Cache\Adapter\FilesystemAdapter"/>
-        <service id="thelia.cache" alias="Symfony\Component\Cache\Adapter\FilesystemAdapter" public="true"/>
+        <service id="thelia.cache" alias="Symfony\Component\Cache\Adapter\AdapterInterface" public="true"/>
     </services>
 </config>
