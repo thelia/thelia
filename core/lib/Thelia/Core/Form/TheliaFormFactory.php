@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Form;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\ValidatorBuilder;
@@ -29,7 +30,7 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
     /** @var RequestStack */
     protected $requestStack;
 
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
     /**
@@ -52,7 +53,7 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
 
     public function __construct(
         RequestStack $requestStack,
-        EventDispatcher $eventDispatcher,
+        EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator,
         FormFactoryBuilderInterface $formFactoryBuilder,
         ValidatorBuilder $validationBuilder,

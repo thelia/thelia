@@ -125,36 +125,6 @@ class TokenProvider
      */
     public static function generateToken()
     {
-        $raw = self::getOpenSSLRandom();
-        if (false === $raw) {
-            $raw = self::getComplexRandom();
-        }
-
-        return md5($raw);
-    }
-
-    /**
-     * @param int $length
-     *
-     * @return string
-     */
-    protected static function getOpenSSLRandom($length = 40)
-    {
-        if (!\function_exists('openssl_random_pseudo_bytes')) {
-            return false;
-        }
-
-        return openssl_random_pseudo_bytes($length);
-    }
-
-    /**
-     * @return string
-     */
-    protected static function getComplexRandom()
-    {
-        $firstValue = (float) (random_int(1, 0xFFFF) * random_int(1, 0x10001));
-        $secondValues = (float) (random_int(1, 0xFFFF) * random_int(1, 0x10001));
-
-        return microtime().ceil($firstValue / $secondValues).uniqid();
+        return md5(random_bytes(32));
     }
 }

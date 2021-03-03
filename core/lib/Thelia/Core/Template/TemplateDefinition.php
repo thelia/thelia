@@ -28,6 +28,18 @@ class TemplateDefinition
     public const PDF_SUBDIR = 'pdf';
     public const EMAIL_SUBDIR = 'email';
 
+    public const FRONT_OFFICE_CONFIG_NAME = 'active-front-template';
+    public const BACK_OFFICE_CONFIG_NAME = 'active-back-template';
+    public const PDF_CONFIG_NAME = 'active-pdf-template';
+    public const EMAIL_CONFIG_NAME = 'active-email-template';
+
+    public const CONFIG_NAMES = [
+        self::FRONT_OFFICE_SUBDIR => self::FRONT_OFFICE_CONFIG_NAME,
+        self::BACK_OFFICE_SUBDIR => self::BACK_OFFICE_CONFIG_NAME,
+        self::PDF_SUBDIR => self::PDF_CONFIG_NAME,
+        self::EMAIL_SUBDIR => self::EMAIL_CONFIG_NAME,
+    ];
+
     /** @var string the template directory full path */
     protected $path;
 

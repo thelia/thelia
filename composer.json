@@ -61,13 +61,16 @@
         "symfony/mime": "5.2.*",
         "symfony/framework-bundle": "5.2.*",
         "wikimedia/less.php": "^3.1",
-        "assetic/framework": "dev-develop#b067e1779fc18db43031a4dc9a80308465febcfd",
         "thelia/open-api-module": "dev-main",
         "thelia/smarty-redirection-module": "dev-main",
         "thelia/choice-filter-module": "dev-main",
         "thelia/custom-delivery-module": "dev-main",
         "thelia/store-seo-module": "dev-main",
-        "doctrine/cache": "~1.0"
+        "doctrine/cache": "~1.0",
+        "assetic/framework": "dev-develop#b067e1779fc18db43031a4dc9a80308465febcfd",
+        "symfony/psr-http-message-bridge": "^2.1",
+        "sentry/sdk": "^3.1",
+        "sentry/sentry-symfony": "^4.0"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",
@@ -128,7 +131,8 @@
                 "local/modules/",
                 "var/cache/propel/model"
             ],
-            "TheliaMain\\": "var/cache/propel/database/TheliaMain"
+            "TheliaMain\\": "var/cache/propel/database/TheliaMain",
+            "App\\": "src/"
         },
         "files": [
             "core/bootstrap.php"

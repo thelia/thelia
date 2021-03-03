@@ -8,7 +8,7 @@
         <parameter key="esi.class">Symfony\Component\HttpKernel\HttpCache\Esi</parameter>
         <parameter key="esi_listener.class">Symfony\Component\HttpKernel\EventListener\SurrogateListener</parameter>
         <parameter key="fragment.renderer.esi.class">Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer</parameter>
-        <parameter key="fragment.renderer.inline.class">Thelia\Core\HttpKernel\Fragment\InlineFragmentRenderer</parameter>
+        <parameter key="fragment.renderer.inline.class">Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer</parameter>
 
         <!--
         The list of Model classes which suppoorts image or document management.
@@ -118,8 +118,10 @@
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="esi" on-invalid="ignore" />
         </service>
+
         <service id="fragment.renderer.inline" class="%fragment.renderer.inline.class%">
             <argument type="service" id="http_kernel" />
+            <argument type="service" id="event_dispatcher" />
         </service>
 
         <service id="Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer" class="%fragment.renderer.esi.class%">
