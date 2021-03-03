@@ -24,6 +24,7 @@ namespace Thelia\Core;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\DataFetcher\PDODataFetcher;
 use Propel\Runtime\Propel;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -35,10 +36,12 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\VarExporter\VarExporter;
 use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Controller\ControllerInterface;
@@ -54,6 +57,7 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Form\FormInterface;
 use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
@@ -63,8 +67,10 @@ class Thelia extends Kernel
 {
     const THELIA_VERSION = '2.5.0';
 
+    /** @var SchemaLocator */
     protected $propelSchemaLocator;
 
+    /** @var PropelInitService */
     protected $propelInitService;
 
     protected $propelConnectionAvailable;
@@ -89,69 +95,87 @@ class Thelia extends Kernel
 
     protected function checkMySQLConfigurations(ConnectionInterface $con): void
     {
-        // TODO : add cache for this test
-        /** @var PDODataFetcher $result */
-        $result = $con->query('SELECT VERSION() as version, @@SESSION.sql_mode as session_sql_mode');
-
-        if ($result && $data = $result->fetch(\PDO::FETCH_ASSOC)) {
-            $sessionSqlMode = explode(',', $data['session_sql_mode']);
-            if (empty($sessionSqlMode[0])) {
-                unset($sessionSqlMode[0]);
-            }
+        if (!file_exists($this->getCacheDir() . DS . 'check_mysql_configurations.php')) {
+            $sessionSqlMode = [];
             $canUpdate = false;
+            $logs = [];
+            /** @var PDODataFetcher $result */
+            $result = $con->query('SELECT VERSION() as version, @@SESSION.sql_mode as session_sql_mode');
 
-            // MariaDB is not impacted by this problem
-            if (false === strpos($data['version'], 'MariaDB')) {
-                // MySQL 5.6+ compatibility
-                if (version_compare($data['version'], '5.6.0', '>=')) {
-                    // add NO_ENGINE_SUBSTITUTION
-                    if (!\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
-                        $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
-                        $canUpdate = true;
-                        Tlog::getInstance()->addWarning('Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.');
+            if ($result && $data = $result->fetch(\PDO::FETCH_ASSOC)) {
+                $sessionSqlMode = explode(',', $data['session_sql_mode']);
+                if (empty($sessionSqlMode[0])) {
+                    unset($sessionSqlMode[0]);
+                }
+
+                // MariaDB is not impacted by this problem
+                if (false === strpos($data['version'], 'MariaDB')) {
+                    // MySQL 5.6+ compatibility
+                    if (version_compare($data['version'], '5.6.0', '>=')) {
+                        // add NO_ENGINE_SUBSTITUTION
+                        if (!\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
+                            $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
+                            $canUpdate = true;
+                            $logs[] = 'Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.';
+                        }
+
+                        // remove STRICT_TRANS_TABLES
+                        if (($key = array_search('STRICT_TRANS_TABLES', $sessionSqlMode)) !== false) {
+                            unset($sessionSqlMode[$key]);
+                            $canUpdate = true;
+                            $logs[] = 'Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.';
+                        }
+
+                        // remove ONLY_FULL_GROUP_BY
+                        if (($key = array_search('ONLY_FULL_GROUP_BY', $sessionSqlMode)) !== false) {
+                            unset($sessionSqlMode[$key]);
+                            $canUpdate = true;
+                            $logs[] = 'Remove sql_mode ONLY_FULL_GROUP_BY. Please configure your MySQL server.';
+                        }
+                    }
+                } else {
+                    // MariaDB 10.2.4+ compatibility
+                    if (version_compare($data['version'], '10.2.4', '>=')) {
+                        // remove STRICT_TRANS_TABLES
+                        if (($key = array_search('STRICT_TRANS_TABLES', $sessionSqlMode)) !== false) {
+                            unset($sessionSqlMode[$key]);
+                            $canUpdate = true;
+                            $logs[] = 'Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.';
+                        }
                     }
 
-                    // remove STRICT_TRANS_TABLES
-                    if (($key = array_search('STRICT_TRANS_TABLES', $sessionSqlMode)) !== false) {
-                        unset($sessionSqlMode[$key]);
-                        $canUpdate = true;
-                        Tlog::getInstance()->addWarning('Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.');
-                    }
-
-                    // remove ONLY_FULL_GROUP_BY
-                    if (($key = array_search('ONLY_FULL_GROUP_BY', $sessionSqlMode)) !== false) {
-                        unset($sessionSqlMode[$key]);
-                        $canUpdate = true;
-                        Tlog::getInstance()->addWarning('Remove sql_mode ONLY_FULL_GROUP_BY. Please configure your MySQL server.');
+                    if (version_compare($data['version'], '10.1.7', '>=')) {
+                        if (!\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
+                            $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
+                            $canUpdate = true;
+                            $logs[] = 'Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.';
+                        }
                     }
                 }
             } else {
-                // MariaDB 10.2.4+ compatibility
-                if (version_compare($data['version'], '10.2.4', '>=')) {
-                    // remove STRICT_TRANS_TABLES
-                    if (($key = array_search('STRICT_TRANS_TABLES', $sessionSqlMode)) !== false) {
-                        unset($sessionSqlMode[$key]);
-                        $canUpdate = true;
-                        Tlog::getInstance()->addWarning('Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.');
-                    }
-                }
-
-                if (version_compare($data['version'], '10.1.7', '>=')) {
-                    if (!\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
-                        $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
-                        $canUpdate = true;
-                        Tlog::getInstance()->addWarning('Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.');
-                    }
-                }
+                $logs[] = 'Failed to get MySQL version and sql_mode';
             }
 
-            if (!empty($canUpdate)) {
-                if (null === $con->query("SET SESSION sql_mode='".implode(',', $sessionSqlMode)."';")) {
-                    throw new \RuntimeException('Failed to set MySQL global and session sql_mode');
-                }
+            foreach($logs as $log) {
+                Tlog::getInstance()->addWarning($log);
             }
-        } else {
-            Tlog::getInstance()->addWarning('Failed to get MySQL version and sql_mode');
+
+            (new Filesystem())->dumpFile(
+                $this->getCacheDir() . DS . 'check_mysql_configurations.php',
+                '<?php return ' . VarExporter::export([
+                    'modes' => array_values($sessionSqlMode),
+                    'canUpdate' => $canUpdate,
+                    'logs' => $logs
+                ]) . ';'
+            );
+        }
+
+        $cache = $this->getCacheDir() . DS . 'check_mysql_configurations.php';
+
+        if (!empty($cache['canUpdate'])) {
+            if (null === $con->query("SET SESSION sql_mode='".implode(',', $cache['modes'])."';")) {
+                throw new \RuntimeException('Failed to set MySQL global and session sql_mode');
+            }
         }
     }
 
@@ -174,6 +198,7 @@ class Thelia extends Kernel
             THELIA_CONF_DIR,
             THELIA_MODULE_DIR
         );
+
         $this->propelInitService = new PropelInitService(
             $this->getEnvironment(),
             $this->isDebug(),
@@ -188,7 +213,12 @@ class Thelia extends Kernel
             $this->checkMySQLConfigurations($this->theliaDatabaseConnection);
         }
 
+        $this->initCacheConfigs();
+
         parent::initializeContainer();
+
+        $this->getContainer()->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
+        $this->getContainer()->set('thelia.propel.init', $this->propelInitService);
     }
 
     /**
@@ -199,9 +229,6 @@ class Thelia extends Kernel
     public function boot(): void
     {
         parent::boot();
-
-        $this->getContainer()->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
-        $this->getContainer()->set('thelia.propel.init', $this->propelInitService);
 
         if ($this->cacheRefresh) {
             $moduleManagement = new ModuleManagement($this->getContainer());
@@ -219,6 +246,28 @@ class Thelia extends Kernel
         }
     }
 
+    public function initCacheConfigs(bool $force = false): void
+    {
+        if ($force || !file_exists($this->getCacheDir() . DS . 'thelia_configs.php')) {
+            $caches = [];
+
+            $configs = ConfigQuery::create()->find();
+
+            foreach ($configs as $config) {
+                $caches[$config->getName()] = $config->getValue();
+            }
+
+            (new Filesystem())->dumpFile(
+                $this->getCacheDir() . DS . 'thelia_configs.php',
+            '<?php return ' . VarExporter::export($caches) . ';'
+            );
+        }
+
+        ConfigQuery::initCache(
+            require $this->getCacheDir() . DS . 'thelia_configs.php'
+        );
+    }
+
     /**
      * @param $forcePropelCacheGeneration
      * @param $cacheRefresh
@@ -231,20 +280,7 @@ class Thelia extends Kernel
     {
         $cacheRefresh = false;
 
-        // initialize Propel, building its cache if necessary
-        $propelSchemaLocator = new SchemaLocator(
-            THELIA_CONF_DIR,
-            THELIA_MODULE_DIR
-        );
-
-        $propelInitService = new PropelInitService(
-            $this->getEnvironment(),
-            $this->isDebug(),
-            $this->getKernelParameters(),
-            $propelSchemaLocator
-        );
-
-        return $propelInitService->init($forcePropelCacheGeneration, $cacheRefresh);
+        return $this->propelInitService->init($forcePropelCacheGeneration, $cacheRefresh);
     }
 
     /**

@@ -26,24 +26,36 @@ class ConfigQuery extends BaseConfigQuery
     protected static $cache = [];
 
     /**
+     * @internal
+     * @param mixed[] $configs
+     */
+    public static function initCache(array $configs): void
+    {
+        self::$cache = $configs;
+    }
+
+    /**
      * Find a config variable and return the value or default value if not founded.
      *
      * Use this method for better performance, a cache is created for each variable already searched
      *
-     * @param $search
      * @param null $default
      */
-    public static function read($search, $default = null)
+    public static function read(string $search, $default = null, bool $ignoreCache = false)
     {
+        if ($ignoreCache) {
+            $value = self::create()->findOneByName($search);
+
+            self::$cache[$search] = $value ? $value->getValue() : $default;
+
+            return self::$cache[$search];
+        }
+
         if (\array_key_exists($search, self::$cache)) {
             return self::$cache[$search];
         }
 
-        $value = self::create()->findOneByName($search);
-
-        self::$cache[$search] = $value ? $value->getValue() : $default;
-
-        return self::$cache[$search];
+        return $default;
     }
 
     public static function write($configName, $value, $secured = null, $hidden = null): void
