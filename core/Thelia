@@ -16,6 +16,10 @@ if (!in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
 
 set_time_limit(0);
 
+$_SERVER['APP_DEBUG'] = false;
+$_SERVER['APP_ENV'] = "prod";
+
+
 if (!isset($bootstrapFile)) {
     $bootstrapFile =  dirname(__DIR__) . '/vendor/autoload.php';
 }
@@ -25,8 +29,6 @@ require $bootstrapFile;
 if (!class_exists(Application::class) || !class_exists(Dotenv::class)) {
     throw new LogicException('You need to add "symfony/framework-bundle" and "symfony/dotenv" as Composer dependencies.');
 }
-
-$_SERVER['APP_DEBUG'] = false;
 
 $input = new ArgvInput();
 if (null !== $env = $input->getParameterOption(['--env', '-e'], null, true)) {
@@ -62,7 +64,7 @@ function getTheliaDatabaseConfigFile($env = "prod")
     return $databaseConfigFile;
 }
 
-if (!file_exists(getTheliaDatabaseConfigFile($_SERVER['APP_DEBUG']))) {
+if (!file_exists(getTheliaDatabaseConfigFile($_SERVER['APP_ENV']))) {
     $kernel = new class($env = "prod", true) extends Kernel {
         use MicroKernelTrait;
 
