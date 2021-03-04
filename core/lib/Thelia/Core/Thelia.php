@@ -61,7 +61,7 @@ use TheliaSmarty\Template\SmartyParser;
 
 class Thelia extends Kernel
 {
-    const THELIA_VERSION = '2.4.4';
+    const THELIA_VERSION = '2.5.0';
 
     protected $propelSchemaLocator;
 
