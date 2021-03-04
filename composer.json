@@ -94,7 +94,7 @@
             "./vendor/bin/phpunit --configuration phpunit.xml.dist --testsuit unit"
         ],
         "demo-database": [
-            "php Thelia thelia:dev:reloadDB",
+            "php Thelia thelia:dev:reloadDB -f",
             "php setup/import.php",
             "php Thelia admin:create --login_name thelia --password thelia --last_name thelia --first_name thelia --email thelia@example.com"
         ],

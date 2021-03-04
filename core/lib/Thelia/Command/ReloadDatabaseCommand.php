@@ -15,6 +15,7 @@ namespace Thelia\Command;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Thelia\Install\Database;
@@ -32,22 +33,29 @@ class ReloadDatabaseCommand extends BaseModuleGenerate
         $this
             ->setName('thelia:dev:reloadDB')
             ->setDescription('erase current database and create new one')
-        ;
+            ->addOption(
+                'force',
+                'f',
+                InputOption::VALUE_NONE,
+                'If defined, it will reload the db without asking'
+            );
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $helper = $this->getHelper('question');
-        $question = new ConfirmationQuestion('<question>Confirm database reset ?<question> (y/N)', false);
+        if (false === $input->getOption('force')) {
+            $helper = $this->getHelper('question');
+            $question = new ConfirmationQuestion('<question>Confirm database reset ?<question> (y/N)', false);
 
-        if (!$helper->ask($input, $output, $question)) {
-            return self::FAILURE;
-        }
+            if (!$helper->ask($input, $output, $question)) {
+                return self::FAILURE;
+            }
 
-        $question = new ConfirmationQuestion('<question>Are you really sure ?<question> (y/N)', false);
+            $question = new ConfirmationQuestion('<question>Are you really sure ?<question> (y/N)', false);
 
-        if (!$helper->ask($input, $output, $question)) {
-            return self::FAILURE;
+            if (!$helper->ask($input, $output, $question)) {
+                return self::FAILURE;
+            }
         }
 
         /** @var ConnectionWrapper $connection */
