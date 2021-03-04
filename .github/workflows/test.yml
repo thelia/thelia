@@ -54,12 +54,7 @@ jobs:
       - name: Install Thelia
         run: |
           php Thelia thelia:install --db_host=127.0.0.1:${{ job.services.mysql.ports['3306'] }} --db_username=root --db_name=thelia --db_password=thelia
-          composer demo-database
           php Thelia module:refresh
-          php Thelia module:activate CustomDelivery
-          php Thelia module:activate Cheque
-          php Thelia module:activate HookTest
-          php Thelia module:activate VirtualProductDelivery
           php Thelia admin:create --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2 --email thelia2@example.com
       - name: Run PHPUnit
-        run: php bin/phpunit
+        run: composer test
