@@ -96,7 +96,7 @@
     </parameters>
 
     <services>
-        <service id="Symfony\Component\DependencyInjection\ContainerInterface" class="Symfony\Component\DependencyInjection\ContainerInterface"/>
+        <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container"/>
         <service id="Psr\Container\ContainerInterface" alias="Symfony\Component\DependencyInjection\ContainerInterface"/>
 
         <!-- Thelia template helper -->
@@ -106,7 +106,7 @@
         <service id="Thelia\Tools\URL" >
             <argument type="service" id="router.admin" />
         </service>
-        <service id="thelia.url.manager" alias="Thelia\Tools\URL"/>
+        <service id="thelia.url.manager" alias="Thelia\Tools\URL" public="true"/>
 
         <service id="event_dispatcher" alias="Thelia\Core\EventDispatcher\EventDispatcher" public="true"/>
         <service id="Symfony\Component\EventDispatcher\EventDispatcherInterface" alias="Thelia\Core\EventDispatcher\EventDispatcher"/>
