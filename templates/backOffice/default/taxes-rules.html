@@ -270,14 +270,14 @@
                 <label for="{$label_attr.for|default:null}" class="control-label">
                     {$label}
                 </label>
-                {if $type::class == "Symfony\Component\Form\Extension\Core\Type\ChoiceType"}
+                {if get_class($type) == "Symfony\Component\Form\Extension\Core\Type\ChoiceType"}
                     <select name="{$name}" data-toggle="selectpicker" {if !$form_error && $attr_list.tax_type != $typeValue || $form_error && $attr_list.tax_type != $typeValueWithError}disabled="disabled"{/if}>
                         {foreach $choices as $choice}
                             <option value="{$choice->value}" {if !$form_error && $REQUIREMENTS.$label|default:null == $choice->value || $form_error && $value == $choice->value}selected="selected" {/if}>{$choice->label}</option>
                         {/foreach}
                     </select>
                 {/if}
-                {if $type::class == "Symfony\Component\Form\Extension\Core\Type\TextType"}
+                {if get_class($type) == "Symfony\Component\Form\Extension\Core\Type\TextType"}
                     <input type="text" {if !$form_error && $attr_list.tax_type != $typeValue || $form_error && $attr_list.tax_type != $typeValueWithError}disabled="disabled"{/if} id="{$label_attr.for|default:null}" name="{$name}" required="required" class="form-control" value="{if $form_error}{$value}{else}{$REQUIREMENTS.$label|default:null}{/if}">
                 {/if}
             </div>
