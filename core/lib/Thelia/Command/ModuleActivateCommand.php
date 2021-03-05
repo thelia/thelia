@@ -41,6 +41,12 @@ class ModuleActivateCommand extends BaseModuleGenerate
                 InputOption::VALUE_NONE,
                 'activate module recursively'
             )
+            ->addOption(
+                'silent',
+                's',
+                InputOption::VALUE_NONE,
+                "Don't throw exception on error"
+            )
             ->addArgument(
                 'module',
                 InputArgument::REQUIRED,
@@ -50,44 +56,50 @@ class ModuleActivateCommand extends BaseModuleGenerate
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $moduleCode = $this->formatModuleName($input->getArgument('module'));
-
-        $module = ModuleQuery::create()->findOneByCode($moduleCode);
-
-        if (null === $module) {
-            throw new \RuntimeException(sprintf('module %s not found', $moduleCode));
-        }
-
-        if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
-            throw new \RuntimeException(sprintf('module %s is already actived', $moduleCode));
-        }
-
         try {
-            $event = new ModuleToggleActivationEvent($module->getId());
-            if ($input->getOption('with-dependencies')) {
-                $event->setRecursive(true);
+            $moduleCode = $this->formatModuleName($input->getArgument('module'));
+
+            $module = ModuleQuery::create()->findOneByCode($moduleCode);
+
+            if (null === $module) {
+                throw new \RuntimeException(sprintf('module %s not found', $moduleCode));
             }
 
-            $this->getDispatcher()->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+            if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
+                throw new \RuntimeException(sprintf('module %s is already actived', $moduleCode));
+            }
+
+            try {
+                $event = new ModuleToggleActivationEvent($module->getId());
+                if ($input->getOption('with-dependencies')) {
+                    $event->setRecursive(true);
+                }
+
+                $this->getDispatcher()->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+            } catch (\Exception $e) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Activation fail with Exception : [%d] %s',
+                        $e->getCode(),
+                        $e->getMessage()
+                    )
+                );
+            }
+
+            //impossible to change output class in CommandTester...
+            if (method_exists($output, 'renderBlock')) {
+                $output->renderBlock([
+                    '',
+                    sprintf('Activation succeed for module %s', $moduleCode),
+                    '',
+                ], 'bg=green;fg=black');
+            }
+
         } catch (\Exception $e) {
-            throw new \RuntimeException(
-                sprintf(
-                    'Activation fail with Exception : [%d] %s',
-                    $e->getCode(),
-                    $e->getMessage()
-                )
-            );
+            if (!$input->getOption('silent')) {
+                throw $e;
+            }
         }
-
-        //impossible to change output class in CommandTester...
-        if (method_exists($output, 'renderBlock')) {
-            $output->renderBlock([
-                '',
-                sprintf('Activation succeed for module %s', $moduleCode),
-                '',
-            ], 'bg=green;fg=black');
-        }
-
         return 0;
     }
 }

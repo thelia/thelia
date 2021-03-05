@@ -76,7 +76,7 @@ class Brand extends BaseAction implements EventSubscriberInterface
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function toggleVisibility(BrandToggleVisibilityEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
+    public function toggleVisibility(BrandToggleVisibilityEvent $event): void
     {
         $brand = $event->getBrand();
 

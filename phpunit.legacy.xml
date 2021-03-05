@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true"
-         bootstrap="tests/Legacy/bootstrap.php" verbose="true" backupGlobals="false"
+         bootstrap="tests/Legacy/bootstrap.php" verbose="false" backupGlobals="false"
          cacheResultFile="var/cache-ci/.phpunit.legacy.result.cache"
+         stopOnFailure="true"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
   <coverage>
     <include>

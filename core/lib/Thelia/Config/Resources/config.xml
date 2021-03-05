@@ -96,6 +96,9 @@
     </parameters>
 
     <services>
+        <service id="Symfony\Component\DependencyInjection\ContainerInterface" class="Symfony\Component\DependencyInjection\ContainerInterface"/>
+        <service id="Psr\Container\ContainerInterface" alias="Symfony\Component\DependencyInjection\ContainerInterface"/>
+
         <!-- Thelia template helper -->
         <service id="thelia.template_helper" class="Thelia\Core\Template\TheliaTemplateHelper" public="true"/>
 

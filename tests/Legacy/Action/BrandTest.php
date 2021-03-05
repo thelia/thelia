@@ -140,7 +140,7 @@ class BrandTest extends TestCaseWithURLToolSetup
         $event = new BrandToggleVisibilityEvent($brand);
 
         $brandAction = new Brand();
-        $brandAction->toggleVisibility($event, null, $this->getMockEventDispatcher());
+        $brandAction->toggleVisibility($event);
 
         $updatedBrand = $event->getBrand();
 

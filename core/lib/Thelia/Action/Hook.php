@@ -12,7 +12,7 @@
 
 namespace Thelia\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Hook\HookCreateAllEvent;
@@ -36,12 +36,16 @@ class Hook extends BaseAction implements EventSubscriberInterface
     /** @var string */
     protected $cacheDir;
 
-    public function __construct($kernelCacheDir)
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
+
+    public function __construct($kernelCacheDir, EventDispatcherInterface $dispatcher)
     {
         $this->cacheDir = $kernelCacheDir;
+        $this->dispatcher = $dispatcher;
     }
 
-    public function create(HookCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function create(HookCreateEvent $event): void
     {
         $hook = new HookModel();
 
@@ -56,10 +60,10 @@ class Hook extends BaseAction implements EventSubscriberInterface
 
         $event->setHook($hook);
 
-        $this->cacheClear($dispatcher);
+        $this->cacheClear();
     }
 
-    public function update(HookUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function update(HookUpdateEvent $event): void
     {
         if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
             $hook
@@ -76,17 +80,17 @@ class Hook extends BaseAction implements EventSubscriberInterface
                 ->save();
 
             $event->setHook($hook);
-            $this->cacheClear($dispatcher);
+            $this->cacheClear();
         }
     }
 
-    public function delete(HookDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function delete(HookDeleteEvent $event): void
     {
         if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
             $hook->delete();
             $event->setHook($hook);
 
-            $this->cacheClear($dispatcher);
+            $this->cacheClear();
         }
     }
 
@@ -130,7 +134,7 @@ class Hook extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function toggleActivation(HookToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function toggleActivation(HookToggleActivationEvent $event): void
     {
         if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
             $hook
@@ -138,15 +142,15 @@ class Hook extends BaseAction implements EventSubscriberInterface
                 ->save();
             $event->setHook($hook);
 
-            $this->cacheClear($dispatcher);
+            $this->cacheClear();
         }
     }
 
-    protected function cacheClear(EventDispatcherInterface $dispatcher): void
+    protected function cacheClear(): void
     {
         $cacheEvent = new CacheEvent($this->cacheDir);
 
-        $dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
+        $this->dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
     /**

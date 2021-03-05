@@ -168,7 +168,7 @@ abstract class BaseLoopTestor extends TestCase
         $dummy = null;
         $loopResults = $this->instance->exec($dummy);
 
-        $this->assertEquals($limit, $loopResults->getCount());
+        $this->assertLessThanOrEqual($limit, $loopResults->getCount());
     }
 
     protected function getTestedInstance()
@@ -181,7 +181,8 @@ abstract class BaseLoopTestor extends TestCase
             $this->container->get('event_dispatcher'),
             $this->container->get('thelia.securityContext'),
             $this->container->get('thelia.translator'),
-            []
+            [],
+            'dev'
         );
     }
 }

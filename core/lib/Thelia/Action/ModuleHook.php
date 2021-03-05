@@ -12,8 +12,8 @@
 
 namespace Thelia\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Hook\HookToggleActivationEvent;
 use Thelia\Core\Event\Hook\HookUpdateEvent;
@@ -44,9 +44,13 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
     /** @var string */
     protected $cacheDir;
 
-    public function __construct($kernelCacheDir)
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
+
+    public function __construct($kernelCacheDir, EventDispatcherInterface $dispatcher)
     {
         $this->cacheDir = $kernelCacheDir;
+        $this->dispatcher = $dispatcher;
     }
 
     public function toggleModuleActivation(ModuleToggleActivationEvent $event)
@@ -127,7 +131,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         $event->setModuleHook($moduleHook);
     }
 
-    public function updateModuleHook(ModuleHookUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function updateModuleHook(ModuleHookUpdateEvent $event): void
     {
         if (null !== $moduleHook = ModuleHookQuery::create()->findPk($event->getModuleHookId())) {
             // todo: test if classname and method exists
@@ -143,11 +147,11 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
 
             $event->setModuleHook($moduleHook);
 
-            $this->cacheClear($dispatcher);
+            $this->cacheClear();
         }
     }
 
-    public function deleteModuleHook(ModuleHookDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function deleteModuleHook(ModuleHookDeleteEvent $event): void
     {
         if (null !== $moduleHook = ModuleHookQuery::create()->findPk($event->getModuleHookId())) {
             $moduleHook->delete();
@@ -164,11 +168,11 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
                 ->setClassname($moduleHook->getClassname())
                 ->save();
 
-            $this->cacheClear($dispatcher);
+            $this->cacheClear();
         }
     }
 
-    public function toggleModuleHookActivation(ModuleHookToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function toggleModuleHookActivation(ModuleHookToggleActivationEvent $event)
     {
         if (null !== $moduleHook = $event->getModuleHook()) {
             if ($moduleHook->getModuleActive()) {
@@ -178,7 +182,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
                 throw new \LogicException(Translator::getInstance()->trans('The module has to be activated.'));
             }
         }
-        $this->cacheClear($dispatcher);
+        $this->cacheClear();
 
         return $event;
     }
@@ -190,41 +194,41 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
      *
      * @return UpdatePositionEvent $event
      */
-    public function updateModuleHookPosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function updateModuleHookPosition(UpdatePositionEvent $event)
     {
-        $this->genericUpdatePosition(ModuleHookQuery::create(), $event, $dispatcher);
-        $this->cacheClear($dispatcher);
+        $this->genericUpdatePosition(ModuleHookQuery::create(), $event);
+        $this->cacheClear();
 
         return $event;
     }
 
-    public function updateHook(HookUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function updateHook(HookUpdateEvent $event): void
     {
         if ($event->hasHook()) {
             $hook = $event->getHook();
             ModuleHookQuery::create()
                 ->filterByHookId($hook->getId())
                 ->update(['HookActive' => $hook->getActivate()]);
-            $this->cacheClear($dispatcher);
+            $this->cacheClear();
         }
     }
 
-    public function toggleHookActivation(HookToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
+    public function toggleHookActivation(HookToggleActivationEvent $event): void
     {
         if ($event->hasHook()) {
             $hook = $event->getHook();
             ModuleHookQuery::create()
                 ->filterByHookId($hook->getId())
                 ->update(['HookActive' => $hook->getActivate()]);
-            $this->cacheClear($dispatcher);
+            $this->cacheClear();
         }
     }
 
-    protected function cacheClear(EventDispatcherInterface $dispatcher): void
+    protected function cacheClear(): void
     {
         $cacheEvent = new CacheEvent($this->cacheDir);
 
-        $dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
+        $this->dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
     /**

@@ -239,7 +239,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
         /** @var ModuleHook $moduleHook */
         foreach ($moduleHooks as $moduleHook) {
             // check if class and method exists
-            if (!$container->hasDefinition($moduleHook->getClassname())) {
+            if (null === $moduleHook->getClassname() || !$container->hasDefinition($moduleHook->getClassname())) {
                 continue;
             }
 

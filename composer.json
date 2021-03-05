@@ -102,10 +102,10 @@
             "./vendor/bin/phpunit --configuration phpunit.xml.dist --testsuit functional"
         ],
         "test-legacy": [
-            "php Thelia module:activate CustomDelivery",
-            "php Thelia module:activate Cheque",
-            "php Thelia module:activate HookTest",
-            "php Thelia module:activate VirtualProductDelivery",
+            "php Thelia module:activate CustomDelivery -s",
+            "php Thelia module:activate Cheque -s",
+            "php Thelia module:activate HookTest -s",
+            "php Thelia module:activate VirtualProductDelivery -s",
             "./vendor/bin/phpunit --configuration phpunit.legacy.xml"
         ],
         "test": [

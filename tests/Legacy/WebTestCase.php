@@ -41,24 +41,6 @@ class WebTestCase extends TestCase
     protected static $kernel;
 
     /**
-     * @return Client
-     */
-    protected static function createClient(array $options = [], array $server = [])
-    {
-        if (null !== static::$kernel) {
-            static::$kernel->shutdown();
-        }
-
-        static::$kernel = new Thelia('test', true);
-        static::$kernel->boot();
-
-        $client = static::$kernel->getContainer()->get('test.client');
-        $client->setServerParameters($server);
-
-        return $client;
-    }
-
-    /**
      * Shuts the kernel down if it was used in the test.
      */
     protected function tearDown(): void

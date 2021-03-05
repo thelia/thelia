@@ -77,7 +77,7 @@ Use the optionnal $field_value parameter if no value is defined
 {elseif $type == 'collection'}
     id="{$label_attr.for|default:null}" name="{$name}[]" class="{$standardClass} {$field_extra_class}" {if $multiple}multiple{/if} {if isset($attr_list.size)}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {elseif $type == 'textarea'}
-    id="{$label_attr.for|default:null}" name="{$name}" class="{$standardClass} {$field_extra_class}" {if $attr_list.rows}rows="{$attr_list.rows}"{/if} {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+    id="{$label_attr.for|default:null}" name="{$name}" class="{$standardClass} {$field_extra_class}" {if $attr_list.rows|default:null}rows="{$attr_list.rows}"{/if} {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {else}
     id="{$label_attr.for|default:null}" name="{$name}" value="{$value}" class="{$standardClass} {$field_extra_class}" {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {/if}

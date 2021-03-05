@@ -42,7 +42,7 @@ class HookTest extends BaseAction
         $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\ContainerInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->action = new Hook($stubContainer, $this->getMockEventDispatcher());
+        $this->action = new Hook(THELIA_CACHE_DIR, $this->getMockEventDispatcher());
     }
 
     public function testCreate()
@@ -56,7 +56,7 @@ class HookTest extends BaseAction
             ->setNative(true)
             ->setTitle('Hook Test');
 
-        $this->action->create($event, null, $this->getMockEventDispatcher());
+        $this->action->create($event);
 
         $createdHook = $event->getHook();
 
