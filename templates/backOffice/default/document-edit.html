@@ -68,11 +68,11 @@
 
                                                     {form_field field='visible'}
                                                     <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
+                                                        <label for="{$label_attr.for|default:null}" class="control-label">{intl l='Visibility'}</label>
 
                                                         <div class="checkbox">
                                                             <label>
-                                                                <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $VISIBLE != 0}checked="checked"{/if}>
+                                                                <input type="checkbox" id="{$label_attr.for|default:null}" name="{$name}" value="1" {if $VISIBLE != 0}checked="checked"{/if}>
                                                                 {$label}
                                                             </label>
                                                         </div>

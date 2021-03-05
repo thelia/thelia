@@ -17,7 +17,7 @@
 {include
   file="components/smarty/Select/Select.html"
   name=$name
-  id="{$label_attr.for}"
+  id="{$label_attr.for|default:null}"
   value=$value
   label=$label
   required=$required

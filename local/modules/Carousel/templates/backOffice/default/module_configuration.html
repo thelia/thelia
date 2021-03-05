@@ -15,9 +15,9 @@
 
                         {form_field field='file'}
                             <div class="form-group {if $error}has-error{/if}">
-                                <label for="{$label_attr.for}" class="control-label">{intl d='carousel.bo.default' l='Add an image to the carousel'}</label>
+                                <label for="{$label_attr.for|default:null}" class="control-label">{intl d='carousel.bo.default' l='Add an image to the carousel'}</label>
                                 <div class="input-group">
-                                    <input type="file" id="{$label_attr.for}" {if $required}required="required"{/if} name="{$name}" value="{$value}" title="{intl l='Carousel image' d='carousel.bo.default'}" placeholder="{intl l='Carousel image' d='carousel.bo.default'}" class="form-control">
+                                    <input type="file" id="{$label_attr.for|default:null}" {if $required}required="required"{/if} name="{$name}" value="{$value}" title="{intl l='Carousel image' d='carousel.bo.default'}" placeholder="{intl l='Carousel image' d='carousel.bo.default'}" class="form-control">
                                     <span class="input-group-btn">
                                         <input type="submit" class="form-submit-button btn btn-sm btn-success" value="{intl d='carousel.bo.default' l='Add this image to the carousel'}" >
                                     </span>

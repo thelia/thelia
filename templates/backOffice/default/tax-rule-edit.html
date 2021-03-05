@@ -72,19 +72,19 @@
 
                                     {form_field field='title'}
                                         <div class="form-group {if $error}has-error{/if}">
-                                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                                            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $error}{$value}{else}{if $IS_TRANSLATED == 1}{$TITLE}{/if}{/if}">
+                                            <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>
+                                            <input type="text" id="{$label_attr.for|default:null}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $error}{$value}{else}{if $IS_TRANSLATED == 1}{$TITLE}{/if}{/if}">
                                         </div>
                                     {/form_field}
 
                                     {form_field field='description'}
                                         <div class="form-group {if $error}has-error{/if}">
-                                            <label for="{$label_attr.for}" class="control-label">
+                                            <label for="{$label_attr.for|default:null}" class="control-label">
                                                 {$label} :
                                                 <span class="label-help-block">{intl l="The detailed description."}</span>
                                             </label>
 
-                                            <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{if $error}{$value}{else}{if $IS_TRANSLATED == 1}{$DESCRIPTION}{/if}{/if}</textarea>
+                                            <textarea name="{$name}" id="{$label_attr.for|default:null}" rows="10" class="form-control wysiwyg">{if $error}{$value}{else}{if $IS_TRANSLATED == 1}{$DESCRIPTION}{/if}{/if}</textarea>
                                         </div>
                                     {/form_field}
 
@@ -296,7 +296,6 @@
 
 </div>
 
-
 {* Confirmation dialog *}
     {form name="thelia.admin.taxrule.taxlistupdate"}
 
@@ -347,7 +346,6 @@
 {/block}
 
 {block name="javascript-initialization"}
-
     {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
         <script src='{$asset_url}'></script>
     {/javascripts}
@@ -358,36 +356,35 @@
 
     <script src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 
-<script id="tax-group" type="text/html">
-    <div class="drop-group droppable add-to-group">
-        <p class="drop-message">
-            <span class="glyphicon glyphicon-plus"></span>
-            <span class="message">{intl l="Add tax to this group"}</span>
-        </p>
+    <script id="tax-group" type="text/html">
+        <div class="drop-group droppable add-to-group">
+            <p class="drop-message">
+                <span class="glyphicon glyphicon-plus"></span>
+                <span class="message">{intl l="Add tax to this group"}</span>
+            </p>
 
+            <% _.each(taxes, function(tax) { %>
+            <div class="drag bg-info" data-id="<%= tax.id %>"><%- tax.title %></div>
+            <% }) %>
+        </div>
+    </script>
+
+    <script id="tax-list" type="text/html">
         <% _.each(taxes, function(tax) { %>
-        <div class="drag bg-info" data-id="<%= tax.id %>"><%- tax.title %></div>
+        <div class="draggable bg-warning" data-id="<%= tax.id %>"><%- tax.title %></div>
         <% }) %>
-    </div>
-</script>
-
-<script id="tax-list" type="text/html">
-    <% _.each(taxes, function(tax) { %>
-    <div class="draggable bg-warning" data-id="<%= tax.id %>"><%- tax.title %></div>
-    <% }) %>
-</script>
+    </script>
 
     {* get taxes configuration *}
     {$taxes=[]}
     {loop type="tax" name="tax-list"}
-        {$taxes[$ID]= {$TITLE}}
+    {$taxes[$ID]= {$TITLE}}
     {/loop}
 
     <script>
         $(function() {
-
             var configuration = {render action='Thelia\Controller\Admin\TaxRuleController::specsAction' taxRuleId=$tax_rule_id};
-            var taxes = {$taxes|json_encode nofilter};
+            var taxes = {$taxes|default:null|json_encode nofilter};
             var eventsRegistered = false;
             var taxesConfigurationInitialized = false;
             var lastSelectedSpec = '';

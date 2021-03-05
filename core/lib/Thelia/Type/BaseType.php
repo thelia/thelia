@@ -12,6 +12,7 @@
 
 namespace Thelia\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 
@@ -26,9 +27,12 @@ abstract class BaseType implements TypeInterface
 
     abstract public function getFormattedValue($value);
 
-    abstract public function getFormType();
-
     abstract public function getFormOptions();
+
+    public function getFormType()
+    {
+        return TextType::class;
+    }
 
     public function verifyForm($value, ExecutionContextInterface $context): void
     {

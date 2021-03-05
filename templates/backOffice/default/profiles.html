@@ -13,7 +13,7 @@
 <div>
 
     <div id="wrapper" class="container">
-        
+
         <div class="clearfix">
             <ul class="breadcrumb">
                 <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
@@ -128,7 +128,7 @@
                                     </tr>
                                 {/elseloop}
 
-                            </tbody>                            
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -158,7 +158,7 @@
 
     {loop type="lang" name="current-edit-lang" default_only="1"}
         <div class="text-center well well-sm">
-            <img src="{image file="assets/img/flags/$CODE.png"}" alt="{$TITLE}" />
+            <img class="img-flags" src="{image file="assets/img/svgFlags/$CODE.svg"}" alt="{$TITLE}" />
             {intl l="Enter information in the default language (%title)" title={$TITLE}}
         </div>
 
@@ -169,40 +169,40 @@
 
     {form_field field='code'}
         <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Profile code'}" placeholder="{intl l='Profile code'}" class="form-control" value="{if $form_error}{$value}{/if}">
+            <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>
+            <input type="text" id="{$label_attr.for|default:null}" name="{$name}" required="required" title="{intl l='Profile code'}" placeholder="{intl l='Profile code'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
     {form_field field='title'}
         <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $form_error}{$value}{/if}">
+            <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>
+            <input type="text" id="{$label_attr.for|default:null}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
     {form_field field='chapo'}
         <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="text" id="{$label_attr.for}" name="{$name}" title="{intl l='Short description'}" placeholder="{intl l='Short description'}" class="form-control" value="{if $form_error}{$value}{/if}">
+            <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>
+            <input type="text" id="{$label_attr.for|default:null}" name="{$name}" title="{intl l='Short description'}" placeholder="{intl l='Short description'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
     {form_field field='description'}
         <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">
+            <label for="{$label_attr.for|default:null}" class="control-label">
                 {$label} :
                 <span class="label-help-block">{intl l="The detailed description."}</span>
             </label>
 
-            <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{if $form_error}{$value}{/if}</textarea>
+            <textarea name="{$name}" id="{$label_attr.for|default:null}" rows="10" class="form-control wysiwyg">{if $form_error}{$value}{/if}</textarea>
         </div>
     {/form_field}
 
     {form_field field='postscriptum'}
         <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="text" id="{$label_attr.for}" name="{$name}" title="{intl l='Postscriptum'}" placeholder="{intl l='Postscriptum'}" class="form-control" value="{if $form_error}{$value}{/if}">
+            <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>
+            <input type="text" id="{$label_attr.for|default:null}" name="{$name}" title="{intl l='Postscriptum'}" placeholder="{intl l='Postscriptum'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
     {hook name="profile.create-form" location="profile_create_form" }

@@ -14,12 +14,12 @@
             <div class="col-xs-6">
                 {form_field field="language"}
                     <div>
-                        <label for="{$label_attr.for}">
+                        <label for="{$label_attr.for|default:null}">
                             {$label}
                         </label>
                     </div>
                     <div>
-                        <select id="{$label_attr.for}" name="{$name}" required>
+                        <select id="{$label_attr.for|default:null}" name="{$name}" required>
                             {loop name="import-lang" type="lang"}
                                 <option value="{$ID}"{if $ID == {lang attr="id"}} selected{/if}>{$TITLE}</option>
                             {/loop}
@@ -30,13 +30,13 @@
             <div class="col-xs-6">
                 {form_field field="file_upload"}
                     <div>
-                        <label form="{$label_attr.for}">
+                        <label form="{$label_attr.for|default:null}">
                             {$label}
                         </label>
                     </div>
 
                     <div>
-                        <input id="{$label_attr.for}" type="file" name="{$name}" accept="{$ALLOWED_MIME_TYPES}" required aria-required="true" />
+                        <input id="{$label_attr.for|default:null}" type="file" name="{$name}" accept="{$ALLOWED_MIME_TYPES}" required aria-required="true" />
                         <div class="small">Accepted formats&nbsp;: {$ALLOWED_EXTENSIONS}</div>
                     </div>
                 {/form_field}

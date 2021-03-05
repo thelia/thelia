@@ -42,11 +42,6 @@ class FloatToFloatArrayType extends BaseType
         return $this->isValid($value) ? $value : null;
     }
 
-    public function getFormType()
-    {
-        return 'text';
-    }
-
     public function getFormOptions()
     {
         return [];

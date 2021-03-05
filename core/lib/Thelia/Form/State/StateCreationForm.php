@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Form\Type\Field\CountryIdType;
 use Thelia\Form\BaseForm;
 
 /**
@@ -38,7 +39,7 @@ class StateCreationForm extends BaseForm
                     'label' => $this->translator->trans('State title'),
                 ]
             )
-            ->add('country_id', 'country_id', [
+            ->add('country_id', CountryIdType::class, [
                 'constraints' => [
                     new NotBlank(),
                 ],

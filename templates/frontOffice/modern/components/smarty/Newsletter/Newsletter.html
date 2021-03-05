@@ -4,7 +4,7 @@
     <div class="Newsletter-field">
       {form_field field="email"}
       <div class="flex">
-        <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" placeholder="{$label}" class="w-full" {if $required} aria-required="true" required{/if} />
+        <input type="email" name="{$name}" id="{$label_attr.for|default:null}" value="{$value}" placeholder="{$label}" class="w-full" {if $required} aria-required="true" required{/if} />
       </div>
       <div class="invalid-feedback text-red-500 hidden py-2">
           {intl l="Error during registration"}

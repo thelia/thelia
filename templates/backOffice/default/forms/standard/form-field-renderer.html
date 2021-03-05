@@ -22,7 +22,7 @@ fragment uses the following additional variables :
 {/if}
 {if (! empty($field_id))}
     {$label_attr.for = $field_id}
-{elseif empty({$label_attr.for})}
+{elseif empty({$label_attr.for|default:null})}
     {* Synthetize an ID if none was given *}
     {$label_attr.for = "{$form->getName()}-id-{$field_name}"}
 {/if}

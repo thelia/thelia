@@ -58,9 +58,9 @@
                                             {form_field field="level"}
 					                        <div class="form-group {if $error}has-error{/if}">
 
-					                            <label for="{$label_attr.for}" class="control-label">{$label}: </label>
+					                            <label for="{$label_attr.for|default:null}" class="control-label">{$label}: </label>
 
-				                                <select name="{$name}" id="{$label_attr.for}" class="form-control">
+				                                <select name="{$name}" id="{$label_attr.for|default:null}" class="form-control">
 				                                    {foreach $choices as $choice}
 				                                        <option value="{$choice->value}" {if $value == $choice->value}selected="selected"{/if}>{$choice->label}</option>
 				                                    {/foreach}
@@ -74,10 +74,10 @@
 
 					                        {form_field field='format'}
 					                           <div class="form-group {if $error}has-error{/if}">
-					                               <label for="{$label_attr.for}" class="control-label">{$label}: </label>
+					                               <label for="{$label_attr.for|default:null}" class="control-label">{$label}: </label>
 
 					                               <div class="form-group">
-					                                   <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Log lines format'}">
+					                                   <input type="text" id="{$label_attr.for|default:null}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Log lines format'}">
 					                               </div>
 
 	                                                <span class="help-block">
@@ -97,7 +97,7 @@
 
 					                        {form_field field='show_redirections'}
 					                           <div class="form-group {if $error}has-error{/if}">
-					                               <label for="{$label_attr.for}" class="control-label">{$label}: </label>
+					                               <label for="{$label_attr.for|default:null}" class="control-label">{$label}: </label>
 
                                                    <div>
 	                                                   <label class="radio-inline">
@@ -114,10 +114,10 @@
 
 					                        {form_field field='files'}
 					                           <div class="form-group {if $error}has-error{/if}">
-					                               <label for="{$label_attr.for}" class="control-label">{$label}: </label>
+					                               <label for="{$label_attr.for|default:null}" class="control-label">{$label}: </label>
 
 					                               <div class="form-group">
-					                                   <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='File names'}">
+					                                   <input type="text" id="{$label_attr.for|default:null}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='File names'}">
 					                               </div>
 
 					                               <span class="help-block">{intl l='Enter one or more file names without path separated by ";". Use "!" before a file name to exclude it. Use "*" to activate logs for all files.'}</span>
@@ -126,10 +126,10 @@
 
                                             {form_field field='ip_addresses'}
                                                <div class="form-group {if $error}has-error{/if}">
-                                                   <label for="{$label_attr.for}" class="control-label">{$label}: </label>
+                                                   <label for="{$label_attr.for|default:null}" class="control-label">{$label}: </label>
 
                                                    <div class="form-group">
-                                                       <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='IP Addresses'}">
+                                                       <input type="text" id="{$label_attr.for|default:null}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='IP Addresses'}">
                                                    </div>
 
                                                    <span class="help-block">{intl l='Enter one or more IP V4 addresses separated by ";". Leave empty to display logs for all IP addresses'}</span>

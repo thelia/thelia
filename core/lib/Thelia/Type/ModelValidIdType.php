@@ -13,6 +13,7 @@
 namespace Thelia\Type;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TypeException;
 
@@ -60,7 +61,7 @@ class ModelValidIdType extends BaseType
 
     public function getFormType()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     public function getFormOptions()

@@ -6,7 +6,7 @@
     file="components/smarty/Input/Input.html"
     type="text"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value={$value|default:{$LABEL} nofilter}
     label=$label
     placeholder=""
@@ -32,7 +32,7 @@
     {include
       file="components/smarty/Select/Select.html"
       name=$name
-      id="{$label_attr.for}"
+      id="{$label_attr.for|default:null}"
       value=$value
       label=$label
       defaultValue=""
@@ -51,7 +51,7 @@
     file="components/smarty/Input/Input.html"
     type="text"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value={$value|default:{$FIRSTNAME|default:null} nofilter}
     label=$label
     placeholder={intl l="First name"}
@@ -68,7 +68,7 @@
     file="components/smarty/Input/Input.html"
     type="text"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value={$value|default:{$LASTNAME|default:null} nofilter}
     label=$label
     placeholder={intl l="Last name"}
@@ -83,7 +83,7 @@
     file="components/smarty/Input/Input.html"
     type="email"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value={$smarty.get.email|default:$value}
     label=$label
     placeholder=""
@@ -98,7 +98,7 @@
     file="components/smarty/Input/Input.html"
     type="email"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value={$smarty.get.email|default:$value}
     label=$label
     placeholder={intl l="Email confirmation"}
@@ -114,7 +114,7 @@
     file="components/smarty/Input/Input.html"
     type="text"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value={$value|default:{$COMPANY|default:null} nofilter}
     label=$label
     placeholder=""
@@ -130,7 +130,7 @@
     file="components/smarty/Input/Input.html"
     type="text"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value={$value|default:{$SIRET|default:null} nofilter}
     label=$label
     placeholder=""
@@ -147,7 +147,7 @@
     file="components/smarty/Input/Input.html"
     type="text"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value={$value|default:{$VAT|default:null} nofilter}
     label=$label
     placeholder=""
@@ -164,7 +164,7 @@
     file="components/smarty/Input/Input.html"
     type="text"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value={$value|default:{$ADDRESS1|default:null} nofilter}
     label=$label
     placeholder=""
@@ -181,7 +181,7 @@
     file="components/smarty/Input/Input.html"
     type="text"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value={$value|default:{$ADDRESS2|default:null} nofilter}
     label=$label
     placeholder=""
@@ -198,7 +198,7 @@
     file="components/smarty/Input/Input.html"
     type="text"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value={$value|default:{$ZIPCODE|default:null} nofilter}
     label=$label
     placeholder=""
@@ -215,7 +215,7 @@
     file="components/smarty/Input/Input.html"
     type="text"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value={$value|default:{$CITY|default:null} nofilter}
     label=$label
     placeholder=""
@@ -247,7 +247,7 @@
     {include
       file="components/smarty/Select/Select.html"
       name=$name
-      id="{$label_attr.for}"
+      id="{$label_attr.for|default:null}"
       value=$value
       label=$label
       required=$required
@@ -272,7 +272,7 @@
     file="components/smarty/Input/Input.html"
     type="text"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value={$value|default:{$PHONE|default:null} nofilter}
     label=$label
     placeholder=""
@@ -289,7 +289,7 @@
     file="components/smarty/Input/Input.html"
     type="text"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value={$value|default:{$CELLPHONE|default:null} nofilter}
     label=$label
     placeholder=""
@@ -304,7 +304,7 @@
     file="components/smarty/Input/Input.html"
     type="password"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value={$value}
     label=$label
     placeholder=""
@@ -319,7 +319,7 @@
   file="components/smarty/Input/Input.html"
   type="password"
   name=$name
-  id="{$label_attr.for}"
+  id="{$label_attr.for|default:null}"
   value={$value}
   label=$label
   placeholder=""
@@ -355,7 +355,7 @@
   {include
     file="components/smarty/Select/Select.html"
     name=$name
-    id="{$label_attr.for}"
+    id="{$label_attr.for|default:null}"
     value=$value
     label=$label
     required=$required

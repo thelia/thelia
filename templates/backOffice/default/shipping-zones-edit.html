@@ -57,9 +57,9 @@
                                 {/form_field}
 
                                 {form_field field='area_id'}
-                                <label class="control-label" for="{$label_attr.for}">{$label}</label>
+                                <label class="control-label" for="{$label_attr.for|default:null}">{$label}</label>
                                 <div class="input-group">
-                                    <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
+                                    <select name="{$name}" id="{$label_attr.for|default:null}" data-toggle="selectpicker">
                                         {loop name="area.module.not_associated" type="area" without_zone=$delivery_module_id}
                                         <option value="{$ID}">{$NAME}</option>
                                         {/loop}

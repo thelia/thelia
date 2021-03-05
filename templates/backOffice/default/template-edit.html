@@ -58,8 +58,8 @@
 
                                             {form_field field='name'}
                                                 <div class="form-group {if $error}has-error{/if}">
-                                                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                                                    <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Template name'}" placeholder="{intl l='Template name'}" class="form-control">
+                                                    <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>
+                                                    <input type="text" id="{$label_attr.for|default:null}" required="required" name="{$name}" value="{$value}" title="{intl l='Template name'}" placeholder="{intl l='Template name'}" class="form-control">
                                                 </div>
                                             {/form_field}
                                         </form>

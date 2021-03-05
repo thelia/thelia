@@ -12,6 +12,8 @@
 
 namespace Thelia\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+
 /**
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
@@ -30,11 +32,6 @@ class AlphaNumStringType extends BaseType
     public function getFormattedValue($value)
     {
         return $this->isValid($value) ? $value : null;
-    }
-
-    public function getFormType()
-    {
-        return 'text';
     }
 
     public function getFormOptions()

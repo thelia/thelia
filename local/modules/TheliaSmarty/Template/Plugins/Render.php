@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Thelia\Core\Controller\ControllerResolver;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\Exception\SmartyPluginException;
@@ -38,11 +39,19 @@ class Render extends AbstractSmartyPlugin
     /** @var Container */
     protected $container;
 
-    public function __construct(ControllerResolver $controllerResolver, RequestStack $requestStack, ContainerInterface $container)
-    {
+    /** @var ArgumentResolverInterface */
+    protected $argumentResolver;
+
+    public function __construct(
+        ControllerResolver $controllerResolver,
+        RequestStack $requestStack,
+        ContainerInterface $container,
+        ArgumentResolverInterface $argumentResolver
+    ) {
         $this->controllerResolver = $controllerResolver;
         $this->requestStack = $requestStack;
         $this->container = $container;
+        $this->argumentResolver = $argumentResolver;
     }
 
     /**
@@ -65,8 +74,8 @@ class Render extends AbstractSmartyPlugin
         $this->requestStack->push($request);
 
         $controller = $this->controllerResolver->getController($request);
-
-        $response = \call_user_func_array($controller, []);
+        $arguments = $this->argumentResolver->getArguments($request, $controller);
+        $response = \call_user_func_array($controller, $arguments);
 
         $this->requestStack->pop();
 

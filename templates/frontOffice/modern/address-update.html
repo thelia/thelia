@@ -118,7 +118,7 @@
 
             {form_field field="country"}
               {assign var="customer_country_id" value={$value|default:$COUNTRY}}
-              {$countryFieldId=$label_attr.for}
+              {$countryFieldId=$label_attr.for|default:null}
               {call name="fn_address_field_country"}
             {/form_field}
 

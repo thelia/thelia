@@ -32,11 +32,6 @@ class AnyType extends BaseType
         return $value;
     }
 
-    public function getFormType()
-    {
-        return 'text';
-    }
-
     public function getFormOptions()
     {
         return [];

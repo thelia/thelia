@@ -51,7 +51,7 @@
 
                             {form_field form=$form field="footer_body_folder_id"}
                             <div class="form-group {if $error}has-error{/if}">
-                                <label class="control-label" for="{$label_attr.for}">
+                                <label class="control-label" for="{$label_attr.for|default:null}">
                                     {$label}
                                     {if $required}<span class="required">*</span>{/if}
 
@@ -61,7 +61,7 @@
                                     {/form_error}
                                 </label>
 
-                                <select id="{$label_attr.for}" class="form-control" name="{$name}" >
+                                <select id="{$label_attr.for|default:null}" class="form-control" name="{$name}" >
                                     <option>--- {intl l="Select a folder" d="hooknavigation.bo.default"} ---</option>
                                     {loop type="folder" name="folder_list_body"}
                                         <option value="{$ID}" {if $bodyConfig == $ID}selected{/if}>
@@ -78,7 +78,7 @@
 
                             {form_field form=$form field="footer_bottom_folder_id"}
                             <div class="form-group {if $error}has-error{/if}">
-                                <label class="control-label" for="{$label_attr.for}">
+                                <label class="control-label" for="{$label_attr.for|default:null}">
                                     {$label}
                                     {if $required}<span class="required">*</span>{/if}
 
@@ -88,7 +88,7 @@
                                     {/form_error}
                                 </label>
 
-                                <select id="{$label_attr.for}" class="form-control" name="{$name}" >
+                                <select id="{$label_attr.for|default:null}" class="form-control" name="{$name}" >
                                     <option>--- {intl l="Select a folder" d="hooknavigation.bo.default"} ---</option>
                                     {loop type="folder" name="folder_list_bottom"}
                                         <option value="{$ID}" {if $bottomConfig == $ID}selected{/if}>

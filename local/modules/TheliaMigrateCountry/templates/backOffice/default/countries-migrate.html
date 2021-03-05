@@ -111,7 +111,7 @@
                                                     </td>
                                                     <td>
                                                         {form_collection_field form=$form row=$row field="new_state"}
-                                                        {$ref[]={$label_attr.for}}
+                                                        {$ref[]={$label_attr.for|default:null}}
                                                             <input type="hidden" name="{$name}" id="new_state_{$collection_current}" value="{$value}" />
                                                             <select class="form-control states-select" data-new-country="{$newCountryId}" data-country="{$countryId}" data-rel="#new_state_{$collection_current}"></select>
                                                         {/form_collection_field}

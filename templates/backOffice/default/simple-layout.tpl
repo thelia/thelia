@@ -70,7 +70,9 @@
 
         <p class="text-center">
             {loop type="lang" name="ui-lang" backend_context="1"}
-                <a href="{url path="{navigate to="current"}" lang={$CODE}}" title="{intl l="View this page in %langname" langname=$TITLE}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></a>
+                <a href="{url path="{navigate to="current"}" lang={$CODE}}" title="{intl l="View this page in %langname" langname=$TITLE}">
+                    <img class="img-flags" src="{image file="assets/img/svgFlags/{$CODE}.svg"}" alt="{$TITLE}" />
+                </a>
             {/loop}
         </p>
 

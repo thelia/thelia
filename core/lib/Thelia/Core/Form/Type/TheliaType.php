@@ -13,6 +13,8 @@
 namespace Thelia\Core\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -26,7 +28,7 @@ class TheliaType extends AbstractType
             'options' => false,
         ]);
 
-        $resolver->setAllowedValues('type', ['text', 'choice']);
+        $resolver->setAllowedValues('type', [TextType::class, ChoiceType::class]);
     }
 
     /**
@@ -42,7 +44,7 @@ class TheliaType extends AbstractType
 
     public function getParent()
     {
-        return 'text';
+        return TextType::class;
     }
 
     public function getName()

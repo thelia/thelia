@@ -31,7 +31,7 @@
                             label=$label
                             value=$value
                             placeholder={intl l="You name"}
-                            id="{$label_attr.for}-mini"
+                            id="{$label_attr.for|default:null}-mini"
                             required=true
                           }
                         {/form_field}
@@ -43,7 +43,7 @@
                             label=$label
                             value=$value
                             placeholder={intl l="Your email"}
-                            id="{$label_attr.for}-mini"
+                            id="{$label_attr.for|default:null}-mini"
                             required=true
                           }
                         {/form_field}
@@ -55,7 +55,7 @@
                             label=$label
                             value=$value
                             placeholder={intl l="The subject of your message"}
-                            id="{$label_attr.for}-mini"
+                            id="{$label_attr.for|default:null}-mini"
                             required=true
                           }
                         {/form_field}
@@ -66,7 +66,7 @@
                           </label>
                           <textarea
                             name="{$name}"
-                            id="{$label_attr.for}"
+                            id="{$label_attr.for|default:null}"
                             placeholder="{intl l="Your message"}"
                             rows="6"
                             class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if $error}border-red-500{else}border-gray-200{/if} {$inputClass}"

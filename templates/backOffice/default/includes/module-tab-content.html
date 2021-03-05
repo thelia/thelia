@@ -1,8 +1,8 @@
 {capture name="module_include"}
-    {if $location}
-        {hook name="$hook" location="$location" id="$id" view="$view" countvar="module_count"}
+    {if $location|default:null}
+        {hook name=$hook location=$location id=$id view=$view countvar="module_count"}
     {else}
-        {hook name="$hook" id="$id" view="$view" countvar="module_count"}
+        {hook name=$hook id=$id view=$view countvar="module_count"}
     {/if}
 {/capture}
 

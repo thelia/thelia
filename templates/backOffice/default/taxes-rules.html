@@ -48,7 +48,7 @@
                     </div>
 
 
-                    {if $general_error}
+                    {if $general_error|default:null}
                         <div class="alert alert-danger">
                             {$general_error}
                         </div>
@@ -240,14 +240,14 @@
 
                 <div class="input-group">
                     <input type="text" {form_field_attributes field="title"}>
-                    <span class="input-group-addon"><img src="{image file="assets/img/flags/`$CODE`.png"}" alt="{$TITLE}" /></span>
+                    <span class="input-group-addon"><img class="img-flags" src="{image file="assets/img/svgFlags/`$CODE`.svg"}" alt="{$TITLE}" /></span>
                 </div>
             {/loop}
         {/custom_render_form_field}
 
         {form_field field='type'}
             <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">
+                <label for="{$label_attr.for|default:null}" class="control-label">
                     {$label} :
                 </label>
 
@@ -267,18 +267,18 @@
 
         {form_tagged_fields tag='requirements'}
             <div class="form-group {if $error}has-error{/if} js-tax-requirements" data-tax-type="{$attr_list.tax_type}" {if !$form_error && $attr_list.tax_type != $typeValue || $form_error && $attr_list.tax_type != $typeValueWithError}style="display: none"{/if}>
-                <label for="{$label_attr.for}" class="control-label">
+                <label for="{$label_attr.for|default:null}" class="control-label">
                     {$label}
                 </label>
-                {if $formType == 'choice'}
+                {if $type::class == "Symfony\Component\Form\Extension\Core\Type\ChoiceType"}
                     <select name="{$name}" data-toggle="selectpicker" {if !$form_error && $attr_list.tax_type != $typeValue || $form_error && $attr_list.tax_type != $typeValueWithError}disabled="disabled"{/if}>
                         {foreach $choices as $choice}
-                            <option value="{$choice->value}" {if !$form_error && $REQUIREMENTS.$label == $choice->value || $form_error && $value == $choice->value}selected="selected" {/if}>{$choice->label}</option>
+                            <option value="{$choice->value}" {if !$form_error && $REQUIREMENTS.$label|default:null == $choice->value || $form_error && $value == $choice->value}selected="selected" {/if}>{$choice->label}</option>
                         {/foreach}
                     </select>
                 {/if}
-                {if $formType == 'text'}
-                    <input type="text" {if !$form_error && $attr_list.tax_type != $typeValue || $form_error && $attr_list.tax_type != $typeValueWithError}disabled="disabled"{/if} id="{$label_attr.for}" name="{$name}" required="required" class="form-control" value="{if $form_error}{$value}{else}{$REQUIREMENTS.$label}{/if}">
+                {if $type::class == "Symfony\Component\Form\Extension\Core\Type\TextType"}
+                    <input type="text" {if !$form_error && $attr_list.tax_type != $typeValue || $form_error && $attr_list.tax_type != $typeValueWithError}disabled="disabled"{/if} id="{$label_attr.for|default:null}" name="{$name}" required="required" class="form-control" value="{if $form_error}{$value}{else}{$REQUIREMENTS.$label|default:null}{/if}">
                 {/if}
             </div>
         {/form_tagged_fields}
@@ -351,7 +351,7 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
 
                 <div class="input-group">
                 <input type="text" {form_field_attributes field="title"}>
-                <span class="input-group-addon"><img src="{image file="assets/img/flags/`$CODE`.png"}" alt="{$TITLE}" /></span>
+                <span class="input-group-addon"><img class="img-flags" src="{image file="assets/img/svgFlags/`$CODE`.svg"}" alt="{$TITLE}" /></span>
             </div>
             {/loop}
         {/custom_render_form_field}

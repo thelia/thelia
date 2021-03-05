@@ -24,20 +24,20 @@
 
                 {form_field field='username'}
                 <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label hidden">{$label} : </label>
+                    <label for="{$label_attr.for|default:null}" class="control-label hidden">{$label} : </label>
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control input-lg" title="{$label}" placeholder="{intl l='Username or e-mail address'}" autofocus>
+                        <input type="text" id="{$label_attr.for|default:null}" name="{$name}" class="form-control input-lg" title="{$label}" placeholder="{intl l='Username or e-mail address'}" autofocus>
                     </div>
                 </div>
                 {/form_field}
 
                 {form_field field='password'}
                 <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label hidden">{$label} : </label>
+                    <label for="{$label_attr.for|default:null}" class="control-label hidden">{$label} : </label>
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-                        <input type="password" id="{$label_attr.for}" name="{$name}" class="form-control input-lg" title="{$label}" placeholder="{intl l='Password'}">
+                        <input type="password" id="{$label_attr.for|default:null}" name="{$name}" class="form-control input-lg" title="{$label}" placeholder="{intl l='Password'}">
                     </div>
                 </div>
                 {/form_field}
@@ -47,8 +47,8 @@
                         {form_field field='remember_me'}
                         <div class="form-group">
                             <div class="checkbox">
-                                <label for="{$label_attr.for}">
-                                    <input type="checkbox" name="{$name}" id="{$label_attr.for}" value="{$value}" {$attr} {if isset($options.checked) && $options.checked}checked="checked"{/if}/> {$label}
+                                <label for="{$label_attr.for|default:null}">
+                                    <input type="checkbox" name="{$name}" id="{$label_attr.for|default:null}" value="{$value}" {$attr} {if isset($options.checked) && $options.checked}checked="checked"{/if}/> {$label}
                                 </label>
                             </div>
                         </div>

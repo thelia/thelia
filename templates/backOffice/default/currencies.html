@@ -271,12 +271,12 @@
 
         {form_field field='name'}
             <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>
 
                 {loop type="lang" name="default-lang" default_only="1"}
                     <div class="input-group">
-                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='Currency name'}" placeholder="{intl l='Name'}">
-                        <span class="input-group-addon"><img src="{image file="assets/img/flags/`$CODE`.png"}" alt="{$TITLE}" /></span>
+                        <input type="text" id="{$label_attr.for|default:null}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='Currency name'}" placeholder="{intl l='Name'}">
+                        <span class="input-group-addon"><img class="img-flags" src="{image file="assets/img/svgFlags/`$CODE`.svg"}" alt="{$TITLE}" /></span>
                     </div>
 
                     <div class="help-block">{intl l="Enter here the currency name in the default language (%title)" title={$TITLE}}</div>
@@ -293,31 +293,31 @@
 
         {form_field field='code'}
             <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='ISO 4217 code'}" placeholder="{intl l='Code'}">
+                <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>
+                <input type="text" id="{$label_attr.for|default:null}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='ISO 4217 code'}" placeholder="{intl l='Code'}">
                 <span class="help-block"><a href="http://fr.wikipedia.org/wiki/ISO_4217" target="_blank">{intl l='More information about ISO 4217'}</a></span>
             </div>
         {/form_field}
 
         {form_field field='symbol'}
             <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='Currency symbol'}" placeholder="{intl l='Symbol'}">
+                <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>
+                <input type="text" id="{$label_attr.for|default:null}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='Currency symbol'}" placeholder="{intl l='Symbol'}">
             </div>
         {/form_field}
 
         {form_field field='rate'}
             <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='Currency rate'}" placeholder="{intl l='Rate'}">
+                <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>
+                <input type="text" id="{$label_attr.for|default:null}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='Currency rate'}" placeholder="{intl l='Rate'}">
                 <span class="help-block">{intl l="The rate from Euro (Price in Euro * rate = Price in this currency)"}</span>
             </div>
         {/form_field}
 
         {form_field field='format'}
             <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                <input type="text" size="10" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" placeholder="{$label_attr.placeholder}" class="form-control">
+                <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>
+                <input type="text" size="10" id="{$label_attr.for|default:null}" required="required" name="{$name}" value="{$value}" placeholder="{$label_attr.placeholder|default:null}" class="form-control">
                 <span class="help-block">
                     {$label_attr.help}
                 </span>

@@ -12,11 +12,18 @@
 
 namespace Thelia\Core\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
+use Thelia\Core\Form\Type\Field\AttributeAvIdType;
+use Thelia\Core\Form\Type\Field\CurrencyIdType;
 use Thelia\Core\Form\Type\Field\ProductIdType;
 use Thelia\Core\Form\Type\Field\ProductSaleElementsIdType;
+use Thelia\Core\Form\Type\Field\TaxRuleIdType;
 
 /**
  * Class ProductSaleElementsType.
@@ -55,67 +62,67 @@ class ProductSaleElementsType extends AbstractTheliaType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('reference', 'text', [
+            ->add('reference', TextType::class, [
                 'required' => false,
             ])
-            ->add('price', 'number', [
-                'required' => false,
-                'constraints' => [
-                    new GreaterThanOrEqual(['value' => 0]),
-                ],
-            ])
-            ->add('price_with_tax', 'number', [
+            ->add('price', NumberType::class, [
                 'required' => false,
                 'constraints' => [
                     new GreaterThanOrEqual(['value' => 0]),
                 ],
             ])
-            ->add('weight', 'number', [
+            ->add('price_with_tax', NumberType::class, [
                 'required' => false,
                 'constraints' => [
                     new GreaterThanOrEqual(['value' => 0]),
                 ],
             ])
-            ->add('quantity', 'number', [
+            ->add('weight', NumberType::class, [
                 'required' => false,
                 'constraints' => [
                     new GreaterThanOrEqual(['value' => 0]),
                 ],
             ])
-            ->add('sale_price', 'number', [
+            ->add('quantity', NumberType::class, [
                 'required' => false,
                 'constraints' => [
                     new GreaterThanOrEqual(['value' => 0]),
                 ],
             ])
-            ->add('sale_price_with_tax', 'number', [
+            ->add('sale_price', NumberType::class, [
                 'required' => false,
                 'constraints' => [
                     new GreaterThanOrEqual(['value' => 0]),
                 ],
             ])
-            ->add('ean_code', 'text', [
+            ->add('sale_price_with_tax', NumberType::class, [
+                'required' => false,
+                'constraints' => [
+                    new GreaterThanOrEqual(['value' => 0]),
+                ],
+            ])
+            ->add('ean_code', TextType::class, [
                 'required' => false,
             ])
-            ->add('attribute_av', 'collection', [
-                'type' => 'attribute_av',
+            ->add('attribute_av', CollectionType::class, [
+                'type' => AttributeAvIdType::class,
                 'required' => false,
                 'allow_add' => true,
             ])
-            ->add('tax_rule_id', 'tax_rule_id')
-            ->add('currency_id', 'currency_id')
-            ->add('onsale', 'checkbox')
-            ->add('isnew', 'checkbox')
-            ->add('isdefault', 'checkbox')
-            ->add('use_exchange_rate', 'checkbox')
+            ->add('tax_rule_id', TaxRuleIdType::class)
+            ->add('currency_id', CurrencyIdType::class)
+            ->add('onsale', CheckboxType::class)
+            ->add('isnew', CheckboxType::class)
+            ->add('isdefault', CheckboxType::class)
+            ->add('use_exchange_rate', CheckboxType::class)
 
             // Only on create
-            ->add('product_id', 'product_id', [
+            ->add('product_id', ProductIdType::class, [
                 'constraints' => $this->getConstraints($this->productIdType, 'create'),
             ])
 
             // Only on update
-            ->add('id', 'product_sale_elements_id', [
+            ->add('id', ProductSaleElementsIdType::class, [
                 'constraints' => $this->getConstraints($this->pseIdType, 'update'),
             ])
         ;

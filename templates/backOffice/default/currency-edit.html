@@ -62,10 +62,10 @@
 
         										{form_field field='code'}
         		                                    <div class="form-group {if $error}has-error{/if}">
-														<label for="{$label_attr.for}" class="control-label">
+														<label for="{$label_attr.for|default:null}" class="control-label">
 															{$label}{if $required} *{/if}
 														</label>
-                                                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" placeholder="{$label_attr.placeholder}" class="form-control">
+                                                        <input type="text" id="{$label_attr.for|default:null}" required="required" name="{$name}" value="{$value}" placeholder="{$label_attr.placeholder|default:null}" class="form-control">
                                                         <span class="help-block">
                                                             <a title="{$label_attr.help}" href="http://fr.wikipedia.org/wiki/ISO_4217" target="_blank">{$label_attr.help}</a>
                                                         </span>
@@ -79,10 +79,10 @@
 
 												{form_field field='format'}
 													<div class="form-group {if $error}has-error{/if}">
-														<label for="{$label_attr.for}" class="control-label">
+														<label for="{$label_attr.for|default:null}" class="control-label">
 															{$label}{if $required} *{/if}
 														</label>
-														<input type="text" size="10" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" placeholder="{$label_attr.placeholder}" class="form-control">
+														<input type="text" size="10" id="{$label_attr.for|default:null}" required="required" name="{$name}" value="{$value}" placeholder="{$label_attr.placeholder|default:null}" class="form-control">
                                                         <span class="help-block">
 															{$label_attr.help}
                                                         </span>

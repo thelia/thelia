@@ -117,7 +117,7 @@
                                                     'auth' => ['resource' => 'admin.order-status']
                                                 ]
                                             ]}
-                                            {if !$DELETABLE}
+                                            {if !$DELETABLE|default:null}
                                                 {$buttons[] = [
                                                     'type' => 'delete',
                                                     'class' => 'order-status-cancel',
@@ -164,7 +164,7 @@
 
                 <div class="input-group">
                     <input type="text" class="form-control" {form_field_attributes field="title"}>
-                    <span class="input-group-addon"><img src="{image file="assets/img/flags/$CODE.png"}" alt="{$TITLE}" /></span>
+                    <span class="input-group-addon"><img class="img-flags" src="{image file="assets/img/svgFlags/$CODE.svg"}" alt="{$TITLE}" /></span>
                 </div>
             {/loop}
         {/custom_render_form_field}

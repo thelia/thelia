@@ -69,7 +69,7 @@
                             file="components/smarty/Input/Input.html"
                             type="email"
                             name=$name
-                            id="{$label_attr.for}"
+                            id="{$label_attr.for|default:null}"
                             value={$smarty.get.email|default:$value}
                             label=$label
                             placeholder={intl l="Email"}
@@ -91,7 +91,7 @@
                             file="components/smarty/Input/Input.html"
                             type="email"
                             name=$name
-                            id="{$label_attr.for}"
+                            id="{$label_attr.for|default:null}"
                             value=""
                             label=$label
                             placeholder={intl l="Email confirmation"}

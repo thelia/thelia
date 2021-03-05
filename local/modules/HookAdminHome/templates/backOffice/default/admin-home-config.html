@@ -15,8 +15,8 @@
 
                             {form_field form=$form field="enabled-stats"}
                                 <div class="form-group">
-                                    <label class="control-label" for="{$label_attr.for}">
-                                        <input type="checkbox" name="{$name}" id="{$label_attr.for}" {if $value}checked{/if} />
+                                    <label class="control-label" for="{$label_attr.for|default:null}">
+                                        <input type="checkbox" name="{$name}" id="{$label_attr.for|default:null}" {if $value}checked{/if} />
                                         {$label}
                                         {form_error form=$form field="enabled-stats"}
                                             <br />
@@ -31,8 +31,8 @@
 
                             {form_field form=$form field="enabled-news"}
                                 <div class="form-group">
-                                    <label class="control-label" for="{$label_attr.for}">
-                                        <input type="checkbox" name="{$name}" id="{$label_attr.for}" {if $value}checked{/if} />
+                                    <label class="control-label" for="{$label_attr.for|default:null}">
+                                        <input type="checkbox" name="{$name}" id="{$label_attr.for|default:null}" {if $value}checked{/if} />
                                         {$label}
                                         {form_error form=$form field="enabled-news"}
                                             <br />
@@ -47,8 +47,8 @@
 
                             {form_field form=$form field="enabled-sales"}
                                 <div class="form-group">
-                                    <label class="control-label" for="{$label_attr.for}">
-                                        <input type="checkbox" name="{$name}" id="{$label_attr.for}" {if $value}checked{/if} />
+                                    <label class="control-label" for="{$label_attr.for|default:null}">
+                                        <input type="checkbox" name="{$name}" id="{$label_attr.for|default:null}" {if $value}checked{/if} />
                                         {$label}
                                         {form_error form=$form field="enabled-sales"}
                                             <br />
@@ -63,8 +63,8 @@
 
                             {form_field form=$form field="enabled-info"}
                                 <div class="form-group">
-                                    <label class="control-label" for="{$label_attr.for}">
-                                        <input type="checkbox" name="{$name}" id="{$label_attr.for}" {if $value}checked{/if} />
+                                    <label class="control-label" for="{$label_attr.for|default:null}">
+                                        <input type="checkbox" name="{$name}" id="{$label_attr.for|default:null}" {if $value}checked{/if} />
                                         {$label}
                                         {form_error form=$form field="enabled-info"}
                                             <br />

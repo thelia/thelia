@@ -41,8 +41,8 @@
 
                     {form_field field='trackingcode'}
                     <div class="form-group {if $error}has-error{/if}">
-                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                        <textarea id="{$label_attr.for}" name="{$name}" class="form-control" style="height: 200px;" title="{$label}">{$value}</textarea>
+                        <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>
+                        <textarea id="{$label_attr.for|default:null}" name="{$name}" class="form-control" style="height: 200px;" title="{$label}">{$value}</textarea>
                     </div>
                     {/form_field}
 

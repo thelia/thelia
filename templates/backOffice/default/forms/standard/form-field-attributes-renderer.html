@@ -33,14 +33,14 @@ Use the optionnal $field_value parameter if no value is defined
 {* Use the provided id if any *}
 {if (! empty($field_id))}
     {$label_attr.for = {$field_id}}
-{elseif "" == $label_attr.for}
+{elseif "" == $label_attr.for|default:null}
     {* Synthetize an ID if none was given *}
     {$label_attr.for = "{$form->getName()}-id-{$field_name}"}
 {/if}
 
 {* If we have a value key, generates a unique ID based on the value key. *}
 {if ! empty($value_key)}
-    {$label_attr.for = "{$label_attr.for}_{$value_key}"}
+    {$label_attr.for = "{$label_attr.for|default:null}_{$value_key}"}
 {/if}
 
 {if $field_no_standard_classes}
@@ -69,16 +69,16 @@ Use the optionnal $field_value parameter if no value is defined
     {$sRequired='aria-required="true" required'}
 {/if}
 {if $type == 'hidden'}
-   id="{$label_attr.for}" name="{$name}" value="{$value}" {$attr}
+   id="{$label_attr.for|default:null}" name="{$name}" value="{$value}" {$attr}
 {elseif $type == 'checkbox' || $type == 'radio'}
-    id="{$label_attr.for}" name="{$name}" class="{$field_extra_class}" value="{$value}" {if $checked}checked="checked"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+    id="{$label_attr.for|default:null}" name="{$name}" class="{$field_extra_class}" value="{$value}" {if $checked}checked="checked"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {elseif $type == 'choice'}
-    id="{$label_attr.for}" name="{$name}{if $multiple && !strpos($name, '[]')}[]{/if}" class="{$standardClass} {$field_extra_class}" {if $multiple}multiple{/if} {if isset($attr_list.size)}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+    id="{$label_attr.for|default:null}" name="{$name}{if $multiple && !strpos($name, '[]')}[]{/if}" class="{$standardClass} {$field_extra_class}" {if $multiple}multiple{/if} {if isset($attr_list.size)}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {elseif $type == 'collection'}
-    id="{$label_attr.for}" name="{$name}[]" class="{$standardClass} {$field_extra_class}" {if $multiple}multiple{/if} {if isset($attr_list.size)}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+    id="{$label_attr.for|default:null}" name="{$name}[]" class="{$standardClass} {$field_extra_class}" {if $multiple}multiple{/if} {if isset($attr_list.size)}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {elseif $type == 'textarea'}
-    id="{$label_attr.for}" name="{$name}" class="{$standardClass} {$field_extra_class}" {if $attr_list.rows}rows="{$attr_list.rows}"{/if} {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+    id="{$label_attr.for|default:null}" name="{$name}" class="{$standardClass} {$field_extra_class}" {if $attr_list.rows}rows="{$attr_list.rows}"{/if} {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {else}
-    id="{$label_attr.for}" name="{$name}" value="{$value}" class="{$standardClass} {$field_extra_class}" {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+    id="{$label_attr.for|default:null}" name="{$name}" value="{$value}" class="{$standardClass} {$field_extra_class}" {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {/if}
 {/strip}

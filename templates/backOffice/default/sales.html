@@ -219,7 +219,7 @@
 
                 <div class="input-group">
                     <input type="text" {form_field_attributes field="title"}>
-                    <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                    <span class="input-group-addon"><img class="img-flags" src="{image file="assets/img/svgFlags/{$CODE}.svg"}" alt="{$TITLE}" /></span>
                 </div>
             {/loop}
             {/custom_render_form_field}
@@ -228,7 +228,7 @@
                 {loop type="lang" name="default-lang" default_only="1"}
                     <div class="input-group">
                         <input type="text" {form_field_attributes field="label"}>
-                        <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                        <span class="input-group-addon"><img class="img-flags" src="{image file="assets/img/svgFlags/{$CODE}.svg"}" alt="{$TITLE}" /></span>
                     </div>
                 {/loop}
             {/custom_render_form_field}

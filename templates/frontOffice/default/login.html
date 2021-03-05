@@ -41,9 +41,9 @@
                 <fieldset>
                     {form_field field="email"}
                         <div class="form-group group-email{if $error} has-error{/if}">
-                            <label for="{$label_attr.for}">{$label}</label>
+                            <label for="{$label_attr.for|default:null}">{$label}</label>
                             <div class="control-input">
-                            <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control input-sm" maxlength="255" {$attr} {if $required}aria-required="true" required{/if}{if !$value || $error} autofocus{/if}>
+                            <input type="email" name="{$name}" id="{$label_attr.for|default:null}" value="{$value}" class="form-control input-sm" maxlength="255" {$attr} {if $required}aria-required="true" required{/if}{if !$value || $error} autofocus{/if}>
                             {if $error}
                                 <span class="help-block">{$message}</span>
                                 {assign var="error_focus" value="true"}
@@ -59,8 +59,8 @@
                         <legend>{intl l="Do you have an account?"}</legend>
                             {foreach $choices as $choice}
                                 <div class="radio radio-account{$choice->value}">
-                                    <label for="{$label_attr.for}{$choice->value}">
-                                        <input type="radio" name="{$name}" id="{$label_attr.for}{$choice->value}" data-toggle="password" value="{$choice->value}"{if $value === {$choice->value}} checked{/if}> {$choice->label}
+                                    <label for="{$label_attr.for|default:null}{$choice->value}">
+                                        <input type="radio" name="{$name}" id="{$label_attr.for|default:null}{$choice->value}" data-toggle="password" value="{$choice->value}"{if $value === {$choice->value}} checked{/if}> {$choice->label}
                                     </label>
                                 </div>
                             {/foreach}
@@ -68,9 +68,9 @@
                         <div class="group-password">
                             {form_field field="password"}
                             <div class="form-group {if $error} has-error{/if}">
-                                <label for="{$label_attr.for}" class="sr-only">{$label}</label>
+                                <label for="{$label_attr.for|default:null}" class="sr-only">{$label}</label>
                                 <div class="control-input">
-                                    <input type="password" name="{$name}" id="{$label_attr.for}" class="form-control input-sm" maxlength="255" autocomplete="off"{if !isset($error_focus)} autofocus{/if}>
+                                    <input type="password" name="{$name}" id="{$label_attr.for|default:null}" class="form-control input-sm" maxlength="255" autocomplete="off"{if !isset($error_focus)} autofocus{/if}>
                                     {if $error}
                                         <span class="help-block">{$message}</span>
                                     {/if}
@@ -82,8 +82,8 @@
                             {/form_field}
                             {form_field field='remember_me'}
                             <div class="checkbox pull-right">
-                                <label for="{$label_attr.for}">
-                                    <input type="checkbox" name="{$name}" id="{$label_attr.for}" value="{$value}" {$attr} {if isset($options.checked) && $options.checked}checked="checked"{/if}/> {$label}
+                                <label for="{$label_attr.for|default:null}">
+                                    <input type="checkbox" name="{$name}" id="{$label_attr.for|default:null}" value="{$value}" {$attr} {if isset($options.checked) && $options.checked}checked="checked"{/if}/> {$label}
                                 </label>
                             </div>
                             {/form_field}

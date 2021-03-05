@@ -34,11 +34,6 @@ class AnyListType extends BaseType
         return $this->isValid($values) ? explode(',', $values) : null;
     }
 
-    public function getFormType()
-    {
-        return 'text';
-    }
-
     public function getFormOptions()
     {
         return [];

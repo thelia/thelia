@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
@@ -34,19 +35,19 @@ class CustomerTitleI18nType extends AbstractTheliaType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('locale', 'text', [
+            ->add('locale', TextType::class, [
                 'required' => true,
                 'constraints' => [
                     new NotBlank(),
                 ],
             ])
-            ->add('short', 'text', [
+            ->add('short', TextType::class, [
                 'required' => false,
                 'constraints' => [
                     new Length(['max' => 10]),
                 ],
             ])
-            ->add('long', 'text', [
+            ->add('long', TextType::class, [
                 'required' => false,
                 'constraints' => [
                     new Length(['max' => 45]),

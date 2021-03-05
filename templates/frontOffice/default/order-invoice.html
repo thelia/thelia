@@ -381,8 +381,8 @@
                     <div class="form-group group-agreed{if $error} has-error{/if}">
                         <div class="control-input">
                             <div class="checkbox">
-                                <label class="control-label" for="{$label_attr.for}">
-                                    <input type="checkbox" name="{$name}" id="{$label_attr.for}" value="{$value}"{if $checked} checked{/if}  {if $required} aria-required="true" required{/if}>
+                                <label class="control-label" for="{$label_attr.for|default:null}">
+                                    <input type="checkbox" name="{$name}" id="{$label_attr.for|default:null}" value="{$value}"{if $checked} checked{/if}  {if $required} aria-required="true" required{/if}>
                                     {$termsAndConditionsId={config key="terms_conditions_content_id"}}
                                     {if $termsAndConditionsId}
                                         {loop name="content-terms" type="content" id=$termsAndConditionsId}

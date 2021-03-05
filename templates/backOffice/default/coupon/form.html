@@ -210,7 +210,7 @@
                                     <label for="title" class="control-label" >{intl l='Title * :'}</label>
                                     <div class="input-group">
                                         <input required id="title" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='title'}">
-                                        <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                                        <span class="input-group-addon"><img class="img-flags" src="{image file="assets/img/svgFlags/{$CODE}.svg"}" alt="{$TITLE}" /></span>
                                     </div>
                                     {if $error}{$message}{/if}
                                 </div>
@@ -218,7 +218,7 @@
 
                             {form_field field='shortDescription'}
                                 <div class="form-group {if $error}has-error{/if}">
-                                    <label for="short-description" class="control-label">{intl l='Short description :'} <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></label>
+                                    <label for="short-description" class="control-label">{intl l='Short description :'} <img class="img-flags" src="{image file="assets/img/svgFlags/{$CODE}.svg"}" alt="{$TITLE}" /></label>
                                     <textarea id="short-description" name="{$name}" class="form-control" placeholder="{intl l='short description'}" rows="3">{$value nofilter}</textarea>
                                      {if $error}{$message}{/if}
                                 </div>
@@ -226,7 +226,7 @@
 
                             {form_field field='description'}
                                 <div class="form-group {if $error}has-error{/if}">
-                                    <label for="description" class="control-label">{intl l='Long description :'} <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></label>
+                                    <label for="description" class="control-label">{intl l='Long description :'} <img class="img-flags" src="{image file="assets/img/svgFlags/{$CODE}.svg"}" alt="{$TITLE}" /></label>
                                     <textarea id="description" name="{$name}" placeholder="{intl l='long description'}" class="form-control wysiwyg" rows="3">{$value nofilter}</textarea>
                                     {if $error}{$message}{/if}
                                 </div>

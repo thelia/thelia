@@ -19,7 +19,7 @@
               label=$label
               value=$value
               placeholder=""
-              id="{$label_attr.for}-mini"
+              id="{$label_attr.for|default:null}-mini"
               required=true
             }
             {/form_field}
@@ -32,7 +32,7 @@
               label=$label
               value=$value
               placeholder=""
-              id="{$label_attr.for}-mini"
+              id="{$label_attr.for|default:null}-mini"
               required=true
             }
             {/form_field}

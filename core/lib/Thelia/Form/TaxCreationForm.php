@@ -37,18 +37,7 @@ class TaxCreationForm extends BaseForm
 
     protected function buildForm(): void
     {
-        if (!$this->container) {
-            throw new \LogicException(
-                Translator::getInstance()->trans(
-                    'The container should not be null in this form. Please use the FormFactory to get an instance.'
-                )
-            );
-        }
-
-        /** @var TaxEngine $taxEngine */
-        $taxEngine = $this->container->get('thelia.taxEngine');
-
-        $types = $taxEngine->getTaxTypeList();
+        $types = TaxEngine::getTaxTypeList();
 
         $typeList = [];
         $requirementList = [];
@@ -91,27 +80,29 @@ class TaxCreationForm extends BaseForm
                     self::$typeList[$requirement->getName()] = $requirement->getType();
                 }
 
+                $options = array_merge(                        [
+                    'constraints' => [
+                        new Constraints\Callback([$this, 'checkRequirementField']),
+                    ],
+                    'attr' => [
+                        'tag' => 'requirements',
+                        'tax_type' => Tax::escapeTypeName($name),
+                    ],
+                    'label_attr' => [
+                        'type' => $requirement->getName(),
+                    ],
+                    'label' => Translator::getInstance()->trans($requirement->getTitle()),
+                ],
+                    $requirement->getType()->getFormOptions()
+                );
+
                 $this->formBuilder
                     // Replace the '\' in the class name by hyphens
                     // See TaxController::getRequirements if some changes are made about this.
                     ->add(
                         Tax::escapeTypeName($name).':'.$requirement->getName(),
-                        new TheliaType(),
-                        [
-                            'constraints' => [
-                                new Constraints\Callback([$this, 'checkRequirementField']),
-                            ],
-                            'attr' => [
-                                'tag' => 'requirements',
-                                'tax_type' => Tax::escapeTypeName($name),
-                            ],
-                            'label_attr' => [
-                                'type' => $requirement->getName(),
-                            ],
-                            'label' => Translator::getInstance()->trans($requirement->getTitle()),
-                            'type' => $requirement->getType()->getFormType(),
-                            'options' => $requirement->getType()->getFormOptions(),
-                        ]
+                        $requirement->getType()->getFormType(),
+                        $options
                     );
             }
         }

@@ -14245,6 +14245,9 @@ ul.navbar-top-menu li.dropdown:hover > ul.dropdown-menu {
   opacity: 1;
   background-color: #E7E7E7;
 }
+.form-container .inner-toolbar .nav-pills .language-change-button img {
+  max-height: 13px;
+}
 .form-container .inner-toolbar-bottom {
   border-top: 1px dotted #A5CED8;
   margin-top: 1em;
@@ -14496,4 +14499,7 @@ footer {
 }
 .table-order-items .dl-horizontal {
   margin-bottom: 5px;
+}
+.img-flags {
+  max-height: 13px;
 }

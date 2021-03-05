@@ -162,11 +162,6 @@ class IntToCombinedStringsListType extends BaseType
         return true;
     }
 
-    public function getFormType()
-    {
-        return 'text';
-    }
-
     public function getFormOptions()
     {
         return [];

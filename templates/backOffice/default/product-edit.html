@@ -216,8 +216,8 @@
 
                         <div class="form-group">
                             {form_field form=$form field="newRef"}
-                            <label for="{$label_attr.for}">{$label}</label>
-                            <input type="text" name="{$name}" value="{$value}" id="{$label_attr.for}" class="form-control" required >
+                            <label for="{$label_attr.for|default:null}">{$label}</label>
+                            <input type="text" name="{$name}" value="{$value}" id="{$label_attr.for|default:null}" class="form-control" required >
                             {/form_field}
                         </div>
                     </div>

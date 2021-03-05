@@ -95,9 +95,9 @@
         <div class="row">
             <div class="col-md-12">
 
-                {if $error_message}<div class="alert alert-danger">{$error_message}</div>{/if}
+                {if $error_message|default:null}<div class="alert alert-danger">{$error_message}</div>{/if}
 
-                {loop type="hook" name="hook" order=$hook_order backend_context=1}
+                {loop type="hook" name="hook" order=$hook_order|default:null backend_context=1}
                 <div class="hook general-block-decorator{if $BLOCK} hook-block{/if}{if $BY_MODULE} hook-by-module{/if}"
                     data-id="{$ID}"
                     data-type="{$TYPE}"

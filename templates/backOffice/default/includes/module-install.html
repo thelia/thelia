@@ -23,11 +23,11 @@
 
                 {form_field field='module'}
                 <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} :
+                    <label for="{$label_attr.for|default:null}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} :
                         <span class="label-help-block">{intl l="Your module should be packaged in a zip file."}</span>
                     </label>
                     <div class="input-group">
-                        <input type="file" id="{$label_attr.for}" {if $required}required="required"{/if} name="{$name}" value="{$value}" title="{intl l='Module file'}" placeholder="{intl l='Module file'}" class="form-control">
+                        <input type="file" id="{$label_attr.for|default:null}" {if $required}required="required"{/if} name="{$name}" value="{$value}" title="{intl l='Module file'}" placeholder="{intl l='Module file'}" class="form-control">
                         <span class="input-group-btn">
                             <input type="submit" class="form-submit-button btn btn-sm btn-success" value="{intl l="Install !"}" >
                         </span>

@@ -19,9 +19,9 @@
                     <div class="col-sm-6">
                         {form_field field="email"}
                             <div class="form-group group-email {if $error}has-error{elseif !$error && $value != ""}has-success{/if}">
-                                <label for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                                <label for="{$label_attr.for|default:null}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                                 <div class="control-input">
-                                    <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" maxlength="255" {if $required} aria-required="true" required{/if} autofocus>
+                                    <input type="email" name="{$name}" id="{$label_attr.for|default:null}" value="{$value}" class="form-control" maxlength="255" {if $required} aria-required="true" required{/if} autofocus>
                                     {if $error}
                                         <span class="help-block">{$message}</span>
                                     {elseif !$error && $value != ""}
@@ -35,18 +35,18 @@
                         {elseloop rel="customer_newsletter_block"}
                             {form_field field="firstname"}
                             <div class="form-group {if $error}has-error{elseif !$error && $value != ""}has-success{/if}">
-                                <label for="{$label_attr.for}">{$label}</label>
+                                <label for="{$label_attr.for|default:null}">{$label}</label>
                                 <div class="control-input">
-                                    <input type="text" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" maxlength="255">
+                                    <input type="text" name="{$name}" id="{$label_attr.for|default:null}" value="{$value}" class="form-control" maxlength="255">
                                 </div>
                             </div>
                             {/form_field}
 
                             {form_field field="lastname"}
                                 <div class="form-group {if $error}has-error{elseif !$error && $value != ""}has-success{/if}">
-                                    <label for="{$label_attr.for}">{$label}</label>
+                                    <label for="{$label_attr.for|default:null}">{$label}</label>
                                     <div class="control-input">
-                                        <input type="text" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" maxlength="255">
+                                        <input type="text" name="{$name}" id="{$label_attr.for|default:null}" value="{$value}" class="form-control" maxlength="255">
                                     </div>
                                 </div>
                             {/form_field}
