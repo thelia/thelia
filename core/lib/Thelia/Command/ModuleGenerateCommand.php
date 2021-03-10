@@ -63,15 +63,20 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
         $this->createDirectories();
         $this->createFiles();
-        if (method_exists($output, 'renderBlock')) {
-            // impossible to change output class in CommandTester...
-            $output->renderBlock([
-                '',
-                sprintf('module %s create with success', $this->module),
-                'You can now configure your module and complete module.xml file',
-                '',
-            ], 'bg=green;fg=black');
-        }
+
+        $formattedLine = $this->getHelper('formatter')->formatBlock(
+            sprintf('module %s create with success', $this->module),
+            'fg=black;bg=green',
+            true
+        );
+        $output->writeln($formattedLine);
+
+        $formattedLine = $this->getHelper('formatter')->formatBlock(
+            'You can now configure your module and complete module.xml file',
+            'fg=black;bg=green',
+            true
+        );
+        $output->writeln($formattedLine);
 
         return 0;
     }
