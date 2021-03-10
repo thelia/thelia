@@ -171,7 +171,7 @@ class ConfigCommandTest extends BaseCommandTest
         ]);
 
         $this->assertNull(
-            ConfigQuery::read($varName),
+            ConfigQuery::read($varName, null, true),
             sprintf("Variable '%s' should not exist", $varName)
         );
     }

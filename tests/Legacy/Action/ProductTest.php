@@ -96,6 +96,7 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->setBasePrice(10)
             ->setTaxRuleId($taxRuleId)
             ->setBaseWeight(10)
+            ->setQuantity(10)
             ->setCurrencyId($currencyId);
 
         $action = new Product($this->getMockEventDispatcher());

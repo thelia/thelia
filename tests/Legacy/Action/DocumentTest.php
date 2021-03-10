@@ -198,7 +198,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
             $config->setValue($oldval)->save();
         }
 
-        $imgdir = ConfigQuery::read('document_cache_dir_from_web_root');
+        $imgdir = ConfigQuery::read('document_cache_dir_from_web_root', null, true);
 
         $this->assertFileExists(THELIA_WEB_DIR."/$imgdir/tests/test-document-1.txt");
     }
@@ -229,7 +229,7 @@ class DocumentTest extends TestCaseWithURLToolSetup
             $config->setValue($oldval)->save();
         }
 
-        $imgdir = ConfigQuery::read('document_cache_dir_from_web_root');
+        $imgdir = ConfigQuery::read('document_cache_dir_from_web_root', null, true);
 
         $this->assertFileExists(THELIA_WEB_DIR."/$imgdir/tests/test-document-2.txt");
     }

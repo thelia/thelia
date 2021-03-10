@@ -51,7 +51,7 @@ class MessageTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->backup_mail_template = ConfigQuery::read('active-mail-template', 'default');
+        $this->backup_mail_template = ConfigQuery::read('active-mail-template', 'default', true);
 
         ConfigQuery::write('active-mail-template', 'test');
 

@@ -30,7 +30,7 @@ class WebTestCase extends TestCase
     {
         // We have to shut down the "One domain for each lang feature" before tests,
         // to prevent 302 redirections during the tests.
-        $this->isMultiDomainActivated = ConfigQuery::read('one_domain_foreach_lang');
+        $this->isMultiDomainActivated = ConfigQuery::read('one_domain_foreach_lang', null, true);
 
         ConfigQuery::write('one_domain_foreach_lang', false);
     }

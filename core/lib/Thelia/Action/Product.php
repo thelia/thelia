@@ -183,6 +183,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->setRef($event->getRef())
             ->setLocale($event->getLang())
             ->setVisible(0)
+            ->setQuantity(0)
             ->setVirtual($event->getOriginalProduct()->getVirtual())
             ->setTaxRuleId($event->getOriginalProduct()->getTaxRuleId())
             ->setDefaultCategory($event->getOriginalProduct()->getDefaultCategoryId())

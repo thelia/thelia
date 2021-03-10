@@ -210,8 +210,8 @@ function createProduct($categories, $brands, $contents, $template, $attribute, $
                 $productPrice = new \Thelia\Model\ProductPrice();
                 $productPrice->setProductSaleElements($stock);
                 $productPrice->setCurrencyId(1);
-                $productPrice->setPrice($data[8]);
-                $productPrice->setPromoPrice($data[9]);
+                $productPrice->setPrice((float)$data[8]);
+                $productPrice->setPromoPrice((float)$data[9]);
                 $productPrice->save($con);
 
                 $attributeAv = \Thelia\Model\AttributeAvI18nQuery::create()
