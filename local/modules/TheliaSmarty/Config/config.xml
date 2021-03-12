@@ -60,8 +60,6 @@
 
         <service id="smarty.plugin.flashMessage" alias="TheliaSmarty\Template\Plugins\FlashMessage"/>
 
-        <service id="smarty.plugin.esi" alias="TheliaSmarty\Template\Plugins\Esi"/>
-
         <service id="smarty.plugin.hook" alias="TheliaSmarty\Template\Plugins\Hook"/>
 
         <service id="smarty.plugin.cache" alias="TheliaSmarty\Template\Plugins\Cache"/>

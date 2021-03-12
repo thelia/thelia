@@ -69,8 +69,7 @@
         "doctrine/cache": "~1.0",
         "assetic/framework": "dev-develop#b067e1779fc18db43031a4dc9a80308465febcfd",
         "symfony/psr-http-message-bridge": "^2.1",
-        "sentry/sdk": "^3.1",
-        "sentry/sentry-symfony": "^4.0"
+        "symfony/flex": "^1.12"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",
@@ -81,7 +80,10 @@
         "phpstan/phpstan": "^0.12.75",
         "phpstan/extension-installer": "^1.1",
         "symfony/css-selector": "^5.2",
-        "friendsofphp/php-cs-fixer": "^2.18"
+        "friendsofphp/php-cs-fixer": "^2.18",
+        "symfony/stopwatch": "^5.2",
+        "symfony/twig-bundle": "^5.2",
+        "symfony/web-profiler-bundle": "^5.2"
     },
     "scripts": {
         "cs-diff": [
@@ -121,7 +123,11 @@
             "@cs-diff",
             "@phpstan",
             "@test"
-        ]
+        ],
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        }
     },
     "minimum-stability": "stable",
     "autoload": {

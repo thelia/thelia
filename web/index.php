@@ -25,7 +25,7 @@ if ($_SERVER['APP_DEBUG']) {
     Debug::enable();
 }
 
-$thelia = new Thelia($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
+$thelia = new App\Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
 $request = Request::createFromGlobals();
 $response = $thelia->handle($request);
 $response->send();

@@ -14,4 +14,5 @@ namespace Thelia\Controller;
 
 interface ControllerInterface
 {
+    public function getControllerType(): string;
 }

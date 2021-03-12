@@ -6,14 +6,13 @@ framework:
 
     # Enables session support. Note that the session will ONLY be started if you read or write from it.
     # Remove or comment this section to explicitly disable session support.
-    session:
-        enabled: true
-        cookie_secure: auto
-        cookie_samesite: lax
-        handler_id: 'session.handler.native_file'
-        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
+#    session:
+#        enabled: true
+#        cookie_secure: auto
+#        cookie_samesite: lax
+#        handler_id: 'session.handler.native_file'
+#        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
 
-    error_controller: App\Controller\ErrorController::jsonExceptionResponse
     #esi: true
     #fragments: true
     php_errors:

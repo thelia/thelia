@@ -69,7 +69,7 @@ class BaseAdminController extends BaseController
     /**
      * @return string
      */
-    public function getControllerType()
+    public function getControllerType(): string
     {
         return self::CONTROLLER_TYPE;
     }

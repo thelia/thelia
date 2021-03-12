@@ -76,10 +76,10 @@
                                 <tr class="{if $DEFAULT == 1}address-primary{else}address-additional{/if}" id="customer-address-{$ID}">
                                     <th>
                                         {if $DEFAULT === 1}
-                                            {$LABEL|default:$default}
+                                            {$LABEL|default:$default|default:null}
                                             <span class="label label-info   ">{intl l="Main Address"}</span>
                                         {else}
-                                            {$LABEL|default:$default}
+                                            {$LABEL|default:$default|default:null}
                                         {/if}
                                     </th>
                                     <td>

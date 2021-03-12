@@ -641,7 +641,7 @@ abstract class BaseController implements ControllerInterface
      *
      * @return string
      */
-    abstract public function getControllerType();
+    abstract public function getControllerType(): string;
 
     /**
      * @param mixed|null $template

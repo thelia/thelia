@@ -136,7 +136,10 @@ class ParamInitMiddleware implements HttpKernelInterface
         if (null === $request->getSession()->getLang(false)) {
             if (ConfigQuery::isMultiDomainActivated()) {
                 // find lang with domain
-                return LangQuery::create()->filterByUrl($request->getSchemeAndHttpHost(), ModelCriteria::LIKE)->findOne();
+                $domainLang =  LangQuery::create()->filterByUrl($request->getSchemeAndHttpHost(), ModelCriteria::LIKE)->findOne();
+                if ($domainLang !== null) {
+                    return $domainLang;
+                }
             }
 
             // At this point, set the lang to the default one.

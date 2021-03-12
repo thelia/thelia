@@ -5,11 +5,6 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
     <parameters>
-        <parameter key="esi.class">Symfony\Component\HttpKernel\HttpCache\Esi</parameter>
-        <parameter key="esi_listener.class">Symfony\Component\HttpKernel\EventListener\SurrogateListener</parameter>
-        <parameter key="fragment.renderer.esi.class">Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer</parameter>
-        <parameter key="fragment.renderer.inline.class">Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer</parameter>
-
         <!--
         The list of Model classes which suppoorts image or document management.
 
@@ -111,24 +106,6 @@
         <service id="event_dispatcher" alias="Thelia\Core\EventDispatcher\EventDispatcher" public="true"/>
         <service id="Symfony\Component\EventDispatcher\EventDispatcherInterface" alias="Thelia\Core\EventDispatcher\EventDispatcher"/>
         <service id="Symfony\Contracts\EventDispatcher\EventDispatcherInterface" alias="Thelia\Core\EventDispatcher\EventDispatcher"/>
-
-        <service id="esi" class="%esi.class%" />
-
-        <service id="esi_listener" class="%esi_listener.class%">
-            <tag name="kernel.event_subscriber" />
-            <argument type="service" id="esi" on-invalid="ignore" />
-        </service>
-
-        <service id="fragment.renderer.inline" class="%fragment.renderer.inline.class%">
-            <argument type="service" id="http_kernel" />
-            <argument type="service" id="event_dispatcher" />
-        </service>
-
-        <service id="Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer" class="%fragment.renderer.esi.class%">
-            <argument type="service" id="esi" />
-            <argument type="service" id="fragment.renderer.inline" />
-        </service>
-        <service id="fragment.renderer.esi" alias="Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer"/>
 
         <!-- Tax engine -->
         <service id="thelia.taxEngine" alias="Thelia\TaxEngine\TaxEngine"/>

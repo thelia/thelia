@@ -37,7 +37,7 @@ if (false === in_array(Request::createFromGlobals()->getClientIp(), $trustedIp))
 umask(0000);
 Debug::enable();
 
-$thelia = new Thelia($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
+$thelia = new App\Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
 $request = Request::createFromGlobals();
 $response = $thelia->handle($request);
 $response->send();

@@ -15,6 +15,7 @@ namespace Thelia\Core\Routing;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Router as BaseRouter;
@@ -26,7 +27,7 @@ class AnnotationRouter extends BaseRouter
     protected $fileLocator;
 
     public function __construct(
-        FileLocator $fileLocator
+        FileLocatorInterface $fileLocator
     ) {
         $this->fileLocator = $fileLocator;
 

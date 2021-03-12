@@ -13,9 +13,12 @@
 namespace Thelia\Core\Controller;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Controller\ControllerResolver as BaseControllerResolver;
+use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 use Thelia\Controller\BaseController;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 
 /**
  * ControllerResolver that supports "a:b:c", "service:method" and class::method" notations in routes definition
@@ -24,21 +27,30 @@ use Thelia\Controller\BaseController;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class ControllerResolver extends BaseControllerResolver
+class ControllerResolver extends ContainerControllerResolver
 {
-    protected $container;
-
     /**
-     * Constructor.
-     *
-     * @param ContainerInterface $container A ContainerInterface instance
-     * @param LoggerInterface    $logger    A LoggerInterface instance
+     * {@inheritdoc}
      */
-    public function __construct(ContainerInterface $container, LoggerInterface $logger = null)
+    protected function instantiateController($class): object
     {
-        $this->container = $container;
+        return $this->configureController(parent::instantiateController($class), $class);
+    }
 
-        parent::__construct($logger);
+    private function configureController($controller, string $class): object
+    {
+        if ($controller instanceof ContainerAwareInterface) {
+            $controller->setContainer($this->container);
+        }
+        if ($controller instanceof AbstractController) {
+            if (null === $previousContainer = $controller->setContainer($this->container)) {
+                throw new \LogicException(sprintf('"%s" has no container set, did you forget to define it as a service subscriber?', $class));
+            } else {
+                $controller->setContainer($previousContainer);
+            }
+        }
+
+        return $controller;
     }
 
     /**
@@ -51,40 +63,24 @@ class ControllerResolver extends BaseControllerResolver
      */
     protected function createController(string $controller)
     {
-        if (false === strpos($controller, '::')) {
-            $count = substr_count($controller, ':');
-            if (2 == $count) {
-                // controller in the a:b:c notation then
-                [$moduleName, $controllerName, $method] = explode(':', $controller, 3);
-                $class = $moduleName.'\\Controller\\'.$controllerName.'Controller';
-                $method .= 'Action';
-            } elseif (1 == $count) {
-                // controller in the service:method notation
-                [$service, $method] = explode(':', $controller, 2);
+        $controller = parent::createController($controller);
 
-                return [$this->container->get($service), $method];
-            } else {
-                throw new \LogicException(sprintf('Unable to parse the controller name "%s".', $controller));
+        // Additional treatment for thelia legacy controllers
+        if (is_array($controller) && isset($controller[0])) {
+            $controllerinstance = $controller[0];
+
+            if (method_exists($controllerinstance, 'getControllerType')) {
+                $this->container->get('request_stack')->getCurrentRequest()->setControllerType(
+                    $controllerinstance->getControllerType()
+                );
             }
-        } else {
-            [$class, $method] = explode('::', $controller, 2);
+
+            // To remove in 2.6
+            if (method_exists($controllerinstance, 'setContainer')) {
+                $controllerinstance->setContainer($this->container);
+            }
         }
 
-        if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
-        }
-
-        /** @var BaseController $controller */
-        $controller = new $class();
-
-        $this->container->get('request_stack')->getCurrentRequest()->setControllerType(
-            $controller->getControllerType()
-        );
-
-        if (method_exists($controller, 'setContainer')) {
-            $controller->setContainer($this->container);
-        }
-
-        return [$controller, $method];
+        return $controller;
     }
 }

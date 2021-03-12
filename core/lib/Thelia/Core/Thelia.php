@@ -47,6 +47,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\VarExporter\VarExporter;
 use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Condition\Implementation\ConditionInterface;
@@ -405,12 +406,7 @@ class Thelia extends Kernel
         }
 
         $this->boot();
-
-        dump($this->getContainer());
-        exit;
-        $session = $this->getContainer()->get(SessionInterface::class);
-        $request->setSession($session);
-
+        
         return parent::handle($request, $type, $catch);
     }
 
@@ -435,7 +431,7 @@ class Thelia extends Kernel
             FormInterface::class => 'thelia.form',
             CouponInterface::class => 'thelia.coupon.addCoupon',
             ConditionInterface::class => 'thelia.coupon.addCondition',
-            ControllerInterface::class => 'controller.service_arguments',
+            ControllerInterface::class => 'controller.service_arguments'
         ];
 
         foreach ($autoconfiguredInterfaces as $interfaceClass => $tag) {

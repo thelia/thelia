@@ -159,4 +159,19 @@ class Request extends BaseRequest
     {
         return $this->controllerType === BaseFrontController::CONTROLLER_TYPE;
     }
+
+    /**
+     * From a Thelia request, we always return a Thelia Session object.
+     *
+     * @return \Thelia\Core\HttpFoundation\Session\Session|null
+     */
+    public function getSession()
+    {
+        if (!$this->hasSession()) {
+            $this->session = $session = new Session();
+            $session->start();
+        }
+
+        return parent::getSession();
+    }
 }
