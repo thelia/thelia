@@ -10,8 +10,6 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Core\EventDispatcher;
-
-class EventDispatcher extends \Symfony\Component\EventDispatcher\EventDispatcher
-{
-}
+return [
+    // 'an english string' => 'The displayed english string',
+];

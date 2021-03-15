@@ -1,0 +1,12 @@
+{
+  "name": "your-vendor/web-profiler-module",
+  "description": "WebProfiler module for Thelia",
+  "license": "LGPL-3.0-or-later",
+  "type": "thelia-module",
+  "require": {
+    "thelia/installer": "~1.1"
+  },
+  "extra": {
+    "installer-name": "WebProfiler"
+  }
+}

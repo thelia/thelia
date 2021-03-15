@@ -24,6 +24,7 @@ use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\Event\PdfEvent;
@@ -139,7 +140,7 @@ abstract class BaseController implements ControllerInterface
      */
     public function getDispatcher()
     {
-        return $this->container->get('event_dispatcher');
+        return $this->container->get(EventDispatcherInterface::class);
     }
 
     /**

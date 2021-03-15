@@ -12,7 +12,7 @@
 
 namespace Thelia\Tools;
 
-use Thelia\Core\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Security\Token\CookieTokenProvider;
 use Thelia\Core\Security\User\UserInterface;
 

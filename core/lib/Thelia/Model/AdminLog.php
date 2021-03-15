@@ -12,7 +12,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Core\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Log\Tlog;
 use Thelia\Model\Base\AdminLog as BaseAdminLog;

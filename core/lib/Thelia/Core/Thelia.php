@@ -25,9 +25,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\DataFetcher\PDODataFetcher;
 use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -38,16 +36,13 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\VarExporter\VarExporter;
 use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Condition\Implementation\ConditionInterface;
@@ -406,7 +401,7 @@ class Thelia extends Kernel
         }
 
         $this->boot();
-        
+
         return parent::handle($request, $type, $catch);
     }
 
@@ -489,6 +484,15 @@ class Thelia extends Kernel
 
                     if (is_file($envConfigFile) && is_readable($envConfigFile)) {
                         $loader->load($envConfigFileName, 'module.'.$module->getCode());
+                    }
+
+                    $templateBasePath = $module->getAbsoluteTemplateBasePath();
+                    if (is_dir($templateBasePath)) {
+                        $container->loadFromExtension('twig', [
+                            'paths' => [
+                                $templateBasePath => $module->getCode().'Module',
+                            ],
+                        ]);
                     }
                 } catch (\Exception $e) {
                     Tlog::getInstance()->addError(

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="http://thelia.net/schema/dic/module"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/module http://thelia.net/schema/dic/module/module-2_2.xsd">
+    <fullnamespace>WebProfiler\WebProfiler</fullnamespace>
+    <descriptive locale="en_US">
+        <title>Add thelia specific data to web profiler</title>
+        <!--
+        <subtitle></subtitle>
+        <description></description>
+        <postscriptum></postscriptum>
+        -->
+    </descriptive>
+    <descriptive locale="fr_FR">
+        <title>Ajoute des données spécifique a thelia dans le web profiler</title>
+    </descriptive>
+    <!-- <logo></logo> -->
+    <!--<images-folder>images</images-folder>-->
+    <languages>
+        <language>en_US</language>
+        <language>fr_FR</language>
+    </languages>
+    <version>2.5.0</version>
+    <authors>
+        <author>
+            <name></name>
+            <email></email>
+        </author>
+    </authors>
+    <type>classic</type>
+    <!--
+    module dependencies
+    <required>
+        <module version="&gt;=0.1">Front</module>
+        <module version="~1.0">HookCart</module>
+        <module version="&gt;0.2">HookSearch</module>
+    </required>
+    -->
+    <thelia>2.5.0</thelia>
+    <stability>other</stability>
+    <mandatory>0</mandatory>
+    <hidden>1</hidden>
+</module>

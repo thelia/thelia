@@ -12,7 +12,7 @@
 
 namespace Thelia\Core\Security\Token;
 
-use Thelia\Core\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Security\User\UserInterface;
 
 class CookieTokenProvider

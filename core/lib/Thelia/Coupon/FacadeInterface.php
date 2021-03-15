@@ -13,9 +13,9 @@
 namespace Thelia\Coupon;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
-use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
@@ -40,7 +40,7 @@ interface FacadeInterface
         ParserInterface $parser,
         RequestStack $requestStack,
         ConditionEvaluator $conditionEvaluator,
-        EventDispatcher $eventDispatcher
+        EventDispatcherInterface $eventDispatcher
     );
 
     /**

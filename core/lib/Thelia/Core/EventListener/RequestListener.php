@@ -12,11 +12,11 @@
 
 namespace Thelia\Core\EventListener;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -24,7 +24,6 @@ use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\JsonResponse;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
 use Thelia\Core\Security\Authentication\CustomerTokenAuthenticator;
@@ -86,7 +85,6 @@ class RequestListener implements EventSubscriberInterface
 
     public function rememberMeLoader(RequestEvent $event): void
     {
-        /** @var \Thelia\Core\HttpFoundation\Request $request */
         $request = $event->getRequest();
 
         /** @var \Thelia\Core\HttpFoundation\Session\Session $session */
@@ -274,7 +272,6 @@ class RequestListener implements EventSubscriberInterface
 
     public function checkCurrency(RequestEvent $event): void
     {
-        /** @var Request $request */
         $request = $event->getRequest();
 
         if ($request->query->has('currency')) {

@@ -12,10 +12,10 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\Hook\HookRenderBlockEvent;
 use Thelia\Core\Event\Hook\HookRenderEvent;
-use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Core\Hook\Fragment;
 use Thelia\Core\Hook\FragmentBag;
 use Thelia\Core\Template\TemplateDefinition;
@@ -53,7 +53,7 @@ class Hook extends AbstractSmartyPlugin
 
     public function __construct(
         $kernelDebug,
-        EventDispatcher $dispatcher,
+        EventDispatcherInterface $dispatcher,
         TranslatorInterface $translator,
         Module $smartyPluginModule
     ) {

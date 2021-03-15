@@ -17,7 +17,6 @@ use Symfony\Component\Form\FormFactoryBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Form\BaseForm;
 
 /**

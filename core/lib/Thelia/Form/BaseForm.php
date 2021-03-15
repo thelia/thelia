@@ -30,7 +30,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\TheliaFormEvent;
-use Thelia\Core\EventDispatcher\EventDispatcher;
 use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
