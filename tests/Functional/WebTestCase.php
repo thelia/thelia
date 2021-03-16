@@ -37,7 +37,9 @@ class WebTestCase extends BaseWebTestCase
     {
         parent::setUp();
 
-        self::$client = static::createClient();
+        if (null === self::$client) {
+            self::$client = static::createClient();
+        }
 
         // todo add logger propel queries in CI
         // Propel::getServiceContainer()->setLogger('defaultLogger', $logger);

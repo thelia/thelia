@@ -105,7 +105,7 @@ INSERT INTO `module` (`id`, `code`, `version`,  `type`, `activate`, `position`, 
 (19, 'TheliaSmarty', '2.5.0', 1, 1, 16, 'TheliaSmarty\\TheliaSmarty', 0, 0, NOW(), NOW()),
 (20, 'VirtualProductControl', '2.5.0', 1, 1, 17, 'VirtualProductControl\\VirtualProductControl', 0, 0, NOW(), NOW()),
 (21, 'HookAdminHome', '2.5.0', 1, 1, 18, 'HookAdminHome\\HookAdminHome', 0, 0, NOW(), NOW()),
-(22, 'WebProfiler', '2.5.0', 1, 1, 19, 'WebProfiler\\WebProfiler', 1, 0, NOW(), NOW()),
+(22, 'WebProfiler', '2.5.0', 1, 1, 19, 'WebProfiler\\WebProfiler', 1, 0, NOW(), NOW())
 ;
 
 -- Insert front hooks

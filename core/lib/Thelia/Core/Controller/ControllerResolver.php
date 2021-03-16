@@ -21,8 +21,6 @@ use Thelia\Controller\BaseController;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 
 /**
- * ControllerResolver that supports "a:b:c", "service:method" and class::method" notations in routes definition
- * thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html).
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Franck Allimant <franck@cqfdev.fr>

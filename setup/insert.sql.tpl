@@ -86,7 +86,6 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `hidden`, `mandatory`, `created_at`, `updated_at`) VALUES
 (1, 'Carousel', 1, 0, 1, 'Carousel\\Carousel', 0, 0, NOW(), NOW()),
-(2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', 0, 0, NOW(), NOW()),
 (3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', 0, 0, NOW(), NOW()),
 (4, 'Front', 1, 1, 2, 'Front\\Front', 1, 0, NOW(), NOW()),
 (5, 'Tinymce', 1, 0, 16, 'Tinymce\\Tinymce', 0, 1, NOW(), NOW()),

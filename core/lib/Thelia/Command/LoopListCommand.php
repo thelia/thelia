@@ -19,6 +19,14 @@ use TheliaSmarty\Template\Plugins\TheliaLoop;
 
 class LoopListCommand extends ContainerAwareCommand
 {
+    protected $theliaLoop;
+
+    public function __construct(TheliaLoop $theliaLoop)
+    {
+        parent::__construct();
+        $this->theliaLoop = $theliaLoop;
+    }
+
     protected function configure(): void
     {
         $this
@@ -32,9 +40,7 @@ class LoopListCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var TheliaLoop $theliaLoop */
-        $theliaLoop = $this->getContainer()->get(TheliaLoop::class);
-        $loops = $theliaLoop->getLoopList();
+        $loops = $this->theliaLoop->getLoopList();
         ksort($loops);
 
         $helper = new Table($output);

@@ -1452,25 +1452,25 @@
     <!-- export management -->
 
     <route id="export.list" path="/admin/export" methods="get">
-        <default key="_controller">Thelia:Admin\Export:index</default>
+        <default key="_controller">Thelia\Controller\Admin\ExportController::indexAction</default>
     </route>
 
     <route id="export.position" path="/admin/export/position" methods="get">
-        <default key="_controller">Thelia:Admin\Export:changeExportPosition</default>
+        <default key="_controller">Thelia\Controller\Admin\ExportController::changeExportPositionAction</default>
     </route>
 
     <route id="export.category.position" path="/admin/export/position/category" methods="get">
-        <default key="_controller">Thelia:Admin\Export:changeCategoryPosition</default>
+        <default key="_controller">Thelia\Controller\Admin\ExportController::changeCategoryPositionAction</default>
     </route>
 
     <route id="export.view" path="/admin/export/{id}" methods="get">
-        <default key="_controller">Thelia:Admin\Export:configure</default>
+        <default key="_controller">Thelia\Controller\Admin\ExportController::configureAction</default>
 
         <requirement key="id">\d+</requirement>
     </route>
 
     <route id="export.process" path="/admin/export/{id}" methods="post">
-        <default key="_controller">Thelia:Admin\Export:export</default>
+        <default key="_controller">Thelia\Controller\Admin\ExportController::exportAction</default>
 
         <requirement key="id">\d+</requirement>
     </route>
@@ -1478,25 +1478,25 @@
     <!-- import management -->
 
     <route id="import.list" path="/admin/import">
-        <default key="_controller">Thelia:Admin\Import:index</default>
+        <default key="_controller">Thelia\Controller\Admin\ImportController::indexAction</default>
     </route>
 
     <route id="import.position" path="/admin/import/position" methods="get">
-        <default key="_controller">Thelia:Admin\Import:changeImportPosition</default>
+        <default key="_controller">Thelia\Controller\Admin\ImportController::changeImportPositionAction</default>
     </route>
 
     <route id="import.category.position" path="/admin/import/position/category" methods="get">
-        <default key="_controller">Thelia:Admin\Import:changeCategoryPosition</default>
+        <default key="_controller">Thelia\Controller\Admin\ImportController::changeCategoryPositionAction</default>
     </route>
 
     <route id="import.view" path="/admin/import/{id}" methods="get">
-        <default key="_controller">Thelia:Admin\Import:configure</default>
+        <default key="_controller">Thelia\Controller\Admin\ImportController::configureAction</default>
 
         <requirement key="id">\d+</requirement>
     </route>
 
     <route id="import.process" path="/admin/import/{id}" methods="post">
-        <default key="_controller">Thelia:Admin\Import:import</default>
+        <default key="_controller">Thelia\Controller\Admin\ImportController::importAction</default>
 
         <requirement key="id">\d+</requirement>
     </route>
@@ -1551,17 +1551,17 @@
 
     <!-- Preview message -->
     <route id="admin.email.preview_html" path="/admin/message/preview/{messageId}" methods="get">
-        <default key="_controller">Thelia:Admin\Message:previewAsHtml</default>
+        <default key="_controller">Thelia\Controller\Admin\MessageController::previewAsHtmlAction</default>
         <requirement key="messageId">\d+</requirement>
     </route>
 
     <route id="admin.email.preview_text" path="/admin/message/preview/text/{messageId}" methods="get">
-        <default key="_controller">Thelia:Admin\Message:previewAsText</default>
+        <default key="_controller">Thelia\Controller\Admin\MessageController::previewAsTextAction</default>
         <requirement key="messageId">\d+</requirement>
     </route>
 
     <route id="admin.email.test_send" path="/admin/message/send/{messageId}" methods="post">
-        <default key="_controller">Thelia:Admin\Message:sendSampleByEmail</default>
+        <default key="_controller">Thelia\Controller\Admin\MessageController::sendSampleByEmailAction</default>
         <requirement key="messageId">\d+</requirement>
     </route>
 

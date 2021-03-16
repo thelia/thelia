@@ -66,7 +66,8 @@ class Application extends BaseApplication
 
         $container = $this->kernel->getContainer();
 
-        foreach ($container->getParameter('command.definition') as $command) {
+        foreach ($container->getParameter('command.definition') as $commandId) {
+            $command = $container->get($commandId);
             $r = new \ReflectionClass($command);
 
             if (!$r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command')) {
@@ -81,7 +82,7 @@ class Application extends BaseApplication
                 continue;
             }
 
-            $this->add($r->newInstance());
+            $this->add($command);
         }
     }
 }

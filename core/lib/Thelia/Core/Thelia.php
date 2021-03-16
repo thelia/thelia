@@ -32,7 +32,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -40,9 +39,9 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\VarExporter\VarExporter;
 use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Condition\Implementation\ConditionInterface;
@@ -110,7 +109,12 @@ class Thelia extends Kernel
      *
      *     $c->parameters()->set('halloween', 'lot of fun');
      */
-    protected function configureContainer(ContainerConfigurator $c): void
+    protected function configureContainer(ContainerConfigurator $container): void
+    {
+
+    }
+
+    protected function configureRoutes(RoutingConfigurator $routes): void
     {
 
     }
@@ -639,22 +643,6 @@ class Thelia extends Kernel
     }
 
     /**
-     * initialize session in Request object.
-     *
-     * All param must be change in Config table
-     */
-
-    /**
-     * Gets a new ContainerBuilder instance used to build the service container.
-     *
-     * @return ContainerBuilder
-     */
-    protected function getContainerBuilder()
-    {
-        return new TheliaContainerBuilder(new ParameterBag($this->getKernelParameters()));
-    }
-
-    /**
      * Builds the service container.
      *
      * @return ContainerBuilder The compiled service container
@@ -663,11 +651,9 @@ class Thelia extends Kernel
      */
     protected function buildContainer()
     {
-        /** @var TheliaContainerBuilder $container */
         $container = parent::buildContainer();
 
         $this->loadConfiguration($container);
-        $container->customCompile();
 
         return $container;
     }

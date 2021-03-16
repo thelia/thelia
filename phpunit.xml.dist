@@ -10,9 +10,13 @@
 >
     <php>
         <ini name="error_reporting" value="-1" />
-        <server name="APP_ENV" value="test" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
-        <server name="KERNEL_CLASS" value="Thelia\Core\Thelia" />
+        <server name="KERNEL_CLASS" value="App\Kernel" />
+
+        <!-- ###+ symfony/framework-bundle ### -->
+        <server name="APP_ENV" value="test" force="true" />
+        <env name="APP_SECRET" value="287f2178af9e0c250e8219a9df833504"/>
+        <!-- ###- symfony/framework-bundle ### -->
     </php>
 
     <testsuites>

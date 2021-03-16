@@ -91,9 +91,6 @@
     </parameters>
 
     <services>
-        <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container"/>
-        <service id="Psr\Container\ContainerInterface" alias="Symfony\Component\DependencyInjection\ContainerInterface"/>
-
         <!-- Thelia template helper -->
         <service id="thelia.template_helper" class="Thelia\Core\Template\TheliaTemplateHelper" public="true"/>
 
@@ -103,7 +100,7 @@
         </service>
         <service id="thelia.url.manager" alias="Thelia\Tools\URL" public="true"/>
 
-<!--        <service id="event_dispatcher" alias="Symfony\Component\EventDispatcher\EventDispatcherInterface" public="true"/>-->
+        <service id="deprecated_event_dispatcher" class="Symfony\Component\EventDispatcher\EventDispatcher" public="true"/>
 
         <!-- Tax engine -->
         <service id="thelia.taxEngine" alias="Thelia\TaxEngine\TaxEngine"/>
@@ -218,9 +215,6 @@
 
 
         <service id="request" alias="Thelia\Core\HttpFoundation\Request" />
-
-        <service id="Symfony\Component\HttpFoundation\RequestStack" class="Symfony\Component\HttpFoundation\RequestStack"/>
-        <service id="request_stack" alias="Symfony\Component\HttpFoundation\RequestStack" public="true"/>
 
         <service id="mailer" alias="Thelia\Mailer\MailerFactory"/>
 

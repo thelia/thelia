@@ -488,7 +488,7 @@ HTML;
     /**
      * Return the event dispatcher,.
      *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcher
+     * @return \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
      */
     public function getDispatcher()
     {

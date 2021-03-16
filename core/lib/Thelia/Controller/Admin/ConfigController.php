@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Config\ConfigCreateEvent;
 use Thelia\Core\Event\Config\ConfigDeleteEvent;
 use Thelia\Core\Event\Config\ConfigUpdateEvent;
@@ -187,7 +188,7 @@ class ConfigController extends AbstractCrudController
      *
      * @return \Thelia\Core\HttpFoundation\Response the response
      */
-    public function changeValuesAction()
+    public function changeValuesAction(EventDispatcherInterface $dispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -201,7 +202,7 @@ class ConfigController extends AbstractCrudController
             $event = new ConfigUpdateEvent($id);
             $event->setValue($value);
 
-            $this->dispatch(TheliaEvents::CONFIG_SETVALUE, $event);
+            $dispatcher->dispatch($event, TheliaEvents::CONFIG_SETVALUE);
         }
 
         return $this->generateRedirectFromRoute('admin.configuration.variables.default');

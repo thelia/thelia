@@ -140,7 +140,7 @@ abstract class BaseController implements ControllerInterface
      */
     public function getDispatcher()
     {
-        return $this->container->get(EventDispatcherInterface::class);
+        return $this->container->get('deprecated_event_dispatcher');
     }
 
     /**
