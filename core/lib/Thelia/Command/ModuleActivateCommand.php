@@ -16,6 +16,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ModuleQuery;
@@ -30,6 +32,15 @@ use Thelia\Module\BaseModule;
  */
 class ModuleActivateCommand extends BaseModuleGenerate
 {
+    protected $eventDispatcher;
+
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
         $this
@@ -75,7 +86,7 @@ class ModuleActivateCommand extends BaseModuleGenerate
                     $event->setRecursive(true);
                 }
 
-                $this->getDispatcher()->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+                $this->eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
             } catch (\Exception $e) {
                 throw new \RuntimeException(
                     sprintf(

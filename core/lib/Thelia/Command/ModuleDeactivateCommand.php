@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Action\Module;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -33,6 +34,15 @@ use Thelia\Module\BaseModule;
  */
 class ModuleDeactivateCommand extends BaseModuleGenerate
 {
+    protected $eventDispatcher;
+
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
         $this
@@ -86,7 +96,7 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
             if ($input->getOption('with-dependencies')) {
                 $event->setRecursive(true);
             }
-            $this->getDispatcher()->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+            $this->eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
         } catch (\Exception $e) {
             throw new \RuntimeException(sprintf('Deactivation fail with Exception : [%d] %s', $e->getCode(), $e->getMessage()));
         }

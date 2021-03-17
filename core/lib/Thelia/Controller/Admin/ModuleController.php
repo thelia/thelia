@@ -249,7 +249,7 @@ class ModuleController extends AbstractCrudController
         );
     }
 
-    public function toggleActivationAction($module_id)
+    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher, $module_id)
     {
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::UPDATE)) {
             return $response;
@@ -257,7 +257,7 @@ class ModuleController extends AbstractCrudController
         $message = null;
         try {
             $event = new ModuleToggleActivationEvent($module_id);
-            $this->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::MODULE_TOGGLE_ACTIVATION);
 
             if (null === $event->getModule()) {
                 throw new \LogicException(
