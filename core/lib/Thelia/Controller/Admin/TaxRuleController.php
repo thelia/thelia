@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
@@ -263,7 +264,7 @@ class TaxRuleController extends AbstractCrudController
         return parent::updateAction($parserContext);
     }
 
-    public function setDefaultAction()
+    public function setDefaultAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
@@ -277,12 +278,12 @@ class TaxRuleController extends AbstractCrudController
             $taxRuleId
         );
 
-        $this->dispatch(TheliaEvents::TAX_RULE_SET_DEFAULT, $setDefaultEvent);
+        $eventDispatcher->dispatch($setDefaultEvent, TheliaEvents::TAX_RULE_SET_DEFAULT);
 
         return $this->redirectToListTemplate();
     }
 
-    public function processUpdateTaxesAction()
+    public function processUpdateTaxesAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -308,7 +309,7 @@ class TaxRuleController extends AbstractCrudController
 
             $changeEvent = $this->getUpdateTaxListEvent($data);
 
-            $this->dispatch(TheliaEvents::TAX_RULE_TAXES_UPDATE, $changeEvent);
+            $eventDispatcher->dispatch($changeEvent,TheliaEvents::TAX_RULE_TAXES_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
                 throw new \LogicException(

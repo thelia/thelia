@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
 use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
@@ -278,7 +279,7 @@ class FolderController extends AbstractSeoCrudController
      *
      * @return Response|void
      */
-    protected function performAdditionalUpdateAction($updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
     {
         if ($this->getRequest()->get('save_mode') != 'stay') {
             return $this->generateRedirectFromRoute(

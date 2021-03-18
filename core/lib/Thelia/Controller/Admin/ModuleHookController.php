@@ -14,6 +14,7 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Hook\ModuleHookCreateEvent;
 use Thelia\Core\Event\Hook\ModuleHookDeleteEvent;
 use Thelia\Core\Event\Hook\ModuleHookEvent;
@@ -64,7 +65,7 @@ class ModuleHookController extends AbstractCrudController
         return $this->renderList();
     }
 
-    public function toggleActivationAction($module_hook_id)
+    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher, $module_hook_id)
     {
         if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::UPDATE)) {
             return $response;
@@ -75,7 +76,7 @@ class ModuleHookController extends AbstractCrudController
         $event = new ModuleHookToggleActivationEvent($this->getExistingObject());
 
         try {
-            $this->dispatch(TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION);
         } catch (\Exception $ex) {
             $message = $ex->getMessage();
         }

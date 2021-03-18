@@ -14,8 +14,10 @@ namespace Front\Controller;
 
 use Front\Front;
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
+use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -35,18 +37,18 @@ class CouponController extends BaseFrontController
     /**
      * Clear all coupons.
      */
-    public function clearAllCouponsAction(): void
+    public function clearAllCouponsAction(EventDispatcherInterface $eventDispatcher): void
     {
         // Dispatch Event to the Action
-        $this->getDispatcher()->dispatch(TheliaEvents::COUPON_CLEAR_ALL);
+        $eventDispatcher->dispatch((new DefaultActionEvent()),TheliaEvents::COUPON_CLEAR_ALL);
     }
 
     /**
      * Coupon consuming.
      */
-    public function consumeAction()
+    public function consumeAction(EventDispatcherInterface $eventDispatcher)
     {
-        $this->checkCartNotEmpty();
+        $this->checkCartNotEmpty($eventDispatcher);
 
         $message = false;
         $couponCodeForm = $this->createForm(FrontForm::COUPON_CONSUME);
@@ -70,7 +72,7 @@ class CouponController extends BaseFrontController
             $couponConsumeEvent = new CouponConsumeEvent($couponCode);
 
             // Dispatch Event to the Action
-            $this->getDispatcher()->dispatch(TheliaEvents::COUPON_CONSUME, $couponConsumeEvent);
+            $eventDispatcher->dispatch($couponConsumeEvent,TheliaEvents::COUPON_CONSUME);
 
             /* recalculate postage amount */
             $order = $this->getSession()->getOrder();
@@ -87,13 +89,14 @@ class CouponController extends BaseFrontController
                     try {
                         $deliveryPostageEvent = new DeliveryPostageEvent(
                             $moduleInstance,
-                            $this->getSession()->getSessionCart($this->getDispatcher()),
+                            $this->getSession()->getSessionCart($eventDispatcher),
                             $deliveryAddress
                         );
 
-                        $this->getDispatcher()->dispatch(
-                            TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
-                            $deliveryPostageEvent
+                        $eventDispatcher->dispatch(
+                            $deliveryPostageEvent,
+                            TheliaEvents::MODULE_DELIVERY_GET_POSTAGE
+
                         );
 
                         $postage = $deliveryPostageEvent->getPostage();
@@ -102,13 +105,13 @@ class CouponController extends BaseFrontController
                         $orderEvent->setPostageTax($postage->getAmountTax());
                         $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
 
-                        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
+                        $eventDispatcher->dispatch($orderEvent,TheliaEvents::ORDER_SET_POSTAGE);
                     } catch (\Exception $ex) {
                         // The postage has been chosen, but changes dues to coupon causes an exception.
                         // Reset the postage data in the order
                         $orderEvent->setDeliveryModule(0);
 
-                        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
+                        $eventDispatcher->dispatch($orderEvent,TheliaEvents::ORDER_SET_DELIVERY_MODULE);
                     }
                 }
             }

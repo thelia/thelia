@@ -14,6 +14,7 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
@@ -58,7 +59,7 @@ class ExportController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function changeExportPositionAction()
+    public function changeExportPositionAction(EventDispatcherInterface $eventDispatcher)
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
         if ($authResponse !== null) {
@@ -67,13 +68,13 @@ class ExportController extends BaseAdminController
 
         $query = $this->getRequest()->query;
 
-        $this->dispatch(
-            TheliaEvents::EXPORT_CHANGE_POSITION,
+        $eventDispatcher->dispatch(
             new UpdatePositionEvent(
                 $query->get('id'),
                 $this->matchPositionMode($query->get('mode')),
                 $query->get('value')
-            )
+            ),
+            TheliaEvents::EXPORT_CHANGE_POSITION
         );
 
         return $this->generateRedirectFromRoute('export.list');
@@ -84,7 +85,7 @@ class ExportController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function changeCategoryPositionAction()
+    public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher)
     {
         $authResponse = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE]);
         if ($authResponse !== null) {
@@ -93,13 +94,13 @@ class ExportController extends BaseAdminController
 
         $query = $this->getRequest()->query;
 
-        $this->dispatch(
-            TheliaEvents::EXPORT_CATEGORY_CHANGE_POSITION,
+        $eventDispatcher->dispatch(
             new UpdatePositionEvent(
                 $query->get('id'),
                 $this->matchPositionMode($query->get('mode')),
                 $query->get('value')
-            )
+            ),
+            TheliaEvents::EXPORT_CATEGORY_CHANGE_POSITION
         );
 
         return $this->generateRedirectFromRoute('export.list');

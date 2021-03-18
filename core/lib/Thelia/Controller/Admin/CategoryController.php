@@ -289,7 +289,7 @@ class CategoryController extends AbstractSeoCrudController
      *
      * @return \Symfony\Component\HttpFoundation\Response|null
      */
-    protected function performAdditionalUpdateAction($updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
     {
         $response = null;
         if ($this->getRequest()->get('save_mode') != 'stay') {
@@ -345,7 +345,7 @@ class CategoryController extends AbstractSeoCrudController
         return $this->jsonResponse(json_encode($result));
     }
 
-    public function addRelatedContentAction()
+    public function addRelatedContentAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -361,7 +361,7 @@ class CategoryController extends AbstractSeoCrudController
             );
 
             try {
-                $this->dispatch(TheliaEvents::CATEGORY_ADD_CONTENT, $event);
+                $eventDispatcher->dispatch($event,TheliaEvents::CATEGORY_ADD_CONTENT);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -386,7 +386,7 @@ class CategoryController extends AbstractSeoCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteRelatedContentAction()
+    public function deleteRelatedContentAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -402,7 +402,7 @@ class CategoryController extends AbstractSeoCrudController
             );
 
             try {
-                $this->dispatch(TheliaEvents::CATEGORY_REMOVE_CONTENT, $event);
+                $eventDispatcher->dispatch($event, TheliaEvents::CATEGORY_REMOVE_CONTENT);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);

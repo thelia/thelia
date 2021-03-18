@@ -332,7 +332,7 @@ class ModuleController extends AbstractCrudController
         return $response;
     }
 
-    public function installAction()
+    public function installAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, [], AccessManager::CREATE)) {
             return $response;
@@ -355,7 +355,7 @@ class ModuleController extends AbstractCrudController
                 ->setModulePath($modulePath)
                 ->setModuleDefinition($moduleDefinition);
 
-            $this->dispatch(TheliaEvents::MODULE_INSTALL, $moduleInstallEvent);
+            $eventDispatcher->dispatch($moduleInstallEvent,TheliaEvents::MODULE_INSTALL);
 
             $newModule = $moduleInstallEvent->getModule();
 

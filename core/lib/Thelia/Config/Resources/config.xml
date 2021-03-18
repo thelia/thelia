@@ -100,7 +100,6 @@
         </service>
         <service id="thelia.url.manager" alias="Thelia\Tools\URL" public="true"/>
 
-        <service id="deprecated_event_dispatcher" class="Symfony\Component\EventDispatcher\EventDispatcher" public="true"/>
 
         <!-- Tax engine -->
         <service id="thelia.taxEngine" alias="Thelia\TaxEngine\TaxEngine"/>

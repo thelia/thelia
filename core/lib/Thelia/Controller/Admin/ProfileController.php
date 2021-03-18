@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
@@ -329,7 +330,7 @@ class ProfileController extends AbstractCrudController
         return $requirements;
     }
 
-    public function processUpdateResourceAccess()
+    public function processUpdateResourceAccess(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -348,7 +349,7 @@ class ProfileController extends AbstractCrudController
 
             $changeEvent = $this->getUpdateResourceAccessEvent($data);
 
-            $this->dispatch(TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE, $changeEvent);
+            $eventDispatcher->dispatch($changeEvent,TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
                 throw new \LogicException(
@@ -390,7 +391,7 @@ class ProfileController extends AbstractCrudController
         return $this->renderEditionTemplate();
     }
 
-    public function processUpdateModuleAccess()
+    public function processUpdateModuleAccess(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -409,7 +410,7 @@ class ProfileController extends AbstractCrudController
 
             $changeEvent = $this->getUpdateModuleAccessEvent($data);
 
-            $this->dispatch(TheliaEvents::PROFILE_MODULE_ACCESS_UPDATE, $changeEvent);
+            $eventDispatcher->dispatch($changeEvent,TheliaEvents::PROFILE_MODULE_ACCESS_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
                 throw new \LogicException(

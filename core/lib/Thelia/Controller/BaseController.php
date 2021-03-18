@@ -120,15 +120,11 @@ abstract class BaseController implements ControllerInterface
      * @param string           $eventName a TheliaEvent name, as defined in TheliaEvents class
      * @param ActionEvent|null $event     the action event, or null (a DefaultActionEvent will be dispatched)
      *
-     * @deprecated since Thelia 2.5, use autowiring instead.
+     * Not allowed since Thelia 2.5, use autowiring instead.
      */
     protected function dispatch(string $eventName, Event $event = null): void
     {
-        if ($event == null) {
-            $event = new DefaultActionEvent();
-        }
-
-        $this->getDispatcher()->dispatch($event, $eventName);
+        throw new \Exception("Since Thelia 2.5 this->dispatch() function is not allowed in controllers, use autowiring instead");
     }
 
     /**
@@ -140,7 +136,7 @@ abstract class BaseController implements ControllerInterface
      */
     public function getDispatcher()
     {
-        return $this->container->get('deprecated_event_dispatcher');
+        throw new \Exception("Since Thelia 2.5 this->getDispatcher() function is not allowed in controllers, use autowiring instead");
     }
 
     /**
@@ -295,7 +291,7 @@ abstract class BaseController implements ControllerInterface
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function generateOrderPdf($order_id, $fileName, $checkOrderStatus = true, $checkAdminUser = true, $browser = false)
+    protected function generateOrderPdf(EventDispatcherInterface $eventDispatcher, $order_id, $fileName, $checkOrderStatus = true, $checkAdminUser = true, $browser = false)
     {
         $order = OrderQuery::create()->findPk($order_id);
 
@@ -317,7 +313,7 @@ abstract class BaseController implements ControllerInterface
         try {
             $pdfEvent = new PdfEvent($html);
 
-            $this->dispatch(TheliaEvents::GENERATE_PDF, $pdfEvent);
+            $eventDispatcher->dispatch($pdfEvent,TheliaEvents::GENERATE_PDF);
 
             if ($pdfEvent->hasPdf()) {
                 return $this->pdfResponse($pdfEvent->getPdf(), $order->getRef(), 200, $browser);

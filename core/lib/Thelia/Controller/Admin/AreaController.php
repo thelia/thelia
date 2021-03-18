@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -211,7 +212,7 @@ class AreaController extends AbstractCrudController
     /**
      * add a country to a define area.
      */
-    public function addCountry()
+    public function addCountry(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -227,7 +228,7 @@ class AreaController extends AbstractCrudController
 
             $event = new AreaAddCountryEvent($area, $form->get('country_id')->getData());
 
-            $this->dispatch(TheliaEvents::AREA_ADD_COUNTRY, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::AREA_ADD_COUNTRY);
 
             // Log object modification
             if (null !== $changedObject = $event->getModel()) {
@@ -267,7 +268,7 @@ class AreaController extends AbstractCrudController
     /**
      * delete several countries from a shipping zone.
      */
-    public function removeCountries()
+    public function removeCountries(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -284,7 +285,7 @@ class AreaController extends AbstractCrudController
 
             foreach ($data['country_id'] as $countryId) {
                 $country = explode('-', $countryId);
-                $this->removeOneCountryFromArea($area, $country[0], $country[1]);
+                $this->removeOneCountryFromArea($eventDispatcher, $area, $country[0], $country[1]);
             }
             // Redirect to the success URL
             return $this->generateSuccessRedirect($areaDeleteCountriesForm);
@@ -306,7 +307,7 @@ class AreaController extends AbstractCrudController
         return $this->renderEditionTemplate();
     }
 
-    protected function removeOneCountryFromArea(Area $area, $countryId, $stateId): void
+    protected function removeOneCountryFromArea(EventDispatcherInterface $eventDispatcher, Area $area, $countryId, $stateId): void
     {
         if ((int) $stateId === 0) {
             $stateId = null;
@@ -314,7 +315,7 @@ class AreaController extends AbstractCrudController
 
         $removeCountryEvent = new AreaRemoveCountryEvent($area, $countryId, $stateId);
 
-        $this->dispatch(TheliaEvents::AREA_REMOVE_COUNTRY, $removeCountryEvent);
+        $eventDispatcher->dispatch($removeCountryEvent,TheliaEvents::AREA_REMOVE_COUNTRY);
 
         if (null !== $changedObject = $removeCountryEvent->getModel()) {
             $this->adminLogAppend(
@@ -333,7 +334,7 @@ class AreaController extends AbstractCrudController
         }
     }
 
-    public function removeCountry()
+    public function removeCountry(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -341,6 +342,7 @@ class AreaController extends AbstractCrudController
         }
 
         $this->removeOneCountryFromArea(
+            $eventDispatcher,
             $this->getRequest()->get('area_id', 0),
             $this->getRequest()->get('country_id', 0),
             $this->getRequest()->get('state_id', null)

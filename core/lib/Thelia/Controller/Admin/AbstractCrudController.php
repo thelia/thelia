@@ -240,7 +240,7 @@ abstract class AbstractCrudController extends BaseAdminController
      *
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalUpdateAction($updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
     {
         return null;
     }
@@ -491,7 +491,7 @@ abstract class AbstractCrudController extends BaseAdminController
             }
 
             // Execute additional Action
-            $response = $this->performAdditionalUpdateAction($changeEvent);
+            $response = $this->performAdditionalUpdateAction($eventDispatcher, $changeEvent);
 
             if ($response == null) {
                 // If we have to stay on the same page, do not redirect to the successUrl,

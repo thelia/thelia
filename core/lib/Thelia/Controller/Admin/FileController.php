@@ -14,6 +14,7 @@ namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\File\FileToggleVisibilityEvent;
@@ -67,6 +68,7 @@ class FileController extends BaseAdminController
      * @return Response
      */
     public function saveFileAjaxAction(
+        EventDispatcherInterface $eventDispatcher,
         $parentId,
         $parentType,
         $objectType,
@@ -84,6 +86,7 @@ class FileController extends BaseAdminController
             $fileBeingUploaded = $this->getRequest()->files->get('file');
             try {
                 $this->processFile(
+                    $eventDispatcher,
                     $fileBeingUploaded,
                     $parentId,
                     $parentType,
@@ -116,6 +119,7 @@ class FileController extends BaseAdminController
      * @deprecated since version 2.3, to be removed in 2.6. Please use the process method File present in the same class.
      */
     public function processImage(
+        EventDispatcherInterface $eventDispatcher,
         $fileBeingUploaded,
         $parentId,
         $parentType,
@@ -125,7 +129,7 @@ class FileController extends BaseAdminController
     ) {
         @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 2.6. Please use the process method File present in the same class.', \E_USER_DEPRECATED);
 
-        return $this->processFile($fileBeingUploaded, $parentId, $parentType, $objectType, $validMimeTypes, $extBlackList);
+        return $this->processFile($eventDispatcher, $fileBeingUploaded, $parentId, $parentType, $objectType, $validMimeTypes, $extBlackList);
     }
 
     /**
@@ -143,6 +147,7 @@ class FileController extends BaseAdminController
      * @since 2.3
      */
     public function processFile(
+        EventDispatcherInterface $eventDispatcher,
         $fileBeingUploaded,
         $parentId,
         $parentType,
@@ -236,9 +241,10 @@ class FileController extends BaseAdminController
         $fileCreateOrUpdateEvent->setParentName($parentModel->getTitle());
 
         // Dispatch Event to the Action
-        $this->dispatch(
-            TheliaEvents::IMAGE_SAVE,
-            $fileCreateOrUpdateEvent
+        $eventDispatcher->dispatch(
+            $fileCreateOrUpdateEvent,
+            TheliaEvents::IMAGE_SAVE
+
         );
 
         $this->adminLogAppend(
@@ -460,7 +466,7 @@ class FileController extends BaseAdminController
      *
      * @return FileModelInterface
      */
-    protected function updateFileAction($fileId, $parentType, $objectType, $eventName)
+    protected function updateFileAction(EventDispatcherInterface $eventDispatcher, $fileId, $parentType, $objectType, $eventName)
     {
         $message = false;
 
@@ -518,7 +524,7 @@ class FileController extends BaseAdminController
                 $event->setUploadedFile($fileForm['file']);
             }
 
-            $this->dispatch($eventName, $event);
+            $eventDispatcher->dispatch($event, $eventName);
 
             $fileUpdated = $event->getModel();
 
@@ -634,7 +640,7 @@ class FileController extends BaseAdminController
      *
      * @return Response
      */
-    public function deleteFileAction($fileId, $parentType, $objectType, $eventName)
+    public function deleteFileAction(EventDispatcherInterface $eventDispatcher, $fileId, $parentType, $objectType, $eventName)
     {
         $message = null;
 
@@ -655,7 +661,7 @@ class FileController extends BaseAdminController
 
         // Dispatch Event to the Action
         try {
-            $this->dispatch($eventName, $fileDeleteEvent);
+            $eventDispatcher->dispatch($fileDeleteEvent, $eventName);
 
             $this->adminLogAppend(
                 $this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT),
@@ -726,7 +732,7 @@ class FileController extends BaseAdminController
         return $this->deleteFileAction($documentId, $parentType, 'document', TheliaEvents::DOCUMENT_DELETE);
     }
 
-    public function updateFilePositionAction($parentType, $parentId, $objectType, $eventName)
+    public function updateFilePositionAction(EventDispatcherInterface $eventDispatcher, $parentType, $parentId, $objectType, $eventName)
     {
         $message = null;
 
@@ -753,7 +759,7 @@ class FileController extends BaseAdminController
 
         // Dispatch Event to the Action
         try {
-            $this->dispatch($eventName, $event);
+            $eventDispatcher->dispatch($eventName, $event);
         } catch (\Exception $e) {
             $message = $this->getTranslator()->trans(
                 'Fail to update %type% position: %err%',
@@ -812,7 +818,7 @@ class FileController extends BaseAdminController
         return $this->updateFilePositionAction($parentType, $documentId, 'document', TheliaEvents::DOCUMENT_UPDATE_POSITION);
     }
 
-    public function toggleVisibilityFileAction($documentId, $parentType, $objectType, $eventName)
+    public function toggleVisibilityFileAction(EventDispatcherInterface $eventDispatcher, $documentId, $parentType, $objectType, $eventName)
     {
         $message = null;
 
@@ -838,7 +844,7 @@ class FileController extends BaseAdminController
 
         // Dispatch Event to the Action
         try {
-            $this->dispatch($eventName, $event);
+            $eventDispatcher->dispatch($eventName, $event);
         } catch (\Exception $e) {
             $message = $this->getTranslator()->trans(
                 'Fail to update %type% visibility: %err%',

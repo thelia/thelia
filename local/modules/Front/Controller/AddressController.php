@@ -14,6 +14,7 @@ namespace Front\Controller;
 
 use Front\Front;
 use Symfony\Component\Form\Form;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -49,7 +50,7 @@ class AddressController extends BaseFrontController
      *
      * Dispatch TheliaEvents::ADDRESS_CREATE event
      */
-    public function createAction()
+    public function createAction(EventDispatcherInterface $eventDispatcher)
     {
         $this->checkAuth();
 
@@ -63,7 +64,7 @@ class AddressController extends BaseFrontController
             $event = $this->createAddressEvent($form);
             $event->setCustomer($customer);
 
-            $this->dispatch(TheliaEvents::ADDRESS_CREATE, $event);
+            $eventDispatcher->dispatch($event, TheliaEvents::ADDRESS_CREATE);
 
             return $this->generateSuccessRedirect($addressCreate);
         } catch (FormValidationException $e) {
@@ -122,7 +123,7 @@ class AddressController extends BaseFrontController
         $this->getParserContext()->set('address_id', $address_id);
     }
 
-    public function processUpdateAction($address_id)
+    public function processUpdateAction($address_id, EventDispatcherInterface $eventDispatcher)
     {
         $this->checkAuth();
 
@@ -146,7 +147,7 @@ class AddressController extends BaseFrontController
             $event = $this->createAddressEvent($form);
             $event->setAddress($address);
 
-            $this->dispatch(TheliaEvents::ADDRESS_UPDATE, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::ADDRESS_UPDATE);
 
             return $this->generateSuccessRedirect($addressUpdate);
         } catch (FormValidationException $e) {
@@ -171,7 +172,7 @@ class AddressController extends BaseFrontController
         }
     }
 
-    public function deleteAction($address_id)
+    public function deleteAction(EventDispatcherInterface $eventDispatcher, $address_id)
     {
         $this->checkAuth();
         $error_message = false;
@@ -200,7 +201,7 @@ class AddressController extends BaseFrontController
         }
 
         try {
-            $this->dispatch(TheliaEvents::ADDRESS_DELETE, new AddressEvent($address));
+            $eventDispatcher->dispatch(new AddressEvent($address),TheliaEvents::ADDRESS_DELETE);
         } catch (\Exception $e) {
             $error_message = $e->getMessage();
         }
@@ -229,7 +230,7 @@ class AddressController extends BaseFrontController
         return $this->generateRedirectFromRoute('default', ['view' => 'account']);
     }
 
-    public function makeAddressDefaultAction($addressId)
+    public function makeAddressDefaultAction(EventDispatcherInterface $eventDispatcher, $addressId)
     {
         $this->checkAuth();
 
@@ -244,7 +245,7 @@ class AddressController extends BaseFrontController
 
         try {
             $event = new AddressEvent($address);
-            $this->dispatch(TheliaEvents::ADDRESS_DEFAULT, $event);
+            $eventDispatcher->dispatch($event, TheliaEvents::ADDRESS_DEFAULT);
         } catch (\Exception $e) {
             $this->getParserContext()
                 ->setGeneralError($e->getMessage())

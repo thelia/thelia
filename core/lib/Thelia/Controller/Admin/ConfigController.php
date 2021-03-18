@@ -77,7 +77,6 @@ class ConfigController extends AbstractCrudController
     {
         $changeEvent = new ConfigUpdateEvent($data['id']);
 
-        // Create and dispatch the change event
         $changeEvent
             ->setEventName($data['name'])
             ->setValue($data['value'])

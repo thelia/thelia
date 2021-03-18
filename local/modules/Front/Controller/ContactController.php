@@ -12,6 +12,7 @@
 
 namespace Front\Controller;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Contact\ContactEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -30,7 +31,7 @@ class ContactController extends BaseFrontController
     /**
      * send contact message.
      */
-    public function sendAction()
+    public function sendAction(EventDispatcherInterface $eventDispatcher)
     {
         $contactForm = $this->createForm(FrontForm::CONTACT);
 
@@ -39,7 +40,7 @@ class ContactController extends BaseFrontController
 
             $event = new ContactEvent($form);
 
-            $this->dispatch(TheliaEvents::CONTACT_SUBMIT, $event);
+            $eventDispatcher->dispatch($event, TheliaEvents::CONTACT_SUBMIT);
 
             $this->getMailer()->sendSimpleEmailMessage(
                 [ConfigQuery::getStoreEmail() => $event->getName()],

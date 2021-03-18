@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ShippingZone\ShippingZoneAddAreaEvent;
 use Thelia\Core\Event\ShippingZone\ShippingZoneRemoveAreaEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -54,13 +55,12 @@ class ShippingZoneController extends BaseAdminController
     /**
      * @return mixed|\Thelia\Core\HttpFoundation\Response
      */
-    public function addArea()
+    public function addArea(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
-//        $shippingAreaForm = new ShippingZoneAddArea($this->getRequest());
         $shippingAreaForm = $this->createForm('thelia.shipping_zone_area');
         $error_msg = null;
 
@@ -72,7 +72,7 @@ class ShippingZoneController extends BaseAdminController
                 $form->get('shipping_zone_id')->getData()
             );
 
-            $this->dispatch(TheliaEvents::SHIPPING_ZONE_ADD_AREA, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::SHIPPING_ZONE_ADD_AREA);
 
             // Redirect to the success URL
             return $this->generateSuccessRedirect($shippingAreaForm);
@@ -94,7 +94,7 @@ class ShippingZoneController extends BaseAdminController
         return $this->renderEditionTemplate();
     }
 
-    public function removeArea()
+    public function removeArea(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, [], AccessManager::UPDATE)) {
             return $response;
@@ -111,7 +111,7 @@ class ShippingZoneController extends BaseAdminController
                 $form->get('shipping_zone_id')->getData()
             );
 
-            $this->dispatch(TheliaEvents::SHIPPING_ZONE_REMOVE_AREA, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::SHIPPING_ZONE_REMOVE_AREA);
 
             // Redirect to the success URL
             return $this->generateSuccessRedirect($shippingAreaForm);

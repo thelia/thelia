@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Country\CountryCreateEvent;
 use Thelia\Core\Event\Country\CountryDeleteEvent;
 use Thelia\Core\Event\Country\CountryToggleDefaultEvent;
@@ -263,7 +264,7 @@ class CountryController extends AbstractCrudController
         return $this->generateRedirectFromRoute('admin.configuration.countries.default');
     }
 
-    public function toggleDefaultAction()
+    public function toggleDefaultAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
@@ -272,7 +273,7 @@ class CountryController extends AbstractCrudController
         if (null !== $country_id = $this->getRequest()->get('country_id')) {
             $toogleDefaultEvent = new CountryToggleDefaultEvent($country_id);
             try {
-                $this->dispatch(TheliaEvents::COUNTRY_TOGGLE_DEFAULT, $toogleDefaultEvent);
+                $eventDispatcher->dispatch($toogleDefaultEvent,TheliaEvents::COUNTRY_TOGGLE_DEFAULT);
 
                 if ($toogleDefaultEvent->hasCountry()) {
                     return $this->nullResponse();

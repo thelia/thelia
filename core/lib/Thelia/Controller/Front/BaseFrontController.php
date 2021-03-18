@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Front;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
@@ -41,9 +42,9 @@ class BaseFrontController extends BaseController
         return self::CONTROLLER_TYPE;
     }
 
-    protected function checkCartNotEmpty(): void
+    protected function checkCartNotEmpty(EventDispatcherInterface $eventDispatcher): void
     {
-        $cart = $this->getSession()->getSessionCart($this->getDispatcher());
+        $cart = $this->getSession()->getSessionCart($eventDispatcher);
         if ($cart === null || $cart->countCartItems() == 0) {
             throw new RedirectException($this->retrieveUrlFromRouteId('cart.view'));
         }

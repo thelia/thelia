@@ -15,6 +15,7 @@ namespace Thelia\Controller\Admin;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Hook\HookCreateAllEvent;
 use Thelia\Core\Event\Hook\HookCreateEvent;
 use Thelia\Core\Event\Hook\HookDeactivationEvent;
@@ -109,7 +110,7 @@ class HookController extends AbstractCrudController
         return $response;
     }
 
-    public function discoverSaveAction()
+    public function discoverSaveAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::UPDATE)) {
             return $response;
@@ -124,7 +125,7 @@ class HookController extends AbstractCrudController
             foreach ($newHooks as $hook) {
                 $event = $this->getDiscoverCreationEvent($hook, $templateType);
 
-                $this->dispatch(TheliaEvents::HOOK_CREATE_ALL, $event);
+                $eventDispatcher->dispatch($event, TheliaEvents::HOOK_CREATE_ALL);
 
                 if (!$event->hasHook()) {
                     $errors[] = sprintf(
@@ -140,7 +141,7 @@ class HookController extends AbstractCrudController
             foreach ($missingHooks as $hookId) {
                 $event = new HookDeactivationEvent($hookId);
 
-                $this->dispatch(TheliaEvents::HOOK_DEACTIVATION, $event);
+                $eventDispatcher->dispatch($event,TheliaEvents::HOOK_DEACTIVATION);
 
                 if (!$event->hasHook()) {
                     $errors[] = sprintf(
@@ -427,7 +428,7 @@ class HookController extends AbstractCrudController
         return $this->generateRedirectFromRoute('admin.hook');
     }
 
-    public function toggleNativeAction()
+    public function toggleNativeAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
@@ -437,7 +438,7 @@ class HookController extends AbstractCrudController
         if (null !== $hook_id = $this->getRequest()->get('hook_id')) {
             $toggleDefaultEvent = new HookToggleNativeEvent($hook_id);
             try {
-                $this->dispatch(TheliaEvents::HOOK_TOGGLE_NATIVE, $toggleDefaultEvent);
+                $eventDispatcher->dispatch($toggleDefaultEvent,TheliaEvents::HOOK_TOGGLE_NATIVE);
 
                 if ($toggleDefaultEvent->hasHook()) {
                     return $this->nullResponse();
@@ -451,7 +452,7 @@ class HookController extends AbstractCrudController
         return $this->nullResponse(500);
     }
 
-    public function toggleActivationAction()
+    public function toggleActivationAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
@@ -461,7 +462,7 @@ class HookController extends AbstractCrudController
         if (null !== $hook_id = $this->getRequest()->get('hook_id')) {
             $toggleDefaultEvent = new HookToggleActivationEvent($hook_id);
             try {
-                $this->dispatch(TheliaEvents::HOOK_TOGGLE_ACTIVATION, $toggleDefaultEvent);
+                $eventDispatcher->dispatch($toggleDefaultEvent, TheliaEvents::HOOK_TOGGLE_ACTIVATION);
 
                 if ($toggleDefaultEvent->hasHook()) {
                     return $this->nullResponse();

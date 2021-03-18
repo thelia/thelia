@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
 use Thelia\Core\Event\Attribute\AttributeCreateEvent;
 use Thelia\Core\Event\Attribute\AttributeDeleteEvent;
@@ -76,7 +77,6 @@ class AttributeController extends AbstractCrudController
     {
         $changeEvent = new AttributeUpdateEvent($formData['id']);
 
-        // Create and dispatch the change event
         $changeEvent
             ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
@@ -93,7 +93,7 @@ class AttributeController extends AbstractCrudController
      *
      * @see \Thelia\Controller\Admin\AbstractCrudController::performAdditionalUpdateAction()
      */
-    protected function performAdditionalUpdateAction($updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
     {
         $attr_values = $this->getRequest()->get('attribute_values', null);
 
@@ -104,7 +104,7 @@ class AttributeController extends AbstractCrudController
                 $event->setTitle($value);
                 $event->setLocale($this->getCurrentEditionLocale());
 
-                $this->dispatch(TheliaEvents::ATTRIBUTE_AV_UPDATE, $event);
+                $eventDispatcher->dispatch($event, TheliaEvents::ATTRIBUTE_AV_UPDATE);
             }
         }
 
@@ -231,7 +231,7 @@ class AttributeController extends AbstractCrudController
     /**
      * Add or Remove from all product templates.
      */
-    protected function addRemoveFromAllTemplates($eventType)
+    protected function addRemoveFromAllTemplates(EventDispatcherInterface $eventDispatcher, $eventType)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -242,7 +242,7 @@ class AttributeController extends AbstractCrudController
             if (null !== $object = $this->getExistingObject()) {
                 $event = new AttributeEvent($object);
 
-                $this->dispatch($eventType, $event);
+                $eventDispatcher->dispatch($eventType, $event);
             }
         } catch (\Exception $ex) {
             // Any error
@@ -255,16 +255,16 @@ class AttributeController extends AbstractCrudController
     /**
      * Remove from all product templates.
      */
-    public function removeFromAllTemplates()
+    public function removeFromAllTemplates(EventDispatcherInterface $eventDispatcher)
     {
-        return $this->addRemoveFromAllTemplates(TheliaEvents::ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES);
+        return $this->addRemoveFromAllTemplates($eventDispatcher, TheliaEvents::ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES);
     }
 
     /**
      * Add to all product templates.
      */
-    public function addToAllTemplates()
+    public function addToAllTemplates(EventDispatcherInterface $eventDispatcher)
     {
-        return $this->addRemoveFromAllTemplates(TheliaEvents::ATTRIBUTE_ADD_TO_ALL_TEMPLATES);
+        return $this->addRemoveFromAllTemplates($eventDispatcher, TheliaEvents::ATTRIBUTE_ADD_TO_ALL_TEMPLATES);
     }
 }

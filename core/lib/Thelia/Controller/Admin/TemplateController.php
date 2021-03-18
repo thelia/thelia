@@ -209,7 +209,7 @@ class TemplateController extends AbstractCrudController
         return null;
     }
 
-    public function duplicateAction()
+    public function duplicateAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::CREATE)) {
@@ -222,7 +222,7 @@ class TemplateController extends AbstractCrudController
             try {
                 $event = new TemplateDuplicateEvent($template_id, $this->getCurrentEditionLocale());
 
-                $this->dispatch(TheliaEvents::TEMPLATE_DUPLICATE, $event);
+                $eventDispatcher->dispatch($event,TheliaEvents::TEMPLATE_DUPLICATE);
 
                 if ($event->hasTemplate()) {
                     $template_id = $event->getTemplate()->getId();
@@ -252,7 +252,7 @@ class TemplateController extends AbstractCrudController
         );
     }
 
-    public function addAttributeAction()
+    public function addAttributeAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
@@ -268,7 +268,7 @@ class TemplateController extends AbstractCrudController
             );
 
             try {
-                $this->dispatch(TheliaEvents::TEMPLATE_ADD_ATTRIBUTE, $event);
+                $eventDispatcher->dispatch($event,TheliaEvents::TEMPLATE_ADD_ATTRIBUTE);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -278,7 +278,7 @@ class TemplateController extends AbstractCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteAttributeAction()
+    public function deleteAttributeAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
@@ -291,7 +291,7 @@ class TemplateController extends AbstractCrudController
         );
 
         try {
-            $this->dispatch(TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE, $event);
+            $eventDispatcher->dispatch($event, TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE);
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
@@ -319,7 +319,7 @@ class TemplateController extends AbstractCrudController
         );
     }
 
-    public function addFeatureAction()
+    public function addFeatureAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
@@ -335,7 +335,7 @@ class TemplateController extends AbstractCrudController
             );
 
             try {
-                $this->dispatch(TheliaEvents::TEMPLATE_ADD_FEATURE, $event);
+                $eventDispatcher->dispatch($event,TheliaEvents::TEMPLATE_ADD_FEATURE);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -345,7 +345,7 @@ class TemplateController extends AbstractCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteFeatureAction()
+    public function deleteFeatureAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, [], AccessManager::UPDATE)) {
@@ -358,7 +358,7 @@ class TemplateController extends AbstractCrudController
         );
 
         try {
-            $this->dispatch(TheliaEvents::TEMPLATE_DELETE_FEATURE, $event);
+            $eventDispatcher->dispatch($event, TheliaEvents::TEMPLATE_DELETE_FEATURE);
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);

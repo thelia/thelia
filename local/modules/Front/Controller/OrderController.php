@@ -17,6 +17,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -48,13 +49,13 @@ class OrderController extends BaseFrontController
     /**
      * Check if the cart contains only virtual products.
      */
-    public function deliverView()
+    public function deliverView(EventDispatcherInterface $eventDispatcher)
     {
         $this->checkAuth();
-        $this->checkCartNotEmpty();
+        $this->checkCartNotEmpty($eventDispatcher);
 
         // check if the cart contains only virtual products
-        $cart = $this->getSession()->getSessionCart($this->getDispatcher());
+        $cart = $this->getSession()->getSessionCart($eventDispatcher);
 
         $deliveryAddress = $this->getCustomerAddress();
 
@@ -90,14 +91,14 @@ class OrderController extends BaseFrontController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    private function registerVirtualProductDelivery($moduleInstance, $deliveryAddress)
+    private function registerVirtualProductDelivery(EventDispatcherInterface $eventDispatcher, $moduleInstance, $deliveryAddress)
     {
         /* get postage amount */
         $deliveryModule = $moduleInstance->getModuleModel();
-        $cart = $this->getSession()->getSessionCart($this->getDispatcher());
+        $cart = $this->getSession()->getSessionCart($eventDispatcher);
         $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $deliveryAddress);
 
-        $this->getDispatcher()->dispatch(
+        $eventDispatcher->dispatch(
             $deliveryPostageEvent,
             TheliaEvents::MODULE_DELIVERY_GET_POSTAGE
         );
@@ -111,9 +112,9 @@ class OrderController extends BaseFrontController
         $orderEvent->setPostageTax($postage->getAmountTax());
         $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
 
-        $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_ADDRESS);
-        $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_MODULE);
-        $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
+        $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_ADDRESS);
+        $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_MODULE);
+        $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
 
         return $this->generateRedirectFromRoute('order.invoice');
     }
@@ -122,10 +123,10 @@ class OrderController extends BaseFrontController
      * set delivery address
      * set delivery module.
      */
-    public function deliver()
+    public function deliver(EventDispatcherInterface $eventDispatcher)
     {
         $this->checkAuth();
-        $this->checkCartNotEmpty();
+        $this->checkCartNotEmpty($eventDispatcher);
 
         $message = false;
 
@@ -168,10 +169,10 @@ class OrderController extends BaseFrontController
             /* get postage amount */
             $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
 
-            $cart = $this->getSession()->getSessionCart($this->getDispatcher());
+            $cart = $this->getSession()->getSessionCart($eventDispatcher);
             $deliveryPostageEvent = new DeliveryPostageEvent($moduleInstance, $cart, $deliveryAddress);
 
-            $this->getDispatcher()->dispatch(
+            $eventDispatcher->dispatch(
                 $deliveryPostageEvent,
                 TheliaEvents::MODULE_DELIVERY_GET_POSTAGE
             );
@@ -191,9 +192,9 @@ class OrderController extends BaseFrontController
             $orderEvent->setPostageTax($postage->getAmountTax());
             $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
 
-            $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_ADDRESS);
-            $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_MODULE);
-            $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
+            $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_ADDRESS);
+            $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_MODULE);
+            $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
 
             return $this->generateRedirectFromRoute('order.invoice');
         } catch (FormValidationException $e) {
@@ -230,10 +231,10 @@ class OrderController extends BaseFrontController
      * set invoice address
      * set payment module.
      */
-    public function invoice()
+    public function invoice(EventDispatcherInterface $eventDispatcher)
     {
         $this->checkAuth();
-        $this->checkCartNotEmpty();
+        $this->checkCartNotEmpty($eventDispatcher);
         $this->checkValidDelivery();
 
         $message = false;
@@ -262,8 +263,8 @@ class OrderController extends BaseFrontController
             $orderEvent->setInvoiceAddress($invoiceAddressId);
             $orderEvent->setPaymentModule($paymentModuleId);
 
-            $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_INVOICE_ADDRESS);
-            $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_SET_PAYMENT_MODULE);
+            $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_INVOICE_ADDRESS);
+            $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_PAYMENT_MODULE);
 
             return $this->generateRedirectFromRoute('order.payment.process');
         } catch (FormValidationException $e) {
@@ -298,17 +299,17 @@ class OrderController extends BaseFrontController
         return $this->generateErrorRedirect($orderPayment);
     }
 
-    public function pay()
+    public function pay(EventDispatcherInterface $eventDispatcher)
     {
         /* check customer */
         $this->checkAuth();
 
         /* check cart count */
-        $this->checkCartNotEmpty();
+        $this->checkCartNotEmpty($eventDispatcher);
 
         /* check stock not empty */
         if (true === ConfigQuery::checkAvailableStock()) {
-            if (null !== $response = $this->checkStockNotEmpty()) {
+            if (null !== $response = $this->checkStockNotEmpty($eventDispatcher)) {
                 return $response;
             }
         }
@@ -321,7 +322,7 @@ class OrderController extends BaseFrontController
 
         $orderEvent = $this->getOrderEvent();
 
-        $this->getDispatcher()->dispatch($orderEvent, TheliaEvents::ORDER_PAY);
+        $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_PAY);
 
         $placedOrder = $orderEvent->getPlacedOrder();
 
@@ -341,7 +342,7 @@ class OrderController extends BaseFrontController
         return $this->generateRedirectFromRoute('cart.view');
     }
 
-    public function orderPlaced($order_id): void
+    public function orderPlaced(EventDispatcherInterface $eventDispatcher, $order_id): void
     {
         /* check if the placed order matched the customer */
         $placedOrder = OrderQuery::create()->findPk(
@@ -374,7 +375,7 @@ class OrderController extends BaseFrontController
             );
         }
 
-        $this->getDispatcher()->dispatch($this->getOrderEvent(), TheliaEvents::ORDER_CART_CLEAR);
+        $eventDispatcher->dispatch($this->getOrderEvent(), TheliaEvents::ORDER_CART_CLEAR);
 
         $this->getParserContext()->set('placed_order_id', $placedOrder->getId());
     }
@@ -441,21 +442,21 @@ class OrderController extends BaseFrontController
         return $this->render('account-order', ['order_id' => $order_id]);
     }
 
-    public function generateInvoicePdf($order_id)
+    public function generateInvoicePdf(EventDispatcherInterface $eventDispatcher, $order_id)
     {
         $this->checkOrderCustomer($order_id);
 
-        return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
+        return $this->generateOrderPdf($eventDispatcher, $order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
     }
 
-    public function generateDeliveryPdf($order_id)
+    public function generateDeliveryPdf(EventDispatcherInterface $eventDispatcher, $order_id)
     {
         $this->checkOrderCustomer($order_id);
 
-        return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
+        return $this->generateOrderPdf($eventDispatcher, $order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
     }
 
-    public function downloadVirtualProduct($order_product_id)
+    public function downloadVirtualProduct(EventDispatcherInterface $eventDispatcher, $order_product_id)
     {
         if (null !== $orderProduct = OrderProductQuery::create()->findPk($order_product_id)) {
             $order = $orderProduct->getOrder();
@@ -465,7 +466,7 @@ class OrderController extends BaseFrontController
                 $this->checkOrderCustomer($order->getId());
 
                 $virtualProductEvent = new VirtualProductOrderDownloadResponseEvent($orderProduct);
-                $this->getDispatcher()->dispatch(
+                $eventDispatcher->dispatch(
                     $virtualProductEvent,
                     TheliaEvents::VIRTUAL_PRODUCT_ORDER_DOWNLOAD_RESPONSE
                 );
@@ -539,9 +540,9 @@ class OrderController extends BaseFrontController
      *
      * @return BaseResponse|null
      */
-    private function checkStockNotEmpty()
+    private function checkStockNotEmpty(EventDispatcherInterface $eventDispatcher)
     {
-        $cart = $this->getSession()->getSessionCart($this->getDispatcher());
+        $cart = $this->getSession()->getSessionCart($eventDispatcher);
 
         $cartItems = $cart->getCartItems();
 

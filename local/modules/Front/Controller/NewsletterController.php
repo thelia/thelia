@@ -14,6 +14,7 @@ namespace Front\Controller;
 
 use Front\Front;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -32,7 +33,7 @@ class NewsletterController extends BaseFrontController
     /**
      * @since 2.3.0-alpha2
      */
-    public function unsubscribeAction()
+    public function unsubscribeAction(EventDispatcherInterface $eventDispatcher)
     {
         $errorMessage = false;
 
@@ -51,7 +52,7 @@ class NewsletterController extends BaseFrontController
 
                 $event->setId($newsletter->getId());
 
-                $this->dispatch(TheliaEvents::NEWSLETTER_UNSUBSCRIBE, $event);
+                $eventDispatcher->dispatch($event, TheliaEvents::NEWSLETTER_UNSUBSCRIBE);
 
                 // If a success URL is defined in the form, redirect to it, otherwise use the defaut view
                 if ($newsletterForm->hasSuccessUrl() && !$this->getRequest()->isXmlHttpRequest()) {
@@ -88,7 +89,7 @@ class NewsletterController extends BaseFrontController
         }
     }
 
-    public function subscribeAction()
+    public function subscribeAction(EventDispatcherInterface $eventDispatcher)
     {
         $errorMessage = false;
 
@@ -115,7 +116,7 @@ class NewsletterController extends BaseFrontController
                 ;
             }
 
-            $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::NEWSLETTER_SUBSCRIBE);
 
             // If a success URL is defined in the form, redirect to it, otherwise use the defaut view
             if ($newsletterForm->hasSuccessUrl() && !$this->getRequest()->isXmlHttpRequest()) {

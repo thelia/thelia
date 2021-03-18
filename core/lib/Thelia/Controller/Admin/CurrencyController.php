@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Currency\CurrencyCreateEvent;
 use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
 use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
@@ -78,7 +79,6 @@ class CurrencyController extends AbstractCrudController
     {
         $changeEvent = new CurrencyUpdateEvent($formData['id']);
 
-        // Create and dispatch the change event
         $changeEvent
         ->setCurrencyName($formData['name'])
         ->setLocale($formData['locale'])
@@ -192,7 +192,7 @@ class CurrencyController extends AbstractCrudController
     /**
      * Update currencies rates.
      */
-    public function updateRatesAction()
+    public function updateRatesAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -202,7 +202,7 @@ class CurrencyController extends AbstractCrudController
         try {
             $event = new CurrencyUpdateRateEvent();
 
-            $this->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::CURRENCY_UPDATE_RATES);
 
             if ($event->hasUndefinedRates()) {
                 return $this->render('currencies', [
@@ -220,7 +220,7 @@ class CurrencyController extends AbstractCrudController
     /**
      * Sets the default currency.
      */
-    public function setDefaultAction()
+    public function setDefaultAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -233,7 +233,7 @@ class CurrencyController extends AbstractCrudController
         $changeEvent->setIsDefault(true)->setVisible(1);
 
         try {
-            $this->dispatch(TheliaEvents::CURRENCY_SET_DEFAULT, $changeEvent);
+            $eventDispatcher->dispatch($changeEvent,TheliaEvents::CURRENCY_SET_DEFAULT);
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
@@ -245,7 +245,7 @@ class CurrencyController extends AbstractCrudController
     /**
      * Sets if the currency is visible for Front.
      */
-    public function setVisibleAction()
+    public function setVisibleAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -258,7 +258,7 @@ class CurrencyController extends AbstractCrudController
         $changeEvent->setVisible((int) $this->getRequest()->get('visible', 0));
 
         try {
-            $this->dispatch(TheliaEvents::CURRENCY_SET_VISIBLE, $changeEvent);
+            $eventDispatcher->dispatch($changeEvent,TheliaEvents::CURRENCY_SET_VISIBLE);
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);

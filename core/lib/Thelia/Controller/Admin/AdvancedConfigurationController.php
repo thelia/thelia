@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
@@ -36,7 +37,7 @@ class AdvancedConfigurationController extends BaseAdminController
         return $this->render('advanced-configuration');
     }
 
-    public function flushCacheAction()
+    public function flushCacheAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $result = $this->checkAuth(AdminResources::ADVANCED_CONFIGURATION, [], AccessManager::UPDATE)) {
             return $result;
@@ -47,7 +48,7 @@ class AdvancedConfigurationController extends BaseAdminController
             $this->validateForm($form);
 
             $event = new CacheEvent($this->container->getParameter('kernel.cache_dir'));
-            $this->dispatch(TheliaEvents::CACHE_CLEAR, $event);
+            $eventDispatcher->dispatch($event, TheliaEvents::CACHE_CLEAR);
         } catch (\Exception $e) {
             Tlog::getInstance()->addError(sprintf('Flush cache error: %s', $e->getMessage()));
         }
@@ -55,7 +56,7 @@ class AdvancedConfigurationController extends BaseAdminController
         return $this->generateRedirectFromRoute('admin.configuration.advanced');
     }
 
-    public function flushAssetsAction()
+    public function flushAssetsAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $result = $this->checkAuth(AdminResources::ADVANCED_CONFIGURATION, [], AccessManager::UPDATE)) {
             return $result;
@@ -66,7 +67,7 @@ class AdvancedConfigurationController extends BaseAdminController
             $this->validateForm($form);
 
             $event = new CacheEvent(THELIA_WEB_DIR.'assets');
-            $this->dispatch(TheliaEvents::CACHE_CLEAR, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::CACHE_CLEAR);
         } catch (\Exception $e) {
             Tlog::getInstance()->addError(sprintf('Flush assets error: %s', $e->getMessage()));
         }
@@ -74,7 +75,7 @@ class AdvancedConfigurationController extends BaseAdminController
         return $this->generateRedirectFromRoute('admin.configuration.advanced');
     }
 
-    public function flushImagesAndDocumentsAction()
+    public function flushImagesAndDocumentsAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $result = $this->checkAuth(AdminResources::ADVANCED_CONFIGURATION, [], AccessManager::UPDATE)) {
             return $result;
@@ -90,7 +91,7 @@ class AdvancedConfigurationController extends BaseAdminController
                     'cache'.DS.'images'
                 )
             );
-            $this->dispatch(TheliaEvents::CACHE_CLEAR, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::CACHE_CLEAR);
 
             $event = new CacheEvent(
                 THELIA_WEB_DIR.ConfigQuery::read(
@@ -98,7 +99,7 @@ class AdvancedConfigurationController extends BaseAdminController
                     'cache'.DS.'documents'
                 )
             );
-            $this->dispatch(TheliaEvents::CACHE_CLEAR, $event);
+            $eventDispatcher->dispatch($event, TheliaEvents::CACHE_CLEAR);
         } catch (\Exception $e) {
             Tlog::getInstance()->addError(sprintf('Flush images and document error: %s', $e->getMessage()));
         }

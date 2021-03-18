@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
@@ -56,7 +57,7 @@ class ImportController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function changeImportPositionAction()
+    public function changeImportPositionAction(EventDispatcherInterface $eventDispatcher)
     {
         $authResponse = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE]);
         if ($authResponse !== null) {
@@ -65,13 +66,13 @@ class ImportController extends BaseAdminController
 
         $query = $this->getRequest()->query;
 
-        $this->dispatch(
-            TheliaEvents::IMPORT_CHANGE_POSITION,
+        $eventDispatcher->dispatch(
             new UpdatePositionEvent(
                 $query->get('id'),
                 $this->matchPositionMode($query->get('mode')),
                 $query->get('value')
-            )
+            ),
+            TheliaEvents::IMPORT_CHANGE_POSITION
         );
 
         return $this->generateRedirectFromRoute('import.list');
@@ -82,7 +83,7 @@ class ImportController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function changeCategoryPositionAction()
+    public function changeCategoryPositionAction(EventDispatcherInterface $eventDispatcher)
     {
         $authResponse = $this->checkAuth([AdminResources::IMPORT], [], [AccessManager::UPDATE]);
         if ($authResponse !== null) {
@@ -91,13 +92,13 @@ class ImportController extends BaseAdminController
 
         $query = $this->getRequest()->query;
 
-        $this->dispatch(
-            TheliaEvents::IMPORT_CATEGORY_CHANGE_POSITION,
+        $eventDispatcher->dispatch(
             new UpdatePositionEvent(
                 $query->get('id'),
                 $this->matchPositionMode($query->get('mode')),
                 $query->get('value')
-            )
+            ),
+            TheliaEvents::IMPORT_CATEGORY_CHANGE_POSITION,
         );
 
         return $this->generateRedirectFromRoute('import.list');

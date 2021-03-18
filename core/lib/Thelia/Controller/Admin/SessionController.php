@@ -13,8 +13,10 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
+use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
@@ -81,7 +83,7 @@ class SessionController extends BaseAdminController
         return $this->render('lost-password');
     }
 
-    public function passwordCreateRequestAction()
+    public function passwordCreateRequestAction(EventDispatcherInterface $eventDispatcher)
     {
         if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (null !== $response = $this->checkAdminLoggedIn())) {
             return $response;
@@ -109,7 +111,7 @@ class SessionController extends BaseAdminController
                 throw new \Exception($this->getTranslator()->trans('Sorry, no email defined for this administrator.'));
             }
 
-            $this->dispatch(TheliaEvents::ADMINISTRATOR_CREATEPASSWORD, new AdministratorEvent($admin));
+            $eventDispatcher->dispatch(new AdministratorEvent($admin),TheliaEvents::ADMINISTRATOR_CREATEPASSWORD);
 
             // Redirect to the success URL
             return $this->generateSuccessRedirect($adminLostPasswordForm);
@@ -156,7 +158,7 @@ class SessionController extends BaseAdminController
         return $this->render('create-password');
     }
 
-    public function passwordCreatedAction()
+    public function passwordCreatedAction(EventDispatcherInterface $eventDispatcher)
     {
         if ((null !== $response = $this->checkPasswordRecoveryEnabled()) || (null !== $response = $this->checkAdminLoggedIn())) {
             return $response;
@@ -178,7 +180,7 @@ class SessionController extends BaseAdminController
             $event = new AdministratorUpdatePasswordEvent($admin);
             $event->setPassword($data['password']);
 
-            $this->dispatch(TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD);
 
             $this->getSession()->set(self::ADMIN_TOKEN_SESSION_VAR_NAME, null);
 
@@ -207,9 +209,9 @@ class SessionController extends BaseAdminController
         return $this->render('create-password-success');
     }
 
-    public function checkLogoutAction()
+    public function checkLogoutAction(EventDispatcherInterface $eventDispatcher)
     {
-        $this->dispatch(TheliaEvents::ADMIN_LOGOUT);
+        $eventDispatcher->dispatch((new DefaultActionEvent()),TheliaEvents::ADMIN_LOGOUT);
 
         $this->getSecurityContext()->clearAdminUser();
 
@@ -220,7 +222,7 @@ class SessionController extends BaseAdminController
         return $this->generateRedirectFromRoute('admin.login');
     }
 
-    public function checkLoginAction()
+    public function checkLoginAction(EventDispatcherInterface $eventDispatcher)
     {
         $request = $this->getRequest();
 
@@ -255,7 +257,7 @@ class SessionController extends BaseAdminController
                 );
             }
 
-            $this->dispatch(TheliaEvents::ADMIN_LOGIN);
+            $eventDispatcher->dispatch((new DefaultActionEvent()), TheliaEvents::ADMIN_LOGIN);
 
             // Check if we have to ask the user to set its address email.
             // This is the case if Thelia has been updated from a pre 2.3.0 version

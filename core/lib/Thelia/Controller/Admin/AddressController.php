@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
@@ -44,7 +45,7 @@ class AddressController extends AbstractCrudController
         );
     }
 
-    public function useAddressAction()
+    public function useAddressAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
@@ -61,7 +62,7 @@ class AddressController extends AbstractCrudController
 
             $addressEvent = new AddressEvent($address);
 
-            $this->dispatch(TheliaEvents::ADDRESS_DEFAULT, $addressEvent);
+            $eventDispatcher->dispatch($addressEvent,TheliaEvents::ADDRESS_DEFAULT);
 
             $this->adminLogAppend(
                 $this->resourceCode,
@@ -308,7 +309,7 @@ class AddressController extends AbstractCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    protected function performAdditionalUpdateAction($event)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $event)
     {
         return $this->redirectToEditionTemplate();
     }

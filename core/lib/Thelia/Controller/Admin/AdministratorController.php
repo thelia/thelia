@@ -12,7 +12,9 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Administrator\AdministratorEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -190,7 +192,7 @@ class AdministratorController extends AbstractCrudController
         return $this->redirectToListTemplate();
     }
 
-    protected function performAdditionalUpdateAction($updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
     {
         // We always return to the feature edition form
         return $this->redirectToListTemplate();

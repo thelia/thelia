@@ -17,6 +17,7 @@ use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Delivery\DeliveryPostageEvent;
@@ -32,7 +33,7 @@ use Thelia\Tools\URL;
 
 class CartController extends BaseFrontController
 {
-    public function addItem()
+    public function addItem(EventDispatcherInterface $eventDispatcher)
     {
         $request = $this->getRequest();
 
@@ -42,13 +43,13 @@ class CartController extends BaseFrontController
         try {
             $form = $this->validateForm($cartAdd);
 
-            $cartEvent = $this->getCartEvent();
+            $cartEvent = $this->getCartEvent($eventDispatcher);
 
             $cartEvent->bindForm($form);
 
-            $this->getDispatcher()->dispatch($cartEvent, TheliaEvents::CART_ADDITEM);
+            $eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_ADDITEM);
 
-            $this->afterModifyCart();
+            $this->afterModifyCart($eventDispatcher);
 
             if (!$this->changeViewForAjax()) {
                 if (null !== $response = $this->generateSuccessRedirect($cartAdd)) {
@@ -72,9 +73,9 @@ class CartController extends BaseFrontController
         }
     }
 
-    public function changeItem()
+    public function changeItem(EventDispatcherInterface $eventDispatcher)
     {
-        $cartEvent = $this->getCartEvent();
+        $cartEvent = $this->getCartEvent($eventDispatcher);
         $cartEvent->setCartItemId($this->getRequest()->get('cart_item'));
         $cartEvent->setQuantity($this->getRequest()->get('quantity'));
 
@@ -83,9 +84,9 @@ class CartController extends BaseFrontController
                 $this->getRequest()->query->get('_token')
             );
 
-            $this->dispatch(TheliaEvents::CART_UPDATEITEM, $cartEvent);
+            $eventDispatcher->dispatch($cartEvent,TheliaEvents::CART_UPDATEITEM);
 
-            $this->afterModifyCart();
+            $this->afterModifyCart($eventDispatcher);
 
             if (!$this->changeViewForAjax()) {
                 if (null !== $successUrl = $this->getRequest()->get('success_url')) {
@@ -99,9 +100,9 @@ class CartController extends BaseFrontController
         }
     }
 
-    public function deleteItem()
+    public function deleteItem(EventDispatcherInterface $eventDispatcher)
     {
-        $cartEvent = $this->getCartEvent();
+        $cartEvent = $this->getCartEvent($eventDispatcher);
         $cartEvent->setCartItemId($this->getRequest()->get('cart_item'));
 
         try {
@@ -109,9 +110,9 @@ class CartController extends BaseFrontController
                 $this->getRequest()->query->get('_token')
             );
 
-            $this->getDispatcher()->dispatch(TheliaEvents::CART_DELETEITEM, $cartEvent);
+            $eventDispatcher->dispatch($cartEvent,TheliaEvents::CART_DELETEITEM);
 
-            $this->afterModifyCart();
+            $this->afterModifyCart($eventDispatcher);
         } catch (\Exception $e) {
             Tlog::getInstance()->error(sprintf('error during deleting cartItem with message : %s', $e->getMessage()));
             $this->getParserContext()->setGeneralError($e->getMessage());
@@ -159,9 +160,9 @@ class CartController extends BaseFrontController
     /**
      * @return \Thelia\Core\Event\Cart\CartEvent
      */
-    protected function getCartEvent()
+    protected function getCartEvent(EventDispatcherInterface $eventDispatcher)
     {
-        $cart = $this->getSession()->getSessionCart($this->getDispatcher());
+        $cart = $this->getSession()->getSessionCart($eventDispatcher);
 
         return new CartEvent($cart);
     }
@@ -193,7 +194,7 @@ class CartController extends BaseFrontController
     /**
      * @throws PropelException
      */
-    protected function afterModifyCart(): void
+    protected function afterModifyCart(EventDispatcherInterface $eventDispatcher): void
     {
         /* recalculate postage amount */
         $order = $this->getSession()->getOrder();
@@ -209,13 +210,13 @@ class CartController extends BaseFrontController
                 try {
                     $deliveryPostageEvent = new DeliveryPostageEvent(
                         $moduleInstance,
-                        $this->getSession()->getSessionCart($this->getDispatcher()),
+                        $this->getSession()->getSessionCart($eventDispatcher),
                         $deliveryAddress
                     );
 
-                    $this->getDispatcher()->dispatch(
+                    $eventDispatcher->dispatch(
+                        $deliveryPostageEvent,
                         TheliaEvents::MODULE_DELIVERY_GET_POSTAGE,
-                        $deliveryPostageEvent
                     );
 
                     $postage = $deliveryPostageEvent->getPostage();
@@ -226,13 +227,13 @@ class CartController extends BaseFrontController
                         $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
                     }
 
-                    $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
+                    $eventDispatcher->dispatch($orderEvent,TheliaEvents::ORDER_SET_POSTAGE);
                 } catch (\Exception $ex) {
                     // The postage has been chosen, but changes in the cart causes an exception.
                     // Reset the postage data in the order
                     $orderEvent->setDeliveryModule(0);
 
-                    $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
+                    $eventDispatcher->dispatch($orderEvent,TheliaEvents::ORDER_SET_DELIVERY_MODULE);
                 }
             }
         }

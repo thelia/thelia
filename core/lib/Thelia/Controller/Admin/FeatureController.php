@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
 use Thelia\Core\Event\Feature\FeatureCreateEvent;
 use Thelia\Core\Event\Feature\FeatureDeleteEvent;
@@ -93,7 +94,7 @@ class FeatureController extends AbstractCrudController
      *
      * @see \Thelia\Controller\Admin\AbstractCrudController::performAdditionalUpdateAction()
      */
-    protected function performAdditionalUpdateAction($updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
     {
         $attr_values = $this->getRequest()->get('feature_values', null);
 
@@ -104,7 +105,7 @@ class FeatureController extends AbstractCrudController
                 $event->setTitle($value);
                 $event->setLocale($this->getCurrentEditionLocale());
 
-                $this->dispatch(TheliaEvents::FEATURE_AV_UPDATE, $event);
+                $eventDispatcher->dispatch($event,TheliaEvents::FEATURE_AV_UPDATE);
             }
         }
 
@@ -231,7 +232,7 @@ class FeatureController extends AbstractCrudController
     /**
      * Add or Remove from all product templates.
      */
-    protected function addRemoveFromAllTemplates($eventType)
+    protected function addRemoveFromAllTemplates(EventDispatcherInterface $eventDispatcher, $eventType)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -242,7 +243,7 @@ class FeatureController extends AbstractCrudController
             if (null !== $object = $this->getExistingObject()) {
                 $event = new FeatureEvent($object);
 
-                $this->dispatch($eventType, $event);
+                $eventDispatcher->dispatch($eventType, $event);
             }
         } catch (\Exception $ex) {
             // Any error
@@ -255,16 +256,16 @@ class FeatureController extends AbstractCrudController
     /**
      * Remove from all product templates.
      */
-    public function removeFromAllTemplates()
+    public function removeFromAllTemplates(EventDispatcherInterface $eventDispatcher)
     {
-        return $this->addRemoveFromAllTemplates(TheliaEvents::FEATURE_REMOVE_FROM_ALL_TEMPLATES);
+        return $this->addRemoveFromAllTemplates($eventDispatcher, TheliaEvents::FEATURE_REMOVE_FROM_ALL_TEMPLATES);
     }
 
     /**
      * Add to all product templates.
      */
-    public function addToAllTemplates()
+    public function addToAllTemplates(EventDispatcherInterface $eventDispatcher)
     {
-        return $this->addRemoveFromAllTemplates(TheliaEvents::FEATURE_ADD_TO_ALL_TEMPLATES);
+        return $this->addRemoveFromAllTemplates($eventDispatcher, TheliaEvents::FEATURE_ADD_TO_ALL_TEMPLATES);
     }
 }

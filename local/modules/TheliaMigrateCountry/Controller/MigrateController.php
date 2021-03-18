@@ -13,6 +13,7 @@
 namespace TheliaMigrateCountry\Controller;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -84,7 +85,7 @@ class MigrateController extends BaseAdminController
         );
     }
 
-    public function doMigrateSystemAction()
+    public function doMigrateSystemAction(EventDispatcherInterface $eventDispatcher)
     {
         $response = $this->checkAuth(AdminResources::COUNTRY, [], AccessManager::UPDATE);
         if (null !== $response) {
@@ -111,7 +112,7 @@ class MigrateController extends BaseAdminController
                     $migration['new_state']
                 );
 
-                $this->dispatch(MigrateCountryEvents::MIGRATE_COUNTRY, $changeEvent);
+                $eventDispatcher->dispatch($changeEvent,MigrateCountryEvents::MIGRATE_COUNTRY);
 
                 // memorize the migration
                 $migratedCountries = json_decode(ConfigQuery::read('thelia_country_state_migration', '[]'), true);

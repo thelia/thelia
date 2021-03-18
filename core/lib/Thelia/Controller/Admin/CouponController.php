@@ -17,6 +17,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
@@ -67,7 +68,7 @@ class CouponController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function createAction()
+    public function createAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::CREATE)) {
             return $response;
@@ -80,6 +81,7 @@ class CouponController extends BaseAdminController
 
         if ($this->getRequest()->isMethod('POST')) {
             if (null !== $response = $this->validateCreateOrUpdateForm(
+                    $eventDispatcher,
                 $eventToDispatch,
                 'created',
                 'creation'
@@ -118,7 +120,7 @@ class CouponController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function updateAction($couponId)
+    public function updateAction(EventDispatcherInterface $eventDispatcher, $couponId)
     {
         if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) {
             return $response;
@@ -144,6 +146,7 @@ class CouponController extends BaseAdminController
         // Update
         if ($this->getRequest()->isMethod('POST')) {
             if (null !== $response = $this->validateCreateOrUpdateForm(
+                $eventDispatcher,
                 $eventToDispatch,
                 'updated',
                 'update',
@@ -372,7 +375,7 @@ class CouponController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function saveConditionsAction($couponId)
+    public function saveConditionsAction(EventDispatcherInterface $eventDispatcher, $couponId)
     {
         if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) {
             return $response;
@@ -408,7 +411,7 @@ class CouponController extends BaseAdminController
         }
         $couponManager->setConditions($conditions);
 
-        $this->manageConditionUpdate($coupon, $conditions);
+        $this->manageConditionUpdate($eventDispatcher, $coupon, $conditions);
 
         return new Response();
     }
@@ -421,7 +424,7 @@ class CouponController extends BaseAdminController
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function deleteConditionsAction($couponId, $conditionIndex)
+    public function deleteConditionsAction(EventDispatcherInterface $eventDispatcher, $couponId, $conditionIndex)
     {
         if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::UPDATE)) {
             return $response;
@@ -448,7 +451,7 @@ class CouponController extends BaseAdminController
         unset($conditions[$conditionIndex]);
         $couponManager->setConditions($conditions);
 
-        $this->manageConditionUpdate($coupon, $conditions);
+        $this->manageConditionUpdate($eventDispatcher, $coupon, $conditions);
 
         return new Response();
     }
@@ -485,7 +488,7 @@ class CouponController extends BaseAdminController
      *
      * @return $this
      */
-    protected function validateCreateOrUpdateForm($eventToDispatch, $log, $action, Coupon $model = null)
+    protected function validateCreateOrUpdateForm(EventDispatcherInterface $eventDispatcher, $eventToDispatch, $log, $action, Coupon $model = null)
     {
         // Create the form from the request
         $couponForm = $this->getForm($action, $model);
@@ -498,9 +501,10 @@ class CouponController extends BaseAdminController
             $couponEvent = $this->feedCouponCreateOrUpdateEvent($form, $model);
 
             // Dispatch Event to the Action
-            $this->dispatch(
-                $eventToDispatch,
-                $couponEvent
+            $eventDispatcher->dispatch(
+                $couponEvent,
+                $eventToDispatch
+
             );
 
             $this->adminLogAppend(
@@ -769,7 +773,7 @@ class CouponController extends BaseAdminController
      * @param Coupon              $coupon     Coupon Model
      * @param ConditionCollection $conditions Condition collection
      */
-    protected function manageConditionUpdate(Coupon $coupon, ConditionCollection $conditions): void
+    protected function manageConditionUpdate(EventDispatcherInterface $eventDispatcher, Coupon $coupon, ConditionCollection $conditions): void
     {
         $couponEvent = new CouponCreateOrUpdateEvent(
             $coupon->getCode(),
@@ -795,9 +799,9 @@ class CouponController extends BaseAdminController
 
         $eventToDispatch = TheliaEvents::COUPON_CONDITION_UPDATE;
         // Dispatch Event to the Action
-        $this->dispatch(
-            $eventToDispatch,
-            $couponEvent
+        $eventDispatcher->dispatch(
+            $couponEvent,
+            $eventToDispatch
         );
 
         $this->adminLogAppend(
@@ -836,7 +840,7 @@ class CouponController extends BaseAdminController
         ]);
     }
 
-    public function deleteAction()
+    public function deleteAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::DELETE)) {
@@ -855,7 +859,7 @@ class CouponController extends BaseAdminController
             ;
             $deleteEvent = new CouponDeleteEvent($coupon);
 
-            $this->dispatch(TheliaEvents::COUPON_DELETE, $deleteEvent);
+            $eventDispatcher->dispatch($deleteEvent, TheliaEvents::COUPON_DELETE);
 
             if (null !== $deletedObject = $deleteEvent->getCoupon()) {
                 $this->adminLogAppend(

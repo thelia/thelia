@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Lang\LangCreateEvent;
 use Thelia\Core\Event\Lang\LangDefaultBehaviorEvent;
 use Thelia\Core\Event\Lang\LangDeleteEvent;
@@ -97,7 +98,7 @@ class LangController extends BaseAdminController
         ]);
     }
 
-    public function processUpdateAction($lang_id)
+    public function processUpdateAction(EventDispatcherInterface $eventDispatcher, $lang_id)
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
@@ -113,7 +114,7 @@ class LangController extends BaseAdminController
             $event = new LangUpdateEvent($form->get('id')->getData());
             $event = $this->hydrateEvent($event, $form);
 
-            $this->dispatch(TheliaEvents::LANG_UPDATE, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::LANG_UPDATE);
 
             if (false === $event->hasLang()) {
                 throw new \LogicException(
@@ -168,31 +169,34 @@ class LangController extends BaseAdminController
         ;
     }
 
-    public function toggleDefaultAction($lang_id)
+    public function toggleDefaultAction(EventDispatcherInterface $eventDispatcher, $lang_id)
     {
         return $this->toggleLangDispatch(
+            $eventDispatcher,
             TheliaEvents::LANG_TOGGLEDEFAULT,
             new LangToggleDefaultEvent($lang_id)
         );
     }
 
-    public function toggleActiveAction($lang_id)
+    public function toggleActiveAction(EventDispatcherInterface $eventDispatcher, $lang_id)
     {
         return $this->toggleLangDispatch(
+            $eventDispatcher,
             TheliaEvents::LANG_TOGGLEACTIVE,
             new LangToggleActiveEvent($lang_id)
         );
     }
 
-    public function toggleVisibleAction($lang_id)
+    public function toggleVisibleAction(EventDispatcherInterface $eventDispatcher, $lang_id)
     {
         return $this->toggleLangDispatch(
+            $eventDispatcher,
             TheliaEvents::LANG_TOGGLEVISIBLE,
             new LangToggleVisibleEvent($lang_id)
         );
     }
 
-    public function addAction()
+    public function addAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::CREATE)) {
             return $response;
@@ -209,7 +213,7 @@ class LangController extends BaseAdminController
             $createEvent = new LangCreateEvent();
             $createEvent = $this->hydrateEvent($createEvent, $form);
 
-            $this->dispatch(TheliaEvents::LANG_CREATE, $createEvent);
+            $eventDispatcher->dispatch($createEvent,TheliaEvents::LANG_CREATE);
 
             if (false === $createEvent->hasLang()) {
                 throw new \LogicException(
@@ -255,7 +259,7 @@ class LangController extends BaseAdminController
         return $response;
     }
 
-    public function deleteAction()
+    public function deleteAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::DELETE)) {
             return $response;
@@ -270,7 +274,7 @@ class LangController extends BaseAdminController
 
             $deleteEvent = new LangDeleteEvent($this->getRequest()->get('language_id', 0));
 
-            $this->dispatch(TheliaEvents::LANG_DELETE, $deleteEvent);
+            $eventDispatcher->dispatch($deleteEvent,TheliaEvents::LANG_DELETE);
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
         } catch (\Exception $ex) {
@@ -287,7 +291,7 @@ class LangController extends BaseAdminController
         return $response;
     }
 
-    public function defaultBehaviorAction()
+    public function defaultBehaviorAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
@@ -303,7 +307,7 @@ class LangController extends BaseAdminController
 
             $event = new LangDefaultBehaviorEvent($form->get('behavior')->getData());
 
-            $this->dispatch(TheliaEvents::LANG_DEFAULTBEHAVIOR, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::LANG_DEFAULTBEHAVIOR);
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
         } catch (FormValidationException $ex) {
@@ -329,7 +333,7 @@ class LangController extends BaseAdminController
         return $response;
     }
 
-    public function domainAction()
+    public function domainAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
@@ -350,7 +354,7 @@ class LangController extends BaseAdminController
                 }
             }
 
-            $this->dispatch(TheliaEvents::LANG_URL, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::LANG_URL);
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
         } catch (FormValidationException $ex) {
@@ -405,7 +409,7 @@ class LangController extends BaseAdminController
      *
      * @return Response
      */
-    protected function toggleLangDispatch($eventName, $event)
+    protected function toggleLangDispatch(EventDispatcherInterface $eventDispatcher, $eventName, $event)
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, [], AccessManager::UPDATE)) {
             return $response;
@@ -418,7 +422,7 @@ class LangController extends BaseAdminController
         );
 
         try {
-            $this->dispatch($eventName, $event);
+            $eventDispatcher->dispatch($event, $eventName);
 
             if (false === $event->hasLang()) {
                 throw new \LogicException(

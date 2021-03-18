@@ -519,7 +519,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @return Response
      */
-    protected function performAdditionalUpdateAction($updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
     {
         // Associate the file if it's a virtual product
         // and with only 1 PSE
@@ -534,10 +534,10 @@ class ProductController extends AbstractSeoCrudController
             if (null !== $defaultPSE) {
                 if ($virtualDocumentId !== 0) {
                     $assocEvent = new MetaDataCreateOrUpdateEvent('virtual', MetaData::PSE_KEY, $defaultPSE->getId(), $virtualDocumentId);
-                    $this->dispatch(TheliaEvents::META_DATA_UPDATE, $assocEvent);
+                    $eventDispatcher->dispatch($assocEvent, TheliaEvents::META_DATA_UPDATE);
                 } else {
                     $assocEvent = new MetaDataDeleteEvent('virtual', MetaData::PSE_KEY, $defaultPSE->getId());
-                    $this->dispatch(TheliaEvents::META_DATA_DELETE, $assocEvent);
+                    $eventDispatcher->dispatch($assocEvent, TheliaEvents::META_DATA_DELETE);
                 }
             }
         }
@@ -610,7 +610,7 @@ class ProductController extends AbstractSeoCrudController
         return $this->jsonResponse(json_encode($result));
     }
 
-    public function addRelatedContentAction()
+    public function addRelatedContentAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -626,7 +626,7 @@ class ProductController extends AbstractSeoCrudController
             );
 
             try {
-                $this->dispatch(TheliaEvents::PRODUCT_ADD_CONTENT, $event);
+                $eventDispatcher->dispatch($event,TheliaEvents::PRODUCT_ADD_CONTENT);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -636,7 +636,7 @@ class ProductController extends AbstractSeoCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteRelatedContentAction()
+    public function deleteRelatedContentAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -652,7 +652,7 @@ class ProductController extends AbstractSeoCrudController
             );
 
             try {
-                $this->dispatch(TheliaEvents::PRODUCT_REMOVE_CONTENT, $event);
+                $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_REMOVE_CONTENT);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -688,7 +688,7 @@ class ProductController extends AbstractSeoCrudController
         return $this->jsonResponse(json_encode($result));
     }
 
-    public function addAccessoryAction()
+    public function addAccessoryAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -704,7 +704,7 @@ class ProductController extends AbstractSeoCrudController
             );
 
             try {
-                $this->dispatch(TheliaEvents::PRODUCT_ADD_ACCESSORY, $event);
+                $eventDispatcher->dispatch($event,TheliaEvents::PRODUCT_ADD_ACCESSORY);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -714,7 +714,7 @@ class ProductController extends AbstractSeoCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteAccessoryAction()
+    public function deleteAccessoryAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -730,7 +730,7 @@ class ProductController extends AbstractSeoCrudController
             );
 
             try {
-                $this->dispatch(TheliaEvents::PRODUCT_REMOVE_ACCESSORY, $event);
+                $eventDispatcher->dispatch($event,TheliaEvents::PRODUCT_REMOVE_ACCESSORY);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -781,7 +781,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @return mixed|\Symfony\Component\HttpFoundation\Response
      */
-    public function setProductTemplateAction($productId)
+    public function setProductTemplateAction(EventDispatcherInterface $eventDispatcher, $productId)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -793,9 +793,9 @@ class ProductController extends AbstractSeoCrudController
         if ($product != null) {
             $template_id = (int) ($this->getRequest()->get('template_id', 0));
 
-            $this->dispatch(
-                TheliaEvents::PRODUCT_SET_TEMPLATE,
-                new ProductSetTemplateEvent($product, $template_id, $this->getCurrentEditionCurrency()->getId())
+            $eventDispatcher->dispatch(
+                new ProductSetTemplateEvent($product, $template_id, $this->getCurrentEditionCurrency()->getId()),
+                TheliaEvents::PRODUCT_SET_TEMPLATE
             );
         }
 
@@ -811,7 +811,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function updateAttributesAndFeaturesAction($productId)
+    public function updateAttributesAndFeaturesAction(EventDispatcherInterface $eventDispatcher, $productId)
     {
         $product = ProductQuery::create()->findPk($productId);
 
@@ -833,13 +833,13 @@ class ProductController extends AbstractSeoCrudController
                     // Delete all features av. for this feature.
                     $event = new FeatureProductDeleteEvent($productId, $featureId);
 
-                    $this->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $event);
+                    $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE);
 
                     // Add then all selected values
                     foreach ($featureValueList as $featureValue) {
                         $event = new FeatureProductUpdateEvent($productId, $featureId, $featureValue);
 
-                        $this->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $event);
+                        $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE);
                     }
 
                     $updatedFeatures[] = $featureId;
@@ -863,7 +863,7 @@ class ProductController extends AbstractSeoCrudController
                     $event = new FeatureProductUpdateEvent($productId, $featureId, $featureValue, true);
                     $event->setLocale($this->getCurrentEditionLocale());
 
-                    $this->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $event);
+                    $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE);
 
                     $updatedFeatures[] = $featureId;
                 }
@@ -874,7 +874,7 @@ class ProductController extends AbstractSeoCrudController
                     if (!\in_array($feature->getId(), $updatedFeatures)) {
                         $event = new FeatureProductDeleteEvent($productId, $feature->getId());
 
-                        $this->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $event);
+                        $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE);
                     }
                 }
             }
@@ -890,7 +890,7 @@ class ProductController extends AbstractSeoCrudController
         return $this->redirectToListTemplate();
     }
 
-    public function addAdditionalCategoryAction()
+    public function addAdditionalCategoryAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -906,7 +906,7 @@ class ProductController extends AbstractSeoCrudController
             );
 
             try {
-                $this->dispatch(TheliaEvents::PRODUCT_ADD_CATEGORY, $event);
+                $eventDispatcher->dispatch($event,TheliaEvents::PRODUCT_ADD_CATEGORY);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -916,7 +916,7 @@ class ProductController extends AbstractSeoCrudController
         return $this->redirectToEditionTemplate();
     }
 
-    public function deleteAdditionalCategoryAction()
+    public function deleteAdditionalCategoryAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -932,7 +932,7 @@ class ProductController extends AbstractSeoCrudController
             );
 
             try {
-                $this->dispatch(TheliaEvents::PRODUCT_REMOVE_CATEGORY, $event);
+                $eventDispatcher->dispatch($event,TheliaEvents::PRODUCT_REMOVE_CATEGORY);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -1017,7 +1017,7 @@ class ProductController extends AbstractSeoCrudController
     /**
      * A a new combination to a product.
      */
-    public function addProductSaleElementAction()
+    public function addProductSaleElementAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -1031,7 +1031,7 @@ class ProductController extends AbstractSeoCrudController
         );
 
         try {
-            $this->dispatch(TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT, $event);
+            $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT);
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
@@ -1043,7 +1043,7 @@ class ProductController extends AbstractSeoCrudController
     /**
      * A a new combination to a product.
      */
-    public function deleteProductSaleElementAction()
+    public function deleteProductSaleElementAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -1056,7 +1056,7 @@ class ProductController extends AbstractSeoCrudController
         );
 
         try {
-            $this->dispatch(TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT, $event);
+            $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT);
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
@@ -1070,7 +1070,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @param array $data the form data
      */
-    protected function processSingleProductSaleElementUpdate($data): void
+    protected function processSingleProductSaleElementUpdate(EventDispatcherInterface $eventDispatcher, $data): void
     {
         $event = new ProductSaleElementUpdateEvent(
             $this->getExistingObject(),
@@ -1092,7 +1092,7 @@ class ProductController extends AbstractSeoCrudController
             ->setFromDefaultCurrency($data['use_exchange_rate'])
         ;
 
-        $this->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $event);
+        $eventDispatcher->dispatch($event,TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
 
         // Log object modification
         if (null !== $changedObject = $event->getProductSaleElement()) {
@@ -1116,7 +1116,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @return mixed|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response|Response|null
      */
-    protected function processProductSaleElementUpdate($changeForm)
+    protected function processProductSaleElementUpdate(EventDispatcherInterface $eventDispatcher, $changeForm)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -1152,11 +1152,11 @@ class ProductController extends AbstractSeoCrudController
                     $tmp_data['isdefault'] = $data['default_pse'] == $pse_id;
                     $tmp_data['ean_code'] = $data['ean_code'][$idx];
 
-                    $this->processSingleProductSaleElementUpdate($tmp_data);
+                    $this->processSingleProductSaleElementUpdate($eventDispatcher, $tmp_data);
                 }
             } else {
                 // No need to preprocess data
-                $this->processSingleProductSaleElementUpdate($data);
+                $this->processSingleProductSaleElementUpdate($eventDispatcher, $data);
             }
 
             // If we have to stay on the same page, do not redirect to the successUrl, just redirect to the edit page again.
@@ -1228,7 +1228,7 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Build combinations from the combination output builder.
      */
-    public function buildCombinationsAction()
+    public function buildCombinationsAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -1282,7 +1282,7 @@ class ProductController extends AbstractSeoCrudController
                 ->setEanCode($data['ean_code'] == null ? '' : $data['ean_code'])
             ;
 
-            $this->dispatch(TheliaEvents::PRODUCT_COMBINATION_GENERATION, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::PRODUCT_COMBINATION_GENERATION);
 
             // Log object modification
             $this->adminLogAppend(
@@ -1470,7 +1470,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @return mixed|\Thelia\Core\HttpFoundation\Response
      */
-    public function productSaleElementsProductImageDocumentAssociation($pseId, $type, $typeId)
+    public function productSaleElementsProductImageDocumentAssociation(EventDispatcherInterface $eventDispatcher, $pseId, $type, $typeId)
     {
         /*
          * Check user's auth
@@ -1487,7 +1487,7 @@ class ProductController extends AbstractSeoCrudController
         $responseData = [];
 
         try {
-            $responseData = $this->getAssociationResponseData($pseId, $type, $typeId);
+            $responseData = $this->getAssociationResponseData($eventDispatcher, $pseId, $type, $typeId);
         } catch (\Exception $e) {
             $responseData['error'] = $e->getMessage();
         }
@@ -1495,7 +1495,7 @@ class ProductController extends AbstractSeoCrudController
         return JsonResponse::create($responseData, isset($responseData['error']) ? 500 : 200);
     }
 
-    public function getAssociationResponseData($pseId, $type, $typeId)
+    public function getAssociationResponseData(EventDispatcherInterface $eventDispatcher, $pseId, $type, $typeId)
     {
         $responseData = [];
 
@@ -1604,11 +1604,11 @@ class ProductController extends AbstractSeoCrudController
 
             if ($documentId === (int) $typeId) {
                 $assocEvent = new MetaDataDeleteEvent('virtual', MetaData::PSE_KEY, $pseId);
-                $this->dispatch(TheliaEvents::META_DATA_DELETE, $assocEvent);
+                $eventDispatcher->dispatch($assocEvent,TheliaEvents::META_DATA_DELETE);
                 $responseData['is-associated'] = 0;
             } else {
                 $assocEvent = new MetaDataCreateOrUpdateEvent('virtual', MetaData::PSE_KEY, $pseId, $typeId);
-                $this->dispatch(TheliaEvents::META_DATA_UPDATE, $assocEvent);
+                $eventDispatcher->dispatch($assocEvent,TheliaEvents::META_DATA_UPDATE);
                 $responseData['is-associated'] = 1;
             }
 
@@ -1634,7 +1634,7 @@ class ProductController extends AbstractSeoCrudController
         return null;
     }
 
-    public function getAjaxProductSaleElementsImagesDocuments($id, $type)
+    public function getAjaxProductSaleElementsImagesDocuments(EventDispatcherInterface $eventDispatcher, $id, $type)
     {
         if (null !== $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::VIEW)) {
             return JsonResponse::createAuthError(AccessManager::VIEW);
@@ -1661,15 +1661,15 @@ class ProductController extends AbstractSeoCrudController
         switch ($type) {
             case 'image':
                 $modalTitle = $this->getTranslator()->trans('Associate images');
-                $data = $this->getPSEImages($pse);
+                $data = $this->getPSEImages($eventDispatcher, $pse);
                 break;
             case 'document':
                 $modalTitle = $this->getTranslator()->trans('Associate documents');
-                $data = $this->getPSEDocuments($pse);
+                $data = $this->getPSEDocuments($eventDispatcher, $pse);
                 break;
             case 'virtual':
                 $modalTitle = $this->getTranslator()->trans('Select the virtual document');
-                $data = $this->getPSEVirtualDocument($pse);
+                $data = $this->getPSEVirtualDocument($eventDispatcher, $pse);
                 break;
             case null:
             default:
@@ -1694,10 +1694,10 @@ class ProductController extends AbstractSeoCrudController
         return $this->render('ajax/pse-image-document-assoc-modal');
     }
 
-    protected function getPSEImages(ProductSaleElementsModel $pse)
+    protected function getPSEImages(EventDispatcherInterface $eventDispatcher, ProductSaleElementsModel $pse)
     {
         /** @var Image $imageLoop */
-        $imageLoop = $this->createLoopInstance(Image::class);
+        $imageLoop = $this->createLoopInstance($eventDispatcher, Image::class);
 
         $imageLoop->initializeArgs([
             'product' => $pse->getProductId(),
@@ -1739,10 +1739,10 @@ class ProductController extends AbstractSeoCrudController
         return $data;
     }
 
-    protected function getPSEDocuments(ProductSaleElementsModel $pse)
+    protected function getPSEDocuments(EventDispatcherInterface $eventDispatcher, ProductSaleElementsModel $pse)
     {
         /** @var Document $documentLoop */
-        $documentLoop = $this->createLoopInstance(Document::class);
+        $documentLoop = $this->createLoopInstance($eventDispatcher, Document::class);
 
         $documentLoop->initializeArgs([
             'product' => $pse->getProductId(),
@@ -1784,10 +1784,10 @@ class ProductController extends AbstractSeoCrudController
         return $data;
     }
 
-    protected function getPSEVirtualDocument(ProductSaleElementsModel $pse)
+    protected function getPSEVirtualDocument(EventDispatcherInterface $eventDispatcher, ProductSaleElementsModel $pse)
     {
         /** @var Document $documentLoop */
-        $documentLoop = $this->createLoopInstance(Document::class);
+        $documentLoop = $this->createLoopInstance($eventDispatcher,Document::class);
 
         // select only not visible documents
         $documentLoop->initializeArgs([
@@ -1823,12 +1823,12 @@ class ProductController extends AbstractSeoCrudController
      * Todo refactor this to not use container or not use loop at all
      * Compute images with the associated loop.
      */
-    protected function createLoopInstance($loopClass)
+    protected function createLoopInstance(EventDispatcherInterface $eventDispatcher, $loopClass)
     {
         return new $loopClass(
             $this->container,
             $this->container->get('request_stack'),
-            $this->getDispatcher(),
+            $eventDispatcher,
             $this->getSecurityContext(),
             $this->getTranslator(),
             $this->container->getParameter('Thelia.parser.loops'),
@@ -1865,7 +1865,7 @@ class ProductController extends AbstractSeoCrudController
      *
      * @throws \Exception
      */
-    public function cloneAction()
+    public function cloneAction(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), [AccessManager::CREATE, AccessManager::UPDATE])) {
             return $response;
@@ -1888,7 +1888,7 @@ class ProductController extends AbstractSeoCrudController
                 $lang,
                 $originalProduct
             );
-            $this->dispatch(TheliaEvents::PRODUCT_CLONE, $productCloneEvent);
+            $eventDispatcher->dispatch($productCloneEvent, TheliaEvents::PRODUCT_CLONE);
 
             return $this->generateRedirectFromRoute(
                 'admin.products.update',

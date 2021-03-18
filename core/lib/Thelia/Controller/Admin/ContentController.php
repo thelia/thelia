@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
@@ -57,7 +58,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return mixed|\Thelia\Core\HttpFoundation\Response
      */
-    public function addAdditionalFolderAction()
+    public function addAdditionalFolderAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -73,7 +74,7 @@ class ContentController extends AbstractSeoCrudController
             );
 
             try {
-                $this->dispatch(TheliaEvents::CONTENT_ADD_FOLDER, $event);
+                $eventDispatcher->dispatch($event, TheliaEvents::CONTENT_ADD_FOLDER);
             } catch (\Exception $e) {
                 return $this->errorPage($e);
             }
@@ -87,7 +88,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return mixed|\Thelia\Core\HttpFoundation\Response
      */
-    public function removeAdditionalFolderAction()
+    public function removeAdditionalFolderAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
@@ -103,7 +104,7 @@ class ContentController extends AbstractSeoCrudController
             );
 
             try {
-                $this->dispatch(TheliaEvents::CONTENT_REMOVE_FOLDER, $event);
+                $eventDispatcher->dispatch($event, TheliaEvents::CONTENT_REMOVE_FOLDER);
             } catch (\Exception $e) {
                 return $this->errorPage($e);
             }
@@ -352,7 +353,7 @@ class ContentController extends AbstractSeoCrudController
      *
      * @return Response|void
      */
-    protected function performAdditionalUpdateAction($updateEvent)
+    protected function performAdditionalUpdateAction(EventDispatcherInterface $eventDispatcher, $updateEvent)
     {
         if ($this->getRequest()->get('save_mode') != 'stay') {
             return $this->generateRedirectFromRoute(

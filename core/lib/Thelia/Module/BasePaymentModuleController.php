@@ -13,6 +13,7 @@
 namespace Thelia\Module;
 
 use Symfony\Component\Routing\Router;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -75,7 +76,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      *
      * @throws \Exception
      */
-    public function confirmPayment($orderId): void
+    public function confirmPayment(EventDispatcherInterface $eventDispatcher, $orderId): void
     {
         try {
             $orderId = (int) $orderId;
@@ -92,7 +93,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
 
                 $event->setStatus(OrderStatusQuery::getPaidStatus()->getId());
 
-                $this->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
+                $eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
 
                 $this->getLog()->addInfo(
                     $this->getTranslator()->trans(
@@ -125,7 +126,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      *
      * @throws \Exception
      */
-    public function saveTransactionRef($orderId, $transactionRef): void
+    public function saveTransactionRef(EventDispatcherInterface $eventDispatcher, $orderId, $transactionRef): void
     {
         try {
             $orderId = (int) $orderId;
@@ -135,7 +136,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
 
                 $event->setTransactionRef($transactionRef);
 
-                $this->dispatch(TheliaEvents::ORDER_UPDATE_TRANSACTION_REF, $event);
+                $eventDispatcher->dispatch($event,TheliaEvents::ORDER_UPDATE_TRANSACTION_REF);
 
                 $this->getLog()->addInfo(
                     $this->getTranslator()->trans(
@@ -169,7 +170,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
      *
      * @param int $orderId the order ID
      */
-    public function cancelPayment($orderId): void
+    public function cancelPayment(EventDispatcherInterface $eventDispatcher, $orderId): void
     {
         try {
             $orderId = (int) $orderId;
@@ -186,7 +187,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
 
                 $event->setStatus(OrderStatusQuery::getNotPaidStatus()->getId());
 
-                $this->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
+                $eventDispatcher->dispatch($event,TheliaEvents::ORDER_UPDATE_STATUS);
 
                 $this->getLog()->addInfo(
                     $this->getTranslator()->trans(

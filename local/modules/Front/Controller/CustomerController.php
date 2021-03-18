@@ -15,10 +15,12 @@ namespace Front\Controller;
 use Front\Front;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
+use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -74,7 +76,7 @@ class CustomerController extends BaseFrontController
         return $this->render('register');
     }
 
-    public function newPasswordAction()
+    public function newPasswordAction(EventDispatcherInterface $eventDispatcher)
     {
         $passwordLost = $this->createForm(FrontForm::CUSTOMER_LOST_PASSWORD);
 
@@ -84,7 +86,7 @@ class CustomerController extends BaseFrontController
 
                 $event = new LostPasswordEvent($form->get('email')->getData());
 
-                $this->dispatch(TheliaEvents::LOST_PASSWORD, $event);
+                $eventDispatcher->dispatch($event,TheliaEvents::LOST_PASSWORD);
 
                 return $this->generateSuccessRedirect($passwordLost);
             } catch (FormValidationException $e) {
@@ -144,7 +146,7 @@ class CustomerController extends BaseFrontController
      * Create a new customer.
      * On success, redirect to success_url if exists, otherwise, display the same view again.
      */
-    public function createAction()
+    public function createAction(EventDispatcherInterface $eventDispatcher)
     {
         if (!$this->getSecurityContext()->hasCustomerUser()) {
             $customerCreation = $this->createForm(FrontForm::CUSTOMER_CREATE);
@@ -154,7 +156,7 @@ class CustomerController extends BaseFrontController
 
                 $customerCreateEvent = $this->createEventInstance($form->getData());
 
-                $this->dispatch(TheliaEvents::CUSTOMER_CREATEACCOUNT, $customerCreateEvent);
+                $eventDispatcher->dispatch($customerCreateEvent,TheliaEvents::CUSTOMER_CREATEACCOUNT);
 
                 $newCustomer = $customerCreateEvent->getCustomer();
 
@@ -171,18 +173,18 @@ class CustomerController extends BaseFrontController
                     // Security : Check if this new Email address already exist
                     if (null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterEmail)) {
                         $nlEvent->setId($newsletter->getId());
-                        $this->dispatch(TheliaEvents::NEWSLETTER_UPDATE, $nlEvent);
+                        $eventDispatcher->dispatch($nlEvent,TheliaEvents::NEWSLETTER_UPDATE);
                     } else {
-                        $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $nlEvent);
+                        $eventDispatcher->dispatch($nlEvent,TheliaEvents::NEWSLETTER_SUBSCRIBE);
                     }
                 }
 
                 if (ConfigQuery::isCustomerEmailConfirmationEnable() && !$newCustomer->getEnable()) {
                     $response = $this->generateRedirectFromRoute('customer.login.view');
                 } else {
-                    $this->processLogin($customerCreateEvent->getCustomer());
+                    $this->processLogin($eventDispatcher, $customerCreateEvent->getCustomer());
 
-                    $cart = $this->getSession()->getSessionCart($this->getDispatcher());
+                    $cart = $this->getSession()->getSessionCart($eventDispatcher);
                     if ($cart->getCartItems()->count() > 0) {
                         $response = $this->generateRedirectFromRoute('cart.view');
                     } else {
@@ -258,7 +260,7 @@ class CustomerController extends BaseFrontController
         $this->getParserContext()->addForm($customerProfileUpdateForm);
     }
 
-    public function updatePasswordAction()
+    public function updatePasswordAction(EventDispatcherInterface $eventDispatcher)
     {
         if ($this->getSecurityContext()->hasCustomerUser()) {
             $customerPasswordUpdateForm = $this->createForm(FrontForm::CUSTOMER_PASSWORD_UPDATE);
@@ -271,7 +273,7 @@ class CustomerController extends BaseFrontController
 
                 $customerChangeEvent = $this->createEventInstance($form->getData());
                 $customerChangeEvent->setCustomer($customer);
-                $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFILE, $customerChangeEvent);
+                $eventDispatcher->dispatch($customerChangeEvent,TheliaEvents::CUSTOMER_UPDATEPROFILE);
 
                 return $this->generateSuccessRedirect($customerPasswordUpdateForm);
             } catch (FormValidationException $e) {
@@ -313,7 +315,7 @@ class CustomerController extends BaseFrontController
         }
     }
 
-    public function updateAction()
+    public function updateAction(EventDispatcherInterface $eventDispatcher)
     {
         if ($this->getSecurityContext()->hasCustomerUser()) {
             $customerProfileUpdateForm = $this->createForm(FrontForm::CUSTOMER_PROFILE_UPDATE);
@@ -332,7 +334,7 @@ class CustomerController extends BaseFrontController
                     ((int) (ConfigQuery::read('customer_change_email', 0))) ? true : false
                 );
 
-                $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFILE, $customerChangeEvent);
+                $eventDispatcher->dispatch($customerChangeEvent,TheliaEvents::CUSTOMER_UPDATEPROFILE);
 
                 $updatedCustomer = $customerChangeEvent->getCustomer();
 
@@ -347,9 +349,9 @@ class CustomerController extends BaseFrontController
 
                     if (null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterOldEmail)) {
                         $nlEvent->setId($newsletter->getId());
-                        $this->dispatch(TheliaEvents::NEWSLETTER_UPDATE, $nlEvent);
+                        $eventDispatcher->dispatch($nlEvent,TheliaEvents::NEWSLETTER_UPDATE);
                     } else {
-                        $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $nlEvent);
+                        $eventDispatcher->dispatch($nlEvent,TheliaEvents::NEWSLETTER_SUBSCRIBE);
                     }
                 } else {
                     if (null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterOldEmail)) {
@@ -358,11 +360,11 @@ class CustomerController extends BaseFrontController
                             $this->getRequest()->getSession()->getLang()->getLocale()
                         );
                         $nlEvent->setId($newsletter->getId());
-                        $this->dispatch(TheliaEvents::NEWSLETTER_UNSUBSCRIBE, $nlEvent);
+                        $eventDispatcher->dispatch($nlEvent,TheliaEvents::NEWSLETTER_UNSUBSCRIBE);
                     }
                 }
 
-                $this->processLogin($updatedCustomer);
+                $this->processLogin($eventDispatcher, $updatedCustomer);
 
                 return $this->generateSuccessRedirect($customerProfileUpdateForm);
             } catch (FormValidationException $e) {
@@ -405,7 +407,7 @@ class CustomerController extends BaseFrontController
      *
      * If login is not successfull, the same view is displayed again.
      */
-    public function loginAction()
+    public function loginAction(EventDispatcherInterface $eventDispatcher)
     {
         if (!$this->getSecurityContext()->hasCustomerUser()) {
             $request = $this->getRequest();
@@ -427,7 +429,7 @@ class CustomerController extends BaseFrontController
                     /** @var Customer $customer */
                     $customer = $authenticator->getAuthentifiedUser();
 
-                    $this->processLogin($customer);
+                    $this->processLogin($eventDispatcher, $customer);
 
                     if ((int) ($form->get('remember_me')->getData()) > 0) {
                         // If a remember me field if present and set in the form, create
@@ -455,9 +457,9 @@ class CustomerController extends BaseFrontController
                 } catch (CustomerNotConfirmedException $e) {
                     if ($e->getUser() !== null) {
                         // Send the confirmation email again
-                        $this->getDispatcher()->dispatch(
-                                TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL,
-                                new CustomerEvent($e->getUser())
+                        $eventDispatcher->dispatch(
+                            new CustomerEvent($e->getUser()),
+                                TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL
                             );
                     }
                     $message = $this->getTranslator()->trans(
@@ -507,10 +509,10 @@ class CustomerController extends BaseFrontController
     /**
      * Perform customer logout.
      */
-    public function logoutAction()
+    public function logoutAction(EventDispatcherInterface $eventDispatcher)
     {
         if ($this->getSecurityContext()->hasCustomerUser()) {
-            $this->dispatch(TheliaEvents::CUSTOMER_LOGOUT);
+            $eventDispatcher->dispatch((new DefaultActionEvent()), TheliaEvents::CUSTOMER_LOGOUT);
         }
 
         $this->clearRememberMeCookie($this->getRememberMeCookieName());
@@ -547,9 +549,9 @@ class CustomerController extends BaseFrontController
     /**
      * Dispatch event for customer login action.
      */
-    protected function processLogin(Customer $customer): void
+    protected function processLogin(EventDispatcherInterface $eventDispatcher, Customer $customer): void
     {
-        $this->dispatch(TheliaEvents::CUSTOMER_LOGIN, new CustomerLoginEvent($customer));
+        $eventDispatcher->dispatch(new CustomerLoginEvent($customer),TheliaEvents::CUSTOMER_LOGIN);
     }
 
     /**

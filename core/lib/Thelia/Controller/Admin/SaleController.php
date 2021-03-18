@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
 use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
@@ -308,18 +309,18 @@ class SaleController extends AbstractCrudController
      *
      * @return Response
      */
-    public function toggleActivity()
+    public function toggleActivity(EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) {
             return $response;
         }
 
         try {
-            $this->dispatch(
-                TheliaEvents::SALE_TOGGLE_ACTIVITY,
+            $eventDispatcher->dispatch(
                 new SaleToggleActivityEvent(
                     $this->getExistingObject()
-                )
+                ),
+                TheliaEvents::SALE_TOGGLE_ACTIVITY
             );
         } catch (\Exception $ex) {
             // Any error
@@ -371,7 +372,7 @@ class SaleController extends AbstractCrudController
         );
     }
 
-    public function resetSaleStatus()
+    public function resetSaleStatus(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) {
@@ -379,9 +380,9 @@ class SaleController extends AbstractCrudController
         }
 
         try {
-            $this->dispatch(
-                TheliaEvents::SALE_CLEAR_SALE_STATUS,
-                new SaleClearStatusEvent()
+            $eventDispatcher->dispatch(
+                new SaleClearStatusEvent(),
+                TheliaEvents::SALE_CLEAR_SALE_STATUS
             );
         } catch (\Exception $ex) {
             // Any error
@@ -391,13 +392,13 @@ class SaleController extends AbstractCrudController
         return $this->redirectToListTemplate();
     }
 
-    public function checkSalesActivationStatus()
+    public function checkSalesActivationStatus(EventDispatcherInterface $eventDispatcher)
     {
         // We do not check auth, as the related route may be invoked from a cron
         try {
-            $this->dispatch(
-                TheliaEvents::CHECK_SALE_ACTIVATION_EVENT,
-                new SaleActiveStatusCheckEvent()
+            $eventDispatcher->dispatch(
+                new SaleActiveStatusCheckEvent(),
+                TheliaEvents::CHECK_SALE_ACTIVATION_EVENT
             );
         } catch (\Exception $ex) {
             // Any error

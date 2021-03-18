@@ -432,7 +432,7 @@
                         <meta itemprop="gtin{strlen($pseItem['ean'])}" content="{$pseItem['ean']}" />
                     {/if}
                     <meta itemprop="description" content="{$DESCRIPTION|strip_tags}" />
-                    <meta itemprop="brand" content="{$brand_title}" />
+                    <meta itemprop="brand" content="{$brand_title|default:null}" />
                     {ifloop rel="additionalProperty"}
                         <div itemprop="additionalProperty" itemscope itemtype="http://schema.org/PropertyValue">
                             {loop name="additionalProperty" type="attribute_combination" product_sale_elements=$pseItem['id'] order="manual"}

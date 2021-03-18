@@ -259,7 +259,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 
         $langSession = $request->getSession()->getLang();
 
-        if ($lang != $langSession) {
+        if ($lang->getLocale() !== $langSession->getLocale()) {
             if (ConfigQuery::isMultiDomainActivated()) {
                 $this->redirect(
                     sprintf('%s/%s', $lang->getUrl(), $rewrittenUrlData->rewrittenUrl),

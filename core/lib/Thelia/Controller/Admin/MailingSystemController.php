@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\MailingSystem\MailingSystemEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\JsonResponse;
@@ -54,7 +55,7 @@ class MailingSystemController extends BaseAdminController
         return $this->render('mailing-system');
     }
 
-    public function updateAction()
+    public function updateAction(EventDispatcherInterface $eventDispatcher)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::UPDATE)) {
@@ -83,7 +84,7 @@ class MailingSystemController extends BaseAdminController
             $event->setTimeout($formData->get('timeout')->getData());
             $event->setSourceIp($formData->get('sourceip')->getData());
 
-            $this->dispatch(TheliaEvents::MAILING_SYSTEM_UPDATE, $event);
+            $eventDispatcher->dispatch($event,TheliaEvents::MAILING_SYSTEM_UPDATE);
 
             // Redirect to the success URL
             $response = $this->generateRedirectFromRoute('admin.configuration.mailing-system.view');
