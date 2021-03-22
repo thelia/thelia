@@ -1,0 +1,11 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        <span class="sf-toolbar-label">
+            {{ include('@WebProfilerModule/debug/dataCollector/Icon/smarty.svg') }}
+        </span>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false, name: 'smarty', status: '', block_attrs: 'title=""' }) }}
+{% endblock %}

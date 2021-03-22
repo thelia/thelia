@@ -7,9 +7,8 @@
 
     <services>
         <!-- Parser configuration -->
-        <service id="thelia.parser" alias="TheliaSmarty\Template\SmartyParser" public="true"/>
-        <service id="Thelia\Core\Template\ParserInterface" alias="TheliaSmarty\Template\SmartyParser"/>
-<!--        <service id="thelia.parser" alias="TheliaSmarty\Template\SmartyParser" public="true"/>-->
+        <service id="thelia.parser" alias="TheliaSmarty\Template\DataCollectorSmartyParser" public="true"/>
+        <service id="Thelia\Core\Template\ParserInterface" alias="TheliaSmarty\Template\DataCollectorSmartyParser"/>
 
         <service id="Thelia\Core\Template\ParserHelperInterface" alias="TheliaSmarty\Template\SmartyHelper" />
         <service id="thelia.parser.helper" alias="TheliaSmarty\Template\SmartyHelper" />
