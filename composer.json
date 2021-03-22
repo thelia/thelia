@@ -44,6 +44,9 @@
         "symfony/http-foundation": "5.2.*",
         "symfony/form": "5.2.*",
         "symfony/dotenv": "5.2.*",
+        "symfony/stopwatch": "^5.2",
+        "symfony/twig-bundle": "^5.2",
+        "symfony/web-profiler-bundle": "^5.2",
         "stack/builder": "1.0.*",
         "thelia/currency-converter": "~1.0",
         "ptachoire/cssembed": "1.0.*",
@@ -56,20 +59,20 @@
         "symfony/cache": "5.2.*",
         "symfony/polyfill-php73": "^1.0",
         "symfony/lock": "5.2.*",
+        "symfony/var-dumper": "5.2.*",
         "thelia/propel": "dev-thelia-2.5",
-        "symfony/var-dumper": "^2.0|^3.0|^4.0",
         "symfony/mime": "5.2.*",
         "symfony/framework-bundle": "5.2.*",
         "wikimedia/less.php": "^3.1",
+        "symfony/psr-http-message-bridge": "^2.1",
+        "symfony/flex": "^1.12",
+        "doctrine/cache": "~1.0",
+        "assetic/framework": "dev-develop#b067e1779fc18db43031a4dc9a80308465febcfd",
         "thelia/open-api-module": "dev-main",
         "thelia/smarty-redirection-module": "dev-main",
         "thelia/choice-filter-module": "dev-main",
         "thelia/custom-delivery-module": "dev-main",
-        "thelia/store-seo-module": "dev-main",
-        "doctrine/cache": "~1.0",
-        "assetic/framework": "dev-develop#b067e1779fc18db43031a4dc9a80308465febcfd",
-        "symfony/psr-http-message-bridge": "^2.1",
-        "symfony/flex": "^1.12"
+        "thelia/store-seo-module": "dev-main"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",
@@ -80,10 +83,7 @@
         "phpstan/phpstan": "^0.12.75",
         "phpstan/extension-installer": "^1.1",
         "symfony/css-selector": "^5.2",
-        "friendsofphp/php-cs-fixer": "^2.18",
-        "symfony/stopwatch": "^5.2",
-        "symfony/twig-bundle": "^5.2",
-        "symfony/web-profiler-bundle": "^5.2"
+        "friendsofphp/php-cs-fixer": "^2.18"
     },
     "scripts": {
         "cs-diff": [
