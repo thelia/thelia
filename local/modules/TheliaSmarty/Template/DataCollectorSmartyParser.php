@@ -4,6 +4,7 @@
 namespace TheliaSmarty\Template;
 
 use Smarty;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 
@@ -11,19 +12,27 @@ class DataCollectorSmartyParser extends Smarty implements ParserInterface
 {
     protected $smartyParser;
 
+    private $stopwatch;
+
     protected $templates = [];
 
-    public function __construct(SmartyParser $smartyParser)
+    public function __construct(SmartyParser $smartyParser, Stopwatch $stopwatch)
     {
         $this->smartyParser = $smartyParser;
+        $this->stopwatch = $stopwatch;
         parent::__construct();
     }
 
     public function render($realTemplateName, array $parameters = [], $compressOutput = true)
     {
+        $this->stopwatch->start($realTemplateName, 'template');
+        $timeStart = hrtime(true);
         $render = $this->smartyParser->render($realTemplateName, $parameters, $compressOutput);
-        $this->collectTemplates($realTemplateName, $parameters);
-
+        $timeEnd = hrtime(true);
+        $this->stopwatch->stop($realTemplateName);
+        $executionTime = round(($timeEnd - $timeStart) /1e+6);
+        $source = \Smarty_Template_Source::load(null, $this, $realTemplateName);
+        $this->collectTemplates($realTemplateName, $parameters, $executionTime);
         return $render;
     }
 
@@ -40,11 +49,12 @@ class DataCollectorSmartyParser extends Smarty implements ParserInterface
         return $this->templates;
     }
 
-    private function collectTemplates(?string $templateName, ?array $parameters = [])
+    private function collectTemplates(?string $templateName, ?array $parameters = [], $executionTime = 0)
     {
         $this->templates[] = [
             "name" => $templateName,
-            "parameters" => $parameters
+            "parameters" => $parameters,
+            "executionTime" => $executionTime
         ];
     }
 

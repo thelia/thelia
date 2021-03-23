@@ -4,6 +4,8 @@ namespace WebProfiler;
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Thelia\Module\BaseModule;
+use WebProfiler\DataCollector\SmartyDataCollector;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 class WebProfiler extends BaseModule
 {
@@ -28,5 +30,19 @@ class WebProfiler extends BaseModule
             ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
             ->autowire(true)
             ->autoconfigure(true);
+
+
+        $servicesConfigurator->set('data_collector.smarty', SmartyDataCollector::class)
+            ->args([
+                service('thelia.parser')->ignoreOnInvalid()
+            ])
+            ->tag(
+                'data_collector',
+                [
+                    'template' => "@WebProfilerModule/debug/dataCollector/smarty.html.twig",
+                    'id' => 'smarty',
+                    'priority' => 42
+                ]
+            );
     }
 }
