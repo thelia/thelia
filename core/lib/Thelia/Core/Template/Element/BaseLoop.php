@@ -369,8 +369,9 @@ abstract class BaseLoop
             if (null !== $searchTerm && null !== $searchIn) {
                 switch ($searchMode) {
                     case SearchLoopInterface::MODE_ANY_WORD:
-                        $searchCriteria = Criteria::IN;
-                        $searchTerm = explode(' ', $searchTerm);
+                        $searchCriteria = ' REGEXP ';
+                        $searchTerm = quotemeta($searchTerm);
+                        $searchTerm = str_replace(' ','|', rtrim($searchTerm));
                         break;
                     case SearchLoopInterface::MODE_SENTENCE:
                         $searchCriteria = Criteria::LIKE;
