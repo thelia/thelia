@@ -17,11 +17,14 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartCreateEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Model\Admin;
 use Thelia\Model\Cart;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 use Thelia\Model\Order;
 use Thelia\Tools\URL;
 
@@ -42,6 +45,10 @@ class Session extends BaseSession
      */
     public function getLang($forceDefault = true)
     {
+        if (Request::$isAdminEnv) {
+            return $this->getAdminLang();
+        }
+
         $lang = $this->get('thelia.current.lang');
         if (null === $lang && $forceDefault) {
             $lang = Lang::getDefaultLanguage();
@@ -53,6 +60,36 @@ class Session extends BaseSession
     public function setLang(Lang $lang)
     {
         $this->set('thelia.current.lang', $lang);
+
+        return $this;
+    }
+
+    /**
+     * @return \Thelia\Model\Lang
+     */
+    public function getAdminLang()
+    {
+        if (null !== $lang = $this->get("thelia.current.admin_lang")) {
+            return $lang;
+        }
+
+        if (null !== $this->getAdminUser()
+            && $lang = LangQuery::create()->findOneByLocale(
+                $this->getAdminUser()->getLocale()
+            )
+        ) {
+            $this->setAdminLang($lang);
+            return $lang;
+        }
+
+        $lang = Lang::getDefaultLanguage();
+        $this->setAdminLang($lang);
+        return $lang;
+    }
+
+    public function setAdminLang(Lang $lang)
+    {
+        $this->set("thelia.current.admin_lang", $lang);
 
         return $this;
     }
@@ -157,6 +194,9 @@ class Session extends BaseSession
         return $this;
     }
 
+    /**
+     * @return Admin|UserInterface
+     */
     public function getAdminUser()
     {
         return $this->get('thelia.admin_user');
