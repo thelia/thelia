@@ -30,8 +30,11 @@ class Request extends BaseRequest
     /** @var string Path info without trailing slash */
     private $resolvedPathInfo;
 
-    /** @var string */
+    /** @var string|null */
     protected $controllerType = null;
+
+    /** @internal  */
+    public static $isAdminEnv = false;
 
     /**
      * @
