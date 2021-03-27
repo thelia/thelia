@@ -12,20 +12,17 @@
 
 namespace Thelia\Core\Stack;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Thelia\Core\Event\Currency\CurrencyChangeEvent;
-use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\IsAdminEnvEvent;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 use Thelia\Tools\URL;
@@ -73,22 +70,69 @@ class ParamInitMiddleware implements HttpKernelInterface
 
     /**
      * @inheritdoc
+     * @param TheliaRequest $request
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
-        if ($type == HttpKernelInterface::MASTER_REQUEST) {
+        if ($type === HttpKernelInterface::MASTER_REQUEST) {
             $response = $this->initParam($request);
 
             if ($response instanceof Response) {
                 return $response;
             }
+
+            $this->checkMultiDomainLang($request);
         }
 
         return $this->app->handle($request, $type, $catch);
     }
 
+    protected function checkMultiDomainLang(TheliaRequest $request)
+    {
+        if (!ConfigQuery::isMultiDomainActivated()) {
+            return;
+        }
+
+        if (TheliaRequest::$isAdminEnv) {
+            return;
+        }
+
+        $domainUrl = $request->getSession()->getLang()->getUrl();
+
+        // if lang domain is different from current domain, redirect to the proper one
+        if (!empty($domainUrl) && rtrim($domainUrl, "/") !== $request->getSchemeAndHttpHost()) {
+            $langs = LangQuery::create()
+                ->filterByActive(true)
+                ->filterByVisible(true)
+                ->find();
+
+            foreach ($langs as $lang) {
+                $domainUrl = $lang->getUrl();
+                if (rtrim($domainUrl, "/") === $request->getSchemeAndHttpHost()) {
+                    $request->getSession()->setLang($lang);
+                    break;
+                }
+            }
+        }
+    }
+
     protected function initParam(TheliaRequest $request)
     {
+        $event = new IsAdminEnvEvent($request);
+
+        $this->eventDispatcher->dispatch(IsAdminEnvEvent::class, $event);
+
+        if ($event->isAdminEnv()) {
+            TheliaRequest::$isAdminEnv = true;
+
+            if (null !== $lang = $this->detectAdminLang($request)) {
+                $request->getSession()->setAdminLang($lang);
+                return $lang;
+            }
+
+            return null;
+        }
+
         $lang = $this->detectLang($request);
 
         if ($lang instanceof Response) {
@@ -101,6 +145,22 @@ class ParamInitMiddleware implements HttpKernelInterface
 
         return null;
     }
+
+    /**
+     * @param  TheliaRequest $request
+     * @return null|\Thelia\Model\Lang
+     */
+    protected function detectAdminLang(TheliaRequest $request)
+    {
+        $requestedLangCodeOrLocale = $request->query->get("lang");
+
+        if (null !== $requestedLangCodeOrLocale) {
+            return LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
+        }
+
+        return null;
+    }
+
 
     /**
      * @param  TheliaRequest $request
@@ -133,7 +193,7 @@ class ParamInitMiddleware implements HttpKernelInterface
             if (ConfigQuery::isMultiDomainActivated()) {
                 $domainUrl = $lang->getUrl();
 
-                if (! empty($domainUrl)) {
+                if (!empty($domainUrl)) {
                     // if lang domain is different from current domain, redirect to the proper one
                     if (rtrim($domainUrl, "/") != $request->getSchemeAndHttpHost()) {
                         return new RedirectResponse($domainUrl, 301);
