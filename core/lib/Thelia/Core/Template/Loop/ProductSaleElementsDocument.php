@@ -116,7 +116,7 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
         }
 
         if (null !== $productDocumentId = $this->getProductDocumentId()) {
-            $query->filterByProductDocumentId($id);
+            $query->filterByProductDocumentId($productDocumentId);
         }
 
         foreach ($this->getOrder() as $order) {
