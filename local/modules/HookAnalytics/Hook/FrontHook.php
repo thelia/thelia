@@ -26,9 +26,11 @@ class FrontHook extends BaseHook
     public function onMainHeadBottom(HookRenderEvent $event): void
     {
         $lang = $this->getRequest()->getSession()->get('thelia.current.lang');
-        $value = trim(HookAnalytics::getConfigValue('hookanalytics_trackingcode', '', $lang->getLocale()));
-        if ('' != $value) {
-            $event->add($value);
+        if(null !== $lang){
+            $value = trim(HookAnalytics::getConfigValue('hookanalytics_trackingcode', '', $lang->getLocale()));
+            if ('' != $value) {
+                $event->add($value);
+            }
         }
     }
 }
