@@ -146,7 +146,7 @@ abstract class BaseForm implements FormInterface
         /**
          * Build the form.
          */
-        $name = self::getName();
+        $name = $this::getName();
 
         $event = null;
         $event = new TheliaFormEvent($this);
