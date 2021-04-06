@@ -137,18 +137,17 @@ abstract class BaseForm implements FormInterface
             ;
         }
 
-        $this->formBuilder = $this->formFactoryBuilder
-            ->addExtension(new ValidatorExtension($this->validatorBuilder->getValidator()))
-            ->getFormFactory()
-            ->createNamedBuilder(self::getName(), $type, $data, $this->cleanOptions($options))
-        ;
-
         /**
          * Build the form.
          */
         $name = $this::getName();
 
-        $event = null;
+        $this->formBuilder = $this->formFactoryBuilder
+            ->addExtension(new ValidatorExtension($this->validatorBuilder->getValidator()))
+            ->getFormFactory()
+            ->createNamedBuilder($name, $type, $data, $this->cleanOptions($options))
+        ;
+
         $event = new TheliaFormEvent($this);
 
         $this->dispatcher->dispatch(
