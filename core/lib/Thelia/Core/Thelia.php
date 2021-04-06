@@ -201,7 +201,7 @@ class Thelia extends Kernel
             );
         }
 
-        $cache = $this->getCacheDir() . DS . 'check_mysql_configurations.php';
+        $cache = require($this->getCacheDir() . DS . 'check_mysql_configurations.php');
 
         if (!empty($cache['canUpdate'])) {
             if (null === $con->query("SET SESSION sql_mode='".implode(',', $cache['modes'])."';")) {
