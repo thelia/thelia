@@ -179,9 +179,13 @@ class ExportHandler
             $rangeDate['end'] = \DateTime::createFromFormat(
                 'Y-m-d H:i:s',
                 $endYear.'-'.$endMonth.'-1 23:59:59'
-            )
-            ->add(new \DateInterval('P1M'))
-            ->sub(new \DateInterval('P1D'));
+            );
+
+            if ($rangeDate instanceof \DateTime) {
+                $rangeDate
+                    ->add(new \DateInterval('P1M'))
+                    ->sub(new \DateInterval('P1D'));
+            }
         }
 
         $instance->setRangeDate($rangeDate);
