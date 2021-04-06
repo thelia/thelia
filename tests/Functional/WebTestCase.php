@@ -73,8 +73,8 @@ class WebTestCase extends BaseWebTestCase
             $formCrawlerNode = $crawler->filter('form');
 
             $form = $formCrawlerNode->form([
-                'thelia_form_admin_login[username]' => $username ?? 'thelia',
-                'thelia_form_admin_login[password]' => $password ?? 'thelia',
+                'thelia_admin_login[username]' => $username ?? 'thelia',
+                'thelia_admin_login[password]' => $password ?? 'thelia',
             ]);
 
             self::$client->submit($form);
