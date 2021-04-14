@@ -97,6 +97,10 @@ class ParamInitMiddleware implements HttpKernelInterface
             return;
         }
 
+        if (null === $request->getSession()) {
+            return;
+        }
+
         $domainUrl = $request->getSession()->getLang()->getUrl();
 
         // if lang domain is different from current domain, redirect to the proper one
@@ -118,6 +122,10 @@ class ParamInitMiddleware implements HttpKernelInterface
 
     protected function initParam(TheliaRequest $request)
     {
+        if (null === $request->getSession()) {
+            return null;
+        }
+
         $event = new IsAdminEnvEvent($request);
 
         $this->eventDispatcher->dispatch(IsAdminEnvEvent::class, $event);
