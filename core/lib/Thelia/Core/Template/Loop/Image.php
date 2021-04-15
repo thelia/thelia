@@ -363,7 +363,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 // Dispatch image processing event
                 $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
 
-                $imageExt = pathinfo($event->getSourceFilepath())["extension"];
+                $imageExt = pathinfo($event->getSourceFilepath(), PATHINFO_EXTENSION);
 
                 $loopResultRow
                     ->set("IMAGE_URL", $event->getFileUrl())

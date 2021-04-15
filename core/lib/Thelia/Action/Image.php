@@ -99,7 +99,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $subdir      = $event->getCacheSubdirectory();
         $source_file = $event->getSourceFilepath();
 
-        $imageExt = pathinfo($source_file)["extension"];
+        $imageExt = pathinfo($source_file, PATHINFO_EXTENSION);
 
         if (null == $subdir || null == $source_file) {
             throw new \InvalidArgumentException("Cache sub-directory and source file path cannot be null");
