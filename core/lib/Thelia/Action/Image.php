@@ -99,6 +99,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $subdir      = $event->getCacheSubdirectory();
         $source_file = $event->getSourceFilepath();
 
+        $imageExt = pathinfo($source_file)["extension"];
+
         if (null == $subdir || null == $source_file) {
             throw new \InvalidArgumentException("Cache sub-directory and source file path cannot be null");
         }
@@ -132,119 +134,142 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
             // Process image only if we have some transformations to do.
             if (! $event->isOriginalImage()) {
-                // We have to process the image.
-                $imagine = $this->createImagineInstance();
+                if ("svg" !== $imageExt) {
+                    // We have to process the image.
+                    $imagine = $this->createImagineInstance();
 
-                $image = $imagine->open($source_file);
+                    $image = $imagine->open($source_file);
 
-                if ($image) {
-                    // Allow image pre-processing (watermarging, or other stuff...)
-                    $event->setImageObject($image);
-                    $dispatcher->dispatch(TheliaEvents::IMAGE_PREPROCESSING, $event);
-                    $image = $event->getImageObject();
+                    if ($image) {
+                        // Allow image pre-processing (watermarging, or other stuff...)
+                        $event->setImageObject($image);
+                        $dispatcher->dispatch(TheliaEvents::IMAGE_PREPROCESSING, $event);
+                        $image = $event->getImageObject();
 
-                    $background_color = $event->getBackgroundColor();
+                        $background_color = $event->getBackgroundColor();
 
-                    $palette = new RGB();
+                        $palette = new RGB();
 
-                    if ($background_color != null) {
-                        $bg_color = $palette->color($background_color);
+                        if ($background_color != null) {
+                            $bg_color = $palette->color($background_color);
+                        } else {
+                            // Define a fully transparent white background color
+                            $bg_color = $palette->color('fff', 0);
+                        }
+
+                        // Apply resize
+                        $image = $this->applyResize(
+                            $imagine,
+                            $image,
+                            $event->getWidth(),
+                            $event->getHeight(),
+                            $event->getResizeMode(),
+                            $bg_color,
+                            $event->getAllowZoom()
+                        );
+
+                        // Rotate if required
+                        $rotation = \intval($event->getRotation());
+
+                        if ($rotation != 0) {
+                            $image->rotate($rotation, $bg_color);
+                        }
+
+                        // Flip
+                        // Process each effects
+                        foreach ($event->getEffects() as $effect) {
+                            $effect = trim(strtolower($effect));
+
+                            $params = explode(':', $effect);
+
+                            switch ($params[0]) {
+
+                                case 'greyscale':
+                                case 'grayscale':
+                                    $image->effects()->grayscale();
+                                    break;
+
+                                case 'negative':
+                                    $image->effects()->negative();
+                                    break;
+
+                                case 'horizontal_flip':
+                                case 'hflip':
+                                    $image->flipHorizontally();
+                                    break;
+
+                                case 'vertical_flip':
+                                case 'vflip':
+                                    $image->flipVertically();
+                                    break;
+
+                                case 'gamma':
+                                    // Syntax: gamma:value. Exemple: gamma:0.7
+                                    if (isset($params[1])) {
+                                        $gamma = \floatval($params[1]);
+
+                                        $image->effects()->gamma($gamma);
+                                    }
+                                    break;
+
+                                case 'colorize':
+                                    // Syntax: colorize:couleur. Exemple: colorize:#ff00cc
+                                    if (isset($params[1])) {
+                                        $the_color = $palette->color($params[1]);
+
+                                        $image->effects()->colorize($the_color);
+                                    }
+                                    break;
+
+                                case 'blur':
+                                    if (isset($params[1])) {
+                                        $blur_level = \intval($params[1]);
+
+                                        $image->effects()->blur($blur_level);
+                                    }
+                                    break;
+                            }
+                        }
+
+                        $quality = $event->getQuality();
+
+                        if (\is_null($quality)) {
+                            $quality = ConfigQuery::read('default_images_quality_percent', 75);
+                        }
+
+                        // Allow image post-processing (watermarging, or other stuff...)
+                        $event->setImageObject($image);
+                        $dispatcher->dispatch(TheliaEvents::IMAGE_POSTPROCESSING, $event);
+                        $image = $event->getImageObject();
+
+                        $image->save(
+                            $cacheFilePath,
+                            array('quality' => $quality)
+                        );
                     } else {
-                        // Define a fully transparent white background color
-                        $bg_color = $palette->color('fff', 0);
+                        throw new ImageException(sprintf("Source file %s cannot be opened.", basename($source_file)));
                     }
+                } else {
+                    $dom = new \DOMDocument('1.0', 'utf-8');
+                    $dom->load($originalImagePathInCache);
+                    $svg = $dom->documentElement;
 
-                    // Apply resize
-                    $image = $this->applyResize(
-                        $imagine,
-                        $image,
-                        $event->getWidth(),
-                        $event->getHeight(),
-                        $event->getResizeMode(),
-                        $bg_color,
-                        $event->getAllowZoom()
-                    );
+                    if ( ! $svg->hasAttribute('viewBox') ) {
+                        $pattern = '/^(\d*\.\d+|\d+)(px)?$/';
 
-                    // Rotate if required
-                    $rotation = \intval($event->getRotation());
+                        $interpretable =  preg_match( $pattern, $svg->getAttribute('width'), $width ) &&
+                            preg_match( $pattern, $svg->getAttribute('height'), $height );
 
-                    if ($rotation != 0) {
-                        $image->rotate($rotation, $bg_color);
-                    }
-
-                    // Flip
-                    // Process each effects
-                    foreach ($event->getEffects() as $effect) {
-                        $effect = trim(strtolower($effect));
-
-                        $params = explode(':', $effect);
-
-                        switch ($params[0]) {
-
-                            case 'greyscale':
-                            case 'grayscale':
-                                $image->effects()->grayscale();
-                                break;
-
-                            case 'negative':
-                                $image->effects()->negative();
-                                break;
-
-                            case 'horizontal_flip':
-                            case 'hflip':
-                                $image->flipHorizontally();
-                                break;
-
-                            case 'vertical_flip':
-                            case 'vflip':
-                                $image->flipVertically();
-                                break;
-
-                            case 'gamma':
-                                // Syntax: gamma:value. Exemple: gamma:0.7
-                                if (isset($params[1])) {
-                                    $gamma = \floatval($params[1]);
-
-                                    $image->effects()->gamma($gamma);
-                                }
-                                break;
-
-                            case 'colorize':
-                                // Syntax: colorize:couleur. Exemple: colorize:#ff00cc
-                                if (isset($params[1])) {
-                                    $the_color = $palette->color($params[1]);
-
-                                    $image->effects()->colorize($the_color);
-                                }
-                                break;
-
-                            case 'blur':
-                                if (isset($params[1])) {
-                                    $blur_level = \intval($params[1]);
-
-                                    $image->effects()->blur($blur_level);
-                                }
-                                break;
+                        if ($interpretable) {
+                            $view_box = implode(' ', [0, 0, $width[0], $height[0]]);
+                            $svg->setAttribute('viewBox', $view_box);
+                        } else {
+                            throw new \Exception("can't create viewBox if height and width is not defined in the svg file");
                         }
                     }
-
-                    $quality = $event->getQuality();
-
-                    if (\is_null($quality)) {
-                        $quality = ConfigQuery::read('default_images_quality_percent', 75);
-                    }
-
-                    // Allow image post-processing (watermarging, or other stuff...)
-                    $event->setImageObject($image);
-                    $dispatcher->dispatch(TheliaEvents::IMAGE_POSTPROCESSING, $event);
-                    $image = $event->getImageObject();
-
-                    $image->save(
-                        $cacheFilePath,
-                        array('quality' => $quality)
-                    );
-                } else {
-                    throw new ImageException(sprintf("Source file %s cannot be opened.", basename($source_file)));
+                    $svg->setAttribute('width', $event->getWidth());
+                    $svg->setAttribute('height', $event->getWidth());
+                    $dom->save($cacheFilePath);
                 }
             }
         }
