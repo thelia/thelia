@@ -134,7 +134,28 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
             // Process image only if we have some transformations to do.
             if (! $event->isOriginalImage()) {
-                if ("svg" !== $imageExt) {
+                if ("svg" === $imageExt) {
+                    $dom = new \DOMDocument('1.0', 'utf-8');
+                    $dom->load($originalImagePathInCache);
+                    $svg = $dom->documentElement;
+
+                    if ( ! $svg->hasAttribute('viewBox') ) {
+                        $pattern = '/^(\d*\.\d+|\d+)(px)?$/';
+
+                        $interpretable =  preg_match( $pattern, $svg->getAttribute('width'), $width ) &&
+                            preg_match( $pattern, $svg->getAttribute('height'), $height );
+
+                        if ($interpretable) {
+                            $view_box = implode(' ', [0, 0, $width[0], $height[0]]);
+                            $svg->setAttribute('viewBox', $view_box);
+                        } else {
+                            throw new \Exception("can't create viewBox if height and width is not defined in the svg file");
+                        }
+                    }
+                    $svg->setAttribute('width', $event->getWidth());
+                    $svg->setAttribute('height', $event->getWidth());
+                    $dom->save($cacheFilePath);
+                } else {
                     // We have to process the image.
                     $imagine = $this->createImagineInstance();
 
@@ -249,27 +270,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                     } else {
                         throw new ImageException(sprintf("Source file %s cannot be opened.", basename($source_file)));
                     }
-                } else {
-                    $dom = new \DOMDocument('1.0', 'utf-8');
-                    $dom->load($originalImagePathInCache);
-                    $svg = $dom->documentElement;
-
-                    if ( ! $svg->hasAttribute('viewBox') ) {
-                        $pattern = '/^(\d*\.\d+|\d+)(px)?$/';
-
-                        $interpretable =  preg_match( $pattern, $svg->getAttribute('width'), $width ) &&
-                            preg_match( $pattern, $svg->getAttribute('height'), $height );
-
-                        if ($interpretable) {
-                            $view_box = implode(' ', [0, 0, $width[0], $height[0]]);
-                            $svg->setAttribute('viewBox', $view_box);
-                        } else {
-                            throw new \Exception("can't create viewBox if height and width is not defined in the svg file");
-                        }
-                    }
-                    $svg->setAttribute('width', $event->getWidth());
-                    $svg->setAttribute('height', $event->getWidth());
-                    $dom->save($cacheFilePath);
                 }
             }
         }
