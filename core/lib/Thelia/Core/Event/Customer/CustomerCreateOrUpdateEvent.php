@@ -69,7 +69,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         string $city,
         string $country,
         string $email,
-        string $password,
+        string $password = null,
         int $langId,
         int $reseller = null,
         int $sponsor = null,
