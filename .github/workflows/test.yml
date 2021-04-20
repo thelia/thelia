@@ -57,4 +57,4 @@ jobs:
           php Thelia module:refresh
           php Thelia admin:create --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2 --email thelia2@example.com
       - name: Run PHPUnit
-        run: composer test
+        run: composer ci
