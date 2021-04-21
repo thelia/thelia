@@ -272,11 +272,12 @@ class FileController extends BaseAdminController
      *
      * @return Response
      */
-    public function saveImageAjaxAction($parentId, $parentType)
+    public function saveImageAjaxAction(EventDispatcherInterface $eventDispatcher, $parentId, $parentType)
     {
         $config = FileConfiguration::getImageConfig();
 
         return $this->saveFileAjaxAction(
+            $eventDispatcher,
             $parentId,
             $parentType,
             $config['objectType'],
@@ -293,11 +294,12 @@ class FileController extends BaseAdminController
      *
      * @return Response
      */
-    public function saveDocumentAjaxAction($parentId, $parentType)
+    public function saveDocumentAjaxAction(EventDispatcherInterface $eventDispatcher, $parentId, $parentType)
     {
         $config = FileConfiguration::getDocumentConfig();
 
         return $this->saveFileAjaxAction(
+            $eventDispatcher,
             $parentId,
             $parentType,
             $config['objectType'],
@@ -595,11 +597,11 @@ class FileController extends BaseAdminController
         }
 
         return $this->render('image-edit', [
-                'imageId' => $imageId,
-                'imageType' => $parentType,
-                'redirectUrl' => $imageInstance->getRedirectionUrl(),
-                'formId' => $imageInstance->getUpdateFormId(),
-            ]);
+            'imageId' => $imageId,
+            'imageType' => $parentType,
+            'redirectUrl' => $imageInstance->getRedirectionUrl(),
+            'formId' => $imageInstance->getUpdateFormId(),
+        ]);
     }
 
     /**
@@ -623,11 +625,11 @@ class FileController extends BaseAdminController
         }
 
         return $this->render('document-edit', [
-                'documentId' => $documentId,
-                'documentType' => $parentType,
-                'redirectUrl' => $documentInstance->getRedirectionUrl(),
-                'formId' => $documentInstance->getUpdateFormId(),
-            ]);
+            'documentId' => $documentId,
+            'documentType' => $parentType,
+            'redirectUrl' => $documentInstance->getRedirectionUrl(),
+            'formId' => $documentInstance->getUpdateFormId(),
+        ]);
     }
 
     /**
