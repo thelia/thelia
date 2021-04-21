@@ -515,10 +515,6 @@ class TheliaLoop extends AbstractSmartyPlugin
 
     public function registerLoop($className, $name = null): void
     {
-        if (null === $name) {
-            $classParts = explode('\\', $className);
-            $name = strtolower(strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', end($classParts))));
-        }
         if (\array_key_exists($name, $this->loopDefinition)) {
             throw new \InvalidArgumentException(
                 $this->translator->trans("The loop name '%name' is already defined in %className class", [

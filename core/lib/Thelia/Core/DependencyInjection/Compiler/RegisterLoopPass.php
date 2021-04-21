@@ -14,6 +14,7 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use TheliaSmarty\Template\Plugins\TheliaLoop;
 
 class RegisterLoopPass implements CompilerPassInterface
@@ -24,11 +25,20 @@ class RegisterLoopPass implements CompilerPassInterface
             return;
         }
 
-        $smarty = $container->getDefinition(TheliaLoop::class);
+        try {
+            $loopConfig = $container->getParameter('Thelia.parser.loops');
+        } catch (ParameterNotFoundException $e) {
+            $loopConfig = [];
+        }
 
         foreach ($container->findTaggedServiceIds('thelia.loop') as $id => $tag) {
             $loopDefinition = $container->getDefinition($id);
-            $smarty->addMethodCall('registerLoop', [$loopDefinition->getClass()]);
+            $classParts = explode('\\', $loopDefinition->getClass());
+            $name = strtolower(strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', end($classParts))));
+
+            $loopConfig[$name] = $loopDefinition->getClass();
         }
+
+        $container->setParameter('Thelia.parser.loops', $loopConfig);
     }
 }
