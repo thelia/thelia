@@ -23,7 +23,6 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 class Folder extends BaseFolder implements FileModelParentInterface
 {
     use PositionManagementTrait;
-
     use UrlRewritingTrait;
 
     /**

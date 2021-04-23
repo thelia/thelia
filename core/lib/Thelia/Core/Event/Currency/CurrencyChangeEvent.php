@@ -22,7 +22,7 @@ use Thelia\Model\Currency;
  */
 class CurrencyChangeEvent extends CurrencyEvent
 {
-    /** @var Request $request */
+    /** @var Request */
     protected $request;
 
     public function __construct(Currency $currency = null, Request $request = null)

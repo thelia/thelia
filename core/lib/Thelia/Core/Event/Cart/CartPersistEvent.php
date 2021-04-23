@@ -22,7 +22,7 @@ use Thelia\Model\Cart;
  */
 class CartPersistEvent extends ActionEvent
 {
-    /** @var Cart $cart */
+    /** @var Cart */
     protected $cart;
 
     public function __construct(Cart $cart)

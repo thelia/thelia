@@ -23,7 +23,7 @@ class FragmentBag implements Iterator
 {
     private $position;
 
-    /** @var array $fragments */
+    /** @var array */
     protected $fragments;
 
     public function __construct()

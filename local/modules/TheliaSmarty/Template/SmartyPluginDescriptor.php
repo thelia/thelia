@@ -35,7 +35,7 @@ class SmartyPluginDescriptor
     protected $class;
 
     /**
-     * @var string plugin implmentation method in $class
+     * @var string plugin implmentation method in
      */
     protected $method;
 

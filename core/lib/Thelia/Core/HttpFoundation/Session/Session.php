@@ -32,7 +32,7 @@ use Thelia\Tools\URL;
  */
 class Session extends BaseSession
 {
-    /** @var Cart|null $transientCart */
+    /** @var Cart|null */
     protected static $transientCart = null;
 
     /**

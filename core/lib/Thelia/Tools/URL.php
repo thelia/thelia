@@ -22,13 +22,13 @@ use Thelia\Rewriting\RewritingRetriever;
 
 class URL
 {
-    /** @var RewritingResolver $resolver */
+    /** @var RewritingResolver */
     protected $resolver;
 
-    /** @var RewritingRetriever $retriever */
+    /** @var RewritingRetriever */
     protected $retriever;
 
-    /** @var RequestContext $requestContext */
+    /** @var RequestContext */
     protected $requestContext;
 
     public const PATH_TO_FILE = true;
@@ -36,7 +36,7 @@ class URL
 
     protected static $instance = null;
 
-    /** @var string $baseUrlScheme a cache for the base URL scheme */
+    /** @var string a cache for the base URL scheme */
     private $baseUrlScheme;
 
     public function __construct(RouterInterface $router = null)

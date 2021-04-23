@@ -52,32 +52,32 @@ use Thelia\Module\BaseModule;
 class OrderTest extends BaseAction
 {
     /**
-     * @var EventDispatcherInterface $realDispatcher
+     * @var EventDispatcherInterface
      */
     protected $realDispatcher;
 
     /**
-     * @var ContainerBuilder $container
+     * @var ContainerBuilder
      */
     protected $container;
 
     /**
-     * @var Order $orderAction
+     * @var Order
      */
     protected $orderAction;
 
     /**
-     * @var \Thelia\Core\Event\Order\OrderEvent $orderEvent
+     * @var \Thelia\Core\Event\Order\OrderEvent
      */
     protected $orderEvent;
 
     /**
-     * @var CustomerModel $customer
+     * @var CustomerModel
      */
     protected $customer;
 
     /**
-     * @var Cart $customer
+     * @var Cart
      */
     protected $cart;
 

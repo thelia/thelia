@@ -26,7 +26,6 @@ use Thelia\TaxEngine\Calculator;
 class Product extends BaseProduct implements FileModelParentInterface
 {
     use PositionManagementTrait;
-
     use UrlRewritingTrait;
 
     /**

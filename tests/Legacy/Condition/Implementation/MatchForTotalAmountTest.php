@@ -30,7 +30,7 @@ use Thelia\Model\CurrencyQuery;
  */
 class MatchForTotalAmountTest extends TestCase
 {
-    /** @var FacadeInterface $stubTheliaAdapter */
+    /** @var FacadeInterface */
     protected $stubTheliaAdapter;
 
     /**

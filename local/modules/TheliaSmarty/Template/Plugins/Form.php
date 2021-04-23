@@ -67,13 +67,13 @@ class Form extends AbstractSmartyPlugin
     /** @var ContainerInterface */
     protected $container;
 
-    /** @var ParserContext $parserContext */
+    /** @var ParserContext */
     protected $parserContext;
 
-    /** @var ParserInterface $parser */
+    /** @var ParserInterface */
     protected $parser;
 
-    /** @var TranslatorInterface $translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     protected $formDefinition = [];

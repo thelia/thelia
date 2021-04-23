@@ -195,15 +195,15 @@ function createProduct($categories, $brands, $contents, $template, $attribute, $
                 $stock = new \Thelia\Model\ProductSaleElements();
                 $stock->setProduct($product);
                 $stock->setRef($product->getId().'_'.uniqid('', true));
-                $stock->setQuantity(rand(1, 50));
+                $stock->setQuantity(random_int(1, 50));
                 if (!empty($data[9])) {
                     $stock->setPromo(1);
                 } else {
                     $stock->setPromo(0);
                 }
 
-                $stock->setNewness(rand(0, 1));
-                $stock->setWeight((float) rand(100, 3000) / 100);
+                $stock->setNewness(random_int(0, 1));
+                $stock->setWeight((float) random_int(100, 3000) / 100);
                 $stock->save($con);
 
                 $productPrice = new \Thelia\Model\ProductPrice();
@@ -304,7 +304,7 @@ function createCustomer($con): void
 
     $address = new Thelia\Model\Address();
     $address->setLabel('Address n°2')
-        ->setTitleId(rand(1, 3))
+        ->setTitleId(random_int(1, 3))
         ->setFirstname('thelia')
         ->setLastname('thelia')
         ->setAddress1('4 rue du Pensionnat Notre Dame de France')
@@ -321,7 +321,7 @@ function createCustomer($con): void
 
     $address = new Thelia\Model\Address();
     $address->setLabel('Address n°3')
-        ->setTitleId(rand(1, 3))
+        ->setTitleId(random_int(1, 3))
         ->setFirstname('thelia')
         ->setLastname('thelia')
         ->setAddress1("43 rue d'Alsace-Lorrainee")

@@ -139,7 +139,7 @@ abstract class BaseLoop implements BaseLoopInterface
         $class = static::class;
 
         if (null === self::$loopDefinitions) {
-            self::$loopDefinitions = \array_flip($this->theliaParserLoops);
+            self::$loopDefinitions = array_flip($this->theliaParserLoops);
         }
 
         if (isset(self::$loopDefinitions[$class])) {

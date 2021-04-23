@@ -22,7 +22,7 @@ use Thelia\Core\Hook\FragmentBag;
  */
 class HookRenderBlockEvent extends BaseHookRenderEvent
 {
-    /** @var FragmentBag $fragmentBag */
+    /** @var FragmentBag */
     protected $fragmentBag;
 
     /** @var array fields that can be added, if empty array any fields can be added */

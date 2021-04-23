@@ -19,7 +19,7 @@ namespace Thelia\Core\Event\Country;
  */
 class CountryUpdateEvent extends CountryCreateEvent
 {
-    /** @var $country_id */
+    /** @var */
     protected $country_id;
 
     /** @var bool */

@@ -30,7 +30,7 @@ use Thelia\Model\LangQuery;
  */
 class HookTest extends BaseAction
 {
-    /** @var Hook $action */
+    /** @var Hook */
     protected $action;
 
     protected $locale;

@@ -144,7 +144,7 @@ class AdminResources
      *      ]
      * ].
      *
-     * @var array $resources
+     * @var array
      */
     protected $resources;
 

@@ -51,16 +51,16 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     /** @var RequestStack */
     protected $requestStack;
 
-    /** @var CouponFactory $couponFactory */
+    /** @var CouponFactory */
     protected $couponFactory;
 
-    /** @var CouponManager $couponManager */
+    /** @var CouponManager */
     protected $couponManager;
 
-    /** @var ConditionInterface $noConditionRule */
+    /** @var ConditionInterface */
     protected $noConditionRule;
 
-    /** @var ConditionFactory $conditionFactory */
+    /** @var ConditionFactory */
     protected $conditionFactory;
 
     public function __construct(

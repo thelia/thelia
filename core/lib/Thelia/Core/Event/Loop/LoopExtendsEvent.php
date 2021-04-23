@@ -22,7 +22,7 @@ use Thelia\Core\Template\Element\BaseLoop;
  */
 class LoopExtendsEvent extends ActionEvent
 {
-    /** @var BaseLoop|null $loop */
+    /** @var BaseLoop|null */
     protected $loop;
 
     /**

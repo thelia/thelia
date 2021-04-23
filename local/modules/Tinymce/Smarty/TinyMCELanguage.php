@@ -24,7 +24,7 @@ use TheliaSmarty\Template\SmartyPluginDescriptor;
  */
 class TinyMCELanguage extends AbstractSmartyPlugin
 {
-    /** @var string $locale */
+    /** @var string */
     private $locale;
 
     public function __construct(RequestStack $requestStack)

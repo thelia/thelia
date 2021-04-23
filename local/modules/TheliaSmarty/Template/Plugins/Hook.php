@@ -166,7 +166,7 @@ class Hook extends AbstractSmartyPlugin
 
     protected function showHook($hookName, $params, $templateVars)
     {
-        if (!\class_exists('\Symfony\Component\VarDumper\VarDumper')) {
+        if (!class_exists('\Symfony\Component\VarDumper\VarDumper')) {
             throw new \Exception('For use SHOW_HOOK, you can install dependency symfony/var-dumper');
         }
 

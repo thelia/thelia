@@ -73,7 +73,7 @@ abstract class AbstractExport implements \Iterator
     protected $orderAndAliases;
 
     /**
-     * @var array|null Keep untranslated $orderAndAliases
+     * @var array|null Keep untranslated
      */
     private $originalOrderAndAliases;
 

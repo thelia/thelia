@@ -24,7 +24,6 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 class Content extends BaseContent implements FileModelParentInterface
 {
     use PositionManagementTrait;
-
     use UrlRewritingTrait;
 
     /**

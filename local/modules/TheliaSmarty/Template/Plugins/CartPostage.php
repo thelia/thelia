@@ -56,22 +56,22 @@ class CartPostage extends AbstractSmartyPlugin
     /** @var ContainerInterface Service Container */
     protected $container;
 
-    /** @var int $countryId the id of country */
+    /** @var int the id of country */
     protected $countryId;
 
-    /** @var int $deliveryId the id of the cheapest delivery */
+    /** @var int the id of the cheapest delivery */
     protected $deliveryId;
 
-    /** @var float $postage the postage amount with taxes */
+    /** @var float the postage amount with taxes */
     protected $postage;
 
-    /** @var float $postageTax the postage tax amount */
+    /** @var float the postage tax amount */
     protected $postageTax;
 
-    /** @var string $postageTaxRuleTitle the postage tax rule title */
+    /** @var string the postage tax rule title */
     protected $postageTaxRuleTitle;
 
-    /** @var bool $isCustomizable indicate if customer can change the country */
+    /** @var bool indicate if customer can change the country */
     protected $isCustomizable = true;
 
     public function __construct(ContainerInterface $container)

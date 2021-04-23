@@ -25,7 +25,7 @@ use Thelia\Model\Currency;
  */
 class MatchForEveryoneTest extends TestCase
 {
-    /** @var FacadeInterface $stubTheliaAdapter */
+    /** @var FacadeInterface */
     protected $stubTheliaAdapter;
 
     /**

@@ -25,7 +25,7 @@ use Symfony\Component\Form\Forms;
 class ActionEventTest extends TestCase
 {
     /**
-     * @var \Symfony\Component\Form\Form $form
+     * @var \Symfony\Component\Form\Form
      */
     protected static $form;
 

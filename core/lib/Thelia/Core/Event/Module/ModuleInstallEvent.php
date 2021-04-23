@@ -28,10 +28,10 @@ class ModuleInstallEvent extends ActionEvent
      */
     protected $module;
 
-    /** @var ModuleDefinition $moduleDefinition */
+    /** @var ModuleDefinition */
     protected $moduleDefinition;
 
-    /** @var string $modulePath */
+    /** @var string */
     protected $modulePath;
 
     public function __construct(Module $module = null)

@@ -41,7 +41,7 @@ class FlashMessage extends AbstractSmartyPlugin
     /** @var RequestStack Request service */
     protected $requestStack;
 
-    /** @var FlashMessageBag $results */
+    /** @var FlashMessageBag */
     protected $results;
 
     /** @var Translator */

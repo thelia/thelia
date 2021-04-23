@@ -52,34 +52,34 @@ abstract class BaseHook
     /** @var \Thelia\Core\Template\ParserInterface */
     public $parser;
 
-    /** @var TranslatorInterface $translator */
+    /** @var TranslatorInterface */
     public $translator;
 
-    /** @var AssetResolverInterface $assetsResolver */
+    /** @var AssetResolverInterface */
     public $assetsResolver;
 
     /** @var EventDispatcherInterface */
     public $dispatcher;
 
-    /** @var Request $request */
+    /** @var Request */
     protected $request;
 
-    /** @var Session $session */
+    /** @var Session */
     protected $session;
 
-    /** @var Customer $customer */
+    /** @var Customer */
     protected $customer;
 
-    /** @var Cart $cart */
+    /** @var Cart */
     protected $cart;
 
-    /** @var Order $order */
+    /** @var Order */
     protected $order;
 
-    /** @var Lang $lang */
+    /** @var Lang */
     protected $lang;
 
-    /** @var Currency $currency */
+    /** @var Currency */
     protected $currency;
 
     /**

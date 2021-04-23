@@ -30,10 +30,10 @@ use TheliaSmarty\Template\SmartyParser;
  */
 class GenerateSQLCommand extends ContainerAwareCommand
 {
-    /** @var Translator $translator */
+    /** @var Translator */
     protected $translator;
 
-    /** @var SmartyParser $parser */
+    /** @var SmartyParser */
     protected $parser;
 
     /** @var \PDO */

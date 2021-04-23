@@ -22,7 +22,7 @@ use Thelia\Core\Template\Element\LoopResult;
  */
 class LoopExtendsParseResultsEvent extends LoopExtendsEvent
 {
-    /** @var LoopResult $loopResult */
+    /** @var LoopResult */
     protected $loopResult;
 
     /**

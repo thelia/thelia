@@ -32,7 +32,7 @@ use Thelia\Model\ProductQuery;
  */
 class FreeProductTest extends TestCase
 {
-    /** @var Product $freeProduct */
+    /** @var Product */
     public $freeProduct;
     public $originalPrice;
     public $originalPromo;

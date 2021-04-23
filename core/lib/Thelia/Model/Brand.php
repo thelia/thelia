@@ -21,7 +21,6 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 class Brand extends BaseBrand implements FileModelParentInterface
 {
     use PositionManagementTrait;
-
     use UrlRewritingTrait;
 
     /**

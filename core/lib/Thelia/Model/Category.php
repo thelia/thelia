@@ -25,7 +25,6 @@ use Thelia\Model\Tools\UrlRewritingTrait;
 class Category extends BaseCategory implements FileModelParentInterface
 {
     use PositionManagementTrait;
-
     use UrlRewritingTrait;
 
     /**

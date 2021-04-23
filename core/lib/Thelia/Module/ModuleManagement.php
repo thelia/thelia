@@ -35,7 +35,7 @@ class ModuleManagement
     protected $baseModuleDir;
     protected $reflected;
 
-    /** @var ModuleDescriptorValidator $descriptorValidator */
+    /** @var ModuleDescriptorValidator */
     protected $descriptorValidator;
 
     protected $container;

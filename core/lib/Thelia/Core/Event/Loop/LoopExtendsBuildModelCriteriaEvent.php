@@ -22,7 +22,7 @@ use Thelia\Core\Template\Element\BaseLoop;
  */
 class LoopExtendsBuildModelCriteriaEvent extends LoopExtendsEvent
 {
-    /** @var ModelCriteria $modelCriteria */
+    /** @var ModelCriteria */
     protected $modelCriteria;
 
     /**
