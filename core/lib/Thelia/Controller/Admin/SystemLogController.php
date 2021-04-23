@@ -102,8 +102,6 @@ class SystemLogController extends BaseAdminController
             return $response;
         }
 
-        $error_msg = false;
-
         $systemLogForm = $this->createForm(AdminForm::SYSTEM_LOG_CONFIGURATION);
 
         try {
@@ -148,9 +146,7 @@ class SystemLogController extends BaseAdminController
             $response = $this->generateRedirectFromRoute('admin.configuration.system-logs.default');
         } catch (\Exception $ex) {
             $error_msg = $ex->getMessage();
-        }
 
-        if (false !== $error_msg) {
             $this->setupFormErrorContext(
                 $this->getTranslator()->trans('System log configuration failed.'),
                 $error_msg,

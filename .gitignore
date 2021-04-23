@@ -5,6 +5,7 @@
 /.env.local.php
 /.env.*.local
 composer.lock
+symfony.lock
 phpunit.xml
 ###< symfony/framework-bundle ###
 
@@ -36,7 +37,9 @@ web/.htaccess
 local/I18n/*.php
 .docker/mysql-data/*
 !.docker/mysql-data/.gitkeep
-.env
+local/session/
+translations/
+bin/
 
 # Ignore everything in the "modules" directory, except the "default modules"
 local/modules/*

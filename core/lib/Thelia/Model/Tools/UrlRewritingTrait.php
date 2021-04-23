@@ -168,6 +168,8 @@ trait UrlRewritingTrait
             return $this;
         }
 
+        $resolver = null;
+
         try {
             $resolver = new RewritingResolver($url);
 
@@ -201,7 +203,7 @@ trait UrlRewritingTrait
         }
 
         /* set the new URL */
-        if (isset($resolver)) {
+        if ($resolver !== null) {
             /* erase the old one */
             $rewritingUrl = RewritingUrlQuery::create()->findOneByUrl($url);
             $rewritingUrl->setView($this->getRewrittenUrlViewName())
