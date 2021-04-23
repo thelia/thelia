@@ -34,9 +34,6 @@ class BaseFrontController extends BaseController
         }
     }
 
-    /**
-     * @return string
-     */
     public function getControllerType(): string
     {
         return self::CONTROLLER_TYPE;

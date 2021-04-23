@@ -19,7 +19,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Form\ShippingZone\ShippingZoneAddArea;
 use Thelia\Form\ShippingZone\ShippingZoneRemoveArea;
 
 /**
@@ -72,7 +71,7 @@ class ShippingZoneController extends BaseAdminController
                 $form->get('shipping_zone_id')->getData()
             );
 
-            $eventDispatcher->dispatch($event,TheliaEvents::SHIPPING_ZONE_ADD_AREA);
+            $eventDispatcher->dispatch($event, TheliaEvents::SHIPPING_ZONE_ADD_AREA);
 
             // Redirect to the success URL
             return $this->generateSuccessRedirect($shippingAreaForm);
@@ -111,7 +110,7 @@ class ShippingZoneController extends BaseAdminController
                 $form->get('shipping_zone_id')->getData()
             );
 
-            $eventDispatcher->dispatch($event,TheliaEvents::SHIPPING_ZONE_REMOVE_AREA);
+            $eventDispatcher->dispatch($event, TheliaEvents::SHIPPING_ZONE_REMOVE_AREA);
 
             // Redirect to the success URL
             return $this->generateSuccessRedirect($shippingAreaForm);

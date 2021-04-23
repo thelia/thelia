@@ -15,8 +15,6 @@ namespace Thelia\Action;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Kernel;
-use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Config\ConfigCreateEvent;
 use Thelia\Core\Event\Config\ConfigDeleteEvent;
 use Thelia\Core\Event\Config\ConfigUpdateEvent;
@@ -32,7 +30,7 @@ class Config extends BaseAction implements EventSubscriberInterface
 
     public function __construct(ContainerInterface $container)
     {
-        /** @var Thelia $kernel */
+        /* @var Thelia $kernel */
         $this->kernel = $container->get('kernel');
     }
 

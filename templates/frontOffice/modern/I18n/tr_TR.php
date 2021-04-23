@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '%nb Item' => '%nb öğe',
     '%nb Items' => '%nb öğeler',
@@ -160,7 +170,7 @@ return [
     'Proceed checkout' => 'Ödeme sayfasına git',
     'Product Empty Button' => 'İlk ürünü ekle',
     'Product Empty Message' => 'Ürün eklemek gerçekten çok kolay.   <ol>
-<li>Onay <strong>YENİ</strong> ürününüzü en son ürün bölümünde görmek istiyorsanız, Ayrıntılar sekmesini altında.</li>             
+<li>Onay <strong>YENİ</strong> ürününüzü en son ürün bölümünde görmek istiyorsanız, Ayrıntılar sekmesini altında.</li>
 <li>Onay <strong>SATIŞ</strong> ürün teklif ürün bölümünde görmek istiyorsanız, Ayrıntılar sekmesini altında.</li>         </ol>',
     'Product Empty Title' => 'Hoşgeldiniz',
     'Product Name' => 'Ürün adı',

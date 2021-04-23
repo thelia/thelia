@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '%nb Item' => 'Στοιχείο %nb',
     '%nb Items' => 'Στοιχεία %nb',
@@ -123,7 +133,7 @@ return [
     'Price descending' => 'Φθίνουσα τιμή',
     'Proceed checkout' => 'Προχωρήστε στην ολοκλήρωση της παραγγελίας',
     'Product Empty Button' => 'Προσθήκη πρώτου προϊόντος',
-    'Product Empty Message' => 'Είναι πολύ εύκολο να προσθέσετε ένα προϊόν.         
+    'Product Empty Message' => 'Είναι πολύ εύκολο να προσθέσετε ένα προϊόν.
             <ol>
                  <li>Επιλέξτε<strong>Νέο</strong> κάτω από την καρτέλα λεπτομέρειες εάν θέλετε να δείτε το προϊόν σας στην ενότητα τελευταίων προϊόντων.</li>
                  <li>Επιλέξτε<strong>Πώληση</strong> κάτω από την καρτέλα λεπτομέρειες εάν θέλετε να δείτε το προϊόν σας στην ενότητα προσφορών προϊόντων.</li>

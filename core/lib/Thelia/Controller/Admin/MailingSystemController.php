@@ -84,7 +84,7 @@ class MailingSystemController extends BaseAdminController
             $event->setTimeout($formData->get('timeout')->getData());
             $event->setSourceIp($formData->get('sourceip')->getData());
 
-            $eventDispatcher->dispatch($event,TheliaEvents::MAILING_SYSTEM_UPDATE);
+            $eventDispatcher->dispatch($event, TheliaEvents::MAILING_SYSTEM_UPDATE);
 
             // Redirect to the success URL
             $response = $this->generateRedirectFromRoute('admin.configuration.mailing-system.view');

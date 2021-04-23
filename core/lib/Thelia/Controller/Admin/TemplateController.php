@@ -222,7 +222,7 @@ class TemplateController extends AbstractCrudController
             try {
                 $event = new TemplateDuplicateEvent($template_id, $this->getCurrentEditionLocale());
 
-                $eventDispatcher->dispatch($event,TheliaEvents::TEMPLATE_DUPLICATE);
+                $eventDispatcher->dispatch($event, TheliaEvents::TEMPLATE_DUPLICATE);
 
                 if ($event->hasTemplate()) {
                     $template_id = $event->getTemplate()->getId();
@@ -268,7 +268,7 @@ class TemplateController extends AbstractCrudController
             );
 
             try {
-                $eventDispatcher->dispatch($event,TheliaEvents::TEMPLATE_ADD_ATTRIBUTE);
+                $eventDispatcher->dispatch($event, TheliaEvents::TEMPLATE_ADD_ATTRIBUTE);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -335,7 +335,7 @@ class TemplateController extends AbstractCrudController
             );
 
             try {
-                $eventDispatcher->dispatch($event,TheliaEvents::TEMPLATE_ADD_FEATURE);
+                $eventDispatcher->dispatch($event, TheliaEvents::TEMPLATE_ADD_FEATURE);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);

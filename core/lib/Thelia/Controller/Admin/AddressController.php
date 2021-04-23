@@ -62,7 +62,7 @@ class AddressController extends AbstractCrudController
 
             $addressEvent = new AddressEvent($address);
 
-            $eventDispatcher->dispatch($addressEvent,TheliaEvents::ADDRESS_DEFAULT);
+            $eventDispatcher->dispatch($addressEvent, TheliaEvents::ADDRESS_DEFAULT);
 
             $this->adminLogAppend(
                 $this->resourceCode,

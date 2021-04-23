@@ -114,7 +114,7 @@ class LangController extends BaseAdminController
             $event = new LangUpdateEvent($form->get('id')->getData());
             $event = $this->hydrateEvent($event, $form);
 
-            $eventDispatcher->dispatch($event,TheliaEvents::LANG_UPDATE);
+            $eventDispatcher->dispatch($event, TheliaEvents::LANG_UPDATE);
 
             if (false === $event->hasLang()) {
                 throw new \LogicException(
@@ -213,7 +213,7 @@ class LangController extends BaseAdminController
             $createEvent = new LangCreateEvent();
             $createEvent = $this->hydrateEvent($createEvent, $form);
 
-            $eventDispatcher->dispatch($createEvent,TheliaEvents::LANG_CREATE);
+            $eventDispatcher->dispatch($createEvent, TheliaEvents::LANG_CREATE);
 
             if (false === $createEvent->hasLang()) {
                 throw new \LogicException(
@@ -274,7 +274,7 @@ class LangController extends BaseAdminController
 
             $deleteEvent = new LangDeleteEvent($this->getRequest()->get('language_id', 0));
 
-            $eventDispatcher->dispatch($deleteEvent,TheliaEvents::LANG_DELETE);
+            $eventDispatcher->dispatch($deleteEvent, TheliaEvents::LANG_DELETE);
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
         } catch (\Exception $ex) {
@@ -307,7 +307,7 @@ class LangController extends BaseAdminController
 
             $event = new LangDefaultBehaviorEvent($form->get('behavior')->getData());
 
-            $eventDispatcher->dispatch($event,TheliaEvents::LANG_DEFAULTBEHAVIOR);
+            $eventDispatcher->dispatch($event, TheliaEvents::LANG_DEFAULTBEHAVIOR);
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
         } catch (FormValidationException $ex) {
@@ -354,7 +354,7 @@ class LangController extends BaseAdminController
                 }
             }
 
-            $eventDispatcher->dispatch($event,TheliaEvents::LANG_URL);
+            $eventDispatcher->dispatch($event, TheliaEvents::LANG_URL);
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
         } catch (FormValidationException $ex) {

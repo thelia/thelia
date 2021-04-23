@@ -361,7 +361,7 @@ class CategoryController extends AbstractSeoCrudController
             );
 
             try {
-                $eventDispatcher->dispatch($event,TheliaEvents::CATEGORY_ADD_CONTENT);
+                $eventDispatcher->dispatch($event, TheliaEvents::CATEGORY_ADD_CONTENT);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);

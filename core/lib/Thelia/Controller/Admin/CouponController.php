@@ -504,7 +504,6 @@ class CouponController extends BaseAdminController
             $eventDispatcher->dispatch(
                 $couponEvent,
                 $eventToDispatch
-
             );
 
             $this->adminLogAppend(

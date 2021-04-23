@@ -190,8 +190,6 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param $eventName
-     *
      * @return UpdatePositionEvent $event
      */
     public function updateModuleHookPosition(UpdatePositionEvent $event)

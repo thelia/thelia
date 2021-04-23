@@ -309,7 +309,7 @@ class TaxRuleController extends AbstractCrudController
 
             $changeEvent = $this->getUpdateTaxListEvent($data);
 
-            $eventDispatcher->dispatch($changeEvent,TheliaEvents::TAX_RULE_TAXES_UPDATE);
+            $eventDispatcher->dispatch($changeEvent, TheliaEvents::TAX_RULE_TAXES_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
                 throw new \LogicException(

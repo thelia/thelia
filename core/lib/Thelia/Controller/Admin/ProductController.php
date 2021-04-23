@@ -626,7 +626,7 @@ class ProductController extends AbstractSeoCrudController
             );
 
             try {
-                $eventDispatcher->dispatch($event,TheliaEvents::PRODUCT_ADD_CONTENT);
+                $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_ADD_CONTENT);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -704,7 +704,7 @@ class ProductController extends AbstractSeoCrudController
             );
 
             try {
-                $eventDispatcher->dispatch($event,TheliaEvents::PRODUCT_ADD_ACCESSORY);
+                $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_ADD_ACCESSORY);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -730,7 +730,7 @@ class ProductController extends AbstractSeoCrudController
             );
 
             try {
-                $eventDispatcher->dispatch($event,TheliaEvents::PRODUCT_REMOVE_ACCESSORY);
+                $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_REMOVE_ACCESSORY);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -906,7 +906,7 @@ class ProductController extends AbstractSeoCrudController
             );
 
             try {
-                $eventDispatcher->dispatch($event,TheliaEvents::PRODUCT_ADD_CATEGORY);
+                $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_ADD_CATEGORY);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -932,7 +932,7 @@ class ProductController extends AbstractSeoCrudController
             );
 
             try {
-                $eventDispatcher->dispatch($event,TheliaEvents::PRODUCT_REMOVE_CATEGORY);
+                $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_REMOVE_CATEGORY);
             } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
@@ -1092,7 +1092,7 @@ class ProductController extends AbstractSeoCrudController
             ->setFromDefaultCurrency($data['use_exchange_rate'])
         ;
 
-        $eventDispatcher->dispatch($event,TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
+        $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT);
 
         // Log object modification
         if (null !== $changedObject = $event->getProductSaleElement()) {
@@ -1282,7 +1282,7 @@ class ProductController extends AbstractSeoCrudController
                 ->setEanCode($data['ean_code'] == null ? '' : $data['ean_code'])
             ;
 
-            $eventDispatcher->dispatch($event,TheliaEvents::PRODUCT_COMBINATION_GENERATION);
+            $eventDispatcher->dispatch($event, TheliaEvents::PRODUCT_COMBINATION_GENERATION);
 
             // Log object modification
             $this->adminLogAppend(
@@ -1604,11 +1604,11 @@ class ProductController extends AbstractSeoCrudController
 
             if ($documentId === (int) $typeId) {
                 $assocEvent = new MetaDataDeleteEvent('virtual', MetaData::PSE_KEY, $pseId);
-                $eventDispatcher->dispatch($assocEvent,TheliaEvents::META_DATA_DELETE);
+                $eventDispatcher->dispatch($assocEvent, TheliaEvents::META_DATA_DELETE);
                 $responseData['is-associated'] = 0;
             } else {
                 $assocEvent = new MetaDataCreateOrUpdateEvent('virtual', MetaData::PSE_KEY, $pseId, $typeId);
-                $eventDispatcher->dispatch($assocEvent,TheliaEvents::META_DATA_UPDATE);
+                $eventDispatcher->dispatch($assocEvent, TheliaEvents::META_DATA_UPDATE);
                 $responseData['is-associated'] = 1;
             }
 
@@ -1787,7 +1787,7 @@ class ProductController extends AbstractSeoCrudController
     protected function getPSEVirtualDocument(EventDispatcherInterface $eventDispatcher, ProductSaleElementsModel $pse)
     {
         /** @var Document $documentLoop */
-        $documentLoop = $this->createLoopInstance($eventDispatcher,Document::class);
+        $documentLoop = $this->createLoopInstance($eventDispatcher, Document::class);
 
         // select only not visible documents
         $documentLoop->initializeArgs([

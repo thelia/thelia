@@ -112,7 +112,7 @@ class MigrateController extends BaseAdminController
                     $migration['new_state']
                 );
 
-                $eventDispatcher->dispatch($changeEvent,MigrateCountryEvents::MIGRATE_COUNTRY);
+                $eventDispatcher->dispatch($changeEvent, MigrateCountryEvents::MIGRATE_COUNTRY);
 
                 // memorize the migration
                 $migratedCountries = json_decode(ConfigQuery::read('thelia_country_state_migration', '[]'), true);

@@ -27,6 +27,7 @@ class ConfigQuery extends BaseConfigQuery
 
     /**
      * @internal
+     *
      * @param mixed[] $configs
      */
     public static function initCache(array $configs): void

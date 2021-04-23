@@ -51,11 +51,11 @@ class TaxEngine
                     if (strtolower($extension) !== 'php') {
                         continue;
                     }
-                    $className  = $fileinfo->getBaseName('.php');
+                    $className = $fileinfo->getBaseName('.php');
 
                     try {
-                        $fullyQualifiedClassName = "Thelia\\TaxEngine\\TaxType\\".$className;
-                        $instance = new $fullyQualifiedClassName;
+                        $fullyQualifiedClassName = 'Thelia\\TaxEngine\\TaxType\\'.$className;
+                        $instance = new $fullyQualifiedClassName();
                         $typeList[] = \get_class($instance);
                     } catch (\Exception $ex) {
                         // Nothing special to do

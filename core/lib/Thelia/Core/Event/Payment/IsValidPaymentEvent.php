@@ -13,7 +13,6 @@
 namespace Thelia\Core\Event\Payment;
 
 use Thelia\Model\Cart;
-use Thelia\Module\AbstractPaymentModule;
 use Thelia\Module\PaymentModuleInterface;
 
 /**

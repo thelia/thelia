@@ -257,7 +257,7 @@ class ModuleController extends AbstractCrudController
         $message = null;
         try {
             $event = new ModuleToggleActivationEvent($module_id);
-            $eventDispatcher->dispatch($event,TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+            $eventDispatcher->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
 
             if (null === $event->getModule()) {
                 throw new \LogicException(
@@ -355,7 +355,7 @@ class ModuleController extends AbstractCrudController
                 ->setModulePath($modulePath)
                 ->setModuleDefinition($moduleDefinition);
 
-            $eventDispatcher->dispatch($moduleInstallEvent,TheliaEvents::MODULE_INSTALL);
+            $eventDispatcher->dispatch($moduleInstallEvent, TheliaEvents::MODULE_INSTALL);
 
             $newModule = $moduleInstallEvent->getModule();
 

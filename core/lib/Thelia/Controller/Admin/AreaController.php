@@ -228,7 +228,7 @@ class AreaController extends AbstractCrudController
 
             $event = new AreaAddCountryEvent($area, $form->get('country_id')->getData());
 
-            $eventDispatcher->dispatch($event,TheliaEvents::AREA_ADD_COUNTRY);
+            $eventDispatcher->dispatch($event, TheliaEvents::AREA_ADD_COUNTRY);
 
             // Log object modification
             if (null !== $changedObject = $event->getModel()) {
@@ -315,7 +315,7 @@ class AreaController extends AbstractCrudController
 
         $removeCountryEvent = new AreaRemoveCountryEvent($area, $countryId, $stateId);
 
-        $eventDispatcher->dispatch($removeCountryEvent,TheliaEvents::AREA_REMOVE_COUNTRY);
+        $eventDispatcher->dispatch($removeCountryEvent, TheliaEvents::AREA_REMOVE_COUNTRY);
 
         if (null !== $changedObject = $removeCountryEvent->getModel()) {
             $this->adminLogAppend(

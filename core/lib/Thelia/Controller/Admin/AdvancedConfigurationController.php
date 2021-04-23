@@ -67,7 +67,7 @@ class AdvancedConfigurationController extends BaseAdminController
             $this->validateForm($form);
 
             $event = new CacheEvent(THELIA_WEB_DIR.'assets');
-            $eventDispatcher->dispatch($event,TheliaEvents::CACHE_CLEAR);
+            $eventDispatcher->dispatch($event, TheliaEvents::CACHE_CLEAR);
         } catch (\Exception $e) {
             Tlog::getInstance()->addError(sprintf('Flush assets error: %s', $e->getMessage()));
         }
@@ -91,7 +91,7 @@ class AdvancedConfigurationController extends BaseAdminController
                     'cache'.DS.'images'
                 )
             );
-            $eventDispatcher->dispatch($event,TheliaEvents::CACHE_CLEAR);
+            $eventDispatcher->dispatch($event, TheliaEvents::CACHE_CLEAR);
 
             $event = new CacheEvent(
                 THELIA_WEB_DIR.ConfigQuery::read(

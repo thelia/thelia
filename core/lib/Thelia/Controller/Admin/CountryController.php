@@ -273,7 +273,7 @@ class CountryController extends AbstractCrudController
         if (null !== $country_id = $this->getRequest()->get('country_id')) {
             $toogleDefaultEvent = new CountryToggleDefaultEvent($country_id);
             try {
-                $eventDispatcher->dispatch($toogleDefaultEvent,TheliaEvents::COUNTRY_TOGGLE_DEFAULT);
+                $eventDispatcher->dispatch($toogleDefaultEvent, TheliaEvents::COUNTRY_TOGGLE_DEFAULT);
 
                 if ($toogleDefaultEvent->hasCountry()) {
                     return $this->nullResponse();

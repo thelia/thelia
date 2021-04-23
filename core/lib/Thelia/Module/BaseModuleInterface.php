@@ -218,7 +218,7 @@ interface BaseModuleInterface
     public static function loadConfiguration(ContainerBuilder $containerBuilder);
 
     /**
-     * Allow modules to add a prefix to all their annotated routes
+     * Allow modules to add a prefix to all their annotated routes.
      */
     public static function getAnnotationRoutePrefix();
 

@@ -12,16 +12,11 @@
 
 namespace Thelia\Core\Controller;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
-use Thelia\Controller\BaseController;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 
 /**
- *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Franck Allimant <franck@cqfdev.fr>
  */
@@ -43,9 +38,8 @@ class ControllerResolver extends ContainerControllerResolver
         if ($controller instanceof AbstractController) {
             if (null === $previousContainer = $controller->setContainer($this->container)) {
                 throw new \LogicException(sprintf('"%s" has no container set, did you forget to define it as a service subscriber?', $class));
-            } else {
-                $controller->setContainer($previousContainer);
             }
+            $controller->setContainer($previousContainer);
         }
 
         return $controller;
@@ -64,7 +58,7 @@ class ControllerResolver extends ContainerControllerResolver
         $controller = parent::createController($controller);
 
         // Additional treatment for thelia legacy controllers
-        if (is_array($controller) && isset($controller[0])) {
+        if (\is_array($controller) && isset($controller[0])) {
             $controllerinstance = $controller[0];
 
             if (method_exists($controllerinstance, 'getControllerType')) {

@@ -12,9 +12,7 @@
 
 namespace Thelia\Command;
 
-use Propel\Runtime\Propel;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,12 +20,8 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Propel\Schema\SchemaLocator;
-use Thelia\Core\PropelInitService;
-use Thelia\Core\Translation\Translator;
 use Thelia\Install\CheckPermission;
 use Thelia\Install\Database;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Tools\TokenProvider;
@@ -342,18 +336,18 @@ class Install extends ContainerAwareCommand
         return $helper->ask($input, $output, $question);
     }
 
-    protected function initModernTemplatesRequirements(OutputInterface $output)
+    protected function initModernTemplatesRequirements(OutputInterface $output): void
     {
-        $output->writeln(array(
-            "",
-            "<info>Init modern template requirements</info>",
-            ""
-        ));
+        $output->writeln([
+            '',
+            '<info>Init modern template requirements</info>',
+            '',
+        ]);
         $moduleToActivates = [
-            "OpenApi",
-            "StoreSeo",
-            "SmartyRedirection",
-            "ChoiceFilter"
+            'OpenApi',
+            'StoreSeo',
+            'SmartyRedirection',
+            'ChoiceFilter',
         ];
 
         foreach ($moduleToActivates as $moduleToActivate) {
@@ -366,11 +360,11 @@ class Install extends ContainerAwareCommand
             if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
                 continue;
             }
-            $output->writeln(array(
-                "",
+            $output->writeln([
+                '',
                 "<info>Activating module $moduleToActivate</info>",
-                ""
-            ));
+                '',
+            ]);
             $event = new ModuleToggleActivationEvent($module->getId());
             $event->setRecursive(true);
 

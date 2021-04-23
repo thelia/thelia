@@ -28,12 +28,12 @@ class Configuration extends BaseForm
     {
         $form = $this->formBuilder;
 
-        $lang = $this->getRequest()->getSession()->get("thelia.admin.edition.lang");
-        if (!$lang){
+        $lang = $this->getRequest()->getSession()->get('thelia.admin.edition.lang');
+        if (!$lang) {
             $lang = LangQuery::create()->filterByByDefault(1)->findOne();
         }
 
-        $value = HookAnalytics::getConfigValue("hookanalytics_trackingcode", "", $lang->getLocale());
+        $value = HookAnalytics::getConfigValue('hookanalytics_trackingcode', '', $lang->getLocale());
         $form->add(
             'trackingcode',
             'text',

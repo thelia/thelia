@@ -47,7 +47,6 @@ class ModuleRefreshCommand extends ContainerAwareCommand
             );
         }
 
-
         $output->writeln('<info>Modules list successfully refreshed</info>');
 
         return 0;

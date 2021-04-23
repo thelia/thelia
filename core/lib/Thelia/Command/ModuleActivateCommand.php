@@ -16,7 +16,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -105,12 +104,12 @@ class ModuleActivateCommand extends BaseModuleGenerate
                     '',
                 ], 'bg=green;fg=black');
             }
-
         } catch (\Exception $e) {
             if (!$input->getOption('silent')) {
                 throw $e;
             }
         }
+
         return 0;
     }
 }

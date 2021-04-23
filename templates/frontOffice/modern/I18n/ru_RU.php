@@ -1,6 +1,16 @@
 <?php
 
-return array(
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+return [
     '%nb Item' => '%nb',
     '%nb Items' => '%nb',
     '+' => '+',
@@ -260,4 +270,4 @@ return array(
     'per page' => 'на странице',
     'update' => 'обновить',
     'with:' => 'с:',
-);
+];

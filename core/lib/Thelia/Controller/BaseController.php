@@ -124,7 +124,7 @@ abstract class BaseController implements ControllerInterface
      */
     protected function dispatch(string $eventName, Event $event = null): void
     {
-        throw new \Exception("Since Thelia 2.5 this->dispatch() function is not allowed in controllers, use autowiring instead");
+        throw new \Exception('Since Thelia 2.5 this->dispatch() function is not allowed in controllers, use autowiring instead');
     }
 
     /**
@@ -136,7 +136,7 @@ abstract class BaseController implements ControllerInterface
      */
     public function getDispatcher()
     {
-        throw new \Exception("Since Thelia 2.5 this->getDispatcher() function is not allowed in controllers, use autowiring instead");
+        throw new \Exception('Since Thelia 2.5 this->getDispatcher() function is not allowed in controllers, use autowiring instead');
     }
 
     /**
@@ -313,7 +313,7 @@ abstract class BaseController implements ControllerInterface
         try {
             $pdfEvent = new PdfEvent($html);
 
-            $eventDispatcher->dispatch($pdfEvent,TheliaEvents::GENERATE_PDF);
+            $eventDispatcher->dispatch($pdfEvent, TheliaEvents::GENERATE_PDF);
 
             if ($pdfEvent->hasPdf()) {
                 return $this->pdfResponse($pdfEvent->getPdf(), $order->getRef(), 200, $browser);
@@ -635,8 +635,6 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * Return controller type.
-     *
-     * @return string
      */
     abstract public function getControllerType(): string;
 

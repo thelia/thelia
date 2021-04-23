@@ -202,7 +202,7 @@ class CurrencyController extends AbstractCrudController
         try {
             $event = new CurrencyUpdateRateEvent();
 
-            $eventDispatcher->dispatch($event,TheliaEvents::CURRENCY_UPDATE_RATES);
+            $eventDispatcher->dispatch($event, TheliaEvents::CURRENCY_UPDATE_RATES);
 
             if ($event->hasUndefinedRates()) {
                 return $this->render('currencies', [
@@ -233,7 +233,7 @@ class CurrencyController extends AbstractCrudController
         $changeEvent->setIsDefault(true)->setVisible(1);
 
         try {
-            $eventDispatcher->dispatch($changeEvent,TheliaEvents::CURRENCY_SET_DEFAULT);
+            $eventDispatcher->dispatch($changeEvent, TheliaEvents::CURRENCY_SET_DEFAULT);
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
@@ -258,7 +258,7 @@ class CurrencyController extends AbstractCrudController
         $changeEvent->setVisible((int) $this->getRequest()->get('visible', 0));
 
         try {
-            $eventDispatcher->dispatch($changeEvent,TheliaEvents::CURRENCY_SET_VISIBLE);
+            $eventDispatcher->dispatch($changeEvent, TheliaEvents::CURRENCY_SET_VISIBLE);
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);

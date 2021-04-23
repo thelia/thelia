@@ -13,8 +13,6 @@
 namespace Thelia\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Thelia\Core\HttpKernel\Client;
-use Thelia\Core\Thelia;
 use Thelia\Model\ConfigQuery;
 
 /**

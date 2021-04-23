@@ -17,8 +17,8 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Util\PropelModelPager;
 use Psr\Container\ContainerInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\Loop\LoopExtendsArgDefinitionsEvent;
 use Thelia\Core\Event\Loop\LoopExtendsBuildArrayEvent;
@@ -123,7 +123,7 @@ abstract class BaseLoop implements BaseLoopInterface
         $this->dispatcher = $eventDispatcher;
         $this->securityContext = $securityContext;
         $this->theliaParserLoops = $theliaParserLoops;
-        $this->kernelEnvironment= $kernelEnvironment;
+        $this->kernelEnvironment = $kernelEnvironment;
 
         $this->initialize();
     }
@@ -625,7 +625,7 @@ abstract class BaseLoop implements BaseLoopInterface
 
     protected function isCaching()
     {
-        return !$this->getArg('no-cache')->getValue() && $this->kernelEnvironment !== "test";
+        return !$this->getArg('no-cache')->getValue() && $this->kernelEnvironment !== 'test';
     }
 
     /**

@@ -177,7 +177,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 
             // If we have a "lang" parameter, whe have to check if the found URL has the proper locale
             // If it's not the case, find the rewritten URL with the requested locale, and redirect to it.
-            if (null ==! $requestedLocale = $request->get('lang')) {
+            if (null == !$requestedLocale = $request->get('lang')) {
                 if (null !== $requestedLang = LangQuery::create()->filterByActive(true)->findOneByLocale($requestedLocale)) {
                     if ($requestedLang->getLocale() != $rewrittenUrlData->locale) {
                         // Save one redirection if requested locale is disabled.

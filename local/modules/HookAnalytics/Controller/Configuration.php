@@ -11,6 +11,7 @@
  */
 
 namespace HookAnalytics\Controller;
+
 use HookAnalytics\HookAnalytics;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Thelia\Controller\Admin\BaseAdminController;
@@ -37,12 +38,12 @@ class Configuration extends BaseAdminController
         ];
         $response = null;
 
-        $lang = $this->getSession()->get("thelia.admin.edition.lang");
+        $lang = $this->getSession()->get('thelia.admin.edition.lang');
         try {
             $vform = $this->validateForm($form);
             $data = $vform->getData();
 
-            HookAnalytics::setConfigValue("hookanalytics_trackingcode", $data["trackingcode"], $lang->getLocale(), true);
+            HookAnalytics::setConfigValue('hookanalytics_trackingcode', $data['trackingcode'], $lang->getLocale(), true);
         } catch (\Exception $e) {
             $resp['error'] = 1;
             $resp['message'] = $e->getMessage();

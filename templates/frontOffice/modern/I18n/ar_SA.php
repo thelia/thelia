@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 return [
     '%nb Item' => 'البند %nb',
     '%nb Items' => 'العناصر %nb',
@@ -84,7 +94,7 @@ return [
     'Need help ?' => 'تحتاج مساعدة؟',
     'Newsletter' => 'رسائل بريدية',
     'Newsletter Subscription' => 'الاشتراك في خدمة الرسائل البريدية',
-    'Next' => ' التالي',
+    'Next' => "\u{a0}التالي",
     'Next Step' => 'الخطوة التالية',
     'Next product' => 'المنتج التالي',
     'No deliveries available for this cart and this country' => 'لا توجد شحنات متاحة لهذه السلة وهذا البلد',

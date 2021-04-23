@@ -1,11 +1,21 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace WebProfiler;
 
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Thelia\Module\BaseModule;
 use WebProfiler\DataCollector\SmartyDataCollector;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 class WebProfiler extends BaseModule
 {
@@ -20,28 +30,25 @@ class WebProfiler extends BaseModule
      */
 
     /**
-     * Defines how services are loaded in your modules
-     *
-     * @param ServicesConfigurator $servicesConfigurator
+     * Defines how services are loaded in your modules.
      */
     public static function configureServices(ServicesConfigurator $servicesConfigurator): void
     {
         $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
-            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
+            ->exclude([THELIA_MODULE_DIR.ucfirst(self::getModuleCode()).'/I18n/*'])
             ->autowire(true)
             ->autoconfigure(true);
 
-
         $servicesConfigurator->set('data_collector.smarty', SmartyDataCollector::class)
             ->args([
-                service('thelia.parser')->ignoreOnInvalid()
+                service('thelia.parser')->ignoreOnInvalid(),
             ])
             ->tag(
                 'data_collector',
                 [
-                    'template' => "@WebProfilerModule/debug/dataCollector/smarty.html.twig",
+                    'template' => '@WebProfilerModule/debug/dataCollector/smarty.html.twig',
                     'id' => 'smarty',
-                    'priority' => 42
+                    'priority' => 42,
                 ]
             );
     }

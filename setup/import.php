@@ -77,7 +77,6 @@ try {
     $folders = createFolders($con);
     $contents = createContents($folders, $con);
 
-
     echo "creating templates\n";
     $template = new \Thelia\Model\Template();
     $template
@@ -210,8 +209,8 @@ function createProduct($categories, $brands, $contents, $template, $attribute, $
                 $productPrice = new \Thelia\Model\ProductPrice();
                 $productPrice->setProductSaleElements($stock);
                 $productPrice->setCurrencyId(1);
-                $productPrice->setPrice((float)$data[8]);
-                $productPrice->setPromoPrice((float)$data[9]);
+                $productPrice->setPrice((float) $data[8]);
+                $productPrice->setPromoPrice((float) $data[9]);
                 $productPrice->save($con);
 
                 $attributeAv = \Thelia\Model\AttributeAvI18nQuery::create()
@@ -441,7 +440,6 @@ function createBrands($con)
     return $brands;
 }
 
-
 function createCategories($templateId, $con)
 {
     echo "start creating categories\n";
@@ -476,15 +474,16 @@ function createCategories($templateId, $con)
 
             foreach ($images as $image) {
                 $image = trim($image);
-                if(empty($image)) continue;
+                if (empty($image)) {
+                    continue;
+                }
                 $categoryImage = new \Thelia\Model\CategoryImage();
                 $categoryImage
                     ->setCategory($category)
                     ->setFile($image)
                     ->save($con);
-                $fileSystem->copy(THELIA_SETUP_DIRECTORY . 'import/images/'.$image, THELIA_LOCAL_DIR . 'media/images/category/'.$image, true);
+                $fileSystem->copy(THELIA_SETUP_DIRECTORY.'import/images/'.$image, THELIA_LOCAL_DIR.'media/images/category/'.$image, true);
             }
-
         }
         fclose($handle);
     }

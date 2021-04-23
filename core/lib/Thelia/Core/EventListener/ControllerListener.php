@@ -38,7 +38,7 @@ class ControllerListener implements EventSubscriberInterface
     {
         $controller = $event->getController();
         //check if an admin is logged in
-        if (is_array($controller) && $controller[0] instanceof BaseAdminController) {
+        if (\is_array($controller) && $controller[0] instanceof BaseAdminController) {
             if (false === $this->securityContext->hasAdminUser() && $event->getRequest()->attributes->get('not-logged') != 1) {
                 throw new AdminAccessDenied(
                     Translator::getInstance()->trans(

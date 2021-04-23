@@ -25,7 +25,6 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Model\ProductQuery;
 use Thelia\Tools\TokenProvider;
 
 /**

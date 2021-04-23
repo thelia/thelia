@@ -66,9 +66,6 @@ class BaseAdminController extends BaseController
         return $this->pageNotFound();
     }
 
-    /**
-     * @return string
-     */
     public function getControllerType(): string
     {
         return self::CONTROLLER_TYPE;

@@ -13,10 +13,7 @@
 namespace Thelia\Model\Breadcrumb;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Loop\CategoryPath;
 use Thelia\Core\Translation\Translator;
 use Thelia\Tools\URL;
@@ -35,9 +32,9 @@ trait CatalogBreadcrumbTrait
         // Todo stop using loop in php
         $categoryPath = new CategoryPath(
             $container,
-            $container->get("request_stack"),
-            $container->get("event_dispatcher"),
-            $container->get("thelia.securityContext"),
+            $container->get('request_stack'),
+            $container->get('event_dispatcher'),
+            $container->get('thelia.securityContext'),
             Translator::getInstance(),
             $container->getParameter('Thelia.parser.loops'),
             $container->getParameter('kernel.environment')

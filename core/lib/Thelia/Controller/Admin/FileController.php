@@ -244,7 +244,6 @@ class FileController extends BaseAdminController
         $eventDispatcher->dispatch(
             $fileCreateOrUpdateEvent,
             TheliaEvents::IMAGE_SAVE
-
         );
 
         $this->adminLogAppend(

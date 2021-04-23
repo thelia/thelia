@@ -147,7 +147,7 @@ class AddressController extends BaseFrontController
             $event = $this->createAddressEvent($form);
             $event->setAddress($address);
 
-            $eventDispatcher->dispatch($event,TheliaEvents::ADDRESS_UPDATE);
+            $eventDispatcher->dispatch($event, TheliaEvents::ADDRESS_UPDATE);
 
             return $this->generateSuccessRedirect($addressUpdate);
         } catch (FormValidationException $e) {
@@ -201,7 +201,7 @@ class AddressController extends BaseFrontController
         }
 
         try {
-            $eventDispatcher->dispatch(new AddressEvent($address),TheliaEvents::ADDRESS_DELETE);
+            $eventDispatcher->dispatch(new AddressEvent($address), TheliaEvents::ADDRESS_DELETE);
         } catch (\Exception $e) {
             $error_message = $e->getMessage();
         }

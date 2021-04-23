@@ -17,7 +17,6 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Thelia\Core\Form\Type\TheliaType;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Tax;
 use Thelia\TaxEngine\TaxEngine;
@@ -80,7 +79,7 @@ class TaxCreationForm extends BaseForm
                     self::$typeList[$requirement->getName()] = $requirement->getType();
                 }
 
-                $options = array_merge(                        [
+                $options = array_merge([
                     'constraints' => [
                         new Constraints\Callback([$this, 'checkRequirementField']),
                     ],

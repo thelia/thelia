@@ -349,7 +349,7 @@ class ProfileController extends AbstractCrudController
 
             $changeEvent = $this->getUpdateResourceAccessEvent($data);
 
-            $eventDispatcher->dispatch($changeEvent,TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE);
+            $eventDispatcher->dispatch($changeEvent, TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
                 throw new \LogicException(
@@ -410,7 +410,7 @@ class ProfileController extends AbstractCrudController
 
             $changeEvent = $this->getUpdateModuleAccessEvent($data);
 
-            $eventDispatcher->dispatch($changeEvent,TheliaEvents::PROFILE_MODULE_ACCESS_UPDATE);
+            $eventDispatcher->dispatch($changeEvent, TheliaEvents::PROFILE_MODULE_ACCESS_UPDATE);
 
             if (!$this->eventContainsObject($changeEvent)) {
                 throw new \LogicException(

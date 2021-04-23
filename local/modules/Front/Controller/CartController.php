@@ -84,7 +84,7 @@ class CartController extends BaseFrontController
                 $this->getRequest()->query->get('_token')
             );
 
-            $eventDispatcher->dispatch($cartEvent,TheliaEvents::CART_UPDATEITEM);
+            $eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_UPDATEITEM);
 
             $this->afterModifyCart($eventDispatcher);
 
@@ -110,7 +110,7 @@ class CartController extends BaseFrontController
                 $this->getRequest()->query->get('_token')
             );
 
-            $eventDispatcher->dispatch($cartEvent,TheliaEvents::CART_DELETEITEM);
+            $eventDispatcher->dispatch($cartEvent, TheliaEvents::CART_DELETEITEM);
 
             $this->afterModifyCart($eventDispatcher);
         } catch (\Exception $e) {
@@ -227,13 +227,13 @@ class CartController extends BaseFrontController
                         $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
                     }
 
-                    $eventDispatcher->dispatch($orderEvent,TheliaEvents::ORDER_SET_POSTAGE);
+                    $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_POSTAGE);
                 } catch (\Exception $ex) {
                     // The postage has been chosen, but changes in the cart causes an exception.
                     // Reset the postage data in the order
                     $orderEvent->setDeliveryModule(0);
 
-                    $eventDispatcher->dispatch($orderEvent,TheliaEvents::ORDER_SET_DELIVERY_MODULE);
+                    $eventDispatcher->dispatch($orderEvent, TheliaEvents::ORDER_SET_DELIVERY_MODULE);
                 }
             }
         }

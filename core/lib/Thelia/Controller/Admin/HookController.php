@@ -141,7 +141,7 @@ class HookController extends AbstractCrudController
             foreach ($missingHooks as $hookId) {
                 $event = new HookDeactivationEvent($hookId);
 
-                $eventDispatcher->dispatch($event,TheliaEvents::HOOK_DEACTIVATION);
+                $eventDispatcher->dispatch($event, TheliaEvents::HOOK_DEACTIVATION);
 
                 if (!$event->hasHook()) {
                     $errors[] = sprintf(
@@ -438,7 +438,7 @@ class HookController extends AbstractCrudController
         if (null !== $hook_id = $this->getRequest()->get('hook_id')) {
             $toggleDefaultEvent = new HookToggleNativeEvent($hook_id);
             try {
-                $eventDispatcher->dispatch($toggleDefaultEvent,TheliaEvents::HOOK_TOGGLE_NATIVE);
+                $eventDispatcher->dispatch($toggleDefaultEvent, TheliaEvents::HOOK_TOGGLE_NATIVE);
 
                 if ($toggleDefaultEvent->hasHook()) {
                     return $this->nullResponse();

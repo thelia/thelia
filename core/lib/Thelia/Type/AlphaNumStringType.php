@@ -12,8 +12,6 @@
 
 namespace Thelia\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-
 /**
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */

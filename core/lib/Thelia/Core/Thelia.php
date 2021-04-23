@@ -91,7 +91,6 @@ class Thelia extends Kernel
         }
     }
 
-
     /**
      * Configures the container.
      *
@@ -111,12 +110,10 @@ class Thelia extends Kernel
      */
     protected function configureContainer(ContainerConfigurator $container): void
     {
-
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
-
     }
 
     public static function isInstalled()
@@ -126,7 +123,7 @@ class Thelia extends Kernel
 
     protected function checkMySQLConfigurations(ConnectionInterface $con): void
     {
-        if (!file_exists($this->getCacheDir() . DS . 'check_mysql_configurations.php')) {
+        if (!file_exists($this->getCacheDir().DS.'check_mysql_configurations.php')) {
             $sessionSqlMode = [];
             $canUpdate = false;
             $logs = [];
@@ -187,21 +184,21 @@ class Thelia extends Kernel
                 $logs[] = 'Failed to get MySQL version and sql_mode';
             }
 
-            foreach($logs as $log) {
+            foreach ($logs as $log) {
                 Tlog::getInstance()->addWarning($log);
             }
 
             (new Filesystem())->dumpFile(
-                $this->getCacheDir() . DS . 'check_mysql_configurations.php',
-                '<?php return ' . VarExporter::export([
+                $this->getCacheDir().DS.'check_mysql_configurations.php',
+                '<?php return '.VarExporter::export([
                     'modes' => array_values($sessionSqlMode),
                     'canUpdate' => $canUpdate,
-                    'logs' => $logs
-                ]) . ';'
+                    'logs' => $logs,
+                ]).';'
             );
         }
 
-        $cache = require($this->getCacheDir() . DS . 'check_mysql_configurations.php');
+        $cache = require $this->getCacheDir().DS.'check_mysql_configurations.php';
 
         if (!empty($cache['canUpdate'])) {
             if (null === $con->query("SET SESSION sql_mode='".implode(',', $cache['modes'])."';")) {
@@ -279,7 +276,7 @@ class Thelia extends Kernel
 
     public function initCacheConfigs(bool $force = false): void
     {
-        if ($force || !file_exists($this->getCacheDir() . DS . 'thelia_configs.php')) {
+        if ($force || !file_exists($this->getCacheDir().DS.'thelia_configs.php')) {
             $caches = [];
 
             $configs = ConfigQuery::create()->find();
@@ -289,13 +286,13 @@ class Thelia extends Kernel
             }
 
             (new Filesystem())->dumpFile(
-                $this->getCacheDir() . DS . 'thelia_configs.php',
-            '<?php return ' . VarExporter::export($caches) . ';'
+                $this->getCacheDir().DS.'thelia_configs.php',
+            '<?php return '.VarExporter::export($caches).';'
             );
         }
 
         ConfigQuery::initCache(
-            require $this->getCacheDir() . DS . 'thelia_configs.php'
+            require $this->getCacheDir().DS.'thelia_configs.php'
         );
     }
 
@@ -395,7 +392,6 @@ class Thelia extends Kernel
 
     public function handle(Request $request, int $type = HttpKernelInterface::MASTER_REQUEST, bool $catch = true)
     {
-
         if (!$this->booted) {
             $container = $this->container ?? $this->preBoot();
 
@@ -430,7 +426,7 @@ class Thelia extends Kernel
             FormInterface::class => 'thelia.form',
             CouponInterface::class => 'thelia.coupon.addCoupon',
             ConditionInterface::class => 'thelia.coupon.addCondition',
-            ControllerInterface::class => 'controller.service_arguments'
+            ControllerInterface::class => 'controller.service_arguments',
         ];
 
         foreach ($autoconfiguredInterfaces as $interfaceClass => $tag) {
@@ -715,10 +711,10 @@ class Thelia extends Kernel
     public function registerBundles(): iterable
     {
         $contents = [
-            Bundle\TheliaBundle::class => ['all' => true]
+            Bundle\TheliaBundle::class => ['all' => true],
         ];
 
-        if (file_exists(THELIA_ROOT .'config/bundles.php')) {
+        if (file_exists(THELIA_ROOT.'config/bundles.php')) {
             $contents = array_merge($contents, require THELIA_ROOT.'config/bundles.php');
         }
 

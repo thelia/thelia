@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace TheliaSmarty\Template;
 
@@ -30,9 +39,10 @@ class DataCollectorSmartyParser extends Smarty implements ParserInterface
         $render = $this->smartyParser->render($realTemplateName, $parameters, $compressOutput);
         $timeEnd = hrtime(true);
         $this->stopwatch->stop($realTemplateName);
-        $executionTime = round(($timeEnd - $timeStart) /1e+6);
+        $executionTime = round(($timeEnd - $timeStart) / 1e+6);
         $source = \Smarty_Template_Source::load(null, $this, $realTemplateName);
         $this->collectTemplates($realTemplateName, $parameters, $executionTime);
+
         return $render;
     }
 
@@ -49,12 +59,12 @@ class DataCollectorSmartyParser extends Smarty implements ParserInterface
         return $this->templates;
     }
 
-    private function collectTemplates(?string $templateName, ?array $parameters = [], $executionTime = 0)
+    private function collectTemplates(?string $templateName, ?array $parameters = [], $executionTime = 0): void
     {
         $this->templates[] = [
-            "name" => $templateName,
-            "parameters" => $parameters,
-            "executionTime" => $executionTime
+            'name' => $templateName,
+            'parameters' => $parameters,
+            'executionTime' => $executionTime,
         ];
     }
 
@@ -63,7 +73,7 @@ class DataCollectorSmartyParser extends Smarty implements ParserInterface
         return $this->smartyParser->getStatus();
     }
 
-    public function setStatus($status)
+    public function setStatus($status): void
     {
         $this->smartyParser->setStatus($status);
     }
@@ -73,17 +83,17 @@ class DataCollectorSmartyParser extends Smarty implements ParserInterface
         return $this->smartyParser->getRequest();
     }
 
-    public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
+    public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): void
     {
         $this->smartyParser->pushTemplateDefinition($templateDefinition, $fallbackToDefaultTemplate);
     }
 
-    public function popTemplateDefinition()
+    public function popTemplateDefinition(): void
     {
         $this->smartyParser->popTemplateDefinition();
     }
 
-    public function setTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
+    public function setTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): void
     {
         $this->smartyParser->setTemplateDefinition($templateDefinition, $fallbackToDefaultTemplate);
     }
@@ -103,7 +113,7 @@ class DataCollectorSmartyParser extends Smarty implements ParserInterface
         return $this->smartyParser->getFallbackToDefaultTemplate();
     }
 
-    public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false)
+    public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false): void
     {
         $this->smartyParser->addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift);
     }

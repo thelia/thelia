@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Tools;
 
 class AssetsManager
@@ -18,13 +28,16 @@ class AssetsManager
         }
     }
 
-    protected function __clone(){}
+    protected function __clone()
+    {
+    }
 
     public static function getInstance()
     {
         if (self::$instance === null) {
-            self::$instance = new AssetsManager();
+            self::$instance = new self();
         }
+
         return self::$instance;
     }
 
@@ -34,7 +47,8 @@ class AssetsManager
         if (isset($this->entrypoints[$entry][$type])) {
             $assets = array_diff($this->entrypoints[$entry][$type], $this->processed);
             $this->processed = array_merge($this->processed, $assets);
-        };
+        }
+
         return $assets;
     }
 }

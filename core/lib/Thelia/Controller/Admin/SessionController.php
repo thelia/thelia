@@ -111,7 +111,7 @@ class SessionController extends BaseAdminController
                 throw new \Exception($this->getTranslator()->trans('Sorry, no email defined for this administrator.'));
             }
 
-            $eventDispatcher->dispatch(new AdministratorEvent($admin),TheliaEvents::ADMINISTRATOR_CREATEPASSWORD);
+            $eventDispatcher->dispatch(new AdministratorEvent($admin), TheliaEvents::ADMINISTRATOR_CREATEPASSWORD);
 
             // Redirect to the success URL
             return $this->generateSuccessRedirect($adminLostPasswordForm);
@@ -180,7 +180,7 @@ class SessionController extends BaseAdminController
             $event = new AdministratorUpdatePasswordEvent($admin);
             $event->setPassword($data['password']);
 
-            $eventDispatcher->dispatch($event,TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD);
+            $eventDispatcher->dispatch($event, TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD);
 
             $this->getSession()->set(self::ADMIN_TOKEN_SESSION_VAR_NAME, null);
 
@@ -211,7 +211,7 @@ class SessionController extends BaseAdminController
 
     public function checkLogoutAction(EventDispatcherInterface $eventDispatcher)
     {
-        $eventDispatcher->dispatch((new DefaultActionEvent()),TheliaEvents::ADMIN_LOGOUT);
+        $eventDispatcher->dispatch((new DefaultActionEvent()), TheliaEvents::ADMIN_LOGOUT);
 
         $this->getSecurityContext()->clearAdminUser();
 

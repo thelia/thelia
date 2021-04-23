@@ -76,7 +76,7 @@ class ModuleHookController extends AbstractCrudController
         $event = new ModuleHookToggleActivationEvent($this->getExistingObject());
 
         try {
-            $eventDispatcher->dispatch($event,TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION);
+            $eventDispatcher->dispatch($event, TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION);
         } catch (\Exception $ex) {
             $message = $ex->getMessage();
         }

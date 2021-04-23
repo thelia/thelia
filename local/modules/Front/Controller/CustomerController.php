@@ -86,7 +86,7 @@ class CustomerController extends BaseFrontController
 
                 $event = new LostPasswordEvent($form->get('email')->getData());
 
-                $eventDispatcher->dispatch($event,TheliaEvents::LOST_PASSWORD);
+                $eventDispatcher->dispatch($event, TheliaEvents::LOST_PASSWORD);
 
                 return $this->generateSuccessRedirect($passwordLost);
             } catch (FormValidationException $e) {
@@ -156,7 +156,7 @@ class CustomerController extends BaseFrontController
 
                 $customerCreateEvent = $this->createEventInstance($form->getData());
 
-                $eventDispatcher->dispatch($customerCreateEvent,TheliaEvents::CUSTOMER_CREATEACCOUNT);
+                $eventDispatcher->dispatch($customerCreateEvent, TheliaEvents::CUSTOMER_CREATEACCOUNT);
 
                 $newCustomer = $customerCreateEvent->getCustomer();
 
@@ -173,9 +173,9 @@ class CustomerController extends BaseFrontController
                     // Security : Check if this new Email address already exist
                     if (null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterEmail)) {
                         $nlEvent->setId($newsletter->getId());
-                        $eventDispatcher->dispatch($nlEvent,TheliaEvents::NEWSLETTER_UPDATE);
+                        $eventDispatcher->dispatch($nlEvent, TheliaEvents::NEWSLETTER_UPDATE);
                     } else {
-                        $eventDispatcher->dispatch($nlEvent,TheliaEvents::NEWSLETTER_SUBSCRIBE);
+                        $eventDispatcher->dispatch($nlEvent, TheliaEvents::NEWSLETTER_SUBSCRIBE);
                     }
                 }
 
@@ -273,7 +273,7 @@ class CustomerController extends BaseFrontController
 
                 $customerChangeEvent = $this->createEventInstance($form->getData());
                 $customerChangeEvent->setCustomer($customer);
-                $eventDispatcher->dispatch($customerChangeEvent,TheliaEvents::CUSTOMER_UPDATEPROFILE);
+                $eventDispatcher->dispatch($customerChangeEvent, TheliaEvents::CUSTOMER_UPDATEPROFILE);
 
                 return $this->generateSuccessRedirect($customerPasswordUpdateForm);
             } catch (FormValidationException $e) {
@@ -334,7 +334,7 @@ class CustomerController extends BaseFrontController
                     ((int) (ConfigQuery::read('customer_change_email', 0))) ? true : false
                 );
 
-                $eventDispatcher->dispatch($customerChangeEvent,TheliaEvents::CUSTOMER_UPDATEPROFILE);
+                $eventDispatcher->dispatch($customerChangeEvent, TheliaEvents::CUSTOMER_UPDATEPROFILE);
 
                 $updatedCustomer = $customerChangeEvent->getCustomer();
 
@@ -349,9 +349,9 @@ class CustomerController extends BaseFrontController
 
                     if (null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterOldEmail)) {
                         $nlEvent->setId($newsletter->getId());
-                        $eventDispatcher->dispatch($nlEvent,TheliaEvents::NEWSLETTER_UPDATE);
+                        $eventDispatcher->dispatch($nlEvent, TheliaEvents::NEWSLETTER_UPDATE);
                     } else {
-                        $eventDispatcher->dispatch($nlEvent,TheliaEvents::NEWSLETTER_SUBSCRIBE);
+                        $eventDispatcher->dispatch($nlEvent, TheliaEvents::NEWSLETTER_SUBSCRIBE);
                     }
                 } else {
                     if (null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterOldEmail)) {
@@ -360,7 +360,7 @@ class CustomerController extends BaseFrontController
                             $this->getRequest()->getSession()->getLang()->getLocale()
                         );
                         $nlEvent->setId($newsletter->getId());
-                        $eventDispatcher->dispatch($nlEvent,TheliaEvents::NEWSLETTER_UNSUBSCRIBE);
+                        $eventDispatcher->dispatch($nlEvent, TheliaEvents::NEWSLETTER_UNSUBSCRIBE);
                     }
                 }
 
@@ -551,7 +551,7 @@ class CustomerController extends BaseFrontController
      */
     protected function processLogin(EventDispatcherInterface $eventDispatcher, Customer $customer): void
     {
-        $eventDispatcher->dispatch(new CustomerLoginEvent($customer),TheliaEvents::CUSTOMER_LOGIN);
+        $eventDispatcher->dispatch(new CustomerLoginEvent($customer), TheliaEvents::CUSTOMER_LOGIN);
     }
 
     /**

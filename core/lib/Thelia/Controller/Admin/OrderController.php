@@ -129,7 +129,7 @@ class OrderController extends BaseAdminController
             $event = new OrderEvent($order);
             $event->setDeliveryRef($deliveryRef);
 
-            $eventDispatcher->dispatch($event,TheliaEvents::ORDER_UPDATE_DELIVERY_REF);
+            $eventDispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_DELIVERY_REF);
         } catch (\Exception $e) {
             $message = $e->getMessage();
         }

@@ -1,8 +1,17 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace WebProfiler\DataCollector;
 
-use Symfony\Bundle\FrameworkBundle\DataCollector\AbstractDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -17,7 +26,7 @@ class SmartyDataCollector extends DataCollector
         $this->smartyParser = $smartyParser;
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
         $this->data['templates'] = $this->smartyParser->getCollectedTemplates();
     }
@@ -29,21 +38,21 @@ class SmartyDataCollector extends DataCollector
 
     public function getTemplateCount()
     {
-        return count($this->data['templates']);
+        return \count($this->data['templates']);
     }
 
     public function getTotalExecutionTime()
     {
-        return array_reduce($this->data['templates'], function ($carry, $template){ return $carry + $template['executionTime'];}, 0);
+        return array_reduce($this->data['templates'], function ($carry, $template) { return $carry + $template['executionTime']; }, 0);
     }
 
     public function getName()
     {
-       return "smarty";
+        return 'smarty';
     }
 
-    public function reset()
+    public function reset(): void
     {
-       $this->data['templates'] = [];
+        $this->data['templates'] = [];
     }
 }

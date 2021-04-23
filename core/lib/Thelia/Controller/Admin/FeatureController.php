@@ -105,7 +105,7 @@ class FeatureController extends AbstractCrudController
                 $event->setTitle($value);
                 $event->setLocale($this->getCurrentEditionLocale());
 
-                $eventDispatcher->dispatch($event,TheliaEvents::FEATURE_AV_UPDATE);
+                $eventDispatcher->dispatch($event, TheliaEvents::FEATURE_AV_UPDATE);
             }
         }
 

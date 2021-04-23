@@ -1,6 +1,16 @@
 <?php
 
-return array(
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+return [
     '%siteName does not use marketing cookies to display advertisements from %siteName or third parties on other sites. If %siteName ever uses cookies, they may be saved by us or third parties for retargeting campaigns.' => ' %siteName n\'utilise pas de cookies Marketing pour afficher des publicités de %siteName ou de tiers sur d’autres sites. Si %siteName en utilise un jour, ils pourront être enregistrés par nous ou par des tiers pour des campagnes de reciblage.',
     '+' => '+',
     '404' => '404',
@@ -82,7 +92,7 @@ return array(
     'Finalize order' => 'Commander',
     'First name' => 'Prénom',
     'Forgot password' => 'Mot de passe oublié ',
-    'Forgot your Password?' => 'Mot de passe oublié ?',
+    'Forgot your Password?' => "Mot de passe oublié\u{a0}?",
     'Free shipping' => 'Livraison gratuite',
     'GDRP' => 'RGPD',
     'Go back to the previous page' => 'Retour à la page précédente',
@@ -232,4 +242,4 @@ return array(
     'missing or invalid data' => 'Information erronée ou incomplète',
     'my main address' => 'mon adresse principal',
     'tools' => 'outils',
-);
+];

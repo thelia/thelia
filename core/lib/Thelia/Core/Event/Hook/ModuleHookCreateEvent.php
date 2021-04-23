@@ -77,7 +77,7 @@ class ModuleHookCreateEvent extends ModuleHookEvent
     /**
      * @return $this
      */
-    public function setClassname(string $classname = "")
+    public function setClassname(string $classname = '')
     {
         $this->classname = $classname;
 
