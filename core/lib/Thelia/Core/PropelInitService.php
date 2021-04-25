@@ -76,6 +76,9 @@ class PropelInitService
      */
     protected $schemaLocator;
 
+    /** @var string */
+    protected $cacheDir;
+
     /**
      * @param string        $environment   application environment
      * @param bool          $debug         whether the application is in debug mode
@@ -85,6 +88,7 @@ class PropelInitService
     public function __construct(
         $environment,
         $debug,
+        $cacheDir,
         array $envParameters,
         SchemaLocator $schemaLocator
     ) {
@@ -92,6 +96,7 @@ class PropelInitService
         $this->debug = $debug;
         $this->envParameters = $envParameters;
         $this->schemaLocator = $schemaLocator;
+        $this->cacheDir = $cacheDir;
     }
 
     /**
@@ -114,7 +119,7 @@ class PropelInitService
      */
     public function getPropelCacheDir()
     {
-        return THELIA_CACHE_DIR.$this->environment.DS.'propel'.DS;
+        return $this->cacheDir.DS.'propel'.DS;
     }
 
     /**
@@ -236,7 +241,7 @@ class PropelInitService
             'resolver' => '\Thelia\Core\Propel\Generator\Builder\ResolverBuilder',
         ];
 
-        $configOptions['propel']['paths']['migrationDir'] = $this->getPropelConfigDir();
+        // $configOptions['propel']['paths']['migrationDir'] = $this->getPropelConfigDir();
 
         $propelConfigCache->write(
             Yaml::dump($propelConfig),
@@ -440,7 +445,7 @@ class PropelInitService
             }
         } catch (\Throwable $th) {
             $fs = new Filesystem();
-            $fs->remove(THELIA_CACHE_DIR.$this->environment);
+            $fs->remove($this->cacheDir);
             $fs->remove($this->getPropelModelDir());
             throw $th;
         } finally {

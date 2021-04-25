@@ -13,6 +13,7 @@
 namespace Thelia\Module\Validator;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Bundle\TheliaBundle;
 use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\FileNotFoundException;
@@ -270,7 +271,7 @@ class ModuleValidator
     protected function checkVersion(): void
     {
         if ($this->moduleDefinition->getTheliaVersion()) {
-            if (!Version::test(Thelia::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion(), false, '>=')) {
+            if (!Version::test(TheliaBundle::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion(), false, '>=')) {
                 throw new ModuleException(
                     $this->trans(
                         'The module %name requires Thelia %version or newer',

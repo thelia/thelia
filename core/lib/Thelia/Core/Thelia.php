@@ -21,9 +21,6 @@ namespace Thelia\Core;
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 
-use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Runtime\DataFetcher\PDODataFetcher;
-use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -33,23 +30,16 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\ErrorHandler\Debug;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
-use Symfony\Component\VarExporter\VarExporter;
-use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Template\Element\BaseLoopInterface;
 use Thelia\Core\Template\TemplateDefinition;
@@ -58,38 +48,13 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Form\FormInterface;
 use Thelia\Log\Tlog;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
-use Thelia\Module\ModuleManagement;
 use TheliaSmarty\Template\SmartyParser;
 
 class Thelia extends Kernel
 {
     use MicroKernelTrait;
-
-    public const THELIA_VERSION = '2.5.0';
-
-    /** @var SchemaLocator */
-    protected $propelSchemaLocator;
-
-    /** @var PropelInitService */
-    protected $propelInitService;
-
-    protected $propelConnectionAvailable;
-
-    protected $theliaDatabaseConnection;
-
-    protected $cacheRefresh;
-
-    public function __construct($environment, $debug)
-    {
-        parent::__construct($environment, $debug);
-
-        if ($debug) {
-            Debug::enable();
-        }
-    }
 
     /**
      * Configures the container.
@@ -114,201 +79,6 @@ class Thelia extends Kernel
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
-    }
-
-    public static function isInstalled()
-    {
-        return file_exists(THELIA_CONF_DIR.'database.yml');
-    }
-
-    protected function checkMySQLConfigurations(ConnectionInterface $con): void
-    {
-        if (!file_exists($this->getCacheDir().DS.'check_mysql_configurations.php')) {
-            $sessionSqlMode = [];
-            $canUpdate = false;
-            $logs = [];
-            /** @var PDODataFetcher $result */
-            $result = $con->query('SELECT VERSION() as version, @@SESSION.sql_mode as session_sql_mode');
-
-            if ($result && $data = $result->fetch(\PDO::FETCH_ASSOC)) {
-                $sessionSqlMode = explode(',', $data['session_sql_mode']);
-                if (empty($sessionSqlMode[0])) {
-                    unset($sessionSqlMode[0]);
-                }
-
-                // MariaDB is not impacted by this problem
-                if (false === strpos($data['version'], 'MariaDB')) {
-                    // MySQL 5.6+ compatibility
-                    if (version_compare($data['version'], '5.6.0', '>=')) {
-                        // add NO_ENGINE_SUBSTITUTION
-                        if (!\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
-                            $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
-                            $canUpdate = true;
-                            $logs[] = 'Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.';
-                        }
-
-                        // remove STRICT_TRANS_TABLES
-                        if (($key = array_search('STRICT_TRANS_TABLES', $sessionSqlMode)) !== false) {
-                            unset($sessionSqlMode[$key]);
-                            $canUpdate = true;
-                            $logs[] = 'Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.';
-                        }
-
-                        // remove ONLY_FULL_GROUP_BY
-                        if (($key = array_search('ONLY_FULL_GROUP_BY', $sessionSqlMode)) !== false) {
-                            unset($sessionSqlMode[$key]);
-                            $canUpdate = true;
-                            $logs[] = 'Remove sql_mode ONLY_FULL_GROUP_BY. Please configure your MySQL server.';
-                        }
-                    }
-                } else {
-                    // MariaDB 10.2.4+ compatibility
-                    if (version_compare($data['version'], '10.2.4', '>=')) {
-                        // remove STRICT_TRANS_TABLES
-                        if (($key = array_search('STRICT_TRANS_TABLES', $sessionSqlMode)) !== false) {
-                            unset($sessionSqlMode[$key]);
-                            $canUpdate = true;
-                            $logs[] = 'Remove sql_mode STRICT_TRANS_TABLES. Please configure your MySQL server.';
-                        }
-                    }
-
-                    if (version_compare($data['version'], '10.1.7', '>=')) {
-                        if (!\in_array('NO_ENGINE_SUBSTITUTION', $sessionSqlMode)) {
-                            $sessionSqlMode[] = 'NO_ENGINE_SUBSTITUTION';
-                            $canUpdate = true;
-                            $logs[] = 'Add sql_mode NO_ENGINE_SUBSTITUTION. Please configure your MySQL server.';
-                        }
-                    }
-                }
-            } else {
-                $logs[] = 'Failed to get MySQL version and sql_mode';
-            }
-
-            foreach ($logs as $log) {
-                Tlog::getInstance()->addWarning($log);
-            }
-
-            (new Filesystem())->dumpFile(
-                $this->getCacheDir().DS.'check_mysql_configurations.php',
-                '<?php return '.VarExporter::export([
-                    'modes' => array_values($sessionSqlMode),
-                    'canUpdate' => $canUpdate,
-                    'logs' => $logs,
-                ]).';'
-            );
-        }
-
-        $cache = require $this->getCacheDir().DS.'check_mysql_configurations.php';
-
-        if (!empty($cache['canUpdate'])) {
-            if (null === $con->query("SET SESSION sql_mode='".implode(',', $cache['modes'])."';")) {
-                throw new \RuntimeException('Failed to set MySQL global and session sql_mode');
-            }
-        }
-    }
-
-    /**
-     * Gets the container's base class.
-     *
-     * All names except Container must be fully qualified.
-     *
-     * @return string
-     */
-    protected function getContainerBaseClass()
-    {
-        return '\Thelia\Core\DependencyInjection\TheliaContainer';
-    }
-
-    protected function initializeContainer(): void
-    {
-        // initialize Propel, building its cache if necessary
-        $this->propelSchemaLocator = new SchemaLocator(
-            THELIA_CONF_DIR,
-            THELIA_MODULE_DIR
-        );
-
-        $this->propelInitService = new PropelInitService(
-            $this->getEnvironment(),
-            $this->isDebug(),
-            $this->getKernelParameters(),
-            $this->propelSchemaLocator
-        );
-
-        $this->propelConnectionAvailable = $this->initializePropelService(false, $this->cacheRefresh);
-
-        if ($this->propelConnectionAvailable) {
-            $this->theliaDatabaseConnection = Propel::getConnection('TheliaMain');
-            $this->checkMySQLConfigurations($this->theliaDatabaseConnection);
-        }
-
-        $this->initCacheConfigs();
-
-        parent::initializeContainer();
-
-        $this->getContainer()->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
-        $this->getContainer()->set('thelia.propel.init', $this->propelInitService);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws \Exception
-     */
-    public function boot(): void
-    {
-        parent::boot();
-
-        if ($this->cacheRefresh) {
-            $moduleManagement = new ModuleManagement($this->getContainer());
-            $moduleManagement->updateModules($this->getContainer());
-        }
-
-        $eventDispatcher = new EventDispatcher();
-
-        if ($this->propelConnectionAvailable) {
-            $this->theliaDatabaseConnection->setEventDispatcher($eventDispatcher);
-        }
-
-        if (self::isInstalled()) {
-            $eventDispatcher->dispatch((new Event()), TheliaEvents::BOOT);
-        }
-    }
-
-    public function initCacheConfigs(bool $force = false): void
-    {
-        if ($force || !file_exists($this->getCacheDir().DS.'thelia_configs.php')) {
-            $caches = [];
-
-            $configs = ConfigQuery::create()->find();
-
-            foreach ($configs as $config) {
-                $caches[$config->getName()] = $config->getValue();
-            }
-
-            (new Filesystem())->dumpFile(
-                $this->getCacheDir().DS.'thelia_configs.php',
-            '<?php return '.VarExporter::export($caches).';'
-            );
-        }
-
-        ConfigQuery::initCache(
-            require $this->getCacheDir().DS.'thelia_configs.php'
-        );
-    }
-
-    /**
-     * @param $forcePropelCacheGeneration
-     * @param $cacheRefresh
-     *
-     * @return bool
-     *
-     * @throws \Throwable
-     */
-    public function initializePropelService($forcePropelCacheGeneration, &$cacheRefresh)
-    {
-        $cacheRefresh = false;
-
-        return $this->propelInitService->init($forcePropelCacheGeneration, $cacheRefresh);
     }
 
     /**

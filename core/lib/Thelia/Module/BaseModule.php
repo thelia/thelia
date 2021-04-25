@@ -25,8 +25,8 @@ use Thelia\Core\Event\Hook\HookCreateAllEvent;
 use Thelia\Core\Event\Hook\HookUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\PropelInitService;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\ModuleException;
 use Thelia\Log\Tlog;
@@ -93,10 +93,11 @@ class BaseModule implements BaseModuleInterface
             // Refresh propel cache to be sure that module's model is created
             // when the module's initialization methods will be called.
 
-            /** @var Thelia $theliaKernel */
-            $theliaKernel = $this->container->get('kernel');
+            /** @var PropelInitService $propelInitService */
+            $propelInitService = $this->container->get('thelia.propel.init');
 
-            $theliaKernel->initializePropelService(true, $cacheRefresh);
+            $cacheRefresh = true;
+            $propelInitService->init(true, $cacheRefresh);
 
             $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
             $con->beginTransaction();

@@ -30,8 +30,10 @@ return function (ContainerConfigurator $configurator): void {
     $serviceConfigurator->load('Thelia\\', THELIA_LIB)
         ->exclude(
             [
-                THELIA_LIB.'/Command/Skeleton/Module/I18n/*.php',
-                THELIA_LIB.'/Config/**/*.php',
+                THELIA_LIB.'Command/Skeleton/Module/I18n/*.php',
+                THELIA_LIB.'Model/',
+                THELIA_LIB.'Log/',
+                THELIA_LIB.'Config/**/*.php',
             ]
         )->autowire()
         ->autoconfigure();
