@@ -12,8 +12,6 @@
 
 namespace Thelia\Exception;
 
-use Thelia\Log\Tlog;
-
 /**
  * Thrown when the Facade is not set.
  *
@@ -21,13 +19,4 @@ use Thelia\Log\Tlog;
  */
 class MissingFacadeException extends \RuntimeException
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct($message, $code = null, $previous = null)
-    {
-        Tlog::getInstance()->addError($message);
-
-        parent::__construct($message, $code, $previous);
-    }
 }

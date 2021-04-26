@@ -24,7 +24,6 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (@max, 'admin.configuration.store', NOW(), NOW()),
 (@max+1, 'admin.configuration.variable', NOW(), NOW()),
 (@max+2, 'admin.configuration.admin-logs', NOW(), NOW()),
-(@max+3, 'admin.configuration.system-logs', NOW(), NOW()),
 (@max+4, 'admin.configuration.advanced', NOW(), NOW()),
 (@max+5, 'admin.configuration.translations', NOW(), NOW()),
 (@max+6, 'admin.tools', NOW(), NOW()),

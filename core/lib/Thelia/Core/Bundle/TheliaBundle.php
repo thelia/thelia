@@ -15,6 +15,7 @@ namespace Thelia\Core\Bundle;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\DataFetcher\PDODataFetcher;
 use Propel\Runtime\Propel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -61,7 +62,6 @@ use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Form\FormInterface;
-use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
@@ -104,6 +104,17 @@ class TheliaBundle extends Bundle
 
         $this->initializeContainer($this->container);
 
+        if ($this->container->getParameter('kernel.debug') && $this->container->has(LoggerInterface::class)) {
+            // In debug mode, we have to initialize Tlog at this point, as this class uses Propel
+            /** @var LoggerInterface $logger */
+            $logger = $this->container->get(LoggerInterface::class);
+            Propel::getServiceContainer()->setLogger('defaultLogger', $logger);
+        }
+
+        if ($this->propelConnectionAvailable) {
+            $this->checkMySQLConfigurations($this->theliaDatabaseConnection);
+        }
+
         if (self::isInstalled()) {
             $eventDispatcher->dispatch((new Event()), TheliaEvents::BOOT);
         }
@@ -129,7 +140,6 @@ class TheliaBundle extends Bundle
 
         if ($this->propelConnectionAvailable) {
             $this->theliaDatabaseConnection = Propel::getConnection('TheliaMain');
-            $this->checkMySQLConfigurations($this->theliaDatabaseConnection);
         }
 
         (new ConfigCacheService(
@@ -204,7 +214,7 @@ class TheliaBundle extends Bundle
             }
 
             foreach ($logs as $log) {
-                Tlog::getInstance()->addWarning($log);
+                //$logger->warning($log);
             }
 
             (new Filesystem())->dumpFile(
@@ -312,53 +322,46 @@ class TheliaBundle extends Bundle
 
             /** @var Module $module */
             foreach ($modules as $module) {
-                try {
-                    //In case modules want add configuration
-                    \call_user_func([$module->getFullNamespace(), 'loadConfiguration'], $container);
+                //In case modules want add configuration
+                \call_user_func([$module->getFullNamespace(), 'loadConfiguration'], $container);
 
-                    $definition = new Definition();
-                    $definition->setClass($module->getFullNamespace());
-                    $definition->addMethodCall('setContainer', [new Reference('service_container')]);
-                    $definition->setPublic(true);
+                $definition = new Definition();
+                $definition->setClass($module->getFullNamespace());
+                $definition->addMethodCall('setContainer', [new Reference('service_container')]);
+                $definition->setPublic(true);
 
-                    $container->setDefinition(
-                        'module.'.$module->getCode(),
-                        $definition
-                    );
+                $container->setDefinition(
+                    'module.'.$module->getCode(),
+                    $definition
+                );
 
-                    $compilers = \call_user_func([$module->getFullNamespace(), 'getCompilers']);
+                $compilers = \call_user_func([$module->getFullNamespace(), 'getCompilers']);
 
-                    foreach ($compilers as $compiler) {
-                        if (\is_array($compiler)) {
-                            $container->addCompilerPass($compiler[0], $compiler[1]);
-                        } else {
-                            $container->addCompilerPass($compiler);
-                        }
+                foreach ($compilers as $compiler) {
+                    if (\is_array($compiler)) {
+                        $container->addCompilerPass($compiler[0], $compiler[1]);
+                    } else {
+                        $container->addCompilerPass($compiler);
                     }
+                }
 
-                    $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
-                    $loader->load('config.xml', 'module.'.$module->getCode());
+                $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
+                $loader->load('config.xml', 'module.'.$module->getCode());
 
-                    $envConfigFileName = sprintf('config_%s.xml', $container->getParameter('kernel.debug'));
-                    $envConfigFile = sprintf('%s%s%s', $module->getAbsoluteConfigPath(), DS, $envConfigFileName);
+                $envConfigFileName = sprintf('config_%s.xml', $container->getParameter('kernel.debug'));
+                $envConfigFile = sprintf('%s%s%s', $module->getAbsoluteConfigPath(), DS, $envConfigFileName);
 
-                    if (is_file($envConfigFile) && is_readable($envConfigFile)) {
-                        $loader->load($envConfigFileName, 'module.'.$module->getCode());
-                    }
+                if (is_file($envConfigFile) && is_readable($envConfigFile)) {
+                    $loader->load($envConfigFileName, 'module.'.$module->getCode());
+                }
 
-                    $templateBasePath = $module->getAbsoluteTemplateBasePath();
-                    if (is_dir($templateBasePath)) {
-                        $container->loadFromExtension('twig', [
-                            'paths' => [
-                                $templateBasePath => $module->getCode().'Module',
-                            ],
-                        ]);
-                    }
-                } catch (\Exception $e) {
-                    Tlog::getInstance()->addError(
-                        sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
-                        $e
-                    );
+                $templateBasePath = $module->getAbsoluteTemplateBasePath();
+                if (is_dir($templateBasePath)) {
+                    $container->loadFromExtension('twig', [
+                        'paths' => [
+                            $templateBasePath => $module->getCode().'Module',
+                        ],
+                    ]);
                 }
             }
 
@@ -369,16 +372,9 @@ class TheliaBundle extends Bundle
 
             /** @var Module $module */
             foreach ($modules as $module) {
-                try {
-                    $this->loadModuleTranslationDirectories($module, $translationDirs, $templateHelper);
+                $this->loadModuleTranslationDirectories($module, $translationDirs, $templateHelper);
 
-                    $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
-                } catch (\Exception $e) {
-                    Tlog::getInstance()->addError(
-                        sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
-                        $e
-                    );
-                }
+                $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
             }
 
             // Load core translation
@@ -493,7 +489,6 @@ class TheliaBundle extends Bundle
                 }
             } catch (\InvalidArgumentException $ex) {
                 // Ignore missing I18n directories
-                Tlog::getInstance()->addWarning("loadTranslation: missing $dir directory");
             }
         }
     }

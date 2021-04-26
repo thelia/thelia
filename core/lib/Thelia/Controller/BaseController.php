@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -35,7 +36,6 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\OrderQuery;
 use Thelia\Tools\URL;
@@ -54,6 +54,11 @@ abstract class BaseController implements ControllerInterface
 
     public const EMPTY_FORM_NAME = 'thelia.empty';
 
+    /**
+     * @var LoggerInterface
+     */
+    public $logger;
+
     protected $tokenProvider;
 
     protected $currentRouter;
@@ -66,6 +71,14 @@ abstract class BaseController implements ControllerInterface
 
     /** @var bool Fallback on default template when setting the templateDefinition */
     protected $useFallbackTemplate = true;
+
+    /**
+     * @required
+     */
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+    }
 
     /**
      * Return an empty response (after an ajax request, for example).
@@ -319,13 +332,11 @@ abstract class BaseController implements ControllerInterface
                 return $this->pdfResponse($pdfEvent->getPdf(), $order->getRef(), 200, $browser);
             }
         } catch (\Exception $e) {
-            Tlog::getInstance()->error(
-                sprintf(
-                    'error during generating invoice pdf for order id : %d with message "%s"',
-                    $order_id,
-                    $e->getMessage()
-                )
-            );
+            $this->logger->error(sprintf(
+                'error during generating invoice pdf for order id : %d with message "%s"',
+                $order_id,
+                $e->getMessage()
+            ));
         }
 
         throw new TheliaProcessException(

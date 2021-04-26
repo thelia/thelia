@@ -64,7 +64,6 @@
                 <parameter key="SHIPPING_ZONE">admin.configuration.shipping-zone</parameter>
                 <parameter key="TAX">admin.configuration.tax</parameter>
                 <parameter key="TEMPLATE">admin.configuration.template</parameter>
-                <parameter key="SYSTEM_LOG">admin.configuration.system-logs</parameter>
                 <parameter key="ADMIN_LOG">admin.configuration.admin-logs</parameter>
                 <parameter key="STORE">admin.configuration.store</parameter>
                 <parameter key="TRANSLATIONS">admin.configuration.translations</parameter>
@@ -82,9 +81,6 @@
 
         <parameter key="thelia.token_id">thelia.token_provider</parameter>
         <parameter key="thelia.validator.translation_domain">validators</parameter>
-
-        <!-- Thelia logger class -->
-        <parameter key="thelia.logger.class">Thelia\Log\Tlog</parameter>
 
         <!-- Thelia Cache Config -->
         <parameter key="thelia.cache.namespace">thelia_cache</parameter>
@@ -111,6 +107,7 @@
         <service id="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
             <tag name="thelia.asset.filter" key="less" />
             <tag name="kernel.event_subscriber"/>
+            <argument type="service" id="Psr\Log\LoggerInterface"/>
             <argument>%kernel.environment%</argument>
         </service>
         <service id="less.assetic.filter" alias="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter"/>
@@ -286,9 +283,6 @@
         <service id="currency.converter.ecbProvider" class="Thelia\CurrencyConverter\Provider\ECBProvider">
             <tag name="currency.converter.provider" priority="0" />
         </service>
-
-        <!-- Thelia logger -->
-        <service factory="%thelia.logger.class%::getInstance" id="thelia.logger" class="%thelia.logger.class%" />
 
         <!-- The AdminRessources manager -->
         <service id="thelia.admin.resources" class="Thelia\Core\Security\Resource\AdminResources" public="true">

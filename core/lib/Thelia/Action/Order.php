@@ -13,6 +13,7 @@
 namespace Thelia\Action;
 
 use Propel\Runtime\Propel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -27,7 +28,6 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Exception\TheliaProcessException;
-use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart as CartModel;
@@ -67,12 +67,17 @@ class Order extends BaseAction implements EventSubscriberInterface
 
     /** @var SecurityContext */
     protected $securityContext;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    public function __construct(RequestStack $requestStack, MailerFactory $mailer, SecurityContext $securityContext)
+    public function __construct(LoggerInterface $logger, RequestStack $requestStack, MailerFactory $mailer, SecurityContext $securityContext)
     {
         $this->requestStack = $requestStack;
         $this->mailer = $mailer;
         $this->securityContext = $securityContext;
+        $this->logger = $logger;
     }
 
     public function setDeliveryAddress(OrderEvent $event): void
@@ -560,16 +565,14 @@ class Order extends BaseAction implements EventSubscriberInterface
                 $event->setOperation($event::DECREASE_STOCK);
             }
 
-            Tlog::getInstance()->addInfo(
-                'Checking stock operation for status change of order : '.$order->getRef()
+            $this->logger->info('Checking stock operation for status change of order : '.$order->getRef()
                 .', version: '.$order->getVersion()
                 .', manageStockOnCreation: '.($manageStockOnCreation ? 0 : 1)
                 .', paid:'.($order->isPaid(false) ? 1 : 0)
                 .', is not paid:'.($order->isNotPaid(false) ? 1 : 0)
                 .', new status paid:'.($newStatus->isPaid(false) ? 1 : 0)
                 .', new status is not paid:'.($newStatus->isNotPaid(false) ? 1 : 0)
-                .' = operation: '.$event->getOperation()
-            );
+                .' = operation: '.$event->getOperation());
         }
     }
 
@@ -614,7 +617,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                                 $offset = -$orderProduct->getQuantity();
                             }
 
-                            Tlog::getInstance()->addError('Product stock: '.$productSaleElements->getQuantity().' -> '.($productSaleElements->getQuantity() + $offset));
+                            $this->logger->error('Product stock: '.$productSaleElements->getQuantity().' -> '.($productSaleElements->getQuantity() + $offset));
 
                             $productSaleElements
                                 ->setQuantity($productSaleElements->getQuantity() + $offset)

@@ -13,7 +13,6 @@
 namespace Thelia\Exception;
 
 use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
 
 /**
  * Thrown when a Coupon with no usage lect (etiher overall or per customer usage) is tried.
@@ -30,8 +29,6 @@ class CouponNoUsageLeftException extends \Exception
     public function __construct($couponCode)
     {
         $message = Translator::getInstance()->trans('Maximum usage count reached for coupon %code', ['%code' => $couponCode]);
-
-        Tlog::getInstance()->addWarning($message);
 
         parent::__construct($message);
     }

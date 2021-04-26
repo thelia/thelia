@@ -12,12 +12,12 @@
 
 namespace Thelia\Mailer;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\MailTransporterEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
@@ -42,8 +42,12 @@ class MailerFactory
 
     /** @var ParserInterface */
     protected $parser;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    public function __construct(EventDispatcherInterface $dispatcher, ParserInterface $parser)
+    public function __construct(EventDispatcherInterface $dispatcher, ParserInterface $parser, LoggerInterface $logger)
     {
         $this->dispatcher = $dispatcher;
         $this->parser = $parser;
@@ -62,6 +66,7 @@ class MailerFactory
         }
 
         $this->swiftMailer = new \Swift_Mailer($transporter);
+        $this->logger = $logger;
     }
 
     private function configureSmtp()
@@ -195,29 +200,22 @@ class MailerFactory
                     $sentCount = $this->send($instance, $failedRecipients);
 
                     if ($sentCount == 0) {
-                        Tlog::getInstance()->addError(
-                            Translator::getInstance()->trans(
-                                'Failed to send message %code. Failed recipients: %failed_addresses',
-                                [
-                                    '%code' => $messageCode,
-                                    '%failed_addresses' => \is_array($failedRecipients) ? implode(
-                                        ',',
-                                        $failedRecipients
-                                    ) : 'none',
-                                ]
-                            )
-                        );
+                        $this->logger->error('Failed to send message {code}. Failed recipients: {failed_addresses}', [
+                            'code' => $messageCode,
+                            'failed_addresses' => \is_array($failedRecipients) ? implode(
+                                ',',
+                                $failedRecipients
+                            ) : 'none',
+                        ]);
                     }
                 } catch (\Exception $ex) {
-                    Tlog::getInstance()->addError(
-                        "Error while sending email message $messageCode: ".$ex->getMessage()
-                    );
+                    $this->logger->error("Error while sending email message $messageCode: ".$ex->getMessage());
                 }
             } else {
-                Tlog::getInstance()->addWarning("Message $messageCode not sent: recipient list is empty.");
+                $this->logger->warning("Message $messageCode not sent: recipient list is empty.");
             }
         } else {
-            Tlog::getInstance()->addError("Can't send email message $messageCode: store email address is not defined.");
+            $this->logger->error("Can't send email message $messageCode: store email address is not defined.");
         }
     }
 

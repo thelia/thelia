@@ -27,7 +27,6 @@ use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Thelia\Core\Bundle\TheliaBundle;
-use Thelia\Log\Tlog;
 use Thelia\Model\Export;
 use Thelia\Model\ExportCategory;
 use Thelia\Model\ExportCategoryQuery;
@@ -403,7 +402,7 @@ class XmlFileLoader extends FileLoader
         } catch (\Exception $e) {
             $con->rollBack();
 
-            Tlog::getInstance()->error($e->getMessage());
+            throw $e;
         }
     }
 
@@ -483,7 +482,7 @@ class XmlFileLoader extends FileLoader
         } catch (\Exception $e) {
             $con->rollBack();
 
-            Tlog::getInstance()->error($e->getMessage());
+            throw $e;
         }
     }
 
@@ -527,7 +526,7 @@ class XmlFileLoader extends FileLoader
         } catch (\Exception $e) {
             $con->rollBack();
 
-            Tlog::getInstance()->error($e->getMessage());
+            throw $e;
         }
     }
 
@@ -607,7 +606,7 @@ class XmlFileLoader extends FileLoader
         } catch (\Exception $e) {
             $con->rollBack();
 
-            Tlog::getInstance()->error($e->getMessage());
+            throw $e;
         }
     }
 

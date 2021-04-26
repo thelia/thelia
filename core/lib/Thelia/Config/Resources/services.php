@@ -12,7 +12,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
@@ -42,15 +41,8 @@ return function (ContainerConfigurator $configurator): void {
         $modules = ModuleQuery::getActivated();
         /** @var Module $module */
         foreach ($modules as $module) {
-            try {
-                \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
-                \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
-            } catch (\Exception $e) {
-                Tlog::getInstance()->addError(
-                    sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
-                    $e
-                );
-            }
+            \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
+            \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
         }
     }
 };

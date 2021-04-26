@@ -23,7 +23,6 @@ use Symfony\Component\Yaml\Yaml;
 use Thelia\Config\DatabaseConfigurationSource;
 use Thelia\Install\Exception\UpdateException;
 use Thelia\Install\Exception\UpToDateException;
-use Thelia\Log\Tlog;
 use Thelia\Tools\Version\Version;
 
 /**
@@ -40,12 +39,6 @@ class Update
     public const INSTRUCTION_DIR = 'update/instruction/';
 
     protected $version;
-
-    /** @var bool */
-    protected $usePropel;
-
-    /** @var Tlog|null */
-    protected $logger;
 
     /** @var array log messages */
     protected $logs = [];
@@ -71,19 +64,8 @@ class Update
     /** @var Translator */
     protected $translator;
 
-    public function __construct($usePropel = true)
+    public function __construct()
     {
-        $this->usePropel = $usePropel;
-
-        if ($this->usePropel) {
-            $this->logger = Tlog::getInstance();
-            $this->logger->setLevel(Tlog::DEBUG);
-        } else {
-            $this->logs = [];
-        }
-
-        $dbConfig = null;
-
         try {
             $this->connection = $this->getDatabasePDO();
         } catch (ParseException $ex) {
@@ -306,30 +288,7 @@ class Update
 
     protected function log($level, $message): void
     {
-        if ($this->usePropel) {
-            switch ($level) {
-                case 'debug':
-                    $this->logger->debug($message);
-                    break;
-                case 'info':
-                    $this->logger->info($message);
-                    break;
-                case 'notice':
-                    $this->logger->notice($message);
-                    break;
-                case 'warning':
-                    $this->logger->warning($message);
-                    break;
-                case 'error':
-                    $this->logger->error($message);
-                    break;
-                case 'critical':
-                    $this->logger->critical($message);
-                    break;
-            }
-        } else {
-            $this->logs[] = [$level, $message];
-        }
+        $this->logs[] = [$level, $message];
     }
 
     protected function updateToVersion($version, Database $database): void

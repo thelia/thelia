@@ -72,7 +72,8 @@
         "thelia/smarty-redirection-module": "dev-main",
         "thelia/choice-filter-module": "dev-main",
         "thelia/custom-delivery-module": "dev-main",
-        "thelia/store-seo-module": "dev-main"
+        "thelia/store-seo-module": "dev-main",
+        "symfony/monolog-bundle": "^3.7"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",

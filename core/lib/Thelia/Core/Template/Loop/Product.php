@@ -23,7 +23,6 @@ use Thelia\Core\Template\Element\StandardI18nFieldsSearchTrait;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Exception\TaxEngineException;
-use Thelia\Log\Tlog;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
@@ -563,8 +562,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      */
     public function buildModelCriteria()
     {
-        Tlog::getInstance()->debug('-- Starting new product build criteria');
-
         $currencyId = $this->getCurrency();
         if (null !== $currencyId) {
             $currency = CurrencyQuery::create()->findOneById($currencyId);

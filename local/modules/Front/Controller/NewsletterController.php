@@ -19,7 +19,6 @@ use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\Definition\FrontForm;
-use Thelia\Log\Tlog;
 use Thelia\Model\Customer;
 use Thelia\Model\NewsletterQuery;
 
@@ -62,7 +61,7 @@ class NewsletterController extends BaseFrontController
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
 
-            Tlog::getInstance()->error(sprintf('Error during newsletter unsubscription : %s', $errorMessage));
+            $this->logger->error(sprintf('Error during newsletter unsubscription : %s', $errorMessage));
 
             $newsletterForm->setErrorMessage($errorMessage);
         }
@@ -125,7 +124,7 @@ class NewsletterController extends BaseFrontController
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
 
-            Tlog::getInstance()->error(sprintf('Error during newsletter subscription : %s', $errorMessage));
+            $this->logger->error(sprintf('Error during newsletter subscription : %s', $errorMessage));
 
             $newsletterForm->setErrorMessage($errorMessage);
         }

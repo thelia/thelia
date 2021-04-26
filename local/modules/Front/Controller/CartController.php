@@ -26,7 +26,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\CartAdd;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
@@ -57,7 +56,7 @@ class CartController extends BaseFrontController
                 }
             }
         } catch (PropelException $e) {
-            Tlog::getInstance()->error(sprintf('Failed to add item to cart with message : %s', $e->getMessage()));
+            $this->logger->error(sprintf('Failed to add item to cart with message : %s', $e->getMessage()));
             $message = $this->getTranslator()->trans(
                 'Failed to add this article to your cart, please try again',
                 [],
@@ -94,7 +93,7 @@ class CartController extends BaseFrontController
                 }
             }
         } catch (\Exception $e) {
-            Tlog::getInstance()->error(sprintf('Failed to change cart item quantity: %s', $e->getMessage()));
+            $this->logger->error(sprintf('Failed to change cart item quantity: %s', $e->getMessage()));
 
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
@@ -114,7 +113,7 @@ class CartController extends BaseFrontController
 
             $this->afterModifyCart($eventDispatcher);
         } catch (\Exception $e) {
-            Tlog::getInstance()->error(sprintf('error during deleting cartItem with message : %s', $e->getMessage()));
+            $this->logger->error(sprintf('error during deleting cartItem with message : %s', $e->getMessage()));
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
 

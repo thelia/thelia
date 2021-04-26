@@ -22,7 +22,6 @@ use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Log\Tlog;
 use Thelia\Model\AdminLog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
@@ -113,11 +112,11 @@ class BaseAdminController extends BaseController
                 ['%msg' => $message->getMessage()]
             );
 
-            Tlog::getInstance()->addError($strMessage.': '.$message->getTraceAsString());
+            $this->logger->error($strMessage.': '.$message->getTraceAsString());
 
             $message = $strMessage;
         } else {
-            Tlog::getInstance()->addError($message);
+            $this->logger->error(\is_string($message) ? $message : $message->getMessage());
         }
 
         return $this->render(
@@ -180,16 +179,11 @@ class BaseAdminController extends BaseController
     {
         if ($error_message !== false) {
             // Log the error message
-            Tlog::getInstance()->error(
-                $this->getTranslator()->trans(
-                    'Error during %action process : %error. Exception was %exc',
-                    [
-                        '%action' => $action,
-                        '%error' => $error_message,
-                        '%exc' => $exception != null ? $exception->getMessage() : 'no exception',
-                    ]
-                )
-            );
+            $this->logger->error('Error during {action} process : {error}. Exception was {exc}', [
+                'action' => $action,
+                'error' => $error_message,
+                'exc' => $exception != null ? $exception->getMessage() : 'no exception',
+            ]);
 
             if ($form != null) {
                 // Mark the form as errored

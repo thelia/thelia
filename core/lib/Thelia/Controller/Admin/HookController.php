@@ -30,7 +30,6 @@ use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\Definition\AdminForm;
-use Thelia\Log\Tlog;
 use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
 use Thelia\Model\Lang;
@@ -434,7 +433,6 @@ class HookController extends AbstractCrudController
             return $response;
         }
 
-        $content = null;
         if (null !== $hook_id = $this->getRequest()->get('hook_id')) {
             $toggleDefaultEvent = new HookToggleNativeEvent($hook_id);
             try {
@@ -444,8 +442,7 @@ class HookController extends AbstractCrudController
                     return $this->nullResponse();
                 }
             } catch (\Exception $ex) {
-                $content = $ex->getMessage();
-                Tlog::getInstance()->debug(sprintf('%s', $content));
+                $this->logger->error(sprintf('%s', $ex->getMessage()));
             }
         }
 
@@ -458,7 +455,6 @@ class HookController extends AbstractCrudController
             return $response;
         }
 
-        $content = null;
         if (null !== $hook_id = $this->getRequest()->get('hook_id')) {
             $toggleDefaultEvent = new HookToggleActivationEvent($hook_id);
             try {
@@ -468,8 +464,7 @@ class HookController extends AbstractCrudController
                     return $this->nullResponse();
                 }
             } catch (\Exception $ex) {
-                $content = $ex->getMessage();
-                Tlog::getInstance()->debug(sprintf('%s', $content));
+                $this->logger->error(sprintf('%s', $ex->getMessage()));
             }
         }
 

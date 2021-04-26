@@ -12,12 +12,10 @@
 
 namespace Thelia\Tools\FileDownload;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
 use Thelia\Core\Translation\Translator as TheliaTranslator;
 use Thelia\Exception\FileNotFoundException;
 use Thelia\Exception\HttpUrlException;
-use Thelia\Log\Tlog;
 use Thelia\Tools\URL;
 
 /**
@@ -27,22 +25,17 @@ use Thelia\Tools\URL;
  */
 class FileDownloader implements FileDownloaderInterface
 {
-    /** @var LoggerInterface */
-    protected $logger;
-
     /** @var Translator */
     protected $translator;
 
-    public function __construct(LoggerInterface $logger, Translator $translator)
+    public function __construct(Translator $translator)
     {
-        $this->logger = $logger;
-
         $this->translator = $translator;
     }
 
     public static function getInstance()
     {
-        return new static(Tlog::getInstance(), TheliaTranslator::getInstance());
+        return new static(TheliaTranslator::getInstance());
     }
 
     /**
@@ -102,26 +95,8 @@ class FileDownloader implements FileDownloaderInterface
                 ]
             );
 
-            $this->logger
-                ->error($errorMessage)
-            ;
-
             throw new FileNotFoundException($errorMessage);
         }
-
-        /*
-         * Inform that you've downloaded a file
-         */
-        $this->logger
-            ->info(
-                $this->translator->trans(
-                    'The file %path has been successfully downloaded',
-                    [
-                        '%path' => $url,
-                    ]
-                )
-            )
-        ;
 
         /**
          * Then try to write it on the disk.
@@ -136,7 +111,6 @@ class FileDownloader implements FileDownloaderInterface
                 ]
             );
 
-            $this->logger->error($translatedErrorMessage);
             throw new \ErrorException($translatedErrorMessage);
         }
 

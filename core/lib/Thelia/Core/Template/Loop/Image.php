@@ -22,7 +22,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImage;
@@ -377,7 +376,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 }
             } catch (\Exception $ex) {
                 // Ignore the result and log an error
-                Tlog::getInstance()->addError(sprintf('Failed to process image in image loop: %s', $ex->getMessage()));
+                $this->logger->error(sprintf('Failed to process image in image loop: %s', $ex->getMessage()));
 
                 if ($returnErroredImages) {
                     $loopResultRow

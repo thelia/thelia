@@ -355,19 +355,6 @@
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc8" role="ADMIN" resource="admin.configuration.system-logs" access="VIEW"}
-                                    <tr>
-                                        <td><a href="{url path='/admin/configuration/system-logs'}">{intl l='System logs'}</a></td>
-                                        <td>
-                                            {include file='renderer/buttons.html' btn_small=true btn_group=false buttons=[
-                                                [
-                                                    'type' => 'edit',
-                                                    'href' => {url path='/admin/configuration/system-logs'}
-                                                ]
-                                            ]}
-                                        </td>
-                                    </tr>
-                                {/loop}
                                 {loop type="auth" name="pcc10" role="ADMIN" resource="admin.configuration.advanced" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/advanced'}">{intl l='Advanced configuration'}</a></td>

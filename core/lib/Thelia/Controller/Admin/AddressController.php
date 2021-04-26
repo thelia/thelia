@@ -75,7 +75,7 @@ class AddressController extends AbstractCrudController
                 $address_id
             );
         } catch (\Exception $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf('error during address setting as default with message %s', $e->getMessage()));
+            $this->logger->error(sprintf('error during address setting as default with message %s', $e->getMessage()));
         }
 
         return $this->redirectToEditionTemplate();

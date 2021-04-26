@@ -12,11 +12,11 @@
 
 namespace TheliaSmarty\Template\Assets;
 
+use Psr\Log\LoggerInterface;
 use Thelia\Core\Template\Assets\AssetManagerInterface;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
 
@@ -27,19 +27,24 @@ class SmartyAssetsResolver implements AssetResolverInterface
     protected $assetsManager;
 
     protected $cdnBaseUrl;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * Creates a new SmartyAssetsManager instance.
      *
      * @param AssetManagerInterface $assetsManager an asset manager instance
      */
-    public function __construct(AssetManagerInterface $assetsManager)
+    public function __construct(AssetManagerInterface $assetsManager, LoggerInterface $logger)
     {
         $this->path_relative_to_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
 
         $this->assetsManager = $assetsManager;
 
         $this->cdnBaseUrl = ConfigQuery::read('cdn.assets-base-url', null);
+        $this->logger = $logger;
     }
 
     /**
@@ -86,7 +91,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
                 $debug
             );
         } else {
-            Tlog::getInstance()->addError("Asset $file (type $type) was not found.");
+            $this->logger->error("Asset $file (type $type) was not found.");
         }
 
         return $url;
@@ -260,7 +265,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
 
             $files_found = !empty($files);
         } catch (\Exception $ex) {
-            Tlog::getInstance()->addError($ex->getMessage());
+            $this->logger->error($ex->getMessage());
 
             $files_found = false;
         }

@@ -12,11 +12,11 @@
 
 namespace Thelia\Core\Hook;
 
+use Psr\Log\LoggerInterface;
 use Thelia\Core\Template\ParserHelperInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 
@@ -34,10 +34,15 @@ class HookHelper
      * @var ParserHelperInterface
      */
     protected $parserHelper;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    public function __construct(ParserHelperInterface $parserHelper)
+    public function __construct(ParserHelperInterface $parserHelper, LoggerInterface $logger)
     {
         $this->parserHelper = $parserHelper;
+        $this->logger = $logger;
     }
 
     /**
@@ -99,7 +104,7 @@ class HookHelper
             try {
                 $ret[] = $this->prepareHook($hook);
             } catch (\UnexpectedValueException $ex) {
-                Tlog::getInstance()->warning($ex->getMessage());
+                $this->logger->warning($ex->getMessage());
             }
         }
 

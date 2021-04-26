@@ -24,7 +24,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\UnmatchableConditionException;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 
 /**
@@ -142,9 +141,7 @@ class CouponController extends BaseFrontController
         }
 
         if ($message !== false) {
-            Tlog::getInstance()->error(
-                sprintf('Error during order delivery process : %s. Exception was %s', $message, $e->getMessage())
-            );
+            $this->logger->error(sprintf('Error during order delivery process : %s. Exception was %s', $message, $e->getMessage()));
 
             $couponCodeForm->setErrorMessage($message);
 

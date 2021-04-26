@@ -22,10 +22,7 @@ namespace Thelia\Core;
  */
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
@@ -115,7 +112,6 @@ class Thelia extends Kernel
     public function registerBundles(): iterable
     {
         $contents = [
-            Bundle\TheliaBundle::class => ['all' => true],
         ];
 
         if (file_exists(THELIA_ROOT.'config/bundles.php')) {

@@ -32,7 +32,6 @@ use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\Lang\LangUrlEvent;
 use Thelia\Form\Lang\LangUrlForm;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
@@ -139,7 +138,9 @@ class LangController extends BaseAdminController
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
         } catch (\Exception $ex) {
             $error_msg = $this->getTranslator()->trans('Failed to update language definition: %ex', ['%ex' => $ex->getMessage()]);
-            Tlog::getInstance()->addError('Failed to update language definition', $ex->getMessage());
+            $this->logger->error('Failed to update language definition. {message}', [
+                'message' => $ex->getMessage(),
+            ]);
         }
 
         if (false !== $error_msg) {
@@ -278,7 +279,9 @@ class LangController extends BaseAdminController
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
         } catch (\Exception $ex) {
-            Tlog::getInstance()->error(sprintf('error during language removal with message : %s', $ex->getMessage()));
+            $this->logger->error('error during language removal with message : {message}', [
+                'message' => $ex->getMessage(),
+            ]);
             $error_msg = $ex->getMessage();
         }
 
@@ -396,9 +399,7 @@ class LangController extends BaseAdminController
             return $response;
         }
 
-        ConfigQuery::create()
-            ->filterByName('one_domain_foreach_lang')
-            ->update(['Value' => $activate]);
+        ConfigQuery::write('one_domain_foreach_lang', $activate);
 
         return $this->generateRedirectFromRoute('admin.configuration.languages');
     }
@@ -443,7 +444,9 @@ class LangController extends BaseAdminController
                 $changedObject->getId()
             );
         } catch (\Exception $e) {
-            Tlog::getInstance()->error(sprintf('Error on changing languages with message : %s', $e->getMessage()));
+            $this->logger->error('Error on changing languages with message : {message}', [
+                'message' => $e->getMessage(),
+            ]);
             $errorMessage = $e->getMessage();
         }
 

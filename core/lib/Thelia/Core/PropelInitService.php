@@ -32,7 +32,6 @@ use Symfony\Component\Yaml\Yaml;
 use Thelia\Config\DatabaseConfigurationSource;
 use Thelia\Core\Propel\Schema\SchemaCombiner;
 use Thelia\Core\Propel\Schema\SchemaLocator;
-use Thelia\Log\Tlog;
 
 /**
  * Propel cache and initialization service.
@@ -437,10 +436,6 @@ class PropelInitService
             $theliaDatabaseConnection->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
 
             if ($this->debug) {
-                // In debug mode, we have to initialize Tlog at this point, as this class uses Propel
-                Tlog::getInstance()->setLevel(Tlog::DEBUG);
-
-                Propel::getServiceContainer()->setLogger('defaultLogger', Tlog::getInstance());
                 $theliaDatabaseConnection->useDebug(true);
             }
         } catch (\Throwable $th) {

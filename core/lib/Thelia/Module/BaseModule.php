@@ -29,7 +29,6 @@ use Thelia\Core\PropelInitService;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\ModuleException;
-use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\HookQuery;
@@ -597,8 +596,6 @@ class BaseModule implements BaseModuleInterface
                 ;
 
                 if (!$isValid) {
-                    Tlog::getInstance()->notice('The module '.$this->getCode().' tried to register an invalid hook');
-
                     continue;
                 }
 

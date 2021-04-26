@@ -136,7 +136,6 @@
         <form name="thelia.lang.url" class="Thelia\Form\Lang\LangUrlForm"/>
 
         <form name="thelia.configuration.store" class="Thelia\Form\ConfigStoreForm"/>
-        <form name="thelia.system-logs.configuration" class="Thelia\Form\SystemLogConfigurationForm"/>
 
         <form name="thelia.admin.module.modification" class="Thelia\Form\ModuleModificationForm"/>
         <form name="thelia.admin.module.image.modification" class="Thelia\Form\ModuleImageModification"/>

@@ -19,7 +19,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-use Thelia\Log\Tlog;
 use Thelia\Model\Import as ImportModel;
 use Thelia\Tools\URL;
 use Thelia\Type\EnumListType;
@@ -58,20 +57,16 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
                 $this->getBaseUrl().'/'.$type->getId()
             );
 
-            try {
-                $loopResultRow
-                    ->set('HANDLE_CLASS', $type->getHandleClass())
-                    ->set('ID', $type->getId())
-                    ->set('REF', $type->getRef())
-                    ->set('TITLE', $type->getVirtualColumn('i18n_TITLE'))
-                    ->set('DESCRIPTION', $type->getVirtualColumn('i18n_DESCRIPTION'))
-                    ->set('URL', $url)
-                    ->set('POSITION', $type->getPosition())
-                    ->set('CATEGORY_ID', $type->getByName($this->getCategoryName()))
-                ;
-            } catch (\Exception $e) {
-                Tlog::getInstance()->error($e->getMessage());
-            }
+            $loopResultRow
+                ->set('HANDLE_CLASS', $type->getHandleClass())
+                ->set('ID', $type->getId())
+                ->set('REF', $type->getRef())
+                ->set('TITLE', $type->getVirtualColumn('i18n_TITLE'))
+                ->set('DESCRIPTION', $type->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('URL', $url)
+                ->set('POSITION', $type->getPosition())
+                ->set('CATEGORY_ID', $type->getByName($this->getCategoryName()))
+            ;
 
             $this->addOutputFields($loopResultRow, $type);
             $loopResult->addRow($loopResultRow);

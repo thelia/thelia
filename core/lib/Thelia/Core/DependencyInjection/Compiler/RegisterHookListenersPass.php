@@ -23,7 +23,6 @@ use Symfony\Component\DependencyInjection\Reference;
 use Thelia\Core\Hook\BaseHook;
 use Thelia\Core\Hook\HookDefinition;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Log\Tlog;
 use Thelia\Model\Base\IgnoredModuleHookQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Hook;
@@ -64,8 +63,6 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
     protected function logAlertMessage($message, $failSafe = false): void
     {
-        Tlog::getInstance()->addAlert($message);
-
         if (!$failSafe && $this->debugEnabled) {
             throw new \InvalidArgumentException($message);
         }

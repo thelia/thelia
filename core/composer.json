@@ -61,7 +61,8 @@
         "symfony/psr-http-message-bridge": "^2.1",
         "symfony/flex": "^1.12",
         "doctrine/cache": "~1.0",
-        "assetic/framework": "dev-develop#b067e1779fc18db43031a4dc9a80308465febcfd"
+        "assetic/framework": "dev-develop#b067e1779fc18db43031a4dc9a80308465febcfd",
+        "symfony/monolog-bundle": "^3.7"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",

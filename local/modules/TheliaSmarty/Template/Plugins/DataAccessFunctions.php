@@ -13,6 +13,7 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -24,7 +25,6 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\Type\CouponInterface;
-use Thelia\Log\Tlog;
 use Thelia\Model\Base\BrandQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\CategoryQuery;
@@ -74,6 +74,10 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     protected $couponManager;
 
     private static $dataAccessCache = [];
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     public function __construct(
         RequestStack $requestStack,
@@ -81,7 +85,8 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         TaxEngine $taxEngine,
         ParserContext $parserContext,
         EventDispatcherInterface $dispatcher,
-        CouponManager $couponManager
+        CouponManager $couponManager,
+        LoggerInterface $logger
     ) {
         $this->securityContext = $securityContext;
         $this->parserContext = $parserContext;
@@ -89,6 +94,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $this->dispatcher = $dispatcher;
         $this->taxEngine = $taxEngine;
         $this->couponManager = $couponManager;
+        $this->logger = $logger;
     }
 
     /**
@@ -511,16 +517,13 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                     $locale
                 );
         }
-        Tlog::getInstance()->addWarning(
-                sprintf(
-                    "Module code '%s' not found in module-config Smarty function",
-                    $moduleCode
-                )
-            );
 
-        $value = $default;
+        $this->logger->warning(sprintf(
+            "Module code '%s' not found in module-config Smarty function",
+            $moduleCode
+        ));
 
-        return $value;
+        return $default;
     }
 
     /**
@@ -862,7 +865,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 $imageSourcePath = $uploadDir.DS.$imageFileName;
 
                 if (!file_exists($imageSourcePath)) {
-                    Tlog::getInstance()->error(sprintf('Source image file %s does not exists.', $imageSourcePath));
+                    $this->logger->error(sprintf('Source image file %s does not exists.', $imageSourcePath));
                     $imageSourcePath = $uploadDir.DS.$defaultImageName;
                 }
 
@@ -920,7 +923,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 $this->dispatcher->dispatch($event, TheliaEvents::IMAGE_PROCESS);
                 $template->assign('MEDIA_URL', $event->getFileUrl());
             } catch (\Exception $ex) {
-                Tlog::getInstance()->error($ex->getMessage());
+                $this->logger->error($ex->getMessage());
                 $template->assign('MEDIA_URL', '');
             }
         }

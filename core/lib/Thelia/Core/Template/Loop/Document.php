@@ -22,7 +22,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
@@ -317,7 +316,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResult->addRow($loopResultRow);
             } catch (\Exception $ex) {
                 // Ignore the result and log an error
-                Tlog::getInstance()->addError(sprintf('Failed to process document in document loop: %s', $ex->getMessage()));
+                $this->logger->error(sprintf('Failed to process document in document loop: %s', $ex->getMessage()));
             }
         }
 

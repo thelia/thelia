@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -20,7 +21,6 @@ use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Translation\TranslationEvent;
 use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
 
 /**
  * Class Translation.
@@ -31,10 +31,15 @@ class Translation extends BaseAction implements EventSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(LoggerInterface $logger, ContainerInterface $container)
     {
         $this->container = $container;
+        $this->logger = $logger;
     }
 
     public function getTranslatableStrings(TranslationEvent $event): void
@@ -95,7 +100,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
         }
 
         try {
-            Tlog::getInstance()->debug("Walking in $directory, in mode $walkMode");
+            $this->logger->debug("Walking in $directory, in mode $walkMode");
 
             /** @var \DirectoryIterator $fileInfo */
             foreach (new \DirectoryIterator($directory) as $fileInfo) {
@@ -120,7 +125,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                         if ($content = file_get_contents($fileInfo->getPathName())) {
                             $short_path = $this->normalizePath($fileInfo->getPathName());
 
-                            Tlog::getInstance()->debug("Examining file $short_path\n");
+                            $this->logger->debug("Examining file $short_path");
 
                             $matches = [];
 
@@ -129,7 +134,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                                 $content,
                                 $matches
                             )) {
-                                Tlog::getInstance()->debug('Strings found: ', $matches[2]);
+                                $this->logger->debug('Strings found: '.$matches[2]);
 
                                 $idx = 0;
 

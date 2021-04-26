@@ -12,8 +12,6 @@
 
 namespace Thelia\Exception;
 
-use Thelia\Log\Tlog;
-
 /**
  * Thrown when a Condition is badly implemented.
  *
@@ -29,7 +27,6 @@ class InvalidConditionException extends \RuntimeException
     public function __construct($className)
     {
         $message = 'Invalid Condition given to '.$className;
-        Tlog::getInstance()->addError($message);
 
         parent::__construct($message);
     }

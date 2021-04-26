@@ -1919,7 +1919,6 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (27, 'admin.configuration.store', NOW(), NOW()),
 (28, 'admin.configuration.variable', NOW(), NOW()),
 (29, 'admin.configuration.admin-logs', NOW(), NOW()),
-(30, 'admin.configuration.system-logs', NOW(), NOW()),
 (31, 'admin.configuration.advanced', NOW(), NOW()),
 (32, 'admin.configuration.translations', NOW(), NOW()),
 (33, 'admin.export', NOW(), NOW()),

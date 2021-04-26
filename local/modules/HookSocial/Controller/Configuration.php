@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -48,7 +47,7 @@ class Configuration extends BaseAdminController
                     ConfigQuery::write('hooksocial_'.$name, $value, false, true);
                 }
 
-                Tlog::getInstance()->debug(sprintf('%s => %s', $name, $value));
+                $this->logger->debug(sprintf('%s => %s', $name, $value));
             }
         } catch (\Exception $e) {
             $resp['error'] = 1;

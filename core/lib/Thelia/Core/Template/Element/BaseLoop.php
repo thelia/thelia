@@ -17,6 +17,7 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Util\PropelModelPager;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -104,6 +105,11 @@ abstract class BaseLoop implements BaseLoopInterface
     protected $kernelEnvironment;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Create a new Loop.
      */
     public function __construct(
@@ -112,6 +118,7 @@ abstract class BaseLoop implements BaseLoopInterface
         EventDispatcherInterface $eventDispatcher,
         SecurityContext $securityContext,
         TranslatorInterface $translator,
+        LoggerInterface $logger,
         array $theliaParserLoops,
         $kernelEnvironment
     ) {
@@ -126,6 +133,7 @@ abstract class BaseLoop implements BaseLoopInterface
         $this->kernelEnvironment = $kernelEnvironment;
 
         $this->initialize();
+        $this->logger = $logger;
     }
 
     /**
