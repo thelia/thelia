@@ -12,9 +12,9 @@
 
 namespace Thelia\Core\Template\Validator;
 
+use Thelia\Core\Bundle\TheliaBundle;
 use Thelia\Core\Template\Exception\TemplateException;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
 use Thelia\Tools\Version\Version;
 
@@ -140,7 +140,7 @@ class TemplateValidator
     protected function checkVersion($templateDescriptor): void
     {
         if ($templateDescriptor->getTheliaVersion()) {
-            if (!Version::test(Thelia::THELIA_VERSION, $templateDescriptor->getTheliaVersion(), false, '>=')) {
+            if (!Version::test(TheliaBundle::THELIA_VERSION, $templateDescriptor->getTheliaVersion(), false, '>=')) {
                 // The Translator could not be initialized, take care of this.
                 try {
                     $message = Translator::getInstance()->trans(

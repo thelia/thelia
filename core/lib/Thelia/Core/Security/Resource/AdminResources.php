@@ -109,8 +109,6 @@ class AdminResources
 
     public const TEMPLATE = 'admin.configuration.template';
 
-    public const SYSTEM_LOG = 'admin.configuration.system-logs';
-
     public const ADMIN_LOG = 'admin.configuration.admin-logs';
 
     public const STORE = 'admin.configuration.store';

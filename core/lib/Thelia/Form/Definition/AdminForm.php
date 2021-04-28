@@ -139,7 +139,6 @@ final class AdminForm
     public const LANG_URL = 'thelia.lang.url';
 
     public const CONFIG_STORE = 'thelia.configuration.store';
-    public const SYSTEM_LOG_CONFIGURATION = 'thelia.system-logs.configuration';
 
     public const MODULE_MODIFICATION = 'thelia.admin.module.modification';
     public const MODULE_INSTALL = 'thelia.admin.module.install';

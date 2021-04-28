@@ -14,6 +14,7 @@ namespace Thelia\Action;
 
 use Exception;
 use Propel\Runtime\Propel;
+use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -32,7 +33,6 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\FileNotFoundException;
 use Thelia\Exception\ModuleException;
-use Thelia\Log\Tlog;
 use Thelia\Model\Base\OrderQuery;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleQuery;
@@ -49,10 +49,15 @@ class Module extends BaseAction implements EventSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(LoggerInterface $logger, ContainerInterface $container)
     {
         $this->container = $container;
+        $this->logger = $logger;
     }
 
     public function toggleActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -262,20 +267,16 @@ class Module extends BaseAction implements EventSubscriberInterface
                 } catch (\ReflectionException $ex) {
                     // Happens probably because the module directory has been deleted.
                     // Log a warning, and delete the database entry.
-                    Tlog::getInstance()->addWarning(
-                        Translator::getInstance()->trans(
-                            'Failed to create instance of module "%name%" when trying to delete module. Module directory has probably been deleted',
-                            ['%name%' => $module->getCode()]
-                        )
+                    $this->logger->warning(
+                        'Failed to create instance of module "{name}" when trying to delete module. Module directory has probably been deleted',
+                        ['name' => $module->getCode()]
                     );
                 } catch (FileNotFoundException $fnfe) {
                     // The module directory has been deleted.
                     // Log a warning, and delete the database entry.
-                    Tlog::getInstance()->addWarning(
-                        Translator::getInstance()->trans(
-                            'Module "%name%" directory was not found',
-                            ['%name%' => $module->getCode()]
-                        )
+                    $this->logger->warning(
+                        'Module "{name}" directory was not found',
+                        ['name' => $module->getCode()]
                     );
                 }
 

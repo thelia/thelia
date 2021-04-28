@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Currency\CurrencyCreateEvent;
@@ -23,7 +24,6 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\CurrencyConverter\CurrencyConverter;
 use Thelia\CurrencyConverter\Exception\CurrencyNotFoundException;
-use Thelia\Log\Tlog;
 use Thelia\Math\Number;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\CurrencyQuery;
@@ -32,10 +32,15 @@ class Currency extends BaseAction implements EventSubscriberInterface
 {
     /** @var CurrencyConverter */
     protected $currencyConverter;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    public function __construct(CurrencyConverter $currencyConverter)
+    public function __construct(LoggerInterface $logger, CurrencyConverter $currencyConverter)
     {
         $this->currencyConverter = $currencyConverter;
+        $this->logger = $logger;
     }
 
     /**
@@ -80,7 +85,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 ->setFormat($event->getFormat())
                 ->setRate($event->getRate())
                 ->setCode(strtoupper($event->getCode()))
-
                 ->save();
 
             $event->setCurrency($currency);
@@ -139,10 +143,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 );
             }
 
-            $currency
-
-                ->delete()
-            ;
+            $currency->delete();
 
             $event->setCurrency($currency);
         }
@@ -169,9 +170,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
                 $currency->setRate($rate->getNumber(-1))->save();
             } catch (CurrencyNotFoundException $ex) {
-                Tlog::getInstance()->addError(
-                    sprintf('Unable to find exchange rate for currency %s, ID %d', $currency->getCode(), $currency->getId())
-                );
+                $this->logger->error(sprintf('Unable to find exchange rate for currency %s, ID %d', $currency->getCode(), $currency->getId()));
                 $event->addUndefinedRate($currency->getId());
             }
         }

@@ -202,9 +202,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
      */
     public function defaultBehavior(LangDefaultBehaviorEvent $event): void
     {
-        ConfigQuery::create()
-            ->filterByName('default_lang_without_translation')
-            ->update(['Value' => $event->getDefaultBehavior()]);
+        ConfigQuery::write('default_lang_without_translation', $event->getDefaultBehavior());
     }
 
     /**

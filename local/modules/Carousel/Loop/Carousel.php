@@ -21,7 +21,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Image;
-use Thelia\Log\Tlog;
 use Thelia\Type\EnumListType;
 use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
@@ -76,7 +75,7 @@ class Carousel extends Image
         foreach ($loopResult->getResultDataCollection() as $carousel) {
             $imgSourcePath = $carousel->getUploadDir().DS.$carousel->getFile();
             if (!file_exists($imgSourcePath)) {
-                Tlog::getInstance()->error(sprintf('Carousel source image file %s does not exists.', $imgSourcePath));
+                $this->logger->error(sprintf('Carousel source image file %s does not exists.', $imgSourcePath));
                 continue;
             }
 

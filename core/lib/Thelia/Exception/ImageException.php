@@ -12,14 +12,10 @@
 
 namespace Thelia\Exception;
 
-use Thelia\Log\Tlog;
-
 class ImageException extends \RuntimeException
 {
     public function __construct($message, $code = null, $previous = null)
     {
-        Tlog::getInstance()->addError($message);
-
         parent::__construct($message, $code, $previous);
     }
 }

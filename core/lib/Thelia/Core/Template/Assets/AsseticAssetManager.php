@@ -16,8 +16,8 @@ use Assetic\AssetManager;
 use Assetic\AssetWriter;
 use Assetic\Factory\AssetFactory;
 use Assetic\FilterManager;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -32,10 +32,15 @@ class AsseticAssetManager implements AssetManagerInterface
     protected $source_file_extensions = ['less', 'js', 'coffee', 'html', 'tpl', 'htm', 'xml'];
 
     protected $assetFilters = [];
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    public function __construct($kernelDebug)
+    public function __construct($kernelDebug, LoggerInterface $logger)
     {
         $this->debugMode = $kernelDebug;
+        $this->logger = $logger;
     }
 
     /**
@@ -82,7 +87,7 @@ class AsseticAssetManager implements AssetManagerInterface
      */
     protected function copyAssets(Filesystem $fs, $from_directory, $to_directory): void
     {
-        Tlog::getInstance()->addDebug("Copying assets from $from_directory to $to_directory");
+        $this->logger->debug("Copying assets from $from_directory to $to_directory");
 
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($from_directory, \RecursiveDirectoryIterator::SKIP_DOTS),
@@ -242,9 +247,7 @@ class AsseticAssetManager implements AssetManagerInterface
      */
     public function processAsset($assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug)
     {
-        Tlog::getInstance()->addDebug(
-            "Processing asset: assetSource=$assetSource, assetDirectoryBase=$assetDirectoryBase, webAssetsDirectoryBase=$webAssetsDirectoryBase, webAssetsTemplate=$webAssetsTemplate, webAssetsKey=$webAssetsKey, outputUrl=$outputUrl"
-        );
+        $this->logger->debug("Processing asset: assetSource=$assetSource, assetDirectoryBase=$assetDirectoryBase, webAssetsDirectoryBase=$webAssetsDirectoryBase, webAssetsTemplate=$webAssetsTemplate, webAssetsKey=$webAssetsKey, outputUrl=$outputUrl");
 
         $assetName = basename($assetSource);
         $inputDirectory = realpath(\dirname($assetSource));
@@ -282,13 +285,13 @@ class AsseticAssetManager implements AssetManagerInterface
          */
         $assetDestinationPath = $outputDirectory.DS.$assetFileDirectoryInAssetDirectory.DS.$assetTargetFilename;
 
-        Tlog::getInstance()->addDebug("Asset destination full path: $assetDestinationPath");
+        $this->logger->debug("Asset destination full path: $assetDestinationPath");
 
         // We generate an asset only if it does not exists, or if the asset processing is forced in development mode
         if (!file_exists($assetDestinationPath) || ($this->debugMode && ConfigQuery::read('process_assets', true))) {
             $writer = new AssetWriter($outputDirectory.DS.$assetFileDirectoryInAssetDirectory);
 
-            Tlog::getInstance()->addDebug("Writing asset to $outputDirectory".DS."$assetFileDirectoryInAssetDirectory");
+            $this->logger->debug("Writing asset to $outputDirectory".DS."$assetFileDirectoryInAssetDirectory");
 
             $writer->writeAsset($asset);
         }

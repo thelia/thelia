@@ -13,6 +13,7 @@
 namespace TheliaSmarty\Template;
 
 use Imagine\Exception\InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Smarty;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +25,6 @@ use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 
@@ -73,6 +73,10 @@ class SmartyParser extends Smarty implements ParserInterface
 
     /** @var bool */
     protected $useMethodCallWrapper = false;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * @param string $kernelEnvironment
@@ -85,6 +89,7 @@ class SmartyParser extends Smarty implements ParserInterface
         EventDispatcherInterface $dispatcher,
         ParserContext $parserContext,
         TemplateHelperInterface $templateHelper,
+        LoggerInterface $logger,
         $kernelEnvironment = 'prod',
         $kernelDebug = false
     ) {
@@ -123,6 +128,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
         $this->registerFilter('output', [$this, 'trimWhitespaces']);
         $this->registerFilter('variable', [__CLASS__, 'theliaEscape']);
+        $this->logger = $logger;
     }
 
     /**
@@ -247,7 +253,7 @@ class SmartyParser extends Smarty implements ParserInterface
      */
     public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $addAtBeginning = false): void
     {
-        Tlog::getInstance()->addDebug("Adding template directory $templateDirectory, type:$templateType name:$templateName, key: $key");
+        $this->logger->debug("Adding template directory $templateDirectory, type:$templateType name:$templateName, key: $key");
 
         if (true === $addAtBeginning && isset($this->templateDirectories[$templateType][$templateName])) {
             // When using array_merge, the key was set to 0. Use + instead.

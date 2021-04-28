@@ -12,9 +12,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Log\Tlog;
 use Thelia\Model\Base\Message as BaseMessage;
 
 class Message extends BaseMessage
@@ -38,11 +36,7 @@ class Message extends BaseMessage
 
         // Try to get the body from template file, if a file is defined
         if (!empty($template)) {
-            try {
-                $body = $parser->render($template, [], $compressOutput);
-            } catch (ResourceNotFoundException $ex) {
-                Tlog::getInstance()->addError("Failed to get mail message template body $template");
-            }
+            $body = $parser->render($template, [], $compressOutput);
         }
 
         // We did not get it ? Use the message entered in the back-office

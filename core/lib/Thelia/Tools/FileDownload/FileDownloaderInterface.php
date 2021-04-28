@@ -12,7 +12,6 @@
 
 namespace Thelia\Tools\FileDownload;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
 
 /**
@@ -34,7 +33,7 @@ interface FileDownloaderInterface
      */
     public function download($url, $pathToStore);
 
-    public function __construct(LoggerInterface $logger, Translator $translator);
+    public function __construct(Translator $translator);
 
     /**
      * @return $this

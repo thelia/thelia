@@ -14,7 +14,6 @@ namespace Thelia\Core\Template\Validator;
 
 use Symfony\Component\Finder\Finder;
 use Thelia\Core\Template\Exception\InvalidDescriptorException;
-use Thelia\Log\Tlog;
 
 /**
  * Class TemplateDescriptorValidator.
@@ -135,7 +134,5 @@ class TemplateDescriptorValidator
 
             return @simplexml_load_file($this->xmlDescriptorPath);
         }
-
-        Tlog::getInstance()->addWarning("Template descriptor $this->xmlDescriptorPath does not exists.");
     }
 }

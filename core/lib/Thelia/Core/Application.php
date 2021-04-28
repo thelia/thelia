@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Thelia\Command\Install;
+use Thelia\Core\Bundle\TheliaBundle;
 
 /**
  * cli application for Thelia
@@ -31,7 +32,7 @@ class Application extends BaseApplication
     {
         $this->kernel = $kernel;
 
-        parent::__construct('Thelia', Thelia::THELIA_VERSION);
+        parent::__construct('Thelia', TheliaBundle::THELIA_VERSION);
 
         $this->kernel->boot();
 
@@ -58,7 +59,7 @@ class Application extends BaseApplication
 
     protected function registerCommands(): void
     {
-        if (!Thelia::isInstalled()) {
+        if (!TheliaBundle::isInstalled()) {
             $this->add(new Install());
 
             return;

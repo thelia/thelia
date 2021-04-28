@@ -32,7 +32,6 @@ use Thelia\Core\Security\Exception\WrongPasswordException;
 use Thelia\Form\CustomerLogin;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
@@ -108,13 +107,11 @@ class CustomerController extends BaseFrontController
             }
 
             if ($message !== false) {
-                Tlog::getInstance()->error(
-                    sprintf(
-                        'Error during customer creation process : %s. Exception was %s',
-                        $message,
-                        $e->getMessage()
-                    )
-                );
+                $this->logger->error(sprintf(
+                    'Error during customer creation process : %s. Exception was %s',
+                    $message,
+                    $e->getMessage()
+                ));
             }
         } else {
             $message = $this->getTranslator()->trans(
@@ -211,13 +208,11 @@ class CustomerController extends BaseFrontController
                 );
             }
 
-            Tlog::getInstance()->error(
-                sprintf(
-                    'Error during customer creation process : %s. Exception was %s',
-                    $message,
-                    $e->getMessage()
-                )
-            );
+            $this->logger->error(sprintf(
+                'Error during customer creation process : %s. Exception was %s',
+                $message,
+                $e->getMessage()
+            ));
 
             $customerCreation->setErrorMessage($message);
 
@@ -294,12 +289,10 @@ class CustomerController extends BaseFrontController
                 );
             }
 
-            Tlog::getInstance()->error(
-                sprintf(
-                    'Error during customer password modification process : %s.',
-                    $message
-                )
-            );
+            $this->logger->error(sprintf(
+                'Error during customer password modification process : %s.',
+                $message
+            ));
 
             $customerPasswordUpdateForm->setErrorMessage($message);
 
@@ -385,7 +378,7 @@ class CustomerController extends BaseFrontController
                 );
             }
 
-            Tlog::getInstance()->error(sprintf('Error during customer modification process : %s.', $message));
+            $this->logger->error(sprintf('Error during customer modification process : %s.', $message));
 
             $customerProfileUpdateForm->setErrorMessage($message);
 
@@ -488,13 +481,11 @@ class CustomerController extends BaseFrontController
                 );
             }
 
-            Tlog::getInstance()->error(
-                sprintf(
-                    'Error during customer login process : %s. Exception was %s',
-                    $message,
-                    $e->getMessage()
-                )
-            );
+            $this->logger->error(sprintf(
+                'Error during customer login process : %s. Exception was %s',
+                $message,
+                $e->getMessage()
+            ));
 
             $customerLoginForm->setErrorMessage($message);
 

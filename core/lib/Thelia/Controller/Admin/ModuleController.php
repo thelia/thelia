@@ -33,7 +33,6 @@ use Thelia\Exception\InvalidModuleException;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ModuleInstallForm;
-use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
@@ -223,7 +222,7 @@ class ModuleController extends AbstractCrudController
         } catch (InvalidModuleException $ex) {
             $this->moduleErrors = $ex->getErrors();
         } catch (Exception $ex) {
-            Tlog::getInstance()->addError('Failed to get modules list:', $ex);
+            $this->logger->error('Failed to get modules list:'.$ex->getMessage());
         }
 
         return $this->renderList();
@@ -267,7 +266,7 @@ class ModuleController extends AbstractCrudController
         } catch (\Exception $e) {
             $message = $e->getMessage();
 
-            Tlog::getInstance()->addError('Failed to activate/deactivate module:', $e);
+            $this->logger->error('Failed to activate/deactivate module: '.$message);
         }
 
         if ($this->getRequest()->isXmlHttpRequest()) {
@@ -318,7 +317,7 @@ class ModuleController extends AbstractCrudController
         } catch (\Exception $e) {
             $message = $e->getMessage();
 
-            Tlog::getInstance()->addError('Error during module removal', $e);
+            $this->logger->error('Error during module removal: '.$message);
         }
 
         if (false !== $message) {
@@ -379,7 +378,7 @@ class ModuleController extends AbstractCrudController
             $message = $this->getTranslator()->trans('Sorry, an error occured: %s', ['%s' => $e->getMessage()]);
         }
 
-        Tlog::getInstance()->error(sprintf('Error during module installation process. Exception was %s', $message));
+        $this->logger->error(sprintf('Error during module installation process. Exception was %s', $message));
 
         $moduleInstall->setErrorMessage($message);
 

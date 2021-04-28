@@ -27,7 +27,6 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Log\Tlog;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
@@ -64,13 +63,7 @@ class OrderController extends BaseFrontController
                 $deliveryModule = ModuleQuery::create()->retrieveVirtualProductDelivery($this->container);
 
                 if (false === $deliveryModule) {
-                    Tlog::getInstance()->error(
-                        $this->getTranslator()->trans(
-                            'To enable the virtual product feature, the VirtualProductDelivery module should be activated',
-                            [],
-                            Front::MESSAGE_DOMAIN
-                        )
-                    );
+                    $this->logger->error('To enable the virtual product feature, the VirtualProductDelivery module should be activated');
                 } elseif (\count($deliveryModule) == 1) {
                     return $this->registerVirtualProductDelivery($deliveryModule[0], $deliveryAddress);
                 }
@@ -214,9 +207,7 @@ class OrderController extends BaseFrontController
         }
 
         if ($message !== false) {
-            Tlog::getInstance()->error(
-                sprintf('Error during order delivery process : %s. Exception was %s', $message, $e->getMessage())
-            );
+            $this->logger->error(sprintf('Error during order delivery process : %s. Exception was %s', $message, $e->getMessage()));
 
             $orderDelivery->setErrorMessage($message);
 
@@ -284,9 +275,7 @@ class OrderController extends BaseFrontController
         }
 
         if ($message !== false) {
-            Tlog::getInstance()->error(
-                sprintf('Error during order payment process : %s. Exception was %s', $message, $e->getMessage())
-            );
+            $this->logger->error(sprintf('Error during order payment process : %s. Exception was %s', $message, $e->getMessage()));
 
             $orderPayment->setErrorMessage($message);
 
@@ -404,7 +393,7 @@ class OrderController extends BaseFrontController
                 );
             }
         } else {
-            Tlog::getInstance()->warning("Failed order ID '$order_id' not found.");
+            $this->logger->warning("Failed order ID '$order_id' not found.");
         }
 
         $this->getParserContext()

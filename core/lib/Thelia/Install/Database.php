@@ -17,7 +17,6 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ServiceContainer\ServiceContainerInterface;
-use Thelia\Log\Tlog;
 
 /**
  * Class Database.
@@ -183,13 +182,6 @@ class Database
 
         foreach ($tables as $table) {
             if (!preg_match("/^[\w_\-]+$/", $table)) {
-                Tlog::getInstance()->alert(
-                    sprintf(
-                        "Attempt to backup the db with this invalid table name: '%s'",
-                        $table
-                    )
-                );
-
                 continue;
             }
 

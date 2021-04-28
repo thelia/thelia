@@ -13,11 +13,11 @@
 namespace VirtualProductDelivery\EventListeners;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\OrderProductQuery;
 use VirtualProductDelivery\Events\VirtualProductDeliveryEvents;
@@ -34,11 +34,16 @@ class SendMail implements EventSubscriberInterface
 
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    public function __construct(MailerFactory $mailer, EventDispatcherInterface $eventDispatcher)
+    public function __construct(MailerFactory $mailer, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
     {
         $this->mailer = $mailer;
         $this->eventDispatcher = $eventDispatcher;
+        $this->logger = $logger;
     }
 
     public function updateStatus(OrderEvent $event): void
@@ -84,9 +89,7 @@ class SendMail implements EventSubscriberInterface
                 ]
             );
         } else {
-            Tlog::getInstance()->warning(
-                "Virtual product download message not sent to customer: there's nothing to downnload"
-            );
+            $this->logger->warning("Virtual product download message not sent to customer: there's nothing to downnload");
         }
     }
 

@@ -13,7 +13,6 @@
 namespace Thelia\TaxEngine\TaxType;
 
 use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
 use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Product;
@@ -55,7 +54,6 @@ class FeatureFixAmountTaxType extends BaseTaxType
             $testFloat = new FloatType();
             if (!$testFloat->isValid($taxAmount)) {
                 //We cannot modify "bad" (consider uninitialized) feature value in backOffice if we throw exception
-                Tlog::getInstance()->error(Translator::getInstance()->trans('Feature value does not match FLOAT format'));
 
                 return 0;
             }

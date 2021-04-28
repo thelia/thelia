@@ -12,8 +12,6 @@
 
 namespace Thelia\Exception;
 
-use Thelia\Log\Tlog;
-
 /**
  * Thrown when a Condition receive an invalid Operator.
  *
@@ -30,7 +28,6 @@ class InvalidConditionOperatorException extends \RuntimeException
     public function __construct($className, $parameter)
     {
         $message = 'Invalid Operator for Condition '.$className.' on parameter '.$parameter;
-        Tlog::getInstance()->addError($message);
 
         parent::__construct($message);
     }

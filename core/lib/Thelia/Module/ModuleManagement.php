@@ -20,7 +20,6 @@ use Symfony\Component\Finder\Finder;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\InvalidModuleException;
-use Thelia\Log\Tlog;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -162,8 +161,6 @@ class ModuleManagement
 
             $con->commit();
         } catch (\Exception $ex) {
-            Tlog::getInstance()->addError('Failed to update module '.$module->getCode(), $ex);
-
             $con->rollBack();
             throw $ex;
         }

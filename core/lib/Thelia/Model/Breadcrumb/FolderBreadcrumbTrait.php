@@ -12,6 +12,7 @@
 
 namespace Thelia\Model\Breadcrumb;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Template\Loop\FolderPath;
@@ -29,16 +30,19 @@ trait FolderBreadcrumbTrait
             $translator->trans('Folder') => $foldersUrl,
         ];
 
-        // Todo stop using loop in php
+        // Todo stop using loop in
+        // I confirm :(
         $folderPath = new FolderPath(
             $container,
             $container->get('request_stack'),
             $container->get('event_dispatcher'),
             $container->get('thelia.securityContext'),
             Translator::getInstance(),
+            $container->get(LoggerInterface::class),
             $container->getParameter('Thelia.parser.loops'),
             $container->getParameter('kernel.environment')
         );
+
         $folderPath->initializeArgs([
                 'folder' => $folderId,
                 'visible' => '*',

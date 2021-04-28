@@ -14,7 +14,6 @@ namespace Thelia\Model;
 
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Security\User\UserInterface;
-use Thelia\Log\Tlog;
 use Thelia\Model\Base\AdminLog as BaseAdminLog;
 
 class AdminLog extends BaseAdminLog
@@ -50,10 +49,6 @@ class AdminLog extends BaseAdminLog
             ->setMessage($message)
             ->setRequest($request->toString($withRequestContent));
 
-        try {
-            $log->save();
-        } catch (\Exception $ex) {
-            Tlog::getInstance()->err('Failed to insert new entry in AdminLog: {ex}', ['ex' => $ex]);
-        }
+        $log->save();
     }
 }

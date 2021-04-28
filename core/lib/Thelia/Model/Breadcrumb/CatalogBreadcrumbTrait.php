@@ -12,6 +12,7 @@
 
 namespace Thelia\Model\Breadcrumb;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Template\Loop\CategoryPath;
@@ -36,6 +37,7 @@ trait CatalogBreadcrumbTrait
             $container->get('event_dispatcher'),
             $container->get('thelia.securityContext'),
             Translator::getInstance(),
+            $container->get(LoggerInterface::class),
             $container->getParameter('Thelia.parser.loops'),
             $container->getParameter('kernel.environment')
         );

@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\EventListener;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -22,7 +23,6 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\TheliaKernelEvents;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -43,12 +43,17 @@ class ErrorListener implements EventSubscriberInterface
 
     /** @var string */
     protected $env;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     public function __construct(
         $kernelEnvironment,
         ParserInterface $parser,
         SecurityContext $securityContext,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        LoggerInterface $logger
     ) {
         $this->env = $kernelEnvironment;
 
@@ -57,6 +62,7 @@ class ErrorListener implements EventSubscriberInterface
         $this->securityContext = $securityContext;
 
         $this->eventDispatcher = $eventDispatcher;
+        $this->logger = $logger;
     }
 
     public function defaultErrorFallback(ExceptionEvent $event): void
@@ -108,7 +114,7 @@ class ErrorListener implements EventSubscriberInterface
             ;
         } while (null !== $exception = $exception->getPrevious());
 
-        Tlog::getInstance()->error($logMessage);
+        $this->logger->error($logMessage);
     }
 
     public function authenticationException(ExceptionEvent $event): void

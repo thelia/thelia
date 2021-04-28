@@ -12,8 +12,6 @@
 
 namespace Thelia\Exception;
 
-use Thelia\Log\Tlog;
-
 /**
  * Thrown when a Condition receives an invalid Parameter.
  *
@@ -30,7 +28,6 @@ class InvalidConditionValueException extends \RuntimeException
     public function __construct($className, $parameter)
     {
         $message = 'Invalid Parameter for Condition '.$className.' on parameter '.$parameter;
-        Tlog::getInstance()->addError($message);
 
         parent::__construct($message);
     }

@@ -13,6 +13,7 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use Propel\Runtime\Util\PropelModelPager;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -24,7 +25,6 @@ use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Thelia\Core\Template\Element\Exception\InvalidElementException;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
@@ -68,6 +68,10 @@ class TheliaLoop extends AbstractSmartyPlugin
 
     /** @var string */
     protected $kernelEnvironment;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * TheliaLoop constructor.
@@ -80,7 +84,8 @@ class TheliaLoop extends AbstractSmartyPlugin
         TranslatorInterface $translator,
         bool $kernelDebug,
         array $theliaParserLoops,
-        string $kernelEnvironment
+        string $kernelEnvironment,
+        LoggerInterface $logger
     ) {
         $this->container = $container;
         $this->requestStack = $requestStack;
@@ -92,6 +97,7 @@ class TheliaLoop extends AbstractSmartyPlugin
         $this->theliaParserLoops = $theliaParserLoops;
         $this->setLoopList($theliaParserLoops);
         $this->kernelEnvironment = $kernelEnvironment;
+        $this->logger = $logger;
     }
 
     /**
@@ -142,7 +148,7 @@ class TheliaLoop extends AbstractSmartyPlugin
 //            }
 
             // Otherwise, log the problem and return a count of 0
-            Tlog::getInstance()->error($ex->getMessage());
+            $this->logger->error($ex->getMessage());
 
             return 0;
         }
@@ -203,7 +209,7 @@ class TheliaLoop extends AbstractSmartyPlugin
 //                }
 
                 // Otherwise, log the problem and simulate an empty result.
-                Tlog::getInstance()->error($ex->getMessage());
+                $this->logger->error($ex->getMessage());
 
                 // Provide an empty result
                 $loopResults = new LoopResult(null);
@@ -476,6 +482,7 @@ class TheliaLoop extends AbstractSmartyPlugin
             $this->dispatcher,
             $this->securityContext,
             $this->translator,
+            $this->logger,
             $this->theliaParserLoops,
             $this->kernelEnvironment
         );

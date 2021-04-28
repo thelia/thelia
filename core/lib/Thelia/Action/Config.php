@@ -12,26 +12,26 @@
 
 namespace Thelia\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Config\ConfigCreateEvent;
 use Thelia\Core\Event\Config\ConfigDeleteEvent;
 use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Thelia;
 use Thelia\Model\Config as ConfigModel;
 use Thelia\Model\ConfigQuery;
+use Thelia\Service\ConfigCacheService;
 
 class Config extends BaseAction implements EventSubscriberInterface
 {
-    /** @var Thelia */
-    protected $kernel;
+    /**
+     * @var ConfigCacheService
+     */
+    private $configCacheService;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ConfigCacheService $configCacheService)
     {
-        /* @var Thelia $kernel */
-        $this->kernel = $container->get('kernel');
+        $this->configCacheService = $configCacheService;
     }
 
     /**
@@ -53,7 +53,7 @@ class Config extends BaseAction implements EventSubscriberInterface
         ->save();
 
         $event->setConfig($config);
-        $this->kernel->initCacheConfigs(true);
+        $this->configCacheService->initCacheConfigs(true);
     }
 
     /**
@@ -68,7 +68,7 @@ class Config extends BaseAction implements EventSubscriberInterface
                 $config->setValue($event->getValue())->save();
 
                 $event->setConfig($config);
-                $this->kernel->initCacheConfigs(true);
+                $this->configCacheService->initCacheConfigs(true);
             }
         }
     }
@@ -95,7 +95,7 @@ class Config extends BaseAction implements EventSubscriberInterface
 
             $event->setConfig($config);
 
-            $this->kernel->initCacheConfigs(true);
+            $this->configCacheService->initCacheConfigs(true);
         }
     }
 
@@ -112,7 +112,7 @@ class Config extends BaseAction implements EventSubscriberInterface
 
                 $event->setConfig($config);
 
-                $this->kernel->initCacheConfigs(true);
+                $this->configCacheService->initCacheConfigs(true);
             }
         }
     }

@@ -12,11 +12,11 @@
 
 namespace Thelia\Coupon;
 
+use Psr\Log\LoggerInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Exception\UnmatchableConditionException;
-use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponCountry;
@@ -49,15 +49,20 @@ class CouponManager
      * @var CouponFactory
      */
     private $couponFactory;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**S
      * Constructor
      *
      * @param FacadeInterface $facade Service container
      */
-    public function __construct(FacadeInterface $facade)
+    public function __construct(FacadeInterface $facade, LoggerInterface $logger)
     {
         $this->facade = $facade;
+        $this->logger = $logger;
     }
 
     /**
@@ -112,9 +117,7 @@ class CouponManager
                 }
             } catch (\Exception $ex) {
                 // Just ignore the coupon and log the problem, just in case someone realize it.
-                Tlog::getInstance()->warning(
-                    sprintf('Coupon %s ignored, exception occurred: %s', $couponCode, $ex->getMessage())
-                );
+                $this->logger->warning(sprintf('Coupon %s ignored, exception occurred: %s', $couponCode, $ex->getMessage()));
             }
         }
 
@@ -398,7 +401,7 @@ class CouponManager
             }
         } catch (\Exception $ex) {
             // Just log the problem.
-            Tlog::getInstance()->addError(sprintf('Failed to decrement coupon %s: %s', $coupon->getCode(), $ex->getMessage()));
+            $this->logger->error(sprintf('Failed to decrement coupon %s: %s', $coupon->getCode(), $ex->getMessage()));
         }
 
         return false;
@@ -448,7 +451,7 @@ class CouponManager
             }
         } catch (\Exception $ex) {
             // Just log the problem.
-            Tlog::getInstance()->addError(sprintf('Failed to increment coupon %s: %s', $coupon->getCode(), $ex->getMessage()));
+            $this->logger->error(sprintf('Failed to increment coupon %s: %s', $coupon->getCode(), $ex->getMessage()));
         }
 
         return false;

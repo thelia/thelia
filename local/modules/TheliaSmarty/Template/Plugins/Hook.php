@@ -12,6 +12,7 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Event\Hook\HookRenderBlockEvent;
@@ -20,7 +21,6 @@ use Thelia\Core\Hook\Fragment;
 use Thelia\Core\Hook\FragmentBag;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
 use Thelia\Model\ModuleQuery;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
@@ -50,18 +50,24 @@ class Hook extends AbstractSmartyPlugin
 
     /** @var bool debug */
     protected $debug = false;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     public function __construct(
         $kernelDebug,
         EventDispatcherInterface $dispatcher,
         TranslatorInterface $translator,
-        Module $smartyPluginModule
+        Module $smartyPluginModule,
+        LoggerInterface $logger
     ) {
         $this->debug = $kernelDebug;
         $this->dispatcher = $dispatcher;
         $this->translator = $translator;
         $this->smartyPluginModule = $smartyPluginModule;
         $this->hookResults = [];
+        $this->logger = $logger;
     }
 
     /**
@@ -295,7 +301,7 @@ HTML;
                     $this->translator->trans("Related hook name '%name' is not defined.", ['%name' => $rel])
                 );
 
-                Tlog::getInstance()->error($exception->getMessage());
+                $this->logger->error($exception->getMessage());
 
                 if ($this->debug) {
                     throw $exception;
@@ -431,7 +437,7 @@ HTML;
                 $this->translator->trans("Related hook name '%name' is not defined.", ['%name' => $hookName])
             );
 
-            Tlog::getInstance()->error($exception->getMessage());
+            $this->logger->error($exception->getMessage());
 
             if ($this->debug) {
                 throw $exception;

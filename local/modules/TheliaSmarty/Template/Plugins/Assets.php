@@ -12,6 +12,7 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
+use Psr\Log\LoggerInterface;
 use Thelia\Core\Template\Assets\AssetManagerInterface;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
 use Thelia\Model\ConfigQuery;
@@ -23,13 +24,14 @@ class Assets extends AbstractSmartyPlugin
 {
     public $assetManager;
 
-    public function __construct(AssetManagerInterface $assetsManager, AssetResolverInterface $assetsResolver)
+    public function __construct(AssetManagerInterface $assetsManager, AssetResolverInterface $assetsResolver, LoggerInterface $logger)
     {
         $asset_dir_from_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
 
         $this->assetManager = new SmartyAssetsManager(
             $assetsManager,
             $assetsResolver,
+            $logger,
             THELIA_WEB_DIR,
             $asset_dir_from_web_root
         );

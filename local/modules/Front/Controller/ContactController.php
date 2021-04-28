@@ -18,7 +18,6 @@ use Thelia\Core\Event\Contact\ContactEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -62,7 +61,7 @@ class ContactController extends BaseFrontController
             $error_message = $e->getMessage();
         }
 
-        Tlog::getInstance()->error(sprintf('Error during sending contact mail : %s', $error_message));
+        $this->logger->error(sprintf('Error during sending contact mail : %s', $error_message));
 
         $contactForm->setErrorMessage($error_message);
 

@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -19,7 +20,6 @@ use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentI18n;
 use Thelia\Model\ProductDocumentI18nQuery;
@@ -35,6 +35,16 @@ use Thelia\Model\ProductImageQuery;
  */
 class File extends BaseAction implements EventSubscriberInterface
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     public function cloneFile(ProductCloneEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $originalProductId = $event->getOriginalProduct()->getId();
@@ -129,7 +139,7 @@ class File extends BaseAction implements EventSubscriberInterface
                     // Clone file's I18n
                     $this->cloneFileI18n($originalProductFileI18ns, $clonedProductFile, $type, $event, $dispatcher);
                 } else {
-                    Tlog::getInstance()->addWarning("Failed to find media file $srcPath");
+                    $this->logger->warning("Failed to find media file $srcPath");
                 }
             }
         }

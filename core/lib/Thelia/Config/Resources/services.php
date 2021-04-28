@@ -12,7 +12,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
@@ -30,8 +29,10 @@ return function (ContainerConfigurator $configurator): void {
     $serviceConfigurator->load('Thelia\\', THELIA_LIB)
         ->exclude(
             [
-                THELIA_LIB.'/Command/Skeleton/Module/I18n/*.php',
-                THELIA_LIB.'/Config/**/*.php',
+                THELIA_LIB.'Command/Skeleton/Module/I18n/*.php',
+                THELIA_LIB.'Model/',
+                THELIA_LIB.'Log/',
+                THELIA_LIB.'Config/**/*.php',
             ]
         )->autowire()
         ->autoconfigure();
@@ -40,15 +41,8 @@ return function (ContainerConfigurator $configurator): void {
         $modules = ModuleQuery::getActivated();
         /** @var Module $module */
         foreach ($modules as $module) {
-            try {
-                \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
-                \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
-            } catch (\Exception $e) {
-                Tlog::getInstance()->addError(
-                    sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
-                    $e
-                );
-            }
+            \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
+            \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
         }
     }
 };

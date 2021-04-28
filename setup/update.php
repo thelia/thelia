@@ -57,7 +57,7 @@ use Thelia\Install\Exception\UpdateException;
  ***************************************************/
 
 try {
-    $update = new \Thelia\Install\Update(false);
+    $update = new \Thelia\Install\Update();
 } catch (UpdateException $ex) {
     cliOutput($ex->getMessage(), 'error');
     exit(2);

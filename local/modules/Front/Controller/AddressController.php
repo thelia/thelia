@@ -20,7 +20,6 @@ use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\Event\AddressEvent;
@@ -73,7 +72,7 @@ class AddressController extends BaseFrontController
             $message = $this->getTranslator()->trans('Sorry, an error occured: %s', ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
 
-        Tlog::getInstance()->error(sprintf('Error during address creation process : %s', $message));
+        $this->logger->error(sprintf('Error during address creation process : %s', $message));
 
         $addressCreate->setErrorMessage($message);
 
@@ -158,7 +157,7 @@ class AddressController extends BaseFrontController
 
         $this->getParserContext()->set('address_id', $address_id);
 
-        Tlog::getInstance()->error(sprintf('Error during address creation process : %s', $message));
+        $this->logger->error(sprintf('Error during address creation process : %s', $message));
 
         $addressUpdate->setErrorMessage($message);
 
@@ -206,7 +205,7 @@ class AddressController extends BaseFrontController
             $error_message = $e->getMessage();
         }
 
-        Tlog::getInstance()->error(sprintf('Error during address deletion : %s', $error_message));
+        $this->logger->error(sprintf('Error during address deletion : %s', $error_message));
 
         // If Ajax Request
         if ($this->getRequest()->isXmlHttpRequest()) {

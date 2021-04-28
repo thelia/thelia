@@ -15,10 +15,10 @@ namespace Thelia\Core\Template;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\Bundle\TheliaBundle;
 use Thelia\Core\Form\TheliaFormFactoryInterface;
 use Thelia\Core\Form\TheliaFormValidatorInterface;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\Thelia;
 use Thelia\Form\BaseForm;
 use TheliaSmarty\Template\Exception\SmartyPluginException;
 
@@ -51,7 +51,7 @@ class ParserContext implements \IteratorAggregate
         TheliaFormValidatorInterface $formValidator
     ) {
         // Setup basic variables
-        $this->set('THELIA_VERSION', Thelia::THELIA_VERSION);
+        $this->set('THELIA_VERSION', TheliaBundle::THELIA_VERSION);
 
         $this->requestStack = $requestStack;
         $this->formFactory = $formFactory;

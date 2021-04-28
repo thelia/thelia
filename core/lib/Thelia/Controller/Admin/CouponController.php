@@ -31,7 +31,6 @@ use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Log\Tlog;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponModule;
@@ -467,13 +466,11 @@ class CouponController extends BaseAdminController
      */
     protected function logError($action, $message, $e)
     {
-        Tlog::getInstance()->error(
-            sprintf(
-                'Error during Coupon '.$action.' process : %s. Exception was %s',
-                $message,
-                $e->getMessage()
-            )
-        );
+        $this->logger->error(sprintf(
+            'Error during Coupon '.$action.' process : %s. Exception was %s',
+            $message,
+            $e->getMessage()
+        ));
 
         return $this;
     }

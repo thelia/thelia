@@ -26,7 +26,6 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
-use Thelia\Log\Tlog;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\State;
@@ -279,7 +278,7 @@ class CountryController extends AbstractCrudController
                     return $this->nullResponse();
                 }
             } catch (\Exception $ex) {
-                Tlog::getInstance()->error($ex->getMessage());
+                $this->logger->error($ex->getMessage());
             }
         }
 

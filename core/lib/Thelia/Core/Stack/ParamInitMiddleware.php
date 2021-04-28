@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
@@ -123,8 +122,6 @@ class ParamInitMiddleware implements HttpKernelInterface
                     //the user is currently on the proper domain, nothing to change
                     return null;
                 }
-
-                Tlog::getInstance()->warning('The domain URL for language '.$lang->getTitle().' (id '.$lang->getId().') is not defined.');
 
                 return Lang::getDefaultLanguage();
             }

@@ -14,10 +14,10 @@ namespace Thelia\Core\Template\Assets\Filter;
 
 use Assetic\Contracts\Asset\AssetInterface;
 use Assetic\Filter\LessphpFilter;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Log\Tlog;
 
 /**
  * Loads LESS files using the oyejorge/less.php PHP implementation of less.
@@ -32,8 +32,12 @@ class LessDotPhpFilter extends LessphpFilter implements EventSubscriberInterface
 {
     /** @var string the compiler cache directory */
     private $cacheDir;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    public function __construct($kernelEnvironment = 'prod')
+    public function __construct(LoggerInterface $logger, string $kernelEnvironment = 'prod')
     {
         // Assign and create the cache directory, if required.
         $this->cacheDir = THELIA_CACHE_DIR.$kernelEnvironment.DS.'less.php';
@@ -43,13 +47,14 @@ class LessDotPhpFilter extends LessphpFilter implements EventSubscriberInterface
 
             $fs->mkdir($this->cacheDir);
         }
+        $this->logger = $logger;
     }
 
     public function filterLoad(AssetInterface $asset): void
     {
         $filePath = $asset->getSourceRoot().DS.$asset->getSourcePath();
 
-        Tlog::getInstance()->addDebug("Starting CSS processing: $filePath...");
+        $this->logger->debug("Starting CSS processing: $filePath...");
 
         $importDirs = [];
 
@@ -75,12 +80,12 @@ class LessDotPhpFilter extends LessphpFilter implements EventSubscriberInterface
         if ($content === false) {
             $content = '';
 
-            Tlog::getInstance()->warning("Compilation of $filePath did not generate an output file.");
+            $this->logger->warning("Compilation of $filePath did not generate an output file.");
         }
 
         $asset->setContent($content);
 
-        Tlog::getInstance()->addDebug('CSS processing done.');
+        $this->logger->debug('CSS processing done.');
     }
 
     public function clearCacheDir(): void

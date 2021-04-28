@@ -70,7 +70,7 @@ if ($context == 'install' && $step == 1) {
         <div class="row">
             <div class="col-md-6">
                 <div class="version-info">
-                    <?php echo $trans->trans('Version').' '.\Thelia\Core\Thelia::THELIA_VERSION; ?>
+                    <?php echo $trans->trans('Version').' '.\Thelia\Core\Bundle\TheliaBundle::THELIA_VERSION; ?>
                 </div>
             </div>
         </div>
