@@ -50,6 +50,7 @@ class FileController extends BaseAdminController
      * Get the FileManager.
      *
      * @return FileManager
+     * @deprecated use autowiring
      */
     public function getFileManager()
     {
@@ -583,13 +584,13 @@ class FileController extends BaseAdminController
      *
      * @return Response
      */
-    public function updateImageAction($imageId, $parentType)
+    public function updateImageAction(EventDispatcherInterface $eventDispatcher, $imageId, $parentType)
     {
         if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) {
             return $response;
         }
 
-        $imageInstance = $this->updateFileAction($imageId, $parentType, 'image', TheliaEvents::IMAGE_UPDATE);
+        $imageInstance = $this->updateFileAction($eventDispatcher, $imageId, $parentType, 'image', TheliaEvents::IMAGE_UPDATE);
 
         if ($imageInstance instanceof \Symfony\Component\HttpFoundation\Response) {
             return $imageInstance;
@@ -611,13 +612,13 @@ class FileController extends BaseAdminController
      *
      * @return Response
      */
-    public function updateDocumentAction($documentId, $parentType)
+    public function updateDocumentAction(EventDispatcherInterface $eventDispatcher, $documentId, $parentType)
     {
         if (null !== $response = $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE)) {
             return $response;
         }
 
-        $documentInstance = $this->updateFileAction($documentId, $parentType, 'document', TheliaEvents::DOCUMENT_UPDATE);
+        $documentInstance = $this->updateFileAction($eventDispatcher, $documentId, $parentType, 'document', TheliaEvents::DOCUMENT_UPDATE);
 
         if ($documentInstance instanceof \Symfony\Component\HttpFoundation\Response) {
             return $documentInstance;
@@ -715,9 +716,9 @@ class FileController extends BaseAdminController
      *
      * @return Response
      */
-    public function deleteImageAction($imageId, $parentType)
+    public function deleteImageAction(EventDispatcherInterface $eventDispatcher, $imageId, $parentType)
     {
-        return $this->deleteFileAction($imageId, $parentType, 'image', TheliaEvents::IMAGE_DELETE);
+        return $this->deleteFileAction($eventDispatcher, $imageId, $parentType, 'image', TheliaEvents::IMAGE_DELETE);
     }
 
     /**
@@ -728,9 +729,9 @@ class FileController extends BaseAdminController
      *
      * @return Response
      */
-    public function deleteDocumentAction($documentId, $parentType)
+    public function deleteDocumentAction(EventDispatcherInterface $eventDispatcher, $documentId, $parentType)
     {
-        return $this->deleteFileAction($documentId, $parentType, 'document', TheliaEvents::DOCUMENT_DELETE);
+        return $this->deleteFileAction($eventDispatcher, $documentId, $parentType, 'document', TheliaEvents::DOCUMENT_DELETE);
     }
 
     public function updateFilePositionAction(EventDispatcherInterface $eventDispatcher, $parentType, $parentId, $objectType, $eventName)
@@ -752,7 +753,7 @@ class FileController extends BaseAdminController
 
         // Feed event
         $event = new UpdateFilePositionEvent(
-            $modelInstance->getQueryInstance($parentType),
+            $modelInstance->getQueryInstance(),
             $parentId,
             UpdateFilePositionEvent::POSITION_ABSOLUTE,
             $position
@@ -760,7 +761,7 @@ class FileController extends BaseAdminController
 
         // Dispatch Event to the Action
         try {
-            $eventDispatcher->dispatch($eventName, $event);
+            $eventDispatcher->dispatch($event, $eventName);
         } catch (\Exception $e) {
             $message = $this->getTranslator()->trans(
                 'Fail to update %type% position: %err%',
@@ -805,18 +806,18 @@ class FileController extends BaseAdminController
         );
     }
 
-    public function updateImagePositionAction($parentType, /* @noinspection PhpUnusedParameterInspection */ $parentId)
+    public function updateImagePositionAction(EventDispatcherInterface $eventDispatcher, $parentType, /* @noinspection PhpUnusedParameterInspection */ $parentId)
     {
         $imageId = $this->getRequest()->request->get('image_id');
 
-        return $this->updateFilePositionAction($parentType, $imageId, 'image', TheliaEvents::IMAGE_UPDATE_POSITION);
+        return $this->updateFilePositionAction($eventDispatcher, $parentType, $imageId, 'image', TheliaEvents::IMAGE_UPDATE_POSITION);
     }
 
-    public function updateDocumentPositionAction($parentType, /* @noinspection PhpUnusedParameterInspection */ $parentId)
+    public function updateDocumentPositionAction(EventDispatcherInterface $eventDispatcher, $parentType, /* @noinspection PhpUnusedParameterInspection */ $parentId)
     {
         $documentId = $this->getRequest()->request->get('document_id');
 
-        return $this->updateFilePositionAction($parentType, $documentId, 'document', TheliaEvents::DOCUMENT_UPDATE_POSITION);
+        return $this->updateFilePositionAction($eventDispatcher, $parentType, $documentId, 'document', TheliaEvents::DOCUMENT_UPDATE_POSITION);
     }
 
     public function toggleVisibilityFileAction(EventDispatcherInterface $eventDispatcher, $documentId, $parentType, $objectType, $eventName)
@@ -845,7 +846,7 @@ class FileController extends BaseAdminController
 
         // Dispatch Event to the Action
         try {
-            $eventDispatcher->dispatch($eventName, $event);
+            $eventDispatcher->dispatch($event, $eventName);
         } catch (\Exception $e) {
             $message = $this->getTranslator()->trans(
                 'Fail to update %type% visibility: %err%',
@@ -863,13 +864,13 @@ class FileController extends BaseAdminController
         return new Response($message);
     }
 
-    public function toggleVisibilityDocumentAction($parentType, $documentId)
+    public function toggleVisibilityDocumentAction(EventDispatcherInterface $eventDispatcher, $parentType, $documentId)
     {
-        return $this->toggleVisibilityFileAction($documentId, $parentType, 'document', TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY);
+        return $this->toggleVisibilityFileAction($eventDispatcher, $documentId, $parentType, 'document', TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY);
     }
 
-    public function toggleVisibilityImageAction($parentType, $documentId)
+    public function toggleVisibilityImageAction(EventDispatcherInterface $eventDispatcher, $parentType, $documentId)
     {
-        return $this->toggleVisibilityFileAction($documentId, $parentType, 'image', TheliaEvents::IMAGE_TOGGLE_VISIBILITY);
+        return $this->toggleVisibilityFileAction($eventDispatcher, $documentId, $parentType, 'image', TheliaEvents::IMAGE_TOGGLE_VISIBILITY);
     }
 }
