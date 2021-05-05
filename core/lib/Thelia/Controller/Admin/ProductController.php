@@ -1188,9 +1188,10 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Process the change of product's PSE list.
      */
-    public function updateProductSaleElementsAction()
+    public function updateProductSaleElementsAction(EventDispatcherInterface $eventDispatcher)
     {
         return $this->processProductSaleElementUpdate(
+            $eventDispatcher,
             $this->createForm(AdminForm::PRODUCT_SALE_ELEMENT_UPDATE)
         );
     }
@@ -1198,9 +1199,10 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Update default product sale element (not attached to any combination).
      */
-    public function updateProductDefaultSaleElementAction()
+    public function updateProductDefaultSaleElementAction(EventDispatcherInterface $eventDispatcher)
     {
         return $this->processProductSaleElementUpdate(
+            $eventDispatcher,
             $this->createForm(AdminForm::PRODUCT_DEFAULT_SALE_ELEMENT_UPDATE)
         );
     }
