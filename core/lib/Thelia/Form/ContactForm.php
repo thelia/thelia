@@ -46,7 +46,7 @@ class ContactForm extends FirewallForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('name', 'text', array(
+            ->add('fullname', 'text', array(
                 'constraints' => array(
                     new NotBlank(),
                 ),

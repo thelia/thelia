@@ -36,7 +36,7 @@ class ContactEvent extends ActionEvent
     protected $email;
 
     /** @var string */
-    protected $name;
+    protected $fullname;
 
     public function __construct(Form $form)
     {
@@ -45,7 +45,7 @@ class ContactEvent extends ActionEvent
         $this->subject = $form->get('subject')->getData();
         $this->message = $form->get('message')->getData();
         $this->email = $form->get('email')->getData();
-        $this->name = $form->get('name')->getData();
+        $this->fullname = $form->get('fullname')->getData();
     }
 
     /**
@@ -105,18 +105,18 @@ class ContactEvent extends ActionEvent
     /**
      * @return string
      */
-    public function getName()
+    public function getFullname()
     {
-        return $this->name;
+        return $this->fullname;
     }
 
     /**
-     * @param string $name
+     * @param string $fullname
      * @return ContactEvent
      */
-    public function setName($name)
+    public function setFullname($fullname)
     {
-        $this->name = $name;
+        $this->fullname = $fullname;
         return $this;
     }
 
