@@ -36,6 +36,9 @@ class DataCollectorSmartyParser extends Smarty implements ParserInterface
     {
         $this->stopwatch->start($realTemplateName, 'template');
         $timeStart = hrtime(true);
+        foreach ($this->getTemplateVars() as $name => $value) {
+            $this->smartyParser->assign($name, $value);
+        }
         $render = $this->smartyParser->render($realTemplateName, $parameters, $compressOutput);
         $timeEnd = hrtime(true);
         $this->stopwatch->stop($realTemplateName);
