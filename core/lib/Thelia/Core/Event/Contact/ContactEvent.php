@@ -41,11 +41,14 @@ class ContactEvent extends ActionEvent
     public function __construct(Form $form)
     {
         $this->form = $form;
+    }
 
-        $this->subject = $form->get('subject')->getData();
-        $this->message = $form->get('message')->getData();
-        $this->email = $form->get('email')->getData();
-        $this->name = $form->get('name')->getData();
+    /**
+     * @return Form
+     */
+    public function getForm()
+    {
+        return $this->form;
     }
 
     /**
