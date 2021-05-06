@@ -181,6 +181,7 @@
 							                            {/loop}
 
 								                        {capture name="select_options"}
+                                                        {$options_count = 0}
 								                        {loop name="product-features-av" type="feature-availability" feature=$ID order="manual" backend_context="1" lang="$edit_language_id"}
 								                            <option value="{$ID}" {if in_array($ID, $selected)}selected="selected"{/if}>{$TITLE}</option>
 
