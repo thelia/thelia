@@ -15,6 +15,7 @@ namespace WebProfiler;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Thelia\Module\BaseModule;
+use TheliaSmarty\Template\DataCollectorSmartyParser;
 use WebProfiler\DataCollector\SmartyDataCollector;
 
 class WebProfiler extends BaseModule
@@ -42,7 +43,7 @@ class WebProfiler extends BaseModule
 
         $servicesConfigurator->set('data_collector.smarty', SmartyDataCollector::class)
             ->args([
-                service('thelia.parser')->ignoreOnInvalid(),
+                service(DataCollectorSmartyParser::class)->ignoreOnInvalid(),
             ])
             ->tag(
                 'data_collector',

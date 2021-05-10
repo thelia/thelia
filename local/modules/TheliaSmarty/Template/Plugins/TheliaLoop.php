@@ -332,13 +332,12 @@ class TheliaLoop extends AbstractSmartyPlugin
         }
 
         // To be sure all variables was set
-        $varsToSet = ['START', 'PREV', 'NEXT','END','LAST', 'PAGE','CURRENT'];
-        array_walk($varsToSet, function ($varName) use ($template) {
+        $varsToSet = ['START', 'PREV', 'NEXT', 'END', 'LAST', 'PAGE', 'CURRENT'];
+        array_walk($varsToSet, function ($varName) use ($template): void {
             if (!isset($template->getTemplateVars()[$varName])) {
                 $template->assign($varName, null);
             }
         });
-
 
         // Find pagination
         $pagination = self::getPagination($loopName);

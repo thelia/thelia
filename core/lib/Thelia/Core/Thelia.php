@@ -34,7 +34,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ErrorHandler\Debug;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\FormExtensionInterface;
@@ -241,8 +241,6 @@ class Thelia extends Kernel
             $this->checkMySQLConfigurations($this->theliaDatabaseConnection);
         }
 
-        $this->initCacheConfigs();
-
         parent::initializeContainer();
 
         $this->getContainer()->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
@@ -263,7 +261,8 @@ class Thelia extends Kernel
             $moduleManagement->updateModules($this->getContainer());
         }
 
-        $eventDispatcher = new EventDispatcher();
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->getContainer()->get('event_dispatcher');
 
         if ($this->propelConnectionAvailable) {
             $this->theliaDatabaseConnection->setEventDispatcher($eventDispatcher);

@@ -398,7 +398,7 @@ class LangController extends BaseAdminController
 
         ConfigQuery::create()
             ->filterByName('one_domain_foreach_lang')
-            ->update(['Value' => $activate]);
+            ->update(['Value' => $activate], null, true);
 
         return $this->generateRedirectFromRoute('admin.configuration.languages');
     }

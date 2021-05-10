@@ -12,33 +12,8 @@
 
 namespace Thelia\Model;
 
-use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Base\Config as BaseConfig;
 
 class Config extends BaseConfig
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function postUpdate(ConnectionInterface $con = null): void
-    {
-        parent::postUpdate($con);
-
-        $this->resetQueryCache();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postDelete(ConnectionInterface $con = null): void
-    {
-        parent::postDelete($con);
-
-        $this->resetQueryCache();
-    }
-
-    public function resetQueryCache(): void
-    {
-        ConfigQuery::resetCache($this->getName());
-    }
 }

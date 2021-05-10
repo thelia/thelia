@@ -50,6 +50,7 @@ class FileController extends BaseAdminController
      * Get the FileManager.
      *
      * @return FileManager
+     *
      * @deprecated use autowiring
      */
     public function getFileManager()

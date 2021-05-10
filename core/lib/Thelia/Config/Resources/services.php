@@ -12,6 +12,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Thelia\Core\Service\ConfigCacheService;
 use Thelia\Log\Tlog;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -51,4 +52,7 @@ return function (ContainerConfigurator $configurator): void {
             }
         }
     }
+
+    $serviceConfigurator->get(ConfigCacheService::class)
+        ->public();
 };

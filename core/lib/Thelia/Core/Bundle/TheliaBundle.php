@@ -32,6 +32,7 @@ use Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\DependencyInjection\Compiler\StackPass;
 use Thelia\Core\DependencyInjection\Compiler\TranslatorPass;
+use Thelia\Core\Service\ConfigCacheService;
 
 /**
  * First Bundle use in Thelia
@@ -70,5 +71,13 @@ class TheliaBundle extends Bundle
             ->addCompilerPass(new RegisterCommandPass())
             ->addCompilerPass(new RegisterFormPass())
         ;
+    }
+
+    public function boot(): void
+    {
+        /** @var ConfigCacheService $configCacheService */
+        $configCacheService = $this->container->get(ConfigCacheService::class);
+
+        $configCacheService->initCacheConfigs();
     }
 }

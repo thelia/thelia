@@ -12,28 +12,17 @@
 
 namespace Thelia\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Config\ConfigCreateEvent;
 use Thelia\Core\Event\Config\ConfigDeleteEvent;
 use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Thelia;
 use Thelia\Model\Config as ConfigModel;
 use Thelia\Model\ConfigQuery;
 
 class Config extends BaseAction implements EventSubscriberInterface
 {
-    /** @var Thelia */
-    protected $kernel;
-
-    public function __construct(ContainerInterface $container)
-    {
-        /* @var Thelia $kernel */
-        $this->kernel = $container->get('kernel');
-    }
-
     /**
      * Create a new configuration entry.
      *
@@ -53,7 +42,6 @@ class Config extends BaseAction implements EventSubscriberInterface
         ->save();
 
         $event->setConfig($config);
-        $this->kernel->initCacheConfigs(true);
     }
 
     /**
@@ -68,7 +56,6 @@ class Config extends BaseAction implements EventSubscriberInterface
                 $config->setValue($event->getValue())->save();
 
                 $event->setConfig($config);
-                $this->kernel->initCacheConfigs(true);
             }
         }
     }
@@ -92,10 +79,6 @@ class Config extends BaseAction implements EventSubscriberInterface
                 ->setChapo($event->getChapo())
                 ->setPostscriptum($event->getPostscriptum())
             ->save();
-
-            $event->setConfig($config);
-
-            $this->kernel->initCacheConfigs(true);
         }
     }
 
@@ -111,8 +94,6 @@ class Config extends BaseAction implements EventSubscriberInterface
                 $config->delete();
 
                 $event->setConfig($config);
-
-                $this->kernel->initCacheConfigs(true);
             }
         }
     }

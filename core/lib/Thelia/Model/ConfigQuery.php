@@ -77,22 +77,6 @@ class ConfigQuery extends BaseConfigQuery
 
         $config->setValue($value);
         $config->save();
-
-        self::$cache[$configName] = $value;
-    }
-
-    public static function resetCache($key = null)
-    {
-        if ($key) {
-            if (\array_key_exists($key, self::$cache)) {
-                unset(self::$cache[$key]);
-
-                return true;
-            }
-        }
-        self::$cache = [];
-
-        return true;
     }
 
     public static function getConfiguredShopUrl()
