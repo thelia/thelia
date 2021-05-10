@@ -31,7 +31,7 @@ class FolderUpdateEvent extends FolderCreateEvent
         $this->folder_id = $folder_id;
     }
 
-    public function setChapo(string $chapo): self
+    public function setChapo(?string $chapo): self
     {
         $this->chapo = $chapo;
 
@@ -67,7 +67,7 @@ class FolderUpdateEvent extends FolderCreateEvent
         return $this->folder_id;
     }
 
-    public function setPostscriptum(string $postscriptum): self
+    public function setPostscriptum(?string $postscriptum): self
     {
         $this->postscriptum = $postscriptum;
 
