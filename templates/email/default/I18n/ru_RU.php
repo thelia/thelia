@@ -85,5 +85,5 @@ return [
     'Your order confirmation Nº %ref' => 'Подтверждение заказа № %ref',
     'Your password for %store' => 'Ваш пароль на %store',
     'Your password is <span style="font-family: courier, fixed; font-size: 120%">%pass</span>' => 'Ваш пароль <span style="font-family: courier, fixed; font-size: 120%">%pass</span>',
-    'Your subscriotion to %store newsletter' => 'Ваша подписка на рассылку новостей %store',
+    'Your subscription to %store newsletter' => 'Ваша подписка на рассылку новостей %store',
 ];
