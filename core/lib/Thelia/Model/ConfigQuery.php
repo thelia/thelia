@@ -23,6 +23,7 @@ use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
  */
 class ConfigQuery extends BaseConfigQuery
 {
+    protected static $booted = false;
     protected static $cache = [];
 
     /**
@@ -32,6 +33,7 @@ class ConfigQuery extends BaseConfigQuery
      */
     public static function initCache(array $configs): void
     {
+        self::$booted = true;
         self::$cache = $configs;
     }
 
@@ -44,7 +46,7 @@ class ConfigQuery extends BaseConfigQuery
      */
     public static function read(string $search, $default = null, bool $ignoreCache = false)
     {
-        if ($ignoreCache) {
+        if ($ignoreCache || !self::$booted) {
             $value = self::create()->findOneByName($search);
 
             self::$cache[$search] = $value ? $value->getValue() : $default;
