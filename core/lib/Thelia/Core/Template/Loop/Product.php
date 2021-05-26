@@ -131,6 +131,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                             'id', 'id_reverse',
                             'alpha', 'alpha_reverse',
                             'min_price', 'max_price',
+                            'min_stock', 'max_stock',
                             'manual', 'manual_reverse',
                             'created', 'created_reverse',
                             'updated', 'updated_reverse',
@@ -1130,6 +1131,20 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                         $search->addDescendingOrderByColumn('real_lowest_price');
                     } else {
                         $search->addDescendingOrderByColumn('real_price');
+                    }
+                    break;
+                case "min_stock":
+                    if ($complex) {
+                        $search->addAscendingOrderByColumn('is_min_stock');
+                    } else {
+                        $search->addAscendingOrderByColumn('quantity');
+                    }
+                    break;
+                case "max_stock":
+                    if ($complex) {
+                        $search->addDescendingOrderByColumn('is_min_stock');
+                    } else {
+                        $search->addDescendingOrderByColumn('quantity');
                     }
                     break;
                 case "manual":

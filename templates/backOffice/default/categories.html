@@ -254,6 +254,7 @@
                                     request_parameter_name='product_order'
                                     label="{intl l='ID'}"
                                  }
+                                 </th>
 
                                  <th>&nbsp;</th>
 
@@ -277,8 +278,20 @@
                                     request_parameter_name='product_order'
                                     label="{intl l='Product title'}"
                                  }
+                                 </th>
 
                                  {hook name="products.header" location="product_list_header" }
+
+                                 <th class="text-center">
+                                     {admin_sortable_header
+                                         current_order=$product_order
+                                         order='min_stock'
+                                         reverse_order='max_stock'
+                                         path={url path='/admin/catalog' category_id=$category_id target='products'}
+                                         request_parameter_name='product_order'
+                                         label="{intl l='Stock'}"
+                                     }
+                                 </th>
 
                                  <th class="text-right">
                                      {admin_sortable_header
@@ -319,6 +332,10 @@
 
                          <tbody>
                          {loop name="product_list" type="product" visible="*" category=$category_id order=$product_order page=$page backend_context="on" limit={config key="number_default_results_per_page.category_list" default=20} return_url=false}
+                         {$totalQty = 0}
+                         {loop name="pse" type="product_sale_elements" product=$ID}
+                         {$totalQty = $totalQty+$QUANTITY}
+                         {/loop}
                          <tr>
                              <td>{$ID}</td>
 
@@ -338,6 +355,10 @@
                              <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
 
                              {hook name="products.row" location="product_list_row" product_id={$ID} }
+
+                             <td class="text-center">
+                                 <a href="{url path='/admin/products/update' product_id=$ID page=$page current_tab='prices'}" title="{intl l='Edit Stock'}">{$totalQty}</a>
+                             </td>
 
                              <td class="text-right"><a href="{url path='/admin/products/update' product_id=$ID page=$page current_tab='prices'}" title="{intl l='Edit Prices'}">{format_money number=$BEST_PRICE symbol=$currency_symbol}</a></td>
 
@@ -459,7 +480,7 @@
                 {render_form_field field="locale" value=$LOCALE}
             {/loop}
         {/custom_render_form_field}
-        
+
         {form_field field="visible"}
 
         <label class="checkbox">
