@@ -58,7 +58,9 @@ class ParserContext implements \IteratorAggregate
         $this->formValidator = $formValidator;
 
         // Purge outdated error form contexts
-        $this->cleanOutdatedFormErrorInformation();
+        if (null !== $this->requestStack->getCurrentRequest()) {
+            $this->cleanOutdatedFormErrorInformation();
+        }
     }
 
     /**

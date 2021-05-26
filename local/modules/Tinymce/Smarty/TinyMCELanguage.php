@@ -30,7 +30,7 @@ class TinyMCELanguage extends AbstractSmartyPlugin
     public function __construct(RequestStack $requestStack)
     {
         $request = $requestStack->getCurrentRequest();
-        if ($request->getSession() != null) {
+        if (null !== $request && null !== $request->getSession()) {
             $this->locale = $request->getSession()->getLang()->getLocale();
         } else {
             $this->locale = Lang::getDefaultLanguage()->getLocale();

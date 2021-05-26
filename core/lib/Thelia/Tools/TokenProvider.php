@@ -54,15 +54,14 @@ class TokenProvider
      */
     public function __construct(RequestStack $requestStack, TranslatorInterface $translator, $tokenName)
     {
-        /*
-         * Store the services
-         */
         $this->requestStack = $requestStack;
-        $this->session = $this->requestStack->getCurrentRequest()->getSession();
+        $this->session = $this->requestStack->getCurrentRequest() !== null ? $this->requestStack->getCurrentRequest()->getSession() : null;
         $this->translator = $translator;
         $this->tokenName = $tokenName;
 
-        $this->token = $this->session->get($this->tokenName);
+        if (null !== $this->session) {
+            $this->token = $this->session->get($this->tokenName);
+        }
     }
 
     /**
