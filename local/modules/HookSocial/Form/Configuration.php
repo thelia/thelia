@@ -12,6 +12,7 @@
 
 namespace HookSocial\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Model\ConfigQuery;
@@ -62,7 +63,7 @@ class Configuration extends BaseForm
             $value = ConfigQuery::read('hooksocial_'.$field['id'], '');
             $form->add(
                 $field['id'],
-                'text',
+                TextType::class,
                 [
                     'data' => $value,
                     'label' => $field['label'],

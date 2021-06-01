@@ -89,6 +89,8 @@
         <meta name="twitter:image" content="{getFileFromManifest file="default-social-thumbnail.png"}" />
     {/block}
 
+    {hook name="main.head-top"}
+
     {* CSS *}
     {block name="css"}
       {getAssetsFromEntrypoints entry="app" type="css"}
@@ -117,6 +119,8 @@
 </head>
 
 <body class="text-gray-700 bg-gray-50 {block name="body-class"}{/block}" itemscope itemtype="http://schema.org/WebPage">
+    {hook name="main.body-top"}
+
     {include file="microdata/store.html"}
 
     {block name="header"}

@@ -292,7 +292,7 @@ class MessageController extends AbstractCrudController
 
         if (null !== $message = MessageQuery::create()->findPk($messageId)) {
             // Ajax submission: prevent CRSF control, as page is not refreshed
-            $baseForm = $this->createForm(AdminForm::MESSAGE_SEND_SAMPLE, 'form', [], ['csrf_protection' => false]);
+            $baseForm = $this->createForm(AdminForm::MESSAGE_SEND_SAMPLE, FormType::class, [], ['csrf_protection' => false]);
 
             try {
                 $form = $this->validateForm($baseForm, 'POST');

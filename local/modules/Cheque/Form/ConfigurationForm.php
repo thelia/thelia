@@ -13,6 +13,8 @@
 namespace Cheque\Form;
 
 use Cheque\Cheque;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
@@ -34,7 +36,7 @@ class ConfigurationForm extends BaseForm
         $this->formBuilder
             ->add(
                 'payable_to',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [new NotBlank()],
                     'label' => $this->trans('Cheque is payable to: '),
@@ -50,7 +52,7 @@ class ConfigurationForm extends BaseForm
             )
             ->add(
                 'instructions',
-                'textarea',
+                TextareaType::class,
                 [
                     'constraints' => [],
                     'required' => false,

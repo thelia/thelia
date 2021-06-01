@@ -12,6 +12,10 @@
 
 namespace Tinymce\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Thelia\Form\BaseForm;
 use Tinymce\Tinymce;
 
@@ -27,7 +31,7 @@ class ConfigurationForm extends BaseForm
         $this->formBuilder
             ->add(
                 'editor_height',
-                'integer',
+                IntegerType::class,
                 [
                     'required' => false,
                     'data' => Tinymce::getConfigValue('editor_height', 0),
@@ -36,7 +40,7 @@ class ConfigurationForm extends BaseForm
             )
             ->add(
                 'show_menu_bar',
-                'checkbox',
+                CheckboxType::class,
                 [
                     'required' => false,
                     'data' => (int) (Tinymce::getConfigValue('show_menu_bar', 0)) != 0,
@@ -45,7 +49,7 @@ class ConfigurationForm extends BaseForm
             )
             ->add(
                 'force_pasting_as_text',
-                'checkbox',
+                CheckboxType::class,
                 [
                     'required' => false,
                     'data' => (int) (Tinymce::getConfigValue('force_pasting_as_text', 0)) != 0,
@@ -57,7 +61,7 @@ class ConfigurationForm extends BaseForm
             )
             ->add(
                 'set_images_as_responsive',
-                'checkbox',
+                CheckboxType::class,
                 [
                     'required' => false,
                     'data' => (int) (Tinymce::getConfigValue('set_images_as_responsive', 1)) != 0,
@@ -69,7 +73,7 @@ class ConfigurationForm extends BaseForm
             )
             ->add(
                 'custom_css',
-                'textarea',
+                TextareaType::class,
                 [
                     'required' => false,
                     'data' => Tinymce::getConfigValue('custom_css', '/* Enter here CSS or LESS code */'),
@@ -85,7 +89,7 @@ class ConfigurationForm extends BaseForm
             )
             ->add(
                 'test_zone',
-                'textarea',
+                TextareaType::class,
                 [
                     'required' => false,
                     'label' => $this->translator->trans('Sample editor', [], Tinymce::MODULE_DOMAIN),
@@ -95,7 +99,7 @@ class ConfigurationForm extends BaseForm
                 ]
             )->add(
                 'available_text_areas',
-                'text',
+                TextType::class,
                 [
                     'disabled' => true,
                     'required' => false,

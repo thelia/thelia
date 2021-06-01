@@ -13,6 +13,7 @@
 namespace HookAnalytics\Form;
 
 use HookAnalytics\HookAnalytics;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Model\LangQuery;
@@ -36,7 +37,7 @@ class Configuration extends BaseForm
         $value = HookAnalytics::getConfigValue('hookanalytics_trackingcode', '', $lang->getLocale());
         $form->add(
             'trackingcode',
-            'text',
+            TextType::class,
             [
                 'data' => $value,
                 'label' => Translator::getInstance()->trans('Tracking Code'),
