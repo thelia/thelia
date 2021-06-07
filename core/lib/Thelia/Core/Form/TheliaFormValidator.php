@@ -107,7 +107,7 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
 
         /** @var Form $child */
         foreach ($form->all() as $child) {
-            if (!$child->isValid()) {
+            if ($child->isSubmitted() && !$child->isValid()) {
                 $fieldName = $child->getConfig()->getOption('label', null);
 
                 if (empty($fieldName)) {
