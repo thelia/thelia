@@ -799,45 +799,45 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             if ($new === true) {
                 $isPSELeftJoinList[] = 'is_new';
                 $search->joinProductSaleElements('is_new', Criteria::LEFT_JOIN)
-                    ->where('`is_new`.NEWNESS' . Criteria::EQUAL . '1')
+                    ->where('is_new.NEWNESS' . Criteria::EQUAL . '?', 1)
                     ->where('NOT ISNULL(`is_new`.ID)');
             } elseif ($new === false) {
                 $isPSELeftJoinList[] = 'is_new';
                 $search->joinProductSaleElements('is_new', Criteria::LEFT_JOIN)
-                    ->where('`is_new`.NEWNESS' . Criteria::EQUAL . '0')
+                    ->where('is_new.NEWNESS' . Criteria::EQUAL . '?', 0)
                     ->where('NOT ISNULL(`is_new`.ID)');
             }
 
             if ($promo === true) {
                 $isPSELeftJoinList[] = 'is_promo';
                 $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
-                    ->where('`is_promo`.PROMO' . Criteria::EQUAL . '1')
+                    ->where('is_promo.PROMO' . Criteria::EQUAL . '?', 1)
                     ->where('NOT ISNULL(`is_promo`.ID)');
             } elseif ($promo === false) {
                 $isPSELeftJoinList[] = 'is_promo';
                 $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
-                    ->where('`is_promo`.PROMO' . Criteria::EQUAL . '0')
+                    ->where('is_promo.PROMO' . Criteria::EQUAL . '?', 0)
                     ->where('NOT ISNULL(`is_promo`.ID)');
             }
 
             if (null != $min_stock) {
                 $isPSELeftJoinList[] = 'is_min_stock';
                 $search->joinProductSaleElements('is_min_stock', Criteria::LEFT_JOIN)
-                    ->where('`is_min_stock`.QUANTITY' . Criteria::GREATER_EQUAL . '?', $min_stock, \PDO::PARAM_INT)
+                    ->where('is_min_stock.QUANTITY' . Criteria::GREATER_EQUAL . '?', $min_stock, \PDO::PARAM_INT)
                     ->where('NOT ISNULL(`is_min_stock`.ID)');
             }
 
             if (null != $min_weight) {
                 $isPSELeftJoinList[] = 'is_min_weight';
                 $search->joinProductSaleElements('is_min_weight', Criteria::LEFT_JOIN)
-                    ->where('`is_min_weight`.WEIGHT' . Criteria::GREATER_EQUAL . '?', $min_weight, \PDO::PARAM_STR)
+                    ->where('is_min_weight.WEIGHT' . Criteria::GREATER_EQUAL . '?', $min_weight, \PDO::PARAM_STR)
                     ->where('NOT ISNULL(`is_min_weight`.ID)');
             }
 
             if (null != $max_weight) {
                 $isPSELeftJoinList[] = 'is_max_weight';
                 $search->joinProductSaleElements('is_max_weight', Criteria::LEFT_JOIN)
-                    ->where('`is_max_weight`.WEIGHT' . Criteria::LESS_EQUAL . '?', $max_weight, \PDO::PARAM_STR)
+                    ->where('is_max_weight.WEIGHT' . Criteria::LESS_EQUAL . '?', $max_weight, \PDO::PARAM_STR)
                     ->where('NOT ISNULL(`is_max_weight`.ID)');
             }
 
@@ -1016,27 +1016,27 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->withColumn('MIN(' . $priceToCompareAsSQL . ')', 'real_lowest_price');
         } else {
             if ($new === true) {
-                $search->where('`pse`.NEWNESS' . Criteria::EQUAL . '1');
+                $search->where('pse.NEWNESS' . Criteria::EQUAL . '?', 1);
             } elseif ($new === false) {
-                $search->where('`pse`.NEWNESS' . Criteria::EQUAL . '0');
+                $search->where('pse.NEWNESS' . Criteria::EQUAL . '?', 0);
             }
 
             if ($promo === true) {
-                $search->where('`pse`.PROMO' . Criteria::EQUAL . '1');
+                $search->where('pse.PROMO' . Criteria::EQUAL . '?', 1);
             } elseif ($promo === false) {
-                $search->where('`pse`.PROMO' . Criteria::EQUAL . '0');
+                $search->where('pse.PROMO' . Criteria::EQUAL . '?', 0);
             }
 
             if (null != $min_stock) {
-                $search->where('`pse`.QUANTITY' . Criteria::GREATER_EQUAL . '?', $min_stock, \PDO::PARAM_INT);
+                $search->where('pse.QUANTITY' . Criteria::GREATER_EQUAL . '?', $min_stock, \PDO::PARAM_INT);
             }
 
             if (null != $min_weight) {
-                $search->where('`pse`.WEIGHT' . Criteria::GREATER_EQUAL . '?', $min_weight, \PDO::PARAM_STR);
+                $search->where('pse.WEIGHT' . Criteria::GREATER_EQUAL . '?', $min_weight, \PDO::PARAM_STR);
             }
 
             if (null != $max_weight) {
-                $search->where('`is_max_weight`.WEIGHT' . Criteria::LESS_EQUAL . '?', $max_weight, \PDO::PARAM_STR);
+                $search->where('is_max_weight.WEIGHT' . Criteria::LESS_EQUAL . '?', $max_weight, \PDO::PARAM_STR);
             }
 
             if (null !== $min_price) {
