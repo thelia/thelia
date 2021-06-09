@@ -292,6 +292,16 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                         }
                     }
 
+                    if (false === $hasConfigurationInterface && $this->container->has("router.annotation")) {
+                        try {
+                            if ($this->container->get("router.annotation")->match('/admin/module/'.$module->getCode())) {
+                                $hasConfigurationInterface = true;
+                            }
+                        } catch (\Exception $e) {
+                            /* $hasConfigurationInterface stays false */
+                        }
+                    }
+
                     /* if not ; test if it uses admin inclusion : module_configuration.html */
                     if (false === $hasConfigurationInterface) {
                         if (file_exists($module->getAbsoluteAdminIncludesPath().DS.'module_configuration.html')) {
