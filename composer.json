@@ -68,6 +68,7 @@
         "symfony/flex": "^1.12",
         "doctrine/cache": "~1.0",
         "assetic/framework": "dev-develop#b067e1779fc18db43031a4dc9a80308465febcfd",
+        "thelia/html2pdf": "dev-main",
         "thelia/open-api-module": "dev-main",
         "thelia/smarty-redirection-module": "dev-main",
         "thelia/choice-filter-module": "dev-main",

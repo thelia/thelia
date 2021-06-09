@@ -55,6 +55,7 @@
         "symfony/lock": "5.2.*",
         "symfony/var-dumper": "5.2.*",
         "thelia/propel": "dev-thelia-2.5",
+        "thelia/html2pdf": "dev-main",
         "symfony/mime": "5.2.*",
         "symfony/framework-bundle": "5.2.*",
         "wikimedia/less.php": "^3.1",
