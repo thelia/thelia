@@ -34,7 +34,7 @@ class ModuleEvent extends ActionEvent
     protected $description;
     protected $postscriptum;
 
-    public function setChapo(string $chapo): void
+    public function setChapo(?string $chapo): void
     {
         $this->chapo = $chapo;
     }
@@ -44,7 +44,7 @@ class ModuleEvent extends ActionEvent
         return $this->chapo;
     }
 
-    public function setDescription(string $description): void
+    public function setDescription(?string $description): void
     {
         $this->description = $description;
     }
@@ -74,7 +74,7 @@ class ModuleEvent extends ActionEvent
         return $this->locale;
     }
 
-    public function setPostscriptum(string $postscriptum): void
+    public function setPostscriptum(?string $postscriptum): void
     {
         $this->postscriptum = $postscriptum;
     }

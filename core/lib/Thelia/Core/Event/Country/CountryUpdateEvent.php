@@ -42,7 +42,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         $this->country_id = $country_id;
     }
 
-    public function setChapo(string $chapo)
+    public function setChapo(?string $chapo)
     {
         $this->chapo = $chapo;
 
@@ -57,7 +57,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this->chapo;
     }
 
-    public function setDescription(string $description)
+    public function setDescription(?string $description)
     {
         $this->description = $description;
 
@@ -69,7 +69,7 @@ class CountryUpdateEvent extends CountryCreateEvent
         return $this->description;
     }
 
-    public function setPostscriptum(string $postscriptum)
+    public function setPostscriptum(?string $postscriptum)
     {
         $this->postscriptum = $postscriptum;
 
