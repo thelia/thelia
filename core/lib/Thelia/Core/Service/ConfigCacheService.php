@@ -12,42 +12,31 @@
 
 namespace Thelia\Core\Service;
 
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\VarExporter\VarExporter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
 use Thelia\Model\ConfigQuery;
 
 class ConfigCacheService
 {
-    /**
-     * @var string
-     */
-    private $kernelCacheDir;
-
-    public function __construct(
-        string $kernelCacheDir
-    ) {
-        $this->kernelCacheDir = $kernelCacheDir;
-    }
-
     public function initCacheConfigs(bool $force = false): void
     {
-        if ($force || !file_exists($this->kernelCacheDir.DS.'thelia_configs.php')) {
-            $caches = [];
+        $cache = new FilesystemAdapter();
 
+        if ($force) {
+            $cache->delete('thelia_config');
+        }
+
+        $value = $cache->get('thelia_config', function (ItemInterface $item) {
             $configs = ConfigQuery::create()->find();
+            $caches = [];
 
             foreach ($configs as $config) {
                 $caches[$config->getName()] = $config->getValue();
             }
 
-            (new Filesystem())->dumpFile(
-                $this->kernelCacheDir.DS.'thelia_configs.php',
-                '<?php return '.VarExporter::export($caches).';'
-            );
-        }
+            return $caches;
+        });
 
-        ConfigQuery::initCache(
-            require $this->kernelCacheDir.DS.'thelia_configs.php'
-        );
+        ConfigQuery::initCache($value);
     }
 }
