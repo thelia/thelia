@@ -27,8 +27,8 @@
 {* Meta *}
 {block name="meta"}
 {loop name="category.seo.meta" type="category" current="yes"}
-{if $META_DESCRIPTION}<meta name="description" content="{$META_DESCRIPTION}">{/if}
-{if $META_KEYWORDS}<meta name="keywords" content="{$META_KEYWORDS}">{/if}
+{if $META_DESCRIPTION|default:null}<meta name="description" content="{$META_DESCRIPTION}">{/if}
+{if $META_KEYWORDS|default:null}<meta name="keywords" content="{$META_KEYWORDS}">{/if}
 {/loop}
 {/block}
 
@@ -42,36 +42,36 @@
 
 {* Content *}
 {block name="main-content"}
-    {loop type="category" name="home.cat" limit=1 id=$category_id}
+    {loop type="category" name="home.cat" limit=1 id=$category_id|default:null}
         <div class="Category">
             {include file="components/smarty/BreadCrumb/BreadCrumb.html"}
 
             {$product_page={$smarty.get.page|default:1}}
             {$product_order={$smarty.get.order|default:'manual'}}
 
-            {if !isset($showFilters)}
+            {if !isset($showFilters)|default:null}
               {$showFilters = false}
             {/if}
-            {loop name="choice_filter" type="choice_filter" category_id=$category_id }
+            {loop name="choice_filter" type="choice_filter" category_id=$category_id|default:null}
               {$showFilters = true}
             {/loop}
 
             <div class="lg:flex">
-              {if $showFilters}
+              {if $showFilters|default:null}
                 <div class="w-full max-w-xs xl:max-w-sm">
                     {include file="components/smarty/CategoryMenu/CategoryMenu.html"}
                 </div>
                 {/if}
-                <div class="flex-1 mt-8 mb-8 {if $showFilters}lg:ml-8{/if}">
+                <div class="flex-1 mt-8 mb-8 {if $showFilters|default:null}lg:ml-8{/if}">
                   {include file="components/smarty/Title/Title.html" type="h1" title=$TITLE class="text-left" }
 
-                  {if $CHAPO}
+                  {if $CHAPO|default:null}
                   <div class="py-4 mb-8">
                         {$CHAPO nofilter}
                   </div>
                   {/if}
 
-                  {if $showFilters}
+                  {if $showFilters|default:null}
                   <div class="mb-8 lg:hidden">
                     <button class="block w-full btn btn--dark" data-toggle-form-filters>{intl l="Show filters"}</button>
                   </div>
@@ -88,5 +88,5 @@
         </div>
     {/loop}
 
-    {hook name="category.bottom" category=$category_id}
+    {hook name="category.bottom" category=$category_id|default:null}
 {/block}

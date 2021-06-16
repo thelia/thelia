@@ -15,7 +15,7 @@
 
 {* Page Title *}
 {block name='no-return-functions' append}
-    {if {$content_id}}
+    {if {$content_id}|default:null}
         {loop name="content.seo.title" type="content" id={$content_id} limit="1"}
             {$page_title = $META_TITLE}
         {/loop}
@@ -24,7 +24,7 @@
 
 {* Meta *}
 {block name="meta"}
-    {if $content_id}
+    {if $content_id|default:null}
         {loop name="content.seo.meta" type="content" id=$content_id limit="1"}
             {include file="includes/meta-seo.html"}
         {/loop}
@@ -42,7 +42,7 @@
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
-    {if $content_id}
+    {if $content_id|default:null}
         {$breadcrumbs = []}
         {loop type="content" name="content-breadcrumb" id=$content_id limit="1"}
             {loop name="folder_path" type="folder-path" folder={$DEFAULT_FOLDER}}
@@ -60,7 +60,7 @@
   {/loop}
 
   <div class="container mx-auto">
-  {if $content_id}
+  {if $content_id|default:null}
       {hook name="content.top" content="$content_id"}
           {hook name="content.main-top" content="$content_id"}
           <article class="" role="main" aria-labelledby="main-label">

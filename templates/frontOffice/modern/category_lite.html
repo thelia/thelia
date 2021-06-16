@@ -25,8 +25,8 @@
 {* Meta *}
 {block name="meta"}
 {loop name="category.seo.meta" type="category" current="yes"}
-{if $META_DESCRIPTION}<meta name="description" content="{$META_DESCRIPTION}">{/if}
-{if $META_KEYWORDS}<meta name="keywords" content="{$META_KEYWORDS}">{/if}
+{if $META_DESCRIPTION|default:null}<meta name="description" content="{$META_DESCRIPTION}">{/if}
+{if $META_KEYWORDS|default:null}<meta name="keywords" content="{$META_KEYWORDS}">{/if}
 {/loop}
 {/block}
 
@@ -66,5 +66,5 @@
         </div>
     {/loop}
 
-    {hook name="category.bottom" category=$category_id}
+    {hook name="category.bottom" category=$category_id|default:null}
 {/block}

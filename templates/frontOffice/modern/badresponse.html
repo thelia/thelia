@@ -23,8 +23,8 @@
     <!-- PAYMENT FORM TEMPLATE -->
     <div>
         <p>
-            {$msg}<br/>
-            {loop name="badresponseorder" type="order" id={$order_id}}
+            {$msg|default:null}<br/>
+            {loop name="badresponseorder" type="order" id={$order_id|default:null}}
                 {$REF}
             {/loop}
             <br/>

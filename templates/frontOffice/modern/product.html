@@ -45,7 +45,7 @@
 
 {* Content *}
 {block name="main-content"}
-    {if $product_id}
+    {if $product_id|default:null}
 
 
         {include file="components/smarty/BreadCrumb/BreadCrumb.html"}

@@ -18,11 +18,11 @@
                     <p>{intl l="To cancel your subscription to our newsletter, please enter your email address below."}</p>
                     <div class="col-sm-6">
                         {form_field field="email"}
-                            <div class="form-group group-email {if $error}has-error{elseif !$error && $value != ""}has-success{/if}">
-                                <label for="{$label_attr.for|default:null}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                            <div class="form-group group-email {if $error|default:null}has-error{elseif !$error && $value != ""}has-success{/if}">
+                                <label for="{$label_attr.for|default:null}">{$label}{if $required|default:null} <span class="required">*</span>{/if}</label>
                                 <div class="control-input">
-                                    <input type="email" name="{$name}" id="{$label_attr.for|default:null}" value="{$value|default:$smarty.get.email}" class="form-control" maxlength="255" {if $required} aria-required="true" required{/if} autofocus>
-                                    {if $error}
+                                    <input type="email" name="{$name|default:null}" id="{$label_attr.for|default:null}" value="{$value|default:$smarty.get.email|default:null}" class="form-control" maxlength="255" {if $required|default:null} aria-required="true" required{/if} autofocus>
+                                    {if $error|default:null}
                                         <span class="help-block">{$message}</span>
                                     {elseif !$error && $value != ""}
                                         <span class="help-block"><span class="fa fa-check"></span> {intl l="Your subscription to our newsletter has been canceled."}</span>

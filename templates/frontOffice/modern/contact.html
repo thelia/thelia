@@ -60,20 +60,20 @@
                           }
                         {/form_field}
                         {form_field field="message"}
-                        <div for="{$id}" class="block mb-2 text-sm text-gray-600">
-                          <label class="font-bold text-sm {if $error}text-red-500{else}text-gray-700{/if}">
+                        <div for="{$id|default:null}" class="block mb-2 text-sm text-gray-600">
+                          <label class="font-bold text-sm {if $error|default:null}text-red-500{else}text-gray-700{/if}">
                             {$label}
                           </label>
                           <textarea
-                            name="{$name}"
+                            name="{$name|default:null}"
                             id="{$label_attr.for|default:null}"
                             placeholder="{intl l="Your message"}"
                             rows="6"
-                            class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if $error}border-red-500{else}border-gray-200{/if} {$inputClass}"
-                            {if $required} aria-required="true" required{/if}>
+                            class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if $error|default:null}border-red-500{else}border-gray-200{/if} {$inputClass|default:null}"
+                            {if $required|default:null} aria-required="true" required{/if}>
                             {$value}
                           </textarea>
-                          {if $error}
+                          {if $error|default:null}
                             <div class="mt-1">
                               <span class="block mb-4 text-xs italic font-normal text-red-500">
                                 {$message}

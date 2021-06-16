@@ -1,4 +1,4 @@
-{if !$smarty.cookies.cookie_consent}
+{if !$smarty.cookies.cookie_consent|default:null}
 <div class="CookieBar fixed bottom-0 z-50 w-full bg-gray-50 text-black p-12">
   <div class="CookieBar-container container mx-auto">
     <p class="CookieBar-text">

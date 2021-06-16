@@ -7,7 +7,7 @@
     type="text"
     name=$name
     id="{$label_attr.for|default:null}"
-    value={$value|default:{$LABEL} nofilter}
+    value={$value|default:{$LABEL|default:null} nofilter}
     label=$label
     placeholder=""
     required=$required

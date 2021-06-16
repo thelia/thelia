@@ -24,7 +24,7 @@
 
       <form action="{url path="/filters/product"}" class="" data-form-filters>
 
-          <input type="hidden" name="category_id" id="CategoryMenu-categories" value="{$category_id}">
+          <input type="hidden" name="category_id" id="CategoryMenu-categories" value="{$category_id|default:null}">
 
           {* on désactive  le cache quand filtre  actif *}
           {if $min_price != 0 || $max_price != 5000 || $featuresSelected|count || $brands|count || $categoriesSelected|count}

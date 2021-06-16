@@ -137,17 +137,17 @@
 		                {$city="{config key="store_zipcode"} {config key="store_city"}"}
 		                {if $addresses != "  "}- {$addresses}{/if}
 		                {if $city != " " }- {$city}{/if}
-		                {if {config key="store_country"} }
+		                {if {config key="store_country"}|default:null}
 		                    {loop type="country" visible="*" name="address.country.title" id={config key="store_country"}} - {$TITLE}{/loop}
 		                {/if}
-		                {if {config key="store_business_id"} }
+		                {if {config key="store_business_id"}|default:null}
 		                    - {config key="store_business_id"}
 		                {/if}
 		                <br>
-		                {if {config key="store_phone"} }
+		                {if {config key="store_phone"}|default:null}
 		                    {intl l="Phone: "}{config key="store_phone"}
 		                {/if}
-		                {if {config key="store_email"} }
+		                {if {config key="store_email"}|default:null}
 		                    {intl l="Email: "}{config key="store_email"}
 		                {/if}
 					{/elsehook}

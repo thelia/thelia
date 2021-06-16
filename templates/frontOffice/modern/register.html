@@ -41,7 +41,7 @@
       {/form_field}
       {form_hidden_fields}
 
-      {if $form_error}
+      {if $form_error|default:null}
         <div class="my-10">{include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$form_error_message}</div>
       {/if}
 
@@ -68,7 +68,7 @@
                 {call name="fn_field_email"}
               {/form_field}
 
-              {if {config key="customer_confirm_email"}}
+              {if {config key="customer_confirm_email"}|default:null}
               {form_field field="email_confirm"}
                 {call name="fn_field_email_confirm"}
               {/form_field}

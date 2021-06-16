@@ -36,7 +36,7 @@
         {form name="thelia.front.address.create"}
         <form id="form-address" class="" action="{url path="/address/create"}" method="post">
             {form_field field='success_url'}
-                {if $value}
+                {if $value|default:null}
                 {$next_url=$value}
                 {else}
                 {$next_url=$smarty.get.next|default:{url path="/account"}}
@@ -50,7 +50,7 @@
 
             {form_hidden_fields}
 
-            {if $form_error}
+            {if $form_error|default:null}
               {include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$form_error_message}
             {/if}
 
@@ -117,7 +117,7 @@
                 {/form_field}
 
                 {form_field field="state"}
-                  {assign var="customer_state_id" value={$value|default:$STATE}}
+                  {assign var="customer_state_id" value={$value|default:$STATE|default:null}}
                   {call name="fn_address_field_state" countryFieldId=$countryFieldId}
                 {/form_field}
               </div>

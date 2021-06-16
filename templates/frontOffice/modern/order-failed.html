@@ -23,7 +23,7 @@
             {hook name="order-failed.top"}
 
             <div id="payment-failure">
-                  {include file="components/smarty/Alert/Alert.html" type="warning" title={intl l="We're sorry, a problem occured and your payment was not successful."} message=$failed_order_message}
+                  {include file="components/smarty/Alert/Alert.html" type="warning" title={intl l="We're sorry, a problem occured and your payment was not successful."} message=$failed_order_message|default:null}
             </div>
 
             {hook name="order-failed.bottom"}

@@ -21,7 +21,7 @@
 {block name='no-return-functions' append}
     {$breadcrumbs = [
         ['title' => {intl l="Account"}, 'url'=>{url path="/account"}],
-        ['title' => {intl l="Address Update"}, 'url'=>{url path="/address/update/%address_id" address_id=$address_id}]
+        ['title' => {intl l="Address Update"}, 'url'=>{url path="/address/update/%address_id" address_id=$address_id|default:null}]
     ]}
 {/block}
 
@@ -36,10 +36,10 @@
     {hook name="address-update.top"}
 
     {form name="thelia.front.address.update"}
-    {loop name="customer.update" type="address" customer="current" id=$address_id}
-        <form id="form-address" class="" action="{url path="/address/update/%address_id" address_id=$address_id}" method="post">
+    {loop name="customer.update" type="address" customer="current" id=$address_id|default:null}
+        <form id="form-address" class="" action="{url path="/address/update/%address_id" address_id=$address_id|default:null}" method="post">
         {form_field field='success_url'}
-            {if $value}
+            {if $value|default:null}
                 {$next_url=$value}
             {else}
                 {$next_url=$smarty.get.next|default:{url path="/account"}}
@@ -53,11 +53,11 @@
 
         {form_hidden_fields}
 
-        {if $form_error}
+        {if $form_error|default:null}
             {include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$form_error_message}
         {/if}
 
-        {hook name="address-update.form-top" address=$address_id}
+        {hook name="address-update.form-top" address=$address_id|default:null}
 
         <fieldset class="panel">
           <h4 class="font-bold text-lg mb-4">
@@ -135,7 +135,7 @@
             {/if}
         {/form_field}
 
-        {hook name="address-update.form-bottom" address=$address_id}
+        {hook name="address-update.form-bottom" address=$address_id|default:null}
 
         <div class="mt-10 text-center">
           <button type="submit" class="btn">{intl l="Update"}</button>
@@ -144,7 +144,7 @@
         </form>
         {/loop}
     {/form}
-    {hook name="address-update.bottom" address=$address_id}
+    {hook name="address-update.bottom" address=$address_id|default:null}
     </div>
 {/block}
 
@@ -153,9 +153,9 @@
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="address-update.after-javascript-include" address=$address_id}
+{hook name="address-update.after-javascript-include" address=$address_id|default:null}
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="address-update.javascript-initialization" address=$address_id}
+{hook name="address-update.javascript-initialization" address=$address_id|default:null}
 {/block}

@@ -9,7 +9,7 @@
 
 {* Page Title *}
 {block name='no-return-functions' append}
-{if $brand_id}
+{if $brand_id|default:null}
     {loop name="brand.seo.title" type="brand" id=$brand_id limit="1"}
     {$page_title = $META_TITLE}
     {/loop}
@@ -18,7 +18,7 @@
 
 {* Meta *}
 {block name="meta"}
-{if $brand_id}
+{if $brand_id|default:null}
     {loop name="brand.seo.meta" type="brand" id=$brand_id limit="1"}
         {include file="includes/meta-seo.html"}
     {/loop}
@@ -27,16 +27,16 @@
 
 {* Feeds *}
 {block name="feeds"}
-{if $brand_id}
+{if $brand_id|default:null}
     <link rel="alternate" type="application/rss+xml" title="{intl l='All product in brand %title' title={brand attr='title'}}" href="{url path="/feed/brand/%lang/%brand_id" lang={lang attr='locale'} brand_id=$brand_id}"/>
 {/if}
 {/block}
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
-{if $brand_id}
+{if $brand_id|default:null}
     {$breadcrumbs = []}
-    {if $brand_id}
+    {if $brand_id|default:null}
         {loop type="brand" name="brand-breadcrumb" id=$brand_id limit="1"}
         {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
         {/loop}
@@ -50,7 +50,7 @@
 {$limit=32}
 {$product_page={$page|default:{$smarty.get.page|default:1}}}
 {hook name="brand.top" brand="$brand_id"}
-    {if $brand_id}
+    {if $brand_id|default:null}
 
     {loop name="brand.info" type="brand" id=$brand_id limit="1"}
       {include file="components/smarty/PageHeader/PageHeader.html"}
@@ -69,7 +69,7 @@
 
             {assign var="amount" value={count type="product" brand=$ID}}
             <div class="grid grid-flow-row-dense lg:grid-cols-2 xl:grid-cols-3 xxl:grid-cols-5 grid-rows-1 gap-8">
-              {loop type="product" name="product_list" brand=$ID limit=$limit page=$product_page order=$product_order}
+              {loop type="product" name="product_list" brand=$ID|default:null limit=$limit|default:null page=$product_page|default:null order=$product_order|default:null}
                   {include file="components/smarty/SingleProduct/SingleProduct.html"}
               {/loop}
             </div>

@@ -9,7 +9,7 @@
 
 {* Page Title *}
 {block name='no-return-functions' append}
-    {if $folder_id}
+    {if $folder_id|default:null}
         {loop name="folder.seo.title" type="folder" id=$folder_id limit="1"}
         {$page_title = $META_TITLE}
         {/loop}
@@ -18,7 +18,7 @@
 
 {* Meta *}
 {block name="meta"}
-    {if $folder_id}
+    {if $folder_id|default:null}
         {loop name="folder.seo.meta" type="folder" id=$folder_id limit="1"}
             {include file="includes/meta-seo.html"}
         {/loop}
@@ -36,7 +36,7 @@
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
-    {if $folder_id}
+    {if $folder_id|default:null}
         {$breadcrumbs = []}
         {loop name="folder_path" type="folder-path" folder=$folder_id}
             {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
@@ -63,7 +63,7 @@
 
         {hook name="folder.content-top" folder="$folder_id"}
 
-        {if $folder_id}
+        {if $folder_id|default:null}
             {loop name="folder" type="folder" id=$folder_id limit="1"}
                   {include file="components/smarty/FolderDefault/FolderDefault.html"}
             {/loop}
@@ -75,7 +75,7 @@
                     <article>
                         <div class="content-info">
                             <h2 class="name"><a href="{$URL nofilter}">{$TITLE}</a></h2>
-                            {if $CHAPO}
+                            {if $CHAPO|default:null}
                             <div class="short-description">
                                 {$CHAPO}
                             </div>
