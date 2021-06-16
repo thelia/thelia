@@ -798,24 +798,24 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             if ($new === true) {
                 $isPSELeftJoinList[] = 'is_new';
                 $search->joinProductSaleElements('is_new', Criteria::LEFT_JOIN)
-                    ->where('`is_new`.NEWNESS' . Criteria::EQUAL . '1')
+                    ->where('is_new.NEWNESS' . Criteria::EQUAL . '?', 1)
                     ->where('NOT ISNULL(`is_new`.ID)');
             } elseif ($new === false) {
                 $isPSELeftJoinList[] = 'is_new';
                 $search->joinProductSaleElements('is_new', Criteria::LEFT_JOIN)
-                    ->where('`is_new`.NEWNESS' . Criteria::EQUAL . '0')
+                    ->where('is_new.NEWNESS' . Criteria::EQUAL . '?', 0)
                     ->where('NOT ISNULL(`is_new`.ID)');
             }
 
             if ($promo === true) {
                 $isPSELeftJoinList[] = 'is_promo';
                 $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
-                    ->where('`is_promo`.PROMO' . Criteria::EQUAL . '1')
+                    ->where('is_promo.PROMO' . Criteria::EQUAL . '?', 1)
                     ->where('NOT ISNULL(`is_promo`.ID)');
             } elseif ($promo === false) {
                 $isPSELeftJoinList[] = 'is_promo';
                 $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
-                    ->where('`is_promo`.PROMO' . Criteria::EQUAL . '0')
+                    ->where('is_promo.PROMO' . Criteria::EQUAL . '?', 0)
                     ->where('NOT ISNULL(`is_promo`.ID)');
             }
 
@@ -1015,15 +1015,15 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->withColumn('MIN(' . $priceToCompareAsSQL . ')', 'real_lowest_price');
         } else {
             if ($new === true) {
-                $search->where('`pse`.NEWNESS' . Criteria::EQUAL . '1');
+                $search->where('pse.NEWNESS' . Criteria::EQUAL . '?', 1);
             } elseif ($new === false) {
-                $search->where('`pse`.NEWNESS' . Criteria::EQUAL . '0');
+                $search->where('pse.NEWNESS' . Criteria::EQUAL . '?', 0);
             }
 
             if ($promo === true) {
-                $search->where('`pse`.PROMO' . Criteria::EQUAL . '1');
+                $search->where('pse.PROMO' . Criteria::EQUAL . '?', 1);
             } elseif ($promo === false) {
-                $search->where('`pse`.PROMO' . Criteria::EQUAL . '0');
+                $search->where('pse.PROMO' . Criteria::EQUAL . '?', 0);
             }
 
             if (null != $min_stock) {
