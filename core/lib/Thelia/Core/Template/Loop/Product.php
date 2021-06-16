@@ -131,6 +131,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                             'id', 'id_reverse',
                             'alpha', 'alpha_reverse',
                             'min_price', 'max_price',
+                            'min_stock', 'max_stock',
                             'manual', 'manual_reverse',
                             'created', 'created_reverse',
                             'updated', 'updated_reverse',
@@ -822,21 +823,21 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             if (null != $min_stock) {
                 $isPSELeftJoinList[] = 'is_min_stock';
                 $search->joinProductSaleElements('is_min_stock', Criteria::LEFT_JOIN)
-                    ->where('`is_min_stock`.QUANTITY' . Criteria::GREATER_EQUAL . '?', $min_stock, \PDO::PARAM_INT)
+                    ->where('is_min_stock.QUANTITY' . Criteria::GREATER_EQUAL . '?', $min_stock, \PDO::PARAM_INT)
                     ->where('NOT ISNULL(`is_min_stock`.ID)');
             }
 
             if (null != $min_weight) {
                 $isPSELeftJoinList[] = 'is_min_weight';
                 $search->joinProductSaleElements('is_min_weight', Criteria::LEFT_JOIN)
-                    ->where('`is_min_weight`.WEIGHT' . Criteria::GREATER_EQUAL . '?', $min_weight, \PDO::PARAM_STR)
+                    ->where('is_min_weight.WEIGHT' . Criteria::GREATER_EQUAL . '?', $min_weight, \PDO::PARAM_STR)
                     ->where('NOT ISNULL(`is_min_weight`.ID)');
             }
 
             if (null != $max_weight) {
                 $isPSELeftJoinList[] = 'is_max_weight';
                 $search->joinProductSaleElements('is_max_weight', Criteria::LEFT_JOIN)
-                    ->where('`is_max_weight`.WEIGHT' . Criteria::LESS_EQUAL . '?', $max_weight, \PDO::PARAM_STR)
+                    ->where('is_max_weight.WEIGHT' . Criteria::LESS_EQUAL . '?', $max_weight, \PDO::PARAM_STR)
                     ->where('NOT ISNULL(`is_max_weight`.ID)');
             }
 
@@ -1027,15 +1028,15 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             }
 
             if (null != $min_stock) {
-                $search->where('`pse`.QUANTITY' . Criteria::GREATER_EQUAL . '?', $min_stock, \PDO::PARAM_INT);
+                $search->where('pse.QUANTITY' . Criteria::GREATER_EQUAL . '?', $min_stock, \PDO::PARAM_INT);
             }
 
             if (null != $min_weight) {
-                $search->where('`pse`.WEIGHT' . Criteria::GREATER_EQUAL . '?', $min_weight, \PDO::PARAM_STR);
+                $search->where('pse.WEIGHT' . Criteria::GREATER_EQUAL . '?', $min_weight, \PDO::PARAM_STR);
             }
 
             if (null != $max_weight) {
-                $search->where('`is_max_weight`.WEIGHT' . Criteria::LESS_EQUAL . '?', $max_weight, \PDO::PARAM_STR);
+                $search->where('is_max_weight.WEIGHT' . Criteria::LESS_EQUAL . '?', $max_weight, \PDO::PARAM_STR);
             }
 
             if (null !== $min_price) {
@@ -1130,6 +1131,20 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                         $search->addDescendingOrderByColumn('real_lowest_price');
                     } else {
                         $search->addDescendingOrderByColumn('real_price');
+                    }
+                    break;
+                case "min_stock":
+                    if ($complex) {
+                        $search->addAscendingOrderByColumn('is_min_stock');
+                    } else {
+                        $search->addAscendingOrderByColumn('quantity');
+                    }
+                    break;
+                case "max_stock":
+                    if ($complex) {
+                        $search->addDescendingOrderByColumn('is_min_stock');
+                    } else {
+                        $search->addDescendingOrderByColumn('quantity');
                     }
                     break;
                 case "manual":

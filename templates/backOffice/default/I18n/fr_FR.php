@@ -457,6 +457,7 @@ return array(
     'Ecotax is a tax wich add a defined amount (throug a product feature) to the product price.' => 'L\'écotaxe est une taxe qui ajoute un montant défini (grâce à une caractéristique produit) au prix du produit.',
     'Edit' => 'Modifier',
     'Edit Prices' => 'Modifier les prix',
+    'Edit Stock' => 'Modifier les stocks',
     'Edit a country' => 'Modifier un pays',
     'Edit a currency' => 'Modifier une devise',
     'Edit a customer' => 'Éditer un client',
