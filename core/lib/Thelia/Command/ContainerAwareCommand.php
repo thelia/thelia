@@ -92,7 +92,6 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
         $request = Request::create($this->getBaseUrl($lang));
         $request->setSession(new Session(new MockArraySessionStorage()));
-        $container->set('request_stack', new RequestStack());
         $container->get('request_stack')->push($request);
 
         $requestContext = new RequestContext();
