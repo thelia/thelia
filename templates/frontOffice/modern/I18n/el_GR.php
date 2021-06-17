@@ -61,7 +61,7 @@ return [
     'Go home' => 'Πήγαινε στην Αρχή',
     'Grid' => 'Πλέγμα',
     'Home' => 'Αρχή',
-    'If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.' => 'Εάν δε συμβεί τίποτα εντός των επόμενων 10 δευτερολέπτων, <a id="force-submit-payment-form" href="#"> Παρακαλώ, πατήστε εδώ</a>. ',
+    'If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" value="please click here">.' => 'Εάν δε συμβεί τίποτα εντός των επόμενων 10 δευτερολέπτων, <input type="submit" id="force-submit-payment-form" value="Παρακαλώ, πατήστε εδώ">.',
     'In Stock' => 'Σε απόθεμα',
     'Invoice REF' => 'Αναφ Τιμολογίου',
     'Language' => 'Γλώσσα',
@@ -123,7 +123,7 @@ return [
     'Price descending' => 'Φθίνουσα τιμή',
     'Proceed checkout' => 'Προχωρήστε στην ολοκλήρωση της παραγγελίας',
     'Product Empty Button' => 'Προσθήκη πρώτου προϊόντος',
-    'Product Empty Message' => 'Είναι πολύ εύκολο να προσθέσετε ένα προϊόν.         
+    'Product Empty Message' => 'Είναι πολύ εύκολο να προσθέσετε ένα προϊόν.
             <ol>
                  <li>Επιλέξτε<strong>Νέο</strong> κάτω από την καρτέλα λεπτομέρειες εάν θέλετε να δείτε το προϊόν σας στην ενότητα τελευταίων προϊόντων.</li>
                  <li>Επιλέξτε<strong>Πώληση</strong> κάτω από την καρτέλα λεπτομέρειες εάν θέλετε να δείτε το προϊόν σας στην ενότητα προσφορών προϊόντων.</li>

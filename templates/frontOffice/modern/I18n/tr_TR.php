@@ -84,7 +84,7 @@ return [
     'Grid' => 'Izgara',
     'Home' => 'Ana sayfa',
     'I\'ve read and agreed on <a href=\'%link\' class=\'terms-quickview\'>Terms &amp; Conditions</a>' => 'Okudum ve <a href=\'%link\' class=\'terms-quickview\'> şartları ve koşulları</a> üzerinde kabul ediyorum',
-    'If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.' => '10 saniye içinde bir eylem gerçekleşmezse <a id="force-submit-payment-form" href="#"> burayı tıklayın</a>. ',
+    'If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" value="please click here">.' => '10 saniye içinde bir eylem gerçekleşmezse <input type="submit" id="force-submit-payment-form" value="burayı tıklayın">.',
     'If you want to change your email, please contact us.' => 'E-posta değiştirmek istiyorsanız lütfen bize ulaşın.',
     'In Stock' => 'Stokta var',
     'Invoice REF' => 'Fatura ürün kodu',
@@ -160,7 +160,7 @@ return [
     'Proceed checkout' => 'Ödeme sayfasına git',
     'Product Empty Button' => 'İlk ürünü ekle',
     'Product Empty Message' => 'Ürün eklemek gerçekten çok kolay.   <ol>
-<li>Onay <strong>YENİ</strong> ürününüzü en son ürün bölümünde görmek istiyorsanız, Ayrıntılar sekmesini altında.</li>             
+<li>Onay <strong>YENİ</strong> ürününüzü en son ürün bölümünde görmek istiyorsanız, Ayrıntılar sekmesini altında.</li>
 <li>Onay <strong>SATIŞ</strong> ürün teklif ürün bölümünde görmek istiyorsanız, Ayrıntılar sekmesini altında.</li>         </ol>',
     'Product Empty Title' => 'Hoşgeldiniz',
     'Product Name' => 'Ürün adı',
