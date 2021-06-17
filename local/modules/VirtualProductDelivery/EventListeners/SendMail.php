@@ -46,9 +46,9 @@ class SendMail implements EventSubscriberInterface
         $order = $event->getOrder();
 
         if ($order->hasVirtualProduct() && $order->isPaid(true)) {
-            $this->eventDispatcher->dispatch(
-                VirtualProductDeliveryEvents::ORDER_VIRTUAL_FILES_AVAILABLE,
-                $event
+            $this->eventDispatcher->dispatch( 
+                $event,
+                VirtualProductDeliveryEvents::ORDER_VIRTUAL_FILES_AVAILABLE
             );
         }
     }

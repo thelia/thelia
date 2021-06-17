@@ -242,7 +242,7 @@ class AttributeController extends AbstractCrudController
             if (null !== $object = $this->getExistingObject()) {
                 $event = new AttributeEvent($object);
 
-                $eventDispatcher->dispatch($eventType, $event);
+                $eventDispatcher->dispatch($event, $eventType);
             }
         } catch (\Exception $ex) {
             // Any error

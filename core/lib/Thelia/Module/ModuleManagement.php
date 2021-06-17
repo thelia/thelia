@@ -189,7 +189,7 @@ class ModuleManagement
             $this->container->getParameter('kernel.cache_dir')
         );
 
-        $this->container->get('event_dispatcher')->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
+        $this->container->get('event_dispatcher')->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
     private function getModuleType(\ReflectionClass $reflected)

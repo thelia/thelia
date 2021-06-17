@@ -82,7 +82,7 @@ $container->set('request', $request);
 $container->get('request_stack')->push($request);
 $event = new \Thelia\Core\Event\SessionEvent(THELIA_CACHE_DIR.$env, false, $env);
 
-$eventDispatcher->dispatch(\Thelia\Core\TheliaKernelEvents::SESSION, $event);
+$eventDispatcher->dispatch($event, \Thelia\Core\TheliaKernelEvents::SESSION);
 $session = $event->getSession();
 $session->start();
 $request->setSession($session);
