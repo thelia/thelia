@@ -56,7 +56,7 @@ return [
     'Demo product title' => 'Tytuł produktu Demo',
     'Description' => 'Opis',
     'I\'ve read and agreed on <a href=\'%link\' class=\'terms-quickview\'>Terms &amp; Conditions</a>' => 'Przeczytałem i zgadzam się z <a href=\'%link\' class=\'terms-quickview\'>Regulaminem</a>',
-    'If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.' => 'Jeśli nic się nie stanie w przeciągu następnych 10 sekund, <a id="force-submit-payment-form" href="#">kliknij tutaj</a>. ',
+    'If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" value="please click here">.' => 'Jeśli nic się nie stanie w przeciągu następnych 10 sekund, <input type="submit" id="force-submit-payment-form" value="kliknij tutaj">.',
     'If you want to change your email, please contact us.' => 'Jeśli chcesz zmienić swój adres e-mail, skontaktuj się z nami.',
     'In Stock' => 'Na magazynie',
     'Invoice REF' => 'Numer faktury',
