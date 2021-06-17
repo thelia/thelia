@@ -12,21 +12,27 @@
 
 namespace Thelia\Core\Service;
 
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 use Thelia\Model\ConfigQuery;
 
 class ConfigCacheService
 {
+    protected $cache;
+
+    public function __construct(AdapterInterface $cache)
+    {
+        $this->cache = $cache;
+    }
+
     public function initCacheConfigs(bool $force = false): void
     {
-        $cache = new FilesystemAdapter();
-
         if ($force) {
-            $cache->delete('thelia_config');
+            $this->cache->delete('thelia_config');
         }
 
-        $value = $cache->get('thelia_config', function (ItemInterface $item) {
+        $value = $this->cache->get('thelia_config', function (ItemInterface $item) {
             $configs = ConfigQuery::create()->find();
             $caches = [];
 
