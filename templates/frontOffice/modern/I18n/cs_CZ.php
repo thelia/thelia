@@ -80,7 +80,7 @@ return [
     'Grid' => 'Mřížka',
     'Home' => 'Domů',
     'I\'ve read and agreed on <a href=\'%link\' class=\'terms-quickview\'>Terms &amp; Conditions</a>' => 'Přečetl jsem a souhlasím s <a href=\'%link\' class=\'terms-quickview\'>obchodními podmínkami</a>',
-    'If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.' => 'Pokud se nic nestane během 10 vteřin, <a id="force-submit-payment-form" href="#">kliknete sem</a>. ',
+    'If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" value="please click here">.' => 'Pokud se nic nestane během 10 vteřin, <input type="submit" id="force-submit-payment-form" value="kliknete sem">.',
     'If you want to change your email, please contact us.' => 'Chcete-li změnit svoji emailovou adresu, prosím, kontaktujte nás.',
     'In Stock' => 'Skladem',
     'Invoice REF' => 'Faktura číslo',
