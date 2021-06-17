@@ -39,13 +39,13 @@
                       <div class="">
                           <div class="">
                           {form_hidden_fields}
-                              {if $form_error}
+                              {if $form_error|default:null}
                                 {include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$form_error_message}
                               {/if}
 
                               {form_field field='payment-module'}
                                   <div id="payment-method" class="">
-                                  {if $error}
+                                  {if $error|default:null}
                                     {include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$message}
                                   {/if}
 

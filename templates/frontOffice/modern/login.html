@@ -12,7 +12,7 @@
 
 
 {block name="main-content"}
-    {if {navigate to="previous"} == {url path="/order/delivery"}}
+    {if {navigate to="previous"}|default:null == {url path="/order/delivery"}|default:null}
         {assign 'redirect' value="/order/delivery"}
     {else}
         {loop type="cart" name="cart"}

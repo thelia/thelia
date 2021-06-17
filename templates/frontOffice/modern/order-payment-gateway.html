@@ -21,7 +21,7 @@
   <article class="container mx-auto my-24" role="main" aria-labelledby="main-label">
     {include file="components/smarty/Title/Title.html" title={intl l="Secure payment"} }
 
-    {loop type="order" name="placed-order" id=$order_id}
+    {loop type="order" name="placed-order" id=$order_id|default:null}
     {ifhook rel="order-payment-gateway.body"}
         {hook name="order-payment-gateway.body" module="$PAYMENT_MODULE"}
     {/ifhook}

@@ -33,7 +33,7 @@
 
                 {form_hidden_fields}
 
-                {if $form_error}
+                {if $form_error|default:null}
                   {include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$form_error_message}
                 {/if}
 
@@ -43,7 +43,7 @@
 
                     <div class="grid grid-cols-1 gap-6">
                         {form_field field="title"}
-                          {assign var="customer_title_id" value={$value|default:$TITLE}}
+                          {assign var="customer_title_id" value={$value|default:$Title|default:null}}
                           {call name="fn_address_field_title"}
                         {/form_field}
                         {form_field field="firstname"}
@@ -79,13 +79,13 @@
 
                         {/form_field}
 
-                        {if !$customer_change_email}
+                        {if !$customer_change_email|default:null}
                         <div class="mb-8">
                           {include file="components/smarty/Alert/Alert.html" type="warning" message="{intl l='If you want to change your email, please contact us.'} <strong><a href='{url path='/contact'}'>{intl l='Contact page'}</a></strong>"}
                         </div>
                         {/if}
 
-                        {if {config key="customer_confirm_email"} && $customer_change_email}
+                        {if {config key="customer_confirm_email"}|default:null && $customer_change_email|default:null}
                         {form_field field="email_confirm"}
                           {include
                             file="components/smarty/Input/Input.html"

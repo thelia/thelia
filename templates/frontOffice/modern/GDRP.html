@@ -21,7 +21,7 @@
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
-  {if $folder_id}
+  {if $folder_id|default:null}
     {$breadcrumbs = []}
     {$breadcrumbs[] = ['title' => {intl l="GDRP"}, 'url'=> {url path="/GDRP"}]}
   {/if}

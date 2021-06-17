@@ -9,7 +9,7 @@
 {block name='no-return-functions' append}
 {$breadcrumbs = [
 ['title' => {intl l="Account"}, 'url'=>{url path="/account"}],
-['title' => {intl l="Order details"}, 'url'=>{url path="/account/order/%order_id" order_id=$order_id}]
+['title' => {intl l="Order details"}, 'url'=>{url path="/account/order/%order_id" order_id=$order_id|default:null}]
 ]}
 {/block}
 
@@ -18,7 +18,7 @@
 {block name="main-content"}
 <div class="container">
 
-    {loop name="order" type="order" customer="current" id="$order_id" limit="1" }
+    {loop name="order" type="order" customer="current" id=$order_id|default:null limit="1" }
 
     {$payment_id=$PAYMENT_MODULE}
     {$delivery_id=$DELIVERY_MODULE}
@@ -41,11 +41,11 @@
             <dt>{intl l="Status"}</dt>
             <dd>{loop type="order-status" name="order_status" id=$STATUS}{$TITLE}{/loop}</dd>
 
-            {if $IS_PAID}
+            {if $IS_PAID|default:null}
                 <dt>{intl l="Invoice date"}</dt>
                 <dd>{format_date date=$INVOICE_DATE output="date"}</dd>
 
-                {if $INVOICE_REF}
+                {if $INVOICE_REF|default:null}
                 <dt>{intl l="Invoice REF"}</dt>
                 <dd>{$INVOICE_REF}</dd>
                 {/if}
@@ -53,7 +53,7 @@
                 <dt>{intl l="PDF invoice"}</dt>
                 <dd><a href="{url path="/account/order/pdf/invoice/%id" id=$ID}">{intl l="Download"}</a></dd>
             {/if}
-            {if $DELIVERY_REF}
+            {if $DELIVERY_REF|default:null}
                 <dt>{intl l="Delivery REF"}</dt>
                 <dd>{$DELIVERY_REF}</dd>
             {/if}
@@ -108,7 +108,7 @@
                         {/ifhook}
                         {elsehook rel="account-order.invoice-information"}
                             <p>{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</p>
-                            {if $TRANSACTION_REF}
+                            {if $TRANSACTION_REF|default:null}
                             <p>{intl l="Transaction REF : %ref" ref={$TRANSACTION_REF}}</p>
                             {/if}
                         {/elsehook}
@@ -220,7 +220,7 @@
             <div class="col-md-6 col-md-offset-6 col-sm-9 col-sm-offset-3 col-xs-12">
                 <table>
                     <tfoot>
-                        {if $DISCOUNT}
+                        {if $DISCOUNT|default:null}
                         <tr>
                             <td><p>{intl l="Discount"}</p></td>
                             <td><p>{format_money number=$DISCOUNT currency_id=$CURRENCY}</p></td>

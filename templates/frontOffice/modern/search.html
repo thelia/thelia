@@ -12,7 +12,7 @@
 
 {block name="main-content"}
 <div class="container mx-auto my-24">
-    {$title = "{intl l="Search Result for"} <span class='underline text-gray-800'>{$smarty.get.query}</span>"}
+    {$title = "{intl l="Search Result for"} <span class='underline text-gray-800'>{$smarty.get.query|default:null}</span>"}
     {include file="components/smarty/Title/Title.html" title=$title }
     <div class="">
         {* {include file="components/smarty/CategoryMenu/CategoryMenu.html"} *}
