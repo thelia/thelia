@@ -95,7 +95,7 @@ return [
     'Grid' => 'Mriežka',
     'Home' => 'Úvod',
     'I\'ve read and agreed on <a href=\'%link\' class=\'terms-quickview\'>Terms &amp; Conditions</a>' => 'Čítal som a súhlasimi <a href=\'%link\' class=\'terms-quickview\'>terms &amp; Conditions</a>',
-    'If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.' => 'Pokiaľ sa nič nestane počas 10 sekúnd, <a id="force-submit-payment-form" href="#">kliknete sem</a>. ',
+    'If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" value="please click here">.' => 'Pokiaľ sa nič nestane počas 10 sekúnd, <input type="submit" id="force-submit-payment-form" value="kliknete sem">.',
     'If you want to change your email, please contact us.' => 'Ak chcete zmeniť e-mail, prosím, kontaktujte nás.',
     'In Stock' => 'Na sklade',
     'Invoice REF' => 'Číslo Faktúry',

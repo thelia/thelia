@@ -71,7 +71,7 @@ return [
     'Go home' => 'Πήγαινε στην Αρχή',
     'Grid' => 'Πλέγμα',
     'Home' => 'Αρχή',
-    'If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.' => 'Εάν δε συμβεί τίποτα εντός των επόμενων 10 δευτερολέπτων, <a id="force-submit-payment-form" href="#"> Παρακαλώ, πατήστε εδώ</a>. ',
+    'If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" value="please click here">.' => 'Εάν δε συμβεί τίποτα εντός των επόμενων 10 δευτερολέπτων, <input type="submit" id="force-submit-payment-form" value="Παρακαλώ, πατήστε εδώ">.',
     'In Stock' => 'Σε απόθεμα',
     'Invoice REF' => 'Αναφ Τιμολογίου',
     'Language' => 'Γλώσσα',

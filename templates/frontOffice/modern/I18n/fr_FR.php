@@ -100,7 +100,7 @@ return [
     'Home' => 'Accueil',
     'I agree' => 'J\'accepte',
     'I discover' => 'Je découvre',
-    'If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#" class="underline text-orange-500">please click here</a>.' => 'Si rien ne se passe dans les 10 secondes, <a id="force-submit-payment-form" href="#" class="underline text-orange-500">veuillez cliquer ici</a>. ',
+    'If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" class="text-orange-500 underline" value="please click here">.' => 'Si rien ne se passe dans les 10 secondes, <input type="submit" id="force-submit-payment-form" class="text-orange-500 underline" value="veuillez cliquer ici">. ',
     'If you want to change your email, please contact us.' => 'Pour changer votre email, merci de nous contacter',
     'Invoice' => 'Facture',
     'Invoice REF' => 'Numéro de facture',

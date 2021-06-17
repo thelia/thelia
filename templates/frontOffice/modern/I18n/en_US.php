@@ -98,7 +98,7 @@ return [
     'Grid' => 'Grid',
     'Home' => 'Home',
     'I\'ve read and agreed on <a href=\'%link\' class=\'terms-quickview\'>Terms &amp; Conditions</a>' => 'I\'ve read and agreed on <a href=\'%link\' class=\'terms-quickview\'>Terms &amp; Conditions</a>',
-    'If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.' => 'Si rien ne se passe dans les 10 prochaines secondes, <a id="force-submit-payment-form" href="#">merci de cliquer ici</a>. ',
+    'If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" value="please click here">.' => 'Si rien ne se passe dans les 10 prochaines secondes, <input type="submit" id="force-submit-payment-form" value="merci de cliquer ici">.',
     'If you want to change your email, please contact us.' => 'If you want to change your email, please contact us.',
     'In Stock' => 'In Stock',
     'Invoice REF' => 'Invoice REF',

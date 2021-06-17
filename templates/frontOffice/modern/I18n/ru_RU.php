@@ -98,7 +98,7 @@ return [
     'Grid' => 'Сетка',
     'Home' => 'Главная',
     'I\'ve read and agreed on <a href=\'%link\' class=\'terms-quickview\'>Terms &amp; Conditions</a>' => 'Я прочитал и согласился с <a href=\'%link\' class=\'terms-quickview\'>Условиями</a>',
-    'If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.' => 'Если ничего не произойдет в течение следующих 10 секунд, <a id="force-submit-payment-form" href="#">нажмите сюда</a>. ',
+    'If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" value="please click here">.' => 'Если ничего не произойдет в течение следующих 10 секунд, <input type="submit" id="force-submit-payment-form" value="нажмите сюда">.',
     'If you want to change your email, please contact us.' => 'Если Вы хотите изменить свой email, пожалуйста свяжитесь с нами.',
     'In Stock' => 'В наличии',
     'Invoice REF' => 'Счет-фактура номер',
