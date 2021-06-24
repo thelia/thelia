@@ -12,7 +12,6 @@
 
 namespace Thelia\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,7 +21,7 @@ use Thelia\Model\ConfigQuery;
 /**
  * @since 2.5
  */
-class SetTemplate extends Command
+class SetTemplate extends ContainerAwareCommand
 {
     protected function configure(): void
     {

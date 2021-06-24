@@ -52,7 +52,6 @@ Encore.addEntry('app', './assets/js/app.js')
 	.addEntry('product', './assets/js/routes/product')
 	.addEntry('register', './assets/js/routes/register')
 	.addEntry('address', './assets/js/routes/address')
-	.addEntry('page-cookies', './assets/js/routes/page-cookies')
 	.addEntry('delivery', './assets/js/routes/delivery');
 ```
 

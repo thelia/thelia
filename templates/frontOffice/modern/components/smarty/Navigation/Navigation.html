@@ -1,17 +1,11 @@
-<nav class="Desktop-Navigation bg-white uppercase sticky shadow-2xl z-10 left-0 w-full overflow-visible hidden lg:block">
-  <div class="Navigation-container max-h-full flex justify-center h-full">
-    {include file="components/smarty/Navigation/NavigationItems.html"}
-  </div>
-</nav>
-
-<nav class="Navigation bg-white uppercase fixed shadow-2xl z-10 left-0 overflow-visible">
-  <div class="Navigation-container overflow-y-auto max-h-full flex flex-col h-full">
+<nav class="fixed left-0 z-10 overflow-visible uppercase bg-white shadow-2xl Navigation">
+  <div class="flex flex-col h-full max-h-full overflow-y-auto Navigation-container">
     {include file="components/smarty/Navigation/NavigationItems.html" mobile=true}
 
     <div class="flex flex-wrap items-center py-4 pl-6 border-t border-b border-gray-300">
       {include file="components/smarty/SocialNetworks/SocialNetworks.html"}
     </div>
-    <div class="ml-8 mt-6 mr-4">
+    <div class="mt-6 ml-8 mr-4">
       {include file="components/smarty/LangSelect/LangSelect.html"}
     </div>
 

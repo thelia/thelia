@@ -1,47 +1,47 @@
 <header role="banner" class="Header bg-white shadow-md flex {if !$lite|default:false}pl-8{/if} sticky top-0 z-40 uppercase">
   {if !$lite|default:false}
-  <button class="lg:hidden focus:outline-none hover:" data-toggle-navigation>
+  <button class="mr-8 focus:outline-none" data-toggle-navigation>
     {include file="components/smarty/Hamburger/Hamburger.html" HamburgerClass="pointer-events-none Header-Hamburger"}
   </button>
 
-  <a href="{navigate to="index"}" class="flex items-center">
+  <a href="{navigate to="index"}" class="flex items-center mr-auto">
     {local_media type="logo"}
       <img src="{$MEDIA_URL}" alt="{$store_name}">
     {/local_media}
   </a>
 
-  <div class="ml-auto flex items-end">
+  <div class="flex items-end ml-auto">
     <div class="my-auto">
       {include file="components/smarty/SearchDropdown/SearchDropdown.html"}
     </div>
 
-   <div class="ml-8 my-auto">{include file="components/smarty/CurrencySelect/CurrencySelect.html"}</div>
+   <div class="my-auto ml-8">{include file="components/smarty/CurrencySelect/CurrencySelect.html"}</div>
 
-    <div class="mx-4 my-auto hidden sm:block">{include file="components/smarty/LangSelect/LangSelect.html"}</div>
+    <div class="mx-4 my-auto sm:block">{include file="components/smarty/LangSelect/LangSelect.html"}</div>
 
     {if $isConnected|default:false}
-    <a href="{url path="/account"}" class="hover:bg-gray-200 pr-4 lg:px-5 xl:px-8 flex items-center h-full">
-    <div class="lg:mr-4">{renderIconSvg icon="user" class="w-4 h-4  mx-auto fill-current "}</div>
+    <a href="{url path="/account"}" class="flex items-center h-full pr-4 hover:bg-gray-200 lg:px-5 xl:px-8">
+    <div class="lg:mr-4">{renderIconSvg icon="user" class="w-4 h-4 mx-auto fill-current "}</div>
     <div class="hidden lg:block">{intl l="Account"}</div>
     </a>
     {else}
-    <a href="{url path="/login"}" class="pr-4 hover:bg-gray-200 lg:px-5 xl:px-8 flex items-center h-full" data-toggle-login>
-    <div class="lg:mr-4 pointer-events-none">{renderIconSvg icon="user" class="w-4 h-4  mx-auto fill-current "}</div>
-    <div class="hidden lg:block pointer-events-none">{intl l="Login"}</div>
+    <a href="{url path="/login"}" class="flex items-center h-full pr-4 hover:bg-gray-200 lg:px-5 xl:px-8" data-toggle-login>
+    <div class="pointer-events-none lg:mr-4">{renderIconSvg icon="user" class="w-4 h-4 mx-auto fill-current "}</div>
+    <div class="hidden pointer-events-none lg:block">{intl l="Login"}</div>
     </a>
     {/if}
 
-    <div class="flex items-center pr-4 lg:px-5 xl:px-8 h-full cursor-pointer" data-toggle-cart>
-      <div class="lg:mr-4 pointer-events-none">{renderIconSvg icon="cart" class="w-4 h-4  mx-auto  fill-current"}</div>
-      <div class="hidden lg:block pointer-events-none">{intl l="Cart"}</div>
-      <div id="js-cart-count" class="ml-2 text-sm hidden sm:block">({cart attr="product_count"})</div>
+    <div class="flex items-center h-full pr-4 cursor-pointer lg:px-5 xl:px-8" data-toggle-cart>
+      <div class="pointer-events-none lg:mr-4">{renderIconSvg icon="cart" class="w-4 h-4 mx-auto fill-current"}</div>
+      <div class="hidden pointer-events-none lg:block">{intl l="Cart"}</div>
+      <div id="js-cart-count" class="hidden ml-2 text-sm sm:block">({cart attr="product_count"})</div>
     </div>
 
   </div>
   {else}
     <a href="{navigate to="index"}" class="flex items-center mx-auto">
       {local_media type="logo"}
-        <img src="{$MEDIA_URL}" alt="{$store_name}" class="block my-auto object-contain" height="40" width="100" loading="lazy">
+        <img src="{$MEDIA_URL}" alt="{$store_name}" class="block object-contain my-auto" height="40" width="100" loading="lazy">
       {/local_media}
     </a>
   {/if}
