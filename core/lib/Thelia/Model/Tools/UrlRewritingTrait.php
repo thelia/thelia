@@ -173,25 +173,23 @@ trait UrlRewritingTrait
         try {
             $resolver = new RewritingResolver($url);
 
-            /* we can reassign old url */
+            /* we can reassign redirected url */
             if (null === $resolver->redirectedToUrl) {
-                /* else ... */
+                /* if it's an url related to the current object */
                 if ($resolver->view == $this->getRewrittenUrlViewName() && $resolver->viewId == $this->getId()) {
-                    /* it's an url related to the current object */
 
+                    /* if it's an url related to this product for another locale */
                     if ($resolver->locale != $locale) {
-                        /* it is an url related to this product for another locale */
                         throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                     }
 
+                    /* if it's an url related to this product but with more arguments */
                     if (\count($resolver->otherParameters) > 0) {
-                        /* it is an url related to this product but with more arguments */
                         throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                     }
 
-                    /* here it must be a deprecated url */
-                } else {
-                    /* already related to another object */
+                } elseif ($resolver->view !== "obsolete-rewritten-url") {
+                    /* Already related to another object and not an obsolete-rewritten-url */
                     throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                 }
             }
