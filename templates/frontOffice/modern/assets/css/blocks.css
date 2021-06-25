@@ -1,9 +1,5 @@
 .panel {
-	@apply bg-white p-4 mb-6 border border-transparent;
-
-	@screen xl {
-		@apply p-6;
-	}
+	@apply bg-white p-4 mb-6 border border-transparent xl:p-6;
 
 	&.shadow {
 		@apply border-0;

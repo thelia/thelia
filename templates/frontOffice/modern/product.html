@@ -51,14 +51,14 @@
         {include file="components/smarty/BreadCrumb/BreadCrumb.html"}
 
         {loop name="product.details" type="product" id=$product_id limit="1" with_prev_next_info="1" with_prev_next_visible="1"}
-        {include file="microdata/product.html"}
+
         <article role="main">
 
             {hook name="product.top" product={$ID}}
 
             <div class="lg:container lg:mx-auto">
-              <div class="lg:grid lg:grid-cols-2 gap-8">
-                <div class="mb-8 mt-8 -mx-8 lg:mx-auto">
+              <div class="gap-8 lg:grid lg:grid-cols-2">
+                <div class="mt-8 mb-8 -mx-8 lg:mx-auto">
                   {include file="components/smarty/ProductGallery/ProductGallery.html"}
                 </div>
 

@@ -6,11 +6,7 @@
 
 {* Body Class *}
 {block name="body-class"}{strip}
-  {if $content_id == {config key="starter_content_gestion_cookies_id"}}
-    page-cookies
-  {else}
-    page-content
-  {/if}
+  page-content
 {/strip}{/block}
 
 {* Page Title *}
@@ -67,12 +63,7 @@
               {hook name="content.content-top" content="$content_id"}
 
               {loop name="blog.content" type="content" id=$content_id limit="1"}
-                  {if $content_id == {config key="starter_content_gestion_cookies_id"}}
-                    {include file="components/smarty/ContentDefault/ContentDefault.html"}
-                    {include file="components/smarty/CookieConsentSelector/CookieConsentSelector.html"}
-                  {else}
-                    {include file="components/smarty/ContentDefault/ContentDefault.html"}
-                  {/if}
+                  {include file="components/smarty/ContentDefault/ContentDefault.html"}
               {/loop}
 
               {hook name="content.content-bottom" content="$content_id"}

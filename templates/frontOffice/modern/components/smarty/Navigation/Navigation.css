@@ -1,85 +1,70 @@
 :root {
-	--nav-width: 90vw;
-	@screen lg {
-		--nav-width: 18rem;
-	}
+  --nav-width: 90vw;
+  @screen lg {
+    --nav-width: 18rem;
+  }
 }
 
 body.Navigation--active {
-	overflow: hidden;
-	@screen lg {
-		overflow-y: auto;
-		overflow-x: hidden;
-	}
-}
-
-.Desktop-Navigation {
-	top: var(--Header-height);
-	.Navigation-item {
-		&.hoverable:hover {
-			.Navigation-item-submenu {
-				display: block;
-			}
-		}
-	}
+  overflow: hidden;
+  @screen lg {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 }
 
 .Navigation {
-	top: var(--Header-height);
-	width: var(--nav-width);
-	transform: translateX(-100%);
-	transition: transform 250ms linear;
+  top: var(--Header-height);
+  width: var(--nav-width);
+  transform: translateX(-100%);
+  transition: transform 250ms linear;
 
-	max-height: calc(100vh - var(--Header-height));
-	height: 100vh;
+  max-height: calc(100vh - var(--Header-height));
+  height: 100vh;
 
-	@screen lg {
-		height: auto;
-	}
+  .Navigation-arrowWrapper {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 
-	.Navigation-arrowWrapper {
-		position: absolute;
-		right: 0;
-		top: 50%;
-		transform: translateY(-50%);
-	}
+  .Navigation-arrow {
+    transform: rotate(-90deg);
+  }
 
-	.Navigation-arrow {
-		transform: rotate(-90deg);
-	}
+  &-item {
+    &--active {
+      > .Navigation-item-submenu {
+        display: block;
+      }
+      .Navigation-arrow {
+        transform: rotate(0);
+      }
+    }
 
-	&-item {
-		&--active {
-			> .Navigation-item-submenu {
-				display: block;
-			}
-			.Navigation-arrow {
-				transform: rotate(0);
-			}
-		}
+    @screen lg {
+      &:hover {
+        > .Navigation-item-submenu {
+          display: block;
+        }
+      }
+    }
+  }
 
-		@screen lg {
-			&:hover {
-				> .Navigation-item-submenu {
-					display: block;
-				}
-			}
-		}
-	}
+  &-item-submenu {
+    z-index: 1;
+    display: none;
 
-	&-item-submenu {
-		z-index: 1;
-		display: none;
+    @screen lg {
+      left: 100%;
+    }
+  }
+  &-item-link:hover {
+    @apply text-base;
+  }
 
-		@screen lg {
-			left: 100%;
-		}
-	}
-	&-item-link:hover {
-		@apply text-base;
-	}
-
-	.Navigation--active & {
-		transform: translateX(0);
-	}
+  .Navigation--active & {
+    transform: translateX(0);
+  }
 }

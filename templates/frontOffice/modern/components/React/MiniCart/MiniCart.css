@@ -5,11 +5,8 @@
   top: var(--Header-height);
   bottom: 0;
   right: 0;
-  @apply w-full fixed shadow-md;
+  @apply w-full fixed shadow-md md:max-w-lg;
 
-  @screen md {
-    @apply max-w-lg;
-  }
   &--visible {
     transform: translateX(0);
   }
