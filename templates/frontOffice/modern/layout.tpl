@@ -116,12 +116,11 @@
     {block name="feeds"}{/block}
 
     {hook name="main.head-bottom"}
+    {block name="structured-data"}{/block}
 </head>
 
 <body class="text-gray-700 bg-gray-50 {block name="body-class"}{/block}" itemscope itemtype="http://schema.org/WebPage">
     {hook name="main.body-top"}
-
-    {include file="microdata/store.html"}
 
     {block name="header"}
         {include file="components/smarty/Header/Header.html"}
@@ -145,8 +144,6 @@
     {/block}
 
     {block name="javascript-data"}{/block}
-
-    {include file="components/smarty/CookieBar/CookieBar.html"}
 
     {block name="minicart"}{include file="components/React/MiniCart/MiniCart.html" }{/block}
     {block name="minilogin"}{include file="components/React/MiniLogin/MiniLogin.html"}{/block}

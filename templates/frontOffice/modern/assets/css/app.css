@@ -1,3 +1,5 @@
+@import 'tailwindcss/base';
+
 @import 'layout';
 @import 'buttons';
 @import 'blocks';
@@ -8,6 +10,5 @@
 
 @import './pages/**/*.css';
 
-/* purgecss start ignore */
-@import 'animations';
-/* purgecss end ignore */
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
