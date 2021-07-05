@@ -27,13 +27,13 @@
     {/ifhook}
     {elsehook rel="order-payment-gateway.body"}
         <div id="payment-success" class="panel panel-default">
-            <div class="text-xl mb-4">
+            <div class="mb-4 text-xl">
                 <h3>{intl l="You choose to pay by"} : <span class="text-orange-500">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
             </div>
 
             <div class="panel-body">
                 {if $cart_count > 0}
-                    <div class="panel-heading clearfix">
+                    <div class="clearfix panel-heading">
                         <span>{intl l="Connecting to the secure payment server, please wait a few seconds..."}</span>
                     </div>
 
@@ -43,7 +43,7 @@
                                 <input type="hidden" name="{$name}" value="{$value}" />
                             {/foreach}
 
-                            <p>{intl l='If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#" class="underline text-orange-500">please click here</a>.'}</p>
+                            <p>{intl l='If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" value="please click here" class="text-orange-500 underline">.'}</p>
                         </form>
                     </div>
                 {else}
@@ -59,7 +59,7 @@
 
 {/block}
 
-{block name="javascript-initialization"}
+{block name="javascript" append}
 {ifhook rel="order-payment-gateway.javascript"}
    {hook name="order-payment-gateway.javascript" module="$PAYMENT_MODULE"}
 {/ifhook}

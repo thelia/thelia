@@ -86,7 +86,7 @@ return [
     'Grid' => 'Cuadrícula',
     'Home' => 'Página de inicio',
     'I\'ve read and agreed on <a href=\'%link\' class=\'terms-quickview\'>Terms &amp; Conditions</a>' => 'He leído y acuerdo con <a href=\'%link\' class=\'terms-quickview\'> los términos y condiciones</a>',
-    'If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.' => 'Si nada sucede dentro de 10 segundos, <a id="force-submit-payment-form" href="#"> por favor haga clic aquí</a>. ',
+    'If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" value="please click here">.' => 'Si nada sucede dentro de 10 segundos, <input type="submit" id="force-submit-payment-form" value="por favor haga clic aqui">.',
     'If you want to change your email, please contact us.' => 'Si deseas cambiar tu correo electrónico, contacta con nosotros.',
     'In Stock' => 'En stock',
     'Invoice REF' => 'REF de factura ',
