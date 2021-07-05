@@ -49,7 +49,8 @@ if (!$bootstraped) {
     }
 }
 
-$thelia = new Thelia\Core\Thelia('dev', true);
+$thelia = new App\Kernel('dev', true);
+
 $thelia->boot();
 
 // Load the translator
