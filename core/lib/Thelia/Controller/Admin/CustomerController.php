@@ -15,7 +15,6 @@ namespace Thelia\Controller\Admin;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
-use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -24,6 +23,7 @@ use Thelia\Exception\CustomerException;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
+use Thelia\Model\Event\CustomerEvent;
 use Thelia\Tools\Password;
 use Thelia\Tools\TokenProvider;
 
@@ -89,7 +89,16 @@ class CustomerController extends AbstractCrudController
 
     protected function eventContainsObject($event)
     {
-        return $event->hasCustomer();
+        if (method_exists($event, 'hasCustomer')) {
+            return $event->hasCustomer();
+        }
+
+        if (method_exists($event, 'getModel')) {
+            return $event->getModel() !== null;
+        }
+
+
+        return false;
     }
 
     /**
@@ -133,7 +142,15 @@ class CustomerController extends AbstractCrudController
 
     protected function getObjectFromEvent($event)
     {
-        return $event->hasCustomer() ? $event->getCustomer() : null;
+        if (method_exists($event, 'hasCustomer') && $event->hasCustomer()) {
+            return $event->getCustomer();
+        }
+
+        if (method_exists($event, 'getModel')) {
+            return $event->getModel();
+        }
+
+        return null;
     }
 
     /**
