@@ -67,7 +67,8 @@
         "thelia/smarty-redirection-module": "~1.0.0",
         "thelia/choice-filter-module": "~1.0.0",
         "thelia/custom-delivery-module": "~2.1.0",
-        "thelia/store-seo-module": "~1.2.0"
+        "thelia/store-seo-module": "~1.2.0",
+        "cqfdev/best-sellers-module": "^1.2"
     },
     "require-dev": {
         "fzaninotto/faker": "1.5.*",

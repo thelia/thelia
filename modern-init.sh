@@ -78,6 +78,7 @@ php Thelia module:activate OpenApi
 php Thelia module:activate ChoiceFilter
 php Thelia module:activate StoreSeo
 php Thelia module:activate SmartyRedirection
+php Thelia module:activate BestSellers
 php Thelia module:deactivate HookAdminHome
 php Thelia module:deactivate HookAnalytics
 php Thelia module:deactivate HookCart

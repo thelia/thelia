@@ -12,8 +12,6 @@
         {$featuresSelected[$featureKey] = [$featureValue]}
     {/if}
 {/foreach}
-{$min_price={$min_price|default:{$smarty.get.min_price|default: 0}}}
-{$max_price={$max_price|default:{$smarty.get.max_price|default: 5000}}}
 
 <div class="fixed inset-0 z-10 p-8 overflow-x-auto bg-gray-200 bg-opacity-75 CategoryMenu-wrapper lg:bg-transparent lg:p-0 lg:pt-8 lg:sticky max-h-screen-header lg:max-h-none lg:overflow-x-visible">
   <div class="px-6 pt-6 mb-8 shadow panel CategoryMenu lg:py-2">
@@ -27,7 +25,7 @@
           <input type="hidden" name="category_id" id="CategoryMenu-categories" value="{$category_id}">
 
           {* on désactive  le cache quand filtre  actif *}
-          {if $min_price != 0 || $max_price != 5000 || $featuresSelected|count || $brands|count || $categoriesSelected|count}
+          {if $min_price != 0 || $max_price != 9999999 || $featuresSelected|count || $brands|count || $categoriesSelected|count}
               {$ttl = 0}
           {else}
               {$ttl = 36000}

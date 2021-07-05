@@ -23,6 +23,7 @@
 <html lang="{$lang_locale|replace:'_':'-'}" class="no-js">
 <head>
   <meta charset="utf-8">
+    {hook name="main.head-top"}
 
     {store_seo_meta locale=$lang_locale}
 
