@@ -139,7 +139,7 @@ class UrlGenerator extends AbstractSmartyPlugin
                     $lang = LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
                 }
 
-                if (ConfigQuery::isMultiDomainActivated()) {
+                if (!Request::$isAdminEnv && ConfigQuery::isMultiDomainActivated()) {
                     $urlRewrite = RewritingUrlQuery::create()
                         ->filterByView($view)
                         ->filterByViewId($viewId)
@@ -156,6 +156,7 @@ class UrlGenerator extends AbstractSmartyPlugin
 
             }
         }
+
         return $this->applyNoAmpAndTarget($params, $url);
     }
 
