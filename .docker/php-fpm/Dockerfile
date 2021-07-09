@@ -19,3 +19,4 @@ RUN apt-get update \
     && apt-get clean;
 
 COPY docker-init.sh /usr/local/bin/docker-init
+RUN chmod 0755 /usr/local/bin/docker-init
