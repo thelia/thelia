@@ -20,6 +20,13 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+    (@max_id + 1, 'cs_CZ', NULL, '', ''),
+    (@max_id + 2, 'cs_CZ', NULL, '', ''),
+    (@max_id + 3, 'cs_CZ', NULL, '', ''),
+    (@max_id + 4, 'cs_CZ', NULL, '', ''),
+    (@max_id + 5, 'cs_CZ', NULL, '', ''),
+    (@max_id + 6, 'cs_CZ', NULL, '', ''),
+    (@max_id + 7, 'cs_CZ', NULL, '', ''),
     (@max_id + 1, 'de_DE', 'Registerkarte SEO - Update-Formular', '', ''),
     (@max_id + 2, 'de_DE', 'Bestellung bearbeiten - Produkttabelle Header', '', ''),
     (@max_id + 3, 'de_DE', 'Bestellung bearbeiten - Produkttabelle Zeile', '', ''),
@@ -47,7 +54,21 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id + 4, 'fr_FR', 'Administrateurs - en-tête', '', ''),
     (@max_id + 5, 'fr_FR', 'Administrateurs - ligne', '', ''),
     (@max_id + 6, 'fr_FR', 'Configuration avancée', '', ''),
-    (@max_id + 7, 'fr_FR', 'Configuration avancée - JavaScript', '', '')
+    (@max_id + 7, 'fr_FR', 'Configuration avancée - JavaScript', '', ''),
+    (@max_id + 1, 'it_IT', NULL, '', ''),
+    (@max_id + 2, 'it_IT', NULL, '', ''),
+    (@max_id + 3, 'it_IT', NULL, '', ''),
+    (@max_id + 4, 'it_IT', NULL, '', ''),
+    (@max_id + 5, 'it_IT', NULL, '', ''),
+    (@max_id + 6, 'it_IT', NULL, '', ''),
+    (@max_id + 7, 'it_IT', NULL, '', ''),
+    (@max_id + 1, 'ru_RU', 'Вкладка SEO - форма обновления', '', ''),
+    (@max_id + 2, 'ru_RU', 'Редактирование заказа - заголовок таблицы заказ товара', '', ''),
+    (@max_id + 3, 'ru_RU', 'Редактирование заказа - строка таблицы заказ товара', '', ''),
+    (@max_id + 4, 'ru_RU', 'Администраторы - заголовок', '', ''),
+    (@max_id + 5, 'ru_RU', 'Администраторы - строка', '', ''),
+    (@max_id + 6, 'ru_RU', 'Расширенная конфигурация', '', ''),
+    (@max_id + 7, 'ru_RU', 'Расширенная конфигурация - Javascript', '', '')
 ;
 
 UPDATE `hook` SET  `block` =  '0', `updated_at` =  NOW() WHERE `code` = 'main.topbar-top' AND `type` = 2;

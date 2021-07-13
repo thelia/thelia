@@ -18,6 +18,10 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(@max_id + 1, 'cs_CZ', NULL, NULL, NULL, NULL),
+(@max_id + 2, 'cs_CZ', NULL, NULL, NULL, NULL),
+(@max_id + 3, 'cs_CZ', NULL, NULL, NULL, NULL),
+(@max_id + 4, 'cs_CZ', NULL, NULL, NULL, NULL),
 (@max_id + 1, 'de_DE', 'Ein dauerhaftes Cookie verwenden, um den Kundes-Warenkorb zu merken', NULL, NULL, NULL),
 (@max_id + 2, 'de_DE', 'Name der Warenkorb-Cookie', NULL, NULL, NULL),
 (@max_id + 3, 'de_DE', 'Dauer der Warenkorb-Cookie in dem Kunden-Browser, in Sekunden', NULL, NULL, NULL),
@@ -33,7 +37,15 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (@max_id + 1, 'fr_FR', 'Utiliser un cookie persistant pour mémoriser le panier du client', NULL, NULL, NULL),
 (@max_id + 2, 'fr_FR', 'Nom du cookie pour le panier', NULL, NULL, NULL),
 (@max_id + 3, 'fr_FR', 'Durée de vie du cookie du panier dans le navigateur du client, en secondes', NULL, NULL, NULL),
-(@max_id + 4, 'fr_FR', 'Autoriser les URI terminées par un slash', NULL, NULL, NULL)
+(@max_id + 4, 'fr_FR', 'Autoriser les URI terminées par un slash', NULL, NULL, NULL),
+(@max_id + 1, 'it_IT', NULL, NULL, NULL, NULL),
+(@max_id + 2, 'it_IT', NULL, NULL, NULL, NULL),
+(@max_id + 3, 'it_IT', NULL, NULL, NULL, NULL),
+(@max_id + 4, 'it_IT', NULL, NULL, NULL, NULL),
+(@max_id + 1, 'ru_RU', 'Использовать cookie для отслеживания корзины клиента', NULL, NULL, NULL),
+(@max_id + 2, 'ru_RU', 'Имя cookie корзины', NULL, NULL, NULL),
+(@max_id + 3, 'ru_RU', 'Время жизни cookie корзины в секундах', NULL, NULL, NULL),
+(@max_id + 4, 'ru_RU', 'Разрешить URI закрывающим слешем', NULL, NULL, NULL)
 ;
 
 DELETE FROM `config` WHERE `name`='currency_rate_update_url';
@@ -62,6 +74,24 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+  (@max_id+1, 'cs_CZ', NULL, '', ''),
+  (@max_id+2, 'cs_CZ', NULL, '', ''),
+  (@max_id+3, 'cs_CZ', NULL, '', ''),
+  (@max_id+4, 'cs_CZ', NULL, '', ''),
+  (@max_id+5, 'cs_CZ', NULL, '', ''),
+  (@max_id+6, 'cs_CZ', NULL, '', ''),
+  (@max_id+7, 'cs_CZ', NULL, '', ''),
+  (@max_id+8, 'cs_CZ', NULL, '', ''),
+  (@max_id+9, 'cs_CZ', NULL, '', ''),
+  (@max_id+10, 'cs_CZ', NULL, '', ''),
+  (@max_id+11, 'cs_CZ', NULL, '', ''),
+  (@max_id+12, 'cs_CZ', NULL, '', ''),
+  (@max_id+13, 'cs_CZ', NULL, '', ''),
+  (@max_id+14, 'cs_CZ', NULL, '', ''),
+  (@max_id+15, 'cs_CZ', NULL, '', ''),
+  (@max_id+16, 'cs_CZ', NULL, '', ''),
+  (@max_id+17, 'cs_CZ', NULL, '', ''),
+  (@max_id+18, 'cs_CZ', NULL, '', ''),
   (@max_id+1, 'de_DE', 'Bestellung - Warenkorb oben', '', ''),
   (@max_id+2, 'de_DE', 'Bestellung - Warenkorb unten', '', ''),
   (@max_id+3, 'de_DE', 'Bestellung - Rechnung oben', '', ''),
@@ -133,7 +163,43 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (@max_id+15, 'fr_FR', 'Promotions - JavaScript', '', ''),
   (@max_id+16, 'fr_FR', 'Produit - en bas d\'une combinaison de déclinaisons', '', ''),
   (@max_id+17, 'fr_FR', 'Layout - Avant le contenu principal', '', ''),
-  (@max_id+18, 'fr_FR', 'Admin layout - Après le contenu principal', '', '')
+  (@max_id+18, 'fr_FR', 'Admin layout - Après le contenu principal', '', ''),
+  (@max_id+1, 'it_IT', NULL, '', ''),
+  (@max_id+2, 'it_IT', NULL, '', ''),
+  (@max_id+3, 'it_IT', NULL, '', ''),
+  (@max_id+4, 'it_IT', NULL, '', ''),
+  (@max_id+5, 'it_IT', NULL, '', ''),
+  (@max_id+6, 'it_IT', NULL, '', ''),
+  (@max_id+7, 'it_IT', NULL, '', ''),
+  (@max_id+8, 'it_IT', NULL, '', ''),
+  (@max_id+9, 'it_IT', NULL, '', ''),
+  (@max_id+10, 'it_IT', NULL, '', ''),
+  (@max_id+11, 'it_IT', NULL, '', ''),
+  (@max_id+12, 'it_IT', NULL, '', ''),
+  (@max_id+13, 'it_IT', NULL, '', ''),
+  (@max_id+14, 'it_IT', NULL, '', ''),
+  (@max_id+15, 'it_IT', NULL, '', ''),
+  (@max_id+16, 'it_IT', NULL, '', ''),
+  (@max_id+17, 'it_IT', NULL, '', ''),
+  (@max_id+18, 'it_IT', NULL, '', ''),
+  (@max_id+1, 'ru_RU', 'Заказ - верх корзины', '', ''),
+  (@max_id+2, 'ru_RU', 'Заказ - низ корзины', '', ''),
+  (@max_id+3, 'ru_RU', 'Заказ - верх оплаты', '', ''),
+  (@max_id+4, 'ru_RU', 'Заказ - низ оплаты', '', ''),
+  (@max_id+5, 'ru_RU', 'Заказ - Перед списком товаров', '', ''),
+  (@max_id+6, 'ru_RU', 'Заказ - Перед строкой товара', '', ''),
+  (@max_id+7, 'ru_RU', 'Заказ - После строки товара', '', ''),
+  (@max_id+8, 'ru_RU', 'Заказ - После списка товаров', '', ''),
+  (@max_id+9, 'ru_RU', 'Распродажи - вверху', '', ''),
+  (@max_id+10, 'ru_RU', 'Распродажи - заголовок таблицы', '', ''),
+  (@max_id+11, 'ru_RU', 'Распродажи - строка таблицы', '', ''),
+  (@max_id+12, 'ru_RU', 'Распродажи - внизу', '', ''),
+  (@max_id+13, 'ru_RU', 'Распродажа - форма создания', '', ''),
+  (@max_id+14, 'ru_RU', 'Распродажа - форма удаления', '', ''),
+  (@max_id+15, 'ru_RU', 'Распродажи - JavaScript', '', ''),
+  (@max_id+16, 'ru_RU', 'Товар - внизу комбинации товара', '', ''),
+  (@max_id+17, 'ru_RU', 'Каркас - Перед основным контентом', '', ''),
+  (@max_id+18, 'ru_RU', 'Каркас админки - После основного контента', '', '')
 ;
 
 # ======================================================================================================================
@@ -168,6 +234,8 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 ;
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(@max_id+1, 'cs_CZ', NULL, NULL,  NULL,  NULL),
+(@max_id+2, 'cs_CZ', NULL, NULL,  NULL,  NULL),
 (@max_id+1, 'de_DE', 'Smarty Template Engine Integration', NULL,  NULL,  NULL),
 (@max_id+2, 'de_DE', 'Steuerung für virtuelle Produkte', 'Prüfen ob ein Liefermodul für virtuellen Produkte aktiviert ist,  wenn es mindestens ein virtuelles Produkt gibt',  NULL,  NULL),
 (@max_id+1, 'en_US', 'Smarty template engine integration', NULL,  NULL,  NULL),
@@ -175,7 +243,11 @@ INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (@max_id+1, 'es_ES', 'Integración del motor de plantillas Smarty', NULL,  NULL,  NULL),
 (@max_id+2, 'es_ES', 'Controlador de producto virtual', 'Compruebe si un módulo de entrega de producto virtual está habilitado si es virtual por lo menos un producto',  NULL,  NULL),
 (@max_id+1, 'fr_FR', 'Intégration du moteur de template Smarty', NULL,  NULL,  NULL),
-(@max_id+2, 'fr_FR', 'Contôle de produit virtuel', 'Vérifie qu\'un module de livraison pour produit virtuel soit activé si des produits virtuels existent',  NULL,  NULL)
+(@max_id+2, 'fr_FR', 'Contôle de produit virtuel', 'Vérifie qu\'un module de livraison pour produit virtuel soit activé si des produits virtuels existent',  NULL,  NULL),
+(@max_id+1, 'it_IT', NULL, NULL,  NULL,  NULL),
+(@max_id+2, 'it_IT', NULL, NULL,  NULL,  NULL),
+(@max_id+1, 'ru_RU', 'Интеграция шаблонизатора Smarty', NULL,  NULL,  NULL),
+(@max_id+2, 'ru_RU', 'Поддержка виртуальных товаров', 'Проверять вкоючен ли модуль доставки виртуальных товаров, если хотя бы однин товар виртуальный',  NULL,  NULL)
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

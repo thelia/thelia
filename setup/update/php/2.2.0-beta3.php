@@ -20,7 +20,7 @@ $sqlGetFloat = 'SELECT COLUMN_NAME '
 $stmtGetFloat = $pdo->query($sqlGetFloat);
 
 // alter tables to convert float to decimal
-if ($stmtGetFloat->rowCount() !== 0) {
+if (0 !== $stmtGetFloat->rowCount()) {
     $columns = [
         ['product_price', 'price'],
         ['product_price', 'promo_price'],

@@ -22,6 +22,12 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+(@max_id + 1, 'cs_CZ', NULL, '', ''),
+(@max_id + 2, 'cs_CZ', NULL, '', ''),
+(@max_id + 3, 'cs_CZ', NULL, '', ''),
+(@max_id + 4, 'cs_CZ', NULL, NULL, NULL),
+(@max_id + 5, 'cs_CZ', NULL, NULL, NULL),
+(@max_id + 6, 'cs_CZ', NULL, NULL, NULL),
 (@max_id + 1, 'de_DE', 'Bestellung - Kunde Informationen unten', '', ''),
 (@max_id + 2, 'de_DE', 'Bestellung - Zahlungsmodul unten', '', ''),
 (@max_id + 3, 'de_DE', 'Bestellung - Liefermodul unten', '', ''),
@@ -45,7 +51,19 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 3, 'fr_FR', 'Commande - en bas du module de livraison', '', ''),
 (@max_id + 4, 'fr_FR', 'Commande - après le module de paiement', NULL, NULL),
 (@max_id + 5, 'fr_FR', 'Commande - après le module de livraison', NULL, NULL),
-(@max_id + 6, 'fr_FR', 'Commande - après le module de livraison', NULL, NULL)
+(@max_id + 6, 'fr_FR', 'Commande - après le module de livraison', NULL, NULL),
+(@max_id + 1, 'it_IT', NULL, '', ''),
+(@max_id + 2, 'it_IT', NULL, '', ''),
+(@max_id + 3, 'it_IT', NULL, '', ''),
+(@max_id + 4, 'it_IT', NULL, NULL, NULL),
+(@max_id + 5, 'it_IT', NULL, NULL, NULL),
+(@max_id + 6, 'it_IT', NULL, NULL, NULL),
+(@max_id + 1, 'ru_RU', 'Заказ - внизу информации о клиенте', '', ''),
+(@max_id + 2, 'ru_RU', 'Заказ - внизу модуля оплаты', '', ''),
+(@max_id + 3, 'ru_RU', 'Заказ - внизу модуля доставки', '', ''),
+(@max_id + 4, 'ru_RU', 'Счет-фактура - После модуля оплаты', NULL, NULL),
+(@max_id + 5, 'ru_RU', 'Счет-фактура - После модуля доставки', NULL, NULL),
+(@max_id + 6, 'ru_RU', 'Доставка - После модуля доставки', NULL, NULL)
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

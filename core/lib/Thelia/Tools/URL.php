@@ -307,23 +307,15 @@ class URL
         return $this->resolver;
     }
 
-    protected function sanitize($string, $force_lowercase = true, $alphabetic_only = false)
+    public static function sanitize(string $url) : string
     {
-        static $strip = ['~', '`', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '=', '+', '[', '{', ']',
-                 '}', '\\', '|', ';', ':', '"', "'", '&#8216;', '&#8217;', '&#8220;', '&#8221;', '&#8211;', '&#8212;',
-                 'â€”', 'â€“', ',', '<', '.', '>', '/', '?', ];
+        $transliterate = \Transliterator::createFromRules(':: Any-Latin; :: Latin-ASCII; :: Lower;');
 
-        $clean = trim(str_replace($strip, '', strip_tags($string)));
+        $url = $transliterate->transliterate($url);
 
-        $clean = preg_replace('/\s+/', '-', $clean);
+        $clean = preg_replace('/\s+/', '-', $url);
 
-        $clean = ($alphabetic_only) ? preg_replace('/[^a-zA-Z0-9]/', '', $clean) : $clean;
-
-        return ($force_lowercase) ?
-             (\function_exists('mb_strtolower')) ?
-                 mb_strtolower($clean, 'UTF-8') :
-             strtolower($clean) :
-             $clean;
+        return preg_replace('/[^a-zA-Z0-9\-_]/', '', $clean);
     }
 
     public static function checkUrl($url, array $protocols = ['http', 'https'])

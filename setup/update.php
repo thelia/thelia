@@ -16,7 +16,7 @@ $bootstraped = false;
 // Autoload bootstrap
 
 foreach ($argv as $arg) {
-    if ($arg === '-b') {
+    if ('-b' === $arg) {
         $bootstrapToggle = true;
 
         continue;
@@ -77,7 +77,7 @@ $files = $update->getLatestVersion();
 $web = $update->getWebVersion();
 
 while (1) {
-    if ($web !== null && $files != $web) {
+    if (null !== $web && $files != $web) {
         cliOutput(sprintf(
             'Thelia server is reporting the current stable release version is %s ',
             $web
@@ -90,7 +90,7 @@ while (1) {
         $files
     ), 'info');
 
-    if ($web !== null && $files < $web) {
+    if (null !== $web && $files < $web) {
         cliOutput(sprintf(
             'Your files belongs to version %s, which is not the latest stable release.',
             $files
@@ -104,10 +104,10 @@ while (1) {
     }
 
     $rep = readStdin(true);
-    if ($rep == 'y') {
+    if ('y' == $rep) {
         break;
     }
-    if ($rep == 'n') {
+    if ('n' == $rep) {
         cliOutput('Update aborted', 'warning');
         exit(0);
     }
@@ -118,11 +118,11 @@ while (1) {
     cliOutput('Would you like to backup the current database before proceeding ? (Y/n)');
 
     $rep = readStdin(true);
-    if ($rep == 'y') {
+    if ('y' == $rep) {
         $backup = true;
         break;
     }
-    if ($rep == 'n') {
+    if ('n' == $rep) {
         $backup = false;
         break;
     }
@@ -175,7 +175,7 @@ if (null === $updateError) {
             cliOutput('Would you like to restore the backup database ? (Y/n)');
 
             $rep = readStdin(true);
-            if ($rep == 'y') {
+            if ('y' == $rep) {
                 cliOutput('Database restore started. Wait, it could take a while...');
 
                 if (false === $update->restoreDb()) {
@@ -190,7 +190,7 @@ if (null === $updateError) {
 
                 break;
             }
-            if ($rep == 'n') {
+            if ('n' == $rep) {
                 exit(0);
             }
         }
@@ -253,7 +253,7 @@ function joinPaths()
     }
 
     $path = implode(\DIRECTORY_SEPARATOR, $paths);
-    if (substr($args[0], 0, 1) === '/') {
+    if ('/' === substr($args[0], 0, 1)) {
         $path = \DIRECTORY_SEPARATOR.$path;
     }
 

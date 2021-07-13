@@ -19,6 +19,9 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`,  `created_at`, `upda
 ('terms_conditions_content_id', '', 0, 0, NOW(), NOW());
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(@max + 1, 'cs_CZ', NULL, NULL, NULL, NULL),
+(@max + 2, 'cs_CZ', NULL, NULL, NULL, NULL),
+(@max + 3, 'cs_CZ', NULL, NULL, NULL, NULL),
 (@max + 1, 'de_DE', 'Standart verfügbaren Bestand wenn check-available-stock gleich 0.', NULL, NULL, NULL),
 (@max + 2, 'de_DE', 'Die ID des Ordners mit Ihren Informations-Seiten: AGB, Impressum, ...', NULL, NULL, NULL),
 (@max + 3, 'de_DE', 'Ihr \'Allgemeine Geschäftsbedingungen \' ID.', NULL, NULL, NULL),
@@ -30,7 +33,13 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (@max + 3, 'es_ES', 'El ID de los contenidos de \'Términos y condiciones\'.', NULL, NULL, NULL),
 (@max + 1, 'fr_FR', 'Stock disponible par défaut quand check-available-stock est à 0.', NULL, NULL, NULL),
 (@max + 2, 'fr_FR', 'L\'ID du dossier contenant vos pages d\'informations : CGV, mentions légales, ...', NULL, NULL, NULL),
-(@max + 3, 'fr_FR', 'L\'ID du contenu de vos \'CGV\'.', NULL, NULL, NULL)
+(@max + 3, 'fr_FR', 'L\'ID du contenu de vos \'CGV\'.', NULL, NULL, NULL),
+(@max + 1, 'it_IT', NULL, NULL, NULL, NULL),
+(@max + 2, 'it_IT', NULL, NULL, NULL, NULL),
+(@max + 3, 'it_IT', NULL, NULL, NULL, NULL),
+(@max + 1, 'ru_RU', 'Доступный остаток когда check-available-stock выставлен в 0', NULL, NULL, NULL),
+(@max + 2, 'ru_RU', 'ID папки содержащей информационные страницы : условия, выходные сведения, ...', NULL, NULL, NULL),
+(@max + 3, 'ru_RU', 'ID  контента \'Условия использования\'', NULL, NULL, NULL)
 ;
 
 # Add new column to order (version, version_created_at, version_created_by)

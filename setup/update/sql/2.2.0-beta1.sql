@@ -21,6 +21,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+    (@max_id + 1, 'cs_CZ', NULL, '', ''),
+    (@max_id + 2, 'cs_CZ', NULL, '', ''),
+    (@max_id + 3, 'cs_CZ', NULL, '', ''),
     (@max_id + 1, 'de_DE', 'Bestellung - Tabellenkopf', '', ''),
     (@max_id + 2, 'de_DE', 'Bestellung - Tabellenzeile', '', ''),
     (@max_id + 3, 'de_DE', 'Mini-Warenkorb', '', ''),
@@ -32,7 +35,13 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id + 3, 'es_ES', 'Mini tarjeta', '', ''),
     (@max_id + 1, 'fr_FR', 'Commande - colonne tableau', '', ''),
     (@max_id + 2, 'fr_FR', 'Commande - ligne tableau', '', ''),
-    (@max_id + 3, 'fr_FR', 'Mini panier', '', '')
+    (@max_id + 3, 'fr_FR', 'Mini panier', '', ''),
+    (@max_id + 1, 'it_IT', NULL, '', ''),
+    (@max_id + 2, 'it_IT', NULL, '', ''),
+    (@max_id + 3, 'it_IT', NULL, '', ''),
+    (@max_id + 1, 'ru_RU', 'Заказ - заголовок таблицы', '', ''),
+    (@max_id + 2, 'ru_RU', 'Заказ - строка таблицы', '', ''),
+    (@max_id + 3, 'ru_RU', 'Мини корзина', '', '')
 ;
 
 ALTER TABLE `rewriting_url` CHANGE `url` `url` VARBINARY( 255 ) NOT NULL;

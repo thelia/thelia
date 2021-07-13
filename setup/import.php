@@ -22,7 +22,7 @@ $bootstraped = false;
 // Autoload bootstrap
 
 foreach ($argv as $arg) {
-    if ($arg === '-b') {
+    if ('-b' === $arg) {
         $bootstrapToggle = true;
 
         continue;
@@ -127,7 +127,7 @@ function createProduct($categories, $brands, $contents, $template, $attribute, $
         $row = 0;
         while (($data = fgetcsv($handle, 100000, ';')) !== false) {
             ++$row;
-            if ($row == 1) {
+            if (1 == $row) {
                 continue;
             }
             $product = new \Thelia\Model\Product();
@@ -391,7 +391,7 @@ function createBrands($con)
         $row = 0;
         while (($data = fgetcsv($handle, 1000, ';')) !== false) {
             ++$row;
-            if ($row == 1) {
+            if (1 == $row) {
                 continue;
             }
             $brand = new \Thelia\Model\Brand();
@@ -423,13 +423,13 @@ function createBrands($con)
                     ->setBrandId($brand->getId())
                     ->setFile($image)
                     ->save($con);
-                if ($logoId === null) {
+                if (null === $logoId) {
                     $logoId = $brandImage->getId();
                 }
                 $fileSystem->copy(THELIA_SETUP_DIRECTORY.'import/images/'.$image, THELIA_LOCAL_DIR.'media/images/brand/'.$image, true);
             }
 
-            if ($logoId !== null) {
+            if (null !== $logoId) {
                 $brand->setLogoImageId($logoId);
                 $brand->save($con);
             }
@@ -451,7 +451,7 @@ function createCategories($templateId, $con)
         $row = 0;
         while (($data = fgetcsv($handle, 1000, ';')) !== false) {
             ++$row;
-            if ($row == 1) {
+            if (1 == $row) {
                 continue;
             }
             $category = new \Thelia\Model\Category();
@@ -507,7 +507,7 @@ function createSales($con)
 
         while (($data = fgetcsv($handle, 1000, ';')) !== false) {
             ++$row;
-            if ($row == 1) {
+            if (1 == $row) {
                 continue;
             }
             $sale = new \Thelia\Model\Sale();
@@ -572,7 +572,7 @@ function createFolders($con)
         $row = 0;
         while (($data = fgetcsv($handle, 1000, ';')) !== false) {
             ++$row;
-            if ($row == 1) {
+            if (1 == $row) {
                 continue;
             }
             $folder = new \Thelia\Model\Folder();
@@ -624,7 +624,7 @@ function createContents($folders, $con)
         $row = 0;
         while (($data = fgetcsv($handle, 1000, ';')) !== false) {
             ++$row;
-            if ($row == 1) {
+            if (1 == $row) {
                 continue;
             }
             $content = new \Thelia\Model\Content();
