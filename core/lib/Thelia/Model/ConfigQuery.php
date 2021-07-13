@@ -70,10 +70,10 @@ class ConfigQuery extends BaseConfigQuery
             $config->setName($configName);
         }
 
-        if (null !== $secured) {
+        if ($secured !== null) {
             $config->setSecured($secured ? 1 : 0);
         }
-        if (null !== $hidden) {
+        if ($hidden !== null) {
             $config->setHidden($hidden ? 1 : 0);
         }
 
@@ -93,12 +93,12 @@ class ConfigQuery extends BaseConfigQuery
 
     public static function isRewritingEnable()
     {
-        return 1 == self::read('rewriting_enable');
+        return self::read('rewriting_enable') == 1;
     }
 
     public static function isSeoTransliteratorEnable()
     {
-        return 1 == self::read('enable_seo_transliterator');
+        return self::read('enable_seo_transliterator') == 1;
     }
 
     public static function getPageNotFoundView()
@@ -113,12 +113,12 @@ class ConfigQuery extends BaseConfigQuery
 
     public static function useTaxFreeAmounts()
     {
-        return 1 == self::read('use_tax_free_amounts', 'default');
+        return self::read('use_tax_free_amounts', 'default') == 1;
     }
 
     public static function checkAvailableStock()
     {
-        return 0 != self::read('check-available-stock', 1);
+        return self::read('check-available-stock', 1) != 0;
     }
 
     public static function getUnknownFlagPath()
@@ -158,7 +158,7 @@ class ConfigQuery extends BaseConfigQuery
      */
     public static function getNotifyNewsletterSubscription()
     {
-        return 0 != self::read('notify_newsletter_subscription', 0);
+        return self::read('notify_newsletter_subscription', 0) != 0;
     }
 
     /**
@@ -192,7 +192,7 @@ class ConfigQuery extends BaseConfigQuery
     /* smtp config */
     public static function isSmtpEnable()
     {
-        return 1 == self::read('smtp.enabled');
+        return self::read('smtp.enabled') == 1;
     }
 
     public static function getSmtpHost()

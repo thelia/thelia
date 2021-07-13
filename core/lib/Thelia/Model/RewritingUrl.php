@@ -41,15 +41,15 @@ class RewritingUrl extends BaseRewritingUrl
      * Set the value of [url] column.
      *
      * @param string $v New value
-     *
      * @return \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
-    public function setUrl($v): self
+    public function setUrl($v) : self
     {
-        if (null !== $v) {
+        if ($v !== null) {
             $v = (string) $v;
 
-            if (1 == ConfigQuery::isSeoTransliteratorEnable()) {
+            if (ConfigQuery::isSeoTransliteratorEnable() == 1)
+            {
                 $v = URL::sanitize($v);
             }
         }
@@ -60,7 +60,5 @@ class RewritingUrl extends BaseRewritingUrl
         }
 
         return $this;
-    }
-
-    // setUrl()
+    } // setUrl()
 }
