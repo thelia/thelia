@@ -47,6 +47,7 @@ class RewritingUrl extends BaseRewritingUrl
     {
         if ($v !== null) {
             $v = (string) $v;
+            $v = trim($v);
 
             if (ConfigQuery::isSeoTransliteratorEnable() == 1)
             {
