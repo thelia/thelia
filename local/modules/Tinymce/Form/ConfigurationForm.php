@@ -133,7 +133,7 @@ class ConfigurationForm extends BaseForm
     {
         $this->formBuilder->add(
             $key,
-            'checkbox',
+            CheckboxType::class,
             [
                 'label_attr' => [],
                 'required' => false,
