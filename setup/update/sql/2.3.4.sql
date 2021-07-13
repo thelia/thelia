@@ -21,13 +21,6 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
-    (@max_id+1, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+2, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+3, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+4, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+5, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+6, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+7, 'cs_CZ', NULL, NULL, NULL),
     (@max_id+1, 'de_DE', NULL, NULL, NULL),
     (@max_id+2, 'de_DE', NULL, NULL, NULL),
     (@max_id+3, 'de_DE', NULL, NULL, NULL),
@@ -56,13 +49,6 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+5, 'fr_FR', NULL, NULL, NULL),
     (@max_id+6, 'fr_FR', NULL, NULL, NULL),
     (@max_id+7, 'fr_FR', NULL, NULL, NULL),
-    (@max_id+1, 'it_IT', NULL, NULL, NULL),
-    (@max_id+2, 'it_IT', NULL, NULL, NULL),
-    (@max_id+3, 'it_IT', NULL, NULL, NULL),
-    (@max_id+4, 'it_IT', NULL, NULL, NULL),
-    (@max_id+5, 'it_IT', NULL, NULL, NULL),
-    (@max_id+6, 'it_IT', NULL, NULL, NULL),
-    (@max_id+7, 'it_IT', NULL, NULL, NULL),
     (@max_id+1, 'ru_RU', NULL, NULL, NULL),
     (@max_id+2, 'ru_RU', NULL, NULL, NULL),
     (@max_id+3, 'ru_RU', NULL, NULL, NULL),
@@ -85,12 +71,10 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (@max_id + 1, 'customer_email_confirmation', '0', 0, 0, NOW(), NOW());
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
-    (@max_id + 1, 'cs_CZ', NULL, NULL, NULL, NULL),
     (@max_id + 1, 'de_DE', NULL, NULL, NULL, NULL),
     (@max_id + 1, 'en_US', 'Customer account creation should be confirmed by email (1: yes, 0: no)', NULL, NULL, NULL),
     (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
     (@max_id + 1, 'fr_FR', 'La création d\'un compte client doit être confirmée par email (1: oui, 0: non)', NULL, NULL, NULL),
-    (@max_id + 1, 'it_IT', NULL, NULL, NULL, NULL),
     (@max_id + 1, 'ru_RU', NULL, NULL, NULL, NULL)
 ;
 
@@ -99,12 +83,10 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (@max_id+1, 'customer_confirmation', NULL, NULL, 'customer_confirmation.txt', NULL, 'customer_confirmation.html', NOW(), NOW());
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
-    (@max_id+1, 'cs_CZ', NULL, NULL, NULL, NULL),
     (@max_id+1, 'de_DE', NULL, NULL, NULL, NULL),
     (@max_id+1, 'en_US', 'Mail sent to the customer to confirm its account', 'Confirm your {config key=\"store_name\"} account', NULL, NULL),
     (@max_id+1, 'es_ES', NULL, NULL, NULL, NULL),
     (@max_id+1, 'fr_FR', 'E-mail de confirmation de création de compte client', 'Confirmez la création de votre compte {config key=\"store_name\"}', NULL, NULL),
-    (@max_id+1, 'it_IT', NULL, NULL, NULL, NULL),
     (@max_id+1, 'ru_RU', NULL, NULL, NULL, NULL)
 ;
 
@@ -129,12 +111,10 @@ SELECT @max_id := MAX(`id`) FROM `resource`;
 INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES (@max_id+1, 'admin.configuration.order-status', NOW(), NOW());
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-  (@max_id+1, 'cs_CZ', NULL),
   (@max_id+1, 'de_DE', NULL),
   (@max_id+1, 'en_US', 'Configuration order status'),
   (@max_id+1, 'es_ES', NULL),
   (@max_id+1, 'fr_FR', NULL),
-  (@max_id+1, 'it_IT', NULL),
   (@max_id+1, 'ru_RU', NULL)
 ;
 
@@ -153,15 +133,6 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
-(@max_id+1,  'cs_CZ', NULL, NULL, NULL),
-(@max_id+2,  'cs_CZ', NULL, NULL, NULL),
-(@max_id+3,  'cs_CZ', NULL, NULL, NULL),
-(@max_id+4,  'cs_CZ', NULL, NULL, NULL),
-(@max_id+5,  'cs_CZ', NULL, NULL, NULL),
-(@max_id+6,  'cs_CZ', NULL, NULL, NULL),
-(@max_id+7,  'cs_CZ', NULL, NULL, NULL),
-(@max_id+8,  'cs_CZ', NULL, NULL, NULL),
-(@max_id+9,  'cs_CZ', NULL, NULL, NULL),
 (@max_id+1,  'de_DE', NULL, NULL, NULL),
 (@max_id+2,  'de_DE', NULL, NULL, NULL),
 (@max_id+3,  'de_DE', NULL, NULL, NULL),
@@ -198,15 +169,6 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id+7,  'fr_FR', NULL, NULL, NULL),
 (@max_id+8,  'fr_FR', NULL, NULL, NULL),
 (@max_id+9,  'fr_FR', NULL, NULL, NULL),
-(@max_id+1,  'it_IT', NULL, NULL, NULL),
-(@max_id+2,  'it_IT', NULL, NULL, NULL),
-(@max_id+3,  'it_IT', NULL, NULL, NULL),
-(@max_id+4,  'it_IT', NULL, NULL, NULL),
-(@max_id+5,  'it_IT', NULL, NULL, NULL),
-(@max_id+6,  'it_IT', NULL, NULL, NULL),
-(@max_id+7,  'it_IT', NULL, NULL, NULL),
-(@max_id+8,  'it_IT', NULL, NULL, NULL),
-(@max_id+9,  'it_IT', NULL, NULL, NULL),
 (@max_id+1,  'ru_RU', NULL, NULL, NULL),
 (@max_id+2,  'ru_RU', NULL, NULL, NULL),
 (@max_id+3,  'ru_RU', NULL, NULL, NULL),
@@ -229,7 +191,7 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (@max+1, 'number_default_results_per_page.coupon_list', '20', '0', '0', NOW(), NOW());
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
-    (@max+1, 'cs_CZ', NULL, NUll, NULL, NULL),    (@max+1, 'de_DE', NULL, NUll, NULL, NULL),    (@max+1, 'en_US', 'Default number of coupons per page on coupon list', NUll, NULL, NULL),    (@max+1, 'es_ES', NULL, NUll, NULL, NULL),    (@max+1, 'fr_FR', 'Nombre de coupons par page dans la liste des coupons', NUll, NULL, NULL),    (@max+1, 'it_IT', NULL, NUll, NULL, NULL),    (@max+1, 'ru_RU', NULL, NUll, NULL, NULL);
+    (@max+1, 'de_DE', NULL, NUll, NULL, NULL),    (@max+1, 'en_US', 'Default number of coupons per page on coupon list', NUll, NULL, NULL),    (@max+1, 'es_ES', NULL, NUll, NULL, NULL),    (@max+1, 'fr_FR', 'Nombre de coupons par page dans la liste des coupons', NUll, NULL, NULL),    (@max+1, 'ru_RU', NULL, NUll, NULL, NULL);
 
 ALTER TABLE `module` ADD `mandatory` TINYINT NOT NULL DEFAULT '0' AFTER `full_namespace`, ADD `hidden` TINYINT NOT NULL DEFAULT '0' AFTER `mandatory`;
 UPDATE `module` SET `mandatory` = 0, `hidden` = 0;

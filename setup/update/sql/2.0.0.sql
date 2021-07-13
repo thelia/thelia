@@ -39,12 +39,10 @@ INSERT INTO `resource` (`id`, `code`, `created_at`, `updated_at`) VALUES
 (@max, 'admin.cache', NOW(), NOW());
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-(@max, 'cs_CZ', NULL),
 (@max, 'de_DE', 'Konfiguration / Cache'),
 (@max, 'en_US', 'Configuration / Cache'),
 (@max, 'es_ES', 'Configuración / caché'),
 (@max, 'fr_FR', 'Configuration / Cache'),
-(@max, 'it_IT', NULL),
 (@max, 'ru_RU', 'Конфигурация / Кеш')
 ;
 
@@ -54,12 +52,10 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (@max, 'admin.home', NOW(), NOW());
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-(@max, 'cs_CZ', NULL),
 (@max, 'de_DE', 'Back-Office Startseite'),
 (@max, 'en_US', 'Back-office home page'),
 (@max, 'es_ES', 'Página de inicio de back office'),
 (@max, 'fr_FR', 'Page d\'acceuil de l\'administration'),
-(@max, 'it_IT', NULL),
 (@max, 'ru_RU', 'Главная админки')
 ;
 

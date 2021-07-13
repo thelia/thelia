@@ -14,9 +14,6 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
-(@max_id + 1, 'cs_CZ', NULL, '', ''),
-(@max_id + 2, 'cs_CZ', NULL, '', ''),
-(@max_id + 3, 'cs_CZ', NULL, '', ''),
 (@max_id + 1, 'de_DE', 'Kundenkonto - Erweitere Informationen', '', ''),
 (@max_id + 2, 'de_DE', 'Produktseite - oben im Formular', '', ''),
 (@max_id + 3, 'de_DE', 'Produktseite - unten an dem Formular', '', ''),
@@ -29,9 +26,6 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 1, 'fr_FR', 'Compte client - informations additionnelles', '', ''),
 (@max_id + 2, 'fr_FR', 'Page produit - En haut du formulaire', '', ''),
 (@max_id + 3, 'fr_FR', 'Page produit - En bas du formulaire', '', ''),
-(@max_id + 1, 'it_IT', NULL, '', ''),
-(@max_id + 2, 'it_IT', NULL, '', ''),
-(@max_id + 3, 'it_IT', NULL, '', ''),
 (@max_id + 1, 'ru_RU', 'Аккаунт клиента - дополнительная информация', '', ''),
 (@max_id + 2, 'ru_RU', 'Страница товара - Вверху формы', '', ''),
 (@max_id + 3, 'ru_RU', 'Страница товара - Внизу формы', '', '')

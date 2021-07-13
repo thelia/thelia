@@ -16,12 +16,10 @@ INSERT IGNORE INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `create
 
 -- add new locales for allow_module_zip_install config variable if it doesn't exists
 INSERT IGNORE INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
-    (@configIdMax+1, 'cs_CZ', NULL, NULL, NULL, NULL),
     (@configIdMax+1, 'de_DE', 'Modulinstallation aus ZIP-Dateien zulassen.', NULL, NULL, NULL),
     (@configIdMax+1, 'en_US', 'Allow module installation from ZIP files.', NULL, NULL, NULL),
     (@configIdMax+1, 'es_ES', 'Permitir la instalación del módulo desde archivos ZIP.', NULL, NULL, NULL),
     (@configIdMax+1, 'fr_FR', 'Autoriser l\'installation des modules par fichier ZIP.', NULL, NULL, NULL),
-    (@configIdMax+1, 'it_IT', NULL, NULL, NULL, NULL),
     (@configIdMax+1, 'ru_RU', NULL, NULL, NULL, NULL)
 ;
 

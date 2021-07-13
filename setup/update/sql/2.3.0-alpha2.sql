@@ -22,12 +22,10 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (@max, 'new_admin_password', NULL, NULL, 'admin_password.txt', NULL, 'admin_password.html', NOW(), NOW());
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
-    (@max, 'cs_CZ', NULL, NULL, NULL, NULL),
     (@max, 'de_DE', NULL, NULL, NULL, NULL),
     (@max, 'en_US', 'Mail sent to an administrator who requested a new password', 'New password request on {config key=\"store_name\"}', NULL, NULL),
     (@max, 'es_ES', 'Correo enviado a un administrador que ha solicitado una nueva contraseña', 'Nueva contraseña solicitada en {config key=\"store_name\"}', NULL, NULL),
     (@max, 'fr_FR', 'Courrier envoyé à un administrateur qui a demandé un nouveau mot de passe', 'Votre demande de mot de passe {config key=\"store_name\"}', NULL, NULL),
-    (@max, 'it_IT', NULL, NULL, NULL, NULL),
     (@max, 'ru_RU', 'Письмо отсылаемое администратору при запросе нового пароля', 'Ваш новый пароль для %store', NULL, NULL)
 ;
 
@@ -49,9 +47,6 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 ;
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
-    (@max_id + 1, 'cs_CZ', NULL, NULL, NULL, NULL),
-    (@max_id + 2, 'cs_CZ', NULL, NULL, NULL, NULL),
-    (@max_id + 3, 'cs_CZ', NULL, NULL, NULL, NULL),
     (@max_id + 1, 'de_DE', NULL, NULL, NULL, NULL),
     (@max_id + 2, 'de_DE', NULL, NULL, NULL, NULL),
     (@max_id + 3, 'de_DE', NULL, NULL, NULL, NULL),
@@ -64,9 +59,6 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
     (@max_id + 1, 'fr_FR', 'La longueur minimale requise pour un mot de passe administrateur', NULL, NULL, NULL),
     (@max_id + 2, 'fr_FR', 'Permettre à un administrateur de recréer un mot de passe perdu (1 = Oui, 0 = non)', NULL, NULL, NULL),
     (@max_id + 3, 'fr_FR', 'Envoyer un email de confirmation aux abonnés de la newsletter (1 = Oui, 0 = non)', NULL, NULL, NULL),
-    (@max_id + 1, 'it_IT', NULL, NULL, NULL, NULL),
-    (@max_id + 2, 'it_IT', NULL, NULL, NULL, NULL),
-    (@max_id + 3, 'it_IT', NULL, NULL, NULL, NULL),
     (@max_id + 1, 'ru_RU', 'Минимальная длина пароля для админа', NULL, NULL, NULL),
     (@max_id + 2, 'ru_RU', 'Позволять восстановление утеряного пароля админа (1 - Да, 0 - Нет)', NULL, NULL, NULL),
     (@max_id + 3, 'ru_RU', 'Посылать email подтверждения подписчикам рассылки', NULL, NULL, NULL)
@@ -96,22 +88,6 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
-    (@max_id+1, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+2, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+3, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+4, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+5, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+6, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+7, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+8, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+9, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+10, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+11, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+12, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+13, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+14, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+15, 'cs_CZ', NULL, NULL, NULL),
-    (@max_id+16, 'cs_CZ', NULL, NULL, NULL),
     (@max_id+1, 'de_DE', NULL, NULL, NULL),
     (@max_id+2, 'de_DE', NULL, NULL, NULL),
     (@max_id+3, 'de_DE', NULL, NULL, NULL),
@@ -176,22 +152,6 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id+14, 'fr_FR', 'Désabonnement newsletter - feuille de style CSS', NULL, NULL),
     (@max_id+15, 'fr_FR', 'Désabonnement newsletter - après l\'inclusion du JavaScript', NULL, NULL),
     (@max_id+16, 'fr_FR', 'Désabonnement newsletter - après l\'initialisation du JavaScript', NULL, NULL),
-    (@max_id+1, 'it_IT', NULL, NULL, NULL),
-    (@max_id+2, 'it_IT', NULL, NULL, NULL),
-    (@max_id+3, 'it_IT', NULL, NULL, NULL),
-    (@max_id+4, 'it_IT', NULL, NULL, NULL),
-    (@max_id+5, 'it_IT', NULL, NULL, NULL),
-    (@max_id+6, 'it_IT', NULL, NULL, NULL),
-    (@max_id+7, 'it_IT', NULL, NULL, NULL),
-    (@max_id+8, 'it_IT', NULL, NULL, NULL),
-    (@max_id+9, 'it_IT', NULL, NULL, NULL),
-    (@max_id+10, 'it_IT', NULL, NULL, NULL),
-    (@max_id+11, 'it_IT', NULL, NULL, NULL),
-    (@max_id+12, 'it_IT', NULL, NULL, NULL),
-    (@max_id+13, 'it_IT', NULL, NULL, NULL),
-    (@max_id+14, 'it_IT', NULL, NULL, NULL),
-    (@max_id+15, 'it_IT', NULL, NULL, NULL),
-    (@max_id+16, 'it_IT', NULL, NULL, NULL),
     (@max_id+1, 'ru_RU', 'Распродажа - вверху', NULL, NULL),
     (@max_id+2, 'ru_RU', 'Распродажа - внизу', NULL, NULL),
     (@max_id+3, 'ru_RU', 'Распродажа - вверху основной зоны', NULL, NULL),
@@ -235,12 +195,10 @@ INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_t
 (@max, 'newsletter_subscription_confirmation', NULL, NULL, 'newsletter_subscription_confirmation.txt', NULL, 'newsletter_subscription_confirmation.html', NOW(), NOW());
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
-    (@max, 'cs_CZ', NULL, NULL, NULL, NULL),
     (@max, 'de_DE', NULL, NULL, NULL, NULL),
     (@max, 'en_US', 'Mail sent after a subscription to newsletter', 'Your subscription to {config key=\"store_name\"} newsletter', NULL, NULL),
     (@max, 'es_ES', 'Correo enviado después de la suscripción al boletín de noticias', 'Tu suscripción al boletín de {config key=\"store_name\"}', NULL, NULL),
     (@max, 'fr_FR', 'Email envoyé après l\'inscription à la newsletter', 'Votre abonnement à {config key=\"store_name\"} newsletter', NULL, NULL),
-    (@max, 'it_IT', NULL, NULL, NULL, NULL),
     (@max, 'ru_RU', 'Выслано письмо после подписки на рассылку', 'Подписка на рассылку новостей %store', NULL, NULL)
 ;
 
@@ -252,9 +210,6 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES (@max+3, 'number_default_results_per_page.customer_list', '20', '0', '0', NOW(), NOW());
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
-    (@max+1, 'cs_CZ', NULL, NUll, NULL, NULL),
-    (@max+2, 'cs_CZ', NULL, NUll, NULL, NULL),
-    (@max+3, 'cs_CZ', NULL, NUll, NULL, NULL),
     (@max+1, 'de_DE', NULL, NUll, NULL, NULL),
     (@max+2, 'de_DE', NULL, NUll, NULL, NULL),
     (@max+3, 'de_DE', NULL, NUll, NULL, NULL),
@@ -267,9 +222,6 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (@max+1, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des produits', NUll, NULL, NULL),
     (@max+2, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des commandes', NUll, NULL, NULL),
     (@max+3, 'fr_FR', 'Nombre par défaut de résultats par page pour la liste des clients', NUll, NULL, NULL),
-    (@max+1, 'it_IT', NULL, NUll, NULL, NULL),
-    (@max+2, 'it_IT', NULL, NUll, NULL, NULL),
-    (@max+3, 'it_IT', NULL, NUll, NULL, NULL),
     (@max+1, 'ru_RU', 'Количество результатов по умолчанию для списка товаров', NUll, NULL, NULL),
     (@max+2, 'ru_RU', 'Количество результатов по умолчанию для списка заказов', NUll, NULL, NULL),
     (@max+3, 'ru_RU', 'Количество результатов по умолчанию для списка клиентов', NUll, NULL, NULL)
@@ -284,12 +236,10 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 ;
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
-(@max_id+1, 'cs_CZ', NULL, NULL,  NULL,  NULL),
 (@max_id+1, 'de_DE', NULL, NULL,  NULL,  NULL),
 (@max_id+1, 'en_US', 'Displays the default blocks on the homepage of the administration', NULL,  NULL,  NULL),
 (@max_id+1, 'es_ES', NULL, NULL,  NULL,  NULL),
 (@max_id+1, 'fr_FR', 'Affiche les blocs par défaut sur la page d\'accueil de l\'administration', NULL,  NULL,  NULL),
-(@max_id+1, 'it_IT', NULL, NULL,  NULL,  NULL),
 (@max_id+1, 'ru_RU', 'Отображение стандартных блоков на главной админки', NULL,  NULL,  NULL)
 ;
 

@@ -29,11 +29,6 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
-(@max_id + 1, 'cs_CZ', NULL, '', ''),
-(@max_id + 2, 'cs_CZ', NULL, '', ''),
-(@max_id + 3, 'cs_CZ', NULL, '', ''),
-(@max_id + 4, 'cs_CZ', NULL, '', ''),
-(@max_id + 5, 'cs_CZ', NULL, '', ''),
 (@max_id + 1, 'de_DE', 'Brand edit Seite - im Formular', '', ''),
 (@max_id + 2, 'de_DE', 'Sonderangebot Änderungsseite - javascript last call block', '', ''),
 (@max_id + 3, 'de_DE', 'API Seite - oben', '', ''),
@@ -54,11 +49,6 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 3, 'fr_FR', NULL, '', ''),
 (@max_id + 4, 'fr_FR', NULL, '', ''),
 (@max_id + 5, 'fr_FR', NULL, '', ''),
-(@max_id + 1, 'it_IT', NULL, '', ''),
-(@max_id + 2, 'it_IT', NULL, '', ''),
-(@max_id + 3, 'it_IT', NULL, '', ''),
-(@max_id + 4, 'it_IT', NULL, '', ''),
-(@max_id + 5, 'it_IT', NULL, '', ''),
 (@max_id + 1, 'ru_RU', 'Страница редактирования бренда - в форме', '', ''),
 (@max_id + 2, 'ru_RU', 'Страница редактирования распродажи - блок последнего вызова javascript', '', ''),
 (@max_id + 3, 'ru_RU', 'Страница API - вверху', '', ''),
