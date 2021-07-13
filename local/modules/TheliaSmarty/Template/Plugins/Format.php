@@ -480,6 +480,15 @@ class Format extends AbstractSmartyPlugin
         return $address;
     }
 
+    public function theliaImplode($firstParameter, $secondParameter = '')
+    {
+        if (is_array($secondParameter)) {
+            return implode($firstParameter, $secondParameter);
+        }
+
+        return implode($secondParameter, $firstParameter);
+    }
+
     /**
      * @return SmartyPluginDescriptor[]
      */
@@ -491,6 +500,7 @@ class Format extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'format_money', $this, 'formatMoney'),
             new SmartyPluginDescriptor('function', 'format_array_2d', $this, 'formatTwoDimensionalArray'),
             new SmartyPluginDescriptor('function', 'format_address', $this, 'formatAddress'),
+            new SmartyPluginDescriptor('modifier', 'implode', $this, 'theliaImplode'),
         ];
     }
 
