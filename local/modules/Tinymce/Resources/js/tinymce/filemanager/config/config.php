@@ -12,7 +12,6 @@
 
 mb_internal_encoding('UTF-8');
 mb_http_output('UTF-8');
-mb_http_input('UTF-8');
 mb_language('uni');
 mb_regex_encoding('UTF-8');
 ob_start('mb_output_handler');
@@ -49,18 +48,18 @@ function generateFolder($env): void
     }
 }
 
-if (file_exists(__DIR__.'/../../../../../../../../vendor/autoload.php')) {
-    // Symlinked with std install
-    require_once __DIR__.'/../../../../../../../../vendor/autoload.php';
-} elseif (file_exists(__DIR__.'/../../../../vendor/autoload.php')) {
-    // Hard copy with std install
-    require_once __DIR__.'/../../../../vendor/autoload.php';
-} elseif (file_exists(__DIR__.'/../../../../../../../../bootstrap.php')) {
+if (file_exists(__DIR__.'/../../../../../../../../bootstrap.php')) {
     // Symlinked with thelia-project
     require_once __DIR__.'/../../../../../../../../bootstrap.php';
 } elseif (file_exists(__DIR__.'/../../../../bootstrap.php')) {
     // Hard copy with thelia-project
     require_once __DIR__.'/../../../../bootstrap.php';
+} elseif (file_exists(__DIR__.'/../../../../../../../../vendor/autoload.php')) {
+    // Symlinked with std install
+    require_once __DIR__.'/../../../../../../../../vendor/autoload.php';
+} elseif (file_exists(__DIR__.'/../../../../vendor/autoload.php')) {
+    // Hard copy with std install
+    require_once __DIR__.'/../../../../vendor/autoload.php';
 }
 
 (new \Symfony\Component\Dotenv\Dotenv())->bootEnv(__DIR__.'/../../../../../../../../.env');
@@ -70,7 +69,7 @@ $env = getenv('THELIA_ENV') ?: 'prod';
 /** @var Request $request */
 $request = Request::createFromGlobals();
 
-$thelia = new Thelia($env, true);
+$thelia = new App\Kernel($env, true);
 
 $thelia->boot();
 
@@ -490,8 +489,8 @@ $config = [
     'ext_misc' => ['zip', 'rar', 'gz', 'tar', 'iso', 'dmg'], //Archives
 
     /******************
-    * AVIARY config
-    *******************/
+     * AVIARY config
+     *******************/
     'aviary_active' => true,
     'aviary_apiKey' => '2444282ef4344e3dacdedc7a78f8877d',
     'aviary_language' => 'en',
@@ -514,13 +513,13 @@ $config = [
     'hidden_files' => ['config.php'],
 
     /*******************
-    * URL upload
-    *******************/
+     * URL upload
+     *******************/
     'url_upload' => true,
 
     /*******************
-    * JAVA upload
-    *******************/
+     * JAVA upload
+     *******************/
     'java_upload' => true,
     'JAVAMaxSizeUpload' => 200, //Gb
 
