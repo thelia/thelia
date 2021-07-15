@@ -49,14 +49,12 @@ function generateFolder($env): void
     }
 }
 
-$env = getenv('THELIA_ENV') ?: 'prod';
-
-if (file_exists(__DIR__.'/../../../../../../../../core/vendor/autoload.php')) {
+if (file_exists(__DIR__.'/../../../../../../../../vendor/autoload.php')) {
     // Symlinked with std install
-    require_once __DIR__.'/../../../../../../../../core/vendor/autoload.php';
-} elseif (file_exists(__DIR__.'/../../../../core/vendor/autoload.php')) {
+    require_once __DIR__.'/../../../../../../../../vendor/autoload.php';
+} elseif (file_exists(__DIR__.'/../../../../vendor/autoload.php')) {
     // Hard copy with std install
-    require_once __DIR__.'/../../../../core/vendor/autoload.php';
+    require_once __DIR__.'/../../../../vendor/autoload.php';
 } elseif (file_exists(__DIR__.'/../../../../../../../../bootstrap.php')) {
     // Symlinked with thelia-project
     require_once __DIR__.'/../../../../../../../../bootstrap.php';
@@ -65,10 +63,14 @@ if (file_exists(__DIR__.'/../../../../../../../../core/vendor/autoload.php')) {
     require_once __DIR__.'/../../../../bootstrap.php';
 }
 
+(new \Symfony\Component\Dotenv\Dotenv())->bootEnv(__DIR__.'/../../../../../../../../.env');
+
+$env = getenv('THELIA_ENV') ?: 'prod';
+
 /** @var Request $request */
 $request = Request::createFromGlobals();
 
-$thelia = new Thelia($env, false);
+$thelia = new Thelia($env, true);
 
 $thelia->boot();
 
@@ -482,7 +484,7 @@ $config = [
     //Allowed extensions (lowercase insert)
     //**********************
     'ext_img' => ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg'], //Images
-    'ext_file' => ['doc', 'docx', 'rtf', 'pdf', 'xls', 'xlsx', 'txt', 'csv', 'html', 'xhtml', 'psd', 'sql', 'log', 'fla', 'xml', 'ade', 'adp', 'mdb', 'accdb', 'ppt', 'pptx', 'odt', 'ots', 'ott', 'odb', 'odg', 'otp', 'otg', 'odf', 'ods', 'odp', 'css', 'ai', 'kmz', 'dwg', 'dxf', 'hpgl', 'plt', 'spl', 'step', 'stp', 'iges', 'igs', 'sat', 'cgm'], //Files
+    'ext_file' => ['svg', 'doc', 'docx', 'rtf', 'pdf', 'xls', 'xlsx', 'txt', 'csv', 'html', 'xhtml', 'psd', 'sql', 'log', 'fla', 'xml', 'ade', 'adp', 'mdb', 'accdb', 'ppt', 'pptx', 'odt', 'ots', 'ott', 'odb', 'odg', 'otp', 'otg', 'odf', 'ods', 'odp', 'css', 'ai', 'kmz', 'dwg', 'dxf', 'hpgl', 'plt', 'spl', 'step', 'stp', 'iges', 'igs', 'sat', 'cgm'], //Files
     'ext_video' => ['mov', 'mpeg', 'm4v', 'mp4', 'avi', 'mpg', 'wma', 'flv', 'webm'], //Video
     'ext_music' => ['mp3', 'mpga', 'm4a', 'ac3', 'aiff', 'mid', 'ogg', 'wav'], //Audio
     'ext_misc' => ['zip', 'rar', 'gz', 'tar', 'iso', 'dmg'], //Archives

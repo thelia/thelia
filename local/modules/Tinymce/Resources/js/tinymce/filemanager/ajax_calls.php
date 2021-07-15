@@ -79,7 +79,7 @@ if (isset($_GET['action'])) {
                 || strpos($_POST['path'], './') === 0
                 || (strpos($_POST['url'], 'http://s3.amazonaws.com/feather') !== 0 && strpos($_POST['url'], 'https://s3.amazonaws.com/feather') !== 0)
                 || $_POST['name'] != fix_filename($_POST['name'], $config)
-                || !in_array(strtolower($info['extension']), ['jpg', 'jpeg', 'png'])
+                || !in_array(strtolower($info['extension']), ['jpg', 'jpeg', 'png', 'svg'])
             ) {
                 response(trans('wrong data').AddErrorLocation())->send();
                 exit;

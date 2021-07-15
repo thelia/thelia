@@ -604,7 +604,6 @@ abstract class BaseController implements ControllerInterface
      *
      * This method builds a thelia form with its name
      *
-     * @deprecated since Thelia 2.5, use autowiring to get form factory and create your form.
      */
     public function createForm($name, $type = FormType::class, array $data = [], array $options = [])
     {

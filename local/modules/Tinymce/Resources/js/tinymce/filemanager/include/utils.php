@@ -308,7 +308,7 @@ function create_img($imgfile, $imgthumb, $newwidth, $newheight = null, $option =
         if (strpos($imgfile, 'http') === 0 || image_check_memory_usage($imgfile, $newwidth, $newheight)) {
             require_once 'php_image_magician.php';
             try {
-                $magicianObj = new imageLib($imgfile);
+                $magicianObj = new php_image_magician($imgfile);
                 $magicianObj->resizeImage($newwidth, $newheight, $option);
                 $magicianObj->saveImage($imgthumb, 80);
             } catch (Exception $e) {
@@ -642,8 +642,8 @@ function image_check_memory_usage($img, $max_breedte, $max_hoogte)
         $memory_usage = memory_get_usage();
         $memory_limit = abs((int) (str_replace('M', '', ini_get('memory_limit')) * 1024 * 1024));
         $image_properties = getimagesize($img);
-        $image_width = $image_properties[0];
-        $image_height = $image_properties[1];
+        $image_width = $image_properties[0] ?? 0;
+        $image_height = $image_properties[1] ?? 0;
         if (isset($image_properties['bits'])) {
             $image_bits = $image_properties['bits'];
         } else {
