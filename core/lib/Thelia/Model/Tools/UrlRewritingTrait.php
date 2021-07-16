@@ -16,7 +16,6 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\GenerateRewrittenUrlEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ConfigQuery;
@@ -102,7 +101,7 @@ trait UrlRewritingTrait
 
         if (ConfigQuery::isEndingWithHtml() == 1)
         {
-            if (!str_contains(".html", $urlFilePart))
+            if (!preg_match("[.html]", $urlFilePart))
             {
                 $ending = ".html";
             }
@@ -188,9 +187,19 @@ trait UrlRewritingTrait
 
         $resolver = null;
 
+        $ending = null;
+
         if (ConfigQuery::isSeoTransliteratorEnable() == 1)
         {
             $url = URL::sanitize($url);
+        }
+
+        if (ConfigQuery::isEndingWithHtml() == 1)
+        {
+            if (!preg_match("[.html]", $url))
+            {
+                $ending = ".html";
+            }
         }
 
         try {
@@ -239,7 +248,7 @@ trait UrlRewritingTrait
         } else {
             /* just create it */
             $rewritingUrl = new RewritingUrl();
-            $rewritingUrl->setUrl($url)
+            $rewritingUrl->setUrl($url . $ending)
                 ->setView($this->getRewrittenUrlViewName())
                 ->setViewId($this->getId())
                 ->setViewLocale($locale)

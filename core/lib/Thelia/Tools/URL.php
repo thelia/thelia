@@ -313,9 +313,9 @@ class URL
 
         $url = $transliterate->transliterate($url);
 
-        $clean = preg_replace('/\s+/', '-', $url);
+        $clean = preg_replace('/\s+|--+|__+|~+/', '-', $url);
 
-        $sanitized = preg_replace('/\/\/+/u', '/', $clean);
+        $sanitized = preg_replace('/\/\/+|\\\\+/u', '/', $clean);
 
         return preg_replace('/[^a-zA-Z0-9\-_\/[.html]]/', '', $sanitized);
     }
