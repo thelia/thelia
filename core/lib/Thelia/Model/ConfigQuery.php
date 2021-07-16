@@ -101,6 +101,11 @@ class ConfigQuery extends BaseConfigQuery
         return self::read('enable_seo_transliterator') == 1;
     }
 
+    public static function isEndingWithHtml()
+    {
+        return self::read('enable_html_ending_in_urls') == 1;
+    }
+
     public static function getPageNotFoundView()
     {
         return self::read('page_not_found_view', '404.html');

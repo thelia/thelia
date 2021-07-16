@@ -1463,4 +1463,6 @@ return [
     'French 10% VAT (France only)' => 'TVA française à 10% (France métropolitaine seulement)',
     'French 20% VAT  for all European countries (metropolitan only)' => 'TVA Française a 20% pour tous les pays en Europe (hors DOM TOM)',
     'French 10% VAT (for metropolitan France only)' => 'TVA Française à 10% (France métropolitaine seulement)',
+    'Allow accents removing in urls' => 'Autoriser la suppression des accents dans les urls',
+    'Enable ending with .html when generating urls' => 'Activer la completion ".html" lors de la génération des urls'
 ];

@@ -15,8 +15,6 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Base\RewritingUrl as BaseRewritingUrl;
-use Thelia\Model\Map\RewritingUrlTableMap;
-use Thelia\Tools\URL;
 
 class RewritingUrl extends BaseRewritingUrl
 {
@@ -36,30 +34,4 @@ class RewritingUrl extends BaseRewritingUrl
                 ]);
         }
     }
-
-    /**
-     * Set the value of [url] column.
-     *
-     * @param string $v New value
-     * @return \Thelia\Model\RewritingUrl The current object (for fluent API support)
-     */
-    public function setUrl($v) : self
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-            $v = trim($v);
-
-            if (ConfigQuery::isSeoTransliteratorEnable() == 1)
-            {
-                $v = URL::sanitize($v);
-            }
-        }
-
-        if ($this->url !== $v) {
-            $this->url = $v;
-            $this->modifiedColumns[RewritingUrlTableMap::COL_URL] = true;
-        }
-
-        return $this;
-    } // setUrl()
 }

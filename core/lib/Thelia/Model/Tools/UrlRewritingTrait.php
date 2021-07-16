@@ -16,6 +16,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\GenerateRewrittenUrlEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ConfigQuery;
@@ -79,26 +80,43 @@ trait UrlRewritingTrait
 
         $title = $this->getTitle();
 
+        $ending = null;
+
         if (null == $title) {
             throw new \RuntimeException('Impossible to create an url if title is null');
         }
         // Replace all weird characters with dashes
-        $string = preg_replace('/[^\w\-~_\.]+/u', '-', $title);
+        $string = preg_replace('/[^\w\-~_.]+/u', '-', $title);
 
         // Only allow one dash separator at a time (and make string lowercase)
         $cleanString = mb_strtolower(preg_replace('/--+/u', '-', $string), 'UTF-8');
 
-        $urlFilePart = rtrim($cleanString, '.-~_').'.html';
+        $cleanString = preg_replace('/\/\/+/u', '/', $cleanString);
+
+        $urlFilePart = rtrim($cleanString, '.-~_" "');
+
+        if (ConfigQuery::isSeoTransliteratorEnable() == 1)
+        {
+            $urlFilePart = URL::sanitize($title);
+        }
+
+        if (ConfigQuery::isEndingWithHtml() == 1)
+        {
+            if (!str_contains(".html", $urlFilePart))
+            {
+                $ending = ".html";
+            }
+        }
 
         try {
             $i = 0;
             while (URL::getInstance()->resolve($urlFilePart)) {
                 ++$i;
-                $urlFilePart = sprintf('%s-%d.html', $cleanString, $i);
+                $urlFilePart = sprintf('%s-%d', $cleanString, $i);
             }
         } catch (UrlRewritingException $e) {
             $rewritingUrl = new RewritingUrl();
-            $rewritingUrl->setUrl($urlFilePart)
+            $rewritingUrl->setUrl($urlFilePart . $ending)
                 ->setView($this->getRewrittenUrlViewName())
                 ->setViewId($this->getId())
                 ->setViewLocale($locale)
@@ -169,6 +187,11 @@ trait UrlRewritingTrait
         }
 
         $resolver = null;
+
+        if (ConfigQuery::isSeoTransliteratorEnable() == 1)
+        {
+            $url = URL::sanitize($url);
+        }
 
         try {
             $resolver = new RewritingResolver($url);

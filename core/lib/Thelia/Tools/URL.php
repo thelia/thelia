@@ -315,7 +315,9 @@ class URL
 
         $clean = preg_replace('/\s+/', '-', $url);
 
-        return preg_replace('/[^a-zA-Z0-9\-_]/', '', $clean);
+        $sanitized = preg_replace('/\/\/+/u', '/', $clean);
+
+        return preg_replace('/[^a-zA-Z0-9\-_\/[.html]]/', '', $sanitized);
     }
 
     public static function checkUrl($url, array $protocols = ['http', 'https'])
