@@ -231,7 +231,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
             $unknownFlagPath = $adminTemplate->getTemplateFilePath($unknownFlag);
 
             // Check if the country flag exists
-            $countryFlag = rtrim(\dirname($unknownFlagPath), DS).DS.$event->getLang()->getCode().'.png';
+            $countryFlag = rtrim(\dirname($unknownFlagPath), DS).DS.$event->getModel()->getCode().'.png';
 
             if (!file_exists($countryFlag)) {
                 $fs = new Filesystem();
