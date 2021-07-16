@@ -42,7 +42,8 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (@max, 'de_DE', 'Konfiguration / Cache'),
 (@max, 'en_US', 'Configuration / Cache'),
 (@max, 'es_ES', 'Configuración / caché'),
-(@max, 'fr_FR', 'Configuration / Cache')
+(@max, 'fr_FR', 'Configuration / Cache'),
+(@max, 'ru_RU', 'Конфигурация / Кеш')
 ;
 
 SET @max := @max+1;
@@ -54,7 +55,8 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (@max, 'de_DE', 'Back-Office Startseite'),
 (@max, 'en_US', 'Back-office home page'),
 (@max, 'es_ES', 'Página de inicio de back office'),
-(@max, 'fr_FR', 'Page d\'acceuil de l\'administration')
+(@max, 'fr_FR', 'Page d\'acceuil de l\'administration'),
+(@max, 'ru_RU', 'Главная админки')
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

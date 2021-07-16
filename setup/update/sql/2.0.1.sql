@@ -68,7 +68,16 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (@max+5, 'fr_FR', 'Traductions'),
 (@max+6, 'fr_FR', 'Outils'),
 (@max+7, 'fr_FR', 'gestion des exports'),
-(@max+8, 'fr_FR', 'Export des inscrits à la newsletter')
+(@max+8, 'fr_FR', 'Export des inscrits à la newsletter'),
+(@max, 'ru_RU', 'Конфигурация информации магазина'),
+(@max+1, 'ru_RU', 'Конфигурация переменных'),
+(@max+2, 'ru_RU', 'Просмотр административных логов'),
+(@max+3, 'ru_RU', 'Конфигурация системы логов'),
+(@max+4, 'ru_RU', 'Расширенная конфигурация'),
+(@max+5, 'ru_RU', 'Переводы'),
+(@max+6, 'ru_RU', 'Панель инструментов'),
+(@max+7, 'ru_RU', 'Управление экспортом в админке'),
+(@max+8, 'ru_RU', 'экспорт подписчиков рассылки')
 ;
 
 SELECT @max := MAX(`id`) FROM `lang`;

@@ -21,7 +21,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (@max_id+1, 'es_ES', 'Modal o página de exportación - superior', '', ''),
     (@max_id+2, 'es_ES', 'Modal o página de exportación - inferior', '', ''),
     (@max_id+1, 'fr_FR', 'Modal ou page d\'export - en haut', '', ''),
-    (@max_id+2, 'fr_FR', 'Modal ou page d\'export - en bas', '', '')
+    (@max_id+2, 'fr_FR', 'Modal ou page d\'export - en bas', '', ''),
+    (@max_id+1, 'ru_RU', 'Страница или модальное окно экспорта - вверху', '', ''),
+    (@max_id+2, 'ru_RU', 'Страница или модальное окно экспорта - внизу', '', '')
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

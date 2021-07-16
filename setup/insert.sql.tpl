@@ -80,8 +80,9 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (70, 'number_default_results_per_page.coupon_list', '20', 0, 0, NOW(), NOW()),
 (71, 'cdn.documents-base-url', '', 0, 0, NOW(), NOW()),
 (72, 'cdn.assets-base-url', '', 0, 0, NOW(), NOW()),
-(73, 'allow_module_zip_install', '1', 0, 0, NOW(), NOW())
-
+(73, 'allow_module_zip_install', '1', 0, 0, NOW(), NOW()),
+(74, 'enable_seo_transliterator', '1', 0, 0, NOW(), NOW()),
+(75, 'enable_html_ending_in_urls', '1', 0, 0, NOW(), NOW())
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `hidden`, `mandatory`, `created_at`, `updated_at`) VALUES
@@ -929,12 +930,12 @@ INSERT INTO `area` (`id`, `name`, `postage`, `created_at`, `updated_at`) VALUES
 (14, 'Central America/Antilla', NULL, NOW(), NOW());
 
 INSERT INTO `area_delivery_module` (`id`, `area_id`, `delivery_module_id`, `created_at`, `updated_at`) VALUES
-(1, 1, 2, NOW(), NOW()),
-(2, 2, 2, NOW(), NOW()),
-(3, 3, 2, NOW(), NOW()),
-(4, 4, 2, NOW(), NOW()),
-(5, 5, 2, NOW(), NOW()),
-(6, 6, 2, NOW(), NOW());
+(1, 1, 3, NOW(), NOW()),
+(2, 2, 3, NOW(), NOW()),
+(3, 3, 3, NOW(), NOW()),
+(4, 4, 3, NOW(), NOW()),
+(5, 5, 3, NOW(), NOW()),
+(6, 6, 3, NOW(), NOW());
 
 INSERT INTO `country` (`id`, `visible`, `isocode`, `isoalpha2`, `isoalpha3`, `by_default`, `shop_country`, `has_states`, `need_zip_code`, `zip_code_format`, `created_at`, `updated_at`) VALUES
 (1, 1, '4', 'AF', 'AFG', 0, 0, '0', '0', '', NOW(), NOW()),
@@ -2017,7 +2018,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (70, '{$locale}', {intl l='Default number of coupons per page on coupon list' locale=$locale}, NULL, NULL, NULL),
     (71, '{$locale}', {intl l='The URL of the assets CDN (leave empty is you\'re not using a CDN for assets).' locale=$locale}, NULL, NULL, NULL),
     (72, '{$locale}', {intl l='The URL of the images and documents CDN (leave empty is you\'re not using a CDN for assets).' locale=$locale}, NULL, NULL, NULL),
-    (73, '{$locale}', {intl l='Allow module installation from ZIP files.' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+    (73, '{$locale}', {intl l='Allow module installation from ZIP files.' locale=$locale}, NULL, NULL, NULL),
+    (74, '{$locale}', {intl l='Allow accents removing in urls' locale=$locale}, NULL, NULL, NULL),
+    (75, '{$locale}', {intl l='Enable ending with .html when generating urls' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
@@ -2025,7 +2028,6 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
 INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
 {foreach $locales as $locale}
     (1, '{$locale}', {intl l='An image carousel on your home page' locale=$locale}, NULL, NULL, NULL),
-    (2, '{$locale}', {intl l='72h delivery' locale=$locale}, NULL, NULL, NULL),
     (3, '{$locale}', {intl l='Pay by cheque' locale=$locale}, NULL, NULL, NULL),
     (4, '{$locale}', {intl l='Front office integration' locale=$locale}, NULL, NULL, NULL),
     (5, '{$locale}', {intl l='TinyMCE WYSIWYG editor' locale=$locale}, NULL, NULL, NULL),

@@ -25,7 +25,10 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 3, 'es_ES', 'Página del producto - en la parte inferior del formulario', '', ''),
 (@max_id + 1, 'fr_FR', 'Compte client - informations additionnelles', '', ''),
 (@max_id + 2, 'fr_FR', 'Page produit - En haut du formulaire', '', ''),
-(@max_id + 3, 'fr_FR', 'Page produit - En bas du formulaire', '', '')
+(@max_id + 3, 'fr_FR', 'Page produit - En bas du formulaire', '', ''),
+(@max_id + 1, 'ru_RU', 'Аккаунт клиента - дополнительная информация', '', ''),
+(@max_id + 2, 'ru_RU', 'Страница товара - Вверху формы', '', ''),
+(@max_id + 3, 'ru_RU', 'Страница товара - Внизу формы', '', '')
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

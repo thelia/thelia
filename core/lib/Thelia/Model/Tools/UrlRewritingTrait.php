@@ -79,26 +79,43 @@ trait UrlRewritingTrait
 
         $title = $this->getTitle();
 
+        $ending = null;
+
         if (null == $title) {
             throw new \RuntimeException('Impossible to create an url if title is null');
         }
         // Replace all weird characters with dashes
-        $string = preg_replace('/[^\w\-~_\.]+/u', '-', $title);
+        $string = preg_replace('/[^\w\-~_.]+/u', '-', $title);
 
         // Only allow one dash separator at a time (and make string lowercase)
         $cleanString = mb_strtolower(preg_replace('/--+/u', '-', $string), 'UTF-8');
 
-        $urlFilePart = rtrim($cleanString, '.-~_').'.html';
+        $cleanString = preg_replace('/\/\/+/u', '/', $cleanString);
+
+        $urlFilePart = rtrim($cleanString, '.-~_" "');
+
+        if (ConfigQuery::isSeoTransliteratorEnable() == 1)
+        {
+            $urlFilePart = URL::sanitize($title);
+        }
+
+        if (ConfigQuery::isEndingWithHtml() == 1)
+        {
+            if (!preg_match("[.html]", $urlFilePart))
+            {
+                $ending = ".html";
+            }
+        }
 
         try {
             $i = 0;
             while (URL::getInstance()->resolve($urlFilePart)) {
                 ++$i;
-                $urlFilePart = sprintf('%s-%d.html', $cleanString, $i);
+                $urlFilePart = sprintf('%s-%d', $cleanString, $i);
             }
         } catch (UrlRewritingException $e) {
             $rewritingUrl = new RewritingUrl();
-            $rewritingUrl->setUrl($urlFilePart)
+            $rewritingUrl->setUrl($urlFilePart . $ending)
                 ->setView($this->getRewrittenUrlViewName())
                 ->setViewId($this->getId())
                 ->setViewLocale($locale)
@@ -170,6 +187,21 @@ trait UrlRewritingTrait
 
         $resolver = null;
 
+        $ending = null;
+
+        if (ConfigQuery::isSeoTransliteratorEnable() == 1)
+        {
+            $url = URL::sanitize($url);
+        }
+
+        if (ConfigQuery::isEndingWithHtml() == 1)
+        {
+            if (!preg_match("[.html]", $url))
+            {
+                $ending = ".html";
+            }
+        }
+
         try {
             $resolver = new RewritingResolver($url);
 
@@ -216,7 +248,7 @@ trait UrlRewritingTrait
         } else {
             /* just create it */
             $rewritingUrl = new RewritingUrl();
-            $rewritingUrl->setUrl($url)
+            $rewritingUrl->setUrl($url . $ending)
                 ->setView($this->getRewrittenUrlViewName())
                 ->setViewId($this->getId())
                 ->setViewLocale($locale)

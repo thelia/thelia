@@ -9,7 +9,8 @@ INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (LAST_INSERT_ID(), 'de_DE', 'Tinymce Wysiwyg Editor', NULL,  NULL,  NULL),
 (LAST_INSERT_ID(), 'en_US', 'tinymce wysiwyg editor', NULL,  NULL,  NULL),
 (LAST_INSERT_ID(), 'es_ES', 'editor tinymce wysiwyg', NULL,  NULL,  NULL),
-(LAST_INSERT_ID(), 'fr_FR', 'Editeur TinyMCE', NULL,  NULL,  NULL)
+(LAST_INSERT_ID(), 'fr_FR', 'Editeur TinyMCE', NULL,  NULL,  NULL),
+(LAST_INSERT_ID(), 'ru_RU', 'WYSIWYG редактор TinyMCE', NULL,  NULL,  NULL)
 ;
 
 UPDATE `config` SET `value`='2.0.0-beta4' WHERE `name`='thelia_version';

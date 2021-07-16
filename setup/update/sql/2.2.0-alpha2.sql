@@ -45,7 +45,13 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 3, 'fr_FR', 'Commande - en bas du module de livraison', '', ''),
 (@max_id + 4, 'fr_FR', 'Commande - après le module de paiement', NULL, NULL),
 (@max_id + 5, 'fr_FR', 'Commande - après le module de livraison', NULL, NULL),
-(@max_id + 6, 'fr_FR', 'Commande - après le module de livraison', NULL, NULL)
+(@max_id + 6, 'fr_FR', 'Commande - après le module de livraison', NULL, NULL),
+(@max_id + 1, 'ru_RU', 'Заказ - внизу информации о клиенте', '', ''),
+(@max_id + 2, 'ru_RU', 'Заказ - внизу модуля оплаты', '', ''),
+(@max_id + 3, 'ru_RU', 'Заказ - внизу модуля доставки', '', ''),
+(@max_id + 4, 'ru_RU', 'Счет-фактура - После модуля оплаты', NULL, NULL),
+(@max_id + 5, 'ru_RU', 'Счет-фактура - После модуля доставки', NULL, NULL),
+(@max_id + 6, 'ru_RU', 'Доставка - После модуля доставки', NULL, NULL)
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

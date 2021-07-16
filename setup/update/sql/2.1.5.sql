@@ -24,7 +24,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (@max_id+1, 'es_ES', 'Factura - información adicional del producto', '', ''),
     (@max_id+2, 'es_ES', 'Entrega - información adicional del producto', '', ''),
     (@max_id+1, 'fr_FR', 'Facture - informations additionnelles pour un produit', '', ''),
-    (@max_id+2, 'fr_FR', 'Bon de livraison - informations additionnelles pour un produit', '', '')
+    (@max_id+2, 'fr_FR', 'Bon de livraison - informations additionnelles pour un produit', '', ''),
+    (@max_id+1, 'ru_RU', 'Счет-фактура - дополнительная информация о товаре', '', ''),
+    (@max_id+2, 'ru_RU', 'Доставка - дополнительная информация о товаре', '', '')
 ;
 
 UPDATE `hook` SET `by_module` = 1 WHERE `code` = 'module.config-js';

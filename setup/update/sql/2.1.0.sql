@@ -46,9 +46,14 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 5, 'es_ES', 'Página de Api - en formulario de eliminación', '', ''),
 (@max_id + 1, 'fr_FR', 'Page brand edit - dans formulaire', '', ''),
 (@max_id + 2, 'fr_FR', 'Page sale edit - appel javascript', '', ''),
-(@max_id + 3, 'fr_FR', 'Page api - en haut', '', ''),
-(@max_id + 4, 'fr_FR', 'Page api - en bas', '', ''),
-(@max_id + 5, 'fr_FR', 'Page api - formulaire de suppression', '', '')
+(@max_id + 3, 'fr_FR', NULL, '', ''),
+(@max_id + 4, 'fr_FR', NULL, '', ''),
+(@max_id + 5, 'fr_FR', NULL, '', ''),
+(@max_id + 1, 'ru_RU', 'Страница редактирования бренда - в форме', '', ''),
+(@max_id + 2, 'ru_RU', 'Страница редактирования распродажи - блок последнего вызова javascript', '', ''),
+(@max_id + 3, 'ru_RU', 'Страница API - вверху', '', ''),
+(@max_id + 4, 'ru_RU', 'Страница API - внизу', '', ''),
+(@max_id + 5, 'ru_RU', 'Страница API - в форме удаления', '', '')
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

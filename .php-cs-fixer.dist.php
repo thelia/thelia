@@ -1,5 +1,6 @@
 <?php
 
+
 use Symfony\Component\Filesystem\Filesystem;
 
 $finder = PhpCsFixer\Finder::create()
@@ -33,4 +34,4 @@ return (new PhpCsFixer\Config)
         ],
     ])
     ->setFinder($finder)
-;
+    ;

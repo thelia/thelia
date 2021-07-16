@@ -45,7 +45,10 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (@max_id + 3, 'es_ES', 'Nombre de archivo de la página de error', NULL, NULL, NULL),
 (@max_id + 1, 'fr_FR', 'Durée de vie du cookie de la session dans le navigateur du client, en secondes', NULL, NULL, NULL),
 (@max_id + 2, 'fr_FR', 'Afficher un message d\'erreur à la place d\'une page blanche lors d\'une erreur serveur', NULL, NULL, NULL),
-(@max_id + 3, 'fr_FR', 'Nom du fichier de la page d\'erreur', NULL, NULL, NULL)
+(@max_id + 3, 'fr_FR', 'Nom du fichier de la page d\'erreur', NULL, NULL, NULL),
+(@max_id + 1, 'ru_RU', 'Время жизни cookie сессии клиента в секундах', NULL, NULL, NULL),
+(@max_id + 2, 'ru_RU', 'Показывать страницу ошибок вместо белой страницы при ошибке сервера', NULL, NULL, NULL),
+(@max_id + 3, 'ru_RU', 'Имя файла для страницы ошибок', NULL, NULL, NULL)
 ;
 
 -- Hide the session_config.handlers configuration variable
@@ -231,7 +234,41 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 31, 'fr_FR', 'Détail d\'une commande - en bas', '', ''),
 (@max_id + 32, 'fr_FR', 'Détail d\'une commande - feuille de style CSS', '', ''),
 (@max_id + 33, 'fr_FR', 'Détail d\'une commande - après l\'inclusion du JavaScript', '', ''),
-(@max_id + 34, 'fr_FR', 'Détail d\'une commande - initialisation du JavaScript', '', '')
+(@max_id + 34, 'fr_FR', 'Détail d\'une commande - initialisation du JavaScript', '', ''),
+(@max_id + 1, 'ru_RU', 'Страница категории - перед основной зоной контента', '', ''),
+(@max_id + 2, 'ru_RU', 'Страница категории - после основной зоны контента', '', ''),
+(@max_id + 3, 'ru_RU', 'Страница контента - перед основной зоной контента', '', ''),
+(@max_id + 4, 'ru_RU', 'Страница контента - после основной зоны контента', '', ''),
+(@max_id + 5, 'ru_RU', 'Страница папки - перед основной зоной контента', '', ''),
+(@max_id + 6, 'ru_RU', 'Страница папки - после основной зоны контента', '', ''),
+(@max_id + 7, 'ru_RU', 'Страница брендов - вверху', '', ''),
+(@max_id + 8, 'ru_RU', 'Страница брендов - внизу', '', ''),
+(@max_id + 9, 'ru_RU', 'Страница брендов - вверху основной зоны', '', ''),
+(@max_id + 10, 'ru_RU', 'Страница брендов - внизу основной зоны', '', ''),
+(@max_id + 11, 'ru_RU', 'Страница брендов - перед основной зоной контента', '', ''),
+(@max_id + 12, 'ru_RU', 'Страница брендов - после основной зоны контента', '', ''),
+(@max_id + 13, 'ru_RU', 'Страница брендов - CSS стили', '', ''),
+(@max_id + 14, 'ru_RU', 'Страница брендов - после включения javascript', '', ''),
+(@max_id + 15, 'ru_RU', 'Страница брендов - после инициализации javascript', '', ''),
+(@max_id + 16, 'ru_RU', 'Страница брендов - вверху боковой панели', '', ''),
+(@max_id + 17, 'ru_RU', 'Страница брендов - содержимое боковой панели', '', ''),
+(@max_id + 18, 'ru_RU', 'Страница брендов - внизу боковой панели', '', ''),
+(@max_id + 19, 'ru_RU', 'Детали заказа - вверху', '', ''),
+(@max_id + 20, 'ru_RU', 'Детали заказа - дополнительная информация', '', ''),
+(@max_id + 21, 'ru_RU', 'Детали заказа - после общей информации', '', ''),
+(@max_id + 22, 'ru_RU', 'Детали заказа - дополнительная информация доставки', '', ''),
+(@max_id + 23, 'ru_RU', 'Детали заказа - адрес доставки', '', ''),
+(@max_id + 24, 'ru_RU', 'Детали заказа - дополнительная информация счет-фактуры', '', ''),
+(@max_id + 25, 'ru_RU', 'Детали заказа - адрес счет-фактуры', '', ''),
+(@max_id + 26, 'ru_RU', 'Детали заказа - после адресов', '', ''),
+(@max_id + 27, 'ru_RU', 'Детали заказа - перед списком товаров', '', ''),
+(@max_id + 28, 'ru_RU', 'Детали заказа - дополнительная информация товара', '', ''),
+(@max_id + 29, 'ru_RU', 'Детали заказа - после списка товаров', '', ''),
+(@max_id + 30, 'ru_RU', 'Детали заказа - после товаров', '', ''),
+(@max_id + 31, 'ru_RU', 'Детали заказа - внизу', '', ''),
+(@max_id + 32, 'ru_RU', 'Детали заказа - CSS стили', '', ''),
+(@max_id + 33, 'ru_RU', 'Детали заказа - после включения javascript', '', ''),
+(@max_id + 34, 'ru_RU', 'Детали заказа - после инициализщации javascript', '', '')
 ;
 
 
@@ -272,7 +309,13 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 3, 'fr_FR', 'Dossier - Onglet', '', ''),
 (@max_id + 4, 'fr_FR', 'Contenu - Onglet', '', ''),
 (@max_id + 5, 'fr_FR', 'Marque - Onglet', '', ''),
-(@max_id + 6, 'fr_FR', 'Modification commande - adresse de livraison', '', '')
+(@max_id + 6, 'fr_FR', 'Modification commande - adresse de livraison', '', ''),
+(@max_id + 1, 'ru_RU', 'Категория - Вкладка', '', ''),
+(@max_id + 2, 'ru_RU', 'Товар - Вкладка', '', ''),
+(@max_id + 3, 'ru_RU', 'Папка - Вкладка', '', ''),
+(@max_id + 4, 'ru_RU', 'Контент - Вкладка', '', ''),
+(@max_id + 5, 'ru_RU', 'Бренд - Вкладка', '', ''),
+(@max_id + 6, 'ru_RU', 'Редактирование заказа - адрес доставки', '', '')
 ;
 
 
