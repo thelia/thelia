@@ -2201,7 +2201,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (71, 'fr_FR', NULL, NULL, NULL, NULL),
     (72, 'fr_FR', NULL, NULL, NULL, NULL),
     (73, 'fr_FR', 'Autoriser l\'installation des modules par fichier ZIP.', NULL, NULL, NULL),
-    (74, 'fr_FR', 'Autoriser la suppression des accents dans les urls', NULL, NULL, NULL),
+    (74, 'fr_FR', 'Autoriser la suppression des accents et l\'assainissement des urls', NULL, NULL, NULL),
     (75, 'fr_FR', 'Activer la completion \".html\" lors de la génération des urls', NULL, NULL, NULL),
     (1, 'ru_RU', 'Проверять доступный запас товара (1) или игнорировать его (0) при отображении и изменении количества в заказе', NULL, NULL, NULL),
     (2, 'ru_RU', 'Имя активного шаблона магазина', NULL, NULL, NULL),

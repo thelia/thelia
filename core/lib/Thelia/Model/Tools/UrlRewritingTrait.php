@@ -49,6 +49,34 @@ trait UrlRewritingTrait
         return URL::getInstance()->retrieve($this->getRewrittenUrlViewName(), $this->getId(), $locale)->toString();
     }
 
+    public function processWithinConfig($url) : array
+    {
+        $firstParse = preg_replace('/\s+|--+|__+|~+/u', '-', $url);
+
+        $secondParse = preg_replace('/\/\/+|\\\\+/u', '/', $firstParse);
+
+        $config = [
+            'url' => $secondParse,
+            'ending' => null,
+        ];
+
+        if (ConfigQuery::isUrlHtmlEndingEnabled() == 1 && $secondParse !== null)
+        {
+            if (!preg_match("[.html]", $secondParse))
+            {
+                $config['ending'] = ".html";
+            }
+        }
+
+        if (ConfigQuery::isUrlTransliteratorEnabled() == 1 && $secondParse !== null)
+        {
+            $config['url'] = URL::sanitize($secondParse);
+        }
+
+        return $config;
+    }
+
+
     /**
      * Generate a rewritten URL from the object title, and store it in the rewriting table.
      *
@@ -59,6 +87,7 @@ trait UrlRewritingTrait
      */
     public function generateRewrittenUrl(string $locale, ConnectionInterface $con): string
     {
+
         if ($this->isNew()) {
             throw new \RuntimeException(sprintf('Object %s must be saved before generating url', $this->getRewrittenUrlViewName()));
         }
@@ -79,43 +108,24 @@ trait UrlRewritingTrait
 
         $title = $this->getTitle();
 
-        $ending = null;
-
         if (null == $title) {
             throw new \RuntimeException('Impossible to create an url if title is null');
         }
-        // Replace all weird characters with dashes
-        $string = preg_replace('/[^\w\-~_.]+/u', '-', $title);
 
-        // Only allow one dash separator at a time (and make string lowercase)
-        $cleanString = mb_strtolower(preg_replace('/--+/u', '-', $string), 'UTF-8');
+        $processedUrl = trim($this->processWithinConfig($title)['url']);
 
-        $cleanString = preg_replace('/\/\/+/u', '/', $cleanString);
-
-        $urlFilePart = rtrim($cleanString, '.-~_" "');
-
-        if (ConfigQuery::isSeoTransliteratorEnable() == 1)
-        {
-            $urlFilePart = URL::sanitize($title);
-        }
-
-        if (ConfigQuery::isEndingWithHtml() == 1)
-        {
-            if (!preg_match("[.html]", $urlFilePart))
-            {
-                $ending = ".html";
-            }
-        }
+        $html = $this->processWithinConfig($title)['ending'];
 
         try {
             $i = 0;
-            while (URL::getInstance()->resolve($urlFilePart)) {
+            while (URL::getInstance()->resolve($processedUrl . $html)) {
                 ++$i;
-                $urlFilePart = sprintf('%s-%d', $cleanString, $i);
+                $processedUrl = sprintf('%s-%d', $processedUrl, $i);
             }
         } catch (UrlRewritingException $e) {
             $rewritingUrl = new RewritingUrl();
-            $rewritingUrl->setUrl($urlFilePart . $ending)
+            $rewritingUrl->setUrl($processedUrl . $html
+        )
                 ->setView($this->getRewrittenUrlViewName())
                 ->setViewId($this->getId())
                 ->setViewLocale($locale)
@@ -123,7 +133,7 @@ trait UrlRewritingTrait
             ;
         }
 
-        return $urlFilePart;
+        return $processedUrl;
     }
 
     /**
@@ -153,7 +163,7 @@ trait UrlRewritingTrait
     }
 
     /**
-     * Mark the current URL as obseolete.
+     * Mark the current URL as obsolete.
      */
     public function markRewrittenUrlObsolete(): void
     {
@@ -187,20 +197,7 @@ trait UrlRewritingTrait
 
         $resolver = null;
 
-        $ending = null;
-
-        if (ConfigQuery::isSeoTransliteratorEnable() == 1)
-        {
-            $url = URL::sanitize($url);
-        }
-
-        if (ConfigQuery::isEndingWithHtml() == 1)
-        {
-            if (!preg_match("[.html]", $url))
-            {
-                $ending = ".html";
-            }
-        }
+        $url = $this->processWithinConfig($url)['url'];
 
         try {
             $resolver = new RewritingResolver($url);
@@ -248,7 +245,7 @@ trait UrlRewritingTrait
         } else {
             /* just create it */
             $rewritingUrl = new RewritingUrl();
-            $rewritingUrl->setUrl($url . $ending)
+            $rewritingUrl->setUrl($url .  $this->processWithinConfig($url)['ending'])
                 ->setView($this->getRewrittenUrlViewName())
                 ->setViewId($this->getId())
                 ->setViewLocale($locale)

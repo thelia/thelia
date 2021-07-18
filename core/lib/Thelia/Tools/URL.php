@@ -311,11 +311,7 @@ class URL
     {
         $transliterate = \Transliterator::createFromRules(':: Any-Latin; :: Latin-ASCII; :: Lower;');
 
-        $url = $transliterate->transliterate($url);
-
-        $clean = preg_replace('/\s+|--+|__+|~+/', '-', $url);
-
-        $sanitized = preg_replace('/\/\/+|\\\\+/u', '/', $clean);
+        $sanitized = $transliterate->transliterate($url);
 
         return preg_replace('/[^a-zA-Z0-9\-_\/[.html]]/', '', $sanitized);
     }

@@ -96,12 +96,12 @@ class ConfigQuery extends BaseConfigQuery
         return self::read('rewriting_enable') == 1;
     }
 
-    public static function isSeoTransliteratorEnable()
+    public static function isUrlTransliteratorEnabled()
     {
         return self::read('enable_seo_transliterator') == 1;
     }
 
-    public static function isEndingWithHtml()
+    public static function isUrlHtmlEndingEnabled()
     {
         return self::read('enable_html_ending_in_urls') == 1;
     }

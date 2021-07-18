@@ -2019,7 +2019,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (71, '{$locale}', {intl l='The URL of the assets CDN (leave empty is you\'re not using a CDN for assets).' locale=$locale}, NULL, NULL, NULL),
     (72, '{$locale}', {intl l='The URL of the images and documents CDN (leave empty is you\'re not using a CDN for assets).' locale=$locale}, NULL, NULL, NULL),
     (73, '{$locale}', {intl l='Allow module installation from ZIP files.' locale=$locale}, NULL, NULL, NULL),
-    (74, '{$locale}', {intl l='Allow accents removing in urls' locale=$locale}, NULL, NULL, NULL),
+    (74, '{$locale}', {intl l='Allow accents removing and sanitizing urls' locale=$locale}, NULL, NULL, NULL),
     (75, '{$locale}', {intl l='Enable ending with .html when generating urls' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
