@@ -30,6 +30,7 @@ class ProductSEOExport extends JsonFileAbstractExport
     const FILE_NAME = 'product_seo';
 
     protected $orderAndAliases = [
+        'product_id' => 'id',
         'product_ref' => 'ref',
         'product_i18n_title' => 'product_title',
         'product_visible' => 'visible',
@@ -45,6 +46,7 @@ class ProductSEOExport extends JsonFileAbstractExport
 
         $con = Propel::getConnection();
         $query = 'SELECT 
+                        product.id as "product_id",
                         product.ref as "product_ref",
                         product_i18n.title as "product_i18n_title",
                         product.visible as "product_visible",
