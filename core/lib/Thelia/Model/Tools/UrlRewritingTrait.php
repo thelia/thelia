@@ -51,26 +51,28 @@ trait UrlRewritingTrait
 
     public function processWithinConfig($url) : array
     {
+        $url = rtrim($url,'" "-~_');
+
         $firstParse = preg_replace('/\s+|--+|__+|~+/u', '-', $url);
 
         $secondParse = preg_replace('/\/\/+|\\\\+/u', '/', $firstParse);
 
         $config = [
-            'url' => $secondParse,
-            'ending' => null,
+            0 => $secondParse,
+            1 => null,
         ];
+
+        if (ConfigQuery::isUrlTransliteratorEnabled() == 1 && $secondParse !== null)
+        {
+            $config[0] = URL::sanitize($secondParse);
+        }
 
         if (ConfigQuery::isUrlHtmlEndingEnabled() == 1 && $secondParse !== null)
         {
             if (!preg_match("[.html]", $secondParse))
             {
-                $config['ending'] = ".html";
+                $config[1] = ".html";
             }
-        }
-
-        if (ConfigQuery::isUrlTransliteratorEnabled() == 1 && $secondParse !== null)
-        {
-            $config['url'] = URL::sanitize($secondParse);
         }
 
         return $config;
@@ -112,14 +114,12 @@ trait UrlRewritingTrait
             throw new \RuntimeException('Impossible to create an url if title is null');
         }
 
-        $processedUrl = trim($this->processWithinConfig($title)['url']);
-
-        $html = $this->processWithinConfig($title)['ending'];
+        list($processedUrl, $html) = $this->processWithinConfig($title);
 
         try {
             $i = 0;
             while (URL::getInstance()->resolve($processedUrl . $html)) {
-                ++$i;
+                $i++;
                 $processedUrl = sprintf('%s-%d', $processedUrl, $i);
             }
         } catch (UrlRewritingException $e) {
@@ -197,7 +197,7 @@ trait UrlRewritingTrait
 
         $resolver = null;
 
-        $url = $this->processWithinConfig($url)['url'];
+        list($url, $html) = $this->processWithinConfig($url);
 
         try {
             $resolver = new RewritingResolver($url);
@@ -245,7 +245,7 @@ trait UrlRewritingTrait
         } else {
             /* just create it */
             $rewritingUrl = new RewritingUrl();
-            $rewritingUrl->setUrl($url .  $this->processWithinConfig($url)['ending'])
+            $rewritingUrl->setUrl($url .  $html)
                 ->setView($this->getRewrittenUrlViewName())
                 ->setViewId($this->getId())
                 ->setViewLocale($locale)
