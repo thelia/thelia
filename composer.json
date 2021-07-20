@@ -69,12 +69,12 @@
         "doctrine/cache": "~1.0",
         "assetic/framework": "~2.0.1",
         "thelia/html2pdf": "dev-main",
-        "thelia/open-api-module": "dev-main",
-        "thelia/smarty-redirection-module": "dev-main",
-        "thelia/choice-filter-module": "dev-main",
-        "thelia/custom-delivery-module": "dev-main",
-        "thelia/store-seo-module": "dev-main",
-        "thelia/better-seo-module": "dev-main"
+        "thelia/open-api-module": "2.0.0",
+        "thelia/smarty-redirection-module": "2.0.0",
+        "thelia/choice-filter-module": "2.0.0",
+        "thelia/custom-delivery-module": "3.0.0",
+        "thelia/store-seo-module": "2.0.1",
+        "thelia/better-seo-module": "2.0.0"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",
