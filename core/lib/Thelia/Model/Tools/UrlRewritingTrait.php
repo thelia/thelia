@@ -51,9 +51,9 @@ trait UrlRewritingTrait
 
     public function processWithinConfig($url) : array
     {
-        $url = rtrim($url,'" "-~_');
+        $url = mb_strtolower(trim($url,'" "-~_.|'), "UTF-8");
 
-        $firstParse = preg_replace('/\s+|--+|__+|~+/u', '-', $url);
+        $firstParse = preg_replace('/\s+|-+|__+|~+|\|+/', '-', $url);
 
         $secondParse = preg_replace('/\/\/+|\\\\+/u', '/', $firstParse);
 
@@ -64,7 +64,7 @@ trait UrlRewritingTrait
 
         if (ConfigQuery::isUrlTransliteratorEnabled() == 1 && $secondParse !== null)
         {
-            $config[0] = URL::sanitize($secondParse);
+            $config[0] = URL::transliterate($secondParse);
         }
 
         if (ConfigQuery::isUrlHtmlEndingEnabled() == 1 && $secondParse !== null)
@@ -119,8 +119,9 @@ trait UrlRewritingTrait
         try {
             $i = 0;
             while (URL::getInstance()->resolve($processedUrl . $html)) {
-                $i++;
-                $processedUrl = sprintf('%s-%d', $processedUrl, $i);
+               $i++ ;
+               $processedUrl = preg_replace('/-(\d?[1-9]|[1-9]0)/',  '',$processedUrl);
+               $processedUrl .= '-'.$i;
             }
         } catch (UrlRewritingException $e) {
             $rewritingUrl = new RewritingUrl();

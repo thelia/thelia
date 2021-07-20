@@ -307,13 +307,11 @@ class URL
         return $this->resolver;
     }
 
-    public static function sanitize(string $url) : string
+    public static function transliterate(string $url) : string
     {
-        $transliterate = \Transliterator::createFromRules(':: Any-Latin; :: Latin-ASCII; :: Lower;');
+        $transliterate = \Transliterator::createFromRules(':: Any-Latin; :: Latin-ASCII;');
 
-        $sanitized = $transliterate->transliterate($url);
-
-        return preg_replace('/[^a-zA-Z0-9\-_\/[.html]]/', '', $sanitized);
+        return $transliterate->transliterate($url);
     }
 
     public static function checkUrl($url, array $protocols = ['http', 'https'])
