@@ -95,10 +95,9 @@ class BaseModule implements BaseModuleInterface
 
             /** @var Thelia $theliaKernel */
             $theliaKernel = $this->container->get('kernel');
+            $theliaKernel->boot();
 
-            $theliaKernel->initializePropelService(true, $cacheRefresh);
-
-            $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
+            $con = Propel::getConnection(ModuleTableMap::DATABASE_NAME);
             $con->beginTransaction();
             try {
                 $this->initializeCoreI18n();
