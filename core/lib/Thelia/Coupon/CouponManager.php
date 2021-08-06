@@ -55,8 +55,9 @@ class CouponManager
      *
      * @param FacadeInterface $facade Service container
      */
-    public function __construct(FacadeInterface $facade)
+    public function __construct(FacadeInterface $facade, CouponFactory $couponFactory)
     {
+        $this->couponFactory = $couponFactory;
         $this->facade = $facade;
     }
 
