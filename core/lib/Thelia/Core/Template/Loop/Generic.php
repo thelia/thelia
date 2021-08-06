@@ -32,7 +32,8 @@ class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createAlphaNumStringTypeArgument('table_name', null, true),
-            Argument::createAnyTypeArgument('filters')
+            Argument::createAnyTypeArgument('filters'),
+            Argument::createAnyTypeArgument('orders')
         );
     }
 
@@ -44,15 +45,16 @@ class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
         $tableMap = new $tableMapClass();
 
         /** @var ModelCriteria $queryClass */
-        $queryClass = $tableMap->getClassName()."Query";
+        $queryClass = $tableMap->getClassName() . "Query";
 
         /** @var ModelCriteria $query */
         $query = $queryClass::create();
 
-        $filters = $this->getParsedFilters();
+        $filters = $this->getParsedParams($this->getFilters());
 
         foreach ($filters as $filter => $value) {
-            $filterMethod = "filterBy".ucfirst($filter);
+            $methodName = str_replace('_', '', ucwords($filter, '_'));
+            $filterMethod = "filterBy" . $methodName;
             if (!method_exists($query, $filterMethod)) {
                 continue;
             }
@@ -60,8 +62,8 @@ class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
             $query->$filterMethod($value, Criteria::IN);
         }
 
-        $i18nTableMapClass = PropelResolver::getTableMapByTableName($this->getTableName()."_i18n");
-        $useI18nQueryMethod = "use".$tableMap->getPhpName()."I18nQuery";
+        $i18nTableMapClass = PropelResolver::getTableMapByTableName($this->getTableName() . "_i18n");
+        $useI18nQueryMethod = "use" . $tableMap->getPhpName() . "I18nQuery";
         if (null !== $i18nTableMapClass && method_exists($query, $useI18nQueryMethod)) {
             $i18nTableMap = new $i18nTableMapClass();
             $i18nQuery = $query->$useI18nQueryMethod();
@@ -73,6 +75,19 @@ class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
                 $query->withColumn($columnName, $i18nFields[$fieldIndex]);
             }
         }
+
+        $orders = $this->getParsedParams($this->getOrders());
+
+        foreach ($orders as $order => $direction) {
+            $methodName = str_replace('_', '', ucwords($order, '_'));
+            $orderByMethod = "orderBy" . $methodName;
+            if (!is_callable([$query, $orderByMethod])) {
+                continue;
+            }
+            $direction = $direction[0] ?? 'ASC';
+            $query->$orderByMethod($direction);
+        }
+
         return $query;
     }
 
@@ -86,13 +101,13 @@ class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
 
             $columnPhpNames = TableMap::getFieldnamesForClass($tableMap->getClassName(), TableMap::TYPE_PHPNAME);
             foreach (TableMap::getFieldnamesForClass($tableMap->getClassName(), TableMap::TYPE_FIELDNAME) as $columnIndex => $columnName) {
-                $getter = "get".$columnPhpNames[$columnIndex];
+                $getter = "get" . $columnPhpNames[$columnIndex];
                 if (method_exists($item, $getter)) {
                     $loopResultRow->set(strtoupper($columnName), $item->$getter());
                 }
             }
 
-            $i18nTableMapClass = PropelResolver::getTableMapByTableName($this->getTableName()."_i18n");
+            $i18nTableMapClass = PropelResolver::getTableMapByTableName($this->getTableName() . "_i18n");
             if (null !== $i18nTableMapClass) {
                 $i18nTableMap = new $i18nTableMapClass();
                 foreach (TableMap::getFieldnamesForClass($i18nTableMap->getClassName(), TableMap::TYPE_PHPNAME) as $columnName) {
@@ -108,19 +123,19 @@ class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
         return $loopResult;
     }
 
-    protected function getParsedFilters()
+    protected function getParsedParams($params)
     {
-        $rawFilters = explode("|", $this->getFilters());
-        $filters = [];
-        foreach ($rawFilters as $rawFilter) {
-            $filterData = explode(":", $rawFilter);
-            if (!isset($filterData[0]) || !isset($filterData[1])) {
+        $rawParams = explode("|", $params);
+        $params = [];
+
+        foreach ($rawParams as $rawParam) {
+            $paramData = explode(":", $rawParam);
+            if (!isset($paramData[0]) || empty($paramData[0])) {
                 continue;
             }
-
-            $filters[$filterData[0]] = explode(',', $filterData[1]);
+            $params[$paramData[0]] = isset($paramData[1]) ? explode(',', $paramData[1]) : null;
         }
 
-        return $filters;
+        return $params;
     }
 }
