@@ -35,6 +35,7 @@ use Thelia\Model\CouponCountryQuery;
 use Thelia\Model\CouponModule;
 use Thelia\Model\CouponModuleQuery;
 use Thelia\Model\CouponQuery;
+use Thelia\Model\Event\AddressEvent;
 use Thelia\Model\Map\OrderCouponTableMap;
 use Thelia\Model\OrderCoupon;
 use Thelia\Model\OrderCouponCountry;
@@ -426,6 +427,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CART_UPDATEITEM => ['updateOrderDiscount', 10],
             TheliaEvents::CART_DELETEITEM => ['updateOrderDiscount', 10],
             TheliaEvents::CUSTOMER_LOGIN => ['updateOrderDiscount', 10],
+            AddressEvent::POST_UPDATE => ['updateOrderDiscount', 10],
         ];
     }
 
