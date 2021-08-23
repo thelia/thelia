@@ -70,9 +70,7 @@
                             placeholder="{intl l="Your message"}"
                             rows="6"
                             class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if $error}border-red-500{else}border-gray-200{/if} {$inputClass}"
-                            {if $required} aria-required="true" required{/if}>
-                            {$value}
-                          </textarea>
+                            {if $required} aria-required="true" required{/if}>{$value}</textarea>
                           {if $error}
                             <div class="mt-1">
                               <span class="block mb-4 text-xs italic font-normal text-red-500">
