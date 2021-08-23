@@ -6551,6 +6551,10 @@ button.close {
     transition: transform 0.3s ease-in-out;
   }
 }
+.navbar-static-top {
+  margin: 0;
+  z-index: 100;
+}
 .navbar-top {
   position: fixed;
   background-color: white;
@@ -13991,10 +13995,6 @@ fieldset[disabled] .has-switch span.switch-default.active {
 }
 #wrapper {
   width: 100%;
-}
-.navbar-static-top {
-  margin: 0;
-  z-index: 1000;
 }
 #page-wrapper {
   padding: 0 15px 10px 15px;
