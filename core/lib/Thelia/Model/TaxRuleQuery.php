@@ -54,6 +54,8 @@ class TaxRuleQuery extends BaseTaxRuleQuery
             $taxRuleQuery->filterByCountry($country, Criteria::EQUAL);
         }
 
+        $taxRuleQuery->groupByTaxId();
+
         $synthetizedSateId = $state;
 
         if (null !== $state) {
