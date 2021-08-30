@@ -99,15 +99,31 @@
                             <label for="{$label_attr.for|default:null}" class="control-label">
                                 {$label}
                             </label>
-                            {if $type::class == "Symfony\Component\Form\Extension\Core\Type\ChoiceType"}
+                            {if $type->getBlockPrefix() == "choice"}
                                 <select name="{$name}" data-toggle="selectpicker" {if !$form_error && $attr_list.tax_type != $ESCAPED_TYPE || $form_error && $attr_list.tax_type != $typeValue}disabled="disabled"{/if}>
                                     {foreach $choices as $choice}
-                                        <option value="{$choice->value}" {if !$form_error && $REQUIREMENTS[$label_attr.type] == $choice->value || $form_error && $value == $choice->value}selected="selected" {/if}>{$choice->label}</option>
+                                        <option
+                                            value="{$choice->value}"
+                                                {if (isset($REQUIREMENTS[$label_attr.type]) && !$form_error && $REQUIREMENTS[$label_attr.type] == $choice->value) || $form_error && $value == $choice->value}
+                                                    selected="selected"
+                                                {/if}
+                                        >
+                                            {$choice->label}
+                                        </option>
                                     {/foreach}
                                 </select>
                             {/if}
-                            {if $type::class == "Symfony\Component\Form\Extension\Core\Type\TextType"}
-                                <input type="text" {if !$form_error && $attr_list.tax_type != $ESCAPED_TYPE || $form_error && $attr_list.tax_type != $typeValue}disabled="disabled"{/if} id="{$label_attr.for|default:null}" name="{$name}" required="required" class="form-control" value="{if $form_error}{$value}{else}{$REQUIREMENTS[$label_attr.type]}{/if}">
+                            {if $type->getBlockPrefix() == "text"}
+                                <input type="text"
+                                        {if !$form_error && $attr_list.tax_type != $ESCAPED_TYPE || $form_error && $attr_list.tax_type != $typeValue}
+                                            disabled="disabled"
+                                        {/if}
+                                       id="{$label_attr.for|default:null}"
+                                       name="{$name}"
+                                       required="required"
+                                       class="form-control"
+                                       value="{if $form_error}{$value}{elseif isset($REQUIREMENTS[$label_attr.type])}{$REQUIREMENTS[$label_attr.type]}{/if}"
+                                >
                             {/if}
                         </div>
                     {/form_tagged_fields}
