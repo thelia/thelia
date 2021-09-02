@@ -130,7 +130,7 @@ function CheckoutRender() {
           <div className="shadow panel">
             <MiniCartFooter
               {...cart}
-              delivery={deliveryModuleOption?.postage || cart.delivery}
+              delivery={deliveryModuleOption?.postage || cart?.delivery}
             />
           </div>
 
