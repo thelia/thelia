@@ -3,7 +3,7 @@ import Error from '../Error';
 import Input from '../Input';
 import React from 'react';
 import SubmitButton from '../SubmitButton';
-import { useCouponCreate } from '@js/api';
+import { useCouponCreate } from '@openstudio/thelia-api-utils';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 

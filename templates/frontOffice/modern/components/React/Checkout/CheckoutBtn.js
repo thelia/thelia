@@ -1,4 +1,7 @@
-import { useAddressQuery, useCheckoutCreate } from '../../../assets/js/api';
+import {
+  useAddressQuery,
+  useCheckoutCreate
+} from '@openstudio/thelia-api-utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
 
@@ -39,9 +42,11 @@ export default function CheckoutBtn() {
   const btnRef = useRef(null);
 
   useEffect(() => {
-    const address = addressesCustomer.find((el) => el.default === 1);
-    if (address?.id) {
-      setAddressCustomerId(address.id);
+    if (Array.isArray(addressesCustomer)) {
+      const address = addressesCustomer.find((el) => el.default === 1);
+      if (address?.id) {
+        setAddressCustomerId(address.id);
+      }
     }
   }, [addressesCustomer]);
 
