@@ -1,6 +1,12 @@
 {extends file="admin-layout.tpl"}
 
 {block name="no-return-functions"}
+    {block name="no-return-functions"}
+        {if !isset($category_order)}
+            {$category_order = "manual"}
+        {/if}
+        {$admin_current_location = 'catalog'}
+    {/block}
     {$admin_current_location = 'catalog'}
 {/block}
 
