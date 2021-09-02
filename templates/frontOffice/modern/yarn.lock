@@ -1731,6 +1731,15 @@
     error-stack-parser "^2.0.0"
     string-width "^2.0.0"
 
+"@openstudio/thelia-api-utils@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@openstudio/thelia-api-utils/-/thelia-api-utils-0.4.2.tgz#d3c78aec9ed06878c5a3b81ab6c06eed5e6e8be2"
+  integrity sha512-BFxrV7KhVKUPao2Hdqiv5r37y6PZyDR5d1JJHnRPP3Phhap1lT4wiunI03R/vDE2aXB1lrf5l/S0tDJup5a9qg==
+  dependencies:
+    axios "^0.21.1"
+    qs "^6.10.1"
+    react-query "^3.21.1"
+
 "@react-leaflet/core@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@react-leaflet/core/-/core-1.1.0.tgz#389b2b373f1da4caeb3c4cf6f33d84561c58d504"
@@ -6734,6 +6743,13 @@ qs@6.7.0:
   resolved "https://registry.npmjs.org/qs/-/qs-6.7.0.tgz"
   integrity sha512-VCdBRNFTX1fyE7Nb6FYoURo/SPe62QCaAyzJvUjwRaIsc+NePBEniHlvxFmmX56+HZphIGtV0XeCirBtpDrTyQ==
 
+qs@^6.10.1:
+  version "6.10.1"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.10.1.tgz#4931482fa8d647a5aab799c5271d2133b981fb6a"
+  integrity sha512-M528Hph6wsSVOBiYUnGf+K/7w0hNshs/duGsNXPUCLH5XAqjEtiPGwNONLV0tBH8NoGb0mvD5JubnUTrujKDTg==
+  dependencies:
+    side-channel "^1.0.4"
+
 querystring@0.2.0:
   version "0.2.0"
   resolved "https://registry.npmjs.org/querystring/-/querystring-0.2.0.tgz"
@@ -6832,10 +6848,10 @@ react-modal@^3.14.3:
     react-lifecycles-compat "^3.0.0"
     warning "^4.0.3"
 
-react-query@^3.16.0:
-  version "3.17.2"
-  resolved "https://registry.yarnpkg.com/react-query/-/react-query-3.17.2.tgz#3ed5b0460a5a05332fbb175c36da55fb2d3ff929"
-  integrity sha512-icMtYL/+jUv0Q3n8GRz6CTyMYKh+l5EBKwhkr8qhbtYRORr43YGiN6EJSyw9WFaSQ9bwD1G9ZhaFxow9NMV0Sw==
+react-query@^3.21.1:
+  version "3.21.1"
+  resolved "https://registry.yarnpkg.com/react-query/-/react-query-3.21.1.tgz#8fe4df90bf6c6a93e0552ea9baff211d1b28f6e0"
+  integrity sha512-aKFLfNJc/m21JBXJk7sR9tDUYPjotWA4EHAKvbZ++GgxaY+eI0tqBxXmGBuJo0Pisis1W4pZWlZgoRv9yE8yjA==
   dependencies:
     "@babel/runtime" "^7.5.5"
     broadcast-channel "^3.4.1"
