@@ -57,7 +57,7 @@
     "@babel/core": "^7.14.6",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/preset-env": "^7.14.7",
-    "@openstudio/thelia-api-utils": "^0.4.2",
+    "@openstudio/thelia-api-utils": "^0.4.3",
     "@reduxjs/toolkit": "^1.6.0",
     "@splidejs/splide": "^2.4.21",
     "@tailwindcss/forms": "^0.3.3",
