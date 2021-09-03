@@ -1,17 +1,13 @@
 import 'leaflet/dist/leaflet.css';
 
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
-import React, {
-  createRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState
-} from 'react';
+import React, { createRef, useCallback, useEffect, useMemo } from 'react';
 import { orderBy, size } from 'lodash-es';
 import {
   useAddressQuery,
-  usePickupLocations
+  useGetCheckout,
+  usePickupLocations,
+  useSetCheckout
 } from '@openstudio/thelia-api-utils';
 
 import Alert from '../Alert';
@@ -23,8 +19,7 @@ import markerColissimoImg from './images/colissimo-logo.png';
 import markerDpDImg from './images/dpd-logo.png';
 import markerImg from './images/marker-icon.png';
 import markerImgShadow from './images/marker-shadow.png';
-import { setDeliveryAddress } from '@js/redux/modules/checkout';
-import { useDispatch } from 'react-redux';
+
 import { useIntl } from 'react-intl';
 
 const customIcon = icon({
@@ -120,9 +115,8 @@ function InfoPopUp({ location, selected, onChooseLocation }) {
 
 function MapDisplay({ locations, selectedLocation, onChooseLocation }) {
   const map = useMap();
-  const [mapCenter, setMapCenter] = useState([0, 0]);
 
-  useEffect(() => {
+  const mapCenter = useMemo(() => {
     if (locations.length > 0) {
       const center = getLatLngCenter(
         locations.map((point) => {
@@ -132,15 +126,17 @@ function MapDisplay({ locations, selectedLocation, onChooseLocation }) {
           };
         })
       );
-      setMapCenter([center.latitude, center.longitude]);
+      return [center.latitude, center.longitude];
     }
   }, [locations]);
 
   useEffect(() => {
     if (selectedLocation) {
-      map.closePopup();
-      map.flyTo([selectedLocation.latitude, selectedLocation.longitude], 16);
-      map.openPopup(selectedLocation.ref.current);
+      if (selectedLocation.ref.current._latlng) {
+        map.closePopup();
+        map.flyTo([selectedLocation.latitude, selectedLocation.longitude], 16);
+        map.openPopup(selectedLocation.ref.current);
+      }
     } else if (mapCenter) {
       map.setView(mapCenter);
     }
@@ -218,12 +214,12 @@ function PickupPointsList({ locations, selectedLocation, onChooseLocation }) {
   );
 }
 
-export default function PickupMap({ module }) {
-  const dispatch = useDispatch();
-  const [selected, setSelected] = useState(null);
+export default function PickupMap() {
+  const { data: checkout } = useGetCheckout();
+  const { mutate: setCheckout } = useSetCheckout();
 
   const { data: addresses = [] } = useAddressQuery();
-  const defaultAddress = addresses?.find((a) => a.default);
+  const defaultAddress = addresses?.find((a) => a.isDefault);
   const query = {
     address: defaultAddress?.address1 || '',
     zipCode: defaultAddress?.zipCode || '',
@@ -238,33 +234,56 @@ export default function PickupMap({ module }) {
   } = usePickupLocations(query);
 
   const locations = useMemo(() => {
-    if (!module || !module.id) return [];
+    if (!checkout?.deliveryModuleId) return [];
     return pickupPoints
-      .filter((l) => l.moduleId === module.id)
+      .filter((l) => l.moduleId === checkout?.deliveryModuleId)
       .map((p) => {
         return {
           ...p,
           ref: createRef(),
           refList: createRef(),
           latitude: parseFloat(p.latitude || 0),
-          longitude: parseFloat(p.longitude || 0),
-          module
+          longitude: parseFloat(p.longitude || 0)
         };
       });
-  }, [pickupPoints, module]);
+  }, [pickupPoints, checkout?.deliveryModuleId]);
 
   const onSelect = useCallback(
     (id) => {
       const location = locations.find((l) => l.id === id);
       if (location?.address) {
-        setSelected(location);
-        dispatch(setDeliveryAddress({ ...location.address, type: 'pickup' }));
+        setCheckout({
+          ...checkout,
+          pickupAddress: { ...location.address, type: 'pickup' },
+          deliveryModuleId: location.moduleId,
+          deliveryModuleOptionCode: location.moduleOptionCode
+        });
       }
     },
-    [dispatch, locations]
+    [locations, checkout, setCheckout]
   );
 
-  if (!module) return null;
+  const selected = useMemo(() => {
+    let match = null;
+    match = locations.find(
+      (location) => location.id === checkout?.pickupAddress?.id
+    );
+    return match;
+  }, [checkout, locations]);
+
+  const mapCenter = useMemo(() => {
+    if (locations.length > 0) {
+      const center = getLatLngCenter(
+        locations.map((point) => {
+          return {
+            latitude: parseFloat(point.latitude || 0),
+            longitude: parseFloat(point.longitude || 0)
+          };
+        })
+      );
+      return [center.latitude, center.longitude];
+    }
+  }, [locations]);
 
   if (isLoading) {
     return <Loader size="w-12 h-12" />;
@@ -277,7 +296,7 @@ export default function PickupMap({ module }) {
   return (
     <div className="lg:flex">
       <MapContainer
-        center={[0, 0]}
+        center={mapCenter}
         zoom={13}
         style={{ height: '50vh', width: '100%' }}
         className="flex-1 overflow-hidden "

@@ -1,13 +1,12 @@
 import {
   useDeliveryModulessQuery,
+  useGetCheckout,
   usePaymentModulessQuery
 } from '@openstudio/thelia-api-utils';
 
-import { useSelector } from 'react-redux';
-
 export function useValidDeliveryModules(type) {
-  const { deliveryAddress } = useSelector((state) => state.checkout);
-  const { data = [] } = useDeliveryModulessQuery(deliveryAddress?.id);
+  const { data: checkout } = useGetCheckout();
+  const { data = [] } = useDeliveryModulessQuery(checkout?.deliveryAddressId);
 
   const validDeliveryModules = data.filter(
     (m) => m.valid && m.options?.length > 0

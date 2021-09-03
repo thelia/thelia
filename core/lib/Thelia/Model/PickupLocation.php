@@ -43,6 +43,9 @@ class PickupLocation
     /** @var int */
     protected $moduleId;
 
+    /** @var string */
+    protected $moduleOptionCode;
+
     /** @var Serializer */
     protected $serializer;
 
@@ -161,6 +164,26 @@ class PickupLocation
     public function getModuleId()
     {
         return $this->moduleId;
+    }
+
+    /**
+     * @param string $moduleId
+     *
+     * @return PickupLocation
+     */
+    public function setModuleOptionCode($moduleOptionCode)
+    {
+        $this->moduleOptionCode = $moduleOptionCode;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getModuleOptionCode()
+    {
+        return $this->moduleOptionCode;
     }
 
     /**
