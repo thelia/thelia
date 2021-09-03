@@ -2412,7 +2412,7 @@ class php_image_magician
         //       third party class to save as bmp.
     {
         // *** Perform a check or two.
-        if (!is_resource($this->imageResized)) {
+        if (!is_resource($this->imageResized) && !$this->imageResized instanceof GdImage) {
             if ($this->debug) {
                 throw new Exception('saveImage: This is not a resource.');
             }
