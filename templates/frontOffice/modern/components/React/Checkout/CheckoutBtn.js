@@ -1,64 +1,35 @@
 import {
-  useAddressQuery,
-  useCheckoutCreate
+  useFinalCheckout,
+  useGetCheckout,
+  useSetCheckout
 } from '@openstudio/thelia-api-utils';
-import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useRef, useState } from 'react';
+
+import { useRef } from 'react';
 
 import React from 'react';
-import { setAcceptedTermsAndConditions } from '@js/redux/modules/checkout';
+
 import { useIntl } from 'react-intl';
 
-function createCheckoutResquest(checkout, addressCustomerId) {
-  let response = {
-    deliveryModuleId: checkout?.deliveryModule?.id,
-    paymentModuleId: checkout?.paymentModule?.id,
-    billingAddressId: checkout?.billingAddress?.id,
-    acceptedTermsAndConditions: checkout?.acceptedTermsAndConditions
-  };
-
-  if (
-    checkout.deliveryModule &&
-    checkout.deliveryModule.deliveryMode === 'pickup'
-  ) {
-    response.pickupAddress = checkout.deliveryAddress;
-    response.billingAddressId = addressCustomerId;
-    response.deliveryAddressId = addressCustomerId;
-  } else {
-    response.deliveryAddressId = checkout?.deliveryAddress?.id;
-    response.pickupAddress = null;
-  }
-
-  return response;
-}
-
 export default function CheckoutBtn() {
-  const dispatch = useDispatch();
   const intl = useIntl();
-  const { mutate: doCheckout } = useCheckoutCreate();
-  const checkout = useSelector((state) => state.checkout);
-  const { data: addressesCustomer = [] } = useAddressQuery();
-  const [addressCustomerId, setAddressCustomerId] = useState(null);
-  const btnRef = useRef(null);
+  const { mutate } = useFinalCheckout();
+  const { mutate: setCheckout } = useSetCheckout();
+  const { data: checkout } = useGetCheckout();
 
-  useEffect(() => {
-    if (Array.isArray(addressesCustomer)) {
-      const address = addressesCustomer.find((el) => el.default === 1);
-      if (address?.id) {
-        setAddressCustomerId(address.id);
-      }
-    }
-  }, [addressesCustomer]);
+  const btnRef = useRef(null);
 
   return (
     <div className="">
-      <label className="inline-flex items-start block mb-4">
+      <label className="items-start block mb-4">
         <input
           type="checkbox"
           className={`border-gray-300 border text-main focus:border-gray-300 focus:ring-main mt-1`}
           id="validTerms"
           onChange={() => {
-            dispatch(setAcceptedTermsAndConditions());
+            setCheckout({
+              ...checkout,
+              acceptedTermsAndConditions: !checkout.acceptedTermsAndConditions
+            });
             btnRef?.current?.scrollIntoView({
               behavior: 'smooth',
               block: 'center'
@@ -73,14 +44,9 @@ export default function CheckoutBtn() {
       <button
         className="w-full shadow btn"
         onClick={async () => {
-          const request = createCheckoutResquest(checkout, addressCustomerId);
-          doCheckout(request);
+          mutate(checkout);
         }}
-        disabled={
-          !checkout.deliveryModuleOption ||
-          !checkout.paymentModule ||
-          !checkout.acceptedTermsAndConditions
-        }
+        disabled={!checkout?.isComplete || !checkout.acceptedTermsAndConditions}
       >
         {intl.formatMessage({ id: 'VALIDATE_CHECKOUT' })}
       </button>

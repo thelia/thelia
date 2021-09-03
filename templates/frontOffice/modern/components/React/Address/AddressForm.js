@@ -59,7 +59,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
       <Input
         label={intl.formatMessage({ id: 'COMPANY_LABEL' })}
         defaultValue={address.company}
-        {...register('company', { required: 'Mandatory' })}
+        {...register('company')}
         error={formState.errors?.company?.message}
       />
 

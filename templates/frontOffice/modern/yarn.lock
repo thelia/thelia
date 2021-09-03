@@ -1858,9 +1858,9 @@
     string-width "^2.0.0"
 
 "@openstudio/thelia-api-utils@^0.4.3":
-  version "0.4.5"
-  resolved "https://registry.yarnpkg.com/@openstudio/thelia-api-utils/-/thelia-api-utils-0.4.5.tgz#717e2f00969af80077166eb67a42f10c0e13e4f9"
-  integrity sha512-dED0xSCG/tZIR9PSJ+NNFNi1t8/0+16GZAw1866VL1Yb6QoO2Nm66yZqW5qvO3jEN9kntse/LEhZbIBbR4NfVw==
+  version "0.4.6"
+  resolved "https://registry.yarnpkg.com/@openstudio/thelia-api-utils/-/thelia-api-utils-0.4.6.tgz#eb0897dbcdcbf948c7aa5d5d0151575baecc4516"
+  integrity sha512-H6+NLHegZsDflom57Sj49Lq8DS1UWZlLGLWeqHy0LFb3Z48wbWFR8rsTZIwDMmcz2g4sl4fUwgFnDWlqBriQiw==
   dependencies:
     axios "^0.21.1"
     qs "^6.10.1"
