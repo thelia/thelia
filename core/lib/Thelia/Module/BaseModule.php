@@ -102,6 +102,7 @@ class BaseModule implements BaseModuleInterface
             try {
                 $this->initializeCoreI18n();
                 if ($this->preActivation($con)) {
+                    $theliaKernel->initializePropelService(true, $cacheRefresh);
                     $this->postActivation($con);
                     $con->commit();
                 }
