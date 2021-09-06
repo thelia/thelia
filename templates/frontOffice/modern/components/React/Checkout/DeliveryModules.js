@@ -2,6 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 import Alert from '../Alert';
+import Loader from '../Loader';
 import priceFormat from '@utils/priceFormat';
 
 import { useIntl } from 'react-intl';
@@ -94,23 +95,10 @@ export default function DeliveryModules() {
 
   const selectedMode = useSelector((state) => state.checkout.mode);
   const { data: checkout } = useGetCheckout();
-
-  const modules = useValidDeliveryModules(
+  const { data: modules, isLoading } = useValidDeliveryModules(
     selectedMode,
     checkout?.deliveryAddressId
   );
-
-  if (
-    modules?.length === 0 ||
-    modules?.flatMap(getModuleValidOptions).length === 0
-  )
-    return (
-      <Alert
-        title={intl.formatMessage({ id: 'WARNING' })}
-        message={intl.formatMessage({ id: 'NO_DELIVERY_MODE_AVAILABLE' })}
-        type="warning"
-      />
-    );
 
   return (
     <div className="shadow panel">
@@ -118,6 +106,19 @@ export default function DeliveryModules() {
         {intl.formatMessage({ id: 'CHOOSE_DELIVERY_PROVIDER' })}
       </div>
       <div className="divide-y divide-gray-300 divide-opacity-50">
+        {isLoading ? (
+          <Loader size="w-10 h-10" className="my-4" />
+        ) : (
+          (modules?.length === 0 ||
+            modules?.flatMap(getModuleValidOptions).length === 0) && (
+            <Alert
+              title={intl.formatMessage({ id: 'WARNING' })}
+              message={intl.formatMessage({ id: 'NO_DELIVERY_MODE_AVAILABLE' })}
+              type="warning"
+            />
+          )
+        )}
+
         {modules.map((module) =>
           getModuleValidOptions(module).map((option) => (
             <ModuleOption

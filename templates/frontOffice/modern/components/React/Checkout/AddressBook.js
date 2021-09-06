@@ -1,4 +1,5 @@
 import React from 'react';
+import Loader from '../Loader';
 
 import {
   useAddressDelete,
@@ -9,9 +10,11 @@ import {
 
 import CreateAddressModal from '../Address/CreateAddressModal';
 import EditAddressModal from '../Address/EditAddressModal';
+import { useIntl } from 'react-intl';
 
 function Address({ address = {}, onSelect = () => {}, isSelected }) {
   const { isSuccess: deleteSuccess } = useAddressDelete();
+  const intl = useIntl();
 
   if (deleteSuccess) return null;
 
@@ -37,7 +40,7 @@ function Address({ address = {}, onSelect = () => {}, isSelected }) {
         {isSelected ? (
           <span className="mr-2 text-lg font-bold text-main">✓</span>
         ) : null}
-        Choisir
+        {intl.formatMessage({ id: 'CHOOSE' })}
       </button>
       <div className="ml-8">
         <EditAddressModal address={address} />
@@ -48,7 +51,7 @@ function Address({ address = {}, onSelect = () => {}, isSelected }) {
 
 function AddressBook({ mode, title }) {
   const { data = [] } = useAddressQuery();
-  const { data: checkout } = useGetCheckout();
+  const { data: checkout, isLoading } = useGetCheckout();
   const { mutate } = useSetCheckout();
 
   return (
@@ -59,6 +62,8 @@ function AddressBook({ mode, title }) {
       </div>
 
       <div className="grid gap-4 py-4">
+        {isLoading && <Loader size="w-10 h-10" />}
+
         {data.map((address) => {
           let isSelected = false;
 
