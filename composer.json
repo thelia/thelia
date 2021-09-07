@@ -72,9 +72,11 @@
         "thelia/open-api-module": "2.0.0",
         "thelia/smarty-redirection-module": "2.0.0",
         "thelia/choice-filter-module": "2.0.0",
-        "thelia/custom-delivery-module": "3.0.0",
+        "thelia/custom-delivery-module": "dev-main",
         "thelia/store-seo-module": "2.0.1",
-        "thelia/better-seo-module": "2.0.0"
+        "thelia/better-seo-module": "2.0.0",
+        "thelia/colissimo-pickup-point-module": "dev-main",
+        "thelia/colissimo-home-delivery-module": "dev-main"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",
