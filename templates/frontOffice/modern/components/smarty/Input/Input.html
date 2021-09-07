@@ -1,26 +1,26 @@
 
-<label for="{$id}" class="block text-sm mb-2 text-gray-600">
+<label for="{$id}" class="block mb-2 text-sm text-gray-600">
   {if $label}
-    <div class="font-bold text-sm {if $error}text-red-500{else}text-gray-700{/if}">
+    <div class="font-bold text-sm {if isset($error)}text-red-500{else}text-gray-700{/if}">
       {$label}
     </div>
   {/if}
   <input
-    type="{$type}"
+    type="{$type|default:'text'}"
     name="{$name}"
     id="{$id}"
     value="{$value|default:null}"
     placeholder="{$placeholder|default:null}"
-    class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if $error}border-red-500{else}border-gray-200{/if} {$inputClass|default:null}"
+    class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if isset($error)}border-red-500{else}border-gray-200{/if} {$inputClass|default:null}"
     {if $required|default:false}required{/if}
     {if $autofocus|default:false}autofocus{/if}
     {if $readonly|default:false}readonly{/if}
   />
 
 
-  {if $error}
+  {if isset($error)}
     <div class="mt-1">
-      <span class="text-red-500 text-xs font-normal italic mb-4 block">
+      <span class="block mb-4 text-xs italic font-normal text-red-500">
         {$message}
       </span>
     </div>

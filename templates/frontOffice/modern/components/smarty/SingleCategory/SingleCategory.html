@@ -17,7 +17,7 @@
         <h3 class="text-2xl text-gray-300 SingleCategory-title "><span>{$categoryTitle}</span></h3>
     </div>
 
-    {if $PRODUCT_COUNT}
+    {if isset($PRODUCT_COUNT)}
     <div class="flex justify-center">
       <div class="inline-block px-4 py-2 mx-auto text-white rounded tex-center bg-main">{$PRODUCT_COUNT} {intl l="tools"}</div>
     </div>

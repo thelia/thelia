@@ -62,6 +62,7 @@
                     {include file="components/smarty/CategoryMenu/CategoryMenu.html"}
                 </div>
                 {/if}
+
                 <div class="flex-1 mt-8 mb-8 {if $showFilters}lg:ml-8{/if}">
                   {include file="components/smarty/Title/Title.html" type="h1" title=$TITLE class="text-left" }
 
@@ -76,6 +77,20 @@
                     <button class="block w-full btn btn--dark" data-toggle-form-filters>{intl l="Show filters"}</button>
                   </div>
                   {/if}
+
+                  {if !$PARENT}
+                  <div class="container mx-auto">
+
+
+                        <div class="grid grid-flow-row-dense grid-rows-1 gap-8 mb-20 md:grid-cols-2 lg:grid-cols-3">
+                          {loop type="category" exclude=$ID name="cat.gateway"}
+                            {include file="components/smarty/SingleCategory/SingleCategory.html" width="263" height="60" class="CategoryCard--small"}
+                          {/loop}
+                        </div>
+
+                  {/if}
+
+
 
                   <div class="container mx-auto">
                     {include file="components/smarty/CategoryProducts/CategoryProducts.html"}
