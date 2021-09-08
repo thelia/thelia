@@ -1,7 +1,7 @@
 
 <label for="{$id}" class="block mb-2 text-sm text-gray-600">
   {if $label}
-    <div class="font-bold text-sm {if isset($error)}text-red-500{else}text-gray-700{/if}">
+    <div class="font-bold text-sm {if isset($error) && $error}text-red-500{else}text-gray-700{/if}">
       {$label}
     </div>
   {/if}
@@ -11,14 +11,14 @@
     id="{$id}"
     value="{$value|default:null}"
     placeholder="{$placeholder|default:null}"
-    class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if isset($error)}border-red-500{else}border-gray-200{/if} {$inputClass|default:null}"
+    class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if isset($error) && $error}border-red-500{else}border-gray-200{/if} {$inputClass|default:null}"
     {if $required|default:false}required{/if}
     {if $autofocus|default:false}autofocus{/if}
     {if $readonly|default:false}readonly{/if}
   />
 
 
-  {if isset($error)}
+  {if isset($error) && $error && isset($message) && $message}
     <div class="mt-1">
       <span class="block mb-4 text-xs italic font-normal text-red-500">
         {$message}

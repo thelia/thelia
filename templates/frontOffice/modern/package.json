@@ -74,6 +74,7 @@
     "react-intl": "^5.17.4",
     "react-leaflet": "^3.2.0",
     "react-modal": "^3.14.3",
+    "react-phone-number-input": "^3.1.27",
     "react-query": "^3.21.1",
     "react-redux": "^7.2.4",
     "react-use": "^17.2.4",
