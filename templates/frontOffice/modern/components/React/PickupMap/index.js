@@ -334,7 +334,7 @@ export function ZipCodeSearcher({ onSubmit }) {
 
   return (
     <form
-      className="w-full my-3"
+      className="w-full mb-4"
       onSubmit={handleSubmit(async (values) => {
         try {
           setHasError(false);
@@ -347,7 +347,7 @@ export function ZipCodeSearcher({ onSubmit }) {
         }
       })}
     >
-      <div className="flex-1 text-xl font-bold my-3">
+      <div className="flex-1 text-xl font-bold mb-3">
         {intl.formatMessage({ id: 'FIND_RELAY' })}
       </div>
 
@@ -390,7 +390,7 @@ export default function Map() {
   });
 
   return (
-    <>
+    <div className="p-5 shadow panel">
       <ZipCodeSearcher
         onSubmit={(zipcode, city) =>
           setQuery({
@@ -402,6 +402,6 @@ export default function Map() {
         }
       />
       <PickupMap query={query} />
-    </>
+    </div>
   );
 }
