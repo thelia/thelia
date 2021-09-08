@@ -15,6 +15,7 @@ import Title from '../Title';
 
 import { useCartQuery, useGetCheckout } from '@openstudio/thelia-api-utils';
 import { useIntl } from 'react-intl';
+import PhoneCheck from '../PhoneCheck';
 
 function LoadingBlock() {
   return (
@@ -28,10 +29,7 @@ function MainContent() {
   const intl = useIntl();
 
   const { mode: selectedMode } = useSelector((state) => state.checkout);
-
   const { data: checkout } = useGetCheckout();
-
-  console.log(checkout);
 
   return (
     <div>
@@ -64,6 +62,8 @@ function MainContent() {
           mode="billing"
           title={intl.formatMessage({ id: 'CHOOSE_BILLING_ADDRESS' })}
         />
+
+        <PhoneCheck addressId={checkout?.deliveryAddressId} />
       </div>
     </div>
   );
