@@ -1,7 +1,13 @@
 import 'leaflet/dist/leaflet.css';
 
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
-import React, { createRef, useCallback, useEffect, useMemo } from 'react';
+import React, {
+  createRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState
+} from 'react';
 import { orderBy, size } from 'lodash-es';
 import {
   useAddressQuery,
@@ -21,6 +27,10 @@ import markerImg from './images/marker-icon.png';
 import markerImgShadow from './images/marker-shadow.png';
 
 import { useIntl } from 'react-intl';
+import { useForm } from 'react-hook-form';
+import Input from '../Input';
+import SubmitButton from '../SubmitButton';
+import axios from 'axios';
 
 const customIcon = icon({
   iconUrl: markerImg,
@@ -153,7 +163,7 @@ function MapDisplay({ locations, selectedLocation, onChooseLocation }) {
           <Marker
             key={location.id}
             position={[location.latitude, location.longitude]}
-            icon={findIcon(location.module?.code)}
+            icon={findIcon(location?.moduleOptionCode)}
           >
             <InfoPopUp
               location={location}
@@ -214,18 +224,9 @@ function PickupPointsList({ locations, selectedLocation, onChooseLocation }) {
   );
 }
 
-export default function PickupMap() {
+export function PickupMap({ query }) {
   const { data: checkout } = useGetCheckout();
   const { mutate: setCheckout } = useSetCheckout();
-
-  const { data: addresses = [] } = useAddressQuery();
-  const defaultAddress = addresses?.find((a) => a.isDefault);
-  const query = {
-    address: defaultAddress?.address1 || '',
-    zipCode: defaultAddress?.zipCode || '',
-    city: defaultAddress?.city || '',
-    radius: 15000
-  };
 
   const {
     data: pickupPoints = [],
@@ -243,10 +244,15 @@ export default function PickupMap() {
           ref: createRef(),
           refList: createRef(),
           latitude: parseFloat(p.latitude || 0),
-          longitude: parseFloat(p.longitude || 0)
+          longitude: parseFloat(p.longitude || 0),
+          moduleOptionCode: checkout?.deliveryModuleOptionCode
         };
       });
-  }, [pickupPoints, checkout?.deliveryModuleId]);
+  }, [
+    pickupPoints,
+    checkout?.deliveryModuleId,
+    checkout?.deliveryModuleOptionCode
+  ]);
 
   const onSelect = useCallback(
     (id) => {
@@ -293,7 +299,7 @@ export default function PickupMap() {
     return <Alert type="error" title="Error" />;
   }
 
-  return (
+  return locations.length > 0 ? (
     <div className="lg:flex">
       <MapContainer
         center={mapCenter}
@@ -317,6 +323,85 @@ export default function PickupMap() {
         selectedLocation={selected}
         onChooseLocation={onSelect}
       />
+    </div>
+  ) : null;
+}
+
+export function ZipCodeSearcher({ onSubmit }) {
+  const intl = useIntl();
+  const { register, handleSubmit } = useForm();
+  const [hasError, setHasError] = useState(false);
+
+  return (
+    <form
+      className="w-full mb-4"
+      onSubmit={handleSubmit(async (values) => {
+        try {
+          setHasError(false);
+          const res = await axios.get(
+            `https://geo.api.gouv.fr/communes?codePostal=${values.zipCode}`
+          );
+          onSubmit(values.zipCode, res.data[0].nom);
+        } catch (e) {
+          setHasError(true);
+        }
+      })}
+    >
+      <div className="flex-1 text-xl font-bold mb-3">
+        {intl.formatMessage({ id: 'FIND_RELAY' })}
+      </div>
+
+      <div className="flex items-stretch">
+        <Input
+          id="zipcode"
+          {...register('zipCode')}
+          placeholder="ex. 75001"
+          className="w-full h-auto"
+          type="number"
+          max="99999"
+          min="10000"
+          required
+        />
+        <SubmitButton
+          type="submit"
+          className="py-0"
+          label={intl.formatMessage({ id: 'OK' })}
+        />
+      </div>
+      {hasError && (
+        <Alert
+          type="error"
+          message={intl.formatMessage({ id: 'INCORRECT_ZIPCODE' })}
+        />
+      )}
+    </form>
+  );
+}
+
+export default function Map() {
+  const { data: addresses = [] } = useAddressQuery();
+  const defaultAddress = addresses?.find((a) => a.isDefault);
+
+  const [query, setQuery] = useState({
+    address: defaultAddress?.address1 || '',
+    zipCode: defaultAddress?.zipCode || '',
+    city: defaultAddress?.city || '',
+    radius: 15000
+  });
+
+  return (
+    <div className="p-5 shadow panel">
+      <ZipCodeSearcher
+        onSubmit={(zipcode, city) =>
+          setQuery({
+            address: ' ',
+            zipCode: zipcode,
+            city: city,
+            radius: 15000
+          })
+        }
+      />
+      <PickupMap query={query} />
     </div>
   );
 }
