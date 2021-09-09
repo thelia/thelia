@@ -1,4 +1,5 @@
 @import 'tailwindcss/base';
+@import 'mmenu-light/dist/mmenu-light.css';
 
 @import 'layout';
 @import 'buttons';

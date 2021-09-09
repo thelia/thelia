@@ -65,6 +65,7 @@
     "leaflet": "^1.7.1",
     "lodash-es": "^4.17.20",
     "micromodal": "^0.4.6",
+    "mmenu-js": "^8.5.24",
     "mmenu-light": "^3.0.8",
     "postcss": "^8.2.10",
     "postcss-loader": "^5",
