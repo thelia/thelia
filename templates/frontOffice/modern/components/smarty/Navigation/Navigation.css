@@ -1,70 +1,23 @@
-:root {
-  --nav-width: 90vw;
-  @screen lg {
-    --nav-width: 18rem;
-  }
-}
+#MainNavigation {
+  .MainNavigation-socials,
+  .MainNavigation-lang {
+    display: grid;
+    grid-gap: 1.25rem;
+    padding: 1.25rem;
+    grid-template-columns: repeat(auto-fit, 1.5rem);
 
-body.Navigation--active {
-  overflow: hidden;
-  @screen lg {
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-}
-
-.Navigation {
-  top: var(--Header-height);
-  width: var(--nav-width);
-  transform: translateX(-100%);
-  transition: transform 250ms linear;
-
-  max-height: calc(100vh - var(--Header-height));
-  height: 100vh;
-
-  .Navigation-arrowWrapper {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
-  .Navigation-arrow {
-    transform: rotate(-90deg);
-  }
-
-  &-item {
-    &--active {
-      > .Navigation-item-submenu {
-        display: block;
-      }
-      .Navigation-arrow {
-        transform: rotate(0);
+    > a {
+      width: auto;
+      padding: 0;
+      &::after {
+        content: none;
       }
     }
-
-    @screen lg {
-      &:hover {
-        > .Navigation-item-submenu {
-          display: block;
-        }
-      }
+    &::before {
+      content: none;
     }
-  }
-
-  &-item-submenu {
-    z-index: 1;
-    display: none;
-
-    @screen lg {
-      left: 100%;
+    &::after {
+      content: none;
     }
-  }
-  &-item-link:hover {
-    @apply text-base;
-  }
-
-  .Navigation--active & {
-    transform: translateX(0);
   }
 }
