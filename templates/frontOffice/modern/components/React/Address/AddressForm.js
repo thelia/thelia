@@ -108,15 +108,15 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Input
           label={intl.formatMessage({ id: 'CELLPHONE_LABEL' })}
-          defaultValue={address.cellphoneNumber}
-          {...register('cellphoneNumber', { required: 'Mandatory' })}
-          error={formState.errors?.cellphoneNumber?.message}
+          defaultValue={address.cellPhone}
+          {...register('cellPhone', { required: 'Mandatory' })}
+          error={formState.errors?.cellPhone?.message}
         />
         <Input
           label={intl.formatMessage({ id: 'PHONE_LABEL' })}
-          defaultValue={address.phoneNumber}
-          {...register('phoneNumber')}
-          error={formState.errors?.phoneNumber?.message}
+          defaultValue={address.phone}
+          {...register('phone')}
+          error={formState.errors?.phone?.message}
         />
       </div>
 

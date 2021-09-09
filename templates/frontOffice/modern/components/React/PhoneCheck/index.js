@@ -1,18 +1,19 @@
 import 'react-phone-number-input/style.css';
 
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import {
   useAddressQuery,
   useAddressUpdate
 } from '@openstudio/thelia-api-utils';
 
 import Alert from '../Alert';
-import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import React from 'react';
+import { parsePhoneNumber } from 'react-phone-number-input';
 
 export default function PhoneCheck({ addressId }) {
   const [phone, setPhone] = React.useState('');
   const { data = [] } = useAddressQuery();
-  const { mutate: update, isSuccess, isError } = useAddressUpdate();
+  const { mutate: update, isSuccess, isError, reset } = useAddressUpdate();
 
   const address = React.useMemo(() => {
     if (addressId && Array.isArray(data)) {
@@ -27,10 +28,25 @@ export default function PhoneCheck({ addressId }) {
   }, [data, addressId]);
 
   React.useEffect(() => {
-    setPhone(address?.cellphoneNumber || '');
+    if (!address) return;
+    let currentPhoneNumber = address?.cellPhone || '';
+
+    if (address?.cellPhone && address?.countryCode) {
+      currentPhoneNumber = parsePhoneNumber(
+        address?.cellPhone,
+        address?.countryCode
+      ).number;
+    }
+    setPhone(currentPhoneNumber);
   }, [address]);
 
-  const isValid = isValidPhoneNumber(phone || '');
+  React.useEffect(() => {
+    if (addressId !== undefined) {
+      reset();
+    }
+  }, [addressId, reset]);
+
+  const isValid = phone ? isValidPhoneNumber(phone || '') : false;
 
   if (!address) return null;
 
@@ -44,7 +60,7 @@ export default function PhoneCheck({ addressId }) {
             id: addressId,
             data: {
               ...address,
-              cellphoneNumber: phone
+              cellPhone: phone
             }
           });
         } catch (error) {
@@ -62,6 +78,7 @@ export default function PhoneCheck({ addressId }) {
           value={phone}
           onChange={setPhone}
         />
+
         <button type="submit" className="btn btn--sm" disabled={!isValid}>
           Modifier
         </button>
@@ -72,7 +89,7 @@ export default function PhoneCheck({ addressId }) {
       {isError ? (
         <Alert type="error" message="erreur lors de la mise à jour" />
       ) : null}
-      {isSuccess ? (
+      {!isError && isValid && isSuccess ? (
         <Alert type="success" message="Numéro de contact mis à jour" />
       ) : null}
     </form>
