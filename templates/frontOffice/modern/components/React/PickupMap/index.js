@@ -17,7 +17,10 @@ import {
 } from '@openstudio/thelia-api-utils';
 
 import Alert from '../Alert';
+import Input from '../Input';
 import Loader from '../Loader';
+import SubmitButton from '../SubmitButton';
+import axios from 'axios';
 import { getLatLngCenter } from '@utils/map';
 import { icon } from 'leaflet/src/layer/marker/Icon';
 import markerChronopostImg from './images/chronopost-logo.png';
@@ -25,12 +28,8 @@ import markerColissimoImg from './images/colissimo-logo.png';
 import markerDpDImg from './images/dpd-logo.png';
 import markerImg from './images/marker-icon.png';
 import markerImgShadow from './images/marker-shadow.png';
-
-import { useIntl } from 'react-intl';
 import { useForm } from 'react-hook-form';
-import Input from '../Input';
-import SubmitButton from '../SubmitButton';
-import axios from 'axios';
+import { useIntl } from 'react-intl';
 
 const customIcon = icon({
   iconUrl: markerImg,
@@ -347,7 +346,7 @@ export function ZipCodeSearcher({ onSubmit }) {
         }
       })}
     >
-      <div className="flex-1 text-xl font-bold mb-3">
+      <div className="flex-1 mb-3 text-xl font-bold">
         {intl.formatMessage({ id: 'FIND_RELAY' })}
       </div>
 
@@ -391,16 +390,18 @@ export default function Map() {
 
   return (
     <div className="p-5 shadow panel">
-      <ZipCodeSearcher
-        onSubmit={(zipcode, city) =>
-          setQuery({
-            address: ' ',
-            zipCode: zipcode,
-            city: city,
-            radius: 15000
-          })
-        }
-      />
+      {defaultAddress?.countryCode === 'FR' ? (
+        <ZipCodeSearcher
+          onSubmit={(zipcode, city) =>
+            setQuery({
+              address: ' ',
+              zipCode: zipcode,
+              city: city,
+              radius: 15000
+            })
+          }
+        />
+      ) : null}
       <PickupMap query={query} />
     </div>
   );
