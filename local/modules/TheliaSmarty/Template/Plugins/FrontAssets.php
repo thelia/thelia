@@ -206,6 +206,7 @@ class FrontAssets extends AbstractSmartyPlugin
                 'ean' => $pse->getEanCode(),
                 'quantity' => $pse->getQuantity(),
                 'price' => $pse->getTaxedPrice($taxCountry),
+                'untaxedPrice' => $pse->getPrice(),
                 'promoPrice' => $pse->getTaxedPromoPrice($taxCountry),
                 'combination' => $attributes,
             ];
