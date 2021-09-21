@@ -292,9 +292,9 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                         }
                     }
 
-                    if (false === $hasConfigurationInterface && $this->container->has("router.annotation")) {
+                    if (false === $hasConfigurationInterface && $this->container->has('router.annotation')) {
                         try {
-                            if ($this->container->get("router.annotation")->match('/admin/module/'.$module->getCode())) {
+                            if ($this->container->get('router.annotation')->match('/admin/module/'.$module->getCode())) {
                                 $hasConfigurationInterface = true;
                             }
                         } catch (\Exception $e) {

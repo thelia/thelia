@@ -97,7 +97,6 @@ class CustomerController extends AbstractCrudController
             return $event->getModel() !== null;
         }
 
-
         return false;
     }
 

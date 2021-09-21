@@ -482,7 +482,7 @@ class Format extends AbstractSmartyPlugin
 
     public function theliaImplode($firstParameter, $secondParameter = '')
     {
-        if (is_array($secondParameter)) {
+        if (\is_array($secondParameter)) {
             return implode($firstParameter, $secondParameter);
         }
 

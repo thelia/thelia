@@ -354,7 +354,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
             $image->resize(new Box($resize_width, $resize_height));
 
-            $resizeFilter = 'imagick' === ConfigQuery::read("imagine_graphic_driver", "gd")
+            $resizeFilter = 'imagick' === ConfigQuery::read('imagine_graphic_driver', 'gd')
                 ? ImageInterface::FILTER_LANCZOS
                 : ImageInterface::FILTER_UNDEFINED;
 

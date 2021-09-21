@@ -13,7 +13,6 @@
 namespace Thelia\Core\Service;
 
 use Symfony\Component\Cache\Adapter\AdapterInterface;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 use Thelia\Model\ConfigQuery;
 

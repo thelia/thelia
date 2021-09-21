@@ -177,7 +177,6 @@ trait UrlRewritingTrait
             if (null === $resolver->redirectedToUrl) {
                 /* if it's an url related to the current object */
                 if ($resolver->view == $this->getRewrittenUrlViewName() && $resolver->viewId == $this->getId()) {
-
                     /* if it's an url related to this product for another locale */
                     if ($resolver->locale != $locale) {
                         throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
@@ -187,8 +186,7 @@ trait UrlRewritingTrait
                     if (\count($resolver->otherParameters) > 0) {
                         throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                     }
-
-                } elseif ($resolver->view !== "obsolete-rewritten-url") {
+                } elseif ($resolver->view !== 'obsolete-rewritten-url') {
                     /* Already related to another object and not an obsolete-rewritten-url */
                     throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                 }
