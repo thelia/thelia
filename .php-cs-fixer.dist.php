@@ -4,7 +4,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
-    ->exclude(['var', 'vendor', '.docker'])
+    ->exclude(['var', 'vendor', '.docker', 'config'])
 ;
 
 (new Filesystem())->mkdir(__DIR__.'/var/cache-ci');
