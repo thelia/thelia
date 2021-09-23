@@ -96,7 +96,7 @@
                                                                 <div class="row">
                                                                     <div class="col-md-12">
                                                                         {custom_render_form_field field='html_message'}
-                                                                            <textarea {$disable_html} {form_field_attributes field='html_message' extra_class="fixedfont"}>{$value nofilter}</textarea>
+                                                                            <textarea {$disable_html|default:''}  {form_field_attributes field='html_message' extra_class="fixedfont"}>{$value nofilter}</textarea>
                                                                             <div id="{$name}" style="height: 500px;"></div>
                                                                         {/custom_render_form_field}
                                                                     </div>
@@ -136,7 +136,7 @@
                                                                 <div class="row">
                                                                     <div class="col-md-12">
                                                                         {custom_render_form_field field='text_message'}
-                                                                        <textarea {$disable_html} {form_field_attributes field='text_message' extra_class="fixedfont"}>{$value nofilter}</textarea>
+                                                                        <textarea {$disable_html|default:''}  {form_field_attributes field='text_message' extra_class="fixedfont"}>{$value nofilter}</textarea>
                                                                         <div id="{$name}" style="height: 500px;"></div>
                                                                     </div>
                                                                     {/custom_render_form_field}
