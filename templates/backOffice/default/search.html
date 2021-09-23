@@ -93,7 +93,7 @@
                                     <td><a href="{url path='/admin/customer/update' customer_id=$ID}">{$REF}</a></td>
 
                                     <td>
-                                        {$COMPANY}
+                                        {$COMPANY|default:null}
                                     </td>
 
                                     <td class="object-title">
@@ -126,7 +126,7 @@
                                             [
                                                 'type' => 'edit',
                                                 'title' => {intl l='Edit this customer'},
-                                                'href' => {url path='/admin/customer/update' customer_id=$ID page=$page},
+                                                'href' => {url path='/admin/customer/update' customer_id=$ID page=$page|default:null},
                                                 'auth' => ['resource' => 'admin.customer']
                                             ],
                                             [
@@ -197,7 +197,7 @@
                                 {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                                 {assign "orderInvoiceFirstName" $FIRSTNAME}
                                 {assign "orderInvoiceLastName" $LASTNAME}
-                                {assign "orderInvoiceCompany" $COMPANY}
+                                {assign "orderInvoiceCompany" $COMPANY|default:null}
                                 {/loop}
 
                                 {loop type="order-status" name="order-status" id=$STATUS}
@@ -376,22 +376,22 @@
 
                                      <td>
                                      {loop type="image" name="cat_image" source="product" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
-                                       <a href="{url path='/admin/products/update' product_id=$OBJECT_ID page=$page}" title="{intl l='Edit this product'}">
+                                       <a href="{url path='/admin/products/update' product_id=$OBJECT_ID page=$page|default:null}" title="{intl l='Edit this product'}">
                                          <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" />
                                        </a>
                                      {/loop}
                                      </td>
 
                                      <td class="object-title">
-                                         <a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$REF}</a>
+                                         <a href="{url path='/admin/products/update' product_id=$ID page=$page|default:null}" title="{intl l='Edit this product'}">{$REF}</a>
                                          {if $VIRTUAL}<span class="glyphicon glyphicon-download text-muted" title="{intl l='Virtual product'}"></span>{/if}
                                      </td>
 
-                                     <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
+                                     <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID page=$page|default:null}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
 
                                      {hook name="products.row" location="product_list_row" product_id={$ID}}
 
-                                     <td class="text-right"><a href="{url path='/admin/products/update' product_id=$ID page=$page current_tab='prices'}" title="{intl l='Edit Prices'}">{format_money number=$BEST_PRICE symbol={currency attr="symbol"}}</a></td>
+                                     <td class="text-right"><a href="{url path='/admin/products/update' product_id=$ID page=$page|default:null current_tab='prices'}" title="{intl l='Edit Prices'}">{format_money number=$BEST_PRICE symbol={currency attr="symbol"}}</a></td>
 
                                      <td class="text-center">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.product" access="UPDATE"}
@@ -413,7 +413,7 @@
                                             [
                                                 'type' => 'edit',
                                                 'title' => {intl l='Edit this product'},
-                                                'href' => {url path='/admin/products/update' product_id=$ID page=$page},
+                                                'href' => {url path='/admin/products/update' product_id=$ID page=$page|default:null},
                                                 'auth' => ['resource' => 'admin.product']
                                             ],
                                             [
@@ -802,7 +802,7 @@ form_content        = {$smarty.capture.content_delete_dialog nofilter}
 
 {* -- Delete customer confirmation dialog ----------------------------------- *}
 {capture "customer_delete_dialog"}
-    <input type="hidden" name="page" value="{$page}">
+    <input type="hidden" name="page" value="{$page|default:null}">
     <input type="hidden" name="customer_id" id="delete_customer_id">
 
     {hook name="customer.delete-form" location="customer_delete_form" }
