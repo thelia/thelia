@@ -208,6 +208,7 @@ class FrontAssets extends AbstractSmartyPlugin
                 'price' => $pse->getTaxedPrice($taxCountry),
                 'untaxedPrice' => $pse->getPrice(),
                 'promoPrice' => $pse->getTaxedPromoPrice($taxCountry),
+                'promoUntaxedPrice' => $pse->getPromoPrice(),
                 'combination' => $attributes,
             ];
         }
