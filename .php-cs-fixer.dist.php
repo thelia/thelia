@@ -16,6 +16,7 @@ $finder = PhpCsFixer\Finder::create()
          'local/modules/BetterSeo',
          'local/modules/ForcePhone',
          'local/modules/HookTest',
+         'local/modules/CustomDelivery',
       ])
 ;
 
