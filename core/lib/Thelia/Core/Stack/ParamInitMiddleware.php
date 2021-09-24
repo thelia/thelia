@@ -73,7 +73,7 @@ class ParamInitMiddleware implements HttpKernelInterface
         return $this->app->handle($request, $type, $catch);
     }
 
-    protected function checkMultiDomainLang(TheliaRequest $request)
+    protected function checkMultiDomainLang(TheliaRequest $request): void
     {
         if (!ConfigQuery::isMultiDomainActivated()) {
             return;
@@ -90,7 +90,7 @@ class ParamInitMiddleware implements HttpKernelInterface
         $domainUrl = $request->getSession()->getLang()->getUrl();
 
         // if lang domain is different from current domain, redirect to the proper one
-        if (!empty($domainUrl) && rtrim($domainUrl, "/") !== $request->getSchemeAndHttpHost()) {
+        if (!empty($domainUrl) && rtrim($domainUrl, '/') !== $request->getSchemeAndHttpHost()) {
             $langs = LangQuery::create()
                 ->filterByActive(true)
                 ->filterByVisible(true)
@@ -98,7 +98,7 @@ class ParamInitMiddleware implements HttpKernelInterface
 
             foreach ($langs as $lang) {
                 $domainUrl = $lang->getUrl();
-                if (rtrim($domainUrl, "/") === $request->getSchemeAndHttpHost()) {
+                if (rtrim($domainUrl, '/') === $request->getSchemeAndHttpHost()) {
                     $request->getSession()->setLang($lang);
                     break;
                 }
@@ -121,6 +121,7 @@ class ParamInitMiddleware implements HttpKernelInterface
 
             if (null !== $lang = $this->detectAdminLang($request)) {
                 $request->getSession()->setAdminLang($lang);
+
                 return $lang;
             }
 
@@ -141,12 +142,11 @@ class ParamInitMiddleware implements HttpKernelInterface
     }
 
     /**
-     * @param  TheliaRequest $request
-     * @return null|\Thelia\Model\Lang
+     * @return \Thelia\Model\Lang|null
      */
     protected function detectAdminLang(TheliaRequest $request)
     {
-        $requestedLangCodeOrLocale = $request->query->get("lang");
+        $requestedLangCodeOrLocale = $request->query->get('lang');
 
         if (null !== $requestedLangCodeOrLocale) {
             return LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
@@ -154,7 +154,6 @@ class ParamInitMiddleware implements HttpKernelInterface
 
         return null;
     }
-
 
     /**
      * @return \Thelia\Model\Lang|null

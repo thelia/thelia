@@ -116,7 +116,6 @@ class HookHelper
      * 'dollar'  => true if the translatable text contains a $
      *
      * @param string $directory the path to the directory to examine
-     * @param        $hooks
      *
      * @internal param string $walkMode type of file scanning: WALK_MODE_PHP or WALK_MODE_TEMPLATE
      * @internal param \Thelia\Core\Translation\Translator $translator the current translator

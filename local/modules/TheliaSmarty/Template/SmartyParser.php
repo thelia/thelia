@@ -499,7 +499,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
         $this->assign($parameters);
 
-        $output = $this->fetch($resourceType . ':' . $resourceContent);
+        $output = $this->fetch($resourceType.':'.$resourceContent);
 
         if ($compressOutput == false) {
             $this->registerFilter('output', [$this, 'trimWhitespaces']);

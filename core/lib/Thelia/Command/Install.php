@@ -368,7 +368,7 @@ class Install extends ContainerAwareCommand
             $event = new ModuleToggleActivationEvent($module->getId());
             $event->setRecursive(true);
 
-            $this->getDispatcher()->dispatch($event,TheliaEvents::MODULE_TOGGLE_ACTIVATION);
+            $this->getDispatcher()->dispatch($event, TheliaEvents::MODULE_TOGGLE_ACTIVATION);
         }
     }
 

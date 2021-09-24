@@ -603,7 +603,6 @@ abstract class BaseController implements ControllerInterface
      * @return BaseForm
      *
      * This method builds a thelia form with its name
-     *
      */
     public function createForm($name, $type = FormType::class, array $data = [], array $options = [])
     {

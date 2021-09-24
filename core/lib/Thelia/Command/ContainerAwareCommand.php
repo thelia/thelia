@@ -15,7 +15,6 @@ namespace Thelia\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;

@@ -69,7 +69,7 @@ class Session extends BaseSession
      */
     public function getAdminLang()
     {
-        if (null !== $lang = $this->get("thelia.current.admin_lang")) {
+        if (null !== $lang = $this->get('thelia.current.admin_lang')) {
             return $lang;
         }
 
@@ -79,17 +79,19 @@ class Session extends BaseSession
             )
         ) {
             $this->setAdminLang($lang);
+
             return $lang;
         }
 
         $lang = Lang::getDefaultLanguage();
         $this->setAdminLang($lang);
+
         return $lang;
     }
 
     public function setAdminLang(Lang $lang)
     {
-        $this->set("thelia.current.admin_lang", $lang);
+        $this->set('thelia.current.admin_lang', $lang);
 
         return $this;
     }
