@@ -126,7 +126,7 @@ class TemplateDescriptorValidator
     }
 
     /**
-     * @return \SimpleXMLElement
+     * @return object|void
      */
     public function getDescriptor()
     {

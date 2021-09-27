@@ -96,7 +96,7 @@
             "./vendor/bin/php-cs-fixer fix"
         ],
         "phpstan": [
-            "php -d memory_limit=-1 ./vendor/bin/phpstan analyse -c phpstan.neon"
+            "php ./vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=-1"
         ],
         "test-unit": [
             "./vendor/bin/phpunit --configuration phpunit.xml.dist --testsuit unit"

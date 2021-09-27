@@ -178,7 +178,7 @@ class ModuleHookCreationForm extends BaseForm
      *
      * @return bool
      */
-    public function verifyTemplates($value, ExecutionContextInterface $context)
+    public function verifyTemplates($value, ExecutionContextInterface $context): void
     {
         $data = $context->getRoot()->getData();
 

@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Template\Parser;
 
+use phpDocumentor\Reflection\DocBlock\Tags\Throws;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
@@ -59,7 +60,7 @@ class ParserFallback implements ParserInterface
      *
      * @return TemplateDefinition
      */
-    public function getTemplateDefinition($webAssetTemplate = false)
+    public function getTemplateDefinition($webAssetTemplate = false): void
     {
         $this->throwException();
     }
@@ -69,7 +70,7 @@ class ParserFallback implements ParserInterface
      *
      * @return bool
      */
-    public function hasTemplateDefinition()
+    public function hasTemplateDefinition(): void
     {
         $this->throwException();
     }
@@ -89,7 +90,7 @@ class ParserFallback implements ParserInterface
     }
 
     /**
-     * Return the registeted template directories for a givent template type.
+     * Return the registered template directories for a given template type.
      *
      * @param int $templateType
      *
@@ -97,7 +98,7 @@ class ParserFallback implements ParserInterface
      *
      * @return array: an array of defined templates directories for the given template type
      */
-    public function getTemplateDirectories($templateType)
+    public function getTemplateDirectories($templateType): void
     {
         $this->throwException();
     }
@@ -116,7 +117,7 @@ class ParserFallback implements ParserInterface
     /**
      * @return \Thelia\Core\Template\TemplateHelperInterface the parser template helper instance
      */
-    public function getTemplateHelper()
+    public function getTemplateHelper(): void
     {
         $this->throwException();
     }
@@ -131,7 +132,7 @@ class ParserFallback implements ParserInterface
      *
      * @return Request
      */
-    public function getRequest()
+    public function getRequest(): void
     {
         $this->throwException();
     }
@@ -163,7 +164,7 @@ class ParserFallback implements ParserInterface
      *
      * @return bool
      */
-    public function getFallbackToDefaultTemplate()
+    public function getFallbackToDefaultTemplate(): void
     {
         $this->throwException();
     }
