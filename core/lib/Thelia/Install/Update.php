@@ -222,7 +222,7 @@ class Update
      *
      * @throws \Exception
      */
-    public function backupDb()
+    public function backupDb(): void
     {
         $database = new Database($this->connection);
 

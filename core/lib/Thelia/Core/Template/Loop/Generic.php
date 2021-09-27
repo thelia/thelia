@@ -23,6 +23,13 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use TheliaMain\PropelResolver;
 
+/**
+ * {@inheritdoc}
+ *
+ * @method string getTableName()
+ * @method string getFilters()
+ * @method string getOrders()
+ */
 class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     /**

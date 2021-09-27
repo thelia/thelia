@@ -109,10 +109,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
         $this->initParser();
     }
 
-    /**
-     * @return array
-     */
-    protected function initLocales(InputInterface $input)
+    protected function initLocales(InputInterface $input): void
     {
         $this->locales = [];
         $availableLocales = [];

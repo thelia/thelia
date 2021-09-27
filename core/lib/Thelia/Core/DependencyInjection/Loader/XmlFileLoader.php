@@ -690,7 +690,7 @@ EOF
      *
      * @return bool true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): void
     {
         // TODO: Implement supports() method.
     }

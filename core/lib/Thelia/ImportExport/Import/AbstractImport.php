@@ -150,7 +150,7 @@ abstract class AbstractImport implements \Iterator
      *
      * @return bool Data contains mandatory columns or not
      */
-    public function checkMandatoryColumns(array $data)
+    public function checkMandatoryColumns(array $data): void
     {
         $diff = array_diff($this->mandatoryColumns, array_keys($data));
 
