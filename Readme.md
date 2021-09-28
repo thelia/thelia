@@ -8,7 +8,7 @@ If you want to download a packaged, ready-to-use distribution of the most recent
 
 Thelia
 ------
-[![Actions Status: test](https://github.com/thelia/thelia/workflows/test/badge.svg)](https://github.com/thelia/thelia/actions?query=workflow%3A"test")
+[![Actions Status: test](https://github.com/thelia/thelia/workflows/test/badge.svg?branch=main)](https://github.com/thelia/thelia/actions?query=workflow%3A"test")
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/thelia/thelia/badges/quality-score.png?s=61e3e04a69bffd71c29b08e5392080317a546716)](https://scrutinizer-ci.com/g/thelia/thelia/)
 [![License](https://poser.pugx.org/thelia/thelia/license.png)](https://packagist.org/packages/thelia/thelia)
 
@@ -21,8 +21,8 @@ Compatibility
 
 | | Thelia 2.3 | Thelia 2.4 | Thelia 2.5 |
 | ------------- |:-----:| -----:| -----:|
-| PHP      | 5.5 5.6 7.0 7.1 | 7.0 7.1 7.2 7.3 | 7.2 7.3 7.4 8.0 |
-| MySQL    | 5.5 5.6 | 5.5 5.6 5.7 | 5.5 5.6 5.7 8.0 |
+| PHP      | 5.5 5.6 7.0 7.1 | 7.0 7.1 7.2 7.3 | 7.3 7.4 8.0 |
+| MySQL    | 5.5 5.6 | 5.5 5.6 5.7 | 5.6 5.7 8.0 |
 | Symfony  | 2.8 | 2.8 | 5.3 |
 
 Requirements
