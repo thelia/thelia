@@ -1,0 +1,19 @@
+{$url = {navigate to="current"}}
+
+{function name=page_link page=1}{{url path=$url page=$page}|regex_replace:"/\?page=1$|page=1$|page=1&|&page=1$/":'' nofilter}{/function}
+<div class="mt-14 flex justify-center">
+  <div id="ScrollController" class="">
+    {pageloop rel=$loop_name}
+      {if $PAGE == $CURRENT}
+          <a href="{page_link page={$NEXT}}" class="ComplexPaginationButton pagination__next text-white bg-main hover:text-white hover:bg-main-dark p-4 transition ">{intl l="See more products"}</a>
+      {/if}
+    {/pageloop}
+  </div>
+  <div class="LoadStatus flex justify-center " style="display: none">
+    <div class="infinite-scroll-request">
+      <a class="ComplexPaginationButton infinite-scroll-request text-white bg-main hover:text-white hover:bg-main-dark p-4 transition">{intl l="Loading..."}</a>
+    </div>
+    <p class="infinite-scroll-last">{intl l="No more products"}</p>
+    <p class="infinite-scroll-error">{intl l="No more products"}</p>
+  </div>
+</div>

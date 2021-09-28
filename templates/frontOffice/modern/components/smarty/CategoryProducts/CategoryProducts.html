@@ -6,8 +6,9 @@
 {$features=$features|default:$smarty.get.features|default: []}
 {$min_price=$min_price|default:$smarty.get.min_price|default: 0}
 {$max_price=$max_price|default:$smarty.get.max_price|default: 9999999}
+{$complexPagination={config key="complex_pagination"}|default:false}
 
-{$limit=32}
+{$limit=2}
 
 {extractOptions features=$features brands=$brands categories=$categories}
 
@@ -32,11 +33,10 @@
   min_price=$min_price
   max_price=$max_price
 }}
-
-<div class="CategoryProducts">
+<div id="GridProductWrapper" class="CategoryProducts">
   {ifloop rel="product_list"}
 
-    <div class="grid grid-flow-row-dense grid-rows-1 gap-8 lg:grid-cols-2 xl:grid-cols-4 xxl:grid-cols-5">
+    <div id="GridProduct" class="grid grid-flow-row-dense grid-rows-1 gap-8 lg:grid-cols-2 " data-total="{$amount}" data-unit=".SingleProduct">
       {loop
         type="product"
         name="product_list"
@@ -55,12 +55,18 @@
         }
           {include file="components/smarty/SingleProduct/SingleProduct.html"}
     {/loop}
-
     </div>
 
-    {if $amount > $limit}
-    {include file="components/smarty/Pagination/Pagination.html" current_page=$product_page loop_name="product_list"}
-    {/if}
+        {if $complexPagination}
+          {if $amount > $product_page*$limit}
+            {include file="components/smarty/ComplexPagination/ComplexPagination.html" current_page=$product_page loop_name="product_list"}
+          {/if}
+        {else}
+        {if $amount > $limit}
+                {include file="components/smarty/Pagination/Pagination.html" current_page=$product_page loop_name="product_list"}
+          {/if}
+        {/if}
+
 
   {/ifloop}
   {elseloop rel="product_list"}
