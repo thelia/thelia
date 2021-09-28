@@ -1,4 +1,5 @@
 import axios from 'axios';
+import ComplexPagination from "@components/smarty/ComplexPagination/ComplexPagination";
 
 const updateProducts = async (url) => {
 	try {
@@ -11,6 +12,7 @@ const updateProducts = async (url) => {
 			.replaceWith(page.querySelector('.CategoryProducts'));
 
 		global.history.replaceState({}, 'recherche', `${url}`);
+    ComplexPagination();
 	} catch (e) {
 		console.error(e);
 		alert('error while fetching products');

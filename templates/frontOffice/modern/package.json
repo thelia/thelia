@@ -62,6 +62,7 @@
     "@splidejs/splide": "^2.4.21",
     "@tailwindcss/forms": "^0.3.3",
     "axios": "^0.21.1",
+    "infinite-scroll": "^4.0.1",
     "leaflet": "^1.7.1",
     "lodash-es": "^4.17.20",
     "micromodal": "^0.4.6",

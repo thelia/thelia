@@ -20,7 +20,7 @@
 
         {pageloop rel=$loop_name}
 
-        <a class="mx-1 px-3 py-2 rounded shadow hover:text-white {if $PAGE == $CURRENT}{else}{/if}" href="{page_link page=$PAGE}"> {$PAGE} </a>
+        <a class="mx-1 px-3 py-2 rounded shadow  {if $PAGE == $CURRENT}bg-gray-300 hover:text-white{else}hover:bg-gray-200{/if}" href="{page_link page=$PAGE}"> {$PAGE} </a>
         {if ($PAGE eq $LAST) || (($PAGE eq $END) && ($END < $LAST))}
             {if $CURRENT lt $LAST}
                 {set_next_page_meta_link url={page_link page={$NEXT}}}
