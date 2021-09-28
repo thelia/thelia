@@ -124,8 +124,7 @@
         ],
         "ci": [
             "@cs-diff",
-            "@phpstan",
-            "@test"
+            "@phpstan"
         ],
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
