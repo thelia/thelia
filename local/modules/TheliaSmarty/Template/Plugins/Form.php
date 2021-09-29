@@ -108,46 +108,47 @@ class Form extends AbstractSmartyPlugin
 
     public function generateForm($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
-        if ($repeat) {
-            $name = $this->getParam($params, 'name');
-            $formType = $this->getParam($params, 'type', FormType::class);
-
-            if (null == $name) {
-                $name = 'thelia.empty';
-            }
-
-            if (!isset($this->formDefinition[$name])) {
-                $name = array_search($name, $this->formDefinition);
-                if (false === $name) {
-                    throw new ElementNotFoundException(sprintf('%s form does not exists', $name));
-                }
-            }
-
-            $formClass = $this->formDefinition[$name];
-
-            // Check if parser context contains our form
-            $instance = $this->parserContext->getForm($name, $formClass, $formType);
-
-            if (null === $instance) {
-                // If not, create a new instance
-                $instance = $this->formFactory->createForm($name);
-            }
-
-            // Set the current form
-            $this->parserContext->pushCurrentForm($instance);
-
-            $instance->createView();
-
-            $template->assign('form', $instance);
-            $template->assign('form_name', $instance::getName());
-
-            $template->assign('form_error', $instance->hasError() ? true : false);
-            $template->assign('form_error_message', $instance->getErrorMessage());
-        } else {
+        if (!$repeat) {
             $this->parserContext->popCurrentForm();
 
             return $content;
         }
+
+        $name = $this->getParam($params, 'name');
+        $formType = $this->getParam($params, 'type', FormType::class);
+        $data = $this->getParam($params, 'data', []);
+
+        if (null == $name) {
+            $name = 'thelia.empty';
+        }
+
+        if (!isset($this->formDefinition[$name])) {
+            $name = array_search($name, $this->formDefinition);
+            if (false === $name) {
+                throw new ElementNotFoundException(sprintf('%s form does not exists', $name));
+            }
+        }
+
+        $formClass = $this->formDefinition[$name];
+
+        // Check if parser context contains our form
+        $instance = $this->parserContext->getForm($name, $formClass, $formType);
+
+        if (null === $instance) {
+            // If not, create a new instance
+            $instance = $this->formFactory->createForm($name, FormType::class, $data);
+        }
+
+        // Set the current form
+        $this->parserContext->pushCurrentForm($instance);
+
+        $instance->createView();
+
+        $template->assign('form', $instance);
+        $template->assign('form_name', $instance::getName());
+
+        $template->assign('form_error', $instance->hasError() ? true : false);
+        $template->assign('form_error_message', $instance->getErrorMessage());
     }
 
     /**
