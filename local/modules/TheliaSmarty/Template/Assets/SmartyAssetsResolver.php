@@ -64,6 +64,11 @@ class SmartyAssetsResolver implements AssetResolverInterface
      */
     public function resolveAssetURL($source, $file, $type, ParserInterface $parserInterface, $filters = [], $debug = false, $declaredAssetsDirectory = null, $sourceTemplateName = false)
     {
+        // Shortcut external uri resolving
+        if (preg_match('#^(https?:)?//#', $file)) {
+            return $file;
+        }
+
         $url = '';
 
         // Normalize path separator
