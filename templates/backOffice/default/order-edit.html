@@ -25,7 +25,10 @@
 
             {hook name="order-edit.top" order_id=$order_id}
 
-	        <div class="row">
+            {$limit={$smarty.get.limit|default:25}}
+            {$product_page={$smarty.get.page|default:1}}
+
+            <div class="row">
             	<div class="col-md-12">
 
                     <div class="general-block-decorator">
@@ -148,7 +151,7 @@
                                                 <tbody>
                                                 {$taxes = []}
 
-                                                {loop type="order_product" name="order-products" order=$ID}
+                                                {loop type="order_product" page=$product_page limit=$limit name="order-products" order=$ID}
                                                     {if ! isset($taxes[{$TAX_RULE_TITLE}])}
                                                         {$taxes[{$TAX_RULE_TITLE}] = 0}
                                                     {/if}
@@ -196,6 +199,57 @@
                                                 {/loop}
                                                 </tbody>
                                             </table>
+                                        </div>
+
+                                        <div class="text-center">
+                                            <ul class="pagination pagination-centered">
+                                                {pageloop rel="order-products" }
+                                                {$prev_page = $PREV}
+                                                {$next_page = $NEXT}
+                                                {$last_page = $LAST}
+                                                {$has_prev  = $CURRENT > 1}
+                                                {$has_next  = $CURRENT < $LAST}
+
+                                                {$has_pages_after = $END < $LAST && $LAST > $max_page_count}
+                                                {$has_pages_before = $START > 1}
+
+                                                {if $PAGE == $START}
+                                                    {if $has_prev}
+                                                        <li><a title="{intl l="Go to first page"}" href="{url current="1" page=1 }">&laquo;</a></li>
+                                                        <li><a title="{intl l="Go to previous page"}" href="{url current="1" page={$PREV} }">&lsaquo;</a></li>
+
+                                                        {if $has_pages_before}
+                                                            <li title="{intl l="More pages before"}" class="disabled"><a href="#">&hellip;</a></li>
+                                                        {/if}
+
+                                                    {else}
+                                                        <li class="disabled"><a href="#">&laquo;</a></li>
+                                                        <li class="disabled"><a href="#">&lsaquo;</a></li>
+                                                    {/if}
+                                                {/if}
+
+                                                {if $PAGE != $CURRENT}
+                                                    <li><a href="{url current="1" page=$PAGE }">{$PAGE}</a></li>
+                                                {else}
+                                                    <li class="active"><a href="#">{$PAGE}</a></li>
+                                                {/if}
+
+                                                {if $PAGE == $END}
+                                                    {if $has_next}
+                                                        {if $has_pages_after}
+                                                            <li title="{intl l="More pages after"}" class="disabled"><a href="#">&hellip;</a></li>
+                                                        {/if}
+
+                                                        <li><a title="{intl l="Go to next page"}" href="{url current="1" page={$NEXT} }">&rsaquo;</a></li>
+                                                        <li><a title="{intl l="Go to last page"}" href="{url current="1" page={$LAST} }">&raquo;</a></li>
+
+                                                    {else}
+                                                        <li class="disabled"><a href="#">&rsaquo;</a></li>
+                                                        <li class="disabled"><a href="#">&raquo;</a></li>
+                                                    {/if}
+                                                {/if}
+                                                {/pageloop}
+                                            </ul>
                                         </div>
 
                                         <div class="row">
