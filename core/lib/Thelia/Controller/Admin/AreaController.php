@@ -313,7 +313,7 @@ class AreaController extends AbstractCrudController
             $stateId = null;
         }
 
-        $removeCountryEvent = new AreaRemoveCountryEvent($area, $countryId, $stateId);
+        $removeCountryEvent = new AreaRemoveCountryEvent($area, [$countryId], $stateId);
 
         $eventDispatcher->dispatch($removeCountryEvent, TheliaEvents::AREA_REMOVE_COUNTRY);
 

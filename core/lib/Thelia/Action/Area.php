@@ -30,7 +30,7 @@ class Area extends BaseAction implements EventSubscriberInterface
 {
     public function addCountry(AreaAddCountryEvent $event): void
     {
-        $countryIds = $event->getCountryId();
+        $countryIds = $event->getCountryIds();
 
         $area = $event->getModel();
 
@@ -59,7 +59,7 @@ class Area extends BaseAction implements EventSubscriberInterface
         $area = $event->getModel();
 
         CountryAreaQuery::create()
-                ->filterByCountryId($event->getCountryId())
+                ->filterByCountryId($event->getCountryIds())
                 ->filterByStateId($event->getStateId())
                 ->filterByAreaId($area->getId())
                 ->delete();
