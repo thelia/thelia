@@ -36,5 +36,13 @@ class ConfigurationHookTest extends WebTestCase
         self::$client->request('GET', '/admin/hook/update/2');
 
         self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/hooks/discover');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/hooks/discover/save');
+
+        self::assertResponseIsSuccessful();
     }
 }

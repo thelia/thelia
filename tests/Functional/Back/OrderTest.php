@@ -29,6 +29,28 @@ class OrderTest extends WebTestCase
     {
         $this->loginAdmin();
 
-        // todo
+        self::$client->request('GET', '/admin/order/update/1');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/order/update/2');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/order/update/3');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/order/update/1/status');
+
+        self::assertResponseStatusCodeSame(302);
+
+        self::$client->request('GET', '/admin/order/update/1/address');
+
+        self::assertResponseStatusCodeSame(302);
+
+        self::$client->request('GET', '/admin/order/update/1/delivery-ref');
+
+        self::assertResponseStatusCodeSame(302);
     }
 }

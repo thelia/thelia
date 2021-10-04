@@ -24,4 +24,21 @@ class ConfigurationTranslationTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
     }
+
+    public function testConfigurationTranslationSubIndexes(): void
+    {
+        $this->loginAdmin();
+
+        self::$client->request('GET', '/admin/configuration/translations/update');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/configuration/translations-customers-title');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/configuration/translations-customers-title/update');
+
+        self::assertResponseRedirects();
+    }
 }

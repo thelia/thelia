@@ -30,6 +30,7 @@ class SecurityTest extends WebTestCase
     {
         return [
             ['GET', '/admin/customers'],
+            ['GET', '/admin/configuration'],
             ['GET', '/admin/orders'],
             ['GET', '/admin/catalog'],
             ['GET', '/admin/folders'],

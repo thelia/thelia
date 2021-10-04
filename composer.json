@@ -119,8 +119,7 @@
         "test": [
             "@demo-database",
             "@test-unit",
-            "@test-functional",
-            "@test-legacy"
+            "@test-functional"
         ],
         "ci": [
             "@cs-diff",

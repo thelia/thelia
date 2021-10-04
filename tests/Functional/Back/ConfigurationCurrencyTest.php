@@ -40,5 +40,17 @@ class ConfigurationCurrencyTest extends WebTestCase
         self::$client->request('GET', '/admin/configuration/currencies/update?currency_id=3');
 
         self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/configuration/currencies/update-rates');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/configuration/currencies/set-default');
+
+        self::assertResponseRedirects();
+
+        self::$client->request('GET', '/admin/configuration/currencies/set-visible');
+
+        self::assertResponseRedirects();
     }
 }

@@ -23,5 +23,17 @@ class ConfigurationAdvancedConfigurationTest extends WebTestCase
         self::$client->request('GET', '/admin/configuration/advanced');
 
         self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/configuration/advanced/flush-cache');
+
+        self::assertResponseRedirects();
+
+        self::$client->request('GET', '/admin/configuration/advanced/flush-assets');
+
+        self::assertResponseRedirects();
+
+        self::$client->request('GET', '/admin/configuration/advanced/flush-images-and-documents');
+
+        self::assertResponseRedirects();
     }
 }

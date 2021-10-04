@@ -36,5 +36,9 @@ class ConfigurationCountryTest extends WebTestCase
         self::$client->request('GET', '/admin/configuration/country/update/2');
 
         self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/configuration/countries');
+
+        self::assertResponseIsSuccessful();
     }
 }
