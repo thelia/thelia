@@ -29,6 +29,7 @@ use TheliaMain\PropelResolver;
  * @method string getTableName()
  * @method string getFilters()
  * @method string getOrders()
+ * @method string getLimit()()
  */
 class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -40,7 +41,8 @@ class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
         return new ArgumentCollection(
             Argument::createAlphaNumStringTypeArgument('table_name', null, true),
             Argument::createAnyTypeArgument('filters'),
-            Argument::createAnyTypeArgument('orders')
+            Argument::createAnyTypeArgument('orders'),
+            Argument::createIntTypeArgument('limit', 100)
         );
     }
 
@@ -97,6 +99,8 @@ class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
             $direction = $direction[0] ?? 'ASC';
             $query->$orderByMethod($direction);
         }
+
+        $query->limit($this->getLimit());
 
         return $query;
     }
