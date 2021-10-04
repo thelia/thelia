@@ -29,6 +29,16 @@ class ConfigurationStateTest extends WebTestCase
     {
         $this->loginAdmin();
 
-        // todo
+        self::$client->request('GET', '/admin/configuration/state/update/1');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/configuration/state/update/2');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/configuration/state/update/3');
+
+        self::assertResponseIsSuccessful();
     }
 }

@@ -27,6 +27,22 @@ class ConfigurationAdminTest extends WebTestCase
 
     public function testOpen(): void
     {
-        // todo
+        $this->loginAdmin();
+
+        self::$client->request('GET', '/admin/password-create-success');
+
+        self::assertResponseStatusCodeSame(302);
+
+        self::$client->request('GET', '/admin/set-email-address');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/password-created');
+
+        self::assertResponseStatusCodeSame(302);
+
+        self::$client->request('GET', '/admin/lost-password');
+
+        self::assertResponseStatusCodeSame(302);
     }
 }

@@ -29,6 +29,20 @@ class ConfigurationTaxeRuleTest extends WebTestCase
     {
         $this->loginAdmin();
 
-        // todo
+        self::$client->request('GET', '/admin/configuration/taxes_rules/update/1');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/configuration/taxes_rules/update/2');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/configuration/taxes_rules/update/3');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/configuration/taxes_rules/saveTaxes');
+
+        self::assertResponseIsSuccessful();
     }
 }

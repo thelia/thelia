@@ -10,21 +10,25 @@
  * file that was distributed with this source code.
  */
 
-namespace Functional\Back;
+namespace Thelia\Tests\Functional\Back;
 
 use Thelia\Tests\Functional\WebTestCase;
 
-class ConfigurationMailingSystemTest extends WebTestCase
+class MessageTest extends WebTestCase
 {
-    public function testOpen(): void
+    public function testMessages(): void
     {
         $this->loginAdmin();
 
-        self::$client->request('GET', '/admin/configuration/mailingSystem');
+        self::$client->request('GET', '/admin/message/preview/4');
 
         self::assertResponseIsSuccessful();
 
-        self::$client->request('GET', '/admin/configuration/mailingSystem/save');
+        self::$client->request('GET', '/admin/message/preview/text/4');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('POST', '/admin/message/send/4');
 
         self::assertResponseIsSuccessful();
     }

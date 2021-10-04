@@ -32,5 +32,21 @@ class ConfigurationProductAttributeTest extends WebTestCase
         self::$client->request('GET', '/admin/configuration/attributes/update?attribute_id=1');
 
         self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/configuration/attributes/update?attribute_id=3');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/configuration/attributes/remove-from-all-templates');
+
+        self::assertResponseRedirects();
+
+        self::$client->request('GET', '/admin/configuration/attributes/add-to-all-templates');
+
+        self::assertResponseRedirects();
+
+        self::$client->request('GET', '/admin/configuration/attributes-av/update?attribute_id=3');
+
+        self::assertResponseIsSuccessful();
     }
 }

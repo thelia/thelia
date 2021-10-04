@@ -32,5 +32,29 @@ class ModuleTest extends WebTestCase
         self::$client->request('GET', '/admin/module/update/7');
 
         self::assertResponseIsSuccessful();
+
+        self::$client->request('POST', '/admin/module/install');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/module/information/3');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/module/documentation/3');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/module/TheliaSmarty');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/module/TheliaSmarty');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/module/HookAdminHome');
+
+        self::assertResponseIsSuccessful();
     }
 }

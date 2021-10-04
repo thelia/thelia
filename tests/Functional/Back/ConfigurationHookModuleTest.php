@@ -36,5 +36,9 @@ class ConfigurationHookModuleTest extends WebTestCase
         self::$client->request('GET', '/admin/module-hook/update/15');
 
         self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/module-hooks/get-module-hook-classnames/1');
+
+        self::assertResponseIsSuccessful();
     }
 }

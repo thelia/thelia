@@ -32,5 +32,17 @@ class ConfigurationProductTemplateTest extends WebTestCase
         self::$client->request('GET', '/admin/configuration/templates/update?template_id=1');
 
         self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/configuration/templates/duplicate');
+
+        self::assertResponseRedirects();
+
+        self::$client->request('GET', '/admin/configuration/templates/features/list');
+
+        self::assertResponseIsSuccessful();
+
+        self::$client->request('GET', '/admin/configuration/templates/attributes/list');
+
+        self::assertResponseIsSuccessful();
     }
 }
