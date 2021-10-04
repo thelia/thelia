@@ -7,6 +7,7 @@
 
 {block name="main-content"}
 {$searchTerm = {$smarty.get.search_term|trim}}
+{$page = $page|default:0}
 
 {capture name="more_results"}
     <tr>
@@ -185,9 +186,9 @@
                                 <th>{intl l="Name"}</th>
                                 <th>{intl l="Amount"}</th>
                                 <th>{intl l="Status"}</th>
-                                
+
                                 {hook name="orders.table-header" location="orders_table_header" }
-                                
+
                                 <th class="actions">{intl l="Actions"}</th>
                             </tr>
                             </thead>
@@ -265,9 +266,9 @@
                                 <th>{intl l="ID"}</th>
                                 <th></th>
                                 <th>{intl l="Category title"}</th>
-                                
+
                                 {hook name="categories.header" location="category_list_header" }
-                                
+
                                 <th class="text-center">
                                     {intl l='Online'}
                                 </th>
@@ -283,9 +284,9 @@
                                 <td>{$ID}</td>
                                 <td></td>
                                 <td class="object-title"><a href="{url path="/admin/categories/update" category_id={$ID}}">{$TITLE}</a></td>
-                                
+
                                 {hook name="categories.row" location="category_list_row" category_id={$ID} }
-                                
+
                                 <td class="text-center">
                                     {loop type="auth" name="can_change" role="ADMIN" resource="admin.category" access="UPDATE"}
                                         <div class="make-switch switch-small categoryVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
@@ -459,9 +460,9 @@
                                 <th>{intl l="ID"}</th>
                                 <th></th>
                                 <th>{intl l="Folder title"}</th>
-                                
+
                                 {hook name="folders.header" location="folder_list_header" }
-                                
+
                                 <th class="text-center">
                                     {intl l='Online'}
                                 </th>
@@ -477,9 +478,9 @@
                                     <td></td>
 
                                     <td class="object-title"><a href="{url path="/admin/folders/update/%id" id=$ID}">{$TITLE}</a></td>
-                                    
+
                                     {hook name="folders.row" location="folder_list_row" folder_id={$ID} }
-                                    
+
                                     <td class="text-center">
                                         {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
                                             <div class="make-switch switch-small folderVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
@@ -550,9 +551,9 @@
                                 <th>{intl l="ID"}</th>
                                 <th></th>
                                 <th>{intl l="Content title"}</th>
-                                
+
                                 {hook name="contents.header" location="content_list_header" }
-    
+
                                 <th class="text-center">
                                     {intl l='Online'}
                                 </th>
@@ -568,9 +569,9 @@
                                     <td></td>
 
                                     <td class="object-title"><a href="{url path="/admin/content/update/%id" id=$ID}">{$TITLE}</a></td>
-                                    
+
                                     {hook name="contents.row" location="content_list_row" }
-                                    
+
                                     <td class="text-center">
                                         {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
                                             <div class="make-switch switch-small contentVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
