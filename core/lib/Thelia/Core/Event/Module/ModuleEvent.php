@@ -39,7 +39,7 @@ class ModuleEvent extends ActionEvent
         $this->chapo = $chapo;
     }
 
-    public function getChapo(): string
+    public function getChapo():? string
     {
         return $this->chapo;
     }
@@ -49,7 +49,7 @@ class ModuleEvent extends ActionEvent
         $this->description = $description;
     }
 
-    public function getDescription(): string
+    public function getDescription():? string
     {
         return $this->description;
     }
@@ -79,7 +79,7 @@ class ModuleEvent extends ActionEvent
         $this->postscriptum = $postscriptum;
     }
 
-    public function getPostscriptum(): string
+    public function getPostscriptum():? string
     {
         return $this->postscriptum;
     }
