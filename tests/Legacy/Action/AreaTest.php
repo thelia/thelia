@@ -52,7 +52,7 @@ class AreaTest extends BaseAction
 
         $country = CountryQuery::create()->findOne();
 
-        $event = new AreaAddCountryEvent($area, $country->getId());
+        $event = new AreaAddCountryEvent($area, [$country->getId()]);
 
         $areaAction = new Area();
         $areaAction->addCountry($event);
@@ -83,7 +83,7 @@ class AreaTest extends BaseAction
             ->find()
             ->getFirst();
 
-        $event = new AreaRemoveCountryEvent($area, $country->getId());
+        $event = new AreaRemoveCountryEvent($area, [$country->getId()]);
 
         $areaAction = new Area();
         $areaAction->removeCountry($event);

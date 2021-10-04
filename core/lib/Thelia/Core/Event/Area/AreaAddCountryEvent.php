@@ -23,27 +23,27 @@ use Thelia\Model\Event\AreaEvent;
 class AreaAddCountryEvent extends AreaEvent
 {
     protected $areaId;
-    protected $countryId;
+    protected $countryIds;
 
-    public function __construct(Area $area, int $countryId)
+    public function __construct(Area $area, array $countryIds)
     {
         parent::__construct($area);
 
-        $this->countryId = $countryId;
+        $this->countryIds = $countryIds;
     }
 
     /**
      * @return $this
      */
-    public function setCountryId(int $countryId): self
+    public function setCountryIds(int $countryIds): self
     {
-        $this->countryId = $countryId;
+        $this->countryIds = $countryIds;
 
         return $this;
     }
 
-    public function getCountryId(): int
+    public function getCountryIds(): array
     {
-        return $this->countryId;
+        return $this->countryIds;
     }
 }
