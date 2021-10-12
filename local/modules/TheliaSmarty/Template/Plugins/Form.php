@@ -889,7 +889,7 @@ class Form extends AbstractSmartyPlugin
 
         $fieldType = $collectionConfig->getConfig()->getType();
 
-        if ($fieldType->getName() !== static::COLLECTION_TYPE_NAME) {
+        if (method_exists($fieldType, 'getName') && $fieldType->getName() !== static::COLLECTION_TYPE_NAME) {
             $baseFieldType = $fieldType;
             $resolved = false;
 
