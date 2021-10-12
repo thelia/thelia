@@ -95,21 +95,6 @@ class PropelInitService
     }
 
     /**
-     * @return string thelia database configuration file
-     */
-    protected function getTheliaDatabaseConfigFile()
-    {
-        $fs = new Filesystem();
-
-        $databaseConfigFile = THELIA_CONF_DIR.'database_'.$this->environment.'.yml';
-        if (!$fs->exists($databaseConfigFile)) {
-            $databaseConfigFile = THELIA_CONF_DIR.'database.yml';
-        }
-
-        return $databaseConfigFile;
-    }
-
-    /**
      * @return string propel subdirectory in the Thelia cache directory
      */
     public function getPropelCacheDir()
@@ -212,10 +197,7 @@ class PropelInitService
             return;
         }
 
-        $configService = new DatabaseConfigurationSource(
-            Yaml::parse(file_get_contents($this->getTheliaDatabaseConfigFile())),
-            $this->envParameters
-        );
+        $configService = new DatabaseConfigurationSource($this->envParameters);
 
         $propelConfig = $configService->getPropelConnectionsConfiguration();
 
@@ -239,8 +221,7 @@ class PropelInitService
         $configOptions['propel']['paths']['migrationDir'] = $this->getPropelConfigDir();
 
         $propelConfigCache->write(
-            Yaml::dump($propelConfig),
-            [new FileResource($this->getTheliaDatabaseConfigFile())]
+            Yaml::dump($propelConfig)
         );
     }
 
@@ -409,7 +390,7 @@ class PropelInitService
                 (new Filesystem())->remove($this->getPropelCacheDir());
             }
 
-            if (!file_exists($this->getTheliaDatabaseConfigFile())) {
+            if (!Thelia::isInstalled()) {
                 return false;
             }
 

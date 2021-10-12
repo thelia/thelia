@@ -12,6 +12,7 @@
 
 namespace Thelia\Install;
 
+use Thelia\Core\Thelia;
 use Thelia\Install\Exception\AlreadyInstallException;
 
 /**
@@ -39,7 +40,7 @@ abstract class BaseInstall
         } else {
             $this->isConsoleMode = false;
         }
-        if (file_exists(THELIA_CONF_DIR.'/database.yml') && $verifyInstall) {
+        if (Thelia::isInstalled() && $verifyInstall) {
             throw new AlreadyInstallException('Thelia is already installed');
         }
 

@@ -15,15 +15,17 @@ namespace Thelia\Install;
 use Michelf\Markdown;
 use PDO;
 use PDOException;
+use Propel\Runtime\Propel;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Yaml;
 use Thelia\Config\DatabaseConfigurationSource;
+use Thelia\Core\Thelia;
 use Thelia\Install\Exception\UpdateException;
 use Thelia\Install\Exception\UpToDateException;
 use Thelia\Log\Tlog;
+use Thelia\Model\Map\ProductTableMap;
 use Thelia\Tools\Version\Version;
 
 /**
@@ -85,7 +87,9 @@ class Update
         $dbConfig = null;
 
         try {
-            $this->connection = $this->getDatabasePDO();
+            $this->connection = Propel::getConnection(
+                ProductTableMap::DATABASE_NAME
+            );
         } catch (ParseException $ex) {
             throw new UpdateException('database.yml is not a valid file : '.$ex->getMessage());
         } catch (\PDOException $ex) {
@@ -105,14 +109,11 @@ class Update
      */
     protected function getDatabasePDO()
     {
-        $configPath = THELIA_CONF_DIR.'database.yml';
-
-        if (!file_exists($configPath)) {
+        if (!Thelia::isInstalled()) {
             throw new UpdateException('Thelia is not installed yet');
         }
 
         $definePropel = new DatabaseConfigurationSource(
-            Yaml::parse(file_get_contents($configPath)),
             $this->getEnvParameters()
         );
 

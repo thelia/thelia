@@ -39,9 +39,7 @@ if ($input->hasParameterOption('--no-debug', true)) {
     putenv('APP_DEBUG='.$_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0');
 }
 
-if (file_exists(THELIA_ROOT . '.env')) {
-    (new Dotenv())->bootEnv(THELIA_ROOT . '.env');
-}
+(new Dotenv())->bootEnv(THELIA_ROOT . '.env');
 
 if ($_SERVER['APP_DEBUG']) {
     umask(0000);
@@ -64,7 +62,7 @@ function getTheliaDatabaseConfigFile($env = "prod")
     return $databaseConfigFile;
 }
 
-if (!file_exists(getTheliaDatabaseConfigFile($_SERVER['APP_ENV']))) {
+if (!Thelia::isInstalled()) {
     $kernel = new class($env = "prod", true) extends Kernel {
         use MicroKernelTrait;
 

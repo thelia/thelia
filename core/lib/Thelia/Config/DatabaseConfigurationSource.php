@@ -12,8 +12,11 @@
 
 namespace Thelia\Config;
 
+use Propel\Runtime\Connection\ConnectionWrapper;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Processes the Thelia database configuration.
@@ -30,28 +33,64 @@ class DatabaseConfigurationSource
     protected $connections;
 
     /**
-     * @param array $theliaDatabaseConfiguration thelia database configuration
-     * @param array $envParameters               environment parameters
+     * @param array $envParameters environment parameters
      */
     public function __construct(
-        array $theliaDatabaseConfiguration,
         array $envParameters
     ) {
+        $this->configureConnections($envParameters);
+    }
+
+    protected function configureConnections($envParameters): void
+    {
+        if (null !== $envParameters['thelia.db_host'] && null !== $envParameters['thelia.db_name']) {
+            $this->addConnection(
+                DatabaseConfiguration::THELIA_CONNECTION_NAME,
+                [
+                    'driver' => 'mysql',
+                    'user' => $envParameters['thelia.db_user'],
+                    'password' => $envParameters['thelia.db_password'],
+                    'dsn' => sprintf('mysql:host=%s;dbname=%s;port=%s', $envParameters['thelia.db_host'], $envParameters['thelia.db_name'], $envParameters['thelia.db_port']),
+                    'classname' => ConnectionWrapper::class,
+                ],
+                $envParameters
+            );
+
+            return;
+        }
+
+        $fs = new Filesystem();
+
+        $databaseConfigFile = THELIA_CONF_DIR.'database_'.$envParameters['kernel.environment'].'.yml';
+        if (!$fs->exists($databaseConfigFile)) {
+            $databaseConfigFile = THELIA_CONF_DIR.'database.yml';
+        }
+
+        if (!$fs->exists($databaseConfigFile)) {
+            throw new \LogicException('No database connection found. Add parameters to your .env file or a database.yml');
+        }
+
+        $theliaDatabaseConfiguration = Yaml::parse(file_get_contents($databaseConfigFile));
+
         $configurationProcessor = new Processor();
         $configuration = $configurationProcessor->processConfiguration(
             new DatabaseConfiguration(),
             $theliaDatabaseConfiguration
         );
 
+        // single connection format
         if (isset($configuration['connection'])) {
-            // single connection format
             $this->addConnection(
                 DatabaseConfiguration::THELIA_CONNECTION_NAME,
                 $configuration['connection'],
                 $envParameters
             );
-        } elseif (isset($configuration['connections'])) {
-            // multiple connections format
+
+            return;
+        }
+
+        // multiple connections format
+        if (isset($configuration['connections'])) {
             foreach ($configuration['connections'] as $connectionName => $connectionParameters) {
                 $this->addConnection(
                     $connectionName,
@@ -59,19 +98,14 @@ class DatabaseConfigurationSource
                     $envParameters
                 );
             }
-        } else {
-            throw new \LogicException(
-                "No 'connection' or 'connections' node under the 'database' node."
-                .' This is checked at configuration validation, and should not happen.'
-            );
+
+            return;
         }
 
-        if (!isset($this->connections[DatabaseConfiguration::THELIA_CONNECTION_NAME])) {
-            throw new \LogicException(
-                "Connection '".DatabaseConfiguration::THELIA_CONNECTION_NAME."' is not defined."
-                .' This is checked at configuration validation, and should not happen.'
-            );
-        }
+        throw new \LogicException(
+            'Connection configuration not found'
+            .' This is checked at configuration validation, and should not happen.'
+        );
     }
 
     /**
