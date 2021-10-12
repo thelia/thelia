@@ -118,7 +118,7 @@ class Thelia extends Kernel
 
     public static function isInstalled()
     {
-        return file_exists(THELIA_CONF_DIR.'database.yml');
+        return file_exists(THELIA_CONF_DIR.'database.yml') || (!empty($_SERVER['DB_HOST']));
     }
 
     protected function checkMySQLConfigurations(ConnectionInterface $con): void
@@ -700,6 +700,12 @@ class Thelia extends Kernel
         $parameters['thelia.root_dir'] = THELIA_ROOT;
         $parameters['thelia.core_dir'] = \dirname(__DIR__); // This class is in core/lib/Thelia/Core.
         $parameters['thelia.module_dir'] = THELIA_MODULE_DIR;
+
+        $parameters['thelia.db_host'] = $_SERVER['DB_HOST'] ?? null;
+        $parameters['thelia.db_port'] = $_SERVER['DB_PORT'] ?? null;
+        $parameters['thelia.db_name'] = $_SERVER['DB_NAME'] ?? null;
+        $parameters['thelia.db_user'] = $_SERVER['DB_USER'] ?? null;
+        $parameters['thelia.db_password'] = $_SERVER['DB_PASSWORD'] ?? null;
 
         return $parameters;
     }

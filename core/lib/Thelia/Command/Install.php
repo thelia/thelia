@@ -151,7 +151,7 @@ class Install extends ContainerAwareCommand
             'Checking some permissions',
         ]);
 
-        $permissions = new CheckPermission(false);
+        $permissions = new CheckPermission();
         $isValid = $permissions->exec();
 
         foreach ($permissions->getValidationMessages() as $item => $data) {
@@ -190,23 +190,20 @@ class Install extends ContainerAwareCommand
     {
         $fs = new Filesystem();
 
-        $sampleConfigFile = THELIA_CONF_DIR.'database.yml.sample';
-        $configFile = THELIA_CONF_DIR.'database.yml';
+        if (!$fs->exists(THELIA_ROOT.'.env.local')) {
+            $fs->touch(THELIA_ROOT.'.env.local');
+        }
 
-        $fs->copy($sampleConfigFile, $configFile, true);
-
-        $configContent = file_get_contents($configFile);
-
-        $configContent = str_replace('%DRIVER%', 'mysql', $configContent);
-        $configContent = str_replace('%USERNAME%', $connectionInfo['username'], $configContent);
-        $configContent = str_replace('%PASSWORD%', $connectionInfo['password'], $configContent);
-        $configContent = str_replace(
-            '%DSN%',
-            sprintf('mysql:host=%s;dbname=%s;port=%s', $connectionInfo['host'], $connectionInfo['dbName'], $connectionInfo['port']),
-            $configContent
+        file_put_contents(THELIA_ROOT.'.env.local',
+            sprintf("\n###> thelia/database-configuration ###\nDB_HOST=%s\nDB_PORT=%s\nDB_NAME=%s\nDB_USER=%s\nDB_PASSWORD=%s\n###< thelia/database-configuration ###",
+                $connectionInfo['host'],
+                $connectionInfo['port'],
+                $connectionInfo['dbName'],
+                $connectionInfo['username'],
+                $connectionInfo['password']
+            ),
+            \FILE_APPEND
         );
-
-        file_put_contents($configFile, $configContent);
 
         $fs->remove($this->getContainer()->getParameter('kernel.cache_dir'));
     }

@@ -10,6 +10,14 @@
  * file that was distributed with this source code.
  */
 
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
+use Thelia\Install\Exception\UpdateException;
+
+if (\PHP_SAPI != 'cli') {
+    throw new \Exception('this script can only be launched with cli sapi');
+}
+
 $bootstrapToggle = false;
 $bootstraped = false;
 
@@ -32,25 +40,22 @@ foreach ($argv as $arg) {
 if (!$bootstraped) {
     if (isset($bootstrapFile)) {
         require $bootstrapFile;
-    } elseif (is_file($file = __DIR__.'/../core/vendor/autoload.php')) {
+    } elseif (is_file($file = __DIR__.'/../vendor/autoload.php')) {
         require $file;
     } elseif (is_file($file = __DIR__.'/../../bootstrap.php')) {
         // Here we are on a thelia/thelia-project
         require $file;
     } else {
-        cliOutput('No autoload file found. Please use the -b argument to include yours', 'error');
+        echo 'No autoload file found. Please use the -b argument to include yours';
         exit(1);
     }
 }
 
-if (\PHP_SAPI != 'cli') {
-    cliOutput('this script can only be launched with cli sapi', 'error');
-    exit(1);
-}
+(new \Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/.env');
 
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
-use Thelia\Install\Exception\UpdateException;
+$thelia = new App\Kernel('dev', true);
+
+$thelia->boot();
 
 /***************************************************
  * Load Update class
