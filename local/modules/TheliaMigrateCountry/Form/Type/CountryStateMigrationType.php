@@ -12,11 +12,15 @@
 
 namespace TheliaMigrateCountry\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Form\Type\AbstractTheliaType;
+use Thelia\Core\Form\Type\Field\CountryIdType;
+use Thelia\Core\Form\Type\Field\StateIdType;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\StateQuery;
 
@@ -31,9 +35,9 @@ class CountryStateMigrationType extends AbstractTheliaType
     {
         $resolver->setDefaults(
             [
-                'cascade_validation' => true,
                 'constraints' => [
                     new Callback([$this, 'checkStateId']),
+                    new Valid(),
                 ],
             ]
         );
@@ -42,18 +46,18 @@ class CountryStateMigrationType extends AbstractTheliaType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('migrate', 'checkbox')
+            ->add('migrate', CheckboxType::class)
             ->add(
                 'country',
-                'country_id'
+                CountryIdType::class
             )
             ->add(
                 'new_country',
-                'country_id'
+                CountryIdType::class
             )
             ->add(
                 'new_state',
-                'state_id',
+                StateIdType::class,
                 [
                     'constraints' => [],
                 ]
@@ -87,18 +91,12 @@ class CountryStateMigrationType extends AbstractTheliaType
         }
     }
 
-    private function getRowData(ExecutionContextInterface $context): void
-    {
-        $propertyPath = $context->getPropertyPath();
-        $data = $this->getRowData($context);
-    }
-
     /**
      * Returns the name of this type.
      *
      * @return string The name of this type
      */
-    public function getName()
+    public function getName(): string
     {
         return 'country_state_migration';
     }

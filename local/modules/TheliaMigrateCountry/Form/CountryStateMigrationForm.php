@@ -12,8 +12,11 @@
 
 namespace TheliaMigrateCountry\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Valid;
 use Thelia\Form\BaseForm;
+use TheliaMigrateCountry\Form\Type\CountryStateMigrationType;
 
 /**
  * Class CountryStateMigrationForm.
@@ -30,14 +33,14 @@ class CountryStateMigrationForm extends BaseForm
         $this->formBuilder
             ->add(
                 'migrations',
-                'collection',
+                CollectionType::class,
                 [
-                    'type' => 'country_state_migration',
+                    'entry_type' => CountryStateMigrationType::class,
                     'allow_add' => true,
                     'required' => true,
-                    'cascade_validation' => true,
                     'constraints' => [
                         new Count(['min' => 1]),
+                        new Valid(),
                     ],
                 ]
             )

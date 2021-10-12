@@ -93,6 +93,7 @@ class MigrateController extends BaseAdminController
         }
 
         $changeForm = $this->createForm('thelia.admin.country.state.migration');
+        $migratedCountries = [];
 
         try {
             // Check the form against constraints violations
