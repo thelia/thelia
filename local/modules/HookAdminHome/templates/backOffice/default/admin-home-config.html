@@ -20,7 +20,7 @@
                                         {$label}
                                         {form_error form=$form field="enabled-stats"}
                                             <br />
-                                            <span class="error">{$message}</span>
+                                            <span class="error">{$message|default:''}</span>
                                         {/form_error}
                                     </label>
                                     {if ! empty($label_attr.help)}
@@ -36,7 +36,7 @@
                                         {$label}
                                         {form_error form=$form field="enabled-news"}
                                             <br />
-                                            <span class="error">{$message}</span>
+                                            <span class="error">{$message|default:''}</span>
                                         {/form_error}
                                     </label>
                                     {if ! empty($label_attr.help)}
@@ -52,7 +52,7 @@
                                         {$label}
                                         {form_error form=$form field="enabled-sales"}
                                             <br />
-                                            <span class="error">{$message}</span>
+                                            <span class="error">{$message|default:''}</span>
                                         {/form_error}
                                     </label>
                                     {if ! empty($label_attr.help)}
@@ -68,7 +68,7 @@
                                         {$label}
                                         {form_error form=$form field="enabled-info"}
                                             <br />
-                                            <span class="error">{$message}</span>
+                                            <span class="error">{$message|default:''}</span>
                                         {/form_error}
                                     </label>
                                     {if ! empty($label_attr.help)}
