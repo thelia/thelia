@@ -16,10 +16,6 @@ if (!in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
 
 set_time_limit(0);
 
-$_SERVER['APP_DEBUG'] = false;
-$_SERVER['APP_ENV'] = "prod";
-
-
 if (!isset($bootstrapFile)) {
     $bootstrapFile =  dirname(__DIR__) . '/vendor/autoload.php';
 }
@@ -30,16 +26,19 @@ if (!class_exists(Application::class) || !class_exists(Dotenv::class)) {
     throw new LogicException('You need to add "symfony/framework-bundle" and "symfony/dotenv" as Composer dependencies.');
 }
 
+(new Dotenv())->bootEnv(THELIA_ROOT . '.env');
+
 $input = new ArgvInput();
-if (null !== $env = $input->getParameterOption(['--env', '-e'], null, true)) {
-    putenv('APP_ENV='.$_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = $env);
+$env = $_ENV['APP_ENV'];
+
+if (null !== $askedEnv = $input->getParameterOption(['--env', '-e'], null, true)) {
+    putenv('APP_ENV='.$_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = $askedEnv);
 }
 
 if ($input->hasParameterOption('--no-debug', true)) {
     putenv('APP_DEBUG='.$_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0');
 }
 
-(new Dotenv())->bootEnv(THELIA_ROOT . '.env');
 
 if ($_SERVER['APP_DEBUG']) {
     umask(0000);

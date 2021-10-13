@@ -53,8 +53,8 @@ jobs:
           composer update --no-interaction --prefer-dist
       - name: Install Thelia
         run: |
-          php Thelia thelia:install --db_host=127.0.0.1:${{ job.services.mysql.ports['3306'] }} --db_username=root --db_name=thelia --db_password=thelia
-          php Thelia module:refresh
-          php Thelia admin:create --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2 --email thelia2@example.com
+          php Thelia thelia:install --env=test --db_host=127.0.0.1:${{ job.services.mysql.ports['3306'] }} --db_username=root --db_name=thelia --db_password=thelia
+          php Thelia module:refresh --env=test
+          php Thelia admin:create --env=test --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2 --email thelia2@example.com
       - name: Run PHPUnit
         run: composer ci
