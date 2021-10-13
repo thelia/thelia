@@ -25,7 +25,7 @@ trait ImplementationClassTrait
     public function getClassFilePath()
     {
         $path = rtrim((new Filesystem())->makePathRelative(
-            TheliaMain_BUILD_MODEL_PATH
+            THELIA_CACHE_DIR.$_SERVER['APP_ENV'].DS.'propel'.DS.'model'.DS
             .parent::getClassFilePath(),
             THELIA_ROOT
         ), '/');

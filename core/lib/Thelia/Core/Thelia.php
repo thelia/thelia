@@ -21,6 +21,7 @@ namespace Thelia\Core;
  * @author Manuel Raynaud <manu@raynaud.io>
  */
 
+use Composer\Autoload\ClassLoader;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\DataFetcher\PDODataFetcher;
 use Propel\Runtime\Propel;
@@ -84,6 +85,12 @@ class Thelia extends Kernel
 
     public function __construct($environment, $debug)
     {
+        $loader = new ClassLoader();
+
+        $loader->addPsr4('', THELIA_ROOT."var/cache/{$environment}/propel/model");
+        $loader->addPsr4('TheliaMain\\', THELIA_ROOT."var/cache/{$environment}/propel/database/TheliaMain");
+        $loader->register();
+
         parent::__construct($environment, $debug);
 
         if ($debug) {

@@ -53,7 +53,7 @@ if (!$bootstraped) {
 
 (new \Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/.env');
 
-$thelia = new App\Kernel('dev', true);
+$thelia = new App\Kernel($_ENV['APP_ENV'], true);
 
 $thelia->boot();
 

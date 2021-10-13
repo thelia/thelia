@@ -135,10 +135,8 @@
         "psr-4": {
             "Thelia\\": "core/lib/Thelia",
             "": [
-                "local/modules/",
-                "var/cache/propel/model"
+                "local/modules/"
             ],
-            "TheliaMain\\": "var/cache/propel/database/TheliaMain",
             "App\\": "src/"
         },
         "files": [

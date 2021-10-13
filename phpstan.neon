@@ -5,3 +5,5 @@ parameters:
     tmpDir: var/cache-ci/phpstan
     paths:
         - core
+    bootstrapFiles:
+        - phpstan_autoload.php

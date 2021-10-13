@@ -139,7 +139,7 @@ class PropelInitService
      */
     public function getPropelModelDir()
     {
-        return TheliaMain_BUILD_MODEL_PATH;
+        return $this->getPropelCacheDir().'model'.DS;
     }
 
     /**
@@ -147,7 +147,7 @@ class PropelInitService
      */
     public function getPropelDatabaseDir()
     {
-        return TheliaMain_BUILD_DATABASE_PATH;
+        return $this->getPropelCacheDir().'database'.DS;
     }
 
     /**

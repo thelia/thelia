@@ -10,13 +10,6 @@
  * file that was distributed with this source code.
  */
 
-if (version_compare(\PHP_VERSION, '7.2', '<')) {
-    exit(sprintf(
-        "Thelia needs at least php 7.2, but you are using php %s. Please upgrade before using Thelia.\n",
-        \PHP_VERSION
-    ));
-}
-
 /*
  * Thelia essential definitions
  */
@@ -93,12 +86,9 @@ if (!defined('THELIA_SETUP_WIZARD_DIRECTORY')) {
     define('THELIA_SETUP_WIZARD_DIRECTORY', THELIA_ROOT.'web'.DS.'install'.DS);
 }
 
-// this will be used in our Propel model builders
-if (!defined('TheliaMain_BUILD_MODEL_PATH')) {
-    define('TheliaMain_BUILD_MODEL_PATH', THELIA_CACHE_DIR.'propel'.DS.'model'.DS);
-}
-
-// this will be used in our Propel model builders
-if (!defined('TheliaMain_BUILD_DATABASE_PATH')) {
-    define('TheliaMain_BUILD_DATABASE_PATH', THELIA_CACHE_DIR.'propel'.DS.'database'.DS);
+if (version_compare(\PHP_VERSION, '7.2', '<')) {
+    exit(sprintf(
+        "Thelia needs at least php 7.2, but you are using php %s. Please upgrade before using Thelia.\n",
+        \PHP_VERSION
+    ));
 }
