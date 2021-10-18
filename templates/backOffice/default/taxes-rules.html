@@ -207,6 +207,33 @@
                             </table>
                         </div>
                     </div>
+
+                    <div class="general-block-decorator">
+                        <div class="title">
+                            {intl l="Tax rule for delivery modules"}
+                        </div>
+                        <div class="row">
+                            <form action="{url path='/admin/configuration/taxes_rules/delivery_module/update'}" method="POST">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <div class="form-group">
+                                            <select id="delivery_module_tax_rule_field" name="delivery-module-tax-rule" class="form-control">
+                                                <option value="">{intl l="Select a tax tule"}</option>
+                                                {loop name="tax" type="tax-rule" backend_context="1"}
+                                                    <option value="{$ID}" {if $ID == $taxruleIdDeliveryModule|default:null}selected="selected"{/if}>{$TITLE}</option>
+                                                {/loop}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default btn-success" type="submit">{intl l="Save"}</button>
+                                    </span>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
 

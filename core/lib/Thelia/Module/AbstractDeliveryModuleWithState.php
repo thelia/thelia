@@ -12,10 +12,15 @@
 
 namespace Thelia\Module;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\Area;
 use Thelia\Model\AreaDeliveryModuleQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Country;
+use Thelia\Model\OrderPostage;
 use Thelia\Model\State;
+use Thelia\Model\TaxRuleQuery;
+use Thelia\TaxEngine\Calculator;
 
 abstract class AbstractDeliveryModuleWithState extends BaseModule implements DeliveryModuleWithStateInterface
 {
@@ -55,5 +60,25 @@ abstract class AbstractDeliveryModuleWithState extends BaseModule implements Del
     public function getDeliveryMode()
     {
         return 'delivery';
+    }
+
+    public function buildOrderPostage($untaxedPostage, $country, $locale, $taxRuleId = null)
+    {
+        $taxRuleQuery = TaxRuleQuery::create();
+        $taxRuleId = ($taxRuleId) ?: ConfigQuery::read('taxrule_id_delivery_module');
+        if (null !== $taxRuleId) {
+            $taxRuleQuery->filterById($taxRuleId);
+        }
+        $taxRule = $taxRuleQuery->orderByIsDefault(Criteria::DESC)->findOne();
+
+        $orderPostage = new OrderPostage();
+        $taxCalculator = new Calculator();
+        $taxCalculator->loadTaxRuleWithoutProduct($taxRule, $country);
+
+        $orderPostage->setAmount($taxCalculator->getTaxedPrice($untaxedPostage));
+        $orderPostage->setAmountTax($taxCalculator->getTaxAmountFromUntaxedPrice($untaxedPostage));
+        $orderPostage->setTaxRuleTitle($taxRule->setLocale($locale)->getTitle());
+
+        return $orderPostage;
     }
 }

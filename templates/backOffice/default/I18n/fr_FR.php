@@ -1103,6 +1103,7 @@ return [
     'Tax created on %date_create. Last modification: %date_change' => 'Taxe créée le %date_create. Dernière modification: %date_change',
     'Tax rule created on %date_create. Last modification: %date_change' => 'Règle de taxe créée le %date_create. Dernière modification le %date_change',
     'Tax rules' => 'Règles de taxes',
+    'Tax rule for delivery modules' => 'Règle de taxe pour les modules de livraison',
     'Tax rules are combination of different taxes.' => 'Les règles de taxe sont une combinaison de différentes taxes.',
     'Tax total' => 'Total des taxes',
     'Taxed total' => 'Prix TTC',
