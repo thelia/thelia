@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -22,10 +23,12 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleCountryQuery;
 use Thelia\Model\TaxRuleQuery;
+use Thelia\Tools\URL;
 
 class TaxRuleController extends AbstractCrudController
 {
@@ -205,7 +208,9 @@ class TaxRuleController extends AbstractCrudController
         // We always return to the feature edition form
         return $this->render(
             'taxes-rules',
-            []
+            [
+                'taxruleIdDeliveryModule' => ConfigQuery::read('taxrule_id_delivery_module'),
+            ]
         );
     }
 
@@ -423,5 +428,22 @@ class TaxRuleController extends AbstractCrudController
         ];
 
         return $data;
+    }
+
+    /**
+     * @Route("/admin/configuration/taxes_rules/delivery_module/update", name="admin.configuration.tax-rule.delivery.modules.update", methods="POST")
+     */
+    public function updateDeliveryModulesTaxRule()
+    {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $data = $this->getRequest()->request;
+        $taxruleId = $data->get('delivery-module-tax-rule');
+
+        ConfigQuery::write('taxrule_id_delivery_module', $taxruleId);
+
+        return $this->generateRedirect(URL::getInstance()->absoluteUrl('admin/configuration/taxes_rules'));
     }
 }
