@@ -88,7 +88,7 @@
                                                 <td>{$ISOCODE}</td>
                                                 <td>{$ISOALPHA3}</td>
                                                 <td>
-                                                    {loop type="area" name="country-area" country={$ID}}
+                                                    {loop type="area" name="country-area" country={$ID} group_by_country_area=1}
                                                         <a href="{url path="/admin/configuration/shipping_configuration/update/%id" id=$ID}">{$NAME}</a>{if $LOOP_COUNT < $LOOP_TOTAL},{/if}
                                                     {/loop}
                                                     {elseloop rel="country-area"}
