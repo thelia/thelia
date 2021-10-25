@@ -114,7 +114,7 @@ class Form extends AbstractSmartyPlugin
             return $content;
         }
 
-        $name = $this->getParam($params, 'name');
+        $name = $askedName = $this->getParam($params, 'name');
         $formType = $this->getParam($params, 'type', FormType::class);
         $data = $this->getParam($params, 'data', []);
 
@@ -125,7 +125,7 @@ class Form extends AbstractSmartyPlugin
         if (!isset($this->formDefinition[$name])) {
             $name = array_search($name, $this->formDefinition);
             if (false === $name) {
-                throw new ElementNotFoundException(sprintf('%s form does not exists', $name));
+                throw new ElementNotFoundException(sprintf('%s form does not exists', $askedName));
             }
         }
 
