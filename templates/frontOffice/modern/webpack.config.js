@@ -10,8 +10,6 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
   Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
 }
 
-const publicPath = '/dist/';
-
 // GENERAL
 Encore.configureFriendlyErrorsPlugin((options) => {
   options.clearConsole = true;
@@ -32,7 +30,11 @@ Encore.addEntry('app', './assets/js/app.js')
   .addEntry('delivery', './assets/js/routes/delivery');
 
 Encore.setOutputPath('dist/')
-  .setPublicPath(publicPath)
+  .setPublicPath(
+    process.env.NODE_ENV === 'production'
+      ? '/assets/frontOffice/' + path.basename(__dirname)
+      : '/dist'
+  )
   .addAliases({
     '@components': path.resolve(__dirname, './components'),
     '@js': path.resolve(__dirname, './assets/js'),
@@ -49,10 +51,12 @@ Encore.setOutputPath('dist/')
   .enableSingleRuntimeChunk()
   .enableSourceMaps(!Encore.isProduction())
   .enableVersioning(Encore.isProduction())
-  .setManifestKeyPrefix('dist/');
+  .setManifestKeyPrefix('');
 
 // CSS CONFIG
 Encore.enablePostCssLoader();
+
+Encore.cleanupOutputBeforeBuild();
 
 // IMAGES CONFIG
 Encore.copyFiles({
@@ -112,7 +116,7 @@ Encore.addPlugin(
 );
 
 Encore.configureManifestPlugin((options) => {
-  options.removeKeyHash = /(?<=dist\/sprite\.)(\w*\.)(?=svg)/;
+  options.removeKeyHash = /(?<=sprite\.)(\w*\.)(?=svg)/;
 });
 
 // SERVER CONFIG
