@@ -371,6 +371,9 @@ class Thelia extends Kernel
 
     private function preBoot(): ContainerInterface
     {
+        if (!Thelia::isInstalled()) {
+            throw new \Exception("Thelia is not installed");
+        }
         if ($this->debug) {
             $this->startTime = microtime(true);
         }
