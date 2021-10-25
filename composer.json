@@ -75,7 +75,8 @@
         "thelia/custom-delivery-module": "dev-main",
         "thelia/store-seo-module": "2.0.1",
         "thelia/better-seo-module": "2.0.0",
-        "thelia/force-phone-module": "dev-main"
+        "thelia/force-phone-module": "dev-main",
+        "thelia/invoice-ref": "dev-main"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",
