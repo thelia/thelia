@@ -185,7 +185,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     public function getSearchIn()
     {
         return array_merge(
-            ['ref'],
+            ['id', 'ref'],
             $this->getStandardI18nSearchFields()
         );
     }
@@ -207,6 +207,13 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             switch ($searchInElement) {
                 case 'ref':
                     $search->filterByRef($searchTerm, $searchCriteria);
+                    break;
+                case 'id':
+                    $search->where(
+                        "`product`.`id` $searchCriteria ?",
+                        $searchTerm,
+                        \PDO::PARAM_STR
+                    );
                     break;
             }
         }

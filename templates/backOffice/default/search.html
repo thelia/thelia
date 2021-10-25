@@ -36,7 +36,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                {if $searchTerm|strlen > 2}
+                {if $searchTerm|strlen > 0}
                 {* customer search *}
                 <div class="general-block-decorator">
                     <div class="table-responsive">
@@ -369,7 +369,7 @@
                             </thead>
 
                             <tbody>
-                            {loop type="product" name="product-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="ref,title,chapo,description,postscriptum" return_url=false  limit=26}
+                            {loop type="product" name="product-search" backend_context=1 visible="*" search_mode="sentence" search_term=$searchTerm search_in="id,ref,title,chapo,description,postscriptum" return_url=false  limit=26}
                             {if $LOOP_COUNT < 26}
                                 {$id_product=$ID}
                                  <tr>
