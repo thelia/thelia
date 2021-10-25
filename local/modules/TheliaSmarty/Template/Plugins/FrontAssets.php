@@ -40,6 +40,12 @@ class FrontAssets extends AbstractSmartyPlugin
 
     protected $entrypoints;
 
+    /** @var AssetsManager */
+    protected $assetsManager;
+
+    /** @var string */
+    protected $assetsPublicPath;
+
     public function __construct(
         RequestStack $requestStack,
         TaxEngine $taxEngine,
@@ -49,22 +55,32 @@ class FrontAssets extends AbstractSmartyPlugin
         $this->taxEngine = $taxEngine;
         $this->securityContext = $securityContext;
 
-        $assetsPublicPath = rtrim(THELIA_FRONT_ASSETS_PUBLIC_DIR, '/');
+        if (Request::$isAdminEnv) {
+            $this->assetsPublicPath = rtrim(THELIA_WEB_DIR.'assets'.DS.'backOffice'.DS.ConfigQuery::read('active-admin-template'), '/');
+            $this->originDistFolder = THELIA_TEMPLATE_DIR.'backOffice'.DS.ConfigQuery::read('active-admin-template').DS.'dist';
+        } else {
+            $this->assetsPublicPath = rtrim(THELIA_WEB_DIR.'assets'.DS.'frontOffice'.DS.ConfigQuery::read('active-front-template'), '/');
+            $this->originDistFolder = THELIA_TEMPLATE_DIR.'frontOffice'.DS.ConfigQuery::read('active-front-template').DS.'dist';
+        }
 
-        if (!is_dir($assetsPublicPath)) {
+        $this->manifestFilePath = $this->assetsPublicPath.DS.'manifest.json';
+        $this->entrypointsFilePath = $this->assetsPublicPath.DS.'entrypoints.json';
+        $this->assetsManager = AssetsManager::getInstance($this->assetsPublicPath.DS.'entrypoints.json');
+
+        if (!is_dir($this->assetsPublicPath)) {
             $fileSystem = new Filesystem();
-            $origin = THELIA_TEMPLATE_DIR.'frontOffice'.DS.ConfigQuery::read('active-front-template').DS.THELIA_FRONT_ASSETS_BUILD_DIR_NAME;
-            if (!is_dir($origin)) {
+
+            if (!is_dir($this->originDistFolder)) {
                 return;
             }
-            $fileSystem->symlink($origin, $assetsPublicPath);
+            $fileSystem->symlink($this->originDistFolder, $this->assetsPublicPath);
         }
 
-        if (file_exists(THELIA_FRONT_ASSETS_MANIFEST_PATH)) {
-            $this->manifest = json_decode(file_get_contents(THELIA_FRONT_ASSETS_MANIFEST_PATH), true);
+        if (file_exists($this->manifestFilePath)) {
+            $this->manifest = json_decode(file_get_contents($this->manifestFilePath), true);
         }
-        if (file_exists(THELIA_FRONT_ASSETS_ENTRYPOINTS_PATH)) {
-            $json = json_decode(file_get_contents(THELIA_FRONT_ASSETS_ENTRYPOINTS_PATH), true);
+        if (file_exists($this->entrypointsFilePath)) {
+            $json = json_decode(file_get_contents($this->entrypointsFilePath), true);
             $this->entrypoints = $json['entrypoints'];
         }
     }
@@ -156,7 +172,7 @@ class FrontAssets extends AbstractSmartyPlugin
             return $result;
         }
 
-        foreach (AssetsManager::getInstance()->getAssets($arg['entry'], $arg['type']) as $asset) {
+        foreach ($this->assetsManager->getAssets($arg['entry'], $arg['type']) as $asset) {
             if ($arg['type'] === 'js') {
                 $result .= "<script src='$asset' defer></script>";
             }

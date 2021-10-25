@@ -82,7 +82,7 @@ and you use them like:
 You can use the smarty function `{getFileFromManifest file="key/of/your/asset/in/the/manifest"}` to retrieve any assets compiled by Symfony Encore, the `manifest.json` file can be found inside the `dist` directory
 
 ```smarty
-  <link rel="icon" type="image/png" sizes="32x32" href="{getFileFromManifest file="dist/favicons/favicon-32x32.png"}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{getFileFromManifest file="favicons/favicon-32x32.png"}">
 ```
 
 
