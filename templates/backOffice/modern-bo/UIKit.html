@@ -1,0 +1,237 @@
+{extends file="admin-layout.tpl"} 
+
+{block name="main-content"}
+  <div class="h-full bg-gray-800 p-5">
+    <div class="m-10">
+      <h1 class="text-center text-5xl text-white font-bold">Thelia Back Office UI KIT</h1>
+    </div>
+
+    <!-- Colors -->
+
+    <div class="flex p-10">
+      <div class="bg-main w-1/6 shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-200 text-3xl font-bold m-4">#ec6352</div>
+      <div class="bg-darkGray w-1/6 shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-200 text-3xl font-bold m-4">#333333</div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex items-center p-10">
+
+      <div class="mr-5">
+        <button class="bg-main p-3 text-gray-200 rounded-lg font-medium shadow-2xl">Click Me</button>
+      </div>
+      
+      <div class="mr-5">
+        <button class="bg-transparent border-main border-2 p-3 text-gray-200 rounded-lg font-medium shadow-2xl">Click Me</button>
+      </div>
+
+      <div class="mr-5">
+        <button disabled class="bg-main bg-opacity-60 p-3 text-gray-200 rounded-lg font-medium shadow-2xl">Disabled</button>
+      </div>
+
+      <div class="mr-5">
+        <a href="#" class="text-main font-medium">Link Button</a>
+      </div>
+
+      <div class="mr-5">
+        <button class="bg-main p-3 text-gray-200 rounded-full font-medium shadow-2xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="mr-5">
+        <button class="bg-main p-3 text-gray-200 rounded-full font-medium shadow-2xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
+
+    </div>
+
+
+
+    <!-- Inputs -->
+    <div class="flex flex-col p-10">
+
+      <div class="w-1/4 mb-5">
+        <input type="text" class="w-full bg-gray-100 placeholder-gray-500 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main" placeholder="Enter something...">
+      </div>
+
+      <div class="w-1/4 mb-5">
+        <div class="search flex items-center">
+          <div class="search-icon h-auto p-2 rounded-l-lg bg-gray-100 text-main">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input type="search" class="search-input w-full bg-gray-100 placeholder-gray-500 border-0 rounded-r-lg shadow-2xl focus:outline-none" placeholder="Search...">
+        </div>
+      </div>
+
+      <div class="mb-5 w-1/4">
+        <input type="date" class="w-full bg-gray-100 text-gray-500 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main">
+      </div>
+
+      <div class="mb-5 w-1/4">
+        <select class="w-full text-gray-500 rounded-lg">
+          <option disabled selected>Select something...</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- Radio & Checkbox -->
+    <div class="flex p-10 w-1/3">
+      <div class="m-2 text-white w-1/2">
+        <div>
+          <input class="mr-3" id="r1" type="radio" name="thelia-radio">
+          <label for="r1">One</label>
+        </div>
+
+        <div>
+          <input class="mr-3" id="r2" type="radio" name="thelia-radio">
+          <label for="r2">Two</label>
+
+        </div>
+        
+        <div>        
+          <input class="mr-3" id="r3" type="radio" name="thelia-radio">
+          <label for="r3">Three</label>
+        </div>
+      </div>
+
+      <div class="m-2 text-white w-1/2">
+        <div>
+          <input class="mr-3" id="cb1" type="checkbox" name="thelia-checkbox">
+          <label for="cb1">One</label>
+        </div>
+
+        <div>
+          <input class="mr-3" id="cb2" type="checkbox" name="thelia-checkbox">
+          <label for="cb2">Two</label>
+
+        </div>
+        
+        <div>        
+          <input class="mr-3" id="cb3" type="checkbox" name="thelia-checkbox">
+          <label for="cb3">Three</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toggle -->
+    <div class="flex p-10">
+      <div class="m-2 mr-5">
+        <label for="toggle" class="flex items-center cursor-pointer">
+          <div class="mr-3 text-white">
+            Off
+          </div>
+          <div class="relative">
+            <input type="checkbox" id="toggle" class="checkbox sr-only">
+            <div class="block bg-red-500 w-10 h-6 rounded-full"></div>
+            <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+          </div>
+        </label>
+      </div>
+
+      <div class="m-2">
+        <label for="toggle2" class="flex items-center cursor-pointer">
+          <div class="mr-3 text-white">
+            On
+          </div>
+          <div class="relative">
+            <input type="checkbox" checked id="toggle2" class="checkbox sr-only">
+            <div class="block bg-red-500 w-10 h-6 rounded-full"></div>
+            <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+
+    <div class="flex p-10">
+      <div class="m-2 flex flex-col text-gray-100">
+        <span class="mb-3 text-4xl font-bold">I'm a Title</span>
+        <span class="mb-3 text-2xl font-semibold">I'm a Subtitle</span>
+        <span class="mb-3">I'm a Regular Text</span>
+      </div>
+    </div>
+
+
+    <!-- Pills -->
+    <div class="flex p-10">
+
+      <div class="m-2">
+        <div class="px-4 py-1 bg-gray-500 rounded-3xl text-white">78346</div>
+      </div>
+
+      <div class="m-2">
+        <div class="px-4 py-1 bg-yellow-300 rounded-3xl text-white">4</div>  
+      </div>
+
+      <div class="m-2">
+        <div class="px-4 py-1 bg-blue-500 rounded-3xl text-white">54743</div>  
+      </div>
+
+      <div class="m-2">
+        <div class="px-4 py-1 bg-green-500 rounded-3xl text-white">18615</div>  
+      </div>
+
+      <div class="m-2">
+        <div class="px-4 py-1 bg-red-500 rounded-3xl text-white">198</div>  
+      </div>
+
+    </div>
+
+
+    <!-- Icons -->
+    <div class="flex p-10">
+
+      <div class="m-2">
+        <div class="p-3 rounded-full bg-gray-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="m-2">
+        <div class="p-3 rounded-full bg-gray-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="m-2">
+        <div class="p-3 rounded-md bg-main text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      </div>
+
+    </div>
+    
+    <!-- Panel -->
+    <div class="flex p-10">
+
+      <div class="m-2 w-1/3">
+        <div class="bg-white rounded-lg h-52 shadow-2xl p-5">
+          <h1 class="text-2xl font-semibold text-center">Panel</h1>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+{/block}
