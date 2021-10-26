@@ -12,8 +12,7 @@ module.exports = {
     extend: {
       colors: {
         main: '#ec6352',
-        darkGray: '#333333',
-        thelia: '#f39922'
+        darkGray: '#333333'
       }
     }
   },
