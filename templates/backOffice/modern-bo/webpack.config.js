@@ -5,6 +5,7 @@ const chokidar = require('chokidar');
 const Encore = require('@symfony/webpack-encore');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const path = require('path');
+const webpack = require('webpack');
 
 if (!Encore.isRuntimeEnvironmentConfigured()) {
   Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
@@ -37,7 +38,12 @@ Encore.setOutputPath('dist/')
   .enableSingleRuntimeChunk()
   .enableSourceMaps(!Encore.isProduction())
   .enableVersioning(Encore.isProduction())
-  .setManifestKeyPrefix('');
+  .setManifestKeyPrefix('')
+  .addPlugin(
+    new webpack.ProvidePlugin({
+      TheliaJS: 'TheliaJS'
+    })
+  );
 
 Encore.cleanupOutputBeforeBuild();
 

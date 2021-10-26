@@ -1,1 +1,13 @@
 {extends file="admin-layout.tpl"}
+
+{block name="javascript" append}
+  {literal}
+    <script type="module">
+    const {ReactDOM, html} = TheliaJS;
+    window.addEventListener('DOMContentLoaded', () => {
+      ReactDOM.render(html`<div>This is a test!</div>`, document.body.querySelector('main'));
+    })
+
+    </script>
+  {/literal}
+{/block}
