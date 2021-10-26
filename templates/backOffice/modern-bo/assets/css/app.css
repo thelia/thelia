@@ -6,3 +6,11 @@
 
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+.checkbox:checked ~ .dot {
+  transform: translateX(100%);
+}
+
+.checkbox:checked ~ .block {
+  background-color: #48bb78;
+}
