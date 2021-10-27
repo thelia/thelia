@@ -54,6 +54,16 @@ Encore.configureManifestPlugin((options) => {
   options.removeKeyHash = /(?<=sprite\.)(\w*\.)(?=svg)/;
 });
 
+Encore.copyFiles({
+  from: './assets/images',
+  to: 'images/[path][name].[ext]',
+  pattern: /\.(png|jpg|jpeg|gif|svg|webp)$/
+}).copyFiles({
+  from: './assets/favicons',
+  to: 'favicons/[path][name].[ext]',
+  pattern: /\.(png|jpg|jpeg|gif|ico|svg|webp|webmanifest)$/
+});
+
 // SERVER CONFIG
 Encore.configureDevServerOptions((options) => {
   options.headers = {
