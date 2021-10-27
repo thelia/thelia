@@ -1,21 +1,19 @@
 import { CartItems, MiniCartFooter } from '../MiniCart/MiniCart';
 import React, { Suspense, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useCartQuery, useGetCheckout } from '@openstudio/thelia-api-utils';
 
 import AddressBook from './AddressBook';
-
 import CheckoutBtn from './CheckoutBtn';
 import { ReactComponent as CloseIcon } from '@icons/drop-down.svg';
 import DeliveryModes from './DeliveryModes';
 import DeliveryModules from './DeliveryModules';
 import Loader from '../Loader';
 import PaymentModules from './PaymentModules';
+import PhoneCheck from '../PhoneCheck';
 import PickupMap from '../PickupMap';
 import Title from '../Title';
-
-import { useCartQuery, useGetCheckout } from '@openstudio/thelia-api-utils';
 import { useIntl } from 'react-intl';
-import PhoneCheck from '../PhoneCheck';
+import { useSelector } from 'react-redux';
 
 function LoadingBlock() {
   return (
@@ -74,6 +72,10 @@ function Sidebar() {
   const { data: cart = {} } = useCartQuery();
   const [cartOpen, setCartOpen] = useState(true);
   const { deliveryModuleOption } = useSelector((state) => state.checkout);
+
+
+  if(cart?.items?.length < 1 ) window.location = "/";
+
   return (
     <div className="">
       <div className="shadow panel">
