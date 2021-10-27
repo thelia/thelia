@@ -27,7 +27,8 @@ use Thelia\TaxEngine\Calculator;
  */
 class ProductTaxedPricesExport extends JsonFileAbstractExport
 {
-    protected Calculator $calculator;
+    /** @var Calculator */
+    protected $calculator;
 
     public function __construct()
     {
