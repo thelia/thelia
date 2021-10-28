@@ -17,18 +17,18 @@
                     <tbody>
                     <tr>
                         <th>{intl l="Overall sales"  d='hookadminhome.bo.default'}</th>
-                        <td>{format_money number={stats key="sales" startDate="today" endDate="today"} symbol=$defaultCurrency}</td>
+                        <td>{format_money number={stats key="sales" startDate="today" endDate="today"} symbol=$defaultCurrency|default:'€'}</td>
                     </tr>
                     <tr>
                         <th>{intl l="Sales excluding shipping" d='hookadminhome.bo.default'}</th>
                         <td>
                             {$salesNoShipping = {stats key="sales" startDate="today" endDate="today" includeShipping="false"}}
-                            {format_money number=$salesNoShipping symbol=$defaultCurrency}
+                            {format_money number=$salesNoShipping symbol=$defaultCurrency|default:'€'}
                         </td>
                     </tr>
                     <tr>
                         <th>{intl l="Yesterday sales" d='hookadminhome.bo.default'}</th>
-                        <td>{format_money number={stats key="sales" startDate="yesterday" endDate="yesterday"} symbol=$defaultCurrency}</td>
+                        <td>{format_money number={stats key="sales" startDate="yesterday" endDate="yesterday"} symbol=$defaultCurrency|default:'€'}</td>
                     </tr>
                     <tr>
                         <th>{intl l="Orders" d='hookadminhome.bo.default'}</th>
@@ -41,9 +41,9 @@
                         <th>{intl l="Average cart" d='hookadminhome.bo.default'}</th>
                         <td>
                             {if $orderCount == 0}
-                                {format_money number=0 symbol=$defaultCurrency}
+                                {format_money number=0 symbol=$defaultCurrency|default:'€'}
                             {else}
-                                {format_money number={($salesNoShipping/$orderCount)|round:"2"} symbol=$defaultCurrency}
+                                {format_money number={($salesNoShipping/$orderCount)|round:"2"} symbol=$defaultCurrency|default:'€'}
                             {/if}
                         </td>
                     </tr>
@@ -62,18 +62,18 @@
                     <tbody>
                     <tr>
                         <th>{intl l="Overall sales" d='hookadminhome.bo.default'}</th>
-                        <td>{format_money number={stats key="sales" startDate="this_year" endDate="this_year"} symbol=$defaultCurrency}</td>
+                        <td>{format_money number={stats key="sales" startDate="this_year" endDate="this_year"} symbol=$defaultCurrency|default:'€'}</td>
                     </tr>
                     <tr>
                         <th>{intl l="Sales excluding shipping" d='hookadminhome.bo.default'}</th>
                         <td>
                             {$salesNoShipping = {stats key="sales" startDate="this_year" endDate="this_year" includeShipping="false"}}
-                            {format_money number=$salesNoShipping symbol=$defaultCurrency}
+                            {format_money number=$salesNoShipping symbol=$defaultCurrency|default:'€'}
                         </td>
                     </tr>
                     <tr>
                         <th>{intl l="Previous year sales" d='hookadminhome.bo.default'}</th>
-                        <td>{format_money number={stats key="sales" startDate="last_year" endDate="last_year"} symbol=$defaultCurrency}</td>
+                        <td>{format_money number={stats key="sales" startDate="last_year" endDate="last_year"} symbol=$defaultCurrency|default:'€'}</td>
                     </tr>
                     <tr>
                         <th>{intl l="Orders" d='hookadminhome.bo.default'}</th>
@@ -86,9 +86,9 @@
                         <th>{intl l="Average cart" d='hookadminhome.bo.default'}</th>
                         <td>
                             {if $orderCount == 0}
-                                {format_money number=0 symbol=$defaultCurrency}
+                                {format_money number=0 symbol=$defaultCurrency|default:'€'}
                             {else}
-                                {format_money number={($salesNoShipping/$orderCount)|round:"2"} symbol=$defaultCurrency}
+                                {format_money number={($salesNoShipping/$orderCount)|round:"2"} symbol=$defaultCurrency|default:'€'}
                             {/if}
                         </td>
                     </tr>
