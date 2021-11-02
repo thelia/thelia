@@ -1,6 +1,7 @@
 import { CartItems, MiniCartFooter } from '../MiniCart/MiniCart';
-import React, { Suspense, useState } from 'react';
-import { useCartQuery, useGetCheckout } from '@openstudio/thelia-api-utils';
+import React, { Suspense, useEffect, useState } from 'react';
+import { useCartQuery, useGetCheckout, useSimpleDeliveryModulessQuery } from '@openstudio/thelia-api-utils';
+import { useDispatch, useSelector } from 'react-redux';
 
 import AddressBook from './AddressBook';
 import CheckoutBtn from './CheckoutBtn';
@@ -12,8 +13,9 @@ import PaymentModules from './PaymentModules';
 import PhoneCheck from '../PhoneCheck';
 import PickupMap from '../PickupMap';
 import Title from '../Title';
+import { setMode } from '@redux/modules/checkout';
+import {uniq} from "lodash-es";
 import { useIntl } from 'react-intl';
-import { useSelector } from 'react-redux';
 
 function LoadingBlock() {
   return (
@@ -25,10 +27,21 @@ function LoadingBlock() {
 
 function MainContent() {
   const intl = useIntl();
-
+  const dispatch = useDispatch();
   const { mode: selectedMode } = useSelector((state) => state.checkout);
   const { data: checkout } = useGetCheckout();
-
+  const { data: modules } = useSimpleDeliveryModulessQuery();
+  
+  useEffect(() => {
+    const uniqModuleMode = uniq(modules?.map(module => module.deliveryMode));
+    if(uniqModuleMode.length === 1 && selectedMode === null) {
+      dispatch(setMode(uniqModuleMode[0]))
+    }
+    else if (uniqModuleMode.length > 0 && selectedMode && !uniqModuleMode.find((mode) => mode === selectedMode)) {
+      dispatch(setMode(uniqModuleMode[0]))
+    }
+  },[modules,dispatch,selectedMode])
+  
   return (
     <div>
       <div className="">

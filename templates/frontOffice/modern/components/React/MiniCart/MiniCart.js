@@ -227,7 +227,7 @@ export function MiniCartFooter({ delivery, taxes, discount, coupon, total }) {
         />
         {delivery !== null ? (
           <FooterItem
-            label={intl.formatMessage({ id: 'DELIVERY' })}
+            label={intl.formatMessage({ id: 'DELIVERY_GENERAL' })}
             value={priceFormat(delivery)}
           />
         ) : null}

@@ -1857,10 +1857,10 @@
     error-stack-parser "^2.0.0"
     string-width "^2.0.0"
 
-"@openstudio/thelia-api-utils@^0.4.3":
-  version "0.4.6"
-  resolved "https://registry.yarnpkg.com/@openstudio/thelia-api-utils/-/thelia-api-utils-0.4.6.tgz#eb0897dbcdcbf948c7aa5d5d0151575baecc4516"
-  integrity sha512-H6+NLHegZsDflom57Sj49Lq8DS1UWZlLGLWeqHy0LFb3Z48wbWFR8rsTZIwDMmcz2g4sl4fUwgFnDWlqBriQiw==
+"@openstudio/thelia-api-utils@^0.4.9":
+  version "0.4.9"
+  resolved "https://registry.yarnpkg.com/@openstudio/thelia-api-utils/-/thelia-api-utils-0.4.9.tgz#e450c2522dc6b3a4031cd409d5e892a7a1ae474e"
+  integrity sha512-yv2t3ypjJYtR3XDKdoc9Ceh6tLSbNeXAUwpqnlK4IjB1fY9AnZMpV4O528oBGE2Pmkpt1jGFNVgZDotoidlWSA==
   dependencies:
     axios "^0.21.1"
     qs "^6.10.1"

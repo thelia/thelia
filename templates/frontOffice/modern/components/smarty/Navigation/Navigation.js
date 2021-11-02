@@ -1,8 +1,11 @@
 import MmenuLight from 'mmenu-light';
 
 export default function Listener() {
-  const menu = new MmenuLight(document.querySelector('#MainNavigation'));
-
+  const target = document.querySelector('#MainNavigation');
+  if(!target) return null;
+  
+  const menu = new MmenuLight(target);
+  
   menu.navigation();
   const drawer = menu.offcanvas();
 

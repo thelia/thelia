@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
-  mode: 'delivery'
+let initialState = {
+  mode: null
 };
 
 export const checkoutSlice = createSlice({
