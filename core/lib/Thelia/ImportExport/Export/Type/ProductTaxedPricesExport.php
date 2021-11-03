@@ -14,6 +14,9 @@ namespace Thelia\ImportExport\Export\Type;
 
 use Propel\Runtime\Propel;
 use Thelia\ImportExport\Export\JsonFileAbstractExport;
+use Thelia\Model\ProductQuery;
+use Thelia\Model\TaxRuleQuery;
+use Thelia\TaxEngine\Calculator;
 
 /**
  * Class ProductTaxedPricesExport.
@@ -24,6 +27,14 @@ use Thelia\ImportExport\Export\JsonFileAbstractExport;
  */
 class ProductTaxedPricesExport extends JsonFileAbstractExport
 {
+    /** @var Calculator */
+    protected $calculator;
+
+    public function __construct()
+    {
+        $this->calculator = new Calculator();
+    }
+
     public const FILE_NAME = 'product_taxed_price';
 
     protected $orderAndAliases = [
@@ -49,6 +60,7 @@ class ProductTaxedPricesExport extends JsonFileAbstractExport
                         product_sale_elements.id as "product_sale_elements_id",
                         product_sale_elements.product_id as "product_sale_elements_product_id",
                         product_i18n.title as "product_i18n_title",
+                        product.id as "product_id",
                         attribute_av_i18n.title as "attribute_av_i18n_title",
                         product_sale_elements.ean_code as "product_sale_elements_ean_code",
                         product_price.price as "product_price_price",
@@ -73,5 +85,27 @@ class ProductTaxedPricesExport extends JsonFileAbstractExport
         $stmt->execute();
 
         return $this->getDataJsonCache($stmt, 'product_taxed_prices');
+    }
+
+    public function current()
+    {
+        $data = parent::current();
+
+        if (!\array_key_exists('tax_rule_i18n_id', $data)) {
+            $taxRule = TaxRuleQuery::create()
+                ->filterById($data['tax_rule_i18n_id'])
+                ->findOne();
+
+            $product = ProductQuery::create()
+                ->filterById($data['product_id'])
+                ->findOne();
+
+            $this->calculator->loadTaxRuleWithoutCountry($taxRule, $product);
+
+            $data['product_price_price'] = $this->calculator->getTaxedPrice($data['product_price_price']);
+            $data['product_price_promo_price'] = $this->calculator->getTaxedPrice($data['product_price_promo_price']);
+        }
+
+        return $data;
     }
 }
