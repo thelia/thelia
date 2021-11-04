@@ -9,10 +9,30 @@ module.exports = {
   darkMode: false,
 
   theme: {
+    maxWidth: {
+      80: '80%'
+    },
+    minWidth: {
+      80: '80%'
+    },
     extend: {
       colors: {
-        main: '#ec6352',
-        darkGray: '#333333'
+        main: '#EC6351',
+        darkMain: '#E25441',
+        lightCharbon: '#444444',
+        mediumCharbon: '#333333',
+        darkCharbon: '#222222',
+        grey: '#707070',
+        mediumGrey: '#A7A7A7',
+        lightGrey: '#EBEBEB',
+        lightPearl: '#F7F7F7',
+        mediumPearl: '#F5F5F5',
+        carot: '#FC9722',
+        green: '#73CE6F',
+        blue: '#1E9AE8',
+        error: '#D10000',
+        danger: '#FDE2E2',
+        success: '#D1FAE5'
       }
     }
   },
