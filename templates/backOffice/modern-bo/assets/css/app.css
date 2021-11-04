@@ -7,10 +7,75 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-.checkbox:checked ~ .dot {
+* {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.switch:checked ~ .dot {
   transform: translateX(100%);
 }
 
-.checkbox:checked ~ .block {
+.switch:checked ~ .block {
   background-color: #48bb78;
+}
+
+.SimpleLayout {
+  @apply bg-lightGrey;
+}
+
+.Checkbox:checked {
+  @apply text-mediumCharbon;
+}
+
+.Checkbox {
+  border-radius: 0.25rem;
+}
+
+.Checkbox:focus {
+  @apply outline-none ring-darkMain;
+}
+
+.Radio:checked {
+  @apply text-mediumCharbon;
+}
+
+.Radio {
+  border-radius: 100%;
+}
+
+.Radio:focus {
+  @apply outline-none ring-darkMain;
+}
+
+#page {
+  display: grid;
+  grid-template-areas:
+    'head head'
+    'sidebar content';
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: 60px auto;
+}
+
+#page > #header {
+  grid-area: head;
+}
+
+#page > #sidebar {
+  grid-area: sidebar;
+}
+
+#page > #main {
+  grid-area: content;
+}
+
+.sidebar-item:hover {
+  @apply bg-darkCharbon;
+}
+
+.sidebar-item:hover span {
+  @apply text-lightGrey;
+}
+
+.sidebar-item:hover i {
+  @apply text-main;
 }
