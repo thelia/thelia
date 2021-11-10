@@ -66,7 +66,7 @@ abstract class AbstractDeliveryModuleWithState extends BaseModule implements Del
     {
         $taxRuleQuery = TaxRuleQuery::create();
         $taxRuleId = ($taxRuleId) ?: ConfigQuery::read('taxrule_id_delivery_module');
-        if (null !== $taxRuleId) {
+        if ($taxRuleId) {
             $taxRuleQuery->filterById($taxRuleId);
         }
         $taxRule = $taxRuleQuery->orderByIsDefault(Criteria::DESC)->findOne();
