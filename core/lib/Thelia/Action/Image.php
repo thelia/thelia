@@ -149,8 +149,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                                 $image->rotate(-90, $color->color('#F00'));
                                 break;
                         }
-                    }
-                    
+                    }                    
                     // Allow image pre-processing (watermarging, or other stuff...)
                     $event->setImageObject($image);
                     $dispatcher->dispatch($event, TheliaEvents::IMAGE_PREPROCESSING);
