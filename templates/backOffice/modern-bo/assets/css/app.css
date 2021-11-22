@@ -80,3 +80,9 @@
 .sidebar-item:hover i {
   @apply text-main;
 }
+
+.dropdown:hover .dropdown-menu {
+  opacity: 1;
+  transform: translate(0) scale(1);
+  visibility: visible;
+}
