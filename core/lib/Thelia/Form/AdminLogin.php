@@ -44,13 +44,13 @@ class AdminLogin extends BruteforceForm
                 ],
             ])
             ->add('remember_me', CheckboxType::class, [
-                    'value' => 'yes',
-                    'label' => Translator::getInstance()->trans('Remember me ?'),
-                    'label_attr' => [
-                        'for' => 'remember_me',
-                    ],
-            ])
-            ;
+                'value' => 'yes',
+                'label' => Translator::getInstance()->trans('Remember me ?'),
+                'label_attr' => [
+                    'for' => 'remember_me',
+                ],
+                'required' => false
+            ]);
     }
 
     public static function getName()

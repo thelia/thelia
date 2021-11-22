@@ -1,51 +1,13 @@
 {$admin_current_location = $admin_current_location|default:null}
 {hook name="main.before-top-menu" location="before_top_menu" }
-<ul class="nav in" id="side-menu">
+<ul id="side-menu">
 
-    <li class="" id="home_menu">
+    <li id="home_menu">
         <a href="{url path='/admin/home'}" title="{intl l="Home"}" class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
-            <i class="fas fa-home ml-5 mr-7 text-white"></i>
+            <i class="fas fa-tachometer-alt ml-5 mr-7 text-white"></i>
             <span class="text-mediumGrey">{intl l="Home"}</span>
         </a>
     </li>
-
-    {loop name="menu-auth-customer" type="auth" role="ADMIN" resource="admin.customer" access="VIEW"}
-        {ifhook rel="main.top-menu-customer"}
-            {hookblock name="main.top-menu-customer" fields="id,class,url,title"}
-                <li class="{if $admin_current_location == 'customer'}bg-darkCharbon{/if}" id="customers_menu">
-
-                    <a title="{intl l="Customers"}" href="#collapse-customer" class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
-                        <i class="fas fa-users ml-5 mr-7 text-white"></i>
-                        <span class="text-mediumGrey">{intl l="Customers"}</span>
-                        <i class="fas fa-chevron-right menu-collapse text-mediumGrey"></i>
-                    </a>
-
-                    <ul id="collapse-customer" class="collapse {if $admin_current_location == 'customer'}in{/if}" role="menu">
-                        <li role="menuitem" id="customers_menu">
-                            <a href="{url path='/admin/customers'}" title="{intl l="Customers"}">
-                                {intl l="Customers"}
-                            </a>
-                        </li>
-                        {forhook rel="main.top-menu-customer"}
-                            <li role="menuitem">
-                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
-                                    {$title}
-                                </a>
-                            </li>
-                        {/forhook}
-                    </ul>
-                </li>
-            {/hookblock}
-        {/ifhook}
-        {elsehook rel="main.top-menu-customer"}
-            <li class="{if $admin_current_location == 'customer'}bg-darkCharbon{/if}" id="customers_menu">
-                <a href="{url path='/admin/customers'}" title="{intl l="Customers"}" class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
-                    <i class="fas fa-users ml-5 mr-7 text-white"></i>
-                    <span class="text-mediumGrey">{intl l="Customers"}</span>
-                </a>
-            </li>
-        {/elsehook}
-    {/loop}
 
     {loop name="menu-auth-order" type="auth" role="ADMIN" resource="admin.order" access="VIEW"}
     <li class="{if $admin_current_location == 'order'}bg-darkCharbon{/if}" id="orders_menu">
@@ -87,6 +49,44 @@
             {/hookblock}
         </ul> *}
     </li>
+    {/loop}
+
+    {loop name="menu-auth-customer" type="auth" role="ADMIN" resource="admin.customer" access="VIEW"}
+        {ifhook rel="main.top-menu-customer"}
+            {hookblock name="main.top-menu-customer" fields="id,class,url,title"}
+                <li class="{if $admin_current_location == 'customer'}bg-darkCharbon{/if}" id="customers_menu">
+
+                    <a title="{intl l="Customers"}" href="#collapse-customer" class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
+                        <i class="fas fa-users ml-5 mr-7 text-white"></i>
+                        <span class="text-mediumGrey">{intl l="Customers"}</span>
+                        <i class="fas fa-chevron-right menu-collapse text-mediumGrey"></i>
+                    </a>
+
+                    <ul id="collapse-customer" class="collapse {if $admin_current_location == 'customer'}in{/if}" role="menu">
+                        <li role="menuitem" id="customers_menu">
+                            <a href="{url path='/admin/customers'}" title="{intl l="Customers"}">
+                                {intl l="Customers"}
+                            </a>
+                        </li>
+                        {forhook rel="main.top-menu-customer"}
+                            <li role="menuitem">
+                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                    {$title}
+                                </a>
+                            </li>
+                        {/forhook}
+                    </ul>
+                </li>
+            {/hookblock}
+        {/ifhook}
+        {elsehook rel="main.top-menu-customer"}
+            <li class="{if $admin_current_location == 'customer'}bg-darkCharbon{/if}" id="customers_menu">
+                <a href="{url path='/admin/customers'}" title="{intl l="Customers"}" class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
+                    <i class="fas fa-users ml-5 mr-7 text-white"></i>
+                    <span class="text-mediumGrey">{intl l="Customers"}</span>
+                </a>
+            </li>
+        {/elsehook}
     {/loop}
 
     {loop name="menu-auth-catalog" type="auth" role="ADMIN" resource="admin.category" access="VIEW"}
@@ -280,7 +280,7 @@
 
 </ul>
 
-<div class="sidebar-footer mt-10 mb-5">
+<div class="mb-10">
     <img src="{getFileFromManifest file="images/logos/logo.svg"}" class="max-h-8 mx-auto mb-2" />
     <p class="text-center text-xs text-mediumGrey">V {intl l="{$THELIA_VERSION}"}</p>
 </div>

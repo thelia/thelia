@@ -15,15 +15,15 @@ Encore.configureFriendlyErrorsPlugin((options) => {
   options.clearConsole = true;
 });
 
-Encore.configureBabelPresetEnv((config) => {
-  config.useBuiltIns = 'usage';
-  config.corejs = 3;
-});
-
 Encore.addPlugin(new ESLintPlugin());
+
+Encore.addAliases({
+  '@TheliaJS': path.resolve(__dirname, './assets/js/app.js')
+});
 
 // ENTRIES
 Encore.addEntry('app', './assets/js/app.js');
+Encore.addEntry('category', './assets/js/pages/category/category.js');
 
 console.log(__dirname, path.basename(__dirname));
 
