@@ -1,0 +1,11 @@
+{extends file="admin-layout.tpl"}
+
+{block name="javascript" append}
+  {getAssetsFromEntrypoints entry="category" type="js"}
+{/block}
+
+{block name="main-content"}
+  <div id="categories">
+
+  </div>
+{/block}

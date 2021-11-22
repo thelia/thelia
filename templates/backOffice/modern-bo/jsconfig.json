@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@TheliaJS": ["./assets/js/app.js"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

@@ -29,13 +29,13 @@ name="no-return-functions"}{/block}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
   </head>
 
   <body>
-    <div id="page" class="min-h-screen">
+    <div id="page" class="min-h-screen bg-mediumPearl">
       {* display top bar only if admin is connected *} {loop name="top-bar-auth"
       type="auth" role="ADMIN"} {* -- Brand bar section
       ------------------------------------------------- *} {hook
@@ -43,29 +43,35 @@ name="no-return-functions"}{/block}
 
       <header
         id="header"
-        class="flex items-center justify-between bg-mediumPearl shadow-xl"
+        class="flex items-center justify-between bg-white shadow-lg"
       >
-        {include file="components/Header/header.html"}
+        {include file="components/Header/Header.html"}
       </header>
 
       <aside
         id="sidebar"
-        class="flex flex-col bg-mediumCharbon"
+        class="flex flex-col justify-between bg-mediumCharbon"
         role="navigation"
       >
-        {include file="components/MainMenu/main-menu.html"} {hook
-        name="main.inside-topbar" location="inside_topbar"}
+        {include file="components/SideBar/SideBar.html"}
       </aside>
 
       {hook name="main.after-topbar" location="after_topbar" }
 
-      <main id="main">
+      <main id="main" class="p-10">
         {* -- Main page content section
         ----------------------------------------- *} {hook
         name="main.before-content" location="before_content"} {block
         name="main-content"}Put here the content of the template{/block} {hook
         name="main.after-content" location="after_content"}
       </main>
+
+      <footer
+        id="footer"
+        class="flex items-center justify-between bg-white shadow-xl"
+      >
+        {include file="components/Footer/Footer.html"}
+      </footer>
       {/loop}
     </div>
 

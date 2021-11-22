@@ -30,7 +30,8 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
 
   {block name="meta"}{/block}
 
@@ -46,7 +47,7 @@
 
 <body class="SimpleLayout">
 
-  <div class="flex flex-col justify-center items-center h-screen">
+  <div class="flex flex-col justify-center items-center h-screen my-14">
     {* -- Main page content section ----------------------------------------- *}
     {hook name="main.before-content" location="before_content"}
 
@@ -57,13 +58,8 @@
 
   {hook name="main.before-footer" location="before_footer" }
 
-  <footer class="mb-3">
-    <p class="text-center">&copy; Thelia <time datetime="{'Y-m-d'|date}">{'Y'|date}</time>
-      - <a class="text-main hover:text-darkMain" href="http://www.openstudio.fr/"
-        target="_blank">{intl l='Made with 💙 by OpenStudio'}</a>
-      - <a class="text-main hover:text-darkMain" href="http://thelia.net/forum"
-        target="_blank">{intl l='Need help ?'}</a>
-    </p>
+  <footer class="flex items-center justify-between bg-mediumPearl shadow-xl h-24">
+    {include file="components/Footer/Footer.html"}
 
     {hook name="main.in-footer" location="in_footer" }
   </footer>
