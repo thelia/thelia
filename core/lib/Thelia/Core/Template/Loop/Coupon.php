@@ -96,7 +96,9 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByCode($code, Criteria::IN);
         }
 
-        $search->filterByIsEnabled($isEnabled ? true : false);
+        if (null !== $isEnabled) {
+            $search->filterByIsEnabled($isEnabled);
+        }
 
         $inUse = $this->getInUse();
 
