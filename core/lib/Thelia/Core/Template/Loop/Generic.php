@@ -15,7 +15,6 @@ namespace Thelia\Core\Template\Loop;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Map\TableMap;
-use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
@@ -32,7 +31,7 @@ use TheliaMain\PropelResolver;
  * @method string getLocale()
  * @method string getLimit()()
  */
-class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
+class Generic implements PropelSearchLoopInterface
 {
     /**
      * @return ArgumentCollection
