@@ -80,7 +80,7 @@ class Generic extends BaseLoop implements PropelSearchLoopInterface
         }
 
         $i18nTableMapClass = PropelResolver::getTableMapByTableName($this->getTableName().'_i18n');
-        $useI18nQueryMethod = 'use' . $tableMap->getPhpName().'I18nQuery';
+        $useI18nQueryMethod = 'use'.$tableMap->getPhpName().'I18nQuery';
         if (null !== $i18nTableMapClass && method_exists($query, $useI18nQueryMethod)) {
             $i18nTableMap = new $i18nTableMapClass();
             $i18nQuery = $query->$useI18nQueryMethod();
