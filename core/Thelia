@@ -32,7 +32,7 @@ if (null !== $askedEnv = $input->getParameterOption(['--env', '-e'], null, true)
     putenv('APP_ENV='.$_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = $askedEnv);
 }
 
-(new Dotenv())->bootEnv(THELIA_ROOT . '.env');
+(new Dotenv())->bootEnv(THELIA_ROOT . '.env', 'dev', []);
 $env = $_ENV['APP_ENV'];
 
 if ($input->hasParameterOption('--no-debug', true)) {
