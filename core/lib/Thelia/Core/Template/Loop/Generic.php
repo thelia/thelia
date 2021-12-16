@@ -29,6 +29,7 @@ use TheliaMain\PropelResolver;
  * @method string getTableName()
  * @method string getFilters()
  * @method string getOrders()
+ * @method string getLocale()
  * @method string getLimit()()
  */
 class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -42,19 +43,22 @@ class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createAlphaNumStringTypeArgument('table_name', null, true),
             Argument::createAnyTypeArgument('filters'),
             Argument::createAnyTypeArgument('orders'),
+            Argument::createAnyTypeArgument('locale'),
             Argument::createIntTypeArgument('limit', 100)
         );
     }
 
     public function buildModelCriteria()
     {
-        $locale = $this->getCurrentRequest()->getSession()->getLang()->getLocale();
+        if (!$locale = $this->getLocale()) {
+            $locale = $this->getCurrentRequest()->getSession()->getLang()->getLocale();
+        }
 
         $tableMapClass = PropelResolver::getTableMapByTableName($this->getTableName());
         $tableMap = new $tableMapClass();
 
         /** @var ModelCriteria $queryClass */
-        $queryClass = $tableMap->getClassName().'Query';
+        $queryClass = $tableMap->getClassName() . 'Query';
 
         /** @var ModelCriteria $query */
         $query = $queryClass::create();
@@ -66,7 +70,7 @@ class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
                 continue;
             }
 
-            $filterMethod = 'filterBy'.str_replace('_', '', ucwords($filter, '_'));
+            $filterMethod = 'filterBy' . str_replace('_', '', ucwords($filter, '_'));
 
             if (!method_exists($query, $filterMethod)) {
                 continue;
@@ -75,8 +79,8 @@ class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
             $query->$filterMethod($value, Criteria::IN);
         }
 
-        $i18nTableMapClass = PropelResolver::getTableMapByTableName($this->getTableName().'_i18n');
-        $useI18nQueryMethod = 'use'.$tableMap->getPhpName().'I18nQuery';
+        $i18nTableMapClass = PropelResolver::getTableMapByTableName($this->getTableName() . '_i18n');
+        $useI18nQueryMethod = 'use' . $tableMap->getPhpName() . 'I18nQuery';
         if (null !== $i18nTableMapClass && method_exists($query, $useI18nQueryMethod)) {
             $i18nTableMap = new $i18nTableMapClass();
             $i18nQuery = $query->$useI18nQueryMethod();
@@ -92,7 +96,7 @@ class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
         $orders = $this->getParsedParams($this->getOrders());
 
         foreach ($orders as $order => $direction) {
-            $orderByMethod = 'orderBy'.str_replace('_', '', ucwords($order, '_'));
+            $orderByMethod = 'orderBy' . str_replace('_', '', ucwords($order, '_'));
             if (!\is_callable([$query, $orderByMethod])) {
                 continue;
             }
@@ -115,13 +119,13 @@ class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
 
             $columnPhpNames = TableMap::getFieldnamesForClass($tableMap->getClassName(), TableMap::TYPE_PHPNAME);
             foreach (TableMap::getFieldnamesForClass($tableMap->getClassName(), TableMap::TYPE_FIELDNAME) as $columnIndex => $columnName) {
-                $getter = 'get'.$columnPhpNames[$columnIndex];
+                $getter = 'get' . $columnPhpNames[$columnIndex];
                 if (method_exists($item, $getter)) {
                     $loopResultRow->set(strtoupper($columnName), $item->$getter());
                 }
             }
 
-            $i18nTableMapClass = PropelResolver::getTableMapByTableName($this->getTableName().'_i18n');
+            $i18nTableMapClass = PropelResolver::getTableMapByTableName($this->getTableName() . '_i18n');
             if (null !== $i18nTableMapClass) {
                 $i18nTableMap = new $i18nTableMapClass();
                 foreach (TableMap::getFieldnamesForClass($i18nTableMap->getClassName(), TableMap::TYPE_PHPNAME) as $columnName) {
