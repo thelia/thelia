@@ -252,7 +252,7 @@ export function MiniCartFooter({ delivery, taxes, discount, coupon, total }) {
 
 function MiniCart() {
   const dispatch = useDispatch();
-  const [maxheight, setMaxHeight] = useState('15px');
+  const [height, setHeight] = useState('auto');
   const footerRef = useRef(null);
   const { data: cart = {} } = useCartQuery();
   const { data: customer } = useCustomer();
@@ -269,7 +269,7 @@ function MiniCart() {
 
   useLayoutEffect(() => {
     if (footerRef.current) {
-      setMaxHeight(`${footerRef.current.offsetHeight}px`);
+      setHeight(`calc(100vh - (10.125rem + ${footerRef.current.offsetHeight}px))`);
     }
   }, [cart, footerRef]);
 
@@ -291,9 +291,7 @@ function MiniCart() {
       <div className="">
         <div
           className="overflow-y-auto"
-          style={{
-            height: `calc(100vh - (10.125rem + ${maxheight}))`
-          }}
+          style={{height}}
         >
           <CartItems cart={cart} />
         </div>
