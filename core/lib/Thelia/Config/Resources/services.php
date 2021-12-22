@@ -26,6 +26,7 @@ return function (ContainerConfigurator $configurator): void {
         ->bind('$kernelCacheDir', '%kernel.cache_dir%')
         ->bind('$kernelDebug', '%kernel.debug%')
         ->bind('$kernelEnvironment', '%kernel.environment%')
+        ->bind('$sessionSavePath', '%session.save_path%')
         ->bind('$theliaParserLoops', '%Thelia.parser.loops%');
 
     $serviceConfigurator->load('Thelia\\', THELIA_LIB)

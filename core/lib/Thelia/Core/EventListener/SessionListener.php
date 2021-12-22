@@ -29,14 +29,27 @@ use Thelia\Model\ConfigQuery;
  */
 class SessionListener implements EventSubscriberInterface
 {
+    protected $sessionSavePath;
+
+    public function __construct($sessionSavePath)
+    {
+        $this->sessionSavePath = $sessionSavePath;
+    }
+
     public function prodSession(SessionEvent $event): void
     {
         $storage = new NativeSessionStorage(
             ['cookie_lifetime' => ConfigQuery::read('session_config.lifetime', 0)]
         );
+
+        $sessionSavePath = ConfigQuery::read('session_config.save_path');
+        if (null == $sessionSavePath) {
+            $sessionSavePath = $this->sessionSavePath;
+        }
+
         $storage->setSaveHandler(
             new NativeFileSessionHandler(
-                ConfigQuery::read('session_config.save_path', THELIA_SESSION_DIR)
+                $sessionSavePath
             )
         );
         $event->setSession($this->getSession($storage));
