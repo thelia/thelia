@@ -131,22 +131,24 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                 $image = $imagine->open($source_file);
 
                 if ($image) {
-                    $exifdata = @exif_read_data($source_file);
-                    if (isset($exifdata['Orientation'])) {
-                        $orientation = $exifdata['Orientation'];
-                        $color = new RGB();
-                        switch ($orientation) {
-                            case 3:
-                                $image->rotate(180, $color->color('#F00'));
-                                break;
+                    if (\function_exists('exif_read_data')) {
+                        $exifdata = @exif_read_data($source_file);
+                        if (isset($exifdata['Orientation'])) {
+                            $orientation = $exifdata['Orientation'];
+                            $color = new RGB();
+                            switch ($orientation) {
+                                case 3:
+                                    $image->rotate(180, $color->color('#F00'));
+                                    break;
 
-                            case 6:
-                                $image->rotate(90, $color->color('#F00'));
-                                break;
+                                case 6:
+                                    $image->rotate(90, $color->color('#F00'));
+                                    break;
 
-                            case 8:
-                                $image->rotate(-90, $color->color('#F00'));
-                                break;
+                                case 8:
+                                    $image->rotate(-90, $color->color('#F00'));
+                                    break;
+                            }
                         }
                     }
 

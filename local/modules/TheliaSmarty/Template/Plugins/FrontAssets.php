@@ -205,6 +205,7 @@ class FrontAssets extends AbstractSmartyPlugin
                 'ref' => $pse->getRef(),
                 'ean' => $pse->getEanCode(),
                 'quantity' => $pse->getQuantity(),
+                'weight' => $pse->getWeight(),
                 'price' => $pse->getTaxedPrice($taxCountry),
                 'untaxedPrice' => $pse->getPrice(),
                 'promoPrice' => $pse->getTaxedPromoPrice($taxCountry),
