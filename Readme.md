@@ -19,11 +19,11 @@ A repository containing all thelia modules is available at this address : https:
 Compatibility
 ------------
 
-| | Thelia 2.3 | Thelia 2.4 | Thelia 2.5 |
-| ------------- |:-----:| -----:| -----:|
-| PHP      | 5.5 5.6 7.0 7.1 | 7.0 7.1 7.2 7.3 | 7.3 7.4 8.0 |
+| | Thelia 2.3 | Thelia 2.4 |  Thelia 2.5 |
+| ------------- |:-----:| -----:|------------:|
+| PHP      | 5.5 5.6 7.0 7.1 | 7.0 7.1 7.2 7.3 |     7.4 8.0 |
 | MySQL    | 5.5 5.6 | 5.5 5.6 5.7 | 5.6 5.7 8.0 |
-| Symfony  | 2.8 | 2.8 | 5.3 |
+| Symfony  | 2.8 | 2.8 |         5.3 |
 
 Requirements
 ------------
