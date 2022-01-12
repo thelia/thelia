@@ -30,7 +30,7 @@ class DatabaseConfiguration implements ConfigurationInterface
     public const THELIA_CONNECTION_NAME = 'TheliaMain';
 
     /**
-     * {@inheritDoc}
+     * @return TreeBuilder The tree builder
      */
     public function getConfigTreeBuilder()
     {
