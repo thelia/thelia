@@ -12,7 +12,6 @@
 
 namespace Thelia\Core\Propel\Schema;
 
-use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -29,14 +28,6 @@ class SchemaLocator
      * @var string
      */
     protected static $SCHEMA_FILE_PATTERN = '*schema.xml';
-
-    /**
-     * Connection to the thelia database.
-     * Used to query the module table for active modules.
-     *
-     * @var ConnectionInterface
-     */
-    protected $theliaDatabaseConnection;
 
     /**
      * Thelia configuration directory.
@@ -65,33 +56,23 @@ class SchemaLocator
     }
 
     /**
-     * @param ConnectionInterface $theliaDatabaseConnection connection to the thelia database
-     */
-    public function setTheliaDatabaseConnection(ConnectionInterface $theliaDatabaseConnection): void
-    {
-        $this->theliaDatabaseConnection = $theliaDatabaseConnection;
-    }
-
-    /**
      * Get schema documents for Thelia core and active modules, as well as included external schemas.
      *
      * @return \DOMDocument[] schema documents
      */
-    public function findForActiveModules()
+    public function findForAllModules()
     {
-        $fs = new Filesystem();
+        $finder = new Finder();
 
-        $codes = $this->queryActiveModuleCodes();
-
-        foreach ($codes as $key => $code) {
-            // test if the module exists on the file system
-            if (!$fs->exists(THELIA_MODULE_DIR.$code)) {
-                unset($codes[$key]);
-            }
-        }
+        $finder
+            ->name('module.xml')
+            ->in(THELIA_MODULE_DIR.'*'.DS.'Config')
+        ;
 
         // reset keys
-        $codes = array_values($codes);
+        $codes = array_map(function ($file) {
+            return basename(\dirname($file, 2));
+        }, iterator_to_array($finder));
 
         return $this->findForModules($codes);
     }
@@ -265,22 +246,5 @@ class SchemaLocator
         }
 
         return $result;
-    }
-
-    /**
-     * @return string[] active module codes
-     */
-    protected function queryActiveModuleCodes()
-    {
-        if (!$this->theliaDatabaseConnection instanceof ConnectionInterface) {
-            throw new \RuntimeException('No connection to the Thelia database was provided.');
-        }
-
-        $query = 'select code from module where module.activate;';
-
-        $statement = $this->theliaDatabaseConnection->prepare($query);
-        $statement->execute();
-
-        return $statement->fetchAll(\PDO::FETCH_COLUMN);
     }
 }
