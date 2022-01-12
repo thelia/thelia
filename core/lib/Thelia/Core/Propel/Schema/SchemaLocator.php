@@ -12,7 +12,6 @@
 
 namespace Thelia\Core\Propel\Schema;
 
-use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;

@@ -255,7 +255,7 @@ class PropelInitService
                 '--config-dir' => $this->getPropelConfigDir(),
                 '--output-dir' => $this->getPropelConfigDir(),
                 '--output-file' => static::$PROPEL_CONFIG_CACHE_FILENAME,
-                '--loader-script-dir' => $this->getPropelLoaderScriptDir()
+                '--loader-script-dir' => $this->getPropelLoaderScriptDir(),
             ]
         );
 
