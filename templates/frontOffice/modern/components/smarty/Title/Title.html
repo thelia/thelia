@@ -1,5 +1,9 @@
 {$type = $type|default:"div"}
 
 <{$type} class="Title {if isset($class)}{$class}{/if}">
-  {$title}
+  {if $nofilter|default:false}
+      {$title nofilter}
+  {else}
+      {$title}
+  {/if}
 </{$type}>
