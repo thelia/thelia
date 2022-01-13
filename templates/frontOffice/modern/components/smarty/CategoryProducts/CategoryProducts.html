@@ -20,7 +20,7 @@
 
 {$amount={count
   type="product"
-  category=$categories|default:$category_id
+  category=$categories|default:$category_id|default:null
   depth=5
   limit=$limit
   order=$product_order
@@ -40,7 +40,7 @@
       {loop
         type="product"
         name="product_list"
-        category=$categories|default:$category_id
+        category=$categories|default:$category_id|default:null
         depth=5
         limit=$limit
         order=$product_order
