@@ -4,7 +4,7 @@
 {default_translation_domain domain='hookadminhome.bo.default'}
 
 <div class="panel-group" id="accordion">
-	{loop type="feed" name="thelia_feeds" url="http://thelia.net/feeds/?lang={$lang_code}" limit="6"}
+	{loop type="feed" name="thelia_feeds" url="https://github.com/thelia/thelia/commits/main.atom" limit="6" timeout=30}
 
 		<div class="panel panel-default">
 			<div class="panel-heading">
