@@ -33,6 +33,9 @@ class HookAdminHome extends BaseModule
     /** @var string */
     public const ACTIVATE_STATS = 'activate_stats';
 
+    /**
+     * @return array
+     */
     public function getHooks()
     {
         return [
