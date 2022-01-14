@@ -30,6 +30,9 @@ class Carousel extends BaseModule
 {
     public const DOMAIN_NAME = 'carousel';
 
+    /**
+     * @return bool true to continue module activation, false to prevent it
+     */
     public function preActivation(ConnectionInterface $con = null)
     {
         if (!self::getConfigValue('is_initialized', false)) {
