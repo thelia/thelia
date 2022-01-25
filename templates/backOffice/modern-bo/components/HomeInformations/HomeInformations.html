@@ -1,0 +1,31 @@
+<div class="h-24 bg-white flex items-center rounded-xl shadow-md">
+  <div class="my-5 flex flex-col justify-center items-center w-1/6 border-r border-lightGrey">
+    <span class="text-4xl text-mediumCharbon font-bold">{count type="customer" current="false" backend_context="1"}</span>
+    <span class="text-mediumCharbon">{intl l="Customers"}</span>
+  </div>
+
+  <div class="my-5 flex flex-col justify-center items-center w-1/6 border-r border-lightGrey">
+    <span class="text-4xl text-mediumCharbon font-bold">{count type="category" visible="*" backend_context="1"}</span>
+    <span class="text-mediumCharbon">{intl l="Categories"}</span>
+  </div>
+
+  <div class="my-5 flex flex-col justify-center items-center w-1/6 border-r border-lightGrey">
+    <span class="text-4xl text-mediumCharbon font-bold">{count type="product" visible="*" backend_context="1"}</span>
+    <span class="text-mediumCharbon">{intl l="Products"}</span>
+  </div>
+
+  <div class="my-5 flex flex-col justify-center items-center w-1/6 border-r border-lightGrey">
+    <span class="text-4xl text-mediumCharbon font-bold">{count type="product" visible="true" backend_context="1"}</span>
+    <span class="text-mediumCharbon">{intl l="Online products"}</span>
+  </div>
+
+  <div class="my-5 flex flex-col justify-center items-center w-1/6 border-r border-lightGrey">
+    <span class="text-4xl text-mediumCharbon font-bold">{count type="product" visible="false" backend_context="1"}</span>
+    <span class="text-mediumCharbon">{intl l="Offline products"}</span>
+  </div>
+
+  <div class="my-5 flex flex-col justify-center items-center w-1/6">
+    <span class="text-4xl text-mediumCharbon font-bold">{count type="order" status="*" customer="*" backend_context="1"}</span>
+    <span class="text-mediumCharbon">{intl l="Orders"}</span>
+  </div>
+</div>
