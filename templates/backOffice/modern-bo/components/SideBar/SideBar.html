@@ -15,7 +15,7 @@
         <a title="{intl l="Orders"}" href="#collapse-orders" {if $admin_current_location == 'order'}class="open"{/if} class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
             <i class="fas fa-shopping-cart ml-5 mr-7 text-white"></i>
             <span class="text-mediumGrey">{intl l="Orders"}</span>
-            <i class="fas fa-chevron-right menu-collapse text-mediumGrey"></i>
+            <i class="fas fa-chevron-right menu-collapse text-mediumGrey ml-auto mr-6"></i>
         </a>
 
         {* <ul id="collapse-orders" class="collapse {if $admin_current_location == 'order'}in{/if}" role="menu">
@@ -170,7 +170,7 @@
             <a title="{intl l="Tools"}" href="#collapse-tools" class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
                 <i class="fas fa-tools ml-5 mr-7 text-white"></i>
                 <span class="text-mediumGrey">{intl l="Tools"}</span>
-                <i class="fas fa-chevron-right menu-collapse text-mediumGrey"></i>
+                <i class="fas fa-chevron-right menu-collapse text-mediumGrey ml-auto mr-6"></i>
             </a>
 
             {* <ul id="collapse-tools" class="collapse {if $admin_current_location == 'tools'}in{/if}" role="menu">
@@ -205,75 +205,6 @@
                 {/hookblock}
             </ul> *}
         </li>
-    {/loop}
-
-    {loop name="menu-auth-modules" type="auth" role="ADMIN" resource="admin.module" access="VIEW"}
-        {ifhook rel="main.top-menu-modules"}
-            {hookblock name="main.top-menu-modules" fields="id,class,url,title"}
-            <li class="{if $admin_current_location == 'modules'}bg-darkCharbon{/if}" id="modules_menu">
-                <a title="{intl l="Modules"}" href="#collapse-modules" class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
-                    <i class="fas fa-puzzle-piece ml-5 mr-7 text-white"></i>
-                    <span class="text-mediumGrey">{intl l="Modules"}</span>
-                    <i class="fas fa-chevron-right menu-collapse text-mediumGrey"></i>
-                </a>
-
-                <ul id="collapse-modules" class="collapse {if $admin_current_location == 'modules'}in{/if}" role="menu">
-                    <li role="menuitem" id="modules_menu">
-                        <a title="{intl l="Modules"}" href="{url path='/admin/modules'}">
-                            {intl l="Modules"}
-                        </a>
-                    </li>
-                    {forhook rel="main.top-menu-modules"}
-                        <li role="menuitem">
-                            <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
-                                {$title}
-                            </a>
-                        </li>
-                    {/forhook}
-                </ul>
-            </li>
-            {/hookblock}
-        {/ifhook}
-        {elsehook rel="main.top-menu-modules"}
-            <li class="{if $admin_current_location == 'modules'}bg-darkCharbon{/if}" id="modules_menu">
-                <a title="{intl l="Modules"}" href="{url path='/admin/modules'}" class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
-                    <i class="fas fa-puzzle-piece ml-5 mr-7 text-white"></i>
-                    <span class="text-mediumGrey">{intl l="Modules"}</span>
-                </a>
-            </li>
-        {/elsehook}
-    {/loop}
-
-    {loop name="menu-auth-config" type="auth" role="ADMIN" resource="admin.configuration" access="VIEW"}
-        {ifhook rel="main.top-menu-configuration"}
-            {hookblock name="main.top-menu-configuration" fields="id,class,url,title"}
-                <li class="{if $admin_current_location == 'configuration'}bg-darkCharbon{/if}" id="config_menu">
-                    <a title="{intl l="Configuration"}" href="#collapse-configuration" {if $admin_current_location == 'configuration'}class="open"{/if}>
-                        <i class="fas fa-cogs text-mediumGrey"></i>
-                        <span class="text-mediumGrey">{intl l="Configuration"}</span>
-                        <i class="fas fa-chevron-right menu-collapse text-mediumGrey"></i>
-                    </a>
-
-                    <ul id="collapse-configuration" class="collapse {if $admin_current_location == 'configuration'}in{/if}" role="menu">
-                        {forhook rel="main.top-menu-configuration"}
-                            <li role="menuitem">
-                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
-                                    {$title}
-                                </a>
-                            </li>
-                        {/forhook}
-                    </ul>
-                </li>
-            {/hookblock}
-        {/ifhook}
-        {elsehook rel="main.top-menu-configuration"}
-            <li class="{if $admin_current_location == 'configuration'}bg-darkCharbon{/if}" id="config_menu">
-                <a title="{intl l="Configuration"}" href="{url path='/admin/configuration'}" class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
-                    <i class="fas fa-cogs ml-5 mr-7 text-white"></i>
-                    <span class="text-mediumGrey">{intl l="Configuration"}</span>
-                </a>
-            </li>
-        {/elsehook}
     {/loop}
 
     {hook name="main.in-top-menu-items" location="in_top_menu_items" admin_current_location=$admin_current_location}

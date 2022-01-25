@@ -47,7 +47,7 @@
 
 <body class="SimpleLayout">
 
-  <div class="flex flex-col justify-center items-center h-screen my-14">
+  <div class="flex flex-col justify-center items-center h-screen">
     {* -- Main page content section ----------------------------------------- *}
     {hook name="main.before-content" location="before_content"}
 

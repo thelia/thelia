@@ -32,7 +32,8 @@ module.exports = {
         blue: '#1E9AE8',
         error: '#D10000',
         danger: '#FDE2E2',
-        success: '#D1FAE5'
+        success: '#D1FAE5',
+        info: '#E6F1FA'
       }
     }
   },

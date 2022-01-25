@@ -1,32 +1,32 @@
-<a class="h-full pl-4 py-2" href="{url path='/admin/home'}">
+<a class="h-full lg:pl-4 py-2" href="{url path='/admin/home'}">
   <img src="{getFileFromManifest file="images/logos/dark-logo.svg"}" class="h-full" />
 </a>
 
-<div class="flex items-center justify-end h-full w-full">
+<div class="hidden lg:flex items-center justify-end h-full w-full ">
   {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search" access="VIEW"}
-  {strip}
-    <form action="{url path='/admin/search'}" class="w-3/5 h-10">
-      {include
-        file="components/TextField/TextField.html"
-        type="search"
-        placeholder="{intl l='Search...'}"
-        name="search_term"
-        value="{if isset($smarty.get.search_term)}{trim($smarty.get.search_term)}{/if}"
-        icon="search"
-        inputClass="w-full"
-      }
-    </form>            
-  {/strip}
-{/loop}
+    {strip}
+      <form action="{url path='/admin/search'}" class="md:w-1/2 h-10">
+        {include
+          file="components/TextField/TextField.html"
+          type="search"
+          placeholder="{intl l='Search...'}"
+          name="search_term"
+          value="{if isset($smarty.get.search_term)}{trim($smarty.get.search_term)}{/if}"
+          icon="search"
+          inputClass="w-full"
+        }
+      </form>            
+    {/strip}
+  {/loop}
 
-  <ul class="flex items-center h-full">
+  <ul class="hidden lg:flex items-center h-full">
     {hook name="main.topbar-top" }
 
     <li class="px-5">
       <a href="{url path='admin/configuration/administrators/view'}" title="{intl l="Edit profile"}" class="flex items-center">
         <div 
           class="h-10 w-10 bg-transparent hover:bg-lightGrey border hover:text-lightGrey p-3 flex items-center justify-center text-mediumCharbon rounded-full font-medium">
-          <img class="w-full h-full object-contain" src="{image file="assets/images/svgFlags/fr.svg" }" alt="fr" />
+          <img class="w-full h-full object-contain" src="{image file="assets/images/svgFlags/fr.svg"}" alt="fr" />
         </div>
       </a>
     </li>
@@ -41,13 +41,13 @@
       <div class="opacity-0 invisible dropdown-menu transition-all duration-300 transform origin-top-right -translate-y-2 scale-95">
         <div class="absolute right-0 w-80 mt-2.5 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg outline-none" aria-labelledby="headlessui-menu-button-1" id="headlessui-menu-items-117" role="menu">
           <div class="p-5">
-            <a href="{url path='admin/logout'}" title="{intl l="Logout"}" class="flex items-center mb-5">
+            <a href="{url path='/admin/configuration'}" title="{intl l="Logout"}" class="flex items-center mb-5">
               <div class="h-10 w-10 bg-lightGrey hover:bg-mediumCharbon hover:text-lightGrey p-4 flex items-center justify-center text-mediumCharbon rounded-full font-medium mr-3">
                 <i class="fas fa-cogs"></i>
               </div>
               Configuration
             </a>
-            <a href="{url path='admin/logout'}" title="{intl l="Logout"}" class="flex items-center">
+            <a href="{url path='/admin/modules'}" title="{intl l="Logout"}" class="flex items-center">
               <div class="h-10 w-10 bg-lightGrey hover:bg-mediumCharbon hover:text-lightGrey p-4 flex items-center justify-center text-mediumCharbon rounded-full font-medium mr-3">
               <i class="fas fa-puzzle-piece"></i>
               </div>
@@ -60,16 +60,19 @@
 
     <li class="px-5 relative inline-block dropdown">
       <button href="#" title="{intl l="Edit profile"}" class="flex items-center">
-        <div class="h-10 w-10 bg-lightGrey hover:bg-mediumCharbon hover:text-lightGrey p-4 flex items-center justify-center text-mediumCharbon rounded-full font-medium mr-3">
+        <div class="h-10 w-10 bg-lightGrey hover:bg-mediumCharbon hover:text-lightGrey p-4 flex items-center justify-center text-mediumCharbon rounded-full font-medium xl:mr-3">
           <i class="fas fa-user"></i>
         </div>
-        {admin attr="firstname"} {admin attr="lastname"}
-        <i class="fas fa-sort-down mb-1 ml-3"></i>
+        <div class="hidden xl:block">
+          {admin attr="firstname"} {admin attr="lastname"}
+          <i class="fas fa-sort-down mb-1 ml-3"></i>
+        </div>
       </button>
 
       <div class="opacity-0 invisible dropdown-menu transition-all duration-300 transform origin-top-right -translate-y-2 scale-95">
         <div class="absolute right-0 w-80 mt-2.5 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg outline-none" aria-labelledby="headlessui-menu-button-1" id="headlessui-menu-items-117" role="menu">
-          <div class="p-5">
+        <div class="text-center my-3 xl:hidden">Welcome <span class="text-main">{admin attr="firstname"} {admin attr="lastname"}</span></div>
+        <div class="p-5">
             <a href="{url path='admin/logout'}" title="{intl l="Logout"}" class="flex items-center mb-5">
               <div class="h-10 w-10 bg-lightGrey hover:bg-mediumCharbon hover:text-lightGrey p-4 flex items-center justify-center text-mediumCharbon rounded-full font-medium mr-3">
                 <i class="fas fa-cog"></i>
