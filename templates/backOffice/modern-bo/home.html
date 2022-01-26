@@ -1,8 +1,26 @@
 {extends file="admin-layout.tpl"}
 
-{* {block name="main-content"}
+{block name="main-content"}
   {include file="components/HomeInformations/HomeInformations.html"}
-{/block} *}
+
+  <div class="h-96 p-6 mt-8 w-full bg-white rounded-xl shadow-md">
+    <span class="text-2xl font-bold">Statistiques</span> 
+  </div>
+
+  <div class="w-full grid grid-cols-1 xl:grid-cols-3 gap-x-8 mt-8">
+    <div class="h-56 p-6 mb-6 w-full bg-white rounded-xl shadow-md">
+      <span class="text-2xl font-bold">Ventes</span> 
+    </div>
+
+    <div class="h-56 p-6 mb-6 w-full bg-white rounded-xl shadow-md">
+      <span class="text-2xl font-bold">Thelia sur Github</span> 
+    </div>
+
+    <div class="h-56 p-6 mb-6 w-full bg-white rounded-xl shadow-md">
+      <span class="text-2xl font-bold">Actualités Thelia</span> 
+    </div>
+  </div>
+{/block}
 
 {* {block name="javascript" append}
   {literal}

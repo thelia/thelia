@@ -45,7 +45,7 @@
         {hook name="main.before-topbar" location="before_topbar" }
 
         <header id="header"
-          class="flex items-center justify-center lg:justify-between bg-white shadow-lg max-h-24 lg:max-h-16">
+          class="flex items-center justify-center lg:justify-between bg-white shadow-lg max-h-24 lg:max-h-16 py-3 lg:py-0">
           {include file="components/Header/Header.html"}
         </header>
 
@@ -55,7 +55,7 @@
 
         {hook name="main.after-topbar" location="after_topbar" }
 
-        <main id="main" class="py-10 px-20">
+        <main id="main" class="py-10 px-6 lg:px-20">
           {* -- Main page content section ----------------------------------------- *} 
           {hook name="main.before-content" location="before_content"} 
           {block name="main-content"}
@@ -64,7 +64,7 @@
           {hook name="main.after-content" location="after_content"}
         </main>
 
-        <footer id="footer" class="flex items-center justify-between bg-white shadow-xl">
+        <footer id="footer" class="flex flex-col lg:flex-row items-center lg:justify-between bg-white shadow-xl py-6 px-4 lg:p-0">
           {include file="components/Footer/Footer.html"}
         </footer>
       {/loop}
