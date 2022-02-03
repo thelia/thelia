@@ -70,7 +70,7 @@
         "doctrine/cache": "~1.0",
         "assetic/framework": "~2.0.1",
         "thelia/html2pdf": "dev-main",
-        "thelia/open-api-module": "2.0.0",
+        "thelia/open-api-module": "dev-main",
         "thelia/smarty-redirection-module": "2.0.0",
         "thelia/choice-filter-module": "2.0.0",
         "thelia/custom-delivery-module": "dev-main",
