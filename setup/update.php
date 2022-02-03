@@ -31,7 +31,7 @@ foreach ($argv as $arg) {
     }
 
     if (preg_match_all('/--env\=(\S+)/', $arg, $matchs)) {
-        $env = $matchs[1];
+        $env = $matchs[1][0];
     }
 
     if ($bootstrapToggle) {
