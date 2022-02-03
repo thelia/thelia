@@ -399,6 +399,11 @@ class Thelia extends Kernel
         return $container;
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Exception
+     */
     public function handle(Request $request, int $type = HttpKernelInterface::MASTER_REQUEST, bool $catch = true)
     {
         if (!$this->booted) {

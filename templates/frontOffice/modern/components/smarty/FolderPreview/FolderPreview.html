@@ -10,7 +10,7 @@
           {/if}
 
           <div class="pt-8 pb-4">
-            {include file="components/smarty/Title/Title.html" type="h2" title=$TITLE class="Title--left mb-6"}
+            {include file="components/smarty/Title/Title.html" type="h2" title=$TITLE class="Title--left mb-6" nofilter=true}
             <div class="mb-4 wysiwyg">{$DESCRIPTION nofilter}</div>
             {if $url}
               <a href="{$url}" class="btn">{intl l="I discover"}</a>
