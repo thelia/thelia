@@ -47,7 +47,7 @@
 
 <body class="SimpleLayout">
 
-  <div class="flex flex-col justify-center items-center h-screen">
+  <div class="min-h-screen flex justify-center items-center">
     {* -- Main page content section ----------------------------------------- *}
     {hook name="main.before-content" location="before_content"}
 
@@ -58,7 +58,7 @@
 
   {hook name="main.before-footer" location="before_footer" }
 
-  <footer class="flex items-center justify-between bg-mediumPearl shadow-xl h-24">
+  <footer class="flex flex-col md:flex-row items-center justify-between bg-mediumPearl shadow-xl p-4 mt-4 text-sm md:text-base">
     {include file="components/Footer/Footer.html"}
 
     {hook name="main.in-footer" location="in_footer" }

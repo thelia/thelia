@@ -10,13 +10,10 @@
     </li>
 
     {loop name="menu-auth-order" type="auth" role="ADMIN" resource="admin.order" access="VIEW"}
-    <li class="{if $admin_current_location == 'order'}bg-darkCharbon{/if}" id="orders_menu">
-
-        <a title="{intl l="Orders"}" href="#collapse-orders" {if $admin_current_location == 'order'}class="open"{/if} class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
-            <i class="fas fa-shopping-cart ml-5 mr-7 text-white"></i>
-            <span class="text-mediumGrey">{intl l="Orders"}</span>
-            <i class="fas fa-chevron-right menu-collapse text-mediumGrey ml-auto mr-6"></i>
-        </a>
+    <li class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}" id="orders_menu">
+        <i class="fas fa-shopping-cart ml-5 mr-7 text-white"></i>
+        <span class="text-mediumGrey">{intl l="Orders"}</span>
+        <i class="fas fa-chevron-right menu-collapse text-mediumGrey ml-auto mr-6"></i>
 
         {* <ul id="collapse-orders" class="collapse {if $admin_current_location == 'order'}in{/if}" role="menu">
 
@@ -49,6 +46,33 @@
             {/hookblock}
         </ul> *}
     </li>
+
+    <ul class="bg-darkCharbon flex flex-col items-center px-4 text-mediumGrey">
+        <li class="flex items-center h-11 w-full justify-between my-2">
+            <span>Toutes les commandes</span>
+            <div class="text-sm px-3 py-0.5 bg-grey rounded-3xl text-white">78346</div>
+        </li>
+
+        <li class="flex items-center h-11 w-full justify-between my-2">
+            <span>Non payée</span>
+            <div class="text-sm px-3 py-0.5 bg-carot rounded-3xl text-white">4</div>
+        </li>
+
+        <li class="flex items-center h-11 w-full justify-between my-2">
+            <span>Confirmée</span>
+            <div class="text-sm px-3 py-0.5 bg-blue rounded-3xl text-white">3</div>
+        </li>
+
+        <li class="flex items-center h-11 w-full justify-between my-2">
+            <span>Payée</span>
+            <div class="text-sm px-3 py-0.5 bg-green rounded-3xl text-white">2</div>
+        </li>
+
+        <li class="flex items-center h-11 w-full justify-between my-2">
+            <span>En traitement</span>
+            <div class="text-sm px-3 py-0.5 bg-error rounded-3xl text-white">198</div>
+        </li>
+    </ul>
     {/loop}
 
     {loop name="menu-auth-customer" type="auth" role="ADMIN" resource="admin.customer" access="VIEW"}

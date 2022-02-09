@@ -90,8 +90,26 @@
   @apply text-main;
 }
 
+.dropdown-menu a:hover {
+  div {
+    @apply bg-mediumCharbon text-lightGrey;
+  }
+}
+
 .dropdown:hover .dropdown-menu {
   opacity: 1;
   transform: translate(0) scale(1);
   visibility: visible;
+}
+
+.fa-twitter {
+  color: #1da1f2;
+}
+
+.fa-facebook {
+  color: #3b5998;
+}
+
+.fa-github {
+  color: #171515;
 }
