@@ -27,6 +27,7 @@ class FileConfiguration
                 'image/jpeg' => ['jpg', 'jpeg'],
                 'image/png' => ['png'],
                 'image/gif' => ['gif'],
+                'image/webp' => ['webp'],
             ],
             'extBlackList' => [],
         ];
