@@ -100,6 +100,11 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         // Find cached file path
         $cacheFilePath = $this->getCacheFilePath($subdir, $source_file, $event->isOriginalImage(), $event->getOptionsHash());
 
+        if ($event->getFormat()) {
+            $currentExtension = pathinfo($cacheFilePath, \PATHINFO_EXTENSION);
+            $cacheFilePath = str_replace($currentExtension, $event->getFormat(), $cacheFilePath);
+        }
+
         $originalImagePathInCache = $this->getCacheFilePath($subdir, $source_file, true);
 
         if (!file_exists($cacheFilePath)) {
@@ -248,7 +253,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                     $image->save(
                         $cacheFilePath,
-                        ['quality' => $quality]
+                        ['quality' => $quality, 'animated' => true]
                     );
                 } else {
                     throw new ImageException(sprintf('Source file %s cannot be opened.', basename($source_file)));

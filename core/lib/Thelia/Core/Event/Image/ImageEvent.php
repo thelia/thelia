@@ -80,6 +80,9 @@ class ImageEvent extends CachedFileEvent
     /** @var bool */
     protected $allowZoom;
 
+    /** @var string */
+    protected $format;
+
     /**
      * @return bool true if the required image is the original image (resize_mode and background_color are not significant)
      */
@@ -246,6 +249,21 @@ class ImageEvent extends CachedFileEvent
     public function setAllowZoom(bool $allowZoom): self
     {
         $this->allowZoom = $allowZoom;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormat()
+    {
+        return $this->format;
+    }
+
+    public function setFormat(string $format): self
+    {
+        $this->format = $format;
 
         return $this;
     }
