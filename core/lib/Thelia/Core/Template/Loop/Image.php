@@ -59,6 +59,7 @@ use Thelia\Type\TypeCollection;
  * @method string      getResizeMode()
  * @method bool        getBase64()
  * @method bool        getWithPrevNextInfo()
+ * @method string      getFormat()
  * @method string[]    getOrder()
  */
 class Image extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -114,7 +115,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createBooleanTypeArgument('allow_zoom', false),
             Argument::createBooleanTypeArgument('base64', false),
             Argument::createBooleanTypeArgument('with_prev_next_info', false),
-            Argument::createAnyTypeArgument('format', 'jpg')
+            Argument::createAnyTypeArgument('format')
         );
 
         // Add possible image sources
