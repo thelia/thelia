@@ -15,7 +15,7 @@ namespace Thelia\Core\Template\Loop;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Map\TableMap;
-use Thelia\Core\Template\Element\BaseI18nLoop;
+use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
@@ -29,9 +29,10 @@ use TheliaMain\PropelResolver;
  * @method string getTableName()
  * @method string getFilters()
  * @method string getOrders()
+ * @method string getLocale()
  * @method string getLimit()()
  */
-class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
+class Generic extends BaseLoop implements PropelSearchLoopInterface
 {
     /**
      * @return ArgumentCollection
@@ -42,13 +43,16 @@ class Generic extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createAlphaNumStringTypeArgument('table_name', null, true),
             Argument::createAnyTypeArgument('filters'),
             Argument::createAnyTypeArgument('orders'),
+            Argument::createAnyTypeArgument('locale'),
             Argument::createIntTypeArgument('limit', 100)
         );
     }
 
     public function buildModelCriteria()
     {
-        $locale = $this->getCurrentRequest()->getSession()->getLang()->getLocale();
+        if (!$locale = $this->getLocale()) {
+            $locale = $this->getCurrentRequest()->getSession()->getLang()->getLocale();
+        }
 
         $tableMapClass = PropelResolver::getTableMapByTableName($this->getTableName());
         $tableMap = new $tableMapClass();

@@ -10,12 +10,12 @@
         </td>
 
         <td class="text-center">
-            <a title="{intl l='Change this condition'}" data-service-id="{$condition.serviceId}" data-condition-index="{$condition.index}" class="condition-update-btn" href="{$urlEdit nofilter}">
+            <a title="{intl l='Change this condition'}" data-service-id="{$condition.serviceId}" data-condition-index="{$condition.index}" class="condition-update-btn" href="{$urlEdit|default:"" nofilter}">
                 <span class="glyphicon glyphicon-edit"></span>
             </a>
 
             {if $conditions|count != 1}
-                <a title="{intl l='Delete this condition'}" data-condition-index="{$condition.index}" data-target="#delete" data-toggle="confirm" class="condition-delete-btn" href="{$urlDelete nofilter}">
+                <a title="{intl l='Delete this condition'}" data-condition-index="{$condition.index}" data-target="#delete" data-toggle="confirm" class="condition-delete-btn" href="{$urlDelete|default:"" nofilter}">
                     <span class="glyphicon glyphicon-remove"></span>
                 </a>
             {/if}

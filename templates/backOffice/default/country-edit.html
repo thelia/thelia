@@ -79,7 +79,7 @@
                                                         <div class="panel-body">
                                                             {ifloop rel="country-areas"}
                                                                 <ul class="list-unstyled">
-                                                                    {loop name="country-areas" type="area" country=$country_id backend_context="1"}
+                                                                    {loop name="country-areas" type="area" country=$country_id backend_context="1" group_by_country_area=1}
                                                                         <li><a href="">{$NAME}</a></li>
                                                                     {/loop}
                                                                 </ul>

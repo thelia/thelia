@@ -6,14 +6,16 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude([
         'var',
-         'vendor', 
-         '.docker', 
+         'vendor',
+         '.docker',
          'config',
          'local/modules/OpenApi',
          'local/modules/SmartyRedirection',
          'local/modules/ChoiceFilter',
          'local/modules/StoreSeo',
          'local/modules/BetterSeo',
+         'local/modules/ShortCode',
+         'local/modules/ShortCodeMeta',
          'local/modules/ForcePhone',
          'local/modules/HookTest',
          'local/modules/CustomDelivery',

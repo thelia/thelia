@@ -159,6 +159,14 @@ class PropelInitService
     }
 
     /**
+     * @return string generated Propel loader directory
+     */
+    public function getPropelLoaderScriptDir()
+    {
+        return $this->getPropelCacheDir().'loader'.DS;
+    }
+
+    /**
      * Run a Propel command.
      *
      * @param Command              $command    command to run
@@ -247,6 +255,7 @@ class PropelInitService
                 '--config-dir' => $this->getPropelConfigDir(),
                 '--output-dir' => $this->getPropelConfigDir(),
                 '--output-file' => static::$PROPEL_CONFIG_CACHE_FILENAME,
+                '--loader-script-dir' => $this->getPropelLoaderScriptDir(),
             ]
         );
 
@@ -275,7 +284,7 @@ class PropelInitService
         $fs->mkdir($this->getPropelSchemaDir());
 
         $schemaCombiner = new SchemaCombiner(
-            $this->schemaLocator->findForActiveModules()
+            $this->schemaLocator->findForAllModules()
         );
 
         foreach ($schemaCombiner->getDatabases() as $database) {
@@ -324,6 +333,7 @@ class PropelInitService
             [
                 '--config-dir' => $this->getPropelConfigDir(),
                 '--schema-dir' => $this->getPropelSchemaDir(),
+                '--loader-script-dir' => $this->getPropelLoaderScriptDir(),
             ]
         );
 
@@ -398,18 +408,16 @@ class PropelInitService
 
             $this->buildPropelInitFile();
 
-            require $this->getPropelInitFile();
-
-            $theliaDatabaseConnection = Propel::getConnection('TheliaMain');
-            $this->schemaLocator->setTheliaDatabaseConnection($theliaDatabaseConnection);
-
             $buildPropelGlobalSchema = $this->buildPropelGlobalSchema();
             $buildPropelModels = $this->buildPropelModels();
+
+            require $this->getPropelInitFile();
 
             if ($buildPropelGlobalSchema || $buildPropelModels) {
                 $cacheRefresh = true;
             }
 
+            $theliaDatabaseConnection = Propel::getConnection('TheliaMain');
             $theliaDatabaseConnection->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
 
             if ($this->debug) {

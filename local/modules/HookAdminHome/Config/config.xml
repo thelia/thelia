@@ -37,6 +37,7 @@
 
         <hook id="hookadminhome.hook.block_thelia_informations" class="HookAdminHome\Hook\AdminHook">
             <tag name="hook.event_listener" event="home.block"  type="back" method="blockTheliaInformation" />
+            <argument type="service" id="thelia.cache" />
         </hook>
     </hooks>
 

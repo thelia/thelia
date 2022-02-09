@@ -3,13 +3,21 @@
   <table class="table table-striped">
     <tbody>
     <tr>
-      <th>{intl l="Current version" d='hookadminhome.bo.default'}</th>
+      <th>{intl l="Your version" d='hookadminhome.bo.default'}</th>
       <td>{$THELIA_VERSION}</td>
     </tr>
+    {if $latestStableRelease}
     <tr>
-      <th>{intl l="Latest version available" d='hookadminhome.bo.default'}</th>
-      <td><a href="https://thelia.net/download/thelia.zip" id="latest-thelia-version">{intl l="Loading..."  d='hookadminhome.bo.default'}</a></td>
+      <th>{intl l="Latest stable version" d='hookadminhome.bo.default'}</th>
+      <td><a href="{$latestStableRelease['html_url']}">{$latestStableRelease['tag_name']}</a></td>
     </tr>
+    {/if}
+    {if $latestPreRelease}
+        <tr>
+            <th>{intl l="Latest pre-release" d='hookadminhome.bo.default'}</th>
+            <td><a href="{$latestPreRelease['html_url']}">{$latestPreRelease['tag_name']}</a></td>
+        </tr>
+    {/if}
     </tbody>
   </table>
 </div>

@@ -221,6 +221,7 @@ class FrontAssets extends AbstractSmartyPlugin
                 'ref' => $pse->getRef(),
                 'ean' => $pse->getEanCode(),
                 'quantity' => $pse->getQuantity(),
+                'weight' => $pse->getWeight(),
                 'price' => $pse->getTaxedPrice($taxCountry),
                 'untaxedPrice' => $pse->getPrice(),
                 'promoPrice' => $pse->getTaxedPromoPrice($taxCountry),
@@ -250,9 +251,14 @@ class FrontAssets extends AbstractSmartyPlugin
         }
 
         foreach ($features as $id => $list) {
-            if (isset($list) && \count($list) > 0 && $list !== '') {
-                $featuresList[] = $id.':('.$this->check($list, '|').')';
+            if (!isset($list)) {
+                continue;
             }
+            $featuresAvs = $this->check($list, '|');
+            if (!$featuresAvs) {
+                continue;
+            }
+            $featuresList[] = $id.':('.$featuresAvs.')';
         }
 
         foreach ($brands as $id) {

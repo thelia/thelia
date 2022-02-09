@@ -20,6 +20,9 @@ use Thelia\Module\AbstractPaymentModule;
 
 class FreeOrder extends AbstractPaymentModule
 {
+    /**
+     * @return bool
+     */
     public function isValidPayment()
     {
         return round($this->getCurrentOrderTotalAmount(), 4) == 0;
@@ -32,6 +35,9 @@ class FreeOrder extends AbstractPaymentModule
         $this->getDispatcher()->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
     }
 
+    /**
+     * @return bool
+     */
     public function manageStockOnCreation()
     {
         return false;

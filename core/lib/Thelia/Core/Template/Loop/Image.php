@@ -59,6 +59,7 @@ use Thelia\Type\TypeCollection;
  * @method string      getResizeMode()
  * @method bool        getBase64()
  * @method bool        getWithPrevNextInfo()
+ * @method string      getFormat()
  * @method string[]    getOrder()
  */
 class Image extends BaseI18nLoop implements PropelSearchLoopInterface
@@ -113,7 +114,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createAnyTypeArgument('query_namespace', 'Thelia\\Model'),
             Argument::createBooleanTypeArgument('allow_zoom', false),
             Argument::createBooleanTypeArgument('base64', false),
-            Argument::createBooleanTypeArgument('with_prev_next_info', false)
+            Argument::createBooleanTypeArgument('with_prev_next_info', false),
+            Argument::createAnyTypeArgument('format')
         );
 
         // Add possible image sources
@@ -281,6 +283,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         $background_color = $this->getBackgroundColor();
         $quality = $this->getQuality();
         $effects = $this->getEffects();
+        $format = $this->getFormat();
 
         $event->setAllowZoom($this->getAllowZoom());
 
@@ -328,6 +331,9 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             }
             if (null !== $effects) {
                 $event->setEffects($effects);
+            }
+            if (null !== $format) {
+                $event->setFormat($format);
             }
 
             // Put source image file path

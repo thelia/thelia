@@ -36,6 +36,7 @@ use Thelia\Type\TypeCollection;
  * @method int         getWithZone()
  * @method int         getWithoutZone()
  * @method bool|string getUnassigned()
+ * @method bool|string getGroupByCountryArea()
  * @method int[]       getModuleId()
  * @method string[]    getOrder()
  */
@@ -54,6 +55,7 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntTypeArgument('with_zone'),
             Argument::createIntTypeArgument('without_zone'),
             Argument::createBooleanOrBothTypeArgument('unassigned'),
+            Argument::createBooleanOrBothTypeArgument('group_by_country_area'),
             Argument::createIntListTypeArgument('module_id'),
             new Argument(
                 'order',
@@ -116,6 +118,15 @@ class Area extends BaseI18nLoop implements PropelSearchLoopInterface
             $search
                 ->useCountryAreaQuery()
                 ->filterByCountryId($countries, Criteria::IN)
+                ->endUse();
+        }
+
+        $groupByCountryArea = $this->getGroupByCountryArea();
+
+        if ($groupByCountryArea) {
+            $search
+                ->useCountryAreaQuery()
+                ->groupByAreaId()
                 ->endUse();
         }
 

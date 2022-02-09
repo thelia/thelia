@@ -91,20 +91,31 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     public function processImage(ImageEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $subdir = $event->getCacheSubdirectory();
-        $source_file = $event->getSourceFilepath();
+        $sourceFile = $event->getSourceFilepath();
 
-        if (null == $subdir || null == $source_file) {
+        if (null == $subdir || null == $sourceFile) {
             throw new \InvalidArgumentException('Cache sub-directory and source file path cannot be null');
         }
 
         // Find cached file path
-        $cacheFilePath = $this->getCacheFilePath($subdir, $source_file, $event->isOriginalImage(), $event->getOptionsHash());
+        $cacheFilePath = $this->getCacheFilePath($subdir, $sourceFile, $event->isOriginalImage(), $event->getOptionsHash());
 
-        $originalImagePathInCache = $this->getCacheFilePath($subdir, $source_file, true);
+        //Alternative image path is for browser that don't support webp
+        $alternativeImagePath = null;
+
+        if ($event->getFormat()) {
+            $sourceExtension = pathinfo($cacheFilePath, \PATHINFO_EXTENSION);
+            if ($event->getFormat() === 'webp') {
+                $alternativeImagePath = $cacheFilePath;
+            }
+            $cacheFilePath = str_replace($sourceExtension, $event->getFormat(), $cacheFilePath);
+        }
+
+        $originalImagePathInCache = $this->getCacheFilePath($subdir, $sourceFile, true);
 
         if (!file_exists($cacheFilePath)) {
-            if (!file_exists($source_file)) {
-                throw new ImageException(sprintf('Source image file %s does not exists.', $source_file));
+            if (!file_exists($sourceFile)) {
+                throw new ImageException(sprintf('Source image file %s does not exists.', $sourceFile));
             }
 
             // Create a cached version of the original image in the web space, if not exists
@@ -113,141 +124,172 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                 $mode = ConfigQuery::read('original_image_delivery_mode', 'symlink');
 
                 if ($mode == 'symlink') {
-                    if (false === symlink($source_file, $originalImagePathInCache)) {
-                        throw new ImageException(sprintf('Failed to create symbolic link for %s in %s image cache directory', basename($source_file), $subdir));
+                    if (false === symlink($sourceFile, $originalImagePathInCache)) {
+                        throw new ImageException(sprintf('Failed to create symbolic link for %s in %s image cache directory', basename($sourceFile), $subdir));
                     }
                 } else {
                     // mode = 'copy'
-                    if (false === @copy($source_file, $originalImagePathInCache)) {
-                        throw new ImageException(sprintf('Failed to copy %s in %s image cache directory', basename($source_file), $subdir));
+                    if (false === @copy($sourceFile, $originalImagePathInCache)) {
+                        throw new ImageException(sprintf('Failed to copy %s in %s image cache directory', basename($sourceFile), $subdir));
                     }
                 }
             }
 
             // Process image only if we have some transformations to do.
             if (!$event->isOriginalImage()) {
-                // We have to process the image.
-                $imagine = $this->createImagineInstance();
-
-                $image = $imagine->open($source_file);
-
-                if ($image) {
-                    // Allow image pre-processing (watermarging, or other stuff...)
-                    $event->setImageObject($image);
-                    $dispatcher->dispatch($event, TheliaEvents::IMAGE_PREPROCESSING);
-                    $image = $event->getImageObject();
-
-                    $background_color = $event->getBackgroundColor();
-
-                    $palette = new RGB();
-
-                    if ($background_color != null) {
-                        $bg_color = $palette->color($background_color);
-                    } else {
-                        // Define a fully transparent white background color
-                        $bg_color = $palette->color('fff', 0);
-                    }
-
-                    // Apply resize
-                    $image = $this->applyResize(
-                        $imagine,
-                        $image,
-                        $event->getWidth(),
-                        $event->getHeight(),
-                        $event->getResizeMode(),
-                        $bg_color,
-                        $event->getAllowZoom()
-                    );
-
-                    // Rotate if required
-                    $rotation = (int) ($event->getRotation());
-
-                    if ($rotation != 0) {
-                        $image->rotate($rotation, $bg_color);
-                    }
-
-                    // Flip
-                    // Process each effects
-                    foreach ($event->getEffects() as $effect) {
-                        $effect = trim(strtolower($effect));
-
-                        $params = explode(':', $effect);
-
-                        switch ($params[0]) {
-                            case 'greyscale':
-                            case 'grayscale':
-                                $image->effects()->grayscale();
-                                break;
-                            case 'negative':
-                                $image->effects()->negative();
-                                break;
-                            case 'horizontal_flip':
-                            case 'hflip':
-                                $image->flipHorizontally();
-                                break;
-                            case 'vertical_flip':
-                            case 'vflip':
-                                $image->flipVertically();
-                                break;
-                            case 'gamma':
-                                // Syntax: gamma:value. Exemple: gamma:0.7
-                                if (isset($params[1])) {
-                                    $gamma = (float) ($params[1]);
-
-                                    $image->effects()->gamma($gamma);
-                                }
-                                break;
-                            case 'colorize':
-                                // Syntax: colorize:couleur. Exemple: colorize:#ff00cc
-                                if (isset($params[1])) {
-                                    $the_color = $palette->color($params[1]);
-
-                                    $image->effects()->colorize($the_color);
-                                }
-                                break;
-                            case 'blur':
-                                if (isset($params[1])) {
-                                    $blur_level = (int) ($params[1]);
-
-                                    $image->effects()->blur($blur_level);
-                                }
-                                break;
-                        }
-                    }
-
-                    $quality = $event->getQuality();
-
-                    if (null === $quality) {
-                        $quality = ConfigQuery::read('default_images_quality_percent', 75);
-                    }
-
-                    // Allow image post-processing (watermarging, or other stuff...)
-                    $event->setImageObject($image);
-                    $dispatcher->dispatch($event, TheliaEvents::IMAGE_POSTPROCESSING);
-                    $image = $event->getImageObject();
-
-                    $image->save(
-                        $cacheFilePath,
-                        ['quality' => $quality]
-                    );
-                } else {
-                    throw new ImageException(sprintf('Source file %s cannot be opened.', basename($source_file)));
+                $this->applyTransformation($sourceFile, $event, $dispatcher, $cacheFilePath);
+                if ($alternativeImagePath) {
+                    $this->applyTransformation($sourceFile, $event, $dispatcher, $alternativeImagePath);
                 }
             }
         }
 
         // Compute the image URL
-        $processed_image_url = $this->getCacheFileURL($subdir, basename($cacheFilePath));
+        $processedImageUrl = $this->getCacheFileURL($subdir, basename($cacheFilePath));
 
         // compute the full resolution image path in cache
-        $original_image_url = $this->getCacheFileURL($subdir, basename($originalImagePathInCache));
+        $originalImageUrl = $this->getCacheFileURL($subdir, basename($originalImagePathInCache));
 
         // Update the event with file path and file URL
         $event->setCacheFilepath($cacheFilePath);
         $event->setCacheOriginalFilepath($originalImagePathInCache);
 
-        $event->setFileUrl(URL::getInstance()->absoluteUrl($processed_image_url, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
-        $event->setOriginalFileUrl(URL::getInstance()->absoluteUrl($original_image_url, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
+        $event->setFileUrl(URL::getInstance()->absoluteUrl($processedImageUrl, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
+        $event->setOriginalFileUrl(URL::getInstance()->absoluteUrl($originalImageUrl, null, URL::PATH_TO_FILE, $this->cdnBaseUrl));
+    }
+
+    private function applyTransformation(
+        $sourceFile,
+        $event,
+        $dispatcher,
+        $cacheFilePath
+    ): void {
+        $imagine = $this->createImagineInstance();
+        $image = $imagine->open($sourceFile);
+
+        if (!$image) {
+            throw new ImageException(sprintf('Source file %s cannot be opened.', basename($sourceFile)));
+        }
+
+        if (\function_exists('exif_read_data')) {
+            $exifdata = @exif_read_data($sourceFile);
+            if (isset($exifdata['Orientation'])) {
+                $orientation = $exifdata['Orientation'];
+                $color = new RGB();
+                switch ($orientation) {
+                    case 3:
+                        $image->rotate(180, $color->color('#F00'));
+                        break;
+
+                    case 6:
+                        $image->rotate(90, $color->color('#F00'));
+                        break;
+
+                    case 8:
+                        $image->rotate(-90, $color->color('#F00'));
+                        break;
+                }
+            }
+        }
+
+        // Allow image pre-processing (watermarging, or other stuff...)
+        $event->setImageObject($image);
+        $dispatcher->dispatch($event, TheliaEvents::IMAGE_PREPROCESSING);
+        $image = $event->getImageObject();
+
+        $background_color = $event->getBackgroundColor();
+
+        $palette = new RGB();
+
+        if ($background_color != null) {
+            $bg_color = $palette->color($background_color);
+        } else {
+            // Define a fully transparent white background color
+            $bg_color = $palette->color('fff', 0);
+        }
+
+        // Apply resize
+        $image = $this->applyResize(
+            $imagine,
+            $image,
+            $event->getWidth(),
+            $event->getHeight(),
+            $event->getResizeMode(),
+            $bg_color,
+            $event->getAllowZoom()
+        );
+
+        // Rotate if required
+        $rotation = (int) ($event->getRotation());
+
+        if ($rotation != 0) {
+            $image->rotate($rotation, $bg_color);
+        }
+
+        // Flip
+        // Process each effects
+        foreach ($event->getEffects() as $effect) {
+            $effect = trim(strtolower($effect));
+
+            $params = explode(':', $effect);
+
+            switch ($params[0]) {
+                case 'greyscale':
+                case 'grayscale':
+                    $image->effects()->grayscale();
+                    break;
+                case 'negative':
+                    $image->effects()->negative();
+                    break;
+                case 'horizontal_flip':
+                case 'hflip':
+                    $image->flipHorizontally();
+                    break;
+                case 'vertical_flip':
+                case 'vflip':
+                    $image->flipVertically();
+                    break;
+                case 'gamma':
+                    // Syntax: gamma:value. Exemple: gamma:0.7
+                    if (isset($params[1])) {
+                        $gamma = (float) ($params[1]);
+
+                        $image->effects()->gamma($gamma);
+                    }
+                    break;
+                case 'colorize':
+                    // Syntax: colorize:couleur. Exemple: colorize:#ff00cc
+                    if (isset($params[1])) {
+                        $the_color = $palette->color($params[1]);
+
+                        $image->effects()->colorize($the_color);
+                    }
+                    break;
+                case 'blur':
+                    if (isset($params[1])) {
+                        $blur_level = (int) ($params[1]);
+
+                        $image->effects()->blur($blur_level);
+                    }
+                    break;
+            }
+        }
+
+        $quality = $event->getQuality();
+
+        if (null === $quality) {
+            $quality = ConfigQuery::read('default_images_quality_percent', 75);
+        }
+
+        // Allow image post-processing (watermarging, or other stuff...)
+        $event->setImageObject($image);
+        $dispatcher->dispatch($event, TheliaEvents::IMAGE_POSTPROCESSING);
+        $image = $event->getImageObject();
+
+        $image->save(
+            $cacheFilePath,
+            ['quality' => $quality, 'animated' => true]
+        );
     }
 
     /**

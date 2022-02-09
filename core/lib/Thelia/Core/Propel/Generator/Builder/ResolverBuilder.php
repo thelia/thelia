@@ -16,6 +16,11 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class ResolverBuilder extends \Propel\Generator\Builder\ResolverBuilder
 {
+    /**
+     * Gets the full path to the file for the current class.
+     *
+     * @return string
+     */
     public function getClassFilePath()
     {
         return rtrim((new Filesystem())->makePathRelative(

@@ -51,7 +51,12 @@ if (!$bootstraped) {
     }
 }
 
-(new \Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/.env');
+if (is_file(dirname(__DIR__).'/.env')) {
+    (new \Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/.env');
+} elseif (is_file($file = __DIR__.'/../../bootstrap.php')) {
+    // Here we are on a thelia/thelia-project
+    (new \Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/../.env');
+}
 
 $thelia = new App\Kernel($_ENV['APP_ENV'], true);
 

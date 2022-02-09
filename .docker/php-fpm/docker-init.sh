@@ -18,6 +18,8 @@ if ! test -f "$DB_FILE"; then
     php Thelia module:activate OpenApi
     php Thelia module:activate ChoiceFilter
     php Thelia module:activate StoreSeo
+    php Thelia module:activate ShortCode
+    php Thelia module:activate ShortCodeMeta
     php Thelia module:activate SmartyRedirection
     php Thelia module:deactivate HookAdminHome
     php Thelia module:deactivate HookAnalytics
