@@ -1,0 +1,84 @@
+{strip}{*
+This file defines the standard fields attributes, depending on input types.
+
+In addition to the standard form_field block output, this fragment uses the following additional variables :
+
+- field_template : the template style ('standard', or something else)
+- field_value : the value of the input field, which is used if the form_field value is empty. For radios and checkboxes,
+  the field is supposed to set the checked property if the form checked status is not defined: 0 -> not checked, != 0 -> checked.
+- field_extra_class : an extra class to add to the input class (see form-field-renderer.html)
+- field_no_standard_classes : an extra class to add to the input class (see form-field-renderer.html)
+- field_id : the ID of the input field. Override the ID defined in the form definition (see form-field-renderer.html)
+*}
+
+{*
+Use the optionnal $field_value parameter if no value is defined
+ Do not use empty(), as empty(0), empty("0") are true
+*}
+{if $type == 'checkbox' || $type == 'radio'}
+    {* we will not manage the "value" attribute, but the "checked" property. The field is checked if the provied field value is non-zero *}
+    {if ($checked == '' || $checked == null) && isset($field_value) && $field_value !== '' && $field_value !== null}
+        {$checked = $field_value != 0}
+    {/if}
+{else}
+    {* for other field types, juste manage the "value" attribute. *}
+    {if ($value == '' || $value == null) && isset($field_value) && $field_value !== '' && $field_value !== null}
+        {$value = $field_value}
+    {/if}
+{/if}
+
+{if (!isset($label_attr.for))}
+    {$label_attr.for = ""}
+{/if}
+{* Use the provided id if any *}
+{if (! empty($field_id))}
+    {$label_attr.for = {$field_id}}
+{elseif "" == $label_attr.for|default:null}
+    {* Synthetize an ID if none was given *}
+    {$label_attr.for = "{$form->getName()}-id-{$field_name}"}
+{/if}
+
+{* If we have a value key, generates a unique ID based on the value key. *}
+{if ! empty($value_key)}
+    {$label_attr.for = "{$label_attr.for|default:null}_{$value_key}"}
+{/if}
+
+{if $field_no_standard_classes}
+    {$standardClass = ''}
+{else}
+    {$standardClass = 'form-control'}
+{/if}
+
+{$sDisabled = null}
+{if  isset($disabled) && $disabled}
+    {$sDisabled = 'disabled'}
+{/if}
+
+{$sReadonly = null}
+{if isset($read_only) && $read_only}
+    {$sReadonly = 'readonly'}
+{/if}
+
+{$sMaxLength = null}
+{if isset($max_length)}
+    {$sMaxLength = "maxlength=\"{$max_length}\""}
+{/if}
+
+{$sRequired = null}
+{if isset($required) && $required}
+    {$sRequired='aria-required="true" required'}
+{/if}
+{if $type == 'hidden'}
+   id="{$label_attr.for|default:null}" name="{$name}" value="{$value}" {$attr}
+{elseif $type == 'checkbox' || $type == 'radio'}
+    id="{$label_attr.for|default:null}" name="{$name}" class="{$field_extra_class}" value="{$value}" {if $checked}checked="checked"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+{elseif $type == 'choice'}
+    id="{$label_attr.for|default:null}" name="{$name}{if $multiple && !strpos($name, '[]')}[]{/if}" class="{$standardClass} {$field_extra_class}" {if $multiple}multiple{/if} {if isset($attr_list.size)}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+{elseif $type == 'collection'}
+    id="{$label_attr.for|default:null}" name="{$name}[]" class="{$standardClass} {$field_extra_class}" {if $multiple}multiple{/if} {if isset($attr_list.size)}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+{elseif $type == 'textarea'}
+    id="{$label_attr.for|default:null}" name="{$name}" class="{$standardClass} {$field_extra_class}" {if $attr_list.rows|default:null}rows="{$attr_list.rows}"{/if} {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+{else}
+    id="{$label_attr.for|default:null}" name="{$name}" value="{$value}" class="{$standardClass} {$field_extra_class}" {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+{/if}
+{/strip}

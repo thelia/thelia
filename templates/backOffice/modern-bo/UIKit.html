@@ -1,0 +1,432 @@
+{extends file="admin-layout.tpl"} 
+
+{block name="main-content"}
+  <div class="bg-gray-800 p-5">
+    <div class="m-10">
+      <h1 class="text-center text-5xl text-white font-bold">Thelia Back Office UI KIT</h1>
+    </div>
+
+    <!-- Colors -->
+
+    <div class="flex justify-center p-10">
+      <div class="w-1/6">
+        <div class="bg-main shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-200 text-3xl font-bold m-4">#EC6351</div>
+        <div class="bg-darkMain shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-200 text-3xl font-bold m-4">#E25441</div>
+      </div>
+
+      <div class="w-1/6">
+        <div class="bg-lightCharbon shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-200 text-3xl font-bold m-4">#444444</div>
+        <div class="bg-mediumCharbon shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-200 text-3xl font-bold m-4">#333333</div>
+        <div class="bg-darkCharbon shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-200 text-3xl font-bold m-4">#222222</div>
+      </div>
+
+      <div class="w-1/6">
+        <div class="bg-grey shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-200 text-3xl font-bold m-4">#707070</div>
+        <div class="bg-mediumGrey shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-200 text-3xl font-bold m-4">#A7A7A7</div>
+        <div class="bg-lightGrey shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-600 text-3xl font-bold m-4">#EBEBEB</div>
+      </div>
+
+      <div class="w-1/6">
+        <div class="bg-lightPearl shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-600 text-3xl font-bold m-4">#F7F7F7</div>
+        <div class="bg-mediumPearl shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-600 text-3xl font-bold m-4">#F5F5F5</div>
+      </div>
+
+      <div class="w-1/6">
+        <div class="bg-carot shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-200 text-3xl font-bold m-4">#FC9722</div>
+        <div class="bg-green shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-200 text-3xl font-bold m-4">#73CE6F</div>
+        <div class="bg-blue shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-200 text-3xl font-bold m-4">#1E9AE8</div>
+      </div>
+
+      <div class="w-1/6">
+        <div class="bg-error shadow-2xl h-24 rounded-lg flex justify-center items-center text-gray-200 text-3xl font-bold m-4">#D10000</div>
+      </div>
+
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex items-center p-10">
+
+      <div class="mr-5">
+        <button class="bg-main hover:bg-darkMain p-3 text-gray-200 rounded-lg font-medium shadow-2xl">Click Me</button>
+      </div>
+      
+      <div class="mr-5">
+        <button class="bg-transparent hover:bg-darkMain border-main border-2 p-3 text-gray-200 rounded-lg font-medium shadow-2xl">Click Me</button>
+      </div>
+
+      <div class="mr-5">
+        <button disabled class="bg-main bg-opacity-60 p-3 text-gray-200 rounded-lg font-medium shadow-2xl">Disabled</button>
+      </div>
+
+      <div class="mr-5">
+        <a href="#" class="text-main font-medium">Link Button</a>
+      </div>
+
+      <div class="mr-5">
+        <button class="bg-main hover:bg-darkMain p-4 flex items-center justify-center text-gray-200 rounded-full font-medium shadow-2xl">
+          <i class="fas fa-user"></i>
+        </button>
+      </div>
+
+      <div class="mr-5">
+        <button class="bg-lightGrey hover:bg-mediumCharbon hover:text-lightGrey p-4 flex items-center justify-center text-mediumCharbon rounded-full font-medium shadow-2xl">
+          <i class="fas fa-cog"></i>
+        </button>
+      </div>
+
+    </div>
+
+
+
+    <!-- Inputs -->
+    <div class="flex flex-col p-10">
+
+      <div class="w-1/4 mb-5">
+        <input type="text" class="w-full bg-gray-100 placeholder-gray-500 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main" placeholder="Enter something...">
+      </div>
+
+      <div class="w-1/4 mb-5">
+        <input type="text" class="w-full bg-gray-100 placeholder-gray-500 rounded-lg shadow-2xl focus:ring-error border-2 border-main focus:outline-none" placeholder="Enter something...">
+        <span class="text-error">Something bad just happened</span>
+      </div>
+
+      <div class="w-1/4 mb-5">
+        <div class="search flex items-center">
+          <div class="search-icon h-auto py-2 pl-3 pr-4 rounded-l-lg bg-gray-100 text-main">
+            <i class="fas fa-search"></i>
+          </div>
+          <input type="search" class="search-input w-full text-mediumCharbon bg-gray-100 placeholder-gray-500 rounded-r-lg border-0 shadow-2xl focus:ring-main focus:outline-none focus:border-main" placeholder="Search...">
+        </div>
+      </div>
+
+      <div class="mb-5 w-1/4">
+        <input type="date" class="w-full bg-gray-100 text-gray-500 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main">
+      </div>
+
+      <div class="mb-5 w-1/4">
+        <select class="w-full text-gray-500 rounded-lg">
+          <option disabled selected>Select something...</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- Radio & Checkbox -->
+    <div class="flex p-10 w-1/3">
+      <div class="m-2 text-white w-1/2">
+        <div>
+          <input class="Radio mr-3" id="r1" type="radio" name="thelia-radio">
+          <label for="r1">One</label>
+        </div>
+
+        <div>
+          <input class="Radio mr-3" id="r2" type="radio" name="thelia-radio">
+          <label for="r2">Two</label>
+
+        </div>
+        
+        <div>        
+          <input class="Radio mr-3" id="r3" type="radio" name="thelia-radio">
+          <label for="r3">Three</label>
+        </div>
+      </div>
+
+      <div class="m-2 text-white w-1/2">
+        <div>
+          <input class="mr-3 Checkbox" id="cb1" type="checkbox" name="thelia-checkbox">
+          <label for="cb1">One</label>
+        </div>
+
+        <div>
+          <input class="mr-3 Checkbox" id="cb2" type="checkbox" name="thelia-checkbox">
+          <label for="cb2">Two</label>
+        </div>
+        
+        <div>        
+          <input class="mr-3 Checkbox" id="cb3" type="checkbox" name="thelia-checkbox">
+          <label for="cb3">Three</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toggle -->
+    <div class="flex p-10">
+      <div class="m-2 mr-5">
+        <label for="toggle" class="flex items-center cursor-pointer">
+          <div class="mr-3 text-white">
+            Off
+          </div>
+          <div class="relative">
+            <input type="checkbox" id="toggle" class="switch sr-only">
+            <div class="block bg-red-500 w-10 h-6 rounded-full"></div>
+            <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+          </div>
+        </label>
+      </div>
+
+      <div class="m-2">
+        <label for="toggle2" class="flex items-center cursor-pointer">
+          <div class="mr-3 text-white">
+            On
+          </div>
+          <div class="relative">
+            <input type="checkbox" checked id="toggle2" class="switch sr-only">
+            <div class="block bg-red-500 w-10 h-6 rounded-full"></div>
+            <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+
+    <div class="flex p-10">
+      <div class="m-2 flex flex-col text-gray-100">
+        <span class="mb-3 text-4xl font-bold">I'm a Title</span>
+        <span class="mb-3 text-2xl font-semibold">I'm a Subtitle</span>
+        <span class="mb-3">I'm a Regular Text</span>
+      </div>
+    </div>
+
+
+    <!-- Pills -->
+    <div class="flex p-10">
+
+      <div class="m-2">
+        <div class="px-4 py-1 bg-gray-500 rounded-3xl text-white">78346</div>
+      </div>
+
+      <div class="m-2">
+        <div class="px-4 py-1 bg-yellow-300 rounded-3xl text-white">4</div>  
+      </div>
+
+      <div class="m-2">
+        <div class="px-4 py-1 bg-blue rounded-3xl text-white">54743</div>  
+      </div>
+
+      <div class="m-2">
+        <div class="px-4 py-1 bg-green rounded-3xl text-white">18615</div>  
+      </div>
+
+      <div class="m-2">
+        <div class="px-4 py-1 bg-red-500 rounded-3xl text-white">198</div>  
+      </div>
+
+    </div>
+
+    <!-- Panel -->
+    <div class="flex p-10">
+
+      <div class="m-2 w-1/3">
+        <div class="bg-white rounded-lg h-52 shadow-2xl p-5">
+          <h1 class="text-2xl font-semibold text-center">Panel</h1>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Array -->
+    <div class="flex p-10">
+
+      <div class="m-2 w-1/2">
+        <div class="bg-white rounded-lg h-52 shadow-2xl p-5">
+          <h1 class="text-2xl font-semibold text-center">Panel</h1>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Tableaux -->
+
+    <div class="flex p-10">
+      <table class="table-auto bg-lightPearl rounded-xl">
+        <thead class="bg-darkCharbon text-lightGrey">
+          <tr>
+            <th class="px-5 py-4">ID</th>
+            <th class="px-5 py-4">Titre de la rubrique</th>
+            <th class="px-5 py-4">En ligne</th>
+            <th class="px-5 py-4">Description</th>
+            <th class="px-5 py-4">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td class="px-5 py-4">1</td>
+            <td class="px-5 py-4">Evénementiel</td>
+            <td class="px-5 py-4">
+              <label for="tabToggle" class="flex items-center justify-center cursor-pointer">
+                <div class="relative">
+                  <input type="checkbox" checked id="tabToggle" class="switch sr-only">
+                  <div class="block bg-red-500 w-10 h-6 rounded-full"></div>
+                  <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+                </div>
+              </label>
+            </td>
+            <td class="px-5 py-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet iste dolore totam minima. Laboriosam, quasi fugit?</td>
+            <td class="py-4 px-auto flex justify-center">
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-yellow-700 hover:bg-yellow-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="far fa-folder"></i>
+              </a>
+
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-indigo-700 hover:bg-indigo-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="fas fa-pen"></i>
+              </a>
+
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-red-700 hover:bg-red-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="fas fa-trash"></i>
+              </a>
+            </td>
+          </tr>
+          
+          <tr class="bg-lightGrey">
+            <td class="px-5 py-4">2</td>
+            <td class="px-5 py-4">Industrie</td>
+            <td class="px-5 py-4">
+              <label for="tabToggle2" class="flex items-center justify-center cursor-pointer">
+                <div class="relative">
+                  <input type="checkbox" checked id="tabToggle2" class="switch sr-only">
+                  <div class="block bg-red-500 w-10 h-6 rounded-full"></div>
+                  <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+                </div>
+              </label>
+            </td>
+            <td class="px-5 py-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet iste dolore totam minima. Laboriosam, quasi fugit?</td>
+            <td class="py-4 px-auto flex justify-center">
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-yellow-700 hover:bg-yellow-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="far fa-folder"></i>
+              </a>
+
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-indigo-700 hover:bg-indigo-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="fas fa-pen"></i>
+              </a>
+
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-red-700 hover:bg-red-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="fas fa-trash"></i>
+              </a>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="px-5 py-4">3</td>
+            <td class="px-5 py-4">Sport</td>
+            <td class="px-5 py-4">
+              <label for="tabToggle3" class="flex items-center justify-center cursor-pointer">
+                <div class="relative">
+                  <input type="checkbox" checked id="tabToggle3" class="switch sr-only">
+                  <div class="block bg-red-500 w-10 h-6 rounded-full"></div>
+                  <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+                </div>
+              </label>
+            </td>
+            <td class="px-5 py-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet iste dolore totam minima. Laboriosam, quasi fugit?</td>
+            <td class="py-4 px-auto flex justify-center">
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-yellow-700 hover:bg-yellow-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="far fa-folder"></i>
+              </a>
+
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-indigo-700 hover:bg-indigo-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="fas fa-pen"></i>
+              </a>
+
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-red-700 hover:bg-red-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="fas fa-trash"></i>
+              </a>
+            </td>
+          </tr>
+
+          
+          <tr class="bg-lightGrey">
+            <td class="px-5 py-4">4</td>
+            <td class="px-5 py-4">Médical</td>
+            <td class="px-5 py-4">
+              <label for="tabToggle4" class="flex items-center justify-center cursor-pointer">
+                <div class="relative">
+                  <input type="checkbox" checked id="tabToggle4" class="switch sr-only">
+                  <div class="block bg-red-500 w-10 h-6 rounded-full"></div>
+                  <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+                </div>
+              </label>
+            </td>
+            <td class="px-5 py-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet iste dolore totam minima. Laboriosam, quasi fugit?</td>
+            <td class="py-4 px-auto flex justify-center">
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-yellow-500 hover:bg-yellow-600 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="far fa-folder"></i>
+              </a>
+
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-indigo-700 hover:bg-indigo-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="fas fa-pen"></i>
+              </a>
+
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-red-700 hover:bg-red-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="fas fa-trash"></i>
+              </a>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="px-5 py-4">5</td>
+            <td class="px-5 py-4">Informatique</td>
+            <td class="px-5 py-4">
+              <label for="tabToggle5" class="flex items-center justify-center cursor-pointer">
+                <div class="relative">
+                  <input type="checkbox" checked id="tabToggle5" class="switch sr-only">
+                  <div class="block bg-red-500 w-10 h-6 rounded-full"></div>
+                  <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+                </div>
+              </label>
+            </td>
+            <td class="px-5 py-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet iste dolore totam minima. Laboriosam, quasi fugit?</td>
+            <td class="py-4 px-auto flex justify-center">
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-yellow-700 hover:bg-yellow-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="far fa-folder"></i>
+              </a>
+
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-indigo-700 hover:bg-indigo-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="fas fa-pen"></i>
+              </a>
+
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-red-700 hover:bg-red-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="fas fa-trash"></i>
+              </a>
+            </td>
+          </tr>
+
+          <tr class="bg-lightGrey">
+            <td class="px-5 py-4">6</td>
+            <td class="px-5 py-4">Aéronautique</td>
+            <td class="px-5 py-4">
+              <label for="tabToggle6" class="flex items-center justify-center cursor-pointer">
+                <div class="relative">
+                  <input type="checkbox" checked id="tabToggle6" class="switch sr-only">
+                  <div class="block bg-red-500 w-10 h-6 rounded-full"></div>
+                  <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+                </div>
+              </label>
+            </td>
+            <td class="px-5 py-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet iste dolore totam minima. Laboriosam, quasi fugit?</td>
+            <td class="py-4 px-auto flex justify-center">
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-yellow-700 hover:bg-yellow-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="far fa-folder"></i>
+              </a>
+
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-indigo-700 hover:bg-indigo-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="fas fa-pen"></i>
+              </a>
+
+              <a href="{navigate to="index"}" class="flex items-center justify-center p-3 text-center bg-red-700 hover:bg-red-800 text-white hover:text-lightGrey font-medium" title="{intl l='View site'}" target="_blank">
+                <i class="fas fa-trash"></i>
+              </a>
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+{/block}

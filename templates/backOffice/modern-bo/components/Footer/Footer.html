@@ -1,0 +1,24 @@
+<div class="lg:mx-20 mb-4 lg:mb-0">
+  <p class="text-lightCharbon text-center">&copy; <span class="font-bold text-mediumCharbon">Thelia <time datetime="{'Y-m-d'|date}">{'Y'|date}</time></span> 
+    - {intl l='Version %ver' ver="{$THELIA_VERSION}"}
+    - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Made with ❤️ by '}<span class="text-main font-bold">OpenStudio</span></a>
+    - <a href="http://thelia.net/forum" target="_blank" class="text-main font-bold">{intl l='Need help ?'}</a>
+  </p>
+
+  {hook name="main.in-footer" location="in_footer" }
+
+</div>
+
+<div class="flex justify-center items-center text-mediumCharbon text-3xl m-0 lg:mr-5">
+  <a href="https://www.facebook.com/theliaecommerce" target="_blank" class="px-3">
+    <i class="fab fa-facebook"></i>
+  </a>
+
+  <a href="https://twitter.com/theliaecommerce" target="_blank" class="px-3">
+    <i class="fab fa-twitter"></i>
+  </a>
+
+  <a href="https://github.com/thelia/thelia" target="_blank" class="px-3">
+    <i class="fab fa-github"></i>
+  </a>
+</div>

@@ -1,0 +1,29 @@
+<div class="">
+  <div class="flex items-center{if isset($error) && $error}border-error border-2 rounded-lg{/if}">
+      {if isset($icon) && $icon}
+      <div class="icon h-auto py-2 px-3 rounded-l-lg bg-lightGrey text-main">
+          <i class="fas fa-{$icon}"></i>
+      </div>
+      {/if}
+
+      <input
+        type="{$type|default:"text"}"
+        name="{$name}"
+        id="{$id|default:$name}"
+        class="text-mediumCharbon bg-lightGrey placeholder-gray-500 rounded-r-lg border-0 focus:ring-main focus:outline-none focus:border-main {$inputClass|default:null}"
+        placeholder="{$placeholder}"
+        {if isset($value)}value="{$value}"{/if}
+        {if isset($mandatory) && $mandatory}
+          aria-required="true"
+          required
+        {/if}
+        {$attributes|default:null nofilter}
+      />
+
+  </div>
+  {if isset($message) && $message}
+    {form_error field=$field_name|default:null}
+        <span class="block text-error mt-2">{$message|default:null}</span>
+    {/form_error}
+  {/if}
+</div>

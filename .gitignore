@@ -70,6 +70,7 @@ templates/frontOffice/modern/core
 !templates/backOffice
 templates/backOffice/*
 !templates/backOffice/default
+!templates/backOffice/modern-bo
 !templates/email
 templates/email/*
 !templates/email/default

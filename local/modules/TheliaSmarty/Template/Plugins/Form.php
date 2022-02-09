@@ -220,7 +220,8 @@ class Form extends AbstractSmartyPlugin
         /* access to choice collections */
         if ($formFieldType instanceof CollectionType) {
             /* access to choices */
-            if ($formFieldConfig->getOption('prototype', false)
+            if (
+                $formFieldConfig->getOption('prototype', false)
                 &&
                 isset($formFieldView->vars['prototype']->vars['choices'])
             ) {
@@ -281,7 +282,8 @@ class Form extends AbstractSmartyPlugin
 
             switch ($formFieldView->vars['type']) {
                 case 'choice':
-                    if (!isset($formFieldView->vars['options']['choices']) ||
+                    if (
+                        !isset($formFieldView->vars['options']['choices']) ||
                         !\is_array($formFieldView->vars['options']['choices'])
                     ) {
                         // throw new FIXME
@@ -383,7 +385,7 @@ class Form extends AbstractSmartyPlugin
 
         $snippet_content = file_get_contents(
             $this->parser->getTemplateDefinition()->getTemplateFilePath(
-                'forms'.DS.$templateStyle.DS.$templateFile.'.html'
+                'forms' . DS . $templateStyle . DS . $templateFile . '.html'
             )
         );
 
@@ -401,6 +403,8 @@ class Form extends AbstractSmartyPlugin
         $field_value = $this->getParam($params, 'value', '');
         $show_label = $this->getParam($params, 'show_label', true);
         $value_key = $this->getParam($params, 'value_key', false);
+        $icon = $this->getParam($params, 'icon', null);
+        $required = $this->getParam($params, 'required', false);
 
         $template->assign([
             'content' => trim($content),
@@ -413,6 +417,8 @@ class Form extends AbstractSmartyPlugin
             'field_template' => $templateStyle,
             'value_key' => $value_key,
             'show_label' => $show_label,
+            'icon' => $icon,
+            'required' => $required
         ]);
 
         return $template->fetch(sprintf('string:%s', $snippet_content));
@@ -518,7 +524,8 @@ class Form extends AbstractSmartyPlugin
         /** @var FormView $row */
         foreach ($formView->getIterator() as $row) {
             // We have to exclude the fields for which value is defined in the template.
-            if ($baseFormInstance->isTemplateDefinedHiddenField($row)
+            if (
+                $baseFormInstance->isTemplateDefinedHiddenField($row)
                 ||
                 \in_array($row->vars['name'], $exclude)
             ) {
@@ -690,8 +697,8 @@ class Form extends AbstractSmartyPlugin
         if (!$instance instanceof BaseForm) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'form parameter in form_field block must be an instance of '.
-                    "\Thelia\Form\BaseForm, instance of %s found",
+                    'form parameter in form_field block must be an instance of ' .
+                        "\Thelia\Form\BaseForm, instance of %s found",
                     \get_class($instance)
                 )
             );
@@ -743,8 +750,8 @@ class Form extends AbstractSmartyPlugin
         if (!$sfForm instanceof SymfonyForm) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    '%s parameter must be an instance of '.
-                    "\Symfony\Component\Form\Form, instance of %s found",
+                    '%s parameter must be an instance of ' .
+                        "\Symfony\Component\Form\Form, instance of %s found",
                     $name,
                     \is_object($sfForm) ? \get_class($sfForm) : \gettype($sfForm)
                 )
@@ -842,10 +849,10 @@ class Form extends AbstractSmartyPlugin
      */
     protected function getFormStackHash(BaseForm $form, SymfonyForm $field = null)
     {
-        $build = \get_class($form).':'.$form->getType();
+        $build = \get_class($form) . ':' . $form->getType();
 
         if (null !== $field) {
-            $build .= ':'.$this->buildFieldName($field);
+            $build .= ':' . $this->buildFieldName($field);
         }
 
         return md5($build);
@@ -902,8 +909,8 @@ class Form extends AbstractSmartyPlugin
             if (!$resolved) {
                 throw new \LogicException(
                     sprintf(
-                        "The field '%s' is not a collection, it's a '%s'.".
-                        "You can't use it with the function 'form_collection' in form '%s'",
+                        "The field '%s' is not a collection, it's a '%s'." .
+                            "You can't use it with the function 'form_collection' in form '%s'",
                         $collection,
                         $baseFieldType->getName(),
                         $form::getName()
