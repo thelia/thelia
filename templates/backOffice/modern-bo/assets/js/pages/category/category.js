@@ -68,7 +68,7 @@ const CategoryRow = ({ id, title, isOnline, description }) => {
         </label>
       </td>
       <td className="px-5 py-4 w-2/3">{description}</td>
-      <td className="py-4 px-auto flex justify-center">
+      <td className="px-5 py-4 px-auto flex justify-center">
         <button
           href="/"
           className="flex items-center justify-center p-3 text-center bg-carot text-white hover:text-lightGrey font-medium rounded-md"
