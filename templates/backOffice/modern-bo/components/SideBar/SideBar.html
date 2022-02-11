@@ -1,6 +1,6 @@
 {$admin_current_location = $admin_current_location|default:null}
 {hook name="main.before-top-menu" location="before_top_menu" }
-<ul id="side-menu">
+<ul id="side-menu" class="relative h-full select-none">
 
     <li id="home_menu">
         <a href="{url path='/admin/home'}" title="{intl l="Home"}" class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
@@ -10,10 +10,44 @@
     </li>
 
     {loop name="menu-auth-order" type="auth" role="ADMIN" resource="admin.order" access="VIEW"}
-    <li class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}" id="orders_menu">
-        <i class="fas fa-shopping-cart ml-5 mr-7 text-white"></i>
-        <span class="text-mediumGrey">{intl l="Orders"}</span>
-        <i class="fas fa-chevron-right menu-collapse text-mediumGrey ml-auto mr-6"></i>
+    <li class="{if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}" id="orders_menu">
+        <span class="sidebar-item py-6 h-11 flex items-center cursor-pointer {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}" data-toggle-order-dropdown>
+            <i class="sidebar-item-icon fas fa-shopping-cart ml-5 mr-7 text-white"></i>
+            <span class="sidebar-item-title text-mediumGrey">{intl l="Orders"}</span>
+        </span>
+        
+        <ul class="sidebar-order-submenu absolute inset-y-0 left-full w-80 bg-darkCharbon hidden p-6 px-5 text-mediumGrey">
+            <div class="flex justify-between w-full mb-8">
+                <span class="text-2xl text-white font-bold">{intl l="Orders"}</span>
+                <div class="text-mediumGrey text-xl hover:text-main cursor-pointer" data-close-order-dropdown>
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+
+            <div class="w-full px-2">
+                <a class="flex items-center h-11 w-full justify-between my-2" href="{url path='admin/orders'}">
+                    <span class="font-semibold">{intl l="All orders"}</span>
+                    <span class="text-sm px-3 py-0.5 rounded-3xl bg-grey text-white">{count type="order" customer="*" backend_context="1"}</span>
+                </a>
+                {loop name="order-status-list" type="order-status"}
+                    {$count = {count type="order" customer="*" backend_context="1" status={$ID}}}
+                    <li class="flex items-center h-11 w-full justify-between my-2">
+                        <span class="font-semibold">{$TITLE}</span>
+                        <div style="background-color: {$COLOR};" class="text-sm px-3 py-0.5 rounded-3xl text-white">{$count}</div>
+                    </li>
+                {/loop}
+                {hookblock name="main.top-menu-order" fields="id,class,url,title"}
+                    {forhook rel="main.top-menu-order"}
+                        <li>
+                            <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                {$title}
+                            </a>
+                        </li>
+                    {/forhook}
+                {/hookblock}
+            </div>
+            
+        </ul>
 
         {* <ul id="collapse-orders" class="collapse {if $admin_current_location == 'order'}in{/if}" role="menu">
 
@@ -46,33 +80,7 @@
             {/hookblock}
         </ul> *}
     </li>
-
-    <ul class="bg-darkCharbon flex flex-col items-center px-4 text-mediumGrey">
-        <li class="flex items-center h-11 w-full justify-between my-2">
-            <span>Toutes les commandes</span>
-            <div class="text-sm px-3 py-0.5 bg-grey rounded-3xl text-white">78346</div>
-        </li>
-
-        <li class="flex items-center h-11 w-full justify-between my-2">
-            <span>Non payée</span>
-            <div class="text-sm px-3 py-0.5 bg-carot rounded-3xl text-white">4</div>
-        </li>
-
-        <li class="flex items-center h-11 w-full justify-between my-2">
-            <span>Confirmée</span>
-            <div class="text-sm px-3 py-0.5 bg-blue rounded-3xl text-white">3</div>
-        </li>
-
-        <li class="flex items-center h-11 w-full justify-between my-2">
-            <span>Payée</span>
-            <div class="text-sm px-3 py-0.5 bg-green rounded-3xl text-white">2</div>
-        </li>
-
-        <li class="flex items-center h-11 w-full justify-between my-2">
-            <span>En traitement</span>
-            <div class="text-sm px-3 py-0.5 bg-error rounded-3xl text-white">198</div>
-        </li>
-    </ul>
+    
     {/loop}
 
     {loop name="menu-auth-customer" type="auth" role="ADMIN" resource="admin.customer" access="VIEW"}
