@@ -18,7 +18,8 @@ Encore.configureFriendlyErrorsPlugin((options) => {
 Encore.addPlugin(new ESLintPlugin());
 
 Encore.addAliases({
-  '@TheliaJS': path.resolve(__dirname, './assets/js/app.js')
+  '@TheliaJS': path.resolve(__dirname, './assets/js/app.js'),
+  '@components': path.resolve(__dirname, './components'),
 });
 
 // ENTRIES
