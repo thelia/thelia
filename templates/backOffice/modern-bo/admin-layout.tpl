@@ -45,11 +45,11 @@
         {hook name="main.before-topbar" location="before_topbar" }
 
         <header id="header"
-          class="flex items-center justify-center lg:justify-between bg-white shadow-lg max-h-24 lg:max-h-16 py-3 lg:py-0">
+          class="sticky top-0 z-10 flex items-center justify-center lg:justify-between bg-white shadow-lg max-h-24 lg:max-h-16 py-3 lg:py-0">
           {include file="components/Header/Header.html"}
         </header>
 
-        <aside id="sidebar" class="hidden lg:flex flex-col justify-between bg-mediumCharbon" role="navigation">
+        <aside id="sidebar" class="z-10 hidden lg:flex flex-col justify-between bg-mediumCharbon" role="navigation">
           {include file="components/SideBar/SideBar.html"}
         </aside>
 

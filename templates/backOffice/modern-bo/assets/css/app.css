@@ -96,6 +96,12 @@
   }
 }
 
+.dropdown:hover {
+  .icon {
+    @apply bg-mediumCharbon text-lightGrey;
+  }
+}
+
 .dropdown:hover .dropdown-menu {
   opacity: 1;
   transform: translate(0) scale(1);

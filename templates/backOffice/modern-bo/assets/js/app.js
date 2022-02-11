@@ -5,6 +5,9 @@ import { html } from 'htm/react';
 import React from 'react';
 import * as ReactQuery from 'react-query';
 import axios from 'axios';
+import { SideBar } from '@components/SideBar/SideBar';
+
+SideBar()
 
 export const TheliaJS = {
   React: React,
