@@ -4,6 +4,8 @@
 
 @import './pages/**/*.css';
 
+@import 'sidebar';
+
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
@@ -76,18 +78,6 @@
 
 #page > #main {
   grid-area: content;
-}
-
-.sidebar-item:hover {
-  @apply bg-darkCharbon;
-}
-
-.sidebar-item:hover span {
-  @apply text-lightGrey;
-}
-
-.sidebar-item:hover i {
-  @apply text-main;
 }
 
 .dropdown-menu a:hover {

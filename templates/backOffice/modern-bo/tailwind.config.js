@@ -39,7 +39,8 @@ module.exports = {
   },
   variants: {
     extend: {
-      backgroundColor: ['odd', 'even']
+      backgroundColor: ['odd', 'even'],
+      display: ['group-hover', 'group-focus']
     }
   },
   plugins: [require('@tailwindcss/forms')]
