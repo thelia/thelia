@@ -24,7 +24,7 @@ Encore.addAliases({
 
 // ENTRIES
 Encore.addEntry('app', './assets/js/app.js');
-Encore.addEntry('category', './assets/js/pages/category/category.js');
+Encore.addEntry('category', './assets/js/pages/category/category.jsx');
 
 console.log(__dirname, path.basename(__dirname));
 

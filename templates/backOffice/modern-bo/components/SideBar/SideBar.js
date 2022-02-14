@@ -1,33 +1,21 @@
-/* import Mmenu from ''
-
-new Mmenu("#sidebar", {
-  "extensions": [
-     "theme-dark"
-  ],
-  "navbars": [
-     {
-        "position": "top",
-        "content": [
-           "searchfield"
-        ]
-     }
-  ]
-}); */
+import MmenuLight from 'mmenu-light'
 
 export const SideBar = () => {
-   // const ordersDropdown = document.querySelector('#orders_menu')
-   // const toolsDropdown = document.querySelector('#tools_menu')
-   const ordersDropdownClose = document.querySelector('[data-close-orders-dropdown]')
-   const toolsDropdownClose = document.querySelector('[data-close-tools-dropdown]')
+  const sidebar = document.querySelector('#side-menu')
+  const burger = document.querySelector('a[href="#Sidebar"]')
 
-   ordersDropdownClose.addEventListener('click', (e) => {
-      console.log("-", document.activeElement)
-      document.body.focus()
-      console.log(document.activeElement)
+  if (!sidebar || !burger) return;
 
-   })
+  const menu = new MmenuLight(sidebar, "(max-width: 1024px)")
 
-   toolsDropdownClose.addEventListener('click', (e) => {
-      document.body.focus()
-   })
+  const navigator = menu.navigation({})
+  const drawer = menu.offcanvas({})
+
+  burger.addEventListener('click', e => {
+    e.preventDefault()
+
+    burger.classList.contains('is-open') ? drawer.close() : drawer.open()
+  })
+
+  return navigator
 }

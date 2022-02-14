@@ -1,13 +1,11 @@
 @import 'tailwindcss/base';
-
-@import '../../components/**/*.css';
-
-@import './pages/**/*.css';
-
-@import 'sidebar';
-
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+@import 'mmenu-light/dist/mmenu-light.css';
+
+@import '../../components/**/*.css';
+@import './pages/**/*.css';
 
 * {
   font-family: 'Open Sans', sans-serif;

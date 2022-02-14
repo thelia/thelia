@@ -4137,6 +4137,11 @@ mkdirp@^0.5.5:
   dependencies:
     minimist "^1.2.5"
 
+mmenu-light@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/mmenu-light/-/mmenu-light-3.1.0.tgz#28105a33b20542156fd1feeaec09d4785afd62b9"
+  integrity sha512-HKJJcMzjYxai4yUz3phODTPJstKxhBdiqEzf9zDmxj/5m8WLUn9/GkAz7uzuBR7LWU70iDS9D7jNgz6m5BqRUw==
+
 modern-normalize@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/modern-normalize/-/modern-normalize-1.1.0.tgz#da8e80140d9221426bd4f725c6e11283d34f90b7"
