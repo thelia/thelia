@@ -1,6 +1,6 @@
 {$admin_current_location = $admin_current_location|default:null}
 {hook name="main.before-top-menu" location="before_top_menu" }
-<ul id="side-menu" class="relative h-full select-none">
+<ul id="side-menu" class="relative h-full">
 
     <li id="home_menu">
         <a href="{url path='/admin/home'}" title="{intl l="Home"}" class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
@@ -10,31 +10,31 @@
     </li>
 
     {loop name="menu-auth-order" type="auth" role="ADMIN" resource="admin.order" access="VIEW"}
-    <li class="{if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}" id="orders_menu">
-        <span class="sidebar-item py-6 h-11 flex items-center cursor-pointer {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}" data-toggle-order-dropdown>
+    <li class="sidebar-item {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}" id="orders_menu">
+        <a href="#" class="py-6 h-11 flex items-center cursor-pointer">
             <i class="sidebar-item-icon fas fa-shopping-cart ml-5 mr-7 text-white"></i>
             <span class="sidebar-item-title text-mediumGrey">{intl l="Orders"}</span>
-        </span>
+        </a>
         
-        <ul class="sidebar-order-submenu absolute inset-y-0 left-full w-80 bg-darkCharbon hidden p-6 px-5 text-mediumGrey">
+        <ul class="sidebar-orders-submenu hidden absolute inset-y-0 left-full w-80 bg-darkCharbon p-6 px-5 text-mediumGrey">
             <div class="flex justify-between w-full mb-8">
                 <span class="text-2xl text-white font-bold">{intl l="Orders"}</span>
-                <div class="text-mediumGrey text-xl hover:text-main cursor-pointer" data-close-order-dropdown>
+                <button class="text-mediumGrey text-xl hover:text-main cursor-pointer" data-close-orders-dropdown>
                     <i class="fas fa-times"></i>
-                </div>
+                </button>
             </div>
 
             <div class="w-full px-2">
-                <a class="flex items-center h-11 w-full justify-between my-2" href="{url path='admin/orders'}">
+                <a class="flex items-center h-11 w-full justify-between my-2 hover:text-main" href="{url path='admin/orders'}">
                     <span class="font-semibold">{intl l="All orders"}</span>
                     <span class="text-sm px-3 py-0.5 rounded-3xl bg-grey text-white">{count type="order" customer="*" backend_context="1"}</span>
                 </a>
                 {loop name="order-status-list" type="order-status"}
                     {$count = {count type="order" customer="*" backend_context="1" status={$ID}}}
-                    <li class="flex items-center h-11 w-full justify-between my-2">
+                    <a href="{url path="admin/orders" status={$ID}}" class="flex items-center h-11 w-full justify-between my-2 hover:text-main">
                         <span class="font-semibold">{$TITLE}</span>
                         <div style="background-color: {$COLOR};" class="text-sm px-3 py-0.5 rounded-3xl text-white">{$count}</div>
-                    </li>
+                    </a>
                 {/loop}
                 {hookblock name="main.top-menu-order" fields="id,class,url,title"}
                     {forhook rel="main.top-menu-order"}
@@ -46,39 +46,7 @@
                     {/forhook}
                 {/hookblock}
             </div>
-            
         </ul>
-
-        {* <ul id="collapse-orders" class="collapse {if $admin_current_location == 'order'}in{/if}" role="menu">
-
-            <li role="menuitem">
-                <a class="clearfix" href="{url path='admin/orders'}">
-                    <span class="sidebar-item pull-left">{intl l="All orders"}</span>
-                    <span class="label label-lg label-default pull-right">{count type="order" customer="*" backend_context="1"}</span>
-                </a>
-            </li>
-
-            {loop name="order-status-list" type="order-status"}
-                {$count = {count type="order" customer="*" backend_context="1" status={$ID}}}
-                {if $count}
-                <li role="menuitem">
-                    <a class="clearfix" data-target="{url path="admin/orders/"}{$LABEL|default:null}" href="{url path="admin/orders" status={$ID}}">
-                        <span class="sidebar-item pull-left">{$TITLE}</span>
-                        <span class="label label-lg pull-right" style="background-color: {$COLOR};">{$count}</span>
-                    </a>
-                </li>
-                {/if}
-            {/loop}
-            {hookblock name="main.top-menu-order" fields="id,class,url,title"}
-                {forhook rel="main.top-menu-order"}
-                    <li role="menuitem">
-                        <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
-                            {$title}
-                        </a>
-                    </li>
-                {/forhook}
-            {/hookblock}
-        </ul> *}
     </li>
     
     {/loop}
@@ -198,44 +166,62 @@
     {/loop}
 
     {loop name="menu-auth-tools" type="auth" role="ADMIN" resource="admin.tools" access="VIEW"}
-        <li class="{if $admin_current_location == 'tools'}bg-darkCharbon{/if}" id="tools_menu">
-            <a title="{intl l="Tools"}" href="#collapse-tools" class="sidebar-item py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
+        <li class="sidebar-item{if $admin_current_location == 'tools'}bg-darkCharbon{/if}" id="tools_menu">
+            <a href="#" class="py-6 h-11 flex items-center cursor-pointer">
                 <i class="fas fa-tools ml-5 mr-7 text-white"></i>
                 <span class="text-mediumGrey">{intl l="Tools"}</span>
-                <i class="fas fa-chevron-right menu-collapse text-mediumGrey ml-auto mr-6"></i>
             </a>
 
-            {* <ul id="collapse-tools" class="collapse {if $admin_current_location == 'tools'}in{/if}" role="menu">
-                {loop name="auth-coupon" type="auth" role="ADMIN" resource="admin.coupon" access="VIEW"}
-                    <li role="menuitem"><a href="{url path='/admin/coupon'}">{intl l="Coupons"}</a></li>
-                {/loop}
+            <ul class="sidebar-tools-submenu hidden absolute inset-y-0 left-full w-80 bg-darkCharbon p-6 px-5 text-mediumGrey">
+                <div class="flex justify-between w-full mb-8">
+                    <span class="text-2xl text-white font-bold">{intl l="Tools"}</span>
+                    <div class="text-mediumGrey text-xl hover:text-main cursor-pointer" data-close-tools-dropdown>
+                        <i class="fas fa-times"></i>
+                    </div>
+                </div>
 
-                {loop name="auth-sales" type="auth" role="ADMIN" resource="admin.sales" access="VIEW"}
-                    <li role="menuitem"><a href="{url path='/admin/sales'}">{intl l="Sales management"}</a></li>
-                {/loop}
+                <div class="w-full px-2">
+                    {loop name="auth-coupon" type="auth" role="ADMIN" resource="admin.coupon" access="VIEW"}
+                        <a class="block h-11 w-full my-2 hover:text-main" href="{url path='/admin/coupon'}">
+                            <span class="font-semibold">{intl l="Coupons"}</span>
+                        </a>
+                    {/loop}
 
-                {loop name="auth-brand" type="auth" role="ADMIN" resource="admin.brand" access="VIEW"}
-                    <li role="menuitem"><a href="{url path='/admin/brand'}">{intl l="Brands"}</a></li>
-                {/loop}
+                    {loop name="auth-sales" type="auth" role="ADMIN" resource="admin.sales" access="VIEW"}
+                        <a class="block h-11 w-full my-2 hover:text-main" href="{url path='/admin/sales'}">
+                            <span class="font-semibold">{intl l="Sales management"}</span>
+                        </a>
+                    {/loop}
 
-                {loop name="auth-export" type="auth" role="ADMIN" resource="admin.export" access="VIEW"}
-                    <li role="menuitem"><a href="{url path='/admin/export'}">{intl l="Export"}</a></li>
-                {/loop}
+                    {loop name="auth-brand" type="auth" role="ADMIN" resource="admin.brand" access="VIEW"}
+                        <a class="block h-11 w-full my-2 hover:text-main" href="{url path='/admin/brand'}">
+                            <span class="font-semibold">{intl l="Brands"}</span>
+                        </a>
+                    {/loop}
 
-                {loop name="auth-import" type="auth" role="ADMIN" resource="admin.import" access="VIEW"}
-                    <li role="menuitem"><a href="{url path='/admin/import'}">{intl l="Import"}</a></li>
-                {/loop}
+                    {loop name="auth-export" type="auth" role="ADMIN" resource="admin.export" access="VIEW"}
+                        <a class="block h-11 w-full my-2 hover:text-main" href="{url path='/admin/export'}">
+                            <span class="font-semibold">{intl l="Export"}</span>
+                        </a>
+                    {/loop}
 
-                {hookblock name="main.top-menu-tools" fields="id,class,url,title"}
-                    {forhook rel="main.top-menu-tools"}
-                        <li role="menuitem">
-                            <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
-                                {$title}
-                            </a>
-                        </li>
-                    {/forhook}
-                {/hookblock}
-            </ul> *}
+                    {loop name="auth-import" type="auth" role="ADMIN" resource="admin.import" access="VIEW"}
+                        <a class="block h-11 w-full my-2 hover:text-main" href="{url path='/admin/import'}">
+                            <span class="font-semibold">{intl l="Import"}</span>
+                        </a>
+                    {/loop}
+
+                    {hookblock name="main.top-menu-tools" fields="id,class,url,title"}
+                        {forhook rel="main.top-menu-tools"}
+                            <li class="h-11 w-full hover:text-main my-2">
+                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                    {$title}
+                                </a>
+                            </li>
+                        {/forhook}
+                    {/hookblock}
+                </div>
+            </ul>
         </li>
     {/loop}
 

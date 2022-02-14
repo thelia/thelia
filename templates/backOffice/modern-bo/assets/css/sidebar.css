@@ -1,0 +1,27 @@
+.sidebar {
+  &-item {
+    > a:focus {
+      @apply bg-darkCharbon;
+      
+      + ul {
+        @apply block; 
+      }
+    }
+
+    &:hover, &:focus {
+      @apply bg-darkCharbon;
+
+      > ul {
+        @apply block; 
+      }
+
+      &-title {
+        @apply text-lightGrey;
+      }
+      
+      &-icon i {
+        @apply text-main;
+      }
+    }
+  }
+}

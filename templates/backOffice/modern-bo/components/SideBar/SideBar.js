@@ -15,20 +15,19 @@ new Mmenu("#sidebar", {
 }); */
 
 export const SideBar = () => {
-   const orderSubmenu = document.querySelector('.sidebar-order-submenu')
-   const orderDropdownButton = document.querySelector('[data-toggle-order-dropdown]')
-   const orderDropdownClose = document.querySelector('[data-close-order-dropdown]')
+   // const ordersDropdown = document.querySelector('#orders_menu')
+   // const toolsDropdown = document.querySelector('#tools_menu')
+   const ordersDropdownClose = document.querySelector('[data-close-orders-dropdown]')
+   const toolsDropdownClose = document.querySelector('[data-close-tools-dropdown]')
 
-   orderDropdownButton.addEventListener('click', () => {
-      orderSubmenu.classList.toggle('hidden')
-      document.querySelector('#main').classList.toggle('lg:filter')
-      document.querySelector('#main').classList.toggle('lg:blur-sm')
+   ordersDropdownClose.addEventListener('click', (e) => {
+      console.log("-", document.activeElement)
+      document.body.focus()
+      console.log(document.activeElement)
+
    })
 
-   orderDropdownClose.addEventListener('click', () => {
-      orderSubmenu.classList.add('hidden')
-      document.querySelector('#main').classList.remove('lg:filter')
-      document.querySelector('#main').classList.remove('lg:blur-sm')
-
+   toolsDropdownClose.addEventListener('click', (e) => {
+      document.body.focus()
    })
 }
