@@ -1,22 +1,12 @@
 @screen lg {
-  #sidebar-content {
-    @apply relative h-full;  
-  }
+  .Sidebar {
+    @apply relative h-full;
 
-  #sidebar-footer {
-    @apply mb-10;
-
-    > img {
-      @apply mx-auto mb-2 max-h-8;
-    }
-    
-    > p {
-      @apply text-xs text-center text-mediumGrey;
-    }
-  }
-
-  .sidebar {
     &-item {
+      > ul {
+        @apply hidden;
+      }
+
       > a {
         @apply py-6 h-11 flex items-center;
   
@@ -29,31 +19,29 @@
         }
       }
 
-      > ul {
-        @apply hidden;
-      }
-
       &:focus, &:focus-within, &:hover {
         @apply bg-darkCharbon;
 
         > ul {
           @apply block;
-        }
+        } 
 
-        &-title {
-          @apply text-lightGrey;
-        }
+        > a {
+          > i {
+            @apply text-main;
+          }
 
-        &-icon i {
-          @apply text-main;
+          > span {
+            @apply text-lightGrey;
+          }
         }
       }
     }
 
     &-submenu {
-      @apply absolute inset-y-0 p-6 left-full w-80 bg-darkCharbon text-mediumGrey;
+      @apply absolute inset-y-0 p-6 left-full w-80 bg-darkCharbon text-mediumGrey overflow-scroll;
 
-      > div {
+      &-header {
         @apply flex justify-between w-full mb-8;  
       }
 
@@ -61,12 +49,24 @@
         @apply text-2xl font-bold text-white;
       }
 
-      &-content {
+      &-item {
         @apply w-full px-2;
 
         a {
           @apply flex items-center justify-between w-full my-2 h-11 hover:text-main;
         }
+      }
+    }
+
+    &-footer {
+      @apply mb-10;
+  
+      &-logo {
+        @apply mx-auto mb-2 max-h-8;
+      }
+      
+      &-version {
+        @apply text-xs text-center text-mediumGrey;
       }
     }
   }

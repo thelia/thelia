@@ -1,5 +1,5 @@
 import { stringify } from 'qs';
-import { axios } from '../app';
+import { axios } from '@thelia/utils-back';
 
 const devPrefix = () =>
   window.location.href.includes('index_dev.php') ? '/index_dev.php' : '';
