@@ -8,7 +8,7 @@ import { useIntl } from 'react-intl';
 
 export default function AddressForm({ address = {}, onSubmit = () => {} }) {
   const intl = useIntl();
-  const { register, handleSubmit, formState } = useForm();
+  const { register, handleSubmit, formState, setError } = useForm();
   const titles = (window.CUSTOMER_TITLES || [])
     .map((t) => {
       return {
@@ -29,31 +29,55 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
   return (
     <form
       className="grid grid-cols-1 gap-6 mb-0"
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(async (data) => {
+        try {
+          await onSubmit(data);
+        } catch (error) {
+          if (error?.response?.data?.schemaViolations) {
+            for (const [key, val] of Object.entries(
+              error?.response?.data?.schemaViolations
+            )) {
+              setError(key, {
+                type: 'manual',
+                message: val.message,
+                shouldFocus: true
+              });
+            }
+          }
+        }
+      })}
     >
       <Input
         label={intl.formatMessage({ id: 'LABEL_LABEL' })}
         defaultValue={address.label}
-        {...register('label', { required: 'Mandatory' })}
+        {...register('label', {
+          required: intl.formatMessage({ id: 'MANDATORY' })
+        })}
         error={formState.errors?.label?.message}
       />
       <Select
         label={intl.formatMessage({ id: 'CIVILITY_TITLE_LABEL' })}
         defaultValue={address.title}
         options={titles}
-        {...register('civilityTitle.id', { required: 'Mandatory' })}
+        {...register('civilityTitle.id', {
+          required: intl.formatMessage({ id: 'MANDATORY' })
+        })}
         error={formState.errors?.title?.message}
       />
       <Input
         label={intl.formatMessage({ id: 'FIRSTNAME_LABEL' })}
         defaultValue={address.firstName}
-        {...register('firstName', { required: 'Mandatory' })}
+        {...register('firstName', {
+          required: intl.formatMessage({ id: 'MANDATORY' })
+        })}
         error={formState.errors?.firstName?.message}
       />
       <Input
         label={intl.formatMessage({ id: 'LASTNAME_LABEL' })}
         defaultValue={address.lastName}
-        {...register('lastName', { required: 'Mandatory' })}
+        {...register('lastName', {
+          required: intl.formatMessage({ id: 'MANDATORY' })
+        })}
         error={formState.errors?.lastName?.message}
       />
       <Input
@@ -66,7 +90,9 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
       <Input
         label={intl.formatMessage({ id: 'ADDRESS_1_LABEL' })}
         defaultValue={address.address1}
-        {...register('address1', { required: 'Mandatory' })}
+        {...register('address1', {
+          required: intl.formatMessage({ id: 'MANDATORY' })
+        })}
         error={formState.errors?.address1?.message}
       />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -86,14 +112,18 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
       <Input
         label={intl.formatMessage({ id: 'ZIPCODE_LABEL' })}
         defaultValue={address.zipCode}
-        {...register('zipCode', { required: 'Mandatory' })}
+        {...register('zipCode', {
+          required: intl.formatMessage({ id: 'MANDATORY' })
+        })}
         error={formState.errors?.zipCode?.message}
       />
 
       <Input
         label={intl.formatMessage({ id: 'CITY_LABEL' })}
         defaultValue={address.city}
-        {...register('city', { required: 'Mandatory' })}
+        {...register('city', {
+          required: intl.formatMessage({ id: 'MANDATORY' })
+        })}
         error={formState.errors?.city?.message}
       />
 
@@ -101,16 +131,20 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
         label={intl.formatMessage({ id: 'COUNTRY_LABEL' })}
         options={countries}
         defaultValue={address.countryCode}
-        {...register('countryCode', { required: 'Mandatory' })}
+        {...register('countryCode', {
+          required: intl.formatMessage({ id: 'MANDATORY' })
+        })}
         error={formState.errors?.countryCode?.message}
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Input
           label={intl.formatMessage({ id: 'CELLPHONE_LABEL' })}
-          defaultValue={address.cellPhone}
-          {...register('cellPhone', { required: 'Mandatory' })}
-          error={formState.errors?.cellPhone?.message}
+          defaultValue={address.cellphone}
+          {...register('cellphone', {
+            required: intl.formatMessage({ id: 'MANDATORY' })
+          })}
+          error={formState.errors?.cellphone?.message}
         />
         <Input
           label={intl.formatMessage({ id: 'PHONE_LABEL' })}

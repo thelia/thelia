@@ -29,13 +29,11 @@ export default function PhoneCheck({ addressId }) {
 
   React.useEffect(() => {
     if (!address) return;
-    let currentPhoneNumber = address?.cellPhone || '';
+    let currentPhoneNumber = address?.cellphone || '';
 
-    if (address?.cellPhone && address?.countryCode) {
-      currentPhoneNumber = parsePhoneNumber(
-        address?.cellPhone,
-        address?.countryCode
-      ).number;
+    if (address?.cellphone && address?.countryCode) {
+      currentPhoneNumber =
+        parsePhoneNumber(address.cellphone, address.countryCode)?.number || '';
     }
     setPhone(currentPhoneNumber);
   }, [address]);
@@ -60,7 +58,7 @@ export default function PhoneCheck({ addressId }) {
             id: addressId,
             data: {
               ...address,
-              cellPhone: phone
+              cellphone: phone
             }
           });
         } catch (error) {
