@@ -1,3 +1,5 @@
+import { React } from '@thelia/utils-back'
+
 const Loader = () => {
   return (
     <svg

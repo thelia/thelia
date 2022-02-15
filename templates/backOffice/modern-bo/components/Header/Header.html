@@ -4,7 +4,7 @@
   <img src="{getFileFromManifest file="images/logos/dark-logo.svg"}" class="h-full" />
 </a>
 
-<div class="hidden lg:flex items-center justify-end h-full w-full ">
+<div class="hidden lg:flex items-center justify-end h-full w-full">
   {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search" access="VIEW"}
     {strip}
       <form action="{url path='/admin/search'}" class="md:w-1/2 h-10">

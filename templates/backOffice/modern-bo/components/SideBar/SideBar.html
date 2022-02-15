@@ -1,51 +1,50 @@
 {$admin_current_location = $admin_current_location|default:null}
 {hook name="main.before-top-menu" location="before_top_menu" }
-<ul id="sidebar-content">
+<ul class="Sidebar">
 
-    <li class="sidebar-item" id="home_menu">
-        <a href="{url path='/admin/home'}" title="{intl l="Home"}" class="sidebar-item">
-            <i class="fas fa-tachometer-alt"></i>
+    <li class="Sidebar-item">
+        <a href="{url path='/admin/home'}" title="{intl l="Home"}" class="Sidebar-item">
+            <i class="hidden lg:block fas fa-tachometer-alt"></i>
             <span>{intl l="Home"}</span>
         </a>
     </li>
 
     {loop name="menu-auth-order" type="auth" role="ADMIN" resource="admin.order" access="VIEW"}
-    <li class="sidebar-item" id="orders_menu">
+    <li class="Sidebar-item">
         <a href="#">
-            <i class="sidebar-item-icon fas fa-shopping-cart"></i>
-            <span class="sidebar-item-title">{intl l="Orders"}</span>
+            <i class="Sidebar-item-icon fas fa-shopping-cart"></i>
+            <span class="Sidebar-item-title">{intl l="Orders"}</span>
         </a>
 
-        <ul class="sidebar-submenu">
-          <li>
-            <div>
-                <span class="sidebar-submenu-title">{intl l="Orders"}</span>
-            </div>
-          </li>
-          <li>
-            <div class="sidebar-submenu-content">
+        <ul class="Sidebar-submenu">
+            <li class="Sidebar-submenu-header">
+                <span class="Sidebar-submenu-title">{intl l="Orders"}</span>
+            </li>
+            <li class="Sidebar-submenu-item">
                 <a href="{url path='admin/orders'}">
                     <span class="font-semibold">{intl l="All orders"}</span>
-                    <span class="text-sm px-3 py-0.5 rounded-3xl bg-grey text-white">{count type="order" customer="*" backend_context="1"}</span>
+                    <div class="text-sm px-3 py-0.5 rounded-3xl inline-block bg-grey text-white">{count type="order" customer="*" backend_context="1"}</div>
                 </a>
-                {loop name="order-status-list" type="order-status"}
-                    {$count = {count type="order" customer="*" backend_context="1" status={$ID}}}
+            </li>
+        
+            {loop name="order-status-list" type="order-status"}
+                {$count = {count type="order" customer="*" backend_context="1" status={$ID}}}
+                <li class="Sidebar-submenu-item">
                     <a href="{url path="admin/orders" status={$ID}}">
                         <span class="font-semibold">{$TITLE}</span>
-                        <div style="background-color: {$COLOR};" class="text-sm px-3 py-0.5 rounded-3xl text-white">{$count}</div>
+                        <div style="background-color: {$COLOR};" class="text-sm px-3 py-0.5 rounded-3xl inline-block text-white">{$count}</div>
                     </a>
-                {/loop}
-                {hookblock name="main.top-menu-order" fields="id,class,url,title"}
-                    {forhook rel="main.top-menu-order"}
-                        <li>
-                            <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
-                                {$title}
-                            </a>
-                        </li>
-                    {/forhook}
-                {/hookblock}
-            </div>
-          </li>
+                </li>
+            {/loop}
+            {hookblock name="main.top-menu-order" fields="id,class,url,title"}
+                {forhook rel="main.top-menu-order"}
+                    <li class="Sidebar-submenu-item">
+                        <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                            {$title}
+                        </a>
+                    </li>
+                {/forhook}
+            {/hookblock}
         </ul>
     </li>
 
@@ -54,15 +53,15 @@
     {loop name="menu-auth-customer" type="auth" role="ADMIN" resource="admin.customer" access="VIEW"}
         {ifhook rel="main.top-menu-customer"}
             {hookblock name="main.top-menu-customer" fields="id,class,url,title"}
-                <li class="sidebar-item" id="customers_menu">
+                <li class="Sidebar-item">
 
                     <a title="{intl l="Customers"}" href="#collapse-customer" class="py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
                         <i class="ml-5 text-white fas fa-users mr-7"></i>
                         <span class="text-mediumGrey">{intl l="Customers"}</span>
-                        <i class="fas fa-chevron-right menu-collapse text-mediumGrey"></i>
+                        <i class="hidden lg:block fas fa-chevron-right menu-collapse text-mediumGrey"></i>
                     </a>
 
-                    <ul id="collapse-customer" class="collapse {if $admin_current_location == 'customer'}in{/if}" role="menu">
+                    <ul class="Sidebar-submenu">
                         <li role="menuitem" id="customers_menu">
                             <a href="{url path='/admin/customers'}" title="{intl l="Customers"}">
                                 {intl l="Customers"}
@@ -80,9 +79,9 @@
             {/hookblock}
         {/ifhook}
         {elsehook rel="main.top-menu-customer"}
-            <li class="sidebar-item" id="customers_menu">
+            <li class="Sidebar-item">
                 <a href="{url path='/admin/customers'}" title="{intl l="Customers"}">
-                    <i class="fas fa-users"></i>
+                    <i class="hidden lg:block fas fa-users"></i>
                     <span>{intl l="Customers"}</span>
                 </a>
             </li>
@@ -92,15 +91,15 @@
     {loop name="menu-auth-catalog" type="auth" role="ADMIN" resource="admin.category" access="VIEW"}
         {ifhook rel="main.top-menu-catalog"}
             {hookblock name="main.top-menu-catalog" fields="id,class,url,title"}
-            <li class="sidebar-item {if $admin_current_location == 'catalog'}bg-darkCharbon{/if}" id="catalog_menu">
+            <li class="Sidebar-item">
 
                 <a title="{intl l="Catalog"}" href="#collapse-catalog" class="py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
                     <i class="ml-5 text-white fas fa-book mr-7"></i>
                     <span class="text-mediumGrey">{intl l="Catalog"}</span>
-                    <i class="fas fa-chevron-right menu-collapse text-mediumGrey"></i>
+                    <i class="hidden lg:block fas fa-chevron-right menu-collapse text-mediumGrey"></i>
                 </a>
 
-                <ul id="collapse-catalog" class="collapse {if $admin_current_location == 'catalog'}in{/if}" role="menu">
+                <ul id="collapse-catalog" class="" role="menu">
                     <li role="menuitem" id="catalog_menu">
                         <a title="{intl l="Catalog"}" href="{url path='/admin/catalog'}">
                             {intl l="Catalog"}
@@ -118,9 +117,9 @@
             {/hookblock}
         {/ifhook}
         {elsehook rel="main.top-menu-catalog"}
-            <li class="sidebar-item" id="catalog_menu">
+            <li class="Sidebar-item">
                 <a title="{intl l="Catalog"}" href="{url path='/admin/catalog'}">
-                    <i class="fas fa-book"></i>
+                    <i class="hidden lg:block fas fa-book"></i>
                     <span>{intl l="Catalog"}</span>
                 </a>
             </li>
@@ -130,12 +129,12 @@
     {loop name="menu-auth-content" type="auth" role="ADMIN" resource="admin.folder" access="VIEW"}
         {ifhook rel="main.top-menu-content"}
             {hookblock name="main.top-menu-content" fields="id,class,url,title"}
-                <li class="sidebar-item {if $admin_current_location == 'content'}bg-darkCharbon{/if}" id="contents_menu">
+                <li class="Sidebar-item">
 
                     <a title="{intl l="Folders"}" href="#collapse-content" class="py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
                         <i class="ml-5 text-white fas fa-folder-open mr-7"></i>
                         <span class="text-mediumGrey">{intl l="Folders"}</span>
-                        <i class="fas fa-chevron-right menu-collapse text-mediumGrey"></i>
+                        <i class="hidden lg:block fas fa-chevron-right menu-collapse text-mediumGrey"></i>
                     </a>
 
                     <ul id="collapse-content" class="collapse {if $admin_current_location == 'content'}in{/if}" role="menu">
@@ -156,9 +155,9 @@
             {/hookblock}
         {/ifhook}
         {elsehook rel="main.top-menu-content"}
-            <li class="sidebar-item" id="contents_menu">
+            <li class="Sidebar-item">
                 <a title="{intl l="Folders"}" href="{url path='/admin/folders'}">
-                    <i class="fas fa-folder-open"></i>
+                    <i class="hidden lg:block fas fa-folder-open"></i>
                     <span>{intl l="Folders"}</span>
                 </a>
             </li>
@@ -166,62 +165,56 @@
     {/loop}
 
     {loop name="menu-auth-tools" type="auth" role="ADMIN" resource="admin.tools" access="VIEW"}
-        <li class="sidebar-item" id="tools_menu">
+        <li class="Sidebar-item">
             <a href="#">
-                <i class="fas fa-tools"></i>
+                <i class="hidden lg:block fas fa-tools"></i>
                 <span>{intl l="Tools"}</span>
             </a>
 
-            <ul class="sidebar-submenu">
-                <li>
-                    <div>
-                        <span class="text-2xl font-bold text-white">{intl l="Tools"}</span>
-                    </div>
+            <ul class="Sidebar-submenu">
+                <li class="Sidebar-submenu-header">
+                    <span class="Sidebar-submenu-title">{intl l="Tools"}</span>
                 </li>
                 
-                <li>
-                    <div class="sidebar-submenu-content">
-                        {loop name="auth-coupon" type="auth" role="ADMIN" resource="admin.coupon" access="VIEW"}
-                            <a class="block w-full my-2 h-11 hover:text-main" href="{url path='/admin/coupon'}">
-                                <span class="font-semibold">{intl l="Coupons"}</span>
-                            </a>
-                        {/loop}
-
-                        {loop name="auth-sales" type="auth" role="ADMIN" resource="admin.sales" access="VIEW"}
-                            <a class="block w-full my-2 h-11 hover:text-main" href="{url path='/admin/sales'}">
-                                <span class="font-semibold">{intl l="Sales management"}</span>
-                            </a>
-                        {/loop}
-
-                        {loop name="auth-brand" type="auth" role="ADMIN" resource="admin.brand" access="VIEW"}
-                            <a class="block w-full my-2 h-11 hover:text-main" href="{url path='/admin/brand'}">
-                                <span class="font-semibold">{intl l="Brands"}</span>
-                            </a>
-                        {/loop}
-
-                        {loop name="auth-export" type="auth" role="ADMIN" resource="admin.export" access="VIEW"}
-                            <a class="block w-full my-2 h-11 hover:text-main" href="{url path='/admin/export'}">
-                                <span class="font-semibold">{intl l="Export"}</span>
-                            </a>
-                        {/loop}
-
-                        {loop name="auth-import" type="auth" role="ADMIN" resource="admin.import" access="VIEW"}
-                            <a class="block w-full my-2 h-11 hover:text-main" href="{url path='/admin/import'}">
-                                <span class="font-semibold">{intl l="Import"}</span>
-                            </a>
-                        {/loop}
-
-                        {hookblock name="main.top-menu-tools" fields="id,class,url,title"}
-                            {forhook rel="main.top-menu-tools"}
-                                <li class="block w-full my-2 h-11 hover:text-main">
-                                    <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
-                                        {$title}
-                                    </a>
-                                </li>
-                            {/forhook}
-                        {/hookblock}
-                    </div>
+                <li class="Sidebar-submenu-item">
+                    {loop name="auth-coupon" type="auth" role="ADMIN" resource="admin.coupon" access="VIEW"}
+                        <a class="block w-full font-semibold my-2 h-11 hover:text-main" href="{url path='/admin/coupon'}">{intl l="Coupons"}</a>
+                    {/loop}
                 </li>
+
+                <li class="Sidebar-submenu-item">
+                    {loop name="auth-sales" type="auth" role="ADMIN" resource="admin.sales" access="VIEW"}
+                        <a class="block w-full font-semibold my-2 h-11 hover:text-main" href="{url path='/admin/sales'}">{intl l="Sales management"}</a>
+                    {/loop}
+                </li>
+
+                <li class="Sidebar-submenu-item">
+                    {loop name="auth-brand" type="auth" role="ADMIN" resource="admin.brand" access="VIEW"}
+                        <a class="block w-full font-semibold my-2 h-11 hover:text-main" href="{url path='/admin/brand'}">{intl l="Brands"}</a>
+                    {/loop}
+                </li>
+                    
+                <li class="Sidebar-submenu-item">
+                    {loop name="auth-export" type="auth" role="ADMIN" resource="admin.export" access="VIEW"}
+                        <a class="block w-full font-semibold my-2 h-11 hover:text-main" href="{url path='/admin/export'}">{intl l="Export"}</a>
+                    {/loop}
+                </li>
+
+                <li class="Sidebar-submenu-item">
+                    {loop name="auth-import" type="auth" role="ADMIN" resource="admin.import" access="VIEW"}
+                        <a class="block w-full font-semibold my-2 h-11 hover:text-main" href="{url path='/admin/import'}">{intl l="Import"}</a>
+                    {/loop}
+                </li>
+
+                {hookblock name="main.top-menu-tools" fields="id,class,url,title"}
+                    {forhook rel="main.top-menu-tools"}
+                        <li class="Sidebar-submenu-item">
+                            <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                {$title}
+                            </a>
+                        </li>
+                    {/forhook}
+                {/hookblock}
             </ul>
         </li>
     {/loop}
@@ -230,9 +223,9 @@
 
 </ul>
 
-<div id="sidebar-footer">
-    <img src="{getFileFromManifest file="images/logos/logo.svg"}" alt="" />
-    <p>V {intl l="{$THELIA_VERSION}"}</p>
+<div class="Sidebar-footer">
+    <img class="Sidebar-footer-logo" src="{getFileFromManifest file="images/logos/logo.svg"}" alt="" />
+    <p class="Sidebar-footer-version">V {intl l="{$THELIA_VERSION}"}</p>
 </div>
 
 {hook name="main.topbar-bottom" }

@@ -44,16 +44,13 @@
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.3.4",
+    "@thelia/utils-back": "^0.0.0",
     "autoprefixer": "^10.3.7",
-    "axios": "^0.24.0",
     "eslint-webpack-plugin": "^3.0.1",
-    "htm": "^3.1.0",
     "mmenu-light": "^3.1.0",
     "postcss-nested": "^5.0.6",
     "qs": "^6.10.1",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-query": "^3.31.0",
     "tailwindcss": "^2.2.17"
   }
 }
