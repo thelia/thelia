@@ -1,3 +1,28 @@
+.Sidebar {
+  &-item, &-submenu-item {
+    > a {
+      @apply flex items-center w-full;
+      span {
+        @apply p-0;
+      }
+    }
+  }
+
+  &-item {
+    > a {
+      > i {
+        @apply mr-5 text-white;
+      }
+    }
+  }
+  
+  &-submenu-item {
+    > a {
+      @apply justify-between;
+    }
+  }
+}
+
 @screen lg {
   .Sidebar {
     @apply relative h-full;

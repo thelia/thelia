@@ -23,7 +23,7 @@
             <li class="Sidebar-submenu-item">
                 <a href="{url path='admin/orders'}">
                     <span class="font-semibold">{intl l="All orders"}</span>
-                    <div class="text-sm px-3 py-0.5 rounded-3xl inline-block bg-grey text-white">{count type="order" customer="*" backend_context="1"}</div>
+                    {include file="components/Pill/Pill.html" class="text-sm px-3 py-0.5 inline-block bg-grey" value={count type="order" customer="*" backend_context="1"}}
                 </a>
             </li>
         
@@ -32,7 +32,7 @@
                 <li class="Sidebar-submenu-item">
                     <a href="{url path="admin/orders" status={$ID}}">
                         <span class="font-semibold">{$TITLE}</span>
-                        <div style="background-color: {$COLOR};" class="text-sm px-3 py-0.5 rounded-3xl inline-block text-white">{$count}</div>
+                        {include file="components/Pill/Pill.html" color=$COLOR class="text-sm px-3 py-0.5 inline-block" value=$count}
                     </a>
                 </li>
             {/loop}
@@ -178,31 +178,31 @@
                 
                 <li class="Sidebar-submenu-item">
                     {loop name="auth-coupon" type="auth" role="ADMIN" resource="admin.coupon" access="VIEW"}
-                        <a class="block w-full font-semibold my-2 h-11 hover:text-main" href="{url path='/admin/coupon'}">{intl l="Coupons"}</a>
+                        <a class="block w-full my-2 font-semibold h-11 hover:text-main" href="{url path='/admin/coupon'}">{intl l="Coupons"}</a>
                     {/loop}
                 </li>
 
                 <li class="Sidebar-submenu-item">
                     {loop name="auth-sales" type="auth" role="ADMIN" resource="admin.sales" access="VIEW"}
-                        <a class="block w-full font-semibold my-2 h-11 hover:text-main" href="{url path='/admin/sales'}">{intl l="Sales management"}</a>
+                        <a class="block w-full my-2 font-semibold h-11 hover:text-main" href="{url path='/admin/sales'}">{intl l="Sales management"}</a>
                     {/loop}
                 </li>
 
                 <li class="Sidebar-submenu-item">
                     {loop name="auth-brand" type="auth" role="ADMIN" resource="admin.brand" access="VIEW"}
-                        <a class="block w-full font-semibold my-2 h-11 hover:text-main" href="{url path='/admin/brand'}">{intl l="Brands"}</a>
+                        <a class="block w-full my-2 font-semibold h-11 hover:text-main" href="{url path='/admin/brand'}">{intl l="Brands"}</a>
                     {/loop}
                 </li>
                     
                 <li class="Sidebar-submenu-item">
                     {loop name="auth-export" type="auth" role="ADMIN" resource="admin.export" access="VIEW"}
-                        <a class="block w-full font-semibold my-2 h-11 hover:text-main" href="{url path='/admin/export'}">{intl l="Export"}</a>
+                        <a class="block w-full my-2 font-semibold h-11 hover:text-main" href="{url path='/admin/export'}">{intl l="Export"}</a>
                     {/loop}
                 </li>
 
                 <li class="Sidebar-submenu-item">
                     {loop name="auth-import" type="auth" role="ADMIN" resource="admin.import" access="VIEW"}
-                        <a class="block w-full font-semibold my-2 h-11 hover:text-main" href="{url path='/admin/import'}">{intl l="Import"}</a>
+                        <a class="block w-full my-2 font-semibold h-11 hover:text-main" href="{url path='/admin/import'}">{intl l="Import"}</a>
                     {/loop}
                 </li>
 
