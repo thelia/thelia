@@ -34,17 +34,19 @@ class Component extends AbstractSmartyPlugin
     /** @var string */
     protected $kernelDebug;
 
-    protected $template;
-
     public function __construct(ParserInterface $parser, $kernelDebug)
     {
         $this->parser = $parser;
         $this->kernelDebug = $kernelDebug;
-        $this->template = $this->parser->getTemplateHelper()->getActiveFrontTemplate();
     }
 
     public function component(array $params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
+        // Do nothing at opening tag
+        if ($repeat) {
+            return '';
+        }
+
         $name = $this->getParam($params, 'name');
         if (null === $name || empty($name)) {
             throw new \InvalidArgumentException(
@@ -54,21 +56,20 @@ class Component extends AbstractSmartyPlugin
 
         $path = $template->getConfigVariable('component_path') ?: 'components'.DS.'smarty';
         $path .= DS.$name.DS.$name.'.html';
-        $componentFile = THELIA_TEMPLATE_DIR.$this->template->getPath().DS.$path;
+        $templatePath = $this->parser->getTemplateHelper()->getActiveFrontTemplate()->getPath();
+        $componentFile = THELIA_TEMPLATE_DIR.$templatePath.DS.$path;
 
-        if ($this->kernelDebug && !file_exists($componentFile)) {
-            throw new Exception('no component at'.$componentFile);
-        } elseif (!file_exists($componentFile)) {
+        if (!file_exists($componentFile)) {
+            if ($this->kernelDebug) {
+                throw new Exception('no component at'.$componentFile);
+            }
+
             return '';
         }
 
-        if (!$repeat) {
-            $render = $this->parser->render($path, array_merge($params, ['children' => $content]));
+        $render = $this->parser->render($path, array_merge($params, ['children' => $content]));
 
-            return $render;
-        }
-
-        return '';
+        return $render;
     }
 
     /**
