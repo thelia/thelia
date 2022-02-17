@@ -12,6 +12,7 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
+use Exception;
 use Thelia\Core\Template\ParserInterface;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
@@ -29,11 +30,16 @@ class Component extends AbstractSmartyPlugin
 
     /** @var ParserInterface */
     protected $parser;
+
+    /** @var string */
+    protected $kernelDebug;
+
     protected $template;
 
-    public function __construct(ParserInterface $parser)
+    public function __construct(ParserInterface $parser, $kernelDebug)
     {
         $this->parser = $parser;
+        $this->kernelDebug = $kernelDebug;
         $this->template = $this->parser->getTemplateHelper()->getActiveFrontTemplate();
     }
 
@@ -46,12 +52,20 @@ class Component extends AbstractSmartyPlugin
             );
         }
 
-        $path = 'components'.DS.'smarty'.DS.$name.DS.$name.'.html';
+        $path = $template->getConfigVariable('component_path') ?: 'components'.DS.'smarty';
+        $path .= DS.$name.DS.$name.'.html';
+        $componentFile = THELIA_TEMPLATE_DIR.$this->template->getPath().DS.$path;
 
-        if (!$repeat && file_exists(THELIA_TEMPLATE_DIR.$this->template->getPath().DS.$path)) {
+        if ($this->kernelDebug && !file_exists($componentFile)) {
+            throw new Exception('no component at'.$componentFile);
+        } elseif (!file_exists($componentFile)) {
+            return '';
+        }
+
+        if (!$repeat) {
             $render = $this->parser->render($path, array_merge($params, ['children' => $content]));
 
-            return htmlspecialchars_decode($render);
+            return $render;
         }
 
         return '';
