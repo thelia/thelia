@@ -9,40 +9,39 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-
 * {
   font-family: 'Open Sans', sans-serif;
 }
 
-.switch:checked ~ .dot {
+input[type=checkbox].switch:checked ~ .dot {
   transform: translateX(100%);
 }
 
-.switch:checked ~ .block {
+input[type=checkbox].switch:checked ~ .block {
   background-color: #48bb78;
 }
 
-.Checkbox:checked {
+input[type=checkbox]:not(.switch):checked {
   @apply text-mediumCharbon;
 }
 
-.Checkbox {
+input[type=checkbox]:not(.switch) {
   border-radius: 0.25rem;
 }
 
-.Checkbox:focus {
+input[type=checkbox]:not(.switch):focus {
   @apply outline-none ring-darkMain;
 }
 
-.Radio:checked {
+input[type=radio]:checked {
   @apply text-mediumCharbon;
 }
 
-.Radio {
+input[type=radio] {
   border-radius: 100%;
 }
 
-.Radio:focus {
+input[type=radio]:focus {
   @apply outline-none ring-darkMain;
 }
 
