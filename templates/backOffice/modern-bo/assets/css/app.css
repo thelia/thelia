@@ -1,11 +1,14 @@
+@import 'mmenu-light/dist/mmenu-light.css';
+
+@import 'layout';
+
+@import '../../components/**/*.css';
+@import './pages/**/*.css';
+
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-@import 'mmenu-light/dist/mmenu-light.css';
-
-@import '../../components/**/*.css';
-@import './pages/**/*.css';
 
 * {
   font-family: 'Open Sans', sans-serif;
@@ -17,10 +20,6 @@
 
 .switch:checked ~ .block {
   background-color: #48bb78;
-}
-
-.SimpleLayout {
-  @apply bg-lightGrey;
 }
 
 .Checkbox:checked {
@@ -45,37 +44,6 @@
 
 .Radio:focus {
   @apply outline-none ring-darkMain;
-}
-
-#page {
-  display: grid;
-  grid-template-areas:
-    'head'
-    'content'
-    'sidebar'
-    'footer';
-  grid-template-columns: 1fr;
-
-  @screen lg {
-    grid-template-areas:
-      'head head'
-      'sidebar content'
-      'sidebar footer';
-    grid-template-columns: 250px 1fr;
-    grid-template-rows: 60px auto 100px;
-  }
-}
-
-#page > #header {
-  grid-area: head;
-}
-
-#page > #sidebar {
-  grid-area: sidebar;
-}
-
-#page > #main {
-  grid-area: content;
 }
 
 .dropdown-menu a:hover {
