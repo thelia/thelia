@@ -56,7 +56,7 @@ class Component extends AbstractSmartyPlugin
 
         $path = $template->getConfigVariable('component_path') ?: 'components'.DS.'smarty';
         $path .= DS.$name.DS.$name.'.html';
-        $templatePath = $this->parser->getTemplateHelper()->getActiveFrontTemplate()->getPath();
+        $templatePath = $this->parser->getTemplateDefinition()->getPath();
         $componentFile = THELIA_TEMPLATE_DIR.$templatePath.DS.$path;
 
         if (!file_exists($componentFile)) {
