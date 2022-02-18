@@ -262,6 +262,13 @@ class Customer extends BaseCustomer implements UserInterface
 
         return $this;
     }
+    
+    public function erasePassword()
+    {
+        parent::setPassword(null);
+
+        return $this;
+    }
 
     /*
         public function setRef($ref)
