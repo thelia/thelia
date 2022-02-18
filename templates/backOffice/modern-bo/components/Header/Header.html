@@ -26,76 +26,72 @@
 
     <li class="px-5">
       <a href="{url path='admin/configuration/administrators/view'}" title="{intl l="Edit profile"}" class="flex items-center">
-        <div 
-          class="flex items-center justify-center w-10 h-10 p-3 font-medium bg-transparent border rounded-full hover:bg-lightGrey hover:text-lightGrey text-mediumCharbon">
+        <div class="flex items-center justify-center w-10 h-10 p-3 font-medium bg-transparent border rounded-full hover:bg-lightGrey hover:text-lightGrey text-mediumCharbon">
           <img class="object-contain w-full h-full" src="{image file="assets/images/svgFlags/fr.svg"}" alt="fr" />
         </div>
       </a>
     </li>
 
-    <li class="relative inline-flex h-full px-5 border-l-2 border-r-2 dropdown border-lightGrey">
-      <button href="#" title="{intl l="Settings"}" class="flex items-center">
-        <div class="flex items-center justify-center w-10 h-10 p-4 font-medium rounded-full icon bg-lightGrey hover:bg-mediumCharbon hover:text-lightGrey text-mediumCharbon">
+    <li class="relative inline-flex h-full px-5 border-l-2 border-r-2 dropdown border-lightGrey hover:bg-lightGrey">
+      <a href="#" title="{intl l="Settings"}" class="flex items-center">
+        {component name="Button" tag="div" level="small-secondary" class="icon"}
           <i class="fas fa-cog"></i>
-        </div>
-      </button>
+        {/component}
+      </a>
 
       <div class="invisible transition-all duration-300 origin-top-right transform scale-95 -translate-y-2 opacity-0 dropdown-menu">
         <div class="absolute origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg outline-none top-full -right-5 w-80" aria-labelledby="headlessui-menu-button-1" id="headlessui-menu-items-117" role="menu">
-          <div class="p-5">
-            <a href="{url path='/admin/configuration'}" title="{intl l="Logout"}" class="flex items-center mb-5">
-              <div class="flex items-center justify-center w-10 h-10 p-4 mr-3 font-medium rounded-full bg-lightGrey hover:bg-mediumCharbon hover:text-lightGrey text-mediumCharbon">
+            <a href="{url path='/admin/configuration'}" title="{intl l="Logout"}" class="flex items-center p-3 hover:bg-lightGrey">
+              {component name="Button" tag="div" level="small-secondary" class="mr-3"}
                 <i class="fas fa-cogs"></i>
-              </div>
+              {/component}
               Configuration
             </a>
-            <a href="{url path='/admin/modules'}" title="{intl l="Logout"}" class="flex items-center">
-              <div class="flex items-center justify-center w-10 h-10 p-4 mr-3 font-medium rounded-full bg-lightGrey hover:bg-mediumCharbon hover:text-lightGrey text-mediumCharbon">
-              <i class="fas fa-puzzle-piece"></i>
-              </div>
+            <a href="{url path='/admin/modules'}" title="{intl l="Logout"}" class="flex items-center p-3 hover:bg-lightGrey">
+              {component name="Button" tag="div" level="small-secondary" class="mr-3"}
+                <i class="fas fa-puzzle-piece"></i>
+              {/component}
               Modules
             </a>
-          </div>
         </div>
       </div>
     </li>
 
-    <li class="relative inline-flex h-full px-5 dropdown">
-      <button href="#" title="{intl l="Edit profile"}" class="flex items-center">
-        <div class="flex items-center justify-center w-10 h-10 p-4 font-medium rounded-full icon bg-lightGrey hover:bg-mediumCharbon hover:text-lightGrey text-mediumCharbon xl:mr-3">
+    <li class="relative inline-flex h-full px-5 dropdown hover:bg-lightGrey">
+      <a href="#" title="{intl l="Edit profile"}" class="flex items-center">
+        {component name="Button" tag="div" level="small-secondary" class="xl:mr-3 icon"}
           <i class="fas fa-user"></i>
-        </div>
+        {/component}
         <div class="hidden xl:block">
           {admin attr="firstname"} {admin attr="lastname"}
           <i class="mb-1 ml-3 fas fa-sort-down"></i>
         </div>
-      </button>
+      </a>
 
       <div class="invisible transition-all duration-300 origin-top-right transform scale-95 -translate-y-2 opacity-0 dropdown-menu">
         <div class="absolute origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg outline-none top-full -right-5 w-80" aria-labelledby="headlessui-menu-button-1" id="headlessui-menu-items-117" role="menu">
         <div class="my-3 text-center xl:hidden">Welcome <span class="text-main">{admin attr="firstname"} {admin attr="lastname"}</span></div>
-        <div class="p-5">
-            <a href="{url path='admin/logout'}" title="{intl l="Logout"}" class="flex items-center mb-5">
-              <div class="flex items-center justify-center w-10 h-10 p-4 mr-3 font-medium rounded-full bg-lightGrey hover:bg-mediumCharbon hover:text-lightGrey text-mediumCharbon">
+          <div>
+            <a href="{url path='admin/logout'}" title="{intl l="Logout"}" class="flex items-center p-3 hover:bg-lightGrey">
+              {component name="Button" tag="div" level="small-secondary" class="mr-3"}
                 <i class="fas fa-cog"></i>
-              </div>
+              {/component}
               Paramètres de mon compte
             </a>
-            <a href="{url path='admin/logout'}" title="{intl l="Logout"}" class="flex items-center">
-              <div class="flex items-center justify-center w-10 h-10 p-4 mr-3 font-medium rounded-full bg-lightGrey hover:bg-mediumCharbon hover:text-lightGrey text-mediumCharbon">
+            <a href="{url path='admin/logout'}" title="{intl l="Logout"}" class="flex items-center p-3 hover:bg-lightGrey">
+              {component name="Button" tag="div" level="small-secondary" class="mr-3"}
                 <i class="fas fa-question-circle"></i>
-              </div>
+              {/component}
               Aide et assistance
             </a>
           </div>
-          <div class="p-5">
-            <a href="{url path='admin/logout'}" title="{intl l="Logout"}" class="flex items-center">
-              <div class="flex items-center justify-center w-10 h-10 p-4 mr-3 font-medium rounded-full bg-lightGrey hover:bg-mediumCharbon hover:text-lightGrey text-mediumCharbon">
-                <i class="fas fa-sign-out-alt"></i>
-              </div>
-              Se déconnecter
-            </a>
-          </div>
+
+          <a href="{url path='admin/logout'}" title="{intl l="Logout"}" class="flex items-center p-3 hover:bg-lightGrey">
+            {component name="Button" tag="div" level="small-secondary" class="mr-3"}
+              <i class="fas fa-sign-out-alt"></i>
+            {/component}
+            Se déconnecter
+          </a>
         </div>
       </div>
     </li>
