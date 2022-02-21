@@ -1,1 +1,3 @@
-<div {if isset($color)}style="background-color: {$color};"{/if} class="Pill text-white rounded-3xl {$class|default:""}">{$value|default:"0"}</div>
+<div {if isset($color)}style="background-color: {$color};"{/if} class="Pill text-white rounded-3xl {$class|default:""}">
+  {$value|default:null}
+</div>
