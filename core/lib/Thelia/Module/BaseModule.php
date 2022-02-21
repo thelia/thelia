@@ -26,7 +26,6 @@ use Thelia\Core\Event\Hook\HookUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\ModuleException;
 use Thelia\Log\Tlog;
@@ -87,25 +86,20 @@ class BaseModule implements BaseModuleInterface
         }
 
         if ($moduleModel->getActivate() === self::IS_NOT_ACTIVATED) {
-            $moduleModel->setActivate(self::IS_ACTIVATED);
-            $moduleModel->save();
-
-            // Refresh propel cache to be sure that module's model is created
-            // when the module's initialization methods will be called.
-
-            /** @var Thelia $theliaKernel */
-            $theliaKernel = $this->container->get('kernel');
-            $theliaKernel->boot();
-
             $con = Propel::getConnection(ModuleTableMap::DATABASE_NAME);
             $con->beginTransaction();
+
             try {
-                $this->initializeCoreI18n();
-                if ($this->preActivation($con)) {
-                    $theliaKernel->initializePropelService(true, $cacheRefresh);
-                    $this->postActivation($con);
-                    $con->commit();
+                if (!$this->preActivation($con)) {
+                    throw new \Exception('An error occured during the module pre activation.');
                 }
+
+                $moduleModel->setActivate(self::IS_ACTIVATED);
+                $moduleModel->save();
+
+                $this->initializeCoreI18n();
+                $this->postActivation($con);
+                $con->commit();
             } catch (\Exception $e) {
                 $con->rollBack();
                 $moduleModel->setActivate(self::IS_NOT_ACTIVATED);

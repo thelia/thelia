@@ -1,15 +1,23 @@
-{extends file="simple-layout.tpl"}
+{extends file="simple-layout.tpl"} 
+{* -- We do not check admin login on this page *} 
 
-{* -- We do not check admin login on this page *}
-{block name="check-auth"}{/block}
+{block name="check-auth"}{/block} 
 
-{block name="page-title"}{intl l='An error occured'}{/block}
-{block name="main-title"}{intl l="Oops! An Error Occurred"}{/block}
+{block name="page-title"}
+    {intl l='An error occured'}
+{/block} 
+
+{block name="main-title"}
+    {intl l="Oops! An Error Occurred"}
+{/block} 
+
 {block name="main-content"}
-    <div class="bg-mediumPearl w-full md:w-1/2 rounded-lg shadow-xl px-4 py-10 flex flex-col items-center">
-        <img src="{getFileFromManifest file="images/logos/dark-logo.svg"}" class="max-h-12 mx-auto mb-5" />
-        {block name="error-message"}<p class="text-center mb-10">{$error_message}</p>{/block}
-        <a href="{url path='/admin'}" class="text-center w-full md:w-2/6 bg-main hover:bg-darkMain p-3 text-gray-200 rounded-lg font-medium shadow-2xl mb-5">
+    <div class="bg-mediumPearl w-4/5 md:w-1/2 rounded-lg shadow-xl px-4 py-10 flex flex-col items-center">
+        <img src="{getFileFromManifest file="images/logos/dark-logo.svg"}" class="max-h-12 mx-auto mb-5" /> 
+        {block name="error-message"}
+            <p class="text-center mb-10">{$error_message}</p>
+        {/block}
+        <a href="{url path='/admin'}" class="w-full md:w-2/3 text-center bg-main hover:bg-darkMain p-3 text-gray-200 rounded-lg font-medium shadow-2xl mb-5">
             <i class="fas fa-home"></i>
             {intl l="Go to administration home"}
         </a>

@@ -1,4 +1,4 @@
-import { React, ReactDOM, ReactQuery } from '@TheliaJS';
+import { React, ReactDOM, ReactQuery } from '@thelia/utils-back';
 import { useGetCategory } from '../../api/hooks';
 import { useGetProduct } from '../../api/hooks';
 import { queryClient } from '../../api/queryClient';

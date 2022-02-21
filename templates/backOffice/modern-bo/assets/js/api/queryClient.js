@@ -1,6 +1,6 @@
-import { QueryClient } from 'react-query';
+import { ReactQuery } from '@thelia/utils-back';
 
-export const queryClient = new QueryClient({
+export const queryClient = new ReactQuery.QueryClient({
   defaultOptions: {
     queries: {
       retry: false,

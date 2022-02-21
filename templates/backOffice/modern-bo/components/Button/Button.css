@@ -1,0 +1,25 @@
+.Button {
+  @apply font-medium;
+
+  &--primary {
+    @apply bg-main hover:bg-darkMain text-gray-200 rounded-lg shadow-lg p-3;
+  }
+
+  &--secondary {
+    @apply bg-transparent hover:bg-darkMain border-main border-2 text-gray-200 rounded-lg shadow-lg p-3;
+  }
+
+  &--link {
+    @apply text-main;
+  }
+
+  &--small {
+    &-primary {
+      @apply bg-main hover:bg-darkMain p-4 flex items-center justify-center text-gray-200 rounded-full;
+    }
+
+    &-secondary {
+      @apply flex items-center justify-center w-10 h-10 p-4 font-medium rounded-full bg-lightGrey hover:bg-mediumCharbon hover:text-lightGrey text-mediumCharbon;
+    }
+  }
+}

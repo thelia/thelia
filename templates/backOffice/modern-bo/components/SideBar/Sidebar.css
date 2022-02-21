@@ -1,0 +1,98 @@
+.Sidebar {
+  &-item, &-submenu-item {
+    > a {
+      @apply flex items-center w-full;
+      span {
+        @apply p-0;
+      }
+    }
+  }
+
+  &-item {
+    > a {
+      > i {
+        @apply mr-5 text-white;
+      }
+    }
+  }
+  
+  &-submenu-item {
+    > a {
+      @apply justify-between;
+    }
+  }
+}
+
+@screen lg {
+  .Sidebar {
+    @apply relative h-full;
+
+    &-item {
+      > ul {
+        @apply hidden;
+      }
+
+      > a {
+        @apply py-6 h-11 flex items-center;
+  
+        > i {
+          @apply ml-5 mr-7 text-white;
+        }
+  
+        > span {
+          @apply text-mediumGrey;
+        }
+      }
+
+      &:focus, &:focus-within, &:hover {
+        @apply bg-darkCharbon;
+
+        > ul {
+          @apply block;
+        } 
+
+        > a {
+          > i {
+            @apply text-main;
+          }
+
+          > span {
+            @apply text-lightGrey;
+          }
+        }
+      }
+    }
+
+    &-submenu {
+      @apply absolute inset-y-0 p-6 left-full w-80 bg-darkCharbon text-mediumGrey overflow-scroll;
+
+      &-header {
+        @apply flex justify-between w-full mb-8;  
+      }
+
+      &-title {
+        @apply text-2xl font-bold text-white;
+      }
+
+      &-item {
+        @apply w-full px-2;
+
+        a {
+          @apply flex items-center justify-between w-full my-2 h-11 hover:text-main;
+        }
+      }
+    }
+
+    &-footer {
+      @apply mb-10;
+  
+      &-logo {
+        @apply mx-auto mb-2 max-h-8;
+      }
+      
+      &-version {
+        @apply text-xs text-center text-mediumGrey;
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+<{$tag|default:"a"}
+  class="Button {if $level|default:null}Button--{$level}{/if} {$class|default:null}"
+  {if $href|default:0}href="{$href}"{/if}
+  {if $target|default:0}target="{$target}"{/if}
+  {if $type|default:0 eq "submit"}type="submit"{/if}
+>
+  {if isset($children)}
+    {$children nofilter}
+  {/if}
+</{$tag|default:"a"}>

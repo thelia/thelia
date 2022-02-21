@@ -1,9 +1,11 @@
-@import 'tailwindcss/base';
+@import 'mmenu-light/dist/mmenu-light.css';
+
+@import 'layout';
 
 @import '../../components/**/*.css';
-
 @import './pages/**/*.css';
 
+@import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
@@ -11,87 +13,46 @@
   font-family: 'Open Sans', sans-serif;
 }
 
-.switch:checked ~ .dot {
+input[type=checkbox].switch:checked ~ .dot {
   transform: translateX(100%);
 }
 
-.switch:checked ~ .block {
+input[type=checkbox].switch:checked ~ .block {
   background-color: #48bb78;
 }
 
-.SimpleLayout {
-  @apply bg-lightGrey;
-}
-
-.Checkbox:checked {
+input[type=checkbox]:not(.switch):checked {
   @apply text-mediumCharbon;
 }
 
-.Checkbox {
+input[type=checkbox]:not(.switch) {
   border-radius: 0.25rem;
 }
 
-.Checkbox:focus {
+input[type=checkbox]:not(.switch):focus {
   @apply outline-none ring-darkMain;
 }
 
-.Radio:checked {
+input[type=radio]:checked {
   @apply text-mediumCharbon;
 }
 
-.Radio {
+input[type=radio] {
   border-radius: 100%;
 }
 
-.Radio:focus {
+input[type=radio]:focus {
   @apply outline-none ring-darkMain;
-}
-
-#page {
-  display: grid;
-  grid-template-areas:
-    'head'
-    'content'
-    'sidebar'
-    'footer';
-  grid-template-columns: 1fr;
-
-  @screen lg {
-    grid-template-areas:
-      'head head'
-      'sidebar content'
-      'sidebar footer';
-    grid-template-columns: 250px 1fr;
-    grid-template-rows: 60px auto 100px;
-  }
-}
-
-#page > #header {
-  grid-area: head;
-}
-
-#page > #sidebar {
-  grid-area: sidebar;
-}
-
-#page > #main {
-  grid-area: content;
-}
-
-.sidebar-item:hover {
-  @apply bg-darkCharbon;
-}
-
-.sidebar-item:hover span {
-  @apply text-lightGrey;
-}
-
-.sidebar-item:hover i {
-  @apply text-main;
 }
 
 .dropdown-menu a:hover {
   div {
+    @apply bg-mediumCharbon text-lightGrey;
+  }
+}
+
+.dropdown:hover {
+  .icon {
     @apply bg-mediumCharbon text-lightGrey;
   }
 }
