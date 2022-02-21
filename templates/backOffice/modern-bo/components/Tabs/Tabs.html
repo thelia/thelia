@@ -1,0 +1,74 @@
+<div class="flex flex-wrap" id="tabs-id">
+  <div class="w-full">
+    <ul id="tabs" class="flex flex-row flex-wrap pt-3 pb-2 mb-0 list-none">
+      <li class="flex-auto mr-2 -mb-px text-center last:mr-0">
+        <a class="block px-5 py-3 text-xs font-bold leading-normal text-white uppercase rounded cursor-pointer bg-carot" onclick="transformTab(event,'tab-profile')">
+          {$title|default:null}
+        </a>
+      </li>
+      <li class="flex-auto mr-2 -mb-px text-center last:mr-0">
+        <a class="block px-5 py-3 text-xs font-bold leading-normal text-black uppercase rounded cursor-pointer" onclick="transformTab(event,'tab-settings')">
+          {$title|default:null}
+        </a>
+      </li>
+      <li class="flex-auto mr-2 text-center">
+        <a class="block px-5 py-3 text-xs font-bold leading-normal text-black uppercase rounded cursor-pointer" onclick="transformTab(event,'tab-options')">
+          {$title|default:null}
+        </a>
+      </li>
+    </ul>
+    <div class="relative flex flex-col w-full min-w-0 mb-6 break-words bg-white rounded shadow-lg">
+      <div class="flex-auto px-4 py-5">
+        <div class="tab-content tab-space">
+          <div class="block" id="tab-profile">
+            <p>
+              {if isset($children)}
+                {$children nofilter}
+              {/if}
+            </p>
+          </div>
+          <div class="hidden" id="tab-settings">
+            <p>
+              {if isset($children)}
+                {$children nofilter}
+              {/if}
+            </p>
+          </div>
+          <div class="hidden" id="tab-options">
+            <p>
+              {if isset($children)}
+                {$children nofilter}
+              {/if}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  
+function transformTab(event,tabID){
+    let element = event.target;
+    while(element.nodeName !== "A"){
+      element = element.parentNode;
+    }
+    ulElement = element.parentNode.parentNode;
+    aElements = ulElement.querySelectorAll("li > a");
+    tabContents = document.getElementById("tabs-id").querySelectorAll(".tab-content > div");
+    for(let i = 0 ; i < aElements.length; i++){
+      aElements[i].classList.remove("text-white");
+      aElements[i].classList.remove("bg-carot");
+      aElements[i].classList.add("text-black");
+      tabContents[i].classList.add("hidden");
+      tabContents[i].classList.remove("block");
+    }
+    element.classList.remove("text-black");
+    element.classList.add("text-white");
+    element.classList.add("bg-carot");
+    document.getElementById(tabID).classList.remove("hidden");
+    document.getElementById(tabID).classList.add("block");
+  };
+  
+</script>
