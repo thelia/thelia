@@ -8,6 +8,7 @@ composer.lock
 symfony.lock
 phpunit.xml
 .php-cs-fixer.cache
+node_modules
 ###< symfony/framework-bundle ###
 
 ###> thelia/thelia ###
