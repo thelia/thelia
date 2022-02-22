@@ -312,7 +312,11 @@
 
    <!-- Tabs -->
    <div class="flex p-10">
-    {component name="Tabs" title="Tabs"}message{/component}
+    {include file="components/Tab/Tab.html" id="one" title="one"}
+    {include file="components/Tab/Tab.html" id="two" title="two"}
+
+    {component name="Tabs" title="one" id="one"}content one{/component}
+    {component name="Tabs" title="two" id="two"}content two{/component}
   </div>
 
 
