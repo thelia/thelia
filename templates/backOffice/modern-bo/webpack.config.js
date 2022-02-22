@@ -20,7 +20,7 @@ Encore.addAliases({'@components': path.resolve(__dirname, './components')});
 
 // ENTRIES
 Encore.addEntry('app', './assets/js/app.js');
-Encore.addEntry('category', './assets/js/pages/category/category.jsx');
+Encore.addEntry('category', './assets/js/pages/category/category.js');
 
 console.log(__dirname, path.basename(__dirname));
 
