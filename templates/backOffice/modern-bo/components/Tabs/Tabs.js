@@ -1,3 +1,6 @@
+
+
+
 export const Tabs = () => {
     console.log('prout')
     document.querySelectorAll('.Tabs').forEach(
@@ -12,6 +15,8 @@ export const Tabs = () => {
             },
         )
     )
+    
 };
+
 
 
