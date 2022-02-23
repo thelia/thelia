@@ -1,0 +1,48 @@
+.Tabs {
+    width: 100%;
+    height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  
+  .TabHeader {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .tabsHead {
+    font-size: 16px;
+    padding: 15px 60px;
+    cursor: pointer;
+  }
+  
+  .tabsHead.active {
+    background-color: rgb(250, 97, 9);
+  }
+  
+  .TabsContent {
+    width: 100%;
+    max-width: 500px;
+    margin-top: 25px;
+  }
+  
+.Item {
+    display: none;
+    padding: 50px;
+    border: 1px solid #ccc;
+  }
+  
+.Item.active {
+    display: flex;
+    justify-content: center;
+  }
+
+  .TabHeader li:hover {
+      transform: translateY(-5px);
+      opacity: 1;
+ 
+  }
