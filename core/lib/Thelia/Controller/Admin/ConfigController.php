@@ -20,6 +20,7 @@ use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Service\ConfigCacheService;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Config;
@@ -45,6 +46,21 @@ class ConfigController extends AbstractCrudController
             null, // No visibility toggle
             null // no position change
         );
+    }
+
+    /**
+     * The default action is displaying the list.
+     *
+     * @return \Thelia\Core\HttpFoundation\Response the response
+     */
+    public function defaultAction(ConfigCacheService $configCacheService = null)
+    {
+        // Force reinit config cache
+        if (null !== $configCacheService) {
+            $configCacheService->initCacheConfigs(true);
+        }
+
+        return parent::defaultAction();
     }
 
     protected function getCreationForm()

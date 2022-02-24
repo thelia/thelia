@@ -52,7 +52,7 @@ class MailingSystemController extends BaseAdminController
         $this->getParserContext()->addForm($form);
 
         // Render the edition template.
-        return $this->render('mailing-system');
+        return $this->render('mailing-system', ['editDisabled' => ConfigQuery::isSmtpInEnv()]);
     }
 
     public function updateAction(EventDispatcherInterface $eventDispatcher)
