@@ -46,19 +46,15 @@ class ConfigQuery extends BaseConfigQuery
      */
     public static function read(string $search, $default = null, bool $ignoreCache = false)
     {
-        if ($ignoreCache || !self::$booted) {
-            $value = self::create()->findOneByName($search);
+        if ($ignoreCache || !self::$booted || !\array_key_exists($search, self::$cache)) {
+            $model = self::create()->filterByName($search)->findOneOrCreate();
 
-            self::$cache[$search] = $value ? $value->getValue() : $default;
+            $value = $model->getValue() ?: $default;
 
-            return self::$cache[$search];
+            self::$cache[$search] = $value;
         }
 
-        if (\array_key_exists($search, self::$cache)) {
-            return self::$cache[$search];
-        }
-
-        return $default;
+        return self::$cache[$search];
     }
 
     public static function write($configName, $value, $secured = null, $hidden = null): void
@@ -185,6 +181,11 @@ class ConfigQuery extends BaseConfigQuery
     }
 
     /* smtp config */
+    public static function isSmtpInEnv()
+    {
+        return isset($_ENV['SMTP_ENABLED']) || isset($_ENV['SMTP_HOST']);
+    }
+
     public static function isSmtpEnable()
     {
         return self::read('smtp.enabled') == 1;

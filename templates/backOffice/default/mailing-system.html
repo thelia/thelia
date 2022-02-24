@@ -28,15 +28,15 @@
 
                     <div class="title title-without-tabs">{intl l="Configuration mailing system"}</div>
 
+                    {if $editDisabled}
+                        <div class="alert alert-warning">
+                            {intl l="Your mailing system has been configured in .env file and cannot be changed here."}
+                        </div>
+                    {/if}
+
                     {form name="thelia.admin.mailing-system.update"}
 
                     <form method="POST" action="{url path="/admin/configuration/mailingSystem/save"}" {form_enctype} >
-
-                        <div class="row inner-toolbar">
-                            <div class="col-md-12 inner-actions clearfix">
-                                <button type="submit" name="save_mode" value="stay" class="btn btn-default btn-success pull-right" title="{intl l="Save SMTP configuration"}">{intl l="Save"} <span class="glyphicon glyphicon-ok"></span></button>
-                            </div>
-                        </div>
 
                         {form_hidden_fields}
 
@@ -84,12 +84,13 @@
                                 {render_form_field field='sourceip'}
                             </div>
                         </div>
-
-                        <div class="row inner-toolbar">
-                            <div class="col-md-12 inner-actions clearfix">
-                                <button type="submit" name="save_mode" value="stay" class="btn btn-default btn-success pull-right" title="{intl l="Save SMTP configuration"}">{intl l="Save"} <span class="glyphicon glyphicon-ok"></span></button>
+                        {if !$editDisabled}
+                            <div class="row inner-toolbar">
+                                <div class="col-md-12 inner-actions clearfix">
+                                    <button type="submit" name="save_mode" value="stay" class="btn btn-default btn-success pull-right" title="{intl l="Save SMTP configuration"}">{intl l="Save"} <span class="glyphicon glyphicon-ok"></span></button>
+                                </div>
                             </div>
-                        </div>
+                        {/if}
                     </form>
                     {/form}
                 </div>

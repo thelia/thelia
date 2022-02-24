@@ -15,6 +15,7 @@ namespace Thelia\Form;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ConfigQuery;
 
 /**
  * Class MailingSystemModificationForm.
@@ -25,23 +26,28 @@ class MailingSystemModificationForm extends BaseForm
 {
     protected function buildForm(): void
     {
+        $disabled = ConfigQuery::isSmtpInEnv();
         $this->formBuilder
             ->add('enabled', CheckboxType::class, [
+                'disabled' => $disabled,
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Enable remote SMTP use'),
                 'label_attr' => ['for' => 'enabled_field'],
             ])
             ->add('host', TextType::class, [
+                'disabled' => $disabled,
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Host'),
                 'label_attr' => ['for' => 'host_field'],
             ])
             ->add('port', TextType::class, [
+                'disabled' => $disabled,
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Port'),
                 'label_attr' => ['for' => 'port_field'],
             ])
             ->add('encryption', TextType::class, [
+                'disabled' => $disabled,
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Encryption'),
                 'label_attr' => [
@@ -50,16 +56,19 @@ class MailingSystemModificationForm extends BaseForm
                 ],
             ])
             ->add('username', TextType::class, [
+                'disabled' => $disabled,
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Username'),
                 'label_attr' => ['for' => 'username_field'],
             ])
             ->add('password', TextType::class, [
+                'disabled' => $disabled,
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Password'),
                 'label_attr' => ['for' => 'password_field'],
             ])
             ->add('authmode', TextType::class, [
+                'disabled' => $disabled,
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Auth mode'),
                 'label_attr' => [
@@ -68,11 +77,13 @@ class MailingSystemModificationForm extends BaseForm
                 ],
             ])
             ->add('timeout', TextType::class, [
+                'disabled' => $disabled,
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Timeout'),
                 'label_attr' => ['for' => 'timeout_field'],
             ])
             ->add('sourceip', TextType::class, [
+                'disabled' => $disabled,
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Source IP'),
                 'label_attr' => ['for' => 'sourceip_field'],
