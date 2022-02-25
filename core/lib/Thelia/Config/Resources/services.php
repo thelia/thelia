@@ -46,6 +46,9 @@ return function (ContainerConfigurator $configurator): void {
                 \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
                 \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
             } catch (\Exception $e) {
+                if ($_ENV['APP_DEBUG']) {
+                    throw $e;
+                }
                 Tlog::getInstance()->addError(
                     sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
                     $e

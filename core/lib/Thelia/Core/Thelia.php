@@ -509,6 +509,9 @@ class Thelia extends Kernel
                         ]);
                     }
                 } catch (\Exception $e) {
+                    if ($this->debug) {
+                        throw $e;
+                    }
                     Tlog::getInstance()->addError(
                         sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
                         $e
@@ -528,6 +531,9 @@ class Thelia extends Kernel
 
                     $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
                 } catch (\Exception $e) {
+                    if ($this->debug) {
+                        throw $e;
+                    }
                     Tlog::getInstance()->addError(
                         sprintf('Failed to load module %s: %s', $module->getCode(), $e->getMessage()),
                         $e
