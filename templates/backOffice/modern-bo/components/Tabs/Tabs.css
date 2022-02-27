@@ -1,6 +1,5 @@
 .Tabs {
     width: 100%;
-    height: 70vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -8,36 +7,34 @@
   }
   
   .TabHeader {
-    display: flex;
     justify-content: center;
     width: 100%;
-    max-width: 500px;
+    max-width: 150px;
+    overflow: auto hidden;
   }
   
   .tabsHead {
-    font-size: 16px;
-    padding: 15px 60px;
+    font-size: 10px;
     cursor: pointer;
   }
   
   .tabsHead.active {
-    background-color: rgb(250, 97, 9);
+    background-color: #FC9722;
   }
   
   .TabsContent {
-    width: 100%;
-    max-width: 500px;
-    margin-top: 25px;
+    block-size: 50%;
+    display: block;
   }
   
 .Item {
-    display: none;
     padding: 50px;
-    border: 1px solid #ccc;
+    overflow-y: auto;
   }
   
+  
 .Item.active {
-    display: flex;
+    display: block;
     justify-content: center;
   }
 

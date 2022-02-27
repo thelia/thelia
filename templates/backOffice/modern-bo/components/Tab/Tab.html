@@ -1,13 +1,13 @@
-<div class="relative flex flex-col w-full min-w-0 mb-6 break-words bg-white rounded shadow-lg">
-    <div class="flex-auto px-4 py-5">
-      <div class="TabsContent tab-space">
-        <div class="block activate">
-          <p>
-            {if isset($message)}
-              {$children nofilter}
-            {/if}
-          </p>
-        </div>
+<div class="bg-white rounded shadow-lg ">
+  <div>
+    <div class="TabsContent">
+      <div id="tab-one" class="block Item {if $active|default:null}active{/if}">
+        <p>
+          {if isset($children)}
+            {$children nofilter}
+          {/if} 
+        </p>
       </div>
     </div>
   </div>
+</div>

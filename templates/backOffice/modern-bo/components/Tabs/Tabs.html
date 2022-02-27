@@ -1,35 +1,9 @@
 <div class="flex flex-wrap Tabs">
   <div class="w-full">
-    <ul class="flex flex-row flex-wrap pt-3 pb-2 mb-0 list-none TabHeader">
-      <li class="flex-auto mr-2 -mb-px text-center last:mr-0">
-        <a data-open="tabOne"class="block px-5 py-3 text-xs font-bold leading-normal text-black uppercase rounded cursor-pointer tabsHead active">
-          un
-        </a>
-      </li>
-      <li class="flex-auto mr-2 -mb-px text-center last:mr-0">
-        <a data-open="tabTwo" class="block px-5 py-3 text-xs font-bold leading-normal text-black uppercase bg-white rounded cursor-pointer tabsHead">
-          deux
-        </a>
-      </li>
-      <li class="flex-auto mr-2 text-center">
-        <a data-open="tabThree" class="block px-5 py-3 text-xs font-bold leading-normal text-black uppercase bg-white rounded cursor-pointer tabsHead">
-          trois
-        </a>
-      </li>
-    </ul>
     
-    <div class="relative flex flex-col w-full min-w-0 mb-6 break-words bg-white rounded shadow-lg">
-      <div class="flex-auto px-4 py-5">
-        <div class="TabsContent tab-space">
-          <div class="block Item active">
-            <p>
-              {if isset($message)}
-                {$children nofilter}
-              {/if}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+    {if isset($children)}
+      {$children nofilter}
+    {/if} 
+   
   </div>
 </div>
