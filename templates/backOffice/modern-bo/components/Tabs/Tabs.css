@@ -1,45 +1,46 @@
 .Tabs {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-  }
-  
-  .TabHeader {
-    justify-content: center;
-    width: 100%;
-    max-width: 150px;
-    overflow: auto hidden;
-  }
-  
-  .tabsHead {
-    font-size: 10px;
-    cursor: pointer;
-  }
-  
-  .tabsHead.active {
-    background-color: #FC9722;
-  }
-  
-  .TabsContent {
-    block-size: 50%;
-    display: block;
-  }
-  
-.Item {
-    padding: 50px;
-    overflow-y: auto;
-  }
-  
-  
-.Item.active {
-    display: block;
-    justify-content: center;
-  }
+  width: 100%;
+  height: 70vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
 
-  .TabHeader li:hover {
-      transform: translateY(-5px);
-      opacity: 1;
- 
-  }
+.TabHeader {
+  justify-content: center;
+  width: 100%;
+  max-width: 500px;
+  max-width: 150px;
+  overflow: auto hidden;
+}
+
+.tabsHead {
+  font-size: 16px;
+  padding: 15px 60px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.tabsHead.active {
+  background-color: #2267fc;
+}
+
+.TabsContent {
+  block-size: 40%;
+  display: block;
+}
+
+.Item {
+  display: none;
+  padding: 50px;
+  border: 1px solid #ccc;
+  overflow-y: auto;
+}
+
+
+.Item.active {
+  display: block;
+  justify-content: center;
+  overflow-y: auto;
+}

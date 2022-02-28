@@ -1,35 +1,49 @@
 export const Tabs = () => {
 
-    let tab = document.querySelectorAll(".Tabs");
-    console.log(tab);
+   let tabs = document.querySelectorAll(".Tabs");
 
-    let tabs = tab[0].querySelectorAll(".TabHeader a");
-    let content = tab[0].querySelectorAll(".Item");
+   if(!tabs) return;
 
-    for(let i = 0 ; i < tab.length; i++){
-        console.log(tab)
-     }
-
-    for(let i = 0 ; i < tabs.length; i++){
-        tabs[i].addEventListener('click', () => click(i));
-     }
-
-        function removeActive() {
-            for (let i = 0; i < tabs.length; i++) {
-                tabs[i].classList.remove('active');
-                content[i].classList.remove('active');
-                content[i].classList.remove('block');
-            }
-        }
-
-        function click(currentTab) {
-            removeActive();
-            tabs[currentTab].classList.add('active');
-            content[currentTab].classList.add('active');
-            content[currentTab].classList.add('hidden');
-            content[currentTab].classList.remove('block');
+    function removeActive(tabsHeader, tabContent){
+        for(let i = 0; i < tabsHeader.length; i++){
+            tabsHeader[i].classList.remove("active");
+            tabContent[i].classList.remove("active");
         }
     }
+
+    function tabsKeyboard(tabsHeader, tabContent){
+        
+        document.body.addEventListener("keydown", function(event){
+            if(event.key === 'Tab') {
+                for(let i = 0; i < tabsHeader.length; i++){
+                    tabsHeader[i].classList.remove("active");
+                    tabContent[i].classList.remove("active");
+                }
+            }
+        })
+    }
+
+    function ActiveTab(event, tabsHeader, tabContent, i){
+            event.preventDefault();
+            removeActive(tabsHeader, tabContent);
+            tabsHeader[i].classList.add("active");
+            tabContent[i].classList.add("active");
+    }
+
+   for(let i = 0; i < tabs.length; i++){
+       let tabsHeader = tabs[i].querySelectorAll(".TabHeader a");
+       let tabContent = tabs[i].querySelectorAll(".Item");
+       tabsKeyboard();
+       for(let i = 0; i < tabsHeader.length; i++){
+           tabsHeader[i].addEventListener("click", e => {
+               ActiveTab(e, tabsHeader, tabContent, i);
+        })
+        tabsHeader[i].addEventListener("focus", e => {
+            ActiveTab(e, tabsHeader, tabContent, i);
+     })
+    }
+    }
+}
     
 
 
