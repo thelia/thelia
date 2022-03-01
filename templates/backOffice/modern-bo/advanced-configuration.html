@@ -4,6 +4,18 @@
 
 {block name="main-content"}
   <div id="advanced-configuration">
-
+    {component name="Panel" title="Thelia caches flushing" class="w-full mb-3"}
+    <div class="flex justify-center border-b">
+      <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl left bg-carot hover:bg-black">
+        Flush the Thelia internal cache
+      </button>
+      <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl center bg-carot hover:bg-black">
+        Flush the assets cache directory
+      </button>
+      <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl right bg-carot hover:bg-black">
+        Flush the images and documents cache
+      </button>
+      </div>    
+    {/component}
   </div>
 {/block}

@@ -4,6 +4,129 @@
 
 {block name="main-content"}
   <div id="store">
+    {component name="Panel" title="Store configuration" class="w-full mb-3"}
+    <div class="flex justify-end border-b">
+      <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
+        Save ✓
+      </button>
+      <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
+        Save and close X
+      </button>
+      <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
+        Close X
+      </button>
+    </div> 
+    <div class="grid grid-flow-col grid-rows-3 gap-4">
+      <div class="col-span-3 mb-8">
+        <h3 class="uppercase ">General</h3>
+        <h5 class="font-bold">Store name*</h5>
+        <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+      />
+      <h5 class="font-bold">Store description</h5>
+        <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+      />
+      <h5 class="font-bold">Business ID</h5>
+        <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+        placeholder="Store business Identification number (SIRET, etc.)"
+      />
+      </div>
+      <div class="col-span-1 row-span-1">
+        <h3 class="uppercase">Email addresses</h3>
+        <h5 class="font-bold">Store email address*</h5>
+        <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+      />
+      <h5 class="font-bold">Email addresses of notification recipients*</h5>
+        <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+      />
+        
+      <h3 class="uppercase">Media</h3>
+      <h5 class="font-bold">Favicon image</h5>
+      <input
+        type="file"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+        accept="image/png, image/jpeg"
+      />
+      <h5 class="font-bold">Store logo</h5>
+      <input
+        type="file"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+        accept="image/png, image/jpeg"
+      />
+      <h5 class="font-bold">Banner</h5>
+      <input
+        type="file"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+        accept="image/png, image/jpeg"
+      />
+      </div>
 
+    
+
+      <div class="row-span-3">
+        <h3 class="uppercase">Store address</h3>
+        <h5 class="uppercase">Street address*</h5>
+        <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+      />
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+        placeholder="Additional address information"
+      />
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+        placeholder="Additional address information"
+      />
+      <div class="flex flex-row justify-center">
+        <h5 class="font-bold">Zip code*</h5>
+        <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+      />
+        <h5 class="font-bold">City*</h5>
+        <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+      />
+      </div>
+      <h5 class="uppercase">Country*</h5>
+        <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+      />
+
+      <h3 class="uppercase">Phone & fax</h3>
+      <div class="flex flex-row justify-center">
+        <h5 class="font-bold">Zip code*</h5>
+        <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+      />
+        <h5 class="font-bold">City*</h5>
+        <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+        placeholder="The store fax number"
+      />
+      </div>
+      
+      </div>
+
+      
+      </div>
+    {/component}
   </div>
+  
 {/block}

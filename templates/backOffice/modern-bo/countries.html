@@ -4,6 +4,149 @@
 
 {block name="main-content"}
   <div id="countries">
-
+    {component name="Panel" title="Countries" class="w-full mb-3"}
+    <div class="flex justify-end">
+    {component name="modal" title="modal"}je suis une modal{/component}
+       
+        </div>
+    <div class="flex p-1 mt-5">
+      <table class="w-full shadow-lg table-auto bg-lightPearl">
+        <thead class="bg-mediumCharbon text-lightGrey">
+          <tr>
+            <th class="px-5 py-4 text-left rounded-tl-xl">ID</th>
+            <th class="px-5 py-4 text-left">Nom</th>
+            <th class="px-5 py-4 text-left">Défaut</th>
+            <th class="px-5 py-4 text-left">N° ISO</th>
+            <th class="px-5 py-4 text-left">Code ISO</th>
+            <th class="px-5 py-4 text-left">Zone de livraison</th>
+            <th class="px-5 py-4 text-left">Visible</th>
+            <th class="px-5 py-4 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">1</td>
+            <td class="px-5 py-4">
+              <a
+                href="/"
+                class="font-bold text-main hover:text-darkMain"
+                >Albanie</a
+              >
+            </td>
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <label for="toggle" class="flex items-center cursor-pointer">
+                <div class="mr-3 text-darkCharbon"></div>
+                <div class="relative">
+                  <input type="checkbox" id="toggle" class="sr-only switch" />
+                  <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+                  <div
+                    class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                  ></div>
+                </div>
+              </label>           
+        </td> 
+            <td class="px-5 py-4">007</td>
+            <td class="px-5 py-4">AFG</td> 
+            <td class="px-5 py-4">
+              <a
+                href="/"
+                class="font-bold text-main hover:text-darkMain"
+                >B Zone</a
+              >
+            </td>
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <label for="toggle" class="flex items-center cursor-pointer">
+                <div class="mr-3 text-darkCharbon"></div>
+                <div class="relative">
+                  <input type="checkbox" id="toggle" class="sr-only switch" />
+                  <div class="block w-10 h-6 bg-red-500 rounded-full "></div>
+                  <div
+                    class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                  ></div>
+                </div>
+              </label>        
+        </td>
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <button
+                href="/"
+                class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-edit" aria-hidden="true"></i></button
+              ><button
+                href="/"
+                class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+              </button>
+            </td>
+          </tr>
+          <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">1</td>
+            <td class="px-5 py-4">
+              <a
+                href="/"
+                class="font-bold text-main hover:text-darkMain"
+                >Albanie</a
+              >
+            </td>
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <label for="toggle" class="flex items-center cursor-pointer">
+                <div class="mr-3 text-darkCharbon"></div>
+                <div class="relative">
+                  <input type="checkbox" id="toggle" class="sr-only switch" />
+                  <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+                  <div
+                    class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                  ></div>
+                </div>
+              </label>           
+        </td> 
+            <td class="px-5 py-4">007</td>
+            <td class="px-5 py-4">AFG</td> 
+            <td class="px-5 py-4">
+              <a
+                href="/"
+                class="font-bold text-main hover:text-darkMain"
+                >B Zone</a
+              >
+            </td>
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <label for="toggle" class="flex items-center cursor-pointer">
+                <div class="mr-3 text-darkCharbon"></div>
+                <div class="relative">
+                  <input type="checkbox" id="toggle" class="sr-only switch" />
+                  <div class="block w-10 h-6 bg-red-500 rounded-full "></div>
+                  <div
+                    class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                  ></div>
+                </div>
+              </label>        
+        </td>
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <button
+                href="/"
+                class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-edit" aria-hidden="true"></i></button
+              ><button
+                href="/"
+                class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    {/component}
   </div>
 {/block}

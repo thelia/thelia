@@ -4,6 +4,60 @@
 
 {block name="main-content"}
   <div id="translations-customer-title">
+    {component name="Panel" title="Store configuration" class="w-full mb-3"}
+    <div class="flex justify-end border-b">
+      <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
+        Save ✓
+      </button>
+      <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
+        Save and close X
+      </button>
+      <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
+        Close X
+      </button>
+    </div> 
+    
+      <div class="flex flex-row justify-center">
+        <h5 class="font-bold">Short</h5>
+        <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+        placeholder="Mr."
+      />
+      <input
+      type="text"
+      class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+      placeholder="Mrs."
+    />
+    <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+    placeholder="Miss_short"
+  />
+        <h5 class="font-bold">Long</h5>
+        <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+        placeholder="Mister"
+      />
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+        placeholder="Misses"
+      />
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
+        placeholder="Miss"
+      />
+      </div>
+     
+      
+      
+      </div>
 
+      
+      </div>
+    {/component}
   </div>
 {/block}

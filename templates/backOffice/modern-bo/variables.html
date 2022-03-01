@@ -4,6 +4,69 @@
 
 {block name="main-content"}
   <div id="variables">
+    {component name="Panel" title="Thelia configuration parameters" class="w-full mb-3"}
+    <div class="flex justify-end border-b">
+      <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
+        Save ✓
+      </button>
+        {component name="modal" title="modal"}je suis une modal{/component}
+      </div>
+    
+      <div class="flex p-1 mt-5">
+        <table class="w-full shadow-lg table-auto bg-lightPearl">
+          <thead class="bg-mediumCharbon text-lightGrey">
+            <tr>
+              <th class="px-5 py-4 text-left rounded-tl-xl">Purpose</th>
+              <th class="px-5 py-4 text-left">Name</th>
+              <th class="px-5 py-4 text-left">Value</th>
+              <th class="px-5 py-4 rounded-tr-xl">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd:bg-mediumPearl even:bg-white">
+              <td class="px-5 py-4">Name of the active back-office template</td>
+              <td class="px-5 py-4">
+                <a
+                  href="#"
+                  class="font-bold text-main hover:text-darkMain"
+                  >active-admin-template</a
+                >
+              </td>
+              <td class="px-5 py-4">
+                <select class="w-full text-gray-500 rounded-lg">
+                <option disabled selected>default</option>
+              </select></td>
+              <td class="flex justify-center px-5 py-4 px-auto">
+                <button
+                  href="/"
+                  class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+                  title="{intl l='View site'}"
+                  target="_blank"
+                >
+                  <i class="fas fa-minus" aria-hidden="true"></i></button
+                ><button
+                  href="/"
+                  class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+                  title="{intl l='View site'}"
+                  target="_blank"
+                >
+                  <i class="fas fa-edit" aria-hidden="true"></i>
+                </button>
+                <button
+                  href="/"
+                  class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+                  title="{intl l='View site'}"
+                  target="_blank"
+                >
+                  <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
+    
+    {/component}
   </div>
 {/block}

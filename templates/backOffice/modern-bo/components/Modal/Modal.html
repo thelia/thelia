@@ -1,0 +1,16 @@
+<dialog id="favDialog">
+    <form class="relative rounded-lg w-5000" method="dialog">     
+            <button class="right" id="confirmBtn" value="default">&times;</button>    
+      <p>
+        {if isset($children)}
+            {$children nofilter}
+        {/if}
+      </p>
+    </form>
+  </dialog>
+  <menu>
+    <button class="flex items-center justify-center w-10 h-10 font-medium text-center text-white rounded shadow-1xl bg-carot hover:bg-black hover:text-lightGrey" id="updateDetails"><i class="p-2 fas fa-plus"></i></button>
+  </menu>
+
+
+

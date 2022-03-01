@@ -4,6 +4,166 @@
 
 {block name="main-content"}
   <div id="taxes-rules">
+    <div class="w-full p-5 mx-auto mt-10 mb-8 border rounded-lg bg-info text-blue border-blue">
+      Pour pouvoir gérer les taxes de votre magasin vous pouvez gérer <strong>taxes</strong> et <strong>règles de taxe</strong>.</br>
+
+Les taxes correspondent au montant ajouté au prix HT d'un produit acheté </br>
+
+Exemple : </br>
+
+La TVA française de 20% est une taxe qui ajoute 20% au prix du produit. </br>
+L'écotaxe est une taxe qui ajoute un montant défini (grâce à une caractéristique produit) au prix du produit. </br>
+Les règles de taxe sont une combinaison de différentes taxes. </br>
+
+Exemple : </br>
+
+La TVA française de 20% avec écotaxe est l'application de l'écotaxe (sur le prix du produit) puis l'application de la taxe de20% (sur le prix du produit + le montant écotaxe). </br>
+vous pouvez combiner des taxes en règles de taxe et choisir si elle sont appliquées l'une après l'autre ou en même temps: cela permet d'appliquer des taxes sur un produit déjà taxé ou non.
+    </div>
+
+    {component name="Panel" title="Taxes" class="w-full mb-8"}
+    <div class="flex justify-end">
+    {component name="modal" title="modal"}je suis une modal{/component}
+  </div>
+    <div class="flex p-1 mt-5">
+      <table class="w-full shadow-lg table-auto bg-lightPearl">
+        <thead class="bg-mediumCharbon text-lightGrey">
+          <tr>
+            <th class="px-5 py-4 text-left rounded-tl-xl">Nom</th>
+            <th class="px-5 py-4 text-left">Description</th>
+            <th class="px-5 py-4 rounded-tr-xl">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">Lorem, ipsum.</td>
+            <td class="px-5 py-4">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Cumque, modi totam.</td>
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <button
+                href="/"
+                class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-edit" aria-hidden="true"></i></button
+              ><button
+                href="/"
+                class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+              </button>
+            </td>
+          </tr>
+          <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">Lorem, ipsum.</td>
+            <td class="px-5 py-4">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Cumque, modi totam.</td>
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <button
+                href="/"
+                class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-edit" aria-hidden="true"></i></button
+              ><button
+                href="/"
+                class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    {/component}
+
+
+    {component name="Panel" title="Règles de taxes" class="w-full mb-8"}
+    <div class="flex justify-end">
+    {component name="modal" title="modal"}je suis une modal{/component}
+  </div>
+    <div class="flex p-1 mt-5">
+      <table class="w-full shadow-lg table-auto bg-lightPearl">
+        <thead class="bg-mediumCharbon text-lightGrey">
+          <tr>
+            <th class="px-5 py-4 text-left rounded-tl-xl">Nom</th>
+            <th class="px-5 py-4 text-left">Description</th>
+            <th class="px-5 py-4 text-left">Défaut</th>
+            <th class="px-5 py-4 rounded-tr-xl">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">Lorem, ipsum.</td>
+            <td class="px-5 py-4">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Cumque, modi totam.</td>
+            <td class="px-5 py-4"></td>
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <button
+                href="/"
+                class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-edit" aria-hidden="true"></i></button
+              ><button
+              href="/"
+              class="flex items-center justify-center p-3 font-medium text-center text-white bg-yellow-300 rounded-md hover:text-lightGrey"
+              title="{intl l='View site'}"
+              target="_blank"
+            >
+              <i class="fas fa-solid fa-star aria-hidden="true"></i>
+            </button>
+            <button
+              href="/"
+              class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+              title="{intl l='View site'}"
+              target="_blank"
+            >
+              <i class="fas fa-trash-alt" aria-hidden="true"></i>
+            </button>
+            </td>
+          </tr>
+          <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">Lorem, ipsum.</td>
+            <td class="px-5 py-4">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Cumque, modi totam.</td>
+            <td class="px-5 py-4"></td>
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <button
+                href="/"
+                class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-edit" aria-hidden="true"></i></button
+              ><button
+                href="/"
+                class="flex items-center justify-center p-3 font-medium text-center text-white bg-yellow-300 rounded-md hover:text-lightGrey"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-solid fa-star aria-hidden="true"></i>
+              </button>
+              <button
+                href="/"
+                class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    {/component}
+
+    
 
   </div>
 {/block}

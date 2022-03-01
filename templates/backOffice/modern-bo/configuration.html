@@ -4,204 +4,255 @@
 
 {block name="main-content"}
 
-<div class="relative flex flex-col justify-center min-h-screen py-6 overflow-hidden bg-gray-50 sm:py-12">
-    <div class="absolute bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
-    <div class="relative px-6 pt-10 pb-8 bg-white shadow-xl ring-1 ring-gray-900/5 sm:max-w-lg sm:mx-auto sm:rounded-lg sm:px-10">
-      <div class="max-w-md mx-auto">
-        <div class="divide-y divide-gray-300/50">
-          <div class="py-8 space-y-6 text-base leading-7 text-gray-600">
-            
-            <table class="table-auto">
-                <caption>{intl l='Product catalog configuration'}</caption>
-        
-                <tr>
-                    <td><a href="{url path='/admin/templates'}">{intl l='Product templates'}</a></td>
-                    <td>
-                        <button></button>
-                    </td>
-                </tr>
-        
-                <tr>
-                    <td><a href="{url path='/admin/attributes'}">{intl l='Product attributes'}</a></td>
-                    <td>
-                        <button></button>
-                    </td>
-                </tr>
-        
-                <tr>
-                    <td><a href="{url path='/admin/features'}">{intl l='Product features'}</a></td>
-                    <td>
-                        <button></button>
-                    </td>
-                </tr>
-        
-                <tr>
-                    <td><a href="{url path='/admin/messages'}">{intl l='Mailing templates'}</a></td>
-                    <td>
-                        <button></button> 
-                    </td>
-                </tr>
-        
-                <tr>
-                    <td><a href="{url path='/admin/currencies'}">{intl l='Currencies'}</a></td>
-                    <td>
-                        <button></button>
-                    </td>
-                </tr>
-        
-                <tr>
-                    <td><a href="{url path='/admin/taxes-rules'}">{intl l='Tax rules'}</a></td>
-                    <td>
-                        <button></button>
-                    </td>
-                </tr>
-            </table>
-            
-          </div>
-          
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="grid w-full grid-cols-1 mt-8 xl:grid-cols-3 gap-x-8">
+    {component name="Panel" title="PRODUCT CATALOG CONFIGURATION" class="w-full mb-3"}
+    <table class="w-full">
+    <tr class="bg-lightGrey">
+        <td><a  href="{url path='/admin/templates'}">{intl l='Product templates'}</a></td>
+        <td>
+            {component name="Button" tag="div" class="w-1 h-1 mr-3"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr>
+        <td><a  href="{url path='/admin/attributes'}">{intl l='Product attributes'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3 bg-white"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr class="bg-lightGrey">
+        <td><a href="{url path='/admin/features'}">{intl l='Product features'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr>
+        <td><a  href="{url path='/admin/messages'}">{intl l='Mailing templates'}</a></td>
+        <td>
+            {component name="Button" href="{url path='/admin/messages'}" tag="div" level="small-secondary" class="w-1 h-1 mr-3 bg-white"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr class="bg-lightGrey">
+        <td><a  href="{url path='/admin/currencies'}">{intl l='Currencies'}</a></td>
+        <td>
+            <a href="{url path='/admin/configuration'}" class="flex items-center">
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </a>
+        </td>
+    </tr>
+
+    <tr>
+        <td><a href="{url path='/admin/taxes-rules'}">{intl l='Tax rules'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3 bg-white"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+</table>
+    {/component}
+
+    {component name="Panel" title="SHIPPING CONFIGURATION" class="w-full mb-6"}
+    <table class="w-full">
+        <tr class="bg-lightGrey">
+        <td><a  href="{url path='/admin/countries'}">{intl l='Countries'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr>
+        <td><a  href="{url path='/admin/states'}">{intl l='States / Provinces'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3 bg-white"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr class="bg-lightGrey">
+        <td><a href="{url path='/admin/shipping-configuration'}">{intl l='Shipping configuration'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr>
+        <td><a href="{url path='/admin/shipping-zones'}">{intl l='Shipping zones management'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3 bg-white"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+</table>
+    {/component}
+
+    {component name="Panel" title="SYSTEM PARAMETERS" class="w-full mb-6"}
+    <table class="w-full">
+        <tr class="bg-lightGrey">
+        <td><a href="{url path='/admin/config-store'}">{intl l='Store'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr>
+        <td><a href="{url path='/admin/variables'}">{intl l='Configuration parameters'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3 bg-white"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr class="bg-lightGrey">
+        <td><a href="{url path='/admin/profiles'}">{intl l='Administration profiles'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr>
+        <td><a href="{url path='/admin/administrators'}">{intl l='Administrators'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3 bg-white"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr class="bg-lightGrey">
+        <td><a href="{url path='/admin/languages'}">{intl l='Languages & URLs'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr>
+        <td><a href="{url path='/admin/translations'}">{intl l='Translation'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3 bg-white"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr class="bg-lightGrey">
+        <td><a href="{url path='/admin/translations-customer-title'}">{intl l='Translations of customers titles'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr>
+        <td><a href="{url path='/admin/mailing-system'}">{intl l='Mailing system'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3 bg-white"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr class="bg-lightGrey">
+        <td><a href="{url path='/admin/admin-logs'}">{intl l='Administration logs'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr>
+        <td><a href="{url path='/admin/system-logs'}">{intl l='System logs'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3 bg-white"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr class="bg-lightGrey">
+        <td><a href="{url path='/admin/config-api'}">{intl l='API configuration'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr>
+        <td><a href="{url path='/admin/advanced-configuration'}">{intl l='Advanced configuration'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3 bg-white"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr class="bg-lightGrey">
+        <td><a href="{url path='/admin/hooks'}">{intl l='Hooks'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+
+    <tr>
+        <td><a href="{url path='/admin/module-hooks'}">{intl l='Modules attachments'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3 bg-white"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+</table>
+    {/component}
+</div>
+
+<div class="flex w-full">
+    {component name="Panel" title="PRODUCT CATALOG CONFIGURATION" class="w-full mb-6"}
+    <table class="w-full">
+        <tr class="bg-lightGrey">
+        <td><a class="text-black" href="{url path='/admin/order-status'}">{intl l='Order status'}</a></td>
+        <td>
+            {component name="Button" tag="div" level="small-secondary" class="w-1 h-1 mr-3"}
+            <i class="fas fa-edit"></i>
+          {/component}
+        </td>
+    </tr>
+</table>
+    {/component}
+</div>
 
     
-    <table class="table-auto">
-        <caption>{intl l='Shipping configuration'}</caption>
-
-            <tr>
-                <td><a href="{url path='/admin/countries'}">{intl l='Countries'}</a></td>
-                <td>
-                    <button></button>
-                </td>
-            </tr>
-
-            <tr>
-                <td><a href="{url path='/admin/states'}">{intl l='States / Provinces'}</a></td>
-                <td>
-                    <button></button>
-                </td>
-            </tr>
-
-            <tr>
-                <td><a href="{url path='/admin/shipping-zones'}">{intl l='Shipping configuration'}</a></td>
-                <td>
-                    <button></button>
-                </td>
-            </tr>
-
-            <tr>
-                <td><a href="{url path='/admin/shipping-configuration'}">{intl l='Shipping zones management'}</a></td>
-                <td>
-                    <button></button>>
-                </td>
-            </tr>
-    </table>
-
-    <table class="table-auto">
-        <caption>{intl l='Order path configuration'}</caption>
-            <tr>
-                <td><a href="{url path='/admin/order-status'}">{intl l='Order status'}</a></td>
-                <td>
-                    <button></button>
-                </td>
-            </tr>
-    </table>
-
-    <table class="table-auto">
-        <caption>{intl l='System parameters'}</caption>
-
-            <tr>
-                <td><a href="{url path='/admin/config-store'}">{intl l='Store'}</a></td>
-                <td>
-                    <button></button>   
-                </td>
-            </tr>
-       
-            <tr>
-                <td><a href="{url path='/admin/variables'}">{intl l='System variables'}</a></td>
-                <td>
-                    <button></button>
-                </td>
-            </tr>
-       
-            <tr>
-                <td><a href="{url path='/admin/profiles'}">{intl l='Administration profiles'}</a></td>
-                <td>
-                    <button></button>
-                </td>
-            </tr>
-       
-            <tr>
-                <td><a href="{url path='/admin/administrators'}">{intl l='Administrators'}</a></td>
-                <td>
-                    <button></button>
-                </td>
-            </tr>
-        
-            <tr>
-                <td><a href="{url path='/admin/languages'}">{intl l='Languages'}</a></td>
-                <td>
-                    <button></button>
-                </td>
-            </tr>
-        
-            <tr>
-                <td><a href="{url path='/admin/translations'}">{intl l='Translations'}</a></td>
-                <td>
-                    <button></button>
-                </td>
-            </tr>
-       
-        <tr>
-            <td><a href="{url path='/admin/translations-customer-title'}">{intl l='Translations-customers-titles'}</a></td>
-            <td>
-                <button></button>   
-            </td>
-        </tr>
-       
-            <tr>
-                <td><a href="{url path='/admin/mailing-system'}">{intl l='Mailing system'}</a></td>
-                <td>
-                    <button></button>
-                </td>
-            </tr>
-        
-            <tr>
-                <td><a href="{url path='/admin/admin-logs'}">{intl l='Administration logs'}</a></td>
-                <td>
-                    <button></button>
-                </td>
-            </tr>
-       
-            <tr>
-                <td><a href="{url path='/admin/system-logs'}">{intl l='System logs'}</a></td>
-                <td>
-                    <button></button>
-                </td>
-            </tr>
-        
-            <tr>
-                <td><a href="{url path='/admin/advanced-configuration'}">{intl l='Advanced configuration'}</a></td>
-                <td>
-                    <button></button>
-                </td>
-            </tr>
-        
-        <tr>
-            <td><a href="{url path='/admin/hooks'}">{intl l='Hooks'}</a></td>
-            <td>
-                <button></button>
-            </td>
-        </tr>
-       
-        <tr>
-            <td><a href="{url path='/admin/module-hooks'}">{intl l='Modules attachments'}</a></td>
-            <td>
-                <button></button>
-            </td>
-        </tr>
-    </table>
-           
+    
 {/block}
 
 {* {block name="javascript" append}

@@ -4,6 +4,75 @@
 
 {block name="main-content"}
   <div id="shipping-configuration">
-
+    {component name="Panel" title="Shipping configuration" class="w-full mb-3"}
+    <div class="flex justify-end">
+    {component name="modal" title="modal"}je suis une modal{/component}
+        </div>
+    <div class="flex p-1 mt-5">
+      <table class="w-full shadow-lg table-auto bg-lightPearl">
+        <thead class="bg-mediumCharbon text-lightGrey">
+          <tr>
+            <th class="px-5 py-4 text-left rounded-tl-xl">Delivery module</th>
+            <th class="px-5 py-4 text-left">Shipping zones for this module</th>
+            <th class="px-5 py-4 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">
+              <a
+                href="/"
+                class="font-bold text-main hover:text-darkMain"
+                >Custom Delivery</a
+              >
+            </td>
+            <td class="px-5 py-4">
+              <a
+                href="/"
+                class="font-bold text-main hover:text-darkMain"
+                >A Zone, Africa, Asia, B Zone</a
+              >
+            </td>
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <button
+                href="/"
+                class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-edit" aria-hidden="true"></i></button
+              >
+            </td>
+          </tr>
+          <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">
+              <a
+                href="/"
+                class="font-bold text-main hover:text-darkMain"
+                >Custom Delivery</a
+              >
+            </td>
+            <td class="px-5 py-4">
+              <a
+                href="/"
+                class="font-bold text-main hover:text-darkMain"
+                >A Zone, Africa, Asia, B Zone</a
+              >
+            </td>
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <button
+                href="/"
+                class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-edit" aria-hidden="true"></i></button
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    {/component}
   </div>
 {/block}
