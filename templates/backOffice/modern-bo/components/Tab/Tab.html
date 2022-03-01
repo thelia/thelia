@@ -1,0 +1,13 @@
+<div class="bg-white rounded shadow-lg ">
+  <div>
+    <div class="TabsContent">
+      <div id="{$id}" class="Item {if $active|default:null}active{/if}">
+        <p>
+          {if isset($children)}
+            {$children nofilter}
+          {/if} 
+        </p>
+      </div>
+    </div>
+  </div> 
+  </div>

@@ -300,19 +300,37 @@
   </div>
 
 
-
-
-
   <!-- Panel -->
   <div class="flex p-10">
     {component name="Panel" title="Panel" class="w-2/3 text-white h-96 bg-mediumCharbon"}{/component}
   </div>
 
-
-
+ 
    <!-- Tabs -->
    <div class="flex p-10">
-    {component name="Tabs" title="Tabs"}message{/component}
+    {component name="Tabs"}
+      {include file="components/TabHeader/TabHeader.html" id="one" title="TestUn"} 
+      {include file="components/TabHeader/TabHeader.html" id="two" title="TestDeux"} 
+      {include file="components/TabHeader/TabHeader.html" id="three" title="TestTrois"} 
+      {include file="components/TabHeader/TabHeader.html" id="katr" title="katr" active="true"} 
+
+      {component name="Tab" title="Tab" id="one"}content un{/component}
+      {component name="Tab" title="Tab" id="two"}content deux{/component}
+      {component name="Tab" title="Tab" id="three" }content trois{/component}
+      {component name="Tab" title="Tab" id="katr" active="true"}content quatre{/component}
+    {/component}
+
+    {component name="Tabs"}
+    {include file="components/TabHeader/TabHeader.html" id="one1" title="TestUn"} 
+    {include file="components/TabHeader/TabHeader.html" id="two1" title="TestDeux"} 
+    {include file="components/TabHeader/TabHeader.html" id="three1" title="TestTrois"} 
+    {include file="components/TabHeader/TabHeader.html" id="katr1" title="katr" active="true"} 
+
+    {component name="Tab" title="Tab" id="one1"}content un{/component}
+    {component name="Tab" title="Tab" id="two1"}content deux{/component}
+    {component name="Tab" title="Tab" id="three1"}content trois{/component}
+    {component name="Tab" title="Tab" id="katr1" active="true"}content quatre{/component}
+  {/component}
   </div>
 
 
