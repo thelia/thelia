@@ -1,0 +1,38 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a shipping configuration'}{/block}
+
+{block name="main-content"}
+<div id="edit-feature">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a shipping configuration'}</h1>
+    {component name="Panel" title="Shipping zone" class="w-full mb-3"}
+    {hook name="shipping-configuration-edit.top"}
+    <div class="flex justify-end border-b">
+        <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
+          Close X
+        </button>
+      </div> 
+
+      <div class="grid grid-cols-2">
+        <div>
+            <div class="flex overflow-hidden border rounded">
+                <input type="text" class="px-4 py-2" value="A Zone">
+                <button class="flex items-center justify-center px-4 border-l bg-carot">{intl l='Update'}
+                </button>
+                </div>
+                <input type="text" class="px-4 py-2" placeholder="filter country">
+        </div>
+
+        <div class="list-none">
+            <h4>intl l='Countries assigned to this zone'}</h4>
+            <ul>
+                <li>Alemania</li>
+                <li>Austria</li>
+                <li>Chipre</li>
+                {hook name="shipping-configuration.edit" location="shipping-configuration-edit"}
+            </ul>
+        </div>
+        {hook name="shipping-configuration-edit.bottom"}
+        {/component}
+    </div>
+        {/block}

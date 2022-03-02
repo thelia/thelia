@@ -4,10 +4,14 @@
 
 {block name="main-content"}
   <div id="shipping-configuration">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Thelia Shipping configuration'}</h1>
     {component name="Panel" title="Shipping configuration" class="w-full mb-3"}
+    {hook name="shipping-zones.top" location="shipping_zones_top" }
     <div class="flex justify-end">
     {component name="modal" title="modal"}je suis une modal{/component}
         </div>
+
+    <!--TODO: Tableau React-->    
     <div class="flex p-1 mt-5">
       <table class="w-full shadow-lg table-auto bg-lightPearl">
         <thead class="bg-mediumCharbon text-lightGrey">
@@ -15,6 +19,7 @@
             <th class="px-5 py-4 text-left rounded-tl-xl">Zone name</th>
             <th class="px-5 py-4 text-left">Included countries</th>
             <th class="px-5 py-4 text-left">Assigned modules</th>
+            {hook name="shipping-zones.table-header" location="shipping_zones_table_header" }
             <th class="px-5 py-4 text-left">Actions</th>
           </tr>
         </thead>
@@ -37,6 +42,7 @@
             <td class="flex justify-center px-5 py-4 px-auto">
               CustomDelivery - Custom Delivery
             </td>
+            {hook name="shipping-zones.table-row" location="shipping_zones_table_row"}
             <td class="flex justify-center px-5 py-4 px-auto">
               <button
                 href="/"
@@ -95,6 +101,7 @@
           </tr>
         </tbody>
       </table>
+      {hook name="shipping-zones.bottom" location="shipping_zones_bottom"}
     </div>
     {/component}
   </div>

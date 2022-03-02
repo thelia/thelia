@@ -131,6 +131,10 @@
       />
       <span class="text-error">Something bad just happened</span>
     </div>
+    
+    <div class="w-1/4 mb-5">
+      <input class="w-full rounded-lg cursor-not-allowed value-gray-500" type="text" disabled="disabled" value="read only" />
+    </div>
 
     <div class="w-1/4 mb-5">
       <div class="flex items-center search">
@@ -168,10 +172,16 @@
     <div class="w-1/4 mb-5">
       <input
         type="file"
-        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+        class="w-full placeholder-gray-500 bg-gray-100 shadow-2xl focus:ring-main focus:outline-none focus:border-main"
         accept="image/png, image/jpeg"
       />
     </div>
+
+    <div>
+      <input type="color" id="body" name="body"
+              value="#f6b73c">
+      <label for="body">Color</label>
+  </div>
     
   </div>
 

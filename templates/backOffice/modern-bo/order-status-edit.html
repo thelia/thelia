@@ -1,0 +1,32 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit order status'}{/block}
+
+{block name="main-content"}
+<div id="edit-feature">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit order status'}</h1>
+    {component name="Panel" title="Edit order status not paid" class="w-full mb-3"}
+    {hook name="order-status-edit.top"}
+    <div class="flex justify-end border-b">
+        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
+          Save ✓
+        </button>
+        <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
+          Save and close X
+        </button>
+        <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
+          Close X
+        </button>
+      </div> 
+
+      {component name="Tabs"}
+      {include file="components/TabHeader/TabHeader.html" id="one" title="General description"} 
+      {include file="components/TabHeader/TabHeader.html" id="two" title="Modules" active="true"} 
+
+      {component name="Tab" title="Tab" id="one"}content un{/component}
+      {component name="Tab" title="Tab" id="two" active="true"}content deux{/component}
+    {/component}
+
+      {/component}
+      </div>
+      {/block}

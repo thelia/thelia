@@ -4,6 +4,101 @@
 
 {block name="main-content"}
   <div id="system-logs">
+    {component name="Panel" title="Store configuration" class="w-full mb-3"}
+    <div class="flex justify-end border-b">
+      <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
+        Save ✓
+      </button>
+      <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
+        Save and close X
+      </button>
+      <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
+        Close X
+      </button>
+    </div> 
 
+    <div class="row">
+      <div class="col-md-6">
+          <p class="title title-without-tabs">{intl l='General configuration'}</p>
+
+
+          <fieldset>
+
+    <div class="form-group">
+
+
+          <select class="form-control">
+         
+          </select>
+
+          <span class="help-block">
+          {intl l='Messages which have a level greater or equal to the selected level will be added to the log destinations. '}
+          </span>
+              </div>
+            
+
+       <div class="form-group">
+
+           <div class="form-group">
+               <input type="text">
+           </div>
+
+                    <span class="help-block">
+                    {intl l='Log lines header format. You may use the following variables: '}
+                    <ul>
+  <li>#INDEX : {intl l='Sequential number of log line'}</li>
+  <li>#LEVEL : {intl l='Message level'}</li>
+  <li>#FILE : {intl l='Originating file name'}</li>
+  <li>#FUNCTION : {intl l='Originating function name '}</li>
+  <li>#LINE : {intl l='Originating file line number '}</li>
+  <li>#DATE : {intl l='date in yyyy-mm-dd format'}</li>
+  <li>#HOUR : {intl l='hour in hh:mm:ss format'}</li>
+</ul>
+                    </span>
+       </div>
+       <div class="form-group">
+
+                     <div>
+                       <label class="radio-inline">
+                          <input type="radio" value="1"> {intl l='Yes'}
+                       </label>
+                       <label class="radio-inline">
+                           <input type="radio" value="0"> {intl l='No'}
+                        </label>
+                      </div>
+
+                     <span class="help-block">{intl l='If yes, redirections through Redirect::exec() will be displayed as links'}</span>
+       </div>
+
+       <div class="form-group">
+
+           <div class="form-group">
+               <input type="text" >
+           </div>
+
+           <span class="help-block">{intl l='Enter one or more file names without path separated by ";". Use "!" before a file name to exclude it. Use "*" to activate logs for all files.'}</span>
+       </div>
+
+
+          
+                 <div class="form-group">
+            
+
+                     <div class="form-group">
+                         <input type="text">
+                     </div>
+
+                     
+                 </div>
+        
+
+          </fieldset>
+
+      </div>
+
+     
+
+</div>
+    {/component}
   </div>
 {/block}

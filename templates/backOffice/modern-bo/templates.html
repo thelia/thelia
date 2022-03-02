@@ -4,10 +4,24 @@
 
 {block name="main-content"}
   <div id="product-template">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Thelia Product Templates'}</h1>
         {component name="Panel" title="Thelia product templates" class="w-full mb-3"}
+        {hook name="templates.top" location="templates_top" }
     <div class="flex justify-end">
-    {component name="modal" title="modal"}je suis une modal{/component}
+    {component name="modal" title="modal"}
+      <h4 class="font-bold">{intl l='Template name:'}</h4>
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-main"
+        placeholder="Title"
+      />
+      <button class="mt-8 font-medium text-white rounded-lg shadow-2xl p-23 bg-carot hover:bg-black">
+        Create this product template
+      </button>
+    {/component}
   </div>
+
+  <!--TODO: Tableau React-->
     <div class="flex p-1 mt-5">
       <table class="w-full shadow-lg table-auto bg-lightPearl">
         <thead class="bg-mediumCharbon text-lightGrey">
@@ -36,7 +50,7 @@
               >
                 <i class="fas fa-folder-open" aria-hidden="true"></i></button
               ><button
-                href="/"
+                href="{url path='./template-edit'}"
                 class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
                 title="{intl l='View site'}"
                 target="_blank"
@@ -122,6 +136,7 @@
           </tr>
         </tbody>
       </table>
+      {hook name="templates.bottom" location="templates_bottom"}
     </div>
     {/component}
   </div>

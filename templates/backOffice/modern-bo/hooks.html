@@ -4,6 +4,88 @@
 
 {block name="main-content"}
   <div id="hooks">
+    {component name="Panel" title="Check the support of hooks." class="w-full mb-3"}
+    <div class="grid grid-cols-2">
+      <form>
+      <select class="p-2 text-gray-500 rounded-lg">
+        <option disabled selected>Front Office</option>
+        <option>Back Office</option>
+        <option>pdf</option>
+        <option>email</option>
+      </select>
+      <button class="p-2 font-medium text-gray-600 rounded-lg shadow-2xl bg-carot hover:bg-black">
+        Parse template
+      </button>
+      </form>
+      </div>    
+    {/component}
 
+    {component name="Panel" title="Hooks" class="w-full mb-3"}
+  <div class="flex p-1 mt-5">
+    <table class="w-full shadow-lg table-auto bg-lightPearl">
+      <thead class="bg-mediumCharbon text-lightGrey">
+        <tr>
+          <th class="px-5 py-4 text-left rounded-tl-xl">ID</th>
+          <th class="px-5 py-4 text-left">Code</th>
+          <th class="px-5 py-4 text-left">Title</th>
+          <th class="px-5 py-4 text-left">Official</th>
+          <th class="px-5 py-4 text-left">Active</th>
+          <th class="px-5 py-4 rounded-tr-xl">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd:bg-mediumPearl even:bg-white">
+          <td class="px-5 py-4">1</td>
+          <td class="px-5 py-4">
+            <a
+              href="?category_id=1"
+              class="font-bold text-main hover:text-darkMain"
+              >order-invoice.top</a
+            >
+          </td>
+          <td class="px-5 py-4">
+            <a
+              href="?category_id=1"
+              class="font-bold text-main hover:text-darkMain"
+              >	Invoice choice - at the top</a
+            >
+          </td>
+          <td class="px-5 py-4">
+            <i class="fas fa-solid fa-check"></i>
+          </td>
+          <td class="px-5 py-4">
+              <label for="toggle" class="flex items-center cursor-pointer">
+                <div class="relative">
+                  <input type="checkbox" id="toggle" class="sr-only switch" />
+                  <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+                  <div
+                    class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                  ></div>
+                </div>
+              </label>
+            </td>
+          <td class="flex justify-center px-5 py-4 px-auto">
+           <button
+              href="/"
+              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+              title="{intl l='View site'}"
+              target="_blank"
+            >
+              <i class="fas fa-edit" aria-hidden="true"></i>
+            </button>
+            <button
+              href="/"
+              class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+              title="{intl l='View site'}"
+              target="_blank"
+            >
+              <i class="fas fa-trash-alt" aria-hidden="true"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+    {/component}
   </div>
 {/block}

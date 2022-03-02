@@ -4,10 +4,28 @@
 
 {block name="main-content"}
   <div id="product-features">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Thelia Product Features'}</h1>
     {component name="Panel" title="Thelia product features" class="w-full mb-3"}
+    {hook name="features.top" location="features_top" }
     <div class="flex justify-end">
-      {component name="modal" title="modal"}je suis une modal{/component}
+      {component name="modal" title="modal"}
+      <h4 class="font-bold">{intl l='Title:'}</h4>
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-main"
+        placeholder="Title"
+      />
+      <div>
+        <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+        <label for="r1">Add to all product templates</label>
+      </div>
+      <button class="mt-8 font-medium text-white rounded-lg shadow-2xl p-23 bg-carot hover:bg-black">
+        Create this product attribute
+      </button>
+      {/component}
     </div>
+
+    <!--TODO: Tableau React-->
     <div class="flex p-1 mt-5">
       <table class="w-full shadow-lg table-auto bg-lightPearl">
         <thead class="bg-mediumCharbon text-lightGrey">
@@ -15,6 +33,7 @@
             <th class="px-5 py-4 text-left rounded-tl-xl">ID</th>
             <th class="px-5 py-4 text-left">Titre</th>
             <th class="px-5 py-4 text-left">Positions</th>
+            {hook name="features.table-header" location="features_table_header" }
             <th class="px-5 py-4 rounded-tr-xl">Actions</th>
           </tr>
         </thead>
@@ -29,6 +48,7 @@
               >
             </td>
             <td class="px-5 py-4">1</td>
+            {hook name="features.table-row" location="features_table_row"}
             <td class="flex justify-center px-5 py-4 px-auto">
               <button
                 href="/"
@@ -150,6 +170,7 @@
           </tr>
         </tbody>
       </table>
+      {hook name="features.bottom" location="features_bottom" }
     </div>
     {/component}
   </div>

@@ -4,10 +4,14 @@
 
 {block name="main-content"}
   <div id="states">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='States'}</h1>
     {component name="Panel" title="States" class="w-full mb-3"}
+    {hook name="states.top" location="states_top" }
     <div class="flex justify-end">
     {component name="modal" title="modal"}je suis une modal{/component}
         </div>
+
+<!--TODO: Tableau React-->
     <div class="flex p-1 mt-5">
       <table class="w-full shadow-lg table-auto bg-lightPearl">
         <thead class="bg-mediumCharbon text-lightGrey">
@@ -17,6 +21,7 @@
             <th class="px-5 py-4 text-left">ISO Code</th>
             <th class="px-5 py-4 text-left">Country</th>
             <th class="px-5 py-4 text-left">Visible</th>
+            {hook name="states.table-header" location="states_table_header" }
             <th class="px-5 py-4 text-left">Actions</th>
           </tr>
         </thead>
@@ -44,6 +49,7 @@
                 </div>
               </label>           
         </td> 
+        {hook name="states.table-row" location="states_table_row"}
             <td class="flex justify-center px-5 py-4 px-auto">
               <button
                 href="/"
@@ -146,6 +152,7 @@
           </tr>
         </tbody>
       </table>
+      {hook name="states.bottom" location="states_bottom" }
     </div>
     {/component}
   </div>

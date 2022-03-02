@@ -1,0 +1,65 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a currency'}{/block}
+
+{block name="main-content"}
+<div id="edit-feature">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a currency'}</h1>
+    {component name="Panel" title="Edit currency" class="w-full mb-3"}
+    {hook name="currency-edit.top"}
+    <div class="flex justify-end border-b">
+        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
+          Save ✓
+        </button>
+        <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
+          Save and close X
+        </button>
+        <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
+          Close X
+        </button>
+      </div> 
+
+      <div class="grid grid-cols-2">
+          <div>
+                <h5>{intl l='Name'}</h5>
+                <input
+      type="text"
+      class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+      value="United States Dollar"
+    />
+              <h5>{intl l='ISO 4217 code'}</h5>
+              <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+    value="USD"
+  />
+          </div>
+          <div>
+              <h5>{intl l='Symbol'}</h5>
+              <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+    value="$"
+  />
+              <h5>{intl l='Format'}</h5>
+              <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+    value="%s%n"
+  />
+  <h5>{intl l='Rate from EUR'}</h5>
+  <input
+type="text"
+class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+value="1.1199"
+/>
+         
+
+          </div>
+          </div>
+          
+          {hook name="currency-edit.bottom"}
+
+      {/component}
+      {/block}
+      </div>

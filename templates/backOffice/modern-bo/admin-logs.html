@@ -4,6 +4,67 @@
 
 {block name="main-content"}
   <div id="admin-logs">
+    {component name="Panel" title="Check the support of hooks." class="w-full mb-3"}
+    <div class="grid grid-cols-3">
+      <p>Period: </p>
+      <input
+        type="date"
+        class="w-full text-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+        value="From: 2022-02-23"
+      />
+      <input
+        type="date"
+        class="w-full text-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+        value="To: 2022-03-02"
+      />
+      </div>   
+      
+      <div class="row">
+        <div class="col-md-12">
 
+              <p class="form-control-static"><strong>{intl l='Administrators'} :</strong></p>
+
+            <div class="row">
+                <div class="col-md-3">
+                      <label class="checkbox-inline">
+                          <input type="checkbox" checked>
+                      </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+      <div class="row">
+        <div class="col-md-12">
+              <p class="form-control-static"><strong>{intl l='Resources'} :</strong></p>
+
+            <div class="row">
+                <div class="col-md-3">
+                      <label class="checkbox-inline">
+                        <input type="checkbox" checked> 
+                      </label>
+                </div>
+            </div>
+
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+              <p class="form-control-static"><strong>{intl l='Modules'} :</strong></p>
+
+            <div class="row">
+                <div class="col-md-3">
+                      <label class="checkbox-inline">
+                        <input type="checkbox" checked> 
+                      </label>
+                </div>
+            </div>
+
+        </div>
+      </div>
+  </div>
+</div>
+    {/component}
   </div>
 {/block}

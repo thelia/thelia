@@ -1,0 +1,125 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a country'}{/block}
+
+{block name="main-content"}
+<div id="edit-feature">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a country'}</h1>
+    {component name="Panel" title="Edit country" class="w-full mb-3"}
+    {hook name="country-edit.top"}
+    <div class="flex justify-end border-b">
+        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
+          Save ✓
+        </button>
+        <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
+          Save and close X
+        </button>
+        <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
+          Close X
+        </button>
+      </div> 
+
+      <div class="grid grid-cols-2">
+          <div>
+            <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" checked />
+                <label for="r1">This country is online</label>
+              </div>
+                <h5>{intl l='Country title'}</h5>
+                <input
+      type="text"
+      class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+      value="France"
+    />
+            </div>
+            <div>
+              <h5>{intl l='Summary'}</h5>
+              <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+    placeholder="Short description text"
+  />
+          </div>
+          <div>
+              <h5>{intl l='Detailled description'}</h5>
+              <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+  />
+          </div>
+          <div>
+              <h5>{intl l='Conclusion'}</h5>
+              <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+    placeholder="Short additional text"
+  />
+          </div>
+          </div>
+
+          <div>
+          <h5>{intl l='Numerical ISO Code'}</h5>
+          <input
+type="text"
+class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+value="4"
+/>
+      </div>
+      <div>
+        <h5>{intl l='ISO Alpha-2 code'}</h5>
+        <input
+type="text"
+class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+value="FR"
+/>
+    </div>
+    <div>
+        <h5>{intl l='ISO Alpha-3 code'}</h5>
+        <input
+type="text"
+class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+value="FRA"
+/>
+</div>
+<div>
+    <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+    <label for="r1">This country has states / provinces</label>
+  </div>
+  <div>
+    <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+    <label for="r1">Addresses for this country need a zip code</label>
+  </div>
+  <div>
+    <h5>{intl l='The zip code format'}</h5>
+    <input
+type="text"
+class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+/>
+</div>
+<!--TODO: Tableau React-->
+<div class="flex p-1 mt-5">
+    <table class="w-full shadow-lg table-auto bg-lightPearl">
+      <thead class="bg-mediumCharbon text-lightGrey">
+        <tr>
+          <th class="px-5 py-4 text-left rounded-tr-xl rounded-tl-xl">Shipping zones for this country</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">
+                <a
+                  href="/"
+                  class="font-bold text-carot hover:text-carot"
+                  >Asia</a
+                >
+              </td>
+        </tr>
+      </tbody>
+    </table>
+      </div>
+          
+      </div>
+      {hook name="country-edit.bottom"}
+
+      {/component}
+      {/block}

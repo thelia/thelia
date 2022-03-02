@@ -1,19 +1,21 @@
 {extends file="admin-layout.tpl"}
 
-{block name="page-title"}{intl l='Shipping zones management'}{/block}
+{block name="page-title"}{intl l='Shipping configuration'}{/block}
 
 {block name="main-content"}
   <div id="shipping-configuration">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Thelia Shipping zones'}</h1>
     {component name="Panel" title="Shipping configuration" class="w-full mb-3"}
-    <div class="flex justify-end">
-    {component name="modal" title="modal"}je suis une modal{/component}
-        </div>
+    {hook name="shipping-configuration.top" location="shipping_configuration_top" }
+    
+    <!--TODO: Tableau React-->
     <div class="flex p-1 mt-5">
       <table class="w-full shadow-lg table-auto bg-lightPearl">
         <thead class="bg-mediumCharbon text-lightGrey">
           <tr>
             <th class="px-5 py-4 text-left rounded-tl-xl">Delivery module</th>
             <th class="px-5 py-4 text-left">Shipping zones for this module</th>
+            {hook name="shipping-configuration.table-header" location="shipping_configuration_table_header"}
             <th class="px-5 py-4 text-left">Actions</th>
           </tr>
         </thead>
@@ -33,6 +35,7 @@
                 >A Zone, Africa, Asia, B Zone</a
               >
             </td>
+            {hook name="shipping-configuration.table-row" location="shipping_configuration_table_row"}
             <td class="flex justify-center px-5 py-4 px-auto">
               <button
                 href="/"
@@ -72,6 +75,7 @@
           </tr>
         </tbody>
       </table>
+      {hook name="shipping-configuration.bottom" location="shipping_configuration_bottom"}
     </div>
     {/component}
   </div>

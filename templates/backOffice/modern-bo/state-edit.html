@@ -1,0 +1,45 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a state'}{/block}
+
+{block name="main-content"}
+<div id="edit-feature">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a state'}</h1>
+    {component name="Panel" title="Edit state" class="w-full mb-3"}
+    {hook name="state-edit.top"}
+    <div class="flex justify-end border-b">
+        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
+          Save ✓
+        </button>
+        <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
+          Save and close X
+        </button>
+        <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
+          Close X
+        </button>
+      </div> 
+
+      <div class="grid grid-cols-2">
+                <h5>{intl l='State title'}</h5>
+                <input
+      type="text"
+      class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+    />
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" checked />
+                <label for="r1">This state is online</label>
+        <div>
+            <h5>{intl l='Country'}</h5>
+                <input
+      type="text"
+      class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+    />
+    <h5>{intl l='ISO Code'}</h5>
+                <input
+      type="text"
+      class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+    />
+    </div>       
+      {hook name="state-edit.bottom"}
+      {/component}
+    </div>
+      {/block}

@@ -4,11 +4,46 @@
 
 {block name="main-content"}
   <div id="countries">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Countries'}</h1>
     {component name="Panel" title="Countries" class="w-full mb-3"}
+    {hook name="countries.top" location="countries_top" }
     <div class="flex justify-end">
-    {component name="modal" title="modal"}je suis une modal{/component}
-       
-        </div>
+    {component name="modal" title="modal"}
+    <h4 class="font-bold">{intl l='Country title:'}</h4>
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-main"
+      />
+      <h4 class="font-bold">{intl l='Numerical ISO Code:'}</h4>
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-main"
+      />
+      <h4 class="font-bold">{intl l='ISO Alpha-2 code:'}</h4>
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-main"
+      />
+      <h4 class="font-bold">{intl l='ISO Alpha-3 code:'}</h4>
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-main"
+      />
+      <div>
+        <input class="mr-3 Radio" checked id="r1" type="radio" name="thelia-radio" />
+        <label for="r1">This country is online</label>
+      </div>
+      <div>
+        <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+        <label for="r1">This country has states / provinces</label>
+      </div>
+      <button class="mt-8 font-medium text-white rounded-lg shadow-2xl p-23 bg-carot hover:bg-black">
+        Create this product country
+      </button>
+    {/component}
+    </div>
+
+<!--TODO: Tableau React-->
     <div class="flex p-1 mt-5">
       <table class="w-full shadow-lg table-auto bg-lightPearl">
         <thead class="bg-mediumCharbon text-lightGrey">
@@ -20,6 +55,7 @@
             <th class="px-5 py-4 text-left">Code ISO</th>
             <th class="px-5 py-4 text-left">Zone de livraison</th>
             <th class="px-5 py-4 text-left">Visible</th>
+            {hook name="countries.table-header" location="countries_table_header" }
             <th class="px-5 py-4 text-left">Actions</th>
           </tr>
         </thead>
@@ -66,6 +102,7 @@
                 </div>
               </label>        
         </td>
+        {hook name="countries.table-row" location="countries_table_row"} }
             <td class="flex justify-center px-5 py-4 px-auto">
               <button
                 href="/"
@@ -146,6 +183,7 @@
           </tr>
         </tbody>
       </table>
+      {hook name="countries.bottom" location="countries_bottom" }
     </div>
     {/component}
   </div>

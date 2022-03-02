@@ -4,7 +4,71 @@
 
 {block name="main-content"}
   <div id="module-hooks">
+    {component name="Panel" title="Modules attachments" class="w-full mb-3"}
+    <div class="flex justify-end">
+      {component name="modal" title="modal"}je suis une modal{/component}
+    </div>
+    <div class="hooks-filter">
+      <form class="form-horizontal" role="form" action="#" id="hook-filter-form">
+          <div class="form-group">
+              <label class="col-sm-2 control-label" for="hooks-filter-status">{intl l="By status"}</label>
+              <div class="col-sm-2">
+                  <select id="hooks-filter-status" class="form-control">
+                      <option value="">{intl l="All"}</option>
+                      <option value="1">{intl l="Active"}</option>
+                      <option value="0">{intl l="Inactive"}</option>
+                  </select>
+              </div>
 
+              <label class="col-sm-2 control-label" for="hooks-filter-module">{intl l="By module"}</label>
+              <div class="col-sm-2">
+                  <select id="hooks-filter-module" class="form-control">
+                      <option value="">{intl l="All"}</option>
+                      {loop type="module" name="module" order='code' backend_context=1}
+                      <option value="{$ID}">{$CODE} - {$TITLE}</option>
+                      {/loop}
+                  </select>
+              </div>
+
+              <label class="col-sm-2 control-label" for="hooks-filter-type">{intl l="By type"}</label>
+              <div class="col-sm-2">
+                  <select id="hooks-filter-type" class="form-control">
+                      <option value="">{intl l="All"}</option>
+                      <option value="1">{intl l="Front Office"}</option>
+                      <option value="2">{intl l="Back Office"}</option>
+                      <option value="3">{intl l="pdf"}</option>
+                      <option value="4">{intl l="email"}</option>
+                  </select>
+              </div>
+          </div>
+
+          <div class="form-group">
+              <label class="col-sm-2 control-label" for="hooks-filter-status">{intl l="Hide empty hook"}</label>
+              <div class="col-sm-2">
+                  <div class="make-switch switch-small hooks-filter-status"
+                      data-id="{$ID}"
+                      data-on="success"
+                      data-off="danger"
+                      data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>"
+                      data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                      <input type="checkbox" id="hooks-filter-empty" value="1" checked="checked" />
+                  </div>
+              </div>
+
+              <label class="col-sm-2 control-label" for="hooks-filter-name">{intl l="Filter by hook name:"}</label>
+              <div class="col-sm-4">
+                  <input type="search" class="form-control" id="hooks-filter-name" value="" />
+              </div>
+          </div>
+      </form>
+  </div>
+    {/component}
+
+    {component name="Panel" title="Invoice choice" class="w-full mb-3"}
+    {/component}
+
+    {component name="Panel" title="Invoice choice" class="w-full mb-3"}
+    {/component}
   </div>
 {/block}
 
