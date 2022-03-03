@@ -1,0 +1,59 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a tax'}{/block}
+
+{block name="main-content"}
+<div id="edit-taxes-rules">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a tax'}</h1>
+    {component name="Panel" class="w-full mb-3"}
+    {hook name="tax-edit.top"}
+
+      <div class="flex justify-end border-b">
+        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
+          Save ✓
+        </button>
+        <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
+          Save and close X
+        </button>
+        <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
+          Close X
+        </button>
+      </div> 
+      <div class="grid-rows-4">
+        <div>
+            <h5>{intl l='Title:'}</h5>
+              <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+    value="French 10% VAT"
+  />
+  </div>
+            <div>
+              <h5>{intl l='Detailled description'}</h5>
+              <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+  />
+  </div>
+  <div>
+    <h5>{intl l='Type'}</h5>
+    <select class="w-full text-gray-500 rounded-lg focus:ring-carot focus:border-carot">
+        <option disabled selected>Percentage of the product price</option>
+        <option>Constant amount</option>
+        <option>constant amount found in one of the product's feature</option>
+        <option>Percentage of the product price</option>
+      </select>
+      </div>
+      <div>
+        <h5>{intl l='Percent'}</h5>
+          <input
+type="text"
+class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+value="10"
+/>
+</div>
+      </div>
+      {/component}
+      {hook name="tax-edit.bottom"}
+</div>
+{/block}

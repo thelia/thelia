@@ -1,0 +1,153 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a mailing template'}{/block}
+
+{block name="main-content"}
+<div id="edit-feature">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit mailing template'}</h1>
+    {component name="Panel" class="w-full mb-3"}
+    {hook name="message-edit.top"}
+
+      {component name="Tabs"}
+      {include file="components/TabHeader/TabHeader.html" id="one" title="Message data"} 
+      {include file="components/TabHeader/TabHeader.html" id="two" title="Preview" active="true"} 
+
+      {component name="Tab" title="Tab" id="one"}
+      <div class="flex justify-end border-b">
+        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
+          Save ✓
+        </button>
+        <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
+          Save and close X
+        </button>
+        <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
+          Close X
+        </button>
+      </div> 
+      <div class="grid-rows-2">
+        <div>
+            <h5>{intl l='Name'}</h5>
+              <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+    value="customer_account_changed"
+  />
+  </div>
+            <div>
+              <h5>{intl l='Title'}</h5>
+              <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+    value="Mail sent to the customer when its password or email is changed in the back-office"
+  />
+  </div>
+  <div>
+    <h5>{intl l='Message subject'}</h5>
+    <input
+type="text"
+class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+value="Your account information on has been changed."
+/>
+</div>
+      </div>
+      {component name="Panel" title="HTML version of this message"}
+      <div class="row">
+          <div class="col-md-6">
+              <h4>{intl l='Name of the HTML layout file'}</h4>
+            <select class="w-full text-gray-500 rounded-lg">
+                <option disabled selected>Use default layout</option>
+                <option>Use default layout</option>
+                <option>default HTML layout</option>
+              </select>
+          </div>
+          <div class="col-md-6">
+            <h4>{intl l='Name of the HTML laytemplateout file'}</h4>
+            <select class="w-full text-gray-500 rounded-lg">
+                <option disabled selected>account_changed_by_admin.html</option>
+                <option>account_changed_by_admin.html</option>
+                <option>order_notification.html</option>
+              </select>
+        </div>
+      </div>
+      {/component}
+
+      {component name="Panel" title="Text version of this message"}
+      <div class="row">
+        <div class="col-md-6">
+            <h4>{intl l='Name of the HTML layout file'}</h4>
+          <select class="w-full text-gray-500 rounded-lg">
+              <option disabled selected>Use default layout</option>
+              <option>Use default layout</option>
+              <option>default HTML layout</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+          <h4>{intl l='Name of the HTML laytemplateout file'}</h4>
+          <select class="w-full text-gray-500 rounded-lg">
+              <option disabled selected>account_changed_by_admin.txt</option>
+              <option>account_changed_by_admin.txt</option>
+              <option>order_notification.txt</option>
+            </select>
+      </div>
+    </div>
+      {/component}
+      {/component}
+      
+      
+      
+      {component name="Tab" title="Tab" id="two" active="true"}
+      <div class="row">
+        <div class="col-md-6">
+            <button class="p-3 font-medium text-white border-2 rounded-lg shadow-2xl bg-carot hover:bg-carot border-carot">
+                Preview HTML
+              </button> 
+        </div>
+        <div class="col-md-6">
+            <button class="p-3 font-medium text-black bg-transparent border-2 border-white rounded-lg shadow-2xl hover:bg-white">
+                Preview text
+              </button> 
+        </div>
+        <h4>{intl l='Variables to inject'}</h4>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+            <h6>{intl l='Name'}</h6>
+            <input
+            type="text"
+            class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+          />
+          <input
+            type="text"
+            class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+          />
+          <input
+            type="text"
+            class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+          />
+        </div>
+        <div class="col-md-6">
+            <h6>{intl l='Value'}</h6>
+            <input
+            type="text"
+            class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+          />
+          <input
+            type="text"
+            class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+          />
+          <input
+            type="text"
+            class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+          />
+        </div>
+      </div>
+
+      
+      {/component}
+      {/component}
+
+      {/component}
+      {hook name="message-edit.bottom"}
+      </div>
+      {/block}

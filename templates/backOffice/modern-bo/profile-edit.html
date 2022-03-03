@@ -1,0 +1,257 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a profile'}{/block}
+
+{block name="main-content"}
+<div id="edit-profiles">
+<!--Panel-->
+{component name="Panel" title="Editing profile"}
+{hook name="profile-edit.top"}
+    <!--Tabs-->
+    {component name="Tabs"}
+      {include file="components/TabHeader/TabHeader.html" id="one" title="Description" active="true"} 
+      {include file="components/TabHeader/TabHeader.html" id="two" title="Resource access rights"} 
+      {include file="components/TabHeader/TabHeader.html" id="three" title="Module access rights"} 
+
+            <!--Tabs contenu 1-->
+      {component name="Tab" title="Tab" id="one" active="true"}
+      <!--Boutons save, save and close et close-->
+      <div class="flex justify-end border-b">
+        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
+          Save ✓
+        </button>
+        <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
+          Save and close X
+        </button>
+        <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
+          Close X
+        </button>
+      </div> 
+      <!--Inputs-->
+      <div class="grid grid-flow-col grid-rows-4 gap-4">
+        <div class="w-1/4 mb-5">
+            <h6>{intl l='Title:'}</h6>
+            <input
+              type="text"
+              class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+              value="profile"
+            />
+          </div>
+          <div class="w-1/4 mb-5">
+            <h6>{intl l='Summary:'}</h6>
+            <input
+              type="text"
+              class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+              value="profile summary"
+            />
+          </div>
+          <div class="w-1/4 mb-5">
+            <h6>{intl l='Detailled description:'}</h6>
+            <input
+              type="text"
+              class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+              value="profile description"
+            />
+          </div>
+          <div class="w-1/4 mb-5">
+            <h6>{intl l='Conclusion:'}</h6>
+            <input
+              type="text"
+              class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+              value="profile conclusion"
+            />
+          </div>
+      </div>
+      {/component}
+
+            <!--Tabs contenu 2-->
+      {component name="Tab" title="Tab" id="two"}
+      <h3 class="mb-16 text-3xl font-bold">{intl l='Manage resource rights'}</h3>
+      <!--Boutons save-->
+      <div class="flex justify-end border-b">
+        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-carot hover:bg-black">
+          Save ✓
+        </button>
+      </div> 
+                <!--TODO refacto tableaux-->
+                <table class="w-full shadow-lg table-auto bg-lightPearl">
+                    <thead class="bg-mediumCharbon text-lightGrey">
+                      <tr>
+                        <th class="px-5 py-4 text-left rounded-tl-xl">{intl l='Resource:'}</th>
+                        <th class="px-5 py-4 text-left">{intl l='Title:'}</th>
+                        <th class="px-5 py-4">{intl l='View:'}</th>
+                        <th class="px-5 py-4 text-left">{intl l='Create:'}</th>
+                        <th class="px-5 py-4 text-left">{intl l='Update:'}</th>
+                        <th class="px-5 py-4 text-left">{intl l='Delete:'}</th>
+                        <th class="px-5 py-4 rounded-tr-xl">{intl l=''}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="odd:bg-mediumPearl even:bg-white">
+                        <td class="px-5 py-4">admin.address</td>
+                        <td class="px-5 py-4">Address</td>
+                        <td class="px-5 py-4">
+                            <div class="m-2 mr-5">
+                                <label for="toggle" class="flex items-center cursor-pointer">
+                                  <div class="relative">
+                                    <input type="checkbox" id="toggle" class="sr-only switch" />
+                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+                                    <div
+                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                                    ></div>
+                                  </div>
+                                </label>
+                              </div>
+                        </td>
+                        <td class="px-5 py-4">
+                            <div class="m-2 mr-5">
+                                <label for="toggle" class="flex items-center cursor-pointer">
+                                  <div class="relative">
+                                    <input type="checkbox" id="toggle" class="sr-only switch" />
+                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+                                    <div
+                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                                    ></div>
+                                  </div>
+                                </label>
+                              </div>
+                        </td>
+                        <td class="px-5 py-4">
+                            <div class="m-2 mr-5">
+                                <label for="toggle" class="flex items-center cursor-pointer">
+                                  <div class="relative">
+                                    <input type="checkbox" id="toggle" class="sr-only switch" />
+                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+                                    <div
+                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                                    ></div>
+                                  </div>
+                                </label>
+                              </div>
+                        </td>
+                        <td class="px-5 py-4">
+                            <div class="m-2 mr-5">
+                                <label for="toggle" class="flex items-center cursor-pointer">
+                                  <div class="relative">
+                                    <input type="checkbox" id="toggle" class="sr-only switch" />
+                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+                                    <div
+                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                                    ></div>
+                                  </div>
+                                </label>
+                              </div>
+                        </td>
+                        <td class="px-5 py-4">
+                            <button
+                            href="/"
+                            class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-carot hover:text-lightGrey"
+                            title="{intl l='View site'}"
+                            target="_blank"
+                          >
+                            <i class="fas fa-solid fa-arrows-repeat" aria-hidden="true"></i></button
+                          >
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+      {/component}
+
+            <!--Tabs contenu 3-->
+      {component name="Tab" title="Tab" id="three" }
+      <h3 class="mb-16 text-3xl font-bold">{intl l='Manage module rights'}</h3>
+      <!--Boutons save-->
+      <div class="flex justify-end border-b">
+        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-carot hover:bg-black">
+          Save ✓
+        </button>
+      </div> 
+                <!--TODO refacto tableaux-->
+                <table class="w-full shadow-lg table-auto bg-lightPearl">
+                    <thead class="bg-mediumCharbon text-lightGrey">
+                      <tr>
+                        <th class="px-5 py-4 text-left rounded-tl-xl">{intl l='Module:'}</th>
+                        <th class="px-5 py-4 text-left">{intl l='Title:'}</th>
+                        <th class="px-5 py-4">{intl l='View:'}</th>
+                        <th class="px-5 py-4 text-left">{intl l='Create:'}</th>
+                        <th class="px-5 py-4 text-left">{intl l='Update:'}</th>
+                        <th class="px-5 py-4 text-left">{intl l='Delete:'}</th>
+                        <th class="px-5 py-4 rounded-tr-xl">{intl l=''}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="odd:bg-mediumPearl even:bg-white">
+                        <td class="px-5 py-4">admin.address</td>
+                        <td class="px-5 py-4">Address</td>
+                        <td class="px-5 py-4">
+                            <div class="m-2 mr-5">
+                                <label for="toggle" class="flex items-center cursor-pointer">
+                                  <div class="relative">
+                                    <input type="checkbox" id="toggle" class="sr-only switch" />
+                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+                                    <div
+                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                                    ></div>
+                                  </div>
+                                </label>
+                              </div>
+                        </td>
+                        <td class="px-5 py-4">
+                            <div class="m-2 mr-5">
+                                <label for="toggle" class="flex items-center cursor-pointer">
+                                  <div class="relative">
+                                    <input type="checkbox" id="toggle" class="sr-only switch" />
+                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+                                    <div
+                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                                    ></div>
+                                  </div>
+                                </label>
+                              </div>
+                        </td>
+                        <td class="px-5 py-4">
+                            <div class="m-2 mr-5">
+                                <label for="toggle" class="flex items-center cursor-pointer">
+                                  <div class="relative">
+                                    <input type="checkbox" id="toggle" class="sr-only switch" />
+                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+                                    <div
+                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                                    ></div>
+                                  </div>
+                                </label>
+                              </div>
+                        </td>
+                        <td class="px-5 py-4">
+                            <div class="m-2 mr-5">
+                                <label for="toggle" class="flex items-center cursor-pointer">
+                                  <div class="relative">
+                                    <input type="checkbox" id="toggle" class="sr-only switch" />
+                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+                                    <div
+                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                                    ></div>
+                                  </div>
+                                </label>
+                              </div>
+                        </td>
+                        <td class="px-5 py-4">
+                            <button
+                            href="/"
+                            class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-carot hover:text-lightGrey"
+                            title="{intl l='View site'}"
+                            target="_blank"
+                          >
+                            <i class="fas fa-solid fa-arrows-repeat" aria-hidden="true"></i></button
+                          >
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  {/component}           
+    {/component}
+
+{hook name="profile-edit.bottom"}
+{/component}
+</div>
+{/block}

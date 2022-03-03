@@ -3,168 +3,35 @@
 {block name="page-title"}{intl l='Edit a template'}{/block}
 
 {block name="main-content"}
-<div id="edit-template">
-    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a template'}</h1>
-    {component name="Panel" title="Edit template" class="w-full mb-3"}
-    {hook name="template-edit.top"}
-    <div class="flex justify-end border-b">
-        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
-          Save ✓
-        </button>
-        <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
-          Save and close X
-        </button>
-        <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
-          Close X
-        </button>
-      </div> 
-
-      <div class="mt-5">
-          <h5 class="font-bold">Template Name:</h5>
-          <div class="w-full mt-2">
-            <input
-              type="text"
-              class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-              placeholder="Template name"
-            />
-          </div>
-      </div>
-
-      <div class="grid grid-cols-2">
-        {component name="Panel" title="Attributes" class="w-full mx-1 mt-3 mb-3 text-sm uppercase"}
-        <p>Manage attributes included in this product template</p>
-        <!--TODO: Tableau React-->
-    <div class="flex p-1 mt-5">
-        <table class="w-full shadow-lg table-auto bg-lightPearl">
-          <thead class="bg-mediumCharbon text-lightGrey">
-            <tr>
-              <th class="px-5 py-4 text-left rounded-tl-xl">ID</th>
-              <th class="px-5 py-4 text-left">Attribute title</th>
-              <th class="px-5 py-4 text-left">Position</th>
-              <th class="px-5 py-4 rounded-tr-xl">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="odd:bg-mediumPearl even:bg-white">
-              <td class="px-5 py-4">1</td>
-              <td class="px-5 py-4"></td>
-              <td class="px-5 py-4">1</td>
-              <td class="flex justify-center px-5 py-4 px-auto">
-               <button
-                  href="/"
-                  class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
-                  title="{intl l='View site'}"
-                  target="_blank"
-                >
-                  <i class="fas fa-trash-alt" aria-hidden="true"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        {/component}
-
-        {component name="Panel" title="Features" class="w-full mx-1 mt-3 mb-3 uppercase"}
-        <p>Manage features included in this product template</p>
-         <!--TODO: Tableau React-->
-    <div class="flex p-1 mt-5">
-        <table class="w-full shadow-lg table-auto bg-lightPearl">
-          <thead class="bg-mediumCharbon text-lightGrey">
-            <tr>
-              <th class="px-5 py-4 text-left rounded-tl-xl">ID</th>
-              <th class="px-5 py-4 text-left">feature title</th>
-              <th class="px-5 py-4 text-left">Position</th>
-              <th class="px-5 py-4 rounded-tr-xl">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="odd:bg-mediumPearl even:bg-white">
-              <td class="px-5 py-4">1</td>
-              <td class="px-5 py-4"></td>
-              <td class="px-5 py-4">1</td>
-              <td class="flex justify-center px-5 py-4 px-auto">
-               <button
-                  href="/"
-                  class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
-                  title="{intl l='View site'}"
-                  target="_blank"
-                >
-                  <i class="fas fa-trash-alt" aria-hidden="true"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        {/component}
-      </div>
-
-      <div class="grid grid-cols-2">
-        {component name="Panel" title="Products using this template(30)" class="w-full mx-1 mt-3 mb-3 uppercase"}
-         <!--TODO: Tableau React-->
-    <div class="flex p-1 mt-5">
-        <table class="w-full shadow-lg table-auto bg-lightPearl">
-          <thead class="bg-mediumCharbon text-lightGrey">
-            <tr>
-              <th class="px-5 py-4 text-left rounded-tl-xl">ID</th>
-              <th class="px-5 py-4 text-left">Reference</th>
-              <th class="px-5 py-4 rounded-tr-xl">Title</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="odd:bg-mediumPearl even:bg-white">
-              <td class="px-5 py-4">
-                <a
-                  href="/"
-                  class="font-bold text-carot hover:text-carot"
-                  >1</a
-                >
-              </td>
-              <td class="px-5 py-4">
-                <a
-                  href="/"
-                  class="font-bold text-carot hover:text-carot"
-                  >PROD001</a
-                >
-              </td>
-              <td class="px-5 py-4">Horatio</td>
-            </tr>
-          </tbody>
-        </table>
-        {/component}
-
-        {component name="Panel" title="Is the default template for categories (4)" class="w-full mx-1 mt-3 mb-3 uppercase"}
-          <!--TODO: Tableau React-->
-    <div class="flex p-1 mt-5">
-        <table class="w-full shadow-lg table-auto bg-lightPearl">
-          <thead class="bg-mediumCharbon text-lightGrey">
-            <tr>
-              <th class="px-5 py-4 text-left rounded-tl-xl">ID</th>
-              <th class="px-5 py-4 rounded-tr-xl">Title</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="odd:bg-mediumPearl even:bg-white">
-              <td class="px-5 py-4">
-                <a
-                  href="/"
-                  class="font-bold text-carot hover:text-carot"
-                  >1</a
-                >
-              </td>
-              <td class="px-5 py-4">
-                <a
-                  href="/"
-                  class="font-bold text-carot hover:text-carot"
-                  >chairs</a
-                >
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        {hook name="template-edit.bottom"}
-        {/component}
-      </div>
-    
-    {/component}
+<div id="templates edit-template">
+  <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a template'}</h1>
+  {loop name="template_edit" type="product-template"}
+  {hook name="template-edit.top"}
+  <div class="container">
+    <!--Panel Thelia product templates-->
+    {component name="Panel" title="Thelia product templates" class="w-full mb-3"}
+    {form name="thelia.admin.template.modification"}
+        <form method="POST" action="{url path='#'}" {form_enctype} class="clearfix">
+          <input type="hidden" name="template_id" />
+            {form_hidden_fields}
+              {form_field field='success_url'}
+                  <input type="hidden"/>
+              {/form_field}
+              {form_field field='locale'}
+                  <input type="hidden"/>
+              {/form_field}
+                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+              {form_field field='name'}
+                  <div class="form-group {if $error}has-error{/if}">
+                      <label for="{$label_attr.for|default:null}" class="control-label">{$label} : </label>
+                         <input type="text" id="{$label_attr.for|default:null}" required="required" name="{$name}" value="{$value}" title="{intl l='Template name'}" placeholder="{intl l='Template name'}" class="form-control">
+                  </div>
+              {/form_field}
+        </form>
+      {/form}
+    {/component} 
+    {/loop}
+  </div>
+</div>  
 </div>
 {/block}

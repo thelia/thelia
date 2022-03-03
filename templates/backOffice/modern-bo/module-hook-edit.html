@@ -1,0 +1,63 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a module hook'}{/block}
+
+{block name="main-content"}
+<div id="edit-hook">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a module hook'}</h1>
+    <!--Panel-->
+    {component name="Panel" title="Editing hook for module"}
+    {hook name="module-hook-edit.top"}
+        <!--Boutons save, save and close et close-->
+      <div class="flex justify-end border-b">
+        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
+          Save ✓
+        </button>
+        <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
+          Save and close X
+        </button>
+        <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
+          Close X
+        </button>
+      </div> 
+      <!--Inputs-->
+      <div class="grid grid-flow-col grid-rows-3 gap-4">
+        <div class="row-span-3">
+            <h5 class="font-bold">{intl l='Module'}</h5>
+            <select class="w-full text-gray-500 rounded-lg focus:ring-carot focus:outline-none focus:border-carot">
+                <option selected>{intl l='PayPlug payment module'}</option>
+                <option>{intl l='New product'}</option>
+                <option>{intl l='Search block'}</option>
+                <option>{intl l='Pay by cheque'}</option>
+              </select>
+            <h5 class="font-bold">{intl l='Hook'}</h5>
+            <select class="w-full text-gray-500 rounded-lg focus:ring-carot focus:outline-none focus:border-carot">
+                <option selected>{intl l='Invoice choice'}</option>
+                <option>{intl l='Languages'}</option>
+              </select>
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" checked />
+                <label for="r1">{intl l='Active'}</label>
+              </div>
+        </div>
+        
+        <div class="col-span-2 row-span-2">
+            <h5 class="font-bold">{intl l='Service ID'}</h5>
+            <select class="w-full text-gray-500 rounded-lg focus:ring-carot focus:outline-none focus:border-carot">
+                <option selected>{intl l='payplugmodule_front_hook'}</option>
+              </select>
+              <h5 class="font-bold">{intl l='Method Name'}</h5>
+            <select class="w-full text-gray-500 rounded-lg focus:ring-carot focus:outline-none focus:border-carot">
+                <option selected>{intl l='onOrderInvoicePaymentExtra'}</option>
+              </select>
+              <h5 class="font-bold">{intl l='Automatic rendered templates'}</h5>
+                <input
+                  type="text"
+                  class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+                />   
+        </div>
+      </div>
+    {hook name="module-hook-edit.bottom"}
+    {/component}
+</div>
+{/block}

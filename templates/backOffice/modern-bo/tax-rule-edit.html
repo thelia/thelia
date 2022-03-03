@@ -1,0 +1,78 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a tax rule'}{/block}
+
+{block name="main-content"}
+<div id="edit-feature">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a tax rule'}</h1>
+    {component name="Panel" class="w-full mb-3"}
+    {hook name="tax-rule-edit.top"}
+
+      {component name="Tabs"}
+      {include file="components/TabHeader/TabHeader.html" id="one" title="Description"} 
+      {include file="components/TabHeader/TabHeader.html" id="two" title="Taxes" active="true"} 
+
+      {component name="Tab" title="Tab" id="one"}
+      <div class="flex justify-end border-b">
+        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
+          Save ✓
+        </button>
+        <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
+          Save and close X
+        </button>
+        <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
+          Close X
+        </button>
+      </div> 
+      <div class="grid-rows-2">
+        <div>
+            <h5>{intl l='Title:'}</h5>
+              <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+    value="French 10% VAT"
+  />
+  </div>
+            <div>
+              <h5>{intl l='Detailled description'}</h5>
+              <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+  />
+  </div>
+      </div>
+      {/component}
+      {component name="Tab" title="Tab" id="two" active="true"}
+      <h1 class="mb-16 text-3xl font-bold">{intl l='Manage taxes'}</h1>
+      {component name="Panel" title="Edit state" class="w-full mb-3"}
+      <div class="w-full grid-cols-2">
+        <div class="grid-rows-2">
+              <div><h4>{intl l='Choose a configuration:'}</h4></div>
+              <div><select class="w-full text-gray-500 rounded-lg">
+                <option disabled selected>New configuration</option>
+                <option>Configuration 1</option>
+              </select></div>
+          </div>
+          <div class="grid-rows-2">
+            <div><h4>{intl l='Choose a country:'}</h4></div>
+            <div><select class="w-full text-gray-500 rounded-lg">
+                <option disabled selected>Afghanistan</option>
+                <option>South Africa</option>
+                <option>Albania</option>
+                <option>Algeria</option>
+              </select></div>
+        </div>
+      </div>
+      {/component}
+      {/component}
+    {/component}
+    {component name="Panel" class="w-full mb-3"}
+    
+    <!--TODO Filter-->
+    {component name="Filter" title="Filter"}{/component}
+    
+    {/component}
+      {/component}
+      {hook name="tax-rule-edit.bottom"}
+      </div>
+      {/block}

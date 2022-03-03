@@ -7,7 +7,14 @@
     <h1 class="mb-16 text-3xl font-bold">{intl l='Edit order status'}</h1>
     {component name="Panel" title="Edit order status not paid" class="w-full mb-3"}
     {hook name="order-status-edit.top"}
-    <div class="flex justify-end border-b">
+    
+
+      {component name="Tabs"}
+      {include file="components/TabHeader/TabHeader.html" id="one" title="General description"} 
+      {include file="components/TabHeader/TabHeader.html" id="two" title="Modules" active="true"} 
+
+      {component name="Tab" title="Tab" id="one"}
+      <div class="flex justify-end border-b">
         <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
           Save ✓
         </button>
@@ -17,16 +24,61 @@
         <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
           Close X
         </button>
-      </div> 
+      </div class="grid grid-cols-2"> 
+        <div>
+          <input class="cursor-not-allowed ounded-lg value-gray-500" type="text" disabled="disabled" value="read only" />
+        </div>
 
-      {component name="Tabs"}
-      {include file="components/TabHeader/TabHeader.html" id="one" title="General description"} 
-      {include file="components/TabHeader/TabHeader.html" id="two" title="Modules" active="true"} 
-
-      {component name="Tab" title="Tab" id="one"}content un{/component}
-      {component name="Tab" title="Tab" id="two" active="true"}content deux{/component}
+        <div>
+          <label class="font-bold" for="body">Order status color</label>
+          <input type="color" id="body" name="body"
+              value="#f6b73c">
+        </div>
+      <div>
+        <div>
+          <h5>{intl l='Country title'}</h5>
+          <input
+type="text"
+class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+value="France"
+/>
+</div>
+          <div>
+            <h5>{intl l='Summary'}</h5>
+              <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+    placeholder="Short description text"
+  />
+  </div>
+            <div>
+              <h5>{intl l='Detailled description'}</h5>
+              <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+  />
+  </div>
+  {hook name="order-status.update-form"}
+  <div>
+    <h5>{intl l='Conclusion'}</h5>
+              <input
+    type="text"
+    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+    placeholder="Short additional text"
+  />
+  </div>
+      </div>
+      {/component}
+      
+      {component name="Tab" title="Tab" id="two" active="true"}
+      <div class="w-full p-5 mx-auto mt-10 mb-8 border rounded-lg bg-info text-blue border-blue">
+        There is currently no active module here.
+      </div>
+      {/component}
+      
     {/component}
 
       {/component}
+      {hook name="order-status-edit.bottom"}
       </div>
       {/block}
