@@ -117,6 +117,9 @@ class Thelia extends Kernel
      */
     protected function configureContainer(ContainerConfigurator $container): void
     {
+        $container->import(__DIR__.'/../Config/Resources/*.yaml');
+        $container->import(__DIR__.'/../Config/Resources/{packages}/*.yaml');
+        $container->import(__DIR__.'/../Config/Resources/{packages}/'.$this->environment.'/*.yaml');
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void
