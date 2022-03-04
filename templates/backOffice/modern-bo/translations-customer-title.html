@@ -4,7 +4,32 @@
 
 {block name="main-content"}
   <div id="translations-customer-title">
-    {component name="Panel" title="Store configuration" class="w-full mb-3"}
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Translations of customers titles'}</h1>
+    <!-- Breadcrumbs -->
+  <nav class="flex mb-10" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+          {intl l='Home'}
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Translations of customers titles'}</span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+    <!--Panel-->
+    {component name="Panel" title="Translations of customers titles" class="w-full mb-3"}
+      <!--Boutons-->
     <div class="flex justify-end border-b">
       <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
         Save ✓
@@ -16,47 +41,56 @@
         Close X
       </button>
     </div> 
-    
       <div class="flex flex-row justify-center">
-        <h5 class="font-bold">Short</h5>
-        <input
-        type="text"
-        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
-        placeholder="Mr."
-      />
-      <input
-      type="text"
-      class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
-      placeholder="Mrs."
-    />
-    <input
-    type="text"
-    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
-    placeholder="Miss_short"
-  />
-        <h5 class="font-bold">Long</h5>
-        <input
-        type="text"
-        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
-        placeholder="Mister"
-      />
-      <input
-        type="text"
-        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
-        placeholder="Misses"
-      />
-      <input
-        type="text"
-        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none"
-        placeholder="Miss"
-      />
-      </div>
-     
-      
-      
-      </div>
 
-      
+              <div class="form-container">
+                  <div class="col-md-12">
+                      {form name="thelia.admin.translations.customer_title"}
+
+                      {if $form_error}
+                      <div class="alert alert-danger">{$form_error_message}</div>
+                      {/if}
+
+                      <form method="POST"class="form-horizontal" id="translation_form" action="{url path='/admin/configuration/translations-customers-title/update'}">
+
+                           {form_hidden_fields}
+
+                          {form_field field='success_url'}
+                          <input type="hidden" name="{$name}" value="{url path='/admin/configuration/translations-customers-title/update'}"/>
+                          {/form_field}
+
+                          {form_field field='locale'}
+                          <input type="hidden" name="{$name}" value="{$edit_language_locale}"/>
+                          {/form_field}
+                          <table class="table table-condensed table-hover">
+                              <thead>
+                                  <tr>
+                                      <th>{intl l="Short"}</th>
+                                      <th>{intl l="Long"}</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {loop name="titlei18n" type="title" backend_context="on"}
+                                      <tr>
+                                          <td>
+                                              {form_field field="short_title_$ID"}
+                                                  <input type="text" class="form-control" required />
+                                              {/form_field}
+                                          </td>
+                                          <td>
+                                              {form_field field="long_title_$ID"}
+                                                  <input type="text" class="form-control" required />
+                                              {/form_field}
+                                          </td>
+                                      </tr>
+                                  {/loop}
+                              </tbody>
+                          </table>
+                      </form>
+                      {/form}
+                  </div>
+              </div>
+          </div>
       </div>
     {/component}
   </div>

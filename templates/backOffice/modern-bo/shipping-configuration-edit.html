@@ -4,7 +4,37 @@
 
 {block name="main-content"}
 <div id="edit-feature">
-    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a shipping configuration'}</h1>
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a shipping configuration}</h1>
+    <!-- Breadcrumbs -->
+  <nav class="flex mb-10" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+          {intl l='Home'}
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Shipping configuration'}</span>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <span class="ml-1 text-sm font-medium text-gray-400 md:ml-2 dark:text-gray-500">{intl l='Editing shipping zone'}</span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+    <!-- Panel -->
+    <h1 class="mb-16 text-3xl font-bold">{intl l=''}</h1>
     {component name="Panel" title="Shipping zone" class="w-full mb-3"}
     {hook name="shipping-configuration-edit.top"}
     <div class="flex justify-end border-b">
@@ -14,23 +44,59 @@
       </div> 
 
       <div class="grid grid-cols-2">
-        <div>
-            <div class="flex overflow-hidden border rounded">
-                <input type="text" class="px-4 py-2" value="A Zone">
-                <button class="flex items-center justify-center px-4 border-l bg-carot">{intl l='Update'}
-                </button>
-                </div>
-                <input type="text" class="px-4 py-2" placeholder="filter country">
-        </div>
+        {form name="thelia.admin.area.modification"}
+            <form method="POST" >
+             {form_hidden_fields exclude="area_id"}
 
-        <div class="list-none">
-            <h4>intl l='Countries assigned to this zone'}</h4>
-            <ul>
-                <li>Alemania</li>
-                <li>Austria</li>
-                <li>Chipre</li>
-                {hook name="shipping-configuration.edit" location="shipping-configuration-edit"}
-            </ul>
+                <input type="hidden" >
+
+                {render_form_field field="success_url"}
+                {render_form_field field="area_id"}
+
+                {custom_render_form_field field='name'}
+            <div class="input-group">
+             <input type="text" >
+               <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary" type="button">{intl l='Update'}</button>
+               </span>
+            </div>
+                {/custom_render_form_field}
+          </form>
+          {/form}
+
+          {form name="thelia.admin.area.country"}
+            <form method="POST" >
+               
+             {form_hidden_fields}
+
+               <input type="hidden" >
+
+                {render_form_field field="success_url"}
+                {render_form_field field="area_id"}
+
+              <div class="form-group">
+                <input id="countries-filter" class="form-control" type="text" />
+              </div>
+
+               <select></select>
+
+                <button type="submit" class="btn btn-block btn-primary"><i class="glyphicon glyphicon-plus-sign"></i> {intl l="Add selected countries"}</button>
+                <button type="button" class="btn btn-block btn-info btn-select-unassigned-countries"><i class="glyphicon glyphicon-cog"></i> {intl l="Select unassigned countries"}</button>
+            </form>
+            {/form}
+           </div>
+
+           <div class="col-md-8">
+            {form name="thelia.admin.area.delete.country"}
+              <form method="POST" >
+  
+                {form_hidden_fields exclude="area_id"}
+
+                {render_form_field field="success_url"}
+                {render_form_field field="area_id"}
+ 
+            </form>
+            {/form}
         </div>
         {hook name="shipping-configuration-edit.bottom"}
         {/component}

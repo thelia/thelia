@@ -4,9 +4,38 @@
 
 {block name="main-content"}
 <div id="edit-attribute">
-    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit an attribute'}</h1>
+  <h1 class="mb-16 text-3xl font-bold">{intl l='Edit an attribute'}</h1>
+  <!-- Breadcrumbs -->
+<nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+        {intl l='Home'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+      </div>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <span class="ml-1 text-sm font-medium text-gray-400 md:ml-2 dark:text-gray-500">{intl l='Attributes'}</span>
+      </div>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <span class="ml-1 text-sm font-medium text-gray-400 md:ml-2 dark:text-gray-500">{intl l='Editing attribute'}</span>
+      </div>
+    </li>
+  </ol>
+</nav>
     {component name="Panel" title="Edit attribute" class="w-full mb-3"}
     {hook name="attribute-edit.top"}
+    <!-- Boutons -->
     <div class="flex justify-end border-b">
         <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
           Save ✓
@@ -18,90 +47,81 @@
           Close X
         </button>
       </div> 
-
+      <!-- Form -->
       <div class="grid grid-cols-2">
-          <div>
-              <h3 class="font-bold uppercase">{intl l='Attribute information'}</h3>
-              <div>
-                  <h5>{intl l='Title'}</h5>
-                  <input
-        type="text"
-        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-        placeholder="A descriptive title"
-      />
-              </div>
-              <div>
-                <h5>{intl l='Summary'}</h5>
-                <input
-      type="text"
-      class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-      placeholder="Short description text"
-    />
-            </div>
-            <div>
-                <h5>{intl l='Detailled description'}</h5>
-                <input
-      type="text"
-      class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-    />
-            </div>
-            <div>
-                <h5>{intl l='Conclusion'}</h5>
-                <input
-      type="text"
-      class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-      placeholder="Short additional text"
-    />
-            </div>
-          </div>
-          <div>
-            <h3 class="font-bold uppercase">{intl l='Attribute values'}</h3>
-            <div class="w-full p-5 mx-auto mt-10 mb-8 border rounded-lg bg-info text-blue border-blue">
-                Enter here all possible attribute values.
-              </div>
-
-            <!--TODO: Tableau React-->
+        <div class="form-container">
+          {form name="thelia.admin.attribute.modification"}
+          <form method="POST">
+               <div class="col-md-6">
+                  <p class="title title-without-tabs">{intl l='Attribute information'}</p>
+                      {form_field field='id'}
+                          <input type="hidden"  />
+                      {/form_field}
+                     <input type="hidden" />
+         {form_hidden_fields}
+         {form_field field='success_url'}
+           <input type="hidden" />
+         {/form_field}
+                 {form_field field='locale'}
+                   <input type="hidden" />
+                 {/form_field}
+           {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+  </div>
+   <div class="col-md-6">
+       <p class="clearfix title title-without-tabs">
+            {intl l='Attribute values'}
+                       <span class="pull-right">
+                            
+                       </span>
+       </p>
+       <div class="alert alert-info">
+        {intl l="Enter here all possible attribute values."}
+       </div>
+          <div class="table-responsive">
+                   <!--TODO: Tableau React-->
     <div class="flex p-1 mt-5">
-        <table class="w-full shadow-lg table-auto bg-lightPearl">
-          <thead class="bg-mediumCharbon text-lightGrey">
-            <tr>
-              <th class="px-5 py-4 text-left rounded-tl-xl">ID</th>
-              <th class="px-5 py-4 text-left">Value</th>
-              <th class="px-5 py-4 text-left">Position</th>
-              {hook name="attributes-value.table-header" location="attributes_value_table_header"}
-              <th class="px-5 py-4 rounded-tr-xl">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="odd:bg-mediumPearl even:bg-white">
-              <td class="px-5 py-4">1</td>
-              <td class="px-5 py-4">
-                <input
-                type="text"
-                class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-              />
-              </td>
-              <td class="px-5 py-4">1</td>
-              {hook name="attributes-value.table-row" location="attributes_value_table_row"}
-              <td class="flex justify-center px-5 py-4 px-auto">
-                <button
-                   href="/"
-                   class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
-                   title="{intl l='View site'}"
-                   target="_blank"
-                 >
-                   <i class="fas fa-trash-alt" aria-hidden="true"></i>
-                 </button>
-               </td>
-            </tr>
-          </tbody>
-        </table>
-          </div>
+      <table class="w-full shadow-lg table-auto bg-lightPearl">
+        <thead class="bg-mediumCharbon text-lightGrey">
+          <tr>
+            <th class="px-5 py-4 text-left rounded-tl-xl">ID</th>
+            <th class="px-5 py-4 text-left">Value</th>
+            <th class="px-5 py-4 text-left">Position</th>
+            {hook name="attributes-value.table-header" location="attributes_value_table_header"}
+            <th class="px-5 py-4 rounded-tr-xl">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">1</td>
+            <td class="px-5 py-4">
+              <input
+              type="text"
+              class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
+            />
+            </td>
+            <td class="px-5 py-4">1</td>
+            {hook name="attributes-value.table-row" location="attributes_value_table_row"}
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <button
+                 href="/"
+                 class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+                 title="{intl l='View site'}"
+                 target="_blank"
+               >
+                 <i class="fas fa-trash-alt" aria-hidden="true"></i>
+               </button>
+             </td>
+          </tr>
+        </tbody>
+      </table>
+        </div>
+                      </div>
+   </div>
+   </form>
+       {/form}
+</div>
+</div> 
           {hook name="attribute-edit.bottom"}
-      </div>
-
-    
+      </div>  
     {/component}
-
-
     {/block}

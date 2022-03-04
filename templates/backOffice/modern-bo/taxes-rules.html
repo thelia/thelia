@@ -4,6 +4,30 @@
 
 {block name="main-content"}
   <div id="taxes-rules">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Taxes rules'}</h1>
+    <!-- Breadcrumbs -->
+  <nav class="flex mb-10" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+          {intl l='Home'}
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Taxes rules'}</span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+  {hook name="taxes-rules.top" location="taxes_rules_top"}
     <div class="w-full p-5 mx-auto mt-10 mb-8 border rounded-lg bg-info text-blue border-blue">
       Pour pouvoir gérer les taxes de votre magasin vous pouvez gérer <strong>taxes</strong> et <strong>règles de taxe</strong>.</br>
 
@@ -21,10 +45,15 @@ La TVA française de 20% avec écotaxe est l'application de l'écotaxe (sur le p
 vous pouvez combiner des taxes en règles de taxe et choisir si elle sont appliquées l'une après l'autre ou en même temps: cela permet d'appliquer des taxes sur un produit déjà taxé ou non.
     </div>
 
-    {component name="Panel" title="Taxes" class="w-full mb-8"}
+    <!--Panel-->
+    {component name="Panel" class="w-full mb-8"}
+    <!--TODO: modal-->
     <div class="flex justify-end">
-    {component name="modal" title="modal"}je suis une modal{/component}
+    {component name="modal" }
+    
+    {/component}
   </div>
+  <!--TODO: Tableau React-->
     <div class="flex p-1 mt-5">
       <table class="w-full shadow-lg table-auto bg-lightPearl">
         <thead class="bg-mediumCharbon text-lightGrey">
@@ -82,11 +111,15 @@ vous pouvez combiner des taxes en règles de taxe et choisir si elle sont appliq
     </div>
     {/component}
 
-
+    <!--Panel-->
     {component name="Panel" title="Règles de taxes" class="w-full mb-8"}
+    <!--TODO: modal-->
     <div class="flex justify-end">
-    {component name="modal" title="modal"}je suis une modal{/component}
+    {component name="modal" title="modal"}
+    
+    {/component}
   </div>
+  <!--TODO: Tableau React-->
     <div class="flex p-1 mt-5">
       <table class="w-full shadow-lg table-auto bg-lightPearl">
         <thead class="bg-mediumCharbon text-lightGrey">
@@ -161,9 +194,7 @@ vous pouvez combiner des taxes en règles de taxe et choisir si elle sont appliq
         </tbody>
       </table>
     </div>
-    {/component}
-
-    
-
+    {/component}  
+  {hook name="taxes-rules.bottom" location="taxes_rules_bottom"}
   </div>
 {/block}

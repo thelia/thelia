@@ -4,13 +4,35 @@
 
 {block name="main-content"}
   <div id="templates">
-  {hook name="templates.top"}
     <h1 class="mb-16 text-3xl font-bold">{intl l='Thelia Product Templates'}</h1>
+    <!-- Breadcrumbs -->
+  <nav class="flex mb-10" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+          {intl l='Home'}
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Product templates'}</span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+  {hook name="templates.top"  location="templates_top"}
     <!--Panel Thelia product templates-->
-    {component name="Panel" title="Thelia product templates" class="w-full mb-3"}
+    {component name="Panel" class="w-full mb-3"}
     <!--Modal-->
     <div class="flex justify-end">
-      {component name="modal" title="modal"}
+      {component name="modal"}
         <h4 class="font-bold">{intl l='Template name:'}</h4>
         <input
           type="text"
@@ -27,6 +49,9 @@
     </div>
     <div class="row">
       <div class="col-md-12">
+        {if ! empty($general_error) }
+	        <div class="alert alert-danger">{$general_error}</div>
+	      {/if}
        <form action="#" method="post">
         <!--TODO: Tableau React-->
     <div class="flex p-1 mt-5">
@@ -35,10 +60,12 @@
           <tr>
             <th class="px-5 py-4 text-left rounded-tl-xl">ID</th>
             <th class="px-5 py-4 text-left">Titre</th>
+            {hook name="templates.table-header" location="templates_table_header"}
             <th class="px-5 py-4 rounded-tr-xl">Actions</th>
           </tr>
         </thead>
         <tbody>
+          {loop name="list" type="product-template" backend_context="1" lang=$lang_id}
           <tr class="odd:bg-mediumPearl even:bg-white">
             <td class="px-5 py-4">1</td>
             <td class="px-5 py-4">
@@ -48,6 +75,7 @@
                 >Chairs</a
               >
             </td>
+            {hook name="templates.table-row" location="templates_table_row" template_id=$ID}
             <td class="flex justify-center px-5 py-4 px-auto">
               <button
                 href="/"
@@ -56,49 +84,19 @@
                 target="_blank"
               >
                 <i class="fas fa-folder-open" aria-hidden="true"></i></button
-              ><button
+              >
+              {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.template" access="UPDATE"}
+              <button
               href="{url path='/admin/template-edit'}"
                 class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
                 title="{intl l='View site'}"
                 target="_blank"
               >
                 <i class="fas fa-edit" aria-hidden="true"></i></button
-              ><button
-                href="/"
-                class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
-                title="{intl l='View site'}"
-                target="_blank"
               >
-                <i class="fas fa-trash-alt" aria-hidden="true"></i>
-              </button>
-            </td>
-          </tr>
-          <tr class="odd:bg-mediumPearl even:bg-white">
-            <td class="px-5 py-4">2</td>
-            <td class="px-5 py-4">
-              <a
-                href="?category_id=2"
-                class="font-bold text-main hover:text-darkMain"
-                >Stools</a
-              >
-            </td>
-            <td class="flex justify-center px-5 py-4 px-auto">
+              {/loop}
               <button
                 href="/"
-                class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-carot hover:text-lightGrey"
-                title="{intl l='View site'}"
-                target="_blank"
-              >
-                <i class="fas fa-folder-open" aria-hidden="true"></i></button
-              ><button
-                href="/"
-                class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
-                title="{intl l='View site'}"
-                target="_blank"
-              >
-                <i class="fas fa-edit" aria-hidden="true"></i></button
-              ><button
-                href="/"
                 class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
                 title="{intl l='View site'}"
                 target="_blank"
@@ -107,40 +105,7 @@
               </button>
             </td>
           </tr>
-          <tr class="odd:bg-mediumPearl even:bg-white">
-            <td class="px-5 py-4">3</td>
-            <td class="px-5 py-4">
-              <a
-                href="/"
-                class="font-bold text-main hover:text-darkMain"
-                >Armchairs</a
-              >
-            </td>
-            <td class="flex justify-center px-5 py-4 px-auto">
-              <button
-                href="/"
-                class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-carot hover:text-lightGrey"
-                title="{intl l='View site'}"
-                target="_blank"
-              >
-                <i class="fas fa-folder-open" aria-hidden="true"></i></button
-              ><button
-                href="/"
-                class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
-                title="{intl l='View site'}"
-                target="_blank"
-              >
-                <i class="fas fa-edit" aria-hidden="true"></i></button
-              ><button
-                href="/"
-                class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
-                title="{intl l='View site'}"
-                target="_blank"
-              >
-                <i class="fas fa-trash-alt" aria-hidden="true"></i>
-              </button>
-            </td>
-          </tr>
+          {/loop}
         </tbody>
       </table>
        </form>  

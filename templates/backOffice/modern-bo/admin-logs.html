@@ -4,7 +4,32 @@
 
 {block name="main-content"}
   <div id="admin-logs">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Administration logs'}</h1>
+    <!-- Breadcrumbs -->
+  <nav class="flex mb-10" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+          {intl l='Home'}
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Administration logs'}</span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+    <!-- Panel -->
     {component name="Panel" title="Check the support of hooks." class="w-full mb-3"}
+    {hook name="admin-logs.top"}
     <div class="grid grid-cols-3">
       <p>Period: </p>
       <input
@@ -23,7 +48,7 @@
         <div class="col-md-12">
 
               <p class="form-control-static"><strong>{intl l='Administrators'} :</strong></p>
-
+              {loop type="admin"}
             <div class="row">
                 <div class="col-md-3">
                       <label class="checkbox-inline">
@@ -31,13 +56,14 @@
                       </label>
                 </div>
             </div>
+            {/loop}
         </div>
     </div>
 
       <div class="row">
         <div class="col-md-12">
               <p class="form-control-static"><strong>{intl l='Resources'} :</strong></p>
-
+              {loop type="resource"}
             <div class="row">
                 <div class="col-md-3">
                       <label class="checkbox-inline">
@@ -45,6 +71,7 @@
                       </label>
                 </div>
             </div>
+            {/loop}
 
         </div>
       </div>
@@ -52,7 +79,7 @@
       <div class="row">
         <div class="col-md-12">
               <p class="form-control-static"><strong>{intl l='Modules'} :</strong></p>
-
+              {loop type="module"}
             <div class="row">
                 <div class="col-md-3">
                       <label class="checkbox-inline">
@@ -60,11 +87,13 @@
                       </label>
                 </div>
             </div>
+            {/loop}
 
         </div>
       </div>
   </div>
 </div>
+    {hook name="admin-logs.bottom"}   
     {/component}
   </div>
 {/block}

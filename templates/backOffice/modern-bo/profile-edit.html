@@ -4,9 +4,38 @@
 
 {block name="main-content"}
 <div id="edit-profiles">
+  <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a profile'}</h1>
+  <!-- Breadcrumbs -->
+<nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+        {intl l='Home'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+      </div>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Profiles'}</span>
+      </div>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <span class="ml-1 text-sm font-medium text-gray-400 md:ml-2 dark:text-gray-500">{intl l='Editing profile'}</span>
+      </div>
+    </li>
+  </ol>
+</nav>
+{hook name="profile-edit.top"}
 <!--Panel-->
 {component name="Panel" title="Editing profile"}
-{hook name="profile-edit.top"}
     <!--Tabs-->
     {component name="Tabs"}
       {include file="components/TabHeader/TabHeader.html" id="one" title="Description" active="true"} 
@@ -27,230 +56,63 @@
           Close X
         </button>
       </div> 
-      <!--Inputs-->
-      <div class="grid grid-flow-col grid-rows-4 gap-4">
-        <div class="w-1/4 mb-5">
-            <h6>{intl l='Title:'}</h6>
-            <input
-              type="text"
-              class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-              value="profile"
-            />
-          </div>
-          <div class="w-1/4 mb-5">
-            <h6>{intl l='Summary:'}</h6>
-            <input
-              type="text"
-              class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-              value="profile summary"
-            />
-          </div>
-          <div class="w-1/4 mb-5">
-            <h6>{intl l='Detailled description:'}</h6>
-            <input
-              type="text"
-              class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-              value="profile description"
-            />
-          </div>
-          <div class="w-1/4 mb-5">
-            <h6>{intl l='Conclusion:'}</h6>
-            <input
-              type="text"
-              class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-              value="profile conclusion"
-            />
-          </div>
-      </div>
+
+      {form name="thelia.admin.profile.modification"}
+
+        <form method="POST" >
+          <input type="hidden" name="profile_id" />
+
+              {form_hidden_fields}
+
+                  {form_field field='success_url'}
+                    <input type="hidden" />
+                  {/form_field}
+
+                  {form_field field='locale'}
+                    <input type="hidden" />
+                  {/form_field}
+
+                  {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                    {form_field field='title'}
+                      <div class="form-group">
+                        <input type="text" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control ">
+                      </div>
+                    {/form_field}
+
+                    {form_field field='chapo'}
+                      <div class="form-group">
+                        <input type="text" title="{intl l='Chapo'}" placeholder="{intl l='Chapo'}" class="form-control">
+                      </div>
+                    {/form_field}
+
+                    {form_field field='description'}
+                      <div class="form-group">
+                        <span class="label-help-block">{intl l="The detailed description."}</span>
+                        <textarea name="{$name}" rows="10" class="form-control wysiwyg"></textarea>
+                      </div>
+                    {/form_field}
+
+                    {form_field field='postscriptum'}
+                      <div class="form-group">
+                        <input type="text" placeholder="{intl l='Postscriptum'}" class="form-control" >
+                      </div>
+                    {/form_field}
+
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="control-group">
+                            <label>&nbsp;</label>
+                            <div class="controls">
+                              <p>{intl l='Profile created on %date_create. Last modification: %date_change'}</p>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+          </form>
+          {/form}
       {/component}
-
-            <!--Tabs contenu 2-->
-      {component name="Tab" title="Tab" id="two"}
-      <h3 class="mb-16 text-3xl font-bold">{intl l='Manage resource rights'}</h3>
-      <!--Boutons save-->
-      <div class="flex justify-end border-b">
-        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-carot hover:bg-black">
-          Save ✓
-        </button>
-      </div> 
-                <!--TODO refacto tableaux-->
-                <table class="w-full shadow-lg table-auto bg-lightPearl">
-                    <thead class="bg-mediumCharbon text-lightGrey">
-                      <tr>
-                        <th class="px-5 py-4 text-left rounded-tl-xl">{intl l='Resource:'}</th>
-                        <th class="px-5 py-4 text-left">{intl l='Title:'}</th>
-                        <th class="px-5 py-4">{intl l='View:'}</th>
-                        <th class="px-5 py-4 text-left">{intl l='Create:'}</th>
-                        <th class="px-5 py-4 text-left">{intl l='Update:'}</th>
-                        <th class="px-5 py-4 text-left">{intl l='Delete:'}</th>
-                        <th class="px-5 py-4 rounded-tr-xl">{intl l=''}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr class="odd:bg-mediumPearl even:bg-white">
-                        <td class="px-5 py-4">admin.address</td>
-                        <td class="px-5 py-4">Address</td>
-                        <td class="px-5 py-4">
-                            <div class="m-2 mr-5">
-                                <label for="toggle" class="flex items-center cursor-pointer">
-                                  <div class="relative">
-                                    <input type="checkbox" id="toggle" class="sr-only switch" />
-                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
-                                    <div
-                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
-                                    ></div>
-                                  </div>
-                                </label>
-                              </div>
-                        </td>
-                        <td class="px-5 py-4">
-                            <div class="m-2 mr-5">
-                                <label for="toggle" class="flex items-center cursor-pointer">
-                                  <div class="relative">
-                                    <input type="checkbox" id="toggle" class="sr-only switch" />
-                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
-                                    <div
-                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
-                                    ></div>
-                                  </div>
-                                </label>
-                              </div>
-                        </td>
-                        <td class="px-5 py-4">
-                            <div class="m-2 mr-5">
-                                <label for="toggle" class="flex items-center cursor-pointer">
-                                  <div class="relative">
-                                    <input type="checkbox" id="toggle" class="sr-only switch" />
-                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
-                                    <div
-                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
-                                    ></div>
-                                  </div>
-                                </label>
-                              </div>
-                        </td>
-                        <td class="px-5 py-4">
-                            <div class="m-2 mr-5">
-                                <label for="toggle" class="flex items-center cursor-pointer">
-                                  <div class="relative">
-                                    <input type="checkbox" id="toggle" class="sr-only switch" />
-                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
-                                    <div
-                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
-                                    ></div>
-                                  </div>
-                                </label>
-                              </div>
-                        </td>
-                        <td class="px-5 py-4">
-                            <button
-                            href="/"
-                            class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-carot hover:text-lightGrey"
-                            title="{intl l='View site'}"
-                            target="_blank"
-                          >
-                            <i class="fas fa-solid fa-arrows-repeat" aria-hidden="true"></i></button
-                          >
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-      {/component}
-
-            <!--Tabs contenu 3-->
-      {component name="Tab" title="Tab" id="three" }
-      <h3 class="mb-16 text-3xl font-bold">{intl l='Manage module rights'}</h3>
-      <!--Boutons save-->
-      <div class="flex justify-end border-b">
-        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-carot hover:bg-black">
-          Save ✓
-        </button>
-      </div> 
-                <!--TODO refacto tableaux-->
-                <table class="w-full shadow-lg table-auto bg-lightPearl">
-                    <thead class="bg-mediumCharbon text-lightGrey">
-                      <tr>
-                        <th class="px-5 py-4 text-left rounded-tl-xl">{intl l='Module:'}</th>
-                        <th class="px-5 py-4 text-left">{intl l='Title:'}</th>
-                        <th class="px-5 py-4">{intl l='View:'}</th>
-                        <th class="px-5 py-4 text-left">{intl l='Create:'}</th>
-                        <th class="px-5 py-4 text-left">{intl l='Update:'}</th>
-                        <th class="px-5 py-4 text-left">{intl l='Delete:'}</th>
-                        <th class="px-5 py-4 rounded-tr-xl">{intl l=''}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr class="odd:bg-mediumPearl even:bg-white">
-                        <td class="px-5 py-4">admin.address</td>
-                        <td class="px-5 py-4">Address</td>
-                        <td class="px-5 py-4">
-                            <div class="m-2 mr-5">
-                                <label for="toggle" class="flex items-center cursor-pointer">
-                                  <div class="relative">
-                                    <input type="checkbox" id="toggle" class="sr-only switch" />
-                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
-                                    <div
-                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
-                                    ></div>
-                                  </div>
-                                </label>
-                              </div>
-                        </td>
-                        <td class="px-5 py-4">
-                            <div class="m-2 mr-5">
-                                <label for="toggle" class="flex items-center cursor-pointer">
-                                  <div class="relative">
-                                    <input type="checkbox" id="toggle" class="sr-only switch" />
-                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
-                                    <div
-                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
-                                    ></div>
-                                  </div>
-                                </label>
-                              </div>
-                        </td>
-                        <td class="px-5 py-4">
-                            <div class="m-2 mr-5">
-                                <label for="toggle" class="flex items-center cursor-pointer">
-                                  <div class="relative">
-                                    <input type="checkbox" id="toggle" class="sr-only switch" />
-                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
-                                    <div
-                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
-                                    ></div>
-                                  </div>
-                                </label>
-                              </div>
-                        </td>
-                        <td class="px-5 py-4">
-                            <div class="m-2 mr-5">
-                                <label for="toggle" class="flex items-center cursor-pointer">
-                                  <div class="relative">
-                                    <input type="checkbox" id="toggle" class="sr-only switch" />
-                                    <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
-                                    <div
-                                      class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
-                                    ></div>
-                                  </div>
-                                </label>
-                              </div>
-                        </td>
-                        <td class="px-5 py-4">
-                            <button
-                            href="/"
-                            class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-carot hover:text-lightGrey"
-                            title="{intl l='View site'}"
-                            target="_blank"
-                          >
-                            <i class="fas fa-solid fa-arrows-repeat" aria-hidden="true"></i></button
-                          >
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  {/component}           
-    {/component}
-
+{/component}
 {hook name="profile-edit.bottom"}
 {/component}
 </div>

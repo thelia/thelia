@@ -4,8 +4,37 @@
 
 {block name="main-content"}
 <div id="edit-feature">
-    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a country'}</h1>
-    {component name="Panel" title="Edit country" class="w-full mb-3"}
+  <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a country'}</h1>
+    <!-- Breadcrumbs -->
+  <nav class="flex mb-10" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+          {intl l='Home'}
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Countries'}</span>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <span class="ml-1 text-sm font-medium text-gray-400 md:ml-2 dark:text-gray-500">{intl l='Editing country'}</span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+  <!-- Panel -->
+    {component name="Panel" class="w-full mb-3"}
     {hook name="country-edit.top"}
     <div class="flex justify-end border-b">
         <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
@@ -20,106 +49,40 @@
       </div> 
 
       <div class="grid grid-cols-2">
-          <div>
-            <div>
-                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" checked />
-                <label for="r1">This country is online</label>
-              </div>
-                <h5>{intl l='Country title'}</h5>
-                <input
-      type="text"
-      class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-      value="France"
-    />
-            </div>
-            <div>
-              <h5>{intl l='Summary'}</h5>
-              <input
-    type="text"
-    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-    placeholder="Short description text"
-  />
-          </div>
-          <div>
-              <h5>{intl l='Detailled description'}</h5>
-              <input
-    type="text"
-    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-  />
-          </div>
-          <div>
-              <h5>{intl l='Conclusion'}</h5>
-              <input
-    type="text"
-    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-    placeholder="Short additional text"
-  />
-          </div>
-          </div>
+        {form name="thelia.admin.country.modification"}
+        <form method="POST" >
+         <input type="hidden" />
+          {form_hidden_fields exclude="locale"}
 
-          <div>
-          <h5>{intl l='Numerical ISO Code'}</h5>
-          <input
-type="text"
-class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-value="4"
-/>
-      </div>
-      <div>
-        <h5>{intl l='ISO Alpha-2 code'}</h5>
-        <input
-type="text"
-class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-value="FR"
-/>
-    </div>
-    <div>
-        <h5>{intl l='ISO Alpha-3 code'}</h5>
-        <input
-type="text"
-class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-value="FRA"
-/>
-</div>
-<div>
-    <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
-    <label for="r1">This country has states / provinces</label>
-  </div>
-  <div>
-    <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
-    <label for="r1">Addresses for this country need a zip code</label>
-  </div>
-  <div>
-    <h5>{intl l='The zip code format'}</h5>
-    <input
-type="text"
-class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-/>
-</div>
-<!--TODO: Tableau React-->
-<div class="flex p-1 mt-5">
-    <table class="w-full shadow-lg table-auto bg-lightPearl">
-      <thead class="bg-mediumCharbon text-lightGrey">
-        <tr>
-          <th class="px-5 py-4 text-left rounded-tr-xl rounded-tl-xl">Shipping zones for this country</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="odd:bg-mediumPearl even:bg-white">
-            <td class="px-5 py-4">
-                <a
-                  href="/"
-                  class="font-bold text-carot hover:text-carot"
-                  >Asia</a
-                >
-              </td>
-        </tr>
-      </tbody>
-    </table>
-      </div>
-          
-      </div>
-      {hook name="country-edit.bottom"}
+          {render_form_field field='success_url' value={url path="/admin/configuration/countries"}}
+          {render_form_field field='locale' value={$edit_language_locale}}
 
-      {/component}
-      {/block}
+          {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+      <div class="row">
+        <div class="col-md-6">
+          {render_form_field field="visible"}
+        </div>
+
+        <div class="col-md-6">
+          {render_form_field field="isocode"}
+          {render_form_field field="isoalpha2"}
+          {render_form_field field="isoalpha3"}
+
+          {render_form_field field="has_states"}
+          {render_form_field field="need_zip_code"}
+          {render_form_field field="zip_code_format"}
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">{intl l="Shipping zones for this country"}</h3>
+        </div>
+        </div>
+       </div>
+      </div>
+    </form>
+  {/form}       
+      </div>
+{hook name="country-edit.bottom"}
+{/component}
+{/block}

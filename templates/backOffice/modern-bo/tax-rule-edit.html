@@ -4,7 +4,36 @@
 
 {block name="main-content"}
 <div id="edit-feature">
-    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a tax rule'}</h1>
+  <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a tax rule'}</h1>
+    <!-- Breadcrumbs -->
+  <nav class="flex mb-10" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+          {intl l='Home'}
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Taxes rules'}</span>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <span class="ml-1 text-sm font-medium text-gray-400 md:ml-2 dark:text-gray-500">{intl l='Editing tax rule'}</span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+  <!-- Panel -->
     {component name="Panel" class="w-full mb-3"}
     {hook name="tax-rule-edit.top"}
 
@@ -25,23 +54,53 @@
         </button>
       </div> 
       <div class="grid-rows-2">
-        <div>
-            <h5>{intl l='Title:'}</h5>
-              <input
-    type="text"
-    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-    value="French 10% VAT"
-  />
-  </div>
-            <div>
-              <h5>{intl l='Detailled description'}</h5>
-              <input
-    type="text"
-    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-  />
-  </div>
+        {form name="thelia.admin.taxrule.modification"}
+
+        <form method="POST" > 
+          <input type="hidden" />
+
+          {form_hidden_fields}
+
+          {form_field field='success_url'}
+            <input type="hidden" />
+          {/form_field}
+
+          {form_field field='locale'}
+            <input type="hidden" />
+          {/form_field}
+
+          {form_field field='title'}
+            <div class="form-group">
+              <input type="text" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" >
+            </div>
+          {/form_field}
+
+          {form_field field='description'}
+            <div class="form-group {if $error}has-error{/if}">
+              <label class="control-label">
+                <span class="label-help-block">{intl l="The detailed description"}</span>
+              </label>
+
+              <textarea class="form-control wysiwyg"></textarea>
+            </div>
+          {/form_field}
+
+            <div class="row">
+             <div class="col-md-12">
+                <div class="control-group">
+                  <label>&nbsp;</label>
+                  <div class="controls">
+                    <p>{intl l='Tax rule created on'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+      </form>
+      {/form}
       </div>
       {/component}
+      
+      <!-- Panel -->
       {component name="Tab" title="Tab" id="two" active="true"}
       <h1 class="mb-16 text-3xl font-bold">{intl l='Manage taxes'}</h1>
       {component name="Panel" title="Edit state" class="w-full mb-3"}
@@ -66,10 +125,9 @@
       {/component}
       {/component}
     {/component}
-    {component name="Panel" class="w-full mb-3"}
     
-    <!--TODO Filter-->
-    {component name="Filter" title="Filter"}{/component}
+    <!-- Panel -->
+    {component name="Panel" class="w-full mb-3"}
     
     {/component}
       {/component}

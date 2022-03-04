@@ -4,6 +4,101 @@
 
 {block name="main-content"}
   <div id="languages">
-
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Thelia Languages'}</h1>
+    <!-- Breadcrumbs -->
+  <nav class="flex mb-10" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+          {intl l='Home'}
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Languages'}</span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+  {hook name="languages.top"}
+  {if $error_message|default:null}
+            <div class="grid grid-rows-1">
+                <div>
+                    <div class="alert alert-danger">
+                        {$error_message}
+                    </div>
+                </div>
+             </div>
+        {/if}
+    <!--Panel-->
+    {component name="Panel" title="Using a domain or subdomain for each language" class="w-full mb-3"}
+    {/component}
+    <!--Panel-->
+    {component name="Panel" title="Parameters" class="w-full mb-3"}
+    {form name="thelia.lang.defaultBehavior"}
+                    <form method="post">
+                        {form_hidden_fields}
+                        {form_field field="behavior"}
+                        <div class="form-group" >
+                            <label class="label-control">{intl l="If a translation is missing or incomplete :"}</label>
+                            <div class="input-group">
+                                <select data-toggle="selectpicker">
+                                    {foreach $choices as $choice}
+                                        <option value="{$choice->value}"</option>
+                                    {/foreach}
+                                </select>
+                                <div class="input-group-btn">
+                                  <button type="submit" class="p-3 font-medium text-gray-600 rounded-lg shadow-2xl bg-main hover:bg-darkMain">
+                                    {intl l="Save"}
+                                  </button>
+                                </div>
+                            </div>
+                        </div>
+                        {/form_field}
+                    </form>
+                    {/form}
+    {/component}
+    <!--Panel-->
+    {component name="Panel" title="Using a domain or subdomain for each language" class="w-full mb-3"}
+        {form name="thelia.lang.url"}
+                    <form method="post">
+                        {form_hidden_fields}
+                        <table class="table table-striped table-condensed table-left-aligned">
+                            <tbody>
+                            {form_tagged_fields tag='url'}
+                                {if $attr_list.url_id}
+                                <tr>
+                                    <th>Fr</th>
+                                    <td>
+                                        <div class="form-group {if $error}has-error{/if}">
+                                        <input type="text" class="form-control"placeholder="http://www.domain.com">
+                                        </div>
+                                    </td>
+                                </tr>
+                                {/if}
+                            {/form_tagged_fields}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-right">
+                                      <button type="submit" class="p-3 font-medium text-gray-600 rounded-lg shadow-2xl bg-main hover:bg-darkMain">
+                                        {intl l="Save"}
+                                      </button>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </form>
+                    {/form}
+      {hook name="languages.bottom"}          
+    {/component}
   </div>
 {/block}

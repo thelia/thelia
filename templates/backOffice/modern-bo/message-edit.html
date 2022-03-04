@@ -4,7 +4,36 @@
 
 {block name="main-content"}
 <div id="edit-feature">
-    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit mailing template'}</h1>
+  <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a mailing template'}</h1>
+  <!-- Breadcrumbs -->
+<nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+        {intl l='Home'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+      </div>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Mailing templates'}</span>
+      </div>
+    </li>
+    <li aria-current="page">
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <span class="ml-1 text-sm font-medium text-gray-400 md:ml-2 dark:text-gray-500">{intl l='Editing mailing template'}</span>
+      </div>
+    </li>
+  </ol>
+</nav>
+<!-- Panel -->
     {component name="Panel" class="w-full mb-3"}
     {hook name="message-edit.top"}
 
@@ -25,72 +54,119 @@
         </button>
       </div> 
       <div class="grid-rows-2">
-        <div>
-            <h5>{intl l='Name'}</h5>
-              <input
-    type="text"
-    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-    value="customer_account_changed"
-  />
-  </div>
-            <div>
-              <h5>{intl l='Title'}</h5>
-              <input
-    type="text"
-    class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-    value="Mail sent to the customer when its password or email is changed in the back-office"
-  />
-  </div>
-  <div>
-    <h5>{intl l='Message subject'}</h5>
-    <input
-type="text"
-class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-carot"
-value="Your account information on has been changed."
-/>
-</div>
-      </div>
-      {component name="Panel" title="HTML version of this message"}
-      <div class="row">
-          <div class="col-md-6">
-              <h4>{intl l='Name of the HTML layout file'}</h4>
-            <select class="w-full text-gray-500 rounded-lg">
-                <option disabled selected>Use default layout</option>
-                <option>Use default layout</option>
-                <option>default HTML layout</option>
-              </select>
-          </div>
-          <div class="col-md-6">
-            <h4>{intl l='Name of the HTML laytemplateout file'}</h4>
-            <select class="w-full text-gray-500 rounded-lg">
-                <option disabled selected>account_changed_by_admin.html</option>
-                <option>account_changed_by_admin.html</option>
-                <option>order_notification.html</option>
-              </select>
-        </div>
-      </div>
-      {/component}
-
-      {component name="Panel" title="Text version of this message"}
-      <div class="row">
-        <div class="col-md-6">
-            <h4>{intl l='Name of the HTML layout file'}</h4>
-          <select class="w-full text-gray-500 rounded-lg">
-              <option disabled selected>Use default layout</option>
-              <option>Use default layout</option>
-              <option>default HTML layout</option>
-            </select>
-        </div>
-        <div class="col-md-6">
-          <h4>{intl l='Name of the HTML laytemplateout file'}</h4>
-          <select class="w-full text-gray-500 rounded-lg">
-              <option disabled selected>account_changed_by_admin.txt</option>
-              <option>account_changed_by_admin.txt</option>
-              <option>order_notification.txt</option>
-            </select>
-      </div>
-    </div>
-      {/component}
+        {form name="thelia.admin.message.modification"}
+          <form method="POST">
+           <input type="hidden" />
+             {form_hidden_fields exclude="success_url,locale"}
+                                                        
+              {render_form_field field='success_url'}
+              {render_form_field field='locale'}
+                                                        
+                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+                                                        
+                      {render_form_field field='name'}
+                      {render_form_field field='secured'}
+                      {render_form_field field='title'}
+                      {render_form_field field='subject'}
+                                                        
+                                                        
+           <div class="panel panel-default">
+              <div class="panel-heading"><h3 class="panel-title">{intl l="HTML version of this message"}</h3></div>
+                 <div class="panel-body">
+                    <div class="row">
+                      <div class="col-md-6">
+                        {custom_render_form_field field='html_layout_file_name'}
+                          <select {form_field_attributes field='html_layout_file_name'}>
+                              <option value="">{intl l='Use default layout'}</option>
+                                <option></option>
+                          </select>
+                        {/custom_render_form_field}
+                      </div>
+                      <div class="col-md-6">
+                        {custom_render_form_field field='html_template_file_name'}
+                          <select data-toggle-textarea="html_message" {form_field_attributes field='html_template_file_name' extra_class="textarea-toggle"}>
+                              <option value="">{intl l='Use HTML message defined below'}</option>
+                                <option></option>
+                          </select>
+                        {/custom_render_form_field}
+                      </div>
+                     </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                         {custom_render_form_field field='html_message'}
+                            <textarea {form_field_attributes field='html_message' extra_class="fixedfont"}></textarea>
+                              <div id="{$name}" style="height: 500px;"></div>
+                          {/custom_render_form_field}
+                              </div>
+                              </div>
+                              </div>
+                              </div>
+                           <div class="panel panel-default">
+                             <div class="panel-heading"><h3 class="panel-title">{intl l="Text version of this message"}</h3></div>
+                              <div class="panel-body">
+                                <div class="row">
+                                  <div class="col-md-6">
+                              {custom_render_form_field field='text_layout_file_name'}
+                                <select {form_field_attributes field='text_layout_file_name'}>
+                                  <option value="">{intl l='Use default layout'}</option>
+                                    <option></option>
+                                </select>
+                              {/custom_render_form_field}
+                                </div>
+                              <div class="col-md-6">
+                              {custom_render_form_field field='text_template_file_name'}
+                                <select data-toggle-textarea="text_message" {form_field_attributes field='text_template_file_name' extra_class='textarea-toggle'}>
+                                    <option value="">{intl l='Use Text message defined below'}</option>
+                                      <option></option>
+                                </select>
+                              {/custom_render_form_field}
+                                </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-md-12">
+                                    {custom_render_form_field field='text_message'}
+                                      <textarea {form_field_attributes field='text_message' extra_class="fixedfont"}></textarea>
+                                  </div>
+                                    {/custom_render_form_field}
+                                  </div>
+                                   </div>
+                                    </div>
+                                                        
+                                                        <div class="form-group">
+                                                            <p>{intl l='Message created on %date_create}</p>
+                                                        </div>
+                                                    
+                                                    </form>
+                                                {/form}
+                                            </div>
+                                        </div>
+                                    
+                                    </div>
+                                    
+                                    <div class="tab-pane fade" id="preview">
+                                        
+                                        <br/>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <button class="btn btn-default btn-primary preview-button" >
+                                                    {intl l="Preview HTML"}
+                                                </button>
+                                                
+                                                <button class="btn btn-default preview-button">
+                                                    {intl l="Preview text"}
+                                                </button>
+                                                
+                                                {form name="thelia.admin.message.send-sample"}
+                                                    <form class="form-inline pull-right send-test-mail-form" method="POST">
+                                                        {form_field field="recipient_email"}
+                                                            <div class="form-group">
+                                                                <label></label>
+                                                                <input type="email" class="form-control" >
+                                                            </div>
+                                                        {/form_field}
+                                                        <button type="submit" class="btn btn-primary">{intl l="Send"}</button>
+                                                    </form>
+                                                {/form}
       {/component}
       
       
