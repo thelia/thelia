@@ -117,7 +117,11 @@ class FrontAssets extends AbstractSmartyPlugin
             return false;
         }
 
-        $svg = file_get_contents(substr($path, 1));
+        if (!filter_var($path, \FILTER_VALIDATE_URL)) {
+            $path = substr($path, 1);
+        }
+
+        $svg = file_get_contents($path);
 
         $matches = [];
         preg_match('/^<svg.*?>/', $svg, $matches);
