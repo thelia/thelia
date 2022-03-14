@@ -1,0 +1,27 @@
+
+    <script>
+      function uploadFiles() {
+        var files = document.getElementById('file_upload').files;
+        if(files.length==0){
+          alert("Please first choose or drop any file(s)...");
+          return;
+        }
+        var filenames="";
+        for(var i=0;i<files.length;i++){
+          filenames+=files[i].name+"\n";
+        }
+        alert("Selected file(s) :\n____________________\n"+filenames);
+      }
+    </script>
+
+
+    
+    <div class="file">
+      <input class="bg-white border border-dashed border-darkCharbon hover:bg-gray-200 hover-border-solid" type="file" id="file_upload" multiple />
+
+      <button class="p-2 font-medium uppercase rounded-lg shadow-2xl upload-btn bg-main hover:bg-darkMain hover:text-white text-wh" onclick="uploadFiles()">
+        {intl l='Install'}
+      </button>
+    </div>
+  </body>
+</html>

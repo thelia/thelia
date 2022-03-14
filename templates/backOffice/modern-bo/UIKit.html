@@ -192,12 +192,11 @@
     </div>
     
     <div class="w-1/4 mb-5">
-      <input
-        type="file"
-        class="w-full placeholder-gray-500 bg-gray-100 shadow-2xl focus:ring-main focus:outline-none focus:border-main"
-        accept="image/png, image/jpeg"
-      />
-    </div>
+      <label class="flex flex-col items-center w-full tracking-wide uppercase bg-white border rounded-lg shadow-lg cursor-pointer text-main border-main hover:bg-darkCharbon hover:text-white">
+          <span class="mt-2 text-base leading-normal">Choisir un fichier</span>
+          <input type='file' class="hidden" />
+      </label>
+  </div>
 
     <div>
       <input type="color" id="body" name="body"
@@ -259,7 +258,8 @@
     </div>
   </div>
 
-
+  <!-- Drag and drop -->
+  {component name="draganddrop" title="draganddrop"}{/component}
 
 
 

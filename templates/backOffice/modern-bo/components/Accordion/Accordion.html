@@ -1,0 +1,157 @@
+<div class="flex flex-col items-center justify-center mt-10 accordion">
+    <!--  Product catalog configuration -->
+    <div class="w-1/2">
+      <input type="checkbox" name="panel" id="panel-1" class="hidden">
+      <label for="panel-1" class="relative block p-4 text-white bg-black border-b shadow cursor-pointer border-grey hover:bg-darkCharbon">{intl l='Product catalog configuration'}</label>
+      <div class="overflow-hidden accordion__content bg-grey-lighter">
+        <p class="pt-4 pl-4 accordion__header">{intl l='Ici, un texte expliquant rapidement Product catalog configuration.'}</p>
+        
+        <table class="flex mt-6 text-lg w-60">
+            <tr class=" hover:bg-carot hover:cursor-pointer">
+                <td><a  href="{url path='/admin/templates'}">{intl l='Product templates'}</a></td>
+            </tr>
+            <tr class="hover:bg-carot hover:cursor-pointer">
+              <td><a  href="{url path='/admin/attributes'}">{intl l='Product attributes'}</a></td>
+          </tr>
+          <tr class="hover:bg-carot hover:cursor-pointer">
+            <td><a  href="{url path='/admin/features'}">{intl l='Product features'}</a></td>
+          </tr>
+            </table>          
+      </div>
+    </div>
+    
+    <!-- Shipping configuration -->
+    <div class="w-1/2">
+      <input type="checkbox" name="panel" id="panel-2" class="hidden">
+      <label for="panel-2" class="relative block p-4 text-white bg-black border-b shadow border-grey hover:bg-darkCharbon">{intl l='Shipping configuration'}</label>
+      <div class="overflow-hidden accordion__content bg-grey-lighter">
+        <p class="pt-4 pl-4 accordion__header">{intl l='Ici, un texte expliquant rapidement Shipping configuration.'}</p>
+        
+        <table class="flex-initial w-full mt-6 text-lg ">
+            <tr class=" hover:bg-carot hover:cursor-pointer">
+                <td><a  href="{url path='/admin/countries'}">{intl l='Countries'}</a></td>
+            </tr>
+            <tr class="hover:bg-carot hover:cursor-pointer">
+              <td><a  href="{url path='/admin/states'}">{intl l='States / Provinces'}</a></td>
+          </tr>
+          <tr class="hover:bg-carot hover:cursor-pointer">
+            <td><a  href="{url path='/admin/shipping-configuration'}">{intl l='Shipping configuration'}</a></td>
+          </tr>
+          <tr class="hover:bg-carot hover:cursor-pointer">
+            <td><a  href="{url path='/admin/shipping-zones'}">{intl l='Shipping zones management'}</a></td>
+          </tr>
+            </table>         
+      </div>
+    </div>
+    
+    <!--  Order configuration  -->
+    <div class="w-1/2">
+      <input type="checkbox" name="panel" id="panel-3" class="hidden">
+      <label for="panel-3" class="relative block p-4 text-white bg-black border-b shadow border-grey">{intl l='Order configuration'}</label>
+      <div class="overflow-hidden accordion__content bg-grey-lighter">
+        <p class="pt-4 pl-4 accordion__header">{intl l='Ici, un texte expliquant rapidement Order configuration.'}</p>
+        
+        <table class="flex-initial w-full mt-6 text-lg ">
+            <tr class=" hover:bg-carot hover:cursor-pointer">
+                <td><a  href="{url path='/admin/currencies'}">{intl l='Currencies'}</a></td>
+            </tr>
+            <tr class="hover:bg-carot hover:cursor-pointer">
+              <td><a  href="{url path='/admin/taxes-rules'}">{intl l='Taxes and Tax rules'}</a></td>
+          </tr>
+          <tr class="hover:bg-carot hover:cursor-pointer">
+            <td><a  href="{url path='/admin/order-status'}">{intl l='Order status'}</a></td>
+          </tr>
+          <tr class="hover:bg-carot hover:cursor-pointer">
+            <td><a  href="{url path='/admin/messages'}">{intl l='Mailing templates'}</a></td>
+          </tr>
+            </table>
+      </div>
+    </div>
+
+    <!--  Translation  -->
+    <div class="w-1/2">
+        <input type="checkbox" name="panel" id="panel-4" class="hidden">
+        <label for="panel-4" class="relative block p-4 text-white bg-black border-b shadow border-grey">{intl l='Translation'}</label>
+        <div class="overflow-hidden accordion__content bg-grey-lighter">
+          <p class="pt-4 pl-4 accordion__header">{intl l='Ici, un texte expliquant rapidement Translation.'}</p>
+          
+          <table class="mt-6 text-lg flex-initialw-full ">
+            <tr class=" hover:bg-carot hover:cursor-pointer">
+                <td><a  href="{url path='/admin/languages'}">{intl l='Languages & URLs'}</a></td>
+            </tr>
+            <tr class="hover:bg-carot hover:cursor-pointer">
+              <td><a  href="{url path='/admin/translations'}">{intl l='Translation'}</a></td>
+          </tr>
+          <tr class="hover:bg-carot hover:cursor-pointer">
+            <td><a  href="{url path='/admin/translations-customer-title'}">{intl l='Translations of customers titles'}</a></td>
+          </tr>
+            </table>
+        </div>
+      </div>
+
+      <!--  Profiles  -->
+    <div class="w-1/2">
+        <input type="checkbox" name="panel" id="panel-5" class="hidden">
+        <label for="panel-5" class="relative block p-4 text-white bg-black border-b shadow border-grey">{intl l='Profiles'}</label>
+        <div class="overflow-hidden accordion__content bg-grey-lighter">
+          <p class="pt-4 pl-4 accordion__header">{intl l='Ici, un texte expliquant rapidement Profiles.'}</p>
+          
+          <table class="flex-initial w-full mt-6 text-lg ">
+            <tr class=" hover:bg-carot hover:cursor-pointer">
+                <td><a  href="{url path='/admin/profiles'}">{intl l='Administration profiles'}</a></td>
+            </tr>
+            <tr class="hover:bg-carot hover:cursor-pointer">
+              <td><a  href="{url path='/admin/administrators'}">{intl l='Administrators'}</a></td>
+          </tr>
+            </table>
+        </div>
+      </div>
+      
+        <!--  Logs  -->
+    <div class="w-1/2">
+        <input type="checkbox" name="panel" id="panel-6" class="hidden">
+        <label for="panel-6" class="relative block p-4 text-white bg-black border-b shadow border-grey">{intl l='Logs'}</label>
+        <div class="overflow-hidden accordion__content bg-grey-lighter">
+          <p class="pt-4 pl-4 accordion__header">{intl l='Ici, un texte expliquant rapidement Logs.'}</p>
+          
+          <table class="flex-initial w-full mt-6 text-lg ">
+            <tr class=" hover:bg-carot hover:cursor-pointer">
+                <td><a  href="{url path='/admin/admin-logs'}">{intl l='Administration logs'}</a></td>
+            </tr>
+            <tr class="hover:bg-carot hover:cursor-pointer">
+              <td><a  href="{url path='/admin/system-logs'}">{intl l='System logs'}</a></td>
+          </tr>
+            </table>
+        </div>
+      </div>
+
+       <!--  System parameters  -->
+    <div class="w-1/2">
+        <input type="checkbox" name="panel" id="panel-7" class="hidden">
+        <label for="panel-7" class="relative block p-4 text-white bg-black border-b shadow border-grey">{intl l='System parameters'}</label>
+        <div class="overflow-hidden accordion__content bg-grey-lighter">
+          <p class="pt-4 pl-4 accordion__header">{intl l='Ici, un texte expliquant rapidement System parameters.'}</p>
+          
+          <table class="w-full mt-6 text-lg ">
+            <tr class=" hover:bg-carot hover:cursor-pointer">
+                <td><a  href="{url path='/admin/config-store'}">{intl l='Store'}</a></td>
+            </tr>
+            <tr class="hover:bg-carot hover:cursor-pointer">
+              <td><a  href="{url path='/admin/variables'}">{intl l='Configuration parameters'}</a></td>
+          </tr>
+          <tr class="hover:bg-carot hover:cursor-pointer">
+            <td><a  href="{url path='/admin/mailing-system'}">{intl l='Mailing system'}</a></td>
+        </tr>
+        <tr class="hover:bg-carot hover:cursor-pointer">
+          <td><a  href="{url path='/admin/config-api'}">{intl l='API configuration'}</a></td>
+        </tr>
+        <tr class="hover:bg-carot hover:cursor-pointer">
+          <td><a  href="{url path='/admin/hooks'}">{intl l='Hooks'}</a></td>
+        </tr>
+        <tr class="hover:bg-carot hover:cursor-pointer">
+          <td><a  href="{url path='/admin/module-hooks'}">{intl l='Modules attachments'}</a></td>
+        </tr>
+            </table>
+        </div>
+      </div>
+  </div>

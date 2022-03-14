@@ -3,140 +3,15 @@
 {block name="page-title"}{intl l='Configuration'}{/block}
 
 {block name="main-content"}
-<h1 class="text-3xl font-bold">{intl l='Configuration'}</h1>
-{hook name="configuration.top" location="configuration_top" }
-<div class="flex justify-center">
-{component name="Panel" title="Product catalog configuration" class="mx-4 mt-12 "}
-{hook name="configuration.catalog-top" location="configuration_catalog_top" }
-<table class="flex mt-6 text-lg w-60">
-  <tr class=" hover:bg-carot hover:cursor-pointer">
-      <td><a  href="{url path='/admin/templates'}">{intl l='Product templates'}</a></td>
-  </tr>
-  <tr class="hover:bg-carot hover:cursor-pointer">
-    <td><a  href="{url path='/admin/attributes'}">{intl l='Product attributes'}</a></td>
-</tr>
-<tr class="hover:bg-carot hover:cursor-pointer">
-  <td><a  href="{url path='/admin/features'}">{intl l='Product features'}</a></td>
-</tr>
-{hook name="configuration.catalog-bottom" location="configuration_catalog_bottom" }
-  </table>
-{/component}
-
-{component name="Panel" title="Shipping configuration" class="mx-4 mt-12 text-black"}
-{hook name="configuration.shipping-top" location="configuration_shipping_top" }
-<table class="flex-initial w-full mt-6 text-lg ">
-  <tr class=" hover:bg-carot hover:cursor-pointer">
-      <td><a  href="{url path='/admin/countries'}">{intl l='Countries'}</a></td>
-  </tr>
-  <tr class="hover:bg-carot hover:cursor-pointer">
-    <td><a  href="{url path='/admin/states'}">{intl l='States / Provinces'}</a></td>
-</tr>
-<tr class="hover:bg-carot hover:cursor-pointer">
-  <td><a  href="{url path='/admin/shipping-configuration'}">{intl l='Shipping configuration'}</a></td>
-</tr>
-<tr class="hover:bg-carot hover:cursor-pointer">
-  <td><a  href="{url path='/admin/shipping-zones'}">{intl l='Shipping zones management'}</a></td>
-</tr>
-{hook name="configuration.shipping-bottom" location="configuration_shipping_bottom" }
-  </table>
-{/component}
-
-{component name="Panel" title="Order configuration" class="mx-4 mt-12 text-black "}
-{hook name="configuration.order-top" location="configuration_order_top" }
-<table class="flex-initial w-full mt-6 text-lg ">
-  <tr class=" hover:bg-carot hover:cursor-pointer">
-      <td><a  href="{url path='/admin/currencies'}">{intl l='Currencies'}</a></td>
-  </tr>
-  <tr class="hover:bg-carot hover:cursor-pointer">
-    <td><a  href="{url path='/admin/taxes-rules'}">{intl l='Taxes and Tax rules'}</a></td>
-</tr>
-<tr class="hover:bg-carot hover:cursor-pointer">
-  <td><a  href="{url path='/admin/order-status'}">{intl l='Order status'}</a></td>
-</tr>
-<tr class="hover:bg-carot hover:cursor-pointer">
-  <td><a  href="{url path='/admin/messages'}">{intl l='Mailing templates'}</a></td>
-</tr>
-{hook name="configuration.order-bottom" location="configuration_order_bottom" }
-  </table>
-{/component}
+ <!-- Header -->
+<div>
+  <h1 class="p-4 text-3xl font-bold">{intl l='Configuration'}</h1>
+  <p class="pl-4 mb-4">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Configuration.'}</p>
 </div>
 
-<div class="flex justify-center">
-  {component name="Panel" title="Translation" class="mx-4 mt-6 text-black "}
-  {hook name="configuration.translation-top" location="configuration_translation_top" }
-  <table class="mt-6 text-lg flex-initialw-full ">
-    <tr class=" hover:bg-carot hover:cursor-pointer">
-        <td><a  href="{url path='/admin/languages'}">{intl l='Languages & URLs'}</a></td>
-    </tr>
-    <tr class="hover:bg-carot hover:cursor-pointer">
-      <td><a  href="{url path='/admin/translations'}">{intl l='Translation'}</a></td>
-  </tr>
-  <tr class="hover:bg-carot hover:cursor-pointer">
-    <td><a  href="{url path='/admin/translations-customer-title'}">{intl l='Translations of customers titles'}</a></td>
-  </tr>
-  {hook name="configuration.translation-bottom" location="configuration_translation_bottom" }
-    </table>
-  {/component}
+ <!-- Accordion -->
+ {component name="accordion"}{/component}
 
-  {component name="Panel" title="Profiles" class="mx-4 mt-6 text-black "}
-  {hook name="configuration.profiles-top" location="configuration_profiles_top" }
-  <table class="flex-initial w-full mt-6 text-lg ">
-    <tr class=" hover:bg-carot hover:cursor-pointer">
-        <td><a  href="{url path='/admin/profiles'}">{intl l='Administration profiles'}</a></td>
-    </tr>
-    <tr class="hover:bg-carot hover:cursor-pointer">
-      <td><a  href="{url path='/admin/administrators'}">{intl l='Administrators'}</a></td>
-  </tr>
-  {hook name="configuration.profiles-bottom" location="configuration_profiles_bottom" }
-    </table>
-  {/component}
-
-  {component name="Panel" title="Logs" class="mx-4 mt-6 text-black "}
-  {hook name="configuration.logs-top" location="configuration_logs_top" }
-  <table class="flex-initial w-full mt-6 text-lg ">
-    <tr class=" hover:bg-carot hover:cursor-pointer">
-        <td><a  href="{url path='/admin/admin-logs'}">{intl l='Administration logs'}</a></td>
-    </tr>
-    <tr class="hover:bg-carot hover:cursor-pointer">
-      <td><a  href="{url path='/admin/system-logs'}">{intl l='System logs'}</a></td>
-  </tr>
-  {hook name="configuration.logs-bottom" location="configuration_logs_bottom" }
-    </table>
-  {/component}
-</div>
-
-  <div>
-    {component name="Panel" title="System parameters" class="mx-4 mt-6 text-black "}
-    {hook name="configuration.system-top" location="configuration_system_top" }
-  <table class="w-full mt-6 text-lg ">
-    <tr class=" hover:bg-carot hover:cursor-pointer">
-        <td><a  href="{url path='/admin/config-store'}">{intl l='Store'}</a></td>
-    </tr>
-    <tr class="hover:bg-carot hover:cursor-pointer">
-      <td><a  href="{url path='/admin/variables'}">{intl l='Configuration parameters'}</a></td>
-  </tr>
-  <tr class="hover:bg-carot hover:cursor-pointer">
-    <td><a  href="{url path='/admin/mailing-system'}">{intl l='Mailing system'}</a></td>
-</tr>
-<tr class="hover:bg-carot hover:cursor-pointer">
-  <td><a  href="{url path='/admin/config-api'}">{intl l='API configuration'}</a></td>
-</tr>
-<tr class="hover:bg-carot hover:cursor-pointer">
-  <td><a  href="{url path='/admin/hooks'}">{intl l='Hooks'}</a></td>
-</tr>
-<tr class="hover:bg-carot hover:cursor-pointer">
-  <td><a  href="{url path='/admin/module-hooks'}">{intl l='Modules attachments'}</a></td>
-</tr>
-{hook name="configuration.system-bottom" location="configuration_system_bottom" }
-    </table>
-  {/component}
-  {hook name="configuration.bottom" location="configuration_bottom" }
-  </div>
-  
-
-
-
-    
     
 {/block}
 
