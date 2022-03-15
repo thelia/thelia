@@ -4,15 +4,6 @@
     width: 500px;
   }
 
-  .file:before {
-    position: absolute;
-    bottom: 50px;
-    left: 245px;
-    content: "ou déposer un fichier";
-    color: #F7F7F7;
-    font-weight: 900;
-  }
-
   .upload-btn {
     margin-left: 300px;
     padding: 7px 20px;

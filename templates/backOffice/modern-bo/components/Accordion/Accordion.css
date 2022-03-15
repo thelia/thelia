@@ -15,6 +15,5 @@ label:after {
     transition: all 0.4s cubic-bezier(0.865, 0.14, 0.095, 0.87);
   }
   input[name='panel']:checked ~ .accordion__content {
-    /* Get this as close to what height you expect */
     max-height: 50em;
   }

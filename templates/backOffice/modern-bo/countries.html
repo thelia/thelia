@@ -4,53 +4,59 @@
 
 {block name="main-content"}
   <div id="countries">
-    <h1 class="mb-16 text-3xl font-bold">{intl l='Countries'}</h1>
-    <!-- Breadcrumbs -->
-  <nav class="flex mb-10" aria-label="Breadcrumb">
-    <ol class="inline-flex items-center space-x-1 md:space-x-3">
-      <li class="inline-flex items-center">
-        <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-          {intl l='Home'}
-        </a>
-      </li>
-      <li>
-        <div class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
-        </div>
-      </li>
-      <li aria-current="page">
-        <div class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Countries'}</span>
-        </div>
-      </li>
-    </ol>
-  </nav>
+<!-- Breadcrumbs -->
+<nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-main dark:text-gray-400 dark:hover:text-white">
+        {intl l='Dashboard'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+      </div>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Countries'}</a>
+      </div>
+    </li>
+  </ol>
+</nav>
+
+<!-- Header -->
+<div>
+  <h1 class="p-4 text-3xl font-bold">{intl l='Countries'}</h1>
+  <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Countries.'}</p>
+</div>
+    
   <!-- Panel -->
     {component name="Panel" class="w-full mb-3"}
-    {hook name="countries.top" location="countries_top" }
+    {hook name="countries.top" location="countries_top"}
     <div class="flex justify-end">
     {component name="modal"}
     <h4 class="font-bold">{intl l='Country title:'}</h4>
       <input
         type="text"
-        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-main"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
       />
       <h4 class="font-bold">{intl l='Numerical ISO Code:'}</h4>
       <input
         type="text"
-        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-main"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
       />
       <h4 class="font-bold">{intl l='ISO Alpha-2 code:'}</h4>
       <input
         type="text"
-        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-main"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
       />
       <h4 class="font-bold">{intl l='ISO Alpha-3 code:'}</h4>
       <input
         type="text"
-        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-carot focus:outline-none focus:border-main"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
       />
       <div>
         <input class="mr-3 Radio" checked id="r1" type="radio" name="thelia-radio" />
@@ -60,7 +66,7 @@
         <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
         <label for="r1">This country has states / provinces</label>
       </div>
-      <button class="mt-8 font-medium text-white rounded-lg shadow-2xl p-23 bg-carot hover:bg-black">
+      <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-main even:bg-main border-main hover:text-main hover:bg-white">
         Create this product country
       </button>
     {/component}
@@ -79,7 +85,7 @@
             <th class="px-5 py-4 text-left">Zone de livraison</th>
             <th class="px-5 py-4 text-left">Visible</th>
             {hook name="countries.table-header" location="countries_table_header" }
-            <th class="px-5 py-4 text-left">Actions</th>
+            <th class="px-5 py-4 text-left rounded-tr-xl">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -92,7 +98,7 @@
                 >Albanie</a
               >
             </td>
-            <td class="flex justify-center px-5 py-4 px-auto">
+            <td class="px-5 py-4 px-auto">
               <label for="toggle" class="flex items-center cursor-pointer">
                 <div class="mr-3 text-darkCharbon"></div>
                 <div class="relative">
@@ -103,7 +109,7 @@
                   ></div>
                 </div>
               </label>           
-        </td> 
+            </td> 
             <td class="px-5 py-4">007</td>
             <td class="px-5 py-4">AFG</td> 
             <td class="px-5 py-4">
@@ -113,7 +119,7 @@
                 >B Zone</a
               >
             </td>
-            <td class="flex justify-center px-5 py-4 px-auto">
+            <td class="px-5 py-4 px-auto">
               <label for="toggle" class="flex items-center cursor-pointer">
                 <div class="mr-3 text-darkCharbon"></div>
                 <div class="relative">
@@ -124,19 +130,18 @@
                   ></div>
                 </div>
               </label>        
-        </td>
-        {hook name="countries.table-row" location="countries_table_row"} }
+            </td>
             <td class="flex justify-center px-5 py-4 px-auto">
               <button
                 href="/"
-                class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
                 <i class="fas fa-edit" aria-hidden="true"></i></button
               ><button
                 href="/"
-                class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
@@ -153,7 +158,7 @@
                 >Albanie</a
               >
             </td>
-            <td class="flex justify-center px-5 py-4 px-auto">
+            <td class="px-5 py-4 px-auto">
               <label for="toggle" class="flex items-center cursor-pointer">
                 <div class="mr-3 text-darkCharbon"></div>
                 <div class="relative">
@@ -174,7 +179,7 @@
                 >B Zone</a
               >
             </td>
-            <td class="flex justify-center px-5 py-4 px-auto">
+            <td class="px-5 py-4 px-auto">
               <label for="toggle" class="flex items-center cursor-pointer">
                 <div class="mr-3 text-darkCharbon"></div>
                 <div class="relative">
@@ -189,14 +194,14 @@
             <td class="flex justify-center px-5 py-4 px-auto">
               <button
                 href="/"
-                class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
                 <i class="fas fa-edit" aria-hidden="true"></i></button
               ><button
                 href="/"
-                class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >

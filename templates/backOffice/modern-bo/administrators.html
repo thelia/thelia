@@ -1,123 +1,96 @@
 {extends file="admin-layout.tpl"}
 
-{block name="page-title"}{intl l='Administrators'}{/block}
+{block name="page-title"}{intl l='Back-office users'}{/block}
 
 {block name="main-content"}
-  <div id="administrators">
-    <h1 class="mb-16 text-3xl font-bold">{intl l='Back-office users'}</h1>
-    <!-- Breadcrumbs -->
-  <nav class="flex mb-10" aria-label="Breadcrumb">
-    <ol class="inline-flex items-center space-x-1 md:space-x-3">
-      <li class="inline-flex items-center">
-        <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-          {intl l='Home'}
-        </a>
-      </li>
-      <li>
-        <div class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
-        </div>
-      </li>
-      <li aria-current="page">
-        <div class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Back-office users'}</span>
-        </div>
-      </li>
-    </ol>
-  </nav>
-  {hook name="administrators.top"}
-    <!--Panel-->
-    {component name="Administrators" class="w-full mb-3"}
-    <div class="flex justify-end">
-      <!--Modal-->
-    {component name="modal" title="modal"}
-    
-    {/component}
-  </div>
-  <!--TODO: Tableau React-->
-    <div class="flex p-1 mt-5">
-      <table class="w-full shadow-lg table-auto bg-lightPearl">
-        <thead class="bg-mediumCharbon text-lightGrey">
-          <tr>
-            <th class="px-5 py-4 text-left rounded-tl-xl">Login</th>
-            <th class="px-5 py-4 text-left">First Name</th>
-            <th class="px-5 py-4 text-left">Last Name</th>
-            <th class="px-5 py-4 text-left">E-mail</th>
-            <th class="px-5 py-4 text-left">Locale</th>
-            <th class="px-5 py-4 text-left">Profile</th>
-            {hook name="administrators.row"}
-            <th class="px-5 py-4 rounded-tr-xl">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="odd:bg-mediumPearl even:bg-white">
-            <td class="px-5 py-4">
-              <a
-                href="/"
-                class="font-bold text-main hover:text-darkMain"
-                >admin</a
-              >
-            </td>
-            <td class="px-5 py-4">admin</td>
-            <td class="px-5 py-4">admin</td>
-            <td class="px-5 py-4">admin@thelia.net</td>
-            <td class="px-5 py-4">en_US</td>
-            <td class="px-5 py-4">Superadministrator</td>
-            <td class="flex justify-center px-5 py-4 px-auto">
-              <button
-                href="/"
-                class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
-                title="{intl l='View site'}"
-                target="_blank"
-              >
-                <i class="fas fa-edit" aria-hidden="true"></i></button
-              ><button
-                href="/"
-                class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
-                title="{intl l='View site'}"
-                target="_blank"
-              >
-                <i class="fas fa-trash-alt" aria-hidden="true"></i>
-              </button>
-            </td>
-          </tr>
-          <tr class="odd:bg-mediumPearl even:bg-white">
-            <td class="px-5 py-4">
-              <a
-                href="/"
-                class="font-bold text-main hover:text-darkMain"
-                >admin</a
-              >
-            </td>
-            <td class="px-5 py-4">admin</td>
-            <td class="px-5 py-4">admin</td>
-            <td class="px-5 py-4">admin@thelia.net</td>
-            <td class="px-5 py-4">en_US</td>
-            <td class="px-5 py-4">Superadministrator</td>
-            <td class="flex justify-center px-5 py-4 px-auto">
-              <button
-                href="/"
-                class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
-                title="{intl l='View site'}"
-                target="_blank"
-              >
-                <i class="fas fa-edit" aria-hidden="true"></i></button
-              ><button
-                href="/"
-                class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
-                title="{intl l='View site'}"
-                target="_blank"
-              >
-                <i class="fas fa-trash-alt" aria-hidden="true"></i>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    {hook name="administrators.bottom"}
-    {/component}
-  </div>
+<div id="administrators">
+  <!-- Breadcrumbs -->
+ <nav class="flex mb-10" aria-label="Breadcrumb">
+   <ol class="inline-flex items-center space-x-1 md:space-x-3">
+     <li class="inline-flex items-center">
+       <a href="#" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-main dark:text-gray-400 dark:hover:text-white">
+         {intl l='Dashboard'}
+       </a>
+     </li>
+     <li>
+       <div class="flex items-center">
+         <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+         <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+       </div>
+     </li>
+     <li>
+       <div class="flex items-center">
+         <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+         <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Back-office users'}</a>
+       </div>
+     </li>
+   </ol>
+ </nav>
+ 
+ <!-- Header -->
+ <div>
+   <h1 class="p-4 text-3xl font-bold">{intl l='Back-office users'}</h1>
+   <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Back-office users.'}</p>
+ </div>
+ 
+   {hook name="profiles.top"}
+     <!--Panel-->
+     {component name="Panel" class="w-full mb-3"}
+     <div class="flex justify-end">
+     {component name="modal"}
+     
+     {/component}
+   </div>
+     <!--TODO: Tableau React-->
+     <div class="flex p-1 mt-5">
+       <table class="w-full shadow-lg table-auto bg-lightPearl">
+         <thead class="bg-mediumCharbon text-lightGrey">
+           <tr>
+             <th class="px-5 py-4 text-left rounded-tl-xl">Login</th>
+             <th class="px-5 py-4 text-left">First Name</th>
+             <th class="px-5 py-4 text-left">Last Name</th>
+             <th class="px-5 py-4 text-left">E-mail</th>
+             <th class="px-5 py-4 text-left">Locale</th>
+             <th class="px-5 py-4 text-left">Profile</th>
+             <th class="px-5 py-4 rounded-tr-xl">Actions</th>
+           </tr>
+         </thead>
+         <tbody>
+           <tr class="odd:bg-mediumPearl even:bg-white">
+             <td class="px-5 py-4">
+               <a
+                 href="/"
+                 class="font-bold text-main hover:text-darkMain"
+                 >Chairs</a
+               >
+             </td>
+             <td class="px-5 py-4">admin</td>
+             <td class="px-5 py-4">admin</td>
+             <td class="px-5 py-4">admin@admin.fr</td>
+             <td class="px-5 py-4">en_US</td>
+             <td class="px-5 py-4">Superadministrator</td>
+             <td class="flex justify-center px-5 py-4 px-auto">
+               <button
+                 href="/"
+                 class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                 title="{intl l='View site'}"
+                 target="_blank"
+               >
+                 <i class="fas fa-edit" aria-hidden="true"></i></button
+               ><button
+                 href="/"
+                 class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
+                 title="{intl l='View site'}"
+                 target="_blank"
+               >
+                 <i class="fas fa-trash-alt" aria-hidden="true"></i>
+               </button>
+             </td>
+           </tr>
+         </tbody>
+       </table>
+     </div>
+     {hook name="profiles.bottom"}
+     {/component}
+   </div>
 {/block}
