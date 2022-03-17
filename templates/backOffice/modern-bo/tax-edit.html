@@ -3,114 +3,95 @@
 {block name="page-title"}{intl l='Edit a tax'}{/block}
 
 {block name="main-content"}
-<div id="edit-taxes-rules">
-  <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a tax'}</h1>
-    <!-- Breadcrumbs -->
-  <nav class="flex mb-10" aria-label="Breadcrumb">
-    <ol class="inline-flex items-center space-x-1 md:space-x-3">
-      <li class="inline-flex items-center">
-        <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-          {intl l='Home'}
-        </a>
-      </li>
-      <li>
-        <div class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
-        </div>
-      </li>
-      <li aria-current="page">
-        <div class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Taxes'}</span>
-        </div>
-      </li>
-      <li aria-current="page">
-        <div class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          <span class="ml-1 text-sm font-medium text-gray-400 md:ml-2 dark:text-gray-500">{intl l='Editing tax'}</span>
-        </div>
-      </li>
-    </ol>
-  </nav>
-  {hook name="tax-edit.top"}
-  <!-- Panel -->
+<div id="edit-attribute">
+  
+<!-- Breadcrumbs -->
+<nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-main dark:text-gray-400 dark:hover:text-white">
+        {intl l='Dashboard'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+      </div>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Taxes'}</a>
+      </div>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Editing tax'}</a>
+      </div>
+    </li>
+  </ol>
+</nav>
+
+<!-- Header -->
+<div>
+  <h1 class="p-4 text-3xl font-bold">{intl l='Edit a tax'}</h1>
+  <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Edit a tax.'}</p>
+</div>
+
+    <!-- Panel principal -->
     {component name="Panel" class="w-full mb-3"}
-      <div class="flex justify-end border-b">
-        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
+    {hook name="attribute-edit.top"}
+      <!--Boutons-->
+      <div class="flex justify-end pb-6 border-b">
+        <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-green even:bg-green border-green hover:text-green hover:bg-white">
           Save ✓
         </button>
-        <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
+        <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-blue even:bg-blue border-blue hover:text-blue hover:bg-white">
           Save and close X
         </button>
-        <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
+        <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-black border border-black rounded-md odd:bg-white even:bg-white hover:text-white hover:bg-black">
           Close X
         </button>
       </div> 
-       <!-- Form -->
-      <div class="grid-rows-4">
-        {form name="thelia.admin.tax.modification"}
-
-          <form method="POST" >
-
-            {form_hidden_fields}
-
-            {form_field field='success_url'}
-              <input type="hidden" />
-            {/form_field}
-
-            {form_field field='locale'}
-              <input type="hidden" />
-            {/form_field}
-
-            {form_field field='title'}
-            <div class="form-group">
-               <input type="text" required="required" class="form-control" >
+      
+      <div>
+        <div class="w-full mt-4 mb-5">
+          <p class="mb-2 font-bold">{intl l='Title'}</p>
+          <input
+            type="text"
+            class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
+            placeholder="French 10% VAT"
+          />
+          </div>
+          <div class="mb-3">
+            <p class="mb-2 font-bold">{intl l='Detailled description'}</p>
+            <textarea
+              class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding rounded-lg transition ease-in-out m-0 focus:text-main focus:bg-white focus:border-main focus:outline-none"
+              rows="3"
+              placeholder="Short description text"
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <p class="mb-2 font-bold">{intl l='Type'}</p>
+          <select class="w-full text-gray-500 rounded-lg focus:ring-main focus:outline-none focus:border-main">
+            <option disabled selected>Percentage of the product price</option>
+            <option>Constant amount</option>
+            <option>Constant amount found in one of the product's feature</option>
+            <option>Percentage of the product price</option>
+            </select>
+          </div>
+          <div class="w-full mt-4 mb-5">
+            <p class="mb-2 font-bold">{intl l='Percent'}</p>
+            <input
+              type="text"
+              class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
+              value="10"
+            />
             </div>
-            {/form_field}
-
-            {form_field field='description'}
-            <div class="form-group" >
-              <label class="control-label">
-                <span class="label-help-block">{intl l="The detailed description."}</span>
-              </label>
-              <textarea class="form-control wysiwyg"></textarea>
-            </div>
-            {/form_field}
-
-            {form_field field='type'}
-            <div class="form-group">
-              <div class="form-group">
-                <select class="js-change-tax-type" >
-                  <option></option>
-                </select>
-              </div>
-            </div>
-
-             {/form_field}
-            <div class="form-group">
-              <select name="{$name}" >                       
-                <option></option>
-              </select>
-              <input type="text" required="required" class="form-control" >
-            </div>
-               {/form_tagged_fields}
-
-            <div class="row">
-              <div class="col-md-12">
-                <div class="control-group">
-                  <label>&nbsp;</label>
-                    <div class="controls">
-                      <p>{intl l='Tax created on Last modification'}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-      </form>
-      {/form}
       </div>
-      {/component}
-      {hook name="tax-edit.bottom"}
-</div>
-{/block}
+       {/component}
+      </div>  
+    </div>
+    {/block}

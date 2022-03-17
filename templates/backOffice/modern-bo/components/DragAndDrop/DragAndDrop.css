@@ -1,10 +1,19 @@
-.file input {
-    padding: 100px;
-    text-align: center;
-    width: 500px;
-  }
+.dropzone {
+  border: 0.2rem dashed #444444;
+  padding: 2px;
+  border-radius: 0.25rem;
+  background-color: #fff;
+  text-align: center;
+  font-size: 12px;
+  transition: 0.25s background-color ease-in-out;
+  cursor: pointer;
+  overflow: hidden;
+  text-align: center;
+  margin-left: 20%;
+}
 
-  .upload-btn {
-    margin-left: 300px;
-    padding: 7px 20px;
-  }
+.cloud {
+  font-size: 400%;
+  color: #444444;
+  position: relative;
+}

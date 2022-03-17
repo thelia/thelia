@@ -48,7 +48,7 @@
     <div class="grid grid-cols-2">
     <!--Panel Parameters-->
     <div>
-    {component name="Panel" title="Parameters" class="w-full h-full mb-3"}
+    {component name="Panel" title="Parameters" class="w-full mb-3 h-60"}
                     <form method="post">
                         <div class="form-group" >
                             <label class="label-control">{intl l="If a translation is missing or incomplete :"}</label>
@@ -70,38 +70,41 @@
     <!--Panel-->
     <div>
     {component name="Panel" title="Using a domain or subdomain for each language" class="w-full h-full mx-4 mb-3"}
-        {form name="thelia.lang.url"}
-                    <form method="post">
-                        {form_hidden_fields}
-                        <table class="table table-striped table-condensed table-left-aligned">
-                            <tbody>
-                            {form_tagged_fields tag='url'}
-                                {if $attr_list.url_id}
-                                <tr>
-                                    <th>Fr</th>
-                                    <td>
-                                        <div class="form-group {if $error}has-error{/if}">
-                                        <input type="text" class="form-control"placeholder="http://www.domain.com">
-                                        </div>
-                                    </td>
-                                </tr>
-                                {/if}
-                            {/form_tagged_fields}
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td></td>
-                                    <td class="text-right">
-                                      <button type="submit" class="p-3 font-medium text-gray-600 rounded-lg shadow-2xl bg-main hover:bg-darkMain">
-                                        {intl l="Save"}
-                                      </button>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </form>
-                    {/form}
-      {hook name="languages.bottom"}          
+    <div class="w-full mt-4 mb-5">
+      <p class="mb-2 font-bold">{intl l='Français'}</p>
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
+      />
+      </div>
+      <div class="w-full mt-4 mb-5">
+        <p class="mb-2 font-bold">{intl l='English'}</p>
+        <input
+          type="text"
+          class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
+        />
+        </div>
+        <div class="w-full mt-4 mb-5">
+          <p class="mb-2 font-bold">{intl l='Castellano'}</p>
+          <input
+            type="text"
+            class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
+          />
+          </div>
+          <div class="w-full mt-4 mb-5">
+            <p class="mb-2 font-bold">{intl l='Italiano'}</p>
+            <input
+              type="text"
+              class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
+            />
+            </div>
+            <div class="w-full mt-4 mb-5">
+              <p class="mb-2 font-bold">{intl l='Russian'}</p>
+              <input
+                type="text"
+                class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
+              />
+              </div>      
     {/component}
   </div>
   </div>

@@ -4,48 +4,52 @@
 
 {block name="main-content"}
   <div id="hooks">
-    <h1 class="mb-4 text-3xl font-bold">{intl l='Hooks'}</h1>
-    <!-- Breadcrumbs -->
-  <nav class="flex mb-10" aria-label="Breadcrumb">
-    <ol class="inline-flex items-center space-x-1 md:space-x-3">
-      <li class="inline-flex items-center">
-        <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-          {intl l='Home'}
-        </a>
-      </li>
-      <li>
-        <div class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
-        </div>
-      </li>
-      <li aria-current="page">
-        <div class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Hooks'}</span>
-        </div>
-      </li>
-    </ol>
-  </nav>
+<!-- Breadcrumbs -->
+<nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-main dark:text-gray-400 dark:hover:text-white">
+        {intl l='Dashboard'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+      </div>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Hooks'}</a>
+      </div>
+    </li>
+  </ol>
+</nav>
+
+<!-- Header -->
+<div>
+  <h1 class="p-4 text-3xl font-bold">{intl l='Hooks'}</h1>
+  <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Hooks.'}</p>
+</div>
+
   {hook name="hooks.top"}
-  {loop type="auth" name="can_create" role="ADMIN" resource="admin.hook" access="UPDATE"}
     <!--Panel Check the support of hooks-->
     {component name="Panel" title="Check the support of hooks." class="w-full mb-3"}
     <div class="grid grid-cols-2">
       <form>
-      <select class="p-2 text-gray-500 rounded-lg">
+      <select class="w-full p-2 text-gray-500 rounded-lg">
         <option disabled selected>Front Office</option>
         <option>Back Office</option>
         <option>pdf</option>
         <option>email</option>
       </select>
-      <button class="p-2 font-medium text-gray-600 rounded-lg shadow-2xl bg-main hover:bg-darkMain">
+      <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center border rounded-md odd:bg-mediumPearl even:bg-white border-main text-main hover:text-white hover:bg-main">
         Parse template
       </button>
       </form>
       </div>    
     {/component}
-    {/loop}
       <!--Panel Hooks-->
     {component name="Panel" title="Hooks" class="w-full mb-3"}
     <!--TODO: Tableau React-->
@@ -63,7 +67,6 @@
         </tr>
       </thead>
       <tbody>
-        {loop name="hooks" type="hook"}
         <tr class="odd:bg-mediumPearl even:bg-white">
           <td class="px-5 py-4">1</td>
           <td class="px-5 py-4">
@@ -81,7 +84,7 @@
             >
           </td>
           <td class="px-5 py-4">
-            <i class="fas fa-solid fa-check"></i>
+            <i class="fas fa-check"></i>
           </td>
           <td class="px-5 py-4">
               <label for="toggle" class="flex items-center cursor-pointer">
@@ -98,7 +101,7 @@
           <td class="flex justify-center px-5 py-4 px-auto">
            <button
               href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
@@ -106,28 +109,32 @@
             </button>
             <button
               href="/"
-              class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
               <i class="fas fa-trash-alt" aria-hidden="true"></i>
             </button>
           </td>
-          {/loop}
         </tr>
       </tbody>
     </table>
   </div>
-  <div class="right-0 grid grid-cols-2 mt-12">
-    <div class="">
-      <button class="p-2 font-medium text-gray-600 rounded-lg shadow-2xl bg-main hover:bg-darkMain">
-        {intl l="Manage modules"}
-      </button>
-      <button class="p-2 font-medium text-gray-600 rounded-lg shadow-2xl bg-main hover:bg-darkMain">
-        {intl l="Manage modules attachements"}
-      </button>
-    </div>
-</div>
+          <!--Boutons Manage hooks et Manage modules attachements-->
+          <div class="grid-rows-2 mt-20 text-right">
+            <div class="mb-4 mr-5">
+                <button class="p-3 font-medium text-white rounded-lg shadow-2xl bg-main hover:bg-darkMain">
+                    {intl l="Manage hooks"}
+                    <i class="ml-3 fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="mr-5">
+                <button class="p-3 font-medium text-white rounded-lg shadow-2xl bg-main hover:bg-darkMain">
+                    {intl l="Manage modules attachements"}
+                    <i class="ml-3 fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
   {hook name="hooks.bottom"}
     {/component}
   </div>

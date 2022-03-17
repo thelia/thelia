@@ -1,6 +1,10 @@
-<div class="file">
-      <input class="bg-white border border-dashed fake-btn border-darkCharbon hover:bg-gray-200 hover-border-solid" type="file" id="file_upload" multiple />
-      <button class="flex items-center justify-center h-3 p-3 mx-3 mt-2 font-medium text-center border rounded-md odd:bg-mediumPearl even:bg-white border-main text-main hover:text-white hover:bg-main">
-        {intl l='Install'}
-      </button>
+<div class="dropzone" id="dropzone">
+  <i class="mt-3 mb-3 cloud fas fa-cloud"></i>  
+  <p class="mb-1 font-bold">{intl l="Choisir un fichier ou déposer"}</p>
+  <input type="file" name="files" class="flex justify-center mb-3 ml-4 dropzone-input" multiple />
+</div>
+<div class="mt-20 ml-6 mr-5">
+  <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center border rounded-md odd:bg-mediumPearl even:bg-white border-main text-main hover:text-white hover:bg-main">
+    {intl l="Install"}
+  </button>
 </div>

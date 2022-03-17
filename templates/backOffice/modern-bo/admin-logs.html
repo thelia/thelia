@@ -36,8 +36,13 @@
     <!-- Panel -->
     {component name="Panel" class="w-full mb-3"}
     {hook name="admin-logs.top"}
+    <div class="flex justify-end pb-6 border-b">
+      <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-green even:bg-green border-green hover:text-green hover:bg-white">
+        Save ✓
+      </button>
+    </div>
     <div class="grid grid-cols-3">
-      <p>Period: </p>
+      <p class="ml-8 font-bold">Period: </p>
       <input
         type="date"
         class="w-full text-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
@@ -48,50 +53,96 @@
         class="w-full mx-4 text-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
         value="To: 2022-03-02"
       />
-      </div>   
+      </div>  
       
-      <div class="row">
-        <div class="col-md-12">
-
-              <p class="form-control-static"><strong>{intl l='Administrators'} :</strong></p>
-            <div class="row">
-                <div class="col-md-3">
-                      <label class="checkbox-inline">
-                          <input type="checkbox" checked>
-                      </label>
-                </div>
+      
+      <div class="container mx-auto mt-4">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <!-- Première colonne -->
+          <div class="flex justify-center p-6 bg-gray-100 border-2 border-gray-300 rounded-xl">
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">admin</label>
+              </div>
             </div>
-        </div>
-    </div>
-
-      <div class="row">
-        <div class="col-md-12">
-              <p class="form-control-static"><strong>{intl l='Resources'} :</strong></p>
-            <div class="row">
-                <div class="col-md-3">
-                      <label class="checkbox-inline">
-                        <input type="checkbox" checked> 
-                      </label>
+              <div class="w-1/2 m-2 text-darkCharbon">
+                <div>
+                  <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                  <label for="r1">Address</label>
                 </div>
+              </div>
+          </div>
+          <!-- Deuxième colonne -->
+          <div class="flex justify-center p-6 bg-gray-100 border-2 border-gray-300 rounded-xl">
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">thelia2</label>
+              </div>
             </div>
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Configuration / Administrator</label>
+              </div>
+            </div>
+            
+          </div>
 
+          <!-- Troisième colonne -->
+          <div class="flex justify-center p-6 bg-gray-100 border-2 border-gray-300 rounded-xl">
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Configuration / Area</label>
+              </div>
+            </div>
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Content</label>
+              </div>
+            </div>
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Customer</label>
+              </div>
+            </div>
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Configuration / Mailing-system</label>
+              </div>
+            </div>
+            
+          </div>
+
+          <!-- Quatrième colonne -->
+          <div class="flex justify-center p-6 bg-gray-100 border-2 border-gray-300 rounded-xl">
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Configuration / Attribute</label>
+              </div>
+            </div>
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Configuration / Country</label>
+              </div>
+            </div>
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Configuration / Feature</label>
+              </div>
+            </div>
+            
+          </div>
         </div>
       </div>
-
-      <div class="row">
-        <div class="col-md-12">
-              <p class="form-control-static"><strong>{intl l='Modules'} :</strong></p>
-            <div class="row">
-                <div class="col-md-3">
-                      <label class="checkbox-inline">
-                        <input type="checkbox" checked> 
-                      </label>
-                </div>
-            </div>
-        </div>
-      </div>
-  </div>
-</div>
     {hook name="admin-logs.bottom"}   
     {/component}
   </div>

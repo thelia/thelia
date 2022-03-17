@@ -4,37 +4,43 @@
 
 {block name="main-content"}
   <div id="mailing-system">
-    <h1 class="mb-16 text-3xl font-bold">{intl l='Thelia Mailing System'}</h1>
-    <!-- Breadcrumbs -->
-  <nav class="flex mb-10" aria-label="Breadcrumb">
-    <ol class="inline-flex items-center space-x-1 md:space-x-3">
-      <li class="inline-flex items-center">
-        <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-          {intl l='Home'}
-        </a>
-      </li>
-      <li>
-        <div class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
-        </div>
-      </li>
-      <li aria-current="page">
-        <div class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Mailing system'}</span>
-        </div>
-      </li>
-    </ol>
-  </nav>
+<!-- Breadcrumbs -->
+<nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-main dark:text-gray-400 dark:hover:text-white">
+        {intl l='Dashboard'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+      </div>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Mailing system'}</a>
+      </div>
+    </li>
+  </ol>
+</nav>
+
+<!-- Header -->
+<div>
+  <h1 class="p-4 text-3xl font-bold">{intl l='Thelia Mailing System'}</h1>
+  <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Thelia Mailing System.'}</p>
+</div>
+
     <!--Panel-->
-    {component name="Panel" title="Configuration mailing system" class="w-full mb-3"}
+    {component name="Panel" class="w-full mb-3"}
     {hook name="mailing-system.top"}
       <!--Bouton save-->
-    <div class="flex justify-end border-b">
-      <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
-        Save ✓
-      </button>
+      <div class="flex justify-end mb-4 border-b">
+        <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-green even:bg-green border-green hover:text-green hover:bg-white">
+          Save ✓
+        </button>
     </div> 
     <!--Form-->
     <div class="flex flex-row">
@@ -107,7 +113,7 @@
     class="placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl w-60 focus:ring-main focus:outline-none focus:border-main"
     value="contact@thelia.net"
   />
-  <button class="p-3 font-medium text-gray-600 rounded-lg shadow-2xl bg-main hover:bg-darkMain">
+  <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center border rounded-md odd:bg-mediumPearl even:bg-white border-main text-main hover:text-white hover:bg-main">
     {intl l="Send"}
   </button>
   </form>

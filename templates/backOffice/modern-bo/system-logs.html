@@ -1,264 +1,141 @@
 {extends file="admin-layout.tpl"}
 
-{block name="page-title"}{intl l='System logs'}{/block}
+{block name="page-title"}{intl l='System Logs'}{/block}
 
 {block name="main-content"}
-  <div id="variables edit-variable">
-    <h1 class="mb-16 text-3xl font-bold">{intl l='System Logs'}</h1>
-    <!-- Breadcrumbs -->
-  <nav class="flex mb-10" aria-label="Breadcrumb">
-    <ol class="inline-flex items-center space-x-1 md:space-x-3">
-      <li class="inline-flex items-center">
-        <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
-          {intl l='Home'}
-        </a>
-      </li>
-      <li>
-        <div class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
-        </div>
-      </li>
-      <li aria-current="page">
-        <div class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          <span class="ml-1 text-sm font-medium text-gray-400 md:ml-2 dark:text-gray-500">{intl l='System logs'}</span>
-        </div>
-      </li>
-    </ol>
-  </nav>
-    <!-- Panel -->
-    {component name="Panel" title="Store configuration" class="w-full mb-3"}
-    <div class="flex justify-end border-b">
-      <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
-        Save ✓
-      </button>
-      <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
-        Save and close X
-      </button>
-      <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
-        Close X
-      </button>
-    </div> 
-
-    <div class="row">
-      <div class="col-md-6">
-          <p class="title title-without-tabs">{intl l='General configuration'}</p>
-          <!-- Form -->
-          {form name='thelia.system-logs.configuration'}
-	 						<form method="POST">
-
-                {form_hidden_fields}
-                  <div class="grid grid-flow-col grid-rows-3 gap-4">
-                    <div class="col-span-2 row-span-2">
-                      <p class="title title-without-tabs">{intl l='General configuration'}</p>
-
-                     
-                      <fieldset>
-
-       
-					               <div class="form-group">
-
-					
-
-				                   <select class="form-control">
-				                                    {foreach $choices as $choice}
-				                                        <option value="{$choice->value}" {if $value == $choice->value}selected="selected"{/if}>{$choice->label}</option>
-				                                    {/foreach}
-				                                </select>
-
-				                                <span class="help-block">
-				                                {intl l='Messages which have a level greater or equal to the selected level will be added to the log destinations. '}
-				                                </span>
-                                            </div>
-            
-
-
-					                           <div class="form-group ">
-					                               <label for="{$label_attr.for|default:null}" class="control-label">{$label}: </label>
-
-					                               <div class="form-group">
-					                                   <input type="text" id="{$label_attr.for|default:null}"  class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Log lines format'}">
-					                               </div>
-
-	                                                <span class="help-block">
-	                                                {intl l='Log lines header format. You may use the following variables: '}
-	                                                <ul>
-												        <li>#INDEX : {intl l='Sequential number of log line'}</li>
-												        <li>#LEVEL : {intl l='Message level'}</li>
-												        <li>#FILE : {intl l='Originating file name'}</li>
-												        <li>#FUNCTION : {intl l='Originating function name '}</li>
-												        <li>#LINE : {intl l='Originating file line number '}</li>
-												        <li>#DATE : {intl l='date in yyyy-mm-dd format'}</li>
-												        <li>#HOUR : {intl l='hour in hh:mm:ss format'}</li>
-												    </ul>
-	                                                </span>
-</div>
-					                           <div class="form-group">
-					                               <label for="{$label_attr.for|default:null}" class="control-label">{$label}: </label>
-
-                                                   <div>
-	                                                   <label class="radio-inline">
-	                                                      <input type="radio" value="1" {if $value == 1}checked="checked"{/if}> {intl l='Yes'}
-	                                                   </label>
-	                                                   <label class="radio-inline">
-	                                                       <input type="radio" value="0" {if $value == 0}checked="checked"{/if}> {intl l='No'}
-	                                                    </label>
-                                                    </div>
-
-                                                   <span class="help-block">{intl l='If yes, redirections through Redirect::exec() will be displayed as links'}</span>
-					                           </div>
-
-					                           <div class="form-group">
-					                               <label for="{$label_attr.for|default:null}" class="control-label">{$label}: </label>
-
-					                               <div class="form-group">
-					                                   <input type="text" id="{$label_attr.for|default:null}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='File names'}">
-					                               </div>
-
-					                               <span class="help-block">{intl l='Enter one or more file names without path separated by ";". Use "!" before a file name to exclude it. Use "*" to activate logs for all files.'}</span>
-					                           </div>
-                                               <div class="form-group">
-                                                   <label for="{$label_attr.for|default:null}" class="control-label">{$label}: </label>
-
-                                                   <div class="form-group">
-                                                       <input type="text" id="{$label_attr.for|default:null}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='IP Addresses'}">
-                                                   </div>
-
-                                                   <span class="help-block">{intl l='Enter one or more IP V4 addresses separated by ";". Leave empty to display logs for all IP addresses'}</span>
-                                                   <span class="help-block">{intl l='Your current IP address is %ip'}</span>
-                                               </div>
-
-                                        </fieldset>
-
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <p class="title title-without-tabs">{intl l='Destinations'}</p>
-
-                                        <div class="alert alert-info">
-                                            {intl l='The destinations processes logs to display, store or send them. You can select and configure zero, one or more destinations below.'}
-                                        </div>
-
-                                        <fieldset>
-                                        {foreach $destinations as $classname => $destination}
-	                                        {$active = in_array(get_class($destination), $active_destinations)}
-	                                        <div class="well well-sm">
-	                                            <input type="hidden" name="destinations[{$classname}][classname]" value="{get_class($destination)}" />
-
-	                                            <p class="title title-without-tabs">{$destination->getTitle()}</p>
-	                                            <p>{$destination->getDescription()}</p>
-
-	                                            <div class="form-group">
-	                                                <div>
-	                                                    <label class="checkbox control-label">
-	                                                       <input type="checkbox" class="activation-checkbox" name="destinations[{$classname}][active]" value="{$classname}" {if $active}checked="checked"{/if}> {intl l='Activate this log destination'}
-	                                                    </label>
-	                                                 </div>
-	                                            </div>
-
-                                                {if count($destination->getConfigs()) > 0}
-		                                            <div class="config config-{$classname}" {if ! $active}style="display: none"{/if}>
-			                                            {foreach $destination->getConfigs() as $config}
-			                                                <div class="form-group">
-			                                                    <label>{$config->getTitle()}</label>
-				                                                {if $config->getType() == 2}
-				                                                    <input  class="form-control" type="text" name="config[{$classname}][{$config->getName()}]" value="{$config->getValue()}" />
-			                                                    {else if $config->getType() == 1}
-			                                                        <textarea  class="form-control" name="config[{$classname}][{$config->getName()}]">{$config->getValue()}</textarea>
-				                                                {/if}
-			                                                   <span class="help-block">{$config->getLabel()}</span>
-			                                                </div>
-			                                            {/foreach}
-		                                            </div>
-	                                            {/if}
-
-	                                        </div>
-                                        {/foreach}
-                                        </fieldset>
-
-                                    </div>
-	                            </div>
-							</form>
-							{/form}
-
-          <fieldset>
-
-    <div class="form-group">
-
-
-          <select class="form-control">
-         
-          </select>
-
-          <span class="help-block">
-          {intl l='Messages which have a level greater or equal to the selected level will be added to the log destinations. '}
-          </span>
-              </div>
-            
-
-       <div class="form-group">
-
-           <div class="form-group">
-               <input type="text">
-           </div>
-
-                    <span class="help-block">
-                    {intl l='Log lines header format. You may use the following variables: '}
-                    <ul>
-  <li>#INDEX : {intl l='Sequential number of log line'}</li>
-  <li>#LEVEL : {intl l='Message level'}</li>
-  <li>#FILE : {intl l='Originating file name'}</li>
-  <li>#FUNCTION : {intl l='Originating function name '}</li>
-  <li>#LINE : {intl l='Originating file line number '}</li>
-  <li>#DATE : {intl l='date in yyyy-mm-dd format'}</li>
-  <li>#HOUR : {intl l='hour in hh:mm:ss format'}</li>
-</ul>
-                    </span>
-       </div>
-       <div class="form-group">
-
-                     <div>
-                       <label class="radio-inline">
-                          <input type="radio" value="1"> {intl l='Yes'}
-                       </label>
-                       <label class="radio-inline">
-                           <input type="radio" value="0"> {intl l='No'}
-                        </label>
-                      </div>
-
-                     <span class="help-block">{intl l='If yes, redirections through Redirect::exec() will be displayed as links'}</span>
-       </div>
-
-       <div class="form-group">
-
-           <div class="form-group">
-               <input type="text" >
-           </div>
-
-           <span class="help-block">{intl l='Enter one or more file names without path separated by ";". Use "!" before a file name to exclude it. Use "*" to activate logs for all files.'}</span>
-       </div>
-
-
-          
-                 <div class="form-group">
-            
-
-                     <div class="form-group">
-                         <input type="text">
-                     </div>
-
-                     
-                 </div>
-        
-
-          </fieldset>
-
+<div id="edit-attribute">
+  
+<!-- Breadcrumbs -->
+<nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-main dark:text-gray-400 dark:hover:text-white">
+        {intl l='Dashboard'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
       </div>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='System logs'}</a>
+      </div>
+    </li>
+  </ol>
+</nav>
 
-     
-
+<!-- Header -->
+<div>
+  <h1 class="p-4 text-3xl font-bold">{intl l='System Logs'}</h1>
+  <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de System Logs.'}</p>
 </div>
+
+    <!-- Panel principal -->
+    {component name="Panel" class="w-full mb-3"}
+    {hook name="attribute-edit.top"}
+      <!--Boutons-->
+      <div class="flex justify-end pb-6 border-b">
+        <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-green even:bg-green border-green hover:text-green hover:bg-white">
+          Save ✓
+        </button>
+        <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-blue even:bg-blue border-blue hover:text-blue hover:bg-white">
+          Save and close X
+        </button>
+        <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-black border border-black rounded-md odd:bg-white even:bg-white hover:text-white hover:bg-black">
+          Close X
+        </button>
+      </div> 
+      
+      <div class="grid mt-5 md:grid-cols-2">
+       <!-- Panel General configuration -->
+       {component name="Panel" class="w-full mb-3 border border-gray-300"}
+       <h3 class="font-bold text-main">{intl l='General configuration'}</h3>
+       <div class="w-full mt-4 mb-5">
+        <p class="mb-2 font-bold">{intl l='Log level'}</p>
+        <select class="w-full text-gray-500 rounded-lg">
+          <option disabled selected>Errors</option>
+          <option>Disabled</option>
+          <option>Alerts</option>
+          <option>Critical</option>
+        </select>
+        </div>
+        <div class="w-full mt-4 mb-5">
+          <p class="mb-2 font-bold">{intl l='Log format'}</p>
+          <input
+            type="text"
+            class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
+            placeholder="INDEX LEVEL FILE DATE HOUR"
+          />
+          </div>
+          <div>
+            <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+            <label for="r1">{intl l='Show redirections'}</label>
+          </div>
+          <div class="w-full mt-4 mb-5">
+            <p class="mb-2 font-bold">{intl l='Activate logs only for these files'}</p>
+            <input
+              type="text"
+              class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
+              placeholder="*"
+            />
+            </div>
+            <div class="w-full mt-4 mb-5">
+              <p class="mb-2 font-bold">{intl l='Activate logs only for these IP Adresses'}</p>
+              <input
+                type="text"
+                class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
+                placeholder="IP Addresses"
+              />
+              </div>
+       <div>
+       {/component}
+
+       <!-- Panel Destinations -->
+       {component name="Panel" class="w-full mx-2 mb-3 border border-gray-300"}
+       <h3 class="font-bold text-main">{intl l='Destinations'}</h3>
+       
+       {component name="Panel" class="w-full mx-2 mb-3 border border-gray-300"}
+       <h4 class="font-bold text-main">{intl l='Javascript popup window'}</h4>
+       <p>{intl l='Display logs in a popup window, separate from the main window'}</p>
+       <div>
+        <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+        <label for="r1">{intl l='Activate this log destination'}</label>
+      </div>
+       {/component}
+       
+       {component name="Panel" class="w-full mx-2 mb-3 border border-gray-300"}
+       <h4 class="font-bold text-main">{intl l='Direct HTML display'}</h4>
+       <p>{intl l='Display logs in HTML format, on top of generated pages'}</p>
+       <div>
+        <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+        <label for="r1">{intl l='Activate this log destination'}</label>
+      </div>
+       {/component}
+
+       {component name="Panel" class="w-full mx-2 mb-3 border border-gray-300"}
+       <h4 class="font-bold text-main">{intl l='Black hole'}</h4>
+       <p>{intl l='This destination consumes the logs but dont display them'}</p>
+       <div>
+        <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+        <label for="r1">{intl l='Activate this log destination'}</label>
+      </div>
+       {/component}
+
+       {component name="Panel" class="w-full mx-2 mb-3 border border-gray-300"}
+       <h4 class="font-bold text-main">{intl l='Browsers javascript console'}</h4>
+       <p>{intl l='The Thelia logs are displayed in your browsers Javascript console'}</p>
+       <div>
+        <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+        <label for="r1">{intl l='Activate this log destination'}</label>
+      </div>
+       {/component}
+       
+       {/component}
+      </div>  
     {/component}
-  </div>
-{/block}
+    </div>
+    {/block}
