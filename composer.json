@@ -48,7 +48,6 @@
         "symfony/stopwatch": "5.4.*",
         "symfony/twig-bundle": "5.4.*",
         "symfony/web-profiler-bundle": "5.4.*",
-        "stack/builder": "1.0.*",
         "thelia/currency-converter": "~1.0",
         "ptachoire/cssembed": "1.0.*",
         "simplepie/simplepie": "1.5.*",
@@ -156,6 +155,13 @@
     "extra": {
         "branch-alias": {
             "dev-master": "2.4-dev"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "thelia/installer": true,
+            "phpstan/extension-installer": true,
+            "symfony/flex": true
         }
     }
 }

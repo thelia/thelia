@@ -168,14 +168,8 @@
         </service>
         <service id="thelia.file_manager" alias="Thelia\Files\FileManager"/>
 
-        <service id="Stack\Builder" class="Stack\Builder"/>
-        <service id="stack_factory" alias="Stack\Builder" public="true" />
-
         <service id="base_http_kernel" alias="Thelia\Core\TheliaHttpKernel" public="true"/>
-        <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel" public="true">
-          <factory service="stack_factory" method="resolve" />
-          <argument type="service" id="base_http_kernel" />
-        </service>
+        <service id="http_kernel" alias="Thelia\Core\TheliaHttpKernel" public="true"/>
 
         <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory" />
 

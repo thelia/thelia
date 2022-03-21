@@ -10,28 +10,27 @@
  * file that was distributed with this source code.
  */
 
-namespace Thelia\Core\Stack;
+namespace Thelia\Core\EventListener;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Event\IsAdminEnvEvent;
+use Thelia\Core\Event\SessionEvent;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
+use Thelia\Core\TheliaKernelEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 
-/**
- * Class ParamInitMiddleware.
- *
- * @author manuel raynaud <manu@raynaud.io>
- */
-class ParamInitMiddleware implements HttpKernelInterface
+class KernelListener implements EventSubscriberInterface
 {
     /**
      * @var HttpKernelInterface
@@ -48,19 +47,28 @@ class ParamInitMiddleware implements HttpKernelInterface
      */
     protected $eventDispatcher;
 
-    public function __construct(HttpKernelInterface $app, Translator $translator, EventDispatcherInterface $eventDispatcher)
+    protected $cacheDir;
+
+    protected $env;
+
+    protected $debug;
+
+    protected static $session;
+
+    public function __construct(HttpKernelInterface $app, Translator $translator, EventDispatcherInterface $eventDispatcher, $kernelCacheDir, $kernelDebug, $kernelEnvironment)
     {
         $this->app = $app;
         $this->translator = $translator;
         $this->eventDispatcher = $eventDispatcher;
+        $this->cacheDir = $kernelCacheDir;
+        $this->debug = $kernelDebug;
+        $this->env = $kernelEnvironment;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function paramInit(RequestEvent $event)
     {
-        if ($type === HttpKernelInterface::MASTER_REQUEST) {
+        if ($event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
+            $request = $event->getRequest();
             $response = $this->initParam($request);
 
             if ($response instanceof Response) {
@@ -69,8 +77,6 @@ class ParamInitMiddleware implements HttpKernelInterface
 
             $this->checkMultiDomainLang($request);
         }
-
-        return $this->app->handle($request, $type, $catch);
     }
 
     protected function checkMultiDomainLang(TheliaRequest $request): void
@@ -217,5 +223,32 @@ class ParamInitMiddleware implements HttpKernelInterface
         }
 
         return null;
+    }
+
+    public function sessionInit(RequestEvent $event): void
+    {
+        if ($event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
+            $request = $event->getRequest();
+            if (null === $session = self::$session) {
+                $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);
+
+                $this->eventDispatcher->dispatch($event, TheliaKernelEvents::SESSION);
+
+                self::$session = $session = $event->getSession();
+            }
+
+            $session->start();
+            $request->setSession($session);
+        }
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            KernelEvents::REQUEST => [
+                ['paramInit', \PHP_INT_MAX - 1],
+                ['sessionInit', \PHP_INT_MAX],
+            ],
+        ];
     }
 }
