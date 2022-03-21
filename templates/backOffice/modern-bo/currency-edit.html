@@ -58,49 +58,48 @@
       
       <div class="grid mt-5 md:grid-cols-2">
       <div>
-        <div class="w-full mt-4 mb-5">
-          <p class="mb-2 font-bold">{intl l='Name'}</p>
-          <input
-            type="text"
-            class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
-            placeholder="United States Dollar"
-          />
-          </div>
-          <div class="w-full mt-4 mb-5">
-            <p class="mb-2 font-bold">{intl l='ISO 4217 code'}</p>
-            <input
-              type="text"
-              class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
-              placeholder="USD"
-            />
-            </div>
+        {form name="thelia.admin.currency.modification"}
+        <form method="POST" action="#" {form_enctype} class="clearfix">
+
+        <input type="hidden" name="currency_id" />
+
+           {form_hidden_fields}
+
+        		{form_field field='success_url'}
+        		<input type="hidden" />
+        		{/form_field}
+
+        		{form_field field='locale'}
+        		<input type="hidden" />
+        		{/form_field}
+
+        		{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+            {render_form_field field='name'}
+
+        		  {form_field field='code'}
+        		                                   
+        		  {/form_field}
       </div>
 
        <div class="w-full mx-3 mt-4 mb-5">
         <div>
-          <div class="w-full mt-4 mb-5">
-            <p class="mb-2 font-bold">{intl l='Symbol'}</p>
-            <input
-              type="text"
-              class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
-            />
-            </div>
-            <div class="w-full mt-4 mb-5">
-              <p class="mb-2 font-bold">{intl l='Format'}</p>
-              <input
-                type="text"
-                class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
-                placeholder="%s%n"
-              />
-              </div>
-              <div class="w-full mt-4 mb-5">
-                <p class="mb-2 font-bold">{intl l='Rate from EUR'}</p>
-                <input
-                  type="text"
-                  class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
-                  placeholder="1.1199"
-                />
-                </div>
+          {render_form_field field='symbol'}
+
+						{form_field field='format'}
+							<label for="{$label_attr.for|default:null}" class="control-label">
+									{$label}{if $required} *{/if}
+							</label>
+							<input type="text" size="10" required="required" class="form-control">
+                  <span class="help-block">
+											{$label_attr.help}
+                  </span>
+					  {/form_field}
+
+					{render_form_field field='rate'}
+        </form>
+        {/form}
+        </div>
         </div>  
        {/component}
       </div>  

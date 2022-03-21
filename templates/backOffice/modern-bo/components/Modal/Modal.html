@@ -1,16 +1,18 @@
-<dialog id="favDialog" class="bg-white rounded-lg">
-    <form class="relative w-full rounded-lg" method="dialog">     
-            <button class="right" id="confirmBtn" value="default">&times;</button>    
-      <p>
-        {if isset($children)}
-            {$children nofilter}
-        {/if}
-      </p>
-    </form>
-  </dialog>
-  <menu>
-    <button class="flex items-center justify-center p-2 font-medium text-white rounded-full shadow-2xl hover:text-white hover:bg-darkMain bg-main" id="updateDetails"><i class="p-2 fas fa-plus"></i></button>
-  </menu>
-
-
-
+<button data-modal-target="#modal" class="relative w-10 h-10 rounded-lg btn right bg-blue" id="open">&times;</button>
+  <div class="modal" id="modal">
+      <div class="modal-header">
+          <div class="title">Open</div>
+          <button data-modal-close class="closebtn">&times;
+  
+          </button>
+      </div>
+      <div class="modal-body">
+          <p class="current desc">
+            {if isset($children)}
+              {$children nofilter}
+            {/if}
+          </p>
+      </div>
+  </div>
+  
+  <div id="overlay"></div>

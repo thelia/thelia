@@ -2,9 +2,12 @@
 
 {block name="page-title"}{intl l='Edit an attribute'}{/block}
 
+{block name="check-resource"}admin.configuration.attribute{/block}
+{block name="check-access"}update{/block}
+
 {block name="main-content"}
 <div id="edit-attribute">
-  
+  {loop name="attribute_edit" type="attribute" backend_context="1"}
 <!-- Breadcrumbs -->
 <nav class="flex mb-10" aria-label="Breadcrumb">
   <ol class="inline-flex items-center space-x-1 md:space-x-3">
@@ -40,9 +43,10 @@
   <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Edit an attribute.'}</p>
 </div>
 
+{hook name="attribute-edit.top"}
+
     <!-- Panel principal -->
     {component name="Panel" class="w-full mb-3"}
-    {hook name="attribute-edit.top"}
       <!--Boutons-->
       <div class="flex justify-end pb-6 border-b">
         <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-green even:bg-green border-green hover:text-green hover:bg-white">
@@ -57,48 +61,37 @@
       </div> 
       
       <div class="grid mt-5 md:grid-cols-2">
+      <div>
        <!-- Panel Attribute information -->
        {component name="Panel" class="w-full mb-3 border border-gray-300"}
        <h3 class="mb-3 font-bold uppercase text-main">{intl l='Attribute information'}</h3>
-       <div class="w-full mt-4 mb-5">
-        <p class="mb-2 font-bold">{intl l='Title'}</p>
-        <input
-          type="text"
-          class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
-          placeholder="Volume"
-        />
-        </div>
-          <div class="mb-3 xl:w-96">
-            <p class="mb-2 font-bold">{intl l='Summary'}</p>
-            <textarea
-              class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded-lg transition ease-in-out m-0 focus:text-main focus:bg-white focus:border-main focus:outline-none"
-              rows="3"
-              placeholder="Short description text"
-            ></textarea>
-            <p class="text-sm italic">{intl l='A short description, used when a summary or an introduction is required'}</p>
-          </div>
-          <div class="mb-3 xl:w-96">
-            <p class="mb-2 font-bold">{intl l='Detailled description'}</p>
-            <textarea
-              class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded-lg transition ease-in-out m-0 focus:text-main focus:bg-white focus:border-main focus:outline-none"
-              rows="3"
-            ></textarea>
-            <p class="text-sm italic">{intl l='The detailled description'}</p>
-          </div>
-          <div class="mb-3 xl:w-96">
-            <p class="mb-2 font-bold">{intl l='Conclusion'}</p>
-            <textarea
-              class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded-lg transition ease-in-out m-0 focus:text-main focus:bg-white focus:border-main focus:outline-none"
-              rows="3"
-              placeholder="Short additional text"
-            ></textarea>
-            <p class="text-sm italic">{intl l='A short text, used when an addition or supplemental information is required'}</p>
-          </div>
+       {form name="thelia.admin.attribute.modification"}
+       <form method="POST" action="#" {form_enctype} class="clearfix">
+                   {form_field field='id'}
+                       <input type="hidden" />
+                   {/form_field}
+
+                  <input type="hidden" />
+
+                    {form_hidden_fields}
+
+                    {form_field field='success_url'}
+                      <input type="hidden" name="{$name}" value="{url path='/admin/configuration/attributes'}" />
+                    {/form_field}
+
+              {form_field field='locale'}
+                <input type="hidden" name="{$name}" />
+              {/form_field}
+
+        {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+        </form>
+        {/form}
+      </div>
        {/component}
 
        <!-- Panel Attribute value -->
        {component name="Panel" class="w-full mx-2 mb-3 border border-gray-300"}
-        <!-- Modal -->
+        <!-- TODO: Modal -->
        <div class="flex justify-end">
         {component name="modal"}
 
@@ -115,10 +108,12 @@
               <th class="px-5 py-4 text-left rounded-tl-xl">ID</th>
               <th class="px-5 py-4 text-left">Value</th>
               <th class="px-5 py-4 text-left">Position</th>
+              {hook name="attributes-value.table-header" location="attributes_value_table_header"}
               <th class="px-5 py-4 rounded-tr-xl">Actions</th>
             </tr>
           </thead>
           <tbody>
+            {loop name="list" type="attribute_availability" backend_context="1"}
             <tr class="odd:bg-mediumPearl even:bg-white">
               <td class="px-5 py-4">1</td>
               <td class="px-5 py-4">
@@ -144,6 +139,7 @@
                 </button>
               </td>
               </tr>
+              {/loop}
             </tbody>
             </table>    
        {/component}
@@ -151,5 +147,7 @@
         
       </div>  
     {/component}
+    {hook name="attribute-edit.bottom"}
+    {/loop}
     </div>
     {/block}

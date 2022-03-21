@@ -1,0 +1,120 @@
+.modal{
+    position:fixed;
+    top: 50%;
+    left: 50%;
+    transform:translate(-50%, -50%) scale(0);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 8px;
+    padding: 1rem;
+    z-index: 15;
+    background: rgba(255,255,255,0.4);
+    width: 500px;
+    max-width: 80%;
+    transition: 200ms ease-in-out;
+    box-shadow: 0 25px 45px rgba(0,0,0,0.1);
+    min-height: 30vh;
+}
+
+.modal.active{
+    transform:translate(-50%, -50%) scale(1);
+}
+
+.modal-header{
+    padding: 0.5rem 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid rgba(255,255,255,0.4);
+}
+
+.modal-footer{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 10px;
+}
+
+.modal-header .title{
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.modal-header .closebtn{
+    cursor: pointer;
+    border: none;
+    font-size: 2rem;
+    outline: none;
+    background: none;
+    color: #fff;
+}
+
+.modal-body{
+    padding: 0.5rem 10px;;
+}
+
+#overlay {
+    position: fixed;
+    background: rgba(0,0,0,0.5);
+    width: 100%;
+    height: 100%;
+    top: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: 200ms ease-in-out;
+}
+
+#overlay.active {
+    pointer-events:all;
+    opacity: 1;
+}
+
+.tooltip{
+    font-size: 2rem;
+    transition: 200ms ease-in-out;
+}
+
+.tool{
+    font-size: 2rem;
+}
+
+.nextbtn{
+    background: none;
+    padding: 10px;
+    background-color: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0.2rem 0.8rem;
+    cursor: pointer;
+}
+
+.tooltip.active{
+   transform: rotate(180deg)
+}
+
+.title,
+.desc{
+    color: #fff;
+}
+
+.current{
+    display: grid;
+    place-items: center;
+    position: relative;
+    transition: 0.4s;
+}
+
+.next{
+    display: none;
+    transition: 0.2s;
+}
+
+.current.inactive{
+    display: none;
+}
+
+.next.active{
+    display: grid;
+    place-items: center;
+}

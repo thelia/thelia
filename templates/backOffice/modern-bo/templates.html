@@ -2,6 +2,9 @@
 
 {block name="page-title"}{intl l='Thelia Product Templates'}{/block}
 
+{block name="check-resource"}admin.configuration.template{/block}
+{block name="check-access"}view{/block}
+
 {block name="main-content"}
   <div id="templates">
  <!-- Breadcrumbs -->
@@ -32,11 +35,12 @@
   <h1 class="p-4 text-3xl font-bold">{intl l='Thelia Product Templates'}</h1>
   <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Thelia Product Templates.'}</p>
 </div>
+
+{hook name="templates.top" location="templates_top" }
     
-  {hook name="templates.top"  location="templates_top"}
     <!--Panel Thelia product templates-->
     {component name="Panel" class="w-full mb-3"}
-    <!--Modal-->
+    <!--TODO: Modal-->
     <div class="flex justify-end">
       {component name="modal"}
         <h4 class="font-bold">{intl l='Template name:'}</h4>
@@ -53,7 +57,8 @@
         </button>
       {/component}
     </div>
-    <div class="row">
+    
+    <div class="container">
       <div class="col-md-12">
         {if ! empty($general_error) }
 	        <div class="alert alert-danger">{$general_error}</div>
@@ -117,7 +122,7 @@
        </form>  
       </div>
     </div>
-    {hook name="templates.bottom"}
+    {hook name="templates.bottom" location="templates_bottom"}
     {/component}
   </div>
 {/block}

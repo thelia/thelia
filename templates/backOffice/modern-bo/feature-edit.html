@@ -39,10 +39,10 @@
   <h1 class="p-4 text-3xl font-bold">{intl l='Edit a feature'}</h1>
   <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Edit a feature.'}</p>
 </div>
+{hook name="attribute-edit.top"}
 
     <!-- Panel principal -->
     {component name="Panel" class="w-full mb-3"}
-    {hook name="attribute-edit.top"}
       <!--Boutons-->
       <div class="flex justify-end pb-6 border-b">
         <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-green even:bg-green border-green hover:text-green hover:bg-white">
@@ -57,44 +57,32 @@
       </div> 
       
       <div class="grid mt-5 md:grid-cols-2">
+        <div> 
        <!-- Panel Feature information -->
        {component name="Panel" class="w-full mb-3 border border-gray-300"}
-       <h3 class="mb-3 font-bold uppercase text-main">{intl l='Attribute information'}</h3>
-       <div class="w-full mt-4 mb-5">
-        <p class="mb-2 font-bold">{intl l='Title'}</p>
-        <input
-          type="text"
-          class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
-          placeholder="Volume"
-        />
-        </div>
-          <div class="mb-3 xl:w-96">
-            <p class="mb-2 font-bold">{intl l='Summary'}</p>
-            <textarea
-              class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded-lg transition ease-in-out m-0 focus:text-main focus:bg-white focus:border-main focus:outline-none"
-              rows="3"
-              placeholder="Short description text"
-            ></textarea>
-            <p class="text-sm italic">{intl l='A short description, used when a summary or an introduction is required'}</p>
-          </div>
-          <div class="mb-3 xl:w-96">
-            <p class="mb-2 font-bold">{intl l='Detailled description'}</p>
-            <textarea
-              class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded-lg transition ease-in-out m-0 focus:text-main focus:bg-white focus:border-main focus:outline-none"
-              rows="3"
-            ></textarea>
-            <p class="text-sm italic">{intl l='The detailled description'}</p>
-          </div>
-          <div class="mb-3 xl:w-96">
-            <p class="mb-2 font-bold">{intl l='Conclusion'}</p>
-            <textarea
-              class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded-lg transition ease-in-out m-0 focus:text-main focus:bg-white focus:border-main focus:outline-none"
-              rows="3"
-              placeholder="Short additional text"
-            ></textarea>
-            <p class="text-sm italic">{intl l='A short text, used when an addition or supplemental information is required'}</p>
-          </div>
+       <h3 class="mb-3 font-bold uppercase text-main">{intl l='Feature information'}</h3>
+       {form name="thelia.admin.feature.modification"}
+		      <form method="POST" action="#" {form_enctype} class="clearfix">
+
+            {form_field field='id'}
+                <input type="hidden" />
+            {/form_field}
+
+     	          <input type="hidden" name="feature_id" />
+
+     				{form_hidden_fields}
+
+     				{form_field field='success_url'}
+     						<input type="hidden" />
+     				{/form_field}
+
+     			  {form_field field='locale'}
+     			      <input type="hidden" />
+     			  {/form_field}
+
+     				{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
        {/component}
+      </div>
 
        <!-- Panel Feature value -->
        {component name="Panel" class="w-full mx-2 mb-3 border border-gray-300"}

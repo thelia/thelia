@@ -2,8 +2,12 @@
 
 {block name="page-title"}{intl l='Edit a template'}{/block}
 
+{block name="check-resource"}admin.configuration.template{/block}
+{block name="check-access"}update{/block}
+
 {block name="main-content"}
 <div id="templates edit-template">
+  {loop name="template_edit" type="product-template"}
   <!-- Breadcrumbs -->
   <nav class="flex mb-10" aria-label="Breadcrumb">
     <ol class="inline-flex items-center space-x-1 md:space-x-3">
@@ -57,12 +61,27 @@
       </div> 
        <!--Input Template Name-->
       <div class="w-full mt-4 mb-5">
-        <p class="mb-2 font-bold">{intl l='Template name:'}</p>
-        <input
-          type="text"
-          class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
-          placeholder="demo template"
-        />
+        {form name="thelia.admin.template.modification"}
+        <form method="POST" action="#" {form_enctype} class="clearfix">
+          <input type="hidden" name="template_id" />
+          {form_hidden_fields}
+
+          {form_field field='success_url'}
+              <input type="hidden" />
+          {/form_field}
+
+          {form_field field='locale'}
+              <input type="hidden" />
+          {/form_field}
+
+          {form_field field='name'}
+              <div class="form-group">
+                  <label for="{$label_attr.for|default:null}" class="font-bold control-label">{$label} : </label>
+                  <input type="text" id="{$label_attr.for|default:null}" required="required" name="{$name}" value="{$value}" title="{intl l='Template name'}" placeholder="{intl l='Template name'}" class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main">
+              </div>
+          {/form_field}
+          </form>
+          {/form}
       </div>
 
       <!--4 Panel-->
@@ -283,6 +302,7 @@
       </button>
       </div>
     {/component} 
+    {/loop}
   </div>
 </div> 
 </div>
