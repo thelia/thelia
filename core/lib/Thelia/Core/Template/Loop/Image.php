@@ -376,8 +376,9 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set('ORIGINAL_IMAGE_URL', $event->getOriginalFileUrl())
                     ->set('IMAGE_PATH', $event->getCacheFilepath())
                     ->set('PROCESSING_ERROR', false)
+                    ->set('IMAGE_HEIGHT', $event->getImageObject()->getSize()->getHeight())
+                    ->set('IMAGE_WIDTH', $event->getImageObject()->getSize()->getWidth())
                 ;
-
                 if ($this->getBase64()) {
                     $loopResultRow->set('IMAGE_BASE64', $this->toBase64($event->getCacheFilepath()));
                 }
@@ -391,6 +392,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                         ->set('ORIGINAL_IMAGE_URL', '')
                         ->set('IMAGE_PATH', '')
                         ->set('PROCESSING_ERROR', true)
+                        ->set('IMAGE_HEIGHT', '')
+                        ->set('IMAGE_WIDTH', '')
                     ;
                 } else {
                     $addRow = false;
