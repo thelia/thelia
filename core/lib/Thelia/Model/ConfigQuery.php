@@ -198,7 +198,7 @@ class ConfigQuery extends BaseConfigQuery
 
     public static function getSmtpPort()
     {
-        return self::read('smtp.port');
+        return self::read('smtp.port', 25);
     }
 
     public static function getSmtpEncryption()

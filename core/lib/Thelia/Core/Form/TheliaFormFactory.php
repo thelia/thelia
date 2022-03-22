@@ -15,6 +15,8 @@ namespace Thelia\Core\Form;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
+use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Form\BaseForm;
@@ -50,12 +52,16 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
     /** @var array */
     protected $formDefinition;
 
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
+
     public function __construct(
         RequestStack $requestStack,
         EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator,
         FormFactoryBuilderInterface $formFactoryBuilder,
         ValidatorBuilder $validationBuilder,
+        TokenStorageInterface $tokenStorage,
         array $formDefinition
     ) {
         $this->requestStack = $requestStack;
@@ -64,6 +70,7 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
         $this->formFactoryBuilder = $formFactoryBuilder;
         $this->validatorBuilder = $validationBuilder;
         $this->formDefinition = $formDefinition;
+        $this->tokenStorage = $tokenStorage;
     }
 
     public function createForm(
@@ -93,6 +100,7 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
             $this->translator,
             $this->formFactoryBuilder,
             $this->validatorBuilder,
+            $this->tokenStorage,
             $type,
             $data,
             $options

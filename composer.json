@@ -51,7 +51,6 @@
         "ptachoire/cssembed": "1.0.*",
         "simplepie/simplepie": "1.5.*",
         "imagine/imagine": "1.2.4",
-        "swiftmailer/swiftmailer": "6.0.*",
         "michelf/php-markdown": "1.9.*",
         "smarty/smarty": "4.0.*",
         "commerceguys/addressing": "1.1.*",
@@ -75,7 +74,8 @@
         "thelia/store-seo-module": "2.0.1",
         "thelia/better-seo-module": "2.0.0",
         "thelia/short-code-meta-module": "dev-main",
-        "thelia/force-phone-module": "dev-main"
+        "thelia/force-phone-module": "dev-main",
+        "symfony/mailer": "6.0.*"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",

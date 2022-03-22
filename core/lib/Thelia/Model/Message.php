@@ -12,6 +12,7 @@
 
 namespace Thelia\Model;
 
+use Symfony\Component\Mime\Email;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Log\Tlog;
@@ -108,11 +109,11 @@ class Message extends BaseMessage
      *                                  `templates/email/default/' directory is used if
      *                                  `$useFallbackTemplate` is set to `true`
      *
-     * @return \Swift_Message
+     * @return Email
      *
      * @throws \SmartyException
      */
-    public function buildMessage(ParserInterface $parser, \Swift_Message $messageInstance, $useFallbackTemplate = true)
+    public function buildMessage(ParserInterface $parser, Email $messageInstance, $useFallbackTemplate = true)
     {
         // Set mail template, and save the current template
         $parser->pushTemplateDefinition(
@@ -124,21 +125,9 @@ class Message extends BaseMessage
         $htmlMessage = $this->getHtmlMessageBody($parser);
         $textMessage = $this->getTextMessageBody($parser);
 
-        $messageInstance->setSubject($subject);
-
-        // If we do not have an HTML message
-        if (empty($htmlMessage)) {
-            // Message body is the text message
-            $messageInstance->setBody($textMessage, 'text/plain');
-        } else {
-            // The main body is the HTML messahe
-            $messageInstance->setBody($htmlMessage, 'text/html');
-
-            // Use the text as a message part, if we have one.
-            if (!empty($textMessage)) {
-                $messageInstance->addPart($textMessage, 'text/plain');
-            }
-        }
+        $messageInstance->subject($subject);
+        $messageInstance->text($textMessage);
+        $messageInstance->html($htmlMessage);
 
         // Restore previous template
         $parser->popTemplateDefinition();

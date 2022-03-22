@@ -264,14 +264,6 @@
         <service id="Symfony\Component\Form\Extension\Core\CoreExtension" class="Symfony\Component\Form\Extension\Core\CoreExtension"/>
         <service id="thelia.forms.extension.core_extension" alias="Symfony\Component\Form\Extension\Core\CoreExtension"/>
 
-        <service id="Thelia\Core\Form\TheliaFormFactory">
-            <argument type="service" id="request_stack" />
-            <argument type="service" id="event_dispatcher" />
-            <argument type="service" id="thelia.translator" />
-            <argument type="service" id="thelia.form_factory_builder" />
-            <argument type="service" id="thelia.forms.validator_builder" />
-            <argument>%Thelia.parser.forms%</argument>
-        </service>
         <service id="thelia.form_factory" alias="Thelia\Core\Form\TheliaFormFactory" public="true"/>
 
         <service id="thelia.form_validator" alias="Thelia\Core\Form\TheliaFormValidator" public="true"/>
