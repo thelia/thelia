@@ -126,15 +126,15 @@ abstract class BaseForm implements FormInterface
         $this->initFormWithRequest($type, $data, $options);
 
         if (!isset($options['csrf_protection']) || $options['csrf_protection'] !== false) {
-            $this->formFactoryBuilder
-                ->addExtension(
-                    new CsrfExtension(
-                        new CsrfTokenManager(null, new SessionTokenStorage(
-                            $this->getRequest()->getSession()
-                        ))
-                    )
-                )
-            ;
+//            $this->formFactoryBuilder
+//                ->addExtension(
+//                    new CsrfExtension(
+//                        new CsrfTokenManager(null, new SessionTokenStorage(
+//                            $this->getRequest()->getSession()
+//                        ))
+//                    )
+//                )
+//            ;
         }
 
         /**

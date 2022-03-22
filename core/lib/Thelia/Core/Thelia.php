@@ -50,6 +50,7 @@ use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Template\Element\BaseLoopInterface;
@@ -224,7 +225,7 @@ class Thelia extends Kernel
      *
      * @return string
      */
-    protected function getContainerBaseClass()
+    protected function getContainerBaseClass(): string
     {
         return '\Thelia\Core\DependencyInjection\TheliaContainer';
     }
@@ -407,7 +408,7 @@ class Thelia extends Kernel
      *
      * @throws \Exception
      */
-    public function handle(Request $request, int $type = HttpKernelInterface::MASTER_REQUEST, bool $catch = true)
+    public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): \Symfony\Component\HttpFoundation\Response
     {
         if (!$this->booted) {
             $container = $this->container ?? $this->preBoot();
@@ -668,7 +669,7 @@ class Thelia extends Kernel
      *
      * @throws \Exception
      */
-    protected function buildContainer()
+    protected function buildContainer(): ContainerBuilder
     {
         $container = parent::buildContainer();
 
@@ -684,7 +685,7 @@ class Thelia extends Kernel
      *
      * @api
      */
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         if (\defined('THELIA_ROOT')) {
             return THELIA_CACHE_DIR.$this->environment;
@@ -700,7 +701,7 @@ class Thelia extends Kernel
      *
      * @api
      */
-    public function getLogDir()
+    public function getLogDir(): string
     {
         if (\defined('THELIA_ROOT')) {
             return THELIA_LOG_DIR;
@@ -714,7 +715,7 @@ class Thelia extends Kernel
      *
      * @return array An array of kernel parameters
      */
-    protected function getKernelParameters()
+    protected function getKernelParameters(): array
     {
         $parameters = parent::getKernelParameters();
 

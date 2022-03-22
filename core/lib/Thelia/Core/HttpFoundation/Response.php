@@ -25,18 +25,13 @@ use Thelia\Model\ConfigQuery;
  */
 class Response extends BaseResponse
 {
-    /**
-     * Allow Tlog to write log stuff in the fina content.
-     *
-     * @see \Thelia\Core\HttpFoundation\Response::sendContent()
-     */
-    public function sendContent(): void
+    public function sendContent(): static
     {
-        //ConfigQuery can be not already generated in cache so we must check it
+        // ConfigQuery can be not already generated in cache so we must check it
         if (class_exists('ConfigQuery')) {
             Tlog::getInstance()->write($this->content);
         }
 
-        parent::sendContent();
+        return parent::sendContent();
     }
 }

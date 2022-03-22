@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
+use Thelia\Core\HttpFoundation\Response;
 
 /**
  * Class HttpCache.
@@ -39,7 +40,7 @@ class HttpCache extends BaseHttpCache implements HttpKernelInterface
         );
     }
 
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
     {
         if (!($request instanceof \Thelia\Core\HttpFoundation\Request)) {
             $request = TheliaRequest::create(

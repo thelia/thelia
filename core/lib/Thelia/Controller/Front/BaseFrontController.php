@@ -108,7 +108,7 @@ class BaseFrontController extends BaseController
      */
     protected function render($templateName, $args = [], $status = 200)
     {
-        return Response::create($this->renderRaw($templateName, $args), $status);
+        return new Response($this->renderRaw($templateName, $args), $status);
     }
 
     /**

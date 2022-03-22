@@ -412,7 +412,7 @@ abstract class BaseController implements ControllerInterface
      */
     protected function generateRedirect($url, $status = 302)
     {
-        return RedirectResponse::create($url, $status);
+        return new RedirectResponse($url, $status);
     }
 
     /**

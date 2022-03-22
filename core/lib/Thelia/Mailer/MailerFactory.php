@@ -57,11 +57,11 @@ class MailerFactory
             if (ConfigQuery::isSmtpEnable()) {
                 $transporter = $this->configureSmtp();
             } else {
-                $transporter = \Swift_MailTransport::newInstance();
+//                $transporter = \Swift_MailTransport::newInstance();
             }
         }
 
-        $this->swiftMailer = new \Swift_Mailer($transporter);
+//        $this->swiftMailer = new \Swift_Mailer($transporter);
     }
 
     private function configureSmtp()
