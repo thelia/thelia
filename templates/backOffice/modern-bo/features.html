@@ -35,23 +35,32 @@
     
     {component name="Panel" class="w-full mb-3"}
     {hook name="features.top" location="features_top" }
-    <div class="flex justify-end">
-       <!-- TODO: Modal -->
-       {component name="modal"}
-       <h4 class="font-bold">{intl l='Title:'}</h4>
-       <input
-         type="text"
-         class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
-         placeholder="Title"
-       />
-       <div>
-         <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
-         <label for="r1">Add to all product templates</label>
-       </div>
-       <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-main even:bg-main border-main hover:text-main hover:bg-white">
-         Create this product feature
-       </button>
-       {/component}
+     <!--TODO: Modal-->
+     <div class="flex justify-end">
+      {component name="modal" titlemodal="titre"}
+      <h4 class="font-bold">{intl l='Template name:'}</h4>
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+        placeholder="Title"
+      />
+      <div>
+        <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+        <label for="r1">Add to all product templates</label>
+      </div>
+      <div class="grid-rows-2 mt-20 text-right">
+        <div class="mb-4 mr-5">
+            <button class="h-4 p-5 mx-1 font-medium text-center text-white border rounded-md odd:bg-main even:bg-main border-main hover:text-main hover:bg-white">
+                {intl l="Create this feature"}
+            </button>
+        </div>
+        <div class="mr-5">
+            <button class="h-5 p-5 mx-1 font-medium text-center border rounded-md odd:bg-mediumPearl even:bg-white border-main text-main hover:text-white hover:bg-main">
+                {intl l="Cancel"}
+            </button>
+        </div>
+    </div>
+      {/component}
     </div>
 
     <!--TODO: Tableau React-->
@@ -85,36 +94,36 @@
             </td>
             {hook name="features.table-row" location="features_table_row"}
             <td class="flex justify-center px-5 py-4 px-auto">
-              <button
+              <a
+              href="{url path='/admin/feature-edit'}"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-minus" aria-hidden="true"></i></a
+              ><a
                 href="/"
                 class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
-                <i class="fas fa-minus" aria-hidden="true"></i></button
-              ><button
-                href="/"
-                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
-                title="{intl l='View site'}"
-                target="_blank"
-              >
-                <i class="fas fa-plus" aria-hidden="true"></i></button
-              ><button
+                <i class="fas fa-plus" aria-hidden="true"></i></a
+              ><a
                 href="/"
                 class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
                 <i class="fas fa-edit" aria-hidden="true"></i>
-              </button>
-              <button
+            </a>
+              <a
                 href="/"
                 class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
                 <i class="fas fa-trash-alt" aria-hidden="true"></i>
-              </button>
+          </a>
             </td>
           </tr>
           <tr class="odd:bg-mediumPearl even:bg-white">
@@ -128,36 +137,36 @@
             </td>
             <td class="px-5 py-4">2</td>
             <td class="flex justify-center px-5 py-4 px-auto">
-              <button
+              <a
+              href="{url path='/admin/feature-edit'}"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-minus" aria-hidden="true"></i></a
+              ><a
                 href="/"
                 class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
-                <i class="fas fa-minus" aria-hidden="true"></i></button
-              ><button
-                href="/"
-                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
-                title="{intl l='View site'}"
-                target="_blank"
-              >
-                <i class="fas fa-plus" aria-hidden="true"></i></button
-              ><button
+                <i class="fas fa-plus" aria-hidden="true"></i></a
+              ><a
                 href="/"
                 class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
                 <i class="fas fa-edit" aria-hidden="true"></i>
-              </button>
-              <button
+            </a>
+              <a
                 href="/"
                 class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
                 <i class="fas fa-trash-alt" aria-hidden="true"></i>
-              </button>
+          </a>
             </td>
           </tr>
           <tr class="odd:bg-mediumPearl even:bg-white">
@@ -171,36 +180,36 @@
             </td>
             <td class="px-5 py-4">3</td>
             <td class="flex justify-center px-5 py-4 px-auto">
-              <button
+              <a
+              href="/"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-minus" aria-hidden="true"></i></a
+              ><a
                 href="/"
                 class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
-                <i class="fas fa-minus" aria-hidden="true"></i></button
-              ><button
-                href="/"
-                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
-                title="{intl l='View site'}"
-                target="_blank"
-              >
-                <i class="fas fa-plus" aria-hidden="true"></i></button
-              ><button
-                href="/"
+                <i class="fas fa-plus" aria-hidden="true"></i></a
+              ><a
+                href="{url path='/admin/feature-edit'}"
                 class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
                 <i class="fas fa-edit" aria-hidden="true"></i>
-              </button>
-              <button
+            </a>
+              <a
                 href="/"
                 class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
                 <i class="fas fa-trash-alt" aria-hidden="true"></i>
-              </button>
+          </a>
             </td>
           </tr>
         </tbody>

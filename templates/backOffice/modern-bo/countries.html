@@ -36,40 +36,50 @@
   <!-- Panel -->
     {component name="Panel" class="w-full mb-3"}
     {hook name="countries.top" location="countries_top"}
-    <div class="flex justify-end">
-    {component name="modal"}
-    <h4 class="font-bold">{intl l='Country title:'}</h4>
+     <!--TODO: Modal-->
+     <div class="flex justify-end">
+      {component name="modal" titlemodal="titre"}
+      <h4 class="font-bold">{intl l='Country title'}</h4>
       <input
         type="text"
         class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
       />
-      <h4 class="font-bold">{intl l='Numerical ISO Code:'}</h4>
+      <h4 class="font-bold">{intl l='Numerical ISO Code'}</h4>
       <input
         type="text"
         class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
       />
-      <h4 class="font-bold">{intl l='ISO Alpha-2 code:'}</h4>
+      <h4 class="font-bold">{intl l='ISO Alpha-2 code'}</h4>
       <input
         type="text"
         class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
       />
-      <h4 class="font-bold">{intl l='ISO Alpha-3 code:'}</h4>
+      <h4 class="font-bold">{intl l='ISO Alpha-3 code'}</h4>
       <input
         type="text"
         class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
       />
       <div>
-        <input class="mr-3 Radio" checked id="r1" type="radio" name="thelia-radio" />
+        <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
         <label for="r1">This country is online</label>
       </div>
       <div>
         <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
         <label for="r1">This country has states / provinces</label>
       </div>
-      <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-main even:bg-main border-main hover:text-main hover:bg-white">
-        Create this product country
-      </button>
-    {/component}
+      <div class="grid-rows-2 mt-20 text-right">
+        <div class="mb-4 mr-5">
+            <button class="h-4 p-5 mx-1 font-medium text-center text-white border rounded-md odd:bg-main even:bg-main border-main hover:text-main hover:bg-white">
+                {intl l="Create this country"}
+            </button>
+        </div>
+        <div class="mr-5">
+            <button class="h-5 p-5 mx-1 font-medium text-center border rounded-md odd:bg-mediumPearl even:bg-white border-main text-main hover:text-white hover:bg-main">
+                {intl l="Cancel"}
+            </button>
+        </div>
+    </div>
+      {/component}
     </div>
 
 <!--TODO: Tableau React-->
@@ -132,21 +142,21 @@
               </label>        
             </td>
             <td class="flex justify-center px-5 py-4 px-auto">
-              <button
-                href="/"
+              <a
+              href="{url path='/admin/country-edit'}"
                 class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
-                <i class="fas fa-edit" aria-hidden="true"></i></button
-              ><button
+                <i class="fas fa-edit" aria-hidden="true"></i></a
+              ><a
                 href="/"
                 class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
                 <i class="fas fa-trash-alt" aria-hidden="true"></i>
-              </button>
+            </a>
             </td>
           </tr>
           <tr class="odd:bg-mediumPearl even:bg-white">
@@ -192,21 +202,21 @@
               </label>        
         </td>
             <td class="flex justify-center px-5 py-4 px-auto">
-              <button
-                href="/"
+              <a
+              href="{url path='/admin/country-edit'}"
                 class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
-                <i class="fas fa-edit" aria-hidden="true"></i></button
-              ><button
+                <i class="fas fa-edit" aria-hidden="true"></i></a
+              ><a
                 href="/"
                 class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
                 title="{intl l='View site'}"
                 target="_blank"
               >
                 <i class="fas fa-trash-alt" aria-hidden="true"></i>
-              </button>
+            </a>
             </td>
           </tr>
         </tbody>

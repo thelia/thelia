@@ -40,9 +40,39 @@
       <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-green even:bg-green border-green hover:text-green hover:bg-white">
         Save ✓
       </button>
-      <!-- TODO: Modal -->
-        {component name="modal"}
-        
+      <!--TODO: Modal-->
+      <div class="flex justify-end">
+        {component name="modal" titlemodal="titre"}
+        <h4 class="font-bold">{intl l='Name'}</h4>
+        <input
+          type="text"
+          class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+          placeholder="Variable name"
+        />
+        <h4 class="font-bold">{intl l='Value'}</h4>
+        <input
+          type="text"
+          class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+          placeholder="Variable value"
+        />
+        <h4 class="font-bold">{intl l='Purpose'}</h4>
+        <input
+          type="text"
+          class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+          placeholder="Variable purpose"
+        />
+        <div class="grid-rows-2 mt-20 text-right">
+          <div class="mb-4 mr-5">
+              <button class="h-4 p-5 mx-1 font-medium text-center text-white border rounded-md odd:bg-main even:bg-main border-main hover:text-main hover:bg-white">
+                  {intl l="Create this variable"}
+              </button>
+          </div>
+          <div class="mr-5">
+              <button class="h-5 p-5 mx-1 font-medium text-center border rounded-md odd:bg-mediumPearl even:bg-white border-main text-main hover:text-white hover:bg-main">
+                  {intl l="Cancel"}
+              </button>
+          </div>
+      </div>
         {/component}
       </div>
     

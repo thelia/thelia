@@ -1,18 +1,16 @@
-<button data-modal-target="#modal" class="relative w-10 h-10 rounded-lg btn right bg-blue" id="open">&times;</button>
-  <div class="modal" id="modal">
-      <div class="modal-header">
-          <div class="title">Open</div>
-          <button data-modal-close class="closebtn">&times;
-  
-          </button>
+<div>
+  <button class="open-button bg-main"><i class="p-2 fas fa-plus"></i></button>
+    <dialog class="modal">
+      <div class="pb-10 border-b-4 border-main">
+        <div class="modal-header">
+          <h1 class="pl-5 mt-5 text-xl font-bold">{$titlemodal|default:null}</h1>
+          <i class="material-icons close-button">&times;</i>
+        </div>
       </div>
-      <div class="modal-body">
-          <p class="current desc">
-            {if isset($children)}
-              {$children nofilter}
-            {/if}
-          </p>
-      </div>
-  </div>
-  
-  <div id="overlay"></div>
+    <div class="pl-2 mt-10">
+      {if isset($children)}
+        {$children nofilter}
+      {/if}  
+    </div>
+    </dialog>
+</div>

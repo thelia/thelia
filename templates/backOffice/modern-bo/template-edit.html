@@ -7,7 +7,6 @@
 
 {block name="main-content"}
 <div id="templates edit-template">
-  {loop name="template_edit" type="product-template"}
   <!-- Breadcrumbs -->
   <nav class="flex mb-10" aria-label="Breadcrumb">
     <ol class="inline-flex items-center space-x-1 md:space-x-3">
@@ -119,14 +118,14 @@
                     </div>
                   </td>
                   <td class="flex justify-center px-5 py-4 px-auto">
-                    <button
+                    <a
                       href="/"
                       class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
                       title="{intl l='View site'}"
                       target="_blank"
                     >
                       <i class="fas fa-trash-alt" aria-hidden="true"></i>
-                    </button>
+                  </a>
                   </td>
                 </tr>
               </tbody>
@@ -203,14 +202,14 @@
                   </div>
                 </td>
                 <td class="flex justify-center px-5 py-4 px-auto">
-                  <button
+                  <a
                     href="/"
                     class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
                     title="{intl l='View site'}"
                     target="_blank"
                   >
                     <i class="fas fa-trash-alt" aria-hidden="true"></i>
-                  </button>
+                </a>
                 </td>
               </tr>
             </tbody>
@@ -302,7 +301,6 @@
       </button>
       </div>
     {/component} 
-    {/loop}
   </div>
 </div> 
 </div>
