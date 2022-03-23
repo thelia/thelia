@@ -292,7 +292,6 @@ function createCustomer($con): void
 {
     echo "Creating customer\n";
 
-    //customer
     $customer = new Thelia\Model\Customer();
     $customer->createOrUpdate(
         1,
@@ -373,7 +372,6 @@ function createMaterials($con)
                     ->setTitle($data[0])
                 ->setLocale('en_US')
                     ->setTitle($data[1]);
-            //$featureAv->setFeature($feature);
 
             $feature->addFeatureAv($featureAv);
         }
