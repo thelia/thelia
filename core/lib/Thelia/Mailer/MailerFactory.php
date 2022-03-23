@@ -216,19 +216,16 @@ class MailerFactory
     }
 
     /**
-     * @param array  $from             From addresses. An array of (email-address => name)
-     * @param array  $to               To addresses. An array of (email-address => name)
-     * @param string $subject          the message subject
-     * @param string $htmlBody         the HTML message body, or null
-     * @param string $textBody         the text message body, or null
-     * @param array  $cc               Cc addresses. An array of (email-address => name) [optional]
-     * @param array  $bcc              Bcc addresses. An array of (email-address => name) [optional]
-     * @param array  $replyTo          Reply to addresses. An array of (email-address => name) [optional]
-     * @param null   $failedRecipients The failed recipients list
-     *
-     * @return int number of recipients who were accepted for delivery
+     * @param array  $from     From addresses. An array of (email-address => name)
+     * @param array  $to       To addresses. An array of (email-address => name)
+     * @param string $subject  the message subject
+     * @param string $htmlBody the HTML message body, or null
+     * @param string $textBody the text message body, or null
+     * @param array  $cc       Cc addresses. An array of (email-address => name) [optional]
+     * @param array  $bcc      Bcc addresses. An array of (email-address => name) [optional]
+     * @param array  $replyTo  Reply to addresses. An array of (email-address => name) [optional]
      */
-    public function sendSimpleEmailMessage($from, $to, $subject, $htmlBody, $textBody, $cc = [], $bcc = [], $replyTo = [])
+    public function sendSimpleEmailMessage($from, $to, $subject, $htmlBody, $textBody, $cc = [], $bcc = [], $replyTo = []): void
     {
         $email = $this->createSimpleEmailMessage($from, $to, $subject, $htmlBody, $textBody, $cc, $bcc, $replyTo);
 
