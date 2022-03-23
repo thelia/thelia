@@ -100,7 +100,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         // Find cached file path
         $cacheFilePath = $this->getCacheFilePath($subdir, $sourceFile, $event->isOriginalImage(), $event->getOptionsHash());
 
-        //Alternative image path is for browser that don't support webp
+        // Alternative image path is for browser that don't support webp
         $alternativeImagePath = null;
 
         if ($event->getFormat()) {

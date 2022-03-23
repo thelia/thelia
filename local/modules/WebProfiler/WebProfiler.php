@@ -21,7 +21,7 @@ use WebProfiler\DataCollector\SmartyDataCollector;
 class WebProfiler extends BaseModule
 {
     /** @var string */
-    const DOMAIN_NAME = 'webprofiler';
+    public const DOMAIN_NAME = 'webprofiler';
 
     /*
      * You may now override BaseModuleInterface methods, such as:

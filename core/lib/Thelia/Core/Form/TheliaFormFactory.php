@@ -15,7 +15,6 @@ namespace Thelia\Core\Form;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Contracts\Translation\TranslatorInterface;

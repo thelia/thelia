@@ -279,7 +279,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
     public static function theliaEscape($content, /* @noinspection PhpUnusedParameterInspection */ $smarty)
     {
-        if (is_scalar($content)) {
+        if (\is_scalar($content)) {
             return htmlspecialchars($content, \ENT_QUOTES, Smarty::$_CHARSET);
         }
 
@@ -340,7 +340,7 @@ class SmartyParser extends Smarty implements ParserInterface
                 $templateDefinition->getType(),
                 $template->getName(), // $templateDefinition->getName(), // We add the template definition in the main template directory
                 $template->getAbsolutePath(),
-                self::TEMPLATE_ASSETS_KEY, //$templateKey,
+                self::TEMPLATE_ASSETS_KEY, // $templateKey,
                 true
             );
         }

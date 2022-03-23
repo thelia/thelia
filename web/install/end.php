@@ -84,7 +84,7 @@ try {
         }
     }
 
-    //clean up cache directories
+    // clean up cache directories
     $fs = new \Symfony\Component\Filesystem\Filesystem();
 
     $fs->remove(THELIA_ROOT.'/cache/prod');

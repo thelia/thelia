@@ -154,7 +154,7 @@ class OrderTest extends BaseAction
     {
         $currency = CurrencyQuery::create()->findOne();
 
-        //create a fake cart in database;
+        // create a fake cart in database;
         $cart = new Cart();
         $cart->setToken(uniqid('createorder', true))
             ->setCustomer($this->customer)
@@ -201,7 +201,7 @@ class OrderTest extends BaseAction
 
     public function testSetDeliveryAddress(): void
     {
-        //$validAddressId = AddressQuery::create()->findOneByCustomerId($this->customer->getId());
+        // $validAddressId = AddressQuery::create()->findOneByCustomerId($this->customer->getId());
 
         $this->orderEvent->setDeliveryAddress(321);
 
@@ -365,7 +365,7 @@ class OrderTest extends BaseAction
 
             if ($manageStock) {
                 if ($orderProduct->getVirtual()) {
-                    /* check same stock*/
+                    /* check same stock */
                     $this->assertEquals(
                         $itemsStock[$index],
                         $cartItem->getProductSaleElements()->getQuantity()
@@ -378,7 +378,7 @@ class OrderTest extends BaseAction
                     );
                 }
             } else {
-                /* check same stock*/
+                /* check same stock */
                 $this->assertEquals(
                     $itemsStock[$index],
                     $cartItem->getProductSaleElements()->getQuantity()

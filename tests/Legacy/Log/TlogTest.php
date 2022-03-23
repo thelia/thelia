@@ -35,7 +35,7 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::DEBUG);
 
-        //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
+        // "#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
         $this->expectOutputRegex(sprintf($this->regex, 'DEBUG', 'foo'));
         $logger->debug('foo');
     }
@@ -54,7 +54,7 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::INFO);
 
-        //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
+        // "#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
         $this->expectOutputRegex(sprintf($this->regex, 'INFO', 'foo'));
         $logger->info('foo');
     }
@@ -73,7 +73,7 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::NOTICE);
 
-        //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
+        // "#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
         $this->expectOutputRegex(sprintf($this->regex, 'NOTICE', 'foo'));
         $logger->notice('foo');
     }
@@ -92,7 +92,7 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::WARNING);
 
-        //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
+        // "#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
         $this->expectOutputRegex(sprintf($this->regex, 'WARNING', 'foo'));
         $logger->warning('foo');
     }
@@ -111,7 +111,7 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::ERROR);
 
-        //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
+        // "#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
         $this->expectOutputRegex(sprintf($this->regex, 'ERROR', 'foo'));
         $logger->error('foo');
     }
@@ -130,7 +130,7 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::CRITICAL);
 
-        //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
+        // "#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
         $this->expectOutputRegex(sprintf($this->regex, 'CRITICAL', 'foo'));
         $logger->critical('foo');
     }
@@ -149,7 +149,7 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::ALERT);
 
-        //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
+        // "#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
         $this->expectOutputRegex(sprintf($this->regex, 'ALERT', 'foo'));
         $logger->alert('foo');
     }
@@ -168,7 +168,7 @@ class TlogTest extends TestCase
         $logger = self::$logger;
         $logger->setLevel(Tlog::EMERGENCY);
 
-        //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
+        // "#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
         $this->expectOutputRegex(sprintf($this->regex, 'EMERGENCY', 'foo'));
         $logger->emergency('foo');
     }

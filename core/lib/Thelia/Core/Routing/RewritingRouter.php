@@ -77,7 +77,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 
     public function setOption($key, $value): void
     {
-        //NOTHING TO DO FOR NOW
+        // NOTHING TO DO FOR NOW
     }
 
     /**

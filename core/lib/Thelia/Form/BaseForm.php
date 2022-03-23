@@ -23,7 +23,6 @@ use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
-use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\ValidatorBuilder;

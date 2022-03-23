@@ -122,7 +122,7 @@ return [
     'no file' => 'Немає файлу',
     'view type number missing' => 'Відсутній номер типу перегляду',
     'Not enought Memory' => 'Недостатньо пам`яті',
-    'max_size_reached' => 'Ваша тека досягла максимального ліміту у %d Мб.', //%d = max overall size
+    'max_size_reached' => 'Ваша тека досягла максимального ліміту у %d Мб.', // %d = max overall size
     'B' => 'Б',
     'KB' => 'Кб',
     'MB' => 'Мб',

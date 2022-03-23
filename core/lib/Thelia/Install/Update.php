@@ -429,7 +429,7 @@ class Update
     public function checkBackupIsPossible()
     {
         $size = 0;
-        if (preg_match('/^(\d+)(.)$/', ini_get('memory_limit'), $matches)) {
+        if (preg_match('/^(\d+)(.)$/', \ini_get('memory_limit'), $matches)) {
             switch (strtolower($matches[2])) {
                 case 'k':
                     $size = $matches[1] / 1024;

@@ -637,7 +637,7 @@ class Tlog implements LoggerInterface
 
         if ($message instanceof \Exception) {
             $text = $message->getMessage()."\n".$message->getTraceAsString();
-        } elseif (is_scalar($message) === false) {
+        } elseif (\is_scalar($message) === false) {
             $text = print_r($message, 1);
         } else {
             $text = $message;

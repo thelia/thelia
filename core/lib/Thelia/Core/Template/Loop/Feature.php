@@ -178,7 +178,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         $title = $this->getTitle();
 
         if (null !== $title) {
-            //find all feature that match exactly this title and find with all locales.
+            // find all feature that match exactly this title and find with all locales.
             $features = FeatureI18nQuery::create()
                 ->filterByTitle($title, Criteria::LIKE)
                 ->select('id')
