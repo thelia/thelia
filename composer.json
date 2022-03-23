@@ -14,7 +14,7 @@
         "wiki": "http://doc.thelia.net"
     },
     "require": {
-        "php": ">= 8.0",
+        "php": ">= 8.0.2",
         "ext-pdo": "*",
         "ext-json": "*",
         "ext-intl": "*",
