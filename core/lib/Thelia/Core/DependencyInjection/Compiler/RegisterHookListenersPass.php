@@ -31,6 +31,7 @@ use Thelia\Model\HookQuery;
 use Thelia\Model\ModuleHook;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
+use Thelia\Module\BaseModule;
 
 /**
  * Class RegisterListenersPass.
@@ -43,6 +44,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container): void
     {
+        $events = $container->findTaggedServiceIds('hook.event_listener');
         if (!$container->hasDefinition('event_dispatcher')) {
             return;
         }
@@ -57,9 +59,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
         $this->debugEnabled = $container->getParameter('kernel.debug');
 
-        if (true === version_compare(ConfigQuery::getTheliaSimpleVersion(), '2.1.0', '>=')) {
-            $this->processHook($container, $definition);
-        }
+        $this->processHook($container, $definition);
     }
 
     protected function logAlertMessage($message, $failSafe = false): void
@@ -82,24 +82,19 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 throw new \InvalidArgumentException(sprintf('Hook class "%s" must extends class "%s".', $class, $implementClass));
             }
 
-            // retrieve the module id
-            $properties = $container->getDefinition($id)->getProperties();
+            $moduleCode = explode('\\', $class)[0];
+            $module = ModuleQuery::create()->findOneByCode($moduleCode);
+            if ($module === null) {
+                continue;
+            }
 
-            $moduleCode = null;
-            $module = null;
-            if (\array_key_exists('module', $properties)) {
-                $moduleProperty = $properties['module'];
-
-                if ($moduleProperty instanceof Definition) {
-                    $moduleCode = explode('\\', $moduleProperty->getClass())[1];
-                }
-
-                if ($moduleProperty instanceof Reference) {
-                    $moduleCode = explode('.', $moduleProperty)[1];
-                }
-
-                if (null !== $moduleCode) {
-                    $module = ModuleQuery::create()->findOneByCode($moduleCode);
+            if (method_exists($class, "getSubscribedHooks")) {
+                $subscribedHooks = $class::getSubscribedHooks();
+                $events = [];
+                foreach ($subscribedHooks as $eventName => $attributesArray) {
+                    foreach ($attributesArray as $attributes) {
+                        $events[] = array_merge($attributes, ["event" => $eventName]);
+                    }
                 }
             }
 
