@@ -93,7 +93,7 @@ abstract class BaseHook implements BaseHookInterface
             $this->assetsResolver = $resolver;
         }
         if (null !== $eventDispatcher) {
-            $this->eventDispatcher = $eventDispatcher;
+            $this->dispatcher = $eventDispatcher;
         }
 
         $moduleCode = explode('\\', static::class)[0];
