@@ -23,6 +23,7 @@ use Thelia\Model\Cart;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Module\BaseModule;
 use TheliaSmarty\Template\SmartyParser;
@@ -89,11 +90,15 @@ abstract class BaseHook implements BaseHookInterface
             $this->parser = $parser;
         }
         if (null !== $resolver) {
-            $this->resolver = $resolver;
+            $this->assetsResolver = $resolver;
         }
         if (null !== $eventDispatcher) {
             $this->eventDispatcher = $eventDispatcher;
         }
+
+        $moduleCode = explode('\\', static::class)[0];
+        $module = ModuleQuery::create()->findOneByCode($moduleCode);
+        $this->module = $module;
         $this->translator = Translator::getInstance();
     }
 
