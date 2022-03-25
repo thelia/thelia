@@ -25,13 +25,11 @@ use Thelia\Core\Hook\HookDefinition;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
 use Thelia\Model\Base\IgnoredModuleHookQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
 use Thelia\Model\ModuleHook;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
-use Thelia\Module\BaseModule;
 
 /**
  * Class RegisterListenersPass.
@@ -88,12 +86,12 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 continue;
             }
 
-            if (method_exists($class, "getSubscribedHooks")) {
+            if (method_exists($class, 'getSubscribedHooks')) {
                 $subscribedHooks = $class::getSubscribedHooks();
                 $events = [];
                 foreach ($subscribedHooks as $eventName => $attributesArray) {
                     foreach ($attributesArray as $attributes) {
-                        $events[] = array_merge($attributes, ["event" => $eventName]);
+                        $events[] = array_merge($attributes, ['event' => $eventName]);
                     }
                 }
             }
