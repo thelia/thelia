@@ -23,7 +23,7 @@ class Kernel extends Thelia
     protected function configureContainer(ContainerConfigurator $container): void
     {
         parent::configureContainer($container);
-        
+
         $container->import('../config/{packages}/*.yaml');
         $container->import('../config/{packages}/'.$this->environment.'/*.yaml');
 
