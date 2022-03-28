@@ -49,10 +49,10 @@ RUN apk add --no-cache freetype libpng libjpeg-turbo freetype-dev libpng-dev lib
   apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev
 
 # XDebug extension
-RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
-  && pecl install xdebug-3.0.0 \
-  && docker-php-ext-enable xdebug \
-  && apk del -f .build-deps
+#RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
+#  && pecl install xdebug-3.0.0 \
+#  && docker-php-ext-enable xdebug \
+#  && apk del -f .build-deps
 
 # Intl extension
 RUN apk add icu-dev

@@ -122,7 +122,7 @@ return [
     'no file' => 'Žádný soubor',
     'view type number missing' => 'Chybí číslo typu pro zobrazení',
     'Not enought Memory' => 'Nedostatek paměti',
-    'max_size_reached' => 'Vaše složka s obrázky dosáhla maximální velikosti %d MB.', //%d = max overall size
+    'max_size_reached' => 'Vaše složka s obrázky dosáhla maximální velikosti %d MB.', // %d = max overall size
     'B' => 'B',
     'KB' => 'KB',
     'MB' => 'MB',

@@ -221,10 +221,8 @@ class Thelia extends Kernel
      * Gets the container's base class.
      *
      * All names except Container must be fully qualified.
-     *
-     * @return string
      */
-    protected function getContainerBaseClass()
+    protected function getContainerBaseClass(): string
     {
         return '\Thelia\Core\DependencyInjection\TheliaContainer';
     }
@@ -403,11 +401,9 @@ class Thelia extends Kernel
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @throws \Exception
      */
-    public function handle(Request $request, int $type = HttpKernelInterface::MASTER_REQUEST, bool $catch = true)
+    public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): \Symfony\Component\HttpFoundation\Response
     {
         if (!$this->booted) {
             $container = $this->container ?? $this->preBoot();
@@ -470,7 +466,7 @@ class Thelia extends Kernel
             /** @var Module $module */
             foreach ($modules as $module) {
                 try {
-                    //In case modules want add configuration
+                    // In case modules want add configuration
                     \call_user_func([$module->getFullNamespace(), 'loadConfiguration'], $container);
 
                     $definition = new Definition();
@@ -668,7 +664,7 @@ class Thelia extends Kernel
      *
      * @throws \Exception
      */
-    protected function buildContainer()
+    protected function buildContainer(): ContainerBuilder
     {
         $container = parent::buildContainer();
 
@@ -684,7 +680,7 @@ class Thelia extends Kernel
      *
      * @api
      */
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         if (\defined('THELIA_ROOT')) {
             return THELIA_CACHE_DIR.$this->environment;
@@ -700,7 +696,7 @@ class Thelia extends Kernel
      *
      * @api
      */
-    public function getLogDir()
+    public function getLogDir(): string
     {
         if (\defined('THELIA_ROOT')) {
             return THELIA_LOG_DIR;
@@ -714,11 +710,11 @@ class Thelia extends Kernel
      *
      * @return array An array of kernel parameters
      */
-    protected function getKernelParameters()
+    protected function getKernelParameters(): array
     {
         $parameters = parent::getKernelParameters();
 
-        //Todo replace this by real runtime env
+        // Todo replace this by real runtime env
         $parameters['kernel.runtime_environment'] = $this->environment;
 
         $parameters['thelia.root_dir'] = THELIA_ROOT;

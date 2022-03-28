@@ -139,11 +139,11 @@ class CheckPermission extends BaseInstall
         }
 
         foreach ($this->minServerConfigurationNecessary as $key => $value) {
-            $this->validationMessages[$key]['text'] = $this->getI18nConfigText($key, $this->formatBytes($value), ini_get($key), true);
+            $this->validationMessages[$key]['text'] = $this->getI18nConfigText($key, $this->formatBytes($value), \ini_get($key), true);
             if (!$this->verifyServerMemoryValues($key, $value)) {
                 $this->isValid = false;
                 $this->validationMessages[$key]['status'] = false;
-                $this->validationMessages[$key]['text'] = $this->getI18nConfigText($key, $this->formatBytes($value), ini_get($key), false);
+                $this->validationMessages[$key]['text'] = $this->getI18nConfigText($key, $this->formatBytes($value), \ini_get($key), false);
             }
         }
 
@@ -287,7 +287,7 @@ class CheckPermission extends BaseInstall
      */
     protected function verifyServerMemoryValues($key, $necessaryValueInBytes)
     {
-        $serverValueInBytes = $this->returnBytes(ini_get($key));
+        $serverValueInBytes = $this->returnBytes(\ini_get($key));
 
         if ($serverValueInBytes == -1) {
             return true;

@@ -63,7 +63,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
 
         $message = $event->getThrowable()->getMessage();
 
-        $response = Response::create(
+        $response = new Response(
             $this->parser->render(
                 'general_error.html',
                 [

@@ -206,7 +206,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
                     ->setHookActive(false)
                     ->save();
             } else {
-                //$moduleHook->setTemplates($attributes['templates']);
+                // $moduleHook->setTemplates($attributes['templates']);
 
                 // Update hook if id was changed in the definition
                 if ($moduleHook->getClassname() != $id) {

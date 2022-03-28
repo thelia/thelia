@@ -59,9 +59,9 @@ class jupload
         if (!isset($appletparams['scriptable'])) {
             $appletparams['scriptable'] = 'false';
         }
-        //if (!isset($appletparams['stringUploadSuccess']))
+        // if (!isset($appletparams['stringUploadSuccess']))
         $appletparams['stringUploadSuccess'] = 'SUCCESS';
-        //if (!isset($appletparams['stringUploadError']))
+        // if (!isset($appletparams['stringUploadError']))
         $appletparams['stringUploadError'] = 'ERROR: (.*)';
         $maxpost = $this->tobytes(ini_get('post_max_size'));
         $maxmem = $this->tobytes(ini_get('memory_limit'));
@@ -431,7 +431,7 @@ class jupload
                     ++$cnt;
                     $rtry = $dir.$nameWithoutExtension.'._'.$cnt.$ext;
                 }
-                //We store the result name in the byReference name parameter.
+                // We store the result name in the byReference name parameter.
                 $name = $nameWithoutExtension.'_'.$cnt.$ext;
                 $ret = $rtry;
             }
@@ -448,7 +448,7 @@ class jupload
         $flist = '[defaultAfterUploadManagement] Nb uploaded files is: '.count($this->files);
         $flist = $this->classparams['http_flist_start'];
         foreach ($this->files as $f) {
-            //$f is an array, that contains all info about the uploaded file.
+            // $f is an array, that contains all info about the uploaded file.
             $this->logDebug('defaultAfterUploadManagement', "  Reading file ${f['name']}");
             $flist .= $this->classparams['http_flist_file_before'];
             $flist .= $f['name'];
@@ -462,7 +462,7 @@ class jupload
             $flist .= $f['md5sum'];
             $addBR = false;
             foreach ($f as $key => $value) {
-                //If it's a specific key, let's display it:
+                // If it's a specific key, let's display it:
                 if ($key != 'name' && $key != 'size' && $key != 'relativePath' && $key != 'fullName' && $key != 'md5sum') {
                     if ($addBR) {
                         $flist .= '<br>';
@@ -581,7 +581,7 @@ class jupload
         }
         $cnt = 0;
         foreach ($_FILES as $key => $value) {
-            //Let's read the $_FILES data
+            // Let's read the $_FILES data
             if (isset($files_data)) {
                 unset($files_data);
             }
@@ -590,8 +590,8 @@ class jupload
             $relpaths = (isset($_POST['relpathinfo'])) ? $_POST['relpathinfo'] : null;
             $md5sums = (isset($_POST['md5sum'])) ? $_POST['md5sum'] : null;
             $mimetypes = (isset($_POST['mimetype'])) ? $_POST['mimetype'] : null;
-            //$relpaths = (isset($_POST["relpathinfo$cnt"])) ? $_POST["relpathinfo$cnt"] : null;
-            //$md5sums = (isset($_POST["md5sum$cnt"])) ? $_POST["md5sum$cnt"] : null;
+            // $relpaths = (isset($_POST["relpathinfo$cnt"])) ? $_POST["relpathinfo$cnt"] : null;
+            // $md5sums = (isset($_POST["md5sum$cnt"])) ? $_POST["md5sum$cnt"] : null;
 
             if (gettype($relpaths) == 'string') {
                 $relpaths = [$relpaths];
@@ -658,7 +658,7 @@ class jupload
                 ++$cnt;
                 continue;
             }
-            //If we get here, the upload is a real one (no demo)
+            // If we get here, the upload is a real one (no demo)
             if ($jupart) {
                 // got a chunk of a multi-part upload
                 $len = filesize($tmpname);
@@ -793,7 +793,7 @@ class jupload
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // If we got a POST request, this is the real work.
             if (isset($_GET['errormail'])) {
-                //Hum, an error occurs on server side. Let's manage the debug log, that we just received.
+                // Hum, an error occurs on server side. Let's manage the debug log, that we just received.
                 $this->receive_debug_log();
             } else {
                 $this->receive_uploaded_files();

@@ -70,14 +70,14 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      *
      * @api
      */
-    public function getContext()
+    public function getContext(): RequestContext
     {
         return $this->context;
     }
 
     public function setOption($key, $value): void
     {
-        //NOTHING TO DO FOR NOW
+        // NOTHING TO DO FOR NOW
     }
 
     /**
@@ -118,7 +118,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      *
      * @api
      */
-    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH)
+    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH): string
     {
         throw new RouteNotFoundException();
     }
@@ -138,7 +138,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      *
      * @api
      */
-    public function match($pathinfo)
+    public function match($pathinfo): array
     {
         throw new ResourceNotFoundException('impossible to find route with this method, please use matchRequest method');
     }
@@ -156,7 +156,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      *
      * @return array An array of parameters
      */
-    public function matchRequest(Request $request)
+    public function matchRequest(Request $request): array
     {
         if (ConfigQuery::isRewritingEnable()) {
             $urlTool = URL::getInstance();

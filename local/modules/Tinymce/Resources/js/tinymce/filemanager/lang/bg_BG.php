@@ -122,7 +122,7 @@ return [
     'no file' => 'Няма файл',
     'view type number missing' => 'Номерът на прегледа липсва',
     'Not enought Memory' => 'Недостатъчна памет',
-    'max_size_reached' => 'Вашата папка за изображения достигна максимумът от %d MB.', //%d = max overall size
+    'max_size_reached' => 'Вашата папка за изображения достигна максимумът от %d MB.', // %d = max overall size
     'B' => 'B',
     'KB' => 'KB',
     'MB' => 'MB',

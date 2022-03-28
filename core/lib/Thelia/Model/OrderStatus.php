@@ -36,7 +36,7 @@ class OrderStatus extends BaseOrderStatus
      */
     public function isNotPaid($exact = true)
     {
-        //return $this->hasStatusHelper(OrderStatus::CODE_NOT_PAID);
+        // return $this->hasStatusHelper(OrderStatus::CODE_NOT_PAID);
         if ($exact) {
             return $this->hasStatusHelper(self::CODE_NOT_PAID);
         }

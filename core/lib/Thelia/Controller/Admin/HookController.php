@@ -102,9 +102,9 @@ class HookController extends AbstractCrudController
                 'missing' => $allHooks,
             ];
 
-            $response = JsonResponse::create($json_data);
+            $response = new JsonResponse($json_data);
         } catch (\Exception $e) {
-            $response = JsonResponse::create(['error' => $e->getMessage()], 500);
+            $response = new JsonResponse(['error' => $e->getMessage()], 500);
         }
 
         return $response;
@@ -157,9 +157,9 @@ class HookController extends AbstractCrudController
         ];
 
         if (\count($errors)) {
-            $response = JsonResponse::create(['error' => $errors], 500);
+            $response = new JsonResponse(['error' => $errors], 500);
         } else {
-            $response = JsonResponse::create($json_data);
+            $response = new JsonResponse($json_data);
         }
 
         return $response;

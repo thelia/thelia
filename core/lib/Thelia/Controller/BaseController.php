@@ -95,12 +95,10 @@ abstract class BaseController implements ControllerInterface
      * @param $fileName
      * @param int  $status
      * @param bool $browser
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function pdfResponse($pdf, $fileName, $status = 200, $browser = false)
     {
-        return Response::create(
+        return new Response(
             $pdf,
             $status,
             [
@@ -412,7 +410,7 @@ abstract class BaseController implements ControllerInterface
      */
     protected function generateRedirect($url, $status = 302)
     {
-        return RedirectResponse::create($url, $status);
+        return new RedirectResponse($url, $status);
     }
 
     /**

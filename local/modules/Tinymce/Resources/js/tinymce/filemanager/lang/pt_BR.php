@@ -122,7 +122,7 @@ return [
     'no file' => 'nenhum arquivo',
     'view type number missing' => 'Ver tipo de número faltando',
     'Not enought Memory' => 'Memória insuficiente',
-    'max_size_reached' => 'Sua pasta de imagens atingiu seu tamanho máximo de %d MB.', //%d = max overall size
+    'max_size_reached' => 'Sua pasta de imagens atingiu seu tamanho máximo de %d MB.', // %d = max overall size
     'B' => 'B',
     'KB' => 'KB',
     'MB' => 'MB',

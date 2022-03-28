@@ -11,7 +11,7 @@
  */
 
 $config = include 'config/config.php';
-//TODO switch to array
+// TODO switch to array
 extract($config, \EXTR_OVERWRITE);
 
 include 'include/utils.php';

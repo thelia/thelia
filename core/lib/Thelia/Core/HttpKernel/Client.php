@@ -30,7 +30,7 @@ class Client extends HttpKernelBrowser
      *
      * @return Request A Request instance
      */
-    protected function filterRequest(DomRequest $request)
+    protected function filterRequest(DomRequest $request): Request
     {
         $httpRequest = Request::create($request->getUri(), $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $request->getServer(), $request->getContent());
 

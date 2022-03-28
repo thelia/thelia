@@ -51,7 +51,7 @@ class FeatureProduct extends BaseFeatureProduct
      */
     public function setIsFreeText($v)
     {
-        parent::setFreeTextValue($v ? 1 : null); //for preventing log deprecation and infinity recursion
+        parent::setFreeTextValue($v ? 1 : null); // for preventing log deprecation and infinity recursion
 
         return parent::setIsFreeText($v);
     }

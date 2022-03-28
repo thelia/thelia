@@ -230,7 +230,7 @@ class Database
 
         $data[] = 'SET foreign_key_checks=1;';
 
-        //save filename
+        // save filename
         $this->writeFilename($filename, $data);
     }
 
