@@ -1,8 +1,8 @@
-export const DragAndDrop = () => {
+export const DragAndDropMedia = () => {
   (function() {
     function Init() {
-      var fileSelect = document.getElementById('file-upload'),
-        fileDrag = document.getElementById('file-drag');
+      let fileSelect = document.getElementById('file-upload-three');
+      let fileDrag = document.getElementById('file-drag-three');
   
       fileSelect.addEventListener('change', false);
   
@@ -16,18 +16,18 @@ export const DragAndDrop = () => {
     }
   
     function fileDragHover(e) {
-      var fileDrag = document.getElementById('file-drag');
+      var fileDrag = document.getElementById('file-drag-three');
   
       e.stopPropagation();
       e.preventDefault();
       
-      fileDrag.className = (e.type === 'dragover' ? 'hover' : 'modal-body file-upload');
+      fileDrag.className = (e.type === 'dragover' ? 'hover' : 'modal-body file-upload-three');
     }
   
     if (window.File && window.FileList && window.FileReader) {
       Init();
     } else {
-      document.getElementById('file-drag').style.display = 'none';
+      document.getElementById('file-drag-three').style.display = 'none';
     }
   })();
 }

@@ -33,7 +33,11 @@ module.exports = {
         error: '#D10000',
         danger: '#FDE2E2',
         success: '#D1FAE5',
-        info: '#E6F1FA'
+        info: '#E6F1FA',
+        vermillon: '#DC3018',
+        lightVermillon: '#FA533C',
+        lighterVermillon: '#FF8F80',
+        greyMedium: '#9B9B9B'
       }
     }
   },

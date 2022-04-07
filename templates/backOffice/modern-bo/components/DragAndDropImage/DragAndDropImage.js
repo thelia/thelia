@@ -1,8 +1,8 @@
-export const DragAndDrop = () => {
+export const DragAndDropImage = () => {
   (function() {
     function Init() {
-      var fileSelect = document.getElementById('file-upload'),
-        fileDrag = document.getElementById('file-drag');
+      let fileSelect = document.getElementById('file-upload-two'),
+        fileDrag = document.getElementById('file-drag-two');
   
       fileSelect.addEventListener('change', false);
   
@@ -16,18 +16,18 @@ export const DragAndDrop = () => {
     }
   
     function fileDragHover(e) {
-      var fileDrag = document.getElementById('file-drag');
+      var fileDrag = document.getElementById('file-drag-two');
   
       e.stopPropagation();
       e.preventDefault();
       
-      fileDrag.className = (e.type === 'dragover' ? 'hover' : 'modal-body file-upload');
+      fileDrag.className = (e.type === 'dragover' ? 'hover' : 'modal-body file-upload-two');
     }
   
     if (window.File && window.FileList && window.FileReader) {
       Init();
     } else {
-      document.getElementById('file-drag').style.display = 'none';
+      document.getElementById('file-drag-two').style.display = 'none';
     }
   })();
 }

@@ -1,68 +1,68 @@
 {extends file="admin-layout.tpl"} {block name="main-content"}
 <div class="text-darkCharbon">
   <div class="m-10">
-    <h1 class="text-5xl font-bold text-center">Thelia Back Office UI KIT</h1>
+    <h1 class="text-5xl font-bold text-center">{intl l = "Thelia Back Office UI KIT"}</h1>
   </div>
 
   <!-- Colors -->
   <div class="flex justify-center p-10">
     <div class="w-1/6">
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-main">
-        #EC6351
+        {intl l = "#EC6351"}
       </div>
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-darkMain">
-        #E25441
+        {intl l = "#E25441"}
       </div>
     </div>
 
     <div class="w-1/6">
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-lightCharbon">
-        #444444
+        {intl l = "#444444"}
       </div>
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-mediumCharbon">
-        #333333
+        {intl l = "#333333"}
       </div>
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-darkCharbon">
-        #222222
+        {intl l = "#222222"}
       </div>
     </div>
 
     <div class="w-1/6">
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-grey">
-        #707070
+        {intl l = "#707070"}
       </div>
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-mediumGrey">
-        #A7A7A7
+        {intl l = "#A7A7A7"}
       </div>
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-lightGrey">
-        #EBEBEB
+        {intl l = "#EBEBEB"}
       </div>
     </div>
 
     <div class="w-1/6">
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-lightPearl">
-        #F7F7F7
+        {intl l = "#F7F7F7"}
       </div>
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-mediumPearl">
-        #F5F5F5
+        {intl l = "#F5F5F5"}
       </div>
     </div>
 
     <div class="w-1/6">
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-carot">
-        #FC9722
+        {intl l = "#FC9722"}
       </div>
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-green">
-        #73CE6F
+        {intl l = "#73CE6F"}
       </div>
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-blue">
-        #1E9AE8
+        {intl l = "#1E9AE8"}
       </div>
     </div>
 
     <div class="w-1/6">
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-error">
-        #D10000
+        {intl l = "#D10000"}
       </div>
     </div>
   </div>
@@ -74,29 +74,33 @@
   <!-- Buttons -->
   <div class="flex items-center p-10">
     <div class="mr-5">
-      <button class="p-3 font-medium text-gray-600 rounded-lg shadow-2xl bg-main hover:bg-darkMain">
-        Click Me
+      <button class="p-3 text-sm font-semibold tracking-wider text-white uppercase rounded bg-vermillon w-103 h-38">
+        {intl l = "Bouton"}
       </button>
     </div>
 
     <div class="mr-5">
-      <button class="p-3 font-medium text-gray-600 bg-transparent border-2 rounded-lg shadow-2xl hover:bg-darkMain border-main">
-        Click Me
+        <button class="p-3 text-sm font-semibold tracking-wider text-white uppercase rounded bg-vermillon w-103 h-38 hover:bg-lightVermillon">
+          {intl l = "Bouton"}
+        </button>
+    </div>
+
+    <div class="mr-5">
+      <button class="p-3 text-sm font-semibold tracking-wider text-white uppercase rounded bg-greyMedium w-103 h-38" disabled>
+        {intl l = "Bouton"}
       </button>
     </div>
 
     <div class="mr-5">
-      <button disabled class="p-3 font-medium text-gray-600 rounded-lg shadow-2xl bg-main bg-opacity-60">
-        Disabled
-      </button>
+      <a href="#" class="font-medium text-vermillon">{intl l = "Link button"}</a>
     </div>
 
     <div class="mr-5">
-      <a href="#" class="font-medium text-main">Link Button</a>
+      <a href="#" class="font-medium underline text-vermillon"><i class="mx-1 fas fa-link"></i>{intl l = "Link button"}</a>
     </div>
 
     <div class="mr-5">
-      <button class="flex items-center justify-center p-4 font-medium text-gray-600 rounded-full shadow-2xl bg-main hover:bg-darkMain">
+      <button class="flex items-center justify-center p-4 font-medium rounded-full shadow-2xl text-darkCharbon bg-vermillon hover:bg-lightVermillon">
         <i class="fas fa-user"></i>
       </button>
     </div>
@@ -107,6 +111,26 @@
       </button>
     </div>
   </div>
+
+  <div class="flex items-center p-10">
+    <div class="mr-5">
+      <button class="p-3 text-sm font-semibold tracking-wider uppercase bg-white border rounded text-vermillon border-vermillon w-103 h-38">
+        {intl l = "Bouton"}
+      </button>
+    </div>
+
+    <div class="mr-5">
+        <button class="p-3 text-sm font-semibold tracking-wider uppercase bg-white border rounded text-vermillon hover:text-white border-vermillon w-103 h-38 hover:bg-vermillon">
+          {intl l = "Bouton"}
+        </button>
+    </div>
+
+    <div class="mr-5">
+      <button class="p-3 text-sm font-semibold tracking-wider uppercase bg-white border rounded border-greyMedium text-greyMedium w-103 h-38" disabled>
+        {intl l = "Bouton"}
+      </button>
+    </div>
+    </div>
 
   <!-- Breadcrumbs -->
   <nav class="flex" aria-label="Breadcrumb">
@@ -119,13 +143,17 @@
       <li>
         <div class="flex items-center">
           <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          <a href="#" class="ml-1 text-sm font-medium text-gray-700 hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">Test</a>
+          <a href="#" class="ml-1 text-sm font-medium text-gray-700 hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">
+            Test
+          </a>
         </div>
       </li>
       <li aria-current="page">
         <div class="flex items-center">
           <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-          <span class="ml-1 text-sm font-medium text-gray-400 md:ml-2 dark:text-gray-500">TestDeux</span>
+          <span class="ml-1 text-sm font-medium text-gray-400 md:ml-2 dark:text-gray-500">
+            TestDeux
+          </span>
         </div>
       </li>
     </ol>
@@ -191,9 +219,9 @@
       </select>
     </div>
     
-    <div class="w-1/4 mb-5">
-      <label class="flex flex-col items-center w-full tracking-wide uppercase bg-white border rounded-lg shadow-lg cursor-pointer text-main border-main hover:bg-darkCharbon hover:text-white">
-          <span class="mt-2 text-base leading-normal">Choisir un fichier</span>
+    <div class="w-1/4 py-8 mb-5">
+      <label class="p-3 text-sm font-semibold tracking-wider text-white uppercase rounded cursor-pointer w-103 h-38 bg-vermillon hover:bg-lightVermillon">
+          <span class="text-sm leading-normal">{intl l="Choisir un fichier"}</span>
           <input type='file' class="hidden" />
       </label>
   </div>
@@ -261,7 +289,13 @@
   <!-- Drag and drop -->
   {component name="draganddrop" title="draganddrop"}{/component}
 
+  {component name="draganddropimage" title="draganddropimage"}{/component}
 
+  {component name="draganddropmedia" title="draganddropmedia"}{/component}
+
+
+  <!-- Pagination -->
+  {component name="Pagination" title="Pagination"}{/component}
 
   <!-- Toggle -->
   <div class="flex p-10">
@@ -305,7 +339,20 @@
     </div>
   </div>
 
+  <!-- Toast Preview -->
+  <div class="pt-2 bg-lightCharbon footer-2 md:pt-6">
+    <div class="container px-2 mx-auto">
+      <div class="flex justify-end py-4 md:flex md:flex-wrap md:-mx-4 md:pb-12">
+        <div class="mt-2 md:w-1/3 md:px-4 md:text-center lg:mt-0 ">
+          <a class="p-2 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer hover:bg-white hover:text-greyMedium"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
+          <a class="p-2 text-sm font-semibold tracking-wider text-white uppercase rounded cursor-pointer bg-vermillon hover:bg-lightVermillon">{intl l="Enregistrer"}</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
+    <!-- Textarea with editor -->
+    {component name="TextAreaEditor" title="TextAreaEditor"}{/component}
 
 
 
@@ -357,20 +404,7 @@
       {component name="Tab" title="Tab" id="three" }content trois{/component}
       {component name="Tab" title="Tab" id="katr" active="true"}content quatre{/component}
     {/component}
-
-    {component name="Tabs"}
-    {include file="components/TabHeader/TabHeader.html" id="one1" title="TestUn"} 
-    {include file="components/TabHeader/TabHeader.html" id="two1" title="TestDeux"} 
-    {include file="components/TabHeader/TabHeader.html" id="three1" title="TestTrois"} 
-    {include file="components/TabHeader/TabHeader.html" id="katr1" title="katr" active="true"} 
-
-    {component name="Tab" title="Tab" id="one1"}content un{/component}
-    {component name="Tab" title="Tab" id="two1"}content deux{/component}
-    {component name="Tab" title="Tab" id="three1"}content trois{/component}
-    {component name="Tab" title="Tab" id="katr1" active="true"}content quatre{/component}
-  {/component}
   </div>
-
 
   <!-- Tableaux -->
   <div class="flex p-10">
@@ -418,21 +452,21 @@
           <td class="flex justify-center px-5 py-4 px-auto">
             <button
               href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-carot hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
               <i class="fas fa-folder-open" aria-hidden="true"></i></button
             ><button
               href="/"
-              class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
               <i class="fas fa-edit" aria-hidden="true"></i></button
             ><button
               href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
@@ -473,21 +507,21 @@
           <td class="flex justify-center px-5 py-4 px-auto">
             <button
               href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-carot hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
               <i class="fas fa-folder-open" aria-hidden="true"></i></button
             ><button
               href="/"
-              class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
               <i class="fas fa-edit" aria-hidden="true"></i></button
             ><button
               href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
@@ -528,21 +562,21 @@
           <td class="flex justify-center px-5 py-4 px-auto">
             <button
               href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-carot hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
               <i class="fas fa-folder-open" aria-hidden="true"></i></button
             ><button
               href="/"
-              class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
               <i class="fas fa-edit" aria-hidden="true"></i></button
             ><button
               href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >

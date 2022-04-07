@@ -1,0 +1,33 @@
+.body-form {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.content-text {
+    padding-left: 20px;
+    padding-top: 50px;
+}
+
+.form-text {
+    margin: 10px 0;
+}
+
+.button-text {
+    border: none;
+    outline: none;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+#output {
+    width: 575px;
+    height: 151px;
+    border: 1px solid #9B9B9B;
+    border-radius: 4px;
+}
+
+.active {
+    border: 1px solid #111;
+}
