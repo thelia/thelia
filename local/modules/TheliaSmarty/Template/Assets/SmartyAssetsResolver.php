@@ -199,7 +199,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
         // Normalize path separator if required (e.g., / becomes \ on windows)
         $fileName = $this->fixPathSeparator($fileName);
 
-        /* Absolute paths are not allowed. This may be a mistake, such as '/assets/...' instead of 'assets/...'. Forgive it.  */
+        /* Absolute paths are not allowed. This may be a mistake, such as '/assets/...' instead of 'assets/...'. Forgive it. */
         $fileName = ltrim($fileName, DS);
 
         /* Navigating in the server's directory tree is not allowed :) */

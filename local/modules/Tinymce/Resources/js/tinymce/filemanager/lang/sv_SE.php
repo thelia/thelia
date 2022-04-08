@@ -14,7 +14,7 @@ return [
     'Select' => 'Välj', // Select
     'Erase' => 'Radera', // Erase
     'Open' => 'Öppna', // Open
-    'Confirm_del' => 'Är du säker på att du vill radera denna fil?', //Are you sure you want to delete this file?
+    'Confirm_del' => 'Är du säker på att du vill radera denna fil?', // Are you sure you want to delete this file?
     'All' => 'Alla', // All
     'Files' => 'Filer', // Files
     'Images' => 'Bilder', // Images
@@ -72,7 +72,7 @@ return [
     'Copy' => 'Kopiera', // Copy
     'Cut' => 'Klipp ut', // Cut
     'Paste' => 'Klistra in', // Paste
-    'CB' => 'Urklipp', //CB,  clipboard
+    'CB' => 'Urklipp', // CB,  clipboard
     'Paste_Here' => 'Klistra in i denna mapp', // Paste to this directory
     'Paste_Confirm' => 'Är du säker på att du vill klistra in i denna mapp? Befintliga filer och mappar kan bli överskrivna.', // Are you sure you want to paste to this directory? This will overwrite existing files/folders if encountered any.
     'Paste_Failed' => 'Misslyckades med att klistra in fil(er)', // Failed to paste file(s)
@@ -118,8 +118,8 @@ return [
     'wrong action' => 'Fel åtgärd', // "Wrong action",
     'wrong sub-action' => 'Fel delåtgärd', // "Wrong sub-actio",
     'no action passed' => 'Ingen åtgärd skickad', // "No action passed",
-    'no path' => 'Ingen sökväg', //"No path",
-    'no file' => 'Ingen fil', //"No file",
+    'no path' => 'Ingen sökväg', // "No path",
+    'no file' => 'Ingen fil', // "No file",
     'view type number missing' => 'Vytypsnummer saknas', // "View type number missing",
     'Not enought Memory' => 'Inte tillräckligt med minne', // "Not enought Memory",
     'max_size_reached' => 'Din bildkatalog har nått den maximala storleken av %d MB', // "Your image folder has reach its maximale size of %d MB.", //%d = max overall size

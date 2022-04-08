@@ -16,4 +16,28 @@ use Thelia\Model\Base\Config as BaseConfig;
 
 class Config extends BaseConfig
 {
+    public function getEnvName()
+    {
+        return str_replace(
+            ['.', '-'],
+            '_',
+            strtoupper(
+                $this->getName()
+            )
+        );
+    }
+
+    public function getValue()
+    {
+        if ($this->isOverriddenInEnv()) {
+            return $_ENV[$this->getEnvName()];
+        }
+
+        return parent::getValue();
+    }
+
+    public function isOverriddenInEnv(): bool
+    {
+        return isset($_ENV[$this->getEnvName()]);
+    }
 }

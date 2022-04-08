@@ -764,7 +764,7 @@ class BaseModule implements BaseModuleInterface
 
                 $returnData[$key] = $value;
             }
-        } elseif (is_scalar($data)) {
+        } elseif (\is_scalar($data)) {
             $returnData[$defaultLocale] = $data;
         }
 

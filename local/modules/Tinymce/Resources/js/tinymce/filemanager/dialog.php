@@ -1,7 +1,7 @@
 <?php
 $time = time();
 $config = include 'config/config.php';
-//TODO switch to array
+// TODO switch to array
 extract($config, \EXTR_OVERWRITE);
 
 if (USE_ACCESS_KEYS == true) {
@@ -55,7 +55,7 @@ if ($subdir == '') {
         $subdir = trim($_COOKIE['last_position']);
     }
 }
-//remember last position
+// remember last position
 setcookie('last_position', $subdir, time() + (86400 * 7));
 
 if ($subdir == '/') {
@@ -159,7 +159,7 @@ if (isset($_GET['popup'])) {
 } else {
     $popup = 0;
 }
-//Sanitize popup
+// Sanitize popup
 $popup = (bool) $popup;
 
 if (isset($_GET['crossdomain'])) {
@@ -168,10 +168,10 @@ if (isset($_GET['crossdomain'])) {
     $crossdomain = 0;
 }
 
-//Sanitize crossdomain
+// Sanitize crossdomain
 $crossdomain = (bool) $crossdomain;
 
-//view type
+// view type
 if (!isset($_SESSION['RF']['view_type'])) {
     $view = $default_view;
     $_SESSION['RF']['view_type'] = $view;
@@ -184,7 +184,7 @@ if (isset($_GET['view'])) {
 
 $view = $_SESSION['RF']['view_type'];
 
-//filter
+// filter
 $filter = '';
 if (isset($_SESSION['RF']['filter'])) {
     $filter = $_SESSION['RF']['filter'];
@@ -571,10 +571,10 @@ if ($ftp) {
 
 $n_files = count($files);
 
-//php sorting
+// php sorting
 $sorted = [];
-//$current_folder=array();
-//$prev_folder=array();
+// $current_folder=array();
+// $prev_folder=array();
 $current_files_number = 0;
 $current_folders_number = 0;
 
@@ -872,11 +872,11 @@ $files = $sorted;
             }
             $new_name = fix_filename($file, $config);
             if ($ftp && $file != '..' && $file != $new_name) {
-                //rename
+                // rename
                 rename_folder($current_path.$subdir.$file, $new_name, $ftp, $config);
                 $file = $new_name;
             }
-            //add in thumbs folder if not exist
+            // add in thumbs folder if not exist
             if ($file != '..') {
                 if (!$ftp && !file_exists($thumbs_path.$subdir.$file)) {
                     create_folder(false, $thumbs_path.$subdir.$file, $ftp, $config);
@@ -986,7 +986,7 @@ $files = $sorted;
                 $filename = substr($file, 0, '-'.(strlen($file_array['extension']) + 1));
                 if (!$ftp) {
                     $file_path = $current_path.$rfm_subfolder.$subdir.$file;
-                    //check if file have illegal caracter
+                    // check if file have illegal caracter
 
                     if ($file != fix_filename($file, $config)) {
                         $file1 = fix_filename($file, $config);
@@ -1036,7 +1036,7 @@ $files = $sorted;
                                 new_thumbnails_creation($current_path.$rfm_subfolder.$subdir, $file_path, $file, $current_path, '', '', '', '', '', '', '', $fixed_image_creation, $fixed_path_from_filemanager, $fixed_image_creation_name_to_prepend, $fixed_image_creation_to_append, $fixed_image_creation_width, $fixed_image_creation_height, $fixed_image_creation_option);
                             }
                         }
-                        //check if is smaller than thumb
+                        // check if is smaller than thumb
                         [$img_width, $img_height, $img_type, $attr] = @getimagesize($file_path);
                         if ($img_width < 122 && $img_height < 91) {
                             $src_thumb = $file_path;

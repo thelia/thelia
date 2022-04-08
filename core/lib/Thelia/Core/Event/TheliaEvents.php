@@ -537,11 +537,6 @@ final class TheliaEvents
     public const FEATURE_AV_UPDATE_POSITION = 'action.updateFeatureAvPosition';
 
     /**
-     * sent when system find a mailer transporter.
-     */
-    public const MAILTRANSPORTER_CONFIG = 'action.mailertransporter.config';
-
-    /**
      * sent when Thelia try to generate a rewritten url.
      */
     public const GENERATE_REWRITTENURL = 'action.generate_rewritenurl';

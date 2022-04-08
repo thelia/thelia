@@ -122,7 +122,7 @@ return [
     'no file' => 'Fișier inexistent',
     'view type number missing' => 'Lipsă număr tip de vizualizare',
     'Not enought Memory' => 'Memorie insuficientă',
-    'max_size_reached' => 'Folderul de imagini a atins dimensiunea maximă de %d MB.', //%d = max overall size
+    'max_size_reached' => 'Folderul de imagini a atins dimensiunea maximă de %d MB.', // %d = max overall size
     'B' => 'B',
     'KB' => 'KB',
     'MB' => 'MB',

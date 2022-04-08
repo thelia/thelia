@@ -32,7 +32,7 @@ class FreeOrder extends AbstractPaymentModule
     {
         $event = new OrderEvent($order);
         $event->setStatus(OrderStatusQuery::getPaidStatus()->getId());
-        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
+        $this->getDispatcher()->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
     }
 
     /**

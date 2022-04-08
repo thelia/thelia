@@ -48,7 +48,7 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
             ]
         );
 
-        return Response::create($renderedTemplate);
+        return new Response($renderedTemplate);
     }
 
     /**

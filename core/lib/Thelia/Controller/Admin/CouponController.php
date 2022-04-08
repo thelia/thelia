@@ -518,14 +518,14 @@ class CouponController extends BaseAdminController
             );
 
             if ($this->getRequest()->get('save_mode') == 'stay') {
-                $response = RedirectResponse::create(str_replace(
+                $response = new RedirectResponse(str_replace(
                     '{id}',
                     $couponEvent->getCouponModel()->getId(),
                     $couponForm->getSuccessUrl()
                 ));
             } else {
                 // Redirect to the success URL
-                $response = RedirectResponse::create(
+                $response = new RedirectResponse(
                     URL::getInstance()->absoluteUrl($this->getRoute('admin.coupon.list'))
                 );
             }
@@ -873,7 +873,7 @@ class CouponController extends BaseAdminController
                 );
             }
 
-            return $response = RedirectResponse::create(
+            return new RedirectResponse(
                 URL::getInstance()->absoluteUrl($this->getRoute('admin.coupon.list'))
             );
         } catch (\Exception $e) {
