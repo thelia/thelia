@@ -45,6 +45,9 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\VarExporter\VarExporter;
 use Symfony\Contracts\EventDispatcher\Event;
+use Thelia\Api\Bridge\Propel\Extension\QueryCollectionExtensionInterface;
+use Thelia\Api\Bridge\Propel\Extension\QueryItemExtensionInterface;
+use Thelia\Api\Bridge\Propel\Filter\FilterInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
@@ -460,6 +463,10 @@ class Thelia extends Kernel
             CouponInterface::class => 'thelia.coupon.addCoupon',
             ConditionInterface::class => 'thelia.coupon.addCondition',
             ControllerInterface::class => 'controller.service_arguments',
+
+            QueryCollectionExtensionInterface::class => 'thelia.api.propel.query_extension.collection',
+            QueryItemExtensionInterface::class => 'thelia.api.propel.query_extension.item',
+            FilterInterface::class => 'thelia.api.propel.filter',
         ];
 
         foreach ($autoconfiguredInterfaces as $interfaceClass => $tag) {
