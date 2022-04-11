@@ -28,7 +28,7 @@ trait StubClassTrait
      *
      * @return string
      */
-    public function getClassFilePath()
+    public function getClassFilePath(): string
     {
         /** @var $this AbstractOMBuilder */
         $fs = new Filesystem();
