@@ -1,17 +1,19 @@
 .SearchDropdown {
   position: relative;
+
   &-input {
     width: 20rem !important;
     max-width: 100%;
     height: 2.375rem;
-    border-radius: 3.125rem;
-
     padding: 0 4rem 0 1rem;
+    border-radius: 3.125rem;
   }
+
   &-icon {
     @apply absolute text-base;
-    right: 1.25rem;
+
     top: 50%;
+    right: 1.25rem;
     transform: translateY(-50%);
   }
 }

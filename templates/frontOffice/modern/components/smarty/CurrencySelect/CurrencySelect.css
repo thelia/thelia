@@ -1,5 +1,4 @@
 .CurrencySelect {
-
   position: relative;
 
   &:hover,
@@ -16,31 +15,31 @@
 
     &:hover,
     &:focus {
-
       .CurrencySelect-flag {
-        fill: currentColor;
+        fill: currentcolor;
       }
     }
   }
 
   &-arrow {
-    width: 10px;
-    height: 5px;
     position: absolute;
     top: 50%;
     right: 0;
+    width: 10px;
+    height: 5px;
     margin-top: 0;
-    fill: black;
     font-weight: 400;
     transform: translateY(-50%);
+    fill: black;
   }
 
   &-dropdown {
     @apply bg-white shadow;
+
     position: absolute;
-    z-index: 20;
     top: 100%;
     left: -99999em;
+    z-index: 20;
     width: auto;
     opacity: 0;
     transition: 0.3s ease-out;

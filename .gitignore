@@ -82,6 +82,8 @@ templates/pdf/*
 #other
 .DS_Store
 .idea/
+.history/
+.husky/
 composer.phar
 
 ###> friendsofphp/php-cs-fixer ###
