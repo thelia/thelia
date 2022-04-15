@@ -25,7 +25,7 @@ final class ResourceResultExtension implements QueryResultCollectionExtensionInt
 
         return array_map(
             function ($propelModel) use ($resourceClass, $langs) {
-                $apiResource = new $resourceClass;
+                $apiResource = new $resourceClass();
                 foreach (get_class_methods($apiResource) as $methodName) {
                     if (!str_starts_with($methodName, 'set')) {
                         continue;
@@ -44,10 +44,11 @@ final class ResourceResultExtension implements QueryResultCollectionExtensionInt
                         /** @var I18n $i18nResource */
                         $i18nResource = new ($resourceClass::getI18nResourceClass());
 
-
                         $i18nResource
-                            ->setLocale($lang->getLocale())
-                            ->setTitle($propelModel->getVirtualColumn('lang_'.$lang->getLocale().'_'.'title'));
+                            ->setLocale($lang->getLocale());
+
+                        $this->setI18nFieldValue($i18nResource, $lang, 'title', $propelModel);
+                        $this->setI18nFieldValue($i18nResource, $lang, 'chapo', $propelModel);
 
                         $apiResource->addI18n($i18nResource);
                     }
@@ -59,8 +60,22 @@ final class ResourceResultExtension implements QueryResultCollectionExtensionInt
         );
     }
 
-    private function getI18ns(): array {
+    private function setI18nFieldValue(I18n $i18nResource, $lang, $field, $propelModel): void
+    {
+        $virtualColumn = 'lang_'.$lang->getLocale().'_'.$field;
+        $setter = 'set'.ucfirst($field);
 
+        $value = '';
+
+        if (
+            $propelModel->hasVirtualColumn($virtualColumn)
+            &&
+            !empty($propelModel->getVirtualColumn($virtualColumn))
+        ) {
+            $value = $propelModel->getVirtualColumn($virtualColumn);
+        }
+
+        $i18nResource->$setter($value);
     }
 
     public function applyToCollection(ModelCriteria $query, string $resourceClass, string $operationName = null, array $context = [])
