@@ -7,13 +7,23 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
+    collectionOperations: [
+        'get',
+        'post'
+    ],
+    itemOperations: [
+        'adminGet' => [
+            'method' => 'GET',
+            'path' => '/admin/products/{id}'
+        ]
+    ],
     denormalizationContext: ['groups' => ['product:write']],
     normalizationContext: ['groups' => ['product:read']]
 )]
 class Product implements PropelResourceInterface, TranslatableResourceInterface
 {
     #[Groups(['product:read'])]
-    private int $id;
+    private ?int $id = null;
 
     #[Groups(['product:read', 'product:write'])]
     private string $ref;
@@ -23,9 +33,6 @@ class Product implements PropelResourceInterface, TranslatableResourceInterface
 
     #[Groups(['product:write'])]
     private bool $virtual;
-
-    #[Groups(['product:read'])]
-    private Template $template;
 
     #[Groups(['product:read', 'product:write'])]
     private array $productCategories;
@@ -40,9 +47,9 @@ class Product implements PropelResourceInterface, TranslatableResourceInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -111,24 +118,6 @@ class Product implements PropelResourceInterface, TranslatableResourceInterface
         return $this;
     }
 
-    /**
-     * @return Template
-     */
-    public function getTemplate(): Template
-    {
-        return $this->template;
-    }
-
-//    /**
-//     * @param Template $template
-//     * @return Product
-//     */
-//    public function setTemplate(Template $template): Product
-//    {
-//        $this->template = $template;
-//        return $this;
-//    }
-
     public function setI18ns(array $i18ns): self
     {
         $this->i18ns = $i18ns;
@@ -156,26 +145,26 @@ class Product implements PropelResourceInterface, TranslatableResourceInterface
 
         return $this;
     }
-
-    /**
-     * @return ProductCategory[]
-     */
-    public function getProductCategories(): array
-    {
-        return $this->productCategories;
-    }
-
-    public function addProductCategory(ProductCategory $productCategory): self
-    {
-
-        return $this;
-    }
-
-    public function removeProductCategory(ProductCategory $productCategory): self
-    {
-
-        return $this;
-    }
+//
+//    /**
+//     * @return ProductCategory[]
+//     */
+//    public function getProductCategories(): array
+//    {
+//        return $this->productCategories;
+//    }
+//
+//    public function addProductCategory(ProductCategory $productCategory): self
+//    {
+//
+//        return $this;
+//    }
+//
+//    public function removeProductCategory(ProductCategory $productCategory): self
+//    {
+//
+//        return $this;
+//    }
 
     public static function getPropelModelClass(): string
     {
