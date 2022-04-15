@@ -166,7 +166,19 @@
         <xsd:attribute name="alias" type="xsd:string" />
         <xsd:attribute name="parent" type="xsd:string" />
         <xsd:attribute name="shared" type="xsd:boolean" />
+        <xsd:attribute name="decorates" type="xsd:string" />
+        <xsd:attribute name="decoration-on-invalid" type="invalid_decorated_service_sequence" />
+        <xsd:attribute name="decoration-inner-name" type="xsd:string" />
+        <xsd:attribute name="decoration-priority" type="xsd:integer" />
     </xsd:complexType>
+
+    <xsd:simpleType name="invalid_decorated_service_sequence">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="null" />
+            <xsd:enumeration value="ignore" />
+            <xsd:enumeration value="exception" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xsd:complexType name="hook">
         <xsd:choice maxOccurs="unbounded">
