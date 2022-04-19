@@ -51,6 +51,10 @@ class TemplateDescriptor
     /** @var array */
     protected $authors = [];
 
+    /** @var string */
+    protected $templateAssets = '';
+    protected $compiledAssets = '';
+
     /**
      * TemplateDescriptor constructor.
      */
@@ -251,6 +255,46 @@ class TemplateDescriptor
     public function setAuthors($authors): self
     {
         $this->authors = $authors;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemplateAssets()
+    {
+        return $this->templateAssets;
+    }
+
+    /**
+     * @param array $string
+     *
+     * @return $this
+     */
+    public function setTemplateAssets($templateAssets): self
+    {
+        $this->templateAssets = $templateAssets;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompiledAssets()
+    {
+        return $this->compiledAssets;
+    }
+
+    /**
+     * @param array $string
+     *
+     * @return $this
+     */
+    public function setCompiledAssets($compiledAssets): self
+    {
+        $this->compiledAssets = $compiledAssets;
 
         return $this;
     }

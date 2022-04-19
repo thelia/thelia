@@ -94,6 +94,8 @@ class TemplateValidator
                 ->setTheliaVersion((string) $this->xmlDescriptorContent->thelia)
                 ->setStability((string) $this->xmlDescriptorContent->stability)
                 ->setDocumentation((string) $this->xmlDescriptorContent->documentation)
+                ->setTemplateAssets((string) $this->xmlDescriptorContent->templateAssets)
+                ->setCompiledAssets((string) $this->xmlDescriptorContent->compiledAssets)
             ;
 
             $this->checkVersion($templateDescriptor);

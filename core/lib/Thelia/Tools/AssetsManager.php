@@ -18,11 +18,13 @@ class AssetsManager
 
     protected $processed = [];
     protected $entrypoints = [];
-    protected $entrypointsPath = THELIA_FRONT_ASSETS_ENTRYPOINTS_PATH;
+    protected $entrypointsPath = null;
 
-    protected function __construct()
+    protected function __construct($entrypointsPath)
     {
-        if (file_exists($this->entrypointsPath)) {
+        $this->entrypointsPath = $entrypointsPath;
+
+        if (null !== $this->entrypointsPath && file_exists($this->entrypointsPath)) {
             $json = json_decode(file_get_contents($this->entrypointsPath), true);
             $this->entrypoints = $json['entrypoints'];
         }
@@ -32,10 +34,10 @@ class AssetsManager
     {
     }
 
-    public static function getInstance()
+    public static function getInstance($entrypointsPath)
     {
         if (self::$instance === null) {
-            self::$instance = new self();
+            self::$instance = new self($entrypointsPath);
         }
 
         return self::$instance;
@@ -44,6 +46,7 @@ class AssetsManager
     public function getAssets($entry, $type)
     {
         $assets = [];
+
         if (isset($this->entrypoints[$entry][$type])) {
             $assets = array_diff($this->entrypoints[$entry][$type], $this->processed);
             $this->processed = array_merge($this->processed, $assets);

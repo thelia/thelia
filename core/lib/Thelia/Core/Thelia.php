@@ -88,6 +88,8 @@ class Thelia extends Kernel
         $loader = new ClassLoader();
 
         $loader->addPsr4('', THELIA_ROOT."var/cache/{$environment}/propel/model");
+        $loader->addPsr4('backOffice\\', THELIA_ROOT."templates/backOffice/{$_SERVER['BO_TEMPLATE']}/components");
+        $loader->addPsr4('frontOffice\\', THELIA_ROOT."templates/frontOffice/{$_SERVER['TEMPLATE']}/components");
         $loader->addPsr4('TheliaMain\\', THELIA_ROOT."var/cache/{$environment}/propel/database/TheliaMain");
         $loader->register();
 

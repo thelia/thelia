@@ -75,7 +75,8 @@
         "thelia/better-seo-module": "2.0.0",
         "thelia/short-code-meta-module": "dev-main",
         "thelia/force-phone-module": "dev-main",
-        "symfony/mailer": "6.0.*"
+        "symfony/mailer": "6.0.*",
+        "symfony/webpack-encore-bundle": "^1.14"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",
