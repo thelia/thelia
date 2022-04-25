@@ -32,7 +32,7 @@ Encore.addEntry('app', './assets/js/app.js')
 Encore.setOutputPath('dist/')
   .setPublicPath(
     process.env.NODE_ENV === 'production'
-      ? '/assets/frontOffice/' + path.basename(__dirname) + '/dist'
+      ? '/templates-assets/frontOffice/' + path.basename(__dirname) + '/dist'
       : '/dist'
   )
   .addAliases({

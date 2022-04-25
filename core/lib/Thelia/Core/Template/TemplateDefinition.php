@@ -244,14 +244,14 @@ class TemplateDefinition
     /**
      * @return array
      */
-    public function getTemplateAssetsPath()
+    public function getAssetsPath()
     {
-        return $this->templateDescriptor->getTemplateAssets();
+        return $this->templateDescriptor->getAssets();
     }
 
-    public function setTemplateAssetsPath($assets)
+    public function setAssetsPath($assets)
     {
-        $this->$this->templateDescriptor->setTemplateAssets($assets);
+        $this->$this->templateDescriptor->setAssets($assets);
 
         return $this;
     }
@@ -259,31 +259,8 @@ class TemplateDefinition
     /**
      * @return string
      */
-    public function getAbsoluteTemplateAssetsPath()
+    public function getAbsoluteAssetsPath()
     {
-        return $this->getAbsolutePath().DS.$this->templateDescriptor->getTemplateAssets();
-    }
-
-    /**
-     * @return array
-     */
-    public function getCompiledAssetsPath()
-    {
-        return $this->templateDescriptor->getCompiledAssets();
-    }
-
-    public function setCompiledAssetsPath($assets)
-    {
-        $this->$this->templateDescriptor->setCompiledAssets($assets);
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAbsoluteCompiledAssetsPath()
-    {
-        return $this->getAbsolutePath().DS.$this->templateDescriptor->getCompiledAssets();
+        return $this->getAbsolutePath().DS.$this->templateDescriptor->getAssets();
     }
 }

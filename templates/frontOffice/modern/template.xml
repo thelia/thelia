@@ -40,5 +40,5 @@
     </authors>
     <thelia>2.5.0</thelia>
     <stability>prod</stability>
-    <compiledAssets>dist</compiledAssets>
+    <assets>dist</assets>
 </template>

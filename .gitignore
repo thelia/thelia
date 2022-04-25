@@ -27,7 +27,8 @@ web/assets/*
 web/cache/*
 web/tinymce
 web/media
-web/dist
+web/modules-assets/
+web/templates-assets/
 phpdoc*.log
 xhprof/
 phpunit.phar

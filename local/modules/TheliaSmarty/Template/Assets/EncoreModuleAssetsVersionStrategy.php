@@ -14,7 +14,7 @@ namespace TheliaSmarty\Template\Assets;
 
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
-class EncoreTemplateAssetsVersionStrategy implements VersionStrategyInterface
+class EncoreModuleAssetsVersionStrategy implements VersionStrategyInterface
 {
     private $originPath;
 

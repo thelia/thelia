@@ -22,7 +22,9 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
+use TheliaSmarty\Template\Assets\EncoreModuleAssetsPathPackage;
 use TheliaSmarty\Template\Assets\EncoreTemplateAssetsPathPackage;
+use TheliaSmarty\Template\Assets\EncoreModuleAssetsVersionStrategy;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 class Encore extends AbstractSmartyPlugin
@@ -45,6 +47,9 @@ class Encore extends AbstractSmartyPlugin
     /** @var string */
     public $templateSymlinkDest;
 
+    /** @var string */
+    public $moduleSymlinkDest;
+
     public function __construct(TagRenderer $tagRenderer, EntrypointLookupCollectionInterface $entrypointLookupInterface, TemplateHelperInterface $templateHelper)
     {
         $this->packages = [];
@@ -54,27 +59,46 @@ class Encore extends AbstractSmartyPlugin
         $this->templateEnv = Request::$isAdminEnv ? TemplateDefinition::BACK_OFFICE_SUBDIR : TemplateDefinition::FRONT_OFFICE_SUBDIR;
         $this->activeTemplate = Request::$isAdminEnv ? $this->templateHelper->getActiveAdminTemplate() : $this->templateHelper->getActiveFrontTemplate();
 
-        $this->templateSymlinkDest = THELIA_WEB_DIR.'assets';
+        $this->templateSymlinkDest = THELIA_WEB_DIR.'templates-assets';
+        $this->moduleSymlinkDest = THELIA_WEB_DIR.'modules-assets';
 
-        if ($this->activeTemplate->getTemplateAssetsPath()) {
-            $this->packages['template-assets'] = new EncoreTemplateAssetsPathPackage($this->activeTemplate);
+        $this->packages['modules'] = new EncoreModuleAssetsPathPackage($this->moduleSymlinkDest.DS);
+
+        if ($this->activeTemplate->getAssetsPath()) {
+            $this->packages['manifest'] = new Package(new JsonManifestVersionStrategy($this->activeTemplate->getAbsoluteAssetsPath().'/manifest.json'));
+            $this->createSymlink($this->activeTemplate->getAbsoluteAssetsPath(), $this->templateSymlinkDest.DS.$this->activeTemplate->getPath().DS.$this->activeTemplate->getAssetsPath(), true);
         }
-        if ($this->activeTemplate->getCompiledAssetsPath()) {
-            $this->packages['manifest'] = new Package(new JsonManifestVersionStrategy($this->activeTemplate->getAbsoluteCompiledAssetsPath().'/manifest.json'));
-            $this->createSymlink($this->activeTemplate->getAbsoluteCompiledAssetsPath(), $this->templateSymlinkDest.DS.$this->activeTemplate->getPath().DS.$this->activeTemplate->getCompiledAssetsPath(), true);
-        }
+
+
+
+
     }
 
-    public function functionAsset($args)
+    public function functionModuleAsset($args)
     {
         $file = $args['file'];
+        $module = $args['module'];
+        $template = $args['template'] ?? '';
+
+
         if (!$file) {
             return '';
         }
 
-        if (isset($this->packages['template-assets'])) {
-            return $this->packages['template-assets']->getUrl($file);
+        $path = $this->findCorrectTemplate($file, $module, $template);
+
+        try {
+            if ($path) {
+                $fileSystem = new Filesystem();
+                $fileSystem->symlink($path, $this->moduleSymlinkDest.DS.$module.DS.$file);
+            }
+
+            return $this->packages['modules']->getUrl(DS.$module.DS.$file);
+        } catch (\Throwable $th) {
+            return '';
         }
+
+
     }
 
     public function getWebpackManifestFile($args): string
@@ -84,9 +108,12 @@ class Encore extends AbstractSmartyPlugin
             return '';
         }
 
+
         if (isset($this->packages['manifest'])) {
             return $this->packages['manifest']->geturl($file);
         }
+
+        return '';
     }
 
     public function getWebpackJsFiles($args): array
@@ -148,7 +175,7 @@ class Encore extends AbstractSmartyPlugin
     public function getPluginDescriptors()
     {
         return [
-            new SmartyPluginDescriptor('function', 'encore_asset', $this, 'functionAsset'),
+            new SmartyPluginDescriptor('function', 'encore_module_asset', $this, 'functionModuleAsset'),
             new SmartyPluginDescriptor('function', 'encore_manifest_file', $this, 'getWebpackManifestFile'),
             new SmartyPluginDescriptor('function', 'encore_entry_js_files', $this, 'getWebpackJsFiles'),
             new SmartyPluginDescriptor('function', 'encore_entry_css_files', $this, 'getWebpackCssFiles'),
@@ -179,35 +206,52 @@ class Encore extends AbstractSmartyPlugin
         }
     }
 
-    private function findCorrectTemplate($file, $module = null, $template = null): string|null
+    private function  findActiveOrDefaultTemplate($prefixPath, $file, $template = null)  : string|null{
+
+        if (isset($template) && file_exists($prefixPath.DS.$template.DS.$file)) {
+          return $prefixPath.DS.$template.DS.$file;
+        }
+
+        if (file_exists($prefixPath.DS.$file)) {
+            return $prefixPath.DS.$file;
+        }
+        if (file_exists($prefixPath.DS."default".DS.$file)) {
+            return $prefixPath.DS."default".DS.$file;
+        }
+
+        return null;
+    }
+
+    private function findCorrectTemplate($file, $module = null, $template = "default"): string|null
     {
-        $path = null;
 
-        // local/modules/MyModule/templates/backOffice/custom-template/foo.css
-        if ('local'.DS.'modules'.DS.$module.DS.'templates'.DS.$this->templateEnv.DS.$template.DS.$file) {
-        }
-        // local/modules/MyModule/templates/backOffice/default/foo.css
-        elseif ('local'.DS.'modules'.DS.$module.DS.'templates'.DS.$this->templateEnv.DS.'default'.DS.$file) {
-        }
-        // templates/backOffice/custom-template/modules/MyModule/foo.css
-        elseif ('templates'.DS.$this->templateEnv.DS.$template.DS.'modules'.DS.$module.DS.$file) {
-            // TODO
-        }
-        // templates/backOffice/custom-template::parent/modules/MyModule/foo.css (handle template hierarchy)
-        elseif ('templates'.DS.$this->templateEnv.DS.$template.DS.'modules'.DS.$module.DS.$file) {
-            // TODO
-        }
-        // templates/backOffice/default/modules/MyModule/foo.css
-        elseif ('templates'.DS.$this->templateEnv.DS.'default'.DS.'modules'.DS.$module.DS.$file) {
-            // TODO
-        }
-        // templates/backOffice/custom-template/foo.css (handle template hierarchy)
-        elseif ('templates'.DS.$this->templateEnv.DS.$template.DS.$file) {
-        }
-        // templates/backOffice/default/foo.css
-        elseif ('templates'.DS.$this->templateEnv.DS.'default'.DS.$file) {
+
+        $possiblePaths = array_merge(...[
+            //paths from active template
+            [
+                $this->activeTemplate->getAbsolutePath().DS.'modules'.DS.$module
+            ],
+
+            // paths from template parents
+            array_map(function($parent) use ($module) {
+                return $parent->getAbsolutePath().DS.'modules'.DS.$module;
+            }, array_values($this->activeTemplate->getParentList())),
+
+            // paths from module
+            [
+                THELIA_MODULE_DIR.$module.DS.'templates'.DS.$this->templateEnv
+            ],
+        ]);
+
+
+
+
+        foreach ($possiblePaths as $path) {
+            $match = $this->findActiveOrDefaultTemplate($path, $file, $template);
+            if ($match) return $match;
         }
 
-        return $path;
+
+        return null;
     }
 }
