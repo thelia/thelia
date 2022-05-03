@@ -1494,7 +1494,7 @@ class ProductController extends AbstractSeoCrudController
             $responseData['error'] = $e->getMessage();
         }
 
-        return JsonResponse::create($responseData, isset($responseData['error']) ? 500 : 200);
+        return new JsonResponse($responseData, isset($responseData['error']) ? 500 : 200);
     }
 
     public function getAssociationResponseData(EventDispatcherInterface $eventDispatcher, $pseId, $type, $typeId)

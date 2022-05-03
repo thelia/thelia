@@ -1,0 +1,84 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a module hook'}{/block}
+
+{block name="main-content"}
+<div id="edit-hook">
+    <h1 class="mb-16 text-3xl font-bold">{intl l='Edit a module hook'}</h1>
+    <!-- Breadcrumbs -->
+  <nav class="flex mb-10" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="#" class="inline-flex items-center text-sm font-medium text-main hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+          {intl l='Home'}
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <a href="#" class="ml-1 text-sm font-medium text-main hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <span class="ml-1 text-sm font-medium text-main md:ml-2 dark:text-gray-500">{intl l='Hook positions'}</span>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <span class="ml-1 text-sm font-medium text-gray-400 md:ml-2 dark:text-gray-500">{intl l='Editing hook for module'}</span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+    <!--Panel-->
+    {component name="Panel" title="Editing hook for module"}
+    {hook name="module-hook-edit.top"}
+        <!--Boutons save, save and close et close-->
+      <div class="flex justify-end border-b">
+        <button class="p-3 mb-3 font-medium text-white rounded-lg shadow-2xl bg-green hover:bg-black">
+          Save ✓
+        </button>
+        <button class="p-3 mx-1 mb-3 font-medium text-white rounded-lg shadow-2xl bg-blue hover:bg-black">
+          Save and close X
+        </button>
+        <button class="p-3 mb-3 font-medium text-black bg-white rounded-lg shadow-2xl hover:bg-darkMain">
+          Close X
+        </button>
+      </div> 
+      <!--Form-->
+          {form name="thelia.admin.module-hook.modification"}
+            <form method="POST">
+              <div class="grid grid-flow-col grid-rows-3 gap-4">
+                <div class="row-span-3">
+                  <input type="hidden" name="module_hook_id" />
+                    {form_hidden_fields}
+                      {render_form_field field="success_url" value={url path="/admin/module-hooks"}}
+                         {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                                        {render_form_field field="module_id"}
+                                        {render_form_field field="hook_id"}
+                                        {render_form_field field="active"}
+                  </div>
+                  <div class="col-span-2 row-span-2">
+                    {custom_render_form_field field='classname'}
+                        <select {form_field_attributes field='classname'} >
+                        </select>
+                    {/custom_render_form_field}
+
+                    {custom_render_form_field field='method'}
+                         <select {form_field_attributes field='method'} >
+                         </select>
+                    {/custom_render_form_field}
+
+                                        {render_form_field field="templates"}
+                  </div>
+                  </div>
+                  </form>
+            {/form}
+    {hook name="module-hook-edit.bottom"}
+    {/component}
+</div>
+{/block}

@@ -117,7 +117,7 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
             ->useFeatureProductQuery()
                 ->filterByIsFreeText(false)
                 ->_or()
-                ->filterByIsFreeText(null) //does not belong to any product
+                ->filterByIsFreeText(null) // does not belong to any product
             ->endUse()
         ;
 

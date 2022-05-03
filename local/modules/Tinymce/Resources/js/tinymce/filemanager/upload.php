@@ -12,7 +12,7 @@
 
 if (!isset($config)) {
     $config = include 'config/config.php';
-    //TODO switch to array
+    // TODO switch to array
     extract($config, \EXTR_OVERWRITE);
 }
 include 'include/utils.php';
@@ -200,7 +200,7 @@ if (!empty($_FILES) || isset($_POST['url'])) {
                         create_img($targetFile, $targetFile, $image_resizing_width, $image_resizing_height, $image_resizing_mode);
                     }
 
-                    //max resizing limit control
+                    // max resizing limit control
                     $resize = false;
                     if ($image_max_width != 0 && $srcWidth > $image_max_width && $image_resizing_override === false) {
                         $resize = true;

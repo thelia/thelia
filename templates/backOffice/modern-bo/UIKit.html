@@ -1,102 +1,197 @@
 {extends file="admin-layout.tpl"} {block name="main-content"}
 <div class="text-darkCharbon">
   <div class="m-10">
-    <h1 class="text-5xl font-bold text-center">Thelia Back Office UI KIT</h1>
+    <h1 class="text-5xl font-bold text-center">{intl l = "Thelia Back Office UI KIT"}</h1>
   </div>
 
   <!-- Colors -->
   <div class="flex justify-center p-10">
     <div class="w-1/6">
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-main">
-        #EC6351
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-darkMain">
-        #E25441
-      </div>
-    </div>
-
-    <div class="w-1/6">
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-lightCharbon">
-        #444444
+      <div class="font-bold pl-7">{intl l = "Main"}</div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-vermillon">
+        {intl l = "#DC3018"}
       </div>
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-mediumCharbon">
-        #333333
+        {intl l = "#333333"}
+      </div>
+    </div>
+
+    <div class="w-1/6">
+      <div class="font-bold pl-7">{intl l = "Secondary"}</div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-lightVermillon">
+        {intl l = "#FA533C"}
       </div>
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-darkCharbon">
-        #222222
-      </div>
-    </div>
-
-    <div class="w-1/6">
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-grey">
-        #707070
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-mediumGrey">
-        #A7A7A7
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-lightGrey">
-        #EBEBEB
-      </div>
-    </div>
-
-    <div class="w-1/6">
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-lightPearl">
-        #F7F7F7
+        {intl l = "#222222"}
       </div>
       <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-mediumPearl">
-        #F5F5F5
+        {intl l = "#EBEBEB"}
+      </div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-greyDark">
+        {intl l = "#787878"}
+      </div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 bg-white rounded-lg shadow-2xl">
+        {intl l = "#FFFFFF"}
+      </div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-lighterVermillon">
+        {intl l = "#FF8F80"}
+      </div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-lightCharbon">
+        {intl l = "#444444"}
+      </div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-greyMedium">
+        {intl l = "#9B9B9B"}
       </div>
     </div>
 
     <div class="w-1/6">
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-carot">
-        #FC9722
+      <div class="font-bold pl-7">{intl l = "Status: Error"}</div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-red">
+        {intl l = "#D21919"}
       </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-green">
-        #73CE6F
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-redLight">
+        {intl l = "#ED5656"}
       </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-blue">
-        #1E9AE8
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-backgroundRed">
+        {intl l = "#FFEDED"}
       </div>
     </div>
 
     <div class="w-1/6">
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-error">
-        #D10000
+      <div class="font-bold pl-7">{intl l = "Status: Ok"}</div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-greenDark">
+        {intl l = "#008958"}
+      </div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-greenLight">
+        {intl l = "#EBFFF8"}
+      </div>
+    </div>
+
+    <div class="w-1/6">
+      <div class="font-bold pl-7">{intl l = "Status: Labels"}</div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-ocre">
+        {intl l = "#9E6700"}
+      </div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-mauve">
+        {intl l = "#8C5383"}
+      </div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-turquoise">
+        {intl l = "#0E7C7B"}
+      </div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-electricBlue">
+        {intl l = "#3423A6"}
+      </div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-darkVermillon">
+        {intl l = "#C4311C"}
+      </div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-ocreLight">
+        {intl l = "#FEFAF1"}
+      </div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-mauveLight">
+        {intl l = "#EBE2EA"}
+      </div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-turquoiseLight">
+        {intl l = "#ECF8F8"}
+      </div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-electricBlueLight">
+        {intl l = "#1E9AE8"}
+      </div>
+      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-backgroundLightVermillon">
+        {intl l = "#F7EEED"}
       </div>
     </div>
   </div>
 
 
+  
+  <!-- Icons -->
+<div class="flex items-center p-5">
+  <div class="mx-5">
+    <div class="w-5 h-5"><img src="{image file="assets/images/svg/close.svg"}" alt="fr" /></div>
+  </div>
+
+  <div class="mx-5">
+    <div class="w-5 h-5"><img src="{image file="assets/images/svg/trash.svg"}" alt="fr" /></div>
+  </div>
+
+  <div class="mx-5">
+    <div class="w-5 h-5"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></div>
+  </div>
+
+  <div class="mx-5">
+    <div class="h-7 w-7"><img src="{image file="assets/images/svg/eye.svg"}" alt="fr" /></div>
+  </div>
+
+  <div class="mx-5">
+    <div class="h-7 w-7"><img src="{image file="assets/images/svg/link.svg"}" alt="fr" /></div>
+  </div>
+</div>
+
+<div class="flex items-center p-5">
+  <div class="mx-5">
+    <div class="w-5 h-5"><img src="{image file="assets/images/svg/arrow-up.svg"}" alt="fr" /></div>
+  </div>
+
+  <div class="mx-5">
+    <div class="w-5 h-5"><img src="{image file="assets/images/svg/down-arrow.svg"}" alt="fr" /></div>
+  </div>
+
+  <div class="mx-5">
+    <div class="w-5 h-5"><img src="{image file="assets/images/svg/right-arrow.svg"}" alt="fr" /></div>
+  </div>
+
+  <div class="mx-5">
+    <div class="w-5 h-5"><img src="{image file="assets/images/svg/arrow-left.svg"}" alt="fr" /></div>
+  </div>
+
+  <div class="mx-5">
+    <div class="w-5 h-5"><img src="{image file="assets/images/svg/left-arrow.svg"}" alt="fr" /></div>
+  </div>
+  
+  <div class="mx-5">
+    <div class="w-5 h-5"><img src="{image file="assets/images/svg/arrow-right.svg"}" alt="fr" /></div>
+  </div>
+
+  <div class="mx-5">
+    <div class="w-5 h-5"><img src="{image file="assets/images/svg/arrow-down-sign.svg"}" alt="fr" /></div>
+  </div>
+  
+  <div class="mx-5">
+    <div class="w-5 h-5"><img src="{image file="assets/images/svg/up-arrow-sign.svg"}" alt="fr" /></div>
+  </div>
+</div>
 
 
-
-  <!-- Buttons -->
-  <div class="flex items-center p-10">
+  <!-- Boutons large -->
+  <div class="flex items-center p-2">
     <div class="mr-5">
-      <button class="p-3 font-medium text-gray-600 rounded-lg shadow-2xl bg-main hover:bg-darkMain">
-        Click Me
+      <button class="w-24 text-sm font-semibold tracking-wider text-white uppercase rounded h-9 bg-vermillon">
+        {intl l = "Bouton"}
       </button>
     </div>
 
     <div class="mr-5">
-      <button class="p-3 font-medium text-gray-600 bg-transparent border-2 rounded-lg shadow-2xl hover:bg-darkMain border-main">
-        Click Me
+        <button class="w-24 text-sm font-semibold tracking-wider text-white uppercase rounded h-9 bg-vermillon hover:bg-lightVermillon">
+          {intl l = "Bouton"}
+        </button>
+    </div>
+
+    <div class="mr-5">
+      <button class="w-24 text-sm font-semibold tracking-wider text-white uppercase rounded h-9 bg-greyMedium" disabled>
+        {intl l = "Bouton"}
       </button>
     </div>
 
     <div class="mr-5">
-      <button disabled class="p-3 font-medium text-gray-600 rounded-lg shadow-2xl bg-main bg-opacity-60">
-        Disabled
-      </button>
+      <a href="#" class="font-medium text-vermillon">{intl l = "Link button"}</a>
     </div>
 
     <div class="mr-5">
-      <a href="#" class="font-medium text-main">Link Button</a>
+      <a href="#" class="font-medium underline text-vermillon"><i class="mx-1 fas fa-link"></i>{intl l = "Link button"}</a>
     </div>
 
     <div class="mr-5">
-      <button class="flex items-center justify-center p-4 font-medium text-gray-600 rounded-full shadow-2xl bg-main hover:bg-darkMain">
+      <button class="flex items-center justify-center p-4 font-medium rounded-full shadow-2xl text-darkCharbon bg-vermillon hover:bg-lightVermillon">
         <i class="fas fa-user"></i>
       </button>
     </div>
@@ -108,8 +203,96 @@
     </div>
   </div>
 
+  <div class="flex items-center p-2">
+    <div class="mr-5">
+      <button class="w-24 text-sm font-semibold tracking-wider uppercase bg-white border rounded text-vermillon border-vermillon h-9">
+        {intl l = "Bouton"}
+      </button>
+    </div>
 
+    <div class="mr-5">
+        <button class="w-24 text-sm font-semibold tracking-wider uppercase bg-white border rounded text-vermillon hover:text-white border-vermillon h-9 hover:bg-vermillon">
+          {intl l = "Bouton"}
+        </button>
+    </div>
 
+    <div class="mr-5">
+      <button class="w-24 text-sm font-semibold tracking-wider uppercase bg-white border rounded border-greyMedium text-greyMedium h-9" disabled>
+        {intl l = "Bouton"}
+      </button>
+    </div>
+    </div>
+
+    <!-- Boutons small -->
+    <div class="flex items-center p-5">
+      <div class="mr-5">
+        <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase rounded h-7 bg-vermillon">
+          {intl l = "Bouton"}
+        </button>
+      </div>
+  
+      <div class="mr-5">
+          <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase rounded h-7 bg-vermillon hover:bg-lightVermillon">
+            {intl l = "Bouton"}
+          </button>
+      </div>
+  
+      <div class="mr-5">
+        <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase rounded h-7 bg-greyMedium" disabled>
+          {intl l = "Bouton"}
+        </button>
+      </div>
+    </div>
+
+    <div class="flex items-center p-2">
+      <div class="mr-5">
+        <button class="w-20 text-xs font-semibold tracking-wider uppercase bg-white border rounded text-vermillon border-vermillon h-7">
+          {intl l = "Bouton"}
+        </button>
+      </div>
+  
+      <div class="mr-5">
+          <button class="w-20 text-xs font-semibold tracking-wider uppercase bg-white border rounded text-vermillon hover:text-white border-vermillon h-7 hover:bg-vermillon">
+            {intl l = "Bouton"}
+          </button>
+      </div>
+  
+      <div class="mr-5">
+        <button class="w-20 text-xs font-semibold tracking-wider uppercase bg-white border rounded border-greyMedium text-greyMedium h-7" disabled>
+          {intl l = "Bouton"}
+        </button>
+      </div>
+      </div>
+
+  <!-- Breadcrumbs -->
+  <nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="#" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+          Home
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <a href="#" class="ml-1 text-sm font-medium text-gray-700 hover:text-gray-900 md:ml-2 dark:text-gray-400 dark:hover:text-white">
+            Test
+          </a>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+          <span class="ml-1 text-sm font-medium text-gray-400 md:ml-2 dark:text-gray-500">
+            TestDeux
+          </span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Modal -->
+  {component name="modal" title="modal"}je suis une modal{/component}
 
 
   <!-- Inputs -->
@@ -129,6 +312,10 @@
         placeholder="Enter something..."
       />
       <span class="text-error">Something bad just happened</span>
+    </div>
+    
+    <div class="w-1/4 mb-5">
+      <input class="w-full rounded-lg cursor-not-allowed value-gray-500" type="text" disabled="disabled" value="read only" />
     </div>
 
     <div class="w-1/4 mb-5">
@@ -163,11 +350,16 @@
         <option>5</option>
       </select>
     </div>
+    
+
+  <!-- Picker color -->
+    <div>
+      <input type="color" id="body" name="body"
+              value="#f6b73c">
+      <label for="body">Color</label>
   </div>
-
-
-
-
+    
+  </div>
 
   <!-- Radio & Checkbox -->
   <div class="flex w-1/3 p-10">
@@ -221,9 +413,24 @@
     </div>
   </div>
 
+  <!-- Drag and drop -->
+  {component name="draganddrop" title="draganddrop"}{/component}
+
+  {component name="draganddropimage" title="draganddropimage"}{/component}
+
+  {component name="draganddropmedia" title="draganddropmedia"}{/component}
 
 
+  <!-- Pagination -->
+  <div class="flex items-center mb-3">
+    <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-white border rounded-l cursor-pointer border-greyMedium text-greyMedium"><i class="pl-4 fas fa-chevron-left text-darkCharbon"></i></a>
+    <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-white border rounded-r cursor-pointer border-greyMedium text-greyMedium"><i class="pl-3 text-darkCharbon fas fa-chevron-right"></i></a>
+  </div>
 
+  <div class="flex items-center">
+    <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-white border rounded-l cursor-pointer border-greyMedium text-greyMedium hover:bg-lightGrey"><i class="pl-4 fas fa-chevron-left text-darkCharbon"></i></a>
+    <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-white border rounded-r cursor-pointer border-greyMedium text-greyMedium hover:bg-lightGrey"><i class="pl-3 text-darkCharbon fas fa-chevron-right"></i></a>
+  </div>
 
   <!-- Toggle -->
   <div class="flex p-10">
@@ -267,7 +474,24 @@
     </div>
   </div>
 
+  <!-- Toast Preview -->
+  {component name="ToastPreview" title="ToastPreview"}{/component}
+</br>
 
+  <!-- Toast Preview Large Desktop-->
+    <div class="flex items-center h-20 max-w-7xl bg-lightCharbon">
+      <div class="container mx-auto">
+      <div class="flex justify-end pr-72">
+        <div class="md:text-center ">
+          <a class="px-3 py-2 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer hover:bg-white hover:text-black"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
+          <a class="px-3 py-2 mx-1 text-sm font-semibold tracking-wider text-white uppercase border rounded cursor-pointer bg-vermillon h-9 border-vermillon hover:bg-lighterVermillon hover:border-lighterVermillon">{intl l="Enregistrer"}</a>
+        </div>
+      </div>
+      </div>
+    </div>
+  
+    <!-- Textarea with editor -->
+    {component name="TextAreaEditor" title="TextAreaEditor"}{/component}
 
 
 
@@ -319,20 +543,7 @@
       {component name="Tab" title="Tab" id="three" }content trois{/component}
       {component name="Tab" title="Tab" id="katr" active="true"}content quatre{/component}
     {/component}
-
-    {component name="Tabs"}
-    {include file="components/TabHeader/TabHeader.html" id="one1" title="TestUn"} 
-    {include file="components/TabHeader/TabHeader.html" id="two1" title="TestDeux"} 
-    {include file="components/TabHeader/TabHeader.html" id="three1" title="TestTrois"} 
-    {include file="components/TabHeader/TabHeader.html" id="katr1" title="katr" active="true"} 
-
-    {component name="Tab" title="Tab" id="one1"}content un{/component}
-    {component name="Tab" title="Tab" id="two1"}content deux{/component}
-    {component name="Tab" title="Tab" id="three1"}content trois{/component}
-    {component name="Tab" title="Tab" id="katr1" active="true"}content quatre{/component}
-  {/component}
   </div>
-
 
   <!-- Tableaux -->
   <div class="flex p-10">
@@ -380,21 +591,21 @@
           <td class="flex justify-center px-5 py-4 px-auto">
             <button
               href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-carot hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
               <i class="fas fa-folder-open" aria-hidden="true"></i></button
             ><button
               href="/"
-              class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
               <i class="fas fa-edit" aria-hidden="true"></i></button
             ><button
               href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
@@ -435,21 +646,21 @@
           <td class="flex justify-center px-5 py-4 px-auto">
             <button
               href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-carot hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
               <i class="fas fa-folder-open" aria-hidden="true"></i></button
             ><button
               href="/"
-              class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
               <i class="fas fa-edit" aria-hidden="true"></i></button
             ><button
               href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
@@ -490,21 +701,21 @@
           <td class="flex justify-center px-5 py-4 px-auto">
             <button
               href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-carot hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
               <i class="fas fa-folder-open" aria-hidden="true"></i></button
             ><button
               href="/"
-              class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >
               <i class="fas fa-edit" aria-hidden="true"></i></button
             ><button
               href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
               title="{intl l='View site'}"
               target="_blank"
             >

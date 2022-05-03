@@ -4,6 +4,120 @@
 
 {block name="main-content"}
   <div id="mailing-system">
+<!-- Breadcrumbs -->
+<nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-main dark:text-gray-400 dark:hover:text-white">
+        {intl l='Dashboard'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+      </div>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Mailing system'}</a>
+      </div>
+    </li>
+  </ol>
+</nav>
 
+<!-- Header -->
+<div>
+  <h1 class="p-4 text-3xl font-bold">{intl l='Thelia Mailing System'}</h1>
+  <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Thelia Mailing System.'}</p>
+</div>
+
+    <!--Panel-->
+    {component name="Panel" class="w-full mb-3"}
+    {hook name="mailing-system.top"}
+      <!--Bouton save-->
+      <div class="flex justify-end mb-4 border-b">
+        <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-green even:bg-green border-green hover:text-green hover:bg-white">
+          Save ✓
+        </button>
+    </div> 
+    <!--Form-->
+    <div class="flex flex-row">
+      {form name="thelia.admin.mailing-system.update"}
+
+                    <form method="POST">
+
+                        {form_hidden_fields}
+
+                        {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                        {render_form_field field='enabled'}
+
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                {render_form_field field='host'}
+                            </div>
+
+                            <div class="col-sm-6">
+                                {render_form_field field='port'}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                {render_form_field field='username'}
+                            </div>
+                            <div class="col-sm-6">
+                                {render_form_field field='password'}
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                {render_form_field field='encryption'}
+                            </div>
+
+                            <div class="col-sm-6">
+                                {render_form_field field='authmode'}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                {render_form_field field='timeout'}
+                            </div>
+
+                            <div class="col-sm-6">
+                                {render_form_field field='sourceip'}
+                            </div>
+                        </div>
+
+                        <div class="row inner-toolbar">
+                            <div class="clearfix col-md-12 inner-actions">
+                                <button type="submit" name="save_mode" value="stay" class="btn btn-default btn-success pull-right" title="{intl l="Save SMTP configuration"}">{intl l="Save"} <span class="glyphicon glyphicon-ok"></span></button>
+                            </div>
+                        </div>
+                    </form>
+                    {/form}
+      </div>
+    {/component}
+
+     <!--Panel-->
+    {component name="Panel" title="Configuration mailing system" class="w-full mb-3"}
+    <form>
+    <input
+    type="text"
+    class="placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl w-60 focus:ring-main focus:outline-none focus:border-main"
+    value="contact@thelia.net"
+  />
+  <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center border rounded-md odd:bg-mediumPearl even:bg-white border-main text-main hover:text-white hover:bg-main">
+    {intl l="Send"}
+  </button>
+  </form>
+  {hook name="mailing-system.bottom"}
+    {/component}
   </div>
 {/block}

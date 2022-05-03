@@ -4,6 +4,225 @@
 
 {block name="main-content"}
   <div id="countries">
+<!-- Breadcrumbs -->
+<nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-main dark:text-gray-400 dark:hover:text-white">
+        {intl l='Dashboard'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+      </div>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Countries'}</a>
+      </div>
+    </li>
+  </ol>
+</nav>
 
+<!-- Header -->
+<div>
+  <h1 class="p-4 text-3xl font-bold">{intl l='Countries'}</h1>
+  <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Countries.'}</p>
+</div>
+    
+  <!-- Panel -->
+    {component name="Panel" class="w-full mb-3"}
+    {hook name="countries.top" location="countries_top"}
+     <!--TODO: Modal-->
+     <div class="flex justify-end">
+      {component name="modal" titlemodal="titre"}
+      <h4 class="font-bold">{intl l='Country title'}</h4>
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+      />
+      <h4 class="font-bold">{intl l='Numerical ISO Code'}</h4>
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+      />
+      <h4 class="font-bold">{intl l='ISO Alpha-2 code'}</h4>
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+      />
+      <h4 class="font-bold">{intl l='ISO Alpha-3 code'}</h4>
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+      />
+      <div>
+        <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+        <label for="r1">This country is online</label>
+      </div>
+      <div>
+        <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+        <label for="r1">This country has states / provinces</label>
+      </div>
+      <div class="grid-rows-2 mt-20 text-right">
+        <div class="mb-4 mr-5">
+            <button class="h-4 p-5 mx-1 font-medium text-center text-white border rounded-md odd:bg-main even:bg-main border-main hover:text-main hover:bg-white">
+                {intl l="Create this country"}
+            </button>
+        </div>
+        <div class="mr-5">
+            <button class="h-5 p-5 mx-1 font-medium text-center border rounded-md odd:bg-mediumPearl even:bg-white border-main text-main hover:text-white hover:bg-main">
+                {intl l="Cancel"}
+            </button>
+        </div>
+    </div>
+      {/component}
+    </div>
+
+<!--TODO: Tableau React-->
+    <div class="flex p-1 mt-5">
+      <table class="w-full shadow-lg table-auto bg-lightPearl">
+        <thead class="bg-mediumCharbon text-lightGrey">
+          <tr>
+            <th class="px-5 py-4 text-left rounded-tl-xl">ID</th>
+            <th class="px-5 py-4 text-left">Nom</th>
+            <th class="px-5 py-4 text-left">Défaut</th>
+            <th class="px-5 py-4 text-left">N° ISO</th>
+            <th class="px-5 py-4 text-left">Code ISO</th>
+            <th class="px-5 py-4 text-left">Zone de livraison</th>
+            <th class="px-5 py-4 text-left">Visible</th>
+            {hook name="countries.table-header" location="countries_table_header" }
+            <th class="px-5 py-4 text-left rounded-tr-xl">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">1</td>
+            <td class="px-5 py-4">
+              <a
+                href="/"
+                class="font-bold text-main hover:text-darkMain"
+                >Albanie</a
+              >
+            </td>
+            <td class="px-5 py-4 px-auto">
+              <label for="toggle" class="flex items-center cursor-pointer">
+                <div class="mr-3 text-darkCharbon"></div>
+                <div class="relative">
+                  <input type="checkbox" id="toggle" class="sr-only switch" />
+                  <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+                  <div
+                    class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                  ></div>
+                </div>
+              </label>           
+            </td> 
+            <td class="px-5 py-4">007</td>
+            <td class="px-5 py-4">AFG</td> 
+            <td class="px-5 py-4">
+              <a
+                href="/"
+                class="font-bold text-main hover:text-darkMain"
+                >B Zone</a
+              >
+            </td>
+            <td class="px-5 py-4 px-auto">
+              <label for="toggle" class="flex items-center cursor-pointer">
+                <div class="mr-3 text-darkCharbon"></div>
+                <div class="relative">
+                  <input type="checkbox" id="toggle" class="sr-only switch" />
+                  <div class="block w-10 h-6 bg-red-500 rounded-full "></div>
+                  <div
+                    class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                  ></div>
+                </div>
+              </label>        
+            </td>
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <a
+              href="{url path='/admin/country-edit'}"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-edit" aria-hidden="true"></i></a
+              ><a
+                href="/"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+            </a>
+            </td>
+          </tr>
+          <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">1</td>
+            <td class="px-5 py-4">
+              <a
+                href="/"
+                class="font-bold text-main hover:text-darkMain"
+                >Albanie</a
+              >
+            </td>
+            <td class="px-5 py-4 px-auto">
+              <label for="toggle" class="flex items-center cursor-pointer">
+                <div class="mr-3 text-darkCharbon"></div>
+                <div class="relative">
+                  <input type="checkbox" id="toggle" class="sr-only switch" />
+                  <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+                  <div
+                    class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                  ></div>
+                </div>
+              </label>           
+        </td> 
+            <td class="px-5 py-4">007</td>
+            <td class="px-5 py-4">AFG</td> 
+            <td class="px-5 py-4">
+              <a
+                href="/"
+                class="font-bold text-main hover:text-darkMain"
+                >B Zone</a
+              >
+            </td>
+            <td class="px-5 py-4 px-auto">
+              <label for="toggle" class="flex items-center cursor-pointer">
+                <div class="mr-3 text-darkCharbon"></div>
+                <div class="relative">
+                  <input type="checkbox" id="toggle" class="sr-only switch" />
+                  <div class="block w-10 h-6 bg-red-500 rounded-full "></div>
+                  <div
+                    class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                  ></div>
+                </div>
+              </label>        
+        </td>
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <a
+              href="{url path='/admin/country-edit'}"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-edit" aria-hidden="true"></i></a
+              ><a
+                href="/"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+            </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      {hook name="countries.bottom" location="countries_bottom" }
+    </div>
+    {/component}
   </div>
 {/block}

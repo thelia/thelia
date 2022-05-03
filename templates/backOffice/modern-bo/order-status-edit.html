@@ -1,0 +1,133 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit order status'}{/block}
+
+{block name="main-content"}
+<div id="edit-feature">
+ <!-- Breadcrumbs -->
+ <nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-main dark:text-gray-400 dark:hover:text-white">
+        {intl l='Dashboard'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+      </div>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='order status'}</a>
+      </div>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Editing order status'}</a>
+      </div>
+    </li>
+  </ol>
+</nav>
+
+  <!-- Header -->
+  <div>
+    <h1 class="p-4 text-3xl font-bold">{intl l='Edit order status'}</h1>
+    <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Edit order status.'}</p>
+  </div>
+  </div>
+  {hook name="order-status-edit.top"}
+    <!-- Panel -->
+    {component name="Panel" class="w-full mb-3"}
+      {component name="Tabs"}
+      {include file="components/TabHeader/TabHeader.html" id="one" title="General description"} 
+      {include file="components/TabHeader/TabHeader.html" id="two" title="Modules" active="true"} 
+
+      <!-- Tab General description -->
+      {component name="Tab" id="one"}
+      <!--Boutons-->
+      <div class="flex justify-end pb-6 border-b">
+        <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-green even:bg-green border-green hover:text-green hover:bg-white">
+          Save ✓
+        </button>
+        <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-blue even:bg-blue border-blue hover:text-blue hover:bg-white">
+          Save and close X
+        </button>
+        <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-black border border-black rounded-md odd:bg-white even:bg-white hover:text-white hover:bg-black">
+          Close X
+        </button>
+      </div> 
+      
+      <div class="mt-5 mb-4 md:flex">
+        <div class="md:flex-1 md:pr-3">
+          <label class="block text-xs font-bold">{intl l='Order status code'}</label>
+          <input class="w-full h-10 placeholder-gray-500 bg-gray-100 border-0 rounded-lg shadow-2xl text-mediumCharbon focus:ring-main focus:outline-none focus:border-main" readonly" type="text" name="order" placeholder="paid">
+        </div>
+        <div class="md:flex-1 md:pl-3">
+          <label class="block text-xs font-bold">{intl l='Order status color'}</label>
+          <input class="h-10 placeholder-gray-500 bg-gray-100 border-0 rounded-r-lg shadow-2xl search-input text-mediumCharbon focus:ring-main focus:outline-none focus:border-main" type="color" name="color">
+        </div>
+      </div>
+      <div class="w-full mt-4 mb-5">
+        <p class="mb-2 font-bold">{intl l='Title'}</p>
+        <input
+          type="text"
+          class="w-full placeholder-gray-500 bg-white rounded-lg focus:ring-main focus:outline-none focus:border-main"
+          placeholder="Paid"
+        />
+        </div>
+        <div class="mb-3">
+          <p class="mb-2 font-bold">{intl l='Summary'}</p>
+          <textarea
+            class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding rounded-lg transition ease-in-out m-0 focus:text-main focus:bg-white focus:border-main focus:outline-none"
+            rows="3"
+            placeholder="Short description text"
+          ></textarea>
+        </div>
+        <div class="mb-3">
+          <p class="mb-2 font-bold">{intl l='Detailled description'}</p>
+          <textarea
+            class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding rounded-lg transition ease-in-out m-0 focus:text-main focus:bg-white focus:border-main focus:outline-none"
+            rows="3"
+          ></textarea>
+        </div>
+        <div class="mb-3">
+          <p class="mb-2 font-bold">{intl l='Conclusion'}</p>
+          <textarea
+            class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding rounded-lg transition ease-in-out m-0 focus:text-main focus:bg-white focus:border-main focus:outline-none"
+            rows="3"
+            placeholder="Short additional text"
+          ></textarea>
+        </div>
+        
+              <!--Boutons-->
+      <div class="flex justify-end pb-6 border-b">
+        <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-green even:bg-green border-green hover:text-green hover:bg-white">
+          Save ✓
+        </button>
+        <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-blue even:bg-blue border-blue hover:text-blue hover:bg-white">
+          Save and close X
+        </button>
+        <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-black border border-black rounded-md odd:bg-white even:bg-white hover:text-white hover:bg-black">
+          Close X
+        </button>
+      </div>   
+    {/component}
+      
+      <!-- Tab Modules -->
+      {component name="Tab" id="two" active="true"}
+      <div class="w-full p-5 mx-auto mt-10 mb-8 border rounded-lg bg-info text-blue border-blue">
+        <i class="fas fa-info-circle"></i>
+        There is currently no active module here.
+      </div>
+      {/component}
+      
+  {/component}
+
+{/component}
+{hook name="order-status-edit.bottom"}
+</div>
+{/block}

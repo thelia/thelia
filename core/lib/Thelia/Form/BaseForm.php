@@ -23,7 +23,7 @@ use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
-use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
+use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -111,6 +111,7 @@ abstract class BaseForm implements FormInterface
         TranslatorInterface $translator,
         FormFactoryBuilderInterface $formFactoryBuilder,
         ValidatorBuilder $validationBuilder,
+        TokenStorageInterface $tokenStorage,
         string $type = "Symfony\Component\Form\Extension\Core\Type\FormType",
         array $data = [],
         array $options = []
@@ -129,9 +130,7 @@ abstract class BaseForm implements FormInterface
             $this->formFactoryBuilder
                 ->addExtension(
                     new CsrfExtension(
-                        new CsrfTokenManager(null, new SessionTokenStorage(
-                            $this->getRequest()->getSession()
-                        ))
+                        new CsrfTokenManager(null, $tokenStorage)
                     )
                 )
             ;

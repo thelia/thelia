@@ -4,6 +4,134 @@
 
 {block name="main-content"}
   <div id="mailing-templates">
+<!-- Breadcrumbs -->
+<nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-main dark:text-gray-400 dark:hover:text-white">
+        {intl l='Dashboard'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+      </div>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Mailing templates'}</a>
+      </div>
+    </li>
+  </ol>
+</nav>
 
+<!-- Header -->
+<div>
+  <h1 class="p-4 text-3xl font-bold">{intl l='Mailing templates'}</h1>
+  <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Mailing templates.'}</p>
+</div>
+ 
+  {hook name="messages.top" location="messages_top" }
+  <!-- Panel -->
+    {component name="Panel" class="w-full mb-3"}
+     <!--TODO: Modal-->
+     <div class="flex justify-end">
+      {component name="modal" titlemodal="titre"}
+      <h4 class="font-bold">{intl l='Name'}</h4>
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+        placeholder="Mail template name"
+      />
+      <h4 class="font-bold">{intl l='Purpose'}</h4>
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+        placeholder="Mail template purpose"
+      />
+      <div class="grid-rows-2 mt-20 text-right">
+        <div class="mb-4 mr-5">
+            <button class="h-4 p-5 mx-1 font-medium text-center text-white border rounded-md odd:bg-main even:bg-main border-main hover:text-main hover:bg-white">
+                {intl l="Create this mailing template"}
+            </button>
+        </div>
+        <div class="mr-5">
+            <button class="h-5 p-5 mx-1 font-medium text-center border rounded-md odd:bg-mediumPearl even:bg-white border-main text-main hover:text-white hover:bg-main">
+                {intl l="Cancel"}
+            </button>
+        </div>
+    </div>
+      {/component}
+    </div>
+    
+    <div class="flex p-1 mt-5">
+      <table class="w-full shadow-lg table-auto bg-lightPearl">
+        <thead class="w-full bg-mediumCharbon text-lightGrey">
+          <tr>
+            <th class="px-5 py-4 text-left rounded-tl-xl">Purpose</th>
+            <th class="px-5 py-4 text-left">Name</th>
+            {hook name="messages.table-header" location="messages_table_header" }
+            <th class="px-5 py-4 text-left rounded-tr-xl">&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">Lorem ipsum dolor sit amet.</td>
+            <td class="px-5 py-4"><a>f</a></td>
+            {hook name="messages.table-row" location="messages_table_row"}
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <a
+              href="{url path='/admin/message-edit'}"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-edit" aria-hidden="true"></i>
+            </a>
+              <a
+                href="/"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+          </a>
+            </td>
+          </tr>
+          <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">Lorem ipsum dolor sit amet.</td>
+            <td class="px-5 py-4">
+              <a
+                href="?category_id=1"
+                class="font-bold text-main hover:text-darkMain"
+                >f</a
+              >
+            </td> 
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <a
+              href="{url path='/admin/message-edit'}"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-edit" aria-hidden="true"></i>
+            </a>
+              <a
+                href="/"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+          </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    {/component}
+    {hook name="messages.bottom" location="messages_bottom" }
   </div>
 {/block}

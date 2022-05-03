@@ -138,7 +138,9 @@
   	                                {hook name="variables.table-row" location="variables_table_row" config_id={$ID} }
 
   	                                <td class="actions">
-  	                                    {if ! $SECURED}
+                                        {if $IS_OVERRIDDEN_IN_ENV}
+                                            <span title="{intl l='This variable has been overridden in an .env file.'}" class="label label-default">.env</span>
+  	                                    {elseif ! $SECURED}
                                             {include file='renderer/buttons.html' buttons=[
                                                 [
                                                     'type' => 'remove',

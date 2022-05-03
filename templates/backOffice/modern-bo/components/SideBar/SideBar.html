@@ -219,7 +219,19 @@
         </li>
     {/loop}
 
-    {hook name="main.in-top-menu-items" location="in_top_menu_items" admin_current_location=$admin_current_location}
+    <li class="Sidebar-item">
+        <a href="{url path='/admin/modules'}" title="{intl l="Modules"}" class="Sidebar-item">
+            <i class="hidden lg:block fas fa-box-open"></i>
+            <span>{intl l="Modules"}</span>
+        </a>
+    </li>
+
+    <li class="Sidebar-item">
+        <a href="{url path='/admin/configuration'}" title="{intl l="Configuration"}" class="Sidebar-item">
+            <i class="hidden lg:block fas fa-desktop"></i>
+            <span>{intl l="Configuration"}</span>
+        </a>
+    </li>
 
 </ul>
 

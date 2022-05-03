@@ -17,9 +17,12 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\MailingSystem\MailingSystemEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\JsonResponse;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 
 class MailingSystemController extends BaseAdminController
@@ -52,7 +55,7 @@ class MailingSystemController extends BaseAdminController
         $this->getParserContext()->addForm($form);
 
         // Render the edition template.
-        return $this->render('mailing-system');
+        return $this->render('mailing-system', ['editDisabled' => ConfigQuery::isSmtpInEnv()]);
     }
 
     public function updateAction(EventDispatcherInterface $eventDispatcher)
@@ -111,8 +114,9 @@ class MailingSystemController extends BaseAdminController
         return $response;
     }
 
-    public function testAction()
+    public function testAction(Request $request, MailerFactory $mailer)
     {
+        $translator = Translator::getInstance();
         // Check current user authorization
         if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, [], AccessManager::UPDATE)) {
             return $response;
@@ -127,32 +131,30 @@ class MailingSystemController extends BaseAdminController
         ];
 
         if ($contactEmail) {
-            $emailTest = $this->getRequest()->get('email', $contactEmail);
+            $emailTest = $request->get('email', $contactEmail);
 
-            $message = $this->getTranslator()->trans('Email test from : %store%', ['%store%' => $storeName]);
+            $message = $translator->trans('Email test from : %store%', ['%store%' => $storeName]);
 
             $htmlMessage = "<p>$message</p>";
 
-            $instance = $this->getMailer()->getMessageInstance()
-                ->addTo($emailTest, $storeName)
-                ->addFrom($contactEmail, $storeName)
-                ->setSubject($message)
-                ->setBody($message, 'text/plain')
-                ->setBody($htmlMessage, 'text/html')
-            ;
-
             try {
-                $this->getMailer()->send($instance);
+                $mailer->sendSimpleEmailMessage(
+                    [$emailTest => $storeName],
+                    [$contactEmail => $storeName],
+                    $message,
+                    $message,
+                    $htmlMessage
+                );
                 $json_data['success'] = true;
-                $json_data['message'] = $this->getTranslator()->trans('Your configuration seems to be ok. Checked out your mailbox : %email%', ['%email%' => $emailTest]);
+                $json_data['message'] = $translator->trans('Your configuration seems to be ok. Checked out your mailbox : %email%', ['%email%' => $emailTest]);
             } catch (\Exception $ex) {
                 $json_data['message'] = $ex->getMessage();
             }
         } else {
-            $json_data['message'] = $this->getTranslator()->trans('You have to configure your store email first !');
+            $json_data['message'] = $translator->trans('You have to configure your store email first !');
         }
 
-        $response = JsonResponse::create($json_data);
+        $response = new JsonResponse($json_data);
 
         return $response;
     }

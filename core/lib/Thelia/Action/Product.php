@@ -760,7 +760,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $freeTextFeatureAvI18n->save();
 
                 $featureAvId = $freeTextFeatureAvI18n->getId();
-            } //To prevent Integrity constraint violation
+            } // To prevent Integrity constraint violation
             elseif (empty($featureAvId)) {
                 return;
             }

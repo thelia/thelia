@@ -170,7 +170,7 @@ class Category extends BaseCategory implements FileModelParentInterface
 
         $this->markRewrittenUrlObsolete();
 
-        //delete all subcategories
+        // delete all subcategories
         $subCategories = CategoryQuery::findAllChild($this->getId());
 
         foreach ($subCategories as $category) {

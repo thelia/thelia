@@ -4,6 +4,138 @@
 
 {block name="main-content"}
   <div id="hooks">
+<!-- Breadcrumbs -->
+<nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-main dark:text-gray-400 dark:hover:text-white">
+        {intl l='Dashboard'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+      </div>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Hooks'}</a>
+      </div>
+    </li>
+  </ol>
+</nav>
 
+<!-- Header -->
+<div>
+  <h1 class="p-4 text-3xl font-bold">{intl l='Hooks'}</h1>
+  <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Hooks.'}</p>
+</div>
+
+  {hook name="hooks.top"}
+    <!--Panel Check the support of hooks-->
+    {component name="Panel" title="Check the support of hooks." class="w-full mb-3"}
+    <div class="grid grid-cols-2">
+      <form>
+      <select class="w-full p-2 text-gray-500 rounded-lg">
+        <option disabled selected>Front Office</option>
+        <option>Back Office</option>
+        <option>pdf</option>
+        <option>email</option>
+      </select>
+      <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center border rounded-md odd:bg-mediumPearl even:bg-white border-main text-main hover:text-white hover:bg-main">
+        Parse template
+      </button>
+      </form>
+      </div>    
+    {/component}
+      <!--Panel Hooks-->
+    {component name="Panel" title="Hooks" class="w-full mb-3"}
+    <!--TODO: Tableau React-->
+  <div class="flex p-1 mt-5">
+    <table class="w-full shadow-lg table-auto bg-lightPearl">
+      <thead class="bg-mediumCharbon text-lightGrey">
+        <tr>
+          <th class="px-5 py-4 text-left rounded-tl-xl">ID</th>
+          <th class="px-5 py-4 text-left">Code</th>
+          <th class="px-5 py-4 text-left">Title</th>
+          <th class="px-5 py-4 text-left">Official</th>
+          <th class="px-5 py-4 text-left">Active</th>
+          {hook name="hooks.table-header"}
+          <th class="px-5 py-4 rounded-tr-xl">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd:bg-mediumPearl even:bg-white">
+          <td class="px-5 py-4">1</td>
+          <td class="px-5 py-4">
+            <a
+              href="?category_id=1"
+              class="font-bold text-main hover:text-darkMain"
+              >order-invoice.top</a
+            >
+          </td>
+          <td class="px-5 py-4">
+            <a
+              href="?category_id=1"
+              class="font-bold text-main hover:text-darkMain"
+              >	Invoice choice - at the top</a
+            >
+          </td>
+          <td class="px-5 py-4">
+            <i class="fas fa-check"></i>
+          </td>
+          <td class="px-5 py-4">
+              <label for="toggle" class="flex items-center cursor-pointer">
+                <div class="relative">
+                  <input type="checkbox" id="toggle" class="sr-only switch" />
+                  <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+                  <div
+                    class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+                  ></div>
+                </div>
+              </label>
+            </td>
+            {hook name="hooks.table-row" location="hooks_table_row"}
+          <td class="flex justify-center px-5 py-4 px-auto">
+           <a
+           href="{url path='/admin/hook-edit'}"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+              title="{intl l='View site'}"
+              target="_blank"
+            >
+              <i class="fas fa-edit" aria-hidden="true"></i>
+          </a>
+            <a
+              href="/"
+              class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
+              title="{intl l='View site'}"
+              target="_blank"
+            >
+              <i class="fas fa-trash-alt" aria-hidden="true"></i>
+        </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+          <!--Boutons Manage hooks et Manage modules attachements-->
+          <div class="grid-rows-2 mt-20 text-right">
+            <div class="mb-4 mr-5">
+                <button class="p-3 font-medium text-white rounded-lg shadow-2xl bg-main hover:bg-darkMain">
+                    {intl l="Manage hooks"}
+                    <i class="ml-3 fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="mr-5">
+                <button class="p-3 font-medium text-white rounded-lg shadow-2xl bg-main hover:bg-darkMain">
+                    {intl l="Manage modules attachements"}
+                    <i class="ml-3 fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+  {hook name="hooks.bottom"}
+    {/component}
   </div>
 {/block}

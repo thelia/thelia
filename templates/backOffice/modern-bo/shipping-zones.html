@@ -4,6 +4,155 @@
 
 {block name="main-content"}
   <div id="shipping-configuration">
+  <!-- Breadcrumbs -->
+<nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-main dark:text-gray-400 dark:hover:text-white">
+        {intl l='Dashboard'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+      </div>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Shipping zones management'}</a>
+      </div>
+    </li>
+  </ol>
+</nav>
 
+<!-- Header -->
+<div>
+  <h1 class="p-4 text-3xl font-bold">{intl l='Thelia Shipping configuration'}</h1>
+  <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Thelia Shipping Configuration.'}</p>
+</div>
+
+  {hook name="shipping-zones.top" location="shipping_zones_top" }
+  <!-- Panel -->
+    {component name="Panel" class="w-full mb-3"}
+    
+     <!--TODO: Modal-->
+     <div class="flex justify-end">
+      {component name="modal" titlemodal="titre"}
+      <h4 class="font-bold">{intl l='Shipping zone name'}</h4>
+      <input
+        type="text"
+        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+        placeholder="A name such as Europe or Overseas"
+      />
+      <div class="grid-rows-2 mt-20 text-right">
+        <div class="mb-4 mr-5">
+            <button class="h-4 p-5 mx-1 font-medium text-center text-white border rounded-md odd:bg-main even:bg-main border-main hover:text-main hover:bg-white">
+                {intl l="Create this shipping zone"}
+            </button>
+        </div>
+        <div class="mr-5">
+            <button class="h-5 p-5 mx-1 font-medium text-center border rounded-md odd:bg-mediumPearl even:bg-white border-main text-main hover:text-white hover:bg-main">
+                {intl l="Cancel"}
+            </button>
+        </div>
+    </div>
+      {/component}
+    </div>
+
+    <!--TODO: Tableau React-->    
+    <div class="flex p-1 mt-5">
+      <table class="w-full shadow-lg table-auto bg-lightPearl">
+        <thead class="bg-mediumCharbon text-lightGrey">
+          <tr>
+            <th class="px-5 py-4 text-left rounded-tl-xl">Zone name</th>
+            <th class="px-5 py-4 text-left">Included countries</th>
+            <th class="px-5 py-4 text-left">Assigned modules</th>
+            {hook name="shipping-zones.table-header" location="shipping_zones_table_header" }
+            <th class="px-5 py-4 text-left rounded-tr-xl">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">
+              <a
+                href="/"
+                class="font-bold text-main hover:text-darkMain"
+                >A Zone</a
+              >
+            </td>
+            
+            <td class="px-5 py-4">
+              Germany, Austria, Cyprus, Croatia, Denmark <div class="m-2">
+                {include file="components/Pill/Pill.html" class="text-sm px-3 py-0.5
+                inline-block bg-grey" value="78346"}
+              </div>
+            </td>
+            <td class="px-5 py-4 px-auto">
+              CustomDelivery - Custom Delivery
+            </td>
+            {hook name="shipping-zones.table-row" location="shipping_zones_table_row"}
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <a
+              href="{url path='/admin/shipping-zones-edit'}"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-edit" aria-hidden="true"></i></a
+              >
+              <a
+                href="/"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+            </a>
+            </td>
+          </tr>
+          <tr class="odd:bg-mediumPearl even:bg-white">
+            <td class="px-5 py-4">
+              <a
+                href="/"
+                class="font-bold text-main hover:text-darkMain"
+                >A Zone</a
+              >
+            </td>
+            
+            <td class="px-5 py-4">
+              Germany, Austria, Cyprus, Croatia, Denmark <div class="m-2">
+                {include file="components/Pill/Pill.html" class="text-sm px-3 py-0.5
+                inline-block bg-grey" value="78346"}
+              </div>
+            </td>
+            <td class="px-5 py-4 px-auto">
+              CustomDelivery - Custom Delivery
+            </td>
+            <td class="flex justify-center px-5 py-4 px-auto">
+              <a
+              href="{url path='/admin/shipping-zones-edit'}"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-edit" aria-hidden="true"></i></a
+              >
+              <a
+                href="/"
+                class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
+                title="{intl l='View site'}"
+                target="_blank"
+              >
+                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+            </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      {hook name="shipping-zones.bottom" location="shipping_zones_bottom"}
+    </div>
+    {/component}
   </div>
 {/block}
