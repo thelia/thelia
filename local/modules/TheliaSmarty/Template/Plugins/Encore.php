@@ -90,7 +90,7 @@ class Encore extends AbstractSmartyPlugin
         try {
             if ($path) {
                 $fileSystem = new Filesystem();
-                $fileSystem->symlink($path, $this->moduleSymlinkDest.DS.$module.DS.$file);
+                $fileSystem->symlink(pathinfo($path, PATHINFO_DIRNAME), $this->moduleSymlinkDest.DS.$module.DS.pathinfo($file, PATHINFO_DIRNAME));
             }
 
             return $this->packages['modules']->getUrl(DS.$module.DS.$file);
