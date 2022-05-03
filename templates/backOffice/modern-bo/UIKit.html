@@ -4,162 +4,654 @@
     <h1 class="text-5xl font-bold text-center">{intl l = "Thelia Back Office UI KIT"}</h1>
   </div>
 
-  <!-- Colors -->
-  <div class="flex justify-center p-10">
-    <div class="w-1/6">
-      <div class="font-bold pl-7">{intl l = "Main"}</div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-vermillon">
-        {intl l = "#DC3018"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-mediumCharbon">
-        {intl l = "#333333"}
-      </div>
-    </div>
-
-    <div class="w-1/6">
-      <div class="font-bold pl-7">{intl l = "Secondary"}</div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-lightVermillon">
-        {intl l = "#FA533C"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-darkCharbon">
-        {intl l = "#222222"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-mediumPearl">
-        {intl l = "#EBEBEB"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-greyDark">
-        {intl l = "#787878"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 bg-white rounded-lg shadow-2xl">
-        {intl l = "#FFFFFF"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-lighterVermillon">
-        {intl l = "#FF8F80"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-lightCharbon">
-        {intl l = "#444444"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-greyMedium">
-        {intl l = "#9B9B9B"}
-      </div>
-    </div>
-
-    <div class="w-1/6">
-      <div class="font-bold pl-7">{intl l = "Status: Error"}</div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-red">
-        {intl l = "#D21919"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-redLight">
-        {intl l = "#ED5656"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-backgroundRed">
-        {intl l = "#FFEDED"}
-      </div>
-    </div>
-
-    <div class="w-1/6">
-      <div class="font-bold pl-7">{intl l = "Status: Ok"}</div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-greenDark">
-        {intl l = "#008958"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-greenLight">
-        {intl l = "#EBFFF8"}
-      </div>
-    </div>
-
-    <div class="w-1/6">
-      <div class="font-bold pl-7">{intl l = "Status: Labels"}</div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-ocre">
-        {intl l = "#9E6700"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-mauve">
-        {intl l = "#8C5383"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-turquoise">
-        {intl l = "#0E7C7B"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-electricBlue">
-        {intl l = "#3423A6"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-darkVermillon">
-        {intl l = "#C4311C"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-ocreLight">
-        {intl l = "#FEFAF1"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-mauveLight">
-        {intl l = "#EBE2EA"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-turquoiseLight">
-        {intl l = "#ECF8F8"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-electricBlueLight">
-        {intl l = "#1E9AE8"}
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-backgroundLightVermillon">
-        {intl l = "#F7EEED"}
-      </div>
-    </div>
+  <!-- Pagination -->
+  <div class="m-6 text-center">
+    <a href="#Coulours" class="text-3xl font-bold text-vermillon">{intl l = "Coulours"}</a>
+  </div>
+  <div class="m-6 text-center">
+    <a href="#Typography" class="text-3xl font-bold text-vermillon">{intl l = "Typography"}</a>
   </div>
 
 
+  <!-- Coulours -->
+    <div class="m-6">
+      <h1 id="Coulours" class="text-3xl font-bold text-greyDark">{intl l = "Coulours"}</h1>
+    </div>
+    
+      <div class="pl-8 text-xl text-greyDark">{intl l = "Main"}</div>
+
+      <div class="flex items-center p-2 border-b border-greyMedium">
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-vermillon border-vermillon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Vermillon"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#DC3018"}</div>
+        </div>
+    
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-mediumCharbon border-mediumCharbon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Charcoal Medium"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#333333"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-lightPearl border-lightPearl"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Pearl Light"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#F5F5F5"}</div>
+        </div>
+      </div>
+
+      <div class="pl-8 mt-10 text-xl text-greyDark">{intl l = "Secondary"}</div>
+      
+      <div class="flex items-center p-2">
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-lightVermillon border-lightVermillon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Light Vermillon"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#FA533C"}</div>
+        </div>
+    
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-darkCharbon border-darkCharbon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Charcoal Dark"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#222222"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-pearlMedium border-pearlMedium"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Pearl Medium"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#EBEBEB"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-greyDark border-greyDark"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Grey Dark"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#787878"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold bg-white rounded-lg shadow-2xl w-13 border-greyMedium"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "White"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#FFFFFF"}</div>
+        </div>
+      </div>
+
+      <div class="flex items-center p-2 border-b border-greyMedium">
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-lighterVermillon border-lighterVermillon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Lighter Vermillon"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#FF8F80"}</div>
+        </div>
+    
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-lightCharbon border-lightCharbon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Charcoal Light"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#444444"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-greyMedium border-greyMedium"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Grey Medium"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#9B9B9B"}</div>
+        </div>
+      </div>
+
+
+      <div class="pl-8 mt-10 text-xl text-greyDark">{intl l = "Status"}</div>
+      <div class="flex items-center p-2 border-b border-greyMedium">
+        <div class="w-1/6">
+          <div class="mb-6 mr-5">
+            <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-red border-red"></div>
+            <div class="pl-5 font-bold text-greyDark">{intl l = "Red"}</div>
+            <div class="pl-5 text-greyDark">{intl l = "#D21919"}</div>
+          </div>
+          
+          <div class="mb-6 mr-5">
+            <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-redLight border-redLight"></div>
+            <div class="pl-5 font-bold text-greyDark">{intl l = "Red Light"}</div>
+            <div class="pl-5 text-greyDark">{intl l = "#ED5656"}</div>
+          </div>
+          
+          <div class="mb-6 mr-5">
+            <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-backgroundRed border-backgroundRed"></div>
+            <div class="pl-5 font-bold text-greyDark">{intl l = "Background Red"}</div>
+            <div class="pl-5 text-greyDark">{intl l = "#FFEDED"}</div>
+          </div>
+        </div>
+
+        <div class="flex items-center p-2">
+          <div class="w-1/6">
+            <div class="mb-6 mr-5">
+              <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-greenDark border-greenDark"></div>
+              <div class="pl-5 font-bold text-greyDark">{intl l = "Green Dark"}</div>
+              <div class="pl-5 text-greyDark">{intl l = "#008958"}</div>
+            </div>
+            
+            <div class="mb-6 mr-5">
+              <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-greenLight border-greenLight"></div>
+              <div class="pl-5 font-bold text-greyDark">{intl l = "Green Light"}</div>
+              <div class="pl-5 text-greyDark">{intl l = "#EBFFF8"}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pl-8 mt-10 text-xl text-greyDark">{intl l = "Labels"}</div>
+      
+      <div class="flex items-center p-2">
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-ocre border-ocre"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Ocre"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#9E6700"}</div>
+        </div>
+    
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-mauve border-mauve"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Mauve"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#8C5383"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-turquoise border-turquoise"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Turquoise"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#0E7C7B"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-electricBlue border-electricBlue"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Electric Blue"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#3423A6"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl bg-darkVermillon w-13 border-darkVermillon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Dark Vermillon"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#C4311C"}</div>
+        </div>
+      </div>
+
+      <div class="flex items-center p-2 border-b border-greyMedium">
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-ocreLight border-ocreLight"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Ocre Light"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#FEFAF1"}</div>
+        </div>
+    
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-mauveLight border-mauveLight"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Mauve Light"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#EBE2EA"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-turquoiseLight border-turquoiseLight"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Turquoise Light"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#ECF8F8"}</div>
+        </div>
+        
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-electricBlueLight border-electricBlueLight"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Electric Blue Light"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#EEECFF"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-backgroundLightVermillon border-backgroundLightVermillon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Background Light Vermillon"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#F7EEED"}</div>
+        </div>
+      </div>
+
+  <!-- Typography -->
+  <div class="m-6">
+    <h1 id="Typography" class="text-3xl font-bold text-greyDark">{intl l = "Typography"}</h1>
+  </div>
+  
+    <div class="pl-8 text-xl text-greyDark">{intl l = "Titles"}</div>
+    <div class="border-b border-greyMedium">
+    <div class="flex p-2">
+      <div class="flex items-center p-2">
+        <div class="mb-6 mr-5 text-sm">
+          <div class="pl-5 font-bold text-greyDark">{intl l = "H1"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Bold"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "Size: 28"}</div>
+        </div>
+        <div class="mb-6 text-3xl font-bold text-darkCharbon">
+          {intl l = "H1 Title"}
+        </div>
+      </div>
+  </div>
+
+  <div class="flex p-2">
+    <div class="flex items-center p-2">
+      <div class="mb-6 mr-5 text-sm">
+        <div class="pl-5 font-bold text-greyDark">{intl l = "H2"}</div>
+        <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans ExtraBold"}</div>
+        <div class="pl-5 text-greyDark">{intl l = "Size: 20"}</div>
+      </div>
+      <div class="mb-6 text-xl font-bold text-darkCharbon">
+        {intl l = "H2 Title"}
+      </div>
+    </div>
+</div>
+
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "H3"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans ExtraBold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 16"}</div>
+    </div>
+    <div class="mb-6 text-base font-bold text-darkCharbon">
+      {intl l = "H3 Title"}
+    </div>
+  </div>
+</div>
+
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "H4"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Bold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 16"}</div>
+    </div>
+    <div class="mb-6 text-base font-bold text-darkCharbon">
+      {intl l = "H4 Title"}
+    </div>
+  </div>
+</div>
+</div>
+
+
+<div class="pl-8 mt-5 text-xl text-greyDark">{intl l = "Paragraphs"}</div>
+<div class="border-b border-greyMedium">
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Style 1 / Regular"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Regular"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+    </div>
+    <div class="mb-6 text-sm text-darkCharbon">
+      {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Style 1 / SemiBold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans SemiBold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+    </div>
+    <div class="mb-6 text-sm font-semibold text-darkCharbon">
+      {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Style 1 / Bold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Bold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+    </div>
+    <div class="mb-6 text-sm font-bold text-darkCharbon">
+      {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Style 1 / Light"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Light"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+    </div>
+    <div class="mb-6 text-sm font-light text-darkCharbon">
+      {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Style 2 / Bold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Bold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 12"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 16"}</div>
+    </div>
+    <div class="mb-6 text-xs font-semibold text-darkCharbon">
+      {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Style 2 / Light"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Light"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 12"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 16"}</div>
+    </div>
+    <div class="mb-6 text-xs font-light text-darkCharbon">
+      {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Style 1 / Regular"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Regular"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+    </div>
+    <div class="mb-6 text-sm text-darkCharbon">
+      {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="pl-8 mt-5 text-xl text-greyDark">{intl l = "Buttons"}</div>
+<div class="border-b border-greyMedium">
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Regular"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans SemiBold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Kerning: 5%"}</div>
+    </div>
+    <div class="mb-6 text-sm font-semibold uppercase text-darkCharbon">
+      {intl l = "Button"}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Small"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans SemiBold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 12"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 16"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Kerning: 5%"}</div>
+    </div>
+    <div class="mb-6 text-xs font-semibold uppercase text-darkCharbon">
+      {intl l = "Button"}
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="pl-8 mt-5 text-xl text-greyDark">{intl l = "Labels"}</div>
+<div class="border-b border-greyMedium">
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Label"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans SemiBold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 10"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Kerning: 5%"}</div>
+    </div>
+    <div class="mb-6 text-xs font-light uppercase text-darkCharbon">
+      {intl l = "Button"}
+    </div>
+  </div>
+</div>
+</div>
+
+
+<div class="pl-8 mt-5 text-xl text-greyDark">{intl l = "Others"}</div>
+<div class="border-b border-greyMedium">
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "BreadCrumb"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Regular"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+    </div>
+    <div class="mb-6 text-sm font-normal underline text-darkCharbon">
+      {intl l = "Homepage / Nom de la page / ..."}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Subhead"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Regular"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 12"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Kerning: 5%"}</div>
+    </div>
+    <div class="mb-6 text-xs font-normal uppercase text-darkCharbon">
+      {intl l = "Subhead"}
+    </div>
+  </div>
+</div>
+</div>
+
+  
   
   <!-- Icons -->
-<div class="flex items-center p-5">
-  <div class="mx-5">
-    <div class="w-5 h-5"><img src="{image file="assets/images/svg/close.svg"}" alt="fr" /></div>
-  </div>
-
-  <div class="mx-5">
-    <div class="w-5 h-5"><img src="{image file="assets/images/svg/trash.svg"}" alt="fr" /></div>
-  </div>
-
-  <div class="mx-5">
-    <div class="w-5 h-5"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></div>
-  </div>
-
-  <div class="mx-5">
-    <div class="h-7 w-7"><img src="{image file="assets/images/svg/eye.svg"}" alt="fr" /></div>
-  </div>
-
-  <div class="mx-5">
-    <div class="h-7 w-7"><img src="{image file="assets/images/svg/link.svg"}" alt="fr" /></div>
-  </div>
-</div>
-
-<div class="flex items-center p-5">
-  <div class="mx-5">
-    <div class="w-5 h-5"><img src="{image file="assets/images/svg/arrow-up.svg"}" alt="fr" /></div>
-  </div>
-
-  <div class="mx-5">
-    <div class="w-5 h-5"><img src="{image file="assets/images/svg/down-arrow.svg"}" alt="fr" /></div>
-  </div>
-
-  <div class="mx-5">
-    <div class="w-5 h-5"><img src="{image file="assets/images/svg/right-arrow.svg"}" alt="fr" /></div>
-  </div>
-
-  <div class="mx-5">
-    <div class="w-5 h-5"><img src="{image file="assets/images/svg/arrow-left.svg"}" alt="fr" /></div>
-  </div>
-
-  <div class="mx-5">
-    <div class="w-5 h-5"><img src="{image file="assets/images/svg/left-arrow.svg"}" alt="fr" /></div>
+  <div class="m-6">
+    <h1 class="text-3xl font-bold text-greyDark">{intl l = "Icons"}</h1>
   </div>
   
-  <div class="mx-5">
-    <div class="w-5 h-5"><img src="{image file="assets/images/svg/arrow-right.svg"}" alt="fr" /></div>
+  <div class="flex items-center p-2">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/close.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Close"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/trash.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Delete"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Search"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/eye.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Preview"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/link.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Link"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/edit.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Edit"}</div>
+    </div>
   </div>
 
-  <div class="mx-5">
-    <div class="w-5 h-5"><img src="{image file="assets/images/svg/arrow-down-sign.svg"}" alt="fr" /></div>
+  <div class="flex items-center p-2 border-b border-greyMedium">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/long-arrow-up.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Long Arrow Up"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/long-arrow-down.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Long Arrow Down"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/long-arrow-right.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Long Arrow Right"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/long-arrow-left.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Long Arrow Left"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/short-arrow-left.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Short Arrow Left"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+      <div class="w-5 h-5"><img src="{image file="assets/images/svg/short-arrow-right.svg"}" alt="fr" /></div>
+    <div class="text-greyDark">{intl l = "Short Arrow Right"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+      <div class="w-5 h-5"><img src="{image file="assets/images/svg/short-arrow-down.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Short Arrow Down"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+      <div class="w-5 h-5"><img src="{image file="assets/images/svg/short-arrow-up.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Short Arrow Up"}</div>
+    </div>
+  </div>
   </div>
   
-  <div class="mx-5">
-    <div class="w-5 h-5"><img src="{image file="assets/images/svg/up-arrow-sign.svg"}" alt="fr" /></div>
+  
+  <div class="m-6">
+    <h1 class="mt-8 text-greyDark">{intl l = "Main Menu"}</h1>
   </div>
-</div>
+  
+  <div class="flex items-center p-2">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/catalog.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Catalogue"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/settings.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Outils"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/blank-page.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Pages"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/dashboard.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Dashboard"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/blocks.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Blocks"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/palette.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Design"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+      <div class="w-5 h-5"><img src="{image file="assets/images/svg/Information.svg"}" alt="fr" /></div>
+    <div class="text-greyDark">{intl l = "Informations"}</div>
+  </div>
+  </div>
+
+  <div class="flex items-center p-2 border-b border-greyMedium">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/customer.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Clients"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/shopping-cart.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Commandes"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/modules.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Modules"}</div>
+    </div>
+  </div>
+
+
+  <div class="m-6">
+    <h1 class="mt-8 text-greyDark">{intl l = "SideBar TheliaBlocks"}</h1>
+  </div>
+  
+  <div class="flex items-center p-2">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/title.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Titres"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/text.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Textes"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/button.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Boutons"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/images.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Images"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/video.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Vidéo"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/product.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Produits"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/accordion.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Accordéons"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/separate.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Séparateurs"}</div>
+    </div>
+  </div>
+
+  <div class="flex items-center p-2 border-b border-greyMedium">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/verticale.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Colonnes"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/html.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "HTML"}</div>
+    </div>
+
+  </div>
+
+
+
+
 
 
   <!-- Boutons large -->
@@ -321,7 +813,7 @@
     <div class="w-1/4 mb-5">
       <div class="flex items-center search">
         <div
-          class="h-auto py-2 pl-3 pr-4 bg-gray-100 rounded-l-lg search-icon text-main"
+          class="h-auto py-2 pr-4 bg-gray-100 rounded-l-lg pl-3x search-icon text-main"
         >
           <i class="fas fa-search"></i>
         </div>
