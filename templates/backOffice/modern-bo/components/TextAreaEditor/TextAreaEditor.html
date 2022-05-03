@@ -75,7 +75,7 @@
         }
         
         if(cmd === 'link') {
-          let url = prompt('Veuillez entrer votre lien ici : ', ' ');
+          let url = prompt('Veuillez entrer votre lien ici : ');
           textField.document.execCommand(cmd, false, url);
         } else {
           textField.document.execCommand(cmd, false, null);

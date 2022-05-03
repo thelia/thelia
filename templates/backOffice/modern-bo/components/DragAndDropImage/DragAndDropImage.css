@@ -14,10 +14,11 @@ input[type="file"] {
 	color         : #333333;
 	cursor        : pointer;
 	display       : block;
+	padding: 1em;
 	margin: 1em 0px;
-	padding       : 3em;
 	text-align    : center;
 	transition    : background 0.3s, color 0.3s;
+	width: 274px;
 }
 
 
@@ -31,6 +32,5 @@ input[type="file"] {
 
 #file-upload-form-two {
 	margin : auto;	
-	width  : 26%;
 }
 

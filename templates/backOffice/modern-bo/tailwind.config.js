@@ -37,7 +37,25 @@ module.exports = {
         vermillon: '#DC3018',
         lightVermillon: '#FA533C',
         lighterVermillon: '#FF8F80',
-        greyMedium: '#9B9B9B'
+        greyMedium: '#9B9B9B',
+        pearlMedium: '#EBEBEB',
+        greyDark: '#787878',
+        white: '#FFFFFF',
+        red: '#D21919',
+        redLight: '#ED5656',
+        backgroundRed: '#FFEDED',
+        greenDark: '#008958',
+        greenLight: '#EBFFF8',
+        ocre: '#9E6700',
+        mauve: '#8C5383',
+        turquoise: '#0E7C7B',
+        electricBlue: '#3423A6',
+        darkVermillon: '#C4311C',
+        ocreLight: '#FEFAF1',
+        mauveLight: '#EBE2EA',
+        turquoiseLight: '#ECF8F8',
+        electricBlueLight: '#EEECFF',
+        backgroundLightVermillon: '#F7EEED'
       }
     }
   },

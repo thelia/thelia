@@ -21,6 +21,7 @@ export const DragAndDropImage = () => {
       e.stopPropagation();
       e.preventDefault();
       
+      
       fileDrag.className = (e.type === 'dragover' ? 'hover' : 'modal-body file-upload-two');
     }
   

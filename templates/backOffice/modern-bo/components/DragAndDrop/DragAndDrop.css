@@ -12,14 +12,14 @@ input[type="file"] {
 
 #file-drag {
 	display: block;
-	margin: 1em 0px;
-	padding: 3em;
+	padding: 1em;
 	border: 1px dashed #787878;
 	border-radius: 4px;
 	color         : #333333;
 	cursor        : pointer;
 	text-align    : center;
 	transition    : background 0.3s, color 0.3s;
+	width: 274px;
 }
 
 
@@ -33,5 +33,4 @@ input[type="file"] {
 
 #file-upload-form {
 	margin : auto;	
-	width  : 26%;
 }
