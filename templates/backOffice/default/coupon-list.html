@@ -1,36 +1,50 @@
 {extends file="admin-layout.tpl"}
 
-{block name="no-return-functions"}
-    {$admin_current_location = 'tools'}
-{/block}
-
 {block name="check-resource"}admin.coupon{/block}
 {block name="check-access"}view{/block}
+{block name="page-title"}Gestions des coupons{/block}
 
-{block name="page-title"}{intl l='Coupons'}{/block}
+{block name="after-admin-css"}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-css/1.4.6/select2-bootstrap.min.css" rel="stylesheet" />
+    <style>
+        {literal}
+        .js-list {
+            width: 100% !important;
+        }
+        .js-animate-info-button {
+            animation: AnimateInfoButton 2s infinite;
+        }
+        @keyframes AnimateInfoButton{
+            0%{opacity: 1;}
+            50%{opacity: 0;}
+            100%{opacity: 1;}
+        }
+        {/literal}
+    </style>
+{/block}
 
 {block name="main-content"}
-    {$coupon_page = {$smarty.get.page|default:1}}
+    <div id="manager-coupons">
 
-    <div class="coupons">
+        <div id="wrapper" class="container">
 
-    <div id="wrapper" class="container">
-
-        <nav>
-            <ul class="breadcrumb">
-                <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
-                <li><a href="{url path='admin/tools'}">{intl l='Tools'}</a></li>
-                <li><a href="{url path='admin/coupon'}">{intl l='Coupons'}</a></li>
-            </ul>
-        </nav>
-
-        {hook name="coupon.top" location="coupon_top" }
-
-        <div class="row">
-            <div class="col-md-12">
-                <div class="general-block-decorator">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-condensed" id="folder_list">
+          <div class="row">
+            <div class="col-md-12 general-block-decorator">
+                <div class="row">
+                    <div class="col-md-12 filter" style="overflow: auto">
+                        <table class="js-list table table-striped table-bordered" style="width: 100%">
+                            <thead>
+                            <tr>
+                                {foreach from=$columnsDefinition item=definition}
+                                <td>
+                                    {$definition.title}
+                                </td>
+                                {/foreach}
+                            </tr>
+                            </thead>
+                            <tbody>
 
                             <caption>
                                 {intl l='Coupons'}
@@ -38,262 +52,267 @@
                                 {hook name="coupon.list-caption" location="coupon_list_caption" }
 
                                 {include file='renderer/buttons.html' btn_group=false buttons=[
-                                    [
-                                        'type' => 'create',
-                                        'class' => 'action-btn',
-                                        'title' => {intl l='Create a new coupon'},
-                                        'href' => {url path='/admin/coupon/create'},
-                                        'auth' => ['resource' => 'admin.coupon'],
-                                        'data' => [
-                                            'toggle' => 'modal'
-                                        ]
-                                    ]
+                                [
+                                'type' => 'create',
+                                'class' => 'action-btn',
+                                'title' => {intl l='Create a new coupon'},
+                                'href' => {url path='/admin/coupon/create'},
+                                'auth' => ['resource' => 'admin.coupon'],
+                                'data' => [
+                                'toggle' => 'modal'
+                                ]
+                                ]
                                 ]}
                             </caption>
+                                    <div class="form-group">
+                                        <label for="js-input-search-coupon">Rechercher coupon</label>
+                                        <input type="text" class="form-control js-refresh-table" data-default="" id="js-input-search-coupon" placeholder="code du coupon ou id">
+                                    </div>
+                            <div class="form-group">
+                                <label for="type">Rechercher par le type</label>
+                                <select id="type" class="col-md-12 form-control js-refresh-table">
+                                <option value="" data-description="" data-inputName="" selected disabled>{intl l='Please select a coupon type'}</option>
+                                {foreach from=$availableCoupons item=availableCoupon}
+                                <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}" data-inputName="{$availableCoupon.inputName|default:null}"}>
+                                {$availableCoupon.name}
+                                </option>
+                                {/foreach}
 
-                            <thead>
-                                <tr>
-                                    <th>{admin_sortable_header
-                                        current_order=$coupon_order
-                                        order='code'
-                                        reverse_order='code-reverse'
-                                        path={url path='/admin/coupon'}
-                                        request_parameter_name='coupon_order'
-                                        label="{intl l='Code'}"
-                                    }
-                                    </th>
-
-                                    <th>{admin_sortable_header
-                                        current_order=$coupon_order
-                                        order='title'
-                                        reverse_order='title-reverse'
-                                        path={url path='/admin/coupon'}
-                                        request_parameter_name='coupon_order'
-                                        label="{intl l='Title'}"
-                                    }
-                                    </th>
-
-                                    <th class="text-center">{admin_sortable_header
-                                        current_order=$coupon_order
-                                        order='enabled'
-                                        reverse_order='enabled-reverse'
-                                        path={url path='/admin/coupon'}
-                                        request_parameter_name='coupon_order'
-                                        label="{intl l='Status'}"
-                                    }
-                                    </th>
-
-                                    <th class="text-center">{admin_sortable_header
-                                        current_order=$coupon_order
-                                        order='start-date'
-                                        reverse_order='start-date-reverse'
-                                        path={url path='/admin/coupon'}
-                                        request_parameter_name='coupon_order'
-                                        label="{intl l='Start Date'}"
-                                        }
-                                    </th>
-
-                                    <th class="text-center">{admin_sortable_header
-                                        current_order=$coupon_order
-                                        order='expiration-date'
-                                        reverse_order='expiration-date-reverse'
-                                        path={url path='/admin/coupon'}
-                                        request_parameter_name='coupon_order'
-                                        label="{intl l='Expiration date'}"
-                                    }
-                                    </th>
-
-                                    <th class="text-center">{admin_sortable_header
-                                        current_order=$coupon_order
-                                        order='days-left'
-                                        reverse_order='days-left-reverse'
-                                        path={url path='/admin/coupon'}
-                                        request_parameter_name='coupon_order'
-                                        label="{intl l='Days before expiration'}"
-                                    }
-                                    </th>
-
-                                    <th class="text-center">{admin_sortable_header
-                                        current_order=$coupon_order
-                                        order='usages-left'
-                                        reverse_order='usages-left-reverse'
-                                        path={url path='/admin/coupon'}
-                                        request_parameter_name='coupon_order'
-                                        label="{intl l='Usages left'}"
-                                    }
-                                    </th>
-
-                                    {hook name="coupon.table-header" location="coupon_table_header" }
-
-                                    <th>{intl l="Actions"}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loop type="coupon" name="list_coupon" page={$coupon_page} limit={config key="number_default_results_per_page.coupon_list" default=20} order={$coupon_order|default:'code'} backend_context="true"}
-                                    <tr>
-                                        <td>
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
-                                                <a title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/%id" id=$ID}">{$CODE}</a>
-                                            {/loop}
-                                            {elseloop rel="can_change"}
-                                                {$CODE}
-                                            {/elseloop}
-                                        </td>
-
-                                        <td>{$TITLE}</td>
-
-                                        <td class="text-center">
-                                            {if $IS_ENABLED}
-                                                <span class="label label-success">{intl l="Enabled"}</span>
-                                            {else}
-                                                <span class="label label-default">{intl l="Disabled"}</span>
-                                            {/if}
-                                        </td>
-
-                                        <td class="text-center">
-                                            {if $START_DATE == null}
-                                                /
-                                            {else}
-                                                {format_date date=$START_DATE output="date"}
-                                            {/if}
-                                        </td>
-
-                                        <td class="text-center">{format_date date=$EXPIRATION_DATE output="date"}</td>
-
-                                        <td class="text-center">
-                                            {if $DAY_LEFT_BEFORE_EXPIRATION <= 0}
-                                                <span class="label label-default">{intl l='Expired'}</span>
-                                            {else}
-                                                {$DAY_LEFT_BEFORE_EXPIRATION}
-                                            {/if}
-                                        </td>
-
-                                        <td class="text-center">
-                                            {if $USAGE_LEFT == -1}
-                                                {intl l="Unlimited"}
-                                            {elseif $USAGE_LEFT}
-                                                {$USAGE_LEFT}
-                                            {else}
-                                                <span class="label label-default">0</span>
-                                            {/if}
-                                        </td>
-
-                                        {hook name="coupon.table-row" location="coupon_table_row" coupon_id={$ID} }
-
-                                        <td class="actions">
-                                            {include file='renderer/buttons.html' buttons=[
-                                                [
-                                                    'type' => 'edit',
-                                                    'title' => {intl l='Change this coupon'},
-                                                    'href' => {url path="/admin/coupon/update/%id" id=$ID},
-                                                    'auth' => ['resource' => 'admin.coupon']
-                                                ],
-                                                [
-                                                    'type' => 'delete',
-                                                    'class' => 'delete_coupon_btn',
-                                                    'title' => {intl l='Delete this coupon'},
-                                                    'href' => '#delete_coupon',
-                                                    'data' => [
-                                                        'id' => $ID,
-                                                        'toggle' => 'modal',
-                                                        'target' => '#delete_coupon'
-                                                    ],
-                                                    'auth' => ['resource' => 'admin.coupon']
-                                                ]
-                                            ]}
-                                        </td>
-                                    </tr>
-                                {/loop}
-                                {elseloop rel="list_coupon"}
-                                    <tr>
-                                        <td colspan="100">
-                                            <div class="alert alert-info text-center">
-                                                <p>{intl l="No coupon is currently defined. Please use the (+) button above to create your first coupon."}</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {/elseloop}
+                                </select>
                             </tbody>
-                            {ifloop rel="list_coupon"}
-                                <tfoot>
-                                <tr>
-                                    <td colspan="100">
-                                        {include
-                                        file = "includes/pagination.html"
-
-                                        loop_ref       = "list_coupon"
-                                        max_page_count = 10
-                                        page_url       = {url path="/admin/coupon" orders_order=$coupon_order}
-                                        }
-
-                                    </td>
-                                </tr>
-                                </tfoot>
-                            {/ifloop}
+                            </div>
                         </table>
                     </div>
                 </div>
 
-                {hook name="coupon.bottom" location="coupon_bottom" }
-
             </div>
+          </div>
+
         </div>
+        {* Cancel coupon confirmation dialog *}
 
-    </div> <!-- #wrapper -->
-
-    {* DELETE MODAL *}
-    {capture "delete_dialog"}
-        <input type="hidden" name="coupon_id" id="coupon_delete_id" value="" />
-
-        {hook name="coupon.delete-form" }
-    {/capture}
-
-    {include
-    file = "includes/generic-confirm-dialog.html"
-
-    dialog_id       = "delete_coupon"
-    dialog_title    = {intl l="Delete coupon"}
-    dialog_message  = {intl l="Do you really want to delete this coupon ?"}
-
-    form_action         = {token_url path='/admin/coupon/delete'}
-    form_content        = {$smarty.capture.delete_dialog nofilter}
-    }
-</div>
-
-{/block}
+        {capture "delete_dialog"}
+            <input type="hidden" name="coupon_id" id="coupon_delete_id" value="5" />
 
 
-{block name="javascript-initialization"}
+        {/capture}
+        {include
+        file = "includes/generic-confirm-dialog.html"
 
-    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
+        dialog_id       = "delete_coupon"
+        dialog_title    = {intl l="Delete an coupon"}
+        dialog_message  = {intl l="Do you really want to delete this coupon ?
+        "}
 
-    {javascripts file='assets/js/tablesorter/jquery.tablesorter.min.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
+        form_action         = {token_url path='/admin/coupon/delete'}
+        form_content        = {$smarty.capture.delete_dialog nofilter}
 
-    {javascripts file='assets/js/tablesorter/jquery.metadata.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
 
-    {javascripts file='assets/js/tablesorter/jquery.tablesorter.widgets.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
+        }
 
-    {javascripts file='assets/js/tablesorter/jquery.tablesorter.widgets-filter-formatter.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
-
-    <script>
-        $(document).ready(function() {
-            $(".delete_coupon_btn").click(function() {
-                $("#coupon_delete_id").val($(this).data("id"));
-            });
-        });
-    </script>
-{/block}
+        {/block}
 
 {block name="javascript-last-call"}
-    {hook name="coupon.list-js" location="coupon-list-js" }
+
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.10/lodash.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
+        {*<script src="https://cdnjs.cloudflare.com/ajax/libs/history.js/1.8/bundled/html4+html5/jquery.history.min.jss"></script>*}
+
+        <script>
+        "use strict";
+
+        (function($, $module){
+            {* Ajout btn module info *}
+            $('#page-wrapper .page-header').append('<button class="btn btn-info pull-right"><i class="glyphicon glyphicon-info-sign"></i></button>');
+
+            //$.fn.select2.defaults.set( "theme", "bootstrap" );
+            var currencySymbol = '{$currencySymbol|default:null}';
+
+            var tv = '{$theliaVersion}',
+                id = $module.attr('id'),
+                popoverPosition = null,
+                $modalDelete = $module.find('#delete_coupon');
+
+
+            var table = $module.find('.js-list').DataTable( {
+                processing: true,
+                serverSide: true,
+                searching: false,
+                lengthChange: false,
+                scrollX: true,
+                drawCallback:function (oSettings) {
+                    // console.log(oSettings);
+                },
+                ajax: {
+                    ajax: "{url current=true}",
+                    method: 'POST',
+                    data: function (data) {
+                        resetPopoverPosition();
+
+                        data.filter = {
+                            searchCoupon: $module.find('#js-input-search-coupon').val(),
+                            searchTypeCoupon : $module.find('#type').val(),
+                        };
+                        data.searchCoupon = {
+                            "value": $module.find('#js-input-search-coupon').val(),
+                            regex: false
+                        };
+                        data.searchTypeCoupon = {
+                            "value": $module.find('#type').val(),
+                            regex: false
+                        };
+
+                        [...document.querySelectorAll(".js-filter-element")].forEach(el => {
+                            data.filter[el.name] = el.value
+                        });
+
+                        data.length = $module.find('#js-input-length').val();
+                    }
+                },
+
+                displayLength: 25,
+                columnDefs: {$columnsDefinition|@json_encode nofilter}.concat([
+                    {
+                        className: "text-center",
+                        targets: [1,2,3,4,5,6,7],
+                        render: function ( data, type, row, meta ) {
+                            return data;
+                        }
+                    },
+                    {
+                        className: "text-center",
+                        targets: 0,
+                        render: function ( data, type, row, meta ) {
+
+                            if (data !== '') {
+                                return '<a href="' + data['href'] + '">' + data['id'] + '</a>'
+                            }
+
+                            return '<a href="#" style="line-height:50px;text-align:center;width: 50px; height: 50px;">Aucune</a>';
+                            return data;
+                        }
+                    },
+                    {
+                        className: "text-center",
+                        targets: 8,
+                        render: function ( data, type, row, meta ) {
+
+                            var html =
+                                '<a href="' + data['hrefUpdate'] + '" class="btn btn-info" title="Modifier">' +
+                                '<i class="glyphicon glyphicon-edit"></i>' +
+                                '</a>'+ ' <a href="#" class="btn btn-danger js-action-delete" title="Supprimer" data-id="' + data['coupon_id'] + '">' +
+                                '<i class="glyphicon glyphicon-trash"></i>' +
+                                '</a>';
+                            return html;
+                        }
+                    },
+
+            ]),
+
+
+
+            language: {
+                "sProcessing":     "Traitement en cours...",
+                    "sSearch":         "Rechercher&nbsp;:",
+                    "sLengthMenu":     "Afficher _MENU_ &eacute;l&eacute;ments",
+                    "sInfo":           "Affichage de l'&eacute;l&eacute;ment _START_ &agrave; _END_ sur _TOTAL_ &eacute;l&eacute;ments",
+                    "sInfoEmpty":      "Affichage de l'&eacute;l&eacute;ment 0 &agrave; 0 sur 0 &eacute;l&eacute;ment",
+                    "sInfoFiltered":   "(filtr&eacute; de _MAX_ &eacute;l&eacute;ments au total)",
+                    "sInfoPostFix":    "",
+                    "sLoadingRecords": "Chargement en cours...",
+                    "sZeroRecords":    "Aucun &eacute;l&eacute;ment &agrave; afficher",
+                    "sEmptyTable":     "Aucune donn&eacute;e disponible dans le tableau",
+                    "oPaginate": {
+                    "sFirst":      "Premier",
+                        "sPrevious":   "Pr&eacute;c&eacute;dent",
+                        "sNext":       "Suivant",
+                        "sLast":       "Dernier"
+                },
+                "oAria": {
+                    "sSortAscending":  ": activer pour trier la colonne par ordre croissant",
+                        "sSortDescending": ": activer pour trier la colonne par ordre d&eacute;croissant"
+                }
+            }
+            })
+
+            table.on('click', '.js-action-position-close', function(event){
+                event.preventDefault();
+                resetPopoverPosition();
+            });
+            table.on('click', '.js-action-delete', function(e){
+
+
+                e.preventDefault();
+
+                $modalDelete.find('#coupon_delete_id').val($(this).data('id'));
+                $modalDelete.modal('show');
+            });
+            var timer = null;
+            $module.find('.js-refresh-table').on('change keyup', function(event){
+                if (event.type === "keyup" ) {
+                    if (timer !== null) {
+                        clearTimeout(timer);
+                    }
+
+                    timer = setTimeout(function(){
+                        refreshFilter();
+                        table.ajax.reload();
+                    }, 350)
+                } else {
+                    refreshFilter();
+                    table.ajax.reload();
+                }
+            });
+            var filters = $module.find('.js-refresh-table');
+            function refreshFilter()
+            {
+                filters.each(function(){
+                    if ('undefined' !== typeof this.dataset.default) {
+                        var val = $(this).val();
+                        {* gestion cas select multiple *}
+                        if (val === null) {
+                            val = '';
+                        }
+
+                        if (val !== this.dataset.default) {
+                            $(this).parents('.filter:eq(0)').css('backgroundColor', 'rgba(0, 102, 255, 0.1)');
+                        } else {
+                            $(this).parents('.filter:eq(0)').css('backgroundColor', '');
+                        }
+                    }
+                });
+            }
+
+            $modalDelete.on('submit', 'form', function(e){
+                e.preventDefault();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: 'post',
+                    data: $(this).serialize(),
+                    success: function() {
+                        table.ajax.reload(null, false);
+
+                        setTimeout(function () {
+                            $modalDelete.modal('hide');
+                        }, 200);
+                    },
+                    error: function() {
+
+                    }
+                });
+            });
+            function resetPopoverPosition() {
+                if (popoverPosition !== null) {
+                    popoverPosition.popover('destroy');
+                }
+            }
+        }(jQuery, jQuery('#manager-coupons')))
+
+
+
+    </script>
 {/block}

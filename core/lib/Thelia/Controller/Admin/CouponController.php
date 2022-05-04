@@ -15,6 +15,7 @@ namespace Thelia\Controller\Admin;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -37,8 +38,19 @@ use Thelia\Model\CouponCountry;
 use Thelia\Model\CouponModule;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\LangQuery;
+use Thelia\Model\Map\CouponTableMap;
 use Thelia\Tools\Rest\ResponseRest;
 use Thelia\Tools\URL;
+use ContactOptionBuilder\Controller\AdminController;
+use EasyCoupnManager\Event\BeforeFilterEvent;
+use EasyCouponManager\EasyCouponManager;
+use Procity\Controller\Back\ProductController;
+use Thelia\Controller\Admin\BaseAdminController;
+use Thelia\Controller\Front\BaseFrontController;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Thelia;
+use Thelia\Core\Translation\Translator;
+use Thelia\Core\HttpFoundation\JsonResponse;
 
 /**
  * Control View and Action (Model) via Events.
@@ -48,19 +60,228 @@ use Thelia\Tools\URL;
 class CouponController extends BaseAdminController
 {
     /**
+     * Datatable and search on coupons.
+     *
+     * @author Arthur LASHERMES <alashermes@openstudio.fr>
+     */
+
+    /**
+     * @param Request $request
+     * @param CouponQuery $query
+     * @return void
+     */
+    protected function applySearchCoupon(Request $request, CouponQuery $query)
+    {
+        $value = $this->getSearchValue($request, 'searchCoupon');
+        $query->where(CouponTableMap::COL_ID . ' LIKE ?', '%' . $value . '%', \PDO::PARAM_STR);
+
+        if (strlen($value) > 2) {
+            $query->_or()->where(CouponTableMap::COL_CODE . ' LIKE ?', '%' . $value . '%', \PDO::PARAM_STR);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @param $searchKey
+     * @return string
+     */
+    protected function getSearchValue(Request $request, $searchKey)
+    {
+        if(!array_key_exists('searchTypeCoupon', $_REQUEST)){
+            return null;
+        }
+        return (string)$request->get($searchKey)['value'];
+    }
+
+    /**
+     * @param $withPrivateData
+     * @return array[]
+     */
+    protected function defineColumnsDefinition($withPrivateData = false): array
+    {
+        $i = -1;
+
+        $definitions = [
+            [
+                'name' => 'id',
+                'targets' => ++$i,
+                'orm' => CouponTableMap::COL_ID,
+                'title' => 'id',
+            ],
+            [
+                'name' => 'code',
+                'targets' => ++$i,
+                'orm' => CouponTableMap::COL_CODE,
+                'title' => 'code',
+            ],
+            [
+                'name' => 'title',
+                'targets' => ++$i,
+                'orderable' => false,
+                'title' => 'titre',
+            ],
+            [
+                'name' => 'is_enabled',
+                'targets' => ++$i,
+                'orm' => CouponTableMap::COL_IS_ENABLED,
+                'title' => 'Etat',
+            ],
+            [
+                'name' => 'start_date',
+                'targets' => ++$i,
+                'orm' => CouponTableMap::COL_START_DATE,
+                'title' => 'Date de début',
+            ],
+            [
+                'name' => 'expiration_date',
+                'targets' => ++$i,
+                'orm' => CouponTableMap::COL_EXPIRATION_DATE,
+                'title' => 'Date de fin',
+            ],
+            [
+                'name' => 'days_before_expiration',
+                'targets' => ++$i,
+                'title' => 'Jour avant expiration',
+                'orderable' => false,
+            ],
+            [
+                'name' => 'is_used',
+                'targets' => ++$i,
+                'title' => 'utilisation',
+                'orm' => CouponTableMap::COL_IS_USED,
+            ],
+            [
+                'name' => 'action',
+                'targets' => ++$i,
+                'title' => 'Action',
+                'orderable' => false,
+            ]
+        ];
+
+        if (!$withPrivateData) {
+            foreach ($definitions as &$definition) {
+                unset($definition['orm']);
+            }
+        }
+
+        return $definitions;
+    }
+
+    /**
+     * @param $request
+     * @param CouponQuery $query
+     * @return void
+     */
+    public function searchWithCouponType($request, CouponQuery $query)
+    {
+
+        $value = $this->getSearchValue($request, 'searchTypeCoupon');
+        $query->filterByType($value);
+    }
+
+    /**
+     * @param Request $request
+     * @return int
+     */
+    protected function getDraw(Request $request): int
+    {
+        return (int)$request->get('draw');
+    }
+
+    /**
      * Manage Coupons list display.
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
-    public function browseAction()
+    public function browseAction(RequestStack $requestStack)
     {
         if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::VIEW)) {
             return $response;
         }
 
+        $request = $requestStack->getCurrentRequest();
+
+        if ($request->isXmlHttpRequest()) {
+
+            $query = CouponQuery::create();
+
+            $queryCount = clone $query;
+
+            $value = $this->getSearchValue($request, 'searchTypeCoupon');
+            if($value !== ""){
+                $this->searchWithCouponType($request,$query);
+            }
+            $this->applySearchCoupon($request, $query);
+
+            $querySearchCount = clone $query;
+
+            $coupons = $query->limit(25)->find();
+
+
+            $json = [
+                "draw" => $this->getDraw($request),
+                "recordsTotal" => $queryCount->count(),
+                "recordsFiltered" => $querySearchCount->count(),
+                "data" => [],
+                "coupon" => count($coupons->getData()),
+            ];
+
+
+            foreach ($coupons as $coupon) {
+
+                $updateUrl = URL::getInstance()->absoluteUrl('admin/coupon/update/' . $coupon->getId());
+
+                $days_after_expiration = $coupon->getExpirationDate()->diff($coupon->getStartDate());
+                $days_after_expiration = $days_after_expiration->days;
+
+
+                $json['data'][] = [
+                    [
+                        'id' => $coupon->getId(),
+                        'href' => $updateUrl
+                    ],
+                    [
+                        $coupon->getCode()
+                    ],
+                    [
+                        $coupon->getTitle()
+                    ],
+                    [
+                        $coupon->getIsEnabled()
+                    ],
+                    [
+                        $coupon->getStartDate()->format('d/m/y H:i:s')
+                    ],
+                    [
+                        $coupon->getExpirationDate()->format('d/m/y H:i:s')
+                    ],
+                    [
+                        $days_after_expiration
+                    ],
+                    [
+                        $coupon->getIsUsed()
+                    ],
+                    [
+                        'coupon_id' => $coupon->getId(),
+                        'hrefUpdate' => $updateUrl,
+                    ]
+                ];
+            }
+
+            return new JsonResponse($json);
+
+        }
+
+        $args['availableCoupons'] = $this->getAvailableCoupons();
+
         return $this->render('coupon-list', [
-            'coupon_order' => $this->getListOrderFromSession('coupon', 'coupon_order', 'code'),
+            'columnsDefinition' => $this->defineColumnsDefinition(),
+            'theliaVersion' => Thelia::THELIA_VERSION,
+            'availableCoupons' => $args['availableCoupons'],
+            'name' => $args['availableCoupons'][0]['name'],
+
         ]);
+
     }
 
     /**
