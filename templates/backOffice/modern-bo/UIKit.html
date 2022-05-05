@@ -1,11 +1,13 @@
 {extends file="admin-layout.tpl"} {block name="main-content"}
-<div class="text-darkCharbon">
+<div  class="text-darkCharbon">
   <div class="m-10">
     <h1 class="text-5xl font-bold text-center">{intl l = "Thelia Back Office UI KIT"}</h1>
   </div>
 
+
+
   <!-- Pagination -->
-  <div class="m-6 text-center">
+  <div id="topPage" class="m-6 text-center">
     <a href="#Coulours" class="text-3xl font-bold text-vermillon">{intl l = "Coulours"}</a>
   </div>
   <div class="m-6 text-center">
@@ -199,6 +201,8 @@
           <div class="pl-5 text-greyDark">{intl l = "#F7EEED"}</div>
         </div>
       </div>
+ezfezfezf
+      {component name="BackToTop" title="BackToTop"}{/component} 
 
   <!-- Typography -->
   <div class="m-6">
@@ -831,27 +835,27 @@
   
   <div class="flex items-center p-2 border-b border-greyMedium">
     <div class="mx-5 mb-6 mr-5">
-        <div class="w-5 h-5"><img src="{image file="assets/images/svg/switch.svg"}" alt="fr" /></div>
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/twoColomn.svg"}" alt="fr" /></div>
       <div class="text-greyDark">{intl l = "2 colonnes"}</div>
     </div>
 
     <div class="mx-5 mb-6 mr-5">
-        <div class="w-5 h-5"><img src="{image file="assets/images/svg/drop-down.svg"}" alt="fr" /></div>
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/threeColomn.svg"}" alt="fr" /></div>
       <div class="text-greyDark">{intl l = "3 colonnes"}</div>
     </div>
 
     <div class="mx-5 mb-6 mr-5">
-        <div class="w-5 h-5"><img src="{image file="assets/images/svg/drop-up.svg"}" alt="fr" /></div>
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/fourColomn.svg"}" alt="fr" /></div>
       <div class="text-greyDark">{intl l = "4 colonnes"}</div>
     </div>
 
     <div class="mx-5 mb-6 mr-5">
-        <div class="w-5 h-5"><img src="{image file="assets/images/svg/info.svg"}" alt="fr" /></div>
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/fiveColomn.svg"}" alt="fr" /></div>
       <div class="text-greyDark">{intl l = "5 colonnes"}</div>
     </div>
 
     <div class="mx-5 mb-6 mr-5">
-        <div class="w-5 h-5"><img src="{image file="assets/images/svg/warning.svg"}" alt="fr" /></div>
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/sixColomn.svg"}" alt="fr" /></div>
       <div class="text-greyDark">{intl l = "6 colonnes"}</div>
     </div>
   </div>
@@ -1448,64 +1452,162 @@
     <div class="mt-8 pl-8 text-sm uppercase text-greyDark">{intl l = "Cliquable"}</div>  
     <div class="flex items-center p-2">
       <div class="m-2 mr-5">
-        <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-lightPearl last:mr-0 mr-1">
+        <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-white last:mr-0 mr-1">
           {intl l = "Tag Pays"}
-        </span>
-      </div>
-  
-      <div class="m-2 mr-5">
-        <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-lightPearl last:mr-0 mr-1">
-          <i class="fas fa-xmark"></i>
-          {intl l = "Tag Pays"}
+          <i class="material-icons close-button">&times;</i>
         </span>
       </div>
   
       <div class="m-2 mr-5">
         <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-lightPearl last:mr-0 mr-1">
           {intl l = "Tag Pays"}
+          <i class="material-icons close-button">&times;</i>
         </span>
       </div>
   
       <div class="m-2 mr-5">
-        <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-lightPearl last:mr-0 mr-1">
+        <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-greenDark border border-greenDark bg-white last:mr-0 mr-1">
           {intl l = "Tag Pays"}
+          <i class="material-icons close-button">&times;</i>
         </span>
       </div>
   
       <div class="m-2 mr-5">
-        <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-lightPearl last:mr-0 mr-1">
+        <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white border border-darkCharbon bg-darkCharbon last:mr-0 mr-1">
           {intl l = "Tag Pays"}
+          <i class="material-icons close-button">&times;</i>
         </span>
       </div>
       </div>
 
       <div class="flex items-center p-2">
-        <div class="mr-5">
-          <button class="w-24 h-9 text-sm font-semibold tracking-wider text-white uppercase  rounded bg-greyMedium">
-            {intl l = "Bouton"}
-          </button>
+        <div class="m-2 mr-5">
+          <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-white last:mr-0 mr-1">
+            {intl l = "Tag Pays"}
+            <i class="material-icons close-button text-red">&times;</i>
+          </span>
         </div>
     
-        <div class="mr-5">
-            <button class="w-24 text-sm font-semibold tracking-wider uppercase border rounded text-greyMedium h-9 border-greyMedium">
-              {intl l = "Bouton"}
-            </button>
+        <div class="m-2 mr-5">
+          <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-lightPearl last:mr-0 mr-1">
+            <i class="fas fa-xmark"></i>
+            {intl l = "Tag Pays"}
+            <i class="material-icons close-button text-red">&times;</i>
+          </span>
         </div>
     
-        <div class="p-5 mr-5 bg-black ">
-          <button class="w-24 text-sm font-semibold tracking-wider text-greyMedium uppercase border border-greyMedium rounded h-9" disabled>
-            {intl l = "Bouton"}
-          </button>
+        <div class="m-2 mr-5">
+          <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-greenDark border border-greenDark bg-white last:mr-0 mr-1">
+            {intl l = "Tag Pays"}
+            <i class="material-icons close-button text-red">&times;</i>
+          </span>
         </div>
     
-        <div class="p-5">
-          <a class="px-3 py-2 text-sm font-semibold tracking-wider uppercase border rounded cursor-pointer text-greyMedium border-greyMedium"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
+        <div class="m-2 mr-5">
+          <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white border border-darkCharbon bg-darkCharbon last:mr-0 mr-1">
+            {intl l = "Tag Pays"}
+            <i class="material-icons close-button text-red">&times;</i>
+          </span>
         </div>
-    
-        <div class="p-5 bg-black md:text-center">
-          <a class="px-3 py-2 text-sm font-semibold tracking-wider text-greyMedium uppercase border border-greyMedium rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
         </div>
-        </div>
+
+        <div class="flex items-center p-2">
+          <div class="m-2 mr-5">
+            <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white border border-darkCharbon bg-darkCharbon last:mr-0 mr-1">
+              {intl l = "Tag Pays"}
+              <i class="material-icons close-button">&times;</i>
+            </span>
+          </div>
+      
+          <div class="m-2 mr-5">
+            <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white border border-darkCharbon bg-darkCharbon last:mr-0 mr-1">
+              {intl l = "Tag Pays"}
+              <i class="material-icons close-button">&times;</i>
+            </span>
+          </div>
+      
+          <div class="m-2 mr-5">
+            <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white border border-greenDark bg-greenDark last:mr-0 mr-1">
+              {intl l = "Tag Pays"}
+              <i class="material-icons close-button">&times;</i>
+            </span>
+          </div>
+      
+          <div class="m-2 mr-5">
+            <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white border border-greenDark bg-greenDark last:mr-0 mr-1">
+              {intl l = "Tag Pays"}
+              <i class="material-icons close-button">&times;</i>
+            </span>
+          </div>
+          </div>
+
+          <div class="flex items-center p-2">
+            <div class="m-2 mr-5">
+              <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-warning last:mr-0 mr-1">
+                <i class="fas fa-triangle-exclamation"></i>
+                {intl l = "Tag Pays"}
+                <i class="material-icons close-button">&times;</i>
+              </span>
+            </div>
+        
+            <div class="m-2 mr-5">
+              <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-warning last:mr-0 mr-1">
+                <i class="fas fa-triangle-exclamation"></i>
+                {intl l = "Tag Pays"}
+                <i class="material-icons close-button">&times;</i>
+              </span>
+            </div>
+        
+            <div class="m-2 mr-5">
+              <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-warning last:mr-0 mr-1">
+                <i class="fas fa-triangle-exclamation"></i>
+                {intl l = "Tag Pays"}
+                <i class="material-icons close-button">&times;</i>
+              </span>
+            </div>
+        
+            <div class="m-2 mr-5">
+              <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-warning last:mr-0 mr-1">
+                <i class="fas fa-triangle-exclamation"></i>
+                {intl l = "Tag Pays"}
+                <i class="material-icons close-button">&times;</i>
+              </span>
+            </div>
+            </div>
+
+            <div class="flex items-center p-2">
+              <div class="m-2 mr-5">
+                <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-lightVermillon border border-lightVermillon bg-white last:mr-0 mr-1">
+                  {intl l = "Tag Pays"}
+                  <i class="material-icons close-button">&times;</i>
+                </span>
+              </div>
+          
+              <div class="m-2 mr-5">
+                <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-lightVermillon border border-lightVermillon bg-lightPearl last:mr-0 mr-1">
+                  {intl l = "Tag Pays"}
+                  <i class="material-icons close-button">&times;</i>
+                </span>
+              </div>
+          
+              <div class="m-2 mr-5">
+                <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-lightVermillon border border-lightVermillon bg-white last:mr-0 mr-1">
+                  {intl l = "Tag Pays"}
+                  <i class="material-icons close-button">&times;</i>
+                </span>
+              </div>
+          
+              <div class="m-2 mr-5">
+                <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white border border-lightVermillon bg-lightVermillon last:mr-0 mr-1">
+                  {intl l = "Tag Pays"}
+                  <i class="material-icons close-button">&times;</i>
+                </span>
+              </div>
+              </div>
+
+{component name="Checkbox" title="Checkbox"}{/component} 
+
+{component name="RadioButton" title="RadioButton"}{/component}             
 
 <!-- Languages -->
   <div class="mt-8 pl-8 text-xl text-greyDark border-b border-greyMedium">{intl l = "Languages"}</div>
@@ -1595,4 +1697,225 @@
       <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-lightVermillon border rounded-full cursor-pointer text-white"><i class="pl-3 fas fa-arrow-up text-white"></i></a>
       <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-lightVermillon border rounded-full cursor-pointer text-white"><i class="pl-3 text-white fas fa-arrow-down"></i></a>
     </div>
+
+<!-- Formulaires -->
+<div class="pl-8 text-3xl text-greyDark">{intl l = "Formulaires"}</div>
+
+<div class="flex items-center p-2">
+  <div>
+    <div class="mr-1 mb-2">
+      <span class="ml-3 uppercase text-greyMedium">{intl l = "Indication"}</span>
+      <div class="border rounded overflow-hidden flex">
+        <input type="text" class="px-4 py-2" placeholder="Insérer le nom">
+      </div>
+
+      <div class="mr-1 mt-2">
+        <span class="ml-3 uppercase text-greyMedium">{intl l = "Indication"}</span>
+        <div class="border border-darkCharbon rounded overflow-hidden flex">
+          <input type="text" class="px-4 py-2" placeholder="Insérer le nom">
+        </div>
+    </div>
+
+    <div class="mr-1 mt-2">
+      <span class="ml-3 uppercase text-greyMedium">{intl l = "Indication"}</span>
+      <div class="border rounded overflow-hidden flex">
+        <input type="text" class="px-4 py-2" value="l">
+      </div>
+  </div>
+
+  <div class="mr-1 mt-2">
+    <span class="ml-3 uppercase text-greyMedium">{intl l = "Indication"}</span>
+    <div class="border border-lightVermillon rounded overflow-hidden flex">
+      <input type="text" class="px-4 py-2" placeholder="Insérer le nom">
+    </div>
+</div>
+
+<div class="mr-1 mt-2">
+  <span class="ml-3 uppercase text-greyMedium">{intl l = "Indication"}</span>
+  <div class="border border-lightVermillon bg-backgroundRed rounded overflow-hidden flex">
+    <input type="text" class="px-4 py-2" placeholder="Insérer le nom">
+    <span class="flex justify-end uppercase text-red">{intl l = "Indication de l'erreur"}</span>
+  </div>
+</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="mr-1 mb-2">
+      <span class="ml-3 uppercase text-greyMedium">{intl l = "Indication"}</span>
+      <div class="border border-lightVermillon bg-backgroundRed rounded overflow-hidden flex">
+        <input type="text" class="px-4 py-2" placeholder="Insérer le nom">
+        <span class="flex justify-end uppercase text-red">{intl l = "Indication de l'erreur"}</span>
+      </div>
+
+
+      <div class="mr-1 mt-2">
+          <div class="border rounded overflow-hidden flex">
+            <input type="text" class="px-4 py-2" placeholder="Search...">
+            <button class="flex items-center justify-center px-4 border-l">
+              <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+            </button>
+          </div>
+      </div>
+
+    <div class="mr-1 mt-2">
+        <div class="border rounded overflow-hidden flex">
+          <input type="text" class="px-4 py-2" placeholder="Search...">
+          <button class="flex items-center justify-center px-4 border-l">
+            <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+          </button>
+        </div>
+    </div>
+
+    <div class="mr-1 mt-2">
+      <div class="border rounded overflow-hidden flex">
+        <input type="text" class="px-4 py-2" placeholder="Search...">
+        <button class="flex items-center justify-center px-4 border-l">
+          <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+        </button>
+      </div>
+  </div>
+
+  <div class="mr-1 mt-2">
+    <div class="border rounded overflow-hidden flex">
+      <input type="text" class="px-4 py-2" placeholder="Search...">
+      <button class="flex items-center justify-center px-4 border-l">
+        <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+      </button>
+    </div>
+</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="mr-1 mb-2">
+        <div class="border rounded overflow-hidden flex">
+          <input type="text" class="px-4 py-2" placeholder="Search...">
+          <button class="flex items-center justify-center px-4 border-l">
+            <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+          </button>
+        </div>
+
+      <div class="mr-1 mt-2">
+          <div class="border rounded overflow-hidden flex">
+            <input type="text" class="px-4 py-2" placeholder="Search...">
+            <button class="flex items-center justify-center px-4 border-l">
+              <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+            </button>
+          </div>
+    </div>
+
+    <div class="mr-1 mt-2">
+        <div class="border rounded overflow-hidden flex">
+          <input type="text" class="px-4 py-2" placeholder="Search...">
+          <button class="flex items-center justify-center px-4 border-l">
+            <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+          </button>
+        </div>
+    </div>
+
+    <div class="mr-1 mt-2">
+      <div class="border rounded overflow-hidden flex">
+        <input type="text" class="px-4 py-2" placeholder="Search...">
+        <button class="flex items-center justify-center px-4 border-l">
+          <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+        </button>
+      </div>
+
+      <div class="mr-1 mt-2">
+        <div class="border rounded overflow-hidden flex">
+          <input type="text" class="px-4 py-2" placeholder="Search...">
+          <button class="flex items-center justify-center px-4 border-l">
+            <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+          </button>
+        </div>
+
+        <div class="mr-1 mt-2">
+          <div class="border rounded overflow-hidden flex">
+            <input type="text" class="px-4 py-2" placeholder="Search...">
+            <button class="flex items-center justify-center px-4 border-l">
+              <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+            </button>
+          </div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+  </div>
+
+  <div>
+    <div class="mr-1 mb-2">
+      <div class="border rounded overflow-hidden flex">
+        <input type="text" class="px-4 py-2" placeholder="Search...">
+        <button class="flex items-center justify-center px-4 border-l">
+          <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+        </button>
+      </div>
+
+      <div class="mr-1 mt-2">
+        <div class="border rounded overflow-hidden flex">
+          <input type="text" class="px-4 py-2" placeholder="Search...">
+          <button class="flex items-center justify-center px-4 border-l">
+            <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+          </button>
+        </div>
+
+        <div class="mr-1 mt-2">
+          <div class="border rounded overflow-hidden flex">
+            <input type="text" class="px-4 py-2" placeholder="Search...">
+            <button class="flex items-center justify-center px-4 border-l">
+              <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+            </button>
+          </div>
+        
+          <div class="mr-1 mt-2">
+            <div class="border rounded overflow-hidden flex">
+              <input type="text" class="px-4 py-2" placeholder="Search...">
+              <button class="flex items-center justify-center px-4 border-l">
+                <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+              </button>
+            </div>
+
+            <div class="mr-1 mt-2">
+              <div class="border rounded overflow-hidden flex">
+                <input type="text" class="px-4 py-2" placeholder="Search...">
+                <button class="flex items-center justify-center px-4 border-l">
+                  <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+                </button>
+              </div>
+
+              <div class="mr-1 mt-2">
+                <div class="border rounded overflow-hidden flex">
+                  <input type="text" class="px-4 py-2" placeholder="Search...">
+                  <button class="flex items-center justify-center px-4 border-l">
+                    <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg>
+                  </button>
+                </div>
+    </div>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+
+
+  <div class="pl-8 text-3xl text-greyDark">{intl l = "Pagination"}</div>
+
+  <div class="flex items-center mb-3 border-b border-greyMedium">
+    <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-white border rounded-l cursor-pointer border-greyMedium text-greyMedium"><i class="pl-4 fas fa-chevron-left text-darkCharbon"></i></a>
+    <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-white border rounded-r cursor-pointer border-greyMedium text-greyMedium"><i class="pl-3 text-darkCharbon fas fa-chevron-right"></i></a>
+    <span class="mx-1">{intl l = "Page 1 de 14"}</span>
+  </div>
+
+
+  <div class="pl-8 text-3xl text-greyDark">{intl l = "Search Bar"}</div>
+  <div class="flex py-2">
+    <input class="w-full border border-gray-400 p-2 focus:outline-none" type="text" placeholder="Je recherche...">
+    <span class="flex items-center justify-center border border-gray-400 border-l-0 py-2 px-3"><i class="text-red fas fa-search"></i></span>
+  </div>
+ 
+
 {/block}
