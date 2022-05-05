@@ -63,7 +63,7 @@
         "symfony/framework-bundle": "6.0.*",
         "wikimedia/less.php": "^3.1",
         "symfony/psr-http-message-bridge": "^2.1",
-        "symfony/flex": "^1.12",
+        "symfony/flex": "^1.17",
         "doctrine/cache": "~1.0",
         "assetic/framework": "~3.0.0",
         "thelia/html2pdf": "dev-main",
