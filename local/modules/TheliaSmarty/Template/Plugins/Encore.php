@@ -191,12 +191,19 @@ class Encore extends AbstractSmartyPlugin
             [
                 THELIA_MODULE_DIR.$module.DS.'templates'.DS.$this->templateEnv.DS.'default',
                 THELIA_MODULE_DIR.$module.DS.'templates'.DS.$this->activeTemplate->getPath(),
-                $this->activeTemplate->getAbsolutePath().DS.'modules'.DS.$module,
             ],
             // paths from template parents
-            array_map(function ($parent) use ($module) {
-                return $parent->getAbsolutePath().DS.'modules'.DS.$module;
-            }, array_values($this->activeTemplate->getParentList())),
+            array_reverse(
+                array_map(
+                    function ($parent) use ($module) {
+                        return $parent->getAbsolutePath().DS.'modules'.DS.$module;
+                    },
+                    array_values($this->activeTemplate->getParentList())
+                )
+            ),
+            [
+                $this->activeTemplate->getAbsolutePath().DS.'modules'.DS.$module,
+            ]
         );
 
         foreach ($possiblePaths as $possiblePath) {
