@@ -50,6 +50,7 @@ use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Hook\BaseHookInterface;
 use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Template\Element\BaseLoopInterface;
@@ -446,6 +447,11 @@ class Thelia extends Kernel
             $container->registerForAutoconfiguration($interfaceClass)
                 ->addTag($tag);
         }
+
+        // We set this particular service with public true to have all of his subscribers after removing type (see TheliaBundle.php)
+        $container->registerForAutoconfiguration(BaseHookInterface::class)
+            ->addTag('hook.event_listener')
+            ->setPublic(true);
 
         $loader = new XmlFileLoader($container, $fileLocator);
         $finder = Finder::create()
