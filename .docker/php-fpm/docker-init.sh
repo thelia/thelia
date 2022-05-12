@@ -36,8 +36,8 @@ if ! test -f "$DB_FILE"; then
     php Thelia module:deactivate HookLinks
     php Thelia module:deactivate HookProductsOffer
 
-    php Thelia template:set frontOffice "${TEMPLATE}"
-    php Thelia template:set backOffice "${BO_TEMPLATE}"
+    php Thelia template:set frontOffice "${ACTIVE_FRONT_TEMPLATE}"
+    php Thelia template:set backOffice "${ACTIVE_ADMIN_TEMPLATE}"
     php Thelia admin:create --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2 --email thelia2@example.com
 fi
 
