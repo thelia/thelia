@@ -13,19 +13,25 @@
 namespace TheliaSmarty\Template\Assets;
 
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class EncoreModuleAssetsVersionStrategy implements VersionStrategyInterface
 {
-    private $originPath;
-
-    public function __construct($originFSPath)
-    {
-        $this->originPath = $originFSPath;
+    public function __construct(
+        private $originPath,
+        private bool $debug,
+        private AdapterInterface $cache
+    ) {
     }
 
     public function getVersion(string $path): string
     {
-        return md5_file($this->originPath.DS.$path);
+        return $this->debug ?
+            md5_file($this->originPath.DS.$path) :
+            $this->cache->get('thelia_module_assets_'.urlencode($path), function (ItemInterface $item) use ($path) {
+                return md5_file($this->originPath.DS.$path);
+            });
     }
 
     public function applyVersion(string $path): string

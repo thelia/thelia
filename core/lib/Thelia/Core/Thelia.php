@@ -88,8 +88,12 @@ class Thelia extends Kernel
         $loader = new ClassLoader();
 
         $loader->addPsr4('', THELIA_ROOT."var/cache/{$environment}/propel/model");
-        $loader->addPsr4('backOffice\\', THELIA_ROOT."templates/backOffice/{$_SERVER['BO_TEMPLATE']}/components");
-        $loader->addPsr4('frontOffice\\', THELIA_ROOT."templates/frontOffice/{$_SERVER['TEMPLATE']}/components");
+        if (isset($_SERVER['ACTIVE_ADMIN_TEMPLATE'])) {
+            $loader->addPsr4('backOffice\\', THELIA_ROOT."templates/backOffice/{$_SERVER['ACTIVE_ADMIN_TEMPLATE']}/components");
+        }
+        if (isset($_SERVER['ACTIVE_FRONT_TEMPLATE'])) {
+            $loader->addPsr4('frontOffice\\', THELIA_ROOT."templates/frontOffice/{$_SERVER['ACTIVE_FRONT_TEMPLATE']}/components");
+        }
         $loader->addPsr4('TheliaMain\\', THELIA_ROOT."var/cache/{$environment}/propel/database/TheliaMain");
         $loader->register();
 
@@ -119,6 +123,7 @@ class Thelia extends Kernel
      */
     protected function configureContainer(ContainerConfigurator $container): void
     {
+        $container->parameters()->set('thelia_default_template', 'default');
         $container->import(__DIR__.'/../Config/Resources/*.yaml');
         $container->import(__DIR__.'/../Config/Resources/{packages}/*.yaml');
         $container->import(__DIR__.'/../Config/Resources/{packages}/'.$this->environment.'/*.yaml');

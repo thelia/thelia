@@ -14,8 +14,9 @@ namespace TheliaSmarty\Template\Plugins;
 
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\WebpackEncoreBundle\Asset\EntrypointLookup;
+use Symfony\Component\Finder\Finder;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupCollectionInterface;
 use Symfony\WebpackEncoreBundle\Asset\TagRenderer;
 use Thelia\Core\HttpFoundation\Request;
@@ -23,82 +24,70 @@ use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\Assets\EncoreModuleAssetsPathPackage;
-use TheliaSmarty\Template\Assets\EncoreTemplateAssetsPathPackage;
-use TheliaSmarty\Template\Assets\EncoreModuleAssetsVersionStrategy;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 class Encore extends AbstractSmartyPlugin
 {
-    /** @var array */
-    public $packages;
+    public array $packages;
 
-    /** @var TemplateHelperInterface */
-    public $templateHelper;
+    public string $templateSymlinkDest;
 
-    /** @var TagRenderer */
-    public $tagRenderer;
+    public string $moduleSymlinkDest;
 
-    /** @var EntrypointLookupCollectionInterface */
-    public $entrypointLookupInterface;
+    public $templateEnv;
 
-    /** @var string */
-    public $templateSymlinkOrigin;
+    public $activeTemplate;
 
-    /** @var string */
-    public $templateSymlinkDest;
-
-    /** @var string */
-    public $moduleSymlinkDest;
-
-    public function __construct(TagRenderer $tagRenderer, EntrypointLookupCollectionInterface $entrypointLookupInterface, TemplateHelperInterface $templateHelper)
-    {
+    public function __construct(
+        private TagRenderer $tagRenderer,
+        private EntrypointLookupCollectionInterface $entrypointLookupCollection,
+        private TemplateHelperInterface $templateHelper,
+        private $kernelDebug,
+        AdapterInterface $cacheService
+    ) {
         $this->packages = [];
-        $this->templateHelper = $templateHelper;
-        $this->tagRenderer = $tagRenderer;
-        $this->entrypointLookupInterface = $entrypointLookupInterface;
         $this->templateEnv = Request::$isAdminEnv ? TemplateDefinition::BACK_OFFICE_SUBDIR : TemplateDefinition::FRONT_OFFICE_SUBDIR;
         $this->activeTemplate = Request::$isAdminEnv ? $this->templateHelper->getActiveAdminTemplate() : $this->templateHelper->getActiveFrontTemplate();
 
         $this->templateSymlinkDest = THELIA_WEB_DIR.'templates-assets';
         $this->moduleSymlinkDest = THELIA_WEB_DIR.'modules-assets';
 
-        $this->packages['modules'] = new EncoreModuleAssetsPathPackage($this->moduleSymlinkDest.DS);
+        $this->packages['modules'] = new EncoreModuleAssetsPathPackage(
+            $this->moduleSymlinkDest.DS,
+            $kernelDebug,
+            $cacheService
+        );
 
         if ($this->activeTemplate->getAssetsPath()) {
             $this->packages['manifest'] = new Package(new JsonManifestVersionStrategy($this->activeTemplate->getAbsoluteAssetsPath().'/manifest.json'));
             $this->createSymlink($this->activeTemplate->getAbsoluteAssetsPath(), $this->templateSymlinkDest.DS.$this->activeTemplate->getPath().DS.$this->activeTemplate->getAssetsPath(), true);
         }
-
-
-
-
     }
 
     public function functionModuleAsset($args)
     {
         $file = $args['file'];
         $module = $args['module'];
-        $template = $args['template'] ?? '';
-
 
         if (!$file) {
             return '';
         }
 
-        $path = $this->findCorrectTemplate($file, $module, $template);
+        $moduleAssetPath = $this->moduleSymlinkDest.DS.$module;
+
+        if (
+            !file_exists($moduleAssetPath.DS.pathinfo($file, PATHINFO_DIRNAME))
+            ||
+            $this->kernelDebug
+        ) {
+            $this->symlinkModuleAssets($moduleAssetPath, $module);
+        }
 
         try {
-            if ($path) {
-                $fileSystem = new Filesystem();
-                $fileSystem->symlink(pathinfo($path, PATHINFO_DIRNAME), $this->moduleSymlinkDest.DS.$module.DS.pathinfo($file, PATHINFO_DIRNAME));
-            }
-
             return $this->packages['modules']->getUrl(DS.$module.DS.$file);
         } catch (\Throwable $th) {
             return '';
         }
-
-
     }
 
     public function getWebpackManifestFile($args): string
@@ -107,7 +96,6 @@ class Encore extends AbstractSmartyPlugin
         if (!$file) {
             return '';
         }
-
 
         if (isset($this->packages['manifest'])) {
             return $this->packages['manifest']->geturl($file);
@@ -120,7 +108,7 @@ class Encore extends AbstractSmartyPlugin
     {
         $entryName = $args['entry'];
 
-        return $this->entrypointLookupInterface->getEntrypointLookup($this->templateEnv)
+        return $this->entrypointLookupCollection->getEntrypointLookup($this->templateEnv)
             ->getJavaScriptFiles($entryName);
     }
 
@@ -128,7 +116,7 @@ class Encore extends AbstractSmartyPlugin
     {
         $entryName = $args['entry'];
 
-        return $this->entrypointLookupInterface->getEntrypointLookup($this->templateEnv)
+        return $this->entrypointLookupCollection->getEntrypointLookup($this->templateEnv)
             ->getCssFiles($entryName);
     }
 
@@ -159,10 +147,7 @@ class Encore extends AbstractSmartyPlugin
         $entryName = $args['entry'];
         $entrypointName = $this->templateEnv;
 
-        $entrypointLookup = $this->getEntrypointLookup->getEntrypointLookup($entrypointName);
-        if (!$entrypointLookup instanceof EntrypointLookup) {
-            throw new \LogicException(sprintf('Cannot use entryExists() unless the entrypoint lookup is an instance of "%s"', EntrypointLookup::class));
-        }
+        $entrypointLookup = $this->entrypointLookupCollection->getEntrypointLookup($entrypointName);
 
         return $entrypointLookup->entryExists($entryName);
     }
@@ -185,73 +170,55 @@ class Encore extends AbstractSmartyPlugin
         ];
     }
 
-    private function createSymlink($origin, $dest, $isDir = true): void
+    private function createSymlink($origin, $dest, $isDir = true, $forceOverWrite = false): void
     {
         $fileSystem = new Filesystem();
 
-        if ($isDir && is_dir($origin)) {
-            if (!is_dir($dest)) {
-                $fileSystem->symlink($origin, $dest);
-            }
-
+        if (
+            $isDir && (!is_dir($origin) || (is_dir($dest) && !$forceOverWrite))
+            ||
+            !$isDir && (!file_exists($origin) || (file_exists($dest) && !$forceOverWrite))
+        ) {
             return;
         }
 
-        if (!$isDir && file_exists($origin)) {
-            if (!file_exists($dest)) {
-                $fileSystem->symlink($origin, $dest);
-            }
-
-            return;
-        }
+        $fileSystem->symlink($origin, $dest);
     }
 
-    private function  findActiveOrDefaultTemplate($prefixPath, $file, $template = null)  : string|null{
-
-        if (isset($template) && file_exists($prefixPath.DS.$template.DS.$file)) {
-          return $prefixPath.DS.$template.DS.$file;
-        }
-
-        if (file_exists($prefixPath.DS.$file)) {
-            return $prefixPath.DS.$file;
-        }
-        if (file_exists($prefixPath.DS."default".DS.$file)) {
-            return $prefixPath.DS."default".DS.$file;
-        }
-
-        return null;
-    }
-
-    private function findCorrectTemplate($file, $module = null, $template = "default"): string|null
+    private function symlinkModuleAssets($targetFolder, $module = null)
     {
-
-
-        $possiblePaths = array_merge(...[
-            //paths from active template
+        $possiblePaths = array_merge(
             [
-                $this->activeTemplate->getAbsolutePath().DS.'modules'.DS.$module
+                THELIA_MODULE_DIR.$module.DS.'templates'.DS.$this->templateEnv.DS.'default',
+                THELIA_MODULE_DIR.$module.DS.'templates'.DS.$this->activeTemplate->getPath(),
+                $this->activeTemplate->getAbsolutePath().DS.'modules'.DS.$module,
             ],
-
             // paths from template parents
-            array_map(function($parent) use ($module) {
+            array_map(function ($parent) use ($module) {
                 return $parent->getAbsolutePath().DS.'modules'.DS.$module;
             }, array_values($this->activeTemplate->getParentList())),
+        );
 
-            // paths from module
-            [
-                THELIA_MODULE_DIR.$module.DS.'templates'.DS.$this->templateEnv
-            ],
-        ]);
-
-
-
-
-        foreach ($possiblePaths as $path) {
-            $match = $this->findActiveOrDefaultTemplate($path, $file, $template);
-            if ($match) return $match;
+        foreach ($possiblePaths as $possiblePath) {
+            if (!file_exists($possiblePath)) {
+                continue;
+            }
+            $this->symlinkFolderFiles($possiblePath, $targetFolder);
         }
+    }
 
+    private function symlinkFolderFiles($folder, $targetFolder)
+    {
+        $finder = new Finder();
+        $finder->files()->in($folder);
 
-        return null;
+        foreach ($finder as $file) {
+            $this->createSymlink(
+                $file->getPath().DS.$file->getFilename(),
+                $targetFolder.DS.$file->getRelativePath().DS.$file->getFilename(),
+                false,
+                true
+            );
+        }
     }
 }

@@ -40,11 +40,14 @@ return function (ContainerConfigurator $configurator): void {
         )->autowire()
         ->autoconfigure();
 
-    $serviceConfigurator->load('backOffice\\', THELIA_ROOT.'templates/backOffice'.DS.$_SERVER['BO_TEMPLATE'].DS.'components')
-        ->autowire()->autoconfigure();
-
-    $serviceConfigurator->load('frontOffice\\', THELIA_ROOT.'templates/frontOffice'.DS.$_SERVER['TEMPLATE'].DS.'components')
-        ->autowire()->autoconfigure();
+    if (isset($_SERVER['ACTIVE_ADMIN_TEMPLATE'])) {
+        $serviceConfigurator->load('backOffice\\', THELIA_ROOT.'templates/backOffice'.DS.$_SERVER['ACTIVE_ADMIN_TEMPLATE'].DS.'components')
+            ->autowire()->autoconfigure();
+    }
+    if (isset($_SERVER['ACTIVE_FRONT_TEMPLATE'])) {
+        $serviceConfigurator->load('frontOffice\\', THELIA_ROOT.'templates/frontOffice'.DS.$_SERVER['ACTIVE_FRONT_TEMPLATE'].DS.'components')
+            ->autowire()->autoconfigure();
+    }
 
     if (ConfigQuery::isSmtpEnable()) {
         $dsn = 'smtp://';

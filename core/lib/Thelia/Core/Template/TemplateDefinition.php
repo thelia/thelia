@@ -242,7 +242,7 @@ class TemplateDefinition
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getAssetsPath()
     {

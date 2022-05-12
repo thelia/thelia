@@ -13,12 +13,16 @@
 namespace TheliaSmarty\Template\Assets;
 
 use Symfony\Component\Asset\Package;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 
 class EncoreModuleAssetsPathPackage extends Package
 {
-    public function __construct(string $path)
-    {
-        parent::__construct(new EncoreModuleAssetsVersionStrategy($path));
+    public function __construct(
+        string $path,
+        bool $debug,
+        AdapterInterface $cacheService
+    ) {
+        parent::__construct(new EncoreModuleAssetsVersionStrategy($path, $debug, $cacheService));
     }
 
     public function getUrl(string $path): string
