@@ -76,7 +76,7 @@ class Encore extends AbstractSmartyPlugin
         $moduleAssetPath = $this->moduleSymlinkDest.DS.$module;
 
         if (
-            !file_exists($moduleAssetPath.DS.pathinfo($file, PATHINFO_DIRNAME))
+            !file_exists($moduleAssetPath.DS.pathinfo($file, \PATHINFO_DIRNAME))
             ||
             $this->kernelDebug
         ) {
@@ -185,7 +185,7 @@ class Encore extends AbstractSmartyPlugin
         $fileSystem->symlink($origin, $dest);
     }
 
-    private function symlinkModuleAssets($targetFolder, $module = null)
+    private function symlinkModuleAssets($targetFolder, $module = null): void
     {
         $possiblePaths = array_merge(
             [
@@ -214,7 +214,7 @@ class Encore extends AbstractSmartyPlugin
         }
     }
 
-    private function symlinkFolderFiles($folder, $targetFolder)
+    private function symlinkFolderFiles($folder, $targetFolder): void
     {
         $finder = new Finder();
         $finder->files()->in($folder);
