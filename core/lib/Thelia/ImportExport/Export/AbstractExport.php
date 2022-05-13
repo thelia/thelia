@@ -223,11 +223,9 @@ abstract class AbstractExport implements \Iterator
     }
 
     /**
-     * @return bool
-     *
      * @throws \Exception
      */
-    public function valid()
+    public function valid(): bool
     {
         if ($this->dataIsJSONFile) {
             return $this->data->valid();

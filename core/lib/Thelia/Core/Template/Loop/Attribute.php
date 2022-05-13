@@ -125,7 +125,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        if (!empty($template)) {
+        if (\count($template) > 0) {
             // Join with feature_template table to get position
             $search
                 ->withColumn(AttributeTemplateTableMap::COL_POSITION, 'position')
