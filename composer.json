@@ -83,7 +83,7 @@
         "phpunit/phpunit": "9.5.*",
         "symfony/browser-kit": "6.0.*",
         "symfony/phpunit-bridge": "6.0.*",
-        "phpstan/phpstan": "^0.12.75",
+        "phpstan/phpstan": "^1.6",
         "phpstan/extension-installer": "^1.1",
         "symfony/css-selector": "6.0.*",
         "friendsofphp/php-cs-fixer": "^3.8"
