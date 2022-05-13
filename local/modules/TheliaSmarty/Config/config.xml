@@ -26,7 +26,6 @@
         <service id="smarty.plugin.thelialoop" alias="TheliaSmarty\Template\Plugins\TheliaLoop" public="true"/>
 
         <service id="smarty.plugin.cartpostage" alias="TheliaSmarty\Template\Plugins\CartPostage"/>
-        <service id="smarty.plugin.component" alias="TheliaSmarty\Template\Plugins\Component"/>
 
         <service id="smarty.plugin.type" alias="TheliaSmarty\Template\Plugins\Type"/>
 

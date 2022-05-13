@@ -1,11 +1,11 @@
 {extends file="layout.tpl"}
 
 {block name="css" append}
-  {getAssetsFromEntrypoints entry="home" type="css"}
+  {encore_entry_link_tags entry="home"}
 {/block}
 
 {block name="javascript" append}
-  {getAssetsFromEntrypoints entry="home" type="js"}
+  {encore_entry_script_tags entry="home"}
 {/block}
 
 
@@ -21,7 +21,8 @@
 
 {* Main content *}
 {block name="main-content"}
-  <div class="-mx-8">
+
+<div class="-mx-8">
 
   {local_media type="banner"}
     {$bannerUrl = $MEDIA_URL}

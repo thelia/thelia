@@ -8,11 +8,11 @@
 {/block}
 
 {block name="css" append}
-  {getAssetsFromEntrypoints entry="product" type="css"}
+  {encore_entry_link_tags entry="product"}
 {/block}
 
 {block name="javascript" append}
-  {getAssetsFromEntrypoints entry="product" type="js"}
+  {encore_entry_script_tags entry="product"}
 {/block}
 
 {* Body Class *}
