@@ -1,0 +1,69 @@
+.sb-checkbox {
+    margin: 10px;
+  }
+  
+  $mapColor: 
+    ('green', #66bb6a, #fff),
+    ('red', #ef5350, #fff),
+    ('blue', #5c6Bc0, #fff),
+    ('orange', #ffa726, #fff);
+  
+  .sb-checkbox {
+    display: inline-block;
+    font-size: 0;
+    &__input {
+      display: none;
+      &:checked {
+        + .sb-checkbox__label {
+          &:after {
+            opacity: 1;
+          }
+        }
+      }
+    }
+    &__label {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      position: relative;
+      cursor: pointer;
+      &:before {
+        content: '';
+        width: 16px;
+        height: 16px;
+        border: 2px solid;
+        box-sizing: border-box;
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-radius: 2px;
+      }
+      &:after {
+        content: 'done';
+        font-family: 'Material Icons';
+        font-size: 14px;
+        line-height: 16px;
+        text-align: center;
+        width: 16px;
+        height: 16px;
+        display: block;
+        border-radius: 2px;
+        overflow: hidden;
+        text-align: center;
+        opacity: 0;
+        transition: .2s opacity;
+      }
+      @each $class, $color1, $color2 in $mapColor {
+        &--#{$class} {
+          &:before {
+            border-color: $color1;
+          }
+          &:after {
+            background-color: $color1;
+            color: $color2;
+          }
+        }
+      }
+    }
+  }

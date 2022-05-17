@@ -2,15 +2,20 @@
 
 @import 'layout';
 
-@import '../../components/**/*.css';
+@import '../components/**/*.css';
 @import './pages/**/*.css';
 
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+
 * {
   font-family: 'Open Sans', sans-serif;
+}
+
+html, body {
+  scroll-behavior: smooth;
 }
 
 input[type=checkbox].switch:checked ~ .dot {
@@ -32,6 +37,7 @@ input[type=checkbox]:not(.switch) {
 input[type=checkbox]:not(.switch):focus {
   @apply outline-none ring-darkMain;
 }
+
 
 input[type=radio]:checked {
   @apply text-mediumCharbon;

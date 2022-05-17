@@ -7,6 +7,8 @@
     'footer';
   grid-template-columns: 1fr;
 
+  
+
   @screen lg {
     grid-template-areas:
       'head head'
