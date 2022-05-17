@@ -1698,42 +1698,125 @@
   </div>
 
   <div class="w-2/5 mr-1">
-    <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-    <div class="flex m-4">
-      <div class="w-8 flex items-center justify-center bg-blue-lighter border-t border-l border-b border-blue-lighter rounded-l text-blue-dark">
-        <div class="w-5 h-5 mx-1 text-greyMedium"><img class="text-greyMedium" src="{image file="assets/images/svg/link.svg"}" alt="fr" /></div>
-      </div>
-      <input type="text" placeholder="10.95" class="py-3 px-2 text-md border border-blue-lighter rounded-r" />
+    {component name="InputLink" title="InputLink"}{/component}  
+  </div>
+
+  <div class="w-2/5 mr-1">
+    {component name="InputSearch" title="InputSearch"}{/component}  
+  </div>
+  </div>
+
+  <div class="flex items-center p-2">
+    <div class="w-2/5 mr-1">
+      <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+      <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
     </div>
-  </div>
-
-  <div class="w-2/5 mr-1">
-    <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-    <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="first_name" type="text" placeholder="Insérer le nom">
-  </div>
-</div>
-
-<div class="flex items-center p-2">
-  <div class="w-2/5 mr-1">
-    <label class="block text-lightGrey text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-    <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-darkCharbon" id="first_name" type="text" placeholder="Insérer le nom">
-  </div>
-
-  <div class="w-2/5 mr-1">
-    <label class="block text-lightGrey text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-    <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="first_name" type="text" placeholder="Insérer le nom">
-  </div>
-
-  <div class="w-2/5 mr-1">
-    <label class="block text-lightGrey text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-    <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="first_name" type="text" placeholder="Insérer le nom">
-  </div>
   
-  <div class="w-2/5 mr-1">
-    <label class="block text-lightGrey text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-    <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="first_name" type="text" placeholder="Insérer le nom">
-  </div>
-</div>
+    <div class="w-2/5 mr-1">
+      <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+      <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
+        <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+      </select>
+    </div>
+  
+    <div class="w-2/5 mr-1">
+      {component name="InputLink" title="InputLink"}{/component}  
+    </div>
+  
+    <div class="w-2/5 mr-1">
+      {component name="InputSearch" title="InputSearch"}{/component}  
+    </div>
+    </div>
+
+    <div class="flex items-center p-2">
+      <div class="w-2/5 mr-1">
+        <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+        <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
+      </div>
+    
+      <div class="w-2/5 mr-1">
+        <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+        <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
+          <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+        </select>
+      </div>
+    
+      <div class="w-2/5 mr-1">
+        {component name="InputLink" title="InputLink"}{/component}  
+      </div>
+    
+      <div class="w-2/5 mr-1">
+        {component name="InputSearch" title="InputSearch"}{/component}  
+      </div>
+      </div>
+
+      <div class="flex items-center p-2">
+        <div class="w-2/5 mr-1">
+          <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+          <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
+        </div>
+      
+        <div class="w-2/5 mr-1">
+          <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+          <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
+            <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+          </select>
+        </div>
+      
+        <div class="w-2/5 mr-1">
+          {component name="InputLink" title="InputLink"}{/component}  
+        </div>
+      
+        <div class="w-2/5 mr-1">
+          {component name="InputSearch" title="InputSearch"}{/component}  
+        </div>
+        </div>
+
+        <div class="flex items-center p-2">
+          <div class="w-2/5 mr-1">
+            <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+            <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
+          </div>
+        
+          <div class="w-2/5 mr-1">
+            <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+            <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
+              <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+            </select>
+          </div>
+        
+          <div class="w-2/5 mr-1">
+            {component name="InputLink" title="InputLink"}{/component}  
+          </div>
+        
+          <div class="w-2/5 mr-1">
+            {component name="InputSearch" title="InputSearch"}{/component}  
+          </div>
+          </div>
+
+
+          <div class="flex items-center p-2">
+            <div class="w-2/5 mr-1">
+              <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+              <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
+            </div>
+          
+            <div class="w-2/5 mr-1">
+              <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+              <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
+                <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+              </select>
+            </div>
+          
+            <div class="w-2/5 mr-1">
+              {component name="InputLink" title="InputLink"}{/component}  
+            </div>
+          
+            <div class="w-2/5 mr-1">
+              {component name="InputSearch" title="InputSearch"}{/component}  
+            </div>
+            </div>
+
 
 
   <div id="Pagination" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Pagination"}</div>
@@ -1748,12 +1831,7 @@
      <!--Search Bar-->
      <div id="SearchBar" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Search Bar"}</div>
     <div  class="p-2">
-      <div class="relative mb-3 w-full flex flex-wrap items-stretch">
-        <input type="text" class="relative py-1 px-2 pr-10 w-100 bg-pearlMedium rounded text-sm  placeholder-gray-400 " placeholder="Je recherche..." />
-        <span class="flex items-center justify-center border border-gray-400 border-l-0 py-2 px-3 bg-pearlMedium">
-          <i class="text-vermillon fa fa-search"></i>
-        </span>
-      </div>
+      {component name="InputSearch" title="InputSearch"}{/component}  
     </div>
 
 
@@ -1769,39 +1847,55 @@
 <div id="BarreActionsTheliaBlocs" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Barre Actions Thelia Blocs"}</div>
   
 <div class="flex items-center p-2">
-  <div>
-    <div class="mr-1 mb-2">
-      <button class="w-28 h-8 text-xs font-semibold tracking-wider border border-greyMedium text-darkCharbon uppercase rounded-sm">
-        {intl l = "Monter"}
-      </button>
-    </div>
-  </div>
-
-  <div>
-    <div class="mr-1 mb-2">
-      <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase border border-greyMedium rounded-sm">
-        {intl l = "Descendre"}
-      </button>
-    </div>
-  </div>
-
-  <div>
-    <div class="mr-1 mb-2">
-      <button class="w-28 h-8 text-xs font-semibold tracking-wider text-vermillon border border-greyMedium uppercase  rounded-sm">
-        {intl l = "Supprimer"}
-      </button>
-    </div>
-  </div>
+  <div class="flex border border-greyMedium">
+		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none">
+      <img class="w-3 mx-1" src="{image file="assets/images/svg/long-arrow-up.svg"}" alt="fr" />
+			<span class="uppercase mr-3">{intl l = "Monter"}</span>
+		</button>
+		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-greyMedium">
+      <img class="w-3 mx-1" src="{image file="assets/images/svg/long-arrow-down.svg"}" alt="fr" />
+			<span class="uppercase mr-3">{intl l = "Descendre"}</span>
+		</button>
+    <button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-greyMedium">
+      <img class="w-3 mx-1 text-vermillon" src="{image file="assets/images/svg/trash.svg"}" alt="fr" />
+			<span class="uppercase mr-3 text-vermillon">{intl l = "Supprimer"}</span>
+		</button>
+	</div>
   </div>
 
 
 <!-- Liste déroulante -->
 <div id="ListeDeroulante" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Liste déroulante"}</div>
-  {component name="DropDownList" title="DropDownList"}{/component}   
+<div class="container w-1/5">
+  <ul class="list-reset text-lightCharbon mb-4 p-8 text-grey-darker rounded-lg shadow-lg">
+     <li class="flex items-center mb-3">
+      {intl l = "Chaise Edgar"}
+     </li>
+     <li class="flex items-center mb-3">
+      {intl l = "Chaise Kenny"}
+     </li>
+     <li class="flex items-center">
+      {intl l = "Chaise Victoria"}
+     </li>  
+  </ul>
+</div>
 
 
 <!-- Positionnement -->
 <div id="Positionnement" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Positionnement"}</div>
+<div class="flex items-center p-2">
+  <div class="flex border border-greyMedium rounded-l rounded-r">
+		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none bg-greyMedium rounded-l">
+      <img class="w-2 mx-1" src="{image file="assets/images/svg/long-arrow-up.svg"}" alt="fr" />
+		</button>
+		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-greyMedium">
+			<span class="mr-2 ml-2">{intl l = "1"}</span>
+		</button>
+    <button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-greyMedium bg-greyMedium rounded-r">
+      <img class="w-2 mx-1" src="{image file="assets/images/svg/long-arrow-down.svg"}" alt="fr" />
+		</button>
+	</div>
+  </div>
 
 
 <!-- Tabulations -->
@@ -1809,16 +1903,49 @@
 
 
 <!-- Language tabulation -->
-<div id="LanguageTabulation" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Language tabulation"}</div>
-{component name="TabLanguage" title="TabLanguage"}{/component}   
+<div id="LanguageTabulation" class="mt-20 pl-8 text-3xl text-darkCharbon mb-2">{intl l = "Language tabulation"}</div>
+<div class="flex items-center p-2">
+  <div class="flex border border-darkCharbon">
+		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none hover:bg-darkCharbon hover:text-white">
+			<span class="uppercase ml-3 mr-3">{intl l = "Français"}</span>
+		</button>
+		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-darkCharbon hover:bg-darkCharbon hover:text-white">
+			<span class="uppercase ml-3 mr-3">{intl l = "English"}</span>
+		</button>
+    <button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-darkCharbon hover:bg-darkCharbon hover:text-white">
+			<span class="uppercase ml-3 mr-3">{intl l = "Espanol"}</span>
+		</button>
+	</div>
+  </div>
 
 
 <!-- In page Navigation Bar -->
 <div id="PageNavigationBar" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "In Page Navigation Bar"}</div>
+<div class="m-3">
+  <ul class="w-full rounded-lg mt-2 mb-3 text-mediumCharbon">
+    <li class="mb-1">
+      <a href="#" class=" flex p-3 pl-3 bg-gray-100 hover:bg-gray-200 rounded-lg">
+        <span class="ml-2 truncate">{intl l = "Autre item"}</span>
+        <img class="w-3 mx-1 ml-20 hover:text-vermillon" src="{image file="assets/images/svg/long-arrow-right.svg"}" alt="fr" />
+      </a>
+    </li>
+  </ul>
+</div>  
+
 
 
 <!-- Concertinas -->
 <div id="Concertinas" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Concertinas"}</div>
+<div class="m-3">
+  <ul class="w-full rounded-lg mt-2 mb-3 text-mediumCharbon">
+    <li class="mb-1">
+      <a href="#" class=" flex p-3 pl-3 bg-gray-100 hover:bg-gray-200 rounded-lg">
+        <span class="ml-2 truncate font-bold">{intl l = "Europe"}</span>
+        <img class="w-3 mx-1 ml-20 bg-vermillon text-white rounded-full" src="{image file="assets/images/svg/long-arrow-right.svg"}" alt="fr" />
+      </a>
+    </li>
+  </ul>
+</div>  
 
 
 <!-- Menus -->
@@ -1875,12 +2002,12 @@
 
   <div>
     <div class="mr-1 mb-2">
-      <button class="w-2/5 text-xs font-semibold tracking-wider uppercase border rounded-sm text-greyMedium h-8 bg-darkCharbon">
+      <button class="w-4/5 text-xs font-semibold tracking-wider uppercase border rounded-sm text-greyMedium h-8 bg-darkCharbon">
         {intl l = "EN"}
       </button>
 
       <div class="mr-1 mt-2">
-        <button class="w-2/5 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 bg-darkCharbon">
+        <button class="w-4/5 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 bg-darkCharbon">
           {intl l = "EN"}
         </button>
       </div>
@@ -1909,5 +2036,112 @@
 </div>
 
 
+<div id="ContenuItem" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Contenu Item"}</div>
+<div class="flex items-center p-2">
+<div>
+  <div class="mr-1 mb-2">
+    <button class="w-20 h-20 text-xs font-semibold tracking-wider uppercase border rounded-sm text-darkCharbon bg-pearlMedium">
+      {intl l = "Titre"}
+    </button>
 
+    <div class="mr-1 mt-2">
+      <button class="w-20 h-20 text-xs font-semibold tracking-wider uppercase border rounded-sm text-vermillon bg-pearlMedium">
+        {intl l = "Titre"}
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="flex items-center p-2">
+  <div>
+    <div class="mr-1 mb-2">
+      <button class="w-20 h-10 text-xs font-semibold tracking-wider uppercase border rounded-sm text-darkCharbon bg-pearlMedium">
+        {intl l = "Titre"}
+      </button>
+  
+      <div class="mr-1 mt-2">
+        <button class="w-20 h-10 text-xs font-semibold tracking-wider uppercase border rounded-sm text-vermillon bg-pearlMedium">
+          {intl l = "Titre"}
+        </button>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+
+
+  <div id="NombreColonnes" class="mt-20 text-3xl text-greyDark mb-2">{intl l = "Nombre Colonnes"}</div>
+<div class="flex items-center p-2">
+<div>
+  <div class="mr-1 mb-2">
+    <div class="w-35 inline-flex h-20 px-5 bg-pearlMedium text-greyMedium rounded-sm">
+      <div class="flex items-center">
+        <div class="w-1/5 mr-1">
+          <div class="w-5 h-5 text-greyMedium flex items-center ml-5"><img class="text-greyMedium" src="{image file="assets/images/svg/twoColomn.svg"}" alt="fr" /></div>
+          <div class="text-xs">{intl l = "colonnes"}</div>
+        </div>
+      </div>
+  </div>
+  </div>
+
+    <div class="mr-1 mt-2">
+      <div class="w-35 inline-flex h-20 px-5 bg-pearlMedium text-vermillon rounded-sm">
+        <div class="flex items-center">
+          <div class="w-1/5 mr-1">
+            <div class="w-5 h-5 text-vermillon flex items-center ml-5"><img class="text-greyMedium" src="{image file="assets/images/svg/twoColomn.svg"}" alt="fr" /></div>
+            <div class="text-xs">{intl l = "colonnes"}</div>
+          </div>
+        </div>
+    </div>
+    </div>
+</div>
+</div>
+
+
+<!-- Text Area -->
+<div id="PageNavigationBar" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Text area"}</div>
+{component name="TextAreaEditor" title="TextAreaEditor"}{/component}  
+
+
+<!-- Drop Down Areas -->
+<div id="PageNavigationBar" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Drop down areas"}</div>
+{component name="DragAndDrop" title="DragAndDrop"}{/component}  
+{component name="DragAndDropImage" title="DragAndDropImage"}{/component}  
+{component name="DragAndDropMedia" title="DragAndDropMedia"}{/component}  
+
+
+<!-- Toast Preview / Enregistrer -->
+<div id="ToastPreview" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Toast Preview / Enregistrer"}</div>
+{component name="ToastPreview" title="ToastPreview"}{/component}  
+
+</br>
+
+<div class="flex items-center h-20 max-w-7xl bg-lightCharbon">
+  <div class="container mx-auto">
+  <div class="flex justify-end pr-72">
+    <div class="md:text-center ">
+      <a class="px-3 py-2 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer hover:bg-white hover:text-black"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
+      <a class="px-3 py-2 mx-1 text-sm font-semibold tracking-wider text-white uppercase border rounded cursor-pointer bg-vermillon h-9 border-vermillon hover:bg-lighterVermillon hover:border-lighterVermillon">{intl l="Enregistrer"}</a>
+    </div>
+  </div>
+  </div>
+</div>
+
+</br>
+
+<div class="flex items-center h-20 max-w-7xl bg-lightCharbon">
+  <div class="container mx-auto">
+  <div class="flex justify-end pr-72">
+    <div class="md:text-center ">
+      <a class="px-3 py-2 mx-1 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer hover:bg-white hover:text-black">{intl l="Fermer"}</a>
+      <a class="px-3 py-2 mx-1 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer hover:bg-white hover:text-black">{intl l="Enregistrer & fermer"}</a>
+      <a class="px-3 py-2 mx-1 text-sm font-semibold tracking-wider text-white uppercase border rounded cursor-pointer bg-vermillon h-9 border-vermillon hover:bg-lighterVermillon hover:border-lighterVermillon">{intl l="Enregistrer"}</a>
+    </div>
+  </div>
+  </div>
+</div>
+
+
+
+<a href="#" class="text-blue-600 mb-2">Retour en haut</a>
 {/block}

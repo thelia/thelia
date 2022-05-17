@@ -2,7 +2,7 @@
 
 @import 'layout';
 
-@import './components/**/*.css';
+@import '../components/**/*.css';
 @import './pages/**/*.css';
 
 @import 'tailwindcss/base';
