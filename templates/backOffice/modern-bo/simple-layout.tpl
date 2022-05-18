@@ -26,7 +26,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-  <script src="https://kit.fontawesome.com/a602a5fdd3.js" crossorigin="anonymous"></script>
+  <script src="https://kit.fontawesome.com/77ea718997.js" crossorigin="anonymous"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

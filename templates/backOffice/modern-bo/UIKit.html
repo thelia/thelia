@@ -1,238 +1,1386 @@
 {extends file="admin-layout.tpl"} {block name="main-content"}
-<div class="text-darkCharbon">
+<div  class="text-darkCharbon">
   <div class="m-10">
-    <h1 class="text-5xl font-bold text-center">Thelia Back Office UI KIT</h1>
-  </div>
-
-  <!-- Colors -->
-  <div class="flex justify-center p-10">
-    <div class="w-1/6">
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-main">
-        #EC6351
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-darkMain">
-        #E25441
-      </div>
-    </div>
-
-    <div class="w-1/6">
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-lightCharbon">
-        #444444
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-mediumCharbon">
-        #333333
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-darkCharbon">
-        #222222
-      </div>
-    </div>
-
-    <div class="w-1/6">
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-grey">
-        #707070
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-mediumGrey">
-        #A7A7A7
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-lightGrey">
-        #EBEBEB
-      </div>
-    </div>
-
-    <div class="w-1/6">
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-lightPearl">
-        #F7F7F7
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-600 rounded-lg shadow-2xl bg-mediumPearl">
-        #F5F5F5
-      </div>
-    </div>
-
-    <div class="w-1/6">
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-carot">
-        #FC9722
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-green">
-        #73CE6F
-      </div>
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-blue">
-        #1E9AE8
-      </div>
-    </div>
-
-    <div class="w-1/6">
-      <div class="flex items-center justify-center h-24 m-4 text-3xl font-bold text-gray-200 rounded-lg shadow-2xl bg-error">
-        #D10000
-      </div>
-    </div>
+    <h1 class="text-5xl font-bold text-center">{intl l = "Thelia Back Office UI KIT"}</h1>
   </div>
 
 
 
-
-
-  <!-- Buttons -->
-  <div class="flex items-center p-10">
-    <div class="mr-5">
-      <button class="p-3 font-medium text-gray-600 rounded-lg shadow-2xl bg-main hover:bg-darkMain">
-        Click Me
-      </button>
-    </div>
-
-    <div class="mr-5">
-      <button class="p-3 font-medium text-gray-600 bg-transparent border-2 rounded-lg shadow-2xl hover:bg-darkMain border-main">
-        Click Me
-      </button>
-    </div>
-
-    <div class="mr-5">
-      <button disabled class="p-3 font-medium text-gray-600 rounded-lg shadow-2xl bg-main bg-opacity-60">
-        Disabled
-      </button>
-    </div>
-
-    <div class="mr-5">
-      <a href="#" class="font-medium text-main">Link Button</a>
-    </div>
-
-    <div class="mr-5">
-      <button class="flex items-center justify-center p-4 font-medium text-gray-600 rounded-full shadow-2xl bg-main hover:bg-darkMain">
-        <i class="fas fa-user"></i>
-      </button>
-    </div>
-
-    <div class="mr-5">
-      <button class="flex items-center justify-center p-4 font-medium rounded-full shadow-2xl bg-lightGrey hover:bg-mediumCharbon hover:text-lightGrey text-mediumCharbon">
-        <i class="fas fa-cog"></i>
-      </button>
-    </div>
+  <!-- Pagination -->
+  <div id="topPage" class="m-6 text-center">
+    <a href="#Coulours" class="text-xl font-bold text-vermillon">{intl l = "Coulours"}</a>
+  </div>
+  <div class="m-6 text-center">
+    <a href="#Typography" class="text-xl font-bold text-vermillon">{intl l = "Typography"}</a>
+  </div>
+  <div class="m-6 text-center">
+    <a href="#Icons" class="text-xl font-bold text-vermillon">{intl l = "Icons"}</a>
+  </div>
+  <div class="m-6 text-center">
+    <a href="#Buttons" class="text-xl font-bold text-vermillon">{intl l = "Buttons"}</a>
   </div>
 
 
-
-
-
-  <!-- Inputs -->
-  <div class="flex flex-col p-10">
-    <div class="w-1/4 mb-5">
-      <input
-        type="text"
-        class="w-full placeholder-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
-        placeholder="Enter something..."
-      />
+  <!-- Coulours -->
+    <div class="m-6">
+      <h1 id="Coulours" class="text-3xl font-bold text-greyDark">{intl l = "Coulours"}</h1>
     </div>
+    
+      <div class="pl-8 text-xl text-greyDark">{intl l = "Main"}</div>
 
-    <div class="w-1/4 mb-5">
-      <input
-        type="text"
-        class="w-full placeholder-gray-500 bg-gray-100 border-2 rounded-lg shadow-2xl focus:ring-error border-main focus:outline-none"
-        placeholder="Enter something..."
-      />
-      <span class="text-error">Something bad just happened</span>
-    </div>
-
-    <div class="w-1/4 mb-5">
-      <div class="flex items-center search">
-        <div
-          class="h-auto py-2 pl-3 pr-4 bg-gray-100 rounded-l-lg search-icon text-main"
-        >
-          <i class="fas fa-search"></i>
+      <div class="flex items-center p-2 border-b border-greyMedium">
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-vermillon border-vermillon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Vermillon"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#DC3018"}</div>
         </div>
-        <input
-          type="search"
-          class="w-full placeholder-gray-500 bg-gray-100 border-0 rounded-r-lg shadow-2xl search-input text-mediumCharbon focus:ring-main focus:outline-none focus:border-main"
-          placeholder="Search..."
-        />
+    
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-mediumCharbon border-mediumCharbon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Charcoal Medium"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#333333"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-lightPearl border-lightPearl"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Pearl Light"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#F5F5F5"}</div>
+        </div>
+      </div>
+
+      <div class="pl-8 mt-10 text-xl text-greyDark">{intl l = "Secondary"}</div>
+      
+      <div class="flex items-center p-2">
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-lightVermillon border-lightVermillon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Light Vermillon"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#FA533C"}</div>
+        </div>
+    
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-darkCharbon border-darkCharbon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Charcoal Dark"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#222222"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-pearlMedium border-pearlMedium"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Pearl Medium"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#EBEBEB"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-greyDark border-greyDark"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Grey Dark"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#787878"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold bg-white rounded-lg shadow-2xl w-13 border-greyMedium"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "White"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#FFFFFF"}</div>
+        </div>
+      </div>
+
+      <div class="flex items-center p-2 border-b border-greyMedium">
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-lighterVermillon border-lighterVermillon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Lighter Vermillon"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#FF8F80"}</div>
+        </div>
+    
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-lightCharbon border-lightCharbon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Charcoal Light"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#444444"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-greyMedium border-greyMedium"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Grey Medium"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#9B9B9B"}</div>
+        </div>
+      </div>
+
+
+      <div class="pl-8 mt-10 text-xl text-greyDark">{intl l = "Status"}</div>
+      <div class="flex items-center p-2 border-b border-greyMedium">
+        <div class="w-1/6">
+          <div class="mb-6 mr-5">
+            <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-red border-red"></div>
+            <div class="pl-5 font-bold text-greyDark">{intl l = "Red"}</div>
+            <div class="pl-5 text-greyDark">{intl l = "#D21919"}</div>
+          </div>
+          
+          <div class="mb-6 mr-5">
+            <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-redLight border-redLight"></div>
+            <div class="pl-5 font-bold text-greyDark">{intl l = "Red Light"}</div>
+            <div class="pl-5 text-greyDark">{intl l = "#ED5656"}</div>
+          </div>
+          
+          <div class="mb-6 mr-5">
+            <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-backgroundRed border-backgroundRed"></div>
+            <div class="pl-5 font-bold text-greyDark">{intl l = "Background Red"}</div>
+            <div class="pl-5 text-greyDark">{intl l = "#FFEDED"}</div>
+          </div>
+        </div>
+
+        <div class="flex items-center p-2">
+          <div class="w-1/6">
+            <div class="mb-6 mr-5">
+              <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-greenDark border-greenDark"></div>
+              <div class="pl-5 font-bold text-greyDark">{intl l = "Green Dark"}</div>
+              <div class="pl-5 text-greyDark">{intl l = "#008958"}</div>
+            </div>
+            
+            <div class="mb-6 mr-5">
+              <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-greenLight border-greenLight"></div>
+              <div class="pl-5 font-bold text-greyDark">{intl l = "Green Light"}</div>
+              <div class="pl-5 text-greyDark">{intl l = "#EBFFF8"}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pl-8 mt-10 text-xl text-greyDark">{intl l = "Labels"}</div>
+      
+      <div class="flex items-center p-2">
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-ocre border-ocre"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Ocre"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#9E6700"}</div>
+        </div>
+    
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-mauve border-mauve"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Mauve"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#8C5383"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-turquoise border-turquoise"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Turquoise"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#0E7C7B"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-electricBlue border-electricBlue"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Electric Blue"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#3423A6"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl bg-darkVermillon w-13 border-darkVermillon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Dark Vermillon"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#C4311C"}</div>
+        </div>
+      </div>
+
+      <div class="flex items-center p-2 border-b border-greyMedium">
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-ocreLight border-ocreLight"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Ocre Light"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#FEFAF1"}</div>
+        </div>
+    
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-mauveLight border-mauveLight"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Mauve Light"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#EBE2EA"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-turquoiseLight border-turquoiseLight"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Turquoise Light"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#ECF8F8"}</div>
+        </div>
+        
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-electricBlueLight border-electricBlueLight"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Electric Blue Light"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#EEECFF"}</div>
+        </div>
+
+        <div class="mb-6 mr-5">
+          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-backgroundLightVermillon border-backgroundLightVermillon"></div>
+          <div class="pl-5 font-bold text-greyDark">{intl l = "Background Light Vermillon"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "#F7EEED"}</div>
+        </div>
+      </div>
+
+
+  <!-- Typography -->
+  <div class="m-6 mt-20">
+    <h1 id="Typography" class="text-3xl font-bold text-greyDark">{intl l = "Typography"}</h1>
+  </div>
+  
+    <div class="pl-8 text-xl text-greyDark">{intl l = "Titles"}</div>
+    <div class="border-b border-greyMedium">
+    <div class="flex p-2">
+      <div class="flex items-center p-2">
+        <div class="mb-6 mr-5 text-sm">
+          <div class="pl-5 font-bold text-greyDark">{intl l = "H1"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Bold"}</div>
+          <div class="pl-5 text-greyDark">{intl l = "Size: 28"}</div>
+        </div>
+        <div class="mb-6 text-3xl font-bold text-darkCharbon">
+          {intl l = "H1 Title"}
+        </div>
+      </div>
+  </div>
+
+  <div class="flex p-2">
+    <div class="flex items-center p-2">
+      <div class="mb-6 mr-5 text-sm">
+        <div class="pl-5 font-bold text-greyDark">{intl l = "H2"}</div>
+        <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans ExtraBold"}</div>
+        <div class="pl-5 text-greyDark">{intl l = "Size: 20"}</div>
+      </div>
+      <div class="mb-6 text-xl font-bold text-darkCharbon">
+        {intl l = "H2 Title"}
       </div>
     </div>
+</div>
 
-    <div class="w-1/4 mb-5">
-      <input
-        type="date"
-        class="w-full text-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
-      />
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "H3"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans ExtraBold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 16"}</div>
+    </div>
+    <div class="mb-6 text-base font-bold text-darkCharbon">
+      {intl l = "H3 Title"}
+    </div>
+  </div>
+</div>
+
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "H4"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Bold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 16"}</div>
+    </div>
+    <div class="mb-6 text-base font-bold text-darkCharbon">
+      {intl l = "H4 Title"}
+    </div>
+  </div>
+</div>
+</div>
+
+
+<div class="pl-8 mt-5 text-xl text-greyDark">{intl l = "Paragraphs"}</div>
+<div class="border-b border-greyMedium">
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Style 1 / Regular"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Regular"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+    </div>
+    <div class="mb-6 text-sm text-darkCharbon">
+      {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Style 1 / SemiBold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans SemiBold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+    </div>
+    <div class="mb-6 text-sm font-semibold text-darkCharbon">
+      {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Style 1 / Bold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Bold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+    </div>
+    <div class="mb-6 text-sm font-bold text-darkCharbon">
+      {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Style 1 / Light"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Light"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+    </div>
+    <div class="mb-6 text-sm font-light text-darkCharbon">
+      {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Style 2 / Bold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Bold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 12"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 16"}</div>
+    </div>
+    <div class="mb-6 text-xs font-semibold text-darkCharbon">
+      {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Style 2 / Light"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Light"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 12"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 16"}</div>
+    </div>
+    <div class="mb-6 text-xs font-light text-darkCharbon">
+      {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Style 1 / Regular"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Regular"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+    </div>
+    <div class="mb-6 text-sm text-darkCharbon">
+      {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="pl-8 mt-5 text-xl text-greyDark">{intl l = "Buttons"}</div>
+<div class="border-b border-greyMedium">
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Regular"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans SemiBold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Kerning: 5%"}</div>
+    </div>
+    <div class="mb-6 text-sm font-semibold uppercase text-darkCharbon">
+      {intl l = "Button"}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Small"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans SemiBold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 12"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 16"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Kerning: 5%"}</div>
+    </div>
+    <div class="mb-6 text-xs font-semibold uppercase text-darkCharbon">
+      {intl l = "Button"}
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="pl-8 mt-5 text-xl text-greyDark">{intl l = "Labels"}</div>
+<div class="border-b border-greyMedium">
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Label"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans SemiBold"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 10"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Kerning: 5%"}</div>
+    </div>
+    <div class="mb-6 text-xs font-light uppercase text-darkCharbon">
+      {intl l = "Button"}
+    </div>
+  </div>
+</div>
+</div>
+
+
+<div class="pl-8 mt-5 text-xl text-greyDark">{intl l = "Others"}</div>
+<div class="border-b border-greyMedium">
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "BreadCrumb"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Regular"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 14"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+    </div>
+    <div class="mb-6 text-sm font-normal underline text-darkCharbon">
+      {intl l = "Homepage / Nom de la page / ..."}
+    </div>
+  </div>
+</div>
+
+<div class="flex p-2">
+  <div class="flex items-center p-2">
+    <div class="mb-6 mr-5 text-sm">
+      <div class="pl-5 font-bold text-greyDark">{intl l = "Subhead"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Font: OpenSans Regular"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Size: 12"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Line height: 19"}</div>
+      <div class="pl-5 text-greyDark">{intl l = "Kerning: 5%"}</div>
+    </div>
+    <div class="mb-6 text-xs font-normal uppercase text-darkCharbon">
+      {intl l = "Subhead"}
+    </div>
+  </div>
+</div>
+</div>
+
+  
+  <!-- Icons -->
+  <div class="m-6 mt-20">
+    <h1 id="Icons" class="text-3xl font-bold text-greyDark">{intl l = "Icons"}</h1>
+  </div>
+  
+  <div class="flex items-center p-2">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/close.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Close"}</div>
     </div>
 
-    <div class="w-1/4 mb-5">
-      <select class="w-full text-gray-500 rounded-lg">
-        <option disabled selected>Select something...</option>
-        <option>1</option>
-        <option>2</option>
-        <option>3</option>
-        <option>4</option>
-        <option>5</option>
-      </select>
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/trash.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Delete"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Search"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/eye.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Preview"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/link.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Link"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/edit.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Edit"}</div>
+    </div>
+  </div>
+
+  <div class="flex items-center p-2 border-b border-greyMedium">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/long-arrow-up.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Long Arrow Up"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/long-arrow-down.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Long Arrow Down"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/long-arrow-right.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Long Arrow Right"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/long-arrow-left.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Long Arrow Left"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/short-arrow-left.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Short Arrow Left"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+      <div class="w-5 h-5"><img src="{image file="assets/images/svg/short-arrow-right.svg"}" alt="fr" /></div>
+    <div class="text-greyDark">{intl l = "Short Arrow Right"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+      <div class="w-5 h-5"><img src="{image file="assets/images/svg/short-arrow-down.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Short Arrow Down"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+      <div class="w-5 h-5"><img src="{image file="assets/images/svg/short-arrow-up.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Short Arrow Up"}</div>
+    </div>
+  </div>
+  </div>
+  
+  <div class="m-6">
+    <h1 class="mt-8 text-greyDark">{intl l = "Main Menu"}</h1>
+  </div>
+  
+  <div class="flex items-center p-2">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/catalog.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Catalogue"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/settings.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Outils"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/blank-page.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Pages"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/dashboard.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Dashboard"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/blocks.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Blocks"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/palette.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Design"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+      <div class="w-5 h-5"><img src="{image file="assets/images/svg/Information.svg"}" alt="fr" /></div>
+    <div class="text-greyDark">{intl l = "Informations"}</div>
+  </div>
+  </div>
+
+  <div class="flex items-center p-2 border-b border-greyMedium">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/customer.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Clients"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/shopping-cart.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Commandes"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/modules.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Modules"}</div>
     </div>
   </div>
 
 
-
-
-
-  <!-- Radio & Checkbox -->
-  <div class="flex w-1/3 p-10">
-    <div class="w-1/2 m-2 text-darkCharbon">
-      <div>
-        <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
-        <label for="r1">One</label>
-      </div>
-
-      <div>
-        <input class="mr-3 Radio" id="r2" type="radio" name="thelia-radio" />
-        <label for="r2">Two</label>
-      </div>
-
-      <div>
-        <input class="mr-3 Radio" id="r3" type="radio" name="thelia-radio" />
-        <label for="r3">Three</label>
-      </div>
+  <div class="m-6">
+    <h1 class="mt-8 text-greyDark">{intl l = "SideBar TheliaBlocks"}</h1>
+  </div>
+  
+  <div class="flex items-center p-2">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/title.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Titres"}</div>
     </div>
 
-    <div class="w-1/2 m-2 text-darkCharbon">
-      <div>
-        <input
-          class="mr-3 Checkbox"
-          id="cb1"
-          type="checkbox"
-          name="thelia-checkbox"
-        />
-        <label for="cb1">One</label>
-      </div>
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/text.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Textes"}</div>
+    </div>
 
-      <div>
-        <input
-          class="mr-3 Checkbox"
-          id="cb2"
-          type="checkbox"
-          name="thelia-checkbox"
-        />
-        <label for="cb2">Two</label>
-      </div>
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/button.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Boutons"}</div>
+    </div>
 
-      <div>
-        <input
-          class="mr-3 Checkbox"
-          id="cb3"
-          type="checkbox"
-          name="thelia-checkbox"
-        />
-        <label for="cb3">Three</label>
-      </div>
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/images.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Images"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/video.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Vidéo"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/product.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Produits"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/accordion.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Accordéons"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/separate.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Séparateurs"}</div>
+    </div>
+  </div>
+
+  <div class="flex items-center p-2 border-b border-greyMedium">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/verticale.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Colonnes"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/html.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "HTML"}</div>
+    </div>
+
+  </div>
+
+  <div class="m-6">
+    <h1 class="mt-8 text-greyDark">{intl l = "Text Edit"}</h1>
+  </div>
+  
+  <div class="flex items-center p-2">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/bold-text.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Bold"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/italic.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Italic"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/underlined-text.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Underlined"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/align-left.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Align Left"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/align-center.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Align Center"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/align-right.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Align Right"}</div>
+    </div>
+  </div>
+
+  <div class="flex items-center p-2 border-b border-greyMedium">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/list-number.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "List (numbers)"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/list.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "List"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/link.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Link"}</div>
+    </div>
+
+  </div>
+
+  <div class="m-6">
+    <h1 class="mt-8 text-greyDark">{intl l = "Réseaux Sociaux / GitHub"}</h1>
+  </div>
+  
+  <div class="flex items-center p-2 border-b border-greyMedium">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/facebook.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Facebook"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/github.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "GitHub"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/twitter.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Twitter"}</div>
+    </div>
+  </div>
+
+  <div class="m-6">
+    <h1 class="mt-8 text-greyDark ">{intl l = "Menu Configuration"}</h1>
+  </div>
+  
+  <div class="flex items-center p-2 border-b border-greyMedium">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/settings.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Configuration"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/product-catalog.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Catalogue produit"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/twitter.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Tunnel de commande"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/delivery.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Livraison"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/cog.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Paramètres système"}</div>
+    </div>
+  </div>
+
+  <div class="m-6">
+    <h1 class="mt-8 text-greyDark">{intl l = "User Menu"}</h1>
+  </div>
+  
+  <div class="flex items-center p-2 border-b border-greyMedium">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/log-out.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Log Out"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/profile-configuration.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Profile"}</div>
+    </div>
+  </div>
+
+  <div class="m-6">
+    <h1 class="mt-8 text-greyDark">{intl l = "Actions"}</h1>
+  </div>
+  
+  <div class="flex items-center p-2 border-b border-greyMedium">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/double.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Dupliquer"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/html-code.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Copier le code"}</div>
+    </div>
+  </div>
+
+  <div class="m-6">
+    <h1 class="mt-8 text-greyDark">{intl l = "Formulaires"}</h1>
+  </div>
+  
+  <div class="flex items-center p-2 border-b border-greyMedium">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/switch.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Switch"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/drop-down.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Drop Down"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/drop-up.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Drop Down (up)"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/info.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Tool Tip"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/warning.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Warning"}</div>
+    </div>
+  </div>
+
+  <div class="m-6">
+    <h1 class="mt-8 text-greyDark ">{intl l = "Nombre de colonnes"}</h1>
+  </div>
+  
+  <div class="flex items-center p-2 border-b border-greyMedium">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/twoColomn.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "2 colonnes"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/threeColomn.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "3 colonnes"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/fourColomn.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "4 colonnes"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/fiveColomn.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "5 colonnes"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/sixColomn.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "6 colonnes"}</div>
+    </div>
+  </div>
+
+  <div class="m-6">
+    <h1 class="mt-8 text-greyDark">{intl l = "Drag & drop areas"}</h1>
+  </div>
+  
+  <div class="flex items-center p-2 border-b border-greyMedium">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/download.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Télécharger"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/image.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Image"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/swipe.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Drag & Drop"}</div>
+    </div>
+  </div>
+
+  <div class="m-6">
+    <h1 class="mt-8 text-greyDark">{intl l = "Other"}</h1>
+  </div>
+  
+  <div class="flex items-center p-2">
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/download.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Financier"}</div>
+    </div>
+
+    <div class="mx-5 mb-6 mr-5">
+        <div class="w-5 h-5"><img src="{image file="assets/images/svg/data.svg"}" alt="fr" /></div>
+      <div class="text-greyDark">{intl l = "Données"}</div>
     </div>
   </div>
 
 
+    <!-- Buttons -->
+    <div id="Buttons" class="m-6 mt-20">
+      <h1 class="text-3xl font-bold text-greyDark">{intl l = "Buttons"}</h1>
+    </div>
 
+    <div class="m-6">
+      <h1 class="mt-8 border-b text-greyDark border-greyMedium">{intl l = "CTA / Large"}</h1>
+    </div>
+    
+  <div class="flex items-center p-2">
+    <div class="mr-5">
+      <button class="w-24 text-sm font-semibold tracking-wider text-white uppercase rounded h-9 bg-vermillon">
+        {intl l = "Bouton"}
+      </button>
+    </div>
+
+    <div class="mr-5">
+        <button class="w-24 text-sm font-semibold tracking-wider uppercase border rounded text-vermillon h-9 border-vermillon">
+          {intl l = "Bouton"}
+        </button>
+    </div>
+
+    <div class="p-5 mr-5 bg-black ">
+      <button class="w-24 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded h-9" disabled>
+        {intl l = "Bouton"}
+      </button>
+    </div>
+
+    <div class="p-5">
+      <a class="px-3 py-2 text-sm font-semibold tracking-wider uppercase border rounded cursor-pointer border-vermillon text-vermillon"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
+    </div>
+
+    <div class="p-5 bg-black md:text-center">
+      <a class="px-3 py-2 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
+    </div>
+  </div>
+
+  <div class="flex items-center p-2">
+    <div class="mr-5">
+      <button class="w-24 text-sm font-semibold tracking-wider text-white uppercase rounded h-9 bg-lighterVermillon">
+        {intl l = "Bouton"}
+      </button>
+    </div>
+
+    <div class="mr-5">
+        <button class="w-24 text-sm font-semibold tracking-wider text-white uppercase border rounded h-9 bg-vermillon">
+          {intl l = "Bouton"}
+        </button>
+    </div>
+
+    <div class="p-5 mr-5 bg-black ">
+      <button class="w-24 text-sm font-semibold tracking-wider text-black uppercase bg-white border border-white rounded h-9" disabled>
+        {intl l = "Bouton"}
+      </button>
+    </div>
+
+    <div class="p-5">
+      <a class="px-3 py-2 text-sm font-semibold tracking-wider text-white uppercase border rounded cursor-pointer bg-vermillon border-vermillon"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
+    </div>
+
+    <div class="p-5 bg-black md:text-center">
+      <a class="px-3 py-2 text-sm font-semibold tracking-wider text-black uppercase bg-white border border-white rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
+    </div>
+    </div>
+
+    <div class="flex items-center p-2">
+      <div class="mr-5">
+        <button class="w-24 text-sm font-semibold tracking-wider text-white uppercase rounded h-9 bg-vermillon">
+          {intl l = "Bouton"}
+        </button>
+      </div>
+  
+      <div class="mr-5">
+          <button class="w-24 text-sm font-semibold tracking-wider uppercase border rounded text-vermillon h-9 border-vermillon">
+            {intl l = "Bouton"}
+          </button>
+      </div>
+  
+      <div class="p-5 mr-5 bg-black ">
+        <button class="w-24 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded h-9" disabled>
+          {intl l = "Bouton"}
+        </button>
+      </div>
+  
+      <div class="p-5">
+        <a class="px-3 py-2 text-sm font-semibold tracking-wider uppercase border rounded cursor-pointer text-vermillon border-vermillon"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
+      </div>
+  
+      <div class="p-5 bg-black md:text-center">
+        <a class="px-3 py-2 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
+      </div>
+      </div>
+
+      <div class="flex items-center p-2">
+        <div class="mr-5">
+          <button class="w-24 h-9 text-sm font-semibold tracking-wider text-white uppercase border-2 border-lighterVermillon rounded bg-vermillon">
+            {intl l = "Bouton"}
+          </button>
+        </div>
+    
+        <div class="mr-5">
+            <button class="w-24 text-sm font-semibold tracking-wider uppercase border-2 rounded text-vermillon h-9 border-vermillon">
+              {intl l = "Bouton"}
+            </button>
+        </div>
+    
+        <div class="p-5 mr-5 bg-black ">
+          <button class="w-24 text-sm font-semibold tracking-wider text-white uppercase border-2 border-white rounded h-9" disabled>
+            {intl l = "Bouton"}
+          </button>
+        </div>
+    
+        <div class="p-5">
+          <a class="px-3 py-2 text-sm font-semibold tracking-wider uppercase border-2 rounded cursor-pointer text-vermillon border-vermillon"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
+        </div>
+    
+        <div class="p-5 bg-black md:text-center">
+          <a class="px-3 py-2 text-sm font-semibold tracking-wider text-white uppercase border-2 border-white rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
+        </div>
+        </div>
+
+        <div class="flex items-center p-2">
+          <div class="mr-5">
+            <button class="w-24 h-9 text-sm font-semibold tracking-wider text-white uppercase  rounded bg-greyMedium">
+              {intl l = "Bouton"}
+            </button>
+          </div>
+      
+          <div class="mr-5">
+              <button class="w-24 text-sm font-semibold tracking-wider uppercase border rounded text-greyMedium h-9 border-greyMedium">
+                {intl l = "Bouton"}
+              </button>
+          </div>
+      
+          <div class="p-5 mr-5 bg-black ">
+            <button class="w-24 text-sm font-semibold tracking-wider text-greyMedium uppercase border border-greyMedium rounded h-9" disabled>
+              {intl l = "Bouton"}
+            </button>
+          </div>
+      
+          <div class="p-5">
+            <a class="px-3 py-2 text-sm font-semibold tracking-wider uppercase border rounded cursor-pointer text-greyMedium border-greyMedium"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
+          </div>
+      
+          <div class="p-5 bg-black md:text-center">
+            <a class="px-3 py-2 text-sm font-semibold tracking-wider text-greyMedium uppercase border border-greyMedium rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
+          </div>
+          </div>
+
+          <!--Small buttons-->
+          <div class="m-6">
+            <h1 class="mt-8 border-b text-greyDark border-greyMedium">{intl l = "CTA / SMALL"}</h1>
+          </div>
+          
+        <div class="flex items-center p-2">
+          <div class="mr-5">
+            <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase rounded h-7 bg-vermillon">
+              {intl l = "Bouton"}
+            </button>
+          </div>
+      
+          <div class="mr-5">
+              <button class="w-20 text-xs font-semibold tracking-wider uppercase border rounded text-vermillon h-7 border-vermillon">
+                {intl l = "Bouton"}
+              </button>
+          </div>
+      
+          <div class="p-5 mr-5 bg-black ">
+            <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase border border-white rounded h-7" disabled>
+              {intl l = "Bouton"}
+            </button>
+          </div>
+      
+          <div class="p-5">
+            <a class="px-2 py-1 text-xs font-semibold tracking-wider uppercase border rounded cursor-pointer border-vermillon text-vermillon">{intl l="Voir la fiche produit"}<i class="mx-1 fas fa-arrow-right"></i></a>
+          </div>
+      
+          <div class="p-5 bg-black md:text-center">
+            <a class="px-2 py-1 text-xs font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Replier"}</a>
+          </div>
+
+          <div class="p-5 bg-black md:text-center">
+            <a class="px-2 py-1 text-xs font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Déplier"}</a>
+          </div>
+        </div>
+      
+        <div class="flex items-center p-2">
+          <div class="mr-5">
+            <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase rounded h-7 bg-lighterVermillon">
+              {intl l = "Bouton"}
+            </button>
+          </div>
+      
+          <div class="mr-5">
+              <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase border rounded h-7 bg-vermillon">
+                {intl l = "Bouton"}
+              </button>
+          </div>
+      
+          <div class="p-5 mr-5 bg-black ">
+            <button class="w-20 text-xs font-semibold tracking-wider text-black uppercase bg-white border border-white rounded h-7" disabled>
+              {intl l = "Bouton"}
+            </button>
+          </div>
+      
+          <div class="p-5">
+            <a class="px-2 py-1 text-xs font-semibold tracking-wider text-white uppercase border rounded cursor-pointer bg-vermillon border-vermillon">{intl l="Voir la fiche produit"}<i class="mx-1 fas fa-arrow-right"></i></a>
+          </div>
+      
+          <div class="p-5 bg-black md:text-center">
+            <a class="px-2 py-1 text-xs font-semibold tracking-wider text-black uppercase bg-white border border-white rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Replier"}</a>
+          </div>
+
+          <div class="p-5 bg-black md:text-center">
+            <a class="px-2 py-1 text-xs font-semibold tracking-wider text-black uppercase bg-white border border-white rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Déplier"}</a>
+          </div>
+          </div>
+      
+          <div class="flex items-center p-2">
+            <div class="mr-5">
+              <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase rounded h-7 bg-vermillon">
+                {intl l = "Bouton"}
+              </button>
+            </div>
+        
+            <div class="mr-5">
+                <button class="w-20 text-xs font-semibold tracking-wider uppercase border rounded text-vermillon h-7 border-vermillon">
+                  {intl l = "Bouton"}
+                </button>
+            </div>
+        
+            <div class="p-5 mr-5 bg-black ">
+              <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase border border-white rounded h-7" disabled>
+                {intl l = "Bouton"}
+              </button>
+            </div>
+        
+            <div class="p-5">
+              <a class="px-2 py-1 text-xs font-semibold tracking-wider uppercase border rounded cursor-pointer text-vermillon border-vermillon">{intl l="Voir la fiche produit"}<i class="mx-1 fas fa-arrow-right"></i></a>
+            </div>
+        
+            <div class="p-5 bg-black md:text-center">
+              <a class="px-2 py-1 text-xs font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Replier"}</a>
+            </div>
+
+            <div class="p-5 bg-black md:text-center">
+              <a class="px-2 py-1 text-xs font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Déplier"}</a>
+            </div>
+            </div>
+      
+            <div class="flex items-center p-2">
+              <div class="mr-5">
+                <button class="w-20 h-7 text-xs font-semibold tracking-wider text-white uppercase border-2 border-lighterVermillon rounded bg-vermillon">
+                  {intl l = "Bouton"}
+                </button>
+              </div>
+          
+              <div class="mr-5">
+                  <button class="w-20 text-xs font-semibold tracking-wider uppercase border-2 rounded text-vermillon h-7 border-vermillon">
+                    {intl l = "Bouton"}
+                  </button>
+              </div>
+          
+              <div class="p-5 mr-5 bg-black ">
+                <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase border-2 border-white rounded h-7" disabled>
+                  {intl l = "Bouton"}
+                </button>
+              </div>
+          
+              <div class="p-5">
+                <a class="px-2 py-1 text-xs font-semibold tracking-wider uppercase border-2 rounded cursor-pointer text-vermillon border-vermillon">{intl l="Voir la fiche produit"}<i class="mx-1 fas fa-arrow-right"></i></a>
+              </div>
+          
+              <div class="p-5 bg-black md:text-center">
+                <a class="px-2 py-1 text-xs font-semibold tracking-wider text-white uppercase border-2 border-white rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Replier"}</a>
+              </div>
+
+              <div class="p-5 bg-black md:text-center">
+                <a class="px-2 py-1 text-xs font-semibold tracking-wider text-white uppercase border-2 border-white rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Déplier"}</a>
+              </div>
+              </div>
+           
+              <div class="flex items-center p-2">
+                <div class="mr-5">
+                  <button class="w-20 h-7 text-xs font-semibold tracking-wider text-white uppercase  rounded bg-greyMedium">
+                    {intl l = "Bouton"}
+                  </button>
+                </div>
+            
+                <div class="mr-5">
+                    <button class="w-20 text-xs font-semibold tracking-wider uppercase border rounded text-greyMedium h-7 border-greyMedium">
+                      {intl l = "Bouton"}
+                    </button>
+                </div>
+            
+                <div class="p-5 mr-5 bg-black ">
+                  <button class="w-20 text-xs font-semibold tracking-wider text-greyMedium uppercase border border-greyMedium rounded h-7" disabled>
+                    {intl l = "Bouton"}
+                  </button>
+                </div>
+            
+                <div class="p-5">
+                  <a class="px-2 py-1 text-xs font-semibold tracking-wider uppercase border rounded cursor-pointer text-greyMedium border-greyMedium">{intl l="Voir la fiche produit"}<i class="mx-1 fas fa-arrow-right"></i></a>
+                </div>
+            
+                <div class="p-5 bg-black md:text-center">
+                  <a class="px-2 py-1 text-xs font-semibold tracking-wider text-greyMedium uppercase border border-greyMedium rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Replier"}</a>
+                </div>
+
+                <div class="p-5 bg-black md:text-center">
+                  <a class="px-2 py-1 text-xs font-semibold tracking-wider text-greyMedium uppercase border border-greyMedium rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Déplier"}</a>
+                </div>
+                </div>
+
+    <!-- Boutons action thelia blocks -->
+      <div class="flex items-center p-2">
+        <h1 class="mt-8 border-b text-greyDark border-greyMedium">{intl l = "Boutons Action Thelia Blocks"}</h1>
+
+        <h1 class="ml-20 mt-8 border-b text-greyDark border-greyMedium">{intl l = "Boutons Preview (short)"}</h1>
+
+        <h1 class="ml-10 mt-8 border-b text-greyDark border-greyMedium">{intl l = "Boutons Icones"}</h1>
+      </div>
+
+        <div class="flex items-center p-2">
+          <div>
+            <div class="mr-1 mb-2">
+              <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase rounded-sm">
+                <i class="fas fa-arrow-up"></i>
+                {intl l = "Monter"}
+              </button>
+      
+              <div class="mr-1 mt-2">
+                <button class="w-28 text-xs font-semibold tracking-wider uppercase rounded-sm text-white h-8 bg-darkCharbon">
+                  <i class="fas fa-arrow-up"></i>
+                  {intl l = "Monter"}
+                </button>
+            </div>
+            </div>
+          </div>
+      
+          <div>
+            <div class="mr-1 mb-2">
+              <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase  rounded-sm">
+                <i class="fas fa-arrow-down"></i>
+                {intl l = "Descendre"}
+              </button>
+      
+              <div class="mr-1 mt-2">
+                <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 border-darkCharbon bg-darkCharbon">
+                  <i class="fas fa-arrow-down"></i>
+                  {intl l = "Descendre"}
+                </button>
+            </div>
+            </div>
+          </div>
+      
+          <div>
+            <div class="mr-1 mb-2">
+              <button class="w-28 h-8 text-xs font-semibold tracking-wider text-vermillon uppercase  rounded-sm">
+                <i class="fas fa-trash"></i>
+                {intl l = "Supprimer"}
+              </button>
+      
+              <div class="mr-1 mt-2">
+                <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 bg-vermillon border-vermillon">
+                  <i class="fas fa-trash"></i>
+                  {intl l = "Supprimer"}
+                </button>
+            </div>
+            </div>
+          </div>
+      
+          <div class="flex items-center p-2 ml-9">
+            <div>
+              <div>
+                <button class="w-14 h-14 text-sm font-semibold tracking-wider text-white uppercase  rounded bg-vermillon">
+                  <i class="mx-1 fas fa-eye"></i>
+                </button>
+        
+                <div>
+                  <button class="w-14 text-sm font-semibold tracking-wider uppercase border rounded text-white h-14 bg-lightVermillon">
+                    <i class="mx-1 fas fa-eye"></i>
+                  </button>
+              </div>
+              </div>
+            </div>
+            </div>
+      
+            <div class="flex items-center p-2 ml-9">
+              <div>
+                <div>
+                  <div class="w-3 h-3 mx-2"><img src="{image file="assets/images/svg/close.svg"}" alt="fr" /></div>
+                </div>
+                <div class="text-vermillon">
+                  <div class="mt-6 w-3 h-3 mx-2 text-vermillon"><img class="text-vermillon" src="{image file="assets/images/svg/close.svg"}" alt="fr" /></div>
+              </div>
+              </div>
+              </div>
+              <div>
+                <div>
+                  <div class="w-5 h-5 mx-2"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></div>
+                </div>
+                <div>
+                  <div class="w-5 h-5 mx-2"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></div>
+              </div>
+              </div>
+
+              <div>
+                <div>
+                  <div class="w-5 h-5 mx-2"><img src="{image file="assets/images/svg/trash.svg"}" alt="fr" /></div>
+                </div>
+                <div>
+                  <div class="w-5 h-5 mx-2"><img src="{image file="assets/images/svg/trash.svg"}" alt="fr" /></div>
+              </div>
+              <div>
+                <div class="w-5 h-5 mx-2"><img src="{image file="assets/images/svg/trash.svg"}" alt="fr" /></div>
+               </div>
+              </div>
+
+  
+              </div>
+
+    <!-- Text link -->
+  <div class="flex items-center p-2">
+    <h1 class="mt-8 mr-10 border-b text-greyDark border-greyMedium">{intl l = "Text link"}</h1>
+
+    <h1 class="ml-20 mt-8 border-b text-greyDark border-greyMedium">{intl l = "Text link + icon"}</h1>
+
+    <h1 class="ml-10 mt-8 border-b text-greyDark border-greyMedium">{intl l = "BreadCrumb"}</h1>
+  </div>
+
+  <div class="flex items-center p-2">
+    <div>
+      <div class="mr-1 mb-2">
+        <a href="#" class="font-bold text-darkCharbon"></i>{intl l = "Nom de ce Thelia blocks"}</a>
+
+        <div class="mr-1 mt-2">
+          <a href="#" class="font-bold text-vermillon"></i>{intl l = "Nom de ce Thelia blocks"}</a>
+      </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="mr-1 mb-2">
+        <a href="#" class="font-normal underline text-greyDark"><i class="mx-1 fas fa-link"></i>{intl l = "12 contenus liés"}</a>
+
+        <div class="mr-1 mt-2">
+          <a href="#" class="font-normal underline text-vermillon"><i class="mx-1 fas fa-link"></i>{intl l = "12 contenus liés"}</a>
+      </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="mr-1 mb-2">
+        <a href="#" class="font-normal text-sm underline text-greyDark">{intl l = "Dashboard"}</a>
+
+        <div class="mr-1 mt-2">
+          <a href="#" class="font-normal text-sm underline text-vermillon">{intl l = "Dashboard"}</a>
+      </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- Formulaires -->
+    <div class="pl-8 text-xl text-greyDark border-b border-greyMedium">{intl l = "Formulaires"}</div>
+
+      <div>
+        <div class="flex items-start py-2">
+          <input type="checkbox" class="border-darkCharbon rounded h-5 w-5" />
+        </div>
+
+        <div class="flex items-start py-2">
+          <input type="checkbox" class="border-lightVermillon rounded h-5 w-5" />
+        </div>
+      </div>
+    
+
+    {component name="RadioButton" title="RadioButton"}{/component}       
 
 
   <!-- Toggle -->
   <div class="flex p-10">
     <div class="m-2 mr-5">
       <label for="toggle" class="flex items-center cursor-pointer">
-        <div class="mr-3 text-darkCharbon">Off</div>
         <div class="relative">
           <input type="checkbox" id="toggle" class="sr-only switch" />
-          <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+          <div class="block w-10 h-6 bg-red rounded-full"></div>
           <div
             class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
           ></div>
@@ -242,10 +1390,9 @@
 
     <div class="m-2">
       <label for="toggle2" class="flex items-center cursor-pointer">
-        <div class="mr-3 text-darkCharbon">On</div>
         <div class="relative">
           <input type="checkbox" checked id="toggle2" class="sr-only switch" />
-          <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
+          <div class="block w-10 h-6 bg-red rounded-full"></div>
           <div
             class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
           ></div>
@@ -254,248 +1401,750 @@
     </div>
   </div>
 
-
-
-
-
-  <!-- Typos -->
-  <div class="flex p-10">
-    <div class="flex flex-col m-2 text-gray-darkCharbon">
-      <span class="mb-3 text-4xl font-bold">I'm a Title</span>
-      <span class="mb-3 text-2xl font-semibold">I'm a Subtitle</span>
-      <span class="mb-3">I'm a Regular Text</span>
+    <!-- Pagination -->
+    <div class="flex items-center mb-3">
+      <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-white border rounded-l cursor-pointer border-greyMedium text-greyMedium"><i class="pl-4 fas fa-chevron-left text-darkCharbon"></i></a>
+      <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-white border rounded-r cursor-pointer border-greyMedium text-greyMedium"><i class="pl-3 text-darkCharbon fas fa-chevron-right"></i></a>
     </div>
+  
+    <div class="flex items-center">
+      <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-white border rounded-l cursor-pointer border-greyMedium text-greyMedium hover:bg-lightGrey"><i class="pl-4 fas fa-chevron-left text-darkCharbon"></i></a>
+      <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-white border rounded-r cursor-pointer border-greyMedium text-greyMedium hover:bg-lightGrey"><i class="pl-3 text-darkCharbon fas fa-chevron-right"></i></a>
+    </div>
+
+    <!-- Tags -->
+    <div class="mt-8 pl-8 text-xl text-greyDark border-b border-greyMedium">{intl l = "Tags"}</div>    
+
+    <div class="mt-8 pl-8 text-sm uppercase text-greyDark">{intl l = "Non cliquable"}</div>   
+    <div class="flex p-10">
+      <div class="m-2 mr-5">
+        <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-lightPearl last:mr-0 mr-1">
+          {intl l = "Tag Pays"}
+        </span>
+      </div>
+  
+      <div class="m-2">
+        <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-white last:mr-0 mr-1">
+          {intl l = "Tag Pays"}
+        </span>
+      </div>
+
+      <div class="m-2">
+        <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white bg-black last:mr-0 mr-1">
+          {intl l = "Tag Pays"}
+        </span>
+      </div>
+    </div>
+
+    <div class="mt-8 pl-8 text-sm uppercase text-greyDark">{intl l = "Cliquable"}</div>  
+    <div class="flex items-center p-2">
+      <div class="m-2 mr-5">
+        <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-white last:mr-0 mr-1">
+          {intl l = "Tag Pays"}
+          <i class="material-icons close-button">&times;</i>
+        </span>
+      </div>
+  
+      <div class="m-2 mr-5">
+        <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-lightPearl last:mr-0 mr-1">
+          {intl l = "Tag Pays"}
+          <i class="material-icons close-button">&times;</i>
+        </span>
+      </div>
+  
+      <div class="m-2 mr-5">
+        <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-greenDark border border-greenDark bg-white last:mr-0 mr-1">
+          {intl l = "Tag Pays"}
+          <i class="material-icons close-button">&times;</i>
+        </span>
+      </div>
+  
+      <div class="m-2 mr-5">
+        <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white border border-darkCharbon bg-darkCharbon last:mr-0 mr-1">
+          {intl l = "Tag Pays"}
+          <i class="material-icons close-button">&times;</i>
+        </span>
+      </div>
+      </div>
+
+      <div class="flex items-center p-2">
+        <div class="m-2 mr-5">
+          <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-white last:mr-0 mr-1">
+            {intl l = "Tag Pays"}
+            <i class="material-icons close-button text-red">&times;</i>
+          </span>
+        </div>
+    
+        <div class="m-2 mr-5">
+          <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-lightPearl last:mr-0 mr-1">
+            <i class="fas fa-xmark"></i>
+            {intl l = "Tag Pays"}
+            <i class="material-icons close-button text-red">&times;</i>
+          </span>
+        </div>
+    
+        <div class="m-2 mr-5">
+          <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-greenDark border border-greenDark bg-white last:mr-0 mr-1">
+            {intl l = "Tag Pays"}
+            <i class="material-icons close-button text-red">&times;</i>
+          </span>
+        </div>
+    
+        <div class="m-2 mr-5">
+          <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white border border-darkCharbon bg-darkCharbon last:mr-0 mr-1">
+            {intl l = "Tag Pays"}
+            <i class="material-icons close-button text-red">&times;</i>
+          </span>
+        </div>
+        </div>
+
+        <div class="flex items-center p-2">
+          <div class="m-2 mr-5">
+            <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white border border-darkCharbon bg-darkCharbon last:mr-0 mr-1">
+              {intl l = "Tag Pays"}
+              <i class="material-icons close-button">&times;</i>
+            </span>
+          </div>
+      
+          <div class="m-2 mr-5">
+            <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white border border-darkCharbon bg-darkCharbon last:mr-0 mr-1">
+              {intl l = "Tag Pays"}
+              <i class="material-icons close-button">&times;</i>
+            </span>
+          </div>
+      
+          <div class="m-2 mr-5">
+            <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white border border-greenDark bg-greenDark last:mr-0 mr-1">
+              {intl l = "Tag Pays"}
+              <i class="material-icons close-button">&times;</i>
+            </span>
+          </div>
+      
+          <div class="m-2 mr-5">
+            <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white border border-greenDark bg-greenDark last:mr-0 mr-1">
+              {intl l = "Tag Pays"}
+              <i class="material-icons close-button">&times;</i>
+            </span>
+          </div>
+          </div>
+
+          <div class="flex items-center p-2">
+            <div class="m-2 mr-5">
+              <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-warning last:mr-0 mr-1">
+                <i class="fas fa-triangle-exclamation"></i>
+                {intl l = "Tag Pays"}
+                <i class="material-icons close-button">&times;</i>
+              </span>
+            </div>
+        
+            <div class="m-2 mr-5">
+              <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-warning last:mr-0 mr-1">
+                <i class="fas fa-triangle-exclamation"></i>
+                {intl l = "Tag Pays"}
+                <i class="material-icons close-button">&times;</i>
+              </span>
+            </div>
+        
+            <div class="m-2 mr-5">
+              <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-warning last:mr-0 mr-1">
+                <i class="fas fa-triangle-exclamation"></i>
+                {intl l = "Tag Pays"}
+                <i class="material-icons close-button">&times;</i>
+              </span>
+            </div>
+        
+            <div class="m-2 mr-5">
+              <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-warning last:mr-0 mr-1">
+                <i class="fas fa-triangle-exclamation"></i>
+                {intl l = "Tag Pays"}
+                <i class="material-icons close-button">&times;</i>
+              </span>
+            </div>
+            </div>
+
+            <div class="flex items-center p-2">
+              <div class="m-2 mr-5">
+                <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-lightVermillon border border-lightVermillon bg-white last:mr-0 mr-1">
+                  {intl l = "Tag Pays"}
+                  <i class="material-icons close-button">&times;</i>
+                </span>
+              </div>
+          
+              <div class="m-2 mr-5">
+                <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-lightVermillon border border-lightVermillon bg-lightPearl last:mr-0 mr-1">
+                  {intl l = "Tag Pays"}
+                  <i class="material-icons close-button">&times;</i>
+                </span>
+              </div>
+          
+              <div class="m-2 mr-5">
+                <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-lightVermillon border border-lightVermillon bg-white last:mr-0 mr-1">
+                  {intl l = "Tag Pays"}
+                  <i class="material-icons close-button">&times;</i>
+                </span>
+              </div>
+          
+              <div class="m-2 mr-5">
+                <span class="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white border border-lightVermillon bg-lightVermillon last:mr-0 mr-1">
+                  {intl l = "Tag Pays"}
+                  <i class="material-icons close-button">&times;</i>
+                </span>
+              </div>
+              </div>      
+
+<!-- Languages -->
+  <div class="mt-8 pl-8 text-xl text-greyDark border-b border-greyMedium">{intl l = "Languages"}</div>
+  
+  <div class="flex items-center p-2">
+    <div>
+      <div class="mr-1 mb-2">
+        <button class="w-28 h-8 text-xs font-semibold tracking-wider border border-darkCharbon text-darkCharbon uppercase rounded-sm">
+          {intl l = "English"}
+        </button>
+
+        <div class="mr-1 mt-2">
+          <button class="w-28 text-xs font-semibold tracking-wider uppercase rounded-sm text-white h-8 bg-darkCharbon">
+            {intl l = "English"}
+          </button>
+      </div>
+
+      <div class="mr-1 mt-2">
+        <button class="w-28 text-xs font-semibold tracking-wider uppercase rounded-sm text-white h-8 bg-darkCharbon">
+          {intl l = "English"}
+        </button>
+    </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="mr-1 mb-2">
+        <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase border border-darkCharbon rounded-sm">
+          {intl l = "English"}
+        </button>
+
+        <div class="mr-1 mt-2">
+          <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 border-darkCharbon bg-darkCharbon">
+            {intl l = "English"}
+          </button>
+      </div>
+
+      <div class="mr-1 mt-2">
+        <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 border-darkCharbon bg-darkCharbon">
+          {intl l = "English"}
+        </button>
+    </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="mr-1 mb-2">
+        <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon border border-darkCharbon uppercase  rounded-sm">
+          {intl l = "English"}
+        </button>
+
+        <div class="mr-1 mt-2">
+          <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 bg-darkCharbon">
+            {intl l = "English"}
+          </button>
+      </div>
+
+      <div class="mr-1 mt-2">
+        <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 bg-darkCharbon">
+          {intl l = "English"}
+        </button>
+      </div> 
+      </div>
+    </div>
+    </div>
+  
+  <!-- Item positionnement -->
+  <div class="mt-8 mb-5 pl-8 text-xl text-greyDark border-b border-greyMedium">{intl l = "Item positionnement"}</div>
+  <div class="flex items-center mb-3">
+    <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-pearlMedium border rounded-l cursor-pointer border-greyMedium text-greyMedium"><i class="pl-4 fas fa-arrow-up text-darkCharbon"></i></a>
+    <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-pearlMedium border rounded-r cursor-pointer border-greyMedium text-greyMedium"><i class="pl-3 text-darkCharbon fas fa-arrow-down"></i></a>
+  </div>
+
+  <div class="flex items-center">
+    <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-darkCharbon border rounded-l cursor-pointer border-darkCharbon text-white"><i class="pl-4 fas fa-arrow-up text-white"></i></a>
+    <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-darkCharbon border rounded-r cursor-pointer border-darkCharbon text-white"><i class="pl-3 text-white fas fa-arrow-down"></i></a>
+  </div>
+
+    <!-- Concertinas -->
+    <div class="mt-8 mb-5 pl-8 text-xl text-greyDark border-b border-greyMedium">{intl l = "Concertinas"}</div>
+    <div class="flex items-center mb-3">
+      <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-vermillon border rounded-full cursor-pointer"><i class="pl-3 fas fa-arrow-up text-white"></i></a>
+      <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-vermillon border rounded-full cursor-pointer"><i class="pl-3 text-white fas fa-arrow-down"></i></a>
+    </div>
+  
+    <div class="flex items-center">
+      <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-lightVermillon border rounded-full cursor-pointer text-white"><i class="pl-3 fas fa-arrow-up text-white"></i></a>
+      <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-lightVermillon border rounded-full cursor-pointer text-white"><i class="pl-3 text-white fas fa-arrow-down"></i></a>
+    </div>
+
+<!-- Formulaires -->
+<div id="Formulaires" class="pl-8 text-3xl text-greyDark mt-20">{intl l = "Formulaires"}</div>
+
+<div class="flex items-center p-2">
+  <div class="w-2/5 mr-1">
+    <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+    <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
+  </div>
+
+  <div class="w-2/5 mr-1">
+    <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+    <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
+      <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+    </select>
+  </div>
+
+  <div class="w-2/5 mr-1">
+    {component name="InputLink" title="InputLink"}{/component}  
+  </div>
+
+  <div class="w-2/5 mr-1">
+    {component name="InputSearch" title="InputSearch"}{/component}  
+  </div>
+  </div>
+
+  <div class="flex items-center p-2">
+    <div class="w-2/5 mr-1">
+      <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+      <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
+    </div>
+  
+    <div class="w-2/5 mr-1">
+      <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+      <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
+        <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+      </select>
+    </div>
+  
+    <div class="w-2/5 mr-1">
+      {component name="InputLink" title="InputLink"}{/component}  
+    </div>
+  
+    <div class="w-2/5 mr-1">
+      {component name="InputSearch" title="InputSearch"}{/component}  
+    </div>
+    </div>
+
+    <div class="flex items-center p-2">
+      <div class="w-2/5 mr-1">
+        <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+        <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
+      </div>
+    
+      <div class="w-2/5 mr-1">
+        <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+        <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
+          <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+        </select>
+      </div>
+    
+      <div class="w-2/5 mr-1">
+        {component name="InputLink" title="InputLink"}{/component}  
+      </div>
+    
+      <div class="w-2/5 mr-1">
+        {component name="InputSearch" title="InputSearch"}{/component}  
+      </div>
+      </div>
+
+      <div class="flex items-center p-2">
+        <div class="w-2/5 mr-1">
+          <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+          <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
+        </div>
+      
+        <div class="w-2/5 mr-1">
+          <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+          <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
+            <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+          </select>
+        </div>
+      
+        <div class="w-2/5 mr-1">
+          {component name="InputLink" title="InputLink"}{/component}  
+        </div>
+      
+        <div class="w-2/5 mr-1">
+          {component name="InputSearch" title="InputSearch"}{/component}  
+        </div>
+        </div>
+
+        <div class="flex items-center p-2">
+          <div class="w-2/5 mr-1">
+            <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+            <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
+          </div>
+        
+          <div class="w-2/5 mr-1">
+            <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+            <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
+              <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+            </select>
+          </div>
+        
+          <div class="w-2/5 mr-1">
+            {component name="InputLink" title="InputLink"}{/component}  
+          </div>
+        
+          <div class="w-2/5 mr-1">
+            {component name="InputSearch" title="InputSearch"}{/component}  
+          </div>
+          </div>
+
+
+          <div class="flex items-center p-2">
+            <div class="w-2/5 mr-1">
+              <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+              <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
+            </div>
+          
+            <div class="w-2/5 mr-1">
+              <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+              <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
+                <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+              </select>
+            </div>
+          
+            <div class="w-2/5 mr-1">
+              {component name="InputLink" title="InputLink"}{/component}  
+            </div>
+          
+            <div class="w-2/5 mr-1">
+              {component name="InputSearch" title="InputSearch"}{/component}  
+            </div>
+            </div>
+
+
+
+  <div id="Pagination" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Pagination"}</div>
+
+  <div class="mt-5">
+    <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-white border rounded-l cursor-pointer border-greyMedium text-greyMedium"><i class="pl-4 fas fa-chevron-left text-darkCharbon"></i></a>
+    <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-white border rounded-r cursor-pointer border-greyMedium text-greyMedium"><i class="pl-3 text-darkCharbon fas fa-chevron-right"></i></a>
+    <span class="mx-1">{intl l = "Page 1 de 14"}</span>
   </div>
 
 
-
-
-
-  <!-- Pills -->
-  <div class="flex p-10">
-    <div class="m-2">
-      {include file="components/Pill/Pill.html" class="text-sm px-3 py-0.5
-      inline-block bg-grey" value="78346"}
+     <!--Search Bar-->
+     <div id="SearchBar" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Search Bar"}</div>
+    <div  class="p-2">
+      {component name="InputSearch" title="InputSearch"}{/component}  
     </div>
 
-    <div class="m-2">
-      {include file="components/Pill/Pill.html" class="text-sm px-3 py-0.5
-      inline-block bg-carot" value="4"}
+
+     <!--Titre Thelia Blocks-->
+    <div id="TitreTheliaBlock" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Titre Thelia Block"}</div>
+    <div class="px-6 py-4">
+      <div class="font-bold text-xl mb-2 text-darkCharbon">{intl l = "Titre"}</div>
+      <div class="font-bold text-xl mb-2 text-vermillon">{intl l = "Titre"}</div>
     </div>
 
-    <div class="m-2">
-      {include file="components/Pill/Pill.html" class="text-sm px-3 py-0.5
-      inline-block bg-error" value="54743"}
-    </div>
 
-    <div class="m-2">
-      {include file="components/Pill/Pill.html" class="text-sm px-3 py-0.5
-      inline-block bg-blue" value="18615"}
-    </div>
-
-    <div class="m-2">
-      {include file="components/Pill/Pill.html" class="text-sm px-3 py-0.5
-      inline-block bg-main" value="198"}
-    </div>
+<!-- Barre Actions Thelia Blocs -->
+<div id="BarreActionsTheliaBlocs" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Barre Actions Thelia Blocs"}</div>
+  
+<div class="flex items-center p-2">
+  <div class="flex border border-greyMedium">
+		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none">
+      <img class="w-3 mx-1" src="{image file="assets/images/svg/long-arrow-up.svg"}" alt="fr" />
+			<span class="uppercase mr-3">{intl l = "Monter"}</span>
+		</button>
+		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-greyMedium">
+      <img class="w-3 mx-1" src="{image file="assets/images/svg/long-arrow-down.svg"}" alt="fr" />
+			<span class="uppercase mr-3">{intl l = "Descendre"}</span>
+		</button>
+    <button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-greyMedium">
+      <img class="w-3 mx-1 text-vermillon" src="{image file="assets/images/svg/trash.svg"}" alt="fr" />
+			<span class="uppercase mr-3 text-vermillon">{intl l = "Supprimer"}</span>
+		</button>
+	</div>
   </div>
 
 
+<!-- Liste déroulante -->
+<div id="ListeDeroulante" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Liste déroulante"}</div>
+<div class="container w-1/5">
+  <ul class="list-reset text-lightCharbon mb-4 p-8 text-grey-darker rounded-lg shadow-lg">
+     <li class="flex items-center mb-3">
+      {intl l = "Chaise Edgar"}
+     </li>
+     <li class="flex items-center mb-3">
+      {intl l = "Chaise Kenny"}
+     </li>
+     <li class="flex items-center">
+      {intl l = "Chaise Victoria"}
+     </li>  
+  </ul>
+</div>
 
 
-
-  <!-- Panel -->
-  <div class="flex p-10">
-    {component name="Panel" title="Panel" class="w-2/3 text-white h-96 bg-mediumCharbon"}{/component}
+<!-- Positionnement -->
+<div id="Positionnement" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Positionnement"}</div>
+<div class="flex items-center p-2">
+  <div class="flex border border-greyMedium rounded-l rounded-r">
+		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none bg-greyMedium rounded-l">
+      <img class="w-2 mx-1" src="{image file="assets/images/svg/long-arrow-up.svg"}" alt="fr" />
+		</button>
+		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-greyMedium">
+			<span class="mr-2 ml-2">{intl l = "1"}</span>
+		</button>
+    <button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-greyMedium bg-greyMedium rounded-r">
+      <img class="w-2 mx-1" src="{image file="assets/images/svg/long-arrow-down.svg"}" alt="fr" />
+		</button>
+	</div>
   </div>
 
 
+<!-- Tabulations -->
+<div id="Tabulations" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Tabulations"}</div>
 
-   <!-- Tabs -->
-   <div class="flex p-10">
-    {component name="Tabs" title="Tabs"}message{/component}
+
+<!-- Language tabulation -->
+<div id="LanguageTabulation" class="mt-20 pl-8 text-3xl text-darkCharbon mb-2">{intl l = "Language tabulation"}</div>
+<div class="flex items-center p-2">
+  <div class="flex border border-darkCharbon">
+		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none hover:bg-darkCharbon hover:text-white">
+			<span class="uppercase ml-3 mr-3">{intl l = "Français"}</span>
+		</button>
+		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-darkCharbon hover:bg-darkCharbon hover:text-white">
+			<span class="uppercase ml-3 mr-3">{intl l = "English"}</span>
+		</button>
+    <button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-darkCharbon hover:bg-darkCharbon hover:text-white">
+			<span class="uppercase ml-3 mr-3">{intl l = "Espanol"}</span>
+		</button>
+	</div>
   </div>
 
 
-  <!-- Tableaux -->
-  <div class="flex p-10">
-    <table class="w-full shadow-lg table-auto bg-lightPearl">
-      <thead class="bg-mediumCharbon text-lightGrey">
-        <tr>
-          <th class="px-5 py-4 text-left rounded-tl-xl">ID</th>
-          <th class="px-5 py-4 text-left">Titre</th>
-          <th class="px-5 py-4">En ligne</th>
-          <th class="px-5 py-4 text-left">Description</th>
-          <th class="px-5 py-4 rounded-tr-xl">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="odd:bg-mediumPearl even:bg-white">
-          <td class="px-5 py-4">1</td>
-          <td class="px-5 py-4">
-            <a
-              href="?category_id=1"
-              class="font-bold text-main hover:text-darkMain"
-              >Chairs</a
-            >
-          </td>
-          <td class="px-5 py-4">
-            <label
-              for="category-1-toggle"
-              class="flex items-center justify-center cursor-pointer"
-              ><div class="relative">
-                <input
-                  type="checkbox"
-                  id="category-1-toggle"
-                  class="sr-only switch"
-                  checked=""
-                />
-                <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
-                <div
-                  class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
-                ></div></div
-            ></label>
-          </td>
-          <td class="w-2/3 px-5 py-4">
-            Eos velit enim autem eum nihil sunt ut. Porro ipsa deleniti dolore
-            molestiae aut omnis autem.
-          </td>
-          <td class="flex justify-center px-5 py-4 px-auto">
-            <button
-              href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-carot hover:text-lightGrey"
-              title="{intl l='View site'}"
-              target="_blank"
-            >
-              <i class="fas fa-folder-open" aria-hidden="true"></i></button
-            ><button
-              href="/"
-              class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
-              title="{intl l='View site'}"
-              target="_blank"
-            >
-              <i class="fas fa-edit" aria-hidden="true"></i></button
-            ><button
-              href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
-              title="{intl l='View site'}"
-              target="_blank"
-            >
-              <i class="fas fa-trash-alt" aria-hidden="true"></i>
-            </button>
-          </td>
-        </tr>
-        <tr class="odd:bg-mediumPearl even:bg-white">
-          <td class="px-5 py-4">2</td>
-          <td class="px-5 py-4">
-            <a
-              href="?category_id=2"
-              class="font-bold text-main hover:text-darkMain"
-              >Stools</a
-            >
-          </td>
-          <td class="px-5 py-4">
-            <label
-              for="category-2-toggle"
-              class="flex items-center justify-center cursor-pointer"
-              ><div class="relative">
-                <input
-                  type="checkbox"
-                  id="category-2-toggle"
-                  class="sr-only switch"
-                  checked=""
-                />
-                <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
-                <div
-                  class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
-                ></div></div
-            ></label>
-          </td>
-          <td class="w-2/3 px-5 py-4">
-            Eos velit enim autem eum nihil sunt ut. Porro ipsa deleniti dolore
-            molestiae aut omnis autem.
-          </td>
-          <td class="flex justify-center px-5 py-4 px-auto">
-            <button
-              href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-carot hover:text-lightGrey"
-              title="{intl l='View site'}"
-              target="_blank"
-            >
-              <i class="fas fa-folder-open" aria-hidden="true"></i></button
-            ><button
-              href="/"
-              class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
-              title="{intl l='View site'}"
-              target="_blank"
-            >
-              <i class="fas fa-edit" aria-hidden="true"></i></button
-            ><button
-              href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
-              title="{intl l='View site'}"
-              target="_blank"
-            >
-              <i class="fas fa-trash-alt" aria-hidden="true"></i>
-            </button>
-          </td>
-        </tr>
-        <tr class="odd:bg-mediumPearl even:bg-white">
-          <td class="px-5 py-4">3</td>
-          <td class="px-5 py-4">
-            <a
-              href="?category_id=3"
-              class="font-bold text-main hover:text-darkMain"
-              >Armchairs</a
-            >
-          </td>
-          <td class="px-5 py-4">
-            <label
-              for="category-3-toggle"
-              class="flex items-center justify-center cursor-pointer"
-              ><div class="relative">
-                <input
-                  type="checkbox"
-                  id="category-3-toggle"
-                  class="sr-only switch"
-                  checked=""
-                />
-                <div class="block w-10 h-6 bg-red-500 rounded-full"></div>
-                <div
-                  class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
-                ></div></div
-            ></label>
-          </td>
-          <td class="w-2/3 px-5 py-4">
-            Eos velit enim autem eum nihil sunt ut. Porro ipsa deleniti dolore
-            molestiae aut omnis autem.
-          </td>
-          <td class="flex justify-center px-5 py-4 px-auto">
-            <button
-              href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-carot hover:text-lightGrey"
-              title="{intl l='View site'}"
-              target="_blank"
-            >
-              <i class="fas fa-folder-open" aria-hidden="true"></i></button
-            ><button
-              href="/"
-              class="flex items-center justify-center p-3 mx-1 font-medium text-center text-white rounded-md bg-blue hover:text-lightGrey"
-              title="{intl l='View site'}"
-              target="_blank"
-            >
-              <i class="fas fa-edit" aria-hidden="true"></i></button
-            ><button
-              href="/"
-              class="flex items-center justify-center p-3 font-medium text-center text-white rounded-md bg-error hover:text-lightGrey"
-              title="{intl l='View site'}"
-              target="_blank"
-            >
-              <i class="fas fa-trash-alt" aria-hidden="true"></i>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+<!-- In page Navigation Bar -->
+<div id="PageNavigationBar" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "In Page Navigation Bar"}</div>
+<div class="m-3">
+  <ul class="w-full rounded-lg mt-2 mb-3 text-mediumCharbon">
+    <li class="mb-1">
+      <a href="#" class=" flex p-3 pl-3 bg-gray-100 hover:bg-gray-200 rounded-lg">
+        <span class="ml-2 truncate">{intl l = "Autre item"}</span>
+        <img class="w-3 mx-1 ml-20 hover:text-vermillon" src="{image file="assets/images/svg/long-arrow-right.svg"}" alt="fr" />
+      </a>
+    </li>
+  </ul>
+</div>  
+
+
+
+<!-- Concertinas -->
+<div id="Concertinas" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Concertinas"}</div>
+<div class="m-3">
+  <ul class="w-full rounded-lg mt-2 mb-3 text-mediumCharbon">
+    <li class="mb-1">
+      <a href="#" class=" flex p-3 pl-3 bg-gray-100 hover:bg-gray-200 rounded-lg">
+        <span class="ml-2 truncate font-bold">{intl l = "Europe"}</span>
+        <img class="w-3 mx-1 ml-20 bg-vermillon text-white rounded-full" src="{image file="assets/images/svg/long-arrow-right.svg"}" alt="fr" />
+      </a>
+    </li>
+  </ul>
+</div>  
+
+
+<!-- Menus -->
+<div id="Menus" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Menus"}</div>
+<div class="flex items-center p-2">
+  <div>
+    <div class="mr-1 mb-2">
+      <div class="relative inline-flex h-full px-5 bg-darkCharbon text-greyMedium rounded-sm">
+        <div class="flex items-center">
+          <div class="w-5 h-5 mx-1 text-greyMedium"><img class="text-greyMedium" src="{image file="assets/images/svg/dashboard.svg"}" alt="fr" /></div>
+          {intl l = "Dashboard"}
+        </div>
+    </div>
+
+      <div class="mr-1 mt-2">
+        <div class="relative inline-flex h-full px-5 bg-darkCharbon text-greyMedium rounded-sm">
+          <div class="flex items-center">
+            <div class="w-5 h-5 mx-1 text-white"><img class="text-white" src="{image file="assets/images/svg/dashboard.svg"}" alt="fr" /></div>
+            {intl l = "Dashboard"}
+          </div>
+      </div>
+    </div>
+
+    <div class="mr-1 mt-2">
+      <div class="relative inline-flex h-full px-5 bg-darkCharbon text-white rounded-sm">
+        <div class="flex items-center">
+          <div class="w-5 h-5 mx-1 text-vermillon"><img class="text-vermillon" src="{image file="assets/images/svg/dashboard.svg"}" alt="fr" /></div>
+          {intl l = "Dashboard"}
+        </div>
+    </div>
+  </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="mr-1 mb-2">
+      <div class="relative inline-flex h-full px-5 bg-darkCharbon text-greyMedium rounded-sm">
+        <div class="flex items-center">
+          <div class="w-5 h-5 mx-1 text-greyMedium"><img class="text-greyMedium" src="{image file="assets/images/svg/dashboard.svg"}" alt="fr" /></div>
+          {intl l = "Tunnel de commande"}
+        </div>
+    </div>
+
+      <div class="mr-1 mt-2">
+        <div class="relative inline-flex h-full px-5 bg-darkCharbon text-white rounded-sm">
+          <div class="flex items-center">
+            <div class="w-5 h-5 mx-1 text-white"><img class="text-white" src="{image file="assets/images/svg/dashboard.svg"}" alt="fr" /></div>
+            {intl l = "Tunnel de commande"}
+          </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="mr-1 mb-2">
+      <button class="w-4/5 text-xs font-semibold tracking-wider uppercase border rounded-sm text-greyMedium h-8 bg-darkCharbon">
+        {intl l = "EN"}
+      </button>
+
+      <div class="mr-1 mt-2">
+        <button class="w-4/5 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 bg-darkCharbon">
+          {intl l = "EN"}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="mr-1 mb-2">
+      <div class="relative inline-flex h-full px-5 bg-darkCharbon text-greyMedium rounded-sm">
+        <div class="flex items-center">
+          <div class="w-5 h-5 mx-1 text-white"><img class="text-white" src="{image file="assets/images/svg/dashboard.svg"}" alt="fr" /></div>
+          {intl l = "Profile"}
+        </div>
+      </div>
+      </div>
+
+      <div class="mr-1 mt-2">
+        <div class="relative inline-flex h-full px-5 bg-darkCharbon text-white rounded-sm">
+          <div class="flex items-center">
+            <div class="w-5 h-5 mx-1 text-white"><img class="text-white" src="{image file="assets/images/svg/dashboard.svg"}" alt="fr" /></div>
+            {intl l = "Profile"}
+          </div>
+      </div>
+    </div>
   </div>
 </div>
+
+
+<div id="ContenuItem" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Contenu Item"}</div>
+<div class="flex items-center p-2">
+<div>
+  <div class="mr-1 mb-2">
+    <button class="w-20 h-20 text-xs font-semibold tracking-wider uppercase border rounded-sm text-darkCharbon bg-pearlMedium">
+      {intl l = "Titre"}
+    </button>
+
+    <div class="mr-1 mt-2">
+      <button class="w-20 h-20 text-xs font-semibold tracking-wider uppercase border rounded-sm text-vermillon bg-pearlMedium">
+        {intl l = "Titre"}
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="flex items-center p-2">
+  <div>
+    <div class="mr-1 mb-2">
+      <button class="w-20 h-10 text-xs font-semibold tracking-wider uppercase border rounded-sm text-darkCharbon bg-pearlMedium">
+        {intl l = "Titre"}
+      </button>
+  
+      <div class="mr-1 mt-2">
+        <button class="w-20 h-10 text-xs font-semibold tracking-wider uppercase border rounded-sm text-vermillon bg-pearlMedium">
+          {intl l = "Titre"}
+        </button>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+
+
+  <div id="NombreColonnes" class="mt-20 text-3xl text-greyDark mb-2">{intl l = "Nombre Colonnes"}</div>
+<div class="flex items-center p-2">
+<div>
+  <div class="mr-1 mb-2">
+    <div class="w-35 inline-flex h-20 px-5 bg-pearlMedium text-greyMedium rounded-sm">
+      <div class="flex items-center">
+        <div class="w-1/5 mr-1">
+          <div class="w-5 h-5 text-greyMedium flex items-center ml-5"><img class="text-greyMedium" src="{image file="assets/images/svg/twoColomn.svg"}" alt="fr" /></div>
+          <div class="text-xs">{intl l = "colonnes"}</div>
+        </div>
+      </div>
+  </div>
+  </div>
+
+    <div class="mr-1 mt-2">
+      <div class="w-35 inline-flex h-20 px-5 bg-pearlMedium text-vermillon rounded-sm">
+        <div class="flex items-center">
+          <div class="w-1/5 mr-1">
+            <div class="w-5 h-5 text-vermillon flex items-center ml-5"><img class="text-greyMedium" src="{image file="assets/images/svg/twoColomn.svg"}" alt="fr" /></div>
+            <div class="text-xs">{intl l = "colonnes"}</div>
+          </div>
+        </div>
+    </div>
+    </div>
+</div>
+</div>
+
+
+<!-- Text Area -->
+<div id="PageNavigationBar" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Text area"}</div>
+
+
+
+<!-- Drop Down Areas -->
+<div id="PageNavigationBar" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Drop down areas"}</div>
+{component name="DragAndDrop" title="DragAndDrop"}{/component}  
+{component name="DragAndDropImage" title="DragAndDropImage"}{/component}  
+{component name="DragAndDropMedia" title="DragAndDropMedia"}{/component}  
+
+
+<!-- Toast Preview / Enregistrer -->
+<div id="ToastPreview" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Toast Preview / Enregistrer"}</div>
+{component name="ToastPreview" title="ToastPreview"}{/component}  
+
+</br>
+
+<div class="flex items-center h-20 max-w-7xl bg-lightCharbon">
+  <div class="container mx-auto">
+  <div class="flex justify-end pr-72">
+    <div class="md:text-center ">
+      <a class="px-3 py-2 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer hover:bg-white hover:text-black"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
+      <a class="px-3 py-2 mx-1 text-sm font-semibold tracking-wider text-white uppercase border rounded cursor-pointer bg-vermillon h-9 border-vermillon hover:bg-lighterVermillon hover:border-lighterVermillon">{intl l="Enregistrer"}</a>
+    </div>
+  </div>
+  </div>
+</div>
+
+</br>
+
+<div class="flex items-center h-20 max-w-7xl bg-lightCharbon">
+  <div class="container mx-auto">
+  <div class="flex justify-end pr-72">
+    <div class="md:text-center ">
+      <a class="px-3 py-2 mx-1 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer hover:bg-white hover:text-black">{intl l="Fermer"}</a>
+      <a class="px-3 py-2 mx-1 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer hover:bg-white hover:text-black">{intl l="Enregistrer & fermer"}</a>
+      <a class="px-3 py-2 mx-1 text-sm font-semibold tracking-wider text-white uppercase border rounded cursor-pointer bg-vermillon h-9 border-vermillon hover:bg-lighterVermillon hover:border-lighterVermillon">{intl l="Enregistrer"}</a>
+    </div>
+  </div>
+  </div>
+</div>
+
+
+
+
+{component name="Tables" title="Tables"}{/component} 
+
+<a href="#" class="text-blue-600 mb-2">Retour en haut</a>
 {/block}
