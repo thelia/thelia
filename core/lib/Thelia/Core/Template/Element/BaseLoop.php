@@ -161,6 +161,12 @@ abstract class BaseLoop implements BaseLoopInterface
         }
 
         $this->args = self::$loopDefinitionsArgs[$class];
+
+        // reset all arguments to default value, as argument list is cached in a static variable and holds
+        // values defined by previous loop usage across loop instances.
+        foreach ($this->args as $arg) {
+            $arg->setValue($arg->default);
+        }
     }
 
     /**
