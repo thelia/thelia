@@ -161,6 +161,10 @@ abstract class BaseLoop implements BaseLoopInterface
         }
 
         $this->args = self::$loopDefinitionsArgs[$class];
+
+        foreach ($this->args as $arg) {
+            $arg->setValue($arg->default);
+        }
     }
 
     /**
