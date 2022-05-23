@@ -121,7 +121,7 @@ return [
     'no file' => 'بدون فایل',
     'view type number missing' => 'نمایش تعداد نوع های غیر مجاز',
     'Not enought Memory' => 'نبود فضای کافی',
-    'max_size_reached' => 'پوشه تصویر شما به حداکثر اندازه خود [%d MB] رسیده است .', //%d = max overall size
+    'max_size_reached' => 'پوشه تصویر شما به حداکثر اندازه خود [%d MB] رسیده است .', // %d = max overall size
     'B' => 'B',
     'KB' => 'KB',
     'MB' => 'MB',

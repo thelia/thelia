@@ -13,6 +13,7 @@
 namespace Thelia\Core\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Session\Session;
@@ -60,7 +61,7 @@ class Request extends BaseRequest
      * example:
      * /admin will be the same as /admin/
      */
-    public function getPathInfo()
+    public function getPathInfo(): string
     {
         $pathInfo = parent::getPathInfo();
         $pathLength = \strlen($pathInfo);
@@ -168,7 +169,7 @@ class Request extends BaseRequest
      *
      * @return \Thelia\Core\HttpFoundation\Session\Session|null
      */
-    public function getSession()
+    public function getSession(): SessionInterface
     {
         if (!$this->hasSession()) {
             $this->session = $session = new Session();

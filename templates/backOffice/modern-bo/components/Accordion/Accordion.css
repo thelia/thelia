@@ -18,3 +18,4 @@ label:after {
   input[name='panel']:checked ~ .accordion__content {
     max-height: 50em;
   }
+

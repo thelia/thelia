@@ -56,7 +56,7 @@ try {
 
                 file_put_contents($configFile, $configContent);
             }
-        } catch (\exception $ex) {
+        } catch (\Exception $ex) {
             ?>
             <div class="alert alert-danger"><?php echo $trans->trans('Unexpected error occured: %err', ['%err' => $ex->getMessage()]); ?></div>
             <?php

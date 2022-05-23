@@ -1,0 +1,285 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Modules'}{/block}
+
+{block name="main-content"}
+<div id="modules">
+ <!-- Breadcrumbs -->
+ <nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-main dark:text-gray-400 dark:hover:text-white">
+        {intl l='Dashboard'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Modules'}</a>
+      </div>
+    </li>
+  </ol>
+</nav>
+
+  <!-- Header -->
+  <div>
+    <h1 class="p-4 text-3xl font-bold">{intl l='Modules'}</h1>
+    <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Modules.'}</p>
+  </div>
+  </div>
+
+    <div class="container">
+        {hook name="modules.top"}   
+        <div class="row">
+            <div class="grid grid-cols-2">
+            {loop type="auth" name="can_create" role="ADMIN" resource="admin.module" access="UPDATE"}
+            
+            <!--Panel install or update a module-->
+            <div>
+              {component name="Panel" title="Install or update a module" class="hidden w-full text-left lg:block fas fa-box-open"}
+                <div class="mt-2">
+                    <p class="text-sm font-normal text-gray-500 uppercase ">{intl l='The module zip file'}</p>
+                    <small class="italic font-normal text-mediumGrey ">{intl l='Your module should be packaged in a zip file'}</small>
+                    <div class="flex items-center pl-20 mt-3 font-normal">
+                      {component name="draganddrop"}{/component}
+                    </div>
+                </div>
+                {/component}
+            </div>
+
+            
+            <!--Panel search a module-->
+            <div>
+              {component name="Panel" title="Search a module" class="hidden w-full mx-6 mt-10 text-left lg:block fas fa-search"}
+              <div class="mt-2">
+                <p class="mb-4 text-sm font-normal text-gray-500 uppercase">{intl l='Discover all our modules on Thelia Modules !'}</p>
+                  <div class="grid grid-cols-2 mb-4">
+                      <div class="flex items-center search">
+                          <div
+                            class="h-10 py-2 pl-3 pr-4 bg-gray-100 rounded-l-lg search-icon text-main"
+                          >
+                            <i class="fas fa-search"></i>
+                          </div>
+                          <input
+                            type="search"
+                            class="w-full h-10 placeholder-gray-500 bg-gray-100 border-0 rounded-r-lg shadow-2xl search-input text-mediumCharbon focus:ring-main focus:outline-none focus:border-main"
+                            placeholder="Search on Thelia Modules"
+                          />
+                      </div>
+                      <div class="flex items-center mx-4">
+                          <div
+                            class="h-10 py-2 pl-3 pr-4 bg-gray-100 rounded-l-lg text-main"
+                          >
+                            <i class="fas fa-eye"></i>
+                          </div>
+                          <select class="w-full h-10 text-gray-500 bg-gray-100 border-0 rounded-r-lg focus:ring-main focus:outline-none focus:border-main">
+                              <option selected>{intl l='No'}</option>
+                              <option>{intl l='Yes'}</option>
+                            </select>
+                      </div>
+                  </div>
+              </div>
+              {/component}
+          </div>
+          {/loop}
+          </div>
+
+             <!--Panel delivery modules-->
+            <!--TODO: Tableau React-->
+            <div class="mt-6 mb-6 col-md-12">
+              <table class="w-full shadow-lg table-auto bg-lightPearl">
+                  <thead class="bg-mediumCharbon text-lightGrey">
+                    <tr>
+                      <th class="px-5 py-4 text-left rounded-tl-xl">{intl l='ID'}</th>
+                      <th class="px-5 py-4 text-left">{intl l='Name'}</th>
+                      <th class="px-5 py-4">{intl l='Code'}</th>
+                      <th class="px-5 py-4 text-left">{intl l='Version'}</th>
+                      <th class="px-5 py-4 rounded-tr-xl">{intl l='Actions'}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="odd:bg-mediumPearl even:bg-white">
+                      <td class="px-5 py-4">{intl l='12'}</td>
+                      <td class="px-5 py-4">{intl l='Virtual Products Delivery'}</td>
+                      <td class="px-5 py-4">{intl l='VirtualProductsDelivery'}</td>
+                      <td class="px-5 py-4">{intl l='2.4.4.'}</td>
+                      <td class="flex justify-center px-5 py-4 px-auto">
+                        <a
+                          href="/"
+                          class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center border rounded-md odd:bg-mediumPearl even:bg-white border-main text-main hover:text-white hover:bg-main"
+                          title="{intl l='View site'}"
+                          target="_blank"
+                        >
+                        {intl l='Shipping zones'}</a
+                        ><a
+                          href="/"
+                          class="flex items-center justify-center p-3 font-medium text-center rounded-md border-main text-darkCharbon hover:text-lightCharbon"
+                          title="{intl l='View site'}"
+                          target="_blank"
+                        >
+                          <i class="fa fa-bar-chart" aria-hidden="true"></i></a
+                        ><a
+                          href="/"
+                          class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                          title="{intl l='View site'}"
+                          target="_blank"
+                        >
+                          <i class="fa fa-cog" aria-hidden="true"></i>
+                      </a>
+                        <a
+                          href="/"
+                          class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                          title="{intl l='View site'}"
+                          target="_blank"
+                        >
+                          <i class="fa fa-edit" aria-hidden="true"></i>
+                    </a>
+                        <a
+                          href="/"
+                          class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
+                          title="{intl l='View site'}"
+                          target="_blank"
+                        >
+                          <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                  </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+          </div>
+
+            <!--Panel payment modules-->
+            <!--TODO: Tableau React-->
+            <div class="mt-2 col-md-12">
+              <table class="w-full shadow-lg table-auto bg-lightPearl">
+                  <thead class="bg-mediumCharbon text-lightGrey">
+                    <tr>
+                      <th class="px-5 py-4 text-left rounded-tl-xl">{intl l='ID'}</th>
+                      <th class="px-5 py-4 text-left">{intl l='Name'}</th>
+                      <th class="px-5 py-4">{intl l='Code'}</th>
+                      <th class="px-5 py-4 text-left">{intl l='Version'}</th>
+                      <th class="px-5 py-4 rounded-tr-xl">{intl l='Actions'}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="odd:bg-mediumPearl even:bg-white">
+                      <td class="px-5 py-4">{intl l='12'}</td>
+                      <td class="px-5 py-4">{intl l='Virtual Products Delivery'}</td>
+                      <td class="px-5 py-4">{intl l='VirtualProductsDelivery'}</td>
+                      <td class="px-5 py-4">{intl l='2.4.4.'}</td>
+                      <td class="flex justify-center px-5 py-4 px-auto">
+                        <a
+                          href="/"
+                          class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                          title="{intl l='View site'}"
+                          target="_blank"
+                        >
+                          <i class="fa fa-bar-chart" aria-hidden="true"></i></a
+                        ><a
+                          href="/"
+                          class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                          title="{intl l='View site'}"
+                          target="_blank"
+                        >
+                          <i class="fa fa-cog" aria-hidden="true"></i>
+                      </a>
+                        <a
+                          href="/"
+                          class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                          title="{intl l='View site'}"
+                          target="_blank"
+                        >
+                          <i class="fa fa-edit" aria-hidden="true"></i>
+                    </a>
+                        <a
+                          href="/"
+                          class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
+                          title="{intl l='View site'}"
+                          target="_blank"
+                        >
+                          <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                  </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+          </div>
+
+              <!--Panel classic modules-->
+            <!--TODO: Tableau React-->
+            <div class="mt-6 col-md-12">
+              <table class="w-full shadow-lg table-auto bg-lightPearl">
+                  <thead class="bg-mediumCharbon text-lightGrey">
+                    <tr>
+                      <th class="px-5 py-4 text-left rounded-tl-xl">{intl l='ID'}</th>
+                      <th class="px-5 py-4 text-left">{intl l='Name'}</th>
+                      <th class="px-5 py-4">{intl l='Code'}</th>
+                      <th class="px-5 py-4 text-left">{intl l='Version'}</th>
+                      <th class="px-5 py-4 rounded-tr-xl">{intl l='Actions'}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="odd:bg-mediumPearl even:bg-white">
+                      <td class="px-5 py-4">{intl l='12'}</td>
+                      <td class="px-5 py-4">{intl l='Virtual Products Delivery'}</td>
+                      <td class="px-5 py-4">{intl l='VirtualProductsDelivery'}</td>
+                      <td class="px-5 py-4">{intl l='2.4.4.'}</td>
+                      <td class="flex justify-center px-5 py-4 px-auto">
+                        <a
+                          href="/"
+                          class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                          title="{intl l='View site'}"
+                          target="_blank"
+                        >
+                          <i class="fa fa-bar-chart" aria-hidden="true"></i></a
+                        ><a
+                          href="/"
+                          class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                          title="{intl l='View site'}"
+                          target="_blank"
+                        >
+                          <i class="fa fa-cog" aria-hidden="true"></i>
+                      </a>
+                        <a
+                          href="/"
+                          class="flex items-center justify-center p-3 font-medium text-center rounded-md text-darkCharbon hover:text-lightCharbon"
+                          title="{intl l='View site'}"
+                          target="_blank"
+                        >
+                          <i class="fa fa-edit" aria-hidden="true"></i>
+                    </a>
+                        <a
+                          href="/"
+                          class="flex items-center justify-center p-3 font-medium text-center rounded-md text-error hover:text-darkCharbon"
+                          title="{intl l='View site'}"
+                          target="_blank"
+                        >
+                          <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                  </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+          </div>
+
+  
+          <!--Boutons Manage hooks et Manage modules attachements-->
+            <div class="grid-rows-2 mt-20 text-right">
+              <div class="mb-4 mr-5">
+                  <button class="p-3 font-medium text-white rounded-lg shadow-2xl bg-main hover:bg-darkMain">
+                      {intl l="Manage hooks"}
+                      <i class="ml-3 fas fa-chevron-right"></i>
+                  </button>
+              </div>
+              <div class="mr-5">
+                  <button class="p-3 font-medium text-white rounded-lg shadow-2xl bg-main hover:bg-darkMain">
+                      {intl l="Manage modules attachements"}
+                      <i class="ml-3 fas fa-chevron-right"></i>
+                  </button>
+              </div>
+          </div>
+  </div>
+  {hook name="modules.bottom"}
+</div>
+</div>
+{/block}

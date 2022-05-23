@@ -279,7 +279,7 @@ class TheliaLoop extends AbstractSmartyPlugin
      */
     public function theliaElseloop($params, $content, /* @noinspection PhpUnusedParameterInspection */ $template, &$repeat)
     {
-        //Block the smarty interpretation in the elseloop
+        // Block the smarty interpretation in the elseloop
         if ($content === null) {
             if (!$this->checkEmptyLoop($params)) {
                 $repeat = false;

@@ -109,6 +109,9 @@ class ErrorListener implements EventSubscriberInterface
         } while (null !== $exception = $exception->getPrevious());
 
         Tlog::getInstance()->error($logMessage);
+        if ($exception !== null) {
+            Tlog::getInstance()->error($exception->getTraceAsString());
+        }
     }
 
     public function authenticationException(ExceptionEvent $event): void

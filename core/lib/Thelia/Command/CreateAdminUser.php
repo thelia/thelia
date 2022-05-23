@@ -137,7 +137,7 @@ class CreateAdminUser extends ContainerAwareCommand
         $admin->setLocale($input->getOption('locale') ?: 'en_US');
         $admin->setEmail($input->getOption('email') ?: $this->enterEmail($helper, $input, $output));
 
-        do {
+        while (true) {
             $password = $input->getOption('password') ?: $this->enterData($helper, $input, $output, 'Password : ', 'Please enter a password.', true);
             $password_again = $input->getOption('password') ?: $this->enterData($helper, $input, $output, 'Password (again): ', 'Please enter the password again.', true);
 
@@ -148,7 +148,7 @@ class CreateAdminUser extends ContainerAwareCommand
             }
 
             $output->writeln('Passwords are different, please try again.');
-        } while (true);
+        }
 
         $admin->setProfile(null);
 

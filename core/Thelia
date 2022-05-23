@@ -1,23 +1,33 @@
 <?php
 
-use Thelia\Core\Thelia;
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\ErrorHandler\Debug;
-use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\Config\Loader\LoaderInterface;
 use Thelia\Core\Application;
+use Thelia\Core\Thelia;
 
-if (!in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
-    echo 'Warning: The console should be invoked via the CLI version of PHP, not the '.PHP_SAPI.' SAPI'.PHP_EOL;
+if (!in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
+    echo 'Warning: The console should be invoked via the CLI version of PHP, not the '.\PHP_SAPI.' SAPI'.\PHP_EOL;
 }
 
 set_time_limit(0);
 
 if (!isset($bootstrapFile)) {
-    $bootstrapFile =  dirname(__DIR__) . '/vendor/autoload.php';
+    $bootstrapFile = dirname(__DIR__).'/vendor/autoload.php';
 }
 
 require $bootstrapFile;
@@ -32,7 +42,7 @@ if (null !== $askedEnv = $input->getParameterOption(['--env', '-e'], null, true)
     putenv('APP_ENV='.$_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = $askedEnv);
 }
 
-(new Dotenv())->bootEnv(THELIA_ROOT . '.env', 'dev', []);
+(new Dotenv())->bootEnv(THELIA_ROOT.'.env', 'dev', []);
 $env = $_ENV['APP_ENV'];
 
 if ($input->hasParameterOption('--no-debug', true)) {
@@ -48,34 +58,34 @@ if ($_SERVER['APP_DEBUG']) {
 }
 
 // for Thelia not installed
-function getTheliaDatabaseConfigFile($env = "prod")
+function getTheliaDatabaseConfigFile($env = 'prod')
 {
     $fs = new Filesystem();
 
-    $databaseConfigFile = THELIA_CONF_DIR . 'database_' . $env . '.yml';
+    $databaseConfigFile = THELIA_CONF_DIR.'database_'.$env.'.yml';
     if (!$fs->exists($databaseConfigFile)) {
-        $databaseConfigFile = THELIA_CONF_DIR . 'database.yml';
+        $databaseConfigFile = THELIA_CONF_DIR.'database.yml';
     }
 
     return $databaseConfigFile;
 }
 
 if (!Thelia::isInstalled()) {
-    $kernel = new class($env = "prod", true) extends Kernel {
+    $kernel = new class($env = 'prod', true) extends Kernel {
         use MicroKernelTrait;
 
-        public function getCacheDir()
+        public function getCacheDir(): string
         {
-            if (\defined('THELIA_ROOT')) {
-                return THELIA_CACHE_DIR . $this->environment;
+            if (defined('THELIA_ROOT')) {
+                return THELIA_CACHE_DIR.$this->environment;
             }
 
             return parent::getCacheDir();
         }
 
-        public function getLogDir()
+        public function getLogDir(): string
         {
-            if (\defined('THELIA_ROOT')) {
+            if (defined('THELIA_ROOT')) {
                 return THELIA_LOG_DIR;
             } else {
                 return parent::getLogDir();
@@ -85,13 +95,12 @@ if (!Thelia::isInstalled()) {
         public function registerBundles(): array
         {
             return [
-                new Symfony\Bundle\FrameworkBundle\FrameworkBundle()
+                new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             ];
         }
 
-        public function registerContainerConfiguration(LoaderInterface $loader)
+        public function registerContainerConfiguration(LoaderInterface $loader): void
         {
-
         }
     };
 

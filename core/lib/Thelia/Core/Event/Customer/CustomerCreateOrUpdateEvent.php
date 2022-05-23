@@ -19,7 +19,7 @@ namespace Thelia\Core\Event\Customer;
  */
 class CustomerCreateOrUpdateEvent extends CustomerEvent
 {
-    //base parameters for creating new customer
+    // base parameters for creating new customer
     protected $title;
     protected $firstname;
     protected $lastname;

@@ -19,6 +19,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
+use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -31,7 +32,7 @@ class ContactController extends BaseFrontController
     /**
      * send contact message.
      */
-    public function sendAction(EventDispatcherInterface $eventDispatcher)
+    public function sendAction(EventDispatcherInterface $eventDispatcher, MailerFactory $mailer)
     {
         $contactForm = $this->createForm(FrontForm::CONTACT);
 
@@ -42,7 +43,7 @@ class ContactController extends BaseFrontController
 
             $eventDispatcher->dispatch($event, TheliaEvents::CONTACT_SUBMIT);
 
-            $this->getMailer()->sendSimpleEmailMessage(
+            $mailer->sendSimpleEmailMessage(
                 [ConfigQuery::getStoreEmail() => $event->getName()],
                 [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
                 $event->getSubject(),

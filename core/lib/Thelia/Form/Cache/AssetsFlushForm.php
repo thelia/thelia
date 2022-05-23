@@ -26,7 +26,7 @@ class AssetsFlushForm extends BaseForm
      */
     protected function buildForm(): void
     {
-        //Nothing, we just want CSRF protection
+        // Nothing, we just want CSRF protection
     }
 
     /**

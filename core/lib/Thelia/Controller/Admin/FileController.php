@@ -164,7 +164,7 @@ class FileController extends BaseAdminController
             $message = $this->getTranslator()
                 ->trans(
                     'File is too large, please retry with a file having a size less than %size%.',
-                    ['%size%' => ini_get('upload_max_filesize')],
+                    ['%size%' => \ini_get('upload_max_filesize')],
                     'core'
                 );
 
@@ -261,7 +261,7 @@ class FileController extends BaseAdminController
             )
         );
 
-        //return new ResponseRest(array('status' => true, 'message' => ''));
+        // return new ResponseRest(array('status' => true, 'message' => ''));
         return $fileCreateOrUpdateEvent;
     }
 
@@ -825,7 +825,7 @@ class FileController extends BaseAdminController
     {
         $message = null;
 
-        //$position = $this->getRequest()->request->get('position');
+        // $position = $this->getRequest()->request->get('position');
 
         $this->checkAuth($this->getAdminResources()->getResource($parentType, static::MODULE_RIGHT), [], AccessManager::UPDATE);
         $this->checkXmlHttpRequest();

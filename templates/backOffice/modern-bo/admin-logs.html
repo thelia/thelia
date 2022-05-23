@@ -4,6 +4,146 @@
 
 {block name="main-content"}
   <div id="admin-logs">
+ <!-- Breadcrumbs -->
+ <nav class="flex mb-10" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-3">
+    <li class="inline-flex items-center">
+      <a href="#" class="inline-flex items-center text-sm font-medium text-gray-400 hover:text-main dark:text-gray-400 dark:hover:text-white">
+        {intl l='Dashboard'}
+      </a>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Configuration'}</a>
+      </div>
+    </li>
+    <li>
+      <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+        <a href="#" class="ml-1 text-sm font-medium text-gray-400 hover:text-main md:ml-2 dark:text-gray-400 dark:hover:text-white">{intl l='Administration logs'}</a>
+      </div>
+    </li>
+  </ol>
+</nav>
 
+<!-- Header -->
+<div>
+  <h1 class="p-4 text-3xl font-bold">{intl l='Administration logs'}</h1>
+  <p class="pl-4 mb-6">{intl l='Ici, un texte expliquant rapidement le fonctionnement de Administration logs.'}</p>
+</div>
+
+    <!-- Panel -->
+    {component name="Panel" class="w-full mb-3"}
+    {hook name="admin-logs.top"}
+    <div class="flex justify-end pb-6 border-b">
+      <button class="flex items-center justify-center h-3 p-3 mx-1 mt-2 font-medium text-center text-white border rounded-md odd:bg-green even:bg-green border-green hover:text-green hover:bg-white">
+        Save ✓
+      </button>
+    </div>
+    <div class="grid grid-cols-3">
+      <p class="ml-8 font-bold">Period: </p>
+      <input
+        type="date"
+        class="w-full text-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+        value="From: 2022-02-23"
+      />
+      <input
+        type="date"
+        class="w-full mx-4 text-gray-500 bg-gray-100 rounded-lg shadow-2xl focus:ring-main focus:outline-none focus:border-main"
+        value="To: 2022-03-02"
+      />
+      </div>  
+      
+      
+      <div class="container mx-auto mt-4">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <!-- Première colonne -->
+          <div class="flex justify-center p-6 bg-gray-100 border-2 border-gray-300 rounded-xl">
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">admin</label>
+              </div>
+            </div>
+              <div class="w-1/2 m-2 text-darkCharbon">
+                <div>
+                  <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                  <label for="r1">Address</label>
+                </div>
+              </div>
+          </div>
+          <!-- Deuxième colonne -->
+          <div class="flex justify-center p-6 bg-gray-100 border-2 border-gray-300 rounded-xl">
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">thelia2</label>
+              </div>
+            </div>
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Configuration / Administrator</label>
+              </div>
+            </div>
+            
+          </div>
+
+          <!-- Troisième colonne -->
+          <div class="flex justify-center p-6 bg-gray-100 border-2 border-gray-300 rounded-xl">
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Configuration / Area</label>
+              </div>
+            </div>
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Content</label>
+              </div>
+            </div>
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Customer</label>
+              </div>
+            </div>
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Configuration / Mailing-system</label>
+              </div>
+            </div>
+            
+          </div>
+
+          <!-- Quatrième colonne -->
+          <div class="flex justify-center p-6 bg-gray-100 border-2 border-gray-300 rounded-xl">
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Configuration / Attribute</label>
+              </div>
+            </div>
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Configuration / Country</label>
+              </div>
+            </div>
+            <div class="w-1/2 m-2 text-darkCharbon">
+              <div>
+                <input class="mr-3 Radio" id="r1" type="radio" name="thelia-radio" />
+                <label for="r1">Configuration / Feature</label>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    {hook name="admin-logs.bottom"}   
+    {/component}
   </div>
 {/block}
