@@ -1,0 +1,37 @@
+<button class="trigger">{intl l="Modal"}</button>
+<div class="modal">
+    <div class="modal-content">
+        <span class="closed-button">×</span>
+        <div class="w-35 h-35"><img src="{image file="assets/images/svg/popinTheliaHTML.svg"}" alt="fr" /></div>
+    <span>{intl l= "Ici un petit message pour informer sur l'utilisation de HTML directement dans le back-office. Ce message apparait en pop-in chaque fois que l'utilisateur ajoute un bloc de HTML."}</span>
+    </br></br>
+    <input type="checkbox" name="checkbox"
+         >
+  <label for="scales">{intl l="Ne plus afficher l'alerte"}</label>
+</br></br>
+<div class="p-2 mb-10">
+    <a class="px-3 py-2 text-sm font-semibold tracking-wider uppercase border rounded cursor-pointer bg-vermillon border-vermillon text-white">{intl l="J'ai compris"}</a>
+  </div>
+</div>
+</div>
+
+
+<script>
+    let modal = document.querySelector(".modal");
+    let trigger = document.querySelector(".trigger");
+    let close = document.querySelector(".closed-button");
+
+function toggleModal() {
+    modal.classList.toggle("show-modal");
+}
+
+function windowOnClick(event) {
+    if (event.target === modal) {
+        toggleModal();
+    }
+}
+
+trigger.addEventListener("click", toggleModal);
+close.addEventListener("click", toggleModal);
+window.addEventListener("click", windowOnClick);
+</script>

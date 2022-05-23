@@ -1,0 +1,4 @@
+[type="radio"]:checked+label:after {
+    background-color: yellow;
+    border: 1px solid red;
+  }

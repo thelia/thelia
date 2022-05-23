@@ -5,7 +5,7 @@
     <li class="Sidebar-item">
         <a href="{url path='/admin/home'}" title="{intl l="Home"}" class="Sidebar-item">
             <i class="hidden lg:block fas fa-tachometer-alt"></i>
-            <span>{intl l="Home"}</span>
+            <span>{intl l="Dashboard"}</span>
         </a>
     </li>
 
@@ -18,7 +18,7 @@
 
         <ul class="Sidebar-submenu">
             <li class="Sidebar-submenu-header">
-                <span class="Sidebar-submenu-title">{intl l="Orders"}</span>
+                <span class="Sidebar-submenu-title">{intl l="Commandes"}</span>
             </li>
             <li class="Sidebar-submenu-item">
                 <a href="{url path='admin/orders'}">
@@ -57,7 +57,7 @@
 
                     <a title="{intl l="Customers"}" href="#collapse-customer" class="py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
                         <i class="ml-5 text-white fas fa-users mr-7"></i>
-                        <span class="text-mediumGrey">{intl l="Customers"}</span>
+                        <span class="text-mediumGrey">{intl l="Clients"}</span>
                         <i class="hidden lg:block fas fa-chevron-right menu-collapse text-mediumGrey"></i>
                     </a>
 
@@ -95,7 +95,7 @@
 
                 <a title="{intl l="Catalog"}" href="#collapse-catalog" class="py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
                     <i class="ml-5 text-white fas fa-book mr-7"></i>
-                    <span class="text-mediumGrey">{intl l="Catalog"}</span>
+                    <span class="text-mediumGrey">{intl l="Catalogue"}</span>
                     <i class="hidden lg:block fas fa-chevron-right menu-collapse text-mediumGrey"></i>
                 </a>
 
@@ -218,6 +218,8 @@
             </ul>
         </li>
     {/loop}
+
+    
 
     {hook name="main.in-top-menu-items" location="in_top_menu_items" admin_current_location=$admin_current_location}
 

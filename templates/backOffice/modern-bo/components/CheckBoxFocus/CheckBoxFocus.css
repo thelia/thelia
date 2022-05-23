@@ -1,0 +1,15 @@
+.b-label {
+	display: inline-block;
+  }
+  
+  .b-label:focus-within {
+	outline :1px solid red;
+  }
+
+  .bed-label {
+	display: inline-block;
+  }
+  
+  .bed-label:focus-within {
+	outline :1px solid red;
+  }

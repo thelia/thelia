@@ -1,0 +1,36 @@
+input[type="file"] {
+	display: none;
+}
+
+
+.Image {
+	margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+
+#file-drag {
+	display: block;
+	padding: 1em;
+	border: 1px dashed #787878;
+	border-radius: 4px;
+	color         : #333333;
+	cursor        : pointer;
+	text-align    : center;
+	transition    : background 0.3s, color 0.3s;
+	width: 274px;
+}
+
+
+#file-drag:hover,
+#file-drag.hover {
+	border-color : #555;
+	border-style : solid;
+	color        : #EC6351;
+}
+
+
+#file-upload-form {
+	margin : auto;	
+}
