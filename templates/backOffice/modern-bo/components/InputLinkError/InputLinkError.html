@@ -1,12 +1,12 @@
-<div class="InputLinkError row">
-    <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
+<div class="InputLink">
     <div>
-        <div class="left-inner-addon input-container">
-            <i class="fa fa-link"></i>
-            <input type="password"
-                   class="form-control border-red bg-backgroundRed" 
-                   placeholder="Insérer le nom" />
+        <div class="left-inner-addon">
+            <i class="text-mediumGrey fa fa-link"></i>
+            <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-vermillon bg-backgroundRed" type="text" placeholder="Insérer le nom">
         </div>
     </div>
-    <label class="block text-red text-xs font-bold">{intl l = "Indication de l'erreur"}</label>
+    <div class="flex" style="margin-left: 170px;">
+        <a href="#"><div class="w-2 h-2 mt-1"><img src="{image file="assets/images/svg/warning.svg"}" alt="fr" /></div></a>
+        <label class="text-red text-xs font-normal mx-1">{intl l = "Indication de l'erreur"}</label>
+    </div>
 </div>

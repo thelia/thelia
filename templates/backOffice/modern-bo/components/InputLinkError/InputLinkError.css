@@ -13,7 +13,7 @@
     pointer-events: none;
 }
 
-.InputLinkError input {
+.InputLink input {
     width: 100%;
 		box-sizing: border-box;
 }
