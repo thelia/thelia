@@ -55,7 +55,8 @@ module.exports = {
         mauveLight: '#EBE2EA',
         turquoiseLight: '#ECF8F8',
         electricBlueLight: '#EEECFF',
-        backgroundLightVermillon: '#F7EEED'
+        backgroundLightVermillon: '#F7EEED',
+        warning: '#FFDD9C'
       }
     }
   },

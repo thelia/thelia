@@ -1,0 +1,10 @@
+.left-inner-addon i {
+    position: absolute;
+    padding: 12px 12px;
+    pointer-events: none;
+}
+
+.InputLink input {
+    width: 100%;
+	box-sizing: border-box;
+}

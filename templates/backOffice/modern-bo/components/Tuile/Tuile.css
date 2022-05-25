@@ -1,0 +1,75 @@
+.tuile {
+    float: left;
+    font-size: 16px;
+    margin: 10px 1%;
+    max-width: 310px;
+    min-width: 250px;
+    overflow: hidden;
+    position: relative;
+    text-align: left;
+    width: 100%;
+  }
+  
+  .tuile * {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-transition: all 0.25s ease;
+    transition: all 0.25s ease;
+  }
+  
+  .tuile img {
+    max-width: 100%;
+    vertical-align: top;
+    position: relative;
+  }
+  
+  .tuile .tag {
+    font-size: 8px;
+    font-weight: 200;
+    min-height: 48px;
+    min-width: 48px;
+    padding: 10px 0;
+    position: absolute;
+    right: 15px;
+    text-align: center;
+    text-transform: uppercase;
+    top: -25px;
+  }
+  
+  .tuile .date span {
+    display: block;
+    line-height: 14px;
+  }
+  
+  .tuile .date .month {
+    font-size: 11px;
+  }
+  
+  .tuile p {
+    margin-left: 20px;
+    padding: 0;
+    font-size: 12px;
+  }
+  
+  .tuile h3 {
+    display: inline-block;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    margin-bottom: 5px;
+  }
+  
+  .tuile a {
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    position: absolute;
+    z-index: 1;
+  }
+  
+  .tuile:hover img,
+  .tuile.hover img {
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
+  }
+  

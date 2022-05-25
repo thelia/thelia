@@ -1,0 +1,29 @@
+.right-inner-addoned {
+    position: relative;
+}
+.right-inner-addoned input {
+    padding-right: 35px !important;
+}
+.right-inner-addoned i {
+    position: absolute;
+    right: 0px;
+    padding: 12px 12px;
+    pointer-events: none;
+}
+
+.right-inner-addoned-b {
+    position: relative;
+}
+.right-inner-addoned-b input {
+    padding-right: 35px !important;
+}
+.right-inner-addoned-b i {
+    position: absolute;
+    right: 0px;
+    padding: 9px 12px;
+    pointer-events: none;
+}
+
+.InputSearched input {
+		box-sizing: border-box;
+}
