@@ -1,0 +1,26 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-prettier",
+    "stylelint-config-rational-order"
+  ],
+  "rules": {
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "tailwind",
+          "apply",
+          "responsive",
+          "screen"
+        ]
+      }
+    ],
+    "keyframes-name-pattern": null,
+    "selector-class-pattern": null,
+    "custom-property-pattern": null,
+    "no-duplicate-selectors": null,
+    "selector-id-pattern": null,
+    "no-descending-specificity": null
+  }
+}
