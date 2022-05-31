@@ -1,6 +1,6 @@
 body.CategoryMenu--active {
   overflow-y: hidden;
-  @screen lg{
+  @screen lg {
     overflow-y: auto;
   }
 }
@@ -14,11 +14,11 @@ body.CategoryMenu--active {
 .CategoryMenu-wrapper {
   display: none;
   @screen lg {
-    display: block;
     top: var(--Header-height) !important;
-  }
-  .CategoryMenu--active & {
     display: block;
   }
 
+  .CategoryMenu--active & {
+    display: block;
+  }
 }

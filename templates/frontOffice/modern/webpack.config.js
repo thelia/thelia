@@ -2,6 +2,7 @@ require('dotenv').config();
 const path = require('path');
 const SVGSpritemapPlugin = require('svg-spritemap-webpack-plugin');
 const Encore = require('@symfony/webpack-encore');
+const PrettierPlugin = require('prettier-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 
 const chokidar = require('chokidar');
@@ -18,6 +19,7 @@ Encore.configureBabel((config) => {
   config.plugins.push('@babel/plugin-transform-runtime');
 });
 
+Encore.addPlugin(new PrettierPlugin());
 Encore.addPlugin(new ESLintPlugin());
 
 // ENTRIES
