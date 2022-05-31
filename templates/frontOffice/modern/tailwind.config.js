@@ -7,7 +7,6 @@ module.exports = {
     '/components/**/*.css',
     '!(node_modules)/**/*.js'
   ],
-  // mode: 'jit',
   theme: {
     extend: {
       colors: {
