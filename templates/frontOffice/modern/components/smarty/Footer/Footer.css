@@ -3,17 +3,21 @@
     max-width: 24.6875rem;
     margin: auto;
   }
+
   &-grid {
     @screen lg {
       grid-template-columns: 1fr 1fr 2fr;
     }
+
     gap: 110px;
   }
+
   &-gammes {
     max-width: 520px;
 
     svg {
       max-width: 140px;
+
       &:not(:last-child) {
         margin-right: 50px;
       }

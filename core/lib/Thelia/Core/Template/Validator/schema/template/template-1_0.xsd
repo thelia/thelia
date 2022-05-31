@@ -127,6 +127,12 @@
                         <xs:documentation>URL to download the new version of the template. Will be called with two get parameters : template name, current version</xs:documentation>
                     </xs:annotation>
                 </xs:element>
+
+                <xs:element type="xs:string" name="assets" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Assets directory path</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

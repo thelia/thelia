@@ -1,10 +1,10 @@
 .CategoriesPanels {
   &-panel {
     position: relative;
-    transition: transform 125ms ease-in-out;
-    will-change: transform;
     z-index: 1;
     overflow: hidden;
+    transition: transform 125ms ease-in-out;
+    will-change: transform;
     @apply bg-gray-500;
 
     &:hover {
@@ -12,21 +12,18 @@
         opacity: 0.8;
       }
     }
+
     &-img {
       opacity: 0.5;
       @screen lg {
         max-height: 400px;
       }
-
     }
+
     &-content {
       @apply inset-0 flex flex-col items-center justify-end;
-      position: absolute;
 
+      position: absolute;
     }
   }
-}
-
-.CategoriesPanels-panel-title {
-
 }

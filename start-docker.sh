@@ -23,9 +23,9 @@ set -o allexport
 eval $(cat '.env' | sed -e '/^#/d;/^\s*$/d' -e 's/\(\w*\)[ \t]*=[ \t]*\(.*\)/\1=\2/' -e "s/=['\"]\(.*\)['\"]/=\1/g" -e "s/'/'\\\''/g" -e "s/=\(.*\)/='\1'/g")
 set +o allexport
 
-if [ ! -z "$TEMPLATE_NAME" ] && [ ! -d "templates/frontOffice/$TEMPLATE_NAME" ]; then
-  echo -e "\e[1;37;46m Copying template files to templates/frontOffice/$TEMPLATE_NAME \e[0m"
-  cp -r "templates/frontOffice/modern" "templates/frontOffice/$TEMPLATE_NAME";
+if [ ! -z "$ACTIVE_FRONT_TEMPLATE" ] && [ ! -d "templates/frontOffice/$ACTIVE_FRONT_TEMPLATE" ]; then
+  echo -e "\e[1;37;46m Copying template files to templates/frontOffice/$ACTIVE_FRONT_TEMPLATE \e[0m"
+  cp -r "templates/frontOffice/modern" "templates/frontOffice/$ACTIVE_FRONT_TEMPLATE";
 fi
 
   echo -e "\e[1;37;46m Starting docker \e[0m"

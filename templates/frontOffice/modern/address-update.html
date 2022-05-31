@@ -6,11 +6,11 @@
 {/block}
 
 {block name="css" append}
-  {getAssetsFromEntrypoints entry="address" type="css"}
+  {encore_entry_link_tags entry="address"}
 {/block}
 
 {block name="javascript" append}
-  {getAssetsFromEntrypoints entry="address" type="js"}
+  {encore_entry_script_tags entry="address"}
 {/block}
 
 
@@ -60,11 +60,11 @@
         {hook name="address-update.form-top" address=$address_id}
 
         <fieldset class="panel">
-          <h4 class="font-bold text-lg mb-4">
+          <h4 class="mb-4 text-lg font-bold">
               {intl l="Personal Information"}
           </h4>
 
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {form_field field="label"}
               {call name="fn_address_field_label"}
             {/form_field}
@@ -93,8 +93,8 @@
         </fieldset>
 
         <fieldset class="panel">
-          <h4 class="font-bold text-lg mb-4">{intl l="Delivery Information"}</h4>
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <h4 class="mb-4 text-lg font-bold">{intl l="Delivery Information"}</h4>
+          <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
             {form_field field="company"}
               {call name="fn_address_field_company"}
