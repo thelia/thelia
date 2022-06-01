@@ -1,31 +1,38 @@
 <?php
 
-namespace Thelia\Api\Bridge\Propel;
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
-use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
-use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
+namespace Thelia\Api\Bridge\Propel\State;
+
+use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Thelia\Api\Bridge\Propel\Extension\QueryCollectionExtensionInterface;
 use Thelia\Api\Bridge\Propel\Extension\QueryResultCollectionExtensionInterface;
 use Thelia\Api\Resource\PropelResourceInterface;
 
-final class CollectionDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface
+class PropelItemProvider implements ProviderInterface
 {
-    /**
-     * @param QueryCollectionExtensionInterface[] $collectionExtensions
-     */
     public function __construct(private iterable $collectionExtensions = [])
-    {}
-
-    /**
-     * @param PropelResourceInterface $resourceClass
-     * @param string|null $operationName
-     * @param array $context
-     * @return iterable|void
-     */
-    public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable
     {
+    }
+
+    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    {
+        $resourceClass = $operation->getClass();
+
+        if (!is_subclass_of($resourceClass, PropelResourceInterface::class)) {
+            throw new RuntimeException('Bad provider');
+        }
+
         /** @var ModelCriteria $queryClass */
         $queryClass = $resourceClass::getPropelModelClass().'Query';
 
@@ -33,10 +40,10 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
         $query = $queryClass::create();
 
         foreach ($this->collectionExtensions as $extension) {
-            $extension->applyToCollection($query, $resourceClass, $operationName, $context);
+            $extension->applyToCollection($query, $resourceClass, $operation->getName(), $context);
 
-            if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
-                return $extension->getResult($query, $resourceClass, $operationName, $context);
+            if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
+                return $extension->getResult($query, $resourceClass, $operation->getName(), $context);
             }
         }
 
@@ -62,10 +69,5 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
 //        );
 
         return $query->find()->toArray();
-    }
-
-    public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
-    {
-        return is_subclass_of($resourceClass, PropelResourceInterface::class);
     }
 }
