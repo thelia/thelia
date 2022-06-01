@@ -1,8 +1,16 @@
 <?php
 
-namespace Thelia\Api\Resource;
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
-use Symfony\Component\Serializer\Annotation\Groups;
+namespace Thelia\Api\Resource;
 
 abstract class I18n
 {
@@ -14,7 +22,6 @@ abstract class I18n
 
     private ?string $chapo;
 
-
     public function getId(): int
     {
         return $this->id;
@@ -23,6 +30,7 @@ abstract class I18n
     public function setId(int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -34,6 +42,7 @@ abstract class I18n
     public function setLocale(string $locale): self
     {
         $this->locale = $locale;
+
         return $this;
     }
 
@@ -45,6 +54,7 @@ abstract class I18n
     public function setTitle(?string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -56,6 +66,7 @@ abstract class I18n
     public function setChapo(?string $chapo): self
     {
         $this->chapo = $chapo;
+
         return $this;
     }
 }
