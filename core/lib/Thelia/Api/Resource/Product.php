@@ -1,24 +1,23 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    collectionOperations: [
-        'get',
-        'post'
-    ],
-    itemOperations: [
-        'adminGet' => [
-            'method' => 'GET',
-            'path' => '/admin/products/{id}'
-        ]
-    ],
-    denormalizationContext: ['groups' => ['product:write']],
-    normalizationContext: ['groups' => ['product:read']]
+    normalizationContext: ['groups' => ['product:read']],
+    denormalizationContext: ['groups' => ['product:write']]
 )]
 class Product implements PropelResourceInterface, TranslatableResourceInterface
 {
@@ -46,75 +45,51 @@ class Product implements PropelResourceInterface, TranslatableResourceInterface
         $this->i18ns = [];
     }
 
-    /**
-     * @return int|null
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     * @return Product
-     */
-    public function setId(int $id): Product
+    public function setId(int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getRef(): string
     {
         return $this->ref;
     }
 
-    /**
-     * @param string $ref
-     * @return Product
-     */
-    public function setRef(string $ref): Product
+    public function setRef(string $ref): self
     {
         $this->ref = $ref;
+
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isVisible(): bool
     {
         return $this->visible;
     }
 
-    /**
-     * @param bool $visible
-     * @return Product
-     */
-    public function setVisible(bool $visible): Product
+    public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isVirtual(): bool
     {
         return $this->virtual;
     }
 
-    /**
-     * @param bool $virtual
-     * @return Product
-     */
-    public function setVirtual(bool $virtual): Product
+    public function setVirtual(bool $virtual): self
     {
         $this->virtual = $virtual;
+
         return $this;
     }
 
@@ -142,7 +117,6 @@ class Product implements PropelResourceInterface, TranslatableResourceInterface
 
     public function removeI18n(ProductI18N $i18n): self
     {
-
         return $this;
     }
 //
@@ -175,7 +149,7 @@ class Product implements PropelResourceInterface, TranslatableResourceInterface
     {
         return [
             'title',
-            'chapo'
+            'chapo',
         ];
     }
 
