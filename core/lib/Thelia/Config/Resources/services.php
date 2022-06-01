@@ -12,7 +12,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Thelia\Api\Bridge\Propel\CollectionDataProvider;
+use Thelia\Api\Bridge\Propel\State\PropelCollectionProvider;
 use Thelia\Core\Service\ConfigCacheService;
 use Thelia\Core\Thelia;
 use Thelia\Log\Tlog;
@@ -31,7 +31,8 @@ return static function (ContainerConfigurator $configurator): void {
         ->bind('$kernelEnvironment', '%kernel.environment%')
         ->bind('$sessionSavePath', '%session.save_path%')
         ->bind('$theliaParserLoops', '%Thelia.parser.loops%')
-        ->bind('$formDefinition', '%Thelia.parser.forms%');
+        ->bind('$formDefinition', '%Thelia.parser.forms%')
+        ->bind('$propelCollectionExtensions', tagged_iterator('thelia.api.propel.query_extension.collection'));
 
     $serviceConfigurator->load('Thelia\\', THELIA_LIB)
         ->exclude(
@@ -95,8 +96,7 @@ return static function (ContainerConfigurator $configurator): void {
     $serviceConfigurator->get(ConfigCacheService::class)
         ->public();
 
-    $services = $configurator->services();
-    $services->set(CollectionDataProvider::class)
-        ->args([tagged_iterator('thelia.api.propel.query_extension.collection')])
-        ->tag("api_platform.collection_data_provider");
+//    $services = $configurator->services();
+//    $services->set(PropelCollectionProvider::class)
+//        ->args([tagged_iterator('thelia.api.propel.query_extension.collection')]);
 };
