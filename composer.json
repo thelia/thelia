@@ -75,7 +75,8 @@
         "thelia/better-seo-module": "2.0.0",
         "thelia/short-code-meta-module": "dev-main",
         "thelia/force-phone-module": "dev-main",
-        "symfony/mailer": "6.0.*"
+        "symfony/mailer": "6.0.*",
+        "symfony/webpack-encore-bundle": "^1.14"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",
@@ -83,7 +84,7 @@
         "phpunit/phpunit": "9.5.*",
         "symfony/browser-kit": "6.0.*",
         "symfony/phpunit-bridge": "6.0.*",
-        "phpstan/phpstan": "^0.12.75",
+        "phpstan/phpstan": "^1.6",
         "phpstan/extension-installer": "^1.1",
         "symfony/css-selector": "6.0.*",
         "friendsofphp/php-cs-fixer": "^3.8"
@@ -160,7 +161,8 @@
         "allow-plugins": {
             "thelia/installer": true,
             "phpstan/extension-installer": true,
-            "symfony/flex": true
+            "symfony/flex": true,
+            "symfony/runtime": true
         }
     }
 }

@@ -2,6 +2,7 @@ require('dotenv').config();
 const path = require('path');
 const SVGSpritemapPlugin = require('svg-spritemap-webpack-plugin');
 const Encore = require('@symfony/webpack-encore');
+const PrettierPlugin = require('prettier-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 
 const chokidar = require('chokidar');
@@ -9,8 +10,6 @@ const chokidar = require('chokidar');
 if (!Encore.isRuntimeEnvironmentConfigured()) {
   Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
 }
-
-const publicPath = '/dist/';
 
 // GENERAL
 Encore.configureFriendlyErrorsPlugin((options) => {
@@ -20,6 +19,7 @@ Encore.configureBabel((config) => {
   config.plugins.push('@babel/plugin-transform-runtime');
 });
 
+Encore.addPlugin(new PrettierPlugin());
 Encore.addPlugin(new ESLintPlugin());
 
 // ENTRIES
@@ -32,7 +32,11 @@ Encore.addEntry('app', './assets/js/app.js')
   .addEntry('delivery', './assets/js/routes/delivery');
 
 Encore.setOutputPath('dist/')
-  .setPublicPath(publicPath)
+  .setPublicPath(
+    process.env.NODE_ENV === 'production'
+      ? '/templates-assets/frontOffice/' + path.basename(__dirname) + '/dist'
+      : '/dist'
+  )
   .addAliases({
     '@components': path.resolve(__dirname, './components'),
     '@js': path.resolve(__dirname, './assets/js'),

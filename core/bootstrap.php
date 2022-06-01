@@ -46,6 +46,10 @@ if (!defined('THELIA_WEB_DIR')) {
     define('THELIA_WEB_DIR', THELIA_ROOT.'web'.DS);
 }
 
+if (!defined('THELIA_WEB_ASSETS_DIR')) {
+    define('THELIA_WEB_ASSETS_DIR', THELIA_ROOT.'web'.DS.'assets'.DS);
+}
+
 if (!defined('THELIA_CACHE_DIR')) {
     define('THELIA_CACHE_DIR', THELIA_ROOT.'var'.DS.'cache'.DS);
 }
@@ -58,20 +62,8 @@ if (!defined('THELIA_TEMPLATE_DIR')) {
     define('THELIA_TEMPLATE_DIR', THELIA_ROOT.'templates'.DS);
 }
 
-if (!defined('THELIA_FRONT_ASSETS_BUILD_DIR_NAME')) {
-    define('THELIA_FRONT_ASSETS_BUILD_DIR_NAME', 'dist');
-}
-
-if (!defined('THELIA_FRONT_ASSETS_PUBLIC_DIR')) {
-    define('THELIA_FRONT_ASSETS_PUBLIC_DIR', THELIA_WEB_DIR.THELIA_FRONT_ASSETS_BUILD_DIR_NAME.DS);
-}
-
-if (!defined('THELIA_FRONT_ASSETS_MANIFEST_PATH')) {
-    define('THELIA_FRONT_ASSETS_MANIFEST_PATH', THELIA_FRONT_ASSETS_PUBLIC_DIR.'manifest.json');
-}
-
-if (!defined('THELIA_FRONT_ASSETS_ENTRYPOINTS_PATH')) {
-    define('THELIA_FRONT_ASSETS_ENTRYPOINTS_PATH', THELIA_FRONT_ASSETS_PUBLIC_DIR.'entrypoints.json');
+if (!defined('THELIA_TEMPLATE_FRONTOFFICE_DIR')) {
+    define('THELIA_TEMPLATE_FRONTOFFICE_DIR', THELIA_TEMPLATE_DIR.'frontOffice'.DS);
 }
 
 if (!defined('THELIA_SETUP_DIRECTORY')) {

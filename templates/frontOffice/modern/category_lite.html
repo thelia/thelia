@@ -5,11 +5,11 @@
 {/block}
 
 {block name="css" append}
-  {getAssetsFromEntrypoints entry="category" type="css"}
+  {encore_entry_link_tags entry="category"}
 {/block}
 
 {block name="javascript" append}
-  {getAssetsFromEntrypoints entry="category" type="js"}
+  {encore_entry_script_tags entry="category"}
 {/block}
 
 {* Body Class *}
@@ -57,7 +57,7 @@
                 {include file="components/smarty/CategoryProducts/CategoryProducts.html"}
               {/if}
 
-              <div class="wysiwyg text-base max-w-xl mx-auto my-24 text-center">
+              <div class="max-w-xl mx-auto my-24 text-base text-center wysiwyg">
                 {category attr="description"}
               </div>
             </div>

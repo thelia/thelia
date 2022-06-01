@@ -1,6 +1,6 @@
 .animated {
-  animation-fill-mode: both;
   animation-duration: 250ms;
+  animation-fill-mode: both;
 }
 
 @keyframes fadeIn {

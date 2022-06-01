@@ -12,20 +12,17 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\TaxEngine\TaxEngine;
-use Thelia\Tools\AssetsManager;
 use Thelia\Tools\URL;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
-class FrontAssets extends AbstractSmartyPlugin
+class FrontUtils extends AbstractSmartyPlugin
 {
     /** @var Request */
     protected $request;
@@ -40,33 +37,17 @@ class FrontAssets extends AbstractSmartyPlugin
 
     protected $entrypoints;
 
+    /** @var string */
+    protected $assetsPublicPath;
+
     public function __construct(
         RequestStack $requestStack,
         TaxEngine $taxEngine,
-        SecurityContext $securityContext
+        SecurityContext $securityContext,
     ) {
         $this->request = $requestStack->getCurrentRequest();
         $this->taxEngine = $taxEngine;
         $this->securityContext = $securityContext;
-
-        $assetsPublicPath = rtrim(THELIA_FRONT_ASSETS_PUBLIC_DIR, '/');
-
-        if (!is_dir($assetsPublicPath)) {
-            $fileSystem = new Filesystem();
-            $origin = THELIA_TEMPLATE_DIR.'frontOffice'.DS.ConfigQuery::read('active-front-template').DS.THELIA_FRONT_ASSETS_BUILD_DIR_NAME;
-            if (!is_dir($origin)) {
-                return;
-            }
-            $fileSystem->symlink($origin, $assetsPublicPath);
-        }
-
-        if (file_exists(THELIA_FRONT_ASSETS_MANIFEST_PATH)) {
-            $this->manifest = json_decode(file_get_contents(THELIA_FRONT_ASSETS_MANIFEST_PATH), true);
-        }
-        if (file_exists(THELIA_FRONT_ASSETS_ENTRYPOINTS_PATH)) {
-            $json = json_decode(file_get_contents(THELIA_FRONT_ASSETS_ENTRYPOINTS_PATH), true);
-            $this->entrypoints = $json['entrypoints'];
-        }
     }
 
     public function getPluginDescriptors()
@@ -76,8 +57,6 @@ class FrontAssets extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'currentView', $this, 'currentView'),
             new SmartyPluginDescriptor('function', 'renderIconSvg', $this, 'renderIconSvg'),
             new SmartyPluginDescriptor('function', 'renderSvg', $this, 'renderSvg'),
-            new SmartyPluginDescriptor('function', 'getFileFromManifest', $this, 'getFileFromManifest'),
-            new SmartyPluginDescriptor('function', 'getAssetsFromEntrypoints', $this, 'getAssetsFromEntrypoints'),
             new SmartyPluginDescriptor('function', 'psesByProduct', $this, 'psesByProduct'),
             new SmartyPluginDescriptor('function', 'extractOptions', $this, 'extractOptions'),
         ];
@@ -117,11 +96,7 @@ class FrontAssets extends AbstractSmartyPlugin
             return false;
         }
 
-        if (!filter_var($path, \FILTER_VALIDATE_URL)) {
-            $path = substr($path, 1);
-        }
-
-        $svg = file_get_contents($path);
+        $svg = file_get_contents(substr($path, 1));
 
         $matches = [];
         preg_match('/^<svg.*?>/', $svg, $matches);
@@ -141,35 +116,6 @@ class FrontAssets extends AbstractSmartyPlugin
         }
 
         return $svg;
-    }
-
-    public function getFileFromManifest($arg)
-    {
-        if (isset($arg['file']) && $this->manifest != null && isset($this->manifest[$arg['file']])) {
-            return $this->manifest[$arg['file']];
-        }
-
-        return '';
-    }
-
-    public function getAssetsFromEntrypoints($arg)
-    {
-        $result = '';
-
-        if (!isset($arg['entry']) || !isset($arg['type'])) {
-            return $result;
-        }
-
-        foreach (AssetsManager::getInstance()->getAssets($arg['entry'], $arg['type']) as $asset) {
-            if ($arg['type'] === 'js') {
-                $result .= "<script src='$asset' defer></script>";
-            }
-            if ($arg['type'] === 'css') {
-                $result .= "<link rel='stylesheet' type='text/css' href='$asset'/>";
-            }
-        }
-
-        return $result;
     }
 
     public function psesByProduct($params)
