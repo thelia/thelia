@@ -19,7 +19,11 @@ Encore.configureBabel((config) => {
   config.plugins.push('@babel/plugin-transform-runtime');
 });
 
-Encore.addPlugin(new PrettierPlugin());
+Encore.addPlugin(
+  new PrettierPlugin({
+    extensions: ['.html', '.css', '.js']
+  })
+);
 Encore.addPlugin(new ESLintPlugin());
 
 // ENTRIES

@@ -19,10 +19,10 @@ const Input = forwardRef(
     ref
   ) => {
     return (
-      <label className={`${className ? className : 'w-full block'}`}>
+      <label className={`${className ? className : 'block w-full'}`}>
         {label ? (
           <div
-            className={`font-bold text-sm ${
+            className={`text-sm font-bold ${
               error ? 'text-red-500' : 'text-gray-700'
             } ${labelClassname}`}
           >
@@ -34,7 +34,7 @@ const Input = forwardRef(
           ref={ref}
           name={name}
           type={type}
-          className={`mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black ${
+          className={`mt-0 block w-full border-0 border-b-2 px-0.5 focus:border-black focus:ring-0 ${
             error ? 'border-red-500' : 'border-gray-200'
           }`}
           {...props}

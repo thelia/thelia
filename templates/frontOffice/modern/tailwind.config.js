@@ -3,8 +3,8 @@ const colors = require('tailwindcss/colors');
 module.exports = {
   content: [
     './**/*.html',
-    '.**/*.tpl',
-    '/components/**/*.css',
+    './**/*.tpl',
+    './components/**/*.css',
     '!(node_modules)/**/*.js'
   ],
   theme: {

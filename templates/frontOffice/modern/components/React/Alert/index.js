@@ -11,12 +11,12 @@ export default function Alert({ type, title, message }) {
   const colorType = types[type] || types['default'];
   return (
     <div
-      className={`Alert ${colorType} border-t-4 rounded-b px-4 py-3 shadow-md my-2`}
+      className={`Alert ${colorType} my-2 rounded-b border-t-4 px-4 py-3 shadow-md`}
       role="alert"
     >
       <div className="flex">
         <svg
-          className="h-6 w-6 text-{$color}-900 fill-current mr-4"
+          className="text-{$color}-900 mr-4 h-6 w-6 fill-current"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
         >

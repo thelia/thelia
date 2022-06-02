@@ -1,5 +1,5 @@
 .MiniLogin {
-  @apply w-full z-10 flex flex-col fixed right-0 inset-y-0 shadow-2xl bg-white p-10;
+  @apply fixed inset-y-0 right-0 z-10 flex w-full flex-col bg-white p-10 shadow-2xl;
 
   top: var(--Header-height);
   max-width: 90%;

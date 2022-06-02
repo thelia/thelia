@@ -5,7 +5,7 @@
   max-width: 90%;
   transform: translateX(150%);
   transition: transform 250ms linear;
-  @apply w-full fixed shadow-md md:max-w-lg;
+  @apply fixed w-full shadow-md md:max-w-lg;
 
   &--visible {
     transform: translateX(0);

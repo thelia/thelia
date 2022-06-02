@@ -1,5 +1,5 @@
 .Title {
-  @apply text-xl mb-6 font-bold text-center;
+  @apply mb-6 text-center text-xl font-bold;
   @screen lg {
     @apply text-2xl;
   }

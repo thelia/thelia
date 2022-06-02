@@ -1,5 +1,5 @@
 .Table {
-  @apply w-full mb-6 mt-6 bg-gray-400 border border-gray-100 border-opacity-25;
+  @apply mt-6 mb-6 w-full border border-gray-100 border-opacity-25 bg-gray-400;
 
   th,
   td {
@@ -8,7 +8,7 @@
   }
 
   thead th {
-    @apply text-xl bg-gray-500;
+    @apply bg-gray-500 text-xl;
   }
 
   tbody tr:nth-child(odd) > td,

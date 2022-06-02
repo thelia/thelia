@@ -31,7 +31,7 @@ function ModuleOption({ module = {}, option = {}, isSelected }) {
             <img
               src={module.images[0]?.url}
               alt=""
-              className="object-contain w-12 h-12 bg-white"
+              className="h-12 w-12 bg-white object-contain"
             />
           </div>
         ) : null}
@@ -70,7 +70,7 @@ function ModuleOption({ module = {}, option = {}, isSelected }) {
           ) : null}
         </div>
 
-        <div className="w-full mt-2 ml-auto text-2xl font-medium xl:w-auto xl: xl:mt-0 text-main">
+        <div className="xl: mt-2 ml-auto w-full text-2xl font-medium text-main xl:mt-0 xl:w-auto">
           {option.postage
             ? `${priceFormat(option.postage)}`
             : intl.formatMessage({ id: 'FREE' })}
@@ -101,8 +101,8 @@ export default function DeliveryModules() {
   );
 
   return (
-    <div className="shadow panel">
-      <div className="items-center pb-6 text-xl font-bold border-b border-gray-300">
+    <div className="panel shadow">
+      <div className="items-center border-b border-gray-300 pb-6 text-xl font-bold">
         {intl.formatMessage({ id: 'CHOOSE_DELIVERY_PROVIDER' })}
       </div>
       <div className="divide-y divide-gray-300 divide-opacity-50">
