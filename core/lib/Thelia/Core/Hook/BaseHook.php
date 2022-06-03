@@ -465,19 +465,21 @@ abstract class BaseHook implements BaseHookInterface
      *
      *  Example:
      *  [
-     *      EventName => [
+     *      'hook.event.name' => [
      *          [
      *              type => "back",
-     *              template => "render:module_configuration.html",
-     *              method => "onModuleConfiguration",
+     *              method => "onModuleConfiguration"
      *          ],
      *          [
      *              type => "front",
-     *              template => "render:module_configuration.html",
-     *              method => "onModuleConfiguration",
+     *              template => "render:module_configuration.html"
+     *          ],
+     *          [
+     *              type => "front",
+     *              method => "displaySomething"
      *          ],
      *      ],
-     *      EventName [[...]]
+     *      'another.hook' => [[...]]
      *  ]
      *
      * @return array

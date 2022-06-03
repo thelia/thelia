@@ -42,7 +42,6 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container): void
     {
-        $events = $container->findTaggedServiceIds('hook.event_listener');
         if (!$container->hasDefinition('event_dispatcher')) {
             return;
         }
@@ -87,17 +86,15 @@ class RegisterHookListenersPass implements CompilerPassInterface
             }
 
             if (method_exists($class, 'getSubscribedHooks')) {
-                $subscribedHooks = $class::getSubscribedHooks();
-                $events = [];
-                foreach ($subscribedHooks as $eventName => $attributesArray) {
-                    foreach ($attributesArray as $attributes) {
-                        $events[] = array_merge($attributes, ['event' => $eventName]);
-                    }
+                foreach ($class::getSubscribedHooks() as $eventName => $attributesArray) {
+                    $events[] = array_merge($attributesArray, ['event' => $eventName]);
                 }
             }
 
             foreach ($events as $hookAttributes) {
-                $this->registerHook($class, $module, $id, $hookAttributes);
+                if (!empty($hookAttributes)) {
+                    $this->registerHook($class, $module, $id, $hookAttributes);
+                }
             }
         }
 
