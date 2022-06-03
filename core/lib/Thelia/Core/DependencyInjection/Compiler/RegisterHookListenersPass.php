@@ -87,7 +87,12 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
             if (method_exists($class, 'getSubscribedHooks')) {
                 foreach ($class::getSubscribedHooks() as $eventName => $attributesArray) {
-                    $events[] = array_merge($attributesArray, ['event' => $eventName]);
+                    if (isset($attributesArray['type'])) {
+                        $attributesArray = [$attributesArray];
+                    }
+                    foreach ($attributesArray as $attributes) {
+                        $events[] = array_merge($attributes, ['event' => $eventName]);
+                    }
                 }
             }
 
