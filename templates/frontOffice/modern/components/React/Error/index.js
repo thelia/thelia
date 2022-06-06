@@ -4,7 +4,7 @@ export default function Error({ error }) {
   if (!error) return null;
 
   return (
-    <span className="text-red-500 text-xs font-normal italic mb-4 block">
+    <span className="mb-4 block text-xs font-normal italic text-red-500">
       {error}
     </span>
   );

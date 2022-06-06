@@ -102,7 +102,7 @@ function InfoPopUp({ location, selected, onChooseLocation }) {
         {!selected ? (
           <button
             type="button"
-            className="mt-4 btn btn--sm"
+            className="btn btn--sm mt-4"
             onClick={() => {
               onChooseLocation(location.id);
               if (location.refList?.current) {
@@ -181,7 +181,7 @@ function PickupPointsList({ locations, selectedLocation, onChooseLocation }) {
 
   return (
     <div
-      className="overflow-y-auto bg-white divide-y divide-gray-200 rounded-l xl:w-4/12"
+      className="divide-y divide-gray-200 overflow-y-auto rounded-l bg-white xl:w-4/12"
       style={{ height: '50vh' }}
     >
       {size(locations) > 0 ? (
@@ -190,7 +190,7 @@ function PickupPointsList({ locations, selectedLocation, onChooseLocation }) {
             <div
               key={location.id}
               ref={location.refList}
-              className={`p-4 flex flex-wrap justify-between items-center  border-b border-main border-opacity-50 cursor-pointer ${
+              className={`flex cursor-pointer flex-wrap items-center justify-between  border-b border-main border-opacity-50 p-4 ${
                 selectedLocation?.id === location.id
                   ? 'bg-main text-white'
                   : 'bg-white'
@@ -199,13 +199,13 @@ function PickupPointsList({ locations, selectedLocation, onChooseLocation }) {
                 onChooseLocation(location.id);
               }}
             >
-              <div className="w-3/4 pr-4 mb-4 leading-tight text-left normal-case">
+              <div className="mb-4 w-3/4 pr-4 text-left normal-case leading-tight">
                 <div className="font-bold">{location.title}</div>
                 <div className="mt-2 text-sm">
                   {location.module?.i18n?.title}
                 </div>
                 {location.address ? (
-                  <div className="mt-2 text-sm leading-tight ">
+                  <div className=" mt-2 text-sm leading-tight">
                     {location.address.address1} <br />
                     {location.address.city} {location.address.zipcode}
                   </div>
@@ -304,10 +304,10 @@ export function PickupMap({ query }) {
         center={mapCenter}
         zoom={13}
         style={{ height: '50vh', width: '100%' }}
-        className="flex-1 overflow-hidden "
+        className=" flex-1 overflow-hidden"
       >
         <div>
-          <div className="relative h-full py-8 overflow-hidden border-t border-gray-300 xl:flex">
+          <div className="relative h-full overflow-hidden border-t border-gray-300 py-8 xl:flex">
             <MapDisplay
               locations={locations}
               selectedLocation={selected}
@@ -333,7 +333,7 @@ export function ZipCodeSearcher({ onSubmit }) {
 
   return (
     <form
-      className="w-full mb-4"
+      className="mb-4 w-full"
       onSubmit={handleSubmit(async (values) => {
         try {
           setHasError(false);
@@ -346,7 +346,7 @@ export function ZipCodeSearcher({ onSubmit }) {
         }
       })}
     >
-      <div className="flex-1 mb-3 text-xl font-bold">
+      <div className="mb-3 flex-1 text-xl font-bold">
         {intl.formatMessage({ id: 'FIND_RELAY' })}
       </div>
 
@@ -355,7 +355,7 @@ export function ZipCodeSearcher({ onSubmit }) {
           id="zipcode"
           {...register('zipCode')}
           placeholder="ex. 75001"
-          className="w-full h-auto"
+          className="h-auto w-full"
           type="number"
           max="99999"
           min="10000"
@@ -389,7 +389,7 @@ export default function Map() {
   });
 
   return (
-    <div className="p-5 shadow panel">
+    <div className="panel p-5 shadow">
       {defaultAddress?.countryCode === 'FR' ? (
         <ZipCodeSearcher
           onSubmit={(zipcode, city) =>

@@ -1,12 +1,12 @@
 button {
   &:focus {
-    @apply outline-none shadow-none;
+    @apply shadow-none outline-none;
   }
 }
 
 .btn {
   transition: background 150ms ease-in-out, box-shadow 250ms;
-  @apply inline-flex bg-main text-white border border-main px-10 py-4 uppercase cursor-pointer justify-center items-center text-center;
+  @apply inline-flex cursor-pointer items-center justify-center border border-main bg-main px-10 py-4 text-center uppercase text-white;
 
   &:hover,
   &--active {
@@ -14,7 +14,7 @@ button {
   }
 
   &:focus {
-    @apply outline-none shadow-none;
+    @apply shadow-none outline-none;
   }
 
   &:disabled {
@@ -30,7 +30,7 @@ button {
   }
 
   &--secondary {
-    @apply bg-gray-500 border-gray-500;
+    @apply border-gray-500 bg-gray-500;
 
     &:hover {
       @apply bg-gray-800;
