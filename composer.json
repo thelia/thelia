@@ -52,7 +52,7 @@
         "simplepie/simplepie": "1.5.*",
         "imagine/imagine": "1.2.4",
         "michelf/php-markdown": "1.9.*",
-        "smarty/smarty": "4.0.*",
+        "smarty/smarty": "~4.1.0",
         "commerceguys/addressing": "1.1.*",
         "symfony/cache": "6.0.*",
         "symfony/polyfill-php73": "^1.0",
