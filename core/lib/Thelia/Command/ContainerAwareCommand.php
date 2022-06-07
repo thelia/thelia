@@ -77,7 +77,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
             $this->container->get('thelia.translator');
         }
 
-        return $container->get(EventDispatcherInterface::class);
+        return $container->get('event_dispatcher');
     }
 
     /**
