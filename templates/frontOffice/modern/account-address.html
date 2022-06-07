@@ -23,7 +23,7 @@
   {include file="components/smarty/HeaderAccount/HeaderAccount.html" title="My Addresses"}
 
   <div class="container mx-auto my-24">
-    <div class="">
+    <div class="">      
       <div class="grid lg:grid-cols-3 gap-6">
         {loop type="address" name="address.loop"}
           {include file="components/smarty/Address/Address.html" }
@@ -32,7 +32,6 @@
           <a href="{url path='/address'}" class="btn text-2xl">{intl l="New address"}</a>
         </div>
       </div>
-
     </div>
   </div>
 {/block}

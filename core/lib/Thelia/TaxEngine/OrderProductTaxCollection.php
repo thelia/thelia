@@ -97,7 +97,7 @@ class OrderProductTaxCollection implements \Iterator
      * @return bool The return value will be casted to boolean and then evaluated.
      *              Returns true on success or false on failure.
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->taxes[$this->position]);
     }

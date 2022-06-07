@@ -2,6 +2,7 @@ require('dotenv').config();
 const path = require('path');
 const SVGSpritemapPlugin = require('svg-spritemap-webpack-plugin');
 const Encore = require('@symfony/webpack-encore');
+const PrettierPlugin = require('prettier-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 
 const chokidar = require('chokidar');
@@ -18,6 +19,11 @@ Encore.configureBabel((config) => {
   config.plugins.push('@babel/plugin-transform-runtime');
 });
 
+Encore.addPlugin(
+  new PrettierPlugin({
+    extensions: ['.html', '.css', '.js']
+  })
+);
 Encore.addPlugin(new ESLintPlugin());
 
 // ENTRIES
@@ -32,7 +38,7 @@ Encore.addEntry('app', './assets/js/app.js')
 Encore.setOutputPath('dist/')
   .setPublicPath(
     process.env.NODE_ENV === 'production'
-      ? '/assets/frontOffice/' + path.basename(__dirname)
+      ? '/templates-assets/frontOffice/' + path.basename(__dirname) + '/dist'
       : '/dist'
   )
   .addAliases({
@@ -51,12 +57,10 @@ Encore.setOutputPath('dist/')
   .enableSingleRuntimeChunk()
   .enableSourceMaps(!Encore.isProduction())
   .enableVersioning(Encore.isProduction())
-  .setManifestKeyPrefix('');
+  .setManifestKeyPrefix('dist/');
 
 // CSS CONFIG
 Encore.enablePostCssLoader();
-
-Encore.cleanupOutputBeforeBuild();
 
 // IMAGES CONFIG
 Encore.copyFiles({
@@ -116,7 +120,7 @@ Encore.addPlugin(
 );
 
 Encore.configureManifestPlugin((options) => {
-  options.removeKeyHash = /(?<=sprite\.)(\w*\.)(?=svg)/;
+  options.removeKeyHash = /(?<=dist\/sprite\.)(\w*\.)(?=svg)/;
 });
 
 // SERVER CONFIG

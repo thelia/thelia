@@ -28,7 +28,8 @@ web/assets/*
 web/cache/*
 web/tinymce
 web/media
-web/dist
+web/modules-assets/
+web/templates-assets/
 phpdoc*.log
 xhprof/
 phpunit.phar
@@ -84,6 +85,8 @@ templates/pdf/*
 #other
 .DS_Store
 .idea/
+.history/
+.husky/
 composer.phar
 
 ###> friendsofphp/php-cs-fixer ###
@@ -101,3 +104,10 @@ composer.phar
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+
+###> symfony/webpack-encore-bundle ###
+/node_modules/
+/public/build/
+npm-debug.log
+yarn-error.log
+###< symfony/webpack-encore-bundle ###

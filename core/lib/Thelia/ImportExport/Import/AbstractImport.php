@@ -68,7 +68,7 @@ abstract class AbstractImport implements \Iterator
         reset($this->data);
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return key($this->data) !== null;
     }

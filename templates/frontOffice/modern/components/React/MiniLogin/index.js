@@ -27,19 +27,19 @@ function AccountLink({ customer }) {
     <div className="px-10">
       <button
         type="button"
-        className="absolute right-0 hover:text-gray-600 focus:text-gray-600 top-header"
+        className="top-header absolute right-0 hover:text-gray-600 focus:text-gray-600"
         data-close-login
       >
         <IconCLose className="" />
       </button>
-      <legend className="mb-4 text-2xl leading-5 uppercase font-heading text-bold">
+      <legend className="font-heading text-bold mb-4 text-2xl uppercase leading-5">
         {intl.formatMessage({ id: 'HELLO' })} {customer.firstName}{' '}
         {customer.lastName}
       </legend>
-      <nav className="flex flex-col mt-10">
+      <nav className="mt-10 flex flex-col">
         <a
           href="/account-update"
-          className="flex items-center justify-between pb-5 text-base italic leading-10 font-heading"
+          className="font-heading flex items-center justify-between pb-5 text-base italic leading-10"
         >
           {intl.formatMessage({ id: 'ACCOUNT' })}
           <svg
@@ -55,7 +55,7 @@ function AccountLink({ customer }) {
         </a>
         <a
           href="/account-address"
-          className="flex items-center justify-between py-5 text-base italic leading-10 border-t border-b border-gray-400 font-heading"
+          className="font-heading flex items-center justify-between border-t border-b border-gray-400 py-5 text-base italic leading-10"
         >
           {intl.formatMessage({ id: 'MY_ADDRESSES' })}
           <svg
@@ -71,7 +71,7 @@ function AccountLink({ customer }) {
         </a>
         <a
           href="/account-orders"
-          className="flex items-center justify-between pt-5 text-base italic leading-10 font-heading"
+          className="font-heading flex items-center justify-between pt-5 text-base italic leading-10"
         >
           {intl.formatMessage({ id: 'MY_ORDERS' })}
           <svg
@@ -118,7 +118,7 @@ function LoginForm() {
       <legend className="mb-4 text-2xl uppercase">
         {intl.formatMessage({ id: 'ALREADY_CUSTOMER' })}
       </legend>
-      <div className="grid grid-cols-1 gap-6 mb-8">
+      <div className="mb-8 grid grid-cols-1 gap-6">
         <Input
           type="email"
           name="email"
@@ -141,7 +141,7 @@ function LoginForm() {
       {error ? (
         <Error error={error.response?.data?.description || 'Erreur'} />
       ) : null}
-      <div className="flex items-center justify-between mt-4">
+      <div className="mt-4 flex items-center justify-between">
         <button
           type="submit"
           className="btn btn--sm"
@@ -155,7 +155,7 @@ function LoginForm() {
         <a
           href="/password"
           disabled={isLoading}
-          className="text-sm italic hover:-dark"
+          className="hover:-dark text-sm italic"
         >
           {intl.formatMessage({ id: 'FORGET_PASSWORD' })}{' '}
         </a>
@@ -169,7 +169,7 @@ function IsLoggedOut() {
 
   return (
     <div>
-      <div className="py-10 border-b border-opacity-25 border-main">
+      <div className="border-b border-main border-opacity-25 py-10">
         <LoginForm />
       </div>
       <div className="py-10">
@@ -177,7 +177,7 @@ function IsLoggedOut() {
           <legend className="mb-4 text-2xl uppercase">
             {intl.formatMessage({ id: 'NEW_CUSTOMER' })}
           </legend>
-          <a href="/register" className="mb-20 btn btn--sm">
+          <a href="/register" className="btn btn--sm mb-20">
             {intl.formatMessage({ id: 'CREATE_ACCOUNT' })}
           </a>
         </fieldset>
