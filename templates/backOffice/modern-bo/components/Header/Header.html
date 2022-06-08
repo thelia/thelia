@@ -1,7 +1,7 @@
 <div class="block lg:hidden">{include file="components/Hamburger/Hamburger.html"}</div>
 
 <a class="h-full py-2 lg:pl-4" href="{url path='/admin/home'}">
-  <img src="{getFileFromManifest file="images/logos/dark-logo.svg"}" class="h-full" />
+  <img src="{encore_manifest_file file="images/logos/dark-logo.svg"}" class="h-full" />
 </a>
 
 <div class="items-center justify-end hidden w-full h-full lg:flex">
@@ -17,7 +17,7 @@
           icon="search"
           inputClass="w-full"
         }
-      </form>            
+      </form>
     {/strip}
   {/loop}
 
@@ -95,7 +95,7 @@
         </div>
       </div>
     </li>
-    
+
     <li class="w-16 h-full">
       <a href="{navigate to="index"}" class="flex items-center justify-center w-full h-full font-medium text-center text-white bg-main hover:bg-darkMain hover:text-lightGrey" title="{intl l='View site'}" target="_blank">
         <i class="far fa-eye"></i>

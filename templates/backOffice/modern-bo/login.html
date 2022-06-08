@@ -9,43 +9,43 @@
 
 {block name="main-content"}
     {hook name="index.top" location="index_top"}
-        
+
     <div class="bg-mediumPearl w-4/5 md:w-3/5 lg:w-2/4 xl:w-2/5 rounded-lg shadow-xl px-4 py-16">
         <div class="logo mb-5">
-            <img src="{getFileFromManifest file="images/logos/dark-logo.svg"}" class="h-14 md:max-h-16 mx-auto" />
+            <img src="{encore_manifest_file file="images/logos/dark-logo.svg"}" class="h-14 md:max-h-16 mx-auto" />
         </div>
 
         <h1 class="text-xl md:text-2xl font-semibold text-center mb-5">{block name="main-title"}{intl l="Welcome to Thelia administration !"}{/block}</h1>
 
         <div class="flex justify-center mb-10">
            {loop type="lang" name="ui-lang" backend_context="1"}
-                <a 
+                <a
                     href="{url path="{navigate to="current"}" lang={$CODE}}"
-                    title="{intl l="View this page in %langname" langname=$TITLE}" 
+                    title="{intl l="View this page in %langname" langname=$TITLE}"
                     class="h-10 w-10 mx-3 bg-transparent border-2 focus:outline-none focus:border-mediumCharbon border-lightGrey hover:bg-lightGrey p-2 flex items-center justify-center rounded-full font-medium"
                 >
                     <img class="w-full h-full object-contain" src="{image file="assets/images/svgFlags/{$CODE}.svg" }" alt="{$TITLE}" />
                 </a>
             {/loop}
         </div>
-        
+
 
         {form name="thelia.admin.login"}
             <form action="{url path='/admin/checklogin'}" method="post" novalidate {form_enctype}>
-    
+
                 {if $form_error}
                     <div class="max-w-80 mx-auto rounded-lg bg-danger text-error text-center mb-5 p-5">
                         {$form_error_message}
                     </div>
                 {/if}
-    
+
                 <fieldset class="max-w-80 mx-auto">
                     {form_hidden_fields}
-    
+
                     {form_field field='success_url'}
                         <input type="hidden" name="{$name}" value="{url path='/admin'}" />
                     {/form_field}
-    
+
                     <div class="w-full md:w-4/5 mx-auto mb-5">
                         {render_form_field field="username" icon="user" extra_class="w-full"}
                     </div>
@@ -53,7 +53,7 @@
                     <div class="w-full md:w-4/5 mx-auto mb-3">
                         {render_form_field field="password" icon="lock" extra_class="w-full"}
                     </div>
-    
+
                     <div class="flex justify-between mb-10 w-full md:w-4/5 mx-auto text-sm md:text-base select-none">
                         {render_form_field field='remember_me'}
                         {if {config key='enable_lost_admin_password_recovery'}}

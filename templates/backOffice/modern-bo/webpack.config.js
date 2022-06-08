@@ -27,7 +27,7 @@ console.log(__dirname, path.basename(__dirname));
 Encore.setOutputPath('dist/')
   .setPublicPath(
     process.env.NODE_ENV === 'production'
-      ? '/assets/backOffice/' + path.basename(__dirname)
+      ? '/templates-assets/backOffice/' + path.basename(__dirname) + '/dist'
       : '/dist'
   )
   .splitEntryChunks()

@@ -40,7 +40,7 @@
 <head>
   <meta charset="utf-8">
 
-    {store_seo_meta locale=$lang_locale}
+    store_seo_meta locale=$lang_locale}
 
     {* Page Title *}
     {strip}
