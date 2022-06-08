@@ -1,19 +1,19 @@
-{extends file="simple-layout.tpl"} 
-{* -- We do not check admin login on this page *} 
+{extends file="simple-layout.tpl"}
+{* -- We do not check admin login on this page *}
 
-{block name="check-auth"}{/block} 
+{block name="check-auth"}{/block}
 
 {block name="page-title"}
     {intl l='An error occured'}
-{/block} 
+{/block}
 
 {block name="main-title"}
     {intl l="Oops! An Error Occurred"}
-{/block} 
+{/block}
 
 {block name="main-content"}
     <div class="bg-mediumPearl w-4/5 md:w-1/2 rounded-lg shadow-xl px-4 py-10 flex flex-col items-center">
-        <img src="{getFileFromManifest file="images/logos/dark-logo.svg"}" class="max-h-12 mx-auto mb-5" /> 
+        <img src="{encore_manifest_file file="images/logos/dark-logo.svg"}" class="max-h-12 mx-auto mb-5" />
         {block name="error-message"}
             <p class="text-center mb-10">{$error_message}</p>
         {/block}

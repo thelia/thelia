@@ -26,7 +26,7 @@
                     {include file="components/Pill/Pill.html" class="text-sm px-3 py-0.5 inline-block bg-grey" value={count type="order" customer="*" backend_context="1"}}
                 </a>
             </li>
-        
+
             {loop name="order-status-list" type="order-status"}
                 {$count = {count type="order" customer="*" backend_context="1" status={$ID}}}
                 <li class="Sidebar-submenu-item">
@@ -175,7 +175,7 @@
                 <li class="Sidebar-submenu-header">
                     <span class="Sidebar-submenu-title">{intl l="Tools"}</span>
                 </li>
-                
+
                 <li class="Sidebar-submenu-item">
                     {loop name="auth-coupon" type="auth" role="ADMIN" resource="admin.coupon" access="VIEW"}
                         <a class="block w-full my-2 font-semibold h-11 hover:text-main" href="{url path='/admin/coupon'}">{intl l="Coupons"}</a>
@@ -193,7 +193,7 @@
                         <a class="block w-full my-2 font-semibold h-11 hover:text-main" href="{url path='/admin/brand'}">{intl l="Brands"}</a>
                     {/loop}
                 </li>
-                    
+
                 <li class="Sidebar-submenu-item">
                     {loop name="auth-export" type="auth" role="ADMIN" resource="admin.export" access="VIEW"}
                         <a class="block w-full my-2 font-semibold h-11 hover:text-main" href="{url path='/admin/export'}">{intl l="Export"}</a>
@@ -236,7 +236,7 @@
 </ul>
 
 <div class="Sidebar-footer">
-    <img class="Sidebar-footer-logo" src="{getFileFromManifest file="images/logos/logo.svg"}" alt="" />
+    <img class="Sidebar-footer-logo" src="{encore_manifest_file file="images/logos/logo.svg"}" alt="" />
     <p class="Sidebar-footer-version">V {intl l="{$THELIA_VERSION}"}</p>
 </div>
 
