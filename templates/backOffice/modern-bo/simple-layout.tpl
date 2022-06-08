@@ -37,7 +37,7 @@
 
 
   {block name="css"}
-    {getAssetsFromEntrypoints entry="app" type="css"}
+      {encore_entry_link_tags entry="app"}
   {/block}
 
   {* Modules css are included here *}
@@ -67,7 +67,7 @@
   {hook name="main.after-footer" location="after_footer" }
 
   {block name="javascript"}
-    {getAssetsFromEntrypoints entry="app" type="js"}
+      {encore_entry_link_tags entry="app"}
   {/block}
 </body>
 

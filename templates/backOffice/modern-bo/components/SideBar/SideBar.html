@@ -5,7 +5,7 @@
     <li class="Sidebar-item">
         <a href="{url path='/admin/home'}" title="{intl l="Home"}" class="Sidebar-item">
             <i class="hidden lg:block fas fa-tachometer-alt"></i>
-            <span>{intl l="Home"}</span>
+            <span>{intl l="Dashboard"}</span>
         </a>
     </li>
 
@@ -18,7 +18,7 @@
 
         <ul class="Sidebar-submenu">
             <li class="Sidebar-submenu-header">
-                <span class="Sidebar-submenu-title">{intl l="Orders"}</span>
+                <span class="Sidebar-submenu-title">{intl l="Commandes"}</span>
             </li>
             <li class="Sidebar-submenu-item">
                 <a href="{url path='admin/orders'}">
@@ -26,7 +26,7 @@
                     {include file="components/Pill/Pill.html" class="text-sm px-3 py-0.5 inline-block bg-grey" value={count type="order" customer="*" backend_context="1"}}
                 </a>
             </li>
-
+        
             {loop name="order-status-list" type="order-status"}
                 {$count = {count type="order" customer="*" backend_context="1" status={$ID}}}
                 <li class="Sidebar-submenu-item">
@@ -57,7 +57,7 @@
 
                     <a title="{intl l="Customers"}" href="#collapse-customer" class="py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
                         <i class="ml-5 text-white fas fa-users mr-7"></i>
-                        <span class="text-mediumGrey">{intl l="Customers"}</span>
+                        <span class="text-mediumGrey">{intl l="Clients"}</span>
                         <i class="hidden lg:block fas fa-chevron-right menu-collapse text-mediumGrey"></i>
                     </a>
 
@@ -95,7 +95,7 @@
 
                 <a title="{intl l="Catalog"}" href="#collapse-catalog" class="py-6 h-11 flex items-center {if $admin_current_location == 'home'}bg-darkCharbon text-main{/if}">
                     <i class="ml-5 text-white fas fa-book mr-7"></i>
-                    <span class="text-mediumGrey">{intl l="Catalog"}</span>
+                    <span class="text-mediumGrey">{intl l="Catalogue"}</span>
                     <i class="hidden lg:block fas fa-chevron-right menu-collapse text-mediumGrey"></i>
                 </a>
 
@@ -175,7 +175,7 @@
                 <li class="Sidebar-submenu-header">
                     <span class="Sidebar-submenu-title">{intl l="Tools"}</span>
                 </li>
-
+                
                 <li class="Sidebar-submenu-item">
                     {loop name="auth-coupon" type="auth" role="ADMIN" resource="admin.coupon" access="VIEW"}
                         <a class="block w-full my-2 font-semibold h-11 hover:text-main" href="{url path='/admin/coupon'}">{intl l="Coupons"}</a>
@@ -193,7 +193,7 @@
                         <a class="block w-full my-2 font-semibold h-11 hover:text-main" href="{url path='/admin/brand'}">{intl l="Brands"}</a>
                     {/loop}
                 </li>
-
+                    
                 <li class="Sidebar-submenu-item">
                     {loop name="auth-export" type="auth" role="ADMIN" resource="admin.export" access="VIEW"}
                         <a class="block w-full my-2 font-semibold h-11 hover:text-main" href="{url path='/admin/export'}">{intl l="Export"}</a>
@@ -236,7 +236,7 @@
 </ul>
 
 <div class="Sidebar-footer">
-    <img class="Sidebar-footer-logo" src="{encore_manifest_file file="images/logos/logo.svg"}" alt="" />
+    <img class="Sidebar-footer-logo" src="{getFileFromManifest file="images/logos/logo.svg"}" alt="" />
     <p class="Sidebar-footer-version">V {intl l="{$THELIA_VERSION}"}</p>
 </div>
 

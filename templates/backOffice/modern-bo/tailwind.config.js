@@ -1,12 +1,10 @@
 module.exports = {
-  purge: [
+  content: [
     './**/*.html',
-    '.**/*.tpl',
-    '/components/**/*.css',
+    './**/*.tpl',
+    './components/**/*.css',
     '!(node_modules)/**/*.js'
   ],
-  //mode: "jit",
-  darkMode: false,
 
   theme: {
     maxWidth: {
