@@ -19,19 +19,19 @@ function Address({ address = {}, onSelect = () => {}, isSelected }) {
   if (deleteSuccess) return null;
 
   return (
-    <div className="flex items-center justify-between w-full">
+    <div className="flex w-full items-center justify-between">
       <address className="mr-auto text-sm">
-        <div className="not-italic font-bold">{address.label}</div>
+        <div className="font-bold not-italic">{address.label}</div>
         <div>
           {address.civilityTitle?.short} {address.firstName} {address.lastName}
         </div>
-        <span className="block street-address">{address.address1}</span>
+        <span className="street-address block">{address.address1}</span>
         {address.address2 ? (
-          <span className="block street-address">
+          <span className="street-address block">
             {address.address2} - {address.address3 ? address.address3 : null}
           </span>
         ) : null}
-        <span className="block postal-code">
+        <span className="postal-code block">
           {address.zipcode} {address.city} {address.countryCode}
         </span>
       </address>
@@ -55,8 +55,8 @@ function AddressBook({ mode, title }) {
   const { mutate } = useSetCheckout();
 
   return (
-    <div className="pb-0 shadow panel">
-      <div className="flex flex-col gap-6 pb-6 text-xl font-bold border-b border-gray-300 xl:items-center xl:flex-row">
+    <div className="panel pb-0 shadow">
+      <div className="flex flex-col gap-6 border-b border-gray-300 pb-6 text-xl font-bold xl:flex-row xl:items-center">
         <div className="flex-1 text-xl font-bold">{title}</div>
         {mode !== 'billing' ? <CreateAddressModal /> : null}
       </div>

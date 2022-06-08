@@ -34,7 +34,6 @@ class Request extends BaseRequest
     /** @var string */
     protected $controllerType;
 
-    /** @internal  */
     public static $isAdminEnv = false;
 
     /**

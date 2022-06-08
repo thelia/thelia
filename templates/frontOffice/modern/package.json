@@ -7,7 +7,10 @@
   "license": "MIT",
   "scripts": {
     "start": "cross-env NODE_ENV=dev encore dev-server --port 8081 --host 0.0.0.0",
-    "build": "NODE_ENV=production encore production"
+    "build": "NODE_ENV=production encore production",
+    "postinstall": "cd ../../.. && husky install",
+    "prepare": "npm run install-hook-commits --scripts-prepend-node-path",
+    "install-hook-commits": "cd ../../.. && husky add .husky/pre-commit && cp pre-commit .husky/"
   },
   "browserslist": {
     "development": [
@@ -20,12 +23,6 @@
       "not dead"
     ]
   },
-  "prettier": {
-    "singleQuote": true,
-    "trailingComma": "none",
-    "useTabs": false,
-    "tabWidth": 2
-  },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.13.15",
     "@babel/preset-react": "^7.0.0",
@@ -33,7 +30,7 @@
     "@symfony/webpack-encore": "^1.5.0",
     "@typescript-eslint/eslint-plugin": "^4.0.0",
     "@typescript-eslint/parser": "^4.0.0",
-    "autoprefixer": "^10.2.5",
+    "autoprefixer": "10.4.5",
     "babel-eslint": "^10.0.0",
     "chokidar": "^3.5.1",
     "cross-env": "^7.0.2",
@@ -48,10 +45,19 @@
     "eslint-plugin-react-hooks": "^4.0.8",
     "eslint-webpack-plugin": "^2.5.3",
     "file-loader": "^6.0.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.3.7",
     "postcss-easy-import": "^3.0.0",
     "postcss-nested": "^5.0.5",
-    "stylelint": "^13.12.0",
-    "stylelint-config-standard": "^22.0.0"
+    "prettier": "^2.6.2",
+    "prettier-plugin-style-order": "^0.2.2",
+    "prettier-plugin-tailwindcss": "^0.1.11",
+    "prettier-webpack-plugin": "^1.2.0",
+    "stylelint": "^14.6.1",
+    "stylelint-config-prettier": "^9.0.3",
+    "stylelint-config-rational-order": "^0.1.2",
+    "stylelint-config-standard": "^25.0.0",
+    "stylelint-order": "^5.0.0"
   },
   "dependencies": {
     "@babel/core": "^7.14.6",
@@ -60,7 +66,7 @@
     "@openstudio/thelia-api-utils": "^0.4.3",
     "@reduxjs/toolkit": "^1.6.0",
     "@splidejs/splide": "^2.4.21",
-    "@tailwindcss/forms": "^0.3.3",
+    "@tailwindcss/forms": "^0.4.0-alpha.2",
     "axios": "^0.21.2",
     "infinite-scroll": "^4.0.1",
     "leaflet": "^1.7.1",
@@ -68,7 +74,7 @@
     "micromodal": "^0.4.6",
     "mmenu-js": "^8.5.24",
     "mmenu-light": "^3.0.8",
-    "postcss": "^8.2.10",
+    "postcss": "^8.4.14",
     "postcss-loader": "^5",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -81,7 +87,7 @@
     "react-redux": "^7.2.4",
     "react-use": "^17.2.4",
     "svg-spritemap-webpack-plugin": "^4.0.3",
-    "tailwindcss": "^2.2.4",
+    "tailwindcss": "^3.0.24",
     "typescript": "^4.3.4"
   },
   "peerDependencies": {

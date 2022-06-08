@@ -1,11 +1,11 @@
 .MiniCart {
+  top: var(--Header-height);
+  right: 0;
+  bottom: 0;
   max-width: 90%;
   transform: translateX(150%);
   transition: transform 250ms linear;
-  top: var(--Header-height);
-  bottom: 0;
-  right: 0;
-  @apply w-full fixed shadow-md md:max-w-lg;
+  @apply fixed w-full shadow-md md:max-w-lg;
 
   &--visible {
     transform: translateX(0);

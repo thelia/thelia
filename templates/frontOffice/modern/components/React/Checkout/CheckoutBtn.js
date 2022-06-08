@@ -20,10 +20,10 @@ export default function CheckoutBtn() {
 
   return (
     <div className="">
-      <label className="items-start block mb-4">
+      <label className="mb-4 block items-start">
         <input
           type="checkbox"
-          className={`border-gray-300 border text-main focus:border-gray-300 focus:ring-main mt-1`}
+          className={`mt-1 border border-gray-300 text-main focus:border-gray-300 focus:ring-main`}
           id="validTerms"
           onChange={() => {
             setCheckout({
@@ -36,13 +36,13 @@ export default function CheckoutBtn() {
             });
           }}
         />
-        <span className="ml-2 leading-0">
+        <span className="leading-0 ml-2">
           {intl.formatMessage({ id: 'ACCEPT_CGV' })}
         </span>
       </label>
 
       <button
-        className="w-full shadow btn"
+        className="btn w-full shadow"
         onClick={async () => {
           mutate(checkout);
         }}

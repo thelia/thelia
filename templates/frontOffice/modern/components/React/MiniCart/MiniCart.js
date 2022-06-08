@@ -44,17 +44,17 @@ function Quantity({ quantity, cartItemId }) {
 
   return (
     <div className="flex items-center">
-      <div className="relative flex flex-row ">
+      <div className=" relative flex flex-row">
         <button
           onClick={() => {
             mutate(quantity - 1);
           }}
           disabled={status === 'loading'}
-          className="flex items-center justify-center w-6 h-6 bg-gray-200 rounded-none cursor-pointer focus:outline-none"
+          className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-none bg-gray-200 focus:outline-none"
         >
           <span className="m-auto">-</span>
         </button>
-        <div className="flex items-center justify-center w-10 h-6 bg-white cursor-default">
+        <div className="flex h-6 w-10 cursor-default items-center justify-center bg-white">
           <span>{quantity}</span>
         </div>
         <button
@@ -62,7 +62,7 @@ function Quantity({ quantity, cartItemId }) {
             mutate(quantity + 1);
           }}
           disabled={status === 'loading'}
-          className="flex items-center justify-center w-6 h-6 bg-gray-200 rounded-none cursor-pointer focus:outline-none"
+          className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-none bg-gray-200 focus:outline-none"
         >
           <span className="m-auto">+</span>
         </button>
@@ -78,9 +78,9 @@ function Delete({ id }) {
 
   if (status === 'loading')
     return (
-      <div className="absolute top-0 right-0 ">
+      <div className=" absolute top-0 right-0">
         <svg
-          className="w-4 h-4 stroke-current "
+          className=" h-4 w-4 stroke-current"
           viewBox="0 0 38 38"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -108,7 +108,7 @@ function Delete({ id }) {
       onClick={() => {
         deleteItem();
       }}
-      className="text-red-500 hover: focus:"
+      className="hover: focus: text-red-500"
     >
       Supprimer
     </button>
@@ -127,13 +127,13 @@ function Item({
   canDelete
 }) {
   return (
-    <div className="flex pt-4 CartItem first:pt-0">
-      <div className="relative CartItem-contain">
+    <div className="CartItem flex pt-4 first:pt-0">
+      <div className="CartItem-contain relative">
         {images ? (
-          <div className="w-16 h-16 p-2 bg-white">
+          <div className="h-16 w-16 bg-white p-2">
             <img
               src={typeof images?.[0]?.url === 'string' ? images[0].url : ''}
-              className="object-contain object-center w-100 h-100"
+              className="w-100 h-100 object-contain object-center"
               alt={
                 typeof images?.[0]?.i18n?.title === 'string'
                   ? images[0].i18n.title
@@ -144,8 +144,8 @@ function Item({
           </div>
         ) : null}
       </div>
-      <div className="flex-1 ml-6">
-        <div className="flex items-start justify-between mb-4">
+      <div className="ml-6 flex-1">
+        <div className="mb-4 flex items-start justify-between">
           <div>
             <a href={product.url} className="block font-bold">
               {product.i18n.title}
@@ -181,7 +181,7 @@ function Item({
 function EmptyCart() {
   const intl = useIntl();
   return (
-    <legend className="px-10 mt-10 text-2xl leading-5 text-center uppercase font-heading text-bold mb-7">
+    <legend className="font-heading text-bold mb-7 mt-10 px-10 text-center text-2xl uppercase leading-5">
       {intl.formatMessage({ id: 'CART_EMPTY' })}
     </legend>
   );
@@ -189,7 +189,7 @@ function EmptyCart() {
 
 export function CartItems({ cart, canDelete = true }) {
   return (
-    <div className="grid divide-y divide-gray-200 gap-y-4">
+    <div className="grid gap-y-4 divide-y divide-gray-200">
       {cart.items?.map((item, index) => (
         <Item key={item.id || index} canDelete={canDelete} {...item} />
       ))}
@@ -199,7 +199,7 @@ export function CartItems({ cart, canDelete = true }) {
 
 function FooterItem({ label, value }) {
   return (
-    <dl className="flex items-center justify-between text-lg leading-none uppercase">
+    <dl className="flex items-center justify-between text-lg uppercase leading-none">
       <dt>{label}</dt>
       <dd>{value}</dd>
     </dl>
@@ -208,7 +208,7 @@ function FooterItem({ label, value }) {
 
 function Total({ label, value }) {
   return (
-    <dl className="flex items-baseline justify-between py-5 leading-none uppercase">
+    <dl className="flex items-baseline justify-between py-5 uppercase leading-none">
       <dt className="text-lg">{label}</dt>
       <dd className="text-2xl">{value}</dd>
     </dl>
@@ -219,7 +219,7 @@ export function MiniCartFooter({ delivery, taxes, discount, coupon, total }) {
   const intl = useIntl();
   return (
     <div>
-      <div className="grid py-5 border-t border-b border-opacity-25 gap-y-4 border-main">
+      <div className="grid gap-y-4 border-t border-b border-main border-opacity-25 py-5">
         <AddCoupon />
         <FooterItem
           label={intl.formatMessage({ id: 'TOTAL_UNTAXED' })}
@@ -281,7 +281,7 @@ function MiniCart() {
     <div>
       <button
         type="Button"
-        className="absolute top-0 right-0 transform -translate-x-4 translate-y-4 hover: focus:"
+        className="hover: focus: absolute top-0 right-0 -translate-x-4 translate-y-4 transform"
         onClick={() => {
           dispatch(hideCart());
         }}
@@ -298,7 +298,7 @@ function MiniCart() {
           <CartItems cart={cart} />
         </div>
       </div>
-      <div className="pt-10 mt-auto" ref={footerRef}>
+      <div className="mt-auto pt-10" ref={footerRef}>
         <MiniCartFooter {...cart} />
         <div className="flex justify-center">
           <a
@@ -335,7 +335,7 @@ export default function MiniCartWrapper() {
   }, []);
   return (
     <div
-      className={`MiniCart z-10 bg-white flex flex-col p-10 ${
+      className={`MiniCart z-10 flex flex-col bg-white p-10 ${
         visible ? 'MiniCart--visible' : ''
       } ${isOrderDelivery ? 'isOrderDelivery' : ''}`}
     >

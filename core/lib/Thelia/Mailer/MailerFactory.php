@@ -13,6 +13,7 @@
 namespace Thelia\Mailer;
 
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Translation\Translator;
@@ -244,27 +245,27 @@ class MailerFactory
     {
         // Add from addresses
         foreach ($from as $address => $name) {
-            $email->addFrom($address, $name);
+            $email->addFrom(new Address($address, $name));
         }
 
         // Add to addresses
         foreach ($to as $address => $name) {
-            $email->addTo($address, $name);
+            $email->addTo(new Address($address, $name));
         }
 
         // Add cc addresses
         foreach ($cc as $address => $name) {
-            $email->addCc($address, $name);
+            $email->addCc(new Address($address, $name));
         }
 
         // Add bcc addresses
         foreach ($bcc as $address => $name) {
-            $email->addBcc($address, $name);
+            $email->addBcc(new Address($address, $name));
         }
 
         // Add reply to addresses
         foreach ($replyTo as $address => $name) {
-            $email->addReplyTo($address, $name);
+            $email->addReplyTo(new Address($address, $name));
         }
     }
 }

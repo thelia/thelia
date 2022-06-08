@@ -41,7 +41,7 @@ function AttributeSelector({
           return (
             <div key={attribute.id} className="mb-4">
               <div className="text-lg font-bold">{attribute.title}</div>
-              <div className="flex flex-wrap gap-2 mt-2">
+              <div className="mt-2 flex flex-wrap gap-2">
                 {attribute.values.map((attrAv) => {
                   return (
                     <button
@@ -129,7 +129,7 @@ function PseSelector({ pses = [], attributes = [] }) {
         currentCombination={currentCombination}
         setAttributes={setCurrentCombination}
       />
-      <div className="pt-8 mt-8 border-t">
+      <div className="mt-8 border-t pt-8">
         <PriceDisplay pse={currentPse} />
       </div>
       <div className="mt-8">

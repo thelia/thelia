@@ -323,7 +323,7 @@ class ParserContext implements \IteratorAggregate
         return $this->store[$name] ?? $default;
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->store);
     }

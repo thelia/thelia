@@ -1,35 +1,39 @@
 button {
-	&:focus {
-		@apply outline-none shadow-none;
-	}
+  &:focus {
+    @apply shadow-none outline-none;
+  }
 }
 
 .btn {
-	transition: background 150ms ease-in-out, box-shadow 250ms;
-	@apply inline-flex bg-main text-white border border-main px-10 py-4 uppercase cursor-pointer justify-center items-center text-center;
+  transition: background 150ms ease-in-out, box-shadow 250ms;
+  @apply inline-flex cursor-pointer items-center justify-center border border-main bg-main px-10 py-4 text-center uppercase text-white;
 
-	&:hover,
-	&--active {
-		@apply bg-main-dark text-white;
-	}
-	&:focus {
-		@apply outline-none shadow-none;
-	}
-	&:disabled {
-		@apply cursor-not-allowed opacity-50;
-	}
+  &:hover,
+  &--active {
+    @apply bg-main-dark text-white;
+  }
 
-	&--sm {
-		@apply px-4 py-2 text-sm;
-	}
-	&--rounded {
-		@apply rounded;
-	}
+  &:focus {
+    @apply shadow-none outline-none;
+  }
 
-	&--secondary {
-		@apply bg-gray-500 border-gray-500;
-		&:hover {
-			@apply bg-gray-800;
-		}
-	}
+  &:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+
+  &--sm {
+    @apply px-4 py-2 text-sm;
+  }
+
+  &--rounded {
+    @apply rounded;
+  }
+
+  &--secondary {
+    @apply border-gray-500 bg-gray-500;
+
+    &:hover {
+      @apply bg-gray-800;
+    }
+  }
 }

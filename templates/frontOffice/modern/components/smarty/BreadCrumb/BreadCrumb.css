@@ -1,11 +1,10 @@
 .BreadCrumb {
   &-item {
-
     &:not(:last-child) {
       a::after {
-        content: '>';
         display: inline-block;
         margin-left: 10px;
+        content: '>';
       }
     }
   }
