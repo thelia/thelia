@@ -1,7 +1,8 @@
 .SingleProduct {
   transform: scale(1);
   transition: transform 125ms ease-in-out;
-    will-change: transform;
+  will-change: transform;
+
   &:hover {
     /* transform: scale(1.125); */
   }

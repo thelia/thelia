@@ -50,7 +50,7 @@ export default function PhoneCheck({ addressId }) {
 
   return (
     <form
-      className="shadow panel"
+      className="panel shadow"
       onSubmit={async (e) => {
         e.preventDefault();
         try {
@@ -66,10 +66,10 @@ export default function PhoneCheck({ addressId }) {
         }
       }}
     >
-      <div className="flex flex-col gap-6 pb-6 text-xl font-bold border-b border-gray-300 xl:items-center xl:flex-row">
+      <div className="flex flex-col gap-6 border-b border-gray-300 pb-6 text-xl font-bold xl:flex-row xl:items-center">
         <div className="flex-1 text-xl font-bold">Votre numéro de contact</div>
       </div>
-      <div className="flex mt-4">
+      <div className="mt-4 flex">
         <PhoneInput
           international={false}
           defaultCountry={address?.countryCode}

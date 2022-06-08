@@ -9,11 +9,11 @@
 {block name="body-class"}page-category{/block}
 
 {block name="css" append}
-  {getAssetsFromEntrypoints entry="category" type="css"}
+  {encore_entry_link_tags entry="category"}
 {/block}
 
 {block name="javascript" append}
-  {getAssetsFromEntrypoints entry="category" type="js"}
+  {encore_entry_script_tags entry="category"}
 {/block}
 
 

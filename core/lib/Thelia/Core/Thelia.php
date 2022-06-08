@@ -50,6 +50,7 @@ use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Hook\BaseHookInterface;
 use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Template\Element\BaseLoopInterface;
@@ -88,6 +89,12 @@ class Thelia extends Kernel
         $loader = new ClassLoader();
 
         $loader->addPsr4('', THELIA_ROOT."var/cache/{$environment}/propel/model");
+        if (isset($_SERVER['ACTIVE_ADMIN_TEMPLATE'])) {
+            $loader->addPsr4('backOffice\\', THELIA_ROOT."templates/backOffice/{$_SERVER['ACTIVE_ADMIN_TEMPLATE']}/components");
+        }
+        if (isset($_SERVER['ACTIVE_FRONT_TEMPLATE'])) {
+            $loader->addPsr4('frontOffice\\', THELIA_ROOT."templates/frontOffice/{$_SERVER['ACTIVE_FRONT_TEMPLATE']}/components");
+        }
         $loader->addPsr4('TheliaMain\\', THELIA_ROOT."var/cache/{$environment}/propel/database/TheliaMain");
         $loader->register();
 
@@ -117,6 +124,7 @@ class Thelia extends Kernel
      */
     protected function configureContainer(ContainerConfigurator $container): void
     {
+        $container->parameters()->set('thelia_default_template', 'default');
         $container->import(__DIR__.'/../Config/Resources/*.yaml');
         $container->import(__DIR__.'/../Config/Resources/{packages}/*.yaml');
         $container->import(__DIR__.'/../Config/Resources/{packages}/'.$this->environment.'/*.yaml');
@@ -446,6 +454,11 @@ class Thelia extends Kernel
             $container->registerForAutoconfiguration($interfaceClass)
                 ->addTag($tag);
         }
+
+        // We set this particular service with public true to have all of his subscribers after removing type (see TheliaBundle.php)
+        $container->registerForAutoconfiguration(BaseHookInterface::class)
+            ->addTag('hook.event_listener')
+            ->setPublic(true);
 
         $loader = new XmlFileLoader($container, $fileLocator);
         $finder = Finder::create()

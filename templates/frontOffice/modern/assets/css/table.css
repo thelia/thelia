@@ -1,26 +1,29 @@
 .Table {
-	@apply w-full mb-6 mt-6 bg-gray-400 border border-gray-100 border-opacity-25;
+  @apply mt-6 mb-6 w-full border border-gray-100 border-opacity-25 bg-gray-400;
 
-	th,
-	td {
-		text-align: left;
-		@apply border-b border-gray-100 border-opacity-25 p-4;
-	}
-	thead th {
-		@apply text-xl bg-gray-500;
-	}
-	tbody tr:nth-child(odd) > td,
-	tbody tr:nth-child(odd) > th {
-		@apply bg-gray-300;
-	}
+  th,
+  td {
+    text-align: left;
+    @apply border-b border-gray-100 border-opacity-25 p-4;
+  }
+
+  thead th {
+    @apply bg-gray-500 text-xl;
+  }
+
+  tbody tr:nth-child(odd) > td,
+  tbody tr:nth-child(odd) > th {
+    @apply bg-gray-300;
+  }
 }
 
 .Table--sm {
-	th,
-	td {
-		@apply p-2;
-	}
-	thead th {
-		@apply text-base;
-	}
+  th,
+  td {
+    @apply p-2;
+  }
+
+  thead th {
+    @apply text-base;
+  }
 }

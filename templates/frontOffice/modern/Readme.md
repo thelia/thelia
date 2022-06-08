@@ -60,29 +60,29 @@ and you use them like:
 ⚠️ **layout.tpl** ⚠️ (this is the main JS bundle, which is used for every pages of the website)
 ``` smarty
     {block name="css"}
-      {getAssetsFromEntrypoints entry="app" type="css"}
+      {encore_entry_link_tags entry="app"}
     {/block}
     {block name="javascript"}
-      {getAssetsFromEntrypoints entry="app" type="js"}
+      {encore_entry_script_tags entry="app"}
     {/block}
 ```
 
 **product.html** (note the use of the *append* keyword in the smarty block, allowing us to keep the main bundle instead of replacing it)
 ```smarty
 {block name="css" append}
-  {getAssetsFromEntrypoints entry="product" type="css"}
+  {encore_entry_link_tags entry="product"}
 {/block}
 
 {block name="javascript" append}
-  {getAssetsFromEntrypoints entry="product" type="js"}
+  {encore_entry_script_tags entry="product"}
 {/block}
 ```
 
 ### Image & other assets
-You can use the smarty function `{getFileFromManifest file="key/of/your/asset/in/the/manifest"}` to retrieve any assets compiled by Symfony Encore, the `manifest.json` file can be found inside the `dist` directory
+You can use the smarty function `{encore_manifest_file file="key/of/your/asset/in/the/manifest"}` to retrieve any assets compiled by Symfony Encore, the `manifest.json` file can be found inside the `dist` directory
 
 ```smarty
-  <link rel="icon" type="image/png" sizes="32x32" href="{getFileFromManifest file="favicons/favicon-32x32.png"}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{encore_manifest_file file="dist/favicons/favicon-32x32.png"}">
 ```
 
 

@@ -13,7 +13,9 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use Exception;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Template\ParserInterface;
+use TheliaSmarty\Events\ComponentRenderEvent;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
@@ -34,10 +36,14 @@ class Component extends AbstractSmartyPlugin
     /** @var string */
     protected $kernelDebug;
 
-    public function __construct(ParserInterface $parser, $kernelDebug)
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
+
+    public function __construct(ParserInterface $parser, $kernelDebug, EventDispatcherInterface $eventDispatcher)
     {
         $this->parser = $parser;
         $this->kernelDebug = $kernelDebug;
+        $this->dispatcher = $eventDispatcher;
     }
 
     public function component(array $params, $content, \Smarty_Internal_Template $template, &$repeat)
@@ -54,10 +60,12 @@ class Component extends AbstractSmartyPlugin
             );
         }
 
-        $path = $template->getConfigVariable('component_path') ?: 'components'.DS.'smarty';
-        $path .= DS.$name.DS.$name.'.html';
-        $templatePath = $this->parser->getTemplateDefinition()->getPath();
-        $componentFile = THELIA_TEMPLATE_DIR.$templatePath.DS.$path;
+        $componentsDir = 'components';
+        $componentPrefixDir = DS.$name.DS.$name; // eg: /Tabs/Tabs
+        $path = $componentsDir.$componentPrefixDir; // eg: Components/Tabs/Tabs
+        $templatePath = $this->parser->getTemplateDefinition()->getPath(); // eg: templates/frontOffice/default
+
+        $componentFile = THELIA_TEMPLATE_DIR.$templatePath.DS.$path.'.html';
 
         if (!file_exists($componentFile)) {
             if ($this->kernelDebug) {
@@ -67,9 +75,19 @@ class Component extends AbstractSmartyPlugin
             return '';
         }
 
-        $render = $this->parser->render($path, array_merge($params, ['children' => $content]));
+        $renderEvent = (new ComponentRenderEvent())
+        ->setName($name)
+        ->setContent($content);
 
-        return $render;
+        $this->dispatcher->dispatch($renderEvent, ComponentRenderEvent::COMPONENT_BEFORE_RENDER_PREFIX.$name);
+
+        $render = $this->parser->render($path.'.html', array_merge($params, ['children' => $renderEvent->getContent()]));
+        $renderEvent = (new ComponentRenderEvent())
+        ->setRender($render);
+
+        $this->dispatcher->dispatch($renderEvent, ComponentRenderEvent::COMPONENT_AFTER_RENDER_PREFIX.$name);
+
+        return $renderEvent->getRender();
     }
 
     /**
@@ -79,6 +97,7 @@ class Component extends AbstractSmartyPlugin
     {
         return [
             new SmartyPluginDescriptor('block', 'component', $this, 'component'),
+            new SmartyPluginDescriptor('function', 'include_component', $this, 'include_component'),
         ];
     }
 }

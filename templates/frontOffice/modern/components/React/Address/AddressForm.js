@@ -28,7 +28,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
 
   return (
     <form
-      className="grid grid-cols-1 gap-6 mb-0"
+      className="mb-0 grid grid-cols-1 gap-6"
       onSubmit={handleSubmit(async (data) => {
         try {
           await onSubmit(data);

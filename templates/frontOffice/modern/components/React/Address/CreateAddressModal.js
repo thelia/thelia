@@ -40,7 +40,7 @@ export default function CreateAddressModal({ className = '' }) {
         onRequestClose={() => setIsCreatingAddress(false)}
         ariaHideApp={false}
         className={{
-          base: 'outline-none bg-white p-8 w-full h-full overflow-auto',
+          base: 'h-full w-full overflow-auto bg-white p-8 outline-none',
           afterOpen: '',
           beforeClose: ''
         }}
@@ -53,7 +53,7 @@ export default function CreateAddressModal({ className = '' }) {
       >
         <div className="relative">
           <div className="flex items-center justify-between">
-            <div className="block w-full mx-auto">
+            <div className="mx-auto block w-full">
               <h4 className="mb-8 text-3xl">
                 {intl.formatMessage({ id: 'CREATE_ADDRESS' })}
               </h4>
