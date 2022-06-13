@@ -30,7 +30,7 @@
         {encore_entry_link_tags entry="app"}
     {/block}
 
-    <script src="https://kit.fontawesome.com/a602a5fdd3.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/6c4690c475.js" crossorigin="anonymous"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
