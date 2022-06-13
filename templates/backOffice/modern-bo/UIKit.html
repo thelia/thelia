@@ -6,24 +6,24 @@
 
 
   <!-- Pagination -->
-  <div class="bg-lightCharbon py-4 px-6 rounded-lg flex sticky top-20 w-2/4 mx-auto justify-between flex-wrap items-center">
+  <div class="bg-lightCharbon py-4 px-6 rounded-lg flex sticky top-20 w-2/4 mx-auto justify-between flex-wrap items-center text-lg font-bold text-mediumPearl">
     <div id="topPage" class="">
-      <a href="#Coulours" class="text-lg font-bold text-mediumPearl hover:text-lightVermillon">{intl l = "Coulours"}</a>
+      <a href="#Coulours" class="hover:text-lightVermillon">{intl l = "Coulours"}</a>
     </div>
     <div class="">
-      <a href="#Typography" class="text-lg font-bold text-mediumPearl hover:text-lightVermillon">{intl l = "Typography"}</a>
+      <a href="#Typography" class="hover:text-lightVermillon">{intl l = "Typography"}</a>
     </div>
     <div class="">
-      <a href="#Icons" class="text-lg font-bold text-mediumPearl hover:text-lightVermillon">{intl l = "Icons"}</a>
+      <a href="#Icons" class="hover:text-lightVermillon">{intl l = "Icons"}</a>
     </div>
     <div class="">
-      <a href="#Buttons" class="text-lg font-bold text-mediumPearl hover:text-lightVermillon">{intl l = "Buttons"}</a>
+      <a href="#Buttons" class="hover:text-lightVermillon">{intl l = "Buttons"}</a>
     </div>
     <div class="">
-      <a href="#Forms" class="text-lg font-bold text-mediumPearl hover:text-lightVermillon">{intl l = "Forms"}</a>
+      <a href="#Forms" class="hover:text-lightVermillon">{intl l = "Forms"}</a>
     </div>
     <div class="">
-      <a href="#Tags" class="text-lg font-bold text-mediumPearl hover:text-lightVermillon">{intl l = "Tags"}</a>
+      <a href="#Tags" class="hover:text-lightVermillon">{intl l = "Tags"}</a>
     </div>
   </div>
 
@@ -1064,7 +1064,7 @@
     <!-- Boutons action thelia blocks -->
       <div class="flex m-6">
         <div>
-          <h1 class="border-t text-greyDark border-greyMedium">{intl l = "Action Bouttons Thelia Blocks"}</h1>
+          <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Action Bouttons Thelia Blocks"}</h1>
           <div class="flex items-center pt-10">
             <div>
               <div class="mr-1 mb-2">
@@ -1115,8 +1115,11 @@
             </div>
           </div>
         </div>
-        <div class="ml-10">
-          <h1 class="border-t text-greyDark border-greyMedium">{intl l = "Preview Button (short)"}</h1>
+
+        <!-- Preview Button (short) -->
+
+        <div class="ml-20">
+          <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Preview Button (short)"}</h1>
           <div class="flex flex-col items-center pt-10">
             <div class="p-2">
               <button class="w-14 h-14 text-sm font-semibold tracking-wider text-white uppercase bg-vermillon hover:bg-lightVermillon focus:ring-2 focus:ring-lighterVermillon focus:bg-vermillon">
@@ -1132,8 +1135,10 @@
           </div>
       </div>
 
-        <div class="ml-10">
-          <h1 class="border-t text-greyDark border-greyMedium">{intl l = "Concertinas"}</h1>
+        <!--Concertinas-->
+
+        <div class="ml-20">
+          <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Concertinas"}</h1>
           <div class="flex flex-col items-center pt-10">
             <div class="p-2">
               <button class="w-8 h-8 bg-vermillon rounded-full border-1 border-vermillon text-center text-white hover:bg-lightVermillon focus:bg-darkCharbon focus:border-1 focus:border-darkCharbon">
@@ -1154,6 +1159,51 @@
           </div>
         </div>
       </div>
+
+  <!--Item positionnement-->
+
+      <div class="mt-20 flex m-6">
+        <div>
+          <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Item positionnement"}</h1>
+          <div class="flex flex-col items-center pt-10">
+            <div class="mr-1 mb-2">
+                <button class="w-6 h-6 text-sm font-medium bg-pearlMedium border rounded-l cursor-pointer border-greyMedium text-darkCharbon hover:bg-mediumCharbon hover:text-white focus:border-2 focus:border-lighterVermillon">
+                  <i class="fas fa-arrow-up"></i></button>
+                <button class="w-6 h-6 mx-3 text-sm font-medium bg-pearlMedium border rounded-r cursor-pointer border-greyMedium text-darkCharbon hover:bg-mediumCharbon hover:text-white focus:border-2 focus:border-lighterVermillon">
+                  <i class="fas fa-arrow-down"></i></button>
+            </div>
+
+            <div class="mr-1 mt-2">
+              <button class="w-6 h-6 text-sm font-medium bg-greyMedium border rounded-l cursor-pointer border-greyMedium text-white" disabled>
+                <i class="fas fa-arrow-up"></i></button>
+              <button class="w-6 h-6 mx-3 text-sm font-medium bg-greyMedium border rounded-r cursor-pointer border-greyMedium text-white" disabled>
+                <i class="fas fa-arrow-down"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!--Pagination-->
+
+        <div class="ml-20">
+          <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Pagination"}</h1>
+          <div class="flex flex-col items-center pt-10">
+            <div class="mr-1 mb-2">
+              <button class="w-9 h-9 text-sm font-medium bg-white border rounded-l cursor-pointer border-greyMedium text-darkCharbon hover:bg-lightGrey focus:border-2 focus:border-lighterVermillon focus:bg-lightGrey">
+                <i class="fas fa-chevron-left"></i></button>
+              <button class="w-9 h-9 mx-3 text-sm font-medium bg-white border rounded-r cursor-pointer border-greyMedium text-darkCharbon hover:bg-lightGrey focus:border-2 focus:border-lighterVermillon focus:bg-lightGrey">
+                <i class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <div class="mr-1 mt-2">
+              <button class="w-9 h-9 text-sm font-medium bg-greyMedium border rounded-l cursor-pointer border-greyMedium text-white" disabled>
+                <i class="fas fa-chevron-left"></i></button>
+              <button class="w-9 h-9 mx-3 text-sm font-medium bg-greyMedium border rounded-r cursor-pointer border-greyMedium text-white" disabled>
+                <i class="fas fa-chevron-right"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
         <div class="flex items-center p-2">
             <div class="flex items-center p-2 ml-9">
@@ -1261,46 +1311,34 @@
          {component name="RadioButton" title="RadioButton"}{/component}
         </div>
 
-  <!-- Toggle -->
-  <div class="flex p-10">
-    <div class="m-2 mr-5">
-      <label for="toggle" class="flex items-center cursor-pointer">
-        <div class="relative">
-          <input type="checkbox" id="toggle" class="sr-only switch" />
-          <div class="block w-10 h-6 bg-red rounded-full"></div>
-          <div
-            class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
-          ></div>
-        </div>
-      </label>
+    <!-- Toggle -->
+    <div class="flex p-10">
+      <div class="m-2 mr-5">
+        <label for="toggle" class="flex items-center cursor-pointer">
+          <div class="relative">
+            <input type="checkbox" id="toggle" class="sr-only switch" />
+            <div class="block w-10 h-6 bg-red rounded-full"></div>
+            <div
+              class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+            ></div>
+          </div>
+        </label>
+      </div>
+
+      <div class="m-2">
+        <label for="toggle2" class="flex items-center cursor-pointer">
+          <div class="relative">
+            <input type="checkbox" checked id="toggle2" class="sr-only switch" />
+            <div class="block w-10 h-6 bg-red rounded-full"></div>
+            <div
+              class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+            ></div>
+          </div>
+        </label>
+      </div>
     </div>
 
-    <div class="m-2">
-      <label for="toggle2" class="flex items-center cursor-pointer">
-        <div class="relative">
-          <input type="checkbox" checked id="toggle2" class="sr-only switch" />
-          <div class="block w-10 h-6 bg-red rounded-full"></div>
-          <div
-            class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
-          ></div>
-        </div>
-      </label>
-    </div>
-  </div>
-
-    <!-- Pagination -->
-    <div class="flex items-center mb-3">
-      <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-white border rounded-l cursor-pointer border-greyMedium text-greyMedium"><i class="pl-4 fas fa-chevron-left text-darkCharbon"></i></a>
-      <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-white border rounded-r cursor-pointer border-greyMedium text-greyMedium"><i class="pl-3 text-darkCharbon fas fa-chevron-right"></i></a>
-    </div>
-
-    <div class="flex items-center">
-      <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-white border rounded-l cursor-pointer border-greyMedium text-greyMedium hover:bg-lightGrey"><i class="pl-4 fas fa-chevron-left text-darkCharbon"></i></a>
-      <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-white border rounded-r cursor-pointer border-greyMedium text-greyMedium hover:bg-lightGrey"><i class="pl-3 text-darkCharbon fas fa-chevron-right"></i></a>
-    </div>
-
-
-    <!-- Tags -->r
+    <!-- Tags -->
     <div id="Tags" class="mt-8 pl-8 text-xl text-greyDark border-b boder-greyMedium">{intl l = "Tags"}</div>
 
     <div class="mt-8 pl-8 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Non cliquable"}</div>
@@ -1545,31 +1583,6 @@
       </div>
     </div>
     </div>
-
-  <!-- Item positionnement -->
-  <div class="mt-8 mb-5 pl-8 text-xl text-greyDark border-b border-greyMedium">{intl l = "Item positionnement"}</div>
-  <div class="flex items-center mb-3">
-    <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-pearlMedium border rounded-l cursor-pointer border-greyMedium text-greyMedium"><i class="pl-4 fas fa-arrow-up text-darkCharbon"></i></a>
-    <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-pearlMedium border rounded-r cursor-pointer border-greyMedium text-greyMedium"><i class="pl-3 text-darkCharbon fas fa-arrow-down"></i></a>
-  </div>
-
-  <div class="flex items-center">
-    <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-darkCharbon border rounded-l cursor-pointer border-darkCharbon text-white"><i class="pl-4 fas fa-arrow-up text-white"></i></a>
-    <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-darkCharbon border rounded-r cursor-pointer border-darkCharbon text-white"><i class="pl-3 text-white fas fa-arrow-down"></i></a>
-  </div>
-
-    <!-- Concertinas -->
-    <div class="mt-8 mb-5 pl-8 text-xl text-greyDark border-b border-greyMedium">{intl l = "Concertinas"}</div>
-    <div class="flex items-center mb-3">
-      <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-vermillon border rounded-full cursor-pointer"><i class="pl-3 fas fa-arrow-up text-white"></i></a>
-      <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-vermillon border rounded-full cursor-pointer"><i class="pl-3 text-white fas fa-arrow-down"></i></a>
-    </div>
-
-    <div class="flex items-center">
-      <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-lightVermillon border rounded-full cursor-pointer text-white"><i class="pl-3 fas fa-arrow-up text-white"></i></a>
-      <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-lightVermillon border rounded-full cursor-pointer text-white"><i class="pl-3 text-white fas fa-arrow-down"></i></a>
-    </div>
-
 
     <!-- Formulaires avec tooltip-->
 <div id="Formulaires" class="pl-8 text-3xl text-greyDark mt-20 mb-8">{intl l = "Formulaires avec tooltip"}</div>
