@@ -1505,8 +1505,8 @@
     </div>
 
     
-    <!-- Tags -->
-    <div id="Tags" class="mt-8 pl-8 text-xl text-greyDark border-b border-greyMedium">{intl l = "Tags"}</div>
+    <!-- Tags -->r
+    <div id="Tags" class="mt-8 pl-8 text-xl text-greyDark border-b boder-greyMedium">{intl l = "Tags"}</div>
 
     <div class="mt-8 pl-8 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Non cliquable"}</div>
     <div class="flex">
@@ -1548,7 +1548,7 @@
       <div class="m-2 mr-5">
         <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-greenDark border border-greenDark bg-white last:mr-0 mr-1">
           {intl l = "Tag Pays"}
-          
+
           <i class="fas fa-times-circle text-lg text-pearlMedium"></i>
         </span>
       </div>
@@ -1775,142 +1775,281 @@
       <a class="inline-flex items-center w-10 h-10 mx-3 text-sm font-medium bg-lightVermillon border rounded-full cursor-pointer text-white"><i class="pl-3 text-white fas fa-arrow-down"></i></a>
     </div>
 
-<!-- Formulaires -->
-<div id="Formulaires" class="pl-8 text-3xl text-greyDark mt-20">{intl l = "Formulaires"}</div>
+
+    <!-- Formulaires avec tooltip-->
+<div id="Formulaires" class="pl-8 text-3xl text-greyDark mt-20 mb-8">{intl l = "Formulaires avec tooltip"}</div>
+
+
 
 <div class="flex items-center p-2">
   <div class="w-2/5 mr-1">
-    <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-    <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
+    <p class="block text-lightCharbon text-sm font-bold uppercase">
+      {intl l= "Indication"}
+      <i class="fa-solid fa-circle-info"></i>
+    </p>
+    <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker focus:ring-2 focus:ring-red focus:border-darkCharbon" type="text" placeholder="Insérer le nom">
   </div>
 
   <div class="w-2/5 mr-1">
-    <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-    <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
+    <p class="block text-lightCharbon text-sm font-bold uppercase">
+      {intl l= "Indication"}
+      <i class="fa-solid fa-circle-info"></i>
+    </p>
+    <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker focus:ring-2 focus:ring-red focus:border-darkCharbon">
       <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
     </select>
   </div>
 
   <div class="w-2/5 mr-1">
-    {component name="InputLink" title="InputLink"}{/component}
+    <p class="block text-lightCharbon text-sm font-bold uppercase">
+      {intl l= "Indication"}
+      <i class="fa-solid fa-circle-info"></i>
+    </p>
+    {component name="InputLink" title="InputLink"}{/component}  
   </div>
 
   <div class="w-2/5 mr-1">
-    {component name="InputSearch" title="InputSearch"}{/component}
+    <p class="block text-lightCharbon text-sm font-bold uppercase">
+      {intl l= "Indication"}
+      <i class="fa-solid fa-circle-info"></i>
+    </p>
+    {component name="InputSearch" title="InputSearch"}{/component}  
   </div>
   </div>
 
-  <div class="flex items-center p-2">
-    <div class="w-2/5 mr-1">
-      <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-      <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
-    </div>
 
-    <div class="w-2/5 mr-1">
-      <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-      <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
-        <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
-      </select>
-    </div>
-
-    <div class="w-2/5 mr-1">
-      {component name="InputLink" title="InputLink"}{/component}
-    </div>
-
-    <div class="w-2/5 mr-1">
-      {component name="InputSearch" title="InputSearch"}{/component}
-    </div>
-    </div>
-
-    <div class="flex items-center p-2">
-      <div class="w-2/5 mr-1">
-        <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-        <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
-      </div>
-
-      <div class="w-2/5 mr-1">
-        <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-        <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
-          <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
-        </select>
-      </div>
-
-      <div class="w-2/5 mr-1">
-        {component name="InputLink" title="InputLink"}{/component}
-      </div>
-
-      <div class="w-2/5 mr-1">
-        {component name="InputSearch" title="InputSearch"}{/component}
-      </div>
-      </div>
 
       <div class="flex items-center p-2">
         <div class="w-2/5 mr-1">
-          <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-          <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
+          <p class="block text-lightCharbon text-sm font-bold uppercase">
+            {intl l= "Indication"}
+            <i class="fa-solid fa-circle-info"></i>
+          </p>
+          <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed focus:ring-2 focus:ring-red focus:border-darkCharbon" type="text" placeholder="Insérer le nom">
+          <label class="block text-red text-xs font-bold left-1"><i class="mx-1 fa-solid fa-triangle-exclamation"></i>{intl l = "Indication de l'erreur"}</label>
         </div>
-
+      
         <div class="w-2/5 mr-1">
-          <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-          <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
+          <p class="block text-lightCharbon text-sm font-bold uppercase">
+            {intl l= "Indication"}
+            <i class="fa-solid fa-circle-info"></i>
+          </p>
+          <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed focus:ring-2 focus:ring-red focus:border-darkCharbon">
             <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
           </select>
+          <label class="block text-red text-xs font-bold left-1"><i class="mx-1 fa-solid fa-triangle-exclamation"></i>{intl l = "Indication de l'erreur"}</label>
+        </div>
+      
+        <div class="w-2/5 mr-1">
+          <p class="block text-lightCharbon text-sm font-bold uppercase">
+            {intl l= "Indication"}
+            <i class="fa-solid fa-circle-info"></i>
+          </p>
+          {component name="InputLinkError" title="InputLinkError"}{/component}  
+        </div>
+      
+        <div class="w-2/5 mr-1">
+          <p class="block text-lightCharbon text-sm font-bold uppercase">
+            {intl l= "Indication"}
+            <i class="fa-solid fa-circle-info"></i>
+          </p>
+          {component name="InputSearchError" title="InputSearchError"}{/component}  
+        </div>
         </div>
 
-        <div class="w-2/5 mr-1">
-          {component name="InputLink" title="InputLink"}{/component}
-        </div>
 
-        <div class="w-2/5 mr-1">
-          {component name="InputSearch" title="InputSearch"}{/component}
-        </div>
-        </div>
         <div class="flex items-center p-2">
           <div class="w-2/5 mr-1">
-            <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-            <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed" type="text" placeholder="Insérer le nom">
-            <label class="block text-red text-xs font-bold mb-2 left-1">{intl l = "Indication de l'erreur"}</label>
+            <p class="block text-mediumGrey text-sm font-bold uppercase">
+              {intl l= "Indication"}
+              <i class="fa-solid fa-circle-info"></i>
+            </p>
+            <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom" disabled="disabled">
           </div>
-
+        
           <div class="w-2/5 mr-1">
-            <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-            <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed">
+            <p class="block text-mediumGrey text-sm font-bold uppercase">
+              {intl l= "Indication"}
+              <i class="fa-solid fa-circle-info"></i>
+            </p>
+            <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" disabled>
               <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
             </select>
-            <label class="block text-red text-xs font-bold mb-2 left-1">{intl l = "Indication de l'erreur"}</label>
+          </div>
+        
+          <div class="w-2/5 mr-1">
+            <p class="block text-mediumGrey text-sm font-bold uppercase">
+              {intl l= "Indication"}
+              <i class="fa-solid fa-circle-info"></i>
+            </p>
+            {component name="InputLinkDisable" title="InputLinkDisable"}{/component}  
+          </div>
+        
+          <div class="w-2/5 mr-1">
+            <p class="block text-mediumGrey text-sm font-bold uppercase">
+              {intl l= "Indication"}
+              <i class="fa-solid fa-circle-info"></i>
+            </p>
+            {component name="InputSearchDisable" title="InputSearchDisable"}{/component}  
+          </div>
           </div>
 
-          <div class="w-2/5 mr-1">
-            {component name="InputLinkError" title="InputLinkError"}{/component}
-          </div>
 
+<!-- Formulaires sans tooltip-->
+<div id="Formulaires" class="pl-8 text-3xl text-greyDark mt-20 mb-8">{intl l = "Formulaires sans tooltip"}</div>
+
+
+
+  <div class="flex items-center p-2">
+    <div class="w-2/5 mr-1">
+      <p class="block text-lightCharbon text-sm font-bold uppercase">
+        {intl l= "Indication"}
+      </p>
+      <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker focus:ring-2 focus:ring-red focus:border-darkCharbon" type="text" placeholder="Insérer le nom">
+    </div>
+  
+    <div class="w-2/5 mr-1">
+      <p class="block text-lightCharbon text-sm font-bold uppercase">
+        {intl l= "Indication"}
+      </p>
+      <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker focus:ring-2 focus:ring-red focus:border-darkCharbon">
+        <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+      </select>
+    </div>
+  
+    <div class="w-2/5 mr-1">
+      <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
+      {component name="InputLink" title="InputLink"}{/component}  
+    </div>
+  
+    <div class="w-2/5 mr-1">
+      <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
+      {component name="InputSearch" title="InputSearch"}{/component}  
+    </div>
+    </div>
+
+  
+
+        <div class="flex items-center p-2">
           <div class="w-2/5 mr-1">
-            {component name="InputSearchError" title="InputSearchError"}{/component}
+            <label class="block text-lightCharbon text-sm font-bold uppercase">{intl l = "Indication"}</label>
+            <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed focus:ring-2 focus:ring-red focus:border-darkCharbon" type="text" placeholder="Insérer le nom">
+            <label class="block text-red text-xs font-bold left-1"><i class="mx-1 fa-solid fa-triangle-exclamation"></i>{intl l = "Indication de l'erreur"}</label>
+          </div>
+        
+          <div class="w-2/5 mr-1">
+            <label class="block text-lightCharbon text-sm font-bold uppercase">{intl l = "Indication"}</label>
+            <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed focus:ring-2 focus:ring-red focus:border-darkCharbon">
+              <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+            </select>
+            <label class="block text-red text-xs font-bold left-1"><i class="mx-1 fa-solid fa-triangle-exclamation"></i>{intl l = "Indication de l'erreur"}</label>
+          </div>
+        
+          <div class="w-2/5 mr-1">
+            <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
+            {component name="InputLinkError" title="InputLinkError"}{/component}  
+          </div>
+        
+          <div class="w-2/5 mr-1">
+            <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
+            {component name="InputSearchError" title="InputSearchError"}{/component}  
           </div>
           </div>
 
 
           <div class="flex items-center p-2">
             <div class="w-2/5 mr-1">
-              <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-              <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom">
+              <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
+              <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom" disabled="disabled">
             </div>
-
+          
             <div class="w-2/5 mr-1">
-              <label class="block text-lightCharbon text-sm font-bold mb-2 uppercase">{intl l = "Indication"}</label>
-              <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey">
+              <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
+              <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" disabled>
                 <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
               </select>
             </div>
-
+          
             <div class="w-2/5 mr-1">
-              {component name="InputLink" title="InputLink"}{/component}
+              <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
+              {component name="InputLinkDisable" title="InputLinkDisable"}{/component}  
+            </div>
+          
+            <div class="w-2/5 mr-1">
+              <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
+              {component name="InputSearchDisable" title="InputSearchDisable"}{/component}  
+            </div>
             </div>
 
-            <div class="w-2/5 mr-1">
-              {component name="InputSearch" title="InputSearch"}{/component}
-            </div>
-            </div>
+         <!-- Formulaires sans indication-->
+<div id="Formulaires" class="pl-8 text-3xl text-greyDark mt-20 mb-8">{intl l = "Formulaires sans indication"}</div>
+
+<div class="flex items-center p-2">
+  <div class="w-2/5 mr-1">
+    <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker focus:ring-2 focus:ring-red focus:border-darkCharbon" type="text" placeholder="Insérer le nom">
+  </div>
+
+  <div class="w-2/5 mr-1">
+    <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker focus:ring-2 focus:ring-red focus:border-darkCharbon">
+      <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+    </select>
+  </div>
+
+  <div class="w-2/5 mr-1">
+    {component name="InputLink" title="InputLink"}{/component}  
+  </div>
+
+  <div class="w-2/5 mr-1">
+    {component name="InputSearch" title="InputSearch"}{/component}  
+  </div>
+  </div>
+
+
+
+      <div class="flex items-center p-2">
+        <div class="w-2/5 mr-1">
+          <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed focus:ring-2 focus:ring-red focus:border-darkCharbon" type="text" placeholder="Insérer le nom">
+          <label class="block text-red text-xs font-bold left-1"><i class="mx-1 fa-solid fa-triangle-exclamation"></i>{intl l = "Indication de l'erreur"}</label>
+        </div>
+      
+        <div class="w-2/5 mr-1">
+          <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed focus:ring-2 focus:ring-red focus:border-darkCharbon">
+            <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+          </select>
+          <label class="block text-red text-xs font-bold left-1"><i class="mx-1 fa-solid fa-triangle-exclamation"></i>{intl l = "Indication de l'erreur"}</label>
+        </div>
+      
+        <div class="w-2/5 mr-1">
+          {component name="InputLinkError" title="InputLinkError"}{/component}  
+        </div>
+      
+        <div class="w-2/5 mr-1">
+          {component name="InputSearchError" title="InputSearchError"}{/component}  
+        </div>
+        </div>
+
+
+        <div class="flex items-center p-2">
+          <div class="w-2/5 mr-1">
+            <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom" disabled="disabled">
+          </div>
+        
+          <div class="w-2/5 mr-1">
+            <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" disabled>
+              <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+            </select>
+          </div>
+        
+          <div class="w-2/5 mr-1">
+            {component name="InputLinkDisable" title="InputLinkDisable"}{/component}  
+          </div>
+        
+          <div class="w-2/5 mr-1">
+            {component name="InputSearchDisable" title="InputSearchDisable"}{/component}  
+          </div>
+          </div>   
+
+
 
 
 
