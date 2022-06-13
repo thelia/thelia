@@ -1062,7 +1062,7 @@
       <div class="flex m-6">
         <div>
           <h1 class="border-t text-greyDark border-greyMedium">{intl l = "Action Bouttons Thelia Blocks"}</h1>
-          <div class="flex items-center">
+          <div class="flex items-center pt-10">
             <div>
               <div class="mr-1 mb-2">
                 <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase hover:bg-darkCharbon hover:text-white focus:ring-1 focus:ring-lighterVermillon">
@@ -1112,29 +1112,42 @@
             </div>
           </div>
         </div>
-        <div>
-            <h1 class="ml-10 border-t text-greyDark border-greyMedium">{intl l = "Preview Button (short)"}</h1>
-            <div class="flex flex-col items-center">
-              <div class="p-2">
-                <button class="w-14 h-14 text-sm font-semibold tracking-wider text-white uppercase bg-vermillon hover:bg-lightVermillon focus:ring-2 focus:ring-lighterVermillon focus:bg-vermillon">
-                  <i class="mx-1 fas fa-eye"></i>
-                </button>
-              </div>
-
-              <div class="p-2">
-                <button class="w-14 text-sm font-semibold tracking-wider uppercase text-white h-14 bg-greyMedium" disabled>
-                  <i class="mx-1 fas fa-eye"></i>
-                </button>
-              </div>
+        <div class="ml-10">
+          <h1 class="border-t text-greyDark border-greyMedium">{intl l = "Preview Button (short)"}</h1>
+          <div class="flex flex-col items-center pt-10">
+            <div class="p-2">
+              <button class="w-14 h-14 text-sm font-semibold tracking-wider text-white uppercase bg-vermillon hover:bg-lightVermillon focus:ring-2 focus:ring-lighterVermillon focus:bg-vermillon">
+                <i class="mx-1 fas fa-eye"></i>
+              </button>
             </div>
-        </div>
 
-        <div>
-          <h1 class="ml-10 border-t text-greyDark border-greyMedium">{intl l = "Concertinas"}</h1>
-          <div>
-            <button class="w-14 bg-vermillon rounded-full">
-              <img class="" src="{image file="assets/images/svg/short-arrow-up.svg"}" alt="fr" />
-            </button>
+            <div class="p-2">
+              <button class="w-14 text-sm font-semibold tracking-wider uppercase text-white h-14 bg-greyMedium" disabled>
+                <i class="mx-1 fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+      </div>
+
+        <div class="ml-10">
+          <h1 class="border-t text-greyDark border-greyMedium">{intl l = "Concertinas"}</h1>
+          <div class="flex flex-col items-center pt-10">
+            <div class="p-2">
+              <button class="w-8 h-8 bg-vermillon rounded-full border-1 border-vermillon text-center text-white hover:bg-lightVermillon focus:bg-darkCharbon focus:border-1 focus:border-darkCharbon">
+                <i class="fa-solid fa-angle-down"></i>
+              </button>
+              <button class="w-8 h-8 bg-vermillon rounded-full border-1 border-vermillon text-center text-white hover:bg-lightVermillon focus:bg-darkCharbon focus:border-1 focus:border-darkCharbon">
+                <i class="fa-solid fa-angle-up"></i>
+              </button>
+            </div>
+            <div class="p-2">
+              <button class="w-8 h-8 bg-greyMedium rounded-full border-1 border-greyMedium text-center text-white" disabled>
+                <i class="fa-solid fa-angle-down"></i>
+              </button>
+              <button class="w-8 h-8 bg-greyMedium rounded-full border-1 border-greyMedium text-center text-white" disabled>
+                <i class="fa-solid fa-angle-up"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
