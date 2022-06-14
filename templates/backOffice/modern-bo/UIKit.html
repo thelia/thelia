@@ -1068,7 +1068,7 @@
           <div class="flex items-center pt-10">
             <div>
               <div class="mr-1 mb-2">
-                <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase hover:bg-darkCharbon hover:text-white focus:ring-1 focus:ring-lighterVermillon">
+                <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase rounded-l-sm hover:bg-darkCharbon hover:text-white focus:ring-1 focus:ring-lighterVermillon">
                   <i class="fas fa-arrow-up"></i>
                   {intl l = "Monter"}
                 </button>
@@ -1100,7 +1100,7 @@
 
             <div>
               <div class="mr-1 mb-2">
-                <button class="w-28 h-8 text-xs font-semibold tracking-wider text-red uppercase hover:bg-red hover:text-white focus:ring-1 focus:ring-lighterVermillon">
+                <button class="w-28 h-8 text-xs font-semibold tracking-wider text-red uppercase rounded-r-sm hover:bg-red hover:text-white focus:ring-1 focus:ring-lighterVermillon">
                   <i class="fas fa-trash"></i>
                   {intl l = "Supprimer"}
                 </button>
@@ -1167,9 +1167,9 @@
           <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Item positionnement"}</h1>
           <div class="flex flex-col items-center pt-10">
             <div class="mr-1 mb-2">
-                <button class="w-6 h-6 text-sm font-medium bg-pearlMedium border rounded-l cursor-pointer border-greyMedium text-darkCharbon hover:bg-mediumCharbon hover:text-white focus:border-2 focus:border-lighterVermillon">
+                <button class="w-6 h-6 text-sm font-medium bg-pearlMedium border rounded-l cursor-pointer border-greyMedium text-darkCharbon hover:bg-mediumCharbon hover:text-white hover:border-mediumCharbon focus:border-2 focus:border-lighterVermillon">
                   <i class="fas fa-arrow-up"></i></button>
-                <button class="w-6 h-6 mx-3 text-sm font-medium bg-pearlMedium border rounded-r cursor-pointer border-greyMedium text-darkCharbon hover:bg-mediumCharbon hover:text-white focus:border-2 focus:border-lighterVermillon">
+                <button class="w-6 h-6 mx-3 text-sm font-medium bg-pearlMedium border rounded-r cursor-pointer border-greyMedium text-darkCharbon hover:bg-mediumCharbon hover:text-white hover:border-mediumCharbon focus:border-2 focus:border-lighterVermillon">
                   <i class="fas fa-arrow-down"></i></button>
             </div>
 
@@ -1204,44 +1204,234 @@
         </div>
       </div>
 
+      <!--buttons icons-->
 
-        <div class="flex items-center p-2">
-            <div class="flex items-center p-2 ml-9">
-              <div>
-                <div>
-                  <div class="w-3 h-3 mx-2"><img src="{image file="assets/images/svg/close.svg"}" alt="fr" /></div>
-                </div>
-                <div class="text-vermillon">
-                  <div class="mt-6 w-3 h-3 mx-2 text-vermillon"><img class="text-vermillon" src="{image file="assets/images/svg/close.svg"}" alt="fr" /></div>
-              </div>
-              </div>
-              </div>
-              <div>
-                <div>
-                  <div class="w-5 h-5 mx-2"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></div>
-                </div>
-              </br>
-                <div>
-                  <div class="w-5 h-5 mx-2"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></div>
-              </div>
+      <div class="m-6">
+        <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Buttons Icons"}</h1>
+      </div>
+      <div class="flex ml-20 gap-11 h-36">
+        <div class="flex flex-col items-center">
+          <span class="text-greyDark font-light text-xl">{intl l = "Close"}</span>
+          <div class="mt-5 h-full flex flex-col justify-around">
+            <button class="w-7 h-7 p-1 focus:bg-lighterVermillon"><img src="{image file="assets/images/svg/close.svg"}" alt="fr" /></button>
+            <button class="w-7 h-7 p-1 text-greyMedium"><img src="{image file="assets/images/svg/close.svg"}" alt="fr" /></button>
+          </div>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-greyDark font-light text-xl">{intl l = "Search"}</span>
+          <div class="mt-5 h-full flex flex-col justify-around">
+            <button class="w-5 h-5"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></button>
+            <button class="w-5 h-5"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></button>
+          </div>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-greyDark font-light text-xl">{intl l = "Delete"}</span>
+          <div class="mt-5 h-full flex flex-col justify-around">
+            <button class="w-5 h-5"><img src="{image file="assets/images/svg/trash.svg"}" alt="fr" /></button>
+            <button class="w-5 h-5"><img src="{image file="assets/images/svg/trash.svg"}" alt="fr" /></button>
+          </div>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-greyDark font-light text-xl">{intl l = "Up/Down"}</span>
+          <div class="flex">
+            <div class="mt-5 h-full flex flex-col justify-around">
+              <button class="w-5 h-5"><img src="{image file="assets/images/svg/arrow-up.svg"}" alt="fr" /></button>
+              <button class="w-5 h-5"><img src="{image file="assets/images/svg/arrow-up.svg"}" alt="fr" /></button>
+            </div>
+            <div class="mt-5 h-full flex flex-col justify-around">
+              <button class="w-5 h-5"><img src="{image file="assets/images/svg/down-arrow.svg"}" alt="fr" /></button>
+              <button class="w-5 h-5"><img src="{image file="assets/images/svg/down-arrow.svg"}" alt="fr" /></button>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col items-center">
+          <span class="text-greyDark font-light text-xl">{intl l = "Sort"}</span>
+          <div class="mt-5 h-full flex flex-col justify-around">
+            <div class="w-5 h-5"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></div>
+            <div class="w-5 h-5"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></div>
+          </div>
+        </div>
+      </div>
+
+      <!--text Edit-->
+
+      <div class="flex ml-20 mt-20">
+        <div>
+          <span class="text-greyDark font-light text-xl">{intl l = "Text Edit"}</span>
+          <div class="flex pt-10">
+            <div>
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/bold-text.svg"}" alt="fr" /></div>
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/bold-text.svg"}" alt="fr" /></div>
+            </div>
+            <div class="grid gap-4 grid-cols-3 ml-5">
+              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+                <div class="w-5 h-5"><img src="{image file="assets/images/svg/bold-text.svg"}" alt="fr" /></div>
+                <div class="text-greyDark text-sm font-light">{intl l = "Bold"}</div>
               </div>
 
-              <div>
-                <div>
-                  <div class="w-5 h-5 mx-2"><img src="{image file="assets/images/svg/trash.svg"}" alt="fr" /></div>
-                </div>
-              </br>
-                <div>
-                  <div class="w-5 h-5 mx-2"><img src="{image file="assets/images/svg/trash.svg"}" alt="fr" /></div>
-              </div>
-            </br>
-              <div>
-                <div class="w-5 h-5 mx-2"><img src="{image file="assets/images/svg/trash.svg"}" alt="fr" /></div>
-               </div>
+              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+                <div class="w-5 h-5"><img src="{image file="assets/images/svg/italic.svg"}" alt="fr" /></div>
+                <div class="text-greyDark text-sm font-light">{intl l = "Italic"}</div>
               </div>
 
-
+              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+                <div class="w-5 h-5"><img src="{image file="assets/images/svg/underlined-text.svg"}" alt="fr" /></div>
+                <div class="text-greyDark text-sm font-light">{intl l = "Underlined"}</div>
               </div>
+
+              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+                <div class="w-5 h-5"><img src="{image file="assets/images/svg/align-left.svg"}" alt="fr" /></div>
+                <div class="text-greyDark text-sm font-light">{intl l = "Align Left"}</div>
+              </div>
+
+              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+                <div class="w-5 h-5"><img src="{image file="assets/images/svg/align-center.svg"}" alt="fr" /></div>
+                <div class="text-greyDark text-sm font-light">{intl l = "Align Center"}</div>
+              </div>
+
+              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+                <div class="w-5 h-5"><img src="{image file="assets/images/svg/align-right.svg"}" alt="fr" /></div>
+                <div class="text-greyDark text-sm font-light">{intl l = "Align Right"}</div>
+              </div>
+
+              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+                <div class="w-5 h-5"><img src="{image file="assets/images/svg/list-number.svg"}" alt="fr" /></div>
+                <div class="text-greyDark text-sm font-light">{intl l = "List (numbers)"}</div>
+              </div>
+
+              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+                <div class="w-5 h-5"><img src="{image file="assets/images/svg/list.svg"}" alt="fr" /></div>
+                <div class="text-greyDark text-sm font-light">{intl l = "List"}</div>
+              </div>
+
+              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+                <div class="w-5 h-5"><img src="{image file="assets/images/svg/link.svg"}" alt="fr" /></div>
+                <div class="text-greyDark text-sm font-light">{intl l = "Link"}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!--Actions tableau-->
+
+      <div class="flex ml-20">
+        <div>
+          <span class="text-greyDark font-light text-xl">{intl l = "Actions tableau"}</span>
+          <div class="flex pt-10">
+            <div>
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/double.svg"}" alt="fr" /></div>
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/double.svg"}" alt="fr" /></div>
+            </div>
+            <div class="ml-5">
+              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+                <div class="w-5 h-5"><img src="{image file="assets/images/svg/double.svg"}" alt="fr" /></div>
+                <div class="text-greyDark text-sm font-light">{intl l = "Copier"}</div>
+              </div>
+
+              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+                <div class="w-5 h-5"><img src="{image file="assets/images/svg/html-code.svg"}" alt="fr" /></div>
+                <div class="text-greyDark text-sm font-light">{intl l = "Code"}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!--Réseaux Sociaux-->
+
+      <div class="flex ml-20">
+        <div>
+          <span class="text-greyDark font-light text-xl">{intl l = "Réseaux Sociaux"}</span>
+          <div class="flex pt-10">
+            <div>
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/github.svg"}" alt="fr" /></div>
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/github.svg"}" alt="fr" /></div>
+            </div>
+            <div class="ml-5 flex">
+              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+                <div class="w-5 h-5"><img src="{image file="assets/images/svg/github.svg"}" alt="fr" /></div>
+                <div class="text-greyDark text-sm font-light">{intl l = "GitHub"}</div>
+              </div>
+
+              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+                <div class="w-5 h-5"><img src="{image file="assets/images/svg/twitter.svg"}" alt="fr" /></div>
+                <div class="text-greyDark text-sm font-light">{intl l = "Twitter"}</div>
+              </div>
+
+              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+                <div class="w-5 h-5"><img src="{image file="assets/images/svg/facebook.svg"}" alt="fr" /></div>
+                <div class="text-greyDark text-sm font-light">{intl l = "Facebook"}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!--Contenu item-->
+
+    <div class="flex ml-20">
+      <div>
+        <span class="text-greyDark font-light text-xl">{intl l = "Contenu item"}</span>
+        <div class="flex pt-10">
+          <div>
+            <div class="w-5 h-5"><img src="{image file="assets/images/svg/title.svg"}" alt="fr" /></div>
+            <div class="w-5 h-5"><img src="{image file="assets/images/svg/title.svg"}" alt="fr" /></div>
+          </div>
+          <div class="grid gap-4 grid-cols-5 ml-5">
+            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/title.svg"}" alt="fr" /></div>
+              <div class="text-greyDark text-sm font-light">{intl l = "Titres"}</div>
+            </div>
+
+            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/text.svg"}" alt="fr" /></div>
+              <div class="text-greyDark text-sm font-light">{intl l = "Textes"}</div>
+            </div>
+
+            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/button.svg"}" alt="fr" /></div>
+              <div class="text-greyDark text-sm font-light">{intl l = "Boutons"}</div>
+            </div>
+
+            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/images.svg"}" alt="fr" /></div>
+              <div class="text-greyDark text-sm font-light">{intl l = "Images"}</div>
+            </div>
+
+            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/video.svg"}" alt="fr" /></div>
+              <div class="text-greyDark text-sm font-light">{intl l = "Vidéo"}</div>
+            </div>
+
+            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/product.svg"}" alt="fr" /></div>
+              <div class="text-greyDark text-sm font-light">{intl l = "Produits"}</div>
+            </div>
+
+            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/accordion.svg"}" alt="fr" /></div>
+              <div class="text-greyDark text-sm font-light">{intl l = "Accordéons"}</div>
+            </div>
+
+            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/separate.svg"}" alt="fr" /></div>
+              <div class="text-greyDark text-sm font-light">{intl l = "Séparateurs"}</div>
+            </div>
+
+            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/verticale.svg"}" alt="fr" /></div>
+              <div class="text-greyDark text-sm font-light">{intl l = "Colonnes"}</div>
+            </div>
+
+            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/html.svg"}" alt="fr" /></div>
+              <div class="text-greyDark text-sm font-light">{intl l = "HTML"}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Text link -->
   <div class="flex items-center p-2">
