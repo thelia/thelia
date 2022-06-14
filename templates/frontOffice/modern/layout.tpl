@@ -6,7 +6,6 @@
 {default_translation_domain domain='fo.modern'}
 
 {* -- Define some stuff for Smarty ------------------------------------------ *}
-{config_load file='variables.conf'}
 {block name="init"}{/block}
 {block name="no-return-functions"}{/block}
 {assign var="store_name" value={config key="store_name"}}
