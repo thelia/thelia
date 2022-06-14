@@ -60,7 +60,7 @@ class Component extends AbstractSmartyPlugin
             );
         }
 
-        $componentsDir = 'components';
+        $componentsDir = $this->parser->getTemplateDefinition()->getComponentsPath();
         $componentPrefixDir = DS.$name.DS.$name; // eg: /Tabs/Tabs
         $path = $componentsDir.$componentPrefixDir; // eg: Components/Tabs/Tabs
         $templatePath = $this->parser->getTemplateDefinition()->getPath(); // eg: templates/frontOffice/default

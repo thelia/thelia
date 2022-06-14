@@ -41,4 +41,5 @@
     <thelia>2.5.0</thelia>
     <stability>prod</stability>
     <assets>dist</assets>
+    <components>components/smarty</components>
 </template>
