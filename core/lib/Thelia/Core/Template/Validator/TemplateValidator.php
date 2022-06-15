@@ -95,6 +95,7 @@ class TemplateValidator
                 ->setStability((string) $this->xmlDescriptorContent->stability)
                 ->setDocumentation((string) $this->xmlDescriptorContent->documentation)
                 ->setAssets((string) $this->xmlDescriptorContent->assets)
+                ->setComponents((string) $this->xmlDescriptorContent->components)
             ;
 
             $this->checkVersion($templateDescriptor);
