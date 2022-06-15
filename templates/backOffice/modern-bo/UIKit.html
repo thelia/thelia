@@ -8,7 +8,7 @@
   <!-- Pagination -->
   <div class="bg-lightCharbon py-4 px-6 rounded-lg flex sticky top-20 w-2/4 mx-auto justify-between flex-wrap items-center text-lg font-bold text-mediumPearl shadow-xl">
     <div id="topPage" class="">
-      <a href="#Coulours" class="hover:text-lightVermillon">{intl l = "Coulours"}</a>
+      <a href="#Colors" class="hover:text-lightVermillon">{intl l = "Colors"}</a>
     </div>
     <div class="">
       <a href="#Typography" class="hover:text-lightVermillon">{intl l = "Typography"}</a>
@@ -28,216 +28,220 @@
   </div>
 
 
-  <!-- Coulours -->
-  <div class="m-6">
-      <h1 id="Coulours" class="text-3xl font-bold text-greyDark">{intl l = "Coulours"}</h1>
+  <!-- Colors -->
+  <div class="mt-20 pb-20 border-b border-greyMedium">
+      <h1 id="Colors" class="mb-10 text-3xl font-bold text-greyDark">{intl l = "Colors"}</h1>
+
+      <div class="mb-8 text-xl text-greyDark">{intl l = "Main"}</div>
+
+      <div class="flex">
+        <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-vermillon border-vermillon"></div>
+          <div class="font-bold text-greyDark">{intl l = "Vermillon"}</div>
+          <div class="text-greyDark">{intl l = "#DC3018"}</div>
+        </div>
+
+        <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-mediumCharbon border-mediumCharbon"></div>
+          <div class="font-bold text-greyDark">{intl l = "Charcoal Medium"}</div>
+          <div class="text-greyDark">{intl l = "#333333"}</div>
+        </div>
+
+        <div class="w-24">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-lightPearl border-lightPearl"></div>
+          <div class="font-bold text-greyDark">{intl l = "Pearl Light"}</div>
+          <div class="text-greyDark">{intl l = "#F5F5F5"}</div>
+        </div>
+      </div>
   </div>
 
-      <div class="text-xl text-greyDark m-6">{intl l = "Main"}</div>
+    <div class="mt-20 pb-20 border-b border-greyMedium">
 
-      <div class="flex items-center p-2 mr-5 mb-6">
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-vermillon border-vermillon"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Vermillon"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#DC3018"}</div>
+       <div class="mb-8 text-xl text-greyDark">{intl l = "Secondary"}</div>
+
+      <div class="flex mb-8">
+        <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-lightVermillon border-lightVermillon"></div>
+          <div class="font-bold text-greyDark">{intl l = "Light Vermillon"}</div>
+          <div class="text-greyDark">{intl l = "#FA533C"}</div>
         </div>
 
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-mediumCharbon border-mediumCharbon"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Charcoal Medium"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#333333"}</div>
+        <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-darkCharbon border-darkCharbon"></div>
+          <div class="font-bold text-greyDark">{intl l = "Charcoal Dark"}</div>
+          <div class="text-greyDark">{intl l = "#222222"}</div>
         </div>
 
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-lightPearl border-lightPearl"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Pearl Light"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#F5F5F5"}</div>
-        </div>
-      </div>
-
-      <div class="flex items-center p-2 border-b border-greyMedium"></div>
-
-      <div class="pl-8 mt-10 text-xl text-greyDark">{intl l = "Secondary"}</div>
-
-      <div class="flex items-center p-2 mb-6 mr-5">
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-lightVermillon border-lightVermillon"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Light Vermillon"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#FA533C"}</div>
+        <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-pearlMedium border-pearlMedium"></div>
+          <div class="font-bold text-greyDark">{intl l = "Pearl Medium"}</div>
+          <div class="text-greyDark">{intl l = "#EBEBEB"}</div>
         </div>
 
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-darkCharbon border-darkCharbon"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Charcoal Dark"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#222222"}</div>
+        <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-greyDark border-greyDark"></div>
+          <div class="font-bold text-greyDark">{intl l = "Grey Dark"}</div>
+          <div class="text-greyDark">{intl l = "#787878"}</div>
         </div>
 
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-pearlMedium border-pearlMedium"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Pearl Medium"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#EBEBEB"}</div>
-        </div>
-
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-greyDark border-greyDark"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Grey Dark"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#787878"}</div>
-        </div>
-
-        <div>
-          <div class="w-24 h-24 m-4 font-bold bg-white rounded-lg shadow-2xl w-13 border-greyMedium"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "White"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#FFFFFF"}</div>
+        <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold bg-white rounded-lg border-greyMedium"></div>
+          <div class="font-bold text-greyDark">{intl l = "White"}</div>
+          <div class="text-greyDark">{intl l = "#FFFFFF"}</div>
         </div>
       </div>
 
-      <div class="flex items-center p-2">
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-lighterVermillon border-lighterVermillon"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Lighter Vermillon"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#FF8F80"}</div>
+      <div class="flex">
+        <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-lighterVermillon border-lighterVermillon"></div>
+          <div class="font-bold text-greyDark">{intl l = "Lighter Vermillon"}</div>
+          <div class="text-greyDark">{intl l = "#FF8F80"}</div>
         </div>
 
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-lightCharbon border-lightCharbon"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Charcoal Light"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#444444"}</div>
+        <div class="w-24 mr-14">
+          <div class="w-24 h-24 font-bold rounded-lg bg-lightCharbon border-lightCharbon"></div>
+          <div class="font-bold text-greyDark">{intl l = "Charcoal Light"}</div>
+          <div class="text-greyDark">{intl l = "#444444"}</div>
         </div>
 
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-greyMedium border-greyMedium"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Grey Medium"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#9B9B9B"}</div>
+        <div class="w-24 mr-14"></div>
+
+        <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-greyMedium border-greyMedium"></div>
+          <div class="font-bold text-greyDark">{intl l = "Grey Medium"}</div>
+          <div class="text-greyDark">{intl l = "#9B9B9B"}</div>
         </div>
-      </div>
+    </div>
+  </div>
 
-      <div class="flex items-center p-2 border-b border-greyMedium mt-8"></div>
+    <div class="mt-20 pb-20 border-b border-greyMedium">
 
-      <div class="pl-8 mt-10 text-xl text-greyDark">{intl l = "Status"}</div>
+       <div class="mb-8 text-xl text-greyDark">{intl l = "Status"}</div>
 
-      <div class="flex items-center p-2 mb-6 mr-5">
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-red border-red"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Red"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#D21919"}</div>
-        </div>
-
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-greenDark border-greenDark"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Green Dark"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#008958"}</div>
+      <div class="flex mb-8">
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-red border-red"></div>
+          <div class="font-bold text-greyDark">{intl l = "Red"}</div>
+          <div class="text-greyDark">{intl l = "#D21919"}</div>
         </div>
 
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-wheatDark border-wheatDark"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Wheat Dark"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#EDAC30"}</div>
-        </div>
-      </div>
-
-      <div class="flex items-center p-2 mb-6">
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-lighterVermillon border-lighterVermillon"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Red Light"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#FF8F80"}</div>
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-greenDark border-greenDark"></div>
+          <div class="font-bold text-greyDark">{intl l = "Green Dark"}</div>
+          <div class="text-greyDark">{intl l = "#008958"}</div>
         </div>
 
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-greenLight border-greenLight"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Green Light"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#EBFFF8"}</div>
-        </div>
-
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-wheat border-wheat"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Wheat"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#FFDD9C"}</div>
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-wheatDark border-wheatDark"></div>
+          <div class="font-bold text-greyDark">{intl l = "Wheat Dark"}</div>
+          <div class="text-greyDark">{intl l = "#EDAC30"}</div>
         </div>
       </div>
 
-      <div class="flex items-center p-2">
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-backgroundRed border-backgroundRed"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Background Red"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#FFEDED"}</div>
+      <div class="flex mb-8">
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-lighterVermillon border-lighterVermillon"></div>
+          <div class="font-bold text-greyDark">{intl l = "Red Light"}</div>
+          <div class="text-greyDark">{intl l = "#FF8F80"}</div>
         </div>
 
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-wheatLight border-wheatLight"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Wheat Light"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#FFECC8"}</div>
-        </div>
-      </div>
-
-      <div class="flex items-center p-2 border-b border-greyMedium mt-8"></div>
-
-      <div class="pl-8 mt-10 text-xl text-greyDark">{intl l = "Labels"}</div>
-
-      <div class="flex items-center p-2 mb-6 mr-5">
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-ocre border-ocre"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Ocre"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#9E6700"}</div>
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-greenLight border-greenLight"></div>
+          <div class="font-bold text-greyDark">{intl l = "Green Light"}</div>
+          <div class="text-greyDark">{intl l = "#EBFFF8"}</div>
         </div>
 
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-mauve border-mauve"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Mauve"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#8C5383"}</div>
-        </div>
-
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-turquoise border-turquoise"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Turquoise"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#0E7C7B"}</div>
-        </div>
-
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-electricBlue border-electricBlue"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Electric Blue"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#3423A6"}</div>
-        </div>
-
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl bg-darkVermillon w-13 border-darkVermillon"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Dark Vermillon"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#C4311C"}</div>
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-wheat border-wheat"></div>
+          <div class="font-bold text-greyDark">{intl l = "Wheat"}</div>
+          <div class="text-greyDark">{intl l = "#FFDD9C"}</div>
         </div>
       </div>
 
-      <div class="flex items-center p-2 mb-6 mr-5">
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-ocreLight border-ocreLight"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Ocre Light"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#FEFAF1"}</div>
+      <div class="flex">
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-backgroundRed border-backgroundRed"></div>
+          <div class="font-bold text-greyDark">{intl l = "Background Red"}</div>
+          <div class="text-greyDark">{intl l = "#FFEDED"}</div>
         </div>
 
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-mauveLight border-mauveLight"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Mauve Light"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#EBE2EA"}</div>
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-wheatLight border-wheatLight"></div>
+          <div class="font-bold text-greyDark">{intl l = "Wheat Light"}</div>
+          <div class="text-greyDark">{intl l = "#FFECC8"}</div>
+        </div>
+      </div>
+      </div>
+
+    <div class="mt-20 pb-20 border-b border-greyMedium">
+
+       <div class="mb-8 text-xl text-greyDark">{intl l = "Labels"}</div>
+
+      <div class="flex mb-8">
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-ocre border-ocre"></div>
+          <div class="font-bold text-greyDark">{intl l = "Ocre"}</div>
+          <div class="text-greyDark">{intl l = "#9E6700"}</div>
         </div>
 
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-turquoiseLight border-turquoiseLight"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Turquoise Light"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#ECF8F8"}</div>
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-mauve border-mauve"></div>
+          <div class="font-bold text-greyDark">{intl l = "Mauve"}</div>
+          <div class="text-greyDark">{intl l = "#8C5383"}</div>
         </div>
 
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-electricBlueLight border-electricBlueLight"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Electric Blue Light"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#EEECFF"}</div>
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-turquoise border-turquoise"></div>
+          <div class="font-bold text-greyDark">{intl l = "Turquoise"}</div>
+          <div class="text-greyDark">{intl l = "#0E7C7B"}</div>
         </div>
 
-        <div>
-          <div class="w-24 h-24 m-4 font-bold rounded-lg shadow-2xl w-13 bg-backgroundLightVermillon border-backgroundLightVermillon"></div>
-          <div class="pl-5 font-bold text-greyDark">{intl l = "Background Light Vermillon"}</div>
-          <div class="pl-5 text-greyDark">{intl l = "#F7EEED"}</div>
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-electricBlue border-electricBlue"></div>
+          <div class="font-bold text-greyDark">{intl l = "Electric Blue"}</div>
+          <div class="text-greyDark">{intl l = "#3423A6"}</div>
+        </div>
+
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-darkVermillon border-darkVermillon"></div>
+          <div class="font-bold text-greyDark">{intl l = "Dark Vermillon"}</div>
+          <div class="text-greyDark">{intl l = "#C4311C"}</div>
         </div>
       </div>
 
-      <div class="flex items-center p-2 border-b border-greyMedium mt-8"></div>
+      <div class="flex">
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-ocreLight border-ocreLight"></div>
+          <div class="font-bold text-greyDark">{intl l = "Ocre Light"}</div>
+          <div class="text-greyDark">{intl l = "#FEFAF1"}</div>
+        </div>
+
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-mauveLight border-mauveLight"></div>
+          <div class="font-bold text-greyDark">{intl l = "Mauve Light"}</div>
+          <div class="text-greyDark">{intl l = "#EBE2EA"}</div>
+        </div>
+
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-turquoiseLight border-turquoiseLight"></div>
+          <div class="font-bold text-greyDark">{intl l = "Turquoise Light"}</div>
+          <div class="text-greyDark">{intl l = "#ECF8F8"}</div>
+        </div>
+
+      <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-electricBlueLight border-electricBlueLight"></div>
+          <div class="font-bold text-greyDark">{intl l = "Electric Blue Light"}</div>
+          <div class="text-greyDark">{intl l = "#EEECFF"}</div>
+        </div>
+
+       <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-backgroundLightVermillon border-backgroundLightVermillon"></div>
+          <div class="font-bold text-greyDark">{intl l = "Background Light Vermillon"}</div>
+          <div class="text-greyDark">{intl l = "#F7EEED"}</div>
+        </div>
+      </div>
+
+    </div>
 
   <!-- Typography -->
   <div class="mb-10 mt-20">
@@ -1529,194 +1533,197 @@
       </div>
     </div>
 
+
     <!-- Tags -->
-    <div id="Tags" class="mt-8 pl-8 text-xl text-greyDark border-b boder-greyMedium">{intl l = "Tags"}</div>
+    <div id="Tags" class="mt-8 text-xl text-greyDark border-b boder-greyMedium">{intl l = "Tags"}</div>
 
-    <div class="mt-8 pl-8 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Non cliquable"}</div>
-    <div class="flex">
+
+
+    <div class="mt-8 mb-3 pl-4 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Non cliquable"}</div>
+    <div class="flex m-2">
       <div class="m-2">
-        <span class="text-sm font-semibold inline-block py-1 px-3 rounded-full text-darkCharbon border border-darkCharbon bg-lightPearl last:mr-0 mr-1">
+        <button class="px-4 py-2 bg-pearlMedium text-darkCharbon border border-darkCharbon text-sm font-medium rounded-full">
           {intl l = "Tag Pays"}
-        </span>
+          </button>
       </div>
 
       <div class="m-2">
-        <span class="text-sm font-semibold inline-block py-1 px-3 rounded-full text-darkCharbon border border-darkCharbon bg-white last:mr-0 mr-1">
+        <button class="px-4 py-2 bg-white text-darkCharbon border border-darkCharbon text-sm font-medium rounded-full">
           {intl l = "Tag Pays"}
-        </span>
+          </button>
       </div>
 
       <div class="m-2">
-        <span class="text-sm font-semibold inline-block py-1 px-3 rounded-full text-white border border-mediumCharbon bg-mediumCharbon last:mr-0 mr-1">
+        <button class="px-4 py-2 bg-darkCharbon text-white border border-darkCharbon text-sm font-medium rounded-full">
           {intl l = "Tag Pays"}
-        </span>
+          </button>
       </div>
     </div>
 
-    <div class="mt-12 pl-8 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Cliquable"}</div>
+    <div class="mt-12 mb-3 pl-4 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Cliquable"}</div>
     <div class="flex">
-      <div class="m-2 mr-5">
-        <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-white last:mr-0 mr-1">
-          {intl l = "Tag Pays"}
-         <i class="fas fa-times-circle text-lg text-pearlMedium"></i>
-        </span>
+      <div class="m-4 mr-5">
+        <button class="px-4 py-2 bg-white text-gray-800 border border-darkCharbon text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon ">
+            {intl l = "Tag Pays"}
+            <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
+            </button>
       </div>
 
-      <div class="m-2 mr-5">
-        <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-white last:mr-0 mr-1">
+      <div class="m-4 mr-5">
+        <button class="px-4 py-2 bg-pearlLight text-gray-800 border border-darkCharbon text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon ">
           {intl l = "Tag Pays"}
-          <i class="fas fa-times-circle text-lg text-pearlMedium"></i>
-        </span>
+          <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
+          </button>
       </div>
 
-      <div class="m-2 mr-5">
-        <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-greenDark border border-greenDark bg-white last:mr-0 mr-1">
+      <div class="m-4 mr-5">
+        <button class="px-4 py-2 bg-white text-greenDark border border-greenDark text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon ">
           {intl l = "Tag Pays"}
-
-          <i class="fas fa-times-circle text-lg text-pearlMedium"></i>
-        </span>
+          <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
+          </button>
       </div>
 
-      <div class="m-2 mr-5">
-        <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-white border border-mediumCharbon bg-mediumCharbon last:mr-0 mr-1">
+      <div class="m-4 mr-5">
+        <button class="px-4 py-2 bg-mediumCharbon text-white border border-mediumCharbon text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon focus:bg-lightVermillon ">
           {intl l = "Tag Pays"}
-          <i class="fas fa-times-circle text-lg text-white"></i>
-        </span>
+          <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
+          </button>
       </div>
       </div>
 
       <div class="flex items-center">
-        <div class="m-2 mr-5">
-          <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-white last:mr-0 mr-1">
+        <div class="m-4 mr-5">
+          <button class="px-4 py-2 bg-mediumCharbon text-white border border-mediumCharbon text-sm font-medium rounded-full">
             {intl l = "Tag Pays"}
-            <i class="fas fa-times-circle text-lg text-red"></i>
-          </span>
+            <i class="mx-1 fas fa-times-circle text-lg text-greyDark"></i>
+            </button>
         </div>
 
-        <div class="m-2 mr-5">
-          <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-white last:mr-0 mr-1">
+        <div class="m-4 mr-5">
+          <button class="px-4 py-2 bg-mediumCharbon text-white border border-mediumCharbon text-sm font-medium rounded-full">
             {intl l = "Tag Pays"}
-            <i class="fas fa-times-circle text-lg text-red"></i>
-          </span>
+            <i class="mx-1 fas fa-times-circle text-lg text-greyDark"></i>
+            </button>
         </div>
 
-        <div class="m-2 mr-5">
-          <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-greenDark border border-greenDark bg-white last:mr-0 mr-1">
+        <div class="m-4 mr-5">
+          <button class="px-4 py-2 bg-greenDark text-white border border-greenDark text-sm font-medium rounded-full">
             {intl l = "Tag Pays"}
-            <i class="fas fa-times-circle text-lg text-red"></i>
-          </span>
+            <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium"></i>
+            </button>
         </div>
 
-        <div class="m-2 mr-5">
-          <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-white border border-mediumCharbon bg-mediumCharbon last:mr-0 mr-1">
+        <div class="m-4 mr-5">
+          <button class="px-4 py-2 bg-greenDark text-white border border-greenDark text-sm font-medium rounded-full">
             {intl l = "Tag Pays"}
-            <i class="fas fa-times-circle text-lg text-red"></i>
-          </span>
+            <i class="mx-1 fas fa-times-circle text-lg text-white"></i>
+            </button>
         </div>
         </div>
 
         <div class="flex items-center">
-          <div class="m-2 mr-5">
-            <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-white border border-mediumCharbon bg-mediumCharbon last:mr-0 mr-1">
+          <div class="m-4 mr-5">
+            <button class="px-4 py-2 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
+              <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
               {intl l = "Tag Pays"}
-              <i class="fas fa-times-circle text-lg text-greyDark"></i>
-            </span>
+              <i class="mx-1 fas fa-times-circle text-lg text-darkCharbon"></i>
+              </button>
           </div>
 
-          <div class="m-2 mr-5">
-            <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-white border border-mediumCharbon bg-mediumCharbon last:mr-0 mr-1">
+          <div class="m-4 mr-5">
+            <button class="px-4 py-2 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
+              <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
               {intl l = "Tag Pays"}
-              <i class="fas fa-times-circle text-lg text-greyDark"></i>
-            </span>
+              <i class="mx-1 fas fa-times-circle text-lg text-darkCharbon"></i>
+              </button>
           </div>
 
-          <div class="m-2 mr-5">
-            <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-white border border-greenDark bg-greenDark last:mr-0 mr-1">
+          <div class="m-4 mr-5">
+            <button class="px-4 py-2 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
+              <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
               {intl l = "Tag Pays"}
-              <i class="fas fa-times-circle text-lg text-pearlMedium"></i>
-            </span>
+              <i class="mx-1 fas fa-times-circle text-lg text-darkCharbon"></i>
+              </button>
           </div>
 
-          <div class="m-2 mr-5">
-            <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-white border border-greenDark bg-greenDark last:mr-0 mr-1">
+          <div class="m-4 mr-5">
+            <button class="px-4 py-2 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
+              <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
               {intl l = "Tag Pays"}
-              <i class="fas fa-times-circle text-lg text-white"></i>
-            </span>
+              <i class="mx-1 fas fa-times-circle text-lg text-darkCharbon"></i>
+              </button>
           </div>
           </div>
 
           <div class="flex items-center">
-            <div class="m-2 mr-5">
-              <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-black border border-darkCharbon bg-wheat last:mr-0 mr-1">
-                <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
+            <div class="m-4 mr-5">
+              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
-                <i class="fas fa-times-circle text-lg text-lightWheat"></i>
-              </span>
+                <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
+                </button>
             </div>
 
-            <div class="m-2 mr-5">
-              <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-black border border-darkCharbon bg-wheat last:mr-0 mr-1">
-                <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
+
+            <div class="m-4 mr-5">
+              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
-                <i class="fas fa-times-circle text-lg text-lightWheat"></i>
-              </span>
+                <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
+                </button>
             </div>
 
-            <div class="m-2 mr-5">
-              <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-black border border-darkCharbon bg-wheat last:mr-0 mr-1">
-                <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
+            <div class="m-4 mr-5">
+              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
-                <i class="fas fa-times-circle text-lg text-lightWheat"></i>
-              </span>
+                <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
+                </button>
             </div>
 
-            <div class="m-2 mr-5">
-              <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-black border border-darkCharbon bg-wheat last:mr-0 mr-1">
-                <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
+            <div class="m-4 mr-5">
+              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
-                <i class="fas fa-times-circle text-lg text-lightWheat"></i>
-              </span>
+                <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
+                </button>
             </div>
             </div>
 
-            <div class="flex items-center">
-              <div class="m-2 mr-5">
-                <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-lightVermillon border-2 border-lightVermillon bg-white last:mr-0 mr-1">
-                  {intl l = "Tag Pays"}
-                  <i class="fas fa-times-circle text-lg text-pearlMedium"></i>
-                </span>
-              </div>
 
-              <div class="m-2 mr-5">
-                <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-lightVermillon border-2 border-lightVermillon bg-lightPearl last:mr-0 mr-1">
-                  {intl l = "Tag Pays"}
-                  <i class="fas fa-times-circle text-lg text-pearlMedium"></i>
-                </span>
-              </div>
+<!-- Tabulations -->
+<div id="Tabulations" class="mt-12 mb-6 text-xl text-greyDark border-b boder-greyMedium font-weight">{intl l = "Tabulations"}</div>
 
-              <div class="m-2 mr-5">
-                <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-lightVermillon border-2 border-lightVermillon bg-white last:mr-0 mr-1">
-                  {intl l = "Tag Pays"}
-                  <i class="fas fa-times-circle text-lg text-pearlMedium"></i>
-                </span>
-              </div>
+<div class="text-xl text-greyDark font-weight">{intl l = "Main Style"}</div>
 
-              <div class="m-2 mr-5">
-                <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-white border-2 border-lightVermillon bg-lightVermillon last:mr-0 mr-1">
-                  {intl l = "Tag Pays"}
-                  <i class="fas fa-times-circle text-lg text-white"></i>
-                </span>
-              </div>
-              </div>
+<div class="mt-7 p-12 bg-pearlMedium w-2/5 rounded-lg">
+      <button class=" bg-white mx-6 text-vermillon py-4 px-5 bloctext-blue-500 border-b-4 border-vermillon uppercase font-semibold leading-5">
+        {intl l = "Tabulation"}
+      </button>
+
+      <button class="mx-4 bg-white text-vermillon py-4 px-5 bloctext-blue-500 border-b-4 border-vermillon uppercase leading-5 font-semibold">
+        {intl l = "Tabulation"}
+        <i class="mx-1 fas fa-times-circle text-lg text-vermillon"></i>
+      </button>
+
+
+<div class="mt-7 bg-pearlMedium ">
+  <div class="bg-pearlMedium ">
+    <button class="mx-6 bg-white text-lightCharbon py-4 px-5 bloctext-blue-500 uppercase leading-5 font-semibold hover:text-vermillon">
+      {intl l = "Tabulation"}
+    </button>
+
+    <button class=" mx-4 bg-white text-lightCharbon py-4 px-5 bloctext-blue-500 uppercase leading-5 font-semibold hover:text-vermillon">
+      {intl l = "Tabulation"}
+      <i class="mx-1 fas fa-times-circle text-lg text-greyMedium hover:text-vermillon"></i>
+    </button>
+</div>
+  </div>
+</div>
 
 
 <!-- Languages -->
-  <div class="mt-12 mb-8 pl-8 text-xl text-greyDark border-b border-greyMedium">{intl l = "Languages"}</div>
-
+<div class="text-xl text-greyDark font-weight mt-10 mb-6">{intl l = "Main Style"}</div>
   <div class="flex items-center p-2">
     <div>
       <div class="mr-1 mb-2">
-        <button class="w-28 h-8 text-xs font-semibold tracking-wider border border-darkCharbon text-darkCharbon uppercase rounded-sm">
+        <button class="w-28 h-8 text-xs font-semibold tracking-wider border border-darkCharbon text-darkCharbon uppercase rounded-sm hover:bg-darkCharbon hover:text-white">
           {intl l = "English"}
         </button>
 
@@ -1726,17 +1733,12 @@
           </button>
       </div>
 
-      <div class="mr-1 mt-2">
-        <button class="w-28 text-xs font-semibold tracking-wider uppercase rounded-sm text-white h-8 bg-darkCharbon">
-          {intl l = "English"}
-        </button>
-    </div>
       </div>
     </div>
 
     <div>
       <div class="mr-1 mb-2">
-        <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase border border-darkCharbon rounded-sm">
+        <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase border border-darkCharbon rounded-sm hover:bg-darkCharbon hover:text-white">
           {intl l = "English"}
         </button>
 
@@ -1745,18 +1747,12 @@
             {intl l = "English"}
           </button>
       </div>
-
-      <div class="mr-1 mt-2">
-        <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 border-darkCharbon bg-darkCharbon">
-          {intl l = "English"}
-        </button>
-    </div>
       </div>
     </div>
 
     <div>
       <div class="mr-1 mb-2">
-        <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon border border-darkCharbon uppercase  rounded-sm">
+        <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon border border-darkCharbon uppercase  rounded-sm hover:bg-darkCharbon hover:text-white">
           {intl l = "English"}
         </button>
 
@@ -1764,12 +1760,6 @@
           <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 bg-darkCharbon">
             {intl l = "English"}
           </button>
-      </div>
-
-      <div class="mr-1 mt-2">
-        <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 bg-darkCharbon">
-          {intl l = "English"}
-        </button>
       </div>
       </div>
     </div>
@@ -2137,6 +2127,41 @@
      </li>
   </ul>
 </div>
+
+
+<!-- Illustrations -->
+<div id="Illustrations" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Illustrations"}</div>
+
+<div class="mt-8 text-xl text-greyDark border-b boder-greyMedium">{intl l = "Errors"}</div>
+
+<div class="flex">
+  <div class="m-4 mr-5">
+    <img class="w-96" src="{image file="assets/images/svg/500.svg"}" alt="fr" />
+  </div>
+
+  <div class="m-4 mr-5">
+    <img class="w-96" src="{image file="assets/images/svg/502.svg"}" alt="fr" />
+  </div>
+
+  <div class="m-4 mr-5">
+    <img class="w-96" src="{image file="assets/images/svg/503.svg"}" alt="fr" />
+  </div>
+  </div>
+
+  <div class="flex">
+    <div class="m-4 mr-5">
+      <img class="w-96" src="{image file="assets/images/svg/404.svg"}" alt="fr" />
+    </div>
+
+    <div class="m-4 mr-5">
+      <img class="w-96" src="{image file="assets/images/svg/403.svg"}" alt="fr" />
+    </div>
+
+    <div class="m-4 mr-5">
+      <img class="w-96" src="{image file="assets/images/svg/other-error.svg"}" alt="fr" />
+    </div>
+    </div>
+
 
 
 <!-- Positionnement -->

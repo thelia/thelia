@@ -38,7 +38,7 @@
   </head>
 
   <body>
-    <div id="page" class="min-h-screen bg-mediumPearl">
+    <div id="page" class="min-h-screen">
       {* display top bar only if admin is connected *}
       {loop name="top-bar-auth" type="auth" role="ADMIN"}
         {* -- Brand bar section ------------------------------------------------- *}
