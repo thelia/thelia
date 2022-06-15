@@ -53,7 +53,10 @@ module.exports = {
         mauveLight: '#EBE2EA',
         turquoiseLight: '#ECF8F8',
         electricBlueLight: '#EEECFF',
-        backgroundLightVermillon: '#F7EEED'
+        backgroundLightVermillon: '#F7EEED',
+        wheatDark: '#EDAC30',
+        wheat: '#FFDD9C',
+        wheatLight: '#FFECC8'
       }
     }
   },
