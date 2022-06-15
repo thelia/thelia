@@ -1528,184 +1528,158 @@
     </div>
 
     <!-- Tags -->
-    <div id="Tags" class="mt-8 pl-8 text-xl text-greyDark border-b boder-greyMedium">{intl l = "Tags"}</div>
+    <div id="Tags" class="mt-8 text-xl text-greyDark border-b boder-greyMedium">{intl l = "Tags"}</div>
 
-    <div class="mt-8 pl-8 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Non cliquable"}</div>
-    <div class="flex">
+ 
+
+    <div class="mt-8 mb-3 pl-4 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Non cliquable"}</div>
+    <div class="flex m-2">
       <div class="m-2">
-        <span class="text-sm font-semibold inline-block py-1 px-3 rounded-full text-darkCharbon border border-darkCharbon bg-lightPearl last:mr-0 mr-1">
+        <button class="px-4 py-2 bg-pearlMedium text-darkCharbon border border-darkCharbon text-sm font-medium rounded-full">
           {intl l = "Tag Pays"}
-        </span>
+          </button>
       </div>
 
       <div class="m-2">
-        <span class="text-sm font-semibold inline-block py-1 px-3 rounded-full text-darkCharbon border border-darkCharbon bg-white last:mr-0 mr-1">
+        <button class="px-4 py-2 bg-white text-darkCharbon border border-darkCharbon text-sm font-medium rounded-full">
           {intl l = "Tag Pays"}
-        </span>
+          </button>
       </div>
 
       <div class="m-2">
-        <span class="text-sm font-semibold inline-block py-1 px-3 rounded-full text-white border border-mediumCharbon bg-mediumCharbon last:mr-0 mr-1">
+        <button class="px-4 py-2 bg-darkCharbon text-white border border-darkCharbon text-sm font-medium rounded-full">
           {intl l = "Tag Pays"}
-        </span>
+          </button>
       </div>
     </div>
 
-    <div class="mt-12 pl-8 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Cliquable"}</div>
+    <div class="mt-12 mb-3 pl-4 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Cliquable"}</div>
     <div class="flex">
-      <div class="m-2 mr-5">
-        <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-white last:mr-0 mr-1">
+      <div class="m-4 mr-5">
+        <button class="px-4 py-2 bg-white text-gray-800 border border-darkCharbon text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon ">
           {intl l = "Tag Pays"}
-         <i class="fas fa-times-circle text-lg text-pearlMedium"></i>
-        </span>
+          <img class="hover:fill-green  hover:bg-vermillon" src="{image file="assets/images/svg/close-circle-grey.svg"}" alt="fr" />
+          </button>
       </div>
 
-      <div class="m-2 mr-5">
-        <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-white last:mr-0 mr-1">
+      <div class="m-4 mr-5">
+        <button class="px-4 py-2 bg-pearlLight text-gray-800 border border-darkCharbon text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon ">
           {intl l = "Tag Pays"}
-          <i class="fas fa-times-circle text-lg text-pearlMedium"></i>
-        </span>
+          <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
+          </button>
       </div>
 
-      <div class="m-2 mr-5">
-        <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-greenDark border border-greenDark bg-white last:mr-0 mr-1">
+      <div class="m-4 mr-5">
+        <button class="px-4 py-2 bg-white text-greenDark border border-greenDark text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon ">
           {intl l = "Tag Pays"}
-
-          <i class="fas fa-times-circle text-lg text-pearlMedium"></i>
-        </span>
+          <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
+          </button>
       </div>
 
-      <div class="m-2 mr-5">
-        <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-white border border-mediumCharbon bg-mediumCharbon last:mr-0 mr-1">
+      <div class="m-4 mr-5">
+        <button class="px-4 py-2 bg-mediumCharbon text-white border border-mediumCharbon text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon focus:bg-lightVermillon ">
           {intl l = "Tag Pays"}
-          <i class="fas fa-times-circle text-lg text-white"></i>
-        </span>
+          <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
+          </button>
       </div>
       </div>
 
       <div class="flex items-center">
-        <div class="m-2 mr-5">
-          <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-white last:mr-0 mr-1">
+        <div class="m-4 mr-5">
+          <button class="px-4 py-2 bg-mediumCharbon text-white border border-mediumCharbon text-sm font-medium rounded-full">
             {intl l = "Tag Pays"}
-            <i class="fas fa-times-circle text-lg text-red"></i>
-          </span>
+            <i class="mx-1 fas fa-times-circle text-lg text-greyDark"></i>
+            </button>
         </div>
 
-        <div class="m-2 mr-5">
-          <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-darkCharbon border border-darkCharbon bg-white last:mr-0 mr-1">
+        <div class="m-4 mr-5">
+          <button class="px-4 py-2 bg-mediumCharbon text-white border border-mediumCharbon text-sm font-medium rounded-full">
             {intl l = "Tag Pays"}
-            <i class="fas fa-times-circle text-lg text-red"></i>
-          </span>
+            <i class="mx-1 fas fa-times-circle text-lg text-greyDark"></i>
+            </button>
         </div>
 
-        <div class="m-2 mr-5">
-          <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-greenDark border border-greenDark bg-white last:mr-0 mr-1">
+        <div class="m-4 mr-5">
+          <button class="px-4 py-2 bg-greenDark text-white border border-greenDark text-sm font-medium rounded-full">
             {intl l = "Tag Pays"}
-            <i class="fas fa-times-circle text-lg text-red"></i>
-          </span>
+            <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium"></i>
+            </button>
         </div>
 
-        <div class="m-2 mr-5">
-          <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-white border border-mediumCharbon bg-mediumCharbon last:mr-0 mr-1">
+        <div class="m-4 mr-5">
+          <button class="px-4 py-2 bg-greenDark text-white border border-greenDark text-sm font-medium rounded-full">
             {intl l = "Tag Pays"}
-            <i class="fas fa-times-circle text-lg text-red"></i>
-          </span>
+            <i class="mx-1 fas fa-times-circle text-lg text-white"></i>
+            </button>
         </div>
         </div>
 
         <div class="flex items-center">
-          <div class="m-2 mr-5">
-            <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-white border border-mediumCharbon bg-mediumCharbon last:mr-0 mr-1">
+          <div class="m-4 mr-5">
+            <button class="px-4 py-2 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
+              <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
               {intl l = "Tag Pays"}
-              <i class="fas fa-times-circle text-lg text-greyDark"></i>
-            </span>
+              <i class="mx-1 fas fa-times-circle text-lg text-darkCharbon"></i>
+              </button>
           </div>
 
-          <div class="m-2 mr-5">
-            <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-white border border-mediumCharbon bg-mediumCharbon last:mr-0 mr-1">
+          <div class="m-4 mr-5">
+            <button class="px-4 py-2 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
+              <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
               {intl l = "Tag Pays"}
-              <i class="fas fa-times-circle text-lg text-greyDark"></i>
-            </span>
+              <i class="mx-1 fas fa-times-circle text-lg text-darkCharbon"></i>
+              </button>
+          </div>
+          
+          <div class="m-4 mr-5">
+            <button class="px-4 py-2 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
+              <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
+              {intl l = "Tag Pays"}
+              <i class="mx-1 fas fa-times-circle text-lg text-darkCharbon"></i>
+              </button>
           </div>
 
-          <div class="m-2 mr-5">
-            <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-white border border-greenDark bg-greenDark last:mr-0 mr-1">
+          <div class="m-4 mr-5">
+            <button class="px-4 py-2 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
+              <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
               {intl l = "Tag Pays"}
-              <i class="fas fa-times-circle text-lg text-pearlMedium"></i>
-            </span>
-          </div>
-
-          <div class="m-2 mr-5">
-            <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-white border border-greenDark bg-greenDark last:mr-0 mr-1">
-              {intl l = "Tag Pays"}
-              <i class="fas fa-times-circle text-lg text-white"></i>
-            </span>
+              <i class="mx-1 fas fa-times-circle text-lg text-darkCharbon"></i>
+              </button>
           </div>
           </div>
 
           <div class="flex items-center">
-            <div class="m-2 mr-5">
-              <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-black border border-darkCharbon bg-wheat last:mr-0 mr-1">
-                <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
+            <div class="m-4 mr-5">
+              <button class="px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
-                <i class="fas fa-times-circle text-lg text-lightWheat"></i>
-              </span>
+                <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
+                </button>
             </div>
+  
 
-            <div class="m-2 mr-5">
-              <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-black border border-darkCharbon bg-wheat last:mr-0 mr-1">
-                <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
+            <div class="m-4 mr-5">
+              <button class="px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
-                <i class="fas fa-times-circle text-lg text-lightWheat"></i>
-              </span>
+                <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
+                </button>
             </div>
 
-            <div class="m-2 mr-5">
-              <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-black border border-darkCharbon bg-wheat last:mr-0 mr-1">
-                <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
+            <div class="m-4 mr-5">
+              <button class="px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
-                <i class="fas fa-times-circle text-lg text-lightWheat"></i>
-              </span>
+                <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
+                </button>
             </div>
 
-            <div class="m-2 mr-5">
-              <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-black border border-darkCharbon bg-wheat last:mr-0 mr-1">
-                <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
+            <div class="m-4 mr-5">
+              <button class="px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
-                <i class="fas fa-times-circle text-lg text-lightWheat"></i>
-              </span>
+                <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
+                </button>
             </div>
             </div>
 
-            <div class="flex items-center">
-              <div class="m-2 mr-5">
-                <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-lightVermillon border-2 border-lightVermillon bg-white last:mr-0 mr-1">
-                  {intl l = "Tag Pays"}
-                  <i class="fas fa-times-circle text-lg text-pearlMedium"></i>
-                </span>
-              </div>
-
-              <div class="m-2 mr-5">
-                <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-lightVermillon border-2 border-lightVermillon bg-lightPearl last:mr-0 mr-1">
-                  {intl l = "Tag Pays"}
-                  <i class="fas fa-times-circle text-lg text-pearlMedium"></i>
-                </span>
-              </div>
-
-              <div class="m-2 mr-5">
-                <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-lightVermillon border-2 border-lightVermillon bg-white last:mr-0 mr-1">
-                  {intl l = "Tag Pays"}
-                  <i class="fas fa-times-circle text-lg text-pearlMedium"></i>
-                </span>
-              </div>
-
-              <div class="m-2 mr-5">
-                <span class="text-sm font-semibold inline-block py-1 px-2 rounded-full text-white border-2 border-lightVermillon bg-lightVermillon last:mr-0 mr-1">
-                  {intl l = "Tag Pays"}
-                  <i class="fas fa-times-circle text-lg text-white"></i>
-                </span>
-              </div>
-              </div>
+           
 
 
 <!-- Languages -->
