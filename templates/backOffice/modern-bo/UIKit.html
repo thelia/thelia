@@ -1528,10 +1528,9 @@
       </div>
     </div>
 
+
     <!-- Tags -->
     <div id="Tags" class="mt-8 text-xl text-greyDark border-b boder-greyMedium">{intl l = "Tags"}</div>
-
- 
 
     <div class="mt-8 mb-3 pl-4 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Non cliquable"}</div>
     <div class="flex m-2">
@@ -1558,9 +1557,9 @@
     <div class="flex">
       <div class="m-4 mr-5">
         <button class="px-4 py-2 bg-white text-gray-800 border border-darkCharbon text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon ">
-          {intl l = "Tag Pays"}
-          <img class="hover:fill-green  hover:bg-vermillon" src="{image file="assets/images/svg/close-circle-grey.svg"}" alt="fr" />
-          </button>
+            {intl l = "Tag Pays"}
+            <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
+            </button>
       </div>
 
       <div class="m-4 mr-5">
@@ -1651,7 +1650,7 @@
 
           <div class="flex items-center">
             <div class="m-4 mr-5">
-              <button class="px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
+              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
                 <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
                 </button>
@@ -1659,37 +1658,65 @@
   
 
             <div class="m-4 mr-5">
-              <button class="px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
+              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
                 <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
                 </button>
             </div>
 
             <div class="m-4 mr-5">
-              <button class="px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
+              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
                 <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
                 </button>
             </div>
 
             <div class="m-4 mr-5">
-              <button class="px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
+              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
                 <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
                 </button>
             </div>
             </div>
 
-           
+            
+<!-- Tabulations -->
+<div id="Tabulations" class="mt-12 mb-6 text-xl text-greyDark border-b boder-greyMedium font-weight">{intl l = "Tabulations"}</div>
 
+<div class="text-xl text-greyDark font-weight">{intl l = "Main Style"}</div>
+  
+<div class="mt-7 p-12 bg-pearlMedium w-2/5 rounded-lg">
+      <button class=" bg-white mx-6 text-vermillon py-4 px-5 bloctext-blue-500 border-b-4 border-vermillon uppercase font-semibold leading-5">
+        {intl l = "Tabulation"}
+      </button>
+
+      <button class="mx-4 bg-white text-vermillon py-4 px-5 bloctext-blue-500 border-b-4 border-vermillon uppercase leading-5 font-semibold">
+        {intl l = "Tabulation"}
+        <i class="mx-1 fas fa-times-circle text-lg text-vermillon"></i>
+      </button>
+     
+
+<div class="mt-7 bg-pearlMedium ">
+  <div class="bg-pearlMedium ">
+    <button class="mx-6 bg-white text-lightCharbon py-4 px-5 bloctext-blue-500 uppercase leading-5 font-semibold hover:text-vermillon">
+      {intl l = "Tabulation"}
+    </button>
+
+    <button class=" mx-4 bg-white text-lightCharbon py-4 px-5 bloctext-blue-500 uppercase leading-5 font-semibold hover:text-vermillon">
+      {intl l = "Tabulation"}
+      <i class="mx-1 fas fa-times-circle text-lg text-greyMedium hover:text-vermillon"></i>
+    </button>
+</div>
+  </div>
+</div>
+       
 
 <!-- Languages -->
-  <div class="mt-12 mb-8 pl-8 text-xl text-greyDark border-b border-greyMedium">{intl l = "Languages"}</div>
-
+<div class="text-xl text-greyDark font-weight mt-10 mb-6">{intl l = "Main Style"}</div>
   <div class="flex items-center p-2">
     <div>
       <div class="mr-1 mb-2">
-        <button class="w-28 h-8 text-xs font-semibold tracking-wider border border-darkCharbon text-darkCharbon uppercase rounded-sm">
+        <button class="w-28 h-8 text-xs font-semibold tracking-wider border border-darkCharbon text-darkCharbon uppercase rounded-sm hover:bg-darkCharbon hover:text-white">
           {intl l = "English"}
         </button>
 
@@ -1699,17 +1726,12 @@
           </button>
       </div>
 
-      <div class="mr-1 mt-2">
-        <button class="w-28 text-xs font-semibold tracking-wider uppercase rounded-sm text-white h-8 bg-darkCharbon">
-          {intl l = "English"}
-        </button>
-    </div>
       </div>
     </div>
 
     <div>
       <div class="mr-1 mb-2">
-        <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase border border-darkCharbon rounded-sm">
+        <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase border border-darkCharbon rounded-sm hover:bg-darkCharbon hover:text-white">
           {intl l = "English"}
         </button>
 
@@ -1718,18 +1740,12 @@
             {intl l = "English"}
           </button>
       </div>
-
-      <div class="mr-1 mt-2">
-        <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 border-darkCharbon bg-darkCharbon">
-          {intl l = "English"}
-        </button>
-    </div>
       </div>
     </div>
 
     <div>
       <div class="mr-1 mb-2">
-        <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon border border-darkCharbon uppercase  rounded-sm">
+        <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon border border-darkCharbon uppercase  rounded-sm hover:bg-darkCharbon hover:text-white">
           {intl l = "English"}
         </button>
 
@@ -1737,12 +1753,6 @@
           <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 bg-darkCharbon">
             {intl l = "English"}
           </button>
-      </div>
-
-      <div class="mr-1 mt-2">
-        <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 bg-darkCharbon">
-          {intl l = "English"}
-        </button>
       </div>
       </div>
     </div>
@@ -2110,6 +2120,41 @@
      </li>
   </ul>
 </div>
+
+
+<!-- Illustrations -->
+<div id="Illustrations" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Illustrations"}</div>
+
+<div class="mt-8 text-xl text-greyDark border-b boder-greyMedium">{intl l = "Errors"}</div>
+
+<div class="flex">
+  <div class="m-4 mr-5">
+    <img class="w-96" src="{image file="assets/images/svg/500.svg"}" alt="fr" />
+  </div>
+
+  <div class="m-4 mr-5">
+    <img class="w-96" src="{image file="assets/images/svg/502.svg"}" alt="fr" />
+  </div>
+
+  <div class="m-4 mr-5">
+    <img class="w-96" src="{image file="assets/images/svg/503.svg"}" alt="fr" />
+  </div>
+  </div>
+
+  <div class="flex">
+    <div class="m-4 mr-5">
+      <img class="w-96" src="{image file="assets/images/svg/404.svg"}" alt="fr" />
+    </div>
+  
+    <div class="m-4 mr-5">
+      <img class="w-96" src="{image file="assets/images/svg/403.svg"}" alt="fr" />
+    </div>
+  
+    <div class="m-4 mr-5">
+      <img class="w-96" src="{image file="assets/images/svg/other-error.svg"}" alt="fr" />
+    </div>
+    </div>
+
 
 
 <!-- Positionnement -->
