@@ -7,13 +7,13 @@ module.exports = {
   ],
 
   theme: {
-    maxWidth: {
-      80: '80%'
-    },
-    minWidth: {
-      80: '80%'
-    },
     extend: {
+      maxWidth: {
+        80: '80%'
+      },
+      minWidth: {
+        80: '80%'
+      },
       colors: {
         main: '#EC6351',
         darkMain: '#E25441',
