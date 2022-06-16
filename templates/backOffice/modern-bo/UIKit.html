@@ -114,7 +114,6 @@
     </div>
   </div>
 
-
     <div class="mt-20 pb-20 border-b border-greyMedium">
 
        <div class="mb-8 text-xl text-greyDark">{intl l = "Status"}</div>
@@ -894,32 +893,24 @@
         <div class="text-greyDark text-sm font-light">{intl l = "Données"}</div>
       </div>
     </div>
-    </div>
+  </div>
 
 
     <!-- Buttons -->
-      <h1 class="mt-20 mb-12 text-3xl font-extrabold text-greyDark">{intl l = "Buttons"}</h1>
+      <h1 id="Buttons" class="mt-20 mb-12 text-3xl font-extrabold text-greyDark">{intl l = "Buttons"}</h1>
 
-    <div class="">
+      <h3 class="text-greyDark text-xl font-semibold">{intl l = "CTA / Large"}</h3>
 
-    <div class="flex">
-      <div class="text-xl text-greyDark">
-        <!--<div class="p-5">
-          {intl l = "Primaire"}
-        </div>-->
-        <div class="flex flex-col justify-between gap-4 mt-7">
-          <div>
+    <div class="flex items-center flex-wrap gap-8 mt-14 pb-20 border-b border-greyMedium">
+      <div class="flex flex-col gap-8 text-xl text-greyDark">
+
             <button class="w-24 text-sm font-semibold tracking-wider text-white uppercase rounded h-9 bg-vermillon hover:bg-lightVermillon active:bg-vermillon focus:ring-2 focus:ring-lighterVermillon">
               {intl l = "Bouton"}
             </button>
-          </div>
-          <div>
             <button class="w-24 h-9 text-sm font-semibold tracking-wider text-white uppercase rounded bg-greyMedium">
               {intl l = "Bouton"}
             </button>
-          </div>
-        </div>
-        <div class="pt-40">
+        <!-- <div class="pt-40">
           <div class="p-5">
             <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase rounded h-7 bg-vermillon hover:bg-lightVermillon active:bg-vermillon focus:ring-2 focus:ring-lighterVermillon">
               {intl l = "Bouton"}
@@ -930,26 +921,16 @@
               {intl l = "Bouton"}
             </button>
           </div>
-        </div>
+        </div> -->
       </div>
-      <div class="text-xl text-greyDark flex flex-col">
-        <!--<div class="p-5 flex flex-col">
-          {intl l = "Secondaire"}
-          <span class="font-light">{intl l  = "Fond clair"}</span>
-        </div>-->
-        <div class="flex flex-col justify-between mt-6">
-          <div class="p-5">
+      <div class="flex flex-col gap-8 ml-20 text-xl text-greyDark">
             <button class="w-24 text-sm font-semibold tracking-wider uppercase border rounded text-vermillon h-9 border-vermillon hover:bg-vermillon hover:text-white active:bg-white active:text-vermillon focus:ring-2 focus:ring-vermillon">
               {intl l = "Bouton"}
             </button>
-          </div>
-          <div class="p-5">
             <button class="w-24 text-sm font-semibold tracking-wider uppercase border rounded text-greyMedium h-9 border-greyMedium">
               {intl l = "Bouton"}
             </button>
-          </div>
-        </div>
-        <div class="pt-40">
+       <!-- <div class="pt-40">
           <div class="p-5">
             <button class="w-20 text-xs font-semibold tracking-wider uppercase border rounded text-vermillon h-7 border-vermillon hover:bg-vermillon hover:text-white active:bg-white active:text-vermillon focus:ring-2 focus:ring-vermillon">
               {intl l = "Bouton"}
@@ -960,25 +941,20 @@
               {intl l = "Bouton"}
             </button>
           </div>
-        </div>
+        </div> -->
       </div>
-      <div class="text-xl text-greyDark">
-        <!--<div class="pt-7">
-          <span class="font-light">{intl l = "Fond foncé"}</span>
-        </div>-->
-        <div class="mt-7">
-          <div class="p-5 mr-5 bg-black ">
+      <div class="flex flex-col gap-8 p-4 mr-20 bg-black text-xl text-greyDark">
+          <div class="">
             <button class="w-24 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded h-9 hover:bg-white hover:text-black active:bg-black active:text-white focus:ring-2 focus:ring-white">
               {intl l = "Bouton"}
             </button>
           </div>
-          <div class="p-5 mr-5 bg-black ">
+          <div class="bg-black ">
             <button class="w-24 text-sm font-semibold tracking-wider text-greyMedium uppercase border border-greyMedium rounded h-9" disabled>
               {intl l = "Bouton"}
             </button>
           </div>
-        </div>
-        <div class="pt-40">
+       <!-- <div class="pt-40">
           <div class="p-5 mr-5 bg-black ">
             <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase border border-white rounded h-7 hover:bg-white hover:text-black active:bg-black active:text-white focus:ring-2 focus:ring-white">
               {intl l = "Bouton"}
@@ -989,222 +965,191 @@
               {intl l = "Bouton"}
             </button>
           </div>
-        </div>
+        </div> -->
       </div>
-      <div class="text-xl text-greyDark flex flex-col">
-        <!--{intl l = "Prévisualisation"}
-        <span class="font-light">{intl l  = "Fond clair"}</span>-->
-        <div class="mt-7">
-          <div class="p-5">
-            <button class="px-3 py-2 text-sm font-semibold tracking-wider uppercase border rounded cursor-pointer border-vermillon text-vermillon hover:bg-vermillon hover:text-white active:bg-white active:text-vermillon focus:ring-2 focus:ring-vermillon">
-              <i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}
-            </button>
-          </div>
-          <div class="p-5">
-            <a class="px-3 py-2 text-sm font-semibold tracking-wider uppercase border rounded cursor-pointer text-greyMedium border-greyMedium"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
-          </div>
-        </div>
+      <div class="flex flex-col gap-8">
+          <button class="px-3 py-2 text-sm font-semibold tracking-wider whitespace-nowrap uppercase border rounded cursor-pointer border-vermillon text-vermillon hover:bg-vermillon hover:text-white active:bg-white active:text-vermillon focus:ring-2 focus:ring-vermillon">
+            <i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}
+          </button>
+          <button class="px-3 py-2 text-sm font-semibold tracking-wider whitespace-nowrap uppercase border rounded cursor-pointer text-greyMedium border-greyMedium"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</>
       </div>
-      <div class="text-xl text-greyDark">
-        <!--<div class="pt-7">
-          <span class="font-light">{intl l = "Fond foncé"}</span>
-        </div>-->
-        <div class="mt-7">
-          <div class="p-5 bg-black md:text-center">
-            <button class="px-3 py-2 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer hover:bg-white hover:text-black active:bg-black active:text-white focus:ring-2 focus:ring-white">
-              <i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}
-            </button>
-          </div>
-          <div class="p-5 bg-black md:text-center">
-            <a class="px-3 py-2 text-sm font-semibold tracking-wider text-greyMedium uppercase border border-greyMedium rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
-          </div>
-        </div>
-      </div>
-      <div class="text-xl text-greyDark">
-        <!--{intl l = "Voir fiche produit"}-->
-        <div class="mt-7">
-          <div class="p-5">
-            <button class="px-2 py-1 text-xs font-semibold tracking-wider uppercase border rounded cursor-pointer border-vermillon text-vermillon  hover:bg-vermillon hover:text-white active:bg-white active:text-vermillon focus:ring-2 focus:ring-vermillon">
-              {intl l="Voir la fiche produit"}<i class="mx-1 fas fa-arrow-right"></i>
-            </button>
-          </div>
-          <div class="p-5">
-            <button class="px-2 py-1 text-xs font-semibold tracking-wider uppercase border rounded cursor-pointer text-greyMedium border-greyMedium">
-              {intl l="Voir la fiche produit"}<i class="mx-1 fas fa-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="text-xl text-greyDark">
-        <!--{intl l = "Déplier / Replier"}-->
-        <div class="mt-7">
-          {component name="FoldUnfoldButton" title="FoldUnfoldButton"}{/component}
-          <div class="p-5 md:text-center">
-            <button class="w-24 h-7 text-xs font-semibold tracking-wider text-white uppercase rounded cursor-pointer bg-greyDark flex" disabled>
-              <div class="bg-greyMedium w-6 flex justify-center items-center rounded-l">
-                <img class="w-2 h-3" src="{image file="assets/images/svg/fold-arrow.svg"}" alt="fr" />
-              </div>
-              <div class="m-auto">
-                {intl l="Replier"}
-              </div>
-            </button>
-          </div>
-        </div>
+      <div class="flex flex-col gap-8 p-4 bg-black">
+          <button class="px-3 py-2 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer hover:bg-white hover:text-black active:bg-black  active:text-white focus:ring-2 focus:ring-white">
+            <i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}
+          </button>
+          <button class="bg-black md:text-center px-3 py-2 text-sm font-semibold tracking-wider text-greyMedium uppercase border border-greyMedium rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</button>
       </div>
     </div>
-  </div>
 
   <!--Small buttons-->
 
-    <!-- Boutons action thelia blocks -->
+  <h3 class="mt-20 text-greyDark text-xl font-semibold">{intl l = "CTA / Small"}</h3>
+
+  <div class="flex items-center flex-wrap gap-8 mt-14 pb-20 border-b border-greyMedium">
+    <div class="flex flex-col gap-8 text-xl text-greyDark">
+      <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase rounded h-7 bg-vermillon hover:bg-lightVermillon active:bg-vermillon focus:ring-2 focus:ring-lighterVermillon">
+        {intl l = "Bouton"}
+      </button>
+      <button class="w-20 h-7 text-xs font-semibold tracking-wider text-white uppercase  rounded bg-greyMedium">
+        {intl l = "Bouton"}
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-8 ml-20 text-xl text-greyDark">
+      <button class="w-20 text-xs font-semibold tracking-wider uppercase border rounded text-vermillon h-7 border-vermillon hover:bg-vermillon hover:text-white active:bg-white active:text-vermillon focus:ring-2 focus:ring-vermillon">
+        {intl l = "Bouton"}
+      </button>
+      <button class="w-20 text-xs font-semibold tracking-wider uppercase border rounded text-greyMedium h-7 border-greyMedium">
+        {intl l = "Bouton"}
+      </button>
+  </div>
+
+    <div class="flex flex-col gap-8 p-4 mr-20 bg-black text-xl text-greyDark">
       <div class="">
-        <div>
-          <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Action Bouttons Thelia Blocks"}</h1>
-          <div class="flex items-center pt-10">
-            <div>
-              <div class="mr-1 mb-2">
-                <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase rounded-l-sm hover:bg-darkCharbon hover:text-white focus:ring-1 focus:ring-lighterVermillon">
+        <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase border border-white rounded h-7 hover:bg-white hover:text-black active:bg-black active:text-white focus:ring-2 focus:ring-white">
+          {intl l = "Bouton"}
+        </button>
+      </div>
+      <div class="bg-black ">
+        <button class="w-20 text-xs font-semibold tracking-wider text-greyMedium uppercase border border-greyMedium rounded h-7" disabled>
+          {intl l = "Bouton"}
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-8">
+      <a href="#" class="px-2 py-1 text-xs font-semibold tracking-wider uppercase border rounded cursor-pointer border-vermillon text-vermillon  hover:bg-vermillon hover:text-white active:bg-white active:text-vermillon focus:ring-2 focus:ring-vermillon">
+        {intl l="Voir la fiche produit"}<i class="mx-1 fas fa-arrow-right"></i>
+      </a>
+      <a href="#" class="px-2 py-1 text-xs font-semibold tracking-wider uppercase border rounded cursor-pointer text-greyMedium border-greyMedium">
+        {intl l="Voir la fiche produit"}<i class="mx-1 fas fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="flex flex-col gap-8">
+       {component name="FoldUnfoldButton" title="FoldUnfoldButton"}{/component}
+          <button class="w-24 h-7 text-xs font-semibold tracking-wider text-white uppercase rounded cursor-pointer bg-greyDark flex" disabled>
+            <div class="h-full bg-greyMedium w-6 flex justify-center items-center rounded-l">
+              <img class="w-2 h-3" src="{image file="assets/images/svg/fold-arrow.svg"}" alt="fr" />
+            </div>
+            <div class="m-auto">
+              {intl l="Replier"}
+            </div>
+          </button>
+    </div>
+  </div>
+
+    <!-- Boutons action thelia blocks -->
+          <h1 class="mt-20 mb-14 text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Action Bouttons Thelia Blocks"}</h1>
+          <div class="flex items-center flex-wrap gap-8 pb-20 border-b border-greyMedium">
+            <div class="flex flex-col gap-8">
+              <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase rounded-l-sm hover:bg-darkCharbon hover:text-white focus:ring-1 focus:ring-lighterVermillon">
+                <i class="fas fa-arrow-up"></i>
+                {intl l = "Monter"}
+              </button>
+
+                <button class="w-28 text-xs text-greyMedium font-semibold tracking-wider uppercase rounded-sm t h-8" disabled>
                   <i class="fas fa-arrow-up"></i>
                   {intl l = "Monter"}
                 </button>
-
-                <div class="mr-1 mt-2">
-                  <button class="w-28 text-xs text-greyMedium font-semibold tracking-wider uppercase rounded-sm t h-8" disabled>
-                    <i class="fas fa-arrow-up"></i>
-                    {intl l = "Monter"}
-                  </button>
-                </div>
-              </div>
             </div>
 
-            <div>
-              <div class="mr-1 mb-2">
+            <div class="flex flex-col gap-8">
                 <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase hover:bg-darkCharbon hover:text-white focus:ring-1 focus:ring-lighterVermillon">
                   <i class="fas fa-arrow-down"></i>
                   {intl l = "Descendre"}
                 </button>
 
-                <div class="mr-1 mt-2">
                   <button class="w-28 text-xs text-greyMedium font-semibold tracking-wider uppercase rounded-sm h-8" disabled>
                     <i class="fas fa-arrow-down"></i>
                     {intl l = "Descendre"}
                   </button>
-                </div>
               </div>
-            </div>
 
-            <div>
-              <div class="mr-1 mb-2">
+              <div class="flex flex-col gap-8 mr-20">
                 <button class="w-28 h-8 text-xs font-semibold tracking-wider text-red uppercase rounded-r-sm hover:bg-red hover:text-white focus:ring-1 focus:ring-lighterVermillon">
                   <i class="fas fa-trash"></i>
                   {intl l = "Supprimer"}
                 </button>
 
-                <div class="mr-1 mt-2">
                   <button class="w-28 text-xs text-greyMedium font-semibold tracking-wider uppercase h-8" disabled>
                     <i class="fas fa-trash"></i>
                     {intl l = "Supprimer"}
                   </button>
-                </div>
               </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Preview Button (short) -->
+              <!-- Preview Button (short) -->
 
-        <div class="ml-20">
-          <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Preview Button (short)"}</h1>
-          <div class="flex flex-col items-center pt-10">
-            <div class="p-2">
-              <button class="w-14 h-14 text-sm font-semibold tracking-wider text-white uppercase bg-vermillon hover:bg-lightVermillon focus:ring-2 focus:ring-lighterVermillon focus:bg-vermillon">
-                <i class="mx-1 fas fa-eye"></i>
-              </button>
-            </div>
+              <div class="flex flex-col gap-8 mr-20">
+                  <button class="w-14 h-14 text-sm font-semibold tracking-wider text-white uppercase bg-vermillon hover:bg-lightVermillon focus:ring-2 focus:ring-lighterVermillon focus:bg-vermillon">
+                    <i class="mx-1 fas fa-eye"></i>
+                  </button>
+    
+                  <button class="w-14 text-sm font-semibold tracking-wider uppercase text-white h-14 bg-greyMedium" disabled>
+                    <i class="mx-1 fas fa-eye"></i>
+                  </button>
+              </div>
 
-            <div class="p-2">
-              <button class="w-14 text-sm font-semibold tracking-wider uppercase text-white h-14 bg-greyMedium" disabled>
-                <i class="mx-1 fas fa-eye"></i>
-              </button>
-            </div>
-          </div>
-      </div>
 
         <!--Concertinas-->
 
-        <div class="ml-20">
-          <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Concertinas"}</h1>
-          <div class="flex flex-col items-center pt-10">
-            <div class="p-2">
-              <button class="w-8 h-8 bg-vermillon rounded-full border-1 border-vermillon text-center text-white hover:bg-lightVermillon focus:bg-darkCharbon focus:border-1 focus:border-darkCharbon">
-                <i class="fa-solid fa-angle-down"></i>
-              </button>
-              <button class="w-8 h-8 bg-vermillon rounded-full border-1 border-vermillon text-center text-white hover:bg-lightVermillon focus:bg-darkCharbon focus:border-1 focus:border-darkCharbon">
-                <i class="fa-solid fa-angle-up"></i>
-              </button>
-            </div>
-            <div class="p-2">
-              <button class="w-8 h-8 bg-greyMedium rounded-full border-1 border-greyMedium text-center text-white" disabled>
-                <i class="fa-solid fa-angle-down"></i>
-              </button>
-              <button class="w-8 h-8 bg-greyMedium rounded-full border-1 border-greyMedium text-center text-white" disabled>
-                <i class="fa-solid fa-angle-up"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+              <div class="flex flex-col gap-8">
+                  <button class="w-8 h-8 bg-vermillon rounded-full border-1 border-vermillon text-center text-white hover:bg-lightVermillon focus:bg-darkCharbon focus:border-1 focus:border-darkCharbon">
+                    <i class="fa-solid fa-angle-down"></i>
+                  </button>
+                  <button class="w-8 h-8 bg-vermillon rounded-full border-1 border-vermillon text-center text-white hover:bg-lightVermillon focus:bg-darkCharbon focus:border-1 focus:border-darkCharbon">
+                    <i class="fa-solid fa-angle-up"></i>
+                  </button>
+              </div>
+              <div class="flex flex-col gap-8 mr-20">
+                  <button class="w-8 h-8 bg-greyMedium rounded-full border-1 border-greyMedium text-center text-white" disabled>
+                    <i class="fa-solid fa-angle-down"></i>
+                  </button>
+                  <button class="w-8 h-8 bg-greyMedium rounded-full border-1 border-greyMedium text-center text-white" disabled>
+                    <i class="fa-solid fa-angle-up"></i>
+                  </button>
+              </div>
 
-  <!--Item positionnement-->
+                <!--Item positionnement-->
 
-      <div class="mt-20 flex m-6">
-        <div>
-          <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Item positionnement"}</h1>
-          <div class="flex flex-col items-center pt-10">
-            <div class="mr-1 mb-2">
+
+              <div class="flex flex-col gap-8">
                 <button class="w-6 h-6 text-sm font-medium bg-pearlMedium border rounded-l cursor-pointer border-greyMedium text-darkCharbon hover:bg-mediumCharbon hover:text-white hover:border-mediumCharbon focus:border-2 focus:border-lighterVermillon">
                   <i class="fas fa-arrow-up"></i></button>
-                <button class="w-6 h-6 mx-3 text-sm font-medium bg-pearlMedium border rounded-r cursor-pointer border-greyMedium text-darkCharbon hover:bg-mediumCharbon hover:text-white hover:border-mediumCharbon focus:border-2 focus:border-lighterVermillon">
+                <button class="w-6 h-6 text-sm font-medium bg-pearlMedium border rounded-r cursor-pointer border-greyMedium text-darkCharbon hover:bg-mediumCharbon hover:text-white hover:border-mediumCharbon focus:border-2 focus:border-lighterVermillon">
                   <i class="fas fa-arrow-down"></i></button>
             </div>
 
-            <div class="mr-1 mt-2">
+            <div class="flex flex-col gap-8 mr-20">
               <button class="w-6 h-6 text-sm font-medium bg-greyMedium border rounded-l cursor-pointer border-greyMedium text-white" disabled>
                 <i class="fas fa-arrow-up"></i></button>
-              <button class="w-6 h-6 mx-3 text-sm font-medium bg-greyMedium border rounded-r cursor-pointer border-greyMedium text-white" disabled>
+              <button class="w-6 h-6 text-sm font-medium bg-greyMedium border rounded-r cursor-pointer border-greyMedium text-white" disabled>
                 <i class="fas fa-arrow-down"></i></button>
             </div>
-          </div>
-        </div>
 
-        <!--Pagination-->
+                    <!--Pagination-->
 
-        <div class="ml-20">
-          <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Pagination"}</h1>
-          <div class="flex flex-col items-center pt-10">
-            <div class="mr-1 mb-2">
+            <div class="flex flex-col gap-8">
               <button class="w-9 h-9 text-sm font-medium bg-white border rounded-l cursor-pointer border-greyMedium text-darkCharbon hover:bg-lightGrey focus:border-2 focus:border-lighterVermillon focus:bg-lightGrey">
                 <i class="fas fa-chevron-left"></i></button>
-              <button class="w-9 h-9 mx-3 text-sm font-medium bg-white border rounded-r cursor-pointer border-greyMedium text-darkCharbon hover:bg-lightGrey focus:border-2 focus:border-lighterVermillon focus:bg-lightGrey">
+              <button class="w-9 h-9 text-sm font-medium bg-white border rounded-r cursor-pointer border-greyMedium text-darkCharbon hover:bg-lightGrey focus:border-2 focus:border-lighterVermillon focus:bg-lightGrey">
                 <i class="fas fa-chevron-right"></i></button>
             </div>
 
-            <div class="mr-1 mt-2">
+            <div class="flex flex-col gap-8">
               <button class="w-9 h-9 text-sm font-medium bg-greyMedium border rounded-l cursor-pointer border-greyMedium text-white" disabled>
                 <i class="fas fa-chevron-left"></i></button>
-              <button class="w-9 h-9 mx-3 text-sm font-medium bg-greyMedium border rounded-r cursor-pointer border-greyMedium text-white" disabled>
+              <button class="w-9 h-9 text-sm font-medium bg-greyMedium border rounded-r cursor-pointer border-greyMedium text-white" disabled>
                 <i class="fas fa-chevron-right"></i></button>
             </div>
+
+              
           </div>
-        </div>
-      </div>
 
       <!--buttons icons-->
 
-      <div class="m-6">
-        <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Buttons Icons"}</h1>
-      </div>
-      <div class="flex ml-20 gap-11 h-36">
+      <h1 class="mt-20 text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Buttons Icons"}</h1>
+      <div class="flex ml-20 mt-14 gap-11 h-36">
         <div class="flex flex-col items-center">
           <span class="text-greyDark font-light text-xl">{intl l = "Close"}</span>
           <div class="mt-5 h-full flex flex-col justify-around">
@@ -1252,58 +1197,58 @@
 
       <div class="flex ml-20 mt-20">
         <div class="flex">
-          <div class="flex flex-col items-center">
+          <div class="flex flex-col items-center h-36">
             <span class="text-greyDark font-light text-xl">{intl l = "Text Edit"}</span>
-              <div class="mt-5">
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/bold-text.svg"}" alt="fr" /></div>
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/bold-text.svg"}" alt="fr" /></div>
+              <div class="mt-5 h-full flex flex-col justify-around">
+                <div class="w-9 h-9 p-2.5 bg-pearlMedium rounded hover:bg-darkCharbon hover:text-white"><img src="{image file="assets/images/svg/bold-text.svg"}" alt="fr" /></div>
+                <div class="w-9 h-9 p-2.5 bg-pearlMedium rounded"><img src="{image file="assets/images/svg/bold-text.svg"}" alt="fr" /></div>
               </div>
           </div>
-          <div class="flex pt-10">
-            <div class="grid gap-4 grid-cols-3 ml-5">
+          <div class="flex pt-10 pl-11">
+            <div class="grid gap-4 grid-cols-3 ml-7">
               <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/bold-text.svg"}" alt="fr" /></div>
-                <div class="text-greyDark text-sm font-light">{intl l = "Bold"}</div>
+                <div class="w-9 h-9 p-2.5 bg-pearlMedium rounded"><img src="{image file="assets/images/svg/bold-text.svg"}" alt="fr" /></div>
+                <div class="text-darkCharbon text-xs font-light">{intl l = "Bold"}</div>
               </div>
 
               <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/italic.svg"}" alt="fr" /></div>
-                <div class="text-greyDark text-sm font-light">{intl l = "Italic"}</div>
+                <div class="w-9 h-9 p-2.5 bg-pearlMedium rounded"><img src="{image file="assets/images/svg/italic.svg"}" alt="fr" /></div>
+                <div class="text-darkCharbon text-xs font-light">{intl l = "Italic"}</div>
               </div>
 
               <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/underlined-text.svg"}" alt="fr" /></div>
-                <div class="text-greyDark text-sm font-light">{intl l = "Underlined"}</div>
+                <div class="w-9 h-9 p-2.5 bg-pearlMedium rounded"><img src="{image file="assets/images/svg/underlined-text.svg"}" alt="fr" /></div>
+                <div class="text-darkCharbon text-xs font-light">{intl l = "Underlined"}</div>
               </div>
 
               <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/align-left.svg"}" alt="fr" /></div>
-                <div class="text-greyDark text-sm font-light">{intl l = "Align Left"}</div>
+                <div class="w-9 h-9 p-2.5 bg-pearlMedium rounded"><img src="{image file="assets/images/svg/align-left.svg"}" alt="fr" /></div>
+                <div class="text-darkCharbon text-xs font-light">{intl l = "Align Left"}</div>
               </div>
 
               <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/align-center.svg"}" alt="fr" /></div>
-                <div class="text-greyDark text-sm font-light">{intl l = "Align Center"}</div>
+                <div class="w-9 h-9 p-2.5 bg-pearlMedium rounded"><img src="{image file="assets/images/svg/align-center.svg"}" alt="fr" /></div>
+                <div class="text-darkCharbon text-xs font-light">{intl l = "Align Center"}</div>
               </div>
 
               <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/align-right.svg"}" alt="fr" /></div>
-                <div class="text-greyDark text-sm font-light">{intl l = "Align Right"}</div>
+                <div class="w-9 h-9 p-2.5 bg-pearlMedium rounded"><img src="{image file="assets/images/svg/align-right.svg"}" alt="fr" /></div>
+                <div class="text-darkCharbon text-xs font-light">{intl l = "Align Right"}</div>
               </div>
 
               <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/list-number.svg"}" alt="fr" /></div>
-                <div class="text-greyDark text-sm font-light">{intl l = "List (numbers)"}</div>
+                <div class="w-9 h-9 p-2.5 bg-pearlMedium rounded"><img src="{image file="assets/images/svg/list-number.svg"}" alt="fr" /></div>
+                <div class="text-darkCharbon text-xs font-light">{intl l = "List (numbers)"}</div>
               </div>
 
               <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/list.svg"}" alt="fr" /></div>
-                <div class="text-greyDark text-sm font-light">{intl l = "List"}</div>
+                <div class="w-9 h-9 p-2.5 bg-pearlMedium rounded"><img src="{image file="assets/images/svg/list.svg"}" alt="fr" /></div>
+                <div class="text-darkCharbon text-xs font-light">{intl l = "List"}</div>
               </div>
 
               <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/link.svg"}" alt="fr" /></div>
-                <div class="text-greyDark text-sm font-light">{intl l = "Link"}</div>
+                <div class="w-9 h-9 p-2.5 bg-pearlMedium rounded"><img src="{image file="assets/images/svg/link.svg"}" alt="fr" /></div>
+                <div class="text-darkCharbon text-xs font-light">{intl l = "Link"}</div>
               </div>
             </div>
           </div>
@@ -1312,54 +1257,55 @@
 
       <!--Actions tableau-->
 
-      <div class="flex ml-20">
-        <div>
+      <div class="flex ml-20 mt-20">
+        <div class="flex">
+          <div class="flex flex-col h-36">
           <span class="text-greyDark font-light text-xl">{intl l = "Actions tableau"}</span>
-          <div class="flex pt-10">
-            <div>
+            <div class="mt-5 h-full flex flex-col justify-around pl-5">
               <div class="w-5 h-5"><img src="{image file="assets/images/svg/double.svg"}" alt="fr" /></div>
               <div class="w-5 h-5"><img src="{image file="assets/images/svg/double.svg"}" alt="fr" /></div>
             </div>
-            <div class="ml-5">
-              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/double.svg"}" alt="fr" /></div>
-                <div class="text-greyDark text-sm font-light">{intl l = "Copier"}</div>
-              </div>
+          </div>
+          <div class="pt-14 ml-3">
+            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/double.svg"}" alt="fr" /></div>
+              <div class="text-darkCharbon text-xs font-light">{intl l = "Copier"}</div>
+            </div>
 
-              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/html-code.svg"}" alt="fr" /></div>
-                <div class="text-greyDark text-sm font-light">{intl l = "Code"}</div>
-              </div>
+            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/html-code.svg"}" alt="fr" /></div>
+              <div class="text-darkCharbon text-xs font-light">{intl l = "Code"}</div>
             </div>
           </div>
         </div>
       </div>
 
+
       <!--Réseaux Sociaux-->
 
-      <div class="flex ml-20">
-        <div>
+      <div class="flex ml-20 mt-20">
+        <div class="flex">
+          <div class="flex flex-col h-36">
           <span class="text-greyDark font-light text-xl">{intl l = "Réseaux Sociaux"}</span>
-          <div class="flex pt-10">
-            <div>
+            <div class="mt-5 h-full flex flex-col justify-around pl-5">
               <div class="w-5 h-5"><img src="{image file="assets/images/svg/github.svg"}" alt="fr" /></div>
               <div class="w-5 h-5"><img src="{image file="assets/images/svg/github.svg"}" alt="fr" /></div>
             </div>
-            <div class="ml-5 flex">
-              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/github.svg"}" alt="fr" /></div>
-                <div class="text-greyDark text-sm font-light">{intl l = "GitHub"}</div>
-              </div>
+          </div>
+          <div class="flex pt-14">
+            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/github.svg"}" alt="fr" /></div>
+              <div class="text-darkCharbon text-xs font-light">{intl l = "GitHub"}</div>
+            </div>
 
-              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/twitter.svg"}" alt="fr" /></div>
-                <div class="text-greyDark text-sm font-light">{intl l = "Twitter"}</div>
-              </div>
+            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/twitter.svg"}" alt="fr" /></div>
+              <div class="text-darkCharbon text-xs font-light">{intl l = "Twitter"}</div>
+            </div>
 
-              <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-                <div class="w-5 h-5"><img src="{image file="assets/images/svg/facebook.svg"}" alt="fr" /></div>
-                <div class="text-greyDark text-sm font-light">{intl l = "Facebook"}</div>
-              </div>
+            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+              <div class="w-5 h-5"><img src="{image file="assets/images/svg/facebook.svg"}" alt="fr" /></div>
+              <div class="text-darkCharbon text-xs font-light">{intl l = "Facebook"}</div>
             </div>
           </div>
         </div>
@@ -1367,64 +1313,64 @@
 
     <!--Contenu item-->
 
-    <div class="flex ml-20">
-      <div>
+    <div class="flex ml-20 mt-20">
+      <div class="flex">
+        <div class="flex flex-col h-36">
         <span class="text-greyDark font-light text-xl">{intl l = "Contenu item"}</span>
-        <div class="flex pt-10">
-          <div>
+          <div class="mt-5 h-full flex flex-col justify-around pl-5">
             <div class="w-5 h-5"><img src="{image file="assets/images/svg/title.svg"}" alt="fr" /></div>
             <div class="w-5 h-5"><img src="{image file="assets/images/svg/title.svg"}" alt="fr" /></div>
           </div>
-          <div class="grid gap-4 grid-cols-5 ml-5">
-            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/title.svg"}" alt="fr" /></div>
-              <div class="text-greyDark text-sm font-light">{intl l = "Titres"}</div>
-            </div>
+        </div>
+        <div class="grid gap-4 grid-cols-5 ml-7 pt-14">
+          <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+            <div class="w-5 h-5"><img src="{image file="assets/images/svg/title.svg"}" alt="fr" /></div>
+            <div class="text-darkCharbon text-xs font-light">{intl l = "Titres"}</div>
+          </div>
 
-            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/text.svg"}" alt="fr" /></div>
-              <div class="text-greyDark text-sm font-light">{intl l = "Textes"}</div>
-            </div>
+          <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+            <div class="w-5 h-5"><img src="{image file="assets/images/svg/text.svg"}" alt="fr" /></div>
+            <div class="text-darkCharbon text-xs font-light">{intl l = "Textes"}</div>
+          </div>
 
-            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/button.svg"}" alt="fr" /></div>
-              <div class="text-greyDark text-sm font-light">{intl l = "Boutons"}</div>
-            </div>
+          <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+            <div class="w-5 h-5"><img src="{image file="assets/images/svg/button.svg"}" alt="fr" /></div>
+            <div class="text-darkCharbon text-xs font-light">{intl l = "Boutons"}</div>
+          </div>
 
-            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/images.svg"}" alt="fr" /></div>
-              <div class="text-greyDark text-sm font-light">{intl l = "Images"}</div>
-            </div>
+          <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+            <div class="w-5 h-5"><img src="{image file="assets/images/svg/images.svg"}" alt="fr" /></div>
+            <div class="text-darkCharbon text-xs font-light">{intl l = "Images"}</div>
+          </div>
 
-            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/video.svg"}" alt="fr" /></div>
-              <div class="text-greyDark text-sm font-light">{intl l = "Vidéo"}</div>
-            </div>
+          <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+            <div class="w-5 h-5"><img src="{image file="assets/images/svg/video.svg"}" alt="fr" /></div>
+            <div class="text-darkCharbon text-xs font-light">{intl l = "Vidéo"}</div>
+          </div>
 
-            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/product.svg"}" alt="fr" /></div>
-              <div class="text-greyDark text-sm font-light">{intl l = "Produits"}</div>
-            </div>
+          <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+            <div class="w-5 h-5"><img src="{image file="assets/images/svg/product.svg"}" alt="fr" /></div>
+            <div class="text-darkCharbon text-xs font-light">{intl l = "Produits"}</div>
+          </div>
 
-            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/accordion.svg"}" alt="fr" /></div>
-              <div class="text-greyDark text-sm font-light">{intl l = "Accordéons"}</div>
-            </div>
+          <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+            <div class="w-5 h-5"><img src="{image file="assets/images/svg/accordion.svg"}" alt="fr" /></div>
+            <div class="text-darkCharbon text-xs font-light">{intl l = "Accordéons"}</div>
+          </div>
 
-            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/separate.svg"}" alt="fr" /></div>
-              <div class="text-greyDark text-sm font-light">{intl l = "Séparateurs"}</div>
-            </div>
+          <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+            <div class="w-5 h-5"><img src="{image file="assets/images/svg/separate.svg"}" alt="fr" /></div>
+            <div class="text-darkCharbon text-xs font-light">{intl l = "Séparateurs"}</div>
+          </div>
 
-            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/verticale.svg"}" alt="fr" /></div>
-              <div class="text-greyDark text-sm font-light">{intl l = "Colonnes"}</div>
-            </div>
+          <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+            <div class="w-5 h-5"><img src="{image file="assets/images/svg/verticale.svg"}" alt="fr" /></div>
+            <div class="text-darkCharbon text-xs font-light">{intl l = "Colonnes"}</div>
+          </div>
 
-            <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/html.svg"}" alt="fr" /></div>
-              <div class="text-greyDark text-sm font-light">{intl l = "HTML"}</div>
-            </div>
+          <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+            <div class="w-5 h-5"><img src="{image file="assets/images/svg/html.svg"}" alt="fr" /></div>
+            <div class="text-darkCharbon text-xs font-light">{intl l = "HTML"}</div>
           </div>
         </div>
       </div>
@@ -1470,7 +1416,6 @@
       </div>
     </div>
     </div>
-
 
     <!-- Formulaires -->
     <div id="Forms" class="m-6 mt-20">
@@ -1525,6 +1470,7 @@
       </div>
     </div>
 
+
     <!-- Tags -->
     <div id="Tags" class="mt-8 text-xl text-greyDark border-b boder-greyMedium">{intl l = "Tags"}</div>
 
@@ -1555,9 +1501,9 @@
     <div class="flex">
       <div class="m-4 mr-5">
         <button class="px-4 py-2 bg-white text-gray-800 border border-darkCharbon text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon ">
-          {intl l = "Tag Pays"}
-          <img class="hover:fill-green  hover:bg-vermillon" src="{image file="assets/images/svg/close-circle-grey.svg"}" alt="fr" />
-          </button>
+            {intl l = "Tag Pays"}
+            <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
+            </button>
       </div>
 
       <div class="m-4 mr-5">
@@ -1648,7 +1594,7 @@
 
           <div class="flex items-center">
             <div class="m-4 mr-5">
-              <button class="px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
+              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
                 <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
                 </button>
@@ -1656,21 +1602,21 @@
 
 
             <div class="m-4 mr-5">
-              <button class="px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
+              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
                 <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
                 </button>
             </div>
 
             <div class="m-4 mr-5">
-              <button class="px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
+              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
                 <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
                 </button>
             </div>
 
             <div class="m-4 mr-5">
-              <button class="px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
+              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
                 <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
                 </button>
@@ -1678,15 +1624,43 @@
             </div>
 
 
+<!-- Tabulations -->
+<div id="Tabulations" class="mt-12 mb-6 text-xl text-greyDark border-b boder-greyMedium font-weight">{intl l = "Tabulations"}</div>
+
+<div class="text-xl text-greyDark font-weight">{intl l = "Main Style"}</div>
+
+<div class="mt-7 p-12 bg-pearlMedium w-2/5 rounded-lg">
+      <button class=" bg-white mx-6 text-vermillon py-4 px-5 bloctext-blue-500 border-b-4 border-vermillon uppercase font-semibold leading-5">
+        {intl l = "Tabulation"}
+      </button>
+
+      <button class="mx-4 bg-white text-vermillon py-4 px-5 bloctext-blue-500 border-b-4 border-vermillon uppercase leading-5 font-semibold">
+        {intl l = "Tabulation"}
+        <i class="mx-1 fas fa-times-circle text-lg text-vermillon"></i>
+      </button>
+
+
+<div class="mt-7 bg-pearlMedium ">
+  <div class="bg-pearlMedium ">
+    <button class="mx-6 bg-white text-lightCharbon py-4 px-5 bloctext-blue-500 uppercase leading-5 font-semibold hover:text-vermillon">
+      {intl l = "Tabulation"}
+    </button>
+
+    <button class=" mx-4 bg-white text-lightCharbon py-4 px-5 bloctext-blue-500 uppercase leading-5 font-semibold hover:text-vermillon">
+      {intl l = "Tabulation"}
+      <i class="mx-1 fas fa-times-circle text-lg text-greyMedium hover:text-vermillon"></i>
+    </button>
+</div>
+  </div>
+</div>
 
 
 <!-- Languages -->
-  <div class="mt-12 mb-8 pl-8 text-xl text-greyDark border-b border-greyMedium">{intl l = "Languages"}</div>
-
+<div class="text-xl text-greyDark font-weight mt-10 mb-6">{intl l = "Main Style"}</div>
   <div class="flex items-center p-2">
     <div>
       <div class="mr-1 mb-2">
-        <button class="w-28 h-8 text-xs font-semibold tracking-wider border border-darkCharbon text-darkCharbon uppercase rounded-sm">
+        <button class="w-28 h-8 text-xs font-semibold tracking-wider border border-darkCharbon text-darkCharbon uppercase rounded-sm hover:bg-darkCharbon hover:text-white">
           {intl l = "English"}
         </button>
 
@@ -1696,17 +1670,12 @@
           </button>
       </div>
 
-      <div class="mr-1 mt-2">
-        <button class="w-28 text-xs font-semibold tracking-wider uppercase rounded-sm text-white h-8 bg-darkCharbon">
-          {intl l = "English"}
-        </button>
-    </div>
       </div>
     </div>
 
     <div>
       <div class="mr-1 mb-2">
-        <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase border border-darkCharbon rounded-sm">
+        <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase border border-darkCharbon rounded-sm hover:bg-darkCharbon hover:text-white">
           {intl l = "English"}
         </button>
 
@@ -1715,18 +1684,12 @@
             {intl l = "English"}
           </button>
       </div>
-
-      <div class="mr-1 mt-2">
-        <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 border-darkCharbon bg-darkCharbon">
-          {intl l = "English"}
-        </button>
-    </div>
       </div>
     </div>
 
     <div>
       <div class="mr-1 mb-2">
-        <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon border border-darkCharbon uppercase  rounded-sm">
+        <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon border border-darkCharbon uppercase  rounded-sm hover:bg-darkCharbon hover:text-white">
           {intl l = "English"}
         </button>
 
@@ -1734,12 +1697,6 @@
           <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 bg-darkCharbon">
             {intl l = "English"}
           </button>
-      </div>
-
-      <div class="mr-1 mt-2">
-        <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 bg-darkCharbon">
-          {intl l = "English"}
-        </button>
       </div>
       </div>
     </div>
@@ -2107,6 +2064,41 @@
      </li>
   </ul>
 </div>
+
+
+<!-- Illustrations -->
+<div id="Illustrations" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Illustrations"}</div>
+
+<div class="mt-8 text-xl text-greyDark border-b boder-greyMedium">{intl l = "Errors"}</div>
+
+<div class="flex">
+  <div class="m-4 mr-5">
+    <img class="w-96" src="{image file="assets/images/svg/500.svg"}" alt="fr" />
+  </div>
+
+  <div class="m-4 mr-5">
+    <img class="w-96" src="{image file="assets/images/svg/502.svg"}" alt="fr" />
+  </div>
+
+  <div class="m-4 mr-5">
+    <img class="w-96" src="{image file="assets/images/svg/503.svg"}" alt="fr" />
+  </div>
+  </div>
+
+  <div class="flex">
+    <div class="m-4 mr-5">
+      <img class="w-96" src="{image file="assets/images/svg/404.svg"}" alt="fr" />
+    </div>
+
+    <div class="m-4 mr-5">
+      <img class="w-96" src="{image file="assets/images/svg/403.svg"}" alt="fr" />
+    </div>
+
+    <div class="m-4 mr-5">
+      <img class="w-96" src="{image file="assets/images/svg/other-error.svg"}" alt="fr" />
+    </div>
+    </div>
+
 
 
 <!-- Positionnement -->

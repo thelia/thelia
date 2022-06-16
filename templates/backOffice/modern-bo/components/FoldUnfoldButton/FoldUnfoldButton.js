@@ -4,9 +4,9 @@ export const FoldUnfoldButton = () => {
 
   document.addEventListener('DOMContentLoaded', function() {
 
-      const btn = document.getElementById('btn');
+      const btn = document.getElementById('deploy-retract-btn');
       let img = btn.querySelector('img');
-      const textBtn = document.getElementById('textBtn');
+      const textBtn = document.getElementById('deploy-retract-text');
 
       const pathFoldImg = img.src;
 
