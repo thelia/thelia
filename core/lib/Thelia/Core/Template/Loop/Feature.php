@@ -109,7 +109,8 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $product = $this->getProduct();
-        $template = $this->getTemplate();
+
+        $template = $this->getTemplate() ?? [];
         $excludeTemplate = $this->getExcludeTemplate();
 
         $this->useFeaturePosition = true;
@@ -120,11 +121,6 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
             // Find all template assigned to the products.
             $products = ProductQuery::create()->filterById($product, Criteria::IN)->find();
-
-            // Create template array
-            if ($template == null) {
-                $template = [];
-            }
 
             /** @var ProductModel $product */
             foreach ($products as $product) {
