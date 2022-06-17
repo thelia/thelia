@@ -879,51 +879,38 @@
     </div>
   </div>
 
-  <div class="mt-20">
-    <h1 class="text-greyDark text-xl font-semibold">{intl l = "Other"}</h1>
-  </div>
+  <div class="mt-20 pb-20 border-b border-greyMedium">
+    <h1 class="text-greyDark text-xl font-semibold">{intl l = "Others"}</h1>
 
-  <div class="flex items-center mt-14 pb-20">
-    <div class="mx-5 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-        <div class="w-5 h-5"><img src="{image file="assets/images/svg/financial.svg"}" alt="fr" /></div>
-      <div class="text-greyDark text-sm font-light">{intl l = "Financier"}</div>
-    </div>
+    <div class="flex mt-14">
+      <div class="mx-5 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+          <div class="w-5 h-5"><img src="{image file="assets/images/svg/financial.svg"}" alt="fr" /></div>
+        <div class="text-greyDark text-sm font-light">{intl l = "Financier"}</div>
+      </div>
 
-    <div class="mx-5 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-        <div class="w-5 h-5"><img src="{image file="assets/images/svg/data.svg"}" alt="fr" /></div>
-      <div class="text-greyDark text-sm font-light">{intl l = "Données"}</div>
+      <div class="mx-5 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
+          <div class="w-5 h-5"><img src="{image file="assets/images/svg/data.svg"}" alt="fr" /></div>
+        <div class="text-greyDark text-sm font-light">{intl l = "Données"}</div>
+      </div>
     </div>
   </div>
 
 
     <!-- Buttons -->
-    <div id="Buttons" class="m-6 mt-20">
-      <h1 class="text-3xl font-extrabold text-greyDark">{intl l = "Buttons"}</h1>
-    </div>
+      <h1 id="Buttons" class="mt-20 mb-12 text-3xl font-extrabold text-greyDark">{intl l = "Buttons"}</h1>
 
-    <div class="m-6">
-      <h1 class="mt-8 border-b text-greyDark border-greyMedium text-2xl font-bold">{intl l = "CTA / LARGE"}</h1>
-    </div>
+      <h3 class="text-greyDark text-xl font-semibold">{intl l = "CTA / Large"}</h3>
 
-  <div>
-    <div class="flex justify-evenly py-4 ">
-      <div class="text-xl text-greyDark">
-        <!--<div class="p-5">
-          {intl l = "Primaire"}
-        </div>-->
-        <div class="flex flex-col justify-between mt-7">
-          <div class="p-5">
+    <div class="flex items-center flex-wrap gap-8 mt-14 pb-20 border-b border-greyMedium">
+      <div class="flex flex-col gap-8 text-xl text-greyDark">
+
             <button class="w-24 text-sm font-semibold tracking-wider text-white uppercase rounded h-9 bg-vermillon hover:bg-lightVermillon active:bg-vermillon focus:ring-2 focus:ring-lighterVermillon">
               {intl l = "Bouton"}
             </button>
-          </div>
-          <div class="p-5">
             <button class="w-24 h-9 text-sm font-semibold tracking-wider text-white uppercase rounded bg-greyMedium">
               {intl l = "Bouton"}
             </button>
-          </div>
-        </div>
-        <div class="pt-40">
+        <!-- <div class="pt-40">
           <div class="p-5">
             <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase rounded h-7 bg-vermillon hover:bg-lightVermillon active:bg-vermillon focus:ring-2 focus:ring-lighterVermillon">
               {intl l = "Bouton"}
@@ -934,26 +921,16 @@
               {intl l = "Bouton"}
             </button>
           </div>
-        </div>
+        </div> -->
       </div>
-      <div class="text-xl text-greyDark flex flex-col">
-        <!--<div class="p-5 flex flex-col">
-          {intl l = "Secondaire"}
-          <span class="font-light">{intl l  = "Fond clair"}</span>
-        </div>-->
-        <div class="flex flex-col justify-between mt-6">
-          <div class="p-5">
+      <div class="flex flex-col gap-8 ml-20 text-xl text-greyDark">
             <button class="w-24 text-sm font-semibold tracking-wider uppercase border rounded text-vermillon h-9 border-vermillon hover:bg-vermillon hover:text-white active:bg-white active:text-vermillon focus:ring-2 focus:ring-vermillon">
               {intl l = "Bouton"}
             </button>
-          </div>
-          <div class="p-5">
             <button class="w-24 text-sm font-semibold tracking-wider uppercase border rounded text-greyMedium h-9 border-greyMedium">
               {intl l = "Bouton"}
             </button>
-          </div>
-        </div>
-        <div class="pt-40">
+       <!-- <div class="pt-40">
           <div class="p-5">
             <button class="w-20 text-xs font-semibold tracking-wider uppercase border rounded text-vermillon h-7 border-vermillon hover:bg-vermillon hover:text-white active:bg-white active:text-vermillon focus:ring-2 focus:ring-vermillon">
               {intl l = "Bouton"}
@@ -964,25 +941,20 @@
               {intl l = "Bouton"}
             </button>
           </div>
-        </div>
+        </div> -->
       </div>
-      <div class="text-xl text-greyDark">
-        <!--<div class="pt-7">
-          <span class="font-light">{intl l = "Fond foncé"}</span>
-        </div>-->
-        <div class="mt-7">
-          <div class="p-5 mr-5 bg-black ">
+      <div class="flex flex-col gap-8 p-4 mr-20 bg-black text-xl text-greyDark">
+          <div class="">
             <button class="w-24 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded h-9 hover:bg-white hover:text-black active:bg-black active:text-white focus:ring-2 focus:ring-white">
               {intl l = "Bouton"}
             </button>
           </div>
-          <div class="p-5 mr-5 bg-black ">
+          <div class="bg-black ">
             <button class="w-24 text-sm font-semibold tracking-wider text-greyMedium uppercase border border-greyMedium rounded h-9" disabled>
               {intl l = "Bouton"}
             </button>
           </div>
-        </div>
-        <div class="pt-40">
+       <!-- <div class="pt-40">
           <div class="p-5 mr-5 bg-black ">
             <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase border border-white rounded h-7 hover:bg-white hover:text-black active:bg-black active:text-white focus:ring-2 focus:ring-white">
               {intl l = "Bouton"}
@@ -993,264 +965,262 @@
               {intl l = "Bouton"}
             </button>
           </div>
-        </div>
+        </div> -->
       </div>
-      <div class="text-xl text-greyDark flex flex-col">
-        <!--{intl l = "Prévisualisation"}
-        <span class="font-light">{intl l  = "Fond clair"}</span>-->
-        <div class="mt-7">
-          <div class="p-5">
-            <button class="px-3 py-2 text-sm font-semibold tracking-wider uppercase border rounded cursor-pointer border-vermillon text-vermillon hover:bg-vermillon hover:text-white active:bg-white active:text-vermillon focus:ring-2 focus:ring-vermillon">
-              <i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}
-            </button>
-          </div>
-          <div class="p-5">
-            <a class="px-3 py-2 text-sm font-semibold tracking-wider uppercase border rounded cursor-pointer text-greyMedium border-greyMedium"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
-          </div>
-        </div>
+      <div class="flex flex-col gap-8">
+          <button class="px-3 py-2 text-sm font-semibold tracking-wider whitespace-nowrap uppercase border rounded cursor-pointer border-vermillon text-vermillon hover:bg-vermillon hover:text-white active:bg-white active:text-vermillon focus:ring-2 focus:ring-vermillon">
+            <i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}
+          </button>
+          <button class="px-3 py-2 text-sm font-semibold tracking-wider whitespace-nowrap uppercase border rounded cursor-pointer text-greyMedium border-greyMedium"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</>
       </div>
-      <div class="text-xl text-greyDark">
-        <!--<div class="pt-7">
-          <span class="font-light">{intl l = "Fond foncé"}</span>
-        </div>-->
-        <div class="mt-7">
-          <div class="p-5 bg-black md:text-center">
-            <button class="px-3 py-2 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer hover:bg-white hover:text-black active:bg-black active:text-white focus:ring-2 focus:ring-white">
-              <i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}
-            </button>
-          </div>
-          <div class="p-5 bg-black md:text-center">
-            <a class="px-3 py-2 text-sm font-semibold tracking-wider text-greyMedium uppercase border border-greyMedium rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
-          </div>
-        </div>
+      <div class="flex flex-col gap-8 p-4 bg-black">
+          <button class="px-3 py-2 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer hover:bg-white hover:text-black active:bg-black  active:text-white focus:ring-2 focus:ring-white">
+            <i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}
+          </button>
+          <button class="bg-black md:text-center px-3 py-2 text-sm font-semibold tracking-wider text-greyMedium uppercase border border-greyMedium rounded cursor-pointer"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</button>
       </div>
-      <div class="text-xl text-greyDark">
-        <!--{intl l = "Voir fiche produit"}-->
-        <div class="mt-7">
-          <div class="p-5">
-            <button class="px-2 py-1 text-xs font-semibold tracking-wider uppercase border rounded cursor-pointer border-vermillon text-vermillon  hover:bg-vermillon hover:text-white active:bg-white active:text-vermillon focus:ring-2 focus:ring-vermillon">
-              {intl l="Voir la fiche produit"}<i class="mx-1 fas fa-arrow-right"></i>
-            </button>
-          </div>
-          <div class="p-5">
-            <button class="px-2 py-1 text-xs font-semibold tracking-wider uppercase border rounded cursor-pointer text-greyMedium border-greyMedium">
-              {intl l="Voir la fiche produit"}<i class="mx-1 fas fa-arrow-right"></i>
-            </button>
-          </div>
-        </div>
+    </div>
+
+  <!--Small buttons-->
+
+  <h3 class="mt-20 text-greyDark text-xl font-semibold">{intl l = "CTA / Small"}</h3>
+
+  <div class="flex items-center flex-wrap gap-8 mt-14 pb-20 border-b border-greyMedium">
+    <div class="flex flex-col gap-8 text-xl text-greyDark">
+      <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase rounded h-7 bg-vermillon hover:bg-lightVermillon active:bg-vermillon focus:ring-2 focus:ring-lighterVermillon">
+        {intl l = "Bouton"}
+      </button>
+      <button class="w-20 h-7 text-xs font-semibold tracking-wider text-white uppercase  rounded bg-greyMedium">
+        {intl l = "Bouton"}
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-8 ml-20 text-xl text-greyDark">
+      <button class="w-20 text-xs font-semibold tracking-wider uppercase border rounded text-vermillon h-7 border-vermillon hover:bg-vermillon hover:text-white active:bg-white active:text-vermillon focus:ring-2 focus:ring-vermillon">
+        {intl l = "Bouton"}
+      </button>
+      <button class="w-20 text-xs font-semibold tracking-wider uppercase border rounded text-greyMedium h-7 border-greyMedium">
+        {intl l = "Bouton"}
+      </button>
+  </div>
+
+    <div class="flex flex-col gap-8 p-4 mr-20 bg-black text-xl text-greyDark">
+      <div class="">
+        <button class="w-20 text-xs font-semibold tracking-wider text-white uppercase border border-white rounded h-7 hover:bg-white hover:text-black active:bg-black active:text-white focus:ring-2 focus:ring-white">
+          {intl l = "Bouton"}
+        </button>
       </div>
-      <div class="text-xl text-greyDark">
-        <!--{intl l = "Déplier / Replier"}-->
-        <div class="mt-7">
-          {component name="FoldUnfoldButton" title="FoldUnfoldButton"}{/component}
-          <div class="p-5 md:text-center">
-            <button class="w-24 h-7 text-xs font-semibold tracking-wider text-white uppercase rounded cursor-pointer bg-greyDark flex" disabled>
-              <div class="bg-greyMedium w-6 flex justify-center items-center rounded-l">
-                <img class="w-2 h-3" src="{image file="assets/images/svg/fold-arrow.svg"}" alt="fr" />
-              </div>
-              <div class="m-auto">
-                {intl l="Replier"}
-              </div>
-            </button>
-          </div>
-        </div>
+      <div class="bg-black ">
+        <button class="w-20 text-xs font-semibold tracking-wider text-greyMedium uppercase border border-greyMedium rounded h-7" disabled>
+          {intl l = "Bouton"}
+        </button>
       </div>
+    </div>
+
+    <div class="flex flex-col gap-8">
+      <a href="#" class="px-2 py-1 text-xs font-semibold tracking-wider uppercase border rounded cursor-pointer border-vermillon text-vermillon  hover:bg-vermillon hover:text-white active:bg-white active:text-vermillon focus:ring-2 focus:ring-vermillon">
+        {intl l="Voir la fiche produit"}<i class="mx-1 fas fa-arrow-right"></i>
+      </a>
+      <a href="#" class="px-2 py-1 text-xs font-semibold tracking-wider uppercase border rounded cursor-pointer text-greyMedium border-greyMedium">
+        {intl l="Voir la fiche produit"}<i class="mx-1 fas fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="flex flex-col gap-8">
+       {component name="FoldUnfoldButton" title="FoldUnfoldButton"}{/component}
+          <button class="w-24 h-7 text-xs font-semibold tracking-wider text-white uppercase rounded cursor-pointer bg-greyDark flex" disabled>
+            <div class="h-full bg-greyMedium w-6 flex justify-center items-center rounded-l">
+              <img class="w-2 h-3" src="{image file="assets/images/svg/fold-arrow.svg"}" alt="fr" />
+            </div>
+            <div class="m-auto">
+              {intl l="Replier"}
+            </div>
+          </button>
     </div>
   </div>
 
-  <!--Small buttons-->
-  <div class="">
-    <h1 class="mt-8 border-b text-greyDark border-greyMedium">{intl l = "CTA / SMALL"}</h1>
-  </div>
-
     <!-- Boutons action thelia blocks -->
-      <div class="flex mt-20 gap-40">
-        <div>
-          <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl pt-5">{intl l = "Action Bouttons Thelia Blocks"}</h1>
-          <div class="flex items-center pt-10">
-            <div>
-              <div class="mr-1 mb-2">
-                <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase rounded-l-sm hover:bg-darkCharbon hover:text-white focus:ring-1 focus:ring-lighterVermillon">
+          <h1 class="mt-20 mb-14 text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Action Bouttons Thelia Blocks"}</h1>
+          <div class="flex items-center flex-wrap gap-8 pb-20 border-b border-greyMedium">
+            <div class="flex flex-col gap-8">
+              <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase rounded-l-sm hover:bg-darkCharbon hover:text-white focus:ring-1 focus:ring-lighterVermillon">
+                <i class="fas fa-arrow-up"></i>
+                {intl l = "Monter"}
+              </button>
+
+                <button class="w-28 text-xs text-greyMedium font-semibold tracking-wider uppercase rounded-sm t h-8" disabled>
                   <i class="fas fa-arrow-up"></i>
                   {intl l = "Monter"}
                 </button>
-
-                <div class="mr-1 mt-2">
-                  <button class="w-28 text-xs text-greyMedium font-semibold tracking-wider uppercase rounded-sm t h-8" disabled>
-                    <i class="fas fa-arrow-up"></i>
-                    {intl l = "Monter"}
-                  </button>
-                </div>
-              </div>
             </div>
 
-            <div>
-              <div class="mr-1 mb-2">
+            <div class="flex flex-col gap-8">
                 <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase hover:bg-darkCharbon hover:text-white focus:ring-1 focus:ring-lighterVermillon">
                   <i class="fas fa-arrow-down"></i>
                   {intl l = "Descendre"}
                 </button>
 
-                <div class="mr-1 mt-2">
                   <button class="w-28 text-xs text-greyMedium font-semibold tracking-wider uppercase rounded-sm h-8" disabled>
                     <i class="fas fa-arrow-down"></i>
                     {intl l = "Descendre"}
                   </button>
-                </div>
               </div>
-            </div>
 
-            <div>
-              <div class="mr-1 mb-2">
+              <div class="flex flex-col gap-8 mr-20">
                 <button class="w-28 h-8 text-xs font-semibold tracking-wider text-red uppercase rounded-r-sm hover:bg-red hover:text-white focus:ring-1 focus:ring-lighterVermillon">
                   <i class="fas fa-trash"></i>
                   {intl l = "Supprimer"}
                 </button>
 
-                <div class="mr-1 mt-2">
                   <button class="w-28 text-xs text-greyMedium font-semibold tracking-wider uppercase h-8" disabled>
                     <i class="fas fa-trash"></i>
                     {intl l = "Supprimer"}
                   </button>
-                </div>
               </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Preview Button (short) -->
+              <!-- Preview Button (short) -->
 
-        <div>
-          <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl pt-5">{intl l = "Preview Button (short)"}</h1>
-          <div class="flex flex-col items-center pt-10">
-            <div class="p-2">
-              <button class="w-14 h-14 text-sm font-semibold tracking-wider text-white uppercase bg-vermillon hover:bg-lightVermillon focus:ring-2 focus:ring-lighterVermillon focus:bg-vermillon">
-                <i class="mx-1 fas fa-eye"></i>
-              </button>
-            </div>
+              <div class="flex flex-col gap-8 mr-20">
+                  <button class="w-14 h-14 text-sm font-semibold tracking-wider text-white uppercase bg-vermillon hover:bg-lightVermillon focus:ring-2 focus:ring-lighterVermillon focus:bg-vermillon">
+                    <i class="mx-1 fas fa-eye"></i>
+                  </button>
 
-            <div class="p-2">
-              <button class="w-14 text-sm font-semibold tracking-wider uppercase text-white h-14 bg-greyMedium" disabled>
-                <i class="mx-1 fas fa-eye"></i>
-              </button>
-            </div>
-          </div>
-      </div>
+                  <button class="w-14 text-sm font-semibold tracking-wider uppercase text-white h-14 bg-greyMedium" disabled>
+                    <i class="mx-1 fas fa-eye"></i>
+                  </button>
+              </div>
+
 
         <!--Concertinas-->
 
-        <div>
-          <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl pt-5">{intl l = "Concertinas"}</h1>
-          <div class="flex flex-col items-center pt-10">
-            <div class="p-2">
-              <button class="w-8 h-8 bg-vermillon rounded-full border-1 border-vermillon text-center text-white hover:bg-lightVermillon focus:bg-darkCharbon focus:border-1 focus:border-darkCharbon">
-                <i class="fa-solid fa-angle-down"></i>
-              </button>
-              <button class="w-8 h-8 bg-vermillon rounded-full border-1 border-vermillon text-center text-white hover:bg-lightVermillon focus:bg-darkCharbon focus:border-1 focus:border-darkCharbon">
-                <i class="fa-solid fa-angle-up"></i>
-              </button>
-            </div>
-            <div class="p-2">
-              <button class="w-8 h-8 bg-greyMedium rounded-full border-1 border-greyMedium text-center text-white" disabled>
-                <i class="fa-solid fa-angle-down"></i>
-              </button>
-              <button class="w-8 h-8 bg-greyMedium rounded-full border-1 border-greyMedium text-center text-white" disabled>
-                <i class="fa-solid fa-angle-up"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+              <div class="flex flex-col gap-8">
+                  <button class="w-8 h-8 bg-vermillon rounded-full border-1 border-vermillon text-center text-white hover:bg-lightVermillon focus:bg-darkCharbon focus:border-1 focus:border-darkCharbon">
+                    <i class="fa-solid fa-angle-down"></i>
+                  </button>
+                  <button class="w-8 h-8 bg-vermillon rounded-full border-1 border-vermillon text-center text-white hover:bg-lightVermillon focus:bg-darkCharbon focus:border-1 focus:border-darkCharbon">
+                    <i class="fa-solid fa-angle-up"></i>
+                  </button>
+              </div>
+              <div class="flex flex-col gap-8 mr-20">
+                  <button class="w-8 h-8 bg-greyMedium rounded-full border-1 border-greyMedium text-center text-white" disabled>
+                    <i class="fa-solid fa-angle-down"></i>
+                  </button>
+                  <button class="w-8 h-8 bg-greyMedium rounded-full border-1 border-greyMedium text-center text-white" disabled>
+                    <i class="fa-solid fa-angle-up"></i>
+                  </button>
+              </div>
 
-  <!--Item positionnement-->
+                <!--Item positionnement-->
 
-      <div class="mt-20 flex gap-20">
-        <div>
-          <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl pt-5">{intl l = "Item positionnement"}</h1>
-          <div class="flex flex-col items-center pt-10">
-            <div class="mr-1 mb-2">
+
+              <div class="flex flex-col gap-8">
                 <button class="w-6 h-6 text-sm font-medium bg-pearlMedium border rounded-l cursor-pointer border-greyMedium text-darkCharbon hover:bg-mediumCharbon hover:text-white hover:border-mediumCharbon focus:border-2 focus:border-lighterVermillon">
-                  <i class="fas fa-arrow-up"></i></button>
-                <button class="w-6 h-6 mx-3 text-sm font-medium bg-pearlMedium border rounded-r cursor-pointer border-greyMedium text-darkCharbon hover:bg-mediumCharbon hover:text-white hover:border-mediumCharbon focus:border-2 focus:border-lighterVermillon">
-                  <i class="fas fa-arrow-down"></i></button>
+                  <i class="fas fa-arrow-up"></i>
+                </button>
+                <button class="w-6 h-6 text-sm font-medium bg-pearlMedium border rounded-r cursor-pointer border-greyMedium text-darkCharbon hover:bg-mediumCharbon hover:text-white hover:border-mediumCharbon focus:border-2 focus:border-lighterVermillon">
+                  <i class="fas fa-arrow-down"></i>
+                </button>
             </div>
 
-            <div class="mr-1 mt-2">
+            <div class="flex flex-col gap-8 mr-20">
               <button class="w-6 h-6 text-sm font-medium bg-greyMedium border rounded-l cursor-pointer border-greyMedium text-white" disabled>
-                <i class="fas fa-arrow-up"></i></button>
-              <button class="w-6 h-6 mx-3 text-sm font-medium bg-greyMedium border rounded-r cursor-pointer border-greyMedium text-white" disabled>
-                <i class="fas fa-arrow-down"></i></button>
+                <i class="fas fa-arrow-up"></i>
+              </button>
+              <button class="w-6 h-6 text-sm font-medium bg-greyMedium border rounded-r cursor-pointer border-greyMedium text-white" disabled>
+                <i class="fas fa-arrow-down"></i>
+              </button>
             </div>
-          </div>
-        </div>
 
-        <!--Pagination-->
+                    <!--Pagination-->
 
-        <div>
-          <h1 class="border-t text-greyDark border-greyMedium font-bold text-2xl pt-5">{intl l = "Pagination"}</h1>
-          <div class="flex flex-col items-center pt-10">
-            <div class="mr-1 mb-2">
+            <div class="flex flex-col gap-8">
               <button class="w-9 h-9 text-sm font-medium bg-white border rounded-l cursor-pointer border-greyMedium text-darkCharbon hover:bg-lightGrey focus:border-2 focus:border-lighterVermillon focus:bg-lightGrey">
-                <i class="fas fa-chevron-left"></i></button>
-              <button class="w-9 h-9 mx-3 text-sm font-medium bg-white border rounded-r cursor-pointer border-greyMedium text-darkCharbon hover:bg-lightGrey focus:border-2 focus:border-lighterVermillon focus:bg-lightGrey">
-                <i class="fas fa-chevron-right"></i></button>
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button class="w-9 h-9 text-sm font-medium bg-white border rounded-r cursor-pointer border-greyMedium text-darkCharbon hover:bg-lightGrey focus:border-2 focus:border-lighterVermillon focus:bg-lightGrey">
+                <i class="fas fa-chevron-right"></i>
+              </button>
             </div>
 
-            <div class="mr-1 mt-2">
+            <div class="flex flex-col gap-8">
               <button class="w-9 h-9 text-sm font-medium bg-greyMedium border rounded-l cursor-pointer border-greyMedium text-white" disabled>
-                <i class="fas fa-chevron-left"></i></button>
-              <button class="w-9 h-9 mx-3 text-sm font-medium bg-greyMedium border rounded-r cursor-pointer border-greyMedium text-white" disabled>
-                <i class="fas fa-chevron-right"></i></button>
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button class="w-9 h-9 text-sm font-medium bg-greyMedium border rounded-r cursor-pointer border-greyMedium text-white" disabled>
+                <i class="fas fa-chevron-right"></i>
+              </button>
             </div>
           </div>
-        </div>
-      </div>
 
       <!--buttons icons-->
 
-      <div class="mt-20">
-        <h2 class="border-t text-greyDark border-greyMedium font-bold text-2xl pt-5">{intl l = "Buttons Icons"}</h2>
-      </div>
+      <h2 class="mt-20 text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Buttons Icons"}</h2>
       <div class="flex ml-20 mt-14 gap-11 h-36">
         <div class="flex flex-col items-center">
           <span class="text-greyDark font-light text-xl">{intl l = "Close"}</span>
           <div class="mt-5 h-full flex flex-col justify-around">
-            <div class="w-7 h-7 focus:bg-lighterVermillon"><i class="fa-solid fa-xmark-large"></i></div>
-            <div class="w-7 h-7 p-1 text-greyMedium"><img src="{image file="assets/images/svg/close.svg"}" alt="fr" /></div>
+            <button class="w-7 h-7 rounded cursor-pointer hover:text-red focus:bg-lighterVermillon focus:text-darkCharbon">
+              <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <button class="w-7 h-7 text-greyMedium" disabled>
+              <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
           </div>
         </div>
         <div class="flex flex-col items-center">
           <span class="text-greyDark font-light text-xl">{intl l = "Search"}</span>
           <div class="mt-5 h-full flex flex-col justify-around">
-            <div class="w-5 h-5"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></div>
-            <div class="w-5 h-5"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></div>
+            <button class="w-7 h-7 text-vermillon rounded cursor-pointer hover:text-lightVermillon focus:bg-lighterVermillon focus:text-darkCharbon">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            <button class="w-7 h-7 text-greyMedium" disabled>
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
           </div>
         </div>
         <div class="flex flex-col items-center">
           <span class="text-greyDark font-light text-xl">{intl l = "Delete"}</span>
           <div class="mt-5 h-full flex flex-col justify-around">
-            <div class="w-5 h-5"><img src="{image file="assets/images/svg/trash.svg"}" alt="fr" /></div>
-            <div class="w-5 h-5"><img src="{image file="assets/images/svg/trash.svg"}" alt="fr" /></div>
+            <button class="w-7 h-7 text-red rounded cursor-pointer hover:text-redLight focus:text-red focus:border focus:border-lighterVermillon">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+            <button class="w-7 h-7 text-pearlMedium" disabled>
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
           </div>
         </div>
         <div class="flex flex-col items-center">
           <span class="text-greyDark font-light text-xl">{intl l = "Up/Down"}</span>
-          <div class="flex h-full mt-5">
+          <div class="flex justify-between h-full mt-5 w-20">
             <div class="h-full flex flex-col justify-around">
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/arrow-up.svg"}" alt="fr" /></div>
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/arrow-up.svg"}" alt="fr" /></div>
+              <button class="w-7 h-7 text-darkCharbon rounded cursor-pointer hover:text-greyDark focus:bg-lighterVermillon focus:text-greyDark">
+                <i class="fa-solid fa-arrow-up"></i>
+              </button>
+              <button class="w-7 h-7 text-pearlMedium" disabled>
+                <i class="fa-solid fa-arrow-up"></i>
+              </button>
             </div>
             <div class="h-full flex flex-col justify-around">
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/down-arrow.svg"}" alt="fr" /></div>
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/down-arrow.svg"}" alt="fr" /></div>
+              <button class="w-7 h-7 text-darkCharbon rounded cursor-pointer hover:text-greyDark focus:bg-lighterVermillon focus:text-greyDark">
+                <i class="fa-solid fa-arrow-down"></i>
+              </button>
+              <button class="w-7 h-7 text-pearlMedium" disabled>
+                <i class="fa-solid fa-arrow-down"></i>
+              </button>
             </div>
           </div>
         </div>
         <div class="flex flex-col items-center">
           <span class="text-greyDark font-light text-xl">{intl l = "Sort"}</span>
           <div class="mt-5 h-full flex flex-col justify-around">
-            <div class="w-5 h-5"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></div>
-            <div class="w-5 h-5"><img src="{image file="assets/images/svg/magnifying-glass.svg"}" alt="fr" /></div>
+            <button class="w-7 h-7 flex justify-center items-center rounded hover:text-vermillon focus:text-vermillon focus:border-2 focus:border-lighterVermillon">
+              <i class="fa-solid fa-arrow-up-long"></i>
+              <i class="fa-solid fa-arrow-down-long"></i>
+            </button>
+            <button class="w-7 h-7 flex justify-center items-center">
+              <i class="fa-solid fa-arrow-up-long"></i>
+              <i class="fa-solid fa-arrow-down-long"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -1262,8 +1232,12 @@
           <div class="flex flex-col items-center h-36">
             <span class="text-greyDark font-light text-xl">{intl l = "Text Edit"}</span>
               <div class="mt-5 h-full flex flex-col justify-around">
-                <div class="w-9 h-9 p-2.5 bg-pearlMedium rounded hover:bg-darkCharbon hover:text-white"><img src="{image file="assets/images/svg/bold-text.svg"}" alt="fr" /></div>
-                <div class="w-9 h-9 p-2.5 bg-pearlMedium rounded"><img src="{image file="assets/images/svg/bold-text.svg"}" alt="fr" /></div>
+                <button class="w-7 h-7 bg-pearlMedium rounded cursor-pointer hover:bg-darkCharbon hover:text-white focus:bg-lighterVermillon focus:text-darkCharbon">
+                  <i class="fa-solid fa-bold"></i>
+                </button>
+                <button class="w-7 h-7 bg-lightPearl text-greyMedium rounded cursor-pointer" disabled>
+                  <i class="fa-solid fa-bold"></i>
+                </button>
               </div>
           </div>
           <div class="flex pt-10 pl-11">
@@ -1324,13 +1298,19 @@
           <div class="flex flex-col h-36">
           <span class="text-greyDark font-light text-xl">{intl l = "Actions tableau"}</span>
             <div class="mt-6 h-full flex flex-col justify-around pl-5">
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/double.svg"}" alt="fr" /></div>
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/double.svg"}" alt="fr" /></div>
+              <button class="w-7 h-7 rounded cursor-pointer hover:text-greyDark focus:text-lighterVermillon">
+                <i class="fa-solid fa-copy"></i>
+              </button>
+              <button class="w-7 h-7 text-greyMedium" disabled>
+                <i class="fa-solid fa-copy"></i>
+              </button>
             </div>
           </div>
           <div class="pt-16 ml-3">
             <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/double.svg"}" alt="fr" /></div>
+              <div class="w-7 h-7">
+                <i class="fa-solid fa-copy"></i>
+              </div>
               <div class="text-darkCharbon text-xs font-light">{intl l = "Copier"}</div>
             </div>
 
@@ -1350,13 +1330,19 @@
           <div class="flex flex-col h-36">
           <span class="text-greyDark font-light text-xl">{intl l = "Réseaux Sociaux"}</span>
             <div class="mt-6 h-full flex flex-col justify-around pl-5">
-              <div class="w-5 h-5"><img class="" src="{image file="assets/images/svg/github.svg"}" alt="fr" /></div>
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/github.svg"}" alt="fr" /></div>
+              <button class="w-7 h-7">
+                <i class="fa-brands fa-github"></i>
+              </button>
+              <button class="w-7 h-7">
+                <i class="fa-brands fa-github"></i>
+              </button>
             </div>
           </div>
           <div class="flex pt-16">
             <div class="mx-5 mb-6 mr-5 h-16 w-24 text-center flex flex-col items-center justify-between">
-              <div class="w-5 h-5"><img src="{image file="assets/images/svg/github.svg"}" alt="fr" /></div>
+              <butto class="w-5 h-5">
+                <i class="fa-brands fa-github"></i>
+              </butto>
               <div class="text-darkCharbon text-xs font-light">{intl l = "GitHub"}</div>
             </div>
 
@@ -1380,8 +1366,12 @@
         <div class="flex flex-col h-36">
         <span class="text-greyDark font-light text-xl">{intl l = "Contenu item"}</span>
           <div class="mt-6 h-full flex flex-col justify-around pl-5">
-            <div class="w-9 h-9 p-1 bg-pearlMedium rounded"><img src="{image file="assets/images/svg/title.svg"}" alt="fr" /></div>
-            <div class="w-9 h-9 p-1 bg-pearlMedium rounded"><img src="{image file="assets/images/svg/title.svg"}" alt="fr" /></div>
+            <button class="w-9 h-9 bg-pearlMedium rounded cursor-pointer hover:text-vermillon focus:text-darkCharbon focus:bg-lighterVermillon">
+              <i class="fa-regular fa-image"></i>
+            </button>
+            <button class="w-9 h-9 bg-pearlMedium rounded text-greyMedium" disabled>
+              <i class="fa-regular fa-image"></i>
+            </button>
           </div>
         </div>
         <div class="grid gap-4 grid-cols-5 ml-7 pt-14">
@@ -1478,7 +1468,6 @@
       </div>
     </div>
     </div>
-
 
     <!-- Formulaires -->
     <div id="Forms" class="m-6 mt-20">
