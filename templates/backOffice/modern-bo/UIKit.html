@@ -85,7 +85,7 @@
         </div>
 
         <div class="w-24 mr-14">
-          <div class="w-24 h-24 mb-3 font-bold bg-white rounded-lg border-greyMedium"></div>
+          <div class="w-24 h-24 mb-3 font-bold bg-white rounded-lg border border-greyLight"></div>
           <div class="font-bold text-greyDark">{intl l = "White"}</div>
           <div class="text-greyDark">{intl l = "#FFFFFF"}</div>
         </div>
@@ -310,7 +310,7 @@
       <div class="text-greyDark">{intl l = "Size : 14"}</div>
       <div class="text-greyDark">{intl l = "Line height : 19"}</div>
     </div>
-    <div class="w-2/3 text-sm text-darkCharbon">
+    <div class="w-2/3 max-w-md text-sm text-darkCharbon">
       {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
     </div>
 </div>
@@ -322,7 +322,7 @@
       <div class="text-greyDark">{intl l = "SIze : 14"}</div>
       <div class="text-greyDark">{intl l = "Line height : 19"}</div>
     </div>
-    <div class="w-2/3 text-sm font-semibold text-darkCharbon">
+    <div class="w-2/3 max-w-md text-sm font-semibold text-darkCharbon">
       {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
     </div>
 </div>
@@ -334,7 +334,7 @@
       <div class="text-greyDark">{intl l = "Size : 14"}</div>
       <div class="text-greyDark">{intl l = "Line height : 19"}</div>
     </div>
-    <div class="w-2/3 maxWidth text-sm font-bold text-darkCharbon">
+    <div class="w-2/3 max-w-md text-sm font-bold text-darkCharbon">
       {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
     </div>
 </div>
@@ -346,7 +346,7 @@
       <div class="text-greyDark">{intl l = "Size : 14"}</div>
       <div class="text-greyDark">{intl l = "Line height : 19"}</div>
     </div>
-    <div class="w-2/3 text-sm font-light text-darkCharbon">
+    <div class="w-2/3 max-w-md text-sm font-light text-darkCharbon">
       {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
     </div>
   </div>
@@ -358,7 +358,7 @@
       <div class="text-greyDark">{intl l = "Size : 12"}</div>
       <div class="text-greyDark">{intl l = "Line height : 16"}</div>
     </div>
-    <div class="w-2/3 text-xs font-bold text-darkCharbon">
+    <div class="w-2/3 max-w-md text-xs font-bold text-darkCharbon">
       {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
     </div>
   </div>
@@ -371,7 +371,7 @@
       <div class="text-greyDark">{intl l = "Size : 12"}</div>
       <div class="text-greyDark">{intl l = "Line height : 16"}</div>
     </div>
-    <div class="w-2/3 text-xs font-light text-darkCharbon">
+    <div class="w-2/3 max-w-md text-xs font-light text-darkCharbon">
       {intl l = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
     </div>
 </div>
@@ -1040,7 +1040,8 @@
   </div>
 
     <!-- Boutons action thelia blocks -->
-          <h1 class="mt-20 mb-14 text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Action Bouttons Thelia Blocks"}</h1>
+          <h2 class="mt-20 mb-14 text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Action Bouttons Thelia Blocks"}</h1>
+          
           <div class="flex items-center flex-wrap gap-8 pb-20 border-b border-greyMedium">
             <div class="flex flex-col gap-8">
               <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase rounded-l-sm hover:bg-darkCharbon hover:text-white focus:ring-1 focus:ring-lighterVermillon">
@@ -1076,9 +1077,15 @@
                     <i class="fas fa-trash"></i>
                     {intl l = "Supprimer"}
                   </button>
-              </div>
+              </div>             
+          </div>
 
-              <!-- Preview Button (short) -->
+          <h3 class="mt-20 mb-14 text-greyDark text-xl font-semibold">{intl l="Preview Button (short)"}</h3>
+          
+          <div class="flex items-center flex-wrap gap-8 pb-20 border-b border-greyMedium">
+
+
+          <!-- Preview Button (short) -->
 
               <div class="flex flex-col gap-8 mr-20">
                   <button class="w-14 h-14 text-sm font-semibold tracking-wider text-white uppercase bg-vermillon hover:bg-lightVermillon focus:ring-2 focus:ring-lighterVermillon focus:bg-vermillon">
@@ -1089,6 +1096,12 @@
                     <i class="mx-1 fas fa-eye"></i>
                   </button>
               </div>
+          </div>
+
+          <h3 class="mt-20 mb-14 text-greyDark text-xl font-semibold">{intl l="Concertinas"}</h3>
+          
+          <div class="flex items-center flex-wrap gap-8 pb-20 border-b border-greyMedium">
+
 
 
         <!--Concertinas-->
@@ -1109,9 +1122,12 @@
                     <i class="fa-solid fa-angle-up"></i>
                   </button>
               </div>
+            </div>
 
+          <h3 class="mt-20 mb-14 text-greyDark text-xl font-semibold">{intl l="Item positionnement"}</h3>
+          
+          <div class="flex items-center flex-wrap gap-8 pb-20 border-b border-greyMedium">          
                 <!--Item positionnement-->
-
 
               <div class="flex flex-col gap-8">
                 <button class="w-6 h-6 text-sm font-medium bg-pearlMedium border rounded-l cursor-pointer border-greyMedium text-darkCharbon hover:bg-mediumCharbon hover:text-white hover:border-mediumCharbon focus:border-2 focus:border-lighterVermillon">
@@ -1131,7 +1147,14 @@
               </button>
             </div>
 
-                    <!--Pagination-->
+              
+          </div>
+
+          <h3 class="mt-20 mb-14 text-greyDark text-xl font-semibold">{intl l="Pagination"}</h3>
+          
+          <div class="flex items-center flex-wrap gap-8 pb-20 border-b border-greyMedium">
+
+            <!--Pagination-->
 
             <div class="flex flex-col gap-8">
               <button class="w-9 h-9 text-sm font-medium bg-white border rounded-l cursor-pointer border-greyMedium text-darkCharbon hover:bg-lightGrey focus:border-2 focus:border-lighterVermillon focus:bg-lightGrey">
@@ -1151,6 +1174,7 @@
               </button>
             </div>
           </div>
+
 
       <!--buttons icons-->
 
@@ -1496,7 +1520,7 @@
         </div>
 
     <!-- Toggle -->
-    <div class="flex p-10">
+    <div class="flex pb-20 border-b border-mediumGrey">
       <div class="m-2 mr-5">
         <label for="toggle" class="flex items-center cursor-pointer">
           <div class="relative">
@@ -1524,156 +1548,155 @@
 
 
     <!-- Tags -->
-    <div id="Tags" class="mt-8 text-xl text-greyDark border-b boder-greyMedium">{intl l = "Tags"}</div>
+    <h2 class="mt-20 mb-14 text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Tags"}</h1>
 
 
-
-    <div class="mt-8 mb-3 pl-4 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Non cliquable"}</div>
-    <div class="flex m-2">
-      <div class="m-2">
-        <button class="px-4 py-2 bg-pearlMedium text-darkCharbon border border-darkCharbon text-sm font-medium rounded-full">
+      <h3 class="mb-6 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Non cliquable"}</h3>
+    <div class="flex mb-8">
+      <div class="w-44">
+        <button class="px-4 py-1 bg-white text-darkCharbon border border-darkCharbon text-sm font-medium rounded-full">
           {intl l = "Tag Pays"}
           </button>
       </div>
 
-      <div class="m-2">
-        <button class="px-4 py-2 bg-white text-darkCharbon border border-darkCharbon text-sm font-medium rounded-full">
+      <div class="w-44">
+        <button class="px-4 py-1 bg-pearlMedium text-darkCharbon border border-darkCharbon text-sm font-medium rounded-full">
           {intl l = "Tag Pays"}
           </button>
       </div>
 
-      <div class="m-2">
-        <button class="px-4 py-2 bg-darkCharbon text-white border border-darkCharbon text-sm font-medium rounded-full">
+      <div class="w-44">
+        <button class="px-4 py-1 bg-darkCharbon text-white border border-darkCharbon text-sm font-medium rounded-full">
           {intl l = "Tag Pays"}
           </button>
       </div>
     </div>
 
-    <div class="mt-12 mb-3 pl-4 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Cliquable"}</div>
-    <div class="flex">
-      <div class="m-4 mr-5">
-        <button class="px-4 py-2 bg-white text-gray-800 border border-darkCharbon text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon ">
+    <h3 class="mb-6 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Cliquable"}</h3>
+    <div class="flex mb-8">
+      <div class="w-44">
+        <button class="flex items-center pl-4 pr-1 py-1 bg-white text-gray-800 border border-darkCharbon text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon ">
             {intl l = "Tag Pays"}
-            <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
-            </button>
+            <i class="ml-2 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
+        </button>
       </div>
 
-      <div class="m-4 mr-5">
-        <button class="px-4 py-2 bg-pearlLight text-gray-800 border border-darkCharbon text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon ">
+      <div class="w-44">
+        <button class="flex items-center pl-4 pr-1 py-1 bg-pearlMedium text-gray-800 border border-darkCharbon text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon ">
           {intl l = "Tag Pays"}
-          <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
+          <i class="ml-2 fas fa-times-circle text-lg hover:text-vermillon"></i>
           </button>
       </div>
 
-      <div class="m-4 mr-5">
-        <button class="px-4 py-2 bg-white text-greenDark border border-greenDark text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon ">
+      <div class="w-44">
+        <button class="flex items-center pl-4 pr-1 py-1 bg-white text-greenDark border border-greenDark text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon ">
           {intl l = "Tag Pays"}
-          <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
+          <i class="ml-2 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
           </button>
       </div>
 
-      <div class="m-4 mr-5">
-        <button class="px-4 py-2 bg-mediumCharbon text-white border border-mediumCharbon text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon focus:bg-lightVermillon ">
+      <div class="w-44">
+        <button class="flex items-center pl-4 pr-1 py-1 bg-mediumCharbon text-white border border-mediumCharbon text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon focus:bg-lightVermillon ">
           {intl l = "Tag Pays"}
-          <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
+          <i class="ml-2 fas fa-times-circle text-lg text-pearlMedium hover:text-vermillon"></i>
           </button>
       </div>
       </div>
 
-      <div class="flex items-center">
-        <div class="m-4 mr-5">
-          <button class="px-4 py-2 bg-mediumCharbon text-white border border-mediumCharbon text-sm font-medium rounded-full">
+      <div class="flex mb-8">
+        <div class="w-44">
+          <button class="flex items-center pl-4 pr-1 py-1 bg-mediumCharbon text-white border border-mediumCharbon text-sm font-medium rounded-full">
             {intl l = "Tag Pays"}
-            <i class="mx-1 fas fa-times-circle text-lg text-greyDark"></i>
+            <i class="ml-2 fas fa-times-circle text-lg text-greyDark"></i>
             </button>
         </div>
 
-        <div class="m-4 mr-5">
-          <button class="px-4 py-2 bg-mediumCharbon text-white border border-mediumCharbon text-sm font-medium rounded-full">
+        <div class="w-44">
+          <button class="flex items-center pl-4 pr-1 py-1 bg-mediumCharbon text-white border border-mediumCharbon text-sm font-medium rounded-full">
             {intl l = "Tag Pays"}
-            <i class="mx-1 fas fa-times-circle text-lg text-greyDark"></i>
+            <i class="ml-2 fas fa-times-circle text-lg text-greyDark"></i>
             </button>
         </div>
 
-        <div class="m-4 mr-5">
-          <button class="px-4 py-2 bg-greenDark text-white border border-greenDark text-sm font-medium rounded-full">
+        <div class="w-44">
+          <button class="flex items-center pl-4 pr-1 py-1 bg-greenDark text-white border border-greenDark text-sm font-medium rounded-full">
             {intl l = "Tag Pays"}
-            <i class="mx-1 fas fa-times-circle text-lg text-pearlMedium"></i>
+            <i class="ml-2 fas fa-times-circle text-lg text-pearlMedium"></i>
             </button>
         </div>
 
-        <div class="m-4 mr-5">
-          <button class="px-4 py-2 bg-greenDark text-white border border-greenDark text-sm font-medium rounded-full">
+        <div class="w-44">
+          <button class="flex items-center pl-4 pr-1 py-1 bg-greenDark text-white border border-greenDark text-sm font-medium rounded-full">
             {intl l = "Tag Pays"}
-            <i class="mx-1 fas fa-times-circle text-lg text-white"></i>
+            <i class="ml-2 fas fa-times-circle text-lg text-white"></i>
             </button>
         </div>
         </div>
 
-        <div class="flex items-center">
-          <div class="m-4 mr-5">
-            <button class="px-4 py-2 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
-              <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
+        <div class="flex mb-8">
+          <div class="w-44">
+            <button class="flex items-center pl-3 pr-1 py-1 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
+              <i class="mr-1 fas fa-triangle-exclamation text-darkCharbon"></i>
               {intl l = "Tag Pays"}
-              <i class="mx-1 fas fa-times-circle text-lg text-darkCharbon"></i>
+              <i class="ml-2 fas fa-times-circle text-lg text-darkCharbon"></i>
               </button>
           </div>
 
-          <div class="m-4 mr-5">
-            <button class="px-4 py-2 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
-              <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
+          <div class="w-44">
+            <button class="flex items-center pl-3 pr-1 py-1 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
+              <i class="mr-1 fas fa-triangle-exclamation text-darkCharbon"></i>
               {intl l = "Tag Pays"}
-              <i class="mx-1 fas fa-times-circle text-lg text-darkCharbon"></i>
+              <i class="ml-2 fas fa-times-circle text-lg text-darkCharbon"></i>
               </button>
           </div>
 
-          <div class="m-4 mr-5">
-            <button class="px-4 py-2 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
-              <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
+          <div class="w-44">
+            <button class="flex items-center pl-3 pr-1 py-1 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
+              <i class="mr-1 fas fa-triangle-exclamation text-darkCharbon"></i>
               {intl l = "Tag Pays"}
-              <i class="mx-1 fas fa-times-circle text-lg text-darkCharbon"></i>
+              <i class="ml-2 fas fa-times-circle text-lg text-darkCharbon"></i>
               </button>
           </div>
 
-          <div class="m-4 mr-5">
-            <button class="px-4 py-2 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
-              <i class="fas fa-triangle-exclamation text-darkCharbon"></i>
+          <div class="w-44">
+            <button class="flex items-center pl-3 pr-1 py-1 bg-wheat text-darkCharbon border border-lightCharbon text-sm font-medium rounded-full">
+              <i class="mr-1 fas fa-triangle-exclamation text-darkCharbon"></i>
               {intl l = "Tag Pays"}
-              <i class="mx-1 fas fa-times-circle text-lg text-darkCharbon"></i>
+              <i class="ml-2 fas fa-times-circle text-lg text-darkCharbon"></i>
               </button>
           </div>
           </div>
 
-          <div class="flex items-center">
-            <div class="m-4 mr-5">
-              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
+          <div class="flex items-center pb-20 border-b border-mediumGrey">
+            <div class="w-44">
+              <button class="flex items-center pl-4 pr-1 py-1 pointer-events-none bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
-                <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
+                <i class="ml-2 fas fa-times-circle text-lg text-greyMedium"></i>
                 </button>
             </div>
 
 
-            <div class="m-4 mr-5">
-              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
+            <div class="w-44">
+              <button class="flex items-center pl-4 pr-1 py-1 pointer-events-none bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
-                <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
+                <i class="ml-2 fas fa-times-circle text-lg text-greyMedium"></i>
                 </button>
             </div>
 
-            <div class="m-4 mr-5">
-              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
+            <div class="w-44">
+              <button class="flex items-center pl-4 pr-1 py-1 pointer-events-none bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
-                <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
+                <i class="ml-2 fas fa-times-circle text-lg text-greyMedium"></i>
                 </button>
             </div>
 
-            <div class="m-4 mr-5">
-              <button class="pointer-events-none px-4 py-2 bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
+            <div class="w-44">
+              <button class="flex items-center pl-4 pr-1 py-1 pointer-events-none bg-white text-greyMedium border border-greyMedium text-sm font-medium rounded-full">
                 {intl l = "Tag Pays"}
-                <i class="mx-1 fas fa-times-circle text-lg text-greyMedium"></i>
+                <i class="ml-2 fas fa-times-circle text-lg text-greyMedium"></i>
                 </button>
             </div>
-            </div>
+      </div>
 
 
 <!-- Tabulations -->
