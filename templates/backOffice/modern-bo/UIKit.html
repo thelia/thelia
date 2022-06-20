@@ -1494,33 +1494,64 @@
     </div>
 
     <!-- Formulaires -->
-    <div id="Forms" class="m-6 mt-20">
-      <h1 class="text-3xl font-bold text-greyDark">{intl l = "Formulaires"}</h1>
-    </div>
-    <div class="flex items-center p-2">
-       <input type="checkbox" class="mx-1 border-darkCharbon rounded h-5 w-5" />
-       <input type="checkbox" class="mx-1 border-darkCharbon rounded h-5 w-5" checked/>
-      </div>
-      <div class="flex items-center p-2">
-        <input type="checkbox" class="mx-1 border-lightVermillon rounded h-5 w-5" />
-        <input type="checkbox" class="mx-1 border-lightVermillon bg-lighterVermillon rounded h-5 w-5" checked/>
-       </div>
-       <div class="flex items-center p-3">
-        {component name="CheckBoxFocus" title="CheckBoxFocus"}{/component}
-       </div>
 
-       <div class="flex items-center p-2">
-        {component name="RadioButton" title="RadioButton"}{/component}
-       </div>
-       <div class="flex items-center p-2">
-        {component name="RadioButton" title="RadioButton"}{/component}
-        </div>
-        <div class="flex items-center p-2">
-         {component name="RadioButton" title="RadioButton"}{/component}
-        </div>
+    <div id="Forms" class="mt-20">
+      <h2 class="text-3xl font-extrabold text-greyDark">{intl l = "Elements formulaires"}</h2>
+    </div>
+
+    <!--Checkbox-->
+
+    <div id="Forms" class="mt-12 pt-5 border-t border-greyMedium">
+      <h2 class="text-2xl font-bold text-greyDark">{intl l = "Check box"}</h2>
+    </div>
+
+    <div class="flex gap-11 mt-14 mx-5 pb-20">
+      <div class="flex flex-col justify-between h-40">
+        <span class="text-greyDark font-light text-xl">{intl l = "Unchecked"}</span>
+        <input type="checkbox" class="mx-1 border-darkCharbon rounded h-5 w-5 hover:border-lightVermillon focus:ring-lightVermillon focus:border-darkCharbon"/>
+        <input type="checkbox" class="mx-1 border-red rounded h-5 w-5 bg-backgroundRed" disabled/>
+        <input type="checkbox" class="mx-1 border-greyMedium rounded h-5 w-5" disabled/>
+      </div>
+      <div class="flex flex-col justify-between h-40">
+        <span class="text-greyDark font-light text-xl">{intl l = "Checked"}</span>
+        <input type="checkbox" class="mx-1 border-darkCharbon rounded h-5 w-5 checked:hover:bg-lightVermillon focus:ring-lightVermillon checked:focus:bg-darkCharbon" checked/>
+        <input type="checkbox" class="mx-1 border-darkCharbon rounded h-5 w-5 checked:bg-redLight checked:hover:bg-redLight" checked/>
+        <input type="checkbox" class="mx-1 border-red rounded h-5 w-5 checked:bg-greyMedium checked:hover:bg-greyMedium" checked disabled/>
+      </div>
+      <div class="flex flex-col justify-between h-40">
+        <span class="text-greyDark font-light text-xl">{intl l = "Undefined"}</span>
+        {component name="CheckboxIndeterminate" title="CheckboxIndeterminate"}{/component}
+      </div>
+    </div>
+
+    <!--Radio button-->
+
+    <div id="Forms" class="mt-20 pt-5 border-t border-greyMedium">
+      <h2 class="text-2xl font-bold text-greyDark">{intl l = "Radio button"}</h2>
+    </div>
+
+    <div class="flex gap-11 mx-5 mt-14">
+      <div class="flex flex-col justify-between h-40">
+        <span class="text-greyDark font-light text-xl">{intl l = "Off"}</span>
+        <input type="radio" class="border-darkCharbon" />
+        <input type="radio" class="" />
+        <input type="radio" class="" disabled/>
+      </div>
+      <div class="flex flex-col justify-between h-40">
+        <span class="text-greyDark font-light text-xl">{intl l = "On"}</span>
+        <input type="radio" class="" checked/>
+        <input type="radio" class="" checked/>
+        <input type="radio" class="" checked disabled/>
+      </div>
+    </div>
 
     <!-- Toggle -->
-    <div class="flex pb-20 border-b border-mediumGrey">
+
+    <div id="Forms" class="mt-20 ">
+      <h2 class="text-2xl font-bold text-greyDark">{intl l = "Toggle"}</h2>
+    </div>
+
+    <div class="flex pb-20 pt-5 border-t border-greyMedium">
       <div class="m-2 mr-5">
         <label for="toggle" class="flex items-center cursor-pointer">
           <div class="relative">
