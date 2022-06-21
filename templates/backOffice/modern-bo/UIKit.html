@@ -1,4 +1,6 @@
-{extends file="admin-layout.tpl"} {block name="main-content"}
+{extends file="admin-layout.tpl"}
+
+{block name="main-content"}
 <div  class="text-darkCharbon">
   <div class="m-10">
     <h1 class="text-5xl font-bold text-center">{intl l = "Thelia Back Office UI KIT"}</h1>
@@ -1175,7 +1177,6 @@
             </div>
           </div>
 
-
       <!--buttons icons-->
 
       <h2 class="mt-20 text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Buttons Icons"}</h2>
@@ -1546,33 +1547,180 @@
       </div>
     </div>
 
+        <!-- Formulaires avec tooltip-->
+        <h3 class="mt-20 mb-14 text-greyDark text-xl font-semibold">Inputs</h3>
+<div class="pb-20 border-b border-greyMedium">
+<div class="flex items-center mb-6">
+  <div class="w-2/5 mr-1">
+    <p class="block text-lightCharbon text-sm font-bold uppercase">
+      {intl l= "Indication"}
+      <i class="fa-solid fa-circle-info"></i>
+    </p>
+    <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker focus:ring-2 focus:ring-red focus:border-darkCharbon" type="text" placeholder="Insérer le nom">
+  </div>
+
+  <div class="w-2/5 mr-1">
+    <p class="block text-lightCharbon text-sm font-bold uppercase">
+      {intl l= "Indication"}
+      <i class="fa-solid fa-circle-info"></i>
+    </p>
+    <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker focus:ring-2 focus:ring-red focus:border-darkCharbon">
+      <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+    </select>
+  </div>
+
+  <div class="w-2/5 mr-1">
+    <p class="block text-lightCharbon text-sm font-bold uppercase">
+      {intl l= "Indication"}
+      <i class="fa-solid fa-circle-info"></i>
+    </p>
+    {component name="InputLink" title="InputLink"}{/component}
+  </div>
+
+  <div class="w-2/5 mr-1">
+    <p class="block text-lightCharbon text-sm font-bold uppercase">
+      {intl l= "Indication"}
+      <i class="fa-solid fa-circle-info"></i>
+    </p>
+    {component name="InputSearch" title="InputSearch"}{/component}
+  </div>
+</div>
+
+
+
+      <div class="flex items-center mb-6">
+        <div class="w-2/5 mr-1">
+          <p class="block text-lightCharbon text-sm font-bold uppercase">
+            {intl l= "Indication"}
+            <i class="fa-solid fa-circle-info"></i>
+          </p>
+          <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed focus:ring-2 focus:ring-red focus:border-darkCharbon" type="text" placeholder="Insérer le nom">
+          <label class="block text-red text-xs font-bold left-1"><i class="mx-1 fa-solid fa-triangle-exclamation"></i>{intl l = "Indication de l'erreur"}</label>
+        </div>
+
+        <div class="w-2/5 mr-1">
+          <p class="block text-lightCharbon text-sm font-bold uppercase">
+            {intl l= "Indication"}
+            <i class="fa-solid fa-circle-info"></i>
+          </p>
+          <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed focus:ring-2 focus:ring-red focus:border-darkCharbon">
+            <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+          </select>
+          <label class="block text-red text-xs font-bold left-1"><i class="mx-1 fa-solid fa-triangle-exclamation"></i>{intl l = "Indication de l'erreur"}</label>
+        </div>
+
+        <div class="w-2/5 mr-1">
+          <p class="block text-lightCharbon text-sm font-bold uppercase">
+            {intl l= "Indication"}
+            <i class="fa-solid fa-circle-info"></i>
+          </p>
+          {component name="InputLinkError" title="InputLinkError"}{/component}
+        </div>
+
+        <div class="w-2/5 mr-1">
+          <p class="block text-lightCharbon text-sm font-bold uppercase">
+            {intl l= "Indication"}
+            <i class="fa-solid fa-circle-info"></i>
+          </p>
+          {component name="InputSearchError" title="InputSearchError"}{/component}
+        </div>
+      </div>
+
+
+        <div class="flex items-center">
+          <div class="w-2/5 mr-1">
+            <p class="block text-mediumGrey text-sm font-bold uppercase">
+              {intl l= "Indication"}
+              <i class="fa-solid fa-circle-info"></i>
+            </p>
+            <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom" disabled="disabled">
+          </div>
+
+          <div class="w-2/5 mr-1">
+            <p class="block text-mediumGrey text-sm font-bold uppercase">
+              {intl l= "Indication"}
+              <i class="fa-solid fa-circle-info"></i>
+            </p>
+            <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" disabled>
+              <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
+            </select>
+          </div>
+
+          <div class="w-2/5 mr-1">
+            <p class="block text-mediumGrey text-sm font-bold uppercase">
+              {intl l= "Indication"}
+              <i class="fa-solid fa-circle-info"></i>
+            </p>
+            {component name="InputLinkDisable" title="InputLinkDisable"}{/component}
+          </div>
+
+          <div class="w-2/5 mr-1">
+            <p class="block text-mediumGrey text-sm font-bold uppercase">
+              {intl l= "Indication"}
+              <i class="fa-solid fa-circle-info"></i>
+            </p>
+            {component name="InputSearchDisable" title="InputSearchDisable"}{/component}
+          </div>
+        </div>
+
+        </div>
+
+    <h3 class="mt-20 mb-14 text-greyDark text-xl font-semibold">{intl l="Labels"}</h3>
+    <div class="flex gap-4 pb-20 border-b border-greyMedium">
+        <button class="px-3 py-1 bg-ocreLight text-ocre border border-ocre text-sm font-semibold uppercase rounded-full cursor-auto">
+          {intl l = "Labels"}
+        </button>
+
+        <button class="px-3 py-1 bg-mauveLight text-mauve border border-mauve text-sm font-semibold uppercase rounded-full cursor-auto">
+          {intl l = "Labels"}
+        </button>
+
+        <button class="px-3 py-1 bg-turquoiseLight text-turquoise border border-turquoise text-sm font-semibold uppercase rounded-full cursor-auto">
+          {intl l = "Labels"}
+        </button>
+
+        <button class="px-3 py-1 bg-electricBlueLight text-electricBlue border border-electricBlue text-sm font-semibold uppercase rounded-full cursor-auto">
+          {intl l = "Labels"}
+        </button>
+
+        <button class="px-3 py-1 bg-backgroundLightVermillon text-darkVermillon border border-darkVermillon text-sm font-semibold uppercase rounded-full cursor-auto">
+          {intl l = "Labels"}
+        </button>
+
+        <button class="px-3 py-1 bg-lightPearl text-lightCharbon border border-lightCharbon text-sm font-semibold uppercase rounded-full cursor-auto">
+          {intl l = "Labels"}
+        </button>
+
+       
+    </div>
+
 
     <!-- Tags -->
-    <h2 class="mt-20 mb-14 text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Tags"}</h1>
+    <h2 id="Tags" class="mt-20 mb-14 text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Tags"}</h2>
 
 
-      <h3 class="mb-6 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Non cliquable"}</h3>
-    <div class="flex mb-8">
+    <h3 class="mb-6 text-greyDark text-xl font-semibold">Non cliquable</h3>
+    <div class="flex mb-14">
       <div class="w-44">
-        <button class="px-4 py-1 bg-white text-darkCharbon border border-darkCharbon text-sm font-medium rounded-full">
+        <button class="px-4 py-1 bg-white text-darkCharbon border border-darkCharbon text-sm font-medium rounded-full cursor-auto">
+          {intl l = "Tag Pays"}
+        </button>
+      </div>
+
+      <div class="w-44">
+        <button class="px-4 py-1 bg-pearlMedium text-darkCharbon border border-darkCharbon text-sm font-medium rounded-full cursor-auto">
           {intl l = "Tag Pays"}
           </button>
       </div>
 
       <div class="w-44">
-        <button class="px-4 py-1 bg-pearlMedium text-darkCharbon border border-darkCharbon text-sm font-medium rounded-full">
-          {intl l = "Tag Pays"}
-          </button>
-      </div>
-
-      <div class="w-44">
-        <button class="px-4 py-1 bg-darkCharbon text-white border border-darkCharbon text-sm font-medium rounded-full">
+        <button class="px-4 py-1 bg-darkCharbon text-white border border-darkCharbon text-sm font-medium rounded-full cursor-auto">
           {intl l = "Tag Pays"}
           </button>
       </div>
     </div>
 
-    <h3 class="mb-6 text-xs uppercase text-darkCharbon font-semibold">{intl l = "Cliquable"}</h3>
+    <h3 class="mb-6 text-greyDark text-xl font-semibold">Cliquable</h3>
     <div class="flex mb-8">
       <div class="w-44">
         <button class="flex items-center pl-4 pr-1 py-1 bg-white text-gray-800 border border-darkCharbon text-sm font-medium rounded-full active:text-lightVermillon focus:outline-none focus:ring focus:ring-lightVermillon ">
@@ -1700,451 +1848,49 @@
 
 
 <!-- Tabulations -->
-<div id="Tabulations" class="mt-12 mb-6 text-xl text-greyDark border-b boder-greyMedium font-weight">{intl l = "Tabulations"}</div>
+<h2 id="Tabulations" class="mt-20 mb-14 text-greyDark border-greyMedium font-bold text-2xl">{intl l = "Tabulations"}</h2>
 
-<div class="text-xl text-greyDark font-weight">{intl l = "Main Style"}</div>
+<h3 class="mb-14 text-greyDark text-xl font-semibold">{intl l="Main style"}</h3>
 
-<div class="mt-7 p-12 bg-pearlMedium w-2/5 rounded-lg">
-      <button class=" bg-white mx-6 text-vermillon py-4 px-5 bloctext-blue-500 border-b-4 border-vermillon uppercase font-semibold leading-5">
-        {intl l = "Tabulation"}
-      </button>
+<div class="pb-20 border-b border-mediumGrey">
+  <div class="w-max p-10 bg-pearlMedium rounded-lg">
+      <div class="inline-block pt-3 px-5 bg-white ">
+        <button class="pb-3 text-lightCharbon bloctext-blue-500 border-b-4 border-vermillon uppercase font-semibold leading-5 hover:text-vermillon">
+          {intl l = "Tabulation"}
+        </button>
+      </div>
 
-      <button class="mx-4 bg-white text-vermillon py-4 px-5 bloctext-blue-500 border-b-4 border-vermillon uppercase leading-5 font-semibold">
-        {intl l = "Tabulation"}
-        <i class="mx-1 fas fa-times-circle text-lg text-vermillon"></i>
-      </button>
+      <div class="inline-block pt-3 px-5 bg-white ">
+        <button class="pb-3 bg-white text-lightCharbon bloctext-blue-500 border-b-4 border-vermillon uppercase font-semibold leading-5  hover:text-vermillon">
+          {intl l = "Tabulation"}
+          <i class="fas fa-times-circle text-lg text-lightCharbon"></i>
+        </button>
+      </div>
 
-
-<div class="mt-7 bg-pearlMedium ">
-  <div class="bg-pearlMedium ">
-    <button class="mx-6 bg-white text-lightCharbon py-4 px-5 bloctext-blue-500 uppercase leading-5 font-semibold hover:text-vermillon">
-      {intl l = "Tabulation"}
-    </button>
-
-    <button class=" mx-4 bg-white text-lightCharbon py-4 px-5 bloctext-blue-500 uppercase leading-5 font-semibold hover:text-vermillon">
-      {intl l = "Tabulation"}
-      <i class="mx-1 fas fa-times-circle text-lg text-greyMedium hover:text-vermillon"></i>
-    </button>
-</div>
   </div>
 </div>
 
 
 <!-- Languages -->
-<div class="text-xl text-greyDark font-weight mt-10 mb-6">{intl l = "Main Style"}</div>
-  <div class="flex items-center p-2">
-    <div>
-      <div class="mr-1 mb-2">
+<h3 class="mt-20 mb-14 text-greyDark text-xl font-semibold">{intl l="Secondary (languages)"}</h3>
+<div class="flex items-center gap-4 pb-20 border-b border-greyMedium">
         <button class="w-28 h-8 text-xs font-semibold tracking-wider border border-darkCharbon text-darkCharbon uppercase rounded-sm hover:bg-darkCharbon hover:text-white">
           {intl l = "English"}
         </button>
 
-        <div class="mr-1 mt-2">
           <button class="w-28 text-xs font-semibold tracking-wider uppercase rounded-sm text-white h-8 bg-darkCharbon">
             {intl l = "English"}
           </button>
-      </div>
-
-      </div>
-    </div>
-
-    <div>
-      <div class="mr-1 mb-2">
+ 
         <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase border border-darkCharbon rounded-sm hover:bg-darkCharbon hover:text-white">
           {intl l = "English"}
         </button>
-
-        <div class="mr-1 mt-2">
-          <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 border-darkCharbon bg-darkCharbon">
-            {intl l = "English"}
-          </button>
-      </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="mr-1 mb-2">
-        <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon border border-darkCharbon uppercase  rounded-sm hover:bg-darkCharbon hover:text-white">
-          {intl l = "English"}
-        </button>
-
-        <div class="mr-1 mt-2">
-          <button class="w-28 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 bg-darkCharbon">
-            {intl l = "English"}
-          </button>
-      </div>
-      </div>
-    </div>
-    </div>
-
-    <!-- Formulaires avec tooltip-->
-<div id="Formulaires" class="pl-8 text-3xl text-greyDark mt-20 mb-8">{intl l = "Formulaires avec tooltip"}</div>
-
-
-
-<div class="flex items-center p-2">
-  <div class="w-2/5 mr-1">
-    <p class="block text-lightCharbon text-sm font-bold uppercase">
-      {intl l= "Indication"}
-      <i class="fa-solid fa-circle-info"></i>
-    </p>
-    <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker focus:ring-2 focus:ring-red focus:border-darkCharbon" type="text" placeholder="Insérer le nom">
   </div>
-
-  <div class="w-2/5 mr-1">
-    <p class="block text-lightCharbon text-sm font-bold uppercase">
-      {intl l= "Indication"}
-      <i class="fa-solid fa-circle-info"></i>
-    </p>
-    <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker focus:ring-2 focus:ring-red focus:border-darkCharbon">
-      <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
-    </select>
-  </div>
-
-  <div class="w-2/5 mr-1">
-    <p class="block text-lightCharbon text-sm font-bold uppercase">
-      {intl l= "Indication"}
-      <i class="fa-solid fa-circle-info"></i>
-    </p>
-    {component name="InputLink" title="InputLink"}{/component}
-  </div>
-
-  <div class="w-2/5 mr-1">
-    <p class="block text-lightCharbon text-sm font-bold uppercase">
-      {intl l= "Indication"}
-      <i class="fa-solid fa-circle-info"></i>
-    </p>
-    {component name="InputSearch" title="InputSearch"}{/component}
-  </div>
-  </div>
-
-
-
-      <div class="flex items-center p-2">
-        <div class="w-2/5 mr-1">
-          <p class="block text-lightCharbon text-sm font-bold uppercase">
-            {intl l= "Indication"}
-            <i class="fa-solid fa-circle-info"></i>
-          </p>
-          <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed focus:ring-2 focus:ring-red focus:border-darkCharbon" type="text" placeholder="Insérer le nom">
-          <label class="block text-red text-xs font-bold left-1"><i class="mx-1 fa-solid fa-triangle-exclamation"></i>{intl l = "Indication de l'erreur"}</label>
-        </div>
-
-        <div class="w-2/5 mr-1">
-          <p class="block text-lightCharbon text-sm font-bold uppercase">
-            {intl l= "Indication"}
-            <i class="fa-solid fa-circle-info"></i>
-          </p>
-          <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed focus:ring-2 focus:ring-red focus:border-darkCharbon">
-            <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
-          </select>
-          <label class="block text-red text-xs font-bold left-1"><i class="mx-1 fa-solid fa-triangle-exclamation"></i>{intl l = "Indication de l'erreur"}</label>
-        </div>
-
-        <div class="w-2/5 mr-1">
-          <p class="block text-lightCharbon text-sm font-bold uppercase">
-            {intl l= "Indication"}
-            <i class="fa-solid fa-circle-info"></i>
-          </p>
-          {component name="InputLinkError" title="InputLinkError"}{/component}
-        </div>
-
-        <div class="w-2/5 mr-1">
-          <p class="block text-lightCharbon text-sm font-bold uppercase">
-            {intl l= "Indication"}
-            <i class="fa-solid fa-circle-info"></i>
-          </p>
-          {component name="InputSearchError" title="InputSearchError"}{/component}
-        </div>
-        </div>
-
-
-        <div class="flex items-center p-2">
-          <div class="w-2/5 mr-1">
-            <p class="block text-mediumGrey text-sm font-bold uppercase">
-              {intl l= "Indication"}
-              <i class="fa-solid fa-circle-info"></i>
-            </p>
-            <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom" disabled="disabled">
-          </div>
-
-          <div class="w-2/5 mr-1">
-            <p class="block text-mediumGrey text-sm font-bold uppercase">
-              {intl l= "Indication"}
-              <i class="fa-solid fa-circle-info"></i>
-            </p>
-            <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" disabled>
-              <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
-            </select>
-          </div>
-
-          <div class="w-2/5 mr-1">
-            <p class="block text-mediumGrey text-sm font-bold uppercase">
-              {intl l= "Indication"}
-              <i class="fa-solid fa-circle-info"></i>
-            </p>
-            {component name="InputLinkDisable" title="InputLinkDisable"}{/component}
-          </div>
-
-          <div class="w-2/5 mr-1">
-            <p class="block text-mediumGrey text-sm font-bold uppercase">
-              {intl l= "Indication"}
-              <i class="fa-solid fa-circle-info"></i>
-            </p>
-            {component name="InputSearchDisable" title="InputSearchDisable"}{/component}
-          </div>
-          </div>
-
-
-<!-- Formulaires sans tooltip-->
-<div id="Formulaires" class="pl-8 text-3xl text-greyDark mt-20 mb-8">{intl l = "Formulaires sans tooltip"}</div>
-
-
-
-  <div class="flex items-center p-2">
-    <div class="w-2/5 mr-1">
-      <p class="block text-lightCharbon text-sm font-bold uppercase">
-        {intl l= "Indication"}
-      </p>
-      <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker focus:ring-2 focus:ring-red focus:border-darkCharbon" type="text" placeholder="Insérer le nom">
-    </div>
-
-    <div class="w-2/5 mr-1">
-      <p class="block text-lightCharbon text-sm font-bold uppercase">
-        {intl l= "Indication"}
-      </p>
-      <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker focus:ring-2 focus:ring-red focus:border-darkCharbon">
-        <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
-      </select>
-    </div>
-
-    <div class="w-2/5 mr-1">
-      <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
-      {component name="InputLink" title="InputLink"}{/component}
-    </div>
-
-    <div class="w-2/5 mr-1">
-      <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
-      {component name="InputSearch" title="InputSearch"}{/component}
-    </div>
-    </div>
-
-
-
-        <div class="flex items-center p-2">
-          <div class="w-2/5 mr-1">
-            <label class="block text-lightCharbon text-sm font-bold uppercase">{intl l = "Indication"}</label>
-            <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed focus:ring-2 focus:ring-red focus:border-darkCharbon" type="text" placeholder="Insérer le nom">
-            <label class="block text-red text-xs font-bold left-1"><i class="mx-1 fa-solid fa-triangle-exclamation"></i>{intl l = "Indication de l'erreur"}</label>
-          </div>
-
-          <div class="w-2/5 mr-1">
-            <label class="block text-lightCharbon text-sm font-bold uppercase">{intl l = "Indication"}</label>
-            <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed focus:ring-2 focus:ring-red focus:border-darkCharbon">
-              <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
-            </select>
-            <label class="block text-red text-xs font-bold left-1"><i class="mx-1 fa-solid fa-triangle-exclamation"></i>{intl l = "Indication de l'erreur"}</label>
-          </div>
-
-          <div class="w-2/5 mr-1">
-            <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
-            {component name="InputLinkError" title="InputLinkError"}{/component}
-          </div>
-
-          <div class="w-2/5 mr-1">
-            <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
-            {component name="InputSearchError" title="InputSearchError"}{/component}
-          </div>
-          </div>
-
-
-          <div class="flex items-center p-2">
-            <div class="w-2/5 mr-1">
-              <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
-              <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom" disabled="disabled">
-            </div>
-
-            <div class="w-2/5 mr-1">
-              <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
-              <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" disabled>
-                <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
-              </select>
-            </div>
-
-            <div class="w-2/5 mr-1">
-              <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
-              {component name="InputLinkDisable" title="InputLinkDisable"}{/component}
-            </div>
-
-            <div class="w-2/5 mr-1">
-              <label class="block text-mediumGrey text-sm font-bold uppercase">{intl l = "Indication"}</label>
-              {component name="InputSearchDisable" title="InputSearchDisable"}{/component}
-            </div>
-            </div>
-
-         <!-- Formulaires sans indication-->
-<div id="Formulaires" class="pl-8 text-3xl text-greyDark mt-20 mb-8">{intl l = "Formulaires sans indication"}</div>
-
-<div class="flex items-center p-2">
-  <div class="w-2/5 mr-1">
-    <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker focus:ring-2 focus:ring-red focus:border-darkCharbon" type="text" placeholder="Insérer le nom">
-  </div>
-
-  <div class="w-2/5 mr-1">
-    <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker focus:ring-2 focus:ring-red focus:border-darkCharbon">
-      <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
-    </select>
-  </div>
-
-  <div class="w-2/5 mr-1">
-    {component name="InputLink" title="InputLink"}{/component}
-  </div>
-
-  <div class="w-2/5 mr-1">
-    {component name="InputSearch" title="InputSearch"}{/component}
-  </div>
-  </div>
-
-
-
-      <div class="flex items-center p-2">
-        <div class="w-2/5 mr-1">
-          <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed focus:ring-2 focus:ring-red focus:border-darkCharbon" type="text" placeholder="Insérer le nom">
-          <label class="block text-red text-xs font-bold left-1"><i class="mx-1 fa-solid fa-triangle-exclamation"></i>{intl l = "Indication de l'erreur"}</label>
-        </div>
-
-        <div class="w-2/5 mr-1">
-          <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-red bg-backgroundRed focus:ring-2 focus:ring-red focus:border-darkCharbon">
-            <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
-          </select>
-          <label class="block text-red text-xs font-bold left-1"><i class="mx-1 fa-solid fa-triangle-exclamation"></i>{intl l = "Indication de l'erreur"}</label>
-        </div>
-
-        <div class="w-2/5 mr-1">
-          {component name="InputLinkError" title="InputLinkError"}{/component}
-        </div>
-
-        <div class="w-2/5 mr-1">
-          {component name="InputSearchError" title="InputSearchError"}{/component}
-        </div>
-        </div>
-
-
-        <div class="flex items-center p-2">
-          <div class="w-2/5 mr-1">
-            <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" type="text" placeholder="Insérer le nom" disabled="disabled">
-          </div>
-
-          <div class="w-2/5 mr-1">
-            <select class="appearance-none border rounded w-full py-2 px-3 text-grey-darker border-mediumGrey" disabled>
-              <option class="text-lightCharbon">{intl l = "Insérer le nom"}</option>
-            </select>
-          </div>
-
-          <div class="w-2/5 mr-1">
-            {component name="InputLinkDisable" title="InputLinkDisable"}{/component}
-          </div>
-
-          <div class="w-2/5 mr-1">
-            {component name="InputSearchDisable" title="InputSearchDisable"}{/component}
-          </div>
-          </div>
-
-
-
-          <div>
-            <div>
-              {component name="CheckboxIndeterminate" title="CheckboxIndeterminate"}{/component}
-              <div class="form-check">
-                <input class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer hover:bg-red" type="checkbox" value="" id="flexCheckDefault">
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input appearance-none h-4 w-4 border border-vermillon rounded-sm bg-backgroundRed checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer hover:bg-lighterVermillon" type="checkbox" value="" id="flexCheckChecked">
-              </div>
-              <input class="border-greyMedium checked:bg-greyMedium" type="checkbox" disabled="disabled">
-            </div>
-          </div>
-
-
-            <div>
-              <div class="form-check">
-                <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer hover:bg-vermillon" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-              </div>
-              <div class="form-check">
-                <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-vermillon bg-backgroundRed checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-greyMedium checked:border-greyMedium focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" checked disabled>
-              </div>
-            </div>
-
-
-  <div id="Pagination" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Pagination"}</div>
-
-  <div class="mt-5">
-    <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-white border rounded-l cursor-pointer border-greyMedium text-greyMedium"><i class="pl-4 fas fa-chevron-left text-darkCharbon"></i></a>
-    <a class="inline-flex items-center w-10 h-10 text-sm font-medium bg-white border rounded-r cursor-pointer border-greyMedium text-greyMedium"><i class="pl-3 text-darkCharbon fas fa-chevron-right"></i></a>
-    <span class="mx-1">{intl l = "Page 1 de 14"}</span>
-  </div>
-
-  <!--Search Bar-->
-     <div id="SearchBar" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Search Bar"}</div>
-    <div  class="p-2">
-      {component name="InputSearch" title="InputSearch"}{/component}
-    </div>
-
-
-     <!--Titre Thelia Blocks-->
-    <div id="TitreTheliaBlock" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Titre Thelia Block"}</div>
-    <div class="px-6 py-4">
-      <div class="font-bold text-xl mb-2 text-darkCharbon">{intl l = "Titre"}</div>
-      <div class="font-bold text-xl mb-2 text-vermillon">{intl l = "Titre"}</div>
-    </div>
-
-
-<!-- Barre Actions Thelia Blocs -->
-<div id="BarreActionsTheliaBlocs" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Barre Actions Thelia Blocs"}</div>
-
-<div class="flex items-center p-2">
-  <div class="flex border border-greyMedium">
-		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none">
-      <img class="w-3 mx-1" src="{image file="assets/images/svg/long-arrow-up.svg"}" alt="fr" />
-			<span class="uppercase mr-3">{intl l = "Monter"}</span>
-		</button>
-		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-greyMedium">
-      <img class="w-3 mx-1" src="{image file="assets/images/svg/long-arrow-down.svg"}" alt="fr" />
-			<span class="uppercase mr-3">{intl l = "Descendre"}</span>
-		</button>
-    <button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-greyMedium">
-      <img class="w-3 mx-1 text-vermillon" src="{image file="assets/images/svg/trash.svg"}" alt="fr" />
-			<span class="uppercase mr-3 text-vermillon">{intl l = "Supprimer"}</span>
-		</button>
-	</div>
-  </div>
-
-
-<!-- Liste déroulante -->
-<div id="ListeDeroulante" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Liste déroulante"}</div>
-<div class="container w-1/5">
-  <ul class="list-reset text-lightCharbon mb-4 p-8 text-grey-darker rounded-lg shadow-lg">
-     <li class="flex items-center mb-3">
-      {intl l = "Chaise Edgar"}
-     </li>
-     <li class="flex items-center mb-3">
-      {intl l = "Chaise Kenny"}
-     </li>
-     <li class="flex items-center">
-      {intl l = "Chaise Victoria"}
-     </li>
-  </ul>
-</div>
-
 
 <!-- Illustrations -->
-<div id="Illustrations" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Illustrations"}</div>
+<h2 id="Illustrations" class="mt-20 mb-10 text-3xl text-greyDark">{intl l = "Illustrations"}</h2>
 
-<div class="mt-8 text-xl text-greyDark border-b boder-greyMedium">{intl l = "Errors"}</div>
+<h3 class="mt-14 text-xl text-greyDark">{intl l = "Errors"}</h3>
 
 <div class="flex">
   <div class="m-4 mr-5">
@@ -2172,225 +1918,6 @@
     <div class="m-4 mr-5">
       <img class="w-96" src="{image file="assets/images/svg/other-error.svg"}" alt="fr" />
     </div>
-    </div>
-
-
-
-<!-- Positionnement -->
-<div id="Positionnement" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Positionnement"}</div>
-<div class="flex items-center p-2">
-  <div class="flex border border-greyMedium rounded-l rounded-r">
-		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none bg-greyMedium rounded-l">
-      <img class="w-2 mx-1" src="{image file="assets/images/svg/long-arrow-up.svg"}" alt="fr" />
-		</button>
-		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-greyMedium">
-			<span class="mr-2 ml-2">{intl l = "1"}</span>
-		</button>
-    <button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-greyMedium bg-greyMedium rounded-r">
-      <img class="w-2 mx-1" src="{image file="assets/images/svg/long-arrow-down.svg"}" alt="fr" />
-		</button>
-	</div>
   </div>
-
-
-<!-- Language tabulation -->
-<div id="LanguageTabulation" class="mt-20 pl-8 text-3xl text-darkCharbon mb-2">{intl l = "Language tabulation"}</div>
-<div class="flex items-center p-2">
-  <div class="flex border border-darkCharbon">
-		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none hover:bg-darkCharbon hover:text-white">
-			<span class="uppercase ml-3 mr-3">{intl l = "Français"}</span>
-		</button>
-		<button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-darkCharbon hover:bg-darkCharbon hover:text-white">
-			<span class="uppercase ml-3 mr-3">{intl l = "English"}</span>
-		</button>
-    <button class="flex items-center justify-center w-25 h-8 text-sm font-medium focus:outline-none border-l border-darkCharbon hover:bg-darkCharbon hover:text-white">
-			<span class="uppercase ml-3 mr-3">{intl l = "Espanol"}</span>
-		</button>
-	</div>
-  </div>
-
-
-<!-- In page Navigation Bar -->
-<div id="PageNavigationBar" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "In Page Navigation Bar"}</div>
-<div class="m-3">
-  <ul class="w-full rounded-lg mt-2 mb-3 text-mediumCharbon">
-    <li class="mb-1">
-      <a href="#" class=" flex p-3 pl-3 bg-gray-100 hover:bg-gray-200 rounded-lg">
-        <span class="ml-2 truncate">{intl l = "Autre item"}</span>
-        <img class="w-3 mx-1 ml-20 hover:text-vermillon" src="{image file="assets/images/svg/long-arrow-right.svg"}" alt="fr" />
-      </a>
-    </li>
-  </ul>
-</div>
-
-
-<!-- Menus -->
-<div id="Menus" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Menus"}</div>
-
-<div class="flex">
-  <div class="m-2">
-    <button class="w-28 text-xs font-semibold tracking-wider rounded-sm border text-mediumGrey h-8 bg-mediumCharbon border-mediumCharbon">
-      {intl l = "Dashboard"}
-    </button>
-  </div>
-
-  <div class="m-2">
-    <button class="w-28 text-xs font-semibold tracking-wider rounded-sm border text-mediumGrey h-8 bg-mediumCharbon border-mediumCharbon">
-      {intl l = "Dashboard"}
-    </button>
-  </div>
-
-  <div class="m-2">
-    <button class="w-28 text-xs font-semibold tracking-wider rounded-sm text-white h-8 bg-mediumCharbon border border-mediumCharbon">
-      {intl l = "Dashboard"}
-    </button>
-  </div>
-</div>
-
-<div class="flex">
-  <div class="m-2">
-    <button class="w-28 h-8 text-xs font-semibold tracking-wider text-mediumGrey border border-mediumCharbon bg-mediumCharbon rounded-sm">
-      {intl l = "Tunnel de commande"}
-    </button>
-  </div>
-
-  <div class="m-2">
-    <button class="w-28 text-xs font-semibold tracking-wider border rounded-sm text-white h-8 border-mediumCharbon bg-mediumCharbon">
-      {intl l = "Tunnel de commande"}
-    </button>
-  </div>
-</div>
-
-<div class="flex">
-  <div class="m-2">
-    <button class="w-20 text-xs font-semibold tracking-wider uppercase border rounded-sm text-mediumGrey h-8 bg-mediumCharbon border-mediumCharbon">
-      {intl l = "EN"}
-    </button>
-  </div>
-
-  <div class="m-2">
-    <button class="w-20 text-xs font-semibold tracking-wider uppercase border rounded-sm text-white h-8 bg-mediumCharbon border-mediumCharbon">
-      {intl l = "EN"}
-    </button>
-  </div>
-</div>
-
-<div class="flex">
-  <div class="m-2">
-    <button class="w-28 text-xs font-semibold tracking-wider border rounded-sm text-mediumGrey h-8 bg-mediumCharbon border-mediumCharbon">
-      {intl l = "Profile"}
-    </button>
-  </div>
-
-  <div class="m-2">
-    <button class="w-28 text-xs font-semibold tracking-wider border rounded-sm text-white h-8 bg-mediumCharbon border-mediumCharbon">
-      {intl l = "Profile"}
-    </button>
-  </div>
-</div>
-
-
-  <div id="NombreColonnes" class="mt-20 text-3xl text-greyDark mb-2">{intl l = "Nombre Colonnes"}</div>
-<div class="flex items-center p-2">
-<div>
-  <div class="mr-1 mb-2">
-    <div class="w-35 inline-flex h-20 px-5 bg-pearlMedium text-greyMedium rounded-sm">
-      <div class="flex items-center">
-        <div class="w-1/5 mr-1">
-          <div class="w-5 h-5 text-greyMedium flex items-center ml-5"><img class="text-greyMedium" src="{image file="assets/images/svg/twoColomn.svg"}" alt="fr" /></div>
-          <div class="text-xs">{intl l = "colonnes"}</div>
-        </div>
-      </div>
-  </div>
-  </div>
-
-    <div class="mr-1 mt-2">
-      <div class="w-35 inline-flex h-20 px-5 bg-pearlMedium text-vermillon rounded-sm">
-        <div class="flex items-center">
-          <div class="w-1/5 mr-1">
-            <div class="w-5 h-5 text-vermillon flex items-center ml-5"><img class="text-greyMedium" src="{image file="assets/images/svg/twoColomn.svg"}" alt="fr" /></div>
-            <div class="text-xs">{intl l = "colonnes"}</div>
-          </div>
-        </div>
-    </div>
-    </div>
-</div>
-</div>
-
-
-<!-- Text Area Editor -->
-<div id="TextAreaEditor" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Text area editor"}</div>
-  {component name="TextAreaEditor" title="TextAreaEditor"}{/component}
-
-
-<!-- Drop Down Areas -->
-<div id="PageNavigationBar" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Drop down areas"}</div>
-<div class="flex items-center p-2">
-  {component name="DragAndDrop" title="DragAndDrop"}{/component}
-	{component name="DragAndDropImage" title="DragAndDropImage"}{/component}
-  {component name="DragAndDropMedia" title="DragAndDropMedia"}{/component}
-</div>
-
-<div class="flex items-center p-2">
-  {component name="DragAndDrop" title="DragAndDrop"}{/component}
-	{component name="DragAndDropImage" title="DragAndDropImage"}{/component}
-  {component name="DragAndDropMedia" title="DragAndDropMedia"}{/component}
-</div>
-
-
-<!-- Toast Preview / Enregistrer -->
-<div id="ToastPreview" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Toast Preview / Enregistrer"}</div>
-{component name="ToastPreview" title="ToastPreview"}{/component}
-
-</br>
-
-<div class="flex items-center h-20 max-w-7xl bg-lightCharbon">
-  <div class="container mx-auto">
-  <div class="flex justify-end pr-72">
-    <div class="md:text-center ">
-      <a class="px-3 py-2 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer hover:bg-white hover:text-black"><i class="h-2 mx-1 fas fa-eye"></i>{intl l="Prévisualiser"}</a>
-      <a class="px-3 py-2 mx-1 text-sm font-semibold tracking-wider text-white uppercase border rounded cursor-pointer bg-vermillon h-9 border-vermillon hover:bg-lighterVermillon hover:border-lighterVermillon">{intl l="Enregistrer"}</a>
-    </div>
-  </div>
-  </div>
-</div>
-
-</br>
-
-<div class="flex items-center h-20 max-w-7xl bg-lightCharbon">
-  <div class="container mx-auto">
-  <div class="flex justify-end pr-72">
-    <div class="md:text-center ">
-      <a class="px-3 py-2 mx-1 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer hover:bg-white hover:text-black">{intl l="Fermer"}</a>
-      <a class="px-3 py-2 mx-1 text-sm font-semibold tracking-wider text-white uppercase border border-white rounded cursor-pointer hover:bg-white hover:text-black">{intl l="Enregistrer & fermer"}</a>
-      <a class="px-3 py-2 mx-1 text-sm font-semibold tracking-wider text-white uppercase border rounded cursor-pointer bg-vermillon h-9 border-vermillon hover:bg-lighterVermillon hover:border-lighterVermillon">{intl l="Enregistrer"}</a>
-    </div>
-  </div>
-  </div>
-</div>
-</br></br>
-
-
-{component name="Tuile" title="Tuile"}{/component}
-
-
-  <!-- Modal -->
-  <div id="Modal" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Modal"}</div>
-  {component name="Modal" title="Modal"}{/component}
-</br></br>
-
-
-  <!-- Médiathèque -->
-  <div id="Modal" class="mt-20 pl-8 text-3xl text-greyDark mb-2">{intl l = "Médiathèque"}</div>
-  {component name="Media" title="Media"}{/component}
-</br></br>
-
-
-  <!-- Tables -->
-{component name="Tables" title="Tables"}{/component}
-
-
-<a href="#" class="text-blue-600 mb-2">Retour en haut</a>
 {/block}
 
-</div>
