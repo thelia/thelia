@@ -17,9 +17,9 @@ input[type=checkbox].switch:checked ~ .dot {
   transform: translateX(100%);
 }
 
-input[type=checkbox].switch:checked ~ .block {
-  background-color: #48bb78;
-}
+/*input[type=checkbox].switch:checked ~ .block {
+  background-color: #DC3018;
+}*/
 
 input[type=checkbox]:not(.switch):checked {
   @apply text-mediumCharbon;

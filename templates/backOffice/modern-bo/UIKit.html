@@ -1533,15 +1533,15 @@
     <div class="flex gap-11 mx-5 mt-14">
       <div class="flex flex-col justify-between h-40">
         <span class="text-greyDark font-light text-xl">{intl l = "Off"}</span>
-        <input type="radio" class="border-darkCharbon" />
-        <input type="radio" class="" />
-        <input type="radio" class="" disabled/>
+        <input type="radio" class="border-darkCharbon hover:border-lightVermillon focus:border-darkCharbon focus:ring-2 focus:ring-lightVermillon focus:ring-offset-0 " />
+        <input type="radio" class="border-red bg-backgroundRed" disabled/>
+        <input type="radio" class="border-greyMedium" disabled/>
       </div>
       <div class="flex flex-col justify-between h-40">
         <span class="text-greyDark font-light text-xl">{intl l = "On"}</span>
         <input type="radio" class="" checked/>
-        <input type="radio" class="" checked/>
-        <input type="radio" class="" checked disabled/>
+        <input type="radio" class="checked:border-darkCharbon checked:bg-darkCharbon checked:ring-2 checked:ring-red checked:ring-offset-2 " checked/>
+        <input type="radio" class="checked:border-darkCharbon checked:bg-darkCharbon checked:ring-2 checked:ring-red checked:ring-offset-2 " checked disabled/>
       </div>
     </div>
 
@@ -1551,31 +1551,60 @@
       <h2 class="text-2xl font-bold text-greyDark">{intl l = "Toggle"}</h2>
     </div>
 
-    <div class="flex pb-20 pt-5 border-t border-greyMedium">
-      <div class="m-2 mr-5">
-        <label for="toggle" class="flex items-center cursor-pointer">
-          <div class="relative">
-            <input type="checkbox" id="toggle" class="sr-only switch" />
-            <div class="block w-10 h-6 bg-red rounded-full"></div>
-            <div
-              class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
-            ></div>
-          </div>
-        </label>
+    <div class="flex gap-11 mx-5 mt-14">
+      <div class="flex flex-col justify-between h-40">
+        <span class="text-greyDark font-light text-xl">{intl l = "Off"}</span>
+
+        <div>
+          <label for="toggle1" class="flex items-center cursor-pointer">
+            <div class="relative">
+              <input type="checkbox" id="toggle1" class="sr-only switch peer" />
+              <div class="block w-10 h-6 bg-greyMedium rounded-full hover:bg-greyDark peer-focus:bg-greyMedium peer-focus:ring-1 peer-focus:ring-lighterVermillon peer-focus:ring-offset-2"></div>
+              <div
+                class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+              ></div>
+            </div>
+          </label>
+        </div>
+
+        <div>
+          <label for="toggle2" class="flex items-center">
+            <div class="relative">
+              <input type="checkbox" id="toggle2" class="sr-only switch" disabled/>
+              <div class="block w-10 h-6 bg-greyMedium rounded-full"></div>
+              <div class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"></div>
+            </div>
+          </label>
+        </div>
       </div>
 
-      <div class="m-2">
-        <label for="toggle2" class="flex items-center cursor-pointer">
-          <div class="relative">
-            <input type="checkbox" checked id="toggle2" class="sr-only switch" />
-            <div class="block w-10 h-6 bg-red rounded-full"></div>
-            <div
-              class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
-            ></div>
-          </div>
-        </label>
+      <div class="flex flex-col justify-between h-40 form-check form-switch">
+        <span class="text-greyDark font-light text-xl">{intl l = "On"}</span>
+
+        <div>
+          <label for="toggle3" class="flex items-center cursor-pointer">
+            <div class="relative">
+              <input type="checkbox" id="toggle3" class="sr-only switch peer" checked/>
+              <div class="block w-10 h-6 bg-vermillon rounded-full hover:bg-lightVermillon peer-focus:bg-vermillon peer-focus:ring-1 peer-focus:ring-lighterVermillon peer-focus:ring-offset-2"></div>
+              <div
+                class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"
+              ></div>
+            </div>
+          </label>
+        </div>
+
+        <div>
+          <label for="toggle2" class="flex items-center">
+            <div class="relative">
+              <input type="checkbox" id="toggle2" class="sr-only switch peer" checked disabled/>
+              <div class="block w-10 h-6 peer-checked:bg-greyMedium rounded-full"></div>
+              <div class="absolute w-4 h-4 transition bg-white rounded-full dot left-1 top-1"></div>
+            </div>
+          </label>
+        </div>
       </div>
     </div>
+
 
 
     <!-- Tags -->
