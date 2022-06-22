@@ -37,7 +37,7 @@
 
   <!-- Colors -->
   <div class="mt-20 pb-20 border-b border-greyMedium">
-      <h1 id="Colors" class="mb-10 text-3xl font-bold text-greyDark">{intl l = "Colors"}</h1>
+      <h2 id="Colors" class="mb-10 text-3xl font-bold text-greyDark">{intl l = "Colors"}</h2>
 
       <div class="mb-8 text-xl text-greyDark">{intl l = "Main"}</div>
 
@@ -126,22 +126,32 @@
        <div class="mb-8 text-xl text-greyDark">{intl l = "Status"}</div>
 
       <div class="flex mb-8">
-      <div class="w-24 mr-14">
+        <div class="w-24 mr-14">
+          <div class="font-extrabold text-base text-greyDark pb-2">{intl l = "Error"}</div>
           <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-red border-red"></div>
           <div class="font-bold text-greyDark">{intl l = "Red"}</div>
           <div class="text-greyDark">{intl l = "#D21919"}</div>
         </div>
 
-      <div class="w-24 mr-14">
+        <div class="w-24 mr-14">
+          <div class="font-extrabold text-base text-greyDark pb-2">{intl l = "Ok"}</div>
           <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-greenDark border-greenDark"></div>
           <div class="font-bold text-greyDark">{intl l = "Green Dark"}</div>
           <div class="text-greyDark">{intl l = "#008958"}</div>
         </div>
 
-      <div class="w-24 mr-14">
+        <div class="w-24 mr-14">
+          <div class="font-extrabold text-base text-greyDark pb-2">{intl l = "Warning"}</div>
           <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-wheatDark border-wheatDark"></div>
           <div class="font-bold text-greyDark">{intl l = "Wheat Dark"}</div>
           <div class="text-greyDark">{intl l = "#EDAC30"}</div>
+        </div>
+
+        <div class="w-24 mr-14">
+          <div class="font-extrabold text-base text-greyDark pb-2">{intl l = "Informational"}</div>
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-ultramarineBlue border-ultramarineBlue"></div>
+          <div class="font-bold text-greyDark">{intl l = "Ultramarine Blue - Dark"}</div>
+          <div class="text-greyDark">{intl l = "#3162DF"}</div>
         </div>
       </div>
 
@@ -163,6 +173,12 @@
           <div class="font-bold text-greyDark">{intl l = "Wheat"}</div>
           <div class="text-greyDark">{intl l = "#FFDD9C"}</div>
         </div>
+
+        <div class="w-24 mr-14">
+          <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-ultramarineBlueLight border-ultramarineBlueLight"></div>
+          <div class="font-bold text-greyDark">{intl l = "Ultramarine Blue - Light"}</div>
+          <div class="text-greyDark">{intl l = "#ECF6FF"}</div>
+        </div>
       </div>
 
       <div class="flex">
@@ -171,6 +187,8 @@
           <div class="font-bold text-greyDark">{intl l = "Background Red"}</div>
           <div class="text-greyDark">{intl l = "#FFEDED"}</div>
         </div>
+
+        <div class="w-24 mr-14"></div>
 
       <div class="w-24 mr-14">
           <div class="w-24 h-24 mb-3 font-bold rounded-lg bg-wheatLight border-wheatLight"></div>
@@ -1755,7 +1773,7 @@
           {intl l = "Labels"}
         </button>
 
-       
+
     </div>
 
 
@@ -1946,7 +1964,7 @@
           <button class="w-28 text-xs font-semibold tracking-wider uppercase rounded-sm text-white h-8 bg-darkCharbon">
             {intl l = "English"}
           </button>
- 
+
         <button class="w-28 h-8 text-xs font-semibold tracking-wider text-darkCharbon uppercase border border-darkCharbon rounded-sm hover:bg-darkCharbon hover:text-white">
           {intl l = "English"}
         </button>

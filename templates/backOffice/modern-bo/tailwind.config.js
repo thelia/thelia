@@ -56,7 +56,9 @@ module.exports = {
         backgroundLightVermillon: '#F7EEED',
         wheatDark: '#EDAC30',
         wheat: '#FFDD9C',
-        wheatLight: '#FFECC8'
+        wheatLight: '#FFECC8',
+        ultramarineBlue : '#3162DF',
+        ultramarineBlueLight : '#ECF6FF'
       }
     }
   },
