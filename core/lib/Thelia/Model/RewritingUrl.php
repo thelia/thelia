@@ -23,7 +23,7 @@ class RewritingUrl extends BaseRewritingUrl
         parent::postInsert($con);
 
         if (null !== $this->getRedirected()) {
-            //check if rewriting url alredy exists and put redirect to the new one
+            // check if rewriting url alredy exists and put redirect to the new one
             RewritingUrlQuery::create()
                 ->filterByView($this->getView())
                 ->filterByViewId($this->getViewId())

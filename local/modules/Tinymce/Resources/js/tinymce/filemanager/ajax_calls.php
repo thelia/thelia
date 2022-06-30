@@ -1,7 +1,7 @@
 <?php
 
 $config = include 'config/config.php';
-//TODO switch to array
+// TODO switch to array
 extract($config, \EXTR_OVERWRITE);
 
 require_once 'include/utils.php';
@@ -169,7 +169,7 @@ if (isset($_GET['action'])) {
                 case 'zip':
                     $zip = new ZipArchive();
                     if ($zip->open($path) === true) {
-                        //get total size
+                        // get total size
                         $sizeTotalFinal = 0;
                         for ($i = 0; $i < $zip->numFiles; ++$i) {
                             $aStat = $zip->statIndex($i);
@@ -180,7 +180,7 @@ if (isset($_GET['action'])) {
                             exit;
                         }
 
-                        //make all the folders
+                        // make all the folders
                         for ($i = 0; $i < $zip->numFiles; ++$i) {
                             $OnlyFileName = $zip->getNameIndex($i);
                             $FullFileName = $zip->statIndex($i);
@@ -188,7 +188,7 @@ if (isset($_GET['action'])) {
                                 create_folder($base_folder.$FullFileName['name']);
                             }
                         }
-                        //unzip into the folders
+                        // unzip into the folders
                         for ($i = 0; $i < $zip->numFiles; ++$i) {
                             $OnlyFileName = $zip->getNameIndex($i);
                             $FullFileName = $zip->statIndex($i);

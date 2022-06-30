@@ -8,7 +8,7 @@ const Checkbox = forwardRef(({ label, name, small = false, ...props }, ref) => {
         name={name}
         {...props}
         ref={ref}
-        className={`border-gray-300 border text-main focus:border-gray-300 focus:ring-main`}
+        className={`border border-gray-300 text-main focus:border-gray-300 focus:ring-main`}
       />
 
       <span className="ml-2">{label}</span>

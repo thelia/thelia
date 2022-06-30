@@ -240,4 +240,39 @@ class TemplateDefinition
 
         throw new TemplateException("Template file not found: $templateName");
     }
+
+    /**
+     * @return string
+     */
+    public function getAssetsPath()
+    {
+        return $this->templateDescriptor->getAssets();
+    }
+
+    public function setAssetsPath($assets)
+    {
+        $this->$this->templateDescriptor->setAssets($assets);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAbsoluteAssetsPath()
+    {
+        return $this->getAbsolutePath().DS.$this->templateDescriptor->getAssets();
+    }
+
+    public function getComponentsPath()
+    {
+        return $this->templateDescriptor->getComponents();
+    }
+
+    public function setComponentsPath($path)
+    {
+        $this->$this->templateDescriptor->setComponents($path);
+
+        return $this;
+    }
 }

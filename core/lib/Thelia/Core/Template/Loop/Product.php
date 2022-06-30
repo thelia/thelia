@@ -946,7 +946,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
              */
 
             /* if we don't have any join yet, let's make a global one */
-            if (empty($isProductPriceFirstLeftJoin)) {
+            if (\count($isProductPriceFirstLeftJoin) === 0) {
                 if (\count($isPSELeftJoinList) == 0) {
                     $joiningTable = 'global';
                     $isPSELeftJoinList[] = $joiningTable;

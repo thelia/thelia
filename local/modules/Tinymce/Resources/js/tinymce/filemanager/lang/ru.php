@@ -121,7 +121,7 @@ return [
     'no file' => 'Файл не существует',
     'view type number missing' => 'Данный тип отсутствует',
     'Not enought Memory' => 'Недостаточно памяти',
-    'max_size_reached' => 'Папка достигла максимального размера в %d MB.', //%d = max overall size
+    'max_size_reached' => 'Папка достигла максимального размера в %d MB.', // %d = max overall size
     'B' => 'B',
     'KB' => 'KB',
     'MB' => 'MB',

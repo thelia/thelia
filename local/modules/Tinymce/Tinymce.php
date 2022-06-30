@@ -43,11 +43,11 @@ class Tinymce extends BaseModule
     {
         $fileSystem = new Filesystem();
 
-        //Check for environment
+        // Check for environment
         if ($env = $this->getContainer()->getParameter('kernel.environment')) {
-            //Check for backward compatibility
+            // Check for backward compatibility
             if ($env !== 'prod' && $env !== 'dev') {
-                //Remove separtion between dev and prod in particular environment
+                // Remove separtion between dev and prod in particular environment
                 $env = str_replace('_dev', '', $env);
                 $this->webMediaEnvPath = $this->webMediaPath.DS.$env;
             }

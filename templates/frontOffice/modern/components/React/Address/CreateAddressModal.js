@@ -10,7 +10,7 @@ import { useLockBodyScroll } from 'react-use';
 export default function CreateAddressModal({ className = '' }) {
   const [showModal] = useState(false);
   useLockBodyScroll(showModal);
-  const { mutate: create, isSuccess } = useAddressCreate();
+  const { mutateAsync: create, isSuccess } = useAddressCreate();
   const [isCreatingAddress, setIsCreatingAddress] = useState(false);
   const intl = useIntl();
 
@@ -19,6 +19,10 @@ export default function CreateAddressModal({ className = '' }) {
       setIsCreatingAddress(false);
     }
   }, [isSuccess]);
+
+  const submitForm = async (values) => {
+    await create(values);
+  };
 
   return (
     <div className={`${className}`}>
@@ -36,7 +40,7 @@ export default function CreateAddressModal({ className = '' }) {
         onRequestClose={() => setIsCreatingAddress(false)}
         ariaHideApp={false}
         className={{
-          base: 'outline-none bg-white p-8 w-full h-full overflow-auto',
+          base: 'h-full w-full overflow-auto bg-white p-8 outline-none',
           afterOpen: '',
           beforeClose: ''
         }}
@@ -48,27 +52,19 @@ export default function CreateAddressModal({ className = '' }) {
         bodyOpenClassName={null}
       >
         <div className="relative">
-          <div className="flex justify-between items-center">
-            <div className="block mx-auto w-full">
-              <h4 className="text-3xl mb-8">
+          <div className="flex items-center justify-between">
+            <div className="mx-auto block w-full">
+              <h4 className="mb-8 text-3xl">
                 {intl.formatMessage({ id: 'CREATE_ADDRESS' })}
               </h4>
               <button
                 type="button"
-                className="top-0 right-0 absolute"
+                className="absolute top-0 right-0"
                 onClick={() => setIsCreatingAddress(false)}
               >
                 <CloseIcon />
               </button>
-              <AddressForm
-                onSubmit={async (values) => {
-                  try {
-                    await create(values);
-                  } catch (error) {
-                    console.error(error);
-                  }
-                }}
-              />
+              <AddressForm onSubmit={submitForm} />
             </div>
           </div>
         </div>

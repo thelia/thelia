@@ -152,6 +152,7 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('ID', $result->getId())
                 ->set('NAME', $result->getName())
                 ->set('VALUE', $result->getValue())
+                ->set('IS_OVERRIDDEN_IN_ENV', $result->isOverriddenInEnv())
                 ->set('IS_TRANSLATED', $result->getVirtualColumn('IS_TRANSLATED'))
                 ->set('LOCALE', $this->locale)
                 ->set('TITLE', $result->getVirtualColumn('i18n_TITLE'))
@@ -159,7 +160,7 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set('DESCRIPTION', $result->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set('POSTSCRIPTUM', $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set('HIDDEN', $result->getHidden())
-                ->set('SECURED', $result->getSecured())
+                ->set('SECURED', $result->isOverriddenInEnv() ? 1 : $result->getSecured())
             ;
 
             $this->addOutputFields($loopResultRow, $result);

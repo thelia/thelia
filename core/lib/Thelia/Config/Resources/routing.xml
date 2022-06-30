@@ -62,7 +62,7 @@
         </service>
 
         <service id="router.default" class="Symfony\Bundle\FrameworkBundle\Routing\Router">
-          <argument type="service" id="Psr\Container\ContainerInterface" />
+          <argument type="service" id="service_container" />
           <argument>%router.resource%</argument>
           <argument type="collection">
             <argument key="cache_dir">%kernel.cache_dir%</argument>

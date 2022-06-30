@@ -21,7 +21,7 @@ use WebProfiler\DataCollector\SmartyDataCollector;
 class WebProfiler extends BaseModule
 {
     /** @var string */
-    const DOMAIN_NAME = 'webprofiler';
+    public const DOMAIN_NAME = 'webprofiler';
 
     /*
      * You may now override BaseModuleInterface methods, such as:
@@ -36,8 +36,12 @@ class WebProfiler extends BaseModule
     public static function configureServices(ServicesConfigurator $servicesConfigurator): void
     {
         $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
-            ->exclude([THELIA_MODULE_DIR.ucfirst(self::getModuleCode()).'/I18n/*'])
-            ->exclude([THELIA_MODULE_DIR.ucfirst(self::getModuleCode()).'/DataCollector/SmartyDataCollector'])
+            ->exclude(
+                [
+                    THELIA_MODULE_DIR.ucfirst(self::getModuleCode()).'/I18n/*',
+                    THELIA_MODULE_DIR.ucfirst(self::getModuleCode()).'/DataCollector/SmartyDataCollector',
+                ]
+            )
             ->autowire(true)
             ->autoconfigure(true);
 

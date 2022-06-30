@@ -8,7 +8,7 @@
 #
 ## Install selected extensions and other stuff
 #RUN apt-get update \
-#    && apt-get -y --no-install-recommends install php-mysql php7.4-mysql php7.4-gd php-imagick php7.4-intl php-yaml php-xdebug \
+#    && apt-get -y --no-install-recommends install php7.4-mysql php7.4-mysql php7.4-gd php7.4-imagick php7.4-intl php7.4-yaml php7.4-xdebug \
 #    && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 #
 ## Install git
@@ -49,10 +49,10 @@ RUN apk add --no-cache freetype libpng libjpeg-turbo freetype-dev libpng-dev lib
   apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev
 
 # XDebug extension
-RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
-  && pecl install xdebug-3.0.0 \
-  && docker-php-ext-enable xdebug \
-  && apk del -f .build-deps
+#RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
+#  && pecl install xdebug-3.0.0 \
+#  && docker-php-ext-enable xdebug \
+#  && apk del -f .build-deps
 
 # Intl extension
 RUN apk add icu-dev

@@ -61,7 +61,8 @@ class Carousel extends Image
             Argument::createAnyTypeArgument('effects'),
             Argument::createBooleanTypeArgument('allow_zoom', false),
             Argument::createBooleanTypeArgument('filter_disable_slides', true),
-            Argument::createAlphaNumStringTypeArgument('group')
+            Argument::createAlphaNumStringTypeArgument('group'),
+            Argument::createAlphaNumStringTypeArgument('format')
         );
     }
 
@@ -129,6 +130,7 @@ class Carousel extends Image
             $background_color = $this->getBackgroundColor();
             $quality = $this->getQuality();
             $effects = $this->getEffects();
+            $format = $this->getFormat();
 
             if (null !== $width) {
                 $event->setWidth($width);
@@ -148,6 +150,9 @@ class Carousel extends Image
             }
             if (null !== $effects) {
                 $event->setEffects($effects);
+            }
+            if (null !== $format) {
+                $event->setFormat($format);
             }
 
             $event->setAllowZoom($this->getAllowZoom());

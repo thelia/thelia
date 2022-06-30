@@ -122,7 +122,7 @@ return [
     'no file' => 'Fichier manquant',
     'view type number missing' => 'Type de vue manquant',
     'Not enought Memory' => 'Mémoire insuffisante',
-    'max_size_reached' => "Votre répertoire d'image a déjà atteind sa taille maximale de %d mo.", //%d = max overall size
+    'max_size_reached' => "Votre répertoire d'image a déjà atteind sa taille maximale de %d mo.", // %d = max overall size
     'B' => 'o',
     'KB' => 'ko',
     'MB' => 'mo',

@@ -204,7 +204,7 @@ class php_image_magician
 
     private $cropFromTopPercent = 10;
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function __construct($fileName)
         // Author:     Jarrod Oberto
@@ -259,7 +259,7 @@ class php_image_magician
         }
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function initialise(): void
     {
@@ -380,7 +380,7 @@ class php_image_magician
         }
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function cropImage($newWidth, $newHeight, $cropPos = 'm'): void
         // Author:     Jarrod Oberto
@@ -410,7 +410,7 @@ class php_image_magician
         $this->crop($this->width, $this->height, $newWidth, $newHeight, $cropPos);
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function keepTransparancy($width, $height, $im): void
         // Author:     Jarrod Oberto
@@ -434,7 +434,7 @@ class php_image_magician
         }
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function crop($optimalWidth, $optimalHeight, $newWidth, $newHeight, $cropPos): void
         // Author:     Jarrod Oberto
@@ -464,7 +464,7 @@ class php_image_magician
         $this->height = $newHeight;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function getCropPlacing($optimalWidth, $optimalHeight, $newWidth, $newHeight, $pos = 'm')
         //
@@ -546,7 +546,7 @@ class php_image_magician
         return ['x' => $cropStartX, 'y' => $cropStartY];
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function getDimensions($newWidth, $newHeight, $option)
         // Author:     Jarrod Oberto
@@ -605,7 +605,7 @@ class php_image_magician
         return ['optimalWidth' => $optimalWidth, 'optimalHeight' => $optimalHeight];
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function getSizeByFixedHeight($newWidth, $newHeight)
     {
@@ -621,11 +621,11 @@ class php_image_magician
 
         $newWidth = $newHeight * $ratio;
 
-        //return $newWidth;
+        // return $newWidth;
         return ['optimalWidth' => $newWidth, 'optimalHeight' => $newHeight];
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function getSizeByFixedWidth($newWidth, $newHeight)
     {
@@ -641,11 +641,11 @@ class php_image_magician
 
         $newHeight = $newWidth * $ratio;
 
-        //return $newHeight;
+        // return $newHeight;
         return ['optimalWidth' => $newWidth, 'optimalHeight' => $newHeight];
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function getSizeByAuto($newWidth, $newHeight)
         // Author:     Jarrod Oberto
@@ -665,31 +665,31 @@ class php_image_magician
 
         if ($this->height < $this->width) {
             // *** Image to be resized is wider (landscape)
-            //$optimalWidth = $newWidth;
-            //$optimalHeight= $this->getSizeByFixedWidth($newWidth);
+            // $optimalWidth = $newWidth;
+            // $optimalHeight= $this->getSizeByFixedWidth($newWidth);
 
             $dimensionsArray = $this->getSizeByFixedWidth($newWidth, $newHeight);
             $optimalWidth = $dimensionsArray['optimalWidth'];
             $optimalHeight = $dimensionsArray['optimalHeight'];
         } elseif ($this->height > $this->width) {
             // *** Image to be resized is taller (portrait)
-            //$optimalWidth = $this->getSizeByFixedHeight($newHeight);
-            //$optimalHeight= $newHeight;
+            // $optimalWidth = $this->getSizeByFixedHeight($newHeight);
+            // $optimalHeight= $newHeight;
 
             $dimensionsArray = $this->getSizeByFixedHeight($newWidth, $newHeight);
             $optimalWidth = $dimensionsArray['optimalWidth'];
             $optimalHeight = $dimensionsArray['optimalHeight'];
         } else { // *** Image to be resizerd is a square
             if ($newHeight < $newWidth) {
-                //$optimalWidth = $newWidth;
-                //$optimalHeight= $this->getSizeByFixedWidth($newWidth);
+                // $optimalWidth = $newWidth;
+                // $optimalHeight= $this->getSizeByFixedWidth($newWidth);
                 $dimensionsArray = $this->getSizeByFixedWidth($newWidth, $newHeight);
                 $optimalWidth = $dimensionsArray['optimalWidth'];
                 $optimalHeight = $dimensionsArray['optimalHeight'];
             } else {
                 if ($newHeight > $newWidth) {
-                    //$optimalWidth = $this->getSizeByFixedHeight($newHeight);
-                    //$optimalHeight= $newHeight;
+                    // $optimalWidth = $this->getSizeByFixedHeight($newHeight);
+                    // $optimalHeight= $newHeight;
                     $dimensionsArray = $this->getSizeByFixedHeight($newWidth, $newHeight);
                     $optimalWidth = $dimensionsArray['optimalWidth'];
                     $optimalHeight = $dimensionsArray['optimalHeight'];
@@ -704,7 +704,7 @@ class php_image_magician
         return ['optimalWidth' => $optimalWidth, 'optimalHeight' => $optimalHeight];
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function getOptimalCrop($newWidth, $newHeight)
         // Author:     Jarrod Oberto
@@ -760,7 +760,7 @@ class php_image_magician
         return ['optimalWidth' => $optimalWidth, 'optimalHeight' => $optimalHeight];
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function sharpen(): void
         // Author:     Jarrod Oberto
@@ -787,7 +787,7 @@ class php_image_magician
 
                 $sharpenMatrix = [
                     [-1, -2, -1],
-                    [-2, $sharpness + 12, -2], //Lessen the effect of a filter by increasing the value in the center cell
+                    [-2, $sharpness + 12, -2], // Lessen the effect of a filter by increasing the value in the center cell
                     [-1, -2, -1],
                 ];
                 $divisor = $sharpness; // adjusts brightness
@@ -801,18 +801,18 @@ class php_image_magician
         }
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function sharpen2($level): void
     {
         $sharpenMatrix = [
             [$level, $level, $level],
-            [$level, (8 * $level) + 1, $level], //Lessen the effect of a filter by increasing the value in the center cell
+            [$level, (8 * $level) + 1, $level], // Lessen the effect of a filter by increasing the value in the center cell
             [$level, $level, $level],
         ];
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function findSharp($orig, $final)
         // Author:     Ryan Rud (http://adryrun.com)
@@ -833,7 +833,7 @@ class php_image_magician
         return max(round($result), 0);
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function prepOption($option)
         // Author:     Jarrod Oberto
@@ -939,7 +939,7 @@ class php_image_magician
         }
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function greyScaleEnhanced(): void
         // Author:     Jarrod Oberto
@@ -959,7 +959,7 @@ class php_image_magician
         }
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function greyScaleDramatic(): void
         // Alias of gd_filter_monopin
@@ -1028,7 +1028,7 @@ class php_image_magician
         }
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function sepia2(): void
     {
@@ -1069,7 +1069,7 @@ class php_image_magician
         }
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function gd_filter_vintage(): void
     {
@@ -1083,7 +1083,7 @@ class php_image_magician
         }
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     /** Apply a PNG overlay */
     private function gd_apply_overlay($im, $type, $amount)
@@ -1134,7 +1134,7 @@ class php_image_magician
             [$r, $g, $b] = array_values(imagecolorsforindex($this->imageResized, $x));
 
             // calculate grayscale in percent
-            $grayscale = ($r + $g + $b) / 3 / 0xff;
+            $grayscale = ($r + $g + $b) / 3 / 0xFF;
 
             imagecolorset($this->imageResized, $x,
                 $grayscale * $rgb[0],
@@ -1332,13 +1332,13 @@ class php_image_magician
 
         // *** Create top-left corner mask (square)
         $cornerImg = imagecreatetruecolor($radius, $radius);
-        //$cornerImg = imagecreate($radius, $radius);
+        // $cornerImg = imagecreate($radius, $radius);
 
-        //imagealphablending($cornerImg, true);
-        //imagesavealpha($cornerImg, true);
+        // imagealphablending($cornerImg, true);
+        // imagesavealpha($cornerImg, true);
 
-        //imagealphablending($this->imageResized, false);
-        //imagesavealpha($this->imageResized, true);
+        // imagealphablending($this->imageResized, false);
+        // imagesavealpha($this->imageResized, true);
 
         // *** Give it a color
         $maskColor = imagecolorallocate($cornerImg, 0, 0, 0);
@@ -1355,21 +1355,21 @@ class php_image_magician
         imagefilledellipse($cornerImg, $radius, $radius, $radius * 2, $radius * 2, $maskColor);
 
         // *** Map to top left corner
-        imagecopymerge($this->imageResized, $cornerImg, 0, 0, 0, 0, $radius, $radius, 100); //tl
+        imagecopymerge($this->imageResized, $cornerImg, 0, 0, 0, 0, $radius, $radius, 100); // tl
 
         // *** Map rounded corner to other corners by rotating and applying the mask
         $cornerImg = imagerotate($cornerImg, 90, 0);
-        imagecopymerge($this->imageResized, $cornerImg, 0, $this->height - $radius, 0, 0, $radius, $radius, 100); //bl
+        imagecopymerge($this->imageResized, $cornerImg, 0, $this->height - $radius, 0, 0, $radius, $radius, 100); // bl
 
         $cornerImg = imagerotate($cornerImg, 90, 0);
-        imagecopymerge($this->imageResized, $cornerImg, $this->width - $radius, $this->height - $radius, 0, 0, $radius, $radius, 100); //br
+        imagecopymerge($this->imageResized, $cornerImg, $this->width - $radius, $this->height - $radius, 0, 0, $radius, $radius, 100); // br
 
         $cornerImg = imagerotate($cornerImg, 90, 0);
-        imagecopymerge($this->imageResized, $cornerImg, $this->width - $radius, 0, 0, 0, $radius, $radius, 100); //tr
+        imagecopymerge($this->imageResized, $cornerImg, $this->width - $radius, 0, 0, 0, $radius, $radius, 100); // tr
 
         // *** If corners are to be transparent, we fill our chromakey color as transparent.
         if ($isTransparent) {
-            //imagecolortransparent($this->imageResized, $imagebgColor);
+            // imagecolortransparent($this->imageResized, $imagebgColor);
             $this->imageResized = $this->transparentImage($this->imageResized);
             imagesavealpha($this->imageResized, true);
         }
@@ -1428,9 +1428,9 @@ class php_image_magician
         $colour = imagecolorallocate($rgb, 0, 0, 0);
         imagefilledrectangle($rgb, 0, 0, $width + $blurWidth, $height + $blurHeight, $colour);
         $colour = imagecolorallocate($rgb, 255, 255, 255);
-        //imagefilledrectangle($rgb, $blurWidth*0.5-$distWidth, $blurHeight*0.5-$distHeight, $width+$blurWidth*0.5-$distWidth, $height+$blurWidth*0.5-$distHeight, $colour);
+        // imagefilledrectangle($rgb, $blurWidth*0.5-$distWidth, $blurHeight*0.5-$distHeight, $width+$blurWidth*0.5-$distWidth, $height+$blurWidth*0.5-$distHeight, $colour);
         imagefilledrectangle($rgb, $blurWidth * 0.5 - $distWidth, $blurHeight * 0.5 - $distHeight, $width + $blurWidth * 0.5 - $distWidth, $height + $blurWidth * 0.5 - $distHeight, $colour);
-        //imagecopymerge($rgb, $newImage, 1+$blurWidth*0.5-$distWidth, 1+$blurHeight*0.5-$distHeight, 0,0, $width, $height, 100);
+        // imagecopymerge($rgb, $newImage, 1+$blurWidth*0.5-$distWidth, 1+$blurHeight*0.5-$distHeight, 0,0, $width, $height, 100);
         imagecopymerge($rgb, $newImage, $blurWidth * 0.5 - $distWidth, $blurHeight * 0.5 - $distHeight, 0, 0, $width + $blurWidth, $height + $blurHeight, 100);
 
         // *** Shadow (alpha)
@@ -1547,7 +1547,7 @@ class php_image_magician
         imagefilledrectangle($this->imageResized, $positionArray['x1'], $positionArray['y1'], $positionArray['x2'], $positionArray['y2'], $transparent);
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function addTextToCaptionBox($text, $fontColor = '#fff', $fontSize = 12, $angle = 0, $font = null)
         //
@@ -1595,7 +1595,7 @@ class php_image_magician
         $this->addText($text, $pos, $padding = 0, $fontColor, $fontSize, $angle, $font);
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function calculateCaptionBoxPosition($side, $thickness, $padding)
     {
@@ -1819,7 +1819,7 @@ class php_image_magician
         return $exifDataArray;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function resolveExposureProgram($ep)
     {
@@ -1858,7 +1858,7 @@ class php_image_magician
         return $ep;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function resolveMeteringMode($mm)
     {
@@ -1894,7 +1894,7 @@ class php_image_magician
         return $mm;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function resolveFlash($flash)
     {
@@ -1986,14 +1986,14 @@ class php_image_magician
         $this->writeIPTC(120, $value);
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function writeIPTCwriter($value): void
     {
-        //$this->writeIPTC(65, $value);
+        // $this->writeIPTC(65, $value);
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function writeIPTC($dat, $value): void
     {
@@ -2004,7 +2004,7 @@ class php_image_magician
         file_put_contents('iptc.jpg', $image_string);
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function iptc_maketag($rec, $dat, $val)
         // Author:   Thies C. Arntzen
@@ -2021,18 +2021,18 @@ class php_image_magician
     {
         $len = strlen($val);
         if ($len < 0x8000) {
-            return chr(0x1c).chr($rec).chr($dat).
+            return chr(0x1C).chr($rec).chr($dat).
             chr($len >> 8).
-            chr($len & 0xff).
+            chr($len & 0xFF).
             $val;
         }
 
-        return chr(0x1c).chr($rec).chr($dat).
+        return chr(0x1C).chr($rec).chr($dat).
             chr(0x80).chr(0x04).
-            chr(($len >> 24) & 0xff).
-            chr(($len >> 16) & 0xff).
-            chr(($len >> 8) & 0xff).
-            chr(($len) & 0xff).
+            chr(($len >> 24) & 0xFF).
+            chr(($len >> 16) & 0xFF).
+            chr(($len >> 8) & 0xFF).
+            chr(($len) & 0xFF).
             $val;
     }
 
@@ -2040,7 +2040,7 @@ class php_image_magician
   Write XMP Data
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-    //http://xmpphptoolkit.sourceforge.net/
+    // http://xmpphptoolkit.sourceforge.net/
 
     /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*-
   Add Text
@@ -2081,7 +2081,7 @@ class php_image_magician
         imagettftext($this->imageResized, $fontSize, $angle, $x, $y, $fontColor, $font, $text);
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function getTextFont($font)
     {
@@ -2110,7 +2110,7 @@ class php_image_magician
         return $font;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function getTextSize($fontSize, $angle, $font, $text)
     {
@@ -2179,7 +2179,7 @@ class php_image_magician
         imagecopy($im, $stamp, $x, $y, 0, 0, imagesx($stamp), imagesy($stamp));
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function calculatePosition($pos, $padding, $assetWidth, $assetHeight, $upperLeft = true)
         //
@@ -2262,7 +2262,7 @@ class php_image_magician
         return ['width' => $width, 'height' => $height];
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function filterOpacity(&$img, $opacity = 75)
         //
@@ -2287,14 +2287,14 @@ class php_image_magician
 
         $opacity /= 100;
 
-        //get image width and height
+        // get image width and height
         $w = imagesx($img);
         $h = imagesy($img);
 
-        //turn alpha blending off
+        // turn alpha blending off
         imagealphablending($img, false);
 
-        //find the most opaque pixel in the image (the one with the smallest alpha value)
+        // find the most opaque pixel in the image (the one with the smallest alpha value)
         $minalpha = 127;
         for ($x = 0; $x < $w; ++$x) {
             for ($y = 0; $y < $h; ++$y) {
@@ -2305,21 +2305,21 @@ class php_image_magician
             }
         }
 
-        //loop through image pixels and modify alpha for each
+        // loop through image pixels and modify alpha for each
         for ($x = 0; $x < $w; ++$x) {
             for ($y = 0; $y < $h; ++$y) {
-                //get current alpha value (represents the TANSPARENCY!)
+                // get current alpha value (represents the TANSPARENCY!)
                 $colorxy = imagecolorat($img, $x, $y);
                 $alpha = ($colorxy >> 24) & 0xFF;
-                //calculate new alpha
+                // calculate new alpha
                 if ($minalpha !== 127) {
                     $alpha = 127 + 127 * $opacity * ($alpha - 127) / (127 - $minalpha);
                 } else {
                     $alpha += 127 * $opacity;
                 }
-                //get the color index with new alpha
+                // get the color index with new alpha
                 $alphacolorxy = imagecolorallocatealpha($img, ($colorxy >> 16) & 0xFF, ($colorxy >> 8) & 0xFF, $colorxy & 0xFF, $alpha);
-                //set pixel with the new color + opacity
+                // set pixel with the new color + opacity
                 if (!imagesetpixel($img, $x, $y, $alphacolorxy)) {
                     return false;
                 }
@@ -2329,7 +2329,7 @@ class php_image_magician
         return true;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function openImage($file)
         // Author:     Jarrod Oberto
@@ -2379,7 +2379,7 @@ class php_image_magician
         return $img;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function reset(): void
         //
@@ -2394,7 +2394,7 @@ class php_image_magician
         $this->__construct($this->fileName);
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function saveImage($savePath, $imageQuality = '100'): void
         // Author:     Jarrod Oberto
@@ -2478,7 +2478,7 @@ class php_image_magician
                 break;
         }
 
-        //imagedestroy($this->imageResized);
+        // imagedestroy($this->imageResized);
 
         // *** Display error if a file type is not supported.
         if ($error != '') {
@@ -2486,7 +2486,7 @@ class php_image_magician
         }
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function displayImage($fileType = 'jpg', $imageQuality = '100'): void
         // Author:     Jarrod Oberto
@@ -2537,10 +2537,10 @@ class php_image_magician
                 break;
         }
 
-        //imagedestroy($this->imageResized);
+        // imagedestroy($this->imageResized);
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function setTransparency($bool): void
         // Sep 2011
@@ -2548,7 +2548,7 @@ class php_image_magician
         $this->keepTransparency = $bool;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function setFillColor($value): void
         // Sep 2011
@@ -2566,7 +2566,7 @@ class php_image_magician
         $this->fillColorArray = $colorArray;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function setCropFromTop($value): void
         // Sep 2011
@@ -2574,7 +2574,7 @@ class php_image_magician
         $this->cropFromTopPercent = $value;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function testGDInstalled()
         // Author:     Jarrod Oberto
@@ -2595,7 +2595,7 @@ class php_image_magician
         return $gdInstalled;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function testEXIFInstalled()
         // Author:     Jarrod Oberto
@@ -2616,7 +2616,7 @@ class php_image_magician
         return $exifInstalled;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function testIsImage($image)
         // Author:     Jarrod Oberto
@@ -2637,7 +2637,7 @@ class php_image_magician
         return $fileIsImage;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function testFunct(): void
         // Author:     Jarrod Oberto
@@ -2652,7 +2652,7 @@ class php_image_magician
         echo $this->height;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function setForceStretch($value): void
         // Author:     Jarrod Oberto
@@ -2667,7 +2667,7 @@ class php_image_magician
         $this->forceStretch = $value;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function setFile($fileName): void
         // Author:     Jarrod Oberto
@@ -2682,7 +2682,7 @@ class php_image_magician
         self::__construct($fileName);
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function getFileName()
         // Author:     Jarrod Oberto
@@ -2697,35 +2697,35 @@ class php_image_magician
         return $this->fileName;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function getHeight()
     {
         return $this->height;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function getWidth()
     {
         return $this->width;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function getOriginalHeight()
     {
         return $this->heightOriginal;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function getOriginalWidth()
     {
         return $this->widthOriginal;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function getErrors()
         // Author:     Jarrod Oberto
@@ -2740,7 +2740,7 @@ class php_image_magician
         return $this->errorArray;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function checkInterlaceImage($isEnabled): void
         // jpg will use progressive (they don't use interace)
@@ -2750,7 +2750,7 @@ class php_image_magician
         }
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     protected function formatColor($value)
         // Author:     Jarrod Oberto
@@ -2791,7 +2791,7 @@ class php_image_magician
         return $rgbArray;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function hex2dec($hex)
         // Purpose:  Convert #hex color to RGB
@@ -2812,7 +2812,7 @@ class php_image_magician
         return $rgb;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function createImageColor($colorArray)
     {
@@ -2823,7 +2823,7 @@ class php_image_magician
         return imagecolorallocate($this->imageResized, $r, $g, $b);
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function testColorExists($colorArray)
     {
@@ -2838,7 +2838,7 @@ class php_image_magician
         return true;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function findUnusedGreen()
         // Purpose:  We find a green color suitable to use like green-screen effect.
@@ -2861,7 +2861,7 @@ class php_image_magician
         return $greenChroma;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function findUnusedBlue()
         // Purpose:  We find a green color suitable to use like green-screen effect.
@@ -2884,7 +2884,7 @@ class php_image_magician
         return $blueChroma;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function invertTransparency($value, $originalMax, $invert = true)
         // Purpose:  This does two things:
@@ -2909,7 +2909,7 @@ class php_image_magician
         return ($value / 100) * $originalMax;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function transparentImage($src)
     {
@@ -2924,9 +2924,9 @@ class php_image_magician
                 $g = ($color >> 8) & 0xFF;
                 $b = $color & 0xFF;
                 for ($i = 0; $i < 270; ++$i) {
-                    //if ($r . $g . $b == ($r1 + $i) . ($g1 + $i) . ($b1 + $i)) {
+                    // if ($r . $g . $b == ($r1 + $i) . ($g1 + $i) . ($b1 + $i)) {
                     if ($r == 0 && $g == 255 && $b == 0) {
-                        //if ($g == 255) {
+                        // if ($g == 255) {
                         $trans_colour = imagecolorallocatealpha($src, 0, 0, 0, 127);
                         imagefill($src, $x, $y, $trans_colour);
                     }
@@ -2937,7 +2937,7 @@ class php_image_magician
         return $src;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function checkStringStartsWith($needle, $haystack)
         // Check if a string starts with a specific pattern
@@ -3000,7 +3000,7 @@ class php_image_magician
         return $BITMAPFILEHEADER.$BITMAPINFOHEADER.$BMP;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function GetPixelColor(&$img, $x, $y)
         // Author:     James Heinrich
@@ -3018,7 +3018,7 @@ class php_image_magician
         return @imagecolorsforindex($img, @imagecolorat($img, $x, $y));
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     private function LittleEndian2String($number, $minbytes = 1)
         // Author:     James Heinrich
@@ -3056,18 +3056,18 @@ class php_image_magician
         // Notes:
         //
     {
-        //Ouverture du fichier en mode binaire
+        // Ouverture du fichier en mode binaire
         if (!$f1 = fopen($filename, 'r')) {
             return false;
         }
 
-        //1 : Chargement des ent�tes FICHIER
+        // 1 : Chargement des ent�tes FICHIER
         $FILE = unpack('vfile_type/Vfile_size/Vreserved/Vbitmap_offset', fread($f1, 14));
         if ($FILE['file_type'] != 19778) {
             return false;
         }
 
-        //2 : Chargement des ent�tes BMP
+        // 2 : Chargement des ent�tes BMP
         $BMP = unpack('Vheader_size/Vwidth/Vheight/vplanes/vbits_per_pixel'.
             '/Vcompression/Vsize_bitmap/Vhoriz_resolution'.
             '/Vvert_resolution/Vcolors_used/Vcolors_important', fread($f1, 40));
@@ -3087,13 +3087,13 @@ class php_image_magician
             $BMP['decal'] = 0;
         }
 
-        //3 : Chargement des couleurs de la palette
+        // 3 : Chargement des couleurs de la palette
         $PALETTE = [];
         if ($BMP['colors'] < 16777216) {
             $PALETTE = unpack('V'.$BMP['colors'], fread($f1, $BMP['colors'] * 4));
         }
 
-        //4 : Cr�ation de l'image
+        // 4 : Cr�ation de l'image
         $IMG = fread($f1, $BMP['size_bitmap']);
         $VIDE = chr(0);
 
@@ -3119,13 +3119,13 @@ class php_image_magician
            */
 
                     // *** Original code (don't work)
-                    //$COLOR = unpack("n",substr($IMG,$P,2));
-                    //$COLOR[1] = $PALETTE[$COLOR[1]+1];
+                    // $COLOR = unpack("n",substr($IMG,$P,2));
+                    // $COLOR[1] = $PALETTE[$COLOR[1]+1];
 
                     $COLOR = unpack('v', substr($IMG, $P, 2));
-                    $blue = ($COLOR[1] & 0x001f) << 3;
-                    $green = ($COLOR[1] & 0x07e0) >> 3;
-                    $red = ($COLOR[1] & 0xf800) >> 8;
+                    $blue = ($COLOR[1] & 0x001F) << 3;
+                    $green = ($COLOR[1] & 0x07E0) >> 3;
+                    $red = ($COLOR[1] & 0xF800) >> 8;
                     $COLOR[1] = $red * 65536 + $green * 256 + $blue;
                 } elseif ($BMP['bits_per_pixel'] == 8) {
                     $COLOR = unpack('n', $VIDE.substr($IMG, $P, 1));
@@ -3170,7 +3170,7 @@ class php_image_magician
             --$Y;
             $P += $BMP['decal'];
         }
-        //Fermeture du fichier
+        // Fermeture du fichier
         fclose($f1);
 
         return $res;
@@ -3205,7 +3205,7 @@ class php_image_magician
         return false;
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 
     public function __destruct()
     {
@@ -3214,7 +3214,7 @@ class php_image_magician
         }
     }
 
-    //# --------------------------------------------------------
+    // # --------------------------------------------------------
 }
 
 /*

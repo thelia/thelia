@@ -1,7 +1,7 @@
 <?php
 
 $config = include '../config/config.php';
-//TODO switch to array
+// TODO switch to array
 extract($config, \EXTR_OVERWRITE);
 
 if (!$java_upload) {
@@ -11,7 +11,7 @@ if ($_SESSION['RF']['verify'] != 'RESPONSIVEfilemanager') {
     exit('forbidden');
 }
 
-//Let's load the 'interesting' stuff ...  ;-)
+// Let's load the 'interesting' stuff ...  ;-)
 include 'jupload.php';
 include '../include/utils.php';
 
@@ -39,9 +39,9 @@ if (strpos($_GET['path'], '../') !== false || strpos($_GET['path'], './') !== fa
 }
 
 $path = str_replace(' ', '~', $path);
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////   The user callback function, that can be called after upload   ////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////   The user callback function, that can be called after upload   ////////////////////////
+// //////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * This function will be called, once all files are uploaded, with the list of uploaded files as an argument.
  *
@@ -62,9 +62,9 @@ function handle_uploaded_files($juploadPhpSupportClass, $files)
         .$juploadPhpSupportClass->defaultAfterUploadManagement();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//First: the applet parameters
+// First: the applet parameters
 //
 // Default value should work nice on most configuration. In this sample, we use some specific parameters, to show
 // how to use this array.
@@ -74,27 +74,27 @@ function handle_uploaded_files($juploadPhpSupportClass, $files)
 // see all details http://jupload.sourceforge.net/howto-customization.html
 //
 $appletParameters = [
-    //Default value is ... maximum size for a file on the current FS. 2G is problably too much already.
+    // Default value is ... maximum size for a file on the current FS. 2G is problably too much already.
     'maxFileSize' => $JAVAMaxSizeUpload.'G',
     //
-    //In the sourceforge project structure, the applet jar file is one folder below. Default
-    //configuration is ok, if wjhk.jupload.jar is in the same folder as the script containing this call.
+    // In the sourceforge project structure, the applet jar file is one folder below. Default
+    // configuration is ok, if wjhk.jupload.jar is in the same folder as the script containing this call.
     'archive' => 'wjhk.jupload.jar',
     'showLogWindow' => 'false',
     'width' => '100%',
     'height' => '358px',
     'name' => 'No limit Uploader',
     'allowedFileExtensions' => implode('/', $ext),
-    //To manage, other jar files, like the ftp jar files if postURL is an FTP URL:
-    //'archive' => 'wjhk.jupload.jar,jakarta-commons-oro.jar,jakarta-commons-net.jar',
+    // To manage, other jar files, like the ftp jar files if postURL is an FTP URL:
+    // 'archive' => 'wjhk.jupload.jar,jakarta-commons-oro.jar,jakarta-commons-net.jar',
     //
-    //Default afterUploadURL displays the list of uploaded files above the applet (in the <!--JUPLOAD_FILES--> markers, see below)
-    //You can use any page you want, to manage the uploaded files. Here is a sample, that also only shows the list of files.
+    // Default afterUploadURL displays the list of uploaded files above the applet (in the <!--JUPLOAD_FILES--> markers, see below)
+    // You can use any page you want, to manage the uploaded files. Here is a sample, that also only shows the list of files.
     'afterUploadURL' => 'success.php?path='.$_GET['path'],
     //
-    //This demo expects the md5sum to be sent by the applet. But the parameter is not mandatory
-    //This value should be set to false (or the line commented), for big files, as md5 calculation
-    //may be long  (Note this must be string and *not* boolean true/false)
+    // This demo expects the md5sum to be sent by the applet. But the parameter is not mandatory
+    // This value should be set to false (or the line commented), for big files, as md5 calculation
+    // may be long  (Note this must be string and *not* boolean true/false)
     'sendMD5Sum' => 'false',
 
     'debugLevel' => 0, // 100 disables redirect after upload, so we keep it below. This still gives a lot of information, in case of problem.
@@ -106,32 +106,32 @@ if ((isset($_SERVER['PHP_AUTH_USER']) && $_SERVER['PHP_AUTH_USER'] != '') && $_S
 }
 
 //
-//Then: the jupload PHP class parameters
+// Then: the jupload PHP class parameters
 $classParameters = [
-    //Files won't be stored on the server. Useful for first tests of the applet behavior ... and sourceforge demo site !
+    // Files won't be stored on the server. Useful for first tests of the applet behavior ... and sourceforge demo site !
     'demo_mode' => false,
     //
-    //Allow creation of subdirectories, when uploading several folders/files (drag and drop a folder on the applet to use it).
+    // Allow creation of subdirectories, when uploading several folders/files (drag and drop a folder on the applet to use it).
     'allow_subdirs' => true,
     //
     // The callbackAfterUploadManagement function will be called, once all files are uploaded, with the list
-    //of uploaded files as an argument. See the above sample, and change it according to your needs.
-    //'callbackAfterUploadManagement' => 'handle_uploaded_files',
+    // of uploaded files as an argument. See the above sample, and change it according to your needs.
+    // 'callbackAfterUploadManagement' => 'handle_uploaded_files',
     //
-    //I work on windows. The default configuration is /var/tmp/jupload_test
-    'destdir' => $path,  //Where to store the files on the web
-    //'errormail' => 'me@my.domain.org',
+    // I work on windows. The default configuration is /var/tmp/jupload_test
+    'destdir' => $path,  // Where to store the files on the web
+    // 'errormail' => 'me@my.domain.org',
 ];
 if (!empty($convert_spaces)) {
     $classParameters['convert_spaces'] = true;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Instantiate and initialize JUpload : integration of the applet in your web site.
 $juploadPhpSupportClass = new JUpload($appletParameters, $classParameters);
-////////////////////////////////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//Then, a simple HTML page, for the demo
+// Then, a simple HTML page, for the demo
 //
 // "<!--JUPLOAD_FILES-->" is the tag where the list of uploaded files will be written.
 // "<!--JUPLOAD_APPLET-->" is the place where the applet will be integrated, in the web page.

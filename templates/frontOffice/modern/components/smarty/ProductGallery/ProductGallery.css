@@ -1,11 +1,11 @@
 .ProductGallery {
-
   .splide__list {
     width: max-content;
     @screen lg {
       width: auto;
     }
   }
+
   .splide__slide {
     @screen lg {
       @apply mb-8;

@@ -76,7 +76,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
         throw new \LogicException('Export data can\'t be rewinded');
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return $this->data->valid();
     }

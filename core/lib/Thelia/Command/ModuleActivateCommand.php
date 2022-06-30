@@ -96,7 +96,7 @@ class ModuleActivateCommand extends BaseModuleGenerate
                 );
             }
 
-            //impossible to change output class in CommandTester...
+            // impossible to change output class in CommandTester...
             if (method_exists($output, 'renderBlock')) {
                 $output->renderBlock([
                     '',

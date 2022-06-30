@@ -1,5 +1,5 @@
 .TopNotification {
-    a {
-        @apply font-bold ;
-    }
+  a {
+    @apply font-bold;
+  }
 }

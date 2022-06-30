@@ -288,10 +288,10 @@ class TranslationsController extends BaseAdminController
                 // Estimate number of fields, and compare to php ini max_input_vars
                 $stringsCount = $event->getTranslatableStringCount() * 4 + 6;
 
-                if ($stringsCount > ini_get('max_input_vars')) {
+                if ($stringsCount > \ini_get('max_input_vars')) {
                     $templateArguments['max_input_vars_warning'] = true;
                     $templateArguments['required_max_input_vars'] = $stringsCount;
-                    $templateArguments['current_max_input_vars'] = ini_get('max_input_vars');
+                    $templateArguments['current_max_input_vars'] = \ini_get('max_input_vars');
                 } else {
                     $templateArguments['all_strings'] = $event->getTranslatableStrings();
                 }

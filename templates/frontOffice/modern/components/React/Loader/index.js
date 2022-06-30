@@ -4,7 +4,7 @@ function Loader({ size, color, className = '', style = {} }) {
   return (
     <div className={className} style={style}>
       <svg
-        className={`${size ? size : 'w-24 h-24'} stroke-current ${
+        className={`${size ? size : 'h-24 w-24'} stroke-current ${
           color ? color : ''
         } mx-auto`}
         viewBox="0 0 38 38"

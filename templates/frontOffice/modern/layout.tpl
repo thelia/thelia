@@ -1,12 +1,11 @@
 <!doctype html>
 
-{* Declare assets directory, relative to template base directory *}
-{declare_assets directory='assets/dist'}
+
+
 {* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
 {default_translation_domain domain='fo.modern'}
 
 {* -- Define some stuff for Smarty ------------------------------------------ *}
-{config_load file='variables.conf'}
 {block name="init"}{/block}
 {block name="no-return-functions"}{/block}
 {assign var="store_name" value={config key="store_name"}}
@@ -82,32 +81,32 @@
         {/if}
 
         {* Share meta *}
-        <meta property="og:image" content="{getFileFromManifest file="default-social-thumbnail.png"}" />
-        <meta property="og:image:secure_url" content="{getFileFromManifest file="default-social-thumbnail.png"}" />
+        <meta property="og:image" content="{encore_manifest_file file="default-social-thumbnail.png"}" />
+        <meta property="og:image:secure_url" content="{encore_manifest_file file="default-social-thumbnail.png"}" />
         <meta property="og:image:width" content="450" />
         <meta property="og:image:height" content="450" />
-        <meta name="twitter:image" content="{getFileFromManifest file="default-social-thumbnail.png"}" />
+        <meta name="twitter:image" content="{encore_manifest_file file="default-social-thumbnail.png"}" />
     {/block}
 
     {hook name="main.head-top"}
 
     {* CSS *}
     {block name="css"}
-      {getAssetsFromEntrypoints entry="app" type="css"}
+      {encore_entry_link_tags entry="app"}
     {/block}
 
     {* FAVICON *}
-    <link rel="apple-touch-icon" sizes="180x180" href="{getFileFromManifest file="dist/favicons/apple-touch-icon.png"}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{getFileFromManifest file="dist/favicons/favicon-32x32.png"}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{getFileFromManifest file="dist/favicons/favicon-16x16.png"}">
-    <link rel="manifest" href="{getFileFromManifest file="dist/favicons/site.webmanifest"}">
-    <link rel="mask-icon" href="{getFileFromManifest file="dist/favicons/safari-pinned-tab.svg"}" color="#5bbad5">
+    <link rel="apple-touch-icon" sizes="180x180" href="{encore_manifest_file file="dist/favicons/apple-touch-icon.png"}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{encore_manifest_file file="dist/favicons/favicon-32x32.png"}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{encore_manifest_file file="dist/favicons/favicon-16x16.png"}">
+    <link rel="manifest" href="{encore_manifest_file file="dist/favicons/site.webmanifest"}">
+    <link rel="mask-icon" href="{encore_manifest_file file="dist/favicons/safari-pinned-tab.svg"}" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="theme-color" content="#ffffff">
 
 
     {* Favicon *}
-    {* <link rel="shortcut icon" type="image/x-icon" href="{getFileFromManifest file="favicon.ico"}"> *}
+    {* <link rel="shortcut icon" type="image/x-icon" href="{encore_manifest_file file="favicon.ico"}"> *}
 
     {* Feeds *}
     <link rel="alternate" type="application/rss+xml" title="{intl l='All products'}" href="{url path="/feed/catalog/%lang" lang=$lang_locale}" />
@@ -154,12 +153,12 @@
     <script>
        var DEFAULT_CURRENCY_CODE = "{currency attr="code"}"
        var DEFAULT_CURRENCY_SYMBOL = "{currency attr="symbol"}"
-       var SVG_SPRITE_URL = "{getFileFromManifest file="dist/sprite.svg"}"
+       var SVG_SPRITE_URL = "{encore_manifest_file file="dist/sprite.svg"}"
     </script>
 
 
     {block name="javascript"}
-      {getAssetsFromEntrypoints entry="app" type="js"}
+      {encore_entry_script_tags entry="app"}
     {/block}
 
 </body>

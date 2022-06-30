@@ -1,11 +1,11 @@
 {extends file="layout.tpl"}
 
 {block name="css" append}
-  {getAssetsFromEntrypoints entry="register" type="css"}
+  {encore_entry_link_tags entry="register"}
 {/block}
 
 {block name="javascript" append}
-  {getAssetsFromEntrypoints entry="register" type="js"}
+  {encore_entry_script_tags entry="register"}
 {/block}
 
 {* Body Class *}
@@ -26,7 +26,7 @@
 
 
 
-  <div class="container mx-auto mb-20 pt-20">
+  <div class="container pt-20 mx-auto mb-20">
 
     {include file="components/smarty/Title/Title.html" title={intl l="Create an account"}}
 
@@ -45,9 +45,9 @@
         <div class="my-10">{include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$form_error_message}</div>
       {/if}
 
-      <div class="md:grid grid-cols-2 gap-6">
+      <div class="grid-cols-2 gap-6 md:grid">
         <fieldset id="register-info" class="panel">
-          <h4 class="text-2xl   font-bold mb-4">
+          <h4 class="mb-4 text-2xl font-bold">
             {intl l="Personal information"}
           </h4>
           <div class="grid grid-cols-1 gap-6">
@@ -86,7 +86,7 @@
         </fieldset>
 
         <fieldset id="register-delivery" class="panel">
-            <h4 class="text-2xl   font-bold mb-4">
+            <h4 class="mb-4 text-2xl font-bold">
               {intl l="Delivery information"}
             </h4>
             <div class="grid grid-cols-1 gap-6">
@@ -123,17 +123,17 @@
       </div>
 
       <fieldset id="register-login" class="panel">
-          <h4 class="text-2xl   font-bold mb-4">
+          <h4 class="mb-4 text-2xl font-bold">
             {intl l="Login Information"}
           </h4>
           <div>
             <div class="lg:flex lg:-mx-12">
-              <div class="lg:w-6/12 px-12">
+              <div class="px-12 lg:w-6/12">
                 {form_field field="password"}
                   {call name="fn_password_field"}
                 {/form_field}
               </div>
-              <div class="lg:w-6/12 px-12">
+              <div class="px-12 lg:w-6/12">
                 {form_field field="password_confirm"}
                   {call name="fn_password_confirm_field"}
                 {/form_field}

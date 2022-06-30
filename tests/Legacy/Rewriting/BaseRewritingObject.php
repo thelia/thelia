@@ -47,7 +47,7 @@ abstract class BaseRewritingObject extends TestCase
         $rewrittenUrl = $object->generateRewrittenUrl('fr_FR', $con);
         $this->assertNotNull($rewrittenUrl, 'rewritten url can not be null');
         $this->assertMatchesRegularExpression('/^mon-super-titre-en-français(-[0-9]+)?\.html$/', $rewrittenUrl);
-        //mon-super-titre-en-français-2.html
+        // mon-super-titre-en-français-2.html
 
         $object->delete();
     }

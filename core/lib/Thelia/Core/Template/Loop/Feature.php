@@ -109,7 +109,8 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $product = $this->getProduct();
-        $template = $this->getTemplate();
+
+        $template = $this->getTemplate() ?? [];
         $excludeTemplate = $this->getExcludeTemplate();
 
         $this->useFeaturePosition = true;
@@ -120,11 +121,6 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
             // Find all template assigned to the products.
             $products = ProductQuery::create()->filterById($product, Criteria::IN)->find();
-
-            // Create template array
-            if ($template == null) {
-                $template = [];
-            }
 
             /** @var ProductModel $product */
             foreach ($products as $product) {
@@ -150,7 +146,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        if (!empty($template)) {
+        if (!\count($template) > 0) {
             // Join with feature_template table to get position, if a manual order position is required
             if (\count(array_diff(['manual_reverse', 'manual'], $this->getOrder())) < 2) {
                 $search
@@ -178,7 +174,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         $title = $this->getTitle();
 
         if (null !== $title) {
-            //find all feature that match exactly this title and find with all locales.
+            // find all feature that match exactly this title and find with all locales.
             $features = FeatureI18nQuery::create()
                 ->filterByTitle($title, Criteria::LIKE)
                 ->select('id')

@@ -101,7 +101,7 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
             throw new \RuntimeException(sprintf('Deactivation fail with Exception : [%d] %s', $e->getCode(), $e->getMessage()));
         }
 
-        //impossible to change output class in CommandTester...
+        // impossible to change output class in CommandTester...
         if (method_exists($output, 'renderBlock')) {
             $output->renderBlock([
                 '',

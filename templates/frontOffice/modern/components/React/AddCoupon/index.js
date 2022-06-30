@@ -30,7 +30,7 @@ export default function AddCoupon() {
               required: intl.formatMessage({ id: 'MANDATORY' })
             })}
             placeholder={intl.formatMessage({ id: 'COUPON' })}
-            className="w-full h-auto"
+            className="h-auto w-full"
           />
           <SubmitButton
             type="submit"

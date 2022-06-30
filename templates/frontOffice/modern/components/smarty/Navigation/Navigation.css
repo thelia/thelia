@@ -3,19 +3,22 @@
   .MainNavigation-lang {
     display: grid;
     grid-gap: 1.25rem;
-    padding: 1.25rem;
     grid-template-columns: repeat(auto-fit, 1.5rem);
+    padding: 1.25rem;
 
     > a {
       width: auto;
       padding: 0;
+
       &::after {
         content: none;
       }
     }
+
     &::before {
       content: none;
     }
+
     &::after {
       content: none;
     }
