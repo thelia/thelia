@@ -72,7 +72,7 @@ class OrderController extends BaseFrontController
                         )
                     );
                 } elseif (\count($deliveryModule) == 1) {
-                    return $this->registerVirtualProductDelivery($deliveryModule[0], $deliveryAddress);
+                    return $this->registerVirtualProductDelivery($eventDispatcher, $deliveryModule[0], $deliveryAddress);
                 }
             }
         }
