@@ -34,7 +34,7 @@ export default function EditAddress({ address = {} }) {
         onClick={() => setIsEditingAddress(true)}
         type="button"
       >
-        <IconPen className="w-4 h-4 mr-4 fill-current" />
+        <IconPen className="mr-4 h-4 w-4 fill-current" />
         {intl.formatMessage({ id: 'EDIT' })}
       </div>
       {isEditingAddress ? (
@@ -43,7 +43,7 @@ export default function EditAddress({ address = {} }) {
           onRequestClose={() => setIsEditingAddress(false)}
           ariaHideApp={false}
           className={{
-            base: 'outline-none p-8 h-full w-full overflow-auto bg-white',
+            base: 'h-full w-full overflow-auto bg-white p-8 outline-none',
             afterOpen: '',
             beforeClose: ''
           }}
@@ -62,8 +62,8 @@ export default function EditAddress({ address = {} }) {
             >
               <CloseIcon />
             </button>
-            <div className="block w-full mx-auto">
-              <h4 className="mb-8 text-3xl ">
+            <div className="mx-auto block w-full">
+              <h4 className=" mb-8 text-3xl">
                 {intl.formatMessage({ id: 'EDIT_AN_ADDRESS' })}
               </h4>
               <AddressForm address={address} onSubmit={submitForm} />

@@ -89,11 +89,9 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
     }
 
     /**
-     * @return bool
-     *
      * @throws \Exception
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->data->getIterator()->valid();
     }

@@ -27,7 +27,7 @@ function DeliveryModes() {
               className={`btn w-full shadow ${
                 mode === selectedMode
                   ? 'bg-main'
-                  : ' bg-white border-white text-black hover:border-main'
+                  : ' border-white bg-white text-black hover:border-main'
               }`}
               onClick={() => dispatch(setMode(mode))}
             >

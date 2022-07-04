@@ -15,8 +15,8 @@ export default function PaymentModules() {
   const { mutate } = useSetCheckout();
 
   return (
-    <div className="shadow panel">
-      <div className="items-center pb-6 text-xl font-bold border-b border-gray-300">
+    <div className="panel shadow">
+      <div className="items-center border-b border-gray-300 pb-6 text-xl font-bold">
         {intl.formatMessage({ id: 'PAYMENT_MODE' })}
         {isLoading ? (
           <Loader size="w-10 h-10" />
@@ -42,7 +42,7 @@ export default function PaymentModules() {
                     <img
                       src={module.images[0]?.url}
                       alt=""
-                      className="object-contain w-12 h-12 bg-white"
+                      className="h-12 w-12 bg-white object-contain"
                     />
                   </div>
                 ) : null}

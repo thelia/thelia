@@ -79,12 +79,11 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
      * @return bool The return value will be casted to boolean and then evaluated.
      *              Returns true on success or false on failure.
      */
-    public function valid()
+    public function valid(): bool
     {
         $key = key($this->conditions);
-        $var = ($key !== null && $key !== false);
 
-        return $var;
+        return $key !== null;
     }
 
     /**
@@ -109,7 +108,7 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
      * @return int The custom count as an integer.
      *             The return value is cast to an integer.
      */
-    public function count()
+    public function count(): int
     {
         return \count($this->conditions);
     }
@@ -126,7 +125,7 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
      * @return bool true on success or false on failure.
      *              The return value will be casted to boolean if non-boolean was returned.
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->conditions[$offset]);
     }

@@ -52,15 +52,18 @@
         vertical-align: top;
     }
 
+    .table-info {
+       margin-bottom: 15px;
+    }
     .table-info h3 {
-        font-size: 18px;
+        font-size: 12px;
         color: #58585a;
         margin-top: 0;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
 
     .table-info h3 span {
-        font-size: 18px;
+        font-size: inherit;
         color: #f6993c;
     }
 
@@ -120,38 +123,39 @@
         {hook name="delivery.header" order=$order_id}
     </page_header>
 
-    <page_footer>
-        {hook name="delivery.footer-top" order=$order_id}
+  <page_footer>
+		{hook name="delivery.footer-top" order=$order_id}
         <table>
-            <col style="width: 80%; padding: 1mm; border: none; text-align: left;" />
-            <col style="width: 20%; padding: 1mm; border: none; text-align: right;" />
+        <col style="width:100%">
             <tbody>
             <tr>
-		    	<td>
-					{hook name="delivery.imprint" order=$order_id}
-					{elsehook rel="delivery.imprint"}
-		                <!-- Imprint -->
-		                {config key="store_name"}
-		                {$addresses="{config key='store_address1'} {config key='store_address2'} {config key='store_address3'}"}
-		                {$city="{config key='store_zipcode'} {config key='store_city'}"}
-		                {if $addresses != "  "}- {$addresses}{/if}
-		                {if $city != " " }- {$city}{/if}
-		                {if {config key="store_country"} }
-		                {loop type="country" visible="*" name="address.country.title" id={config key="store_country"}} - {$TITLE}{/loop}
-		                {/if}
-		                {if {config key="store_business_id"} }
-		                - {config key="store_business_id"}
-		                {/if}
-		                <br>
-		                {if {config key="store_phone"} }
-		                {intl l="Phone: "}{config key="store_phone"}
-		                {/if}
-		                {if {config key="store_email"} }
-		                {intl l="Email: "}{config key="store_email"}
-		                {/if}
-					{/elsehook}
+                <td>
+                <div style="width:100%; text-align:center; position:relative;">
+                        {hook name="invoice.imprint" order=$order_id}
+                        {elsehook rel="invoice.imprint"}
+                            <!-- Imprint -->
+                            {config key="store_name"}
+                            {$addresses="{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}"}
+                            {$city="{config key="store_zipcode"} {config key="store_city"}"}
+                            {if $addresses != "  "}- {$addresses}{/if}
+                            {if $city != " " }- {$city}{/if}
+                            {if {config key="store_country"} }
+                                {loop type="country" visible="*" name="address.country.title" id={config key="store_country"}} - {$TITLE}{/loop}
+                            {/if}
+                            {if {config key="store_business_id"} }
+                                - {config key="store_business_id"}
+                            {/if}
+                            <br>
+                            {if {config key="store_phone"} }
+                                {intl l="Phone: "}{config key="store_phone"}
+                            {/if}
+                            {if {config key="store_email"} }
+                                {intl l="Email: "}{config key="store_email"}
+                            {/if}
+                        {/elsehook}
+                    <div style="position:absolute;top:1mm;right:1mm;line-height:1">{intl l="page"} [[page_cu]]/[[page_nb]]</div>
+                </div>
                 </td>
-                <td>{intl l="page"} [[page_cu]]/[[page_nb]]</td>
             </tr>
             </tbody>
         </table>

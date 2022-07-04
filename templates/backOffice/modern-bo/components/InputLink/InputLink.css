@@ -1,0 +1,17 @@
+
+.left-inner-addon {
+    position: relative;
+}
+.left-inner-addon input {
+    padding-left: 35px !important; 
+}
+.left-inner-addon i {
+    position: absolute;
+    padding: 12px 12px;
+    pointer-events: none;
+}
+
+.InputLinkError input {
+    width: 100%;
+		box-sizing: border-box;
+}

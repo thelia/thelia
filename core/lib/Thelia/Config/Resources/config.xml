@@ -93,7 +93,7 @@
     <services>
         <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container"/>
         <service id="Psr\Container\ContainerInterface" alias="service_container"/>
-      
+
         <!-- Thelia template helper -->
         <service id="thelia.template_helper" class="Thelia\Core\Template\TheliaTemplateHelper" public="true"/>
 
@@ -295,5 +295,8 @@
             <argument>%kernel.cache_dir%</argument>
         </service>
         <service id="thelia.cache" alias="Symfony\Component\Cache\Adapter\AdapterInterface" public="true"/>
+
+        <service id="Symfony\WebpackEncoreBundle\Asset\TagRenderer" alias="webpack_encore.tag_renderer" public="true"/>
+        <service id="Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface" alias="webpack_encore.entrypoint_lookup_collection" public="true"/>
     </services>
 </config>

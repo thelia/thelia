@@ -1,21 +1,19 @@
 module.exports = {
-  purge: [
+  content: [
     './**/*.html',
-    '.**/*.tpl',
-    '/components/**/*.css',
+    './**/*.tpl',
+    './components/**/*.css',
     '!(node_modules)/**/*.js'
   ],
-  //mode: "jit",
-  darkMode: false,
 
   theme: {
-    maxWidth: {
-      80: '80%'
-    },
-    minWidth: {
-      80: '80%'
-    },
     extend: {
+      maxWidth: {
+        80: '80%'
+      },
+      minWidth: {
+        80: '80%'
+      },
       colors: {
         main: '#EC6351',
         darkMain: '#E25441',
@@ -55,14 +53,20 @@ module.exports = {
         mauveLight: '#EBE2EA',
         turquoiseLight: '#ECF8F8',
         electricBlueLight: '#EEECFF',
-        backgroundLightVermillon: '#F7EEED'
+        backgroundLightVermillon: '#F7EEED',
+        wheatDark: '#EDAC30',
+        wheat: '#FFDD9C',
+        wheatLight: '#FFECC8',
+        ultramarineBlue : '#3162DF',
+        ultramarineBlueLight : '#ECF6FF'
       }
     }
   },
   variants: {
     extend: {
-      backgroundColor: ['odd', 'even'],
-      display: ['group-hover', 'group-focus']
+      backgroundColor: ['odd', 'even', 'active'],
+      display: ['group-hover', 'group-focus'],
+      textColor: ['active'],
     }
   },
   plugins: [require('@tailwindcss/forms')]

@@ -1,0 +1,15 @@
+
+  <input type="checkbox" id="flexCheckIndeterminate" class="mx-1 border border-darkCharbon rounded h-5 w-5 indeterminate:bg-darkCharbon indeterminate:hover:bg-lightVermillon indeterminate:focus:bg-darkCharbon indeterminate:focus:ring-2 indeterminate:focus:ring-lightVermillon" />
+  <input type="checkbox" id="flexCheckIndeterminateDisabled" class="mx-1 border border-red rounded h-5 w-5 indeterminate:bg-redLight indeterminate:hover:bg-redLight" disabled/>
+  <input type="checkbox" id="flexCheckIndeterminateError" class="mx-1 border border-greyMedium rounded h-5 w-5 indeterminate:bg-greyMedium indeterminate:hover:bg-greyMedium" disabled/>
+
+  <script type="text/javascript">
+    const checkbox = document.getElementById("flexCheckIndeterminate");
+    checkbox.indeterminate = true;
+
+    const checkboxError = document.getElementById("flexCheckIndeterminateError");
+    checkboxError.indeterminate = true;
+
+    const checkboxDisabled = document.getElementById("flexCheckIndeterminateDisabled");
+    checkboxDisabled.indeterminate = true;
+  </script>

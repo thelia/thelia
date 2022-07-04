@@ -1,11 +1,11 @@
 .panel {
-	@apply bg-white p-4 mb-6 border border-transparent xl:p-6;
+  @apply mb-6 border border-transparent bg-white p-4 xl:p-6;
 
-	&.shadow {
-		@apply border-0;
-	}
+  &.shadow {
+    @apply border-0;
+  }
 }
 
 .panel--highlight {
-	@apply border-main;
+  @apply border-main;
 }

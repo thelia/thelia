@@ -1,90 +1,101 @@
 .wysiwyg {
-	font-size: 1rem;
+  font-size: 1rem;
 
-	h1,
-	h2,
-	h3,
-	h4,
-	h5 {
-		font-weight: bold;
-		@apply mb-4;
-	}
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    font-weight: bold;
+    @apply mb-4;
+  }
 
-	h1 {
-		@apply text-3xl;
-	}
-	h2 {
-		@apply text-2xl;
-	}
-	h3 {
-		@apply text-3xl;
-	}
-	h4 {
-		@apply text-2xl;
-	}
-	h5 {
-		@apply text-xl;
-	}
+  h1 {
+    @apply text-3xl;
+  }
 
-	hr {
-		@apply border-t border-white border-opacity-50 my-4;
-	}
-	p {
-		@apply mb-6;
-	}
+  h2 {
+    @apply text-2xl;
+  }
 
-	ul {
-		@apply list-disc list-inside mb-6;
-	}
-	ol {
-		@apply list-decimal list-inside mb-6;
-	}
+  h3 {
+    @apply text-3xl;
+  }
 
-	blockquote {
-		@apply mb-6;
-		padding: 0 2rem;
-		position: relative;
-		display: inline-block;
-		text-align: center;
+  h4 {
+    @apply text-2xl;
+  }
 
-		p {
-			margin-bottom: 0;
-		}
+  h5 {
+    @apply text-xl;
+  }
 
-		&::after,
-		&::before {
-			font-size: 3rem;
-			line-height: 1rem;
-			@apply text-main;
-			position: absolute;
-			display: block;
-			font-style: italic;
-			content: '“';
-			top: 0;
-			left: 0;
-		}
-	}
+  hr {
+    @apply my-4 border-t border-white border-opacity-50;
+  }
 
-	a {
-		@apply underline;
-		&:hover {
-			@apply text-main;
-		}
-	}
+  p {
+    @apply mb-6;
+  }
 
-	table {
-		@apply w-full mb-6 mt-6 border border-gray-100 border-opacity-25;
-	}
-	th,
-	td {
-		text-align: left;
-		@apply border-b border-gray-100 border-opacity-25 p-4;
-	}
-	thead th {
-		@apply text-xl bg-gray-500;
-	}
-	tbody tr:nth-child(odd) > td,
-	tbody tr:nth-child(odd) > th {
-		@apply bg-gray-300;
-	}
+  ul {
+    @apply mb-6 list-inside list-disc;
+  }
+
+  ol {
+    @apply mb-6 list-inside list-decimal;
+  }
+
+  blockquote {
+    @apply mb-6;
+
+    position: relative;
+    display: inline-block;
+    padding: 0 2rem;
+    text-align: center;
+
+    p {
+      margin-bottom: 0;
+    }
+
+    &::after,
+    &::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      font-size: 3rem;
+      font-style: italic;
+      line-height: 1rem;
+      content: '“';
+      @apply text-main;
+    }
+  }
+
+  a {
+    @apply underline;
+
+    &:hover {
+      @apply text-main;
+    }
+  }
+
+  table {
+    @apply mt-6 mb-6 w-full border border-gray-100 border-opacity-25;
+  }
+
+  th,
+  td {
+    text-align: left;
+    @apply border-b border-gray-100 border-opacity-25 p-4;
+  }
+
+  thead th {
+    @apply bg-gray-500 text-xl;
+  }
+
+  tbody tr:nth-child(odd) > td,
+  tbody tr:nth-child(odd) > th {
+    @apply bg-gray-300;
+  }
 }

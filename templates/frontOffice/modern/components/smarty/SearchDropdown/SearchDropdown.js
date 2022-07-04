@@ -14,7 +14,7 @@ function Item({ title, price, promoPrice, image, url }) {
       <div>
         <img
           src={image}
-          className="object-contain w-12 h-12 rounded-full"
+          className="h-12 w-12 rounded-full object-contain"
           alt=""
           loading="lazy"
         />
@@ -22,7 +22,7 @@ function Item({ title, price, promoPrice, image, url }) {
       <div className="px-4 font-bold">{title}</div>
       <div className="ml-auto font-bold">
         <span>{promoPrice > 0 && priceFormat(promoPrice)}</span>
-        <span className={promoPrice > 0 ? 'line-through ml-1 text-sm' : ''}>
+        <span className={promoPrice > 0 ? 'ml-1 text-sm line-through' : ''}>
           {priceFormat(price)}
         </span>
       </div>
@@ -89,14 +89,14 @@ function SearchDropdown({ showResults = false }) {
       <div className="flex">
         <form
           ref={formRef}
-          className="flex-1 hidden md:block"
+          className="hidden flex-1 md:block"
           onSubmit={(e) => e.stopPropagation()}
         >
           <input
             type="text"
             name="query"
             value={query}
-            className="block leading-normal appearance-none SearchDropdown-input focus:outline-none"
+            className="SearchDropdown-input block appearance-none leading-normal focus:outline-none"
             autoComplete="off"
             onKeyUp={(e) => setQuery(e.target.value)}
             onChange={(e) => setQuery(e.target.value)}
@@ -112,7 +112,7 @@ function SearchDropdown({ showResults = false }) {
                 formRef.current.submit();
               }
             }}
-            className="w-4 h-4 mx-auto cursor-pointer fill-current SearchDropdown-icon"
+            className="SearchDropdown-icon mx-auto h-4 w-4 cursor-pointer fill-current"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 64 64"
           >
@@ -126,11 +126,11 @@ function SearchDropdown({ showResults = false }) {
 
       {showResults ? (
         <div
-          className={`absolute w-full py-2 SearchDropdown-results top-full ${
+          className={`SearchDropdown-results absolute top-full w-full py-2 ${
             !isOpen ? 'hidden' : ''
           }`}
         >
-          <div className="overflow-y-auto bg-white divide-y divide-gray-200 rounded shadow-lg max-h-half-screen">
+          <div className="max-h-half-screen divide-y divide-gray-200 overflow-y-auto rounded bg-white shadow-lg">
             <Suspense
               fallback={
                 <div className="p-4">

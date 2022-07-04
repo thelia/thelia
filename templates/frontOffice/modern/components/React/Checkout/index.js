@@ -19,7 +19,7 @@ import PhoneCheck from '../PhoneCheck';
 
 function LoadingBlock() {
   return (
-    <div className="shadow panel">
+    <div className="panel shadow">
       <Loader size="w-12 h-12" />
     </div>
   );
@@ -76,7 +76,7 @@ function Sidebar() {
   const { deliveryModuleOption } = useSelector((state) => state.checkout);
   return (
     <div className="">
-      <div className="shadow panel">
+      <div className="panel shadow">
         <div className="flex items-center justify-between">
           <Title
             title={intl.formatMessage({ id: 'YOUR_ORDER' })}
@@ -88,7 +88,7 @@ function Sidebar() {
           >
             <span className={cartOpen ? 'invisible' : ''}>View cart</span>
             <CloseIcon
-              className={`w-4 h-4 ml-4 transform transition-transform ${
+              className={`ml-4 h-4 w-4 transform transition-transform ${
                 cartOpen ? 'rotate-0' : '-rotate-90'
               }`}
             />
@@ -104,7 +104,7 @@ function Sidebar() {
         className="sticky"
         style={{ top: 'calc(var(--Header-height) + 1.5rem)' }}
       >
-        <div className="shadow panel">
+        <div className="panel shadow">
           <MiniCartFooter
             {...cart}
             delivery={deliveryModuleOption?.postage || cart?.delivery}

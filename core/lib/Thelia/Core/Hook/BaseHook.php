@@ -13,18 +13,20 @@
 namespace Thelia\Core\Hook;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\Cart;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Module\BaseModule;
+use TheliaSmarty\Template\SmartyParser;
 
 /**
  * The base class for hook. If you provide hooks in your module you have to extends
@@ -39,7 +41,7 @@ use Thelia\Module\BaseModule;
  *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-abstract class BaseHook
+abstract class BaseHook implements BaseHookInterface
 {
     public const INJECT_TEMPLATE_METHOD_NAME = 'insertTemplate';
 
@@ -81,6 +83,24 @@ abstract class BaseHook
 
     /** @var Currency */
     protected $currency;
+
+    public function __construct(SmartyParser $parser = null, AssetResolverInterface $resolver = null, EventDispatcherInterface $eventDispatcher = null)
+    {
+        if (null !== $parser) {
+            $this->parser = $parser;
+        }
+        if (null !== $resolver) {
+            $this->assetsResolver = $resolver;
+        }
+        if (null !== $eventDispatcher) {
+            $this->dispatcher = $eventDispatcher;
+        }
+
+        $moduleCode = explode('\\', static::class)[0];
+        $module = ModuleQuery::create()->findOneByCode($moduleCode);
+        $this->module = $module;
+        $this->translator = Translator::getInstance();
+    }
 
     /**
      * This function is called when hook uses the automatic insert template.
@@ -438,5 +458,34 @@ abstract class BaseHook
         }
 
         return [$type, $filepath];
+    }
+
+    /**
+     *  A hook is basically an Event, this function returns an array of hooks this hook subscriber wants to listen to.
+     *
+     *  Example:
+     *  [
+     *      'hook.event.name' => [
+     *          [
+     *              type => "back",
+     *              method => "onModuleConfiguration"
+     *          ],
+     *          [
+     *              type => "front",
+     *              template => "render:module_configuration.html"
+     *          ],
+     *          [
+     *              type => "front",
+     *              method => "displaySomething"
+     *          ],
+     *      ],
+     *      'another.hook' => [[...]]
+     *  ]
+     *
+     * @return array
+     */
+    public static function getSubscribedHooks()
+    {
+        return [];
     }
 }
