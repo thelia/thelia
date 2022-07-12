@@ -186,10 +186,10 @@ function IsLoggedOut() {
   );
 }
 
-export function MiniLogin() {
+export function MiniLogin({ isLogged }) {
   const visible = useSelector((state) => state.visibility.login);
   const cartVisible = useSelector((state) => state.visibility.cart);
-  const { data: customer, isLoading } = useCustomer();
+  const { data: customer, isLoading } = useCustomer(isLogged);
 
   useEffect(() => {
     if (visible && cartVisible && customer) {
@@ -212,6 +212,9 @@ export function MiniLogin() {
 }
 
 export default function MiniLoginRender() {
+  const isLogged =
+    document.querySelector('.MiniLogin-root').dataset.login || false;
+
   document.addEventListener(
     'click',
     (e) => {
@@ -230,7 +233,7 @@ export default function MiniLoginRender() {
     <QueryClientProvider client={queryClient}>
       <IntlProvider locale={locale} messages={messages[locale]}>
         <Provider store={store}>
-          <MiniLogin />
+          <MiniLogin isLogged={isLogged} />
         </Provider>
       </IntlProvider>
     </QueryClientProvider>,

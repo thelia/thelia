@@ -1,0 +1,37 @@
+.PhoneCheck {
+  @apply mb-10 lg:mb-16;
+
+  &-field {
+    @apply flex items-stretch focus-within:outline focus-within:outline-1 focus-within:outline-main;
+  }
+
+  .PhoneInput {
+    @apply w-full border border-main;
+
+    &Input {
+      @apply border-none ring-transparent focus:border-none focus:shadow-none focus:outline-none;
+    }
+  }
+
+  &-btn {
+    @apply block bg-main py-3 px-5 font-bold  leading-none text-white transition focus:bg-main-dark;
+  }
+
+  .PhoneInputCountry {
+    @apply hidden;
+  }
+
+  &--error {
+    .PhoneCheck-field {
+      @apply focus-within:outline-red-500;
+    }
+
+    .PhoneInput {
+      @apply border-red-500;
+    }
+
+    .PhoneCheck-btn {
+      @apply bg-red-500 focus:bg-red-500;
+    }
+  }
+}

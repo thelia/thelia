@@ -5,6 +5,7 @@ import Select from '../Select';
 import SubmitButton from '../SubmitButton';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
+import { isUndefined } from 'lodash-es';
 
 export default function AddressForm({ address = {}, onSubmit = () => {} }) {
   const intl = useIntl();
@@ -22,13 +23,14 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
   const countries = (window.COUNTRIES || []).map((c) => {
     return {
       label: c.title,
-      value: c.id
+      value: c.id,
+      isDefault: c.id === 'FR'
     };
   });
 
   return (
     <form
-      className="mb-0 grid grid-cols-1 gap-6"
+      className="mb-0 grid grid-cols-1 gap-x-8 md:grid-cols-2 lg:gap-y-2"
       onSubmit={handleSubmit(async (data) => {
         try {
           await onSubmit(data);
@@ -50,6 +52,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
       <Input
         label={intl.formatMessage({ id: 'LABEL_LABEL' })}
         defaultValue={address.label}
+        required={true}
         {...register('label', {
           required: intl.formatMessage({ id: 'MANDATORY' })
         })}
@@ -57,7 +60,12 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
       />
       <Select
         label={intl.formatMessage({ id: 'CIVILITY_TITLE_LABEL' })}
-        defaultValue={address.title}
+        defaultValue={
+          isUndefined(address.title)
+            ? titles.find((t) => t.isDefault).value
+            : address.title
+        }
+        required={true}
         options={titles}
         {...register('civilityTitle.id', {
           required: intl.formatMessage({ id: 'MANDATORY' })
@@ -67,6 +75,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
       <Input
         label={intl.formatMessage({ id: 'FIRSTNAME_LABEL' })}
         defaultValue={address.firstName}
+        required={true}
         {...register('firstName', {
           required: intl.formatMessage({ id: 'MANDATORY' })
         })}
@@ -75,6 +84,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
       <Input
         label={intl.formatMessage({ id: 'LASTNAME_LABEL' })}
         defaultValue={address.lastName}
+        required={true}
         {...register('lastName', {
           required: intl.formatMessage({ id: 'MANDATORY' })
         })}
@@ -82,6 +92,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
       />
       <Input
         label={intl.formatMessage({ id: 'COMPANY_LABEL' })}
+        required={true}
         defaultValue={address.company}
         {...register('company')}
         error={formState.errors?.company?.message}
@@ -89,28 +100,22 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
 
       <Input
         label={intl.formatMessage({ id: 'ADDRESS_1_LABEL' })}
+        required={true}
         defaultValue={address.address1}
         {...register('address1', {
           required: intl.formatMessage({ id: 'MANDATORY' })
         })}
         error={formState.errors?.address1?.message}
       />
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Input
-          label={intl.formatMessage({ id: 'ADDRESS_2_LABEL' })}
-          defaultValue={address.address2}
-          {...register('address2')}
-          error={formState.errors?.address2?.message}
-        />
-        <Input
-          label={intl.formatMessage({ id: 'ADDRESS_3_LABEL' })}
-          defaultValue={address.address3}
-          {...register('address3')}
-          error={formState.errors?.address3?.message}
-        />
-      </div>
+      <Input
+        label={intl.formatMessage({ id: 'ADDRESS_2_LABEL' })}
+        defaultValue={address.address2}
+        {...register('address2')}
+        error={formState.errors?.address2?.message}
+      />
       <Input
         label={intl.formatMessage({ id: 'ZIPCODE_LABEL' })}
+        required={true}
         defaultValue={address.zipCode}
         {...register('zipCode', {
           required: intl.formatMessage({ id: 'MANDATORY' })
@@ -120,51 +125,52 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
 
       <Input
         label={intl.formatMessage({ id: 'CITY_LABEL' })}
+        required={true}
         defaultValue={address.city}
         {...register('city', {
           required: intl.formatMessage({ id: 'MANDATORY' })
         })}
         error={formState.errors?.city?.message}
       />
-
       <Select
         label={intl.formatMessage({ id: 'COUNTRY_LABEL' })}
+        required={true}
         options={countries}
-        defaultValue={address.countryCode}
-        {...register('countryCode', {
-          required: intl.formatMessage({ id: 'MANDATORY' })
-        })}
+        defaultValue={
+          isUndefined(address.countryCode)
+            ? countries.find((c) => c.isDefault).value
+            : address.countryCode
+        }
+        {...register('countryCode', { required: 'Mandatory' })}
         error={formState.errors?.countryCode?.message}
       />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Input
-          label={intl.formatMessage({ id: 'CELLPHONE_LABEL' })}
-          defaultValue={address.cellphone}
-          {...register('cellphone', {
-            required: intl.formatMessage({ id: 'MANDATORY' })
-          })}
-          error={formState.errors?.cellphone?.message}
-        />
-        <Input
-          label={intl.formatMessage({ id: 'PHONE_LABEL' })}
-          defaultValue={address.phone}
-          {...register('phone')}
-          error={formState.errors?.phone?.message}
-        />
-      </div>
+      <Input
+        label={intl.formatMessage({ id: 'CELLPHONE_LABEL' })}
+        required={true}
+        defaultValue={address.cellphone}
+        {...register('cellphone', {
+          required: intl.formatMessage({ id: 'MANDATORY' })
+        })}
+        error={formState.errors?.cellphone?.message}
+      />
+      <Input
+        label={intl.formatMessage({ id: 'PHONE_LABEL' })}
+        defaultValue={address.phone}
+        {...register('phone')}
+        error={formState.errors?.phone?.message}
+      />
 
       <Checkbox
         label={intl.formatMessage({ id: 'DEFAULT_ADDRESS' })}
         {...register('isDefault')}
       />
 
-      <div className="mt-8 mb-3 text-center">
+      <div className="mx-auto mt-8 text-center md:col-span-2">
         <SubmitButton
           label={intl.formatMessage({ id: 'SUBMIT' })}
           isSubmitting={formState.isSubmitting}
           type="submit"
-          className=""
         />
       </div>
     </form>

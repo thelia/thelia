@@ -43,14 +43,18 @@ function Quantity({ quantity, cartItemId }) {
   if (!quantity || !cartItemId) return null;
 
   return (
-    <div className="flex items-center">
-      <div className=" relative flex flex-row">
+    <div
+      className={`${
+        status === 'loading' ? 'pointer-events-none opacity-50' : ''
+      } flex items-center`}
+    >
+      <div className="relative flex flex-row ">
         <button
           onClick={() => {
             mutate(quantity - 1);
           }}
           disabled={status === 'loading'}
-          className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-none bg-gray-200 focus:outline-none"
+          className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-none bg-gray-200 focus:bg-main focus:text-white focus:outline-none"
         >
           <span className="m-auto">-</span>
         </button>
@@ -62,7 +66,7 @@ function Quantity({ quantity, cartItemId }) {
             mutate(quantity + 1);
           }}
           disabled={status === 'loading'}
-          className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-none bg-gray-200 focus:outline-none"
+          className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-none bg-gray-200 focus:bg-main focus:text-white focus:outline-none"
         >
           <span className="m-auto">+</span>
         </button>
@@ -78,9 +82,9 @@ function Delete({ id }) {
 
   if (status === 'loading')
     return (
-      <div className=" absolute top-0 right-0">
+      <div className="absolute top-0 right-0 ">
         <svg
-          className=" h-4 w-4 stroke-current"
+          className="h-4 w-4 stroke-current "
           viewBox="0 0 38 38"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -181,7 +185,7 @@ function Item({
 function EmptyCart() {
   const intl = useIntl();
   return (
-    <legend className="font-heading text-bold mb-7 mt-10 px-10 text-center text-2xl uppercase leading-5">
+    <legend className="font-heading text-bold mt-10 mb-7 px-10 text-center text-2xl uppercase leading-5">
       {intl.formatMessage({ id: 'CART_EMPTY' })}
     </legend>
   );

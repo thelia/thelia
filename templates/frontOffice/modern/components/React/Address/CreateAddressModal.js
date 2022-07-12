@@ -10,7 +10,7 @@ import { useLockBodyScroll } from 'react-use';
 export default function CreateAddressModal({ className = '' }) {
   const [showModal] = useState(false);
   useLockBodyScroll(showModal);
-  const { mutateAsync: create, isSuccess } = useAddressCreate();
+  const { mutate: create, isSuccess } = useAddressCreate();
   const [isCreatingAddress, setIsCreatingAddress] = useState(false);
   const intl = useIntl();
 
@@ -20,14 +20,10 @@ export default function CreateAddressModal({ className = '' }) {
     }
   }, [isSuccess]);
 
-  const submitForm = async (values) => {
-    await create(values);
-  };
-
   return (
     <div className={`${className}`}>
       <button
-        className="btn btn--sm"
+        className=" btn btn--sm"
         type="button"
         onClick={() => {
           setIsCreatingAddress(true);
@@ -40,12 +36,12 @@ export default function CreateAddressModal({ className = '' }) {
         onRequestClose={() => setIsCreatingAddress(false)}
         ariaHideApp={false}
         className={{
-          base: 'h-full w-full overflow-auto bg-white p-8 outline-none',
+          base: 'h-full w-full max-w-4xl overflow-auto  bg-white p-8 outline-none lg:p-20 lg:py-14',
           afterOpen: '',
           beforeClose: ''
         }}
         overlayClassName={{
-          base: 'fixed bg-gray-500 bg-opacity-50 inset-0 z-200 flex items-center justify-center px-4 py-24 lg:px-24',
+          base: 'fixed bg-black  bg-opacity-80 inset-0 z-200 flex items-center justify-center px-8 py-24 lg:px-24',
           afterOpen: '',
           beforeClose: ''
         }}
@@ -59,12 +55,20 @@ export default function CreateAddressModal({ className = '' }) {
               </h4>
               <button
                 type="button"
-                className="absolute top-0 right-0"
+                className="absolute top-0 right-0 border-main p-2 focus:border"
                 onClick={() => setIsCreatingAddress(false)}
               >
                 <CloseIcon />
               </button>
-              <AddressForm onSubmit={submitForm} />
+              <AddressForm
+                onSubmit={async (values) => {
+                  try {
+                    await create(values);
+                  } catch (error) {
+                    console.error(error);
+                  }
+                }}
+              />
             </div>
           </div>
         </div>

@@ -17,9 +17,7 @@ import {
 } from '@openstudio/thelia-api-utils';
 
 import Alert from '../Alert';
-import Input from '../Input';
 import Loader from '../Loader';
-import SubmitButton from '../SubmitButton';
 import axios from 'axios';
 import { getLatLngCenter } from '@utils/map';
 import { icon } from 'leaflet/src/layer/marker/Icon';
@@ -30,6 +28,7 @@ import markerImg from './images/marker-icon.png';
 import markerImgShadow from './images/marker-shadow.png';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
+import Title from '../Title';
 
 const customIcon = icon({
   iconUrl: markerImg,
@@ -102,7 +101,7 @@ function InfoPopUp({ location, selected, onChooseLocation }) {
         {!selected ? (
           <button
             type="button"
-            className="btn btn--sm mt-4"
+            className="Button Button--primary mt-4"
             onClick={() => {
               onChooseLocation(location.id);
               if (location.refList?.current) {
@@ -190,10 +189,10 @@ function PickupPointsList({ locations, selectedLocation, onChooseLocation }) {
             <div
               key={location.id}
               ref={location.refList}
-              className={`flex cursor-pointer flex-wrap items-center justify-between  border-b border-main border-opacity-50 p-4 ${
+              className={`border-primary flex cursor-pointer flex-wrap items-center  justify-between border-b border-opacity-50 p-4 ${
                 selectedLocation?.id === location.id
-                  ? 'bg-main text-white'
-                  : 'bg-white'
+                  ? 'bg-gray-200 font-bold '
+                  : 'bg-gray-100'
               }`}
               onClick={() => {
                 onChooseLocation(location.id);
@@ -205,7 +204,7 @@ function PickupPointsList({ locations, selectedLocation, onChooseLocation }) {
                   {location.module?.i18n?.title}
                 </div>
                 {location.address ? (
-                  <div className=" mt-2 text-sm leading-tight">
+                  <div className="mt-2 text-sm leading-tight ">
                     {location.address.address1} <br />
                     {location.address.city} {location.address.zipcode}
                   </div>
@@ -223,7 +222,7 @@ function PickupPointsList({ locations, selectedLocation, onChooseLocation }) {
   );
 }
 
-export function PickupMap({ query }) {
+export function PickupMap({ query, defaultAddressId }) {
   const { data: checkout } = useGetCheckout();
   const { mutate: setCheckout } = useSetCheckout();
 
@@ -261,11 +260,12 @@ export function PickupMap({ query }) {
           ...checkout,
           pickupAddress: { ...location.address, type: 'pickup' },
           deliveryModuleId: location.moduleId,
+          deliveryAddressId: defaultAddressId,
           deliveryModuleOptionCode: location.moduleOptionCode
         });
       }
     },
-    [locations, checkout, setCheckout]
+    [locations, checkout, setCheckout, defaultAddressId]
   );
 
   const selected = useMemo(() => {
@@ -304,7 +304,7 @@ export function PickupMap({ query }) {
         center={mapCenter}
         zoom={13}
         style={{ height: '50vh', width: '100%' }}
-        className=" flex-1 overflow-hidden"
+        className="flex-1 overflow-hidden "
       >
         <div>
           <div className="relative h-full overflow-hidden border-t border-gray-300 py-8 xl:flex">
@@ -346,26 +346,22 @@ export function ZipCodeSearcher({ onSubmit }) {
         }
       })}
     >
-      <div className="mb-3 flex-1 text-xl font-bold">
-        {intl.formatMessage({ id: 'FIND_RELAY' })}
-      </div>
+      <Title title={intl.formatMessage({ id: 'FIND_RELAY' })} step={3} />
 
-      <div className="flex items-stretch">
-        <Input
+      <div className="flex w-full items-stretch focus-within:outline focus-within:outline-1 focus-within:outline-main lg:w-1/2">
+        <input
+          type="number"
           id="zipcode"
           {...register('zipCode')}
-          placeholder="ex. 75001"
-          className="h-auto w-full"
-          type="number"
           max="99999"
           min="10000"
+          placeholder="ex. 75001"
+          className="h-auto w-full border-main focus:border-main focus:shadow-none focus:outline-none focus:ring-transparent"
           required
         />
-        <SubmitButton
-          type="submit"
-          className="py-0"
-          label={intl.formatMessage({ id: 'OK' })}
-        />
+        <button type="submit" className="btn relative py-0">
+          {intl.formatMessage({ id: 'OK' })}
+        </button>
       </div>
       {hasError && (
         <Alert
@@ -389,7 +385,7 @@ export default function Map() {
   });
 
   return (
-    <div className="panel p-5 shadow">
+    <div className="transUp">
       {defaultAddress?.countryCode === 'FR' ? (
         <ZipCodeSearcher
           onSubmit={(zipcode, city) =>
@@ -402,7 +398,7 @@ export default function Map() {
           }
         />
       ) : null}
-      <PickupMap query={query} />
+      <PickupMap query={query} defaultAddressId={defaultAddress?.id} />
     </div>
   );
 }

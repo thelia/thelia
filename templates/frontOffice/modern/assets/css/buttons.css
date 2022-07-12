@@ -14,7 +14,7 @@ button {
   }
 
   &:focus {
-    @apply shadow-none outline-none;
+    @apply bg-main-dark shadow-none outline-none;
   }
 
   &:disabled {
