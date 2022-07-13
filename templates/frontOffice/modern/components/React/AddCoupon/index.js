@@ -15,7 +15,11 @@ export default function AddCoupon() {
   const { register, handleSubmit, formState } = useForm();
   const { data: cart = {} } = useCartQuery();
   const { mutate: create, error, isSuccess } = useCouponCreate();
-  const { mutate: deleteCoupon, isLoading } = useCouponClearAll();
+  const {
+    mutate: deleteCoupon,
+    isLoading,
+    isSuccess: successClear
+  } = useCouponClearAll();
   const intl = useIntl();
 
   return (
@@ -50,7 +54,7 @@ export default function AddCoupon() {
       {error ? (
         <Alert type="error" message={error.response?.data?.description} />
       ) : null}
-      {isSuccess ? (
+      {isSuccess && !successClear ? (
         <Alert
           type="success"
           title={intl.formatMessage({ id: 'COUPON_ADDED' })}
