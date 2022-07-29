@@ -81,7 +81,7 @@ class CouponController extends BaseAdminController
 
         if ($this->getRequest()->isMethod('POST')) {
             if (null !== $response = $this->validateCreateOrUpdateForm(
-                    $eventDispatcher,
+                $eventDispatcher,
                 $eventToDispatch,
                 'created',
                 'creation'

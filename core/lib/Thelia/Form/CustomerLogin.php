@@ -46,7 +46,7 @@ class CustomerLogin extends BruteforceForm
             ->add('account', ChoiceType::class, [
                 'constraints' => [
                     new Constraints\Callback(
-                            [$this, 'verifyAccount']),
+                        [$this, 'verifyAccount']),
                     ],
                 'choices' => [
                     Translator::getInstance()->trans('No, I am a new customer.') => 0,

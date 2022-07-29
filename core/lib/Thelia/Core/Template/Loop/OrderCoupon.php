@@ -76,7 +76,7 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
 
                 $now = time();
                 $datediff = $orderCoupon->getExpirationDate()->getTimestamp() - $now;
-                $daysLeftBeforeExpiration = floor($datediff / ($oneDayInSeconds));
+                $daysLeftBeforeExpiration = floor($datediff / $oneDayInSeconds);
 
                 $freeShippingForCountriesIds = [];
                 /** @var OrderCouponCountry $couponCountry */

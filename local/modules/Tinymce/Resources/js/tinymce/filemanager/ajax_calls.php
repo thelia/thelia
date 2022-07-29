@@ -33,7 +33,7 @@ if (isset($_GET['action'])) {
                 echo '<option value=".'.$ext.'">.'.$ext.'</option>';
             }
             echo '</select><br><hr><textarea id="textfile_create_area" style="width:100%;height:150px;"></textarea>';
-        break;
+            break;
         case 'view':
             if (isset($_GET['type'])) {
                 $_SESSION['RF']['view_type'] = $_GET['type'];
@@ -341,7 +341,7 @@ if (isset($_GET['action'])) {
 
 			<?php }
 
-            $content = ob_get_clean();
+			$content = ob_get_clean();
 
             response($content)->send();
             exit;
@@ -419,7 +419,7 @@ if (isset($_GET['action'])) {
                     ($_POST['folder'] == 1 && $chmod_dirs === false)
                     || ($_POST['folder'] == 0 && $chmod_files === false)
                     || (is_function_callable('chmod') === false)) {
-                    response(sprintf(trans('File_Permission_Not_Allowed'), (is_dir($path) ? trans('Folders') : trans('Files')), 403).AddErrorLocation())->send();
+                    response(sprintf(trans('File_Permission_Not_Allowed'), is_dir($path) ? trans('Folders') : trans('Files'), 403).AddErrorLocation())->send();
                     exit;
                 }
                 $info = $_POST['permissions'];
@@ -429,7 +429,7 @@ if (isset($_GET['action'])) {
                     (is_dir($path) && $chmod_dirs === false)
                     || (is_file($path) && $chmod_files === false)
                     || (is_function_callable('chmod') === false)) {
-                    response(sprintf(trans('File_Permission_Not_Allowed'), (is_dir($path) ? trans('Folders') : trans('Files')), 403).AddErrorLocation())->send();
+                    response(sprintf(trans('File_Permission_Not_Allowed'), is_dir($path) ? trans('Folders') : trans('Files'), 403).AddErrorLocation())->send();
                     exit;
                 }
 
@@ -496,7 +496,7 @@ if (isset($_GET['action'])) {
 					</tbody>
 				</table>';
 
-            if ((!$ftp && is_dir($path))) {
+            if (!$ftp && is_dir($path)) {
                 $ret .= '<div class="hero-unit" style="padding:10px;">'.trans('File_Permission_Recursive').'<br/><br/>
 						<ul class="unstyled">
 							<li><label class="radio"><input value="none" name="apply_recursive" type="radio" checked> '.trans('No').'</label></li>
@@ -613,7 +613,7 @@ if (isset($_GET['action'])) {
                 || $is_allowed === false
                 || (!$ftp && !is_readable($selected_file))
             ) {
-                response(sprintf(trans('File_Open_Edit_Not_Allowed'), ($sub_action == 'preview' ? strtolower(trans('Open')) : strtolower(trans('Edit')))).AddErrorLocation())->send();
+                response(sprintf(trans('File_Open_Edit_Not_Allowed'), $sub_action == 'preview' ? strtolower(trans('Open')) : strtolower(trans('Edit'))).AddErrorLocation())->send();
                 exit;
             }
             if ($sub_action == 'preview') {

@@ -154,7 +154,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
                         ->filterByTemplate(
                             TemplateQuery::create()->filterById($template, Criteria::IN)->find(),
                             Criteria::IN
-                    )
+                        )
                     ->endUse()
                     ->withColumn(FeatureTemplateTableMap::COL_POSITION, 'position');
 

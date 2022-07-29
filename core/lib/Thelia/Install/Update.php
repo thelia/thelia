@@ -415,7 +415,7 @@ class Update
         );
 
         if ($stmt->rowCount()) {
-            return (float) ($stmt->fetch(PDO::FETCH_OBJ)->size);
+            return (float) $stmt->fetch(PDO::FETCH_OBJ)->size;
         }
 
         throw new \Exception('Impossible to calculate the database size');

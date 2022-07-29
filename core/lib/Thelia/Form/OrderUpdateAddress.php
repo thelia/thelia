@@ -38,7 +38,7 @@ class OrderUpdateAddress extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                            [$this, 'verifyId']
+                        [$this, 'verifyId']
                     ),
                 ],
                 'required' => true,
@@ -47,7 +47,7 @@ class OrderUpdateAddress extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                            [$this, 'verifyTitle']
+                        [$this, 'verifyTitle']
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('Title'),
@@ -100,8 +100,8 @@ class OrderUpdateAddress extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                            [$this, 'verifyZipCode']
-                        ),
+                        [$this, 'verifyZipCode']
+                    ),
                 ],
                 'label' => Translator::getInstance()->trans('Zip code'),
                 'label_attr' => [
@@ -121,7 +121,7 @@ class OrderUpdateAddress extends BaseForm
                 'constraints' => [
                     new NotBlank(),
                     new Callback(
-                            [$this, 'verifyCountry']
+                        [$this, 'verifyCountry']
                     ),
                 ],
                 'label' => Translator::getInstance()->trans('Country'),
@@ -133,8 +133,8 @@ class OrderUpdateAddress extends BaseForm
                 'required' => false,
                 'constraints' => [
                     new Callback(
-                            [$this, 'verifyState']
-                        ),
+                        [$this, 'verifyState']
+                    ),
                 ],
                 'label' => Translator::getInstance()->trans('State *'),
                 'label_attr' => [

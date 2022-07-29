@@ -371,8 +371,8 @@ class ModuleController extends AbstractCrudController
                 return $this->generateRedirectFromRoute('admin.module');
             }
             $message = $this->getTranslator()->trans(
-                    'Sorry, an error occured.'
-                );
+                'Sorry, an error occured.'
+            );
         } catch (FormValidationException $e) {
             $message = $e->getMessage();
         } catch (\Exception $e) {

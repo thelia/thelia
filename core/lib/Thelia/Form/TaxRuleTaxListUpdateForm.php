@@ -65,7 +65,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                     ],
                     'constraints' => [
                         new Constraints\Callback(
-                                [$this, 'verifyCountryList']
+                            [$this, 'verifyCountryList']
                         ),
                     ],
                 ]

@@ -119,7 +119,7 @@ class Customer extends BaseCustomer implements UserInterface
                     ->setCountryId($countryId)
                     ->setStateId($stateId)
                     ->setIsDefault(1)
-                    ;
+                ;
 
                 $this->addAddress($address);
 

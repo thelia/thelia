@@ -230,7 +230,7 @@ if (!empty($_FILES) || isset($_POST['url'])) {
             if ($memory_error) {
                 unlink($targetFile);
                 response(trans('Not enought Memory').AddErrorLocation(), 406)->send();
-                exit();
+                exit;
             }
         }
 
@@ -246,11 +246,11 @@ if (!empty($_FILES) || isset($_POST['url'])) {
     } else { // file ext. is not in the allowed list
         response(trans('Error_extension').AddErrorLocation(), 406)->send();
 
-        exit();
+        exit;
     }
 } else { // no files to upload
     response(trans('no file').AddErrorLocation(), 405)->send();
-    exit();
+    exit;
 }
 
 // redirect

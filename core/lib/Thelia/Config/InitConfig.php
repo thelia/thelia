@@ -1,17 +1,27 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Config;
 
 use Composer\Script\Event;
 
-class InitConfig 
+class InitConfig
 {
-    public static function initConfig(Event $event)
+    public static function initConfig(Event $event): void
     {
         $vendorDir = $event->getComposer()->getConfig()->get('vendor-dir');
 
         $packageConfigFiles = [
-            'webpack_encore.yaml'
+            'webpack_encore.yaml',
         ];
 
         $initConfigPackagesDir = __DIR__.'/Resources/packages';

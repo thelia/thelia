@@ -269,10 +269,10 @@ class CustomerController extends AbstractCrudController
 
         try {
             parent::deleteAction(
-                 $request,
-                 $tokenProvider,
-                 $eventDispatcher,
-                 $parserContext
+                $request,
+                $tokenProvider,
+                $eventDispatcher,
+                $parserContext
             );
         } catch (CustomerException $e) {
             $errorMsg = $e->getMessage();

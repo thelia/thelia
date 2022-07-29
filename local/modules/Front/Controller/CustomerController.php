@@ -331,7 +331,7 @@ class CustomerController extends BaseFrontController
                 $customerChangeEvent->setCustomer($customer);
 
                 $customerChangeEvent->setEmailUpdateAllowed(
-                    ((int) (ConfigQuery::read('customer_change_email', 0))) ? true : false
+                    ((int) ConfigQuery::read('customer_change_email', 0)) ? true : false
                 );
 
                 $eventDispatcher->dispatch($customerChangeEvent, TheliaEvents::CUSTOMER_UPDATEPROFILE);
@@ -431,48 +431,48 @@ class CustomerController extends BaseFrontController
 
                     $this->processLogin($eventDispatcher, $customer);
 
-                    if ((int) ($form->get('remember_me')->getData()) > 0) {
+                    if ((int) $form->get('remember_me')->getData() > 0) {
                         // If a remember me field if present and set in the form, create
                         // the cookie thant store "remember me" information
                         $this->createRememberMeCookie(
-                                $customer,
-                                $this->getRememberMeCookieName(),
-                                $this->getRememberMeCookieExpiration()
-                            );
+                            $customer,
+                            $this->getRememberMeCookieName(),
+                            $this->getRememberMeCookieExpiration()
+                        );
                     }
 
                     return $this->generateSuccessRedirect($customerLoginForm);
                 } catch (UsernameNotFoundException $e) {
                     $message = $this->getTranslator()->trans(
-                            'Wrong email or password. Please try again',
-                            [],
-                            Front::MESSAGE_DOMAIN
-                        );
+                        'Wrong email or password. Please try again',
+                        [],
+                        Front::MESSAGE_DOMAIN
+                    );
                 } catch (WrongPasswordException $e) {
                     $message = $this->getTranslator()->trans(
-                            'Wrong email or password. Please try again',
-                            [],
-                            Front::MESSAGE_DOMAIN
-                        );
+                        'Wrong email or password. Please try again',
+                        [],
+                        Front::MESSAGE_DOMAIN
+                    );
                 } catch (CustomerNotConfirmedException $e) {
                     if ($e->getUser() !== null) {
                         // Send the confirmation email again
                         $eventDispatcher->dispatch(
                             new CustomerEvent($e->getUser()),
-                                TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL
-                            );
+                            TheliaEvents::SEND_ACCOUNT_CONFIRMATION_EMAIL
+                        );
                     }
                     $message = $this->getTranslator()->trans(
-                            'Your account is not yet confirmed. A confirmation email has been sent to your email address, please check your mailbox',
-                            [],
-                            Front::MESSAGE_DOMAIN
-                        );
+                        'Your account is not yet confirmed. A confirmation email has been sent to your email address, please check your mailbox',
+                        [],
+                        Front::MESSAGE_DOMAIN
+                    );
                 } catch (AuthenticationException $e) {
                     $message = $this->getTranslator()->trans(
-                            'Wrong email or password. Please try again',
-                            [],
-                            Front::MESSAGE_DOMAIN
-                        );
+                        'Wrong email or password. Please try again',
+                        [],
+                        Front::MESSAGE_DOMAIN
+                    );
                 }
             } catch (FormValidationException $e) {
                 $message = $this->getTranslator()->trans(
@@ -512,7 +512,7 @@ class CustomerController extends BaseFrontController
     public function logoutAction(EventDispatcherInterface $eventDispatcher)
     {
         if ($this->getSecurityContext()->hasCustomerUser()) {
-            $eventDispatcher->dispatch((new DefaultActionEvent()), TheliaEvents::CUSTOMER_LOGOUT);
+            $eventDispatcher->dispatch(new DefaultActionEvent(), TheliaEvents::CUSTOMER_LOGOUT);
         }
 
         $this->clearRememberMeCookie($this->getRememberMeCookieName());

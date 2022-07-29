@@ -82,7 +82,7 @@ class AdminHook extends BaseHook
         if (1 == HookAdminHome::getConfigValue(HookAdminHome::ACTIVATE_INFO, 1)) {
             $content = trim(
                 $this->render(
-                'block-thelia-information.html',
+                    'block-thelia-information.html',
                     [
                         'latestStableRelease' => $releases['latestStableRelease'],
                         'latestPreRelease' => $releases['latestPreRelease'],

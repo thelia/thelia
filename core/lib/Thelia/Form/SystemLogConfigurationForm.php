@@ -67,7 +67,7 @@ class SystemLogConfigurationForm extends BaseForm
                             'for' => 'files_field',
                     ],
             ])
-            ;
+        ;
     }
 
     public static function getName()

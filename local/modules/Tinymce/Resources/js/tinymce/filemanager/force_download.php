@@ -135,7 +135,7 @@ if ($ftp) {
         exit('Error - can not open file.');
     }
 
-    exit();
+    exit;
 } else {
     // file does not exist
     header('HTTP/1.0 404 Not Found');

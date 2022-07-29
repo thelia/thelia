@@ -34,7 +34,7 @@ class AdministratorCreationForm extends BaseForm
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Callback(
-                            [$this, 'verifyExistingLogin']),
+                        [$this, 'verifyExistingLogin']),
                 ],
                 'label' => $this->translator->trans('Login name'),
                 'label_attr' => [
@@ -47,8 +47,8 @@ class AdministratorCreationForm extends BaseForm
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
                     new Constraints\Callback(
-                            [$this, 'verifyExistingEmail']
-                        ),
+                        [$this, 'verifyExistingEmail']
+                    ),
                 ],
                 'label' => $this->translator->trans('Email address'),
                 'label_attr' => [

@@ -67,7 +67,7 @@ class ConfigurationForm extends BaseForm
                     ],
                 ]
             )
-         ;
+        ;
     }
 
     /**

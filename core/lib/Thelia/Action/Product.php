@@ -141,7 +141,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 // It will be updated later by updateClone()
                 $originalProductDefaultI18n = ProductI18nQuery::create()
                     ->findOneById($originalProduct->getId())
-                    ;
+                ;
             }
 
             $originalProductDefaultPrice = ProductPriceQuery::create()
@@ -443,7 +443,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         $product
             ->setVisible($product->getVisible() ? false : true)
             ->save()
-            ;
+        ;
 
         $event->setProduct($product);
     }

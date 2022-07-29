@@ -47,10 +47,10 @@ abstract class AbstractDeliveryModuleWithState extends BaseModule implements Del
         $area = null;
 
         if (null !== $areaDeliveryModule = AreaDeliveryModuleQuery::create()->findByCountryAndModule(
-                $country,
-                $this->getModuleModel(),
-                $state
-            )) {
+            $country,
+            $this->getModuleModel(),
+            $state
+        )) {
             $area = $areaDeliveryModule->getArea();
         }
 

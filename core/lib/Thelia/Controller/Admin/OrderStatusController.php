@@ -134,7 +134,7 @@ class OrderStatusController extends AbstractCrudController
             ->setPostscriptum($formData['postscriptum'])
             ->setCode($formData['code'])
             ->setColor($formData['color'])
-         ;
+        ;
 
         return $orderStatusUpdateEvent;
     }

@@ -115,7 +115,7 @@ class Accessory extends Product
                 ->set('ID', $this->accessoryId[$accessoryProductId])
                 ->set('POSITION', $this->accessoryPosition[$accessoryProductId])
                 ->set('ACCESSORY_ID', $accessoryProductId)
-                ;
+            ;
         }
 
         return $results;

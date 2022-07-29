@@ -116,16 +116,16 @@ class OrderQuery extends BaseOrderQuery
      */
     public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping, $withTaxes = true)
     {
-        $amount = (float) (
+        $amount = (float)
             self::baseSaleStats($startDate, $endDate, 'o')
                 ->innerJoinOrderProduct()
                 ->withColumn('SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE,`order_product`.PRICE)))', 'TOTAL')
                 ->select(['TOTAL'])
                 ->findOne()
-        );
+        ;
 
         if ($withTaxes) {
-            $amount += (float) (
+            $amount += (float)
                 self::baseSaleStats($startDate, $endDate, 'o')
                     ->useOrderProductQuery()
                         ->useOrderProductTaxQuery()
@@ -134,23 +134,23 @@ class OrderQuery extends BaseOrderQuery
                     ->endUse()
                     ->select(['TAX'])
                     ->findOne()
-            );
+            ;
         }
 
-        $amount -= (float) (
+        $amount -= (float)
             self::baseSaleStats($startDate, $endDate)
                 ->withColumn('SUM(`order`.discount)', 'DISCOUNT')
                 ->select('DISCOUNT')
                 ->findOne()
-        );
+        ;
 
         if ($includeShipping) {
-            $amount += (float) (
+            $amount += (float)
                 self::baseSaleStats($startDate, $endDate)
                     ->withColumn('SUM(`order`.postage)', 'POSTAGE')
                     ->select('POSTAGE')
                     ->findOne()
-            );
+            ;
         }
 
         return $amount;

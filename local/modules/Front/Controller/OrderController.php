@@ -333,10 +333,10 @@ class OrderController extends BaseFrontController
             }
 
             return $this->generateRedirectFromRoute(
-                    'order.placed',
-                    [],
-                    ['order_id' => $orderEvent->getPlacedOrder()->getId()]
-                );
+                'order.placed',
+                [],
+                ['order_id' => $orderEvent->getPlacedOrder()->getId()]
+            );
         }
         /* order has not been placed */
         return $this->generateRedirectFromRoute('cart.view');
