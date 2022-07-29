@@ -772,7 +772,7 @@ $files = $sorted;
 
 	<div class="row-fluid">
 	<?php
-				    $link = 'dialog.php?'.$get_params;
+				                    $link = 'dialog.php?'.$get_params;
 ?>
 	<ul class="breadcrumb">
 	<li class="pull-left"><a href="<?php echo $link; ?>/"><i class="icon-home"></i></a></li>
@@ -863,7 +863,7 @@ if (!empty($bc)) {
 		<!--ul class="thumbnails ff-items"-->
 		<ul class="grid cs-style-2 <?php echo 'list-view'.$view; ?>" id="main-item-container">
 		<?php
-		    $jplayer_ext = ['mp4', 'flv', 'webmv', 'webma', 'webm', 'm4a', 'm4v', 'ogv', 'oga', 'mp3', 'midi', 'mid', 'ogg', 'wav'];
+		            $jplayer_ext = ['mp4', 'flv', 'webmv', 'webma', 'webm', 'm4a', 'm4v', 'ogv', 'oga', 'mp3', 'midi', 'mid', 'ogg', 'wav'];
 
 		    foreach ($files as $file_array) {
 		        $file = $file_array['file'];
