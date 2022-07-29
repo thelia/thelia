@@ -181,14 +181,14 @@ class TranslationsController extends BaseAdminController
                     $templateArguments['has_admin_includes'] = $hasAdminIncludes;
 
                     break;
-                // Thelia Core
+                    // Thelia Core
                 case 'co':
                     $directory = THELIA_LIB;
                     $domain = 'core';
                     $i18nDirectory = THELIA_LIB.'Config'.DS.'I18n';
                     $walkMode = TranslationEvent::WALK_MODE_PHP;
                     break;
-                // Thelia Install
+                    // Thelia Install
                 case 'in':
                     $directory = THELIA_SETUP_DIRECTORY;
                     $domain = 'install';
@@ -197,7 +197,7 @@ class TranslationsController extends BaseAdminController
                     // resources not loaded by default
                     $this->loadTranslation($i18nDirectory, $domain);
                     break;
-                // Thelia Install wizard
+                    // Thelia Install wizard
                 case 'wi':
                     $directory = THELIA_SETUP_WIZARD_DIRECTORY;
                     $domain = 'wizard';
@@ -206,19 +206,19 @@ class TranslationsController extends BaseAdminController
                     // resources not loaded by default
                     $this->loadTranslation($i18nDirectory, $domain);
                     break;
-                // Front-office template
+                    // Front-office template
                 case 'fo':
                     $template = new TemplateDefinition($itemName, TemplateDefinition::FRONT_OFFICE);
                     break;
-                // Back-office template
+                    // Back-office template
                 case 'bo':
                     $template = new TemplateDefinition($itemName, TemplateDefinition::BACK_OFFICE);
                     break;
-                // PDF templates
+                    // PDF templates
                 case 'pf':
                     $template = new TemplateDefinition($itemName, TemplateDefinition::PDF);
                     break;
-                // Email templates
+                    // Email templates
                 case 'ma':
                     $template = new TemplateDefinition($itemName, TemplateDefinition::EMAIL);
                     break;

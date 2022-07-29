@@ -234,7 +234,7 @@ class FreeProduct extends AbstractRemoveOnProducts
                 // The discount is the product price.
                 $discount = $freeProductCartItem->getRealTaxedPrice($this->facade->getDeliveryCountry());
             }
-            // No eligible product was found !
+        // No eligible product was found !
         } else {
             // Remove all free products for this coupon, but no not remove the product from the cart.
             $this->clearFreeProductsCartItemIds();

@@ -189,7 +189,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         } else {
             // Check for product="id" folder="id", etc. style arguments
             foreach ($this->possible_sources as $source) {
-                $argValue = (int) ($this->getArgValue($source));
+                $argValue = (int) $this->getArgValue($source);
 
                 if ($argValue > 0) {
                     $search = $this->createSearchQuery($source, $argValue);

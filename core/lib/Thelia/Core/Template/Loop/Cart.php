@@ -82,7 +82,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
         $locale = $this->getCurrentRequest()->getSession()->getLang()->getLocale();
         $checkAvailability = ConfigQuery::checkAvailableStock();
-        $defaultAvailability = (int) (ConfigQuery::read('default-available-stock', 100));
+        $defaultAvailability = (int) ConfigQuery::read('default-available-stock', 100);
 
         /** @var CartItemModel $cartItem */
         foreach ($loopResult->getResultDataCollection() as $cartItem) {

@@ -50,7 +50,7 @@ class AdminLogin extends BruteforceForm
                         'for' => 'remember_me',
                     ],
             ])
-            ;
+        ;
     }
 
     public static function getName()

@@ -371,7 +371,7 @@ class CouponManager
                             ->filterByCouponId($coupon->getId())
                             ->filterByCustomerId($customerId)
                             ->findOne()
-                        ;
+                    ;
 
                     if ($ccc === null) {
                         $ccc = new CouponCustomerCount();
@@ -387,7 +387,7 @@ class CouponManager
                     $ccc
                             ->setCount($newCount)
                             ->save()
-                        ;
+                    ;
 
                     return $usageLeft - $newCount;
                 }
@@ -428,7 +428,7 @@ class CouponManager
                         ->filterByCouponId($coupon->getId())
                         ->filterByCustomerId($customerId)
                         ->findOne()
-                    ;
+                ;
 
                 if ($ccc !== null && $ccc->getCount() > 0) {
                     $newCount = $ccc->getCount() - 1;

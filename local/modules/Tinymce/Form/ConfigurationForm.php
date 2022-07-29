@@ -43,7 +43,7 @@ class ConfigurationForm extends BaseForm
                 CheckboxType::class,
                 [
                     'required' => false,
-                    'data' => (int) (Tinymce::getConfigValue('show_menu_bar', 0)) != 0,
+                    'data' => (int) Tinymce::getConfigValue('show_menu_bar', 0) != 0,
                     'label' => $this->translator->trans('Show the TinyMCE menu bar', [], Tinymce::MODULE_DOMAIN),
                 ]
             )
@@ -52,7 +52,7 @@ class ConfigurationForm extends BaseForm
                 CheckboxType::class,
                 [
                     'required' => false,
-                    'data' => (int) (Tinymce::getConfigValue('force_pasting_as_text', 0)) != 0,
+                    'data' => (int) Tinymce::getConfigValue('force_pasting_as_text', 0) != 0,
                     'label' => $this->translator->trans('Force pasting as text', [], Tinymce::MODULE_DOMAIN),
                     'label_attr' => [
                         'help' => $this->translator->trans('If checked, all pasted data will be converted as plain text, removing tags and styles.', [], Tinymce::MODULE_DOMAIN),
@@ -64,7 +64,7 @@ class ConfigurationForm extends BaseForm
                 CheckboxType::class,
                 [
                     'required' => false,
-                    'data' => (int) (Tinymce::getConfigValue('set_images_as_responsive', 1)) != 0,
+                    'data' => (int) Tinymce::getConfigValue('set_images_as_responsive', 1) != 0,
                     'label' => $this->translator->trans('Add responsive class to images', [], Tinymce::MODULE_DOMAIN),
                     'label_attr' => [
                         'help' => $this->translator->trans('If checked, the "img-responsive" class is added by default to inserted images', [], Tinymce::MODULE_DOMAIN),
@@ -138,7 +138,7 @@ class ConfigurationForm extends BaseForm
                 'label_attr' => [],
                 'required' => false,
                 'constraints' => [],
-                'data' => (int) (Tinymce::getConfigValue($key, 0)) != 0,
+                'data' => (int) Tinymce::getConfigValue($key, 0) != 0,
             ]
         );
     }

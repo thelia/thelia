@@ -230,12 +230,12 @@ class ConfigCommandTest extends BaseCommandTest
 
     protected function assertStringContains($data, $needle, $message = ''): void
     {
-        $this->assertTrue((false !== strpos($data, $needle)), $message);
+        $this->assertTrue(false !== strpos($data, $needle), $message);
     }
 
     protected function assertStringNotContains($data, $needle, $message = ''): void
     {
-        $this->assertTrue((false === strpos($data, $needle)), $message);
+        $this->assertTrue(false === strpos($data, $needle), $message);
     }
 
     protected function getFakeCommands()

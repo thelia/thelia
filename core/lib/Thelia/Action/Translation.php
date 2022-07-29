@@ -51,7 +51,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
         $event
             ->setTranslatableStrings($strings)
             ->setTranslatableStringCount($stringCount)
-            ;
+        ;
     }
 
     /**

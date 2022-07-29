@@ -128,7 +128,7 @@ class CartController extends BaseFrontController
     protected function changeViewForAjax()
     {
         // If this is an ajax request, and if the template allow us to return an ajax result
-        if ($this->getRequest()->isXmlHttpRequest() && (0 === (int) ($this->getRequest()->get('no_ajax_check', 0)))) {
+        if ($this->getRequest()->isXmlHttpRequest() && (0 === (int) $this->getRequest()->get('no_ajax_check', 0))) {
             $request = $this->getRequest();
 
             $view = $request->get('ajax-view', 'includes/mini-cart');

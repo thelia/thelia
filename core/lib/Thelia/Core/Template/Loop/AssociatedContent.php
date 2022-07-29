@@ -50,7 +50,7 @@ class AssociatedContent extends Content
             ->addArgument(Argument::createIntTypeArgument('category'))
             ->addArgument(Argument::createIntListTypeArgument('exclude_product'))
             ->addArgument(Argument::createIntListTypeArgument('exclude_category'))
-            ;
+        ;
 
         $argumentCollection->get('order')->default = 'associated_content';
 

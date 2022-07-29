@@ -764,7 +764,7 @@ EOF
 
         if ('' !== $this->getAttributeAsPhp($factoryXml, 'service')) {
             return [
-                (new Reference($this->getAttributeAsPhp($factoryXml, 'service'))),
+                new Reference($this->getAttributeAsPhp($factoryXml, 'service')),
                 $factoryMethod,
             ];
         }

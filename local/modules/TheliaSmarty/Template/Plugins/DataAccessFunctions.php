@@ -512,11 +512,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 );
         }
         Tlog::getInstance()->addWarning(
-                sprintf(
-                    "Module code '%s' not found in module-config Smarty function",
-                    $moduleCode
-                )
-            );
+            sprintf(
+                "Module code '%s' not found in module-config Smarty function",
+                $moduleCode
+            )
+        );
 
         $value = $default;
 

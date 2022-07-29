@@ -119,7 +119,7 @@ class ErrorListener implements EventSubscriberInterface
         $exception = $event->getThrowable();
         if ($exception instanceof AuthenticationException) {
             $event->setResponse(
-               new RedirectResponse($exception->getLoginTemplate())
+                new RedirectResponse($exception->getLoginTemplate())
             );
         }
     }

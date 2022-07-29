@@ -29,10 +29,10 @@ class ConfigurationController extends BaseAdminController
     public function editConfiguration()
     {
         if (null !== $response = $this->checkAuth(
-                AdminResources::MODULE,
-                [HookAdminHome::DOMAIN_NAME],
-                AccessManager::UPDATE
-            )) {
+            AdminResources::MODULE,
+            [HookAdminHome::DOMAIN_NAME],
+            AccessManager::UPDATE
+        )) {
             return $response;
         }
 

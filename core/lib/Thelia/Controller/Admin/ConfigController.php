@@ -84,7 +84,7 @@ class ConfigController extends AbstractCrudController
             ->setTitle($data['title'])
             ->setHidden($data['hidden'])
             ->setSecured($data['secured'])
-            ;
+        ;
 
         return $createEvent;
     }

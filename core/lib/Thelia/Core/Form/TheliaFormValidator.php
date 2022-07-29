@@ -57,8 +57,8 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
             if ($form->isValid()) {
                 if ($aBaseForm instanceof FirewallForm && !$aBaseForm->isFirewallOk($this->environment)) {
                     throw new FormValidationException(
-                      $this->translator->trans("You've submitted this form too many times. ")
-                      .$this->translator->trans('Further submissions will be ignored during %time',
+                        $this->translator->trans("You've submitted this form too many times. ")
+                        .$this->translator->trans('Further submissions will be ignored during %time',
                             [
                                 '%time' => $aBaseForm->getWaitingTime(),
                             ]
@@ -73,23 +73,23 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
                 $errorMessage = $form->get('error_message')->getData();
             } else {
                 $errorMessage = sprintf(
-                        $this->translator->trans(
-                            'Missing or invalid data: %s'
-                        ),
-                        $this->getErrorMessages($form)
-                    );
+                    $this->translator->trans(
+                        'Missing or invalid data: %s'
+                    ),
+                    $this->getErrorMessages($form)
+                );
             }
             $aBaseForm->setError(true);
             throw new FormValidationException($errorMessage);
         }
         throw new FormValidationException(
-                sprintf(
-                    $this->translator->trans(
-                        'Wrong form method, %s expected.'
-                    ),
-                    $expectedMethod
-                )
-            );
+            sprintf(
+                $this->translator->trans(
+                    'Wrong form method, %s expected.'
+                ),
+                $expectedMethod
+            )
+        );
     }
 
     /**

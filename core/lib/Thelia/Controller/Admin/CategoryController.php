@@ -352,7 +352,7 @@ class CategoryController extends AbstractSeoCrudController
             return $response;
         }
 
-        $content_id = (int) ($this->getRequest()->get('content_id'));
+        $content_id = (int) $this->getRequest()->get('content_id');
 
         if ($content_id > 0) {
             $event = new CategoryAddContentEvent(
@@ -393,7 +393,7 @@ class CategoryController extends AbstractSeoCrudController
             return $response;
         }
 
-        $content_id = (int) ($this->getRequest()->get('content_id'));
+        $content_id = (int) $this->getRequest()->get('content_id');
 
         if ($content_id > 0) {
             $event = new CategoryDeleteContentEvent(

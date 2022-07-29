@@ -207,13 +207,13 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function __construct($fileName)
-        // Author:     Jarrod Oberto
-        // Date:     27-02-08
-        // Purpose:    Constructor
-        // Param in:   $fileName: File name and path.
-        // Param out:  n/a
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:     27-02-08
+    // Purpose:    Constructor
+    // Param in:   $fileName: File name and path.
+    // Param out:  n/a
+    // Reference:
+    // Notes:
         //
     {
         if (!$this->testGDInstalled()) {
@@ -275,10 +275,10 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     public function resizeImage($newWidth, $newHeight, $option = 0, $sharpen = false, $autoRotate = false): void
-        // Author:     Jarrod Oberto
-        // Date:       27-02-08
-        // Purpose:    Resizes the image
-        // Param in:   $newWidth:
+    // Author:     Jarrod Oberto
+    // Date:       27-02-08
+    // Purpose:    Resizes the image
+    // Param in:   $newWidth:
         //             $newHeight:
         //             $option:     0 / exact = defined size;
         //                          1 / portrait = keep aspect set height;
@@ -296,9 +296,9 @@ class php_image_magician
         //
         //       $sharpen:    true: sharpen (jpg only);
         //                false: don't sharpen
-        // Param out:  n/a
-        // Reference:
-        // Notes:      To clarify the $option input:
+    // Param out:  n/a
+    // Reference:
+    // Notes:      To clarify the $option input:
         //               0 = The exact height and width dimensions you set.
         //               1 = Whatever height is passed in will be the height that
         //                   is set. The width will be calculated and set automatically
@@ -350,7 +350,7 @@ class php_image_magician
 
         // *** If '4', then crop too
         if ($option == 4 || $option == 'crop') {
-            if (($optimalWidth >= $newWidth && $optimalHeight >= $newHeight)) {
+            if ($optimalWidth >= $newWidth && $optimalHeight >= $newHeight) {
                 $this->crop($optimalWidth, $optimalHeight, $newWidth, $newHeight, $cropPos);
             }
         }
@@ -383,18 +383,18 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function cropImage($newWidth, $newHeight, $cropPos = 'm'): void
-        // Author:     Jarrod Oberto
-        // Date:       08-09-11
-        // Purpose:    Crops the image
-        // Param in:   $newWidth: crop with
+    // Author:     Jarrod Oberto
+    // Date:       08-09-11
+    // Purpose:    Crops the image
+    // Param in:   $newWidth: crop with
         //             $newHeight: crop height
         //       $cropPos: Can be any of the following:
         //             tl, t, tr, l, m, r, bl, b, br, auto
         //           Or:
         //             a custom position such as '30x50'
-        // Param out:  n/a
-        // Reference:
-        // Notes:
+    // Param out:  n/a
+    // Reference:
+    // Notes:
         //
     {
         // *** Make sure the file passed in is valid
@@ -413,13 +413,13 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function keepTransparancy($width, $height, $im): void
-        // Author:     Jarrod Oberto
-        // Date:       08-04-11
-        // Purpose:    Keep transparency for png and gif image
-        // Param in:
-        // Param out:  n/a
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       08-04-11
+    // Purpose:    Keep transparency for png and gif image
+    // Param in:
+    // Param out:  n/a
+    // Reference:
+    // Notes:
         //
     {
         // *** If PNG, perform some transparency retention actions (gif untested)
@@ -437,14 +437,14 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function crop($optimalWidth, $optimalHeight, $newWidth, $newHeight, $cropPos): void
-        // Author:     Jarrod Oberto
-        // Date:       15-09-08
-        // Purpose:    Crops the image
-        // Param in:   $newWidth:
+    // Author:     Jarrod Oberto
+    // Date:       15-09-08
+    // Purpose:    Crops the image
+    // Param in:   $newWidth:
         //             $newHeight:
-        // Param out:  n/a
-        // Reference:
-        // Notes:
+    // Param out:  n/a
+    // Reference:
+    // Notes:
         //
     {
         // *** Get cropping co-ordinates
@@ -468,12 +468,12 @@ class php_image_magician
 
     private function getCropPlacing($optimalWidth, $optimalHeight, $newWidth, $newHeight, $pos = 'm')
         //
-        // Author:   Jarrod Oberto
-        // Date:   July 11
-        // Purpose:  Set the cropping area.
-        // Params in:
-        // Params out: (array) the crop x and y co-ordinates.
-        // Notes:    When specifying the exact pixel crop position (eg 10x15), be
+    // Author:   Jarrod Oberto
+    // Date:   July 11
+    // Purpose:  Set the cropping area.
+    // Params in:
+    // Params out: (array) the crop x and y co-ordinates.
+    // Notes:    When specifying the exact pixel crop position (eg 10x15), be
         //       very careful as it's easy to crop out of the image leaving
         //       black borders.
         //
@@ -549,14 +549,14 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function getDimensions($newWidth, $newHeight, $option)
-        // Author:     Jarrod Oberto
-        // Date:       17-11-09
-        // Purpose:    Get new image dimensions based on user specificaions
-        // Param in:   $newWidth:
+    // Author:     Jarrod Oberto
+    // Date:       17-11-09
+    // Purpose:    Get new image dimensions based on user specificaions
+    // Param in:   $newWidth:
         //             $newHeight:
-        // Param out:  Array of new width and height values
-        // Reference:
-        // Notes:    If $option = 3 then this function is call recursivly
+    // Param out:  Array of new width and height values
+    // Reference:
+    // Notes:    If $option = 3 then this function is call recursivly
         //
         //       To clarify the $option input:
         //               0 = The exact height and width dimensions you set.
@@ -648,11 +648,11 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function getSizeByAuto($newWidth, $newHeight)
-        // Author:     Jarrod Oberto
-        // Date:       19-08-08
-        // Purpose:    Depending on the height, choose to resize by 0, 1, or 2
-        // Param in:   The new height and new width
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       19-08-08
+    // Purpose:    Depending on the height, choose to resize by 0, 1, or 2
+    // Param in:   The new height and new width
+    // Notes:
         //
     {
         // *** If forcing is off...
@@ -707,32 +707,32 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function getOptimalCrop($newWidth, $newHeight)
-        // Author:     Jarrod Oberto
-        // Date:       17-11-09
-        // Purpose:    Get optimal crop dimensions
-        // Param in:   width and height as requested by user (fig 3)
-        // Param out:  Array of optimal width and height (fig 2)
-        // Reference:
-        // Notes:      The optimal width and height return are not the same as the
+    // Author:     Jarrod Oberto
+    // Date:       17-11-09
+    // Purpose:    Get optimal crop dimensions
+    // Param in:   width and height as requested by user (fig 3)
+    // Param out:  Array of optimal width and height (fig 2)
+    // Reference:
+    // Notes:      The optimal width and height return are not the same as the
         //       same as the width and height passed in. For example:
         //
         //
-        //   |-----------------|     |------------|       |-------|
-        //   |             |   =>  |**|      |**|   =>  |       |
-        //   |             |     |**|      |**|       |       |
-        //   |           |       |------------|       |-------|
-        //   |-----------------|
+    //   |-----------------|     |------------|       |-------|
+    //   |             |   =>  |**|      |**|   =>  |       |
+    //   |             |     |**|      |**|       |       |
+    //   |           |       |------------|       |-------|
+    //   |-----------------|
         //        original                optimal             crop
         //              size                   size               size
-        //  Fig          1                      2                  3
+    //  Fig          1                      2                  3
         //
         //       300 x 250           150 x 125          150 x 100
         //
         //    The optimal size is the smallest size (that is closest to the crop size)
         //    while retaining proportion/ratio.
         //
-        //  The crop size is the optimal size that has been cropped on one axis to
-        //  make the image the exact size specified by the user.
+    //  The crop size is the optimal size that has been cropped on one axis to
+    //  make the image the exact size specified by the user.
         //
         //               * represent cropped area
         //
@@ -763,14 +763,14 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function sharpen(): void
-        // Author:     Jarrod Oberto
-        // Date:       08 04 2011
-        // Purpose:    Sharpen image
-        // Param in:   n/a
-        // Param out:  n/a
-        // Reference:
-        // Notes:
-        // Credit:   Incorporates Joe Lencioni (August 6, 2008) code
+    // Author:     Jarrod Oberto
+    // Date:       08 04 2011
+    // Purpose:    Sharpen image
+    // Param in:   n/a
+    // Param out:  n/a
+    // Reference:
+    // Notes:
+    // Credit:   Incorporates Joe Lencioni (August 6, 2008) code
     {
         if (version_compare(\PHP_VERSION, '5.1.0') >= 0) {
             // ***
@@ -815,12 +815,12 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function findSharp($orig, $final)
-        // Author:     Ryan Rud (http://adryrun.com)
-        // Purpose:    Find optimal sharpness
-        // Param in:   n/a
-        // Param out:  n/a
-        // Reference:
-        // Notes:
+    // Author:     Ryan Rud (http://adryrun.com)
+    // Purpose:    Find optimal sharpness
+    // Param in:   n/a
+    // Param out:  n/a
+    // Reference:
+    // Notes:
         //
     {
         $final = $final * (750.0 / $orig);
@@ -836,12 +836,12 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function prepOption($option)
-        // Author:     Jarrod Oberto
-        // Purpose:    Prep option like change the passed in option to lowercase
-        // Param in:   (str/int) $option: eg. 'exact', 'crop'. 0, 4
-        // Param out:  lowercase string
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Purpose:    Prep option like change the passed in option to lowercase
+    // Param in:   (str/int) $option: eg. 'exact', 'crop'. 0, 4
+    // Param out:  lowercase string
+    // Reference:
+    // Notes:
         //
     {
         if (is_array($option)) {
@@ -892,13 +892,13 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     public function addBorder($thickness = 1, $rgbArray = [255, 255, 255]): void
-        // Author:     Jarrod Oberto
-        // Date:       05-05-11
-        // Purpose:    Add a border to the image
-        // Param in:
-        // Param out:
-        // Reference:
-        // Notes:    This border is added to the INSIDE of the image
+    // Author:     Jarrod Oberto
+    // Date:       05-05-11
+    // Purpose:    Add a border to the image
+    // Param in:
+    // Param out:
+    // Reference:
+    // Notes:    This border is added to the INSIDE of the image
         //
     {
         if ($this->imageResized) {
@@ -925,13 +925,13 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     public function greyScale(): void
-        // Author:     Jarrod Oberto
-        // Date:       07-05-2011
-        // Purpose:    Make image greyscale
-        // Param in:   n/a
-        // Param out:
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       07-05-2011
+    // Purpose:    Make image greyscale
+    // Param in:   n/a
+    // Param out:
+    // Reference:
+    // Notes:
         //
     {
         if ($this->imageResized) {
@@ -942,13 +942,13 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function greyScaleEnhanced(): void
-        // Author:     Jarrod Oberto
-        // Date:       07-05-2011
-        // Purpose:    Make image greyscale
-        // Param in:   n/a
-        // Param out:
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       07-05-2011
+    // Purpose:    Make image greyscale
+    // Param in:   n/a
+    // Param out:
+    // Reference:
+    // Notes:
         //
     {
         if ($this->imageResized) {
@@ -962,7 +962,7 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function greyScaleDramatic(): void
-        // Alias of gd_filter_monopin
+    // Alias of gd_filter_monopin
     {
         $this->gd_filter_monopin();
     }
@@ -972,13 +972,13 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     public function blackAndWhite(): void
-        // Author:     Jarrod Oberto
-        // Date:       07-05-2011
-        // Purpose:    Make image black and white
-        // Param in:   n/a
-        // Param out:
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       07-05-2011
+    // Purpose:    Make image black and white
+    // Param in:   n/a
+    // Param out:
+    // Reference:
+    // Notes:
         //
     {
         if ($this->imageResized) {
@@ -992,13 +992,13 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     public function negative(): void
-        // Author:     Jarrod Oberto
-        // Date:       07-05-2011
-        // Purpose:    Make image negative
-        // Param in:   n/a
-        // Param out:
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       07-05-2011
+    // Purpose:    Make image negative
+    // Param in:   n/a
+    // Param out:
+    // Reference:
+    // Notes:
         //
     {
         if ($this->imageResized) {
@@ -1011,13 +1011,13 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     public function sepia(): void
-        // Author:     Jarrod Oberto
-        // Date:       07-05-2011
-        // Purpose:    Make image sepia
-        // Param in:   n/a
-        // Param out:
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       07-05-2011
+    // Purpose:    Make image sepia
+    // Param in:   n/a
+    // Param out:
+    // Reference:
+    // Notes:
         //
     {
         if ($this->imageResized) {
@@ -1049,7 +1049,7 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     public function vintage(): void
-        // Alias of gd_filter_monopin
+    // Alias of gd_filter_monopin
     {
         $this->gd_filter_vintage();
     }
@@ -1088,12 +1088,12 @@ class php_image_magician
     /** Apply a PNG overlay */
     private function gd_apply_overlay($im, $type, $amount)
         //
-        // Original Author:    Marc Hibbins
-        // License:  Attribution-ShareAlike 3.0
-        // Purpose:
-        // Params in:
-        // Params out:
-        // Notes:
+    // Original Author:    Marc Hibbins
+    // License:  Attribution-ShareAlike 3.0
+    // Purpose:
+    // Params in:
+    // Params out:
+    // Notes:
         //
     {
         $width = imagesx($im);
@@ -1231,16 +1231,16 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     public function rotate($value = 90, $bgColor = 'transparent'): void
-        // Author:     Jarrod Oberto
-        // Date:       07-05-2011
-        // Purpose:    Rotate image
-        // Param in:   (mixed) $degrees: (int) number of degress to rotate image
+    // Author:     Jarrod Oberto
+    // Date:       07-05-2011
+    // Purpose:    Rotate image
+    // Param in:   (mixed) $degrees: (int) number of degress to rotate image
         //               (str) param "left": rotate left
         //               (str) param "right": rotate right
         //               (str) param "upside": upside-down image
-        // Param out:
-        // Reference:
-        // Notes:    The default direction of imageRotate() is counter clockwise.
+    // Param out:
+    // Reference:
+    // Notes:    The default direction of imageRotate() is counter clockwise.
         //
     {
         if ($this->imageResized) {
@@ -1298,14 +1298,14 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     public function roundCorners($radius = 5, $bgColor = 'transparent'): void
-        // Author:     Jarrod Oberto
-        // Date:       19-05-2011
-        // Purpose:    Create rounded corners on your image
-        // Param in:   (int) radius = the amount of curvature
+    // Author:     Jarrod Oberto
+    // Date:       19-05-2011
+    // Purpose:    Create rounded corners on your image
+    // Param in:   (int) radius = the amount of curvature
         //       (mixed) $bgColor = the corner background color
-        // Param out:  n/a
-        // Reference:
-        // Notes:
+    // Param out:  n/a
+    // Reference:
+    // Notes:
         //
     {
         // *** Check if the user wants transparency
@@ -1381,14 +1381,14 @@ class php_image_magician
 
     public function addShadow($shadowAngle = 45, $blur = 15, $bgColor = 'transparent'): void
         //
-        // Author:   Jarrod Oberto (Adapted from Pascal Naidon)
-        // Ref:    http://www.les-stooges.org/pascal/webdesign/vignettes/index.php?la=en
-        // Purpose:  Add a drop shadow to your image
-        // Params in:  (int) $angle: the angle of the shadow
+    // Author:   Jarrod Oberto (Adapted from Pascal Naidon)
+    // Ref:    http://www.les-stooges.org/pascal/webdesign/vignettes/index.php?la=en
+    // Purpose:  Add a drop shadow to your image
+    // Params in:  (int) $angle: the angle of the shadow
         //       (int) $blur: the blur distance
         //       (mixed) $bgColor: the color of the background
-        // Params out:
-        // Notes:
+    // Params out:
+    // Notes:
         //
     {
         // *** A higher number results in a smoother shadow
@@ -1517,16 +1517,16 @@ class php_image_magician
 
     public function addCaptionBox($side = 'b', $thickness = 50, $padding = 0, $bgColor = '#000', $transaprencyAmount = 30): void
         //
-        // Author:   Jarrod Oberto
-        // Date:   26 May 2011
-        // Purpose:  Add a caption box
-        // Params in:  (str) $side: the side to add the caption box (t, r, b, or l).
+    // Author:   Jarrod Oberto
+    // Date:   26 May 2011
+    // Purpose:  Add a caption box
+    // Params in:  (str) $side: the side to add the caption box (t, r, b, or l).
         //       (int) $thickness: how thick you want the caption box to be.
         //       (mixed) $bgColor: The color of the caption box.
         //       (int) $transaprencyAmount: The amount of transparency to be
         //       applied.
-        // Params out: n/a
-        // Notes:
+    // Params out: n/a
+    // Notes:
         //
     {
         $side = fix_strtolower($side);
@@ -1551,13 +1551,13 @@ class php_image_magician
 
     public function addTextToCaptionBox($text, $fontColor = '#fff', $fontSize = 12, $angle = 0, $font = null)
         //
-        // Author:   Jarrod Oberto
-        // Date:   03 Aug 11
-        // Purpose:  Simplify adding text to a caption box by automatically
+    // Author:   Jarrod Oberto
+    // Date:   03 Aug 11
+    // Purpose:  Simplify adding text to a caption box by automatically
         //       locating the center of the caption box
-        // Params in:  The usually text paams (less a couple)
-        // Params out: n/a
-        // Notes:
+    // Params in:  The usually text paams (less a couple)
+    // Params out: n/a
+    // Notes:
         //
     {
         // *** Get the caption box measurements
@@ -1638,14 +1638,14 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     public function getExif($debug = false)
-        // Author:     Jarrod Oberto
-        // Date:       07-05-2011
-        // Purpose:    Get image EXIF data
-        // Param in:   n/a
-        // Param out:  An associate array of EXIF data
-        // Reference:
-        // Notes:
-        // 23 May 13 : added orientation flag -jco
+    // Author:     Jarrod Oberto
+    // Date:       07-05-2011
+    // Purpose:    Get image EXIF data
+    // Param in:   n/a
+    // Param out:  An associate array of EXIF data
+    // Reference:
+    // Notes:
+    // 23 May 13 : added orientation flag -jco
         //
     {
         if (!$this->debug || !$debug) {
@@ -1981,7 +1981,7 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     public function writeIPTCcaption($value): void
-        // Caption
+    // Caption
     {
         $this->writeIPTC(120, $value);
     }
@@ -2007,15 +2007,15 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function iptc_maketag($rec, $dat, $val)
-        // Author:   Thies C. Arntzen
-        // Purpose:    Function to format the new IPTC text
-        // Param in:   $rec: Application record. (We’re working with #2)
+    // Author:   Thies C. Arntzen
+    // Purpose:    Function to format the new IPTC text
+    // Param in:   $rec: Application record. (We’re working with #2)
         //       $dat: Index. (120 for caption, 118 for contact. See the IPTC IIM
         //         specification:
         //         http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf
         //       $val: Value/data/text. Make sure this is within the length
         //         constraints of the IPTC IIM specification
-        // Ref:      http://blog.peterhaza.no/working-with-image-meta-data-in-exif-and-iptc-headers-from-php/
+    // Ref:      http://blog.peterhaza.no/working-with-image-meta-data-in-exif-and-iptc-headers-from-php/
         //       http://php.net/manual/en/function.iptcembed.php
         //
     {
@@ -2032,7 +2032,7 @@ class php_image_magician
             chr(($len >> 24) & 0xFF).
             chr(($len >> 16) & 0xFF).
             chr(($len >> 8) & 0xFF).
-            chr(($len) & 0xFF).
+            chr($len & 0xFF).
             $val;
     }
 
@@ -2047,13 +2047,13 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     public function addText($text, $pos = '20x20', $padding = 0, $fontColor = '#fff', $fontSize = 12, $angle = 0, $font = null): void
-        // Author:     Jarrod Oberto
-        // Date:       18-11-09
-        // Purpose:    Add text to an image
-        // Param in:
-        // Param out:
-        // Reference:  http://php.net/manual/en/function.imagettftext.php
-        // Notes:      Make sure you supply the font.
+    // Author:     Jarrod Oberto
+    // Date:       18-11-09
+    // Purpose:    Add text to an image
+    // Param in:
+    // Param out:
+    // Reference:  http://php.net/manual/en/function.imagettftext.php
+    // Notes:      Make sure you supply the font.
         //
     {
         // *** Convert color
@@ -2131,10 +2131,10 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     public function addWatermark($watermarkImage, $pos, $padding = 0, $opacity = 0): void
-        // Author:     Jarrod Oberto
-        // Date:       18-11-09
-        // Purpose:    Add watermark image
-        // Param in:   (str) $watermark: The watermark image
+    // Author:     Jarrod Oberto
+    // Date:       18-11-09
+    // Purpose:    Add watermark image
+    // Param in:   (str) $watermark: The watermark image
         //       (str) $pos: Could be a pre-determined position such as:
         //           tl = top left,
         //           t  = top (middle),
@@ -2150,9 +2150,9 @@ class php_image_magician
         //       (int) $padding: If using a pre-determined position you can
         //         adjust the padding from the edges by passing an amount
         //         in pixels. If using co-ordinates, this value is ignored.
-        // Param out:
-        // Reference:  http://www.php.net/manual/en/image.examples-watermark.php
-        // Notes:      Based on example in reference.
+    // Param out:
+    // Reference:  http://www.php.net/manual/en/image.examples-watermark.php
+    // Notes:      Based on example in reference.
         //
         //
     {
@@ -2183,10 +2183,10 @@ class php_image_magician
 
     private function calculatePosition($pos, $padding, $assetWidth, $assetHeight, $upperLeft = true)
         //
-        // Author:   Jarrod Oberto
-        // Date:   08-05-11
-        // Purpose:  Calculate the x, y pixel cordinates of the asset to place
-        // Params in:  (str) $pos: Either something like: "tl", "l", "br" or an
+    // Author:   Jarrod Oberto
+    // Date:   08-05-11
+    // Purpose:  Calculate the x, y pixel cordinates of the asset to place
+    // Params in:  (str) $pos: Either something like: "tl", "l", "br" or an
         //         exact position like: "100x50"
         //       (int) $padding: The amount of padding from the edge. Only
         //         used for the predefined $pos.
@@ -2196,9 +2196,9 @@ class php_image_magician
         //         on the upper left x, y coords. If false, it means you're
         //         using the lower left as the basepoint and this will
         //         convert it to the upper left position
-        // Params out:
-        // NOTE: this is done from the UPPER left corner!! But will convert lower
-        //   left basepoints to upper left if $upperleft is set to false
+    // Params out:
+    // NOTE: this is done from the UPPER left corner!! But will convert lower
+    //   left basepoints to upper left if $upperleft is set to false
         //
         //
     {
@@ -2266,15 +2266,15 @@ class php_image_magician
 
     private function filterOpacity(&$img, $opacity = 75)
         //
-        // Author:     aiden dot mail at freemail dot hu
-        // Author date:  29-03-08 08:16
-        // Date added:   08-05-11
-        // Purpose:    Change opacity of image
-        // Params in:    $img: Image resource id
+    // Author:     aiden dot mail at freemail dot hu
+    // Author date:  29-03-08 08:16
+    // Date added:   08-05-11
+    // Purpose:    Change opacity of image
+    // Params in:    $img: Image resource id
         //         (int) $opacity: the opacity amount: 0-100, 100 being not opaque.
-        // Params out:   (bool) true on success, else false
-        // Ref:      http://www.php.net/manual/en/function.imagefilter.php#82162
-        // Notes:      png only
+    // Params out:   (bool) true on success, else false
+    // Ref:      http://www.php.net/manual/en/function.imagefilter.php#82162
+    // Notes:      png only
         //
     {
         if (!isset($opacity)) {
@@ -2332,13 +2332,13 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function openImage($file)
-        // Author:     Jarrod Oberto
-        // Date:       27-02-08
-        // Purpose:
-        // Param in:
-        // Param out:  n/a
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       27-02-08
+    // Purpose:
+    // Param in:
+    // Param out:  n/a
+    // Reference:
+    // Notes:
         //
     {
         if (!file_exists($file) && !$this->checkStringStartsWith('http://', $file) && !$this->checkStringStartsWith('https://', $file)) {
@@ -2369,7 +2369,7 @@ class php_image_magician
             case '.psd':
                 $img = @$this->imagecreatefrompsd($file);
                 break;
-            // ... etc
+                // ... etc
 
             default:
                 $img = false;
@@ -2383,12 +2383,12 @@ class php_image_magician
 
     public function reset(): void
         //
-        // Author:   Jarrod Oberto
-        // Date:   30-08-11
-        // Purpose:  Reset the resource (allow further editing)
-        // Params in:
-        // Params out:
-        // Notes:
+    // Author:   Jarrod Oberto
+    // Date:   30-08-11
+    // Purpose:  Reset the resource (allow further editing)
+    // Params in:
+    // Params out:
+    // Notes:
         //
     {
         $this->__construct($this->fileName);
@@ -2397,14 +2397,14 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function saveImage($savePath, $imageQuality = '100'): void
-        // Author:     Jarrod Oberto
-        // Date:       27-02-08
-        // Purpose:    Saves the image
-        // Param in:   $savePath: Where to save the image including filename:
+    // Author:     Jarrod Oberto
+    // Date:       27-02-08
+    // Purpose:    Saves the image
+    // Param in:   $savePath: Where to save the image including filename:
         //             $imageQuality: image quality you want the image saved at 0-100
-        // Param out:  n/a
-        // Reference:
-        // Notes:    * gif doesn't have a quality parameter
+    // Param out:  n/a
+    // Reference:
+    // Notes:    * gif doesn't have a quality parameter
         //       * jpg has a quality setting 0-100 (100 being the best)
         //       * png has a quality setting 0-9 (0 being the best)
         //
@@ -2470,7 +2470,7 @@ class php_image_magician
             case '.bmp':
                 file_put_contents($savePath, $this->GD2BMPstring($this->imageResized));
                 break;
-            // ... etc
+                // ... etc
 
             default:
                 // *** No extension - No save.
@@ -2489,13 +2489,13 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function displayImage($fileType = 'jpg', $imageQuality = '100'): void
-        // Author:     Jarrod Oberto
-        // Date:       18-11-09
-        // Purpose:    Display images directly to the browser
-        // Param in:   The image type you want to display
-        // Param out:
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       18-11-09
+    // Purpose:    Display images directly to the browser
+    // Param in:   The image type you want to display
+    // Param out:
+    // Reference:
+    // Notes:
         //
     {
         if (!is_resource($this->imageResized)) {
@@ -2530,7 +2530,7 @@ class php_image_magician
             case 'bmp':
                 echo 'bmp file format is not supported.';
                 break;
-            // ... etc
+                // ... etc
 
             default:
                 // *** No extension - No save.
@@ -2543,7 +2543,7 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function setTransparency($bool): void
-        // Sep 2011
+    // Sep 2011
     {
         $this->keepTransparency = $bool;
     }
@@ -2551,15 +2551,15 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function setFillColor($value): void
-        // Sep 2011
-        // Param in:   (mixed) $value: (array) Could be an array of RGB
+    // Sep 2011
+    // Param in:   (mixed) $value: (array) Could be an array of RGB
         //               (str) Could be hex #ffffff or #fff, fff, ffffff
         //
-        // If the keepTransparency is set to false, then no transparency is to be used.
-        // This is ideal when you want to save as jpg.
+    // If the keepTransparency is set to false, then no transparency is to be used.
+    // This is ideal when you want to save as jpg.
         //
-        // this method allows you to set the background color to use instead of
-        // transparency.
+    // this method allows you to set the background color to use instead of
+    // transparency.
         //
     {
         $colorArray = $this->formatColor($value);
@@ -2569,7 +2569,7 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function setCropFromTop($value): void
-        // Sep 2011
+    // Sep 2011
     {
         $this->cropFromTopPercent = $value;
     }
@@ -2577,13 +2577,13 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function testGDInstalled()
-        // Author:     Jarrod Oberto
-        // Date:       27-02-08
-        // Purpose:    Test to see if GD is installed
-        // Param in:   n/a
-        // Param out:  (bool) True is gd extension loaded otherwise false
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       27-02-08
+    // Purpose:    Test to see if GD is installed
+    // Param in:   n/a
+    // Param out:  (bool) True is gd extension loaded otherwise false
+    // Reference:
+    // Notes:
         //
     {
         if (extension_loaded('gd') && function_exists('gd_info')) {
@@ -2598,13 +2598,13 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function testEXIFInstalled()
-        // Author:     Jarrod Oberto
-        // Date:       08-05-11
-        // Purpose:    Test to see if EXIF is installed
-        // Param in:   n/a
-        // Param out:  (bool) True is exif extension loaded otherwise false
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       08-05-11
+    // Purpose:    Test to see if EXIF is installed
+    // Param in:   n/a
+    // Param out:  (bool) True is exif extension loaded otherwise false
+    // Reference:
+    // Notes:
         //
     {
         if (extension_loaded('exif')) {
@@ -2619,13 +2619,13 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function testIsImage($image)
-        // Author:     Jarrod Oberto
-        // Date:       27-02-08
-        // Purpose:    Test if file is an image
-        // Param in:   n/a
-        // Param out:  n/a
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       27-02-08
+    // Purpose:    Test if file is an image
+    // Param in:   n/a
+    // Param out:  n/a
+    // Reference:
+    // Notes:
         //
     {
         if ($image) {
@@ -2640,13 +2640,13 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function testFunct(): void
-        // Author:     Jarrod Oberto
-        // Date:       27-02-08
-        // Purpose:    Test Function
-        // Param in:   n/a
-        // Param out:  n/a
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       27-02-08
+    // Purpose:    Test Function
+    // Param in:   n/a
+    // Param out:  n/a
+    // Reference:
+    // Notes:
         //
     {
         echo $this->height;
@@ -2655,13 +2655,13 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function setForceStretch($value): void
-        // Author:     Jarrod Oberto
-        // Date:       23-12-10
-        // Purpose:
-        // Param in:   (bool) $value
-        // Param out:  n/a
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       23-12-10
+    // Purpose:
+    // Param in:   (bool) $value
+    // Param out:  n/a
+    // Reference:
+    // Notes:
         //
     {
         $this->forceStretch = $value;
@@ -2670,13 +2670,13 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function setFile($fileName): void
-        // Author:     Jarrod Oberto
-        // Date:       28-02-08
-        // Purpose:
-        // Param in:   n/a
-        // Param out:  n/a
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       28-02-08
+    // Purpose:
+    // Param in:   n/a
+    // Param out:  n/a
+    // Reference:
+    // Notes:
         //
     {
         self::__construct($fileName);
@@ -2685,13 +2685,13 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function getFileName()
-        // Author:     Jarrod Oberto
-        // Date:       10-09-08
-        // Purpose:
-        // Param in:   n/a
-        // Param out:  n/a
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       10-09-08
+    // Purpose:
+    // Param in:   n/a
+    // Param out:  n/a
+    // Reference:
+    // Notes:
         //
     {
         return $this->fileName;
@@ -2728,13 +2728,13 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function getErrors()
-        // Author:     Jarrod Oberto
-        // Date:       19-11-09
-        // Purpose:    Returns the error array
-        // Param in:   n/a
-        // Param out:  Array of errors
-        // Reference:
-        // Notes:
+    // Author:     Jarrod Oberto
+    // Date:       19-11-09
+    // Purpose:    Returns the error array
+    // Param in:   n/a
+    // Param out:  Array of errors
+    // Reference:
+    // Notes:
         //
     {
         return $this->errorArray;
@@ -2743,7 +2743,7 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function checkInterlaceImage($isEnabled): void
-        // jpg will use progressive (they don't use interace)
+    // jpg will use progressive (they don't use interace)
     {
         if ($isEnabled) {
             imageinterlace($this->imageResized, $isEnabled);
@@ -2753,14 +2753,14 @@ class php_image_magician
     // # --------------------------------------------------------
 
     protected function formatColor($value)
-        // Author:     Jarrod Oberto
-        // Date:       09-05-11
-        // Purpose:    Determine color method passed in and return color as RGB
-        // Param in:   (mixed) $value: (array) Could be an array of RGB
+    // Author:     Jarrod Oberto
+    // Date:       09-05-11
+    // Purpose:    Determine color method passed in and return color as RGB
+    // Param in:   (mixed) $value: (array) Could be an array of RGB
         //               (str) Could be hex #ffffff or #fff, fff, ffffff
-        // Param out:
-        // Reference:
-        // Notes:
+    // Param out:
+    // Reference:
+    // Notes:
         //
     {
         $rgbArray = [];
@@ -2794,7 +2794,7 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function hex2dec($hex)
-        // Purpose:  Convert #hex color to RGB
+    // Purpose:  Convert #hex color to RGB
     {
         $color = str_replace('#', '', $hex);
 
@@ -2841,7 +2841,7 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function findUnusedGreen()
-        // Purpose:  We find a green color suitable to use like green-screen effect.
+    // Purpose:  We find a green color suitable to use like green-screen effect.
         //     Therefore, the color must not exist in the image.
     {
         $green = 255;
@@ -2864,7 +2864,7 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function findUnusedBlue()
-        // Purpose:  We find a green color suitable to use like green-screen effect.
+    // Purpose:  We find a green color suitable to use like green-screen effect.
         //     Therefore, the color must not exist in the image.
     {
         $blue = 255;
@@ -2887,7 +2887,7 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function invertTransparency($value, $originalMax, $invert = true)
-        // Purpose:  This does two things:
+    // Purpose:  This does two things:
         //       1) Convert the range from 0-127 to 0-100
         //       2) Inverts value to 100 is not transparent while 0 is fully
         //          transparent (like Photoshop)
@@ -2940,7 +2940,7 @@ class php_image_magician
     // # --------------------------------------------------------
 
     public function checkStringStartsWith($needle, $haystack)
-        // Check if a string starts with a specific pattern
+    // Check if a string starts with a specific pattern
     {
         return substr($haystack, 0, strlen($needle)) == $needle;
     }
@@ -2950,12 +2950,12 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     private function GD2BMPstring(&$gd_image)
-        // Author:     James Heinrich
-        // Purpose:    Save file as type bmp
-        // Param in:   The image canvas (passed as ref)
-        // Param out:
-        // Reference:
-        // Notes:    This code was stripped out of two external files
+    // Author:     James Heinrich
+    // Purpose:    Save file as type bmp
+    // Param in:   The image canvas (passed as ref)
+    // Param out:
+    // Reference:
+    // Notes:    This code was stripped out of two external files
         //       (phpthumb.bmp.php,phpthumb.functions.php) and added below to
         //       avoid dependancies.
         //
@@ -3003,12 +3003,12 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function GetPixelColor(&$img, $x, $y)
-        // Author:     James Heinrich
-        // Purpose:
-        // Param in:
-        // Param out:
-        // Reference:
-        // Notes:
+    // Author:     James Heinrich
+    // Purpose:
+    // Param in:
+    // Param out:
+    // Reference:
+    // Notes:
         //
     {
         if (!is_resource($img)) {
@@ -3021,12 +3021,12 @@ class php_image_magician
     // # --------------------------------------------------------
 
     private function LittleEndian2String($number, $minbytes = 1)
-        // Author:     James Heinrich
-        // Purpose:    BMP SUPPORT (SAVING)
-        // Param in:
-        // Param out:
-        // Reference:
-        // Notes:
+    // Author:     James Heinrich
+    // Purpose:    BMP SUPPORT (SAVING)
+    // Param in:
+    // Param out:
+    // Reference:
+    // Notes:
         //
     {
         $intstring = '';
@@ -3043,17 +3043,17 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     private function ImageCreateFromBMP($filename)
-        // Author:     DHKold
-        // Date:     The 15th of June 2005
-        // Version:    2.0B
-        // Purpose:    To create an image from a BMP file.
-        // Param in:   BMP file to open.
-        // Param out:  Return a resource like the other ImageCreateFrom functions
-        // Reference:  http://us3.php.net/manual/en/function.imagecreate.php#53879
-        // Bug fix:    Author:   domelca at terra dot es
+    // Author:     DHKold
+    // Date:     The 15th of June 2005
+    // Version:    2.0B
+    // Purpose:    To create an image from a BMP file.
+    // Param in:   BMP file to open.
+    // Param out:  Return a resource like the other ImageCreateFrom functions
+    // Reference:  http://us3.php.net/manual/en/function.imagecreate.php#53879
+    // Bug fix:    Author:   domelca at terra dot es
         //       Date:   06 March 2008
         //       Fix:    Correct 16bit BMP support
-        // Notes:
+    // Notes:
         //
     {
         // Ouverture du fichier en mode binaire
@@ -3181,13 +3181,13 @@ class php_image_magician
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-**-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
     private function imagecreatefrompsd($fileName)
-        // Author:     Tim de Koning
-        // Version:    1.3
-        // Purpose:    To create an image from a PSD file.
-        // Param in:   PSD file to open.
-        // Param out:  Return a resource like the other ImageCreateFrom functions
-        // Reference:  http://www.kingsquare.nl/phppsdreader
-        // Notes:
+    // Author:     Tim de Koning
+    // Version:    1.3
+    // Purpose:    To create an image from a PSD file.
+    // Param in:   PSD file to open.
+    // Param out:  Return a resource like the other ImageCreateFrom functions
+    // Reference:  http://www.kingsquare.nl/phppsdreader
+    // Notes:
         //
     {
         if (file_exists($this->psdReaderPath)) {

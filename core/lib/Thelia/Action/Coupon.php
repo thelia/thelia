@@ -354,7 +354,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         }
 
         // Clear all coupons.
-        $dispatcher->dispatch((new Event()), TheliaEvents::COUPON_CLEAR_ALL);
+        $dispatcher->dispatch(new Event(), TheliaEvents::COUPON_CLEAR_ALL);
     }
 
     /**

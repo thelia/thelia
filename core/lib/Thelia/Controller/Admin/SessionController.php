@@ -52,7 +52,7 @@ class SessionController extends BaseAdminController
     protected function checkPasswordRecoveryEnabled()
     {
         // Check if user is already authenticate
-        if (!(bool) (ConfigQuery::read('enable_lost_admin_password_recovery', false))) {
+        if (!(bool) ConfigQuery::read('enable_lost_admin_password_recovery', false)) {
             AdminLog::append(
                 'admin',
                 'ADMIN_CREATE_PASSWORD',
@@ -211,7 +211,7 @@ class SessionController extends BaseAdminController
 
     public function checkLogoutAction(EventDispatcherInterface $eventDispatcher)
     {
-        $eventDispatcher->dispatch((new DefaultActionEvent()), TheliaEvents::ADMIN_LOGOUT);
+        $eventDispatcher->dispatch(new DefaultActionEvent(), TheliaEvents::ADMIN_LOGOUT);
 
         $this->getSecurityContext()->clearAdminUser();
 
@@ -247,7 +247,7 @@ class SessionController extends BaseAdminController
 
             $this->applyUserLocale($user);
 
-            if ((int) ($form->get('remember_me')->getData()) > 0) {
+            if ((int) $form->get('remember_me')->getData() > 0) {
                 // If a remember me field if present and set in the form, create
                 // the cookie thant store "remember me" information
                 $this->createRememberMeCookie(
@@ -257,7 +257,7 @@ class SessionController extends BaseAdminController
                 );
             }
 
-            $eventDispatcher->dispatch((new DefaultActionEvent()), TheliaEvents::ADMIN_LOGIN);
+            $eventDispatcher->dispatch(new DefaultActionEvent(), TheliaEvents::ADMIN_LOGIN);
 
             // Check if we have to ask the user to set its address email.
             // This is the case if Thelia has been updated from a pre 2.3.0 version

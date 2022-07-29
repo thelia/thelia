@@ -86,7 +86,7 @@ class CurrencyTest extends ContainerAwareTestCase
             ->setLocale('en_US')
             ->setSymbol('ù')
             ->setFormat('%n %c')
-            ;
+        ;
 
         $action = new Currency($this->getCurrencyConverter());
         $action->update($event, null, $this->getMockEventDispatcher());

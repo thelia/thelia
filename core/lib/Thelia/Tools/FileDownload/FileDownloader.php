@@ -88,7 +88,7 @@ class FileDownloader implements FileDownloaderInterface
 
         if (false === $response || $errno !== 0 ||
             ($httpCode != '200' && $httpCode != '204')
-            ) {
+        ) {
             /**
              * The server is down ? The file doesn't exist ? Anything else ?
              */

@@ -128,7 +128,7 @@ class AddressCreateForm extends FirewallForm
                     'constraints' => [
                         new Constraints\NotBlank(),
                         new Constraints\Callback(
-                                [$this, 'verifyZipCode']
+                            [$this, 'verifyZipCode']
                         ),
                     ],
                     'label' => Translator::getInstance()->trans('Zip code'),
@@ -149,8 +149,8 @@ class AddressCreateForm extends FirewallForm
                 'required' => false,
                 'constraints' => [
                     new Constraints\Callback(
-                            [$this, 'verifyState']
-                     ),
+                        [$this, 'verifyState']
+                    ),
                 ],
 
                 'label' => Translator::getInstance()->trans('State *'),
@@ -162,14 +162,14 @@ class AddressCreateForm extends FirewallForm
             ->add('phone', TextType::class, [
                     'label' => Translator::getInstance()->trans('Phone'),
                     'label_attr' => [
-                        'for' => 'phone',
+                       'for' => 'phone',
                     ],
                     'required' => false,
                 ])
             ->add('cellphone', TextType::class, [
                     'label' => Translator::getInstance()->trans('Cellphone'),
                     'label_attr' => [
-                        'for' => 'cellphone',
+                       'for' => 'cellphone',
                     ],
                     'required' => false,
                 ])
@@ -177,7 +177,7 @@ class AddressCreateForm extends FirewallForm
             ->add('is_default', CheckboxType::class, [
                     'label' => Translator::getInstance()->trans('Make this address as my primary address'),
                     'label_attr' => [
-                        'for' => 'default_address',
+                       'for' => 'default_address',
                     ],
                     'required' => false,
                 ])

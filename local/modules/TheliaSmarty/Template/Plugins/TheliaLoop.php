@@ -107,8 +107,8 @@ class TheliaLoop extends AbstractSmartyPlugin
             return self::$pagination[$loopName];
         }
         throw new \InvalidArgumentException(
-                Translator::getInstance()->trans("No pagination currently defined for loop name '%name'", ['%name' => $loopName])
-            );
+            Translator::getInstance()->trans("No pagination currently defined for loop name '%name'", ['%name' => $loopName])
+        );
     }
 
     /**
@@ -347,8 +347,8 @@ class TheliaLoop extends AbstractSmartyPlugin
             return '';
         }
 
-        $startPage = (int) ($this->getParam($params, 'start-page', 1));
-        $displayedPageCount = (int) ($this->getParam($params, 'limit', 10));
+        $startPage = (int) $this->getParam($params, 'start-page', 1);
+        $displayedPageCount = (int) $this->getParam($params, 'limit', 10);
 
         if ((int) $displayedPageCount == 0) {
             $displayedPageCount = \PHP_INT_MAX;

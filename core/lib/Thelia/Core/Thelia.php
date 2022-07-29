@@ -285,7 +285,7 @@ class Thelia extends Kernel
         }
 
         if (self::isInstalled()) {
-            $eventDispatcher->dispatch((new Event()), TheliaEvents::BOOT);
+            $eventDispatcher->dispatch(new Event(), TheliaEvents::BOOT);
         }
     }
 
@@ -302,7 +302,7 @@ class Thelia extends Kernel
 
             (new Filesystem())->dumpFile(
                 $this->getCacheDir().DS.'thelia_configs.php',
-            '<?php return '.VarExporter::export($caches).';'
+                '<?php return '.VarExporter::export($caches).';'
             );
         }
 

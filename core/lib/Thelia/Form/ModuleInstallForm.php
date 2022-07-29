@@ -52,7 +52,7 @@ class ModuleInstallForm extends BaseForm
                             ]
                         ),
                         new Constraints\Callback(
-                                [$this, 'checkModuleValidity']
+                            [$this, 'checkModuleValidity']
                         ),
                     ],
                     'label' => Translator::getInstance()->trans('The module zip file'),

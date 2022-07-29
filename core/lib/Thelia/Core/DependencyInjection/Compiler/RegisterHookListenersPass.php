@@ -280,7 +280,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
                     [
                         $eventName,
                         [
-                            (new ServiceClosureArgument(new Reference($moduleHook->getClassname()))),
+                            new ServiceClosureArgument(new Reference($moduleHook->getClassname())),
                             $moduleHook->getMethod(),
                         ],
                         ModuleHook::MAX_POSITION - $moduleHook->getPosition(),
@@ -409,13 +409,13 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 return strtoupper($matches[0]);
             };
             $event['method'] = 'on'.preg_replace_callback(
-                    [
-                        '/(?<=\b)[a-z]/i',
-                        '/[^a-z0-9]/i',
-                    ],
-                    $callback,
-                    $event['event']
-                );
+                [
+                    '/(?<=\b)[a-z]/i',
+                    '/[^a-z0-9]/i',
+                ],
+                $callback,
+                $event['event']
+            );
             $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
 
             return $event;

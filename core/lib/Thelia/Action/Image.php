@@ -224,7 +224,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         );
 
         // Rotate if required
-        $rotation = (int) ($event->getRotation());
+        $rotation = (int) $event->getRotation();
 
         if ($rotation != 0) {
             $image->rotate($rotation, $bg_color);
@@ -256,7 +256,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                 case 'gamma':
                     // Syntax: gamma:value. Exemple: gamma:0.7
                     if (isset($params[1])) {
-                        $gamma = (float) ($params[1]);
+                        $gamma = (float) $params[1];
 
                         $image->effects()->gamma($gamma);
                     }
@@ -271,7 +271,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                     break;
                 case 'blur':
                     if (isset($params[1])) {
-                        $blur_level = (int) ($params[1]);
+                        $blur_level = (int) $params[1];
 
                         $image->effects()->blur($blur_level);
                     }

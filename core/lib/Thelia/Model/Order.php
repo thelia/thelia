@@ -283,8 +283,8 @@ class Order extends BaseOrder
         }
 
         if (false !== $includePostage) {
-            $total += (float) ($this->getPostage());
-            $tax += (float) ($this->getPostageTax());
+            $total += (float) $this->getPostage();
+            $tax += (float) $this->getPostageTax();
         }
 
         return $total;
