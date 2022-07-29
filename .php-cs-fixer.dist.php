@@ -19,6 +19,7 @@ $finder = PhpCsFixer\Finder::create()
          'local/modules/ForcePhone',
          'local/modules/HookTest',
          'local/modules/CustomDelivery',
+         'local/modules/Tinymce/Resources',
       ])
 ;
 
