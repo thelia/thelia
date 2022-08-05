@@ -190,7 +190,14 @@
                                     </div>
 
                                     <div class="tab-pane fade" id="images">
-                                        {include file='includes/image-upload-form.html' imageType='content' parentId=$content_id resource="admin.content"}
+                                        {ifhook rel="item.edition.images"}
+                                            {hook name="item.edition.images" itemType='content' itemId=$ID resource="admin.content"}
+                                        {/ifhook}
+                                        {elsehook rel="item.edition.images"}
+                                        <div class="fallback-image-manager">
+                                            {include file='includes/image-upload-form.html' imageType='content' parentId=$ID resource="admin.content"}
+                                        </div>
+                                        {/elsehook}
                                     </div>
 
                                     <div class="tab-pane fade" id="documents">
@@ -273,7 +280,10 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
 
             // Load active tab
 
-            $.imageUploadManager.initImageDropZone();
+            if ($('#images > .fallback-image-manager')[0]) {
+                $.imageUploadManager.initImageDropZone();
+            };
+
             $.documentUploadManager.initDocumentDropZone();
 
             $('.use_default_rewriten_url').click(function(ev) {
