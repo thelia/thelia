@@ -2,6 +2,7 @@
 
 {block name="no-return-functions"}
     {$admin_current_location = 'catalog'}
+
 {/block}
 
 {block name="check-resource"}admin.product{/block}
@@ -10,6 +11,9 @@
 {block name="page-title"}{intl l='Edit product'}{/block}
 
 {block name="main-content"}
+
+    {$displayLegacyImageManager = true}
+    {$forceLegacyImageManager = $smarty.get.legacy_image_manager|default:false}
 
     <div class="catalog edit-product">
 
@@ -89,11 +93,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    {$imageSuccessUrl ={navigate to="current"}}
-                                    <a href="#images"
-                                       data-toggle="tab"
-                                       data-href="{url path="/admin/image/type/product/%id/form-ajax" id=$ID successUrl=$imageSuccessUrl}"
-                                       data-callback="$.imageUploadManager.initImageDropZone">
+                                    <a href="#images" data-toggle="tab">
                                         {intl l="Images"}
                                     </a>
                                 </li>
@@ -140,7 +140,12 @@
                                 </div>
 
                                 <div class="tab-pane fade" id="images">
-                                    <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                                    {ifhook rel="item.edition.images"}
+                                        {hook name="item.edition.images" itemType='product' itemId=$ID resource="admin.product"}
+                                    {/ifhook}
+                                    {elsehook rel="item.edition.images"}
+                                        <div class="text-center fallback-image-manager"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                                    {/elsehook}
                                 </div>
 
                                 <div class="tab-pane fade" id="documents">
@@ -245,8 +250,8 @@
                                 <input name="search" class="js-input-search form-control" type="text"/>
                             </div>
                         </div>
-                        <div class="js-loader text-center hide">{intl l="Please wait, loading"}</div>
-                        <div class="alert alert-warning text-center hide js-alert-no-result">
+                        <div class="text-center js-loader hide">{intl l="Please wait, loading"}</div>
+                        <div class="text-center alert alert-warning hide js-alert-no-result">
                             {intl l="No results found for your search."}
                         </div>
                         <div class="form-group js-block-search-result hide">
@@ -304,6 +309,26 @@ $(function() {
         });
 
     });
+
+    /****** {$displayLegacyImageManager} {$forceLegacyImageManager} *****/
+
+        {$imageSuccessUrl ={navigate to="current"}}
+
+        $('.nav-tabs a[href="#images"]').on('shown.bs.tab', function(ev) {
+            let $this = $(this);
+
+            if (!$('#images > .fallback-image-manager')[0]) {
+                return;
+            };
+
+            let remoteForm = "{url path="/admin/image/type/product/%id/form-ajax" id=$product_id successUrl=$imageSuccessUrl}";
+
+            $($this.attr('href')).load(remoteForm, function(ev) {
+                $.imageUploadManager.initImageDropZone();
+            });
+        });
+
+
     $('.nav-tabs a[data-trigger]').on('shown.bs.tab', function(ev) {
         var $this = $(this);
         var trigger = $this.data('trigger');

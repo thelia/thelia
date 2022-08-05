@@ -777,7 +777,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1421, 'order-status.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1422, 'order-status.form.creation', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1423, 'order-status.form.modification', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(1424, 'order-status.js', 2, 0, 0, 1, 1, 1, NOW(), NOW());
+(1424, 'order-status.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1425, 'item.edition.images', 2, 0, 0, 1, 1, 1, NOW(), NOW());
 
 -- Insert pdf hooks
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
@@ -4620,6 +4621,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1422,  'cs_CZ', NULL, NULL, NULL),
     (1423,  'cs_CZ', NULL, NULL, NULL),
     (1424, 'cs_CZ', NULL, NULL, NULL),
+    (1425, 'cs_CZ', NULL, NULL, NULL),
     (1000, 'de_DE', 'Kategorie - Inhalt', NULL, NULL),
     (1001, 'de_DE', 'Inhalt - Inhalt', NULL, NULL),
     (1002, 'de_DE', 'Ordner - Inhalt', NULL, NULL),
@@ -5042,6 +5044,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1422,  'de_DE', NULL, NULL, NULL),
     (1423,  'de_DE', NULL, NULL, NULL),
     (1424, 'de_DE', NULL, NULL, NULL),
+    (1425, 'de_DE', NULL, NULL, NULL),
     (1000, 'en_US', 'Category - content', NULL, NULL),
     (1001, 'en_US', 'Content - content', NULL, NULL),
     (1002, 'en_US', 'Folder - content', NULL, NULL),
@@ -5464,6 +5467,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1422,  'en_US', 'Order status - form creation', NULL, NULL),
     (1423,  'en_US', 'Order status - form modification', NULL, NULL),
     (1424, 'en_US', 'Order status - JavaScript', NULL, NULL),
+    (1425, 'en_US', 'Edit images for an item', NULL, NULL),
     (1000, 'es_ES', 'Categoría - contenido', NULL, NULL),
     (1001, 'es_ES', 'Contenido - contenido', NULL, NULL),
     (1002, 'es_ES', 'Carpeta - contenido', NULL, NULL),
@@ -5886,6 +5890,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1422,  'es_ES', NULL, NULL, NULL),
     (1423,  'es_ES', NULL, NULL, NULL),
     (1424, 'es_ES', NULL, NULL, NULL),
+    (1425, 'es_ES', NULL, NULL, NULL),
     (1000, 'fr_FR', 'Catégorie - contenu', NULL, NULL),
     (1001, 'fr_FR', 'Contenu - contenu', NULL, NULL),
     (1002, 'fr_FR', 'Dossier - contenu', NULL, NULL),
@@ -6308,6 +6313,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1422,  'fr_FR', NULL, NULL, NULL),
     (1423,  'fr_FR', NULL, NULL, NULL),
     (1424, 'fr_FR', NULL, NULL, NULL),
+    (1425, 'fr_FR', NULL, NULL, NULL),
     (1000, 'it_IT', NULL, NULL, NULL),
     (1001, 'it_IT', NULL, NULL, NULL),
     (1002, 'it_IT', NULL, NULL, NULL),
@@ -6730,6 +6736,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1422,  'it_IT', NULL, NULL, NULL),
     (1423,  'it_IT', NULL, NULL, NULL),
     (1424, 'it_IT', NULL, NULL, NULL),
+    (1425, 'it_IT', NULL, NULL, NULL),
     (1000, 'ru_RU', 'Категория - содержимое', NULL, NULL),
     (1001, 'ru_RU', 'Контент - содержимое', NULL, NULL),
     (1002, 'ru_RU', 'Папка - содержимое', NULL, NULL),
@@ -7151,7 +7158,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1421,  'ru_RU', NULL, NULL, NULL),
     (1422,  'ru_RU', NULL, NULL, NULL),
     (1423,  'ru_RU', NULL, NULL, NULL),
-    (1424, 'ru_RU', NULL, NULL, NULL)
+    (1424, 'ru_RU', NULL, NULL, NULL),
+    (1425, 'ru_RU', NULL, NULL, NULL)
 ;
 
 -- Insert I18n pdf hooks
