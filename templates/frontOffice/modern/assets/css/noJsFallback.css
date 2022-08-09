@@ -1,0 +1,6 @@
+body.no-js {
+  #MainNavigation,
+  .mm-ocd {
+    display: none !important;
+  }
+}

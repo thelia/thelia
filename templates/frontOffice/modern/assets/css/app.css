@@ -1,6 +1,7 @@
 @import 'tailwindcss/base';
 @import 'mmenu-light/dist/mmenu-light.css';
 
+@import 'noJsFallback';
 @import 'layout';
 @import 'buttons';
 @import 'blocks';

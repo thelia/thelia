@@ -22,6 +22,7 @@ function main() {
   import(/* webpackChunkName: "Modal" */ '@components/smarty/Modal/Modal').then(
     ({ default: Modal }) => Modal()
   );
+  document.body.classList.remove('no-js');
 }
 
 document.addEventListener('DOMContentLoaded', () => {

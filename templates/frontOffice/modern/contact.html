@@ -60,7 +60,7 @@
                           }
                         {/form_field}
                         {form_field field="message"}
-                        <div for="{$id}" class="block mb-2 text-sm text-gray-600">
+                        <div for="{$label_attr.for|default:null}" class="block mb-2 text-sm text-gray-600">
                           <label class="font-bold text-sm {if $error}text-red-500{else}text-gray-700{/if}">
                             {$label}
                           </label>
@@ -69,7 +69,7 @@
                             id="{$label_attr.for|default:null}"
                             placeholder="{intl l="Your message"}"
                             rows="6"
-                            class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if $error}border-red-500{else}border-gray-200{/if} {$inputClass}"
+                            class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if $error}border-red-500{else}border-gray-200{/if} {$inputClass|default:null}"
                             {if $required} aria-required="true" required{/if}>{$value}</textarea>
                           {if $error}
                             <div class="mt-1">
