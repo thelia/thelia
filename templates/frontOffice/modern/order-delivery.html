@@ -76,6 +76,9 @@
       'id' => $ISOALPHA2,
       'title' => $TITLE
     ]}
+    {if $ID eq {config key="store_country"}}
+      var DEFAULT_COUNTRY = "{$ISOALPHA2|default:'FR'}";
+    {/if}
   {/loop}
 
   var COUNTRIES = {$countries|json_encode nofilter}

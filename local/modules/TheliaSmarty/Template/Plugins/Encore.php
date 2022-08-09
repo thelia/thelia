@@ -22,6 +22,7 @@ use Symfony\WebpackEncoreBundle\Asset\TagRenderer;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Tools\URL;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\Assets\EncoreModuleAssetsPathPackage;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
@@ -92,13 +93,15 @@ class Encore extends AbstractSmartyPlugin
 
     public function getWebpackManifestFile($args): string
     {
+        $urlTool = URL::getInstance();
+
         $file = $args['file'];
         if (!$file) {
             return '';
         }
 
         if (isset($this->packages['manifest'])) {
-            return $this->packages['manifest']->geturl($file);
+            return $urlTool->absoluteUrl($this->packages['manifest']->geturl($file));
         }
 
         return '';

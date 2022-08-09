@@ -7,8 +7,8 @@
     type="text"
     name=$name
     id="{$label_attr.for|default:null}"
-    value={$value|default:{$LABEL} nofilter}
-    label=$label
+    value={$value|default:{$LABEL|default:null} nofilter}
+    label=$label|default:null
     placeholder=""
     required=$required
   }
@@ -209,7 +209,6 @@
 
 {* ------------------------------ City ----------------------------- *}
 
-
 {function name="fn_address_field_city"}
   {include
     file="components/smarty/Input/Input.html"
@@ -226,24 +225,25 @@
 
 {* ------------------------------ Country ----------------------------- *}
 
-
 {function name="fn_address_field_country"}
-
-    {assign var="value" value={$value|default:$COUNTRY|default:null}}
     {$countriesOptions = []}
 
-    {$countriesOptions['default'] = [
-      'value' => '',
-      'label' => {intl l="Choose a country"}
-    ]}
-
     {loop type="country" name="country.list" order="alpha"}
-    {$countriesOptions[$ID] = [
-      'value' => $ID,
-      'label' => $TITLE
-      ]}
+      {if $ID eq {config key="store_country"}}
+        {$countriesOptions['default'] = [
+          'value' => $ID,
+          'label' => $TITLE
+        ]}
+        {else}
+        {$countriesOptions[$ID] = [
+          'value' => $ID,
+          'label' => $TITLE
+          ]}
+      {/if}
     {/loop}
 
+
+    {assign var="value" value={$country|default:$countriesOptions['default']['value']}}
     {include
       file="components/smarty/Select/Select.html"
       name=$name
@@ -254,6 +254,7 @@
       options=$countriesOptions
     }
 {/function}
+
 
 
 {* ------------------------------ State ----------------------------- *}

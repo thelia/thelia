@@ -20,7 +20,7 @@ const Select = forwardRef(
           ref={ref}
           name={name}
           {...props}
-          value={props.defaultValue || props.value}
+          defaultValue={props.defaultValue}
           className="mt-0 block w-full border-0 border-b-2 border-gray-200 px-0.5 focus:border-black focus:ring-0"
         >
           {options.map((option, index) => {
