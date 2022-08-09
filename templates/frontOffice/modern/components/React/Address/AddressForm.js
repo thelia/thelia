@@ -24,7 +24,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
     return {
       label: c.title,
       value: c.id,
-      isDefault: c.id === window.COUNTRY_DEFAULT
+      isDefault: c.id === window.DEFAULT_COUNTRY
     };
   });
 

@@ -73,13 +73,15 @@
   {$countries = []}
   {loop type="country" name="getCountry" order="alpha"}
     {$countries[] = [
-      'id' => $ID,
+      'id' => $ISOALPHA2,
       'title' => $TITLE
     ]}
+    {if $ID eq {config key="store_country"}}
+      var DEFAULT_COUNTRY = "{$ISOALPHA2|default:'FR'}";
+    {/if}
   {/loop}
 
-  var COUNTRIES = {$countries|json_encode nofilter};
-  var COUNTRY_DEFAULT = {config key="store_country"};
+  var COUNTRIES = {$countries|json_encode nofilter}
 
   </script>
 
