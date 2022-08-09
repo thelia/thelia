@@ -22,10 +22,10 @@ use Symfony\WebpackEncoreBundle\Asset\TagRenderer;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Tools\URL;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\Assets\EncoreModuleAssetsPathPackage;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
-use Thelia\Tools\URL;
 
 class Encore extends AbstractSmartyPlugin
 {
