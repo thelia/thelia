@@ -73,12 +73,13 @@
   {$countries = []}
   {loop type="country" name="getCountry" order="alpha"}
     {$countries[] = [
-      'id' => $ISOALPHA2,
+      'id' => $ID,
       'title' => $TITLE
     ]}
   {/loop}
 
-  var COUNTRIES = {$countries|json_encode nofilter}
+  var COUNTRIES = {$countries|json_encode nofilter};
+  var COUNTRY_DEFAULT = {config key="store_country"};
 
   </script>
 
