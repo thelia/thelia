@@ -25,6 +25,7 @@ use Thelia\Core\Template\TemplateHelperInterface;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\Assets\EncoreModuleAssetsPathPackage;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
+use Thelia\Tools\URL;
 
 class Encore extends AbstractSmartyPlugin
 {
@@ -92,13 +93,15 @@ class Encore extends AbstractSmartyPlugin
 
     public function getWebpackManifestFile($args): string
     {
+        $urlTool = URL::getInstance();
+
         $file = $args['file'];
         if (!$file) {
             return '';
         }
 
         if (isset($this->packages['manifest'])) {
-            return $this->packages['manifest']->geturl($file);
+            return $urlTool->absoluteUrl($this->packages['manifest']->geturl($file));
         }
 
         return '';
