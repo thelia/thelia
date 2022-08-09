@@ -30,4 +30,9 @@
       }
     }
   }
+
+  &-logo {
+    width: 91px;
+    height: 30px;
+  }
 }

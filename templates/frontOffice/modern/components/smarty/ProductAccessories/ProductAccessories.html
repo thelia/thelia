@@ -3,12 +3,12 @@
 {$otherProductsCount = {count type="product" name="other-products" limit={$maxAccessories - $accessoriesCount} category=$DEFAULT_CATEGORY order="random" exclude=$product_id}}
 
 {if $accessoriesCount > 0 || $otherProductsCount > 0 }
-<div class="pt-12 px-8 pb-32">
+<div class="px-8 pt-12 pb-32">
   <div class="container mx-auto">
     <section class="ProductAccessories">
-        {include file="components/smarty/Title/Title.html" type="h3" title={intl l="Similar products"}}
+        {include file="components/smarty/Title/Title.html" type="h2" title={intl l="Similar products"}}
 
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="grid grid-cols-2 gap-8 lg:grid-cols-4">
             {loop type="accessory" name="product_list" product=$product_id limit=$maxAccessories}
               {include file="components/smarty/SingleProduct/SingleProduct.html" product_id=$ACCESSORY_ID}
             {/loop}

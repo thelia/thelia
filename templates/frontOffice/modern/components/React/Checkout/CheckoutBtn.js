@@ -9,21 +9,21 @@ import { useRef } from 'react';
 import React from 'react';
 
 import { useIntl } from 'react-intl';
+import { useSelector } from 'react-redux';
 
 export default function CheckoutBtn() {
   const intl = useIntl();
   const { mutate } = useFinalCheckout();
   const { mutate: setCheckout } = useSetCheckout();
   const { data: checkout } = useGetCheckout();
-
+  const { phoneNumberValid } = useSelector((state) => state.checkout);
   const btnRef = useRef(null);
-
   return (
     <div className="">
-      <label className="mb-4 block items-start">
+      <label className="my-4 inline-block cursor-pointer">
         <input
           type="checkbox"
-          className={`mt-1 border border-gray-300 text-main focus:border-gray-300 focus:ring-main`}
+          className="h-5 w-5 border border-main text-main focus:border-main focus:ring-main"
           id="validTerms"
           onChange={() => {
             setCheckout({
@@ -36,17 +36,21 @@ export default function CheckoutBtn() {
             });
           }}
         />
-        <span className="leading-0 ml-2">
+        <span className="leading-0 ml-2 text-lg">
           {intl.formatMessage({ id: 'ACCEPT_CGV' })}
         </span>
       </label>
 
       <button
-        className="btn w-full shadow"
+        className="btn mx-auto mt-8 block"
         onClick={async () => {
           mutate(checkout);
         }}
-        disabled={!checkout?.isComplete || !checkout.acceptedTermsAndConditions}
+        disabled={
+          !checkout?.isComplete ||
+          !checkout.acceptedTermsAndConditions ||
+          !phoneNumberValid
+        }
       >
         {intl.formatMessage({ id: 'VALIDATE_CHECKOUT' })}
       </button>

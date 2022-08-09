@@ -24,16 +24,12 @@
 
 <div class="-mx-8">
 
-  {local_media type="banner"}
-    {$bannerUrl = $MEDIA_URL}
-  {/local_media}
   {include
     file="components/smarty/HeroImage/HeroImage.html"
     title={config key="store_name"}
     subtitle={config key="store_description"}
     description=""
-    img=$bannerUrl
-    }
+  }
 
   {include file="components/smarty/NewProducts/NewProducts.html"}
   <div class="px-8 pt-20 pb-32">

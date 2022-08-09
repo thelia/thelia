@@ -1,7 +1,7 @@
 <footer class="Footer">
-  <div class="py-16 px-8 text-white bg-gray-700">
+  <div class="px-8 py-16 text-white bg-gray-700">
     <div class="container mx-auto">
-      <div class="lg:flex justify-between divide-y lg:divide-y-0 lg:divide-x divide-gray-200 divide-opacity-25 text-center">
+      <div class="justify-between text-center divide-y divide-gray-200 lg:flex lg:divide-y-0 lg:divide-x divide-opacity-25">
         <div class="lg:w-1/2 lg:flex lg:justify-items-start">
           <div>
             <div class="Title">{intl l="Subscribe to our newsletter"}</div>
@@ -10,12 +10,12 @@
             </div>
           </div>
         </div>
-        <div class="lg:w-1/2 mt-8 pt-8 lg:mt-0 lg:pt-0 lg:flex lg:justify-items-end">
+        <div class="pt-8 mt-8 lg:w-1/2 lg:mt-0 lg:pt-0 lg:flex lg:justify-items-end">
           <div class="Footer-gammes lg:mx-auto">
             <div class="Title">{intl l="Our brands"}</div>
-            <div class="flex flex-col lg:flex-row mx-auto items-center justify-center">
+            <div class="flex flex-col items-center justify-center mx-auto lg:flex-row">
               {loop type="brand" name="brands.footer" order="manual" limit=3}
-              <a href="{$URL}" class="px-4">
+              <a href="{$URL}" class="p-4">
                 {$TITLE}
               </a>
               {/loop}
@@ -25,15 +25,15 @@
       </div>
     </div>
   </div>
-  <div class="py-16 px-8 text-white bg-gray-900">
+  <div class="px-8 py-16 text-white bg-gray-900">
     <div class="container mx-auto">
-      <div class="Footer-grid grid mb-8">
+      <div class="grid mb-8 Footer-grid">
 
         <div>
-          <div class="text-2xl   font-bold mb-4">{intl l="Our catalog"}</div>
-          <ul class="divide-y divide-gray-200 divide-opacity-25 uppercase">
+          <div class="mb-4 text-2xl font-bold">{intl l="Our catalog"}</div>
+          <ul class="uppercase divide-y divide-gray-200 divide-opacity-25">
             {loop name="footer_category" type="category" parent=0 }
-              <li><a href="{$URL nofilter}" class="py-2 block">{$TITLE}</a></li>
+              <li><a href="{$URL nofilter}" class="block py-2">{$TITLE}</a></li>
             {/loop}
           </ul>
         </div>
@@ -42,17 +42,17 @@
           {$folder_information={config key="information_folder_id"}}
           {if $folder_information}
             {loop name="folder_footer_links" type="folder" id={config key="information_folder_id"} order="manual"}
-              <div class="text-2xl font-bold mb-4">{$TITLE}</div>
+              <div class="mb-4 text-2xl font-bold">{$TITLE}</div>
             {/loop}
-            <ul class="divide-y divide-gray-200 divide-opacity-25 uppercase">
+            <ul class="uppercase divide-y divide-gray-200 divide-opacity-25">
               {loop name="footer_links" type="content" folder=$folder_information order="manual"}
-                <li><a href="{$URL nofilter}" class="py-2 block">{$TITLE}</a></li>
+                <li><a href="{$URL nofilter}" class="block py-2">{$TITLE}</a></li>
               {/loop}
             </ul>
           {/if}
         </div>
 
-        <div class="flex flex-col items-center justify-center text-white text-center font-bold leading-5 uppercase">
+        <div class="flex flex-col items-center justify-center font-bold leading-5 text-center text-white uppercase">
 
           <div class="">
             {config key="store_address1"}<br />

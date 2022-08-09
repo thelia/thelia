@@ -1,20 +1,21 @@
 
-  <div class="CategoriesPanels container mx-auto">
+  <div class="container mx-auto CategoriesPanels">
     {if $title}
       {include file="components/smarty/Title/Title.html" type="h2" title=$title}
     {/if}
-    <div class="flex justify-center flex-wrap flex-row -mx-1 -mt-1">
+    <div class="flex flex-row flex-wrap justify-center -mx-1 -mt-1">
       {loop type="category" name="CategoriesPanels" parent={$parent|default:0} limit=7}
-      <div class="p-1 w-6/12 md:w-4/12 xl:w-2/12 ">
-        <a href="{$URL}" class="CategoriesPanels-panel block hover:shadow-xl">
-          {loop type="image" name="CategoriesPanels.img" source="category" source_id=$ID width=280 height=450 resize_mode="crop" limit=1}
-            <img src="{$IMAGE_URL}" class="CategoriesPanels-panel-img object-cover object-center w-full h-full" />
+      {$title_cat = $TITLE}
+      <div class="w-6/12 p-1 md:w-4/12 xl:w-2/12 ">
+        <a href="{$URL}" class="block CategoriesPanels-panel hover:shadow-xl">
+          {loop type="image" name="CategoriesPanels.img" source="category" source_id=$ID width=280 height=450 resize_mode="crop" limit=1 format="webp"}
+            <img src="{$IMAGE_URL}" alt="{$TITLE|default:$title_cat}" class="object-cover object-center w-full h-full CategoriesPanels-panel-img" />
           {/loop}
           {elseloop rel="CategoriesPanels.img"}
-            <img src="//placehold.it/280x450" class="CategoriesPanels-panel-img object-cover object-center w-full h-full" />
+            <img src="{encore_manifest_file file="dist/images/placeholder.webp"}" class="object-cover object-center w-full h-full CategoriesPanels-panel-img" />
           {/elseloop}
           <div class="CategoriesPanels-panel-content">
-            <div class="CategoriesPanels-panel-title text-2xl text-white text-center px-4 mb-6">{$TITLE}</div>
+            <div class="px-4 mb-6 text-2xl text-center text-white CategoriesPanels-panel-title">{$TITLE}</div>
           </div>
         </a>
         </div>

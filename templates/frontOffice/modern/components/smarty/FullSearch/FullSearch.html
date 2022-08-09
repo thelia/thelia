@@ -1,9 +1,9 @@
-<div class="FullSearch flex flex-col items-center fixed inset-0 w-full h-full z-50 hidden">
-    <div class="FullSearch-background bg-black opacity-25 absolute inset-0 w-full h-full"></div>
-    <div class="FullSearch-container w-full max-w-screen-lg bg-white rounded relative mt-24 p-6 shadow-lg">
-      <div class="flex justify-between mb-8 items-center">
+<div class="fixed inset-0 z-50 flex flex-col items-center hidden w-full h-full FullSearch">
+    <div class="absolute inset-0 w-full h-full bg-black opacity-25 FullSearch-background"></div>
+    <div class="relative w-full max-w-screen-lg p-6 mt-24 bg-white rounded shadow-lg FullSearch-container">
+      <div class="flex items-center justify-between mb-8">
         {include file="components/smarty/Title/Title.html" size="2xl" title={intl l="What are you looking for ?"} class="mt-0"}
-        <button class="FullSearch-close text-right  hover:" data-toggle-search>{renderIconSvg icon="close" class="w-6 h-6 fill-current pointer-events-none"}</button>
+        <button class="text-right FullSearch-close hover:" aria-label="{intl l="Close Search"}" data-toggle-search>{renderIconSvg icon="close" class="w-6 h-6 pointer-events-none fill-current"}</button>
       </div>
       <div id="FullSearch-result"></div>
     </div>

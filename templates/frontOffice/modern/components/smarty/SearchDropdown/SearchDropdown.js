@@ -92,20 +92,23 @@ function SearchDropdown({ showResults = false }) {
           className="hidden flex-1 md:block"
           onSubmit={(e) => e.stopPropagation()}
         >
-          <input
-            type="text"
-            name="query"
-            value={query}
-            className="SearchDropdown-input block appearance-none leading-normal focus:outline-none"
-            autoComplete="off"
-            onKeyUp={(e) => setQuery(e.target.value)}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => {
-              if (debouncedQuery) {
-                setIsOpen(true);
-              }
-            }}
-          />
+          <label htmlFor="SearchInput" className="relative">
+            <input
+              id="SearchInput"
+              type="text"
+              name="query"
+              value={query}
+              className="SearchDropdown-input block appearance-none leading-normal focus:outline-none"
+              autoComplete="off"
+              onKeyUp={(e) => setQuery(e.target.value)}
+              onChange={(e) => setQuery(e.target.value)}
+              onFocus={() => {
+                if (debouncedQuery) {
+                  setIsOpen(true);
+                }
+              }}
+            />
+          </label>
           <svg
             onClick={() => {
               if (query) {

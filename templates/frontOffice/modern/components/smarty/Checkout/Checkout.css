@@ -1,0 +1,13 @@
+.Checkout {
+  &-block {
+    @apply animated transUp mb-10 lg:mb-16;
+  }
+}
+
+.Option {
+  @apply relative flex-1 border-2 border-transparent  bg-white px-4 py-6 leading-none shadow focus-within:border-main focus:border-main;
+
+  &.active {
+    @apply bg-main font-bold text-white;
+  }
+}

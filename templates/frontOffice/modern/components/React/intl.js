@@ -13,10 +13,11 @@ const messages = {
     EDIT_AN_ADDRESS: 'Éditer une adresse',
     CLOSE: 'Fermer',
     CHOOSE: 'Choisir',
+    CHOOSEN: 'Sélectionnée',
     UNDERSTOOD: "J'ai compris",
     YOUR_ORDER: 'Votre commande',
     CHOOSE_DELIVERY_MODE: 'Choisir mon mode de livraison',
-    HOME_DELIVERY: 'Livraison à domicile',
+    DELIVERY_FOOTER: 'Livraison',
     PICKUP_DELIVERY: 'Livraison en point relais',
     CHOOSE_DELIVERY_ADDRESS: 'Choisir mon adresse de livraison',
     CHOOSE_BILLING_ADDRESS: 'Choisir mon adresse de facturation',
@@ -86,7 +87,14 @@ const messages = {
     NO_PAYMENT_MODE_AVAILABLE: "Aucun moyen de paiement n'est disponible",
     NO_DELIVERY_MODE_AVAILABLE: "Aucun moyen de livraison n'est disponible",
     FIND_RELAY: 'Trouver un point relais',
-    INCORRECT_ZIPCODE: 'Le code postal est incorrect'
+    INCORRECT_ZIPCODE: 'Le code postal est incorrect',
+    COUPON_ADDED: 'Le code promo a été ajouté',
+    LOADING: 'Chargement...',
+    NOTHING_TO_PAY: "Vous n'avez rien à régler pour cette commande",
+    KEEP_SHOPPING: 'Continuer vos achats',
+    UPDATE: 'Modifier',
+    YOU_USING_COUPON: 'Vous utilisez les bon de réductions suivant :',
+    CLICK_TO_CLEAR_COUPON: 'Cliquez ici pour retire tout les bons de réduction'
   },
   'en-US': {
     OK: 'OK',
@@ -98,9 +106,10 @@ const messages = {
     EDIT_AN_ADDRESS: 'Edit an address',
     CLOSE: 'Close',
     CHOOSE: 'Choose',
+    CHOOSEN: 'Choosen',
     TOTAL_UNTAXED: 'Total w/o tax',
     CHOOSE_DELIVERY_MODE: 'Choose delivery mode',
-    HOME_DELIVERY: 'Delivery',
+    DELIVERY_FOOTER: 'Delivery',
     PICKUP_DELIVERY: 'Pickup',
     CHOOSE_DELIVERY_ADDRESS: 'Choose your delivery address',
     CHOOSE_BILLING_ADDRESS: 'Choose your billing address',
@@ -171,7 +180,13 @@ const messages = {
     NO_PAYMENT_MODE_AVAILABLE: 'No payment mode available',
     NO_DELIVERY_MODE_AVAILABLE: 'No delivery mode available',
     FIND_RELAY: 'Find a relay point',
-    INCORRECT_ZIPCODE: 'Zipcode is incorrect'
+    INCORRECT_ZIPCODE: 'Zipcode is incorrect',
+    COUPON_ADDED: 'Added coupon',
+    NOTHING_TO_PAY: 'Nothing to pay for this order',
+    KEEP_SHOPPING: 'Keep shopping',
+    UPDATE: 'Update',
+    YOU_USING_COUPON: 'Cliquez ici pour retire tout les bons de réduction',
+    CLICK_TO_CLEAR_COUPON: 'Clear all coupons'
   }
 };
 

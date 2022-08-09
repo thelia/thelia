@@ -10,10 +10,8 @@
   }
 
   &-icon {
-    @apply absolute text-base;
+    @apply absolute top-1/2 right-5 text-base;
 
-    top: 50%;
-    right: 1.25rem;
     transform: translateY(-50%);
   }
 }
