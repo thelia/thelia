@@ -62,7 +62,8 @@
         "assetic/framework": "~3.0.0",
         "thelia/html2pdf": "dev-main",
         "symfony/mailer": "6.0.*",
-        "symfony/webpack-encore-bundle": "^1.14"
+        "symfony/webpack-encore-bundle": "^1.14",
+        "composer/composer": "~2.3.0"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",

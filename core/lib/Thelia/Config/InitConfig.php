@@ -12,11 +12,11 @@
 
 namespace Thelia\Config;
 
-use Composer\Script\Event;
+use Composer\Installer\PackageEvent;
 
 class InitConfig
 {
-    public static function initConfig(Event $event): void
+    public static function initConfig(PackageEvent $event): void
     {
         $vendorDir = $event->getComposer()->getConfig()->get('vendor-dir');
 
