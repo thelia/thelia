@@ -130,7 +130,10 @@
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
-        }
+        },
+        "pre-package-install": [
+            "Thelia\\Config\\InitConfig::initConfig"
+        ]
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

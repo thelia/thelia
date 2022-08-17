@@ -18,6 +18,12 @@ class InitConfig
 {
     public static function initConfig(PackageEvent $event): void
     {
+        $packageName = $event->getOperation()->getPackage()->getName();
+
+        if (!\in_array($packageName, ['symfony/flex', 'thelia/core'])) {
+            return;
+        }
+
         $vendorDir = $event->getComposer()->getConfig()->get('vendor-dir');
 
         $packageConfigFiles = [
