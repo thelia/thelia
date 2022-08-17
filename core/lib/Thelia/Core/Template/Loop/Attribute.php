@@ -92,7 +92,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $product = $this->getProduct();
-        $template = $this->getTemplate();
+        $template = $this->getTemplate() ?? [];
         $excludeTemplate = $this->getExcludeTemplate();
 
         $this->useAttributePosistion = true;
