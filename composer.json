@@ -131,7 +131,7 @@
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
-        "pre-package-install": [
+        "post-autoload-dump": [
             "Thelia\\Config\\InitConfig::initConfig"
         ]
     },
