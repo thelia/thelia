@@ -12,7 +12,6 @@
 
 namespace Thelia\Config;
 
-use Composer\Installer\PackageEvent;
 use Composer\Script\Event;
 
 class InitConfig
