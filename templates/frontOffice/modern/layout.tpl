@@ -118,7 +118,7 @@
     {block name="structured-data"}{/block}
 </head>
 
-<body class="text-gray-700 bg-gray-50 {block name="body-class"}{/block}" itemscope itemtype="http://schema.org/WebPage">
+<body class="text-gray-700 bg-gray-50 {block name="body-class"}{/block} no-js" itemscope itemtype="http://schema.org/WebPage">
     {hook name="main.body-top"}
 
     {block name="header"}
