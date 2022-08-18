@@ -60,7 +60,7 @@
         "michelf/php-markdown": "1.6.*",
         "smarty/smarty": "3.1.20",
         "ramsey/array_column": "~1.1",
-        "propel/propel": "dev-thelia-2.3",
+        "thelia/propel": "dev-thelia-2.3",
         "commerceguys/addressing": "0.8.*",
         "symfony/cache": "~3.1.0"
     },
@@ -73,7 +73,10 @@
     "minimum-stability": "stable",
     "config": {
         "vendor-dir": "core/vendor",
-        "bin-dir": "bin"
+        "bin-dir": "bin",
+        "allow-plugins": {
+            "thelia/installer": true
+        }
     },
     "autoload": {
         "psr-4": {
