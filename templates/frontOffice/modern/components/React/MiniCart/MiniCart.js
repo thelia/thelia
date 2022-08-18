@@ -23,9 +23,9 @@ import { useIntl } from 'react-intl';
 function Price({ price, price_promo, isPromo }) {
   return (
     <div className="flex items-center">
-      {isPromo === 1 ? (
-        <div className="flex flex-col leading-none">
-          <span className="mb-2 text-lg">{priceFormat(+price_promo)}</span>
+      {isPromo ? (
+        <div className="flex flex-col items-end leading-none">
+          <span className="text-lg">{priceFormat(+price_promo)}</span>
           <span className="text-sm line-through">{priceFormat(+price)}</span>
         </div>
       ) : (
@@ -82,7 +82,7 @@ function Delete({ id }) {
 
   if (status === 'loading')
     return (
-      <div className="absolute top-0 right-0 ">
+      <div className="">
         <svg
           className="h-4 w-4 stroke-current "
           viewBox="0 0 38 38"
