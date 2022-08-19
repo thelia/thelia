@@ -133,9 +133,9 @@ class BaseHookRenderEvent extends Event
      *
      * @param string $templateVariableName the variable name
      *
-     * @return mixed the variable value
-     *
      * @throws \InvalidArgumentException if the variable is not defined
+     *
+     * @return mixed the variable value
      */
     public function getTemplateVar(string $templateVariableName)
     {

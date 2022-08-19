@@ -79,9 +79,9 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @return \Propel\Runtime\ActiveQuery\ModelCriteria|FeatureQuery
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return \Propel\Runtime\ActiveQuery\ModelCriteria|FeatureQuery
      */
     public function buildModelCriteria()
     {
@@ -225,9 +225,9 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @return LoopResult
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return LoopResult
      */
     public function parseResults(LoopResult $loopResult)
     {

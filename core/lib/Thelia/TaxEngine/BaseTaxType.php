@@ -79,9 +79,9 @@ abstract class BaseTaxType
     }
 
     /**
-     * @return array return the requirements array
-     *
      * @throws TaxEngineException
+     *
+     * @return array return the requirements array
      */
     public function getRequirements()
     {

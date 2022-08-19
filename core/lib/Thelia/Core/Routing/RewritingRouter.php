@@ -109,12 +109,12 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      * @param mixed       $parameters    An array of parameters
      * @param bool|string $referenceType The type of reference to be generated (one of the constants)
      *
-     * @return string The generated URL
-     *
      * @throws RouteNotFoundException              If the named route doesn't exist
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
+     *
+     * @return string The generated URL
      *
      * @api
      */
@@ -131,10 +131,10 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      *
      * @param string $pathinfo The path info to be parsed (raw format, i.e. not urldecoded)
      *
-     * @return array An array of parameters
-     *
      * @throws ResourceNotFoundException If the resource could not be found
      * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
+     *
+     * @return array An array of parameters
      *
      * @api
      */

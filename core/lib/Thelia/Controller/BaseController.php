@@ -536,9 +536,9 @@ abstract class BaseController implements ControllerInterface
     /**
      * Return a 404 error.
      *
-     * @return \Thelia\Core\HttpFoundation\Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function pageNotFound()
     {

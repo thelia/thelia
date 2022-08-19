@@ -314,9 +314,9 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
     }
 
     /**
-     * @return LoopResult
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return LoopResult
      */
     public function parseResults(LoopResult $loopResult)
     {

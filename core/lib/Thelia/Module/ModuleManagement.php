@@ -86,10 +86,10 @@ class ModuleManagement
      * @param SplFileInfo        $file      the module.xml file descriptor
      * @param ContainerInterface $container the container
      *
-     * @return Module
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return Module
      */
     public function updateModule($file, ContainerInterface $container)
     {

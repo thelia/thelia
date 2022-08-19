@@ -325,9 +325,9 @@ class SchemaCombiner
      *
      * @param \DOMElement $databaseElement database element
      *
-     * @return string database name
-     *
      * @throws \LogicException if the database element is unnamed
+     *
+     * @return string database name
      */
     protected function getDatabaseFromDatabaseElement(\DOMElement $databaseElement)
     {

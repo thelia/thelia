@@ -193,9 +193,9 @@ class Coupon extends BaseCoupon
     /**
      * Get the Coupon effects.
      *
-     * @return array
-     *
      * @throws Exception\InvalidArgumentException
+     *
+     * @return array
      */
     public function getEffects()
     {

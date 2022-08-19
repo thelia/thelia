@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 use Symfony\Component\Filesystem\Filesystem;
 
 $finder = PhpCsFixer\Finder::create()
@@ -25,7 +35,7 @@ $finder = PhpCsFixer\Finder::create()
 
 (new Filesystem())->mkdir(__DIR__.'/var/cache-ci');
 
-return (new PhpCsFixer\Config)
+return (new PhpCsFixer\Config())
     ->setCacheFile(__DIR__.'/var/cache-ci/.php_cs.cache')
     ->setRiskyAllowed(true)
     ->setRules([
@@ -36,6 +46,7 @@ return (new PhpCsFixer\Config)
         'yoda_style' => false,
         'single_line_throw' => false,
         'declare_strict_types' => false,
+        'phpdoc_order' => true,
         'header_comment' => [
             'header' => implode("\n", [
                 'This file is part of the Thelia package.',
@@ -44,8 +55,8 @@ return (new PhpCsFixer\Config)
                 '(c) OpenStudio <info@thelia.net>',
                 '',
                 'For the full copyright and license information, please view the LICENSE',
-                'file that was distributed with this source code.'
-            ])
+                'file that was distributed with this source code.',
+            ]),
         ],
     ])
     ->setFinder($finder)

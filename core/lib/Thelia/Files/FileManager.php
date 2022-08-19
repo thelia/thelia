@@ -56,9 +56,9 @@ class FileManager
      * @param string $fileType   the file type, such as document, image, etc
      * @param string $parentType the parent type, such as product, category, etc
      *
-     * @return FileModelInterface a file model interface instance
-     *
      * @throws FileException if the file type is not supported, or if the class does not implements FileModelInterface
+     *
+     * @return FileModelInterface a file model interface instance
      */
     public function getModelInstance($fileType, $parentType)
     {
@@ -147,9 +147,9 @@ class FileManager
      * @param int                $parentId  the parent object ID
      * @param FileModelInterface $fileModel the file model object (image or document) to save
      *
-     * @return int number of modified rows in database
-     *
      * @throws \Thelia\Exception\ImageException
+     *
+     * @return int number of modified rows in database
      */
     protected function saveFile($parentId, FileModelInterface $fileModel)
     {

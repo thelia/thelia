@@ -80,9 +80,9 @@ class CategoryQuery extends BaseCategoryQuery
      * @param int       $depth
      * @param int       $currentPos
      *
-     * @return array
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return array
      */
     public static function findAllChildId($categoryId, $depth = 0, $currentPos = 0)
     {

@@ -246,9 +246,9 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @return Country|null
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return Country|null
      */
     public function getCountry()
     {
@@ -256,9 +256,9 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @return State|null
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return State|null
      */
     public function getState()
     {
@@ -271,9 +271,9 @@ class DeliveryPostageEvent extends ActionEvent
     }
 
     /**
-     * @return DeliveryPostageEvent
-     *
      * @throws \Exception
+     *
+     * @return DeliveryPostageEvent
      */
     public function setDeliveryMode($deliveryMode)
     {

@@ -524,10 +524,10 @@ class CustomerController extends BaseFrontController
     /**
      * @param $token
      *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function confirmCustomerAction($token)
     {

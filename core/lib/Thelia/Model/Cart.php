@@ -30,10 +30,10 @@ class Cart extends BaseCart
      * @param Currency                 $currency
      * @param EventDispatcherInterface $dispatcher
      *
-     * @return Cart|bool
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return Cart|bool
      */
     public function duplicate(
         $token,
@@ -133,9 +133,9 @@ class Cart extends BaseCart
      *
      * @param bool $withDiscount
      *
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public function getTaxedAmount(Country $country, $withDiscount = true, State $state = null)
     {
@@ -159,9 +159,9 @@ class Cart extends BaseCart
     /**
      * @param bool $withDiscount
      *
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      *
      * @see getTaxedAmount same as this method but the amount is without taxes
      */
@@ -191,9 +191,9 @@ class Cart extends BaseCart
      * @param null    $taxState
      * @param bool    $withDiscount
      *
-     * @return float|int|string
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float|int|string
      */
     public function getTotalVAT($taxCountry, $taxState = null, $withDiscount = true)
     {
@@ -204,9 +204,9 @@ class Cart extends BaseCart
      * @param $taxCountry
      * @param null $taxState
      *
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public function getDiscountVAT($taxCountry, $taxState = null)
     {
@@ -216,9 +216,9 @@ class Cart extends BaseCart
     /**
      * Retrieve the total weight for all products in cart.
      *
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public function getWeight()
     {
@@ -237,9 +237,9 @@ class Cart extends BaseCart
     /**
      * Tell if the cart contains only virtual products.
      *
-     * @return bool
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return bool
      */
     public function isVirtual()
     {
@@ -274,9 +274,9 @@ class Cart extends BaseCart
      * @param \Thelia\Model\Country|null $country
      * @param \Thelia\Model\State|null   $state
      *
-     * @return float|int|string
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float|int|string
      */
     public function getDiscount($withTaxes = true, Country $country = null, State $state = null)
     {

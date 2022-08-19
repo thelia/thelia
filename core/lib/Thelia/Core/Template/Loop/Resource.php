@@ -73,9 +73,9 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @return \Propel\Runtime\ActiveQuery\ModelCriteria|ResourceQuery
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return \Propel\Runtime\ActiveQuery\ModelCriteria|ResourceQuery
      */
     public function buildModelCriteria()
     {
@@ -127,9 +127,9 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @return LoopResult
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return LoopResult
      */
     public function parseResults(LoopResult $loopResult)
     {

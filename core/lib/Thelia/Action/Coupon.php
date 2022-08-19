@@ -276,9 +276,9 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Exception if something goes wrong
-     *
      * @param $eventName
+     *
+     * @throws \Exception if something goes wrong
      */
     public function afterOrder(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {

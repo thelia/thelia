@@ -222,9 +222,9 @@ abstract class BaseLoop implements BaseLoopInterface
      * @param string $name      the method name (only getArgname is supported)
      * @param mixed  $arguments this parameter is ignored
      *
-     * @return mixed the argument value
-     *
      * @throws \InvalidArgumentException if the parameter is unknown or the method name is not supported
+     *
+     * @return mixed the argument value
      */
     public function __call($name, $arguments)
     {
@@ -326,9 +326,9 @@ abstract class BaseLoop implements BaseLoopInterface
      *
      * @param string $argumentName the argument name
      *
-     * @return Argument the loop argument
-     *
      * @throws \InvalidArgumentException if argument is not found in loop argument list
+     *
+     * @return Argument the loop argument
      */
     protected function getArg($argumentName)
     {
@@ -361,9 +361,9 @@ abstract class BaseLoop implements BaseLoopInterface
      * @param ModelCriteria         $search     the search request
      * @param PropelModelPager|null $pagination the pagination part
      *
-     * @return array|PropelModelPager|ObjectCollection
-     *
      * @throws \InvalidArgumentException if the search mode is undefined
+     *
+     * @return array|PropelModelPager|ObjectCollection
      */
     protected function search(ModelCriteria $search, &$pagination = null)
     {

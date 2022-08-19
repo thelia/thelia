@@ -103,9 +103,9 @@ abstract class AbstractExport implements \Iterator
     protected $rangeDate;
 
     /**
-     * @return array|false|mixed|string
-     *
      * @throws \Exception
+     *
+     * @return array|false|mixed|string
      */
     public function current()
     {
@@ -135,9 +135,9 @@ abstract class AbstractExport implements \Iterator
     }
 
     /**
-     * @return bool|float|int|string|null
-     *
      * @throws \Exception
+     *
+     * @return bool|float|int|string|null
      */
     public function key()
     {
