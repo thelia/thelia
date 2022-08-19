@@ -28,9 +28,9 @@ class MessageQuery extends BaseMessageQuery
      *
      * @param string $messageName the message name
      *
-     * @return Message the loaded message
-     *
      * @throws \Exception if the message could not be loaded
+     *
+     * @return Message the loaded message
      */
     public static function getFromName($messageName)
     {

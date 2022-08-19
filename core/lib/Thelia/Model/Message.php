@@ -29,9 +29,9 @@ class Message extends BaseMessage
      * @param $template
      * @param bool $compressOutput
      *
-     * @return bool|string
-     *
      * @throws \SmartyException
+     *
+     * @return bool|string
      */
     protected function getMessageBody($parser, $message, $layout, $template, $compressOutput = true)
     {
@@ -66,9 +66,9 @@ class Message extends BaseMessage
     /**
      * Get the HTML message body.
      *
-     * @return bool|string
-     *
      * @throws \SmartyException
+     *
+     * @return bool|string
      */
     public function getHtmlMessageBody(ParserInterface $parser)
     {
@@ -81,9 +81,9 @@ class Message extends BaseMessage
     }
 
     /**
-     * @return string|string[]|null
-     *
      * @throws \SmartyException
+     *
+     * @return string|string[]|null
      */
     public function getTextMessageBody(ParserInterface $parser)
     {
@@ -109,9 +109,9 @@ class Message extends BaseMessage
      *                                  `templates/email/default/' directory is used if
      *                                  `$useFallbackTemplate` is set to `true`
      *
-     * @return Email
-     *
      * @throws \SmartyException
+     *
+     * @return Email
      */
     public function buildMessage(ParserInterface $parser, Email $messageInstance, $useFallbackTemplate = true)
     {

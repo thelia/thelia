@@ -75,9 +75,9 @@ class BaseAction
      *
      * @param EventDispatcherInterface $dispatcher
      *
-     * @return mixed an SEOxxx object
-     *
      * @throws FormValidationException if a rewritten URL cannot be created
+     *
+     * @return mixed an SEOxxx object
      */
     protected function genericUpdateSeo(ModelCriteria $query, UpdateSeoEvent $event, EventDispatcherInterface $dispatcher = null)
     {

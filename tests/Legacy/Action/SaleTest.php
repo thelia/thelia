@@ -55,10 +55,10 @@ class SaleTest extends TestCaseWithURLToolSetup
     /**
      * @param SaleUpdateEvent $event
      *
-     * @return SaleModel
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return SaleModel
      */
     public function processUpdateAction($event)
     {

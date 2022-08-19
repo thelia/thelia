@@ -51,9 +51,9 @@ class FeedController extends BaseFrontController
      * @param $id string        The id of the parent element. The id of the main parent category for catalog context.
      *                          The id of the content folder for content context
      *
-     * @return Response
-     *
      * @throws \RuntimeException
+     *
+     * @return Response
      */
     public function generateAction($context, $lang, $id)
     {

@@ -394,9 +394,9 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * @param $currencyId
      *
-     * @return int
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return int
      */
     public function createClonePSE(ProductCloneEvent $event, ProductSaleElements $originalProductPSE, $currencyId)
     {

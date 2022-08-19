@@ -173,9 +173,9 @@ class PropelInitService
      * @param array                $parameters command parameters
      * @param OutputInterface|null $output     command output
      *
-     * @return int command exit code
-     *
      * @throws \Exception
+     *
+     * @return int command exit code
      */
     public function runCommand(Command $command, array $parameters = [], OutputInterface $output = null)
     {
@@ -377,12 +377,12 @@ class PropelInitService
     /**
      * Initialize the Propel environment and connection.
      *
-     * @return bool whether a Propel connection is available
-     *
      * @param bool $force        force cache generation
      * @param bool $cacheRefresh
      *
      * @throws \Throwable
+     *
+     * @return bool whether a Propel connection is available
      *
      * @internal
      */

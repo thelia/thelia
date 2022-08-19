@@ -67,9 +67,9 @@ abstract class ConditionAbstract implements ConditionInterface
      * @param array  $operatorList  the list of comparison operator values, as entered in the condition parameter form
      * @param string $parameterName the name of the parameter to check
      *
-     * @return $this
-     *
      * @throws \Thelia\Exception\InvalidConditionOperatorException if the operator value is not in the allowed value
+     *
+     * @return $this
      */
     protected function checkComparisonOperatorValue($operatorList, $parameterName)
     {
@@ -185,9 +185,9 @@ abstract class ConditionAbstract implements ConditionInterface
      *
      * @param string $currencyValue Currency EUR|USD|..
      *
-     * @return bool
-     *
      * @throws \Thelia\Exception\InvalidConditionValueException
+     *
+     * @return bool
      */
     protected function isCurrencyValid($currencyValue)
     {
@@ -214,9 +214,9 @@ abstract class ConditionAbstract implements ConditionInterface
      *
      * @param float $priceValue Price value to check
      *
-     * @return bool
-     *
      * @throws \Thelia\Exception\InvalidConditionValueException
+     *
+     * @return bool
      */
     protected function isPriceValid($priceValue)
     {

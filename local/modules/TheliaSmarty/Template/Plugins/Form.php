@@ -369,11 +369,11 @@ class Form extends AbstractSmartyPlugin
      * @param string                    $templateFile
      * @param \Smarty_Internal_Template $template
      *
-     * @return string
-     *
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
      * @throws \Exception
      * @throws \SmartyException
+     *
+     * @return string
      */
     protected function automaticFormFieldRendering($params, $content, $template, $templateFile)
     {
@@ -424,11 +424,11 @@ class Form extends AbstractSmartyPlugin
      * @param \Smarty_Internal_Template $template
      * @param $repeat
      *
-     * @return string
-     *
      * @throws \Exception
      * @throws \SmartyException
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
+     *
+     * @return string
      */
     public function customFormFieldRendering($params, $content, $template, &$repeat)
     {
@@ -440,11 +440,11 @@ class Form extends AbstractSmartyPlugin
     /**
      * @param $params
      *
-     * @return string
-     *
      * @throws \Exception
      * @throws \SmartyException
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
+     *
+     * @return string
      */
     public function standardFormFieldRendering($params, \Smarty_Internal_Template $template)
     {
@@ -454,11 +454,11 @@ class Form extends AbstractSmartyPlugin
     /**
      * @param $params
      *
-     * @return string
-     *
      * @throws \Exception
      * @throws \SmartyException
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
+     *
+     * @return string
      */
     public function standardFormFieldAttributes($params, \Smarty_Internal_Template $template)
     {
@@ -585,9 +585,9 @@ class Form extends AbstractSmartyPlugin
     /**
      * @param $params
      *
-     * @return FormView
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return FormView
      */
     protected function getFormFieldView($params)
     {
@@ -635,9 +635,9 @@ class Form extends AbstractSmartyPlugin
     /**
      * @param $params
      *
-     * @return FormConfigInterface
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return FormConfigInterface
      */
     protected function getFormFieldConfig($params)
     {
@@ -671,9 +671,9 @@ class Form extends AbstractSmartyPlugin
     /**
      * @param $params
      *
-     * @return BaseForm
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return BaseForm
      */
     protected function getInstanceFromParams($params)
     {

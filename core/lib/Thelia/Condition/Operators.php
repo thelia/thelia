@@ -99,7 +99,7 @@ abstract class Operators
                 );
                 break;
             default:
-            }
+        }
 
         return $ret;
     }

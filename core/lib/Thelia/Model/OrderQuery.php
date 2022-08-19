@@ -30,9 +30,9 @@ class OrderQuery extends BaseOrderQuery
      * @param $month
      * @param $year
      *
-     * @return array
-     *
      * @throws \Exception
+     *
+     * @return array
      */
     public static function getMonthlySaleStats($month, $year, $includeShipping = true, $withTaxes = true)
     {
@@ -75,9 +75,9 @@ class OrderQuery extends BaseOrderQuery
      * @param $month
      * @param $year
      *
-     * @return array
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return array
      */
     public static function getFirstOrdersStats($month, $year)
     {
@@ -110,9 +110,9 @@ class OrderQuery extends BaseOrderQuery
      * @param bool $includeShipping
      * @param bool $withTaxes
      *
-     * @return float|int
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float|int
      */
     public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping, $withTaxes = true)
     {

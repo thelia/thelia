@@ -57,11 +57,11 @@ class CouponFactory
      *
      * @param string $couponCode Coupon code ex: XMAS
      *
-     * @return CouponInterface
-     *
      * @throws CouponExpiredException
      * @throws CouponNoUsageLeftException
      * @throws CouponNotReleaseException
+     *
+     * @return CouponInterface
      */
     public function buildCouponFromCode(string $couponCode)
     {

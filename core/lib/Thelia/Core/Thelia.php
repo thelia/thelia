@@ -315,9 +315,9 @@ class Thelia extends Kernel
      * @param $forcePropelCacheGeneration
      * @param $cacheRefresh
      *
-     * @return bool
-     *
      * @throws \Throwable
+     *
+     * @return bool
      */
     public function initializePropelService($forcePropelCacheGeneration, &$cacheRefresh)
     {
@@ -673,9 +673,9 @@ class Thelia extends Kernel
     /**
      * Builds the service container.
      *
-     * @return ContainerBuilder The compiled service container
-     *
      * @throws \Exception
+     *
+     * @return ContainerBuilder The compiled service container
      */
     protected function buildContainer(): ContainerBuilder
     {

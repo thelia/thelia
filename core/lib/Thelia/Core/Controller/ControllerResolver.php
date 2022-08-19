@@ -48,10 +48,10 @@ class ControllerResolver extends ContainerControllerResolver
     /**
      * Returns a callable for the given controller.
      *
-     * @return mixed A PHP callable
-     *
      * @throws \LogicException           When the name could not be parsed
      * @throws \InvalidArgumentException When the controller class does not exist
+     *
+     * @return mixed A PHP callable
      */
     protected function createController(string $controller): callable
     {

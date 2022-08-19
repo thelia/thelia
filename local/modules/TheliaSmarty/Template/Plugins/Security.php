@@ -48,11 +48,11 @@ class Security extends AbstractSmartyPlugin
      * @param array   $params
      * @param \Smarty $smarty
      *
-     * @return string no text is returned
-     *
      * @throws \Thelia\Core\Security\Exception\AuthenticationException
      * @throws AuthenticationException
      * @throws AuthorizationException
+     *
+     * @return string no text is returned
      */
     public function checkAuthFunction($params, &$smarty)
     {

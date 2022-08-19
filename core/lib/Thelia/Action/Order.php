@@ -135,10 +135,10 @@ class Order extends BaseAction implements EventSubscriberInterface
      * @param bool $unusedArgument           deprecated argument. Will be removed in 2.5
      * @param bool $useOrderDefinedAddresses if true, the delivery and invoice OrderAddresses will be used instead of creating new OrderAdresses using Order::getChoosenXXXAddress()
      *
-     * @return ModelOrder
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return ModelOrder
      */
     protected function createOrder(
         EventDispatcherInterface $dispatcher,
@@ -388,10 +388,9 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Thelia\Exception\TheliaProcessException
-     *
      * @param $eventName
      *
+     * @throws \Thelia\Exception\TheliaProcessException
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */

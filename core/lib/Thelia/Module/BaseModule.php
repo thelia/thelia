@@ -159,9 +159,9 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @return \Thelia\Core\HttpFoundation\Request the request
-     *
      * @throws \RuntimeException
+     *
+     * @return \Thelia\Core\HttpFoundation\Request the request
      */
     public function getRequest()
     {
@@ -188,9 +188,9 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @return EventDispatcherInterface
-     *
      * @throws \RuntimeException
+     *
+     * @return EventDispatcherInterface
      */
     public function getDispatcher()
     {
