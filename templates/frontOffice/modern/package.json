@@ -7,10 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start": "cross-env NODE_ENV=dev encore dev-server --port 8081 --host 0.0.0.0",
-    "build": "NODE_ENV=production encore production",
-    "postinstall": "cd ../../.. && husky install",
-    "prepare": "npm run install-hook-commits --scripts-prepend-node-path",
-    "install-hook-commits": "cd ../../.. && husky add .husky/pre-commit && cp pre-commit .husky/"
+    "build": "NODE_ENV=production encore production"
   },
   "browserslist": {
     "development": [
