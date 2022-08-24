@@ -41,14 +41,14 @@ services:
 
   encore:
     build:
-      context: ./templates/frontOffice/${TEMPLATE_NAME}
+      context: ./templates/frontOffice/${TEMPLATE_NAME:-modern}
       target: thelia_encore
     container_name: docker-thelia-encore
-    working_dir: /application/templates/frontOffice/${TEMPLATE_NAME}
+    working_dir: /application/templates/frontOffice/${TEMPLATE_NAME:-modern}
     environment:
       BROWSERSYNC_PROXY: http://localhost:8081
     volumes:
-      - ./templates/frontOffice/${TEMPLATE_NAME}:/application/templates/frontOffice/${TEMPLATE_NAME}:delegated
-      - ./templates/frontOffice/${TEMPLATE_NAME}/node_modules:/application/templates/frontOffice/${TEMPLATE_NAME}/node_modules
+      - ./templates/frontOffice/${TEMPLATE_NAME:-modern}:/application/templates/frontOffice/${TEMPLATE_NAME:-modern}:delegated
+      - ./templates/frontOffice/${TEMPLATE_NAME:-modern}/node_modules:/application/templates/frontOffice/${TEMPLATE_NAME:-modern}/node_modules
     ports:
       - 8081:8081
