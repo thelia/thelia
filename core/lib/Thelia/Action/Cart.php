@@ -323,7 +323,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
         if (null === $cart) {
             $cart = $this->dispatchNewCart($dispatcher);
         }
-
+        if ($cart->getCurrency()) {
+            $this->getSession()->setCurrency($cart->getCurrency());
+        }
         $cartRestoreEvent->setCart($cart);
     }
 
