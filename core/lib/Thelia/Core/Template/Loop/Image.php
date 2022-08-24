@@ -371,11 +371,14 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 // Dispatch image processing event
                 $this->dispatcher->dispatch($event, TheliaEvents::IMAGE_PROCESS);
 
+                $imageExt = pathinfo($event->getSourceFilepath(), PATHINFO_EXTENSION);
+
                 $loopResultRow
                     ->set('IMAGE_URL', $event->getFileUrl())
                     ->set('ORIGINAL_IMAGE_URL', $event->getOriginalFileUrl())
                     ->set('IMAGE_PATH', $event->getCacheFilepath())
                     ->set('PROCESSING_ERROR', false)
+                    ->set('IS_SVG', 'svg' === $imageExt)
                     ->set('IMAGE_HEIGHT', $event->getImageObject()->getSize()->getHeight())
                     ->set('IMAGE_WIDTH', $event->getImageObject()->getSize()->getWidth())
                 ;

@@ -93,6 +93,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $subdir = $event->getCacheSubdirectory();
         $sourceFile = $event->getSourceFilepath();
 
+        $imageExt = pathinfo($sourceFile, PATHINFO_EXTENSION);
+
         if (null == $subdir || null == $sourceFile) {
             throw new \InvalidArgumentException('Cache sub-directory and source file path cannot be null');
         }
@@ -137,9 +139,32 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
             // Process image only if we have some transformations to do.
             if (!$event->isOriginalImage()) {
-                $this->applyTransformation($sourceFile, $event, $dispatcher, $cacheFilePath);
-                if ($alternativeImagePath) {
-                    $this->applyTransformation($sourceFile, $event, $dispatcher, $alternativeImagePath);
+                if ("svg" === $imageExt) {
+                    $dom = new \DOMDocument('1.0', 'utf-8');
+                    $dom->load($originalImagePathInCache);
+                    $svg = $dom->documentElement;
+
+                    if ( ! $svg->hasAttribute('viewBox') ) {
+                        $pattern = '/^(\d*\.\d+|\d+)(px)?$/';
+
+                        $interpretable =  preg_match( $pattern, $svg->getAttribute('width'), $width ) &&
+                            preg_match( $pattern, $svg->getAttribute('height'), $height );
+
+                        if ($interpretable) {
+                            $view_box = implode(' ', [0, 0, $width[0], $height[0]]);
+                            $svg->setAttribute('viewBox', $view_box);
+                        } else {
+                            throw new \Exception("can't create viewBox if height and width is not defined in the svg file");
+                        }
+                    }
+                    $svg->setAttribute('width', $event->getWidth());
+                    $svg->setAttribute('height', $event->getWidth());
+                    $dom->save($cacheFilePath);
+                } else {
+                    $this->applyTransformation($sourceFile, $event, $dispatcher, $cacheFilePath);
+                    if ($alternativeImagePath) {
+                        $this->applyTransformation($sourceFile, $event, $dispatcher, $alternativeImagePath);
+                    }
                 }
             }
         }
