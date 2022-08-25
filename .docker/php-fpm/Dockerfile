@@ -11,18 +11,14 @@ RUN docker-php-ext-install zip
 # Calendar extension
 RUN docker-php-ext-install calendar
 
-# GD extension
-RUN apk add --no-cache freetype libpng libjpeg-turbo freetype-dev libpng-dev libjpeg-turbo-dev && \
-  docker-php-ext-configure gd \
-    --with-freetype \
-    --with-jpeg \
-  NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) && \
-  docker-php-ext-install -j$(nproc) gd && \
-  apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev
+# Imagick extension
+RUN apk add --update --no-cache autoconf g++ imagemagick imagemagick-dev libtool make pcre-dev
+RUN pecl install imagick
+RUN docker-php-ext-enable imagick
 
 # XDebug extension
 #RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
-#  && pecl install xdebug-3.0.0 \
+#  && pecl install xdebug \
 #  && docker-php-ext-enable xdebug \
 #  && apk del -f .build-deps
 

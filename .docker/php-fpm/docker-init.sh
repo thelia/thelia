@@ -38,6 +38,7 @@ if ! test -f "$DB_FILE"; then
 
     php Thelia template:set frontOffice "${ACTIVE_FRONT_TEMPLATE}"
     php Thelia template:set backOffice "${ACTIVE_ADMIN_TEMPLATE}"
+    php Thelia thelia:config set imagine_graphic_driver imagick
     php Thelia admin:create --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2 --email thelia2@example.com
 fi
 
