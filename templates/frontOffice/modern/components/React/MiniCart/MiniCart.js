@@ -273,7 +273,9 @@ function MiniCart() {
 
   useLayoutEffect(() => {
     if (footerRef.current) {
-      setHeight(`calc(100vh - (10.125rem + ${footerRef.current.offsetHeight}px))`);
+      setHeight(
+        `calc(100vh - (10.125rem + ${footerRef.current.offsetHeight}px))`
+      );
     }
   }, [cart, footerRef]);
 
@@ -293,10 +295,7 @@ function MiniCart() {
         <IconCLose className="" />
       </button>
       <div className="">
-        <div
-          className="overflow-y-auto"
-          style={{height}}
-        >
+        <div className="overflow-y-auto" style={{ height }}>
           <CartItems cart={cart} />
         </div>
       </div>
