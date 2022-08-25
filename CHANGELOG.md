@@ -1,26 +1,26 @@
 # 2.5.0
 - #2979 Upgrade pdf invoice template
 - #2974 Feature symfony encore
-- #2960 Carousel: add format argument
 - #2968 Autowire Hooks
 - #2964 Add image size to the loop
 - #2962 Fix svg render function when using absolute url
-- #2891 Move propel cache to specific env cache directory
-- #2879 Add pagination for order product list on order edit page
-- #2888 Add database configuration to .env
-- #2872 Add untaxed promo price in smarty plugin
-- #2874 Add infinite Scroll if complex_pagination is set in BO
+- #2960 Carousel: add format argument
+- #2957 Allow to override config in .env
 - #2951 Add a function to erase a customer password
-- #2948 Add a smarty block to display a component
+- #2949 Add a smarty block to display a component
 - #2948 Better phone and cellphone input validation
-- #2944 Add WebP compatibility
 - #2944 Add WebP compatibility
 - #2932 Improve Thelia version list in back office
 - #2918 Change session path to be more symfony compliant
+- #2909 Handle exif rotation meta-data
 - #2908 Add weight in smarty plugin pse
 - #2906 Fix filterByIsEnabled in Coupon
 - #2902 Change module skeleton to add update function and external-schema
-- #2909 Handle exif rotation meta-data
+- #2891 Move propel cache to specific env cache directory
+- #2888 Add database configuration to .env
+- #2879 Add pagination for order product list on order edit page
+- #2874 Add infinite Scroll if complex_pagination is set in BO
+- #2872 Add untaxed promo price in smarty plugin
 - (Multiple PR) Update Symfony, Propel and Smarty to their latest release
 # 2.4.5
 - #2834 Add svg support
