@@ -87,7 +87,7 @@ class Assets extends AbstractSmartyPlugin
     {
         $path = $params['file'];
 
-        if(!$path) {
+        if (!$path) {
             return false;
         }
 
@@ -96,21 +96,18 @@ class Assets extends AbstractSmartyPlugin
         $matches = [];
         preg_match('/<svg.*?>/', $svg, $matches);
 
-
         if ($params['class']) {
             $svgTag = $matches[0];
             $existingClass = [];
             $hasClass = preg_match('/class="(.*?)"/', $svgTag, $existingClass);
 
-
             if ($hasClass) {
-                $newSvgTag = preg_replace('/class="(.*?)"/', 'class="$1 ' . $params["class"]  . '"', $svgTag);
+                $newSvgTag = preg_replace('/class="(.*?)"/', 'class="$1 '.$params['class'].'"', $svgTag);
             } else {
-                $newSvgTag = preg_replace('/(>)$/', ' class="' . $params["class"]  . '">', $svgTag);
+                $newSvgTag = preg_replace('/(>)$/', ' class="'.$params['class'].'">', $svgTag);
             }
 
             $svg = preg_replace('/<svg.*?>/', $newSvgTag, $svg);
-
         }
 
         return $svg;
