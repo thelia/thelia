@@ -1,4 +1,5 @@
 # 2.5.0
+- #3020 Item image edition hook
 - #2979 Upgrade pdf invoice template
 - #2974 Feature symfony encore
 - #2968 Autowire Hooks
