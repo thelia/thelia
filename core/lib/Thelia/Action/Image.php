@@ -150,12 +150,12 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                         $interpretable = preg_match($pattern, $svg->getAttribute('width'), $width) &&
                             preg_match($pattern, $svg->getAttribute('height'), $height);
 
-                        if ($interpretable) {
-                            $view_box = implode(' ', [0, 0, $width[0], $height[0]]);
-                            $svg->setAttribute('viewBox', $view_box);
-                        } else {
+                        if (!$interpretable || !isset($width) || !isset($height)) {
                             throw new \Exception("can't create viewBox if height and width is not defined in the svg file");
                         }
+
+                        $viewBox = implode(' ', [0, 0, $width[0], $height[0]]);
+                        $svg->setAttribute('viewBox', $viewBox);
                     }
                     $svg->setAttribute('width', $event->getWidth());
                     $svg->setAttribute('height', $event->getWidth());
