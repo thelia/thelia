@@ -222,7 +222,7 @@ class SmartyParser extends Smarty implements ParserInterface
             $source = $tmp;
             unset($tmp);
         } else {
-            Tlog::getInstance()->error("Failed to trim whitespaces from parser output: " . preg_last_error());
+            Tlog::getInstance()->error('Failed to trim whitespaces from parser output: '.preg_last_error());
         }
 
         // capture html elements not to be messed with
