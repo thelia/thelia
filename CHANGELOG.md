@@ -1,3 +1,15 @@
+# 2.4.5
+- #2834 Add svg support
+- #3015 RestoreCurrentCart also restore currency
+- #3014 Fix docker for 2.4
+- #2909 Protecting content from preg_replace errors
+- #2858 Adding IDs in product SEO export
+- #2846 Change link tag and append javascript init on order payment gateway
+- #2841 Fix Spelling Mistakes
+- #2832 Fix export with no date
+- #2831 Fix case where lang is null
+- #2830 Fix language when multi domain is enabled
+- #2828 Fix wrong id in ProductSaleElementsDocument Loop
 # 2.4.4
 - #2821 Fix can set not active lang in front office
 - #2820 Add translations page for customer titles
