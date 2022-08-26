@@ -293,15 +293,7 @@ class PropelInitService
                 $this->debug
             );
 
-            $databaseSchemaResources = [];
-            foreach ($schemaCombiner->getSourceDocuments($database) as $sourceDocument) {
-                $databaseSchemaResources[] = new FileResource($sourceDocument->baseURI);
-            }
-
-            $databaseSchemaCache->write(
-                $schemaCombiner->getCombinedDocument($database)->saveXML(),
-                $databaseSchemaResources
-            );
+            $databaseSchemaCache->write($schemaCombiner->getCombinedDocument($database)->saveXML());
 
             $hash .= md5(file_get_contents($this->getPropelSchemaDir().$database.'.schema.xml'));
         }
