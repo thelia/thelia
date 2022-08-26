@@ -24,7 +24,7 @@ class InitConfig
             'webpack_encore.yaml',
         ];
 
-        $initConfigPackagesDir = __DIR__.'/Resources/packages';
+        $ConfigReplacementDir = __DIR__.'/ConfigReplacement';
 
         $configDir = $vendorDir.'/../config';
 
@@ -39,11 +39,13 @@ class InitConfig
         }
 
         foreach ($packageConfigFiles as $packageConfigFile) {
+            $baseFile = $ConfigReplacementDir.'/base_'.$packageConfigFile;
+            $theliaFile = $ConfigReplacementDir.'/thelia_'.$packageConfigFile;
             $destinationFile = $configPackagesDir.'/'.$packageConfigFile;
-            if (file_exists($destinationFile)) {
+            if (file_exists($destinationFile) && sha1_file($baseFile) !== sha1_file($destinationFile)) {
                 continue;
             }
-            copy($initConfigPackagesDir.'/'.$packageConfigFile, $destinationFile);
+            copy($theliaFile, $destinationFile);
         }
     }
 }
