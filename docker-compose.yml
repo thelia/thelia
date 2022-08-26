@@ -37,6 +37,10 @@ services:
       - PHP_IDE_CONFIG
       - XDEBUG_CONFIG
       - ACTIVE_FRONT_TEMPLATE
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
 
   encore:
     build:

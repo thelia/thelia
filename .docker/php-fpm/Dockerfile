@@ -11,10 +11,19 @@ RUN docker-php-ext-install zip
 # Calendar extension
 RUN docker-php-ext-install calendar
 
-# Imagick extension
+# Imagick extension needed for webp
 RUN apk add --update --no-cache autoconf g++ imagemagick imagemagick-dev libtool make pcre-dev
 RUN pecl install imagick
 RUN docker-php-ext-enable imagick
+
+# GD extension needed for html2pdf
+RUN apk add --no-cache freetype libpng libjpeg-turbo freetype-dev libpng-dev libjpeg-turbo-dev && \
+  docker-php-ext-configure gd \
+    --with-freetype \
+    --with-jpeg \
+  NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) && \
+  docker-php-ext-install -j$(nproc) gd && \
+  apk del --no-cache freetype-dev libpng-dev libjpeg-turbo-dev
 
 # XDebug extension
 #RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
@@ -35,3 +44,4 @@ CMD composer install ;  php-fpm
 
 # Copy script used at docker-start
 COPY docker-init.sh /usr/local/bin/docker-init
+RUN chmod 755 /usr/local/bin/docker-init
