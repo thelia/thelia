@@ -72,9 +72,9 @@ class TemplateValidator
      * @param string $name the template directory name
      * @param int    $type the template type (front, back, etc.)
      *
-     * @return TemplateDescriptor the template descriptor
-     *
      * @throws \Exception
+     *
+     * @return TemplateDescriptor the template descriptor
      */
     public function getTemplateDefinition(string $name, int $type)
     {

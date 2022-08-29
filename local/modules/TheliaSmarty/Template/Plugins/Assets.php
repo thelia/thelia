@@ -83,6 +83,36 @@ class Assets extends AbstractSmartyPlugin
         return $this->assetManager->computeAssetUrl('css', $params, $template);
     }
 
+    public function renderSvg($params, \Smarty_Internal_Template $template)
+    {
+        $path = $params['file'];
+
+        if (!$path) {
+            return false;
+        }
+
+        $svg = file_get_contents($path);
+
+        $matches = [];
+        preg_match('/<svg.*?>/', $svg, $matches);
+
+        if ($params['class']) {
+            $svgTag = $matches[0];
+            $existingClass = [];
+            $hasClass = preg_match('/class="(.*?)"/', $svgTag, $existingClass);
+
+            if ($hasClass) {
+                $newSvgTag = preg_replace('/class="(.*?)"/', 'class="$1 '.$params['class'].'"', $svgTag);
+            } else {
+                $newSvgTag = preg_replace('/(>)$/', ' class="'.$params['class'].'">', $svgTag);
+            }
+
+            $svg = preg_replace('/<svg.*?>/', $newSvgTag, $svg);
+        }
+
+        return $svg;
+    }
+
     /**
      * Define the various smarty plugins hendled by this class.
      *
@@ -99,6 +129,8 @@ class Assets extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'image', $this, 'functionImage'),
             new SmartyPluginDescriptor('function', 'javascript', $this, 'functionJavascript'),
             new SmartyPluginDescriptor('function', 'stylesheet', $this, 'functionStylesheet'),
+
+            new SmartyPluginDescriptor('function', 'renderSvgImage', $this, 'renderSvg'),
 
             new SmartyPluginDescriptor('function', 'declare_assets', $this, 'declareAssets'),
         ];

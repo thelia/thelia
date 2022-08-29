@@ -64,7 +64,7 @@ class ConfigurationController extends BaseAdminController
                 HookAdminHome::setConfigValue(HookAdminHome::ACTIVATE_STATS, 1);
             }
 
-            return RedirectResponse::create(URL::getInstance()->absoluteUrl('/admin/module/HookAdminHome'));
+            return new RedirectResponse(URL::getInstance()->absoluteUrl('/admin/module/HookAdminHome'));
         } catch (FormValidationException $e) {
             $error_message = $this->createStandardFormValidationErrorMessage($e);
         }

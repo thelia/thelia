@@ -314,9 +314,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      * @param array   $params
      * @param \Smarty $smarty
      *
-     * @return string the value of the requested attribute
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return string the value of the requested attribute
      */
     public function cartDataAccess($params, $smarty)
     {
@@ -529,9 +529,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      * @param array   $params
      * @param \Smarty $smarty
      *
-     * @return string the value of the requested attribute
-     *
      * @throws \Exception
+     *
+     * @return string the value of the requested attribute
      */
     public function statsAccess($params, $smarty)
     {
@@ -749,9 +749,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      * @param       $data
      * @param array $noGetterData
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     protected function dataAccess($objectLabel, $params, $data, $noGetterData = [])
     {

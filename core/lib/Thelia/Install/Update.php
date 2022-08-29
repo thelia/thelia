@@ -102,10 +102,10 @@ class Update
     /**
      * retrieve the database connection.
      *
-     * @return \PDO
-     *
      * @throws ParseException
      * @throws \PDOException
+     *
+     * @return \PDO
      */
     protected function getDatabasePDO()
     {
@@ -219,9 +219,9 @@ class Update
     /**
      * Backup current DB to file local/backup/update.sql.
      *
-     * @return bool if it succeeds, false otherwise
-     *
      * @throws \Exception
+     *
+     * @return bool if it succeeds, false otherwise
      */
     public function backupDb(): void
     {
@@ -404,9 +404,9 @@ class Update
     /**
      * Returns the database size in Mo.
      *
-     * @return float
-     *
      * @throws \Exception
+     *
+     * @return float
      */
     public function getDataBaseSize()
     {

@@ -145,9 +145,9 @@ interface BaseModuleInterface
     public function deployImageFolder(Module $module, $folderPath, ConnectionInterface $con = null);
 
     /**
-     * @return Module
-     *
      * @throws \Thelia\Exception\ModuleException
+     *
+     * @return Module
      */
     public function getModuleModel();
 

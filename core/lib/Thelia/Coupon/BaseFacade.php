@@ -168,9 +168,9 @@ class BaseFacade implements FacadeInterface
     /**
      * @param bool $withItemsInPromo
      *
-     * @return float|int
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float|int
      */
     public function getCartTotalTaxPrice($withItemsInPromo = true)
     {

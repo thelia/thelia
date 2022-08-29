@@ -139,9 +139,9 @@ interface CouponInterface
      *
      * @param ConditionCollection $conditions ConditionInterface to add
      *
-     * @return $this
-     *
      * @throws \Thelia\Exception\InvalidConditionException
+     *
+     * @return $this
      */
     public function setConditions(ConditionCollection $conditions);
 

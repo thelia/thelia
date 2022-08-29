@@ -1,3 +1,40 @@
+# 2.5.0
+- #3020 Item image edition hook
+- #2979 Upgrade pdf invoice template
+- #2974 Feature symfony encore
+- #2968 Autowire Hooks
+- #2964 Add image size to the loop
+- #2962 Fix svg render function when using absolute url
+- #2960 Carousel: add format argument
+- #2957 Allow to override config in .env
+- #2951 Add a function to erase a customer password
+- #2949 Add a smarty block to display a component
+- #2948 Better phone and cellphone input validation
+- #2944 Add WebP compatibility
+- #2932 Improve Thelia version list in back office
+- #2918 Change session path to be more symfony compliant
+- #2909 Handle exif rotation meta-data
+- #2908 Add weight in smarty plugin pse
+- #2906 Fix filterByIsEnabled in Coupon
+- #2902 Change module skeleton to add update function and external-schema
+- #2891 Move propel cache to specific env cache directory
+- #2888 Add database configuration to .env
+- #2879 Add pagination for order product list on order edit page
+- #2874 Add infinite Scroll if complex_pagination is set in BO
+- #2872 Add untaxed promo price in smarty plugin
+- (Multiple PR) Update Symfony, Propel and Smarty to their latest release
+# 2.4.5
+- #2834 Add svg support
+- #3015 RestoreCurrentCart also restore currency
+- #3014 Fix docker for 2.4
+- #2909 Protecting content from preg_replace errors
+- #2858 Adding IDs in product SEO export
+- #2846 Change link tag and append javascript init on order payment gateway
+- #2841 Fix Spelling Mistakes
+- #2832 Fix export with no date
+- #2831 Fix case where lang is null
+- #2830 Fix language when multi domain is enabled
+- #2828 Fix wrong id in ProductSaleElementsDocument Loop
 # 2.4.4
 - #2821 Fix can set not active lang in front office
 - #2820 Add translations page for customer titles
@@ -54,10 +91,10 @@
 # 2.4.0
 - #2740 Fix defaultErrorFallback templateDfinition replacement
 - #2739 Fix ignored_module_hook table update
-- #2738 removed versionnable from schema example 
+- #2738 removed versionnable from schema example
 - #2737 Add php < 7.4 requirements
 - #2736 Optimized exports with JSON cache file and SQL request
-- #2735 Tax calculation fixes, revamped 
+- #2735 Tax calculation fixes, revamped
 - #2734 Use select instead of input fields to choose template in B.O configuration parameter
 - #2733 Carousel module improvements
 - #2732 Sales are now considered done a invoice date
@@ -95,23 +132,23 @@
 - #2665 Fix bad translation key
 - #2664 Add BO brand search
 - #2663 Improve SHOW_HOOK
-- #2661 Fix issue #2660 
+- #2661 Fix issue #2660
 - #2659 Improved ajax management in CartController
 - #2658 Customer email language fix when sent from the BO
 - #2657 Add option to show/Hide stats bloc
-- #2655 Update var name error MailerFactory.php 
+- #2655 Update var name error MailerFactory.php
 - #2651 Allow to load tax rule without country
 - #2650 Fix attribute-edit.html smarty error
-- #2649 Docker & Docker compose update 
-- #2648 Fix #2647 Wrong edition URL in message template 
+- #2649 Docker & Docker compose update
+- #2648 Fix #2647 Wrong edition URL in message template
 - #2646 Fix #2592 Add Delivery address in order loop search in
 - #2645 Add new event on contact submit
 - #2644 Change two redirection from 302 to 301
-- #2642 Fix missing parent preSave and postSave in Models 
+- #2642 Fix missing parent preSave and postSave in Models
 - #2640 Update address-update.html
 - #2638 Remove Tlog in Propel init
 - #2637 New "visible" parameter to pse loop
-- #2634 Add phone on create customer modal 
+- #2634 Add phone on create customer modal
 - #2633 Update propel dependency
 - #2630 Change travis configuration, composer propel repo, root-namespace special compiled PHP functions
 - #2629 Improve invoice and delivery interface
@@ -126,7 +163,7 @@
 - #2617 Added missing argument 'code' to the Coupon loop
 - #2616 Allow use of CDN (e.g. alternate URL) on assets and documents
 - #2615 feature_values filter is now working in Product loop
-- #2614 Shipping zone configuration improvement 
+- #2614 Shipping zone configuration improvement
 - #2613 Pagination fix
 - #2611 Fixed loop arguments cache initialisation
 - #2610 MailerFactory::send() is now wrapped in an exception handler
@@ -203,7 +240,7 @@
 - #2501 PHP 7.1 compatibility fix in ExportHandler
 - #2500 Fix newsletter unsubscribe/subscribe
 - #2499 Using better headers to generate PDF response
-- #2498 Fix for PHP 7.1 warning A non-numeric value encountered 
+- #2498 Fix for PHP 7.1 warning A non-numeric value encountered
 - #2497 Remove unnecessary openssl extension install step
 - #2495 Prevent setting the only default PSE to non-default
 - #2494 Fixed Carousel module translations
@@ -260,19 +297,19 @@
 - (related to #2204) Add isEmpty(), to check if $data is empty.
 - (related to #2203) Check if $error exist, specific for submit type
 - (related to #2202) Fix currency creation modal (The currency field is missing in the html template)
-- (related to #2201) Deprecated class NotFountHttpException because typo and removed deprecated classes 
+- (related to #2201) Deprecated class NotFountHttpException because typo and removed deprecated classes
 - (related to #2198) Cancel coupon usage on order cancel
 - (related to #2197) Pagination of coupon list
 - (related to #2191) Update BO typo
 - (related to #2190) Home stats improvements
 - (related to #2189) Huge performance improvement in feature-availability loop
 - (related to #2188) A more effective way to solve issue #2061
-- (related to #2187) Merge versions 2.1.10 2.2.4 2.3.2 in master branch 
+- (related to #2187) Merge versions 2.1.10 2.2.4 2.3.2 in master branch
 - (related to #2181) Fix CSV export cached file size
 - (related to #2178) Add a coupon type to offer a product
 - (related to #2174) PSR-6 + thelia.cache service and smarty cache block
 - (related to #2173) Fix customer discount apply on backoffice
-- (related to #2171) Fix sql syntax in setup/update/tpl/2.4.0-alpha1.sql.tpl 
+- (related to #2171) Fix sql syntax in setup/update/tpl/2.4.0-alpha1.sql.tpl
 - (related to #2170) Fix #2166 : array to string conversion when php setup/update.php
 - (related to #2168) Router redirect to last rewriting_url
 - (related to #2167) Add global variable `app` to Smarty
@@ -283,11 +320,11 @@
 - (related to #2161) State Fixes
 - (related to #2160) Added missing home.block 'class' parameter
 - (related to #2157) Prevent an infinite loop in new product dialog
-- (related to #2155) Injects versions 2.1.9 2.2.3 2.3.1 in the master branch 
+- (related to #2155) Injects versions 2.1.9 2.2.3 2.3.1 in the master branch
 - (related to #2154) Test range dates exists before testing type
 - (related to #2153) Lighten placeholders color
 - (related to #2150) Fix form and validator translations
-- (related to #2149) Fixed status_id parameter access 
+- (related to #2149) Fixed status_id parameter access
 - (related to #2148) Added search by EAN code to product sale elements loop
 - (related to #2147) Fixed help text display if show_label is false
 - (related to #2146) Fix search in i18n fields when backend_context=1, and search improvements
@@ -303,8 +340,8 @@
 - (related to #2128) Fix checkout issues
 - (related to #2127) Fix for 2.3.0 BC break.
 - (related to #2125) fix construct in GenerateRewrittenUrlEvent
-- (related to #2123) Init Version 2.4.0-alpha1 
-- (related to #2109) Module routers priority improvement (issue #2108) 
+- (related to #2123) Init Version 2.4.0-alpha1
+- (related to #2109) Module routers priority improvement (issue #2108)
 - (related to #2107) Add create function for AlphaNumStringType argument
 - (related to #2106) Added order-invoice form hooks
 - (related to #2093) Fix #1662 add of hooks in pdf email and account-order

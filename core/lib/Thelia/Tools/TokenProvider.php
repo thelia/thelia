@@ -81,9 +81,9 @@ class TokenProvider
     /**
      * @param string $entryValue
      *
-     * @return bool
-     *
      * @throws \Thelia\Core\Security\Exception\TokenAuthenticationException
+     *
+     * @return bool
      */
     public function checkToken($entryValue)
     {

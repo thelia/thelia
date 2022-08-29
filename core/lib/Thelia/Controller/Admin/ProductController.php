@@ -807,9 +807,9 @@ class ProductController extends AbstractSeoCrudController
      *
      * @param int $productId
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function updateAttributesAndFeaturesAction(EventDispatcherInterface $eventDispatcher, $productId)
     {
@@ -1863,9 +1863,9 @@ class ProductController extends AbstractSeoCrudController
     }
 
     /**
-     * @return mixed|\Symfony\Component\HttpFoundation\Response
-     *
      * @throws \Exception
+     *
+     * @return mixed|\Symfony\Component\HttpFoundation\Response
      */
     public function cloneAction(EventDispatcherInterface $eventDispatcher)
     {
@@ -1919,9 +1919,9 @@ class ProductController extends AbstractSeoCrudController
     }
 
     /**
-     * @return mixed|\Thelia\Core\HttpFoundation\Response
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
      */
     public function searchCategoryAction()
     {
@@ -1941,9 +1941,9 @@ class ProductController extends AbstractSeoCrudController
     }
 
     /**
-     * @return mixed|\Thelia\Core\HttpFoundation\Response
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
      */
     public function searchProductAction()
     {

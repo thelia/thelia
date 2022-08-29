@@ -412,9 +412,9 @@ HTML;
      *
      * @param array $params
      *
-     * @return bool true if the hook is empty
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return bool true if the hook is empty
      */
     protected function checkEmptyHook($params)
     {

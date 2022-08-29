@@ -181,8 +181,8 @@ class ExportHandler
                 $endYear.'-'.$endMonth.'-1 23:59:59'
             );
 
-            if ($rangeDate instanceof \DateTime) {
-                $rangeDate
+            if ($rangeDate['end'] instanceof \DateTime) {
+                $rangeDate['end']
                     ->add(new \DateInterval('P1M'))
                     ->sub(new \DateInterval('P1D'));
             }

@@ -217,7 +217,13 @@ class SmartyParser extends Smarty implements ParserInterface
             }
         }
 
-        $source = preg_replace(array_keys($expressions), array_values($expressions), $source);
+        // Protect output against a potential regex execution error (e.g., PREG_BACKTRACK_LIMIT_ERROR)
+        if (null !== $tmp = preg_replace(array_keys($expressions), array_values($expressions), $source)) {
+            $source = $tmp;
+            unset($tmp);
+        } else {
+            Tlog::getInstance()->error('Failed to trim whitespaces from parser output: '.preg_last_error());
+        }
 
         // capture html elements not to be messed with
         $_offset = 0;
@@ -294,7 +300,7 @@ class SmartyParser extends Smarty implements ParserInterface
     public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false): void
     {
         if (null !== $this->templateDefinition) {
-            array_push($this->tplStack, [$this->templateDefinition, $this->fallbackToDefaultTemplate]);
+            $this->tplStack[] = [$this->templateDefinition, $this->fallbackToDefaultTemplate];
         }
 
         $this->setTemplateDefinition($templateDefinition, $fallbackToDefaultTemplate);
@@ -461,10 +467,10 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param array  $parameters      an associative array of names / value pairs
      * @param bool   $compressOutput  if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      *
-     * @return string the rendered template text
-     *
      * @throws \Exception
      * @throws \SmartyException
+     *
+     * @return string the rendered template text
      */
     protected function internalRenderer($resourceType, $resourceContent, array $parameters, $compressOutput = true)
     {
@@ -513,14 +519,13 @@ class SmartyParser extends Smarty implements ParserInterface
      *
      * @param string $realTemplateName the template name (from the template directory)
      * @param array  $parameters       an associative array of names / value pairs
-     *
-     * @return string the rendered template text
-     *
-     * @param bool $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
+     * @param bool   $compressOutput   if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      *
      * @throws ResourceNotFoundException if the template cannot be found
      * @throws \Exception
      * @throws \SmartyException
+     *
+     * @return string the rendered template text
      */
     public function render($realTemplateName, array $parameters = [], $compressOutput = true)
     {
@@ -556,10 +561,10 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param array  $parameters     an associative array of names / value pairs
      * @param bool   $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      *
-     * @return string the rendered template text
-     *
      * @throws \Exception
      * @throws \SmartyException
+     *
+     * @return string the rendered template text
      */
     public function renderString($templateText, array $parameters = [], $compressOutput = true)
     {

@@ -323,7 +323,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
         if (null === $cart) {
             $cart = $this->dispatchNewCart($dispatcher);
         }
-
+        if ($cart->getCurrency()) {
+            $this->getSession()->setCurrency($cart->getCurrency());
+        }
         $cartRestoreEvent->setCart($cart);
     }
 
@@ -332,10 +334,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * if needed or create duplicate the current cart if the customer is not the same as customer already present in
      * the cart.
      *
-     * @return CartModel
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return CartModel
      */
     protected function manageNonPersistentCookie(CartRestoreEvent $cartRestoreEvent, EventDispatcherInterface $dispatcher)
     {
@@ -355,10 +357,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @param $cookieName
      *
-     * @return CartModel
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return CartModel
      */
     protected function managePersistentCart(CartRestoreEvent $cartRestoreEvent, $cookieName, EventDispatcherInterface $dispatcher)
     {

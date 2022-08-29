@@ -94,7 +94,7 @@ return [
     'Grid' => 'جدول',
     'Home' => 'خانه',
     'I\'ve read and agreed on <a href=\'%link\' class=\'terms-quickview\'>Terms &amp; Conditions</a>' => 'من متن <a href=\'%link\' class=\'terms-quickview\'> قرارداد</a> را خوانده‌ام و با شرایط و قوانین آمده در آن موافقم و آن را می‌پذیرم',
-    'If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.' => 'اگر در ده ثانیه آتی اتفاقی نیفتاد، لطفا <a id="force-submit-payment-form" href="#">در این قسمت کلیک کنید</a>. ',
+    'If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" value="please click here">.' => 'اگر در ده ثانیه آتی اتفاقی نیفتاد، لطفا <input type="submit" id="force-submit-payment-form" value="در این قسمت کلیک کنید">.',
     'If you want to change your email, please contact us.' => 'اگر می‌خواهید ایمیل خود را تغییر دهید، لطفا با ما تماس بگیرید.',
     'In Stock' => 'موجودی',
     'Invoice REF' => 'شماره صورت حساب',

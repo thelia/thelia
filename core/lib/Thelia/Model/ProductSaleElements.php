@@ -23,9 +23,9 @@ class ProductSaleElements extends BaseProductSaleElements
      * @param string $virtualColumnName
      * @param int    $discount
      *
-     * @return float|int|mixed
-     *
      * @throws PropelException
+     *
+     * @return float|int|mixed
      */
     public function getPrice($virtualColumnName = 'price_PRICE', $discount = 0)
     {
@@ -46,9 +46,9 @@ class ProductSaleElements extends BaseProductSaleElements
      * @param string $virtualColumnName
      * @param int    $discount
      *
-     * @return float|int|mixed
-     *
      * @throws PropelException
+     *
+     * @return float|int|mixed
      */
     public function getPromoPrice($virtualColumnName = 'price_PROMO_PRICE', $discount = 0)
     {
@@ -69,9 +69,9 @@ class ProductSaleElements extends BaseProductSaleElements
      * @param string $virtualColumnName
      * @param int    $discount
      *
-     * @return int
-     *
      * @throws PropelException
+     *
+     * @return int
      */
     public function getTaxedPrice(Country $country, $virtualColumnName = 'price_PRICE', $discount = 0)
     {
@@ -84,9 +84,9 @@ class ProductSaleElements extends BaseProductSaleElements
      * @param string $virtualColumnName
      * @param int    $discount
      *
-     * @return int
-     *
      * @throws PropelException
+     *
+     * @return int
      */
     public function getTaxedPromoPrice(Country $country, $virtualColumnName = 'price_PROMO_PRICE', $discount = 0)
     {
@@ -105,10 +105,10 @@ class ProductSaleElements extends BaseProductSaleElements
      *
      * @param int $discount
      *
-     * @return ProductPriceTools
-     *
      * @throws \RuntimeException
      * @throws PropelException
+     *
+     * @return ProductPriceTools
      */
     public function getPricesByCurrency(Currency $currency, $discount = 0)
     {

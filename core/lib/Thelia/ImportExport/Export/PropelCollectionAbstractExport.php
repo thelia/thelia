@@ -23,9 +23,9 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
     private $data;
 
     /**
-     * @return array|false|mixed|string
-     *
      * @throws \Exception
+     *
+     * @return array|false|mixed|string
      */
     public function current()
     {
@@ -40,9 +40,9 @@ abstract class PropelCollectionAbstractExport extends AbstractExport
     }
 
     /**
-     * @return bool|float|int|string|null
-     *
      * @throws \Exception
+     *
+     * @return bool|float|int|string|null
      */
     public function key()
     {

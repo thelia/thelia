@@ -49,6 +49,6 @@ class Configuration extends BaseAdminController
             $resp['message'] = $e->getMessage();
         }
 
-        return JsonResponse::create($resp);
+        return new JsonResponse($resp);
     }
 }

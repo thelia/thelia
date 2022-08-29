@@ -44,9 +44,9 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
     protected $timestampable = true;
 
     /**
-     * @return LoopResult
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return LoopResult
      */
     public function parseResults(LoopResult $loopResult)
     {

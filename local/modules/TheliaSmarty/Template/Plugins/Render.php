@@ -57,9 +57,9 @@ class Render extends AbstractSmartyPlugin
     /**
      * @param $params
      *
-     * @return mixed|string
-     *
      * @throws SmartyPluginException
+     *
+     * @return mixed|string
      */
     public function processRender($params)
     {

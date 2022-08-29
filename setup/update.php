@@ -21,8 +21,9 @@ if (\PHP_SAPI != 'cli') {
 $bootstrapToggle = false;
 $bootstraped = false;
 
-// Autoload bootstrap
+$env = 'dev';
 
+// Autoload bootstrap
 foreach ($argv as $arg) {
     if ($arg === '-b') {
         $bootstrapToggle = true;

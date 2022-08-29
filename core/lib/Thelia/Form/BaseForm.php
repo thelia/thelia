@@ -322,9 +322,9 @@ abstract class BaseForm implements FormInterface
     }
 
     /**
-     * @return FormView
-     *
      * @throws \LogicException
+     *
+     * @return FormView
      */
     public function getView()
     {

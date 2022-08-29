@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Support Question
+    url: https://forum.thelia.net
+    about: We use GitHub issues only to discuss about Thelia bugs and new features. For this kind of questions about using Thelia or modules, please use the forum.
+  - name: Documentation Issue
+    url: https://github.com/thelia/docs/issues
+    about: Thelia Documentation has its own dedicated repository.

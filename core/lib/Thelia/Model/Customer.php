@@ -355,9 +355,9 @@ class Customer extends BaseCustomer implements UserInterface
     }
 
     /**
-     * @return string
-     *
      * @throws PropelException
+     *
+     * @return string
      */
     public function getLocale()
     {

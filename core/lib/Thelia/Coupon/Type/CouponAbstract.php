@@ -303,9 +303,9 @@ abstract class CouponAbstract implements CouponInterface
      *
      * @param ConditionCollection $conditions ConditionInterface to add
      *
-     * @return $this
-     *
      * @throws \Thelia\Exception\InvalidConditionException
+     *
+     * @return $this
      */
     public function setConditions(ConditionCollection $conditions)
     {
@@ -447,9 +447,9 @@ abstract class CouponAbstract implements CouponInterface
      * @param array  $data         the input form data (e.g. $form->getData())
      * @param mixed  $defaultValue the default value if the field is not found
      *
-     * @return mixed the input value, or the default one
-     *
      * @throws \InvalidArgumentException if the field is not found, and no default value has been defined
+     *
+     * @return mixed the input value, or the default one
      */
     protected function getCouponFieldValue($fieldName, $data, $defaultValue = null)
     {

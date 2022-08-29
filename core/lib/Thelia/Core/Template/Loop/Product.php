@@ -222,9 +222,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * @return LoopResult
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return LoopResult
      */
     public function parseResults(LoopResult $loopResult)
     {
@@ -238,9 +238,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * @return LoopResult
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return LoopResult
      */
     public function parseSimpleResults(LoopResult $loopResult)
     {
@@ -320,9 +320,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * @return LoopResult
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return LoopResult
      */
     public function parseComplexResults(LoopResult $loopResult)
     {
@@ -564,9 +564,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * @return \Propel\Runtime\ActiveQuery\ModelCriteria|ProductQuery
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return \Propel\Runtime\ActiveQuery\ModelCriteria|ProductQuery
      */
     public function buildModelCriteria()
     {
@@ -1218,9 +1218,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      *
      * @param \Thelia\Model\Product $product
      *
-     * @return int|null
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return int|null
      */
     protected function getDefaultCategoryId($product)
     {

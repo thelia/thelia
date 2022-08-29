@@ -154,10 +154,10 @@ trait UrlRewritingTrait
      * @param string $locale a valid locale (e.g. en_US)
      * @param $url
      *
-     * @return $this
-     *
      * @throws UrlRewritingException
      * @throws \Thelia\Exception\UrlRewritingException
+     *
+     * @return $this
      */
     public function setRewrittenUrl(string $locale, ?string $url)
     {

@@ -81,8 +81,31 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
             $moduleCode = explode('\\', $class)[0];
             $module = ModuleQuery::create()->findOneByCode($moduleCode);
-            if ($module === null) {
-                continue;
+
+            if (null === $module) {
+                // retrieve the module when no class is defined in xml
+                $properties = $container->getDefinition($id)->getProperties();
+                if (!\array_key_exists('module', $properties)) {
+                    continue;
+                }
+
+                $moduleProperty = $properties['module'];
+                if ($moduleProperty instanceof Definition) {
+                    $moduleCode = explode('\\', $moduleProperty->getClass())[1];
+                }
+                if ($moduleProperty instanceof Reference) {
+                    $moduleCode = explode('.', $moduleProperty)[1];
+                }
+
+                if (null === $moduleCode) {
+                    continue;
+                }
+
+                $module = ModuleQuery::create()->findOneByCode($moduleCode);
+
+                if (null === $module) {
+                    continue;
+                }
             }
 
             if (method_exists($class, 'getSubscribedHooks')) {

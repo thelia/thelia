@@ -262,9 +262,9 @@ class Module extends BaseModule
     /**
      * @param ContainerInterface $container the Thelia container
      *
-     * @return BaseModuleInterface a module instance
-     *
      * @throws \InvalidArgumentException if the module could not be found in the container/
+     *
+     * @return BaseModuleInterface a module instance
      */
     public function getModuleInstance(ContainerInterface $container)
     {
@@ -280,9 +280,9 @@ class Module extends BaseModule
     /**
      * @param ContainerInterface $container the Thelia container
      *
-     * @return BaseModuleInterface a module instance
-     *
      * @throws \InvalidArgumentException if the module could not be found in the container/
+     *
+     * @return BaseModuleInterface a module instance
      */
     public function getDeliveryModuleInstance(ContainerInterface $container)
     {
@@ -302,9 +302,9 @@ class Module extends BaseModule
     /**
      * @param ContainerInterface $container the Thelia container
      *
-     * @return PaymentModuleInterface a payment module instance
-     *
      * @throws \InvalidArgumentException if the module is not found or not a payment module
+     *
+     * @return PaymentModuleInterface a payment module instance
      */
     public function getPaymentModuleInstance(ContainerInterface $container)
     {

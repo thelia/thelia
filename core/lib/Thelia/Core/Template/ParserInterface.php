@@ -29,14 +29,13 @@ interface ParserInterface
      *
      * @param string $realTemplateName the template name (from the template directory)
      * @param array  $parameters       an associative array of names / value pairs
-     *
-     * @return string the rendered template text
-     *
-     * @param bool $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
+     * @param bool   $compressOutput   if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      *
      * @throws ResourceNotFoundException if the template cannot be found
      * @throws \Exception
      * @throws \SmartyException
+     *
+     * @return string the rendered template text
      */
     public function render($realTemplateName, array $parameters = [], $compressOutput = true);
 
@@ -47,10 +46,10 @@ interface ParserInterface
      * @param array  $parameters     an associative array of names / value pairs
      * @param bool   $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      *
-     * @return string the rendered template text
-     *
      * @throws \Exception
      * @throws \SmartyException
+     *
+     * @return string the rendered template text
      */
     public function renderString($templateText, array $parameters = [], $compressOutput = true);
 

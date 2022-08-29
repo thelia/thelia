@@ -142,9 +142,9 @@ class OrderStatusController extends AbstractCrudController
     /**
      * Creates the delete event with the provided form data.
      *
-     * @return OrderStatusDeleteEvent
-     *
      * @throws \Exception
+     *
+     * @return OrderStatusDeleteEvent
      */
     protected function getDeleteEvent()
     {

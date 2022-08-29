@@ -73,9 +73,9 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     }
 
     /**
-     * @return LoopResult
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return LoopResult
      */
     public function parseResults(LoopResult $loopResult)
     {

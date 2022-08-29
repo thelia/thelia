@@ -28,6 +28,7 @@ class FileConfiguration
                 'image/png' => ['png'],
                 'image/gif' => ['gif'],
                 'image/webp' => ['webp'],
+                'image/svg+xml' => ['svg'],
             ],
             'extBlackList' => [],
         ];

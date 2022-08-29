@@ -213,9 +213,9 @@ class TemplateDefinition
      *
      * @param string $templateName the template name, with path
      *
-     * @return string
-     *
      * @throws TemplateException
+     *
+     * @return string
      */
     public function getTemplateFilePath($templateName)
     {

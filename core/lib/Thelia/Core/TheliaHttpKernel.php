@@ -59,9 +59,9 @@ class TheliaHttpKernel extends HttpKernel
      *                         (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      * @param bool    $catch   Whether to catch exceptions or not
      *
-     * @return Response A Response instance
-     *
      * @throws \Exception When an Exception occurs during processing
+     *
+     * @return Response A Response instance
      *
      * @api
      */

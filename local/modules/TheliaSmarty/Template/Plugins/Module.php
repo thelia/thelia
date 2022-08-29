@@ -44,10 +44,10 @@ class Module extends AbstractSmartyPlugin
      *
      * @internal param \Thelia\Core\Template\Smarty\Plugins\unknown $smarty
      *
-     * @return string
-     *
      * @throws \Exception
      * @throws \SmartyException
+     *
+     * @return string
      */
     public function theliaModule($params, \Smarty_Internal_Template $parser)
     {

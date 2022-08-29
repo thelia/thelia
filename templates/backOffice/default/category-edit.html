@@ -280,7 +280,14 @@
                                 </div>
 
                                 <div class="tab-pane fade" id="images">
-                                    {include file='includes/image-upload-form.html' imageType='category' parentId=$ID resource="admin.category"}
+                                    {ifhook rel="item.edition.images"}
+                                        {hook name="item.edition.images" itemType='category' itemId=$ID resource="admin.category"}
+                                    {/ifhook}
+                                    {elsehook rel="item.edition.images"}
+                                    <div class="fallback-image-manager">
+                                        {include file='includes/image-upload-form.html' imageType='category' parentId=$ID resource="admin.category"}
+                                    </div>
+                                    {/elsehook}
                                 </div>
 
                                 <div class="tab-pane fade" id="documents">
@@ -365,7 +372,9 @@ $(function() {
 
     });
 
-    $.imageUploadManager.initImageDropZone();
+    if ($('#images > .fallback-image-manager')[0]) {
+        $.imageUploadManager.initImageDropZone();
+    };
     $.documentUploadManager.initDocumentDropZone();
 
     $('.use_default_rewriten_url').click(function(ev) {
