@@ -1,13 +1,13 @@
 {loop name="product.infos" type="product" id=$product_id limit="1" with_prev_next_info="1" with_prev_next_visible="1"}
 <div class="ProductInfos">
   <div class="flex justify-between">
-    {include file="components/smarty/Title/Title.html" type="h1" title=$TITLE class="Title--left mb-6" nofilter=true}
+    {include file="components/smarty/Title/Title.html" type="h1" title=$TITLE class="mb-6 Title--left" nofilter=true}
   </div>
 
-    <div><span class="">{intl l="Reference"} : </span>  {$REF}</div>
+    <div><span class="">{intl l="Reference"} : </span>  <span id="RefPse">{$REF}</span></div>
 
     {if $CHAPO}
-      <div class="ProductInfos-chapo my-4 text-lg">
+      <div class="my-4 text-lg ProductInfos-chapo">
           <p>{$CHAPO nofilter}</p>
       </div>
     {/if}

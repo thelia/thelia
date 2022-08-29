@@ -94,7 +94,11 @@ const messages = {
     KEEP_SHOPPING: 'Continuer vos achats',
     UPDATE: 'Modifier',
     YOU_USING_COUPON: 'Vous utilisez les bon de réductions suivant :',
-    CLICK_TO_CLEAR_COUPON: 'Cliquez ici pour retire tout les bons de réduction'
+    CLICK_TO_CLEAR_COUPON: 'Cliquez ici pour retire tout les bons de réduction',
+    NO_DELIVERY_MODULE_MESSAGE:
+      "Aucun moyen de livraison n'est disponnible pour l'instant. Veuillez réessayer plus tard ou nous contacter",
+    ERROR: 'Une erreur est survenue',
+    BACK_TO_SITE: 'Retourner au site'
   },
   'en-US': {
     OK: 'OK',
@@ -186,7 +190,10 @@ const messages = {
     KEEP_SHOPPING: 'Keep shopping',
     UPDATE: 'Update',
     YOU_USING_COUPON: 'Cliquez ici pour retire tout les bons de réduction',
-    CLICK_TO_CLEAR_COUPON: 'Clear all coupons'
+    CLICK_TO_CLEAR_COUPON: 'Clear all coupons',
+    NO_DELIVERY_MODULE_MESSAGE: 'No delivery mode available, please contact us',
+    ERROR: 'Error',
+    BACK_TO_SITE: 'Back to site'
   }
 };
 

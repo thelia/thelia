@@ -240,6 +240,6 @@ return [
     'Your payment method' => 'Votre mode de paiement',
     'Your subscription to our newsletter has been canceled.' => 'Votre inscription à notre newsletter a été annulée.',
     'missing or invalid data' => 'Information erronée ou incomplète',
-    'my main address' => 'mon adresse principal',
+    'my main address' => 'Mon adresse principal',
     'tools' => 'outils',
 ];

@@ -6,8 +6,8 @@
   "main": "./src/index.js",
   "license": "MIT",
   "scripts": {
-    "start": "cross-env NODE_ENV=dev encore dev-server --port 8081 --host 0.0.0.0",
-    "build": "NODE_ENV=production encore production"
+    "start": "cross-env NODE_ENV=dev encore dev-server --port 8042 --host 0.0.0.0",
+    "build": "NODE_ENV=production encore production",
   },
   "browserslist": {
     "development": [
