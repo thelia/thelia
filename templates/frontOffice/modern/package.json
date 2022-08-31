@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start": "cross-env NODE_ENV=dev encore dev-server --port 8042 --host 0.0.0.0",
-    "build": "NODE_ENV=production encore production"
+    "build": "cross-env NODE_ENV=production encore production"
   },
   "browserslist": {
     "development": [
