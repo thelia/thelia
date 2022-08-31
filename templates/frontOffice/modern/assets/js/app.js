@@ -12,17 +12,17 @@ function main() {
   MiniCart();
 
   import(
-    /* webpackChunkName: "Navigation" */ /* webpackPrefetch: true */ '@components/smarty/Navigation/Navigation'
-  ).then(({ default: Navigation }) => Navigation());
-
-  import(
     /* webpackChunkName: "SearchDropdown" */ /* webpackPrefetch: true */ '@components/smarty/SearchDropdown/SearchDropdown'
   ).then(({ default: SearchDropdown }) => SearchDropdown());
 
   import(/* webpackChunkName: "Modal" */ '@components/smarty/Modal/Modal').then(
     ({ default: Modal }) => Modal()
   );
-  document.body.classList.remove('no-js');
+  import(
+    /* webpackChunkName: "Navigation" */ /* webpackPrefetch: true */ '@components/smarty/Navigation/Navigation'
+  )
+    .then(({ default: Navigation }) => Navigation())
+    .then(() => document.body.classList.remove('no-js'));
 }
 
 document.addEventListener('DOMContentLoaded', () => {

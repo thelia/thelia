@@ -7,16 +7,16 @@ const types = {
   default: 'bg-white border-white text-black'
 };
 
-export default function Alert({ type, title, message }) {
+export default function Alert({ type, title, message, className = '' }) {
   const colorType = types[type] || types['default'];
   return (
     <div
-      className={`Alert ${colorType} my-2 rounded-b border-t-4 px-4 py-3 shadow-md`}
+      className={`Alert ${colorType} my-2 rounded-b border-t-4 px-4 py-3 shadow-md ${className}`}
       role="alert"
     >
       <div className="flex items-center">
         <svg
-          className="text-{$color}-900 mr-4 h-6 w-6 fill-current"
+          className={`text-${colorType}-900 mr-4 h-6 w-6 fill-current`}
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
         >

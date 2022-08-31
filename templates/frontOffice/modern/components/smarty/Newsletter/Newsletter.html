@@ -5,7 +5,7 @@
     {form_hidden_fields}
     <div class="Newsletter-field">
       {form_field field="email"}
-      <div class="flex">
+      <div class="flex text-gray-700">
         <input type="email" name="{$name}" id="{$label_attr.for|default:null}" value="{$value}" placeholder="{$label}" class="w-full" {if $required} aria-required="true" required{/if} />
       </div>
       <div class="hidden py-2 text-red-500 invalid-feedback">

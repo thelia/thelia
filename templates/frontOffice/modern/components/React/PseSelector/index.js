@@ -122,6 +122,10 @@ function PseSelector({ pses = [], attributes = [] }) {
     }
   }, [currentCombination, pses, setCurrentPse]);
 
+  useEffect(() => {
+    document.getElementById('RefPse').innerText = currentPse?.ref;
+  }, [currentPse]);
+
   return (
     <div>
       <AttributeSelector
