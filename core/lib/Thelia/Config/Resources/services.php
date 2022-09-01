@@ -42,9 +42,9 @@ return static function (ContainerConfigurator $configurator): void {
         ->autowire()
         ->autoconfigure();
 
-    foreach (Thelia::getTemplateComponentsDirectories() as $var => $dir) {
-        if (is_dir($dir['resource'])) {
-            $serviceConfigurator->load($dir['namespace'], $dir['resource'])
+    foreach (Thelia::getTemplateComponentsDirectories() as $namespace => $resource) {
+        if (is_dir($resource)) {
+            $serviceConfigurator->load($namespace, $resource)
                 ->autowire()
                 ->autoconfigure();
         }
