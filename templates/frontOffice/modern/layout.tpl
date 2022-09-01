@@ -161,5 +161,10 @@
       {encore_entry_script_tags entry="app"}
     {/block}
 
+    {hook name="main.after-javascript-include"}
+
+    {hook name="main.javascript-initialization"}
+
+    {hook name="main.body-bottom"}
 </body>
 </html>
