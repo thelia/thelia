@@ -49,6 +49,7 @@ use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
+use Thelia\Core\DependencyInjection\TheliaContainer;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Hook\BaseHookInterface;
 use Thelia\Core\Propel\Schema\SchemaLocator;
@@ -89,12 +90,7 @@ class Thelia extends Kernel
         $loader = new ClassLoader();
 
         $loader->addPsr4('', THELIA_ROOT."var/cache/{$environment}/propel/model");
-        if (isset($_SERVER['ACTIVE_ADMIN_TEMPLATE'])) {
-            $loader->addPsr4('backOffice\\', THELIA_ROOT."templates/backOffice/{$_SERVER['ACTIVE_ADMIN_TEMPLATE']}/components");
-        }
-        if (isset($_SERVER['ACTIVE_FRONT_TEMPLATE'])) {
-            $loader->addPsr4('frontOffice\\', THELIA_ROOT."templates/frontOffice/{$_SERVER['ACTIVE_FRONT_TEMPLATE']}/components");
-        }
+
         $loader->addPsr4('TheliaMain\\', THELIA_ROOT."var/cache/{$environment}/propel/database/TheliaMain");
         $loader->register();
 
@@ -103,6 +99,23 @@ class Thelia extends Kernel
         if ($debug) {
             Debug::enable();
         }
+    }
+
+    /** Get the front and back templates "components" directory path.
+     *
+     */
+    public static function getTemplateComponentsDirectories(): array
+    {
+        return [
+            'backOffice\\' => THELIA_TEMPLATE_DIR
+                .TemplateDefinition::BACK_OFFICE_SUBDIR.DS
+                .ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default').DS
+                .'components',
+            'frontOffice\\' => THELIA_TEMPLATE_DIR
+                .TemplateDefinition::FRONT_OFFICE_SUBDIR.DS
+                .ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default').DS
+                .'components',
+        ];
     }
 
     /**
@@ -125,6 +138,10 @@ class Thelia extends Kernel
     protected function configureContainer(ContainerConfigurator $container): void
     {
         $container->parameters()->set('thelia_default_template', 'default');
+
+        $container->parameters()->set('thelia_front_template', ConfigQuery::read(TemplateDefinition::FRONT_OFFICE_CONFIG_NAME));
+        $container->parameters()->set('thelia_backoffice_template', ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME));
+
         $container->import(__DIR__.'/../Config/Resources/*.yaml');
         $container->import(__DIR__.'/../Config/Resources/{packages}/*.yaml');
         $container->import(__DIR__.'/../Config/Resources/{packages}/'.$this->environment.'/*.yaml');
@@ -232,7 +249,7 @@ class Thelia extends Kernel
      */
     protected function getContainerBaseClass(): string
     {
-        return '\Thelia\Core\DependencyInjection\TheliaContainer';
+        return TheliaContainer::class;
     }
 
     protected function initializeContainer(): void
@@ -530,6 +547,17 @@ class Thelia extends Kernel
                     );
                 }
             }
+
+            // Register templates 'component' directories in a class loader.
+            $templateClassLoader = new ClassLoader();
+
+            foreach (self::getTemplateComponentsDirectories() as $namespace => $resource) {
+                if (is_dir($resource)) {
+                    $templateClassLoader->addPsr4($namespace, $resource);
+                }
+            }
+
+            $templateClassLoader->register();
 
             $parser = $container->getDefinition(SmartyParser::class);
 

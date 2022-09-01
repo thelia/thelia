@@ -29,7 +29,7 @@ class TemplateDefinition
     public const EMAIL_SUBDIR = 'email';
 
     public const FRONT_OFFICE_CONFIG_NAME = 'active-front-template';
-    public const BACK_OFFICE_CONFIG_NAME = 'active-back-template';
+    public const BACK_OFFICE_CONFIG_NAME = 'active-admin-template';
     public const PDF_CONFIG_NAME = 'active-pdf-template';
     public const EMAIL_CONFIG_NAME = 'active-email-template';
 

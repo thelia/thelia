@@ -13,12 +13,13 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Thelia\Core\Service\ConfigCacheService;
+use Thelia\Core\Thelia;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
-return function (ContainerConfigurator $configurator): void {
+return static function (ContainerConfigurator $configurator): void {
     $serviceConfigurator = $configurator->services();
 
     $serviceConfigurator->defaults()
@@ -37,16 +38,16 @@ return function (ContainerConfigurator $configurator): void {
                 THELIA_LIB.'/Command/Skeleton/Module/I18n/*.php',
                 THELIA_LIB.'/Config/**/*.php',
             ]
-        )->autowire()
+        )
+        ->autowire()
         ->autoconfigure();
 
-    if (isset($_SERVER['ACTIVE_ADMIN_TEMPLATE'])) {
-        $serviceConfigurator->load('backOffice\\', THELIA_ROOT.'templates/backOffice'.DS.$_SERVER['ACTIVE_ADMIN_TEMPLATE'].DS.'components')
-            ->autowire()->autoconfigure();
-    }
-    if (isset($_SERVER['ACTIVE_FRONT_TEMPLATE'])) {
-        $serviceConfigurator->load('frontOffice\\', THELIA_ROOT.'templates/frontOffice'.DS.$_SERVER['ACTIVE_FRONT_TEMPLATE'].DS.'components')
-            ->autowire()->autoconfigure();
+    foreach (Thelia::getTemplateComponentsDirectories() as $namespace => $resource) {
+        if (is_dir($resource)) {
+            $serviceConfigurator->load($namespace, $resource)
+                ->autowire()
+                ->autoconfigure();
+        }
     }
 
     if (!isset($_SERVER['MAILER_DSN'])) {
