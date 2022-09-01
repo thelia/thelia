@@ -95,7 +95,9 @@
         <service id="Psr\Container\ContainerInterface" alias="service_container"/>
 
         <!-- Thelia template helper -->
-        <service id="thelia.template_helper" class="Thelia\Core\Template\TheliaTemplateHelper" public="true"/>
+        <service id="thelia.template_helper" class="Thelia\Core\Template\TheliaTemplateHelper" public="true">
+          <argument>%kernel.cache_dir%</argument>
+        </service>
 
         <!--  URL maganement -->
         <service id="Thelia\Tools\URL" >
