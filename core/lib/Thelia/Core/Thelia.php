@@ -91,7 +91,7 @@ class Thelia extends Kernel
 
         $loader->addPsr4('', THELIA_ROOT . "var/cache/{$environment}/propel/model");
 
-        $loader->addPsr4('TheliaMain\\', THELIA_ROOT."var/cache/{$environment}/propel/database/TheliaMain");
+        $loader->addPsr4('TheliaMain\\', THELIA_ROOT . "var/cache/{$environment}/propel/database/TheliaMain");
         $loader->register();
 
         parent::__construct($environment, $debug);
@@ -113,9 +113,9 @@ class Thelia extends Kernel
                 .ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default').DS
                 .'components',
             'frontOffice\\' => THELIA_TEMPLATE_DIR
-                    .TemplateDefinition::FRONT_OFFICE_SUBDIR.DS
-                    .ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default').DS
-                    .'components'
+                .TemplateDefinition::FRONT_OFFICE_SUBDIR.DS
+                .ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default').DS
+                .'components',
         ];
     }
 
