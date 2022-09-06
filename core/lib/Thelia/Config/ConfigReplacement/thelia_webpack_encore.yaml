@@ -4,5 +4,5 @@ webpack_encore:
     defer: true
   builds:
     _default: ''
-    frontOffice: '%kernel.project_dir%/templates/frontOffice/%env(default:thelia_default_template:resolve:ACTIVE_FRONT_TEMPLATE)%/dist'
-    backOffice: '%kernel.project_dir%/templates/backOffice/%env(default:thelia_default_template:resolve:ACTIVE_ADMIN_TEMPLATE)%/dist'
+    frontOffice: '%kernel.project_dir%/templates/frontOffice/%thelia_front_template%/dist'
+    backOffice: '%kernel.project_dir%/templates/backOffice/%thelia_admin_template%/dist'
