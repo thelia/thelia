@@ -18,7 +18,7 @@ use Thelia\Model\ConfigQuery;
 
 class ConfigCacheService
 {
-    const CACHE_KEY =  'thelia_config';
+    public const CACHE_KEY = 'thelia_config';
     protected $cache;
 
     public function __construct(AdapterInterface $cache)

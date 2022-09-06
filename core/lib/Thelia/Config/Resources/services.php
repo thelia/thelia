@@ -55,7 +55,7 @@ return function (ContainerConfigurator $configurator): void {
             $dsn = 'smtp://';
 
             if (ConfigQuery::getSmtpUsername()) {
-                $dsn .= ConfigQuery::getSmtpUsername().':'.ConfigQuery::getSmtpPassword()."@";
+                $dsn .= ConfigQuery::getSmtpUsername().':'.ConfigQuery::getSmtpPassword().'@';
             }
 
             $dsn .= ConfigQuery::getSmtpHost().':'.ConfigQuery::getSmtpPort();
