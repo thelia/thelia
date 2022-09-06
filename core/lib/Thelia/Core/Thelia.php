@@ -89,9 +89,9 @@ class Thelia extends Kernel
     {
         $loader = new ClassLoader();
 
-        $loader->addPsr4('', THELIA_ROOT . "var/cache/{$environment}/propel/model");
+        $loader->addPsr4('', THELIA_ROOT."var/cache/{$environment}/propel/model");
 
-        $loader->addPsr4('TheliaMain\\', THELIA_ROOT . "var/cache/{$environment}/propel/database/TheliaMain");
+        $loader->addPsr4('TheliaMain\\', THELIA_ROOT."var/cache/{$environment}/propel/database/TheliaMain");
         $loader->register();
 
         parent::__construct($environment, $debug);
@@ -103,7 +103,6 @@ class Thelia extends Kernel
 
     /** Get the front and back templates "components" directory path.
      *
-     * @return array
      */
     public static function getTemplateComponentsDirectories(): array
     {

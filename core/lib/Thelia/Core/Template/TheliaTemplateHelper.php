@@ -163,10 +163,9 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
     /**
      * Clear the cache if the front or admin template is changed in the back-office.
      *
-     * @param ConfigUpdateEvent $event
      * @return void
      */
-    public function clearCache(ConfigUpdateEvent $event, string $eventName, EventDispatcherInterface $dispatcher)
+    public function clearCache(ConfigUpdateEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (
             (null === $config = ConfigQuery::create()->findPk($event->getConfigId()))
@@ -193,5 +192,4 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
             TheliaEvents::CONFIG_SETVALUE => ['clearCache', 130],
         ];
     }
-
 }
