@@ -81,7 +81,7 @@ class FrontUtils extends AbstractSmartyPlugin
     public function renderIconSvg($params)
     {
         $class = 'icon-'.$params['icon'];
-        if ($params['class']) {
+        if (isset($params['class'])) {
             $class = $params['class'];
         }
 
@@ -101,7 +101,7 @@ class FrontUtils extends AbstractSmartyPlugin
         $matches = [];
         preg_match('/^<svg.*?>/', $svg, $matches);
 
-        if ($params['class']) {
+        if (isset($params['class'])) {
             $svgTag = $matches[0];
             $existingClass = [];
             $hasClass = preg_match('/class="(.*?)"/', $svgTag, $existingClass);
