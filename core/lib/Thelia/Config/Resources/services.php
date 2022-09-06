@@ -49,14 +49,18 @@ return function (ContainerConfigurator $configurator): void {
             ->autowire()->autoconfigure();
     }
 
-    if (ConfigQuery::isSmtpEnable()) {
-        $dsn = 'smtp://';
+    if (!isset($_SERVER['MAILER_DSN'])) {
+        $dsn = 'smtp://localhost:25';
+        if (ConfigQuery::isSmtpEnable()) {
+            $dsn = 'smtp://';
 
-        if (ConfigQuery::getSmtpUsername()) {
-            $dsn .= ConfigQuery::getSmtpUsername().':'.ConfigQuery::getSmtpPassword();
+            if (ConfigQuery::getSmtpUsername()) {
+                $dsn .= ConfigQuery::getSmtpUsername().':'.ConfigQuery::getSmtpPassword()."@";
+            }
+
+            $dsn .= ConfigQuery::getSmtpHost().':'.ConfigQuery::getSmtpPort();
         }
 
-        $dsn .= ConfigQuery::getSmtpHost().':'.ConfigQuery::getSmtpPort();
         $configurator->extension('framework', [
             'mailer' => [
                 'dsn' => $dsn,

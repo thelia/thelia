@@ -18,6 +18,7 @@ use Thelia\Model\ConfigQuery;
 
 class ConfigCacheService
 {
+    const CACHE_KEY =  'thelia_config';
     protected $cache;
 
     public function __construct(AdapterInterface $cache)
@@ -28,10 +29,10 @@ class ConfigCacheService
     public function initCacheConfigs(bool $force = false): void
     {
         if ($force) {
-            $this->cache->delete('thelia_config');
+            $this->cache->delete(self::CACHE_KEY);
         }
 
-        $value = $this->cache->get('thelia_config', function (ItemInterface $item) {
+        $value = $this->cache->get(self::CACHE_KEY, function (ItemInterface $item) {
             $configs = ConfigQuery::create()->find();
             $caches = [];
 
