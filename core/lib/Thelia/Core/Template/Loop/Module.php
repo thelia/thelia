@@ -302,13 +302,6 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                         }
                     }
 
-                    /* if not ; test if it uses admin inclusion : module_configuration.html */
-                    if (false === $hasConfigurationInterface) {
-                        if (file_exists($module->getAbsoluteAdminIncludesPath().DS.'module_configuration.html')) {
-                            $hasConfigurationInterface = true;
-                        }
-                    }
-                } else {
                     // Make a quick and dirty test on the module's config.xml file
                     $configContent = @file_get_contents($module->getAbsoluteConfigPath().DS.'config.xml');
 
@@ -316,19 +309,19 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                         preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent) === 1
                     ;
 
-                    if (false === $hasConfigurationInterface) {
-                        // Make a quick and dirty test on the module's routing.xml file
-                        $routing = @file_get_contents($module->getAbsoluteConfigPath().DS.'routing.xml');
+                    $routing = @file_get_contents($module->getAbsoluteConfigPath().DS.'routing.xml');
+                    if ($routing && strpos($routing, '/admin/module/'.$module->getCode()) !== false) {
+                        $hasConfigurationInterface = true;
+                    }
 
-                        if ($routing && strpos($routing, '/admin/module/') !== false) {
+                    /* if not ; test if it uses admin inclusion : module_configuration.html */
+                    if (false === $hasConfigurationInterface) {
+                        if (file_exists($module->getAbsoluteAdminIncludesPath().DS.'module_configuration.html')) {
                             $hasConfigurationInterface = true;
-                        } else {
-                            if (file_exists($module->getAbsoluteAdminIncludesPath().DS.'module_configuration.html')) {
-                                $hasConfigurationInterface = true;
-                            }
                         }
                     }
                 }
+
                 $loopResultRow->set('CONFIGURABLE', $hasConfigurationInterface ? 1 : 0);
 
                 // Does module have hook(s)
