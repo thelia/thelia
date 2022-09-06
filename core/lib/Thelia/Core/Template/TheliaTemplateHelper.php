@@ -162,8 +162,6 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
 
     /**
      * Clear the cache if the front or admin template is changed in the back-office.
-     *
-     * @return void
      */
     public function clearCache(ConfigUpdateEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
     {

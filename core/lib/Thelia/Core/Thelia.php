@@ -137,10 +137,8 @@ class Thelia extends Kernel
      */
     protected function configureContainer(ContainerConfigurator $container): void
     {
-        $container->parameters()->set('thelia_default_template', 'default');
-
-        $container->parameters()->set('thelia_front_template', ConfigQuery::read(TemplateDefinition::FRONT_OFFICE_CONFIG_NAME));
-        $container->parameters()->set('thelia_backoffice_template', ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME));
+        $container->parameters()->set('thelia_front_template', ConfigQuery::read(TemplateDefinition::FRONT_OFFICE_CONFIG_NAME, 'default'));
+        $container->parameters()->set('thelia_admin_template', ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default'));
 
         $container->import(__DIR__.'/../Config/Resources/*.yaml');
         $container->import(__DIR__.'/../Config/Resources/{packages}/*.yaml');
