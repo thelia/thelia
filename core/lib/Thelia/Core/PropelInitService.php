@@ -413,9 +413,6 @@ class PropelInitService
             $theliaDatabaseConnection->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
 
             if ($this->debug) {
-                // In debug mode, we have to initialize Tlog at this point, as this class uses Propel
-                Tlog::getInstance()->setLevel(Tlog::DEBUG);
-
                 Propel::getServiceContainer()->setLogger('defaultLogger', Tlog::getInstance());
                 $theliaDatabaseConnection->useDebug(true);
             }
