@@ -13,12 +13,19 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\MailingSystem\MailingSystemEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Service\ConfigCacheService;
 use Thelia\Model\ConfigQuery;
 
 class MailingSystem extends BaseAction implements EventSubscriberInterface
 {
+    public function __construct(private ConfigCacheService $configCache, private EventDispatcherInterface $dispatcher, private $kernelCacheDir)
+    {
+    }
+
     public function update(MailingSystemEvent $event): void
     {
         if ($event->getEnabled()) {
@@ -34,6 +41,10 @@ class MailingSystem extends BaseAction implements EventSubscriberInterface
         ConfigQuery::setSmtpAuthMode($event->getAuthMode());
         ConfigQuery::setSmtpTimeout($event->getTimeout());
         ConfigQuery::setSmtpSourceIp($event->getSourceIp());
+
+        $cacheEvent = new CacheEvent($this->kernelCacheDir);
+        $this->dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
+        $this->configCache->initCacheConfigs(true);
     }
 
     /**

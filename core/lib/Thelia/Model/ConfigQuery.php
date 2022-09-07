@@ -183,7 +183,7 @@ class ConfigQuery extends BaseConfigQuery
     /* smtp config */
     public static function isSmtpInEnv()
     {
-        return isset($_ENV['SMTP_ENABLED']) || isset($_ENV['SMTP_HOST']);
+        return isset($_ENV['SMTP_ENABLED']) || isset($_ENV['SMTP_HOST']) || isset($_ENV['MAILER_DSN']);
     }
 
     public static function isSmtpEnable()
