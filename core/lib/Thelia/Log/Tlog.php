@@ -75,7 +75,7 @@ class Tlog implements LoggerInterface
     protected $destinations = [];
 
     protected $mode_back_office = false;
-    protected $level = self::MUET;
+    protected $level = self::ERROR;
     protected $prefix = '';
     protected $files = [];
     protected $all_files = false;
