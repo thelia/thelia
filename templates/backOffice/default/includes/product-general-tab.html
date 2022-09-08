@@ -3,23 +3,12 @@
     {form name="thelia.admin.product.modification"}
     <form method="POST" action="{url path='/admin/products/save'}" {form_enctype} class="clearfix">
 
-        {capture "visibility_field"}
-            {form_field field='visible'}
-                <div class="product-visibility-switch"" style="display: inline-block; margin-right:1rem;" rel="tooltip" data-toggle="tooltip" title="{$label}">
-                    <label for="{$label_attr.for|default:null}" class="sr-only">{$label}</label>
-                    <div class="make-switch productVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
-                        <input type="checkbox" name="{$name}" id="{$label_attr.for|default:null}" class="productVisibleToggle" {if $value != 0}checked="checked"{/if} aria-label="{intl l="is visible"}"/>
-                    </div>
-                </div>
-            {/form_field}
-        {/capture}
-
         {include
             file = "includes/inner-form-toolbar.html"
             hide_submit_buttons = false
+
             page_url  = "{url path='/admin/products/update' product_id=$ID}"
             close_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}"
-            preInnerActionsContent=$smarty.capture.visibility_field
         }
 
         {hook name="product.modification.form_top" product_id=$ID}
@@ -133,6 +122,17 @@
                     </select>
                 {/custom_render_form_field}
 
+                {form_field field='visible'}
+                    <div class="form-group sr-only {if $error}has-error{/if}">
+                        <label for="{$label_attr.for|default:null}" class="control-label">{intl l='Visibility'}</label>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="{$label_attr.for|default:null}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
+                                {$label}
+                            </label>
+                        </div>
+                    </div>
+                {/form_field}
 
                 {hook name="product.modification.form-right.bottom" product_id=$ID}
             </div>

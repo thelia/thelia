@@ -50,8 +50,6 @@ Parameters:
     </div>
 
     <div class="text-right col-md-6 inner-actions">
-        {$preInnerActionsContent|default:"" nofilter}
-
          {if $hide_submit_buttons|default:false != true}
             {if $hide_save_buttons|default:false != true}
                 <button type="submit" name="save_mode" value="stay" class="form-submit-button btn btn-sm btn-default btn-success" title="{intl l='Save'}">{intl l='Save'} <span class="glyphicon glyphicon-ok"></span></button>
