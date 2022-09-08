@@ -823,6 +823,18 @@ $(function() {
         });
     });
 
+    $(function() {
+    $(".productVisibleToggle").on('switch-change', function(event, data) {
+            $.ajax({
+                url : "{url path='admin/products/toggle-online'}",
+                data : {
+                    product_id : $(this).data('id'),
+                    action : 'visibilityToggle'
+                }
+            });
+        });
+    })
+
 
 </script>
 
