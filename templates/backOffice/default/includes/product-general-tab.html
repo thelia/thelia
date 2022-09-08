@@ -133,17 +133,6 @@
                     </select>
                 {/custom_render_form_field}
 
-                {form_field field='visible'}
-                    <div class="form-group {if $error}has-error{/if}">
-                        <label for="{$label_attr.for|default:null}" class="control-label">{intl l='Visibility'}</label>
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" id="{$label_attr.for|default:null}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
-                                {$label}
-                            </label>
-                        </div>
-                    </div>
-                {/form_field}
 
                 {hook name="product.modification.form-right.bottom" product_id=$ID}
             </div>
