@@ -65,7 +65,7 @@ if (is_file(dirname(__DIR__)."/.env.$env.local")) {
     (new \Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/../.env');
 }
 
-$thelia = new App\Kernel($_ENV['APP_ENV'], true);
+$thelia = new App\Kernel($_ENV['APP_ENV'], false);
 
 $thelia->boot();
 
