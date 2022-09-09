@@ -82,10 +82,12 @@ class TaxEngine
         if (null === $this->taxCountry) {
             /* is there a logged in customer ? */
             /** @var Customer $customer */
-            if (null !== $customer = $this->getSession()->getCustomerUser()) {
-                if (null !== $this->getSession()->getOrder()
+            if (null !== $customer = $this->getSession()?->getCustomerUser()) {
+                if (
+                    null !== $this->getSession()->getOrder()
                         && null !== $this->getSession()->getOrder()->getChoosenDeliveryAddress()
-                        && null !== $currentDeliveryAddress = AddressQuery::create()->findPk($this->getSession()->getOrder()->getChoosenDeliveryAddress())) {
+                        && null !== $currentDeliveryAddress = AddressQuery::create()->findPk($this->getSession()->getOrder()->getChoosenDeliveryAddress())
+                ) {
                     $this->taxCountry = $currentDeliveryAddress->getCountry();
                     $this->taxState = $currentDeliveryAddress->getState();
                 } else {
@@ -130,6 +132,6 @@ class TaxEngine
 
     protected function getSession()
     {
-        return $this->requestStack->getCurrentRequest()->getSession();
+        return $this->requestStack?->getCurrentRequest()?->getSession();
     }
 }
