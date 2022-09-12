@@ -60,7 +60,7 @@
         "symfony/flex": "^1.12",
         "doctrine/cache": "~1.0",
         "assetic/framework": "~3.0.0",
-        "thelia/html2pdf": "dev-main",
+        "spipu/html2pdf": "~5.2.5",
         "symfony/mailer": "6.0.*|6.1.*",
         "symfony/webpack-encore-bundle": "^1.14",
         "composer/composer": "~2.3.0"
