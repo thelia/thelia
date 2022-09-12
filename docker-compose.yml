@@ -55,3 +55,9 @@ services:
       - ./templates/frontOffice/${ACTIVE_FRONT_TEMPLATE:-modern}/node_modules:/application/templates/frontOffice/${ACTIVE_FRONT_TEMPLATE:-modern}/node_modules
     ports:
       - 8081:8081
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: docker-thelia-mailhog
+    ports:
+      - 8085:8025
