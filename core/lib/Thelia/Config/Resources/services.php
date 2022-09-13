@@ -60,7 +60,7 @@ return static function (ContainerConfigurator $configurator): void {
             }
 
             // Escape "%" added by urlencode
-            $dsn = str_replace("%", "%%", $dsn);
+            $dsn = str_replace('%', '%%', $dsn);
 
             $dsn .= ConfigQuery::getSmtpHost().':'.ConfigQuery::getSmtpPort();
         }
