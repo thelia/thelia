@@ -56,15 +56,18 @@ return static function (ContainerConfigurator $configurator): void {
             $dsn = 'smtp://';
 
             if (ConfigQuery::getSmtpUsername()) {
-                $dsn .= ConfigQuery::getSmtpUsername().':'.ConfigQuery::getSmtpPassword().'@';
+                $dsn .= urlencode(ConfigQuery::getSmtpUsername()).':'.urlencode(ConfigQuery::getSmtpPassword()).'@';
             }
+
+            // Escape "%" added by urlencode
+            $dsn = str_replace("%", "%%", $dsn);
 
             $dsn .= ConfigQuery::getSmtpHost().':'.ConfigQuery::getSmtpPort();
         }
 
         $configurator->extension('framework', [
             'mailer' => [
-                'dsn' => $dsn,
+                'dsn' => addslashes($dsn),
             ],
         ]);
     }
