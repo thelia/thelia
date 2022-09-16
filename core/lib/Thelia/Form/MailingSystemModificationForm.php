@@ -13,6 +13,7 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
@@ -61,7 +62,7 @@ class MailingSystemModificationForm extends BaseForm
                 'label' => Translator::getInstance()->trans('Username'),
                 'label_attr' => ['for' => 'username_field'],
             ])
-            ->add('password', TextType::class, [
+            ->add('password', PasswordType::class, [
                 'disabled' => $disabled,
                 'required' => false,
                 'label' => Translator::getInstance()->trans('Password'),
