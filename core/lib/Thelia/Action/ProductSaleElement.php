@@ -451,7 +451,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             $originalProductFilePositionQuery = [];
             $originalProductPSEFileId = null;
 
-            if (!\in_array($type, ['images', 'documents'])) {
+            if (!\in_array($type, ['image', 'document'])) {
                 throw new \Exception(Translator::getInstance()->trans('Cloning files of type %type is not allowed.', ['%type' => $type], 'core'));
             }
 
