@@ -436,9 +436,23 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                 $border_height = (int) (($dest_height - $resize_height) / 2);
 
                 $canvas = new Box($dest_width, $dest_height);
+                $layersCount = \count($image->layers());
+
+                if ('imagick' === ConfigQuery::read('imagine_graphic_driver', 'gd') && $layersCount > 1) {
+                    // If image has layers we apply transformation to all layers since paste method would flatten the image
+                    $newImage = $imagine->create($canvas, $bg_color);
+                    $resizedLayers = $newImage->layers();
+                    $resizedLayers->remove(0);
+                    for ($i = 0; $i < $layersCount; ++$i) {
+                        $newImage2 = $imagine->create($canvas, $bg_color);
+                        $resizedLayers[] = $newImage2->paste($image->layers()->get($i)->resize(new Box($resize_width, $resize_height), $resizeFilter), new Point($border_width, $border_height));
+                    }
+
+                    return $newImage;
+                }
 
                 return $imagine->create($canvas, $bg_color)
-                    ->paste($image, new Point($border_width, $border_height));
+                        ->paste($image, new Point($border_width, $border_height));
             }
             if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
                 $image->crop(
