@@ -173,7 +173,7 @@ Thelia documentation is available at https://doc.thelia.net
 Contribute
 ----------
 
-See the documentation : http://doc.thelia.net/en/documentation/contribute.html
+See the documentation : https://doc.thelia.net/docs/contribute
 
 
-If you submit modifications that adds new data or change the structure of the database, take a look to https://doc.thelia.net/en/documentation/contribute.html#sql-scripts-modification
+If you submit modifications that adds new data or change the structure of the database, take a look to https://doc.thelia.net/docs/contribute#sql-scripts-modification
