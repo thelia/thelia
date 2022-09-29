@@ -133,7 +133,7 @@ class Encore extends AbstractSmartyPlugin
         return $this->tagRenderer
             ->renderWebpackScriptTags($entryName, $packageName, $entrypointName, $attributes);
     }
-    
+
     public function renderPrefetchWebpackScriptTags($args): string
     {
         $res = '';
