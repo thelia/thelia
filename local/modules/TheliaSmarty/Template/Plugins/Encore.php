@@ -136,7 +136,7 @@ class Encore extends AbstractSmartyPlugin
     
     public function renderPrefetchWebpackScriptTags($args): string
     {
-        $res = "";
+        $res = '';
         foreach ($this->getWebpackJsFiles($args) as $asset) {
             $res .= sprintf('<link rel="prefetch" as="script" href="%s">', $asset);
         }
