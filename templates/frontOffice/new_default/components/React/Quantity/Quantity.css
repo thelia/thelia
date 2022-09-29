@@ -1,0 +1,47 @@
+.Quantity {
+  @apply relative flex flex-row  rounded-md border border-gray-400;
+
+  max-width: rem(154px);
+  padding: rem(6px);
+
+  &-btn {
+    @apply flex items-center justify-center  transition rounded-md cursor-pointer bg-black hover:bg-black focus:outline-none  disabled:opacity-50 text-white;
+
+    flex: 1 0 auto;
+    width: rem(36px);
+    height: rem(36px);
+
+    &--disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    &:focus {
+      background-color: theme('colors.main');
+    }
+  }
+
+  &-number {
+    @apply flex items-center justify-center  cursor-default text-lg px-2;
+
+    width: rem(124px);
+    height: rem(36px);
+
+  }
+
+  &--small {
+    max-width: rem(115px);
+    padding: rem(3px);
+
+    .Quantity-btn {
+      width: rem(24px);
+      height: rem(24px);
+    }
+
+    .Quantity-number {
+      width: rem(54px);
+      height: rem(24px);
+      font-size: rem(10px);
+    }
+  }
+}

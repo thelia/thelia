@@ -1,0 +1,10 @@
+<div id="Checkout" class="Checkout"></div>
+
+{$cgv_url = ""}
+{loop name="information" type="content" id={config key="terms_conditions_content_id"}}
+  {$cgv_url = $URL}
+{/loop}
+
+<script id="Checkout-data" type="text/javascript">
+  var CGV_URL = '{$cgv_url}';
+</script>

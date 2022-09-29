@@ -1,0 +1,31 @@
+{assign var="objectTitle" value="{$TITLE}"}
+{$width = $width|default:342}
+{$height = $height|default:156}
+{$objectTitle = $TITLE}
+{$type = $type|default:"div"}
+
+<a href="{$URL}"  class="ContentCard" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
+  <figure class="ContentCard-img">
+    {loop name="category_thumbnail" type="image" quality="100" source_id=$ID source=$object_type|default:"content" width=$width height=$height resize_mode="crop" limit="1" format="webp"}
+        <img
+          src="{$IMAGE_URL}"
+          alt="{{$TITLE|default:$objectTitle}|cat:' '|cat:'Visuel'}"
+          width="{$width}"
+          height="{$height}"
+          loading="lazy"
+        />
+    {/loop}
+    {elseloop rel="category_thumbnail"}
+        <img
+          src="{encore_manifest_file file="dist/images/placeholder.webp"}"
+          alt="{$objectTitle|cat:' '|cat:'Visuel'}"
+          title="{$objectTitle|cat:' '|cat:'Visuel'}"
+          width="{$width}"
+          height="{$height}"
+        />
+    {/elseloop}
+  </figure>
+  <div class="ContentCard-title">
+      <{$type}>{$objectTitle}</{$type}>
+  </div>
+</a>

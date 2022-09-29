@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!--
+generated on : {$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'}
+{if $_lang_ != "" }lang : {$_lang_}{/if}
+{if $_context_ != "" }context : {$_context_}{/if}
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>{url path="/"}</loc>
+        {*
+        You can also set priority and changefreq
+        <priority>0.8</priority>
+        <changefreq>weekly</changefreq>
+        *}
+    </url>
+
+{if $_context_ == "" || $_context_ == "catalog" }
+
+    <!-- categories -->
+    {loop type="lang" name="category_lang"}
+        {if $_lang_ == "" || $_lang_ == $CODE }
+            {loop type="category" name="category" lang="$ID"}
+            <url>
+                <loc>{$URL}</loc>
+                <lastmod>{format_date date=$UPDATE_DATE format="c"}</lastmod>
+            </url>
+            {/loop}
+        {/if}
+    {/loop}
+
+    <!-- products -->
+    {loop type="lang" name="product_lang"}
+        {if $_lang_ == "" || $_lang_ == $CODE }
+            {loop type="product" name="product" lang="$ID"}
+                <url>
+                    <loc>{$URL}</loc>
+                    <lastmod>{format_date date=$UPDATE_DATE format="c"}</lastmod>
+                </url>
+            {/loop}
+        {/if}
+    {/loop}
+
+{/if}
+
+{if $_context_ == "" || $_context_ == "content" }
+    <!-- folders -->
+    {loop type="lang" name="folder_lang"}
+        {if $_lang_ == "" || $_lang_ == $CODE }
+            {loop type="folder" name="folder" lang="$ID"}
+                <url>
+                    <loc>{$URL}</loc>
+                    <lastmod>{format_date date=$UPDATE_DATE format="c"}</lastmod>
+                </url>
+            {/loop}
+        {/if}
+   {/loop}
+
+    <!-- contents -->
+    {loop type="lang" name="content_lang"}
+        {if $_lang_ == "" || $_lang_ == $CODE }
+            {loop type="content" name="content" lang="$ID"}
+            <url>
+                <loc>{$URL}</loc>
+                <lastmod>{format_date date=$UPDATE_DATE format="c"}</lastmod>
+            </url>
+            {/loop}
+        {/if}
+    {/loop}
+{/if}
+
+{hook name="sitemap.bottom" lang="$_lang_" context="$_context_"}
+
+</urlset>

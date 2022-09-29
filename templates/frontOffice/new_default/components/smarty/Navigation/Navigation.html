@@ -1,0 +1,65 @@
+{$category_id = $category_id|default: null}
+{$folder_id = $folder_id|default: null}
+
+{if isset($product_id)}
+  {loop type="product" name="test-prod" id=$product_id limit=1}
+    {$category_id = $DEFAULT_CATEGORY|default: null}
+  {/loop}
+{/if}
+
+{if isset($content_id)}
+  {loop type="content" name="test-prod" id=$content_id limit=1}
+    {$folder_id = $DEFAULT_FOLDER|default: null}
+  {/loop}
+{/if}
+
+
+
+<div id="StickyToggler" class="Navigation">
+  <div class="container">
+    <div class=" Navigation-contain">
+      <a href="{navigate to="index"}" title="{intl l='Lien Accueil sticky'}" class="Navigation-logo" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
+        {renderSvgImage file={encore_manifest_file file="dist/images/logo.svg"} class=""}
+      </a>
+      <nav id="MainNavigation" class="Menu">
+        <ul class="Menu-list">
+          {loop type="category" name="store_navigation"  need_count_child=false parent=0}
+            <li class="Menu-item">
+              {if {count type="category" parent=$ID} > 0}
+                <button type="button" class="js-toggleCategory Menu-item-link {if {isInCategory category=$ID current_category=$category_id}}Menu-item-link--active{/if}" data-href="{$URL}" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
+                  {$TITLE}
+                </button>
+              {else}
+                <a href="{$URL}" class="Menu-item-link {if {isInCategory category=$ID current_category=$category_id}}Menu-item-link--active{/if}" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
+                  {$TITLE}
+                </a>
+              {/if}
+
+              {ifloop rel="Navigation.sub1"}
+                <ul class="Menu-sub1">
+                  {loop type="category" name="Navigation.sub1" parent=$ID need_count_child=false}
+                    <li class="Menu-sub1-item">
+                      <a href="{$URL}" class="Menu-sub1-link" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>{$TITLE}</a>
+
+                      {ifloop rel="Navigation.sub2"}
+                        <ul class="Menu-sub2">
+                          {loop type="category" name="Navigation.sub2" parent=$ID need_count_child=false}
+                            <li class="Menu-sub2-item"><a href="{$URL}" class="Menu-sub2-link" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>{$TITLE}</a></li>
+                          {/loop}
+                        </ul>
+                      {/ifloop}
+                    </li>
+                  {/loop}
+                  <li class="Menu-sub1-item is-seeAll">
+                    <a href="{$URL}" class="Menu-sub1-link" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>{intl l="View all"}</a>
+                  </li>
+                </ul>
+
+              {/ifloop}
+            </li>
+          {/loop}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
