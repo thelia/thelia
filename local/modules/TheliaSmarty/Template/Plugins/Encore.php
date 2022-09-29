@@ -145,7 +145,6 @@ class Encore extends AbstractSmartyPlugin
         return $res;
     }
 
-
     public function renderWebpackLinkTags($args): string
     {
         $entryName = $args['entry'];
