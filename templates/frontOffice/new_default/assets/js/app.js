@@ -9,6 +9,7 @@ import axios from 'axios';
 
 import * as apiUtils from '@openstudio/thelia-api-utils';
 import Header from '@components/smarty/Header/Header';
+import Newsletter from '@components/smarty/Newsletter/Newsletter';
 
 window.apiUtils = apiUtils;
 
@@ -20,6 +21,7 @@ function main() {
   PasswordSwitcher();
   OrderDetailsButton();
   Header();
+  Newsletter();
 
   import(
     /* webpackChunkName: "SearchDropdown" */ /* webpackPrefetch: true */ '@components/smarty/SearchDropdown/SearchDropdown'
