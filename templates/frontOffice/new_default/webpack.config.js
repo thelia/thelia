@@ -53,6 +53,7 @@ Encore.setOutputPath('dist/')
   .enableSingleRuntimeChunk()
   .enableSourceMaps(!Encore.isProduction())
   .enableVersioning(Encore.isProduction())
+  .addStyleEntry('print', './assets/css/print.css')
   .setManifestKeyPrefix('dist/');
 
 // CSS CONFIG

@@ -1,5 +1,6 @@
 {$title = $TITLE|default:{config key="store_description"}}
 
+{cache key="thelia.strat.seo.top" ttl=86400}
 <section id="StratSeo" class="StratSeo is-hide">
     {include
       file="components/smarty/Title/Title.html"
@@ -36,3 +37,4 @@
       </div>
     </div>
 </section>
+{/cache}

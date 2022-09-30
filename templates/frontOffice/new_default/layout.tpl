@@ -100,6 +100,7 @@
 
   {* CSS *}
   {block name="css"}
+    {encore_entry_link_tags entry="print" attributes=["media" => "print"]}
     {encore_entry_link_tags entry="app"}
   {/block}
 
