@@ -45,7 +45,7 @@
           {/if}
           <button type="button" class="Header-link" data-toggle-cart data-close-login {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
             {renderIconSvg icon="cart" class="Header-icon cart"}
-            <span class="Header-linkText">{intl l="Mon panier"}</span>
+            <span class="Header-linkText">{intl l="My cart"}</span>
             <span id="js-cart-count" class="Header-cartCount">{{cart attr="product_count"}|default:0}</span>
           </button>
         </div>
