@@ -15,6 +15,8 @@ namespace TheliaSmarty\Template\Plugins;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Model\CategoryQuery;
+use Thelia\Model\FolderQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\TaxEngine\TaxEngine;
@@ -59,6 +61,8 @@ class FrontUtils extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'renderSvg', $this, 'renderSvg'),
             new SmartyPluginDescriptor('function', 'psesByProduct', $this, 'psesByProduct'),
             new SmartyPluginDescriptor('function', 'extractOptions', $this, 'extractOptions'),
+            new SmartyPluginDescriptor('function', 'isInCategory', $this, 'isInCategory'),
+            new SmartyPluginDescriptor('function', 'isInFolder', $this, 'isInFolder'),
         ];
     }
 
@@ -228,5 +232,77 @@ class FrontUtils extends AbstractSmartyPlugin
         }
 
         return $param;
+    }
+
+    /**
+     * @param array   $params
+     * @param \Smarty $smarty
+     */
+    public function isInFolder($params)
+    {
+        if (!isset($params['folder']) || !isset($params['current_folder'])) {
+            return '';
+        }
+
+        $res = $this->iterateFolders($params['current_folder']);
+
+        return \in_array($params['folder'], array_reverse($res));
+    }
+
+    private function iterateFolders($folderId, $list = [])
+    {
+        if ($folderId === 0) {
+            return [...$list, 0];
+        }
+
+        if (null === $folderId) {
+            return $list;
+        }
+
+        $folder = FolderQuery::create()->findOneById($folderId);
+
+        if ($folder === null) {
+            return $this->iterateCategories(null, $list);
+        }
+
+        $list[] = $folder->getId();
+
+        return $this->iterateFolders($folder->getParent(), $list);
+    }
+
+    /**
+     * @param array   $params
+     * @param \Smarty $smarty
+     */
+    public function isInCategory($params)
+    {
+        if (!isset($params['category']) || !isset($params['current_category'])) {
+            return '';
+        }
+
+        $res = $this->iterateCategories($params['current_category']);
+
+        return \in_array($params['category'], array_reverse($res));
+    }
+
+    private function iterateCategories($categoryId, $list = [])
+    {
+        if ($categoryId === 0) {
+            return [...$list, 0];
+        }
+
+        if (null === $categoryId) {
+            return $list;
+        }
+
+        $category = CategoryQuery::create()->findOneById($categoryId);
+
+        if ($category === null) {
+            return $this->iterateCategories(null, $list);
+        }
+
+        $list[] = $category->getId();
+
+        return $this->iterateCategories($category->getParent(), $list);
     }
 }
