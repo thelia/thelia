@@ -78,7 +78,7 @@
         "symfony/mailer": "6.0.*|6.1.*",
         "symfony/webpack-encore-bundle": "^1.14",
         "composer/composer": "~2.3.0",
-        "thelia/thelia-blocks-module": "^2.0.2-beta",
+        "thelia/thelia-blocks-module": "^2.0.3-beta",
         "thelia/thelia-library-module": "^1.1.6"
     },
     "require-dev": {

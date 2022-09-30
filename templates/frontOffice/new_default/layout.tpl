@@ -89,11 +89,11 @@
 
   {block name="share-meta"}
     {* Share meta *}
-    <meta property="og:image" content="{encore_manifest_file file="default-social-thumbnail.png"}" />
-    <meta property="og:image:secure_url" content="{encore_manifest_file file="default-social-thumbnail.png"}" />
+    <meta property="og:image" content="{encore_manifest_file file="default-social-thumbnail.webp"}" />
+    <meta property="og:image:secure_url" content="{encore_manifest_file file="default-social-thumbnail.webp"}" />
     <meta property="og:image:width" content="450" />
     <meta property="og:image:height" content="450" />
-    <meta name="twitter:image" content="{encore_manifest_file file="default-social-thumbnail.png"}" />
+    <meta name="twitter:image" content="{encore_manifest_file file="default-social-thumbnail.webp"}" />
   {/block}
 
   {hook name="main.head-top"}
