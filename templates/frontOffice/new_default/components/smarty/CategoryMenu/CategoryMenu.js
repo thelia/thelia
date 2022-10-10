@@ -38,12 +38,6 @@ export default function CategoryMenu() {
 
       // need to focus when opening overlay
       const targetButtonClose = document.querySelector('.CategoryMenu-close');
-      console.log(
-        'document.querySelector.classList: ',
-        document
-          .querySelector('body')
-          .classList.contains('CategoryMenu--active')
-      );
 
       if (
         !targetButtonClose ||

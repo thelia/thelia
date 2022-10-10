@@ -2,7 +2,6 @@ import axios from 'axios';
 
 export default function Newsletter() {
   const forms = document.querySelectorAll('.Newsletter-form');
-  console.log('forms: ', forms);
 
   [...forms].forEach((form) => {
     form.addEventListener('submit', async function (e) {

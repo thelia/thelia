@@ -13,6 +13,7 @@
 @import 'animations';
 @import 'table';
 @import 'wysiwyg';
+@import 'zoom';
 @import 'print';
 
 @import '../../components/**/*.css';

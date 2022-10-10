@@ -49,7 +49,5 @@ export default function useEnableCta(currentStep = 1, checkout = {}) {
     }
   }, [checkout, selectedMode, currentStep, phoneNumberValid]);
 
-  console.log(checkout, selectedMode, currentStep, phoneNumberValid);
-
   return enabledCta;
 }

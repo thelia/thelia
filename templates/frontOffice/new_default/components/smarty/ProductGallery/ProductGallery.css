@@ -9,8 +9,6 @@
   }
 
   &-tagList {
-    width: 511px;
-    margin: auto;
     position: absolute;
     top: 1rem;
     right: 0;
@@ -20,6 +18,8 @@
     flex-wrap: wrap;
     gap: 10px;
     align-items: center;
+    width: 511px;
+    margin: auto;
   }
 
   &-list {
