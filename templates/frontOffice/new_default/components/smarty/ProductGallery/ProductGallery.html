@@ -28,7 +28,7 @@
         height="525"
         loading="lazy"
         data-image-zoom
-      />
+      >
     {else}
       <img
         id="MainImage"
@@ -39,13 +39,13 @@
         width="525"
         height="525"
         loading="lazy"
-      />
+      >
     {/if}
   </picture>
   <ul class="ProductGallery-list max-w-[525px]">
     {foreach from=$images|default:[] item=image name="thumbnail"}
       <li class="ProductGallery-item ">
-        <img src="{$image['url']}" data-image-id="{$image['id']}" class="ProductGallery-thumbnail {if $smarty.foreach.thumbnail.first}is-active{/if}" alt="{$image['alt']}" title="{$image['alt']}" width="92" height="92" loading="lazy" tabindex="0" />
+        <img src="{$image['url']}" data-image-id="{$image['id']}" class="ProductGallery-thumbnail {if $smarty.foreach.thumbnail.first}is-active{/if}" alt="{$image['alt']}" title="{$image['alt']}" width="92" height="92" loading="lazy" tabindex="0" >
       </li>
     {/foreach}
   </ul>

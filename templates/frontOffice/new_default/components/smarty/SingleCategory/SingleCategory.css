@@ -27,6 +27,13 @@
     }
   }
 
+  &.is-nav {
+    @apply hidden md:flex;
+
+    margin-bottom: rem(8px);
+    box-shadow: 0 0 10px theme("colors.gray.300");
+  }
+
   &--small {
     @apply w-full flex-row h-16;
 

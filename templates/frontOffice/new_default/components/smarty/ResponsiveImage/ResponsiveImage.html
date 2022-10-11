@@ -1,0 +1,14 @@
+<picture class="w-full ResponsiveImage {$class}">
+    {foreach $images as $index => $image}
+        <source media="{$image['breakpoint']}" srcset="{$image['url']} {$index + 1}x">
+    {/foreach}
+
+    <img
+      src="{$defaultImageUrl['url']}"
+      alt="{$title}"
+      loading="{$loading|default:'lazy'}"
+      width="{$defaultImageUrl['width']}"
+      height="{$defaultImageUrl['height']}"
+      class="w-full"
+    >
+</picture>

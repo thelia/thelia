@@ -9,7 +9,7 @@
     <div class="Newsletter-field">
       {form_field field="email"}
       <div class="flex text-gray-700">
-        <input class="Input-field  text-primary bg-white" type="email" name="{$name}" id="{$label_attr.for|default:null}" value="{$value}" placeholder="{$label}" class="w-full" {if $required} aria-required="true" required{/if} />
+        <input class="Input-field  text-primary bg-white w-full" type="email" name="{$name}" id="{$label_attr.for|default:null}" value="{$value}" placeholder="{$label}" {if $required} aria-required="true" required{/if}>
       </div>
       <div class="hidden py-2 text-red-500 invalid-feedback">
           {intl l="Error during registration"}

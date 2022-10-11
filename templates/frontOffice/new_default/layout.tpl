@@ -89,11 +89,11 @@
 
   {block name="share-meta"}
     {* Share meta *}
-    <meta property="og:image" content="{encore_manifest_file file="default-social-thumbnail.webp"}" />
-    <meta property="og:image:secure_url" content="{encore_manifest_file file="default-social-thumbnail.webp"}" />
-    <meta property="og:image:width" content="450" />
-    <meta property="og:image:height" content="450" />
-    <meta name="twitter:image" content="{encore_manifest_file file="default-social-thumbnail.webp"}" />
+    <meta property="og:image" content="{encore_manifest_file file="default-social-thumbnail.webp"}">
+    <meta property="og:image:secure_url" content="{encore_manifest_file file="default-social-thumbnail.webp"}">
+    <meta property="og:image:width" content="450">
+    <meta property="og:image:height" content="450">
+    <meta name="twitter:image" content="{encore_manifest_file file="default-social-thumbnail.webp"}">
   {/block}
 
   {hook name="main.head-top"}
@@ -119,11 +119,11 @@
 
   {* Feeds *}
   <link rel="alternate" type="application/rss+xml" title="{intl l='All products'}"
-    href="{url path="/feed/catalog/%lang" lang=$lang_locale}" />
+    href="{url path="/feed/catalog/%lang" lang=$lang_locale}">
   <link rel="alternate" type="application/rss+xml" title="{intl l='All contents'}"
-    href="{url path="/feed/content/%lang" lang=$lang_locale}" />
+    href="{url path="/feed/content/%lang" lang=$lang_locale}">
   <link rel="alternate" type="application/rss+xml" title="{intl l='All brands'}"
-    href="{url path="/feed/brand/%lang" lang=$lang_locale}" />
+    href="{url path="/feed/brand/%lang" lang=$lang_locale}">
   {block name="feeds"}{/block}
 
   {hook name="main.head-bottom"}

@@ -5,7 +5,7 @@
 {$type = $type|default:"h2"}
 
 <a href="{$URL}"  class="SingleCategory {$class|default:''}">
-  <figure tabindex="-1" class="SingleCategory-img">
+  <figure class="SingleCategory-img">
     {loop name="category_thumbnail" type="image" quality="100" category=$ID width=$width height=$height resize_mode="crop" limit="1" format="webp"}
         <img
           src="{$IMAGE_URL}"
@@ -13,7 +13,8 @@
           title="{{$TITLE|default:$categoryTitle}|cat:' '|cat:'Visuel'}"
           width="{$width}"
           height="{$height}"
-          loading="lazy"/>
+          loading="lazy"
+        >
     {/loop}
     {elseloop rel="category_thumbnail"}
         <img
@@ -22,7 +23,7 @@
           title="{$categoryTitle|cat:' '|cat:'Visuel'}"
           width="{$width}"
           height="{$height}"
-        />
+        >
     {/elseloop}
   </figure>
 

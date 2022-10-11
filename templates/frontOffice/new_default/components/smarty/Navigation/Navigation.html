@@ -13,8 +13,6 @@
   {/loop}
 {/if}
 
-
-
 <div id="StickyToggler" class="Navigation">
   <div class="container">
     <div class=" Navigation-contain">
@@ -39,7 +37,9 @@
                 <ul class="Menu-sub1">
                   {loop type="category" name="Navigation.sub1" parent=$ID need_count_child=false}
                     <li class="Menu-sub1-item">
-                      <a href="{$URL}" class="Menu-sub1-link" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>{$TITLE}</a>
+                      <a href="{$URL}" class="Menu-sub1-link md:hidden" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>{$TITLE}</a>
+
+                      {include file="components/smarty/SingleCategory/SingleCategory.html" class="SingleCategory--small is-nav"}
 
                       {ifloop rel="Navigation.sub2"}
                         <ul class="Menu-sub2">
@@ -51,10 +51,57 @@
                     </li>
                   {/loop}
                   <li class="Menu-sub1-item is-seeAll">
-                    <a href="{$URL}" class="Menu-sub1-link" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>{intl l="View all"}</a>
+                    <a href="{$URL}" class="Menu-sub1-link" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
+                      <span>
+                        {loop
+                          type="image"
+                          name="CategoriesPanels.img"
+                          source="category"
+                          source_id=$ID
+                          limit=1
+                        }
+                          {$images = [
+                            [
+                              "title" => $TITLE,
+                              "breakpoint" => "(min-width: 1280px)",
+                              "url" => "/legacy-image-library/category_image_{$ID}/full/!250,/0/default.webp",
+                              "link" => $URL,
+                              "description" => $DESCRIPTION,
+                              "alt" => $TITLE,
+                              "width" => '250',
+                              "height" => '250'
+                            ],
+                            [
+                              "title" => $TITLE,
+                              "breakpoint" => "(min-width: 768px)",
+                              "url" => "/legacy-image-library/category_image_{$ID}/full/!158,/0/default.webp",
+                              "link" => $URL,
+                              "description" => $DESCRIPTION,
+                              "alt" => $TITLE,
+                              "width" => '158',
+                              "height" => '158'
+                            ]
+                          ]}
+                          {include
+                            file="components/smarty/ResponsiveImage/ResponsiveImage.html"
+                            images=$images|default:[]
+                            defaultImageUrl=$images[0]
+                            title=$images[0]['title']
+                            class="object-cover object-center w-full h-auto"
+                            loading="lazy"
+                            width=$images[0]['width']
+                            height=$images[0]['height']
+                          }
+                        {/loop}
+                        {elseloop rel="CategoriesPanels.img"}
+                          <img src="{encore_manifest_file file="dist/images/placeholder.webp"}" class="object-cover object-center w-full h-auto">
+                        {/elseloop}
+                      </span>
+
+                      {intl l="I discover"} {$TITLE}
+                    </a>
                   </li>
                 </ul>
-
               {/ifloop}
             </li>
           {/loop}
