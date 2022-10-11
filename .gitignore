@@ -89,6 +89,9 @@ templates/pdf/*
 .idea/
 .history/
 .husky/
+.lighthouseci
+setup/audit/lighthouserc.yaml
+setup/audit/greenit.yaml
 composer.phar
 
 ###> friendsofphp/php-cs-fixer ###

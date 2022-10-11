@@ -6,13 +6,19 @@ include .env.local
 # =========================== SHORTCUT ===========================
 
 Y = yarn
-TEMPLATE_NAME=${ACTIVE_FRONT_TEMPLATE}
-SITE_NAME=thelia
-FRONT_OFFICE = templates/frontOffice/$(TEMPLATE_NAME)
-OUTPUT_PATH_LIGHTHOUSE = ./web/cache/audit/lighthouse
+
+# Template dir
+FRONT_OFFICE = templates/frontOffice/$(ACTIVE_FRONT_TEMPLATE)
+
+# SETUP CONSTANT
+SETUP_PATH = $(shell test -d ./setup && echo "./setup" || echo "./local/setup")
 OUTPUT_PATH_GREENIT = ./web/cache/audit/greenit
-# TODO Récupérer le bon path du setup.
-# SETUP_PATH=
+
+# COLORS
+RED=$'\x1b[31m
+GREEN=$'\x1b[32m
+YELLOW=$'\x1b[33m
+reset=`tput sgr0`
 
 # =========================== MAIN COMMANDS ===========================
 
@@ -66,22 +72,37 @@ cache-clear: ## clear cache
 	@rm -rf var/cache & rm -rf web/assets & rm -rf web/cache & rm -rf web/templates-assets & rm -rf web/modules-assets
 
 lighthouse: ## review lighthouse
-	# @if [ ! -x "$(command -v lighthouse)" ]; then\
-	# 	echo 'Error: lighthouse is not installed.' >&2;\
-	# 	exit 1;\
-	# fi;
-	@if [ ! -d $(OUTPUT_PATH_LIGHTHOUSE) ]; then \
-		mkdir $(OUTPUT_PATH_LIGHTHOUSE); \
+	@if [[ -z $(LHCI_DOMAIN) ]]; then\
+		echo "LHCI_DOMAIN=your-domain.test" >> .env.local;\
 	fi;
-	@lighthouse --config-path:setup/audit/lighthouse.yaml --output-path="$(OUTPUT_PATH_LIGHTHOUSE)/index.html"
+	@if [[ -z $(LHCI_PRESET) ]]; then\
+		echo "LHCI_PRESET=desktop" >> .env.local;\
+	fi;
+	@if [ ! -f $(SETUP_PATH)/audit/lighthouserc.yaml ]; then \
+		echo "${YELLOW}lighthouserc.yaml doesn't exists so creating with env config${reset}"; \
+		cp $(SETUP_PATH)/audit/lighthouserc.default.yaml $(SETUP_PATH)/audit/lighthouserc.yaml; \
+		sed -i '' 's/__PRESET__/$(LHCI_PRESET)/g' $(SETUP_PATH)/audit/lighthouserc.yaml;\
+	fi;
+	@if [ ! -x $(command -v lhci) ]; then\
+		npm install -g @lhci/cli;\
+	fi;
+	@lhci collect --config=$(SETUP_PATH)/audit/lighthouserc.yaml
+	@open .lighthouseci/*.html
 
 greenit: ## review green it
 	@if [ ! -x $(npm ls --link --global | grep greenit) ]; then \
-		echo "Error: greenit is not installed." >&2; \
+		echo "${RED}Error: greenit is not installed.${reset}" >&2; \
 		echo "Please look up for https://github.com/cnumr/GreenIT-Analysis-cli#installation"; \
 		exit 1; \
 	fi;
-	@if [ ! -d $(OUTPUT_PATH_GREENIT) ]; then \
-		mkdir $(OUTPUT_PATH_GREENIT); \
+	if [ ! -f $(SETUP_PATH)/audit/greenit.yaml ]; then \
+		echo "${YELLOW}greenit.yaml doesn't exists so creating with env config${reset}"; \
+		cp $(SETUP_PATH)/audit/greenit.default.yaml $(SETUP_PATH)/audit/greenit.yaml; \
+		sed -i '' 's/__DOMAIN__/$(LHCI_DOMAIN)/g' $(SETUP_PATH)/audit/greenit.yaml;\
 	fi;
-	@greenit analyse setup/audit/greenit.yaml $(OUTPUT_PATH_GREENIT)/global.html --ci --format=html && open $(OUTPUT_PATH_GREENIT)/global.html
+	@if [ ! -d $(OUTPUT_PATH_GREENIT) ]; then \
+		mkdir -p $(OUTPUT_PATH_GREENIT); \
+	fi;
+	@greenit analyse $(SETUP_PATH)/audit/greenit.yaml $(OUTPUT_PATH_GREENIT)/global.html --ci --format=html && open $(OUTPUT_PATH_GREENIT)/global.html
+
+audit: build greenit lighthouse ## audit website
