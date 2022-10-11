@@ -1,6 +1,13 @@
 .Navigation {
   display: none;
 }
+
+.Menu-sub1-item {
+  &.is-seeAll {
+    display: none;
+  }
+}
+
 @screen md {
   .Navigation {
     position: sticky;
@@ -192,7 +199,7 @@
       max-width: 340px;
 
       &.is-seeAll {
-        display: hidden;
+        display: flex;
         grid-row: 1 / calc(var(--grid-size) + 2);
         grid-column: var(--grid-size) / calc(var(--grid-size) + 1);
         align-self: start;
