@@ -24,7 +24,10 @@
           {loop type="category" name="store_navigation"  need_count_child=false parent=0}
             <li class="Menu-item">
               {if {count type="category" parent=$ID} > 0}
-                <button type="button" class="js-toggleCategory Menu-item-link {if {isInCategory category=$ID current_category=$category_id}}Menu-item-link--active{/if}" data-href="{$URL}" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
+                <span role="button" class="md:hidden Menu-item-link {if {isInCategory category=$ID current_category=$category_id}}Menu-item-link--active{/if}" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
+                  {$TITLE}
+                </span>
+                <button type="button" class="hidden md:block js-toggleCategory Menu-item-link {if {isInCategory category=$ID current_category=$category_id}}Menu-item-link--active{/if}" data-href="{$URL}" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
                   {$TITLE}
                 </button>
               {else}
