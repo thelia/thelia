@@ -55,35 +55,62 @@
           </div>
         </div>
         {if $DESCRIPTION|default:null}
-        <section id="desc" class="pt-12 lg:pt-16">
-          <div class="py-12 bg-main-light lg:pt-14 lg:pb-16">
-            <div class="container">
-              <div class="max-w-[714px] mx-auto">
-                {include file="components/smarty/Title/Title.html" type="h2" level="3" title={intl l="Description"} class="mb-8 lg:mb-7"}
-                <div class="wysiwyg">
-                  {$DESCRIPTION nofilter}
-                {if $POSTSCRIPTUM|default:null}
-                    <div>
-                      {$POSTSCRIPTUM}
-                    </div>
-                {/if}
-                </div>
-                <div class="container my-8 wysiwyg">
-                  {loop
-                    type="block_group"
-                    name="product.blocks"
-                    item_type="product"
-                    item_id=$product_id
-                  }
-                    {$RENDER nofilter}
-                  {/loop}
+          <section id="desc" class="pt-12 lg:pt-16">
+            <div class="py-12 bg-main-light lg:pt-14 lg:pb-16">
+              <div class="container">
+                <div class="max-w-[714px] mx-auto">
+                  {include file="components/smarty/Title/Title.html" type="h2" level="3" title={intl l="Description"} class="mb-8 lg:mb-7"}
+                  <div class="wysiwyg">
+                    {$DESCRIPTION nofilter}
+                    {if $POSTSCRIPTUM|default:null}
+                        <div>
+                          {$POSTSCRIPTUM nofilter}
+                        </div>
+                    {/if}
+                  </div>
+                  <div class="container my-8 wysiwyg">
+                    {loop
+                      type="block_group"
+                      name="product.blocks"
+                      item_type="product"
+                      item_id=$product_id
+                    }
+                      {$RENDER nofilter}
+                    {/loop}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
         {/if}
-          {include file="components/smarty/ProductAccessories/ProductAccessories.html" product_id=$product_id}
+
+        {ifloop rel="product.features"}
+          <section id="features">
+            <div class="py-12 bg-gray-100 lg:pt-14 lg:pb-16">
+              <div class="container">
+                <div class="max-w-[714px] mx-auto">
+                  {include file="components/smarty/Title/Title.html" type="h2" level="3" title={intl l="Features"} class="mb-8 lg:mb-7"}
+                  <div class="wysiwyg">
+                    {loop type="feature" name="product.features" product=$product_id}
+                      {ifloop rel="product.features.val"}
+                        <p class="text-sm">
+                          <span class="font-semibold">{$TITLE} :</span>
+
+                          {loop type="feature_value" feature=$ID name="product.features.val" product=$product_id}
+                            {$TITLE} {if $LOOP_COUNT != $LOOP_TOTAL}-{/if}
+                          {/loop}
+                        </p>
+                      {/ifloop}
+                    {/loop}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        {/ifloop}
+
+        {include file="components/smarty/ProductAccessories/ProductAccessories.html" product_id=$product_id}
+
         {hook name="product.bottom" product={$ID}}
       </div>
       {/loop}
