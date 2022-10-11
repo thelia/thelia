@@ -37,10 +37,10 @@ function LoginForm({ setLoginHandler, redirectionToCheckout }) {
         setLoginHandler(true);
       }}
     >
-      <legend className="mb-6 Title Title--3">
+      <legend className="Title Title--3 mb-6">
         {intl.formatMessage({ id: 'ALREADY_CUSTOMER' })}
       </legend>
-      <div className="grid grid-cols-1 gap-6 mb-6">
+      <div className="mb-6 grid grid-cols-1 gap-6">
         <Input
           type="email"
           name="email"
@@ -66,7 +66,7 @@ function LoginForm({ setLoginHandler, redirectionToCheckout }) {
           message={error?.response?.data?.description || 'Erreur'}
         />
       ) : null}
-      <div className="flex flex-wrap items-center justify-between gap-4 mt-6">
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
         <button
           type="submit"
           className="Button"
@@ -95,10 +95,10 @@ function IsLoggedOut({ setLoginHandler, redirectionToCheckout }) {
         redirectionToCheckout={redirectionToCheckout}
       />
       <fieldset className="pt-12">
-        <span className="block mb-5 Title Title--3">
+        <span className="Title Title--3 mb-5 block">
           {intl.formatMessage({ id: 'NEW_CUSTOMER' })}
         </span>
-        <a href="/register" className="inline-block mb-20 Button">
+        <a href="/register" className="Button mb-20 inline-block">
           {intl.formatMessage({ id: 'CREATE_ACCOUNT' })}
         </a>
       </fieldset>
@@ -131,7 +131,7 @@ export function MiniLogin({ isLogged }) {
   useLockBodyScroll(ref, visible, redirectionToCheckout);
 
   useClickAway(ref, (e) => {
-    if (!e.target?.matches('[data-toggle-login]')) {
+    if (!e.target?.matches('[data-toggle-login]') && visible) {
       closeAndFocus(() => dispatch(hideLogin()), '[data-toggle-login]');
     }
   });
@@ -159,7 +159,7 @@ export function MiniLogin({ isLogged }) {
         className="SideBar-close"
         aria-label="Fermer le formulair de connexion"
       >
-        <IconCLose className="w-3 h-3 pointer-events-none" />
+        <IconCLose className="pointer-events-none h-3 w-3" />
       </button>
       {isLoading ? (
         <Loader />

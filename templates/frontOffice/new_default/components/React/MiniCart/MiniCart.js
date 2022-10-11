@@ -326,7 +326,7 @@ function MiniCart({ visible, redirect }) {
   useLockBodyScroll(ref, visible, redirect);
 
   useClickAway(ref, (e) => {
-    if (!e.target?.matches('[data-toggle-cart]')) {
+    if (!e.target?.matches('[data-toggle-cart]') && visible) {
       closeAndFocus(() => dispatch(hideCart()), '[data-toggle-cart]');
     }
   });

@@ -39,7 +39,6 @@ export default function zoom() {
 }
 
 function setZoom(z, bgImg, bgPosition, zLeft, zTop) {
-  console.log('bgImg: ', bgImg);
   z.style.backgroundImage = bgImg;
   z.style.backgroundPosition = bgPosition;
   z.style.left = zLeft + 'px';
