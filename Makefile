@@ -35,7 +35,7 @@ install: ## install existing project
 	@php Thelia t:i
 	@make activate-module
 	@if [ ! -f .env.local ]; then \
-			touch .env.local\
+			touch .env.local;\
 	fi;
 	@if ! grep -q ACTIVE_FRONT_TEMPLATE .env.local; then \
     echo '\nACTIVE_FRONT_TEMPLATE=modern' >> .env.local; \
