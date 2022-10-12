@@ -4,11 +4,12 @@
 {$types = $types|default:$smarty.get.types|default:[]}
 {$brands=$brands|default:$smarty.get.brands|default: []}
 {$features=$features|default:$smarty.get.features|default: []}
+{$attributes=$attributes|default:$smarty.get.attributes|default: []}
 {$min_price=$min_price|default:$smarty.get.min_price|default: 0}
 {$max_price=$max_price|default:$smarty.get.max_price|default: 9999999}
 {$complexPagination={config key="complex_pagination"}|default:false}
 
-{$limit=32}
+{$limit = 32}
 
 {extractOptions features=$features brands=$brands categories=$categories}
 
@@ -17,6 +18,7 @@
     {$types = ','|explode:$types}
 {/if}
 
+{$attributesList = {','|implode:$attributes}}
 
 {$amount={count
   type="product"
@@ -26,17 +28,21 @@
   order=$product_order
   page=$product_page
   brand=$brands
+  title={$smarty.get.query|default:null}
   new={'new'|in_array:$types}
   promo={'promo'|in_array:$types}
-  title={$smarty.get.query|default:null}
   feature_availability=$features
+  attribute_extend=true
+  attribute_availability=$attributesList
   min_price=$min_price
   max_price=$max_price
 }}
-<div id="GridProductWrapper" class="CategoryProducts">
+
+
+<div id="GridProductWrapper" class="mb-10 md:mb-20 GridProductWrapper">
   {ifloop rel="product_list"}
 
-    <div id="GridProduct" class="grid grid-flow-row-dense grid-cols-1 grid-rows-1 gap- md:grid-cols-2 lg:grid-cols-4" data-total="{$amount}" data-unit=".SingleProduct">
+    <div id="GridProduct" class="ProductList" data-total="{$amount}" data-unit=".SingleProduct">
       {loop
         type="product"
         name="product_list"
@@ -50,26 +56,24 @@
         promo={'promo'|in_array:$types}
         title={$smarty.get.query|default:null}
         feature_availability=$features
+        attribute_extend=true
+        attribute_availability=$attributesList
         min_price=$min_price
         max_price=$max_price
         }
           {include file="components/smarty/SingleProduct/SingleProduct.html"}
-    {/loop}
+      {/loop}
     </div>
 
-        {if $complexPagination}
-          {if $amount > $product_page*$limit}
-            {include file="components/smarty/ComplexPagination/ComplexPagination.html" current_page=$product_page loop_name="product_list"}
-          {/if}
-        {else}
-        {if $amount > $limit}
-                {include file="components/smarty/Pagination/Pagination.html" current_page=$product_page loop_name="product_list"}
-          {/if}
-        {/if}
+    {if $amount > $limit}
+          {include file="components/smarty/Pagination/Pagination.html" current_page=$product_page loop_name="product_list"}
+    {/if}
 
 
+  {include file="components/smarty/Loader/Loader.html" class="w-56 h-56 GridProductWrapper-loader"}
   {/ifloop}
   {elseloop rel="product_list"}
-    {include file="components/smarty/Alert/Alert.html" type="warning" title={intl l="No results"}}
+    {include file="components/smarty/Alert/Alert.html" type="warning" title={intl l="Il semblerait que nous n'ayons plus d'articles dans cette rubrique"}}
+    <a href="{navigate to="index"}" role="button" class="inline-block mt-8 lg:mt-12 Button">{intl l="Go home"}</a>
   {/elseloop}
 </div>

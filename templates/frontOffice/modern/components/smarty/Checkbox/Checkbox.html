@@ -1,13 +1,11 @@
-<label class="inline-flex items-center">
+<label class="Checkbox {$class|default:null}">
   <input
     type="{$type|default:"checkbox"}"
     name="{$name}"
     id="{$id}"
-    class="border-gray-300 border text-main focus:border-gray-300 focus:ring-main"
     value="{$value}"
     {if $checked|default:false} checked{/if}
     {if $required|default:false} aria-required="true" required{/if}
   />
-
-  <span class="ml-2">{$label|default:null nofilter}</span>
+  <span>{$label|default:null nofilter}</span>
 </label>

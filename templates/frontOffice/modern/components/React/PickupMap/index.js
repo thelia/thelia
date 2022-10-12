@@ -1,6 +1,13 @@
 import 'leaflet/dist/leaflet.css';
 
-import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
+import {
+  FeatureGroup,
+  MapContainer,
+  Marker,
+  Popup,
+  TileLayer,
+  useMap
+} from 'react-leaflet';
 import React, {
   createRef,
   useCallback,
@@ -10,7 +17,6 @@ import React, {
 } from 'react';
 import { orderBy, size } from 'lodash-es';
 import {
-  useAddressQuery,
   useGetCheckout,
   usePickupLocations,
   useSetCheckout
@@ -29,6 +35,8 @@ import markerImgShadow from './images/marker-shadow.png';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import Title from '../Title';
+import { useRef } from 'react';
+// import { pickupFixtures } from '../Checkout/constants';
 
 const customIcon = icon({
   iconUrl: markerImg,
@@ -101,7 +109,7 @@ function InfoPopUp({ location, selected, onChooseLocation }) {
         {!selected ? (
           <button
             type="button"
-            className="Button Button--primary mt-4"
+            className="mt-4 Button Button--primary"
             onClick={() => {
               onChooseLocation(location.id);
               if (location.refList?.current) {
@@ -123,18 +131,21 @@ function InfoPopUp({ location, selected, onChooseLocation }) {
 
 function MapDisplay({ locations, selectedLocation, onChooseLocation }) {
   const map = useMap();
+  const groupRef = useRef(null);
 
   const mapCenter = useMemo(() => {
     if (locations.length > 0) {
-      const center = getLatLngCenter(
-        locations.map((point) => {
-          return {
-            latitude: parseFloat(point.latitude || 0),
-            longitude: parseFloat(point.longitude || 0)
-          };
-        })
-      );
-      return [center.latitude, center.longitude];
+      const markers = locations.map((point) => {
+        return {
+          latitude: parseFloat(point.latitude || 0),
+          longitude: parseFloat(point.longitude || 0)
+        };
+      });
+      const center = getLatLngCenter(markers);
+      return {
+        center: [center.latitude, center.longitude],
+        bounds: markers.map((e) => [e.latitude, e.longitude])
+      };
     }
   }, [locations]);
 
@@ -146,7 +157,8 @@ function MapDisplay({ locations, selectedLocation, onChooseLocation }) {
         map.openPopup(selectedLocation.ref.current);
       }
     } else if (mapCenter) {
-      map.setView(mapCenter);
+      map.setView(mapCenter.center);
+      map.fitBounds(mapCenter.bounds);
     }
   }, [mapCenter, selectedLocation, map]);
 
@@ -156,21 +168,23 @@ function MapDisplay({ locations, selectedLocation, onChooseLocation }) {
         url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
         subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
       />
-      {locations.map((location) => {
-        return (
-          <Marker
-            key={location.id}
-            position={[location.latitude, location.longitude]}
-            icon={findIcon(location?.moduleOptionCode)}
-          >
-            <InfoPopUp
-              location={location}
-              selected={selectedLocation?.id === location.id}
-              onChooseLocation={onChooseLocation}
-            />
-          </Marker>
-        );
-      })}
+      <FeatureGroup ref={groupRef}>
+        {locations.map((location) => {
+          return (
+            <Marker
+              key={location.id}
+              position={[location.latitude, location.longitude]}
+              icon={findIcon(location?.moduleOptionCode)}
+            >
+              <InfoPopUp
+                location={location}
+                selected={selectedLocation?.id === location.id}
+                onChooseLocation={onChooseLocation}
+              />
+            </Marker>
+          );
+        })}
+      </FeatureGroup>
     </div>
   );
 }
@@ -180,7 +194,7 @@ function PickupPointsList({ locations, selectedLocation, onChooseLocation }) {
 
   return (
     <div
-      className="divide-y divide-gray-200 overflow-y-auto rounded-l bg-white xl:w-4/12"
+      className="overflow-y-auto bg-white divide-y divide-gray-200 rounded-l 2xl:w-5/12"
       style={{ height: '50vh' }}
     >
       {size(locations) > 0 ? (
@@ -191,14 +205,14 @@ function PickupPointsList({ locations, selectedLocation, onChooseLocation }) {
               ref={location.refList}
               className={`border-primary flex cursor-pointer flex-wrap items-center  justify-between border-b border-opacity-50 p-4 ${
                 selectedLocation?.id === location.id
-                  ? 'bg-gray-200 font-bold '
+                  ? 'bg-main font-bold text-white'
                   : 'bg-gray-100'
               }`}
               onClick={() => {
                 onChooseLocation(location.id);
               }}
             >
-              <div className="mb-4 w-3/4 pr-4 text-left normal-case leading-tight">
+              <div className="w-3/4 pr-4 mb-4 leading-tight text-left normal-case">
                 <div className="font-bold">{location.title}</div>
                 <div className="mt-2 text-sm">
                   {location.module?.i18n?.title}
@@ -224,7 +238,8 @@ function PickupPointsList({ locations, selectedLocation, onChooseLocation }) {
 
 export function PickupMap({ query, defaultAddressId }) {
   const { data: checkout } = useGetCheckout();
-  const { mutate: setCheckout } = useSetCheckout();
+  const { mutateAsync: setCheckout } = useSetCheckout();
+  const intl = useIntl();
 
   const {
     data: pickupPoints = [],
@@ -253,19 +268,23 @@ export function PickupMap({ query, defaultAddressId }) {
   ]);
 
   const onSelect = useCallback(
-    (id) => {
+    async (id) => {
       const location = locations.find((l) => l.id === id);
       if (location?.address) {
-        setCheckout({
-          ...checkout,
-          pickupAddress: { ...location.address, type: 'pickup' },
-          deliveryModuleId: location.moduleId,
-          deliveryAddressId: defaultAddressId,
-          deliveryModuleOptionCode: location.moduleOptionCode
-        });
+        try {
+          await setCheckout({
+            ...checkout,
+            pickupAddress: { ...location.address, type: 'pickup' },
+            deliveryModuleId: location.moduleId,
+            deliveryAddressId: null,
+            deliveryModuleOptionCode: location.moduleOptionCode
+          });
+        } catch (error) {
+          alert('Cannot select this pickup point');
+        }
       }
     },
-    [locations, checkout, setCheckout, defaultAddressId]
+    [locations, checkout, setCheckout]
   );
 
   const selected = useMemo(() => {
@@ -291,23 +310,29 @@ export function PickupMap({ query, defaultAddressId }) {
   }, [locations]);
 
   if (isLoading) {
-    return <Loader size="w-12 h-12" />;
+    return <Loader />;
   }
 
   if (error) {
-    return <Alert type="error" title="Error" />;
+    return (
+      <Alert
+        type="warning"
+        title={intl.formatMessage({ id: 'ERROR' })}
+        message={intl.formatMessage({ id: 'NO_PICKUP_POINT_LOADED' })}
+      />
+    );
   }
 
   return locations.length > 0 ? (
     <div className="lg:flex">
       <MapContainer
         center={mapCenter}
-        zoom={13}
+        zoom={15}
         style={{ height: '50vh', width: '100%' }}
-        className="flex-1 overflow-hidden "
+        className="z-0 overflow-hidden"
       >
         <div>
-          <div className="relative h-full overflow-hidden border-t border-gray-300 py-8 xl:flex">
+          <div className="relative h-full py-8 overflow-hidden border-t border-gray-300 xl:flex">
             <MapDisplay
               locations={locations}
               selectedLocation={selected}
@@ -323,7 +348,13 @@ export function PickupMap({ query, defaultAddressId }) {
         onChooseLocation={onSelect}
       />
     </div>
-  ) : null;
+  ) : (
+    <Alert
+      type="warning"
+      title={intl.formatMessage({ id: 'ERROR' })}
+      message={intl.formatMessage({ id: 'NO_PICKUP_POINT_LOADED' })}
+    />
+  );
 }
 
 export function ZipCodeSearcher({ onSubmit }) {
@@ -333,7 +364,7 @@ export function ZipCodeSearcher({ onSubmit }) {
 
   return (
     <form
-      className="mb-4 w-full"
+      className="w-full mb-4"
       onSubmit={handleSubmit(async (values) => {
         try {
           setHasError(false);
@@ -346,22 +377,24 @@ export function ZipCodeSearcher({ onSubmit }) {
         }
       })}
     >
-      <Title title={intl.formatMessage({ id: 'FIND_RELAY' })} step={3} />
+      <Title title="FIND_RELAY" className="mb-4 text-2xl Title--3" />
 
-      <div className="flex w-full items-stretch focus-within:outline focus-within:outline-1 focus-within:outline-main lg:w-1/2">
-        <input
-          type="number"
-          id="zipcode"
-          {...register('zipCode')}
-          max="99999"
-          min="10000"
-          placeholder="ex. 75001"
-          className="h-auto w-full border-main focus:border-main focus:shadow-none focus:outline-none focus:ring-transparent"
-          required
-        />
-        <button type="submit" className="btn relative py-0">
-          {intl.formatMessage({ id: 'OK' })}
-        </button>
+      <div className="PhoneCheck">
+        <div className="PhoneCheck-field">
+          <input
+            type="number"
+            id="zipcode"
+            {...register('zipCode')}
+            max="99999"
+            min="10000"
+            placeholder="ex. 75001"
+            className="PhoneInput"
+            required
+          />
+          <button type="submit" className="PhoneCheck-btn">
+            {intl.formatMessage({ id: 'OK' })}
+          </button>
+        </div>
       </div>
       {hasError && (
         <Alert
@@ -373,9 +406,8 @@ export function ZipCodeSearcher({ onSubmit }) {
   );
 }
 
-export default function Map() {
-  const { data: addresses = [] } = useAddressQuery();
-  const defaultAddress = addresses?.find((a) => a.isDefault);
+export default function Map({ addresses }) {
+  const defaultAddress = addresses?.find((a) => a.isDefault === 1);
 
   const [query, setQuery] = useState({
     address: defaultAddress?.address1 || '',
@@ -385,7 +417,7 @@ export default function Map() {
   });
 
   return (
-    <div className="transUp">
+    <div>
       {defaultAddress?.countryCode === 'FR' ? (
         <ZipCodeSearcher
           onSubmit={(zipcode, city) =>

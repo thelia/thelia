@@ -19,27 +19,27 @@
 {block name="main-content"}
     <div class="main">
       <article class="container mx-auto my-24" role="main" aria-labelledby="main-label">
+          <div class="max-w-5xl mx-auto">
 
-            {hook name="order-failed.top"}
+              {hook name="order-failed.top"}
 
-            <div id="payment-failure">
-                  {include file="components/smarty/Alert/Alert.html" type="warning" title={intl l="We're sorry, a problem occured and your payment was not successful."} message=$failed_order_message}
-            </div>
+              <div id="payment-failure">
+                    {include file="components/smarty/Alert/Alert.html" type="warning" title={intl l="We're sorry, a problem occured and your payment was not successful."}}
+              </div>
 
-            {hook name="order-failed.bottom"}
+              {hook name="order-failed.bottom"}
 
-            <div class="text-center">
-              <a href="{url path="/order/invoice"}" role="button" class="btn mt-5">{intl l="Try again"}</a>
-            </div>
-            <div class="text-center">
-                <a href="{navigate to="index"}" role="button" class="btn btn--secondary mt-5">{intl l="Go home"}</a>
-            </div>
+              <div class="flex flex-wrap items-stretch justify-start gap-4 mt-8">
+                <a href="{url path="/order/delivery"}" class="Button">{intl l="Try again"}</a>
+                <a href="{navigate to="index"}" class="Button Button--active">{intl l="Go home"}</a>
+              </div>
+          </div>
         </article>
     </div>
 {/block}
 
 
-{block name="stylesheet"}
+{block name="css" append}
 {hook name="order-failed.stylesheet"}
 {/block}
 

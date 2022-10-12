@@ -6,8 +6,9 @@ import { Provider } from 'react-redux';
 import { QueryClientProvider } from 'react-query';
 import React from 'react';
 import { queryClient } from '@openstudio/thelia-api-utils';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import store from '@redux/store';
+// import Loader from '@components/React/Loader';
 
 function CheckoutWrapper() {
   return (
@@ -22,8 +23,11 @@ function CheckoutWrapper() {
 }
 
 export default function CheckoutPage() {
-  const root = document.getElementById('Checkout');
-  if (!root) return;
+  const DOMElement = document.getElementById('Checkout');
 
-  render(<CheckoutWrapper />, root);
+  if (!DOMElement) return;
+
+  const root = createRoot(DOMElement);
+
+  root.render(<CheckoutWrapper />);
 }

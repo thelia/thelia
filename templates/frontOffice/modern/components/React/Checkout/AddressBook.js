@@ -3,7 +3,6 @@ import Loader from '../Loader';
 
 import {
   useAddressDelete,
-  useAddressQuery,
   useGetCheckout,
   useSetCheckout
 } from '@openstudio/thelia-api-utils';
@@ -20,96 +19,95 @@ function Address({ address = {}, onSelect = () => {}, isSelected }) {
   if (deleteSuccess) return null;
 
   return (
-    <div className="flex w-full items-center justify-between">
-      <address className="mr-auto">
-        <div className="font-bold not-italic">{address.label}</div>
+    <label
+      htmlFor={`home_delivery_address_${address?.id}`}
+      className={`AddressCard ${isSelected ? 'AddressCard--selected' : ''}`}
+    >
+      <div className="Radio">
+        <input
+          type="radio"
+          checked={isSelected}
+          name="home_delivery_address"
+          id={`home_delivery_address_${address?.id}`}
+          onChange={onSelect}
+        />
+      </div>
+      <address className="AddressCard-info">
+        <span className="mb-3 font-bold text-black">
+          {address.label}{' '}
+          {address.isDefault === 1 && (
+            <>({intl.formatMessage({ id: 'DEFAULT_ADDRESS' })})</>
+          )}
+        </span>
         <div>
           {address.civilityTitle?.short} {address.firstName} {address.lastName}
         </div>
         <span className="street-address block">{address.address1}</span>
         {address.address2 ? (
-          <span className="street-address block">
-            {address.address2} - {address.address3 ? address.address3 : null}
+          <span className="street-address">
+            {address.address2}
+            {address.address3 ? ' - ' + address.address3 : null}
           </span>
         ) : null}
-        <span className="postal-code block">
+        <span className="postal-code">
           {address.zipcode} {address.city} {address.countryCode}
         </span>
       </address>
-
-      <button
-        onClick={onSelect}
-        className={` px-4 py-2 focus:outline focus:outline-2 focus:outline-main ${
-          isSelected ? 'bg-main text-white' : 'bg-gray-200'
-        }`}
-      >
-        {isSelected ? <span className="mr-2 text-lg font-bold">✓</span> : null}
-        {intl.formatMessage({ id: isSelected ? 'CHOOSEN' : 'CHOOSE' })}
-      </button>
-      <div className="ml-8">
-        <EditAddressModal address={address} />
-      </div>
-    </div>
+      <EditAddressModal address={address} />
+    </label>
   );
 }
 
-function AddressBook({ mode, title }) {
-  const { data = [] } = useAddressQuery();
+function AddressBook({ mode, title = null, addresses }) {
   const { data: checkout, isLoading } = useGetCheckout();
   const { mutate } = useSetCheckout();
 
   return (
-    <div className="Checkout-block">
-      <div className="flex items-center justify-between gap-6 text-xl font-bold ">
-        <Title title={title} step={mode === 'delivery' ? 2 : 4} />
-      </div>
-      <div className="panel pb-0 shadow">
-        <div className="grid gap-4 py-4">
-          {isLoading && <Loader size="w-10 h-10" />}
+    <div className="mt-8">
+      {title && <Title className="Title--3 mb-5 text-2xl" title={title} />}
+      <div className="grid gap-4">
+        {isLoading && <Loader className="w-40" />}
 
-          {data.map((address) => {
-            let isSelected = false;
+        {addresses.map((address) => {
+          let isSelected = false;
 
-            if (mode === 'delivery') {
-              isSelected = address.id === checkout?.deliveryAddressId;
-            }
-            if (mode === 'billing') {
-              isSelected = address.id === checkout?.billingAddressId;
-            }
+          if (mode === 'delivery') {
+            isSelected = address.id === checkout?.deliveryAddressId;
+          }
+          if (mode === 'billing') {
+            isSelected = address.id === checkout?.billingAddressId;
+          }
 
-            return (
-              <Address
-                key={address.id}
-                address={address}
-                isSelected={isSelected}
-                onSelect={() => {
-                  let request = {};
+          return (
+            <Address
+              key={address.id}
+              address={address}
+              isSelected={isSelected}
+              onSelect={() => {
+                let request = {};
 
-                  if (mode === 'delivery') {
-                    request.deliveryAddressId = address.id;
-                    request.deliveryModuleId = null;
-                    request.deliveryModuleOptionCode = null;
-                    if (!checkout.billingAddressId) {
-                      request.billingAddressId = address.id;
-                    }
-                  }
-
-                  if (mode === 'billing') {
+                if (mode === 'delivery') {
+                  request.deliveryAddressId = address.id;
+                  request.deliveryModuleId = null;
+                  request.deliveryModuleOptionCode = null;
+                  if (!checkout.billingAddressId) {
                     request.billingAddressId = address.id;
                   }
+                }
 
-                  mutate({
-                    ...checkout,
-                    ...request
-                  });
-                }}
-              />
-            );
-          })}
-          <div className="flex justify-end">
-            {mode !== 'billing' ? <CreateAddressModal /> : null}
-          </div>
-        </div>
+                if (mode === 'billing') {
+                  request.billingAddressId = address.id;
+                }
+
+                mutate({
+                  ...checkout,
+                  ...request
+                });
+              }}
+            />
+          );
+        })}
+        <CreateAddressModal />
       </div>
     </div>
   );

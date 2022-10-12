@@ -8,7 +8,7 @@
     name=$name
     id="{$label_attr.for|default:null}"
     value={$value|default:{$LABEL|default:null} nofilter}
-    label=$label|default:null
+    label={intl l="Intitulé de l'adresse"}
     placeholder=""
     required=$required
   }
@@ -23,9 +23,9 @@
     {$titleOptions = []}
 
     {loop type="title" name="title.list"}
-    {$titleOptions[$ID] = [
-      'value' => $ID,
-      'label' => $LONG
+      {$titleOptions[$ID] = [
+        'value' => $ID,
+        'label' => $LONG
       ]}
     {/loop}
 
@@ -34,9 +34,8 @@
       name=$name
       id="{$label_attr.for|default:null}"
       value=$value
-      label=$label
+      label={intl l="Civilité"}
       defaultValue=""
-      defaultLabel={intl l="Select Title"}
       required=$required
       options=$titleOptions
     }
@@ -85,8 +84,9 @@
     name=$name
     id="{$label_attr.for|default:null}"
     value={$smarty.get.email|default:$value}
-    label=$label
+    label={intl l="Adresse e-mail"}
     placeholder=""
+    autocomplete="username"
     required=$required
   }
 {/function}
@@ -100,8 +100,8 @@
     name=$name
     id="{$label_attr.for|default:null}"
     value={$smarty.get.email|default:$value}
-    label=$label
-    placeholder={intl l="Email confirmation"}
+    label={intl l="Confirmez votre adresse e-mail"}
+    placeholder=""
     required=$required
   }
 {/function}
@@ -183,7 +183,7 @@
     name=$name
     id="{$label_attr.for|default:null}"
     value={$value|default:{$ADDRESS2|default:null} nofilter}
-    label=$label
+    label={intl l="Complément d'adresse"}
     placeholder=""
     required=$required
   }
@@ -202,6 +202,7 @@
     value={$value|default:{$ZIPCODE|default:null} nofilter}
     label=$label
     placeholder=""
+    autocomplete="false"
     required=$required
   }
 {/function}
@@ -229,7 +230,7 @@
     {$countriesOptions = []}
 
     {loop type="country" name="country.list" order="alpha"}
-      {if $ID eq {config key="store_country"}}
+      {if $value == $ID || $IS_DEFAULT}
         {$countriesOptions['default'] = [
           'value' => $ID,
           'label' => $TITLE
@@ -275,9 +276,9 @@
     name=$name
     id="{$label_attr.for|default:null}"
     value={$value|default:{$PHONE|default:null} nofilter}
-    label=$label
+    label={intl l="Téléphone fixe"}
     placeholder=""
-    required=$required
+    required=false
   }
 {/function}
 
@@ -292,9 +293,9 @@
     name=$name
     id="{$label_attr.for|default:null}"
     value={$value|default:{$CELLPHONE|default:null} nofilter}
-    label=$label
+    label={intl l="Téléphone mobile"}
     placeholder=""
-    required=$required
+    required=true
   }
 {/function}
 
@@ -310,6 +311,7 @@
     label=$label
     placeholder=""
     required=$required
+    autocomplete="new-password"
   }
 {/function}
 
@@ -325,6 +327,7 @@
   label=$label
   placeholder=""
   required=$required
+  autocomplete="new-password"
 }
 {/function}
 
@@ -332,7 +335,7 @@
 {* ------------------------------ Newsletter ----------------------------- *}
 
 {function name="fn_newsletter"}
-  {include file="components/smarty/Checkbox/Checkbox.html" value=$value id=$label_attr.for type="checkbox" checked=$checked label=$label}
+  {include file="components/smarty/Checkbox/Checkbox.html" value=$value id=$label_attr.for type="checkbox" class="text-base" checked=$checked label=$label}
 {/function}
 
 {* ------------------------------ Is Default ----------------------------- *}

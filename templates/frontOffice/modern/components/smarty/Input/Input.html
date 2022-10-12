@@ -1,29 +1,31 @@
+{if !isset($displayError)}
+  {$displayError = true}
+{/if}
 
-<label for="{$id}" class="block mb-2 text-sm text-gray-600">
-  {if $label}
-    <div class="font-bold text-sm {if isset($error) && $error}text-red-500{else}text-gray-700{/if}">
-      {$label}
+<label for="{$id}" class="Input">
+  {if $label|default:null}
+    <div class="Input-label {if isset($displayError) && $displayError && isset($error) && $error}text-error{/if}">
+      {$label}{if $required|default:null}<sup>*</sup>{/if}
     </div>
   {/if}
+  {if $type eq 'password'}<div class="relative">{/if}
   <input
     type="{$type|default:'text'}"
     name="{$name}"
     id="{$id}"
     value="{$value|default:null}"
     placeholder="{$placeholder|default:null}"
-    class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if isset($error) && $error}border-red-500{else}border-gray-200{/if} {$inputClass|default:null}"
+    class="Input-field {if isset($displayError) && $displayError && isset($error) && $error} border-error focus:border-error focus:ring-error text-error {else} text-primary{/if} {$inputClass|default:null}"
     {if $required|default:false}required{/if}
     {if $autofocus|default:false}autofocus{/if}
     {if $readonly|default:false}readonly{/if}
+    {if $autocomplete|default:false} autocomplete="{$autocomplete}"{/if}
   />
-
-
-  {if isset($error) && $error && isset($message) && $message}
-    <div class="mt-1">
-      <span class="block mb-4 text-xs italic font-normal text-red-500">
-        {$message}
-      </span>
-    </div>
+  {if $type eq 'password'}<button type="button" aria-label="{intl l='Show password'}" class="Input-switchPassword">{renderIconSvg icon="eye" class="w-5 h-5"}</button>{/if}
+  {if $type eq 'password'}</div>{/if}
+  {if isset($displayError) && $displayError && isset($error) && $error && isset($message) && $message}
+    <span class="Input-message">
+      {$message}
+    </span>
   {/if}
 </label>
-

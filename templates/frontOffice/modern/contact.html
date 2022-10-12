@@ -6,20 +6,24 @@
 {/block}
 
 {block name="main-content"}
-
-
     {include file="components/smarty/PageHeader/PageHeader.html" TITLE={intl l="Contact Us"}}
 
     <div class="container mx-auto mb-24">
+          <div class="max-w-[714px] mx-auto">
 
-        {block name="contact-form"}
+            {block name="contact-form"}
             {form name="thelia.front.contact"}
-            <form class="max-w-xl mx-auto" action="{url path="/contact"}" method="post">
+            <form id="ContactForm" class="" action="{url path="/contact"}" method="post" novalidate>
                 {form_hidden_fields}
-
+                {hook name="recaptcha.check"  id="ContactRecaptcha"}
                 {hook name="contact.form-top"}
+                <input type="hidden" value="{intl l="missing or invalid data"}" />
 
-                <fieldset id="contact-info" class="mt-5">
+                {if $form_error}
+                  <div class="my-10">{include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$form_error_message}</div>
+                {/if}
+
+                <fieldset id="contact-info">
 
                     <div class="grid gap-4">
 
@@ -60,40 +64,37 @@
                           }
                         {/form_field}
                         {form_field field="message"}
-                        <div for="{$label_attr.for|default:null}" class="block mb-2 text-sm text-gray-600">
-                          <label class="font-bold text-sm {if $error}text-red-500{else}text-gray-700{/if}">
+                        <div class="Input">
+                          <label for="{$label_attr.for|default:null}" class="Input-label {if isset($error) && $error}text-error{/if}">
                             {$label}
                           </label>
                           <textarea
                             name="{$name}"
                             id="{$label_attr.for|default:null}"
-                            placeholder="{intl l="Your message"}"
                             rows="6"
-                            class="mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black {if $error}border-red-500{else}border-gray-200{/if} {$inputClass|default:null}"
-                            {if $required} aria-required="true" required{/if}>{$value}</textarea>
-                          {if $error}
-                            <div class="mt-1">
-                              <span class="block mb-4 text-xs italic font-normal text-red-500">
-                                {$message}
-                              </span>
-                            </div>
+                            class="Input-field {if isset($error) && $error}border-error focus:border-error focus:ring-error text-error{/if} {$inputClass|default:null}">
+                          </textarea>
+                          {if isset($error) && $error && isset($message) && $message}
+                            <span class="Input-message">
+                              {$message}
+                            </span>
                           {/if}
+                          </div>
                         {/form_field}
-                      </div>
                     </div>
                 </fieldset>
 
                 {hook name="contact.form-bottom"}
 
-                <div class="mt-5">
-                    <div class="text-center">
-                        <button type="submit" class="btn">{intl l="Send"}</button>
-                    </div>
+                <div class="flex justify-center mt-5">
+                    <button type="submit" class="Button">{intl l="Send"}</button>
                 </div>
 
             </form>
             {/form}
         {/block}
+          </div>
+
 
         {ifhook rel="contact.top"}
           {hook name="contact.top"}
@@ -109,7 +110,7 @@
 
 {/block}
 
-{block name="stylesheet"}
+{block name="css" append}
 {hook name="contact.stylesheet"}
 {/block}
 

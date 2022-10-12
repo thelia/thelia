@@ -3,27 +3,48 @@
 
   h1,
   h2,
-  h3,
-  h4,
   h5 {
-    font-weight: bold;
-    @apply mb-4;
+    @apply mb-4 font-medium;
+  }
+
+  h3,
+  h4 {
+    @apply font-barlow font-semibold uppercase mb-4;
   }
 
   h1 {
-    @apply text-3xl;
+    font-size: 2rem;
+
+    @screen lg {
+      font-size: rem(48px);
+    }
   }
 
   h2 {
-    @apply text-2xl;
+    font-size: 1.5rem;
+
+    @screen lg {
+      font-size: 2rem;
+    }
   }
 
   h3 {
-    @apply text-3xl;
+    font-size: rem(22px);
+    line-height: 1.4;
+
+    @screen lg {
+      font-size: rem(28px);
+      line-height: 1.1;
+    }
   }
 
   h4 {
-    @apply text-2xl;
+    font-size: rem(18px);
+    line-height: 1.1;
+
+    @screen lg {
+      font-size: 1.5rem;
+    }
   }
 
   h5 {
@@ -35,11 +56,43 @@
   }
 
   p {
-    @apply mb-6;
+    @apply mb-6 text-inherit leading-6 lg:leading-8;
+  }
+
+  p + p {
+    @apply mt-6
+  }
+
+  p.ql-align-center {
+    @apply text-center;
+  }
+
+  p.ql-align-right {
+    @apply text-right;
   }
 
   ul {
-    @apply mb-6 list-inside list-disc;
+    @apply mb-6 list-none;
+
+    li {
+      position: relative;
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+      line-height: 1;
+
+      &::before {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        display: block;
+        width: rem(7px);
+        height: rem(7px);
+        background-color: theme("colors.main");
+        border-radius: 50%;
+        transform: translate(0,-50%);
+        content: '';
+      }
+    }
   }
 
   ol {
@@ -76,7 +129,7 @@
     @apply underline;
 
     &:hover {
-      @apply text-main;
+      @apply text-main-dark;
     }
   }
 
@@ -92,10 +145,21 @@
 
   thead th {
     @apply bg-gray-500 text-xl;
+
   }
 
   tbody tr:nth-child(odd) > td,
   tbody tr:nth-child(odd) > th {
     @apply bg-gray-300;
+  }
+}
+
+.Chapo {
+  font-size: rem(18px);
+  line-height: 1.3;
+
+  @screen lg {
+    font-size: rem(22px);
+    line-height: 1.4;
   }
 }

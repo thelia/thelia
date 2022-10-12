@@ -1,9 +1,12 @@
 import React from 'react';
+import { useIntl } from 'react-intl';
 
-export default function Title({ title, className, step }) {
+export default function Title({ title = 'HOME', className }) {
+  const intl = useIntl();
+
   return (
-    <div className={`mb-6 text-2xl font-bold lg:text-3xl ${className || ''}`}>
-      {step && <span>{step}/6</span>} {title}
+    <div className={`Title ${className || ''}`}>
+      {intl.formatMessage({ id: title })}
     </div>
   );
 }
