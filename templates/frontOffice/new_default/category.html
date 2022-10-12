@@ -102,7 +102,7 @@
             <div class="items-stretch lg:flex lg:flex-row-reverse">
                 <div id="CategoryList" class="container flex-1 2xl:px-10">
                   <div class="flex items-center  mb-7 gap-[10px] flex-wrap">
-                    <div id="ProductFilterCount" class="w-full mr-auto Title Title--3 md:w-auto">{$product_count} {if $product_count <= 1}{intl l="Article"}{else}{intl l="Articles"}{/if}</div>
+                    <div id="ProductFilterCount" class="w-full mr-auto Title Title--3 md:w-auto">{$product_count} {if $product_count <= 1}{intl l="Item"}{else}{intl l="Items"}{/if}</div>
                     {if $showFilters}
                     <div class="md:ml-auto 2xl:hidden">
                       {include file="components/smarty/FilterBtn/FilterBtn.html" count=4}
@@ -111,9 +111,9 @@
                   {if $product_count >= 1}
                     <label for="filterBy" id="ProductSort" class="Select max-w-[195px] w-full mt-0">
                         <select id="filterBy" name="filterBy" class="w-full cursor-pointer Select-field" {if $showFilters}form="CategoryMenu"{/if}>
-                          <option value="" disabled selected>{intl l="Trier par"}</option>
-                          <option value="max_price" {if $product_order == "max_price"}selected{/if}>{intl l="Prix décroissant"}</option>
-                          <option value="min_price" {if $product_order == "min_price"}selected{/if}>{intl l="Prix croissant"}</option>
+                          <option value="" disabled selected>{intl l="Filter by"}</option>
+                          <option value="max_price" {if $product_order == "max_price"}selected{/if}>{intl l="Descending price"}</option>
+                          <option value="min_price" {if $product_order == "min_price"}selected{/if}>{intl l="Ascending price"}</option>
                       </select>
                     </label>
                     {/if}

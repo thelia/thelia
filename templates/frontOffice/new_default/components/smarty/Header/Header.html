@@ -25,8 +25,11 @@
 
         <div class="Header-right">
           {include file="components/smarty/SearchDropdown/SearchDropdown.html"}
+
+          {include file="components/smarty/LangSelect/LangSelect.html"}
+
           {if $isConnected|default:false}
-            <div id="Header-Account" class="Header-accountWrapper">
+            <div id="header-account" class="Header-accountWrapper">
               <a href="{$userLink.url}" class="Header-link" aria-label="{$userLink.label}" {$userLink.toggle} data-close-cart {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
                 {renderIconSvg icon="user" class="Header-icon user"}
                 <span class="Header-linkText">{$userLink.label}</span>

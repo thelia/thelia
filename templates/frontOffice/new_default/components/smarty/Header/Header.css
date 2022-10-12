@@ -191,7 +191,8 @@ body.is-sticky {
   }
 }
 
-#Header-Account:hover .Header-dropdown, #Header-Account .Header-dropdown.open {
+#header-account:hover .Header-dropdown,
+#header-account .Header-dropdown.open {
   display: flex;
   flex-direction: column;
   gap: 10px;

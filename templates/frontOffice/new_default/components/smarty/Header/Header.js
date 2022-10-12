@@ -1,11 +1,11 @@
 import { trapTabKey } from '@js/standalone/trapItemsMenu';
 
-function manageFocusOnMyAccount() {
-  const account = document.querySelector('#Header-Account');
+function manageFocusAccesibilty(target, targetMenu, activeClass = 'open') {
+  const lang = document.querySelector(target);
 
-  if (!account) return;
+  if (!lang) return;
 
-  account.addEventListener('keydown', (e) => {
+  lang.addEventListener('keydown', (e) => {
     const { key } = e;
 
     if (!['Enter', 'Escape'].includes(key)) return;
@@ -13,11 +13,13 @@ function manageFocusOnMyAccount() {
     e.preventDefault();
     e.stopPropagation();
 
-    const menu = account.querySelector('.Header-dropdown');
+    const menu = lang.querySelector(targetMenu);
 
     if (!menu) return;
 
-    menu.classList.toggle('open');
+    if (key !== 'Escape') {
+      menu.classList.add(activeClass);
+    }
 
     const firstItem = menu.querySelector('a');
 
@@ -27,21 +29,19 @@ function manageFocusOnMyAccount() {
 
     menu.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
-        account.querySelector('a').focus();
+        menu.classList.remove(activeClass);
+        lang.querySelector('a').focus();
         return;
       }
 
       trapTabKey(menu, event);
     });
-
-    menu.addEventListener('focusout', (e) => {
-      menu.classList.remove('open');
-    });
   });
 }
 
 function Header() {
-  manageFocusOnMyAccount();
+  manageFocusAccesibilty('#header-account', '.Header-dropdown');
+  manageFocusAccesibilty('#lang-select', '.LangSelect-dropdown');
 }
 
 export default Header;

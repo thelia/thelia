@@ -33,13 +33,13 @@
     {intl l="Search Result for"} <span class='font-medium underline font-barlow text-main'>{$smarty.get.query}</span>
     </h1>
       <div class="flex items-center  mb-7 gap-[10px] flex-wrap">
-          <div id="ProductFilterCount" class="w-full mr-auto Title Title--3 md:w-auto">{$product_count} {if $product_count <= 1}{intl l="Article"}{else}{intl l="Articles"}{/if}</div>
+          <div id="ProductFilterCount" class="w-full mr-auto Title Title--3 md:w-auto">{$product_count} {if $product_count <= 1}{intl l="Item"}{else}{intl l="Items"}{/if}</div>
           {if $product_count >= 1}
           <label for="filterBy" class="Select max-w-[195px] w-full mt-0">
               <select id="filterBy" name="filterBy" class="w-full cursor-pointer Select-field" data-query="{$smarty.get.query|default:''}">
-                <option value="" disabled selected>{intl l='Trier par'}</option>
-                <option value="max_price" {if $product_order == "max_price"}selected{/if}>{intl l="Prix décroissant"}</option>
-                <option value="min_price" {if $product_order == "min_price"}selected{/if}>{intl l="Prix croissant"}</option>
+                <option value="" disabled selected>{intl l='Filter by'}</option>
+                <option value="max_price" {if $product_order == "max_price"}selected{/if}>{intl l="Descending price"}</option>
+                <option value="min_price" {if $product_order == "min_price"}selected{/if}>{intl l="Ascending price"}</option>
             </select>
           </label>
           {/if}

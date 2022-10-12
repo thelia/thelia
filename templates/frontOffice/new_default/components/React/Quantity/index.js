@@ -1,6 +1,7 @@
 import React from 'react';
 import { ReactComponent as IconMinus } from '@icons/minus.svg';
 import { ReactComponent as IconPlus } from '@icons/plus.svg';
+import { useIntl } from 'react-intl';
 
 export default function Quantity({
   mutate,
@@ -10,9 +11,15 @@ export default function Quantity({
   small = false,
   visible = true
 }) {
+  const intl = useIntl();
+
   return (
     <div>
-      {title && <span className="mb-3 text-sm text-gray-600">Quantité</span>}
+      {title && (
+        <span className="mb-3 text-sm text-gray-600">
+          {intl.formatMessage({ id: 'QUANTITY' })}
+        </span>
+      )}
       <div className={`Quantity md:mr-10 ${small ? 'Quantity--small' : null}`}>
         <button
           onClick={() => {

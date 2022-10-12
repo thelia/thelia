@@ -32,7 +32,7 @@ function AttributeSelector({
           return (
             <div key={attribute.id} className="mb-5">
               <div className="text-sm text-gray-600">{attribute.title}</div>
-              <div className="flex flex-wrap gap-2 mt-3">
+              <div className="mt-3 flex flex-wrap gap-2">
                 {attribute.values.map((attrAv) => {
                   return (
                     <button
@@ -165,7 +165,7 @@ function PseSelector({ pses = [], attributes = [] }) {
 
       {currentPse && currentPse?.quantity && currentPse?.quantity > 0 ? (
         <button
-          className="w-full mt-8 Button lg:mt-7 2xl:w-auto"
+          className="Button mt-8 w-full lg:mt-7 2xl:w-auto"
           onClick={() => {
             addPseToCart({
               pseId: currentPse.id,
@@ -174,7 +174,7 @@ function PseSelector({ pses = [], attributes = [] }) {
           }}
           data-toggle-cart
         >
-          Ajouter au panier
+          {intl.formatMessage({ id: 'ADD_TO_CART' })}
         </button>
       ) : null}
 
