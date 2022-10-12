@@ -41,16 +41,17 @@ function LoginForm({ setLoginHandler, redirectionToCheckout }) {
         setLoginHandler(true);
       }}
     >
-      <legend className="Title Title--3 mb-6">
+      <legend className="mb-6 Title Title--3">
         {intl.formatMessage({ id: 'ALREADY_CUSTOMER' })}
       </legend>
-      <div className="mb-6 grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-6 mb-6">
         <Input
           type="email"
           name="email"
           className=""
           label="E-mail"
           value={email}
+          autocomplete="email"
           onChange={(e) => setEmail(e.target.value)}
         />
 
@@ -59,6 +60,7 @@ function LoginForm({ setLoginHandler, redirectionToCheckout }) {
           name="password"
           className=""
           label="Mot de passe"
+          autocomplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
@@ -70,7 +72,7 @@ function LoginForm({ setLoginHandler, redirectionToCheckout }) {
           message={error?.response?.data?.description || 'Erreur'}
         />
       ) : null}
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 mt-6">
         <button
           type="submit"
           className="Button"
@@ -99,10 +101,10 @@ function IsLoggedOut({ setLoginHandler, redirectionToCheckout }) {
         redirectionToCheckout={redirectionToCheckout}
       />
       <fieldset className="pt-12">
-        <span className="Title Title--3 mb-5 block">
+        <span className="block mb-5 Title Title--3">
           {intl.formatMessage({ id: 'NEW_CUSTOMER' })}
         </span>
-        <a href="/register" className="Button mb-20 inline-block">
+        <a href="/register" className="inline-block mb-20 Button">
           {intl.formatMessage({ id: 'CREATE_ACCOUNT' })}
         </a>
       </fieldset>
@@ -163,7 +165,7 @@ export function MiniLogin({ isLogged }) {
         className="SideBar-close"
         aria-label="Fermer le formulair de connexion"
       >
-        <IconCLose className="pointer-events-none h-3 w-3" />
+        <IconCLose className="w-3 h-3 pointer-events-none" />
       </button>
       {isLoading ? (
         <Loader />

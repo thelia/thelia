@@ -46,6 +46,11 @@ install: ## install existing project
 	@make install-front
 	@make build
 	@make cache-clear
+	@make remove-encore-files
+
+remove-encore-files:
+	@rm webpack.config.js
+	@rm -rf assets
 
 activate-module:
 	@php Thelia module:refresh
@@ -85,6 +90,7 @@ install-front: ## install front
 
 import-demo-db: ## import demo table into your database
 	@php $(SETUP_PATH)/import.php
+	@php Thelia admin:create --login_name thelia --password thelia --last_name thelia --first_name thelia --email thelia@example.com
 	@make cache-clear
 
 build: ## build front
@@ -137,5 +143,9 @@ greenit: ## review green it
 		mkdir -p $(OUTPUT_PATH_GREENIT); \
 	fi;
 	@greenit analyse $(SETUP_PATH)/audit/greenit.yaml $(OUTPUT_PATH_GREENIT)/global.html --ci --format=html && open $(OUTPUT_PATH_GREENIT)/global.html
+
+cypress: ## run cypress
+	@npx cypress run --project ./tests
+
 
 audit: build greenit lighthouse ## audit website
