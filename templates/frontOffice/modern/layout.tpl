@@ -3,7 +3,7 @@
 
 
 {* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
-{default_translation_domain domain='fo.new_default'}
+{default_translation_domain domain='fo.modern'}
 
 {* -- Define some stuff for Smarty ------------------------------------------ *}
 {block name="init"}{/block}
