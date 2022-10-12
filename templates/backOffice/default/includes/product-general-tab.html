@@ -123,7 +123,7 @@
                 {/custom_render_form_field}
 
                 {form_field field='visible'}
-                    <div class="form-group {if $error}has-error{/if}">
+                    <div class="form-group sr-only {if $error}has-error{/if}">
                         <label for="{$label_attr.for|default:null}" class="control-label">{intl l='Visibility'}</label>
                         <div class="checkbox">
                             <label>

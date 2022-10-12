@@ -21,6 +21,7 @@ use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderManualEvent;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
+use Thelia\Core\Event\Order\OrderPayTotalEvent;
 use Thelia\Core\Event\Product\VirtualProductOrderHandleEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
@@ -677,6 +678,24 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function getOrderPayTotal(OrderPayTotalEvent $event): void
+    {
+        $order = $event->getOrder();
+        $tax = $event->getTax();
+
+        $total = $order->getTotalAmount(
+            $tax,
+            $event->isIncludePostage(),
+            $event->isIncludeDiscount()
+        );
+
+        $event->setTotal($total);
+        $event->setTax($tax);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
@@ -688,6 +707,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
             TheliaEvents::ORDER_SET_PAYMENT_MODULE => ['setPaymentModule', 128],
             TheliaEvents::ORDER_PAY => ['create', 128],
+            TheliaEvents::ORDER_PAY_GET_TOTAL => ['getOrderPayTotal', 128],
             TheliaEvents::ORDER_CART_CLEAR => ['orderCartClear', 128],
             TheliaEvents::ORDER_BEFORE_PAYMENT => ['orderBeforePayment', 128],
             TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL => ['sendConfirmationEmail', 128],
