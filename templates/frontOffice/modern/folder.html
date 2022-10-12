@@ -48,58 +48,29 @@
     <link rel="alternate" type="application/rss+xml" title="{intl l='All contents in'} {folder attr='title'}" href="{url path="/feed/content/%lang/%folder_id" lang={lang attr="locale"} folder_id={folder attr="id"}}" />
 {/block}
 
-{* Content *}
 {block name="main-content"}
-
-    {loop name="folder" type="folder" id=$folder_id limit="1"}
-      {include file="components/smarty/PageHeader/PageHeader.html"}
-    {/loop}
-
-
-    {hook name="folder.top" folder="$folder_id"}
-
-    <div role="main" class="container mx-auto">
-        {hook name="folder.main-top" folder="$folder_id"}
-
-        {hook name="folder.content-top" folder="$folder_id"}
-
-        {if $folder_id}
-            {loop name="folder" type="folder" id=$folder_id limit="1"}
-                  {include file="components/smarty/FolderDefault/FolderDefault.html"}
-            {/loop}
-        {else}
-            {ifloop rel="folders"}
-            <ul class="divide-y divide-main">
-                {loop name="folders" type="folder"}
-                <li class="item">
-                    <article>
-                        <div class="content-info">
-                            <h2 class="name"><a href="{$URL nofilter}">{$TITLE}</a></h2>
-                            {if $CHAPO}
-                            <div class="short-description">
-                                {$CHAPO}
-                            </div>
-                            {/if}
-                        </div>
-                    </article>
-                </li>
-                {/loop}
-            </ul>
-            {/ifloop}
+  {loop name="folder" type="folder" id=$folder_id limit="1"}
+    {hook name="folder.main-top" folder="$folder_id"}
+    {hook name="folder.content-top" folder="$folder_id"}
+    {include file="components/smarty/BreadCrumb/BreadCrumb.html"}
+    <div class="max-w-[714px] mx-auto mb-10 md:mb-20">
+        {include file="components/smarty/Title/Title.html" type="h1" title=$TITLE class="mb-8 text-center"  nofilter=true}
+        {if $CHAPO|default:null}
+          <div class="text-lg lg:text-2xl ">
+              {$CHAPO nofilter}
+          </div>
         {/if}
-
-        {hook name="folder.content-bottom" folder="$folder_id"}
-
-        </div>
-        {hook name="folder.main-bottom" folder="$folder_id"}
-    </div>
-
-    {hook name="folder.bottom" folder="$folder_id"}
-
-
+        {if $DESCRIPTION|default:null}
+          <div class="my-8 text-base text-gray-600 md:my-10 md:text-lg wysiwyg">
+              {$DESCRIPTION nofilter}
+          </div>
+        {/if}
+        {include file="components/smarty/FolderDefault/FolderDefault.html"}
+      </div>
+  {/loop}
 {/block}
 
-{block name="stylesheet"}
+{block name="css" append}
 {hook name="folder.stylesheet"}
 {/block}
 

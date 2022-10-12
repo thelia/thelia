@@ -27,13 +27,13 @@
     {/ifhook}
     {elsehook rel="order-payment-gateway.body"}
         <div id="payment-success" class="panel panel-default">
-            <div class="mb-4 text-xl">
+            <div class="text-xl mb-4">
                 <h3>{intl l="You choose to pay by"} : <span class="text-orange-500">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
             </div>
 
             <div class="panel-body">
                 {if $cart_count > 0}
-                    <div class="clearfix panel-heading">
+                    <div class="panel-heading clearfix">
                         <span>{intl l="Connecting to the secure payment server, please wait a few seconds..."}</span>
                     </div>
 
@@ -43,7 +43,7 @@
                                 <input type="hidden" name="{$name}" value="{$value}" />
                             {/foreach}
 
-                            <p>{intl l='If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" value="please click here" class="text-orange-500 underline">.'}</p>
+                            <p>{intl l='If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#" class="underline text-orange-500">please click here</a>.'}</p>
                         </form>
                     </div>
                 {else}
@@ -59,11 +59,12 @@
 
 {/block}
 
-{block name="javascript" append}
+{block name="javascript-initialization"}
 {ifhook rel="order-payment-gateway.javascript"}
    {hook name="order-payment-gateway.javascript" module="$PAYMENT_MODULE"}
 {/ifhook}
 {elsehook rel="order-payment-gateway.javascript"}
+    {strip}
     <script type="text/javascript">
       document.getElementById('payement_gateway_form').submit();
 
@@ -71,12 +72,13 @@
         document.getElementById('payement_gateway_form').submit();
         ev.preventDefault();
       });
-     </script>
+    </script>
+    {/strip}
 {/elsehook}
 {hook name="order-payment-gateway.javascript-initialization"}
 {/block}
 
-{block name="stylesheet"}
+{block name="css" append}
 {hook name="order-payment-gateway.stylesheet"}
 {/block}
 

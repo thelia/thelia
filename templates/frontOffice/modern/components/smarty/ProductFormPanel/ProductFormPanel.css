@@ -1,3 +1,4 @@
 .ProductFormPanel {
-  top: var(--Header-height);
+  top: var(--header-height);
+  order: 2;
 }

@@ -1,44 +1,72 @@
-<header role="banner" class="Header bg-white shadow-md flex {if !$lite|default:false}pl-8{/if} sticky top-0 z-40 uppercase">
-  {if !$lite|default:false}
-  <button class="mr-8 focus:outline-none" aria-label="{intl l="Open Menu"}" data-toggle-navigation>
-    {include file="components/smarty/Hamburger/Hamburger.html" HamburgerClass="pointer-events-none Header-Hamburger"}
-  </button>
+{cache key="thelia.header.top" ttl=86400}
+<header class="Header {if $lite|default:false}static{/if}">
+  <div class="Header-wrapper">
+    {if !$lite|default:false}
+      <div class="Header-contain">
+        {include file="components/smarty/Hamburger/Hamburger.html"}
 
-  <a href="{navigate to="index"}" class="flex items-center mr-auto" aria-label="{config key="store_name"}">
-    {renderIconSvg icon="thelia-logo" class="Header-logo"}
-  </a>
+        <a href="{navigate to="index"}" class="Header-home" aria-label="{config key="store_name"}" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
+          {renderSvgImage file={encore_manifest_file file="dist/images/logo.svg"} class="Header-logo"}
+        </a>
 
-  <div class="flex items-end ml-auto">
-    <div class="my-auto">
-      {include file="components/smarty/SearchDropdown/SearchDropdown.html"}
-    </div>
+        {$userLink = [
+          "url" => "{url path='/login'}",
+          "label" => "{intl l='Login'}",
+          "toggle" => "data-toggle-login"
+        ]}
 
-   <div class="my-auto ml-8">{include file="components/smarty/CurrencySelect/CurrencySelect.html"}</div>
+        {if $isConnected|default:false}
+          {$userLink = [
+            "url" => "{url path='/account'}",
+            "label" => "{intl l='My account'}",
+            "toggle" => ""
+          ]}
+        {/if}
 
-    <div class="mx-4 my-auto sm:block">{include file="components/smarty/LangSelect/LangSelect.html"}</div>
+        <div class="Header-right">
+          {include file="components/smarty/SearchDropdown/SearchDropdown.html"}
 
-    {if $isConnected|default:false}
-    <a href="{url path="/account"}" class="flex items-center h-full pr-4 hover:bg-gray-200 lg:px-5 xl:px-8" aria-label="{intl l="Account"}">
-    <div class="lg:mr-4">{renderIconSvg icon="user" class="w-4 h-4 mx-auto fill-current "}</div>
-    <div class="hidden lg:block">{intl l="Account"}</div>
-    </a>
+          {include file="components/smarty/LangSelect/LangSelect.html"}
+
+          {if $isConnected|default:false}
+            <div id="header-account" class="Header-accountWrapper">
+              <a href="{$userLink.url}" class="Header-link" aria-label="{$userLink.label}" {$userLink.toggle} data-close-cart {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
+                {renderIconSvg icon="user" class="Header-icon user"}
+                <span class="Header-linkText">{$userLink.label}</span>
+              </a>
+              <ul class="Header-dropdown">
+                <li><a href="{url path='/account/update'}" class="inline-block hover:text-main" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>{intl l="My Profile"}</a></li>
+                <li><a href="{url path='/account-orders'}" class="inline-block hover:text-main" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>{intl l="My orders"}</a></li>
+                <li><a href="{url path='/account-address'}" class="inline-block hover:text-main" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>{intl l="My Addresses"}</a></li>
+                <li><a href="{url path='/logout'}" class="inline-block hover:text-main" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>{intl l="Logout"}</a></li>
+              </ul>
+            </div>
+          {else}
+            <a href="{$userLink.url}" class="Header-link" aria-label="{$userLink.label}" {$userLink.toggle} data-close-cart {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
+              {renderIconSvg icon="user" class="Header-icon user"}
+              <span class="Header-linkText">{$userLink.label}</span>
+            </a>
+          {/if}
+          <button type="button" class="Header-link" data-toggle-cart data-close-login {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
+            {renderIconSvg icon="cart" class="Header-icon cart"}
+            <span class="Header-linkText">{intl l="My cart"}</span>
+            <span id="js-cart-count" class="Header-cartCount">{{cart attr="product_count"}|default:0}</span>
+          </button>
+        </div>
+      </div>
     {else}
-    <a href="{url path="/login"}" class="flex items-center h-full pr-4 hover:bg-gray-200 lg:px-5 xl:px-8" aria-label="{intl l="Login"}" data-toggle-login>
-    <div class="pointer-events-none lg:mr-4">{renderIconSvg icon="user" class="w-4 h-4 mx-auto fill-current "}</div>
-    <div class="hidden pointer-events-none lg:block">{intl l="Login"}</div>
-    </a>
+      <div class="relative flex items-center justify-center h-full">
+        <a href="{navigate to='index'}" class="Header-previous " {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
+          <div class="transform ArrowLink">
+            {renderIconSvg icon="arrow" class="w-2 h-4"}
+          </div>
+          {intl l="Continuer mes achats"}
+        </a>
+        <a href="{navigate to="index"}"  aria-label="{config key="store_name"}" class="mx-auto" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
+          {renderIconSvg icon="logo" class="Header-logo"}
+        </a>
+      </div>
     {/if}
-
-    <div class="flex items-center h-full pr-4 cursor-pointer lg:px-5 xl:px-8" data-toggle-cart>
-      <div class="pointer-events-none lg:mr-4">{renderIconSvg icon="cart" class="w-4 h-4 mx-auto fill-current"}</div>
-      <div class="hidden pointer-events-none lg:block">{intl l="Cart"}</div>
-      <div id="js-cart-count" class="hidden ml-2 text-sm sm:block">({cart attr="product_count"})</div>
-    </div>
-
   </div>
-  {else}
-    <a href="{navigate to="index"}" class="flex items-center mx-auto">
-      {renderIconSvg icon="thelia-logo" class="Header-logo"}
-    </a>
-  {/if}
 </header>
+{/cache}

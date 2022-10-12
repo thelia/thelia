@@ -1,9 +1,0 @@
-{$type = $type|default:"div"}
-
-<{$type} class="Title Title--{$level|default:'1'}{if isset($class)} {$class}{/if}">
-  {if $nofilter|default:false}
-      {$title nofilter}
-  {else}
-      {$title}
-  {/if}
-</{$type}>

@@ -1,17 +1,16 @@
 import React, { forwardRef } from 'react';
 
-const Checkbox = forwardRef(({ label, name, small = false, ...props }, ref) => {
+const Checkbox = forwardRef(({ label, name, small = false, className = '', ...props }, ref) => {
   return (
-    <label className="inline-flex items-center">
+    <label className={`Checkbox ${className ? className : ''}`}>
       <input
         type="checkbox"
         name={name}
         {...props}
         ref={ref}
-        className={`border border-gray-300 text-main focus:border-gray-300 focus:ring-main`}
       />
 
-      <span className="ml-2">{label}</span>
+      <span>{label}</span>
     </label>
   );
 });

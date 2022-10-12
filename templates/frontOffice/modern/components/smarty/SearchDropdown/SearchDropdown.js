@@ -1,28 +1,31 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
-import { useClickAway, useDebounce } from 'react-use';
-
+import { useDebounce } from 'react-use';
+import messages, { locale } from '@components/React/intl';
 import Loader from '@components/React/Loader';
 import { QueryClientProvider } from 'react-query';
 import priceFormat from '@utils/priceFormat';
 import { queryClient } from '@openstudio/thelia-api-utils';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { useSearchQuery } from '@openstudio/thelia-api-utils';
+import { ReactComponent as IconSearch } from '@icons/search.svg';
 
-function Item({ title, price, promoPrice, image, url }) {
+import { ReactComponent as IconCLose } from '@icons/close.svg';
+import useEscape from '@js/utils/useEscape';
+import { trapTabKey } from '@js/standalone/trapItemsMenu';
+import { useIntl, IntlProvider } from 'react-intl';
+
+function Item({ title, price, promoPrice, image, url, promo }) {
   return (
-    <a href={url} className="flex items-center px-4 py-2 hover:bg-gray-200">
-      <div>
-        <img
-          src={image}
-          className="h-12 w-12 rounded-full object-contain"
-          alt=""
-          loading="lazy"
-        />
+    <a href={url} className="CartItem rounded-md bg-white">
+      <div className="CartItem-img">
+        <img src={image} alt="" loading="lazy" />
       </div>
-      <div className="px-4 font-bold">{title}</div>
-      <div className="ml-auto font-bold">
-        <span>{promoPrice > 0 && priceFormat(promoPrice)}</span>
-        <span className={promoPrice > 0 ? 'ml-1 text-sm line-through' : ''}>
+      <div className="CartItem-contain">
+        <strong>{title}</strong>
+      </div>
+      <div className="flex flex-col items-end text-lg leading-none">
+        <span>{promo && priceFormat(promoPrice)}</span>
+        <span className={promo ? 'mt-1 text-sm line-through' : ''}>
           {priceFormat(price)}
         </span>
       </div>
@@ -31,42 +34,118 @@ function Item({ title, price, promoPrice, image, url }) {
 }
 
 function formatSearchResults(data = []) {
-  return data.map((product) => ({
-    id: product.id,
-    title: product.i18n.title,
-    url: product.url,
-    price: product?.productSaleElements[0]?.price.taxed,
-    promoPrice: product?.productSaleElements[0]?.promoPrice.taxed,
-    // priceUntaxed: product?.productSaleElements[0]?.price.untaxed,
-    image: product?.images[0]?.url
-  }));
+  return data.map((product) => {
+    const defaultPSE =
+      product?.productSaleElements.find((pse) => pse.default) ||
+      product?.productSaleElements[0];
+    return {
+      id: product.id,
+      title: product.i18n.title,
+      url: product.url,
+      price: defaultPSE.price.taxed,
+      promoPrice: defaultPSE.promoPrice.taxed,
+      promo: defaultPSE.promo,
+      image: product?.images[0]?.id
+        ? `/legacy-image-library/product_image_${product?.images[0]?.id}/full/!50,/0/default.webp`
+        : ''
+    };
+  });
 }
 
-function SearchResults({ query }) {
-  const { data = [] } = useSearchQuery(query);
+function SearchResults({ query = null }) {
+  const { data = null } = useSearchQuery({
+    ref: query,
+    title: query,
+    limit: 12
+  });
 
   if (!Array.isArray(data)) {
     return null;
   }
-  if (data.length <= 0) {
-    return <div className="p-4">NO RESULT</div>;
+  if (data.length === 0) {
+    return (
+      <div className="mx-auto max-w-xl text-lg font-medium text-white">
+        Aucun résultat.
+      </div>
+    );
   }
 
-  return formatSearchResults(data).map((result) => (
-    <Item {...result} key={result.id} />
-  ));
+  return (
+    <>
+      <div className="SearchDropdown-results">
+        {formatSearchResults(data).map((result) => (
+          <Item {...result} key={result.id} />
+        ))}
+      </div>
+      {data.length > 0 && (
+        <button
+          type="submit"
+          className="Button Button--actived mx-auto mt-8 animate-none"
+          form="SearchForm"
+        >
+          Voir tous les résultats
+        </button>
+      )}
+    </>
+  );
+}
+
+function SearchForm({ formRef, setQuery, query }) {
+  const focusRef = useRef(null);
+
+  useEffect(() => {
+    focusRef?.current?.focus();
+  }, [focusRef]);
+
+  return (
+    <form
+      id="SearchForm"
+      ref={formRef}
+      action="/search"
+      className="SearchDropdown-form"
+      onSubmit={(e) => e.stopPropagation()}
+    >
+      <label
+        htmlFor="SearchInput"
+        className="SearchDropdown-field mx-auto max-w-xl"
+        aria-label="Recherche"
+      >
+        <input
+          id="SearchInput"
+          type="text"
+          name="query"
+          ref={focusRef}
+          value={query}
+          required={true}
+          placeholder="Recherche"
+          className="SearchDropdown-input"
+          autoComplete="off"
+          onKeyUp={(e) => setQuery(e.target.value)}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <IconSearch
+          className="SearchDropdown-icon"
+          onClick={() => {
+            if (query) {
+              formRef.current.submit();
+            }
+          }}
+        />
+      </label>
+    </form>
+  );
 }
 
 function SearchDropdown({ showResults = false }) {
   const ref = useRef(null);
   const formRef = useRef(null);
+  const btnRef = useRef(null);
+  const modalRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-
-  useClickAway(ref, () => {
-    setIsOpen(false);
-  });
+  const intl = useIntl();
+  useEscape(ref, () => modalObserver(false));
 
   const [,] = useDebounce(
     () => {
@@ -76,87 +155,93 @@ function SearchDropdown({ showResults = false }) {
     [query]
   );
 
-  useEffect(() => {
-    if (debouncedQuery) {
-      setIsOpen(true);
+  function modalObserver(open) {
+    setIsOpen(open);
+    if (open) {
+      document.body.classList.add('overflow-y-hidden');
+      document.getElementById('StickyToggler').classList.add('searchActive');
     } else {
-      setIsOpen(false);
+      btnRef.current.focus();
+      document.getElementById('StickyToggler').classList.remove('searchActive');
+      document.body.classList.remove('overflow-y-hidden');
     }
-  }, [debouncedQuery, setIsOpen]);
+  }
+
+  function handleClickModal(target) {
+    if (target?.matches('.SearchDropdown-full')) {
+      modalObserver(false);
+    }
+  }
 
   return (
     <div ref={ref}>
-      <div className="flex">
-        <form
-          ref={formRef}
-          className="hidden flex-1 md:block"
-          onSubmit={(e) => e.stopPropagation()}
+      <div className={`SearchDropdown-contain ${isOpen ? 'opacity-0' : ''}`}>
+        <button
+          type="button"
+          ref={btnRef}
+          className="SearchDropdown-fake no-focusTrap"
+          aria-label={intl.formatMessage({ id: 'SEARCH' })}
+          onClick={() => modalObserver(true)}
+          tabIndex="1"
         >
-          <label htmlFor="SearchInput" className="relative">
-            <input
-              id="SearchInput"
-              type="text"
-              name="query"
-              value={query}
-              className="SearchDropdown-input block appearance-none leading-normal focus:outline-none"
-              autoComplete="off"
-              onKeyUp={(e) => setQuery(e.target.value)}
-              onChange={(e) => setQuery(e.target.value)}
-              onFocus={() => {
-                if (debouncedQuery) {
-                  setIsOpen(true);
-                }
-              }}
-            />
-          </label>
-          <svg
-            onClick={() => {
-              if (query) {
-                formRef.current.submit();
-              }
-            }}
-            className="SearchDropdown-icon mx-auto h-4 w-4 cursor-pointer fill-current"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 64 64"
-          >
-            <path
-              d="M80.114,90.929H77.189l-1.1-1.1a22.891,22.891,0,0,0,5.851-15.36A23.771,23.771,0,1,0,58.171,98.243a22.891,22.891,0,0,0,15.36-5.851l1.1,1.1v2.926L92.914,114.7l5.486-5.486Zm-21.943,0A16.457,16.457,0,1,1,74.629,74.471,16.389,16.389,0,0,1,58.171,90.929Z"
-              transform="translate(-34.4 -50.7)"
-            />
-          </svg>
-        </form>
+          <IconSearch className="SearchDropdown-fakeIcon" />
+          <span className="ml-[10px] hidden lg:block">
+            {intl.formatMessage({ id: 'SEARCH' })}
+          </span>
+        </button>
       </div>
-
-      {showResults ? (
+      {isOpen && (
         <div
-          className={`SearchDropdown-results absolute top-full w-full py-2 ${
-            !isOpen ? 'hidden' : ''
-          }`}
+          className="SearchDropdown-full"
+          ref={modalRef}
+          tabIndex="0"
+          onClick={(e) => handleClickModal(e.target)}
+          onKeyDownCapture={(e) => trapTabKey(modalRef.current, e)}
         >
-          <div className="max-h-half-screen divide-y divide-gray-200 overflow-y-auto rounded bg-white shadow-lg">
-            <Suspense
-              fallback={
-                <div className="p-4">
-                  <Loader size="w-8 h-8" />
-                </div>
-              }
-            >
-              <SearchResults query={debouncedQuery} />
-            </Suspense>
+          <button
+            type="button"
+            className="absolute top-8 right-8 focus:outline-offset-4 focus:outline-white"
+            aria-label="Fermer la recherche"
+            onClick={() => modalObserver(false)}
+          >
+            <IconCLose className="pointer-events-none h-4 w-4 text-white" />
+          </button>
+          <div className="container">
+            <SearchForm formRef={formRef} query={query} setQuery={setQuery} />
+            {showResults && (
+              <div className={!isOpen ? 'hidden' : ''}>
+                <Suspense
+                  fallback={
+                    <div className="col-span-full">
+                      <Loader className="mx-auto w-40" />
+                    </div>
+                  }
+                >
+                  <div className="trans-up">
+                    <SearchResults query={debouncedQuery} />
+                  </div>
+                </Suspense>
+              </div>
+            )}
           </div>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
 
 export default function SearchDropdownRender() {
-  const root = document.querySelector('.SearchDropdown');
-  if (!root) return;
-  render(
+  const DOMElement = document.getElementById('SearchDropdown');
+
+  if (!DOMElement) return;
+
+  const root = createRoot(DOMElement);
+
+  root.render(
     <QueryClientProvider client={queryClient}>
-      <SearchDropdown showResults />
-    </QueryClientProvider>,
-    root
+      <IntlProvider locale={locale} messages={messages[locale]}>
+        <SearchDropdown showResults />
+      </IntlProvider>
+    </QueryClientProvider>
   );
 }

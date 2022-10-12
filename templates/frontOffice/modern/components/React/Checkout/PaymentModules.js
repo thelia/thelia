@@ -3,9 +3,8 @@ import React from 'react';
 import Loader from '../Loader';
 
 import { useIntl } from 'react-intl';
-import { useValidPaymentModules } from '../Checkout/hooks';
+import useValidPaymentModules from './hooks/useValidPaymentModules';
 import { useGetCheckout, useSetCheckout } from '@openstudio/thelia-api-utils';
-import Title from '../Title';
 
 export default function PaymentModules() {
   const intl = useIntl();
@@ -16,42 +15,52 @@ export default function PaymentModules() {
   const { mutate } = useSetCheckout();
 
   return (
-    <div className="mb-10 lg:mb-16">
-      <Title title={intl.formatMessage({ id: 'PAYMENT_MODE' })} step={6} />
-      <div>
-        {isLoading ? (
-          <Loader size="w-10 h-10" />
-        ) : (
-          modules?.length === 0 && (
-            <Alert
-              title={intl.formatMessage({ id: 'WARNING' })}
-              message={intl.formatMessage({ id: 'NO_PAYMENT_MODE_AVAILABLE' })}
-              type="warning"
-            />
-          )
-        )}
-      </div>
-
-      <div className="grid gap-6 sm:grid-cols-2">
-        {modules.map((module) => {
-          const isSelected = module.id === checkout?.paymentModuleId;
-          return (
-            <button
-              key={module.id}
-              type="button"
-              className={`Option ${isSelected ? 'active' : ''}`}
-              onClick={() => {
-                mutate({
-                  ...checkout,
-                  paymentModuleId: module.id
-                });
-              }}
-            >
-              {module.title || module?.i18n?.title}
-            </button>
-          );
-        })}
-      </div>
+    <div className="mb-8">
+      {isLoading ? (
+        <Loader size="w-10 h-10" />
+      ) : modules?.length === 0 ? (
+        <Alert
+          title={intl.formatMessage({ id: 'WARNING' })}
+          message={intl.formatMessage({ id: 'NO_PAYMENT_MODE_AVAILABLE' })}
+          type="warning"
+        />
+      ) : (
+        <div className="flex-start item-start mt-8 flex flex-col gap-3">
+          {modules.map((module, index) => {
+            const isSelected = module.id === checkout?.paymentModuleId;
+            return (
+              <label
+                key={index}
+                htmlFor={`option_${module?.code}`}
+                className="Radio"
+              >
+                <input
+                  type="radio"
+                  name="radio"
+                  id={`option_${module?.code}`}
+                  checked={isSelected}
+                  onChange={() => {
+                    mutate({
+                      ...checkout,
+                      paymentModuleId: module.id
+                    });
+                  }}
+                />
+                <span
+                  className={`mr-6 block text-base ${
+                    isSelected ? 'text-main' : ''
+                  }`}
+                >
+                  {module.title || module?.i18n?.title}{' '}
+                  <span className="block text-xs text-gray-600">
+                    {module.chapo || module?.i18n?.chapo}
+                  </span>
+                </span>
+              </label>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

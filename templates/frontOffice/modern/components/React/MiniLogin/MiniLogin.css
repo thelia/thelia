@@ -1,7 +1,7 @@
 .MiniLogin {
-  @apply fixed inset-y-0 right-0 z-10 flex w-full flex-col bg-white p-10 shadow-2xl;
+  @apply fixed inset-y-0 right-0 z-10 flex w-full flex-col bg-white p-10 ;
 
-  top: var(--Header-height);
+  top: calc(var(--header-height) - 1px);
   max-width: 90%;
   transform: translateX(100%);
   transition: transform 250ms linear;

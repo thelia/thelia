@@ -1,6 +1,16 @@
 body.no-js {
-  #MainNavigation,
-  .mm-ocd {
-    display: none !important;
+  #MainNavigation {
+    display: none;
+
+    @screen md {
+      display: block;
+    }
+  }
+
+  .Selection--animated {
+    &.is-hide {
+      transform: none;
+      opacity: 1;
+    }
   }
 }

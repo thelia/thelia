@@ -1,21 +1,23 @@
-import '@splidejs/splide/dist/css/splide-core.min.css';
-import '@splidejs/splide/dist/css/themes/splide-default.min.css';
-
-import Splide from '@splidejs/splide';
-
 export default function ProductGallery() {
-  new Splide('.splide', {
-    pagination: false,
-    arrows: false,
-    padding: '2rem',
-    gap: '1rem',
-    breakpoints: {
-      5000: {
-        destroy: true
-      },
-      1024: {
-        type: 'loop'
-      }
-    }
-  }).mount();
+  const main = document.getElementById('MainImage');
+
+  const thumbs = document.querySelectorAll('.ProductGallery-thumbnail');
+
+  if (!main || thumbs.length === 0) return null;
+
+  [...thumbs].forEach((img) => {
+    img.addEventListener('click', (e) => {
+      resetFocus();
+      main.src =
+        '/legacy-image-library/product_image_' +
+        img.dataset.imageId +
+        '/full/!525,/0/default.webp';
+
+      img.parentNode.classList.add('is-active');
+    });
+  });
+
+  function resetFocus() {
+    [...thumbs].forEach((el) => el.parentNode.classList.remove('is-active'));
+  }
 }

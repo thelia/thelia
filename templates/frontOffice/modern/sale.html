@@ -60,7 +60,7 @@
                     {ifloop rel="product_list"}
                         <ul class="list-unstyled row">
                         {loop type="product" sale={$ID} name="product_list" limit=$limit page=$product_page order=$product_order}
-                            {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="700" height="320"}
+                            {include file="includes/single-product.html" product_id=$ID hasButton=true hasDescription=true width="700" height="320"}
                         {/loop}
                         </ul>
                     {/ifloop}
@@ -97,7 +97,7 @@
 {/block}
 
 
-{block name="stylesheet"}
+{block name="css" append}
     {hook name="sale.stylesheet"}
 {/block}
 

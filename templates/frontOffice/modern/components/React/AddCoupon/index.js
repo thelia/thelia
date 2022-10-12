@@ -1,11 +1,11 @@
 import Alert from '../Alert';
 import Error from '../Error';
 import React from 'react';
-import SubmitButton from '../SubmitButton';
 import {
   useCouponCreate,
   useCartQuery,
-  useCouponClearAll
+  useCouponClearAll,
+  useCouponClear
 } from '@openstudio/thelia-api-utils';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
@@ -16,50 +16,55 @@ export default function AddCoupon() {
   const { data: cart = {} } = useCartQuery();
   const { mutate: create, error, isSuccess } = useCouponCreate();
   const {
-    mutate: deleteCoupon,
+    mutate: clearAllCoupons,
     isLoading,
     isSuccess: successClear
   } = useCouponClearAll();
+
+  const { mutate: clearCoupon } = useCouponClear();
+
   const intl = useIntl();
 
   return (
-    <div className="flex flex-col flex-wrap items-stretch leading-none">
+    <div>
       <form
-        className="flex flex-wrap items-center justify-between"
+        className={`PhoneCheck mt-0 ${isLoading ? 'PhoneCheck--loading' : ''} ${
+          error ? 'PhoneCheck--error' : ''
+        }`}
         onSubmit={handleSubmit((values) => {
           create(values.coupon);
         })}
       >
-        <div className="items-stret ch flex w-full focus-within:outline focus-within:outline-1 focus-within:outline-main">
+        <div className="PhoneCheck-field">
           <input
             id="coupon"
             type="text"
-            className="h-auto w-full border-main focus:border-main focus:shadow-none focus:outline-none focus:ring-transparent"
+            className="PhoneInput"
             placeholder={intl.formatMessage({ id: 'COUPON' })}
             {...register('coupon', {
               required: intl.formatMessage({ id: 'MANDATORY' })
             })}
           />
-          <SubmitButton
-            type="submit"
-            isSubmitting={formState.isSubmitting}
-            className="py-0"
-            label={intl.formatMessage({ id: 'OK' })}
-          />
+          <button type="submit" className="PhoneCheck-btn">
+            {intl.formatMessage({ id: 'OK' })}
+          </button>
         </div>
       </form>
       {formState.errors?.coupon?.message ? (
         <Error error={formState.errors.coupon?.message} />
       ) : null}
       {error ? (
-        <Alert type="error" message={error.response?.data?.description} />
+        <Alert
+          type="error"
+          className="mt-4"
+          message={error.response?.data?.description}
+        />
       ) : null}
       {isSuccess && !successClear ? (
         <Alert
           type="success"
-          title={intl.formatMessage({ id: 'COUPON_ADDED' })}
-          message=""
-          className="mt-6"
+          message={intl.formatMessage({ id: 'COUPON_ADDED' })}
+          className="mt-4"
         />
       ) : null}
       {cart?.coupons?.length > 0 ? (
@@ -68,24 +73,34 @@ export default function AddCoupon() {
             isLoading
               ? 'pointer-events-none text-base opacity-20 transition'
               : ''
-          } mt-6 border-t-4  bg-gray-100 px-4 py-3 text-sm shadow-md`}
+          } mt-4 rounded-sm bg-main-light px-4 py-3 text-sm`}
         >
           <span className="block">
-            {intl.formatMessage({ id: 'YOU_USING_COUPON' })}
+            {cart?.coupons?.length > 1
+              ? intl.formatMessage({ id: 'YOU_USING_COUPONS' })
+              : intl.formatMessage({ id: 'YOU_USING_COUPON' })}
           </span>
-          <ul className="my-2">
+          <ul className="flex flex-col gap-2 my-2">
             {cart?.coupons.map((c) => (
-              <li key={c.id} className="block font-bold">
-                {c?.code} - {priceFormat(c?.amount)}
+              <li key={c.id} className="flex justify-between">
+                <span className="block font-bold">
+                  {c?.code} - {priceFormat(c?.amount)}
+                </span>
+                <button
+                  className="text-sm text-main-dark hover:text-main"
+                  onClick={() => clearCoupon(c.id)}
+                >
+                  {intl.formatMessage({ id: 'DELETE' })}
+                </button>
               </li>
             ))}
           </ul>
           <button
             type="button"
             className="underline"
-            onClick={() => deleteCoupon()}
+            onClick={() => clearAllCoupons()}
           >
-            {intl.formatMessage({ id: 'CLICK_TO_CLEAR_COUPON' })}
+            {intl.formatMessage({ id: 'CLICK_TO_CLEAR_COUPONS' })}
           </button>
         </div>
       ) : null}

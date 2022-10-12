@@ -4,36 +4,50 @@ button {
   }
 }
 
-.btn {
-  transition: background 150ms ease-in-out, box-shadow 250ms;
-  @apply inline-flex cursor-pointer items-center justify-center border border-main bg-main px-10 py-4 text-center uppercase text-white;
+.Button {
+  @apply font-roboto font-medium leading-none;
+
+  padding: 15px 30px;
+  font-size: rem(18px);
+  text-align: center;
+  border: 2px solid theme("colors.main");
+  border-radius: 6px;
 
   &:hover,
+  &:focus,
   &--active {
-    @apply bg-main-dark text-white;
+    @apply bg-main text-white;
   }
 
   &:focus {
-    @apply bg-main-dark shadow-none outline-none;
+    @apply shadow-none;
+
+    outline: 2px solid theme("colors.main");
+    outline-offset: 2px;
   }
 
-  &:disabled {
-    @apply cursor-not-allowed opacity-50;
-  }
+  &:disabled, &--disabled {
+    border-color: theme("colors.gray.400");
+    outline: none;
+    cursor: not-allowed;
 
-  &--sm {
-    @apply px-4 py-2 text-sm;
-  }
-
-  &--rounded {
-    @apply rounded;
-  }
-
-  &--secondary {
-    @apply border-gray-500 bg-gray-500;
-
-    &:hover {
-      @apply bg-gray-800;
+    &:hover, &:focus {
+      color: black;
+      background: transparent;
+      outline: none;
     }
+  }
+
+
+  &--actived {
+    color: white;
+    background-color: theme("colors.main");
+    animation: shake 0.75s linear 1;
+  }
+
+  &--loading {
+    color: white;
+    background-color: theme("colors.main-light");
+    border-color: theme("colors.main-light");
   }
 }
