@@ -182,7 +182,7 @@ function SearchDropdown({ showResults = false }) {
           className="SearchDropdown-fake no-focusTrap"
           aria-label={intl.formatMessage({ id: 'SEARCH' })}
           onClick={() => modalObserver(true)}
-          tabIndex="1"
+          tabIndex={window.location.pathname === "/" ? "1" : null}
         >
           <IconSearch className="SearchDropdown-fakeIcon" />
           <span className="ml-[10px] hidden lg:block">
