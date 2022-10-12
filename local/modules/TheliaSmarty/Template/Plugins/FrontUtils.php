@@ -73,7 +73,7 @@ class FrontUtils extends AbstractSmartyPlugin
 
     public function currentView()
     {
-        $view = strtolower($this->request->get('_view'));
+        $view = htmlentities(strtolower($this->request->get('_view')));
 
         if ($view != null) {
             return $view;
