@@ -7,7 +7,7 @@
     <div class="CategoriesPanels-list">
       {loop type="category" name="CategoriesPanels" parent={$parent|default:0} limit=7}
         {$title_cat = $TITLE}
-        {include file="components/smarty/ContentCard/ContentCard.html" tabindex=$tabindex|default:null}
+        {include file="components/smarty/ContentCard/ContentCard.html" tabindex=$tabindex|default:null object_type="category"}
       {/loop}
     </div>
 
