@@ -36,6 +36,7 @@ install: ## install existing project
 	@make activate-module
 	@make install-front
 	@make build
+	@make cache-clear
 
 activate-module:
 	@php Thelia module:refresh
@@ -43,6 +44,9 @@ activate-module:
 	@php Thelia module:activate ChoiceFilter
 	@php Thelia module:activate StoreSeo
 	@php Thelia module:activate SmartyRedirection
+	@php Thelia module:activate ShortCode
+	@php Thelia module:activate TheliaLibrary
+	@php Thelia module:activate TheliaBlocks
 	@php Thelia module:deactivate HookAnalytics
 	@php Thelia module:deactivate HookCart
 	@php Thelia module:deactivate HookCustomer
@@ -59,10 +63,24 @@ activate-module:
 	@php Thelia module:refresh
 
 install-front: ## install front
+	@if [ -z $(ACTIVE_FRONT_TEMPLATE) ] || [ -z $(ACTIVE_ADMIN_TEMPLATE) ]; then\
+		echo "${RED}You need to add ACTIVE_FRONT_TEMPLATE and ACTIVE_ADMIN_TEMPLATE variable into your .env.local${reset}"; \
+		echo "${RED}Example:${reset}";\
+		echo "${RED}ACTIVE_FRONT_TEMPLATE=default${reset}";\
+		echo "${RED}ACTIVE_ADMIN_TEMPLATE=default${reset}";\
+		echo "${RED}Once this is done, restart make install-front{reset}";\
+		exit 1;\
+	fi;
 	@cd $(FRONT_OFFICE) && $(Y)
+	@make cache-clear
+
+import-demo-db: ## import demo table into your database
+	@php $(SETUP_PATH)/import.php
+	@make cache-clear
 
 build: ## build front
 	@cd $(FRONT_OFFICE) && $(Y) build
+	@make cache-clear
 
 dev: ## start front
 	@cd $(FRONT_OFFICE) && $(Y) start

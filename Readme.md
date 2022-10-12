@@ -164,6 +164,23 @@ If you want add some sample data just add the option `-demo`
 
 If you want to access your database from your computer (with DBeaver, Sequel Pro or anything else) by default the host is `localhost` and the port is `8086`
 
+### Using Makefile
+
+To install Thelia, run :
+````bash
+touch .env .env.local
+make install
+````
+If you have been missing `ACTIVE_FRONT_TEMPLATE` and/or `ACTIVE_ADMIN_TEMPLATE`, you should set them up in .env.local and launch :
+````bash
+make install-front
+make build
+````
+If you need an example of thelia database, you can run:
+````bash
+make import-demo-db
+````
+
 Documentation
 -------------
 
