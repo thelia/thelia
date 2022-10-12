@@ -70,7 +70,6 @@
                               "url" => "/legacy-image-library/category_image_{$ID}/full/!250,/0/default.webp",
                               "link" => $URL,
                               "description" => $DESCRIPTION,
-                              "alt" => $TITLE,
                               "width" => '250',
                               "height" => '250'
                             ],
@@ -80,7 +79,6 @@
                               "url" => "/legacy-image-library/category_image_{$ID}/full/!158,/0/default.webp",
                               "link" => $URL,
                               "description" => $DESCRIPTION,
-                              "alt" => $TITLE,
                               "width" => '158',
                               "height" => '158'
                             ]
@@ -92,6 +90,7 @@
                             title=$images[0]['title']
                             class="object-cover object-center w-full h-auto"
                             loading="lazy"
+                            alt=$TITLE
                             width=$images[0]['width']
                             height=$images[0]['height']
                           }

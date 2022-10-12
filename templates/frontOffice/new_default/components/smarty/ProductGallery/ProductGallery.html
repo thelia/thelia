@@ -1,4 +1,4 @@
-{loop name="image.carousel" type="image" product=$product_id width=92 height=92 resize_mode="borders" format="webp"}
+{loop name="image.carousel" type="image" product=$product_id width=88 height=88 resize_mode="borders" format="webp"}
   {$images[] = [
     'id' => $ID,
     'url' => $IMAGE_URL,
@@ -44,8 +44,8 @@
   </picture>
   <ul class="ProductGallery-list max-w-[525px]">
     {foreach from=$images|default:[] item=image name="thumbnail"}
-      <li class="ProductGallery-item ">
-        <img src="{$image['url']}" data-image-id="{$image['id']}" class="ProductGallery-thumbnail {if $smarty.foreach.thumbnail.first}is-active{/if}" alt="{$image['alt']}" title="{$image['alt']}" width="92" height="92" loading="lazy" tabindex="0" >
+      <li class="ProductGallery-item {if $smarty.foreach.thumbnail.first}is-active{/if}">
+        <img src="{$image['url']}" data-image-id="{$image['id']}" class="ProductGallery-thumbnail " alt="{$image['alt']}" title="{$image['alt']}" width="92" height="92" loading="lazy" tabindex="0" >
       </li>
     {/foreach}
   </ul>

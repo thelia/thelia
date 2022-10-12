@@ -34,6 +34,16 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
+    border: 2px solid transparent;
+    border-radius: rem(20px);
+
+    &:focus-within, &.is-active {
+      border-color: theme("colors.main");
+    }
+
+    &.is-active {
+      animation: thumbnail 0.14s ease-out 1;
+    }
   }
 
   &-img {
@@ -43,16 +53,10 @@
   }
 
   &-thumbnail {
-    border: 2px solid transparent;
-    border-radius: rem(20px);
     cursor: pointer;
 
-    &:focus, &.is-active {
-      border-color: theme("colors.main");
-    }
-
-    &.is-active {
-      animation: thumbnail 0.14s ease-out 1;
+    &:focus {
+      outline: none;
     }
   }
 }

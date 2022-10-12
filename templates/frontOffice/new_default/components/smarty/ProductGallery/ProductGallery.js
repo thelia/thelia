@@ -13,11 +13,11 @@ export default function ProductGallery() {
         img.dataset.imageId +
         '/full/!525,/0/default.webp';
 
-      img.classList.add('is-active');
+      img.parentNode.classList.add('is-active');
     });
   });
 
   function resetFocus() {
-    [...thumbs].forEach((el) => el.classList.remove('is-active'));
+    [...thumbs].forEach((el) => el.parentNode.classList.remove('is-active'));
   }
 }

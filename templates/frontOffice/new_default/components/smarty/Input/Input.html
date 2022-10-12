@@ -20,7 +20,7 @@
     {if $autofocus|default:false}autofocus{/if}
     {if $readonly|default:false}readonly{/if}
   />
-  {if $type eq 'password'}<button type="button" class="Input-switchPassword">{renderIconSvg icon="eye" class="w-5 h-5"}</button>{/if}
+  {if $type eq 'password'}<button type="button" aria-label="{intl l='Show password'}" class="Input-switchPassword">{renderIconSvg icon="eye" class="w-5 h-5"}</button>{/if}
   {if $type eq 'password'}</div>{/if}
   {if isset($displayError) && $displayError && isset($error) && $error && isset($message) && $message}
     <span class="Input-message">

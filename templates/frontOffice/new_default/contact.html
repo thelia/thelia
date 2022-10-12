@@ -64,15 +64,16 @@
                           }
                         {/form_field}
                         {form_field field="message"}
-                        <div for="{$label_attr.for|default:null}" class="Input">
-                          <label class="Input-label {if isset($error) && $error}text-error{/if}">
+                        <div class="Input">
+                          <label for="{$label_attr.for|default:null}" class="Input-label {if isset($error) && $error}text-error{/if}">
                             {$label}
                           </label>
                           <textarea
                             name="{$name}"
                             id="{$label_attr.for|default:null}"
                             rows="6"
-                            class="Input-field {if isset($error) && $error}border-error focus:border-error focus:ring-error text-error{/if} {$inputClass|default:null}"></textarea>
+                            class="Input-field {if isset($error) && $error}border-error focus:border-error focus:ring-error text-error{/if} {$inputClass|default:null}">
+                          </textarea>
                           {if isset($error) && $error && isset($message) && $message}
                             <span class="Input-message">
                               {$message}

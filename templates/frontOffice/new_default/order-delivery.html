@@ -49,36 +49,38 @@
 {/block}
 
 {block name="javascript-data"}
+  {strip}
   <script type="text/javascript">
-  {$customerTitles = []}
-  {loop type="title" name="getTitles"}
-    {$customerTitles[] = [
-      'id' => $ID,
-      'long' => $LONG,
-      'short' => $SHORT,
-      'isDefault' => $DEFAULT
-    ]}
-  {/loop}
+    {$customerTitles = []}
+    {loop type="title" name="getTitles"}
+      {$customerTitles[] = [
+        'id' => $ID,
+        'long' => $LONG,
+        'short' => $SHORT,
+        'isDefault' => $DEFAULT
+      ]}
+    {/loop}
 
-  var CUSTOMER_TITLES = {$customerTitles|json_encode nofilter}
+    window.CUSTOMER_TITLES = {$customerTitles|json_encode nofilter};
   </script>
+  {/strip}
 
+  {strip}
   <script type="text/javascript">
-  {$countries = []}
-  {loop type="country" name="getCountry" order="alpha"}
-    {$countries[] = [
-      'id' => $ISOALPHA2,
-      'title' => $TITLE
-    ]}
-    {if $ID eq {config key="store_country"}}
-      var DEFAULT_COUNTRY = "{$ISOALPHA2|default:'FR'}";
-    {/if}
-  {/loop}
+    {$countries = []}
+    {loop type="country" name="getCountry" order="alpha"}
+      {$countries[] = [
+        'id' => $ISOALPHA2,
+        'title' => $TITLE
+      ]}
+      {if $ID eq {config key="store_country"}}
+        var DEFAULT_COUNTRY = "{$ISOALPHA2|default:'FR'}";
+      {/if}
+    {/loop}
 
-  var COUNTRIES = {$countries|json_encode nofilter}
-
+    window.COUNTRIES = {$countries|json_encode nofilter}
   </script>
-
+  {/strip}
 {/block}
 
 {block name="footer"}

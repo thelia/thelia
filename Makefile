@@ -1,3 +1,4 @@
+SHELL := /bin/sh
 .DEFAULT_GOAL := help
 
 include .env
@@ -5,6 +6,7 @@ include .env.local
 
 # =========================== SHORTCUT ===========================
 
+# Aliases
 Y = yarn
 
 # Template dir
@@ -23,7 +25,7 @@ reset=`tput sgr0`
 # =========================== MAIN COMMANDS ===========================
 
 help: ## show the help.
-	@fgrep -hE '[a-zA-Z0-9_\-\/\.]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@grep -hE '[a-zA-Z0-9_\-\/\.]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 install: ## install existing project
 	@composer install
@@ -71,17 +73,21 @@ reset-asset: ## reset assets
 cache-clear: ## clear cache
 	@rm -rf var/cache & rm -rf web/assets & rm -rf web/cache & rm -rf web/templates-assets & rm -rf web/modules-assets
 
+clear-image-cache: ## clear image cache
+	@rm -rf web/cache/images
+
 lighthouse: ## review lighthouse
-	@if [[ -z $(LHCI_DOMAIN) ]]; then\
-		echo "LHCI_DOMAIN=your-domain.test" >> .env.local;\
-	fi;
-	@if [[ -z $(LHCI_PRESET) ]]; then\
-		echo "LHCI_PRESET=desktop" >> .env.local;\
+	@if [ -z $(LHCI_DOMAIN) ] || [ -z $(LHCI_PRESET) ]; then\
+		echo "${RED}You need to add LHCI env variable into your .env.local${reset}"; \
+		echo "${RED}LHCI_DOMAIN=your-domain.test${reset}";\
+		echo "${RED}LHCI_PRESET=desktop${reset}";\
+		exit 1;\
 	fi;
 	@if [ ! -f $(SETUP_PATH)/audit/lighthouserc.yaml ]; then \
 		echo "${YELLOW}lighthouserc.yaml doesn't exists so creating with env config${reset}"; \
 		cp $(SETUP_PATH)/audit/lighthouserc.default.yaml $(SETUP_PATH)/audit/lighthouserc.yaml; \
 		sed -i '' 's/__PRESET__/$(LHCI_PRESET)/g' $(SETUP_PATH)/audit/lighthouserc.yaml;\
+		sed -i '' 's/__DOMAIN__/$(LHCI_DOMAIN)/g' $(SETUP_PATH)/audit/lighthouserc.yaml;\
 	fi;
 	@if [ ! -x $(command -v lhci) ]; then\
 		npm install -g @lhci/cli;\

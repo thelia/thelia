@@ -56,14 +56,14 @@ const Input = forwardRef(
           {type === 'password' ? (
             <button
               type="button"
-              class={`Input-switchPassword ${
+              className={`Input-switchPassword ${
                 passwordVisible ? 'is-noVisible' : ''
               }`}
               onClick={() => {
                 setPasswordVisible(!passwordVisible);
               }}
             >
-              <EyeIcon className="w-5 h-5" />
+              <EyeIcon className="h-5 w-5" />
             </button>
           ) : null}
         </div>

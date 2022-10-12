@@ -24,6 +24,7 @@ export default function Quantity({
             quantity === 1 ? 'Quantity-btn--disabled' : ''
           }`}
           tabIndex={visible ? '0' : '-1'}
+          aria-label="Minus"
         >
           <span className="m-auto font-bold text-white">
             <IconMinus className="text-white" />
@@ -42,6 +43,7 @@ export default function Quantity({
             quantity === max ? 'Quantity-btn--disabled' : ''
           }`}
           tabIndex={visible ? '0' : '-1'}
+          aria-label="Add"
         >
           <span className="m-auto font-bold text-white">
             <IconPlus />

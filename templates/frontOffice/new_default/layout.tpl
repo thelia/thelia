@@ -89,11 +89,11 @@
 
   {block name="share-meta"}
     {* Share meta *}
-    <meta property="og:image" content="{encore_manifest_file file="default-social-thumbnail.webp"}">
-    <meta property="og:image:secure_url" content="{encore_manifest_file file="default-social-thumbnail.webp"}">
+    <meta property="og:image" content="{encore_manifest_file file="dist/images/default-social-thumbnail.webp"}">
+    <meta property="og:image:secure_url" content="{encore_manifest_file file="dist/images/default-social-thumbnail.webp"}">
     <meta property="og:image:width" content="450">
     <meta property="og:image:height" content="450">
-    <meta name="twitter:image" content="{encore_manifest_file file="default-social-thumbnail.webp"}">
+    <meta name="twitter:image" content="{encore_manifest_file file="dist/images/default-social-thumbnail.webp"}">
   {/block}
 
   {hook name="main.head-top"}
@@ -168,13 +168,14 @@
   {block name="minilogin"}{include file="components/React/MiniLogin/MiniLogin.html"}{/block}
   {block name="modals"}{/block}
 
+  {strip}
   <script>
-    var DEFAULT_CURRENCY_CODE = "{currency attr="code"}"
-    var DEFAULT_CURRENCY_SYMBOL = "{currency attr="symbol"}"
-    var SVG_SPRITE_URL = "{encore_manifest_file file="dist/sprite.svg"}"
-    var PLACEHOLDER_IMAGE = "{encore_manifest_file file="dist/images/placeholder.webp"}"
+    window.DEFAULT_CURRENCY_CODE = "{currency attr="code"}";
+    window.DEFAULT_CURRENCY_SYMBOL = "{currency attr="symbol"}";
+    window.SVG_SPRITE_URL = "{encore_manifest_file file="dist/sprite.svg"}";
+    window.PLACEHOLDER_IMAGE = "{encore_manifest_file file="dist/images/placeholder.webp"}";
   </script>
-
+  {/strip}
 
   {block name="javascript"}
     {encore_entry_script_tags entry="app"}

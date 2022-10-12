@@ -27,10 +27,9 @@
 
 {* Meta *}
 {block name="meta"}
-{loop name="category.seo.meta" type="category" current="yes"}
-{if $META_DESCRIPTION}<meta name="description" content="{$META_DESCRIPTION}">{/if}
-{if $META_KEYWORDS}<meta name="keywords" content="{$META_KEYWORDS}">{/if}
-{/loop}
+  {loop name="category.seo.meta" type="category" current="yes"}
+    {include file="includes/meta-seo.html"}
+  {/loop}
 {/block}
 
 {* Breadcrumb *}
