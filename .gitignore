@@ -116,3 +116,9 @@ composer.phar
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
+
+
+### cypress
+tests/cypress/videos
+tests/cypress/screenshots
+tests/cypress/downloads

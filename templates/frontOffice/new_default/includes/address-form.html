@@ -86,6 +86,7 @@
     value={$smarty.get.email|default:$value}
     label={intl l="Adresse e-mail"}
     placeholder=""
+    autocomplete="username"
     required=$required
   }
 {/function}
@@ -201,6 +202,7 @@
     value={$value|default:{$ZIPCODE|default:null} nofilter}
     label=$label
     placeholder=""
+    autocomplete="false"
     required=$required
   }
 {/function}
@@ -309,6 +311,7 @@
     label=$label
     placeholder=""
     required=$required
+    autocomplete="new-password"
   }
 {/function}
 
@@ -324,6 +327,7 @@
   label=$label
   placeholder=""
   required=$required
+  autocomplete="new-password"
 }
 {/function}
 
