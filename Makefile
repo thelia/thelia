@@ -34,11 +34,14 @@ install: ## install existing project
 	fi;
 	@php Thelia t:i
 	@make activate-module
+	@if [ ! -f .env.local ]; then \
+			touch .env.local\
+	fi;
 	@if ! grep -q ACTIVE_FRONT_TEMPLATE .env.local; then \
-		echo '\nACTIVE_FRONT_TEMPLATE=modern' >> .env.local; \
+    echo '\nACTIVE_FRONT_TEMPLATE=modern' >> .env.local; \
 	fi;
 	@if ! grep -q ACTIVE_ADMIN_TEMPLATE .env.local; then \
-		echo '\nACTIVE_ADMIN_TEMPLATE=default' >> .env.local; \
+			echo '\nACTIVE_ADMIN_TEMPLATE=default' >> .env.local; \
 	fi;
 	@make install-front
 	@make build

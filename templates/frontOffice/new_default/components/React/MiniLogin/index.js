@@ -25,7 +25,11 @@ import { trapTabKey } from '@js/standalone/trapItemsMenu';
 function LoginForm({ setLoginHandler, redirectionToCheckout }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { mutate: login, isLoading, error } = useLogin(!redirectionToCheckout);
+  const {
+    mutateAsync: login,
+    isLoading,
+    error
+  } = useLogin(!redirectionToCheckout);
   const intl = useIntl();
 
   return (

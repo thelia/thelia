@@ -168,7 +168,6 @@ If you want to access your database from your computer (with DBeaver, Sequel Pro
 
 To install Thelia, run :
 ````bash
-touch .env .env.local
 make install
 ````
 If you have been missing `ACTIVE_FRONT_TEMPLATE` and/or `ACTIVE_ADMIN_TEMPLATE`, you should set them up in .env.local and launch :
