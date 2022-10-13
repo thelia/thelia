@@ -79,7 +79,8 @@
         "symfony/webpack-encore-bundle": "^1.14",
         "composer/composer": "~2.3.0",
         "thelia/thelia-blocks-module": "^2.0.3-beta",
-        "thelia/thelia-library-module": "^1.1.6"
+        "thelia/thelia-library-module": "^1.1.6",
+        "thelia/product-loop-attribute-filter-module": "dev-main"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",

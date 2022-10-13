@@ -66,6 +66,7 @@
                     {/ifloop}
                 {/loop}
             {elseif $TYPE == "attribute" and $VISIBLE}
+              {if {count type="module" name="has-attribute-extend" code="ProductLoopAttributeFilter"}}
                   {loop type="attribute" name="attribute-$ID" id=$ID}
                       {$attributeId = $ID}
                       <div class="py-4">
@@ -89,6 +90,7 @@
                           </div>
                       </div>
                   {/loop}
+                {/if}
 
             {elseif $TYPE == "category" and $VISIBLE}
                 {ifloop rel="categoryFilter"}
