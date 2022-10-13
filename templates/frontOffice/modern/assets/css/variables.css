@@ -5,11 +5,10 @@
   --header-height: rem(60px);
   --nav-height: rem(90px);
   --space: rem(20px);
-  --min-height-cartitem: 4rem;
+  --min-height-cartitem: rem(106px);
 
   @screen md {
     --gap-checkout: 2.5rem;
     --header-height: rem(80px);
-    --min-height-cartitem: rem(106px);
   }
 }

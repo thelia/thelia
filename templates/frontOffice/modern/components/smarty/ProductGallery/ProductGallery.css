@@ -19,6 +19,7 @@
     gap: 10px;
     align-items: center;
     width: 511px;
+    max-width: 100%;
     margin: auto;
   }
 
@@ -37,8 +38,9 @@
     border: 2px solid transparent;
     border-radius: rem(20px);
 
-    &:focus-within, &.is-active {
-      border-color: theme("colors.main");
+    &:focus-within,
+    &.is-active {
+      border-color: theme('colors.main');
     }
 
     &.is-active {

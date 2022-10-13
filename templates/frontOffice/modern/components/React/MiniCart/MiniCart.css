@@ -14,12 +14,19 @@
 }
 
 .CartItems {
-  max-height: calc(calc(5 * var(--min-height-cartitem)) + calc(var(--min-height-cartitem) * 0.5));
+  max-height: calc(
+    calc(5 * var(--min-height-cartitem)) +
+      calc(var(--min-height-cartitem) * 0.75)
+  );
   margin: 0 rem(-20px);
-  padding: 0 rem(20px);
+  padding: 0 rem(20px) 4rem;
   overflow: auto;
-  scrollbar-color: theme("colors.main") white;
+  scrollbar-color: theme('colors.main') white;
   scrollbar-width: thin;
+
+  @screen md {
+    padding-bottom: 0;
+  }
 
   &::-webkit-scrollbar-track {
     background-color: #f5f5f5;
@@ -38,7 +45,10 @@
   &--recap {
     --min-height-cartitem: 4rem;
 
-    max-height: calc(calc(4 * var(--min-height-cartitem)) + calc(var(--min-height-cartitem) * 0.5));
+    max-height: calc(
+      calc(4 * var(--min-height-cartitem)) +
+        calc(var(--min-height-cartitem) * 0.75)
+    );
   }
 }
 
@@ -53,7 +63,7 @@
   &:not(:first-child) {
     margin-top: rem(20px);
     padding-top: rem(20px);
-    border-top: 1px solid theme("colors.gray.300");
+    border-top: 1px solid theme('colors.gray.300');
   }
 
   &--recap {
@@ -73,7 +83,7 @@
     width: var(--min-height-cartitem);
     height: var(--min-height-cartitem);
     overflow: hidden;
-    background-color: theme("colors.gray.200");
+    background-color: theme('colors.white');
     border-radius: rem(6px);
 
     img {

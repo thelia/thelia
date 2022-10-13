@@ -18,14 +18,14 @@
     visibility: visible;
   }
 
-
   @screen md {
     max-width: rem(428px);
+    padding-bottom: rem(36px);
   }
 
   &-close {
     position: absolute;
-    top: calc(rem(20px) + var(--header-height) );
+    top: calc(rem(20px) + var(--header-height));
     right: rem(20px);
     outline-offset: 2px;
   }

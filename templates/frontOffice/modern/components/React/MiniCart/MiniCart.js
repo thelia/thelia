@@ -147,10 +147,10 @@ export function Item({
         </div>
       )}
       <div className="CartItem-contain">
-        <div className="item-center flex justify-between">
+        <div className="flex justify-between item-center">
           <a
             href={product.url}
-            className="mr-4 block font-bold"
+            className="block mr-4 font-bold"
             tabIndex={visible ? '0' : '-1'}
           >
             {product.i18n.title}
@@ -203,14 +203,14 @@ export function Item({
 function EmptyCart() {
   const intl = useIntl();
   return (
-    <legend className="Title Title--3 text-center">
+    <legend className="text-center Title Title--3">
       <button
         type="button"
         className="SideBar-close"
         aria-label={intl.formatMessage({ id: 'CLOSE_CART' })}
         data-close-cart
       >
-        <IconCLose className="pointer-events-none h-3 w-3" />
+        <IconCLose className="w-3 h-3 pointer-events-none" />
       </button>
       {intl.formatMessage({ id: 'CART_EMPTY' })}
     </legend>
@@ -222,11 +222,16 @@ export function CartItems({
   canDelete = true,
   canChangeQuantity = true,
   recap = false,
+  noOverflow = false,
   visible
 }) {
   return (
-    <div>
-      <div className={`CartItems ${recap ? 'CartItems--recap' : ''}`}>
+    <div className="CartItems-wrapper">
+      <div
+        className={`CartItems ${recap ? 'CartItems--recap' : ''} ${
+          noOverflow ? 'max-h-max overflow-visible' : ''
+        }`}
+      >
         {cart.items?.map((item, index) => (
           <Item
             key={item.id || index}
@@ -244,7 +249,7 @@ export function CartItems({
 
 function FooterItem({ label, value }) {
   return (
-    <dl className="flex items-center justify-between text-lg uppercase leading-none">
+    <dl className="flex items-center justify-between text-lg leading-none uppercase">
       <dt>{label}</dt>
       <dd>{value}</dd>
     </dl>
@@ -264,7 +269,7 @@ export function MiniCartFooter({ delivery, taxes, discount, coupon, total }) {
   const intl = useIntl();
   return (
     <div>
-      <div className="grid gap-y-4 border-t border-b border-main border-opacity-25 py-5">
+      <div className="grid py-5 border-t border-b border-opacity-25 gap-y-4 border-main">
         <AddCoupon />
         <FooterItem
           label={intl.formatMessage({ id: 'TOTAL_UNTAXED' })}
@@ -348,7 +353,7 @@ function MiniCart({ visible, redirect }) {
   });
 
   return (
-    <div ref={ref} className="grid gap-8">
+    <div ref={ref} className="grid grid-cols-1 gap-8">
       <button
         ref={focusRef}
         type="button"
@@ -360,7 +365,7 @@ function MiniCart({ visible, redirect }) {
         }
         tabIndex={visible ? '0' : '-1'}
       >
-        <IconCLose className="pointer-events-none h-3 w-3" />
+        <IconCLose className="w-3 h-3 pointer-events-none" />
       </button>
       {!cart.items || cart.items.length === 0 ? (
         <EmptyCart />
