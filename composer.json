@@ -78,7 +78,10 @@
     "minimum-stability": "stable",
     "config": {
         "vendor-dir": "core/vendor",
-        "bin-dir": "bin"
+        "bin-dir": "bin",
+        "allow-plugins": {
+            "thelia/installer": true
+        }
     },
     "autoload": {
         "psr-4": {

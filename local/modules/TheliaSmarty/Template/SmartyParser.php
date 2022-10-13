@@ -49,9 +49,6 @@ class SmartyParser extends Smarty implements ParserInterface
     /** @var RequestStack */
     protected $requestStack;
 
-    protected $backOfficeTemplateDirectories = array();
-    protected $frontOfficeTemplateDirectories = array();
-
     protected $templateDirectories = array();
 
     /** @var TemplateDefinition */
@@ -222,7 +219,13 @@ class SmartyParser extends Smarty implements ParserInterface
             }
         }
 
-        $source = preg_replace(array_keys($expressions), array_values($expressions), $source);
+        // Protect output against a potential regex execution error (e.g., PREG_BACKTRACK_LIMIT_ERROR)
+        if (null !== $tmp = preg_replace(array_keys($expressions), array_values($expressions), $source)) {
+            $source = $tmp;
+            unset($tmp);
+        } else {
+            Tlog::getInstance()->error("Failed to trim whitespaces from parser output: " . preg_last_error());
+        }
 
         // capture html elements not to be messed with
         $_offset = 0;
@@ -284,9 +287,9 @@ class SmartyParser extends Smarty implements ParserInterface
     {
         if (is_scalar($content)) {
             return htmlspecialchars($content, ENT_QUOTES, Smarty::$_CHARSET);
-        } else {
-            return $content;
         }
+
+        return $content;
     }
 
 
@@ -299,7 +302,7 @@ class SmartyParser extends Smarty implements ParserInterface
     public function pushTemplateDefinition(TemplateDefinition $templateDefinition, $fallbackToDefaultTemplate = false)
     {
         if (null !== $this->templateDefinition) {
-            array_push($this->tplStack, [$this->templateDefinition, $this->fallbackToDefaultTemplate]);
+            $this->tplStack[] = [$this->templateDefinition, $this->fallbackToDefaultTemplate];
         }
 
         $this->setTemplateDefinition($templateDefinition, $fallbackToDefaultTemplate);
