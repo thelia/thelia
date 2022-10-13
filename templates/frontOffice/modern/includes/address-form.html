@@ -278,7 +278,7 @@
     value={$value|default:{$PHONE|default:null} nofilter}
     label={intl l="Téléphone fixe"}
     placeholder=""
-    required=false
+    required={$required|default:false}
   }
 {/function}
 
@@ -295,7 +295,7 @@
     value={$value|default:{$CELLPHONE|default:null} nofilter}
     label={intl l="Téléphone mobile"}
     placeholder=""
-    required=true
+    required={$required|default:false}
   }
 {/function}
 
