@@ -45,13 +45,13 @@
     display: none;
     width: max-content;
     padding: 8px 12px;
-    background-color: theme("colors.white");
+    background-color: theme('colors.white');
     border-radius: 0.375rem;
     box-shadow: 0 0 6px rgb(0 0 0 / 30%);
     visibility: hidden;
 
     @screen md {
-      top: 80px;
+      top: 60px;
       padding: 15px 20px;
     }
   }
