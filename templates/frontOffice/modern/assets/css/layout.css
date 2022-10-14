@@ -12,7 +12,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
 
   &.is-open {
-    .Header-link, .Header-home, .LangSelect {
+    .Header-link,
+    .Header-home,
+    .LangSelect {
       opacity: 0;
       pointer-events: none;
     }
@@ -21,20 +23,22 @@ body {
       &-contain span {
         transition: none;
 
-        &:nth-child(1), &:nth-child(4) {
+        &:nth-child(1),
+        &:nth-child(4) {
           opacity: 0;
         }
 
-        &:nth-child(2), &:nth-child(3) {
+        &:nth-child(2),
+        &:nth-child(3) {
           transition: ease-in 0.15s;
         }
 
         &:nth-child(2) {
-          transform: rotate(45deg)
+          transform: rotate(45deg);
         }
 
         &:nth-child(3) {
-          transform: rotate(-45deg)
+          transform: rotate(-45deg);
         }
       }
     }
@@ -45,17 +49,13 @@ body {
   }
 
   &.sidebar-open:not(.is-sticky) {
-    @apply overflow-y-hidden;
-
     .SearchDropdown {
-
       @screen md {
         opacity: 0;
         pointer-events: none;
       }
     }
   }
-
 }
 
 .video {
