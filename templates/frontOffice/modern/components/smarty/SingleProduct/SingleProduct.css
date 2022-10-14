@@ -17,7 +17,6 @@
   &-img {
     margin-bottom: 13px;
     overflow: hidden;
-    background-color: theme("colors.gray.50");
     border-radius: 20px;
     transition: all ease-in 0.1s;
 
@@ -35,7 +34,7 @@
   }
 
   &-desc {
-    @apply font-roboto font-medium;
+    @apply font-medium;
   }
 
   &-title {
@@ -45,7 +44,7 @@
 
   &-from {
     margin-right: 5px;
-    color: theme("colors.gray.600");
+    color: theme('colors.gray.600');
     font-size: rem(12px);
   }
 
@@ -53,7 +52,8 @@
     font-size: rem(15px);
   }
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     .SingleProduct-img {
       img {
         transform: scale(1.075);
@@ -61,15 +61,16 @@
     }
 
     .SingleProduct-title {
-      color: theme("colors.main-dark");
+      color: theme('colors.main-dark');
     }
   }
 
-  &:focus, &:focus-visible {
+  &:focus,
+  &:focus-visible {
     outline: none;
 
     .SingleProduct-img {
-      outline: 2px solid theme("colors.gray.400");
+      outline: 2px solid theme('colors.gray.400');
     }
   }
 }

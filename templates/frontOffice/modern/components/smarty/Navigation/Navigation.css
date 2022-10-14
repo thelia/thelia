@@ -53,7 +53,7 @@
   }
 
   .Menu {
-    @apply font-roboto;
+    @apply;
 
     height: 100%;
 

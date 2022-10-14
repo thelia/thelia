@@ -1,4 +1,6 @@
 .ProductGallery {
+  --border-radius-tumbnail: rem(20px);
+
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -36,7 +38,7 @@
     align-items: flex-start;
     justify-content: center;
     border: 2px solid transparent;
-    border-radius: rem(20px);
+    border-radius: var(--border-radius-tumbnail);
 
     &:focus-within,
     &.is-active {
@@ -51,11 +53,12 @@
   &-img {
     display: block;
     margin: auto;
-    border-radius: rem(20px);
+    border-radius: var(--border-radius-tumbnail);
   }
 
   &-thumbnail {
     cursor: pointer;
+    border-radius: var(--border-radius-tumbnail);
 
     &:focus {
       outline: none;

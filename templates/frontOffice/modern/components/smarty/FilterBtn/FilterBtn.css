@@ -1,5 +1,5 @@
 .FilterBtn {
-  @apply font-roboto font-medium;
+  @apply font-medium;
 
   display: flex;
   align-items: center;
@@ -12,7 +12,7 @@
   border-radius: 6px;
 
   &:hover {
-    color: theme("colors.gray.200");
+    color: theme('colors.gray.200');
   }
 
   &:focus {
@@ -36,7 +36,7 @@
     height: rem(20px);
     margin-left: 6px;
     font-size: rem(12px);
-    background-color: theme("colors.main");
+    background-color: theme('colors.main');
     border-radius: 50%;
     pointer-events: none;
 

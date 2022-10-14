@@ -1,5 +1,5 @@
 .ContentCard {
-  @apply font-roboto font-medium;
+  @apply font-medium;
 
   display: flex;
   flex-direction: column;
@@ -8,7 +8,7 @@
   color: black;
   font-size: rem(20px);
   text-align: center;
-  border: 2px solid #EAEDED;
+  border: 2px solid #eaeded;
   border-radius: rem(20px);
   transition: all ease-in 0.1s;
 
@@ -33,12 +33,13 @@
     font-size: rem(20px);
     text-transform: lowercase;
 
-    > ::first-letter{
+    > ::first-letter {
       text-transform: uppercase;
     }
   }
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     border-color: theme('colors.main');
 
     .SingleCategory-img {

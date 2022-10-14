@@ -5,8 +5,8 @@
   padding: rem(6px);
 
   &-btn {
-    @apply flex items-center justify-center  transition rounded-md cursor-pointer bg-black hover:bg-black focus:outline-none  disabled:opacity-50 text-white;
-
+    @apply flex cursor-pointer items-center  justify-center rounded-md text-white transition  focus:outline-none disabled:opacity-50;
+    background-color: theme('colors.main');
     flex: 1 0 auto;
     width: rem(36px);
     height: rem(36px);
@@ -16,17 +16,17 @@
       pointer-events: none;
     }
 
+    &:hover,
     &:focus {
-      background-color: theme('colors.main');
+      background-color: theme('colors.main-dark');
     }
   }
 
   &-number {
-    @apply flex items-center justify-center  cursor-default text-lg px-2;
+    @apply flex cursor-default items-center  justify-center px-2 text-lg;
 
     width: rem(124px);
     height: rem(36px);
-
   }
 
   &--small {

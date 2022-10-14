@@ -1,18 +1,14 @@
 .AccountCard {
-  @apply font-roboto font-medium;
+  @apply font-medium;
 
   padding: rem(30px) rem(16px);
-  background-color: theme("colors.main-light");
+  background-color: theme('colors.main-light');
   border-radius: rem(20px);
   transition: all ease-in 0.1s;
-
 
   @screen lg {
     padding: rem(44px) rem(30px);
   }
-
-
-
 
   &-title {
     margin: rem(30px) 0 rem(16px);
@@ -25,8 +21,9 @@
     font-size: rem(15px);
   }
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     color: white;
-    background-color: theme("colors.main");
+    background-color: theme('colors.main');
   }
 }

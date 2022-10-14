@@ -6,7 +6,7 @@
   "main": "./src/index.js",
   "license": "GPL",
   "scripts": {
-    "start": "cross-env NODE_ENV=dev encore dev-server --port 8085 --host 0.0.0.0 --hot",
+    "start": "cross-env NODE_ENV=dev encore dev-server --port 8085 --host localhost --hot",
     "build": "cross-env NODE_ENV=production encore production"
   },
   "browserslist": {

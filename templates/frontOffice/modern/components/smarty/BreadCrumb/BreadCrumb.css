@@ -1,5 +1,5 @@
 .BreadCrumb {
-  @apply font-roboto;
+  @apply;
 
   padding: rem(26px) rem(28px);
   color: theme('colors.gray.600');

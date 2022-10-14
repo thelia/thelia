@@ -1,9 +1,9 @@
 .Pagination {
-  @apply font-roboto font-medium;
+  @apply font-medium;
 
   display: flex;
   flex-wrap: wrap;
-  gap: 10px ;
+  gap: 10px;
   align-items: center;
   justify-content: center;
   margin-top: rem(50px);
@@ -20,24 +20,28 @@
     border: 2px solid transparent;
     border-radius: 50%;
 
-    &:hover, &:focus {
-      border-color: theme("colors.gray.400");
+    &:hover,
+    &:focus {
+      border-color: theme('colors.gray.400');
       outline: none;
     }
     &.current {
-      border-color: theme("colors.main");
+      border-color: theme('colors.main');
 
-      &:hover, &:focus {
-        border-color: theme("colors.main-dark");
+      &:hover,
+      &:focus {
+        border-color: theme('colors.main-dark');
       }
     }
   }
 
-  &-prev, &-next {
-    color: theme("colors.main");
+  &-prev,
+  &-next {
+    color: theme('colors.main');
 
-    &:hover, &:focus {
-      border-color: theme("colors.main");
+    &:hover,
+    &:focus {
+      border-color: theme('colors.main');
       outline: none;
     }
 

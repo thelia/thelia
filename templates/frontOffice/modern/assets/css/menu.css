@@ -14,7 +14,7 @@ body.mm-ocd-opened {
 }
 
 .mm-ocd {
-  @apply font-roboto font-medium;
+  @apply font-medium;
 
   position: fixed;
   top: 0;
@@ -125,7 +125,6 @@ body.mm-ocd-opened {
 }
 
 :root {
-
 }
 
 .mm-spn {
@@ -165,7 +164,7 @@ body.mm-ocd-opened {
   display: block;
   height: 50px;
   height: var(--mm-spn-item-height);
-  content: "";
+  content: '';
 }
 
 .mm-spn > ul {
@@ -199,17 +198,17 @@ body.mm-ocd-opened {
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  transform: translate(0,-50%);
+  transform: translate(0, -50%);
   transform-origin: center;
-  content: "";
+  content: '';
 }
 
 .mm-spn li::after {
   display: block;
   margin: 0 var(--mm-spn-item-indent);
-  border-top: 1px solid theme("colors.gray.500");
+  border-top: 1px solid theme('colors.gray.500');
   opacity: 0.15;
-  content: "";
+  content: '';
 }
 
 .mm-spn a,
@@ -218,7 +217,8 @@ body.mm-ocd-opened {
   position: relative;
   z-index: 1;
   padding: 13px 20px;
-  padding: calc((var(--mm-spn-item-height) - var(--mm-spn-line-height)) / 2) var(--mm-spn-item-indent);
+  padding: calc((var(--mm-spn-item-height) - var(--mm-spn-line-height)) / 2)
+    var(--mm-spn-item-indent);
 }
 
 .mm-spn a {
@@ -254,9 +254,9 @@ body.mm-ocd-opened {
   background-repeat: no-repeat;
   background-position: left;
   background-size: contain;
-  transform: translate(0,-50%);
+  transform: translate(0, -50%);
   transform-origin: center;
-  content: "Retour";
+  content: 'Retour';
 }
 
 .mm-spn.mm-spn--navbar.mm-spn--main {

@@ -32,7 +32,7 @@
     padding: 0;
 
     @screen md {
-      border-bottom: 1px solid theme("colors.gray.300");
+      border-bottom: 1px solid theme('colors.gray.300');
     }
 
     @screen lg {
@@ -51,7 +51,7 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%,-50%);
+      transform: translate(-50%, -50%);
     }
   }
 
@@ -71,9 +71,8 @@
     height: 100%;
   }
 
-
   &-link {
-    @apply font-roboto;
+    @apply;
 
     display: flex;
     align-items: center;
@@ -125,7 +124,7 @@
     display: none;
     width: max-content;
     padding: 8px 12px;
-    background-color: theme("colors.white");
+    background-color: theme('colors.white');
     border-radius: 0.375rem;
     box-shadow: 0 0 6px rgb(0 0 0 / 30%);
     visibility: hidden;
@@ -160,7 +159,7 @@
     margin-left: 3px;
     color: white;
     font-size: rem(12px);
-    background-color: theme("colors.main");
+    background-color: theme('colors.main');
     border-radius: 50%;
 
     &:empty {
