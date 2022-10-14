@@ -6,6 +6,60 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 
 const chokidar = require('chokidar');
 
+const svgoConfig = {
+  plugins: [
+    'removeDoctype',
+    'removeXMLProcInst',
+    'removeComments',
+    'removeMetadata',
+    'removeEditorsNSData',
+    'cleanupAttrs',
+    'mergeStyles',
+    'inlineStyles',
+    'minifyStyles',
+    'removeUselessDefs',
+    'cleanupNumericValues',
+    'convertColors',
+    'removeUnknownsAndDefaults',
+    'removeNonInheritableGroupAttrs',
+    'removeUselessStrokeAndFill',
+    'removeViewBox',
+    'cleanupEnableBackground',
+    'removeHiddenElems',
+    'removeEmptyText',
+    'convertShapeToPath',
+    'convertEllipseToCircle',
+    'moveElemsAttrsToGroup',
+    'moveGroupAttrsToElems',
+    'collapseGroups',
+    'convertPathData',
+    'convertTransform',
+    'removeEmptyAttrs',
+    'removeEmptyContainers',
+    'mergePaths',
+    'removeUnusedNS',
+    'sortDefsChildren',
+    'removeTitle',
+    'removeDesc',
+    {
+      name: 'cleanupIDs',
+      params: {
+        prefix: {
+          toString() {
+            return `${Math.random().toString(36).substr(2, 9)}`;
+          }
+        }
+      }
+    },
+    {
+      name: 'removeAttrs',
+      params: {
+        attrs: '(data-name)'
+      }
+    }
+  ]
+};
+
 if (!Encore.isRuntimeEnvironmentConfigured()) {
   Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
 }
@@ -89,19 +143,7 @@ Encore.addRule({
     {
       loader: '@svgr/webpack',
       options: {
-        svgoConfig: {
-          plugins: [
-            {
-              name: 'preset-default',
-              params: {
-                overrides: {
-                  removeViewBox: false,
-                  minifyStyles: false
-                }
-              }
-            }
-          ]
-        }
+        svgoConfig: svgoConfig
       }
     },
     'file-loader'
@@ -120,59 +162,7 @@ Encore.addPlugin(
         keep: true
       },
       svg4everybody: false,
-      svgo: {
-        plugins: [
-          'removeDoctype',
-          'removeXMLProcInst',
-          'removeComments',
-          'removeMetadata',
-          'removeEditorsNSData',
-          'cleanupAttrs',
-          'mergeStyles',
-          'inlineStyles',
-          'minifyStyles',
-          'removeUselessDefs',
-          'cleanupNumericValues',
-          'convertColors',
-          'removeUnknownsAndDefaults',
-          'removeNonInheritableGroupAttrs',
-          'removeUselessStrokeAndFill',
-          'removeViewBox',
-          'cleanupEnableBackground',
-          'removeHiddenElems',
-          'removeEmptyText',
-          'convertShapeToPath',
-          'convertEllipseToCircle',
-          'moveElemsAttrsToGroup',
-          'moveGroupAttrsToElems',
-          'collapseGroups',
-          'convertPathData',
-          'convertTransform',
-          'removeEmptyAttrs',
-          'removeEmptyContainers',
-          'mergePaths',
-          'removeUnusedNS',
-          'sortDefsChildren',
-          'removeTitle',
-          'removeDesc',
-          {
-            name: 'cleanupIDs',
-            params: {
-              prefix: {
-                toString() {
-                  return `${Math.random().toString(36).substr(2, 9)}`;
-                }
-              }
-            }
-          },
-          {
-            name: 'removeAttrs',
-            params: {
-              attrs: '(data-name)'
-            }
-          }
-        ]
-      }
+      svgo: svgoConfig
     }
   })
 );

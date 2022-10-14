@@ -420,7 +420,7 @@ export default function MiniCartWrapper() {
   return (
     <div className={`SideBar ${visible ? 'SideBar--visible' : ''} `}>
       <Suspense fallback={<Loader />}>
-        <MiniCart visible={visible} redirect={redirect} />
+        {visible ? <MiniCart visible={visible} redirect={redirect} /> : null}
       </Suspense>
     </div>
   );
