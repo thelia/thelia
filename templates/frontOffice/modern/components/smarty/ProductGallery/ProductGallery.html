@@ -8,7 +8,7 @@
 {/loop}
 
 <div class="ProductGallery">
-  <picture class="ProductGallery-main">
+  <div class="ProductGallery-main">
     <div class="ProductGallery-tagList">
       {if $IS_NEW}
         {include file="components/smarty/Tag/Tag.html" type="primary" text={intl l="New"}}
@@ -41,7 +41,7 @@
         loading="lazy"
       >
     {/if}
-  </picture>
+  </div>
   <ul class="ProductGallery-list max-w-[525px]">
     {foreach from=$images|default:[] item=image name="thumbnail"}
       <li class="ProductGallery-item {if $smarty.foreach.thumbnail.first}is-active{/if}">
