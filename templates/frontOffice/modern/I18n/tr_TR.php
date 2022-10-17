@@ -94,7 +94,7 @@ return [
     'Grid' => 'Izgara',
     'Home' => 'Ana sayfa',
     'I\'ve read and agreed on <a href=\'%link\' class=\'terms-quickview\'>Terms &amp; Conditions</a>' => 'Okudum ve <a href=\'%link\' class=\'terms-quickview\'> şartları ve koşulları</a> üzerinde kabul ediyorum',
-    'If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" value="please click here">.' => '10 saniye içinde bir eylem gerçekleşmezse <input type="submit" id="force-submit-payment-form" value="burayı tıklayın">.',
+    'If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.' => '10 saniye içinde bir eylem gerçekleşmezse <a id="force-submit-payment-form" href="#"> burayı tıklayın</a>. ',
     'If you want to change your email, please contact us.' => 'E-posta değiştirmek istiyorsanız lütfen bize ulaşın.',
     'In Stock' => 'Stokta var',
     'Invoice REF' => 'Fatura ürün kodu',

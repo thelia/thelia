@@ -1,16 +1,21 @@
 .LangSelect {
   position: relative;
+  height: 100%;
 
-  &:hover,
-  &:focus {
-    .LangSelect-dropdown {
-      left: 0;
-      opacity: 1;
-    }
+  &:hover &-dropdown,
+  &:focus &-dropdown,
+  &-dropdown.open {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    visibility: visible;
   }
 
   &-current {
     position: relative;
+    display: flex;
+    align-items: center;
+    height: 100%;
     padding: 10px 20px 10px 0;
 
     &:hover,
@@ -34,15 +39,24 @@
   }
 
   &-dropdown {
-    @apply bg-white shadow;
-
     position: absolute;
-    top: 100%;
-    left: -99999em;
-    z-index: 20;
-    width: auto;
-    opacity: 0;
-    transition: 0.3s ease-out;
-    transition-property: opacity, transform;
+    top: 60px;
+    right: 0;
+    display: none;
+    width: max-content;
+    padding: 8px 12px;
+    background-color: theme('colors.white');
+    border-radius: 0.375rem;
+    box-shadow: 0 0 6px rgb(0 0 0 / 30%);
+    visibility: hidden;
+
+    @screen md {
+      top: 60px;
+      padding: 15px 20px;
+    }
   }
+}
+
+body.is-sticky .LangSelect-dropdown {
+  top: 68px;
 }

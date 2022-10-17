@@ -1,18 +1,19 @@
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import React, { useEffect, useState } from 'react';
 
 import AddressForm from './AddressForm';
-import { ReactComponent as CloseIcon } from './imgs/icon-close.svg';
+import { ReactComponent as IconCLose } from '@icons/close.svg';
 import Modal from 'react-modal';
 import { useAddressCreate } from '@openstudio/thelia-api-utils';
 import { useLockBodyScroll } from 'react-use';
+import { ReactComponent as IconPlus } from '@icons/plus.svg';
+import Title from '../Title';
 
 export default function CreateAddressModal({ className = '' }) {
   const [showModal] = useState(false);
   useLockBodyScroll(showModal);
-  const { mutate: create, isSuccess } = useAddressCreate();
+  const { mutateAsync: create, isSuccess } = useAddressCreate();
   const [isCreatingAddress, setIsCreatingAddress] = useState(false);
-  const intl = useIntl();
 
   useEffect(() => {
     if (isSuccess) {
@@ -20,15 +21,27 @@ export default function CreateAddressModal({ className = '' }) {
     }
   }, [isSuccess]);
 
+  const submitForm = async (values) => {
+    try {
+      await create(values);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return (
     <div className={`${className}`}>
       <button
-        className=" btn btn--sm"
+        className="flex items-center hover:underline"
         type="button"
         onClick={() => {
           setIsCreatingAddress(true);
         }}
       >
+        <span className="flex items-center justify-center w-6 h-6 mr-3 text-white bg-black rounded-full">
+          <IconPlus className="h-[9px] w-[9px]" />
+        </span>
+
         <FormattedMessage id="CREATE_ADDRESS" />
       </button>
       <Modal
@@ -36,40 +49,28 @@ export default function CreateAddressModal({ className = '' }) {
         onRequestClose={() => setIsCreatingAddress(false)}
         ariaHideApp={false}
         className={{
-          base: 'h-full w-full max-w-4xl overflow-auto  bg-white p-8 outline-none lg:p-20 lg:py-14',
-          afterOpen: '',
-          beforeClose: ''
+          base: 'Modal',
+          afterOpen: 'Modal--open',
+          beforeClose: 'Modal--close'
         }}
         overlayClassName={{
-          base: 'fixed bg-black  bg-opacity-80 inset-0 z-200 flex items-center justify-center px-8 py-24 lg:px-24',
-          afterOpen: '',
-          beforeClose: ''
+          base: 'Modal-overlay',
+          afterOpen: 'opacity-100',
+          beforeClose: 'opacity-0'
         }}
         bodyOpenClassName={null}
       >
         <div className="relative">
-          <div className="flex items-center justify-between">
-            <div className="mx-auto block w-full">
-              <h4 className="mb-8 text-3xl">
-                {intl.formatMessage({ id: 'CREATE_ADDRESS' })}
-              </h4>
-              <button
-                type="button"
-                className="absolute top-0 right-0 border-main p-2 focus:border"
-                onClick={() => setIsCreatingAddress(false)}
-              >
-                <CloseIcon />
-              </button>
-              <AddressForm
-                onSubmit={async (values) => {
-                  try {
-                    await create(values);
-                  } catch (error) {
-                    console.error(error);
-                  }
-                }}
-              />
-            </div>
+          <Title title="CREATE_ADDRESS" className="pr-5 mb-8 Title--3" />
+          <div className="block w-full mx-auto">
+            <button
+              type="button"
+              className="Modal-close"
+              onClick={() => setIsCreatingAddress(false)}
+            >
+              <IconCLose />
+            </button>
+            <AddressForm onSubmit={submitForm} />
           </div>
         </div>
       </Modal>

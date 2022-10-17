@@ -9,3 +9,14 @@
 .panel--highlight {
   @apply border-main;
 }
+
+.ArrowLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: rem(38px);
+  height: rem(38px);
+  color: theme('colors.main');
+  border: 2px solid currentcolor;
+  border-radius: 100%;
+}

@@ -1,25 +1,15 @@
-
-  <div class="container mx-auto CategoriesPanels">
+<section class="CategoriesPanels {if $animated|default:false}CategoriesPanels--animated is-hide{/if}">
+  <div class="container flex flex-col items-center">
     {if $title}
-      {include file="components/smarty/Title/Title.html" type="h2" title=$title}
+      {include file="components/smarty/Title/Title.html" type="h2" level="3" title=$title class="mb-5 text-center md:mb-6"}
     {/if}
-    <div class="flex flex-row flex-wrap justify-center -mx-1 -mt-1">
+
+    <div class="CategoriesPanels-list">
       {loop type="category" name="CategoriesPanels" parent={$parent|default:0} limit=7}
-      {$title_cat = $TITLE}
-      <div class="w-6/12 p-1 md:w-4/12 xl:w-2/12 ">
-        <a href="{$URL}" class="block CategoriesPanels-panel hover:shadow-xl">
-          {loop type="image" name="CategoriesPanels.img" source="category" source_id=$ID width=280 height=450 resize_mode="crop" limit=1 format="webp"}
-            <img src="{$IMAGE_URL}" alt="{$TITLE|default:$title_cat}" class="object-cover object-center w-full h-full CategoriesPanels-panel-img" />
-          {/loop}
-          {elseloop rel="CategoriesPanels.img"}
-            <img src="{encore_manifest_file file="dist/images/placeholder.webp"}" class="object-cover object-center w-full h-full CategoriesPanels-panel-img" />
-          {/elseloop}
-          <div class="CategoriesPanels-panel-content">
-            <div class="px-4 mb-6 text-2xl text-center text-white CategoriesPanels-panel-title">{$TITLE}</div>
-          </div>
-        </a>
-        </div>
+        {$title_cat = $TITLE}
+        {include file="components/smarty/ContentCard/ContentCard.html" tabindex=$tabindex|default:null object_type="category"}
       {/loop}
     </div>
-  </div>
 
+  </div>
+</section>

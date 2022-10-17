@@ -2,10 +2,63 @@ require('dotenv').config();
 const path = require('path');
 const SVGSpritemapPlugin = require('svg-spritemap-webpack-plugin');
 const Encore = require('@symfony/webpack-encore');
-const PrettierPlugin = require('prettier-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 
 const chokidar = require('chokidar');
+
+const svgoConfig = {
+  plugins: [
+    'removeDoctype',
+    'removeXMLProcInst',
+    'removeComments',
+    'removeMetadata',
+    'removeEditorsNSData',
+    'cleanupAttrs',
+    'mergeStyles',
+    'inlineStyles',
+    'minifyStyles',
+    'removeUselessDefs',
+    'cleanupNumericValues',
+    'convertColors',
+    'removeUnknownsAndDefaults',
+    'removeNonInheritableGroupAttrs',
+    'removeUselessStrokeAndFill',
+    'removeViewBox',
+    'cleanupEnableBackground',
+    'removeHiddenElems',
+    'removeEmptyText',
+    'convertShapeToPath',
+    'convertEllipseToCircle',
+    'moveElemsAttrsToGroup',
+    'moveGroupAttrsToElems',
+    'collapseGroups',
+    'convertPathData',
+    'convertTransform',
+    'removeEmptyAttrs',
+    'removeEmptyContainers',
+    'mergePaths',
+    'removeUnusedNS',
+    'sortDefsChildren',
+    'removeTitle',
+    'removeDesc',
+    {
+      name: 'cleanupIDs',
+      params: {
+        prefix: {
+          toString() {
+            return `${Math.random().toString(36).substr(2, 9)}`;
+          }
+        }
+      }
+    },
+    {
+      name: 'removeAttrs',
+      params: {
+        attrs: '(data-name)'
+      }
+    }
+  ]
+};
 
 if (!Encore.isRuntimeEnvironmentConfigured()) {
   Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
@@ -19,11 +72,6 @@ Encore.configureBabel((config) => {
   config.plugins.push('@babel/plugin-transform-runtime');
 });
 
-Encore.addPlugin(
-  new PrettierPlugin({
-    extensions: ['.html', '.css', '.js']
-  })
-);
 Encore.addPlugin(new ESLintPlugin());
 
 // ENTRIES
@@ -33,6 +81,7 @@ Encore.addEntry('app', './assets/js/app.js')
   .addEntry('product', './assets/js/routes/product')
   .addEntry('register', './assets/js/routes/register')
   .addEntry('address', './assets/js/routes/address')
+  .addEntry('search', './assets/js/routes/search')
   .addEntry('delivery', './assets/js/routes/delivery');
 
 Encore.setOutputPath('dist/')
@@ -46,6 +95,7 @@ Encore.setOutputPath('dist/')
     '@js': path.resolve(__dirname, './assets/js'),
     '@redux': path.resolve(__dirname, './assets/js/redux'),
     '@utils': path.resolve(__dirname, './assets/js/utils'),
+    '@standalone': path.resolve(__dirname, './assets/js/standalone'),
     '@css': path.resolve(__dirname, './assets/css'),
     '@images': path.resolve(__dirname, './assets/images'),
     '@icons': path.resolve(__dirname, './assets/svg-icons'),
@@ -57,6 +107,7 @@ Encore.setOutputPath('dist/')
   .enableSingleRuntimeChunk()
   .enableSourceMaps(!Encore.isProduction())
   .enableVersioning(Encore.isProduction())
+  .addStyleEntry('print', './assets/css/print.css')
   .setManifestKeyPrefix('dist/');
 
 // CSS CONFIG
@@ -92,11 +143,7 @@ Encore.addRule({
     {
       loader: '@svgr/webpack',
       options: {
-        svgoConfig: {
-          plugins: {
-            removeViewBox: false
-          }
-        }
+        svgoConfig: svgoConfig
       }
     },
     'file-loader'
@@ -105,16 +152,17 @@ Encore.addRule({
 
 Encore.addPlugin(
   new SVGSpritemapPlugin('assets/svg-icons/**/*.svg', {
+    sprite: {
+      prefix: 'svg-icons-'
+    },
     output: {
       filename: 'sprite.[contenthash].svg',
       chunk: {
         name: 'sprite',
         keep: true
       },
-      svg4everybody: false
-    },
-    sprite: {
-      prefix: 'svg-icons-'
+      svg4everybody: false,
+      svgo: svgoConfig
     }
   })
 );
@@ -128,10 +176,14 @@ Encore.configureDevServerOptions((options) => {
   options.headers = {
     'Access-Control-Allow-Origin': '*'
   };
-  options.client.overlay = true;
-  options.firewall = false;
+  options.allowedHosts = 'all';
+  options.hot = false;
+  options.liveReload = true;
+  options.client = {
+    overlay: true
+  };
 
-  options.onBeforeSetupMiddleware = (server) => {
+  options.onListening = (devServer) => {
     chokidar
       .watch(['./**/*.html', './**/*.tpl'], {
         alwaysStat: true,
@@ -143,9 +195,14 @@ Encore.configureDevServerOptions((options) => {
         usePolling: true
       })
       .on('all', function () {
-        server.sockWrite(server.sockets, 'content-changed');
+        devServer.sendMessage(
+          devServer.webSocketServer.clients,
+          'content-changed'
+        );
       });
   };
 });
+
+Encore.cleanupOutputBeforeBuild();
 
 module.exports = Encore.getWebpackConfig();

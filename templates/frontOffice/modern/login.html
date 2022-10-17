@@ -23,8 +23,10 @@
         {/elseloop}
     {/if}
     {$url_login = {url path="/login"}}
+    
+    {include file="components/smarty/BreadCrumb/BreadCrumb.html"}
 
-    <div class="container mx-auto mb-24 mt-0 lg:mt-24">
+    <div class="container mx-auto mt-0 mb-24 lg:mt-24">
       {include file="components/smarty/Login/Login.html" success=$redirect}
     </div>
 {/block}

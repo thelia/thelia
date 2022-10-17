@@ -1,53 +1,59 @@
 <div class="Orders">
-
-      {ifloop rel="customer.orders"}
-        <div class="Orders-header ">
-          <strong class="Orders-header-text">{intl l="Order"}</strong>
-          <strong class="Orders-header-text">{intl l="Date"}</strong>
-          <strong class="Orders-header-text">{intl l="Status"}</strong>
-          <strong class="Orders-header-text">{intl l="Amount"}</strong>
-          <strong class="Orders-header-text">{intl l="Invoice REF"}</strong>
-          <strong class="Orders-header-text">{intl l="PDF invoice"}</strong>
-          <strong class="Orders-header-text is-last">{intl l="Delivery REF"}</strong>
+  {ifloop rel="customer.orders"}
+    {loop type="order" name="customer.orders"}
+      <div class="Order">
+        <div class="Order-infos">
+          <div class="Order-info">
+            <span class="Order-date">Commandés le {format_date date=$CREATE_DATE output="date"}</span>
+            {loop type="order_status" name="order.status" id=$STATUS}
+              <div class="uppercase">
+                {include file="components/smarty/Tag/Tag.html" type="primary" color=$COLOR text=$TITLE}
+              </div>
+            {/loop}
+          </div>
+          <div class="Order-info">
+            <span>{intl l="N° %ref" ref=$REF}</span>
+            <div class="Order-price-wrapper"><span>Total TTC</span> <span class="Order-price">{format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}</span></div>
+          </div>
         </div>
-
-        {loop type="order" name="customer.orders"}
-        <div class="Order">
-
-            <div>
-              <div class="Order-mobile-Label">{intl l="Order"}</div>
-              {intl l="N° %ref" ref=$REF}
-            </div>
-            <div>
-              <div class="Order-mobile-Label">{intl l="Date"}</div>
-              {format_date date=$CREATE_DATE output="date"}
-            </div>
-            <div>
-              <div class="Order-mobile-Label">{intl l="Status"}</div>
-              {include file="components/smarty/OrderStatusLabel/OrderStatusLabel.html"}
-            </div>
-            <div>
-              <div class="Order-mobile-Label">{intl l="Amount"}</div>
-              {format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}
-            </div>
+        <details>
+          <summary class="underline inline-flex gap-[10px] select-none items-center cursor-pointer w-full">
+            <div class="transform -rotate-90 ArrowLink">
+              {renderIconSvg icon="arrow" class="w-2 h-4"}
+              </div>
+              Détail
+          </summary>
+          <div class="Order-products">
+            {loop type="order_product" name="order.products" order=$ID}
+              <div class="Order-product">
+                <div class="Order-product-infos">
+                  {if $PRODUCT_ID}
+                  {loop name="product.images" type="image" source="product" source_id=$PRODUCT_ID width=60 height=60 resize_mode="borders" limit="1" format="webp"}
+                    <img src="{$IMAGE_URL}" alt="<{$TITLE}" loading="lazy" class="Order-product-image">
+                  {/loop}
+                  {elseloop rel="product.images"}
+                    <img src="{encore_manifest_file file="dist/images/placeholder.webp"}" alt="product placeholder" loading="lazy" class="Order-product-image">
+                  {/elseloop}
+                  {/if}
+                  <span class="Order-product-title">{$TITLE}</span>
+                </div>
+                <div class="Order-product-quantity">
+                  <span>x{$QUANTITY}</span>
+                </div>
+              </div>
+            {/loop}
+          </div>
+          </details>
           {if $IS_PAID}
-            <div>
-              <div class="Order-mobile-Label">{intl l="Invoice REF"}</div> {$INVOICE_REF}
-            </div>
-            <div>
-              <div class="Order-mobile-Label">{intl l="PDF invoice"}</div>
-              <a href="{url path="/account/order/pdf/invoice/%id" id=$ID}">{intl l="Invoice"}</a>
-            </div>
-            <div>
-              <div class="Order-mobile-Label">{intl l="Delivery REF"}</div>
-              {$DELIVERY_REF}</div>
+            <a href="{url path="/account/order/pdf/invoice/%id" id=$ID}" class="Order-download-invoice">
+              {renderIconSvg icon="download" class="w-5 h-5 fill-current"}
+              Télécharger la facture en PDF
+            </a>
           {/if}
-        </div>
-        {/loop}
-      {/ifloop}
-
-      {elseloop rel="customer.orders"}
-        <div class="alert alert-warning" role="alert">{intl l="You don't have any order"}</div>
-      {/elseloop}
-
-  </div>
+      </div>
+    {/loop}
+  {/ifloop}
+  {elseloop rel="customer.orders"}
+    <div class="alert alert-warning" role="alert">{intl l="You don't have any order"}</div>
+  {/elseloop}
+</div>

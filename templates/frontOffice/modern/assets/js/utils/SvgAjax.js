@@ -8,5 +8,5 @@ export default async function SvgAjax() {
 
   div.style.display = 'none';
   div.appendChild(svg.documentElement);
-  document.body.insertBefore(div, document.body.childNodes[0]);
+  document.body.after(div);
 }

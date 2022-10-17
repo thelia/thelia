@@ -43,7 +43,7 @@
                                 <input type="hidden" name="{$name}" value="{$value}" />
                             {/foreach}
 
-                            <p>{intl l='If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" value="please click here" class="text-orange-500 underline">.'}</p>
+                            <p>{intl l='If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#" class="text-orange-500 underline">please click here</a>.'}</p>
                         </form>
                     </div>
                 {else}
@@ -56,27 +56,28 @@
 
   </article>
 
-
 {/block}
 
-{block name="javascript" append}
-{ifhook rel="order-payment-gateway.javascript"}
-   {hook name="order-payment-gateway.javascript" module="$PAYMENT_MODULE"}
-{/ifhook}
-{elsehook rel="order-payment-gateway.javascript"}
-    <script type="text/javascript">
-      document.getElementById('payement_gateway_form').submit();
-
-      document.getElementById('force-submit-payment-form').addEventListener('click', function(ev) {
+{block name="javascript-initialization"}
+  {ifhook rel="order-payment-gateway.javascript"}
+    {hook name="order-payment-gateway.javascript" module="$PAYMENT_MODULE"}
+  {/ifhook}
+  {elsehook rel="order-payment-gateway.javascript"}
+      {strip}
+      <script type="text/javascript">
         document.getElementById('payement_gateway_form').submit();
-        ev.preventDefault();
-      });
-     </script>
-{/elsehook}
-{hook name="order-payment-gateway.javascript-initialization"}
+
+        document.getElementById('force-submit-payment-form').addEventListener('click', function(ev) {
+          document.getElementById('payement_gateway_form').submit();
+          ev.preventDefault();
+        });
+      </script>
+      {/strip}
+  {/elsehook}
+  {hook name="order-payment-gateway.javascript-initialization"}
 {/block}
 
-{block name="stylesheet"}
+{block name="css" append}
 {hook name="order-payment-gateway.stylesheet"}
 {/block}
 

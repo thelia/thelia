@@ -20,10 +20,12 @@
   ]}
 {/loop}
 
-<script id="PseSelector-data" type="text/javascript">
-  var PSES = {psesByProduct product_id=$product_id};
-  var ATTRIBUTES = {$attributes|json_encode nofilter};
+{strip}
+<script id="PseSelector-data">
+  window.PSES = {psesByProduct product_id=$product_id};
+  window.ATTRIBUTES = {$attributes|json_encode nofilter};
 </script>
+{/strip}
 
 <div id="PseSelector-root"></div>
 

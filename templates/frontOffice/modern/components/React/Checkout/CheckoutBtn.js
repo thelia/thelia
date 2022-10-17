@@ -11,13 +11,13 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 
-export default function CheckoutBtn() {
+export default function CheckoutButton() {
   const intl = useIntl();
   const { mutate } = useFinalCheckout();
   const { mutate: setCheckout } = useSetCheckout();
   const { data: checkout } = useGetCheckout();
   const { phoneNumberValid } = useSelector((state) => state.checkout);
-  const btnRef = useRef(null);
+  const ButtonRef = useRef(null);
   return (
     <div className="">
       <label className="my-4 inline-block cursor-pointer">
@@ -30,7 +30,7 @@ export default function CheckoutBtn() {
               ...checkout,
               acceptedTermsAndConditions: !checkout.acceptedTermsAndConditions
             });
-            btnRef?.current?.scrollIntoView({
+            ButtonRef?.current?.scrollIntoView({
               behavior: 'smooth',
               block: 'center'
             });
@@ -42,7 +42,7 @@ export default function CheckoutBtn() {
       </label>
 
       <button
-        className="btn mx-auto mt-8 block"
+        className="Button mx-auto mt-8 block"
         onClick={async () => {
           mutate(checkout);
         }}

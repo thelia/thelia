@@ -4,21 +4,19 @@ import React from 'react';
 export default function SubmitButton({
   label,
   isSubmitting,
-  onClick = () => {},
+  onClick = () => { },
   className,
   ...props
 }) {
   return (
     <button
-      className={`btn relative ${className ? className : ''}`}
+      className={`Button relative ${className ? className : ''} ${isSubmitting ? 'Button--loading' : ''}`}
       onClick={onClick}
       type="button"
       {...props}
     >
       {isSubmitting ? (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Loader size="w-6 h-6" color="text-white" />
-        </div>
+        <Loader className="absolute w-8 h-8 text-white transform -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2" />
       ) : null}
 
       <div className={`${isSubmitting ? 'opacity-0' : ''}`}>{label}</div>

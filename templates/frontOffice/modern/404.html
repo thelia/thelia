@@ -13,31 +13,30 @@
 {block name="main-content"}
   <div class="main">
     <article class="container mx-auto my-24" role="main" aria-labelledby="main-label">
-
         {ifhook rel="404.content"}
             {hook name="404.content"}
         {/ifhook}
         {elsehook rel="404.content"}
-        <h1 id="main-label" class="text-center">
-            <div class="font-bold  text-9xl">404</div>
-            <div class="text-5xl">{intl l="The page cannot be found"}</div>
-        </h1>
-        <div class="text-center">
-          <a href="{navigate to="index"}" role="button" class="btn mt-5">{intl l="Go home"}</a>
-        </div>
+            <h1 id="main-label" class="text-center">
+                <div class="font-bold text-7xl lg:text-8xl">404</div>
+                <div class="text-3xl lg:text-5xl">{intl l="Il semblerait que la page que vous cherchez n'existe pas."}</div>
+            </h1>
+            <div class="text-center">
+            <a href="{navigate to="index"}" role="button" class="inline-block mt-8 lg:mt-12 Button">{intl l="Go home"}</a>
+            </div>
         {/elsehook}
     </article>
 </div>
 {/block}
 
-{block name="stylesheet"}
-{hook name="404.stylesheet"}
+{block name="css" append}
+    {hook name="404.stylesheet"}
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="404.after-javascript-include"}
+    {hook name="404.after-javascript-include"}
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="404.javascript-initialization"}
+    {hook name="404.javascript-initialization"}
 {/block}

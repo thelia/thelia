@@ -10,33 +10,32 @@
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
-    {$breadcrumbs = [
-        ['title' => {intl l="Account"}, 'url'=>{url path="/account"}],
-        ['title' => {intl l="Address"}, 'url'=>{url path="/address/create"}]
-    ]}
+  {$breadcrumbs = [
+    ['title' => {intl l="Account"}, 'url'=>{url path="/account"}],
+    ['title' => {intl l="Address"}, 'url'=>{url path="/address/create"}]
+  ]}
 {/block}
 
 {block name="main-content"}
 
   {include file="components/smarty/BreadCrumb/BreadCrumb.html"}
 
-  {include file="components/smarty/HeaderAccount/HeaderAccount.html" title="My Addresses"}
-
-  <div class="container mx-auto my-24">
-    <div class="">      
-      <div class="grid lg:grid-cols-3 gap-6">
+  <div class="container mx-auto mt-4 mb-24">
+    {include file="components/smarty/Title/Title.html" class="text-center mb-7" title={intl l="My Addresses"}}
+    <div class="rounded-[20px] bg-main-light p-8 flex flex-col">
+      <div class="grid gap-6 lg:grid-cols-3">
         {loop type="address" name="address.loop"}
           {include file="components/smarty/Address/Address.html" }
         {/loop}
-        <div class="flex items-center justify-center ">
-          <a href="{url path='/address'}" class="btn text-2xl">{intl l="New address"}</a>
         </div>
-      </div>
+    </div>
+    <div class="flex items-center justify-center mt-7">
+      <a href="{url path='/address'}" class="Button">{intl l="New address"}</a>
     </div>
   </div>
 {/block}
 
-{block name="stylesheet"}
+{block name="css" append}
 {hook name="address-create.stylesheet"}
 {/block}
 

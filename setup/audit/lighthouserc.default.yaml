@@ -1,0 +1,32 @@
+ci:
+  collect:
+    # Method
+    method: "node"
+    # Show the browser which is helpful when checking the config
+    headful: false
+    # Number of runs by url (default: 3)
+    numberOfRuns: 1
+    # Specify that thelia isn't pwa
+    isSinglePageApplication: false
+    # Settings
+    settings:
+      preset: "__PRESET__"
+      chromeFlags: "--no-sandbox"
+      onlyCategories:
+        - "performance"
+        - "accessibility"
+        - "best-practices"
+        - "seo"
+    # Url list
+    url:
+      - "http://__DOMAIN__"
+      - "http://__DOMAIN__/contact"
+      - "http://__DOMAIN__/register"
+      - "http://__DOMAIN__/a-propos.html"
+      - "http://__DOMAIN__/search?query=t"
+      - "http://__DOMAIN__/chairs.html"
+      - "http://__DOMAIN__/barbara-1.html"
+      - "http://__DOMAIN__/account"
+      - "http://__DOMAIN__/account/update"
+      - "http://__DOMAIN__/account-orders"
+      - "http://__DOMAIN__/account-address"

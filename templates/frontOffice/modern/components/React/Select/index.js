@@ -5,14 +5,11 @@ import Error from '../Error';
 const Select = forwardRef(
   ({ label, name, options = [], error, className = '', ...props }, ref) => {
     return (
-      <label className={`${className ? className : 'block w-full'}`}>
+      <label className={`Select ${className ? className : ''}`}>
         {label ? (
-          <div
-            className={`text-sm font-bold ${
-              error ? 'text-red-500' : 'text-gray-700'
-            } `}
-          >
-            {label}
+          <div className={`Select-label ${error ? 'text-error' : ''} `}>
+            {label}{' '}
+            {props.required ? <span className="text-gray-500">*</span> : ''}
           </div>
         ) : null}
 
@@ -21,7 +18,11 @@ const Select = forwardRef(
           name={name}
           {...props}
           defaultValue={props.defaultValue}
-          className="mt-0 block w-full border-0 border-b-2 border-gray-200 px-0.5 focus:border-black focus:ring-0"
+          className={`Select-field ${
+            error
+              ? 'border-error text-error focus:border-error focus:ring-error'
+              : ''
+          }`}
         >
           {options.map((option, index) => {
             return (

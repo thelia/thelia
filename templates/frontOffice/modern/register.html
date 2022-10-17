@@ -25,121 +25,137 @@
   {set_previous_url ignore_current="1"}
 
 
+  {include file="components/smarty/BreadCrumb/BreadCrumb.html"}
 
-  <div class="container pt-20 mx-auto mb-20">
-
-    {include file="components/smarty/Title/Title.html" title={intl l="Create an account"}}
-
+  <div class="container mx-auto mt-4 mb-24">
+    {include file="components/smarty/Title/Title.html" class="text-center mb-7" title={intl l="Create an account"}}
+    {hook name="register.top"}
       {form name="thelia.front.customer.create"}
-      <form id="form-register" class="" action="{url path="/register"}" method="post">
-      {form_field field='success_url'}
-      <input type="hidden" name="{$name}" value="{navigate to="previous"}" /> {* the url the user is redirected to on registration success *}
-      {/form_field}
+        <form id="RegisterForm" novalidate action="{url path="/register"}" method="post" novalidate>
+          {hook name="recaptcha.check" id="RegisterRecaptcha"}
+          {form_field field='success_url'}
+          <input type="hidden" name="{$name}" value="{navigate to="previous"}" /> {* the url the user is redirected to on registration success *}
+          {/form_field}
 
-      {form_field field='error_message'}
-      <input type="hidden" name="{$name}" value="{intl l="missing or invalid data"}" />
-      {/form_field}
-      {form_hidden_fields}
 
-      {if $form_error}
-        <div class="my-10">{include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$form_error_message}</div>
-      {/if}
+          {form_hidden_fields}
 
-      <div class="grid-cols-2 gap-6 md:grid">
-        <fieldset id="register-info" class="panel">
-          <h4 class="mb-4 text-2xl font-bold">
-            {intl l="Personal information"}
-          </h4>
-          <div class="grid grid-cols-1 gap-6">
+          {if $form_error}
+            <div class="my-10">{include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$form_error_message|replace:[',',':']:'<br>'}</div>
+          {/if}
 
-              {form_field field="title"}
-                {call name="fn_address_field_title"}
-              {/form_field}
+          {hook name="register.form-top"}
 
-              {form_field field="firstname"}
-                {call name="fn_address_field_firstname"}
-              {/form_field}
+          <div>
+            <small class="text-gray-600">{intl l="* Champs obligatoires"}</small>
+          </div>
 
-              {form_field field="lastname"}
-                {call name="fn_address_field_lastname"}
-              {/form_field}
+          <div class="grid gap-6 my-8 md:grid-cols-2">
+            <fieldset id="register-info">
+              {include file="components/smarty/Title/Title.html" type="div" level=4 class="mb-4" title={intl l="Personal information"}}
+              <div class="grid grid-cols-1 gap-6">
+              <div class="w-1/2 lg:w-1/3">
+                {form_field field="title"}
+                  {call name="fn_address_field_title"}
+                {/form_field}
+              </div>
+
+              <div class="flex gap-3">
+                <div class="w-1/2">
+                  {form_field field="firstname"}
+                    {call name="fn_address_field_firstname"}
+                  {/form_field}
+                </div>
+
+                <div class="w-1/2">
+                  {form_field field="lastname"}
+                    {call name="fn_address_field_lastname"}
+                  {/form_field}
+                </div>
+              </div>
 
               {form_field field="email"}
                 {call name="fn_field_email"}
               {/form_field}
 
               {if {config key="customer_confirm_email"}}
-              {form_field field="email_confirm"}
-                {call name="fn_field_email_confirm"}
-              {/form_field}
+                {form_field field="email_confirm"}
+                  {call name="fn_field_email_confirm"}
+                {/form_field}
               {/if}
 
-              {form_field field="phone"}
-                {call name="fn_address_field_phone"}
-              {/form_field}
+            <div class="flex gap-3">
+              <div class="w-1/2">
+                {form_field field="cellphone"}
+                  {call name="fn_address_field_cellphone"}
+                {/form_field}
+              </div>
+              <div class="w-1/2">
+                {form_field field="phone"}
+                  {call name="fn_address_field_phone"}
+                {/form_field}
+              </div>
 
-              {form_field field="cellphone"}
-                {call name="fn_address_field_cellphone"}
-              {/form_field}
-
+            </div>
           </div>
         </fieldset>
 
-        <fieldset id="register-delivery" class="panel">
-            <h4 class="mb-4 text-2xl font-bold">
-              {intl l="Delivery information"}
-            </h4>
-            <div class="grid grid-cols-1 gap-6">
-
+        <fieldset id="register-delivery">
+          {include file="components/smarty/Title/Title.html" type="div" level=4 class="mb-4" title={intl l="Delivery information"}}
+          <div class="grid grid-cols-1 gap-6">
+            <div class="w-1/2">
               {form_field field="company"}
                 {call name="fn_address_field_company"}
               {/form_field}
+            </div>
 
-              {form_field field="address1"}
-                {call name="fn_address_field_address1"}
-              {/form_field}
+            {form_field field="address1"}
+              {call name="fn_address_field_address1"}
+            {/form_field}
 
-              {form_field field="address2"}
-                {call name="fn_address_field_address2"}
-              {/form_field}
-              {form_field field="zipcode"}
-                {call name="fn_address_field_zipcode"}
-              {/form_field}
+            {form_field field="address2"}
+              {call name="fn_address_field_address2"}
+            {/form_field}
 
-              {form_field field="city"}
-                {call name="fn_address_field_city"}
-              {/form_field}
+            <div class="flex gap-3">
+              <div class="w-1/2 md:w-2/3">
+                {form_field field="city"}
+                  {call name="fn_address_field_city"}
+                {/form_field}
+              </div>
 
+              <div class="w-1/2 md:w-1/3">
+                {form_field field="zipcode"}
+                  {call name="fn_address_field_zipcode"}
+                {/form_field}
+              </div>
+            </div>
+
+            <div class="w-1/2">
               {form_field field="country"}
                 {$countryFieldId=$label_attr.for|default:null}
                 {call name="fn_address_field_country"}
               {/form_field}
-
-              {form_field field="state"}
-                {call name="fn_address_field_state" countryFieldId=$countryFieldId}
-              {/form_field}
             </div>
+
+            {form_field field="state"}
+              {call name="fn_address_field_state" countryFieldId=$countryFieldId}
+            {/form_field}
+          </div>
         </fieldset>
       </div>
 
-      <fieldset id="register-login" class="panel">
-          <h4 class="mb-4 text-2xl font-bold">
-            {intl l="Login Information"}
-          </h4>
-          <div>
-            <div class="lg:flex lg:-mx-12">
-              <div class="px-12 lg:w-6/12">
-                {form_field field="password"}
-                  {call name="fn_password_field"}
-                {/form_field}
-              </div>
-              <div class="px-12 lg:w-6/12">
-                {form_field field="password_confirm"}
-                  {call name="fn_password_confirm_field"}
-                {/form_field}
-              </div>
-            </div>
-          </div>
+      <fieldset id="register-login">
+        {include file="components/smarty/Title/Title.html" type="div" level=4 class="mb-4" title={intl l="Login Information"}}
+        <div class="grid gap-6 md:grid-cols-2">
+          {form_field field="password"}
+            {call name="fn_password_field"}
+          {/form_field}
+
+          {form_field field="password_confirm"}
+            {call name="fn_password_confirm_field"}
+          {/form_field}
+        </div>
       </fieldset>
 
       {form_field field="newsletter"}
@@ -148,11 +164,15 @@
         </div>
       {/form_field}
 
+      {hook name="register.form-bottom"}
 
       <div class="mt-12 text-center">
-        <button type="submit" class="btn">{intl l="Create my account"}</button>
+        <button type="submit" class="Button">{intl l="Create my account"}</button>
       </div>
       </form>
       {/form}
+
+      {hook name="register.bottom"}
+
   </div>
 {/block}

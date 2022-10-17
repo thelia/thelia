@@ -1,10 +1,10 @@
 
 {set_previous_url ignore_current="1"}
-<div class="Login lg:grid grid-cols-2 gap-6 max-w-6xl mx-auto">
-    <div class="panel  mb-8">
+<div class="max-w-6xl grid-cols-2 gap-6 mx-auto Login lg:grid">
+    <div class="mb-8 panel">
       {form name="thelia.front.customer.login"}
         <form action="{url path="/login"}" method="post" {form_enctype}>
-            <div class=" uppercase text-2xl font-bold mb-8">{intl l="Do you have an account?"}</div>
+            <div class="mb-8 text-2xl font-bold uppercase ">{intl l="Do you have an account?"}</div>
             {form_hidden_fields}
 
             {form_field field="success_url"}
@@ -46,17 +46,17 @@
                 {include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$form_error_message}
               {/if}
 
-            <div class="flex justify-between items-center mt-8">
-              <a href="{url path="/password"}" class="mini-forgot-password inline-block align-baseline font-bold text-sm text-gray-100 hover:">{intl l="Forgot your Password?" }</a>
-              <button type="submit" class="btn">{intl l="Login"}</button>
+            <div class="flex items-center justify-between mt-8">
+              <a href="{url path="/password"}" class="underline">{intl l="Forgot your Password?" }</a>
+              <button type="submit" class="Button">{intl l="Login"}</button>
             </div>
         </form>
       {/form}
     </div>
-    <div class="panel mb-8 flex flex-col justify-center">
-        <div class=" uppercase text-2xl font-bold mb-8 text-center">{intl l="No, I am a new customer"}</div>
-        <div class="text-center my-auto">
-          <a href="{url path="/register"}" class="btn"></i> {intl l="Create an account"}</a>
+    <div class="flex flex-col justify-center mb-8 panel">
+        <div class="mb-8 text-2xl font-bold text-center uppercase ">{intl l="No, I am a new customer"}</div>
+        <div class="my-auto text-center">
+          <a href="{url path="/register"}" class="Button"></i> {intl l="Create an account"}</a>
         </div>
     </div>
 </div>

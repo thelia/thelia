@@ -1,24 +1,16 @@
-{$maxAccessories = 4}
-{$accessoriesCount = {count type="accessory" name="product_list" product=$product_id limit=$maxAccessories}}
-{$otherProductsCount = {count type="product" name="other-products" limit={$maxAccessories - $accessoriesCount} category=$DEFAULT_CATEGORY order="random" exclude=$product_id}}
-
-{if $accessoriesCount > 0 || $otherProductsCount > 0 }
-<div class="px-8 pt-12 pb-32">
-  <div class="container mx-auto">
-    <section class="ProductAccessories">
-        {include file="components/smarty/Title/Title.html" type="h2" title={intl l="Similar products"}}
-
-        <div class="grid grid-cols-2 gap-8 lg:grid-cols-4">
-            {loop type="accessory" name="product_list" product=$product_id limit=$maxAccessories}
-              {include file="components/smarty/SingleProduct/SingleProduct.html" product_id=$ACCESSORY_ID}
-            {/loop}
-            {if $accessoriesCount < $maxAccessories}
-                {loop type="product" name="other-products" limit={$maxAccessories - $accessoriesCount} category=$DEFAULT_CATEGORY order="random" exclude=$product_id}
-                  {include file="components/smarty/SingleProduct/SingleProduct.html" product_id=$ID}
-                {/loop}
-            {/if}
-        </div>
-    </section>
-  </div>
-</div>
-{/if}
+{ifloop rel="product.related"}
+  <section class="Selection Selection--animated is-hide">
+    <div class="container flex flex-col items-center">
+        {include file="components/smarty/Title/Title.html" type="h2" level="3" title={intl l="You may also like"} class="w-full mb-5 md:mb-6"}
+        {include
+          file="components/smarty/ProductList/ProductList.html"
+          loopType="product"
+          loopName="product.related"
+          loopLimit=4
+          loopOrder="random"
+          loopExcludeProductId=$ID
+          loopCategory={$DEFAULT_CATEGORY}
+        }
+    </div>
+  </section>
+{/ifloop}

@@ -94,7 +94,7 @@ return [
     'Grid' => 'Raster',
     'Home' => 'Startseite',
     'I\'ve read and agreed on <a href=\'%link\' class=\'terms-quickview\'>Terms &amp; Conditions</a>' => 'Ich habe gelesen und akzeptiere die <a href=\'%link\' class=\'terms-quickview\'>allgemeine Bedingungen</a> ',
-    'If nothing happens within 10 seconds, <input type="submit" id="force-submit-payment-form" value="please click here">.' => 'Wenn nichts passiert nach 10 Sekunden, <input type="submit" id="force-submit-payment-form" value="bitte hier klicken">.',
+    'If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.' => 'Wenn nichts passiert nach 10 Sekunden, <a id="force-submit-payment-form" href="#">bitte hier klicken</a>. ',
     'If you want to change your email, please contact us.' => 'Wenn Sie Ihre E-Mail wechseln möchten, bitte kontaktieren Sie uns. ',
     'In Stock' => 'Verfügbar',
     'Invoice REF' => 'Rechnungs REF',

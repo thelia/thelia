@@ -1,26 +1,33 @@
-{assign var="categoryTitle" value="{$TITLE}"}
+{$category_id = $category_id|default:$ID}
+{$width = $width|default:64}
+{$height = $height|default:64}
+{$categoryTitle = $TITLE}
+{$type = $type|default:"span"}
 
-<article class="flex flex-col w-full p-4 bg-white SingleCategory">
-    <a href="{$URL}" itemprop="url">
-      <div class="text-center SingleCategory-image">
+<a href="{$URL}"  class="SingleCategory {$class|default:''}">
+  <figure class="SingleCategory-img">
+    {loop name="category_thumbnail" type="image" quality="100" category=$ID width=$width height=$height resize_mode="crop" limit="1" format="webp"}
+        <img
+          src="{$IMAGE_URL}"
+          alt="{{$TITLE|default:$categoryTitle}|cat:' '|cat:'Visuel'}"
+          title="{{$TITLE|default:$categoryTitle}|cat:' '|cat:'Visuel'}"
+          width="{$width}"
+          height="{$height}"
+          loading="lazy"
+        >
+    {/loop}
+    {elseloop rel="category_thumbnail"}
+        <img
+          src="{encore_manifest_file file="dist/images/placeholder.webp"}"
+          alt="{$categoryTitle|cat:' '|cat:'Visuel'}"
+          title="{$categoryTitle|cat:' '|cat:'Visuel'}"
+          width="{$width}"
+          height="{$height}"
+        >
+    {/elseloop}
+  </figure>
 
-        {loop name="category_thumbnail" type="image" quality="100" category=$ID width={$width|default:270} height={$height|default:270} resize_mode="borders" limit="1"}
-            <img class="object-cover mx-auto" itemprop="image" src="{$IMAGE_URL}" alt="{$categoryTitle}" width="270" height="270" loading="lazy">
-        {/loop}
-        {elseloop rel="category_thumbnail"}
-            <img class="object-cover mx-auto" itemprop="image" src="//placehold.it/{$width|default:270}x{$height|default:270}" alt="{$categoryTitle}">
-        {/elseloop}
-      </div>
-
-
-    <div class="my-6 text-center SingleCategory-info">
-        <h2 class="text-2xl text-gray-300 SingleCategory-title "><span>{$categoryTitle}</span></h2>
-    </div>
-
-    {if isset($PRODUCT_COUNT)}
-    <div class="flex justify-center">
-      <div class="inline-block px-4 py-2 mx-auto text-white rounded tex-center bg-main">{$PRODUCT_COUNT} {intl l="tools"}</div>
-    </div>
-    {/if}
-  </a>
-</article><!-- /product -->
+  <div class="SingleCategory-title">
+      <{$type}>{$categoryTitle}</{$type}>
+  </div>
+</a>

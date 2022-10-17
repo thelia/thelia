@@ -118,6 +118,9 @@ class AddressCreateForm extends FirewallForm
             ->add('city', TextType::class, [
                     'constraints' => [
                         new Constraints\NotBlank(),
+                        new Constraints\Callback(
+                            [$this, 'verifyCity']
+                        ),
                     ],
                     'label' => Translator::getInstance()->trans('City'),
                     'label_attr' => [

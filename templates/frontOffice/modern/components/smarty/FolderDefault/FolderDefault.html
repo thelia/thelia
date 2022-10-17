@@ -1,58 +1,25 @@
-{loop type="image" name="folder_image" folder={$ID} limit=1 width=1900 height=450 resize_mode=crop}
-    {$visuelHeader = {$IMAGE_URL nofilter}}
-{/loop}
-
-
-
-<div class="container panel mx-auto mb-20">
-    <div class="FolderDefault">
-        {if $DESCRIPTION}
-            <div class="FolderDefault-description my-5">
-                {$DESCRIPTION nofilter}
-            </div>
-        {/if}
-
-        <div class="">
-            {ifloop rel="folder_content"}
-                <ul class="divide-y divide-main divide-opacity-25">
-                    {loop name="folder_content" type="content" folder="$ID"}
-                        <li class="py-4">
-                            <article class="">
-
-                                <div class="">
-                                    <h2 class="text-3xl"><a href="{$URL nofilter}" class="hover:">{$TITLE}</a></h2>
-
-                                    {if $CHAPO}
-                                    <div class="">
-                                        {$CHAPO}
-                                    </div>
-                                    {/if}
-                                </div>
-                            </article><!-- /content -->
-                        </li>
-                    {/loop}
-                </ul>
-            {/ifloop}
-            {elseloop  rel="folder_content"}
-              {include file="components/smarty/Alert/Alert.html" message={intl l="No Contents in this folder."}}
-            {/elseloop}
-        </div>
-
-
-        {ifloop rel="blog.document"}
-        <div class="documents">
-            <ul>
-            {loop name="blog.document"  type="document" folder={$ID}}
-            <li><a href="{$DOCUMENT_URL nofilter}" target="_blank">{$TITLE}</a></li>
-            {/loop}
-            </ul>
-        </div>
-        {/ifloop}
-
-        {if $POSTSCRIPTUM}
-            <small class="folder-postscriptum">
-                {$POSTSCRIPTUM}
-            </small>
-        {/if}
-    </div>
+<div class="">
+  {ifloop rel="folder_content"}
+      <ul class="grid sm:grid-cols-2 gap-4 md:gap-[30px] grid-cols-1">
+          {loop name="folder_content" type="folder" parent=$ID}
+              <li>
+                {include file="components/smarty/ContentCard/ContentCard.html" object_type="folder" object_id=$ID}
+              </li>
+          {/loop}
+          {loop name="folder_content" type="content" folder=$ID}
+              <li>
+                {include file="components/smarty/ContentCard/ContentCard.html" object_type="content" object_id=$ID}
+              </li>
+          {/loop}
+      </ul>
+  {/ifloop}
+  {elseloop  rel="folder_content"}
+    {include file="components/smarty/Alert/Alert.html" type="warning"  message={intl l="No Contents in this folder."}}
+  {/elseloop}
 </div>
+
+{if $POSTSCRIPTUM}
+    <small class="folder-postscriptum">
+        {$POSTSCRIPTUM}
+    </small>
+{/if}

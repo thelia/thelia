@@ -6,7 +6,7 @@ import Loader from '../Loader';
 import priceFormat from '@utils/priceFormat';
 
 import { useIntl } from 'react-intl';
-import { useValidDeliveryModules } from '../Checkout/hooks';
+import useValidDeliveryModules from './hooks/useValidDeliveryModules';
 import {
   queryClient,
   useGetCheckout,
@@ -20,46 +20,48 @@ function getModuleValidOptions(module) {
 
 function ModuleOption({ module = {}, option = {}, isSelected }) {
   const intl = useIntl();
-
   const { data: checkout } = useGetCheckout();
   const { mutate } = useSetCheckout();
 
   return (
-    <button
-      type="button"
-      className={`Option ${isSelected ? 'active' : ''}`}
-      onClick={() => {
-        if (module.deliveryMode === 'delivery') {
-          mutate({
-            ...checkout,
-            deliveryModuleId: module.id,
-            deliveryModuleOptionCode: option.code,
-            pickupAddress: null
-          });
-        } else {
-          queryClient.setQueryData('checkout', (oldData) => {
-            return {
-              ...oldData,
+    <label htmlFor={`option_${option?.code}`} className="Radio">
+      <input
+        type="radio"
+        name="radio"
+        id={`option_${option?.code}`}
+        checked={isSelected}
+        onChange={() => {
+          if (module.deliveryMode === 'delivery') {
+            mutate({
+              ...checkout,
               deliveryModuleId: module.id,
-              deliveryModuleOptionCode: option.code
-            };
-          });
-        }
-      }}
-    >
-      <div>
-        <span className="mr-2 inline-block">
-          {option.title || module?.i18n?.title}
+              deliveryModuleOptionCode: option.code,
+              pickupAddress: null
+            });
+          } else {
+            queryClient.setQueryData('checkout', (oldData) => {
+              return {
+                ...oldData,
+                deliveryModuleId: module.id,
+                deliveryModuleOptionCode: option.code
+              };
+            });
+          }
+        }}
+      />
+      <div className="flex flex-wrap">
+        <span
+          className={`mr-6 block text-base ${isSelected ? 'text-main' : ''}`}
+        >
+          {module?.i18n?.title}
         </span>
-        <strong>
-          (
+        <strong className="text-main">
           {option.postage
             ? `${priceFormat(option.postage)}`
             : intl.formatMessage({ id: 'FREE' })}
-          )
         </strong>
       </div>
-    </button>
+    </label>
   );
 }
 
@@ -74,38 +76,37 @@ export default function DeliveryModules() {
   );
 
   return (
-    <div className="Checkout-block">
-      <Title
-        title={intl.formatMessage({ id: 'CHOOSE_DELIVERY_PROVIDER' })}
-        step={selectedMode === 'delivery' ? 3 : 2}
-      />
-      <div className="grid gap-6 sm:grid-cols-2">
-        {isLoading ? (
-          <Loader size="w-10 h-10" className="col-span-2 my-4" />
-        ) : (
-          (modules?.length === 0 ||
-            modules?.flatMap(getModuleValidOptions).length === 0) && (
-            <Alert
-              title={intl.formatMessage({ id: 'WARNING' })}
-              message={intl.formatMessage({ id: 'NO_DELIVERY_MODE_AVAILABLE' })}
-              type="warning"
-            />
-          )
-        )}
-
-        {modules.map((module) =>
-          getModuleValidOptions(module).map((option) => (
-            <ModuleOption
-              key={module.code}
-              module={module}
-              option={option}
-              isSelected={
-                checkout && checkout?.deliveryModuleOptionCode === option.code
-              }
-            />
-          ))
-        )}
-      </div>
-    </div>
+    <>
+      {isLoading ? (
+        <Loader className="w-40 mx-auto mt-8" />
+      ) : modules?.length === 0 ||
+        modules?.flatMap(getModuleValidOptions).length === 0 ? (
+        <Alert
+          title={intl.formatMessage({ id: 'WARNING' })}
+          message={intl.formatMessage({ id: 'NO_DELIVERY_MODE_AVAILABLE' })}
+          type="warning"
+          className="mt-8"
+        />
+      ) : (
+        <div className="flex flex-col gap-3 mt-8 flex-start item-start">
+          <Title
+            className="mb-5 text-2xl Title--3"
+            title="CHOOSE_DELIVERY_PROVIDER"
+          />
+          {modules.map((module) =>
+            getModuleValidOptions(module).map((option) => (
+              <ModuleOption
+                key={module.code}
+                module={module}
+                option={option}
+                isSelected={
+                  checkout && checkout?.deliveryModuleOptionCode === option.code
+                }
+              />
+            ))
+          )}
+        </div>
+      )}
+    </>
   );
 }
