@@ -69,4 +69,19 @@ trait AddressCountryValidationTrait
             }
         }
     }
+
+    public function verifyCity($value, ExecutionContextInterface $context): void
+    {
+        $data = $context->getRoot()->getData();
+
+        $re = '/\D+/';
+
+        if (!preg_match($re, $data['city'], $matches, \PREG_OFFSET_CAPTURE, 0)) {
+            $context->addViolation(
+                Translator::getInstance()->trans(
+                    'Your city can only contains letters.'
+                )
+            );
+        }
+    }
 }

@@ -3,9 +3,13 @@
   flex-direction: column;
   align-items: center;
   padding: 1rem;
-  color: theme("colors.main-dark");
-  background: theme("colors.main-light");
+  color: theme('colors.main-dark');
+  background: theme('colors.main-light');
   border-radius: rem(6px);
+
+  &_icon {
+    align-self: baseline;
+  }
 
   @screen xs {
     flex-direction: row;
@@ -13,16 +17,16 @@
 
   &--success {
     color: white;
-    background: theme("colors.main");
+    background: theme('colors.main');
   }
 
   &--warning {
-    color: theme("colors.yellow.900");
-    background: theme("colors.yellow.200");
+    color: theme('colors.yellow.900');
+    background: theme('colors.yellow.200');
   }
 
   &--error {
     color: white;
-    background: theme("colors.error");
+    background: theme('colors.error');
   }
 }

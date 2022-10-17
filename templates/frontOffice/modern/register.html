@@ -41,7 +41,7 @@
           {form_hidden_fields}
 
           {if $form_error}
-            <div class="my-10">{include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$form_error_message}</div>
+            <div class="my-10">{include file="components/smarty/Alert/Alert.html" type="error" title={intl l="Error"} message=$form_error_message|replace:[',',':']:'<br>'}</div>
           {/if}
 
           {hook name="register.form-top"}

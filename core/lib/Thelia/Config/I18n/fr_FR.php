@@ -124,6 +124,7 @@ return [
     'Check the total Cart amount in the given currency' => 'Applique une condition sur le montant total du panier dans la devise indiquée.',
     'Choice a color for this order status code' => 'Choisissez la couleur à associer à ce statut',
     'City' => 'Ville',
+    'Your city can only contains letters.' => 'Votre ville ne doit contenir que des lettres',
     'Code' => 'Code',
     'Combination builder' => 'Générateur de combinaison',
     'Compagny' => 'Société',
