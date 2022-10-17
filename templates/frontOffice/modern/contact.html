@@ -36,7 +36,7 @@
                             value=$value
                             placeholder={intl l="You name"}
                             id="{$label_attr.for|default:null}-mini"
-                            required=true
+                            required=$required
                           }
                         {/form_field}
                         {form_field field="email"}
@@ -48,7 +48,7 @@
                             value=$value
                             placeholder={intl l="Your email"}
                             id="{$label_attr.for|default:null}-mini"
-                            required=true
+                            required=$required
                           }
                         {/form_field}
                         {form_field field="subject"}
@@ -60,19 +60,23 @@
                             value=$value
                             placeholder={intl l="The subject of your message"}
                             id="{$label_attr.for|default:null}-mini"
-                            required=true
+                            required=$required
                           }
                         {/form_field}
                         {form_field field="message"}
+
                         <div class="Input">
-                          <label for="{$label_attr.for|default:null}" class="Input-label {if isset($error) && $error}text-error{/if}">
-                            {$label}
+                          <label for="{$label_attr.for|default:null}" class="Input-label {if isset($error) && $error}text-error{/if}" >
+                            {$label}{if $required|default:null}<sup>*</sup>{/if}
                           </label>
                           <textarea
                             name="{$name}"
                             id="{$label_attr.for|default:null}"
                             rows="6"
-                            class="Input-field {if isset($error) && $error}border-error focus:border-error focus:ring-error text-error{/if} {$inputClass|default:null}">
+                            class="Input-field {if isset($error) && $error}border-error focus:border-error focus:ring-error text-error{/if} {$inputClass|default:null}"
+                            {if $required} required{/if}
+                            >
+
                           </textarea>
                           {if isset($error) && $error && isset($message) && $message}
                             <span class="Input-message">

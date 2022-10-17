@@ -135,6 +135,8 @@
   <!-- Accessibility -->
   <a class="sr-only" href="#content" {if $smarty.server.REQUEST_URI === "/"}tabindex="1"
     {/if}>{intl l="Skip to content"}</a>
+  <a class="sr-only" href="#MainNavigation" {if $smarty.server.REQUEST_URI === "/"}tabindex="1"
+    {/if}>{intl l="Skip to main navigation"}</a>
 
   {$currentTabIndex = null}
   {if $smarty.server.REQUEST_URI === "/"}

@@ -51,7 +51,7 @@ function LoginForm({ setLoginHandler, redirectionToCheckout }) {
           className=""
           label="E-mail"
           value={email}
-          autocomplete="email"
+          autoComplete="email"
           onChange={(e) => setEmail(e.target.value)}
         />
 
@@ -60,7 +60,7 @@ function LoginForm({ setLoginHandler, redirectionToCheckout }) {
           name="password"
           className=""
           label="Mot de passe"
-          autocomplete="current-password"
+          autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />

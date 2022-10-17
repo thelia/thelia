@@ -130,7 +130,11 @@ const messages = {
     UNIT_PRICE: 'Prix unitaire',
     REQUIRED: 'requis',
     MANDATORY_FIELDS: '* Champs obligatoires',
-    VISUAL_OF_CART: 'Visuel du panier'
+    VISUAL_OF_CART: 'Visuel du panier',
+    PRODUCTS: 'Produits',
+    CATEGORIES: 'Catégories',
+    NO_MATCHING_CATEGORIES: 'Aucune categorie correspondantes.',
+    NO_MATCHING_PRODUCTS: 'Aucun Produit correspondant.'
   },
   'en-US': {
     OK: 'OK',
@@ -253,7 +257,11 @@ const messages = {
     UNIT_PRICE: 'Unit price',
     REQUIRED: 'required',
     MANDATORY_FIELDS: '* Required fields',
-    VISUAL_OF_CART: 'Visual of the cart'
+    VISUAL_OF_CART: 'Visual of the cart',
+    PRODUCTS: 'Products',
+    CATEGORIES: 'Categories',
+    NO_MATCHING_CATEGORIES: 'no matching category',
+    NO_MATCHING_PRODUCTS: 'no matching product'
   }
 };
 

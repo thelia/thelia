@@ -253,4 +253,6 @@ return [
   'You may also like' => 'Vous aimerez aussi',
   'Any means of payment' => 'Tout moyen de paiement',
   'From %price of purchase TTC' => 'À partir de %price d’achat TTC',
+  'Skip to content' => 'Aller au contenu',
+  'Skip to main navigation' => 'Aller à la navigation principale',
 ];

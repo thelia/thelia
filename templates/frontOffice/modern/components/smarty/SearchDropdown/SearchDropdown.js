@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'react-use';
 import messages, { locale } from '@components/React/intl';
 import Loader from '@components/React/Loader';
@@ -6,7 +6,10 @@ import { QueryClientProvider } from 'react-query';
 import priceFormat from '@utils/priceFormat';
 import { queryClient } from '@openstudio/thelia-api-utils';
 import { createRoot } from 'react-dom/client';
-import { useSearchQuery } from '@openstudio/thelia-api-utils';
+import {
+  useSearchProductsQuery,
+  useSearchCategoriesQuery
+} from '@openstudio/thelia-api-utils';
 import { ReactComponent as IconSearch } from '@icons/search.svg';
 
 import { ReactComponent as IconCLose } from '@icons/close.svg';
@@ -16,24 +19,26 @@ import { useIntl, IntlProvider } from 'react-intl';
 
 function Item({ title, price, promoPrice, image, url, promo }) {
   return (
-    <a href={url} className="CartItem rounded-md bg-white">
+    <a href={url} className="bg-white rounded-md CartItem">
       <div className="CartItem-img">
         <img src={image} alt="" loading="lazy" />
       </div>
       <div className="CartItem-contain">
         <strong>{title}</strong>
       </div>
-      <div className="flex flex-col items-end text-lg leading-none">
-        <span>{promo && priceFormat(promoPrice)}</span>
-        <span className={promo ? 'mt-1 text-sm line-through' : ''}>
-          {priceFormat(price)}
-        </span>
-      </div>
+      {price === null ? null : (
+        <div className="flex flex-col items-end text-lg leading-none">
+          <span>{promo && priceFormat(promoPrice)}</span>
+          <span className={promo ? 'mt-1 text-sm line-through' : ''}>
+            {priceFormat(price)}
+          </span>
+        </div>
+      )}
     </a>
   );
 }
 
-function formatSearchResults(data = []) {
+function formatSearchProductsResults(data = []) {
   return data.map((product) => {
     const defaultPSE =
       product?.productSaleElements.find((pse) => pse.default) ||
@@ -52,40 +57,114 @@ function formatSearchResults(data = []) {
   });
 }
 
-function SearchResults({ query = null }) {
-  const { data = null } = useSearchQuery({
-    ref: query,
-    title: query,
-    limit: 12
+function formatSearchCategoriesResults(data = []) {
+  return data.map((category) => {
+    return {
+      id: category.id,
+      title: category.i18n.title,
+      url: category.url,
+      price: null,
+      image: `/legacy-image-library/category_image_${category.id}/full/!50,/0/default.webp`
+    };
   });
+}
 
+function ProductsResults({ data = null }) {
+  const intl = useIntl();
   if (!Array.isArray(data)) {
     return null;
   }
+
   if (data.length === 0) {
     return (
-      <div className="mx-auto max-w-xl text-lg font-medium text-white">
-        Aucun résultat.
+      <div className="text-lg font-medium text-white">
+        {intl.formatMessage({ id: 'NO_MATCHING_PRODUCTS' })}
       </div>
     );
   }
 
   return (
-    <>
-      <div className="SearchDropdown-results">
-        {formatSearchResults(data).map((result) => (
-          <Item {...result} key={result.id} />
-        ))}
+    <div className="SearchDropdown-results">
+      {formatSearchProductsResults(data).map((result) => (
+        <Item {...result} key={result.id} />
+      ))}
+    </div>
+  );
+}
+
+function CategoriesResults({ data = null }) {
+  const intl = useIntl();
+
+  if (!Array.isArray(data)) {
+    return null;
+  }
+
+  if (data.length === 0) {
+    return (
+      <div className="text-lg font-medium text-white">
+        {intl.formatMessage({ id: 'NO_MATCHING_CATEGORIES' })}
       </div>
-      {data.length > 0 && (
+    );
+  }
+
+  return (
+    <div className="SearchDropdown-results">
+      {formatSearchCategoriesResults(data).map((result) => (
+        <Item {...result} key={result.id} />
+      ))}
+    </div>
+  );
+}
+
+function SearchResults({ query = null }) {
+  const intl = useIntl();
+  const { data: productsData = null, isLoading: isLoadingProducts } =
+    useSearchProductsQuery({
+      ref: query,
+      title: query,
+      limit: 12
+    });
+  const { data: categoriesData = null, isLoading: isLoadingCategories } =
+    useSearchCategoriesQuery({
+      ref: query,
+      title: query,
+      limit: 12
+    });
+
+  if (!query) return null;
+
+  return (
+    <>
+      <div className="mb-8">
+        <div className="mb-4 text-2xl text-white">
+          {intl.formatMessage({ id: 'PRODUCTS' })}
+        </div>
+
+        {isLoadingProducts ? (
+          <Loader className="h-40 text-white" />
+        ) : (
+          <ProductsResults data={productsData} />
+        )}
+      </div>
+      <div className="mb-8">
+        <div className="mb-4 text-2xl text-white">
+          {intl.formatMessage({ id: 'CATEGORIES' })}
+        </div>
+        {isLoadingCategories ? (
+          <Loader className="h-40 text-white " />
+        ) : (
+          <CategoriesResults data={categoriesData} />
+        )}
+      </div>
+      {productsData?.length > 0 || categoriesData?.length > 0 ? (
         <button
           type="submit"
-          className="Button Button--actived mx-auto mt-8 animate-none"
+          className="mx-auto mt-8 Button Button--actived animate-none"
           form="SearchForm"
         >
           Voir tous les résultats
         </button>
-      )}
+      ) : null}
     </>
   );
 }
@@ -107,7 +186,7 @@ function SearchForm({ formRef, setQuery, query }) {
     >
       <label
         htmlFor="SearchInput"
-        className="SearchDropdown-field mx-auto max-w-xl"
+        className="max-w-xl mx-auto SearchDropdown-field"
         aria-label="Recherche"
       >
         <input
@@ -182,7 +261,7 @@ function SearchDropdown({ showResults = false }) {
           className="SearchDropdown-fake no-focusTrap"
           aria-label={intl.formatMessage({ id: 'SEARCH' })}
           onClick={() => modalObserver(true)}
-          tabIndex={window.location.pathname === "/" ? "1" : null}
+          tabIndex={window.location.pathname === '/' ? '1' : null}
         >
           <IconSearch className="SearchDropdown-fakeIcon" />
           <span className="ml-[10px] hidden lg:block">
@@ -204,25 +283,16 @@ function SearchDropdown({ showResults = false }) {
             aria-label="Fermer la recherche"
             onClick={() => modalObserver(false)}
           >
-            <IconCLose className="pointer-events-none h-4 w-4 text-white" />
+            <IconCLose className="w-4 h-4 text-white pointer-events-none" />
           </button>
           <div className="container">
             <SearchForm formRef={formRef} query={query} setQuery={setQuery} />
-            {showResults && (
-              <div className={!isOpen ? 'hidden' : ''}>
-                <Suspense
-                  fallback={
-                    <div className="col-span-full">
-                      <Loader className="mx-auto w-40" />
-                    </div>
-                  }
-                >
-                  <div className="trans-up">
-                    <SearchResults query={debouncedQuery} />
-                  </div>
-                </Suspense>
+
+            <div>
+              <div className="trans-up">
+                <SearchResults query={debouncedQuery} />
               </div>
-            )}
+            </div>
           </div>
         </div>
       )}
