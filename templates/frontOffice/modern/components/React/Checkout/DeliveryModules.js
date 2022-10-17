@@ -53,7 +53,7 @@ function ModuleOption({ module = {}, option = {}, isSelected }) {
         <span
           className={`mr-6 block text-base ${isSelected ? 'text-main' : ''}`}
         >
-          {option.title || module?.i18n?.title}
+          {module?.i18n?.title}
         </span>
         <strong className="text-main">
           {option.postage
@@ -78,7 +78,7 @@ export default function DeliveryModules() {
   return (
     <>
       {isLoading ? (
-        <Loader className="mx-auto mt-8 w-40" />
+        <Loader className="w-40 mx-auto mt-8" />
       ) : modules?.length === 0 ||
         modules?.flatMap(getModuleValidOptions).length === 0 ? (
         <Alert
@@ -88,9 +88,9 @@ export default function DeliveryModules() {
           className="mt-8"
         />
       ) : (
-        <div className="flex-start item-start mt-8 flex flex-col gap-3">
+        <div className="flex flex-col gap-3 mt-8 flex-start item-start">
           <Title
-            className="Title--3 mb-5 text-2xl"
+            className="mb-5 text-2xl Title--3"
             title="CHOOSE_DELIVERY_PROVIDER"
           />
           {modules.map((module) =>
