@@ -37,9 +37,9 @@
 
                         <div class="col-md-5 actions">
                             <div class="product-visibility-switch"" style="display: inline-block; margin-right:1rem;" rel="tooltip" data-toggle="tooltip" title="{intl l="Active"}">
-                                <label for="visibility-switch" class="sr-only">{$label}</label>
+                                <label for="visibility-switch" class="sr-only">{$label|default:""}</label>
                                 <div class="make-switch productVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
-                                    <input type="checkbox" name="{$name}" id="visibility-switch" value="1" class="productVisibleToggle" {if $VISIBLE != 0}checked="checked"{/if} aria-label="{intl l="is visible"}"/>
+                                    <input type="checkbox" name="{$name|default:""}" id="visibility-switch" value="1" class="productVisibleToggle" {if $VISIBLE != 0}checked="checked"{/if} aria-label="{intl l="is visible"}"/>
                                 </div>
                             </div>
 

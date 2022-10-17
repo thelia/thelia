@@ -60,6 +60,7 @@ activate-module:
 	@php Thelia module:activate StoreSeo
 	@php Thelia module:activate SmartyRedirection
 	@php Thelia module:activate ShortCode
+	@php Thelia module:activate ShortCodeMeta
 	@php Thelia module:activate TheliaLibrary
 	@php Thelia module:activate TheliaBlocks
 	@php Thelia module:deactivate HookAnalytics

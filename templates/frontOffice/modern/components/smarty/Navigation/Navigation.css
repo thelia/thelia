@@ -258,6 +258,12 @@
   }
 }
 
+.Menu-sub1-item--no-childs {
+  &:before {
+    content: none !important;
+  }
+}
+
 @keyframes sticky {
   0% {
     opacity: 0;
