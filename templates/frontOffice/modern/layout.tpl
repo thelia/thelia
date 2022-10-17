@@ -179,9 +179,13 @@
   </script>
   {/strip}
 
+  {block name="javascript-initialization"}{/block}
+
   {block name="javascript"}
     {encore_entry_script_tags entry="app"}
   {/block}
+
+  {block name="after-javascript-include"}{/block}
 
   {hook name="main.after-javascript-include"}
 
