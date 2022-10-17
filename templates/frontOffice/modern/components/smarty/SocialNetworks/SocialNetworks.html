@@ -11,7 +11,7 @@
 <ul class="SocialNetworks">
   {foreach $socials as $social}
     <li>
-      <a href="#" class="SocialNetworks-link" aria-label="facebook url"{if isset($tabindex)}tabindex="{$tabindex}"{/if}>
+      <a href="#" class="SocialNetworks-link" aria-label="{$social['label']}" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
         {renderIconSvg icon=$social.icon class=$social.className }
       </a>
     </li>
