@@ -1,3 +1,27 @@
+# 2.5.1
+- #3057 Fix current view
+- #3056 Feat/new frontoffice template
+- #3055 Add smarty plugin to prefetch js assets
+- #3054 Add isInFolder and isInCategory
+- #3053 Fix doc links
+- #3052 Apply resize to all layers and prevent flatten to keep animation
+- #3051 Add pre order pay total calculation
+- #3049 Change smtp password field type + add warning message
+- #3048 Licences
+- #3047 Fix smtp with special chars
+- #3046 Reset html2pdf to spipu vendor and fix his version
+- #3045 Add mailhog to docker
+- #3044 Fix tax engine getter when session is null
+- #3043 Fix versions in composer.json
+- #3042 Move the product visibility switch to inner toolbar
+- #3041 Disable always debug for update script
+- #3040 Remove default debug log on propel init
+- #3039 Template configuration consistency
+- #3037 Fix remote smtp is disabled and no dsn in env
+- #3036 Fix module config button for route in routing.xml
+- #3035 Update FrontUtils
+- #3034 ApiUtils accessible globaly on window object
+- #3032 Added missing hooks in modern layout.tpl
 # 2.5.0
 - #3020 Item image edition hook
 - #2979 Upgrade pdf invoice template
