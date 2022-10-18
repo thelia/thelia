@@ -255,4 +255,5 @@ return [
   'From %price of purchase TTC' => 'À partir de %price d’achat TTC',
   'Skip to content' => 'Aller au contenu',
   'Skip to main navigation' => 'Aller à la navigation principale',
+  'Open Menu' => 'Ouvrir le menu',
 ];
