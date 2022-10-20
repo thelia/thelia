@@ -167,6 +167,7 @@ return [
   'Regular Price:' => 'Prix normal',
   'Resend a new password' => 'Renvoyer un nouveau mot de passe ',
   'Reset' => 'Réinitialiser',
+  'Required fields' => 'Champs obligatoires',
   'SELECT YOUR CURRENCY' => 'Sélectionnez votre devise',
   'SELECT YOUR LANGUAGE' => 'Sélectionnez votre langue',
   'Sale was not found' => 'La promotion n\'a pas été trouvée',
