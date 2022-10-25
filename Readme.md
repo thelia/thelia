@@ -11,7 +11,7 @@ Thelia
 [![Actions Status: test](https://github.com/thelia/thelia/workflows/test/badge.svg?branch=main)](https://github.com/thelia/thelia/actions?query=workflow%3A"test")
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/thelia/thelia/badges/quality-score.png?s=61e3e04a69bffd71c29b08e5392080317a546716)](https://scrutinizer-ci.com/g/thelia/thelia/)
 
-[Thelia](https://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under GPL.
+[Thelia](https://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under GNU General Public License v3.0.
 
 A repository containing all thelia modules is available at this address : https://github.com/thelia-modules
 
