@@ -210,8 +210,8 @@ class MailerFactory
 
         $email->subject($subject);
         $email->subject($subject);
-        $email->text($htmlBody);
-        $email->html($textBody);
+        $email->text($textBody);
+        $email->html($htmlBody);
 
         return $email;
     }
