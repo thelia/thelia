@@ -141,7 +141,7 @@ class CSVSerializer extends AbstractSerializer
         $data = [];
 
         $index = 0;
-        while (null !== $row = $fileObject->fgetcsv($this->delimiter, $this->enclosure)) {
+        while (false !== $row = $fileObject->fgetcsv($this->delimiter, $this->enclosure)) {
             ++$index;
             if (empty($row)) {
                 continue;
