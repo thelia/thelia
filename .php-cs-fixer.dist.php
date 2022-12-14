@@ -30,6 +30,9 @@ $finder = PhpCsFixer\Finder::create()
          'local/modules/HookTest',
          'local/modules/CustomDelivery',
          'local/modules/Tinymce/Resources',
+         'local/modules/TheliaLibrary',
+         'local/modules/TheliaBlocks',
+         'local/modules/ProductLoopAttributeFilter',
       ])
 ;
 
