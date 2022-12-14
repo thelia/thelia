@@ -5,7 +5,7 @@
         <span class="sf-toolbar-label">
             {{ include('@WebProfilerModule/debug/dataCollector/Icon/thelia.svg') }}
         </span>
-        <span class="sf-toolbar-value">{{ collector.theliaVersion is defined ? collector.theliaVersion : 'n/a' }}</span>
+        <span class="sf-toolbar-value" style="margin-left: 5px">{{ collector.theliaVersion is defined ? collector.theliaVersion : 'n/a' }}</span>
     {% endset %}
 
     {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false, name: 'thelia', status: '', additional_classes: 'sf-toolbar-block-right', block_attrs: 'title=""' }) }}
