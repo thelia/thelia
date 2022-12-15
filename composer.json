@@ -92,7 +92,7 @@
         "phpstan/phpstan": "1.8.2",
         "phpstan/extension-installer": "1.1.0",
         "symfony/css-selector": "6.0.*|6.2.*",
-        "friendsofphp/php-cs-fixer": "3.10.0"
+        "friendsofphp/php-cs-fixer": "3.13.0"
     },
     "scripts": {
         "cs-diff": [
