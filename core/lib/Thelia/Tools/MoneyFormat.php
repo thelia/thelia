@@ -89,7 +89,6 @@ class MoneyFormat extends NumberFormat
     }
 
     /**
-     * @param $number
      * @param null $decimals
      * @param null $decPoint
      * @param null $thousandsSep

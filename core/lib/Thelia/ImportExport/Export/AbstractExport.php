@@ -14,7 +14,6 @@ namespace Thelia\ImportExport\Export;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Map\TableMap;
-use SplFileObject;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
 
@@ -48,7 +47,7 @@ abstract class AbstractExport implements \Iterator
     public const USE_RANGE_DATE = false;
 
     /**
-     * @var SplFileObject|\Propel\Runtime\Util\PropelModelPager Data to export
+     * @var \SplFileObject|\Propel\Runtime\Util\PropelModelPager Data to export
      */
     private $data;
 
@@ -191,7 +190,7 @@ abstract class AbstractExport implements \Iterator
                 && file_exists($data)
             ) {
                 $this->data = new \SplFileObject($data, 'r');
-                $this->data->setFlags(SPLFileObject::READ_AHEAD);
+                $this->data->setFlags(\SplFileObject::READ_AHEAD);
                 $this->dataIsJSONFile = true;
 
                 $this->data->rewind();

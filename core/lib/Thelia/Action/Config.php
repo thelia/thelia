@@ -25,8 +25,6 @@ class Config extends BaseAction implements EventSubscriberInterface
 {
     /**
      * Create a new configuration entry.
-     *
-     * @param $eventName
      */
     public function create(ConfigCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -46,8 +44,6 @@ class Config extends BaseAction implements EventSubscriberInterface
 
     /**
      * Change a configuration entry value.
-     *
-     * @param $eventName
      */
     public function setValue(ConfigUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -62,8 +58,6 @@ class Config extends BaseAction implements EventSubscriberInterface
 
     /**
      * Change a configuration entry.
-     *
-     * @param $eventName
      */
     public function modify(ConfigUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -84,8 +78,6 @@ class Config extends BaseAction implements EventSubscriberInterface
 
     /**
      * Delete a configuration entry.
-     *
-     * @param $eventName
      */
     public function delete(ConfigDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {

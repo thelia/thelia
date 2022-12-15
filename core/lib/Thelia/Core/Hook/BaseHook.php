@@ -441,8 +441,6 @@ abstract class BaseHook implements BaseHookInterface
     }
 
     /**
-     * @param $template
-     *
      * @return array
      */
     protected function getTemplateParams($template)

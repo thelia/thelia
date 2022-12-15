@@ -201,7 +201,6 @@ class Cart extends BaseCart
     }
 
     /**
-     * @param $taxCountry
      * @param null $taxState
      *
      * @throws \Propel\Runtime\Exception\PropelException

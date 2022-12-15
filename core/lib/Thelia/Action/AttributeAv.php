@@ -26,8 +26,6 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
 {
     /**
      * Create a new attribute entry.
-     *
-     * @param $eventName
      */
     public function create(AttributeAvCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -46,8 +44,6 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
 
     /**
      * Change a product attribute.
-     *
-     * @param $eventName
      */
     public function update(AttributeAvUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -67,8 +63,6 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
 
     /**
      * Delete a product attribute entry.
-     *
-     * @param $eventName
      */
     public function delete(AttributeAvDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -83,8 +77,6 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
 
     /**
      * Changes position, selecting absolute ou relative change.
-     *
-     * @param $eventName
      */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {

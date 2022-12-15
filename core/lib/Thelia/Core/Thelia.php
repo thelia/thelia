@@ -71,7 +71,7 @@ class Thelia extends Kernel
 {
     use MicroKernelTrait;
 
-    public const THELIA_VERSION = '2.5.1';
+    public const THELIA_VERSION = '2.5.2';
 
     /** @var SchemaLocator */
     protected $propelSchemaLocator;
@@ -327,9 +327,6 @@ class Thelia extends Kernel
     }
 
     /**
-     * @param $forcePropelCacheGeneration
-     * @param $cacheRefresh
-     *
      * @throws \Throwable
      *
      * @return bool

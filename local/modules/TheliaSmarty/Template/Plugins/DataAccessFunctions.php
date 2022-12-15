@@ -691,8 +691,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * @param        $objectLabel
-     * @param        $params
      * @param array  $columns
      * @param null   $foreignTable
      * @param string $foreignKey
@@ -744,9 +742,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * @param       $objectLabel
-     * @param       $params
-     * @param       $data
      * @param array $noGetterData
      *
      * @throws \InvalidArgumentException

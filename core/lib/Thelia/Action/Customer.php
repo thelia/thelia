@@ -57,8 +57,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param $eventName
-     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function create(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -97,8 +95,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param $eventName
-     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function modify(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -117,8 +113,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param $eventName
-     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function updateProfile(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void

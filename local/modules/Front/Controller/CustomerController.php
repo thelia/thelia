@@ -522,8 +522,6 @@ class CustomerController extends BaseFrontController
     }
 
     /**
-     * @param $token
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      *
@@ -555,8 +553,6 @@ class CustomerController extends BaseFrontController
     }
 
     /**
-     * @param $data
-     *
      * @return \Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent
      */
     private function createEventInstance($data)

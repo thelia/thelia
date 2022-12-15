@@ -144,7 +144,6 @@ class Argument
     }
 
     /**
-     * @param $name
      * @param null $default
      * @param bool $mandatory
      * @param bool $empty
@@ -180,7 +179,6 @@ class Argument
     }
 
     /**
-     * @param $name
      * @param null $default
      * @param bool $mandatory
      * @param bool $empty
@@ -203,7 +201,6 @@ class Argument
     }
 
     /**
-     * @param $name
      * @param null $default
      * @param bool $mandatory
      * @param bool $empty

@@ -104,7 +104,7 @@ class URL
                 }
             }
 
-            $this->baseUrlScheme = "$scheme://$host"."$port";
+            $this->baseUrlScheme = "$scheme://$host$port";
         }
 
         return $scheme_only ? $this->baseUrlScheme : $this->baseUrlScheme.$this->requestContext->getBaseUrl();
@@ -229,10 +229,6 @@ class URL
     /**
      * Retrieve a rewritten URL from a view, a view id and a locale.
      *
-     * @param $view
-     * @param $viewId
-     * @param $viewLocale
-     *
      * @return RewritingRetriever You can access $url and $rewrittenUrl properties
      */
     public function retrieve($view, $viewId, $viewLocale)
@@ -295,8 +291,6 @@ class URL
 
     /**
      * Retrieve a rewritten URL from the current GET parameters or use toString method.
-     *
-     * @param $url
      *
      * @return RewritingResolver
      */

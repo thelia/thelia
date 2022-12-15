@@ -325,8 +325,6 @@ class BaseFacade implements FacadeInterface
     /**
      * Add a coupon in session.
      *
-     * @param $couponCode
-     *
      * @return mixed|void
      */
     public function pushCouponInSession($couponCode)

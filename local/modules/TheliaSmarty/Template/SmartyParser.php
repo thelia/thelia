@@ -32,7 +32,7 @@ use Thelia\Model\Lang;
  * @author Franck Allimant <franck@cqfdev.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class SmartyParser extends Smarty implements ParserInterface
+class SmartyParser extends \Smarty implements ParserInterface
 {
     public $plugins = [];
 
@@ -286,7 +286,7 @@ class SmartyParser extends Smarty implements ParserInterface
     public static function theliaEscape($content, /* @noinspection PhpUnusedParameterInspection */ $smarty)
     {
         if (\is_scalar($content)) {
-            return htmlspecialchars($content, \ENT_QUOTES, Smarty::$_CHARSET);
+            return htmlspecialchars($content, \ENT_QUOTES, \Smarty::$_CHARSET);
         }
 
         return $content;

@@ -29,8 +29,6 @@ trait StandardI18nFieldsSearchTrait
     }
 
     /**
-     * @param $searchTerm
-     * @param $searchCriteria
      * @param string[] $searchIn
      */
     protected function addStandardI18nSearch(ModelCriteria $search, string $searchTerm, string $searchCriteria, array $searchIn = ['title', 'chapo', 'description', 'postscriptum']): void

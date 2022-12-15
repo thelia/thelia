@@ -64,9 +64,6 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
         }
     }
 
-    /**
-     * @param $value
-     */
     public function verifyExistingEmail($value, ExecutionContextInterface $context): void
     {
         $customer = CustomerQuery::getCustomerByEmail($value);

@@ -48,7 +48,6 @@ class Coupon extends BaseCoupon
      * @param array     $freeShippingForCountries   ID of Countries to which shipping is free
      * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
      * @param bool      $perCustomerUsageCount      True if usage coiunt is per customer
-     * @param $startDate
      *
      * @throws \Exception
      */

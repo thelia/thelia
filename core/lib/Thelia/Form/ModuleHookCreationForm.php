@@ -174,8 +174,6 @@ class ModuleHookCreationForm extends BaseForm
     /**
      * Check if method is the right one if we want to use automatic inserted templates .
      *
-     * @param $value
-     *
      * @return bool
      */
     public function verifyTemplates($value, ExecutionContextInterface $context): void

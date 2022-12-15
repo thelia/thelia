@@ -12,7 +12,6 @@
 
 namespace Thelia\Form;
 
-use Exception;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints;
@@ -75,7 +74,7 @@ class ModuleInstallForm extends BaseForm
                 // get the first directory
                 $moduleFiles = $this->getDirContents($modulePath);
                 if (\count($moduleFiles['directories']) !== 1) {
-                    throw new Exception(
+                    throw new \Exception(
                         Translator::getInstance()->trans(
                             'Your zip must contain 1 root directory which is the root folder directory of your module'
                         )
@@ -91,7 +90,7 @@ class ModuleInstallForm extends BaseForm
                 $moduleValidator->validate();
 
                 $this->moduleDefinition = $moduleValidator->getModuleDefinition();
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 $context->addViolation(
                     Translator::getInstance()->trans(
                         'The module is not valid : %message',

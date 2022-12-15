@@ -291,9 +291,6 @@ class CouponCreationForm extends BaseForm
         }
     }
 
-    /**
-     * @param $value
-     */
     public function checkConsistencyDates($value, ExecutionContextInterface $context): void
     {
         if (null === $startDate = $this->getForm()->get('startDate')->getData()) {

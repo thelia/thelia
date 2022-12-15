@@ -442,8 +442,6 @@ class TheliaLoop extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $smartyParams
-     *
      * @throws \Thelia\Core\Template\Element\Exception\InvalidElementException
      * @throws \Thelia\Core\Template\Element\Exception\ElementNotFoundException
      * @throws \ReflectionException

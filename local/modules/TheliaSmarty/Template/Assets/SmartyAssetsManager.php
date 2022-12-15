@@ -209,11 +209,6 @@ class SmartyAssetsManager
     }
 
     /**
-     * @param $assetType
-     * @param $params
-     * @param $content
-     * @param $repeat
-     *
      * @throws \Exception
      *
      * @return null

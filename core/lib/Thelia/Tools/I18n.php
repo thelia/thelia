@@ -111,8 +111,6 @@ class I18n
     }
 
     /**
-     * @param $str
-     *
      * @return string
      *
      * Really escapes a string for SQL query

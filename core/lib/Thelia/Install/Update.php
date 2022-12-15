@@ -13,8 +13,6 @@
 namespace Thelia\Install;
 
 use Michelf\Markdown;
-use PDO;
-use PDOException;
 use Propel\Runtime\Propel;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -58,7 +56,7 @@ class Update
     /** @var array */
     protected $updatedVersions = [];
 
-    /** @var PDO */
+    /** @var \PDO */
     protected $connection;
 
     /** @var string|null */
@@ -393,7 +391,7 @@ class Update
             try {
                 $stmt = $this->connection->prepare('UPDATE config set value = ? where name = ?');
                 $stmt->execute([$version, 'thelia_version']);
-            } catch (PDOException $e) {
+            } catch (\PDOException $e) {
                 $this->log('error', sprintf('Error setting current version : %s', $e->getMessage()));
 
                 throw $e;
@@ -415,7 +413,7 @@ class Update
         );
 
         if ($stmt->rowCount()) {
-            return (float) $stmt->fetch(PDO::FETCH_OBJ)->size;
+            return (float) $stmt->fetch(\PDO::FETCH_OBJ)->size;
         }
 
         throw new \Exception('Impossible to calculate the database size');

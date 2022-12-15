@@ -161,10 +161,6 @@ class RequestListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param $request
-     * @param $session
-     */
     protected function getRememberMeAdmin(Request $request, Session $session): void
     {
         // try to get the remember me cookie

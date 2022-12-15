@@ -548,9 +548,6 @@ class ProductController extends AbstractSeoCrudController
     /**
      * return a list of document which will be displayed in AJAX.
      *
-     * @param $productId
-     * @param $pseId
-     *
      * @return Response
      */
     public function getVirtualDocumentListAjaxAction($productId, $pseId)
@@ -1435,8 +1432,6 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Calculate taxed/untexted price for a product.
      *
-     * @param $price
-     * @param $price_type
      * @param bool $convert
      *
      * @return string

@@ -1,3 +1,7 @@
+# 2.5.2
+- #3068 Update Symfony dependencies to 6.2
+- #3064 Fix wrong mail content type
+- #3063 Fix csv serializer
 # 2.5.1
 - #3057 Fix current view
 - #3056 Feat/new frontoffice template

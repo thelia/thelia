@@ -119,8 +119,6 @@ class BaseHookRenderEvent extends Event
     /**
      * Check if an argument exists with this key.
      *
-     * @param $key
-     *
      * @return bool true if it exists, else false
      */
     public function hasArgument($key)
@@ -148,8 +146,6 @@ class BaseHookRenderEvent extends Event
 
     /**
      * Check if a template variable is defined.
-     *
-     * @param $templateVariableName
      *
      * @return bool true if the template variable is defined, false otherwise
      */

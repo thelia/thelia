@@ -308,9 +308,6 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 
     /**
      * @param ProductSaleElementsQuery $search
-     * @param $searchTerm
-     * @param $searchIn
-     * @param $searchCriteria
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
     {

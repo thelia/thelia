@@ -177,9 +177,6 @@ class GenerateSQLCommand extends ContainerAwareCommand
      * - `in_string`: set to 1 not add simple quote around the string. (default = 0)
      * - `use_default`: set to 1 to use the `l` string as a fallback. (default = 0)
      *
-     * @param $params
-     * @param $smarty
-     *
      * @return string
      */
     public function translate($params, $smarty)

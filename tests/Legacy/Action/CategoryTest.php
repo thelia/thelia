@@ -129,6 +129,7 @@ class CategoryTest extends TestCaseWithURLToolSetup
 
     /**
      * @param array $argArray
+     *
      * @depends testUpdate
      *
      * @return CategoryModel

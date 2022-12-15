@@ -131,8 +131,6 @@ class Content extends BaseContent implements FileModelParentInterface
      *
      * Here pre and post insert event are fired
      *
-     * @param $defaultFolderId
-     *
      * @throws \Exception
      *
      * @return $this Return $this, allow chaining

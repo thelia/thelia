@@ -14,7 +14,6 @@ namespace Thelia\Module;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
-use SplFileInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Thelia\Core\Event\Cache\CacheEvent;
@@ -83,7 +82,7 @@ class ModuleManagement
      * Update module information, and invoke install() for new modules (e.g. modules
      * just discovered), or update() modules for which version number ha changed.
      *
-     * @param SplFileInfo        $file      the module.xml file descriptor
+     * @param \SplFileInfo       $file      the module.xml file descriptor
      * @param ContainerInterface $container the container
      *
      * @throws \Exception

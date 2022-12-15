@@ -8,6 +8,8 @@ jobs:
   phpunit:
     name: PHP ${{ matrix.php-versions }}
     runs-on: ubuntu-latest
+    env:
+      PHP_CS_FIXER_IGNORE_ENV: 1
     services:
       mysql:
         image: mariadb:10.3
@@ -20,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['8.0', '8.1']
+        php-versions: ['8.0', '8.1', '8.2']
     steps:
       - name: Checkout
         uses: actions/checkout@v2

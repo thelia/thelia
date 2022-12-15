@@ -123,6 +123,7 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
      * test update creation.
      *
      * @covers \Thelia\Action\OrderStatus::update
+     *
      * @depends testCreateOrderStatus
      */
     public function testUpdateOrderStatusNotProtected(): void
@@ -146,6 +147,7 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
      * test order status removal.
      *
      * @covers \Thelia\Action\OrderStatus::delete
+     *
      * @depends testUpdateOrderStatusNotProtected
      */
     public function testDeleteOrderStatus(): void
@@ -166,6 +168,7 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
      * test order status removal.
      *
      * @covers \Thelia\Action\OrderStatus::delete
+     *
      * @depends testUpdateOrderStatusProtected
      */
     public function testDeleteOrderStatusProtected(): void
@@ -187,6 +190,7 @@ class OrderStatusTest extends TestCaseWithURLToolSetup
      * test order status removal.
      *
      * @covers \Thelia\Action\OrderStatus::delete
+     *
      * @depends testUpdateOrderStatusNotProtected
      */
     public function testDeleteOrderStatusWithOrders(): void

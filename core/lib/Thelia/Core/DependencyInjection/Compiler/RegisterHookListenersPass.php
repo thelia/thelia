@@ -13,8 +13,6 @@
 namespace Thelia\Core\DependencyInjection\Compiler;
 
 use Propel\Runtime\Propel;
-use ReflectionException;
-use ReflectionMethod;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -392,7 +390,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
     protected function isValidHookMethod(string $className, string $methodName, bool $block, bool $failSafe = false)
     {
         try {
-            $method = new ReflectionMethod($className, $methodName);
+            $method = new \ReflectionMethod($className, $methodName);
 
             $parameters = $method->getParameters();
 
@@ -405,7 +403,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
                 return false;
             }
-        } catch (ReflectionException $ex) {
+        } catch (\ReflectionException $ex) {
             $this->logAlertMessage(
                 sprintf('Method %s does not exist in %s : %s', $methodName, $className, $ex),
                 $failSafe
@@ -417,9 +415,6 @@ class RegisterHookListenersPass implements CompilerPassInterface
         return true;
     }
 
-    /**
-     * @param $event
-     */
     protected function getMethodName($event)
     {
         if (!isset($event['method'])) {

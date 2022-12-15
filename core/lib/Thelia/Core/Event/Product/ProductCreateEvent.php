@@ -179,8 +179,6 @@ class ProductCreateEvent extends ProductEvent
     /**
      * This method is an alias of setCurrencyId and used by the event when binding a form.
      *
-     * @param $currencyId
-     *
      * @return $this
      *
      * @see setCurrencyId
@@ -192,8 +190,6 @@ class ProductCreateEvent extends ProductEvent
 
     /**
      * This method is an alias of setTaxRuleId and used by the event when binding a form.
-     *
-     * @param $taxRuleId
      *
      * @return $this
      *

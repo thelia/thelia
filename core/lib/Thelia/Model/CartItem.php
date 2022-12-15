@@ -89,8 +89,6 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param $value
-     *
      * @throws \Propel\Runtime\Exception\PropelException
      *
      * @return $this
@@ -120,8 +118,6 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param $value
-     *
      * @throws \Propel\Runtime\Exception\PropelException
      *
      * @return $this

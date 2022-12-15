@@ -250,7 +250,6 @@ class Calculator
     }
 
     /**
-     * @param $untaxedPrice
      * @param null $taxCollection
      *
      * @throws \Propel\Runtime\Exception\PropelException
@@ -263,8 +262,6 @@ class Calculator
     }
 
     /**
-     * @param $taxedPrice
-     *
      * @return float
      */
     public function getTaxAmountFromTaxedPrice($taxedPrice)
@@ -339,8 +336,6 @@ class Calculator
     }
 
     /**
-     * @param $taxedPrice
-     *
      * @return float|int|number
      */
     public function getUntaxedPrice($taxedPrice)

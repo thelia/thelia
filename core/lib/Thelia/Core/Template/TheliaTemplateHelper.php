@@ -23,9 +23,6 @@ class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberIn
 {
     protected $kernelCacheDir;
 
-    /**
-     * @param $kernelCacheDir
-     */
     public function __construct($kernelCacheDir)
     {
         $this->kernelCacheDir = $kernelCacheDir;

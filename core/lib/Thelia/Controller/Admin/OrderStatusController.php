@@ -269,9 +269,6 @@ class OrderStatusController extends AbstractCrudController
     }
 
     /**
-     * @param $positionChangeMode
-     * @param $positionValue
-     *
      * @return UpdatePositionEvent|void
      */
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
