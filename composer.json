@@ -67,6 +67,10 @@
         "doctrine/cache": "~1.0",
         "assetic/framework": "~3.0.0",
         "spipu/html2pdf": "~5.2.5",
+        "symfony/mailer": "6.0.*|6.2.*",
+        "symfony/webpack-encore-bundle": "^1.14",
+        "composer/composer": "~2.3.0",
+
         "thelia/open-api-module": "^2.1.6",
         "thelia/smarty-redirection-module": "~2.0.0",
         "thelia/choice-filter-module": "^2.1",
@@ -75,9 +79,6 @@
         "thelia/better-seo-module": "^2.1",
         "thelia/short-code-meta-module": "^2.0",
         "thelia/force-phone-module": "^2.0",
-        "symfony/mailer": "6.0.*|6.2.*",
-        "symfony/webpack-encore-bundle": "^1.14",
-        "composer/composer": "~2.3.0",
         "thelia/thelia-blocks-module": "^2.0.3-beta",
         "thelia/thelia-library-module": "^1.1.7",
         "thelia/product-loop-attribute-filter-module": "~2.0.0"
