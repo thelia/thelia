@@ -60,7 +60,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
                 && file_exists($data)
             ) {
                 $this->data = new \SplFileObject($data, 'r');
-                $this->data->setFlags(\SPLFileObject::READ_AHEAD);
+                $this->data->setFlags(\SplFileObject::READ_AHEAD);
 
                 $this->data->rewind();
 

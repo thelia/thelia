@@ -190,7 +190,7 @@ abstract class AbstractExport implements \Iterator
                 && file_exists($data)
             ) {
                 $this->data = new \SplFileObject($data, 'r');
-                $this->data->setFlags(\SPLFileObject::READ_AHEAD);
+                $this->data->setFlags(\SplFileObject::READ_AHEAD);
                 $this->dataIsJSONFile = true;
 
                 $this->data->rewind();
