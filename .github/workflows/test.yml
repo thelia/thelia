@@ -8,13 +8,14 @@ jobs:
   phpunit:
     name: PHP ${{ matrix.php-versions }}
     runs-on: ubuntu-latest
+    env:
+      PHP_CS_FIXER_IGNORE_ENV: 1
     services:
       mysql:
         image: mariadb:10.3
         env:
           MYSQL_ROOT_PASSWORD: thelia
           MYSQL_DATABASE: thelia
-          PHP_CS_FIXER_IGNORE_ENV: 1
         ports:
           - 3306/tcp
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
