@@ -20,7 +20,7 @@ Compatibility
 
 |         |   Thelia 2.3    |      Thelia 2.4 |  Thelia 2.5 |
 |---------|:---------------:|----------------:|------------:|
-| PHP     | 5.5 5.6 7.0 7.1 | 7.0 7.1 7.2 7.3 |     8.0.2 8.1 |
+| PHP     | 5.5 5.6 7.0 7.1 | 7.0 7.1 7.2 7.3 |     8.0.2 8.1 8.2 |
 | MySQL   |     5.5 5.6     |     5.5 5.6 5.7 | 5.6 5.7 8.0 |
 | Symfony |       2.8       |             2.8 |     6.0 6.1 |
 
@@ -90,7 +90,7 @@ You can get the sources from git and then let composer install dependencies, or 
 ``` bash
 $ git clone --recursive https://github.com/thelia/thelia path
 $ cd path
-$ git checkout 2.5.0 (2.4.5 or 2.3.5)
+$ git checkout 2.5.2 (2.4.5 or 2.3.5)
 $ curl -sS https://getcomposer.org/installer | php
 $ php composer.phar install
 ```
@@ -99,7 +99,7 @@ $ php composer.phar install
 
 ``` bash
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar create-project thelia/thelia path/ 2.5.0 (2.4.5 or 2.3.5)
+$ php composer.phar create-project thelia/thelia path/ 2.5.2 (2.4.5 or 2.3.5)
 ```
 
 If something goes wrong during the install process, you can restart Thelia install wizard with
