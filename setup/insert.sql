@@ -53,7 +53,7 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (43, 'thelia_version','2.5.2', 1, 1, NOW(), NOW()),
 (44, 'thelia_major_version','2', 1, 1, NOW(), NOW()),
 (45, 'thelia_minus_version','5', 1, 1, NOW(), NOW()),
-(46, 'thelia_release_version','2', 1, 1, NOW(), NOW()),œ
+(46, 'thelia_release_version','2', 1, 1, NOW(), NOW()),
 (47, 'thelia_extra_version','', 1, 1, NOW(), NOW()),
 (48, 'front_cart_country_cookie_name','fcccn', 1, 1, NOW(), NOW()),
 (49, 'front_cart_country_cookie_expires','2592000', 1, 1, NOW(), NOW()),
