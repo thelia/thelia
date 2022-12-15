@@ -39,8 +39,6 @@ class Category extends BaseAction implements EventSubscriberInterface
 {
     /**
      * Create a new category entry.
-     *
-     * @param $eventName
      */
     public function create(CategoryCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -60,8 +58,6 @@ class Category extends BaseAction implements EventSubscriberInterface
 
     /**
      * Change a category.
-     *
-     * @param $eventName
      */
     public function update(CategoryUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -86,8 +82,6 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * Change a Category SEO.
      *
-     * @param $eventName
-     *
      * @return object
      */
     public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -97,8 +91,6 @@ class Category extends BaseAction implements EventSubscriberInterface
 
     /**
      * Delete a category entry.
-     *
-     * @param $eventName
      *
      * @throws \Exception
      */
@@ -144,8 +136,6 @@ class Category extends BaseAction implements EventSubscriberInterface
 
     /**
      * Toggle category visibility. No form used here.
-     *
-     * @param $eventName
      */
     public function toggleVisibility(CategoryToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -161,8 +151,6 @@ class Category extends BaseAction implements EventSubscriberInterface
 
     /**
      * Changes position, selecting absolute ou relative change.
-     *
-     * @param $eventName
      */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {

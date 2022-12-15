@@ -333,8 +333,6 @@ class HookController extends AbstractCrudController
      *
      * @param unknown $event
      *
-     * @return
-     *
      * @internal param \Thelia\Controller\Admin\unknown $createEvent
      */
     protected function getObjectFromEvent($event)

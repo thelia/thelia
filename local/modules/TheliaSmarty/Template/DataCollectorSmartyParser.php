@@ -17,7 +17,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 
-class DataCollectorSmartyParser extends Smarty implements ParserInterface
+class DataCollectorSmartyParser extends \Smarty implements ParserInterface
 {
     protected $smartyParser;
 

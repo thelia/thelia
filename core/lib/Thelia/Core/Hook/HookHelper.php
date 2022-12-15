@@ -224,9 +224,6 @@ class HookHelper
     /**
      * Translate Hook labels.
      *
-     * @param $context
-     * @param $key
-     *
      * @return string
      */
     protected function trans($context, $key)
@@ -534,8 +531,6 @@ class HookHelper
 
     /**
      * This method do nothing for now.
-     *
-     * @param $locale
      */
     protected function loadEmailTrans($locale): void
     {

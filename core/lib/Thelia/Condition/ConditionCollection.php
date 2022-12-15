@@ -22,7 +22,7 @@ use Thelia\Condition\Implementation\ConditionInterface;
  *
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  */
-class ConditionCollection implements Iterator, Countable, ArrayAccess
+class ConditionCollection implements \Iterator, \Countable, \ArrayAccess
 {
     /** @var ConditionInterface[] */
     protected $conditions = [];

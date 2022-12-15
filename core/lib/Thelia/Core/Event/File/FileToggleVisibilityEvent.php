@@ -24,9 +24,6 @@ class FileToggleVisibilityEvent extends ToggleVisibilityEvent
 {
     protected $query;
 
-    /**
-     * @param $object_id
-     */
     public function __construct(ModelCriteria $query, $object_id)
     {
         parent::__construct($object_id);

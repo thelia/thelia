@@ -392,8 +392,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param $currencyId
-     *
      * @throws \Propel\Runtime\Exception\PropelException
      *
      * @return int
@@ -437,11 +435,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param $clonedProductId
-     * @param $clonedProductPSEId
-     * @param $originalProductPSEFiles
-     * @param $type
-     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function clonePSEAssociatedFiles($clonedProductId, $clonedProductPSEId, $originalProductPSEFiles, $type): void

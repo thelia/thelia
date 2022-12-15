@@ -106,9 +106,6 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
 
     /**
      * @param CustomerQuery $search
-     * @param $searchTerm
-     * @param $searchIn
-     * @param $searchCriteria
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
     {

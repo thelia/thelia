@@ -44,8 +44,6 @@ class TemplateValidator
     /**
      * TemplateValidator constructor.
      *
-     * @param $templatePath
-     *
      * @throws \Exception
      */
     public function __construct($templatePath)

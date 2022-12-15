@@ -29,9 +29,6 @@ class GenerateRewrittenUrlEvent extends ActionEvent
 
     /**
      * GenerateRewrittenUrlEvent constructor.
-     *
-     * @param $object
-     * @param $locale
      */
     public function __construct($object, $locale)
     {
@@ -75,8 +72,6 @@ class GenerateRewrittenUrlEvent extends ActionEvent
     }
 
     /**
-     * @param $url
-     *
      * @return $this
      */
     public function setUrl($url)

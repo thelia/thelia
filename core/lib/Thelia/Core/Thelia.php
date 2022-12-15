@@ -327,9 +327,6 @@ class Thelia extends Kernel
     }
 
     /**
-     * @param $forcePropelCacheGeneration
-     * @param $cacheRefresh
-     *
      * @throws \Throwable
      *
      * @return bool

@@ -21,9 +21,6 @@ use Thelia\Model\TaxQuery;
 
 class Tax extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     * @param $eventName
-     */
     public function create(TaxEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $tax = new TaxModel();
@@ -42,9 +39,6 @@ class Tax extends BaseAction implements EventSubscriberInterface
         $event->setTax($tax);
     }
 
-    /**
-     * @param $eventName
-     */
     public function update(TaxEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {

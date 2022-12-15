@@ -98,8 +98,6 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     /**
      * Creates the update SEO event with the provided form data.
      *
-     * @param $formData
-     *
      * @return UpdateSeoEvent
      */
     protected function getUpdateSeoEvent($formData)

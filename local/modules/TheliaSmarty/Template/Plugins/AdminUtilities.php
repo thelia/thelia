@@ -71,9 +71,6 @@ class AdminUtilities extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     * @param $smarty
-     *
      * @throws \Exception
      * @throws \SmartyException
      *

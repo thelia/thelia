@@ -40,8 +40,6 @@ class Template extends BaseAction implements EventSubscriberInterface
 {
     /**
      * Create a new template entry.
-     *
-     * @param $eventName
      */
     public function create(TemplateCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -62,7 +60,6 @@ class Template extends BaseAction implements EventSubscriberInterface
      * Dupliucate an existing template entry.
      *
      * @param \Thelia\Core\Event\Template\TemplateCreateEvent $event
-     * @param $eventName
      */
     public function duplicate(TemplateDuplicateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -106,8 +103,6 @@ class Template extends BaseAction implements EventSubscriberInterface
 
     /**
      * Change a product template.
-     *
-     * @param $eventName
      */
     public function update(TemplateUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -124,8 +119,6 @@ class Template extends BaseAction implements EventSubscriberInterface
 
     /**
      * Delete a product template entry.
-     *
-     * @param $eventName
      *
      * @throws \Exception
      */
@@ -183,8 +176,6 @@ class Template extends BaseAction implements EventSubscriberInterface
 
     /**
      * Changes position, selecting absolute ou relative change.
-     *
-     * @param $eventName
      */
     public function updateAttributePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -193,8 +184,6 @@ class Template extends BaseAction implements EventSubscriberInterface
 
     /**
      * Changes position, selecting absolute ou relative change.
-     *
-     * @param $eventName
      */
     public function updateFeaturePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {

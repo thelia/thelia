@@ -124,9 +124,6 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
 
     /**
      * @param OrderQuery $search
-     * @param $searchTerm
-     * @param $searchIn
-     * @param $searchCriteria
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */

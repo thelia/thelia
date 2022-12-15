@@ -204,8 +204,6 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Process update sale.
      *
-     * @param $eventName
-     *
      * @throws PropelException
      */
     public function update(SaleUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -305,8 +303,6 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Toggle Sale activity.
      *
-     * @param $eventName
-     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function toggleActivity(SaleToggleActivityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -339,8 +335,6 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
     /**
      * Delete a sale.
-     *
-     * @param $eventName
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -408,8 +402,6 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * This method check the activation and deactivation dates of sales, and perform
      * the required action depending on the current date.
-     *
-     * @param $eventName
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */

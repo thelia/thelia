@@ -101,7 +101,7 @@ class Encore extends AbstractSmartyPlugin
         }
 
         if (isset($this->packages['manifest'])) {
-            return $urlTool->absoluteUrl($this->packages['manifest']->geturl($file));
+            return '/application/web'.$this->packages['manifest']->geturl($file);
         }
 
         return '';

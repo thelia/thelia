@@ -49,8 +49,6 @@ class Brand extends BaseAction implements EventSubscriberInterface
 
     /**
      * process update brand.
-     *
-     * @param $eventName
      */
     public function update(BrandUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -89,8 +87,6 @@ class Brand extends BaseAction implements EventSubscriberInterface
 
     /**
      * Change Brand SEO.
-     *
-     * @param $eventName
      *
      * @return object
      */

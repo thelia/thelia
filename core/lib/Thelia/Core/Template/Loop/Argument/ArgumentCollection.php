@@ -25,8 +25,6 @@ class ArgumentCollection implements \Iterator
     }
 
     /**
-     * @param $key
-     *
      * @return bool
      */
     public function hasKey($key)
@@ -35,8 +33,6 @@ class ArgumentCollection implements \Iterator
     }
 
     /**
-     * @param $key
-     *
      * @return Argument|null
      */
     public function get($key)
@@ -53,8 +49,6 @@ class ArgumentCollection implements \Iterator
     }
 
     /**
-     * @param $force
-     *
      * @return ArgumentCollection
      */
     public function addArguments(array $argumentList, $force = true)
@@ -67,8 +61,6 @@ class ArgumentCollection implements \Iterator
     }
 
     /**
-     * @param $force
-     *
      * @return ArgumentCollection
      */
     public function addArgument(Argument $argument, $force = true)

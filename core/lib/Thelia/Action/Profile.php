@@ -28,9 +28,6 @@ use Thelia\Model\ResourceQuery;
 
 class Profile extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     * @param $eventName
-     */
     public function create(ProfileEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $profile = new ProfileModel();
@@ -50,9 +47,6 @@ class Profile extends BaseAction implements EventSubscriberInterface
         $event->setProfile($profile);
     }
 
-    /**
-     * @param $eventName
-     */
     public function update(ProfileEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {

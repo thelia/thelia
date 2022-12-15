@@ -19,7 +19,7 @@ use Iterator;
  *
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class FragmentBag implements Iterator
+class FragmentBag implements \Iterator
 {
     private $position;
 

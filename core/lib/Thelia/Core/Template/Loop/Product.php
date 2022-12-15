@@ -192,9 +192,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     /**
      * @param ProductQuery $search
-     * @param $searchTerm
-     * @param $searchIn
-     * @param $searchCriteria
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
     {
@@ -376,7 +373,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     /**
      * @param LoopResultRow         $loopResultRow the current result row
      * @param \Thelia\Model\Product $product
-     * @param $defaultCategoryId
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -488,7 +484,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 if ($sqlWhereString == '*') {
                     $sqlWhereString = 'NOT ISNULL(`fa_'.$feature.'`.ID)';
                 } else {
-                    $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`fa_'.$feature.'_'.'\1`.ID)', $sqlWhereString);
+                    $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`fa_'.$feature.'_\1`.ID)', $sqlWhereString);
                     $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
                     $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
                 }
@@ -859,7 +855,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     if ($key == 0) {
                         continue;
                     }
-                    $search->where('`'.$actuallyUsedAttributeNonStrictMatch.'`.ID='.'`'.$actuallyUsedAttributeNonStrictMatchList[$key - 1].'`.ID');
+                    $search->where('`'.$actuallyUsedAttributeNonStrictMatch.'`.ID=`'.$actuallyUsedAttributeNonStrictMatchList[$key - 1].'`.ID');
                 }
             }
 

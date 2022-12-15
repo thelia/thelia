@@ -211,8 +211,6 @@ class Install extends ContainerAwareCommand
     /**
      * test database access.
      *
-     * @param $connectionInfo
-     *
      * @return bool|\PDO
      */
     protected function tryConnection($connectionInfo, OutputInterface $output)

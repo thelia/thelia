@@ -55,8 +55,6 @@ class Render extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     *
      * @throws SmartyPluginException
      *
      * @return mixed|string
@@ -120,8 +118,6 @@ class Render extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $param
-     *
      * @return array
      *
      * If $param is an array, return it.
@@ -144,7 +140,6 @@ class Render extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $name
      * @param null $default
      *
      * @return mixed

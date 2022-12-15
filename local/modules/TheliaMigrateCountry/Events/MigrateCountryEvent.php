@@ -36,7 +36,6 @@ class MigrateCountryEvent extends ActionEvent
     /**
      * MigrateCountryEvent constructor.
      *
-     * @param $country
      * @param int $newCountry
      * @param int $newState
      */

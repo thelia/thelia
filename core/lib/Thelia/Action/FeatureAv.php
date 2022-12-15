@@ -26,8 +26,6 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
 {
     /**
      * Create a new feature entry.
-     *
-     * @param $eventName
      */
     public function create(FeatureAvCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -47,8 +45,6 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
 
     /**
      * Change a product feature.
-     *
-     * @param $eventName
      */
     public function update(FeatureAvUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -69,8 +65,6 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
 
     /**
      * Delete a product feature entry.
-     *
-     * @param $eventName
      */
     public function delete(FeatureAvDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -86,8 +80,6 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
 
     /**
      * Changes position, selecting absolute ou relative change.
-     *
-     * @param $eventName
      */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {

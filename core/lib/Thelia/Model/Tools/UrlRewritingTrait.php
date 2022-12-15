@@ -152,7 +152,6 @@ trait UrlRewritingTrait
      * Set the rewritten URL for the given locale.
      *
      * @param string $locale a valid locale (e.g. en_US)
-     * @param $url
      *
      * @throws UrlRewritingException
      * @throws \Thelia\Exception\UrlRewritingException

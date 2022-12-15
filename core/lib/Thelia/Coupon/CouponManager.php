@@ -123,8 +123,6 @@ class CouponManager
     }
 
     /**
-     * @param $code
-     *
      * @return mixed|void
      */
     public function pushCouponInSession($code)

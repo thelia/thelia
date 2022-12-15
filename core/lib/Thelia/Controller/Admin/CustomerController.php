@@ -153,8 +153,6 @@ class CustomerController extends AbstractCrudController
     }
 
     /**
-     * @param $data
-     *
      * @return \Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent
      */
     private function createEventInstance($data)

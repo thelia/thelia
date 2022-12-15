@@ -365,8 +365,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * Create an order outside of the front-office context, e.g. manually from the back-office.
      *
-     * @param $eventName
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -389,8 +387,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param $eventName
-     *
      * @throws \Thelia\Exception\TheliaProcessException
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
@@ -427,9 +423,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param $eventName
-     */
     public function orderBeforePayment(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $dispatcher->dispatch(clone $event, TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL);
@@ -440,8 +433,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * Clear the cart and the order in the customer session once the order is placed,
      * and the payment performed.
-     *
-     * @param $eventName
      */
     public function orderCartClear(/* @noinspection PhpUnusedParameterInspection */ OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -483,8 +474,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param $eventName
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -516,8 +505,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * Check if a stock update is required on order products for a given order status change, and compute if
      * the stock should be decreased or increased.
-     *
-     * @param $eventName
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */

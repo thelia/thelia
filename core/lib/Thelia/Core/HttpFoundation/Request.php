@@ -134,8 +134,6 @@ class Request extends BaseRequest
      * if ($request->fromControllerType(BaseFrontController::CONTROLLER_TYPE)) {...}
      * </code>
      *
-     * @param $controllerType
-     *
      * @return bool
      */
     public function fromControllerType($controllerType)

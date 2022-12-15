@@ -58,8 +58,6 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @param $native
-     *
      * @return $this
      */
     public function setNative($native): self
@@ -75,8 +73,6 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @param $title
-     *
      * @return $this
      */
     public function setTitle($title): self
@@ -92,8 +88,6 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @param $type
-     *
      * @return $this
      */
     public function setType($type): self
@@ -109,8 +103,6 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @param $active
-     *
      * @return $this
      */
     public function setActive($active): self
@@ -126,8 +118,6 @@ class HookCreateEvent extends HookEvent
     }
 
     /**
-     * @param $code
-     *
      * @return $this
      */
     public function setCode($code): self

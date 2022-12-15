@@ -54,8 +54,6 @@ class Import extends BaseAction implements EventSubscriberInterface
 
     /**
      * Handle import change position event.
-     *
-     * @param $eventName
      */
     public function importChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -65,8 +63,6 @@ class Import extends BaseAction implements EventSubscriberInterface
 
     /**
      * Handle import category change position event.
-     *
-     * @param $eventName
      */
     public function importCategoryChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher): void
     {

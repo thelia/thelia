@@ -12,7 +12,6 @@
 
 namespace Thelia\Module;
 
-use ErrorException;
 use Symfony\Component\Finder\Finder;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
 
@@ -114,7 +113,7 @@ class ModuleDescriptorValidator
             }
 
             libxml_use_internal_errors(false);
-        } catch (ErrorException $ex) {
+        } catch (\ErrorException $ex) {
             libxml_use_internal_errors(false);
         }
 

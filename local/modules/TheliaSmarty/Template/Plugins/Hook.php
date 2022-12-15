@@ -449,8 +449,6 @@ HTML;
      * Clean the params of the params passed to the hook function or block to feed the arguments of the event
      * with relevant arguments.
      *
-     * @param $params
-     *
      * @return array
      */
     protected function getArgumentsFromParams($params)

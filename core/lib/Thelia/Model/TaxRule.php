@@ -19,8 +19,6 @@ use Thelia\TaxEngine\OrderProductTaxCollection;
 class TaxRule extends BaseTaxRule
 {
     /**
-     * @param $untaxedAmount
-     * @param $untaxedPromoAmount
      * @param null $askedLocale
      *
      * @return OrderProductTaxCollection

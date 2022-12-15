@@ -12,9 +12,7 @@
 
 namespace Thelia\Action;
 
-use Exception;
 use Propel\Runtime\Propel;
-use SplFileInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -112,7 +110,7 @@ class Module extends BaseAction implements EventSubscriberInterface
      *
      * @param \Thelia\Model\Module $module
      *
-     * @throws Exception if activation fails
+     * @throws \Exception if activation fails
      *
      * @return bool true if the module can be activated, otherwise false
      */
@@ -163,8 +161,6 @@ class Module extends BaseAction implements EventSubscriberInterface
 
     /**
      * Get dependencies of the current module and activate it if needed.
-     *
-     * @param $eventName
      */
     public function recursiveActivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -185,8 +181,6 @@ class Module extends BaseAction implements EventSubscriberInterface
 
     /**
      * Get modules having current module in dependence and deactivate it if needed.
-     *
-     * @param $eventName
      */
     public function recursiveDeactivation(ModuleToggleActivationEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -292,9 +286,6 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param $eventName
-     */
     public function update(ModuleEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getId())) {
@@ -313,8 +304,6 @@ class Module extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param $eventName
-     *
      * @throws \Exception
      * @throws \Symfony\Component\Filesystem\Exception\IOException
      * @throws \Exception
@@ -349,7 +338,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
             try {
                 $dispatcher->dispatch($deleteEvent, TheliaEvents::MODULE_DELETE);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 // if module has not been deleted
                 if ($fs->exists($modulePath)) {
                     throw $ex;
@@ -371,7 +360,7 @@ class Module extends BaseAction implements EventSubscriberInterface
         // Update the module
         $moduleDescriptorFile = sprintf('%s%s%s%s%s', $modulePath, DS, 'Config', DS, 'module.xml');
         $moduleManagement = new ModuleManagement($this->container);
-        $file = new SplFileInfo($moduleDescriptorFile);
+        $file = new \SplFileInfo($moduleDescriptorFile);
         $module = $moduleManagement->updateModule($file, $this->container);
 
         // activate if old was activated
@@ -418,8 +407,6 @@ class Module extends BaseAction implements EventSubscriberInterface
 
     /**
      * Changes position, selecting absolute ou relative change.
-     *
-     * @param $eventName
      */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {

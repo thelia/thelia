@@ -25,9 +25,7 @@ class Message extends BaseMessage
      *
      * @param ParserInterface $parser
      * @param string          $message
-     * @param $layout
-     * @param $template
-     * @param bool $compressOutput
+     * @param bool            $compressOutput
      *
      * @throws \SmartyException
      *

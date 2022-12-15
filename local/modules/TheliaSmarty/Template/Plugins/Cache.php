@@ -42,8 +42,6 @@ class Cache extends AbstractSmartyPlugin
 
     /**
      * Cache constructor.
-     *
-     * @param $kernelDebug
      */
     public function __construct(AdapterInterface $esiFragmentRenderer, RequestStack $requestStack, TaxEngine $taxEngine, $kernelDebug)
     {

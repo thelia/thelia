@@ -23,15 +23,15 @@ class AdminResources
 {
     /**
      * @deprecated 2.3
+     *
      * @removed 2.5
      */
     private static $selfReflection = null;
 
     /**
      * @deprecated 2.3
-     * @removed 2.5
      *
-     * @param $name
+     * @removed 2.5
      *
      * @return string the constant value
      */

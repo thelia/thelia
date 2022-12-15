@@ -27,7 +27,6 @@ use Thelia\Model\LangQuery;
 class ModelCriteriaTools
 {
     /**
-     * @param        $requestedLocale
      * @param array  $columns
      * @param null   $foreignTable
      * @param string $foreignKey

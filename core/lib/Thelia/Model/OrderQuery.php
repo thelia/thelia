@@ -27,9 +27,6 @@ use Thelia\Model\Map\OrderTableMap;
 class OrderQuery extends BaseOrderQuery
 {
     /**
-     * @param $month
-     * @param $year
-     *
      * @throws \Exception
      *
      * @return array
@@ -72,9 +69,6 @@ class OrderQuery extends BaseOrderQuery
     }
 
     /**
-     * @param $month
-     * @param $year
-     *
      * @throws \Propel\Runtime\Exception\PropelException
      *
      * @return array

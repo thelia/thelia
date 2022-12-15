@@ -114,8 +114,6 @@ class TypeCollection implements \Iterator
     }
 
     /**
-     * @param $value
-     *
      * @return bool
      */
     public function isValid($value)

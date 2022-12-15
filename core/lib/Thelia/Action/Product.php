@@ -379,9 +379,6 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param $eventName
-     */
     public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         return $this->genericUpdateSeo(ProductQuery::create(), $event, $dispatcher);
@@ -450,8 +447,6 @@ class Product extends BaseAction implements EventSubscriberInterface
 
     /**
      * Changes position, selecting absolute ou relative change.
-     *
-     * @param $eventName
      */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -650,8 +645,6 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Changes accessry position, selecting absolute ou relative change.
      *
-     * @param $eventName
-     *
      * @return object
      */
     public function updateAccessoryPosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
@@ -661,8 +654,6 @@ class Product extends BaseAction implements EventSubscriberInterface
 
     /**
      * Changes position, selecting absolute ou relative change.
-     *
-     * @param $eventName
      *
      * @return object
      */

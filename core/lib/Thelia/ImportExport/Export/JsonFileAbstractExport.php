@@ -13,7 +13,6 @@
 namespace Thelia\ImportExport\Export;
 
 use Propel\Runtime\Connection\StatementInterface;
-use SplFileObject;
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -24,7 +23,7 @@ use Thelia\Core\Translation\Translator;
 abstract class JsonFileAbstractExport extends AbstractExport
 {
     /**
-     * @var SplFileObject Data to export
+     * @var \SplFileObject Data to export
      */
     private $data;
 
@@ -61,7 +60,7 @@ abstract class JsonFileAbstractExport extends AbstractExport
                 && file_exists($data)
             ) {
                 $this->data = new \SplFileObject($data, 'r');
-                $this->data->setFlags(SPLFileObject::READ_AHEAD);
+                $this->data->setFlags(\SPLFileObject::READ_AHEAD);
 
                 $this->data->rewind();
 

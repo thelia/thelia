@@ -19,7 +19,6 @@ class UpdateFilePositionEvent extends UpdatePositionEvent
     protected $query;
 
     /**
-     * @param      $object_id
      * @param null $mode
      * @param null $position
      */

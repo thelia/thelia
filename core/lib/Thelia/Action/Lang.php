@@ -54,8 +54,6 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param $eventName
-     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function update(LangUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -77,8 +75,6 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param $eventName
-     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function toggleDefault(LangToggleDefaultEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -139,8 +135,6 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param $eventName
-     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function create(LangCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
@@ -163,8 +157,6 @@ class Lang extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param $eventName
-     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function delete(LangDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void

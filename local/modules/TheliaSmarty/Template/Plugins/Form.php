@@ -419,10 +419,7 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     * @param $content
      * @param \Smarty_Internal_Template $template
-     * @param $repeat
      *
      * @throws \Exception
      * @throws \SmartyException
@@ -438,8 +435,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     *
      * @throws \Exception
      * @throws \SmartyException
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
@@ -452,8 +447,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     *
      * @throws \Exception
      * @throws \SmartyException
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
@@ -583,8 +576,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     *
      * @throws \InvalidArgumentException
      *
      * @return FormView
@@ -633,8 +624,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     *
      * @throws \InvalidArgumentException
      *
      * @return FormConfigInterface
@@ -669,8 +658,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     *
      * @throws \InvalidArgumentException
      *
      * @return BaseForm
@@ -701,10 +688,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $needle
-     * @param $haystack
-     * @param $formName
-     *
      * @return \Symfony\Component\Form\Form
      */
     protected function retrieveField($needle, $haystack, $formName)
@@ -724,8 +707,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     * @param $name
      * @param bool $throwException
      *
      * @return mixed|null
@@ -755,10 +736,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     * @param $content
-     * @param $repeat
-     *
      * @return mixed
      *
      * Loops around a form collection entries and assigns values to template
@@ -852,8 +829,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $collection
-     *
      * @return SymfonyForm
      *
      * Extract the collection object from the form
@@ -916,10 +891,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     * @param $content
-     * @param $repeat
-     *
      * @return string
      *
      * Injects a collection field variables into the parser
@@ -1008,8 +979,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     *
      * @return mixed
      *
      * Counts collection entries

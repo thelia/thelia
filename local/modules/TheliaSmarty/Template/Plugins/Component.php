@@ -12,7 +12,6 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
-use Exception;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Template\ParserInterface;
 use TheliaSmarty\Events\ComponentRenderEvent;
@@ -69,7 +68,7 @@ class Component extends AbstractSmartyPlugin
 
         if (!file_exists($componentFile)) {
             if ($this->kernelDebug) {
-                throw new Exception('no component at'.$componentFile);
+                throw new \Exception('no component at'.$componentFile);
             }
 
             return '';

@@ -25,8 +25,6 @@ class Message extends BaseAction implements EventSubscriberInterface
 {
     /**
      * Create a new messageuration entry.
-     *
-     * @param $eventName
      */
     public function create(MessageCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -47,8 +45,6 @@ class Message extends BaseAction implements EventSubscriberInterface
 
     /**
      * Change a message.
-     *
-     * @param $eventName
      */
     public function modify(MessageUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -79,8 +75,6 @@ class Message extends BaseAction implements EventSubscriberInterface
 
     /**
      * Delete a messageuration entry.
-     *
-     * @param $eventName
      */
     public function delete(MessageDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {

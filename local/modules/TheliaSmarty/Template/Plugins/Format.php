@@ -13,7 +13,6 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use CommerceGuys\Addressing\Model\Address;
-use IntlDateFormatter;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\HttpFoundation\Session\Session;
@@ -128,7 +127,7 @@ class Format extends AbstractSmartyPlugin
     private function formatDateWithLocale(\DateTime $date, $locale, $format)
     {
         if (false === strpos($format, '%')) {
-            $formatter = new IntlDateFormatter($locale, IntlDateFormatter::FULL, IntlDateFormatter::FULL);
+            $formatter = new \IntlDateFormatter($locale, \IntlDateFormatter::FULL, \IntlDateFormatter::FULL);
 
             $icuFormat = $this->convertDatePhpToIcu($format);
             $formatter->setPattern($icuFormat);
@@ -163,7 +162,6 @@ class Format extends AbstractSmartyPlugin
      *
      *  ex : {format_number number="1246.12" decimals="1" dec_point="," thousands_sep=" "} will output "1 246,1"
      *
-     * @param $params
      * @param null $template
      *
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
@@ -200,7 +198,6 @@ class Format extends AbstractSmartyPlugin
      *  ex : {format_money number="1246.12" decimals="1" dec_point="," thousands_sep=" " symbol="€"} will output "1 246,1 €"
      *  ex : {format_money number="1246.00" decimals="2" dec_point="," thousands_sep=" " symbol="€" remove_zero_decimal=true} will output "1 246 €"
      *
-     * @param $params
      * @param null $template
      *
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
@@ -246,8 +243,6 @@ class Format extends AbstractSmartyPlugin
      * ex :
      *  {format_array_2d values=['Colors' => ['Green', 'Yellow', 'Red'], 'Material' => ['Wood']] separators=[' : ', ' / ', ' | ']}
      *  will output the format with specific format : "Colors : Green / Yellow / Red | Material : Wood"
-     *
-     * @param $params
      *
      * @return string
      */
@@ -375,7 +370,6 @@ class Format extends AbstractSmartyPlugin
      *
      *  ex : {format_money number="1246.12" decimals="1" dec_point="," thousands_sep=" " symbol="€"} will output "1 246,1 €"
      *
-     * @param $params
      * @param null $template
      *
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
