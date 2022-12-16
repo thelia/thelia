@@ -505,9 +505,13 @@ class SmartyParser extends \Smarty implements ParserInterface
 
         $this->assign($parameters);
 
+        if (ConfigQuery::read('smarty_mute_undefined_or_null', 0)) {
+            $this->muteUndefinedOrNullWarnings();
+        }
+
         $output = $this->fetch($resourceType.':'.$resourceContent);
 
-        if ($compressOutput == false) {
+        if (!$compressOutput) {
             $this->registerFilter('output', [$this, 'trimWhitespaces']);
         }
 
