@@ -1,4 +1,5 @@
 # 2.5.2
+- #3072 Allow to hide smarty "undefined" errors
 - #3071 Better module configuration route check
 - #3068 Update Symfony dependencies to 6.2
 - #3064 Fix wrong mail content type
