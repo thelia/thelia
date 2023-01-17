@@ -22,6 +22,8 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Thelia\Api\Bridge\Propel\State\PropelCollectionProvider;
 use Thelia\Api\Bridge\Propel\State\PropelItemProvider;
+use Thelia\Api\Bridge\Propel\State\PropelPersistProcessor;
+use Thelia\Api\Bridge\Propel\State\PropelRemoveProcessor;
 use Thelia\Api\Resource\PropelResourceInterface;
 
 final class PropelResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
@@ -89,9 +91,9 @@ final class PropelResourceCollectionMetadataFactory implements ResourceMetadataC
     private function getProcessor(Operation $operation): string
     {
         if ($operation instanceof DeleteOperationInterface) {
-            return RemoveProcessor::class;
+            return PropelRemoveProcessor::class;
         }
 
-        return PersistProcessor::class;
+        return PropelPersistProcessor::class;
     }
 }
