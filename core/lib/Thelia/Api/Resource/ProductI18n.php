@@ -21,8 +21,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class ProductI18n extends I18n
 {
-    public int $id;
-
     #[Groups(['product:read', 'product:write'])]
     private string $locale;
 
