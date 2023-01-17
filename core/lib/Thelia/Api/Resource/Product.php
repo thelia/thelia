@@ -13,9 +13,11 @@
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -28,12 +30,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Get(
             uriTemplate: '/admin/products/{id}'
+        ),
+        new Put(
+            uriTemplate: '/admin/products/{id}'
+        ),
+        new Delete(
+            uriTemplate: '/admin/products/{id}'
         )
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class Product implements PropelResourceInterface, TranslatableResourceInterface
+class Product extends AbstractPropelResource implements TranslatableResourceInterface
 {
     public const GROUP_READ = 'product:read';
     public const GROUP_READ_SINGLE = 'product:read:single';
