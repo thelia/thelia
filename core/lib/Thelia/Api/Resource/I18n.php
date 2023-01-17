@@ -14,13 +14,15 @@ namespace Thelia\Api\Resource;
 
 abstract class I18n
 {
-    private int $id;
+    public int $id;
 
     private string $locale;
 
     private ?string $title;
 
     private ?string $chapo;
+
+    private ?string $description;
 
     public function getId(): int
     {
@@ -67,6 +69,17 @@ abstract class I18n
     {
         $this->chapo = $chapo;
 
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
         return $this;
     }
 }
