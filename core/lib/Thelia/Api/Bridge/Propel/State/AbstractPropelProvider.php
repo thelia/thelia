@@ -16,6 +16,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
             $langs = LangQuery::create()->filterByActive(1)->find();
         }
 
+        /** @var PropelResourceInterface $apiResource */
         $apiResource = new $resourceClass();
         foreach (get_class_methods($apiResource) as $methodName) {
             if (!str_starts_with($methodName, 'set')) {
@@ -38,17 +39,44 @@ abstract class AbstractPropelProvider implements ProviderInterface
                 $i18nResource
                     ->setLocale($lang->getLocale());
 
-                // Todo : dynamic translatable fields
-                $this->setI18nFieldValue($i18nResource, $lang, 'title', $propelModel);
-                $this->setI18nFieldValue($i18nResource, $lang, 'chapo', $propelModel);
+                $i18nFields = array_map(
+                    function (\ReflectionProperty $reflectionProperty) {
+                        return $reflectionProperty->getName();
+                    },
+                    (new \ReflectionClass($i18nResource))->getProperties()
+                );
 
-                $apiResource->addI18n($i18nResource);
+                $langHasI18nValue = false;
+
+                foreach ($i18nFields as $i18nField) {
+                    $virtualColumn = 'lang_'.$lang->getLocale().'_'.$i18nField;
+
+                    if (
+                        !$propelModel->hasVirtualColumn($virtualColumn)
+                    ) {
+                       continue;
+                    }
+
+                    $fieldValue = $propelModel->getVirtualColumn($virtualColumn);
+                    $setter = 'set'.ucfirst($i18nField);
+                    $i18nResource->$setter($fieldValue);
+
+                    if (!empty($fieldValue)) {
+                        $langHasI18nValue = true;
+                    }
+                }
+
+                if ($langHasI18nValue) {
+                    $apiResource->addI18n($i18nResource);
+                }
             }
         }
 
+        $apiResource->setPropelModel($propelModel);
+
         return $apiResource;
     }
-    protected function setI18nFieldValue(I18n $i18nResource, $lang, $field, $propelModel): void
+    protected function setI18nFieldValue(I18n $i18nResource, $lang, $field, $propelModel): string
     {
         $virtualColumn = 'lang_'.$lang->getLocale().'_'.$field;
         $setter = 'set'.ucfirst($field);
@@ -64,5 +92,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
         }
 
         $i18nResource->$setter($value);
+
+        return $value;
     }
 }
