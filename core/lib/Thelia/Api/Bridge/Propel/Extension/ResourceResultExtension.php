@@ -2,8 +2,6 @@
 
 namespace Thelia\Api\Bridge\Propel\Extension;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use Doctrine\ORM\QueryBuilder;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Resource\I18n;
 use Thelia\Api\Resource\TranslatableResourceInterface;

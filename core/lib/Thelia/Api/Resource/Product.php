@@ -13,31 +13,49 @@
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
-    normalizationContext: ['groups' => ['product:read']],
-    denormalizationContext: ['groups' => ['product:write']]
+    operations: [
+        new Post(
+            uriTemplate: '/admin/products'
+        ),
+        new GetCollection(
+            uriTemplate: '/admin/products'
+        ),
+        new Get(
+            uriTemplate: '/admin/products/{id}'
+        )
+    ],
+    normalizationContext: ['groups' => [self::GROUP_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
 class Product implements PropelResourceInterface, TranslatableResourceInterface
 {
-    #[Groups(['product:read'])]
-    private ?int $id = null;
+    public const GROUP_READ = 'product:read';
+    public const GROUP_READ_SINGLE = 'product:read:single';
+    public const GROUP_WRITE = 'product:write';
 
-    #[Groups(['product:read', 'product:write'])]
-    private string $ref;
+    #[Groups([self::GROUP_READ])]
+    public ?int $id = null;
 
-    #[Groups(['product:read', 'product:write'])]
-    private bool $visible;
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public string $ref;
 
-    #[Groups(['product:write'])]
-    private bool $virtual;
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public bool $visible;
 
-    #[Groups(['product:read', 'product:write'])]
-    private array $productCategories;
+    #[Groups([self::GROUP_WRITE])]
+    public bool $virtual;
 
-    #[Groups(['product:read', 'product:write'])]
-    private array $i18ns;
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    public array $productCategories;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public array $i18ns;
 
     public function __construct()
     {
