@@ -2,25 +2,19 @@
 
 namespace Thelia\Api\Bridge\Propel\State;
 
-use ApiPlatform\Exception\InvalidResourceException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 
 class PropelPersistProcessor implements ProcessorInterface
 {
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        $propelModelClass = $data::getPropelModelClass();
-
-        /** @var ModelCriteria $queryClass */
-        $queryClass = $propelModelClass.'Query';
-        $id = $uriVariables['id'] ?? $data->getId();
-        $propelModel = $id ? $queryClass::create()->filterById($id)->findOne() : new $propelModelClass();
+        $propelModel = $data->getPropelModel();
 
         if (null === $propelModel) {
-            throw new InvalidResourceException('Invalid resource, can\'t find or create a propel model.');
+            $propelModelClass = $data::getPropelModelClass();
+            $propelModel = new $propelModelClass;
         }
 
         foreach (get_class_methods($propelModel) as $methodName) {
@@ -61,7 +55,13 @@ class PropelPersistProcessor implements ProcessorInterface
 
         if (is_subclass_of($data, TranslatableResourceInterface::class)) {
             foreach ($data->getI18ns() as $i18n) {
-                $i18nGetters = array_filter(get_class_methods($i18n), function ($method) {return str_starts_with($method, 'get');});
+                $i18nGetters = array_map(
+                    function (\ReflectionProperty $reflectionProperty) {
+                        return 'get'.ucfirst($reflectionProperty->getName());
+                    },
+                    (new \ReflectionClass($i18n))->getProperties()
+                );
+
                 usort($i18nGetters, function ($a, $b) {return $a !== 'getLocale'; });
                 foreach ($i18nGetters as $i18nGetter) {
                     if ($i18nGetter === 'getId') {
