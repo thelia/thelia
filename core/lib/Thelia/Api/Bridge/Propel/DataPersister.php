@@ -2,7 +2,7 @@
 
 namespace Thelia\Api\Bridge\Propel;
 
-use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use ApiPlatform\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Exception\InvalidResourceException;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Resource\PropelResourceInterface;

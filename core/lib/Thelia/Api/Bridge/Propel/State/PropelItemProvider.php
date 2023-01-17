@@ -17,15 +17,18 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Bridge\Propel\Extension\QueryResultCollectionExtensionInterface;
+use Thelia\Api\Resource\I18n;
 use Thelia\Api\Resource\PropelResourceInterface;
+use Thelia\Api\Resource\TranslatableResourceInterface;
+use Thelia\Model\LangQuery;
 
-class PropelItemProvider implements ProviderInterface
+class PropelItemProvider extends AbstractPropelProvider
 {
-    public function __construct(private iterable $collectionExtensions = [])
+    public function __construct(private iterable $propelItemExtensions = [])
     {
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $resourceClass = $operation->getClass();
 
@@ -38,36 +41,23 @@ class PropelItemProvider implements ProviderInterface
 
         /** @var ModelCriteria $query */
         $query = $queryClass::create();
+        $itemId =  $uriVariables['id'];
+        $query->filterByPrimaryKey($itemId);
 
-        foreach ($this->collectionExtensions as $extension) {
-            $extension->applyToCollection($query, $resourceClass, $operation->getName(), $context);
+        foreach ($this->propelItemExtensions as $extension) {
+            $extension->applyToItem($query, $resourceClass, $itemId, $operation->getName(), $context);
 
-            if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
-                return $extension->getResult($query, $resourceClass, $operation->getName(), $context);
-            }
+//            if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
+//                return $extension->getResult($query, $resourceClass, $operation->getName(), $context);
+//            }
         }
 
-//        $items = array_map(
-//            function ($propelModel) use ($resourceClass) {
-//                $apiResource = new $resourceClass;
-//                foreach (get_class_methods($apiResource) as $methodName) {
-//                    if (!str_starts_with($methodName, 'set')) {
-//                        continue;
-//                    }
-//                    $propelGetter = 'get'.ucfirst(substr($methodName, 3));
-//
-//                    if (!method_exists($propelModel, $propelGetter)) {
-//                        continue;
-//                    }
-//
-//                    $apiResource->$methodName($propelModel->$propelGetter());
-//                }
-//
-//                return $apiResource;
-//            },
-//            iterator_to_array($query->find())
-//        );
+        $propelModel = $query->findOne();
 
-        return $query->find()->toArray();
+        if (null === $propelModel) {
+            return null;
+        }
+
+        return $this->modelToResource($resourceClass, $propelModel);
     }
 }

@@ -32,7 +32,8 @@ return static function (ContainerConfigurator $configurator): void {
         ->bind('$sessionSavePath', '%session.save_path%')
         ->bind('$theliaParserLoops', '%Thelia.parser.loops%')
         ->bind('$formDefinition', '%Thelia.parser.forms%')
-        ->bind('$propelCollectionExtensions', tagged_iterator('thelia.api.propel.query_extension.collection'));
+        ->bind('$propelCollectionExtensions', tagged_iterator('thelia.api.propel.query_extension.collection'))
+        ->bind('$propelItemExtensions', tagged_iterator('thelia.api.propel.query_extension.item'));
 
     $serviceConfigurator->load('Thelia\\', THELIA_LIB)
         ->exclude(
