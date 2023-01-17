@@ -23,7 +23,7 @@ final class I18nExtension implements QueryCollectionExtensionInterface, QueryIte
         $this->apply($query, $resourceClass, $operationName, $context);
     }
 
-    public function applyToItem(ModelCriteria $query, string $resourceClass, array $identifiers, string $operationName = null, array $context = []): void
+    public function applyToItem(ModelCriteria $query, string $resourceClass, string $identifiers, string $operationName = null, array $context = []): void
     {
         $this->apply($query, $resourceClass, $operationName, $context);
     }

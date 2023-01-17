@@ -81,6 +81,18 @@
         "thelia/thelia-library-module": "^1.1.7",
         "thelia/product-loop-attribute-filter-module": "~2.0.0",
         "doctrine/annotations": "^2.0"
+        "api-platform/core": "~3.0.0",
+        "nelmio/cors-bundle": "^2.2",
+        "symfony/asset": "6.0.*|6.2.*",
+        "doctrine/doctrine-bundle": "^2.6",
+        "doctrine/doctrine-migrations-bundle": "^3.2",
+        "doctrine/orm": "^2.11",
+        "symfony/proxy-manager-bridge": "6.0.*|6.2.*",
+        "symfony/security-bundle": "6.0.*|6.2.*",
+        "phpdocumentor/reflection-docblock": "^5.3",
+        "phpstan/phpdoc-parser": "^1.4",
+        "symfony/property-info": "6.0.*|6.2.*",
+        "symfony/runtime": "6.0.*|6.2.*"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",
