@@ -69,9 +69,9 @@ class URL
      *
      * @return \Thelia\Tools\URL the instance
      */
-    public static function getInstance()
+    public static function getInstance(): self
     {
-        if (self::$instance == null) {
+        if (self::$instance === null) {
             throw new \RuntimeException('URL instance is not initialized.');
         }
 
