@@ -14,15 +14,26 @@ namespace Thelia\Api\Resource;
 
 abstract class I18n
 {
-    public int $id;
+    public const GROUP_READ = 'i18n:read';
+    public const GROUP_WRITE = 'i18n:write';
 
-    private string $locale;
+    public int $id;
 
     private ?string $title;
 
     private ?string $chapo;
 
     private ?string $description;
+
+    public function __construct($data = [])
+    {
+        foreach ($data as $field => $value) {
+            $setter = 'set'.ucfirst($field);
+            if (method_exists($this, $setter)) {
+                $this->$setter($value);
+            }
+        }
+    }
 
     public function getId(): int
     {
@@ -32,18 +43,6 @@ abstract class I18n
     public function setId(int $id): self
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    public function getLocale(): string
-    {
-        return $this->locale;
-    }
-
-    public function setLocale(string $locale): self
-    {
-        $this->locale = $locale;
 
         return $this;
     }
