@@ -13,11 +13,12 @@
 namespace Thelia\Core\Security\UserProvider;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Security\User\UserInterface;
 use Thelia\Model\CustomerQuery;
 
 class CustomerTokenUserProvider extends TokenUserProvider
 {
-    public function getUser($dataArray)
+    public function getUser(array $dataArray): UserInterface
     {
         return CustomerQuery::create()
             ->filterByEmail($dataArray['username'], Criteria::EQUAL)
