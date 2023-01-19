@@ -12,42 +12,40 @@
 
 namespace Thelia\Api\Resource;
 
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/products'
+            uriTemplate: '/admin/categories'
         ),
         new GetCollection(
-            uriTemplate: '/admin/products'
+            uriTemplate: '/admin/categories'
         ),
         new Get(
-            uriTemplate: '/admin/products/{id}'
+            uriTemplate: '/admin/categories/{id}'
         ),
         new Put(
-            uriTemplate: '/admin/products/{id}'
+            uriTemplate: '/admin/categories/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/products/{id}'
+            uriTemplate: '/admin/categories/{id}'
         )
     ],
     normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE, I18n::GROUP_WRITE]]
 )]
-class Product extends AbstractTranslatableResource
+class Category extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'product:read';
-    public const GROUP_READ_SINGLE = 'product:read:single';
-    public const GROUP_WRITE = 'product:write';
+    public const GROUP_READ = 'category:read';
+    public const GROUP_READ_SINGLE = 'category:read:single';
+    public const GROUP_WRITE = 'category:write';
 
     #[Groups([self::GROUP_READ])]
     public ?int $id = null;
@@ -61,15 +59,6 @@ class Product extends AbstractTranslatableResource
     #[Groups([self::GROUP_WRITE])]
     public bool $virtual;
 
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public array $productCategories;
-
-    public function __construct()
-    {
-        $this->productCategories = [];
-        parent::__construct();
-    }
-
     public function getId(): ?int
     {
         return $this->id;
@@ -78,18 +67,6 @@ class Product extends AbstractTranslatableResource
     public function setId(int $id): self
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    public function getRef(): string
-    {
-        return $this->ref;
-    }
-
-    public function setRef(string $ref): self
-    {
-        $this->ref = $ref;
 
         return $this;
     }
@@ -106,21 +83,9 @@ class Product extends AbstractTranslatableResource
         return $this;
     }
 
-    public function isVirtual(): bool
-    {
-        return $this->virtual;
-    }
-
-    public function setVirtual(bool $virtual): self
-    {
-        $this->virtual = $virtual;
-
-        return $this;
-    }
-
     public static function getPropelModelClass(): string
     {
-        return \Thelia\Model\Product::class;
+        return \Thelia\Model\Category::class;
     }
 
     public static function getTranslatableFields(): array
@@ -133,6 +98,6 @@ class Product extends AbstractTranslatableResource
 
     public static function getI18nResourceClass(): string
     {
-        return ProductI18n::class;
+        return CategoryI18n::class;
     }
 }

@@ -16,11 +16,11 @@ use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 
-class ProductI18n extends I18n
+class CategoryI18n extends I18n
 {
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['category:read', 'category:write'])]
     private ?string $title;
 
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['category:read', 'category:write'])]
     private ?string $chapo;
 }
