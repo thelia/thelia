@@ -6,7 +6,9 @@ interface TranslatableResourceInterface
 {
     public function setI18ns(array $i18ns): self;
 
-    public function getI18ns(): array;
+    public function addI18n(I18n $i18n, string $locale): self;
+
+    public function getI18ns(): I18nCollection;
 
     public static function getTranslatableFields(): array;
 
