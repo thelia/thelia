@@ -13,11 +13,12 @@
 namespace Thelia\Core\Security\UserProvider;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Security\User\UserInterface;
 use Thelia\Model\AdminQuery;
 
 class AdminTokenUserProvider extends TokenUserProvider
 {
-    public function getUser($dataArray)
+    public function getUser(array $dataArray): UserInterface
     {
         return AdminQuery::create()
             ->filterByLogin($dataArray['username'], Criteria::EQUAL)
