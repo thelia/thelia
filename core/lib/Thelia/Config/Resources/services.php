@@ -17,6 +17,7 @@ use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
 use Thelia\Api\Bridge\Propel\State\PropelCollectionProvider;
 use Thelia\Api\OpenApiDecorator\I18nDecorator;
+use Thelia\Api\OpenApiDecorator\JwtDecorator;
 use Thelia\Core\Service\ConfigCacheService;
 use Thelia\Core\Thelia;
 use Thelia\Log\Tlog;
@@ -101,7 +102,7 @@ return static function (ContainerConfigurator $configurator): void {
     $serviceConfigurator->get(ConfigCacheService::class)
         ->public();
 
-    $serviceConfigurator->set(I18nDecorator::class)
-        ->decorate('api_platform.hydra.json_schema.schema_factory')
+    $serviceConfigurator->set(JwtDecorator::class)
+        ->decorate('api_platform.openapi.factory')
         ->args([service('.inner')]);
 };
