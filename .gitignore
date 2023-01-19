@@ -113,6 +113,10 @@ tests/cypress/videos
 tests/cypress/screenshots
 tests/cypress/downloads
 
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
+
 ###> friendsofphp/php-cs-fixer ###
 /.php-cs-fixer.php
 /.php-cs-fixer.cache

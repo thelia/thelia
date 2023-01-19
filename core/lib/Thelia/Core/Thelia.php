@@ -27,6 +27,7 @@ use Propel\Runtime\DataFetcher\PDODataFetcher;
 use Propel\Runtime\Propel;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -56,6 +57,8 @@ use Thelia\Core\DependencyInjection\TheliaContainer;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Hook\BaseHookInterface;
 use Thelia\Core\Propel\Schema\SchemaLocator;
+use Thelia\Core\Security\UserProvider\AdminUserProvider;
+use Thelia\Core\Security\UserProvider\CustomerUserProvider;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Template\Element\LoopInterface;
 use Thelia\Core\Template\TemplateDefinition;
@@ -624,6 +627,64 @@ class Thelia extends Kernel
                 $this->loadTranslation($container, $translationDirs);
             }
         }
+
+        $this->loadDefaultSecurityConfig($container);
+    }
+
+    private function loadDefaultSecurityConfig(Container $container)
+    {
+        $extensionConfigsReflection = new \ReflectionProperty(ContainerBuilder::class, 'extensionConfigs');
+        $extensionConfigsReflection->setAccessible(true);
+        $extensionConfigs = $extensionConfigsReflection->getValue($container);
+
+        $extensionConfigs['security'][0]['providers'] = array_merge(
+            [
+                'admin_provider' => [
+                    'id' => AdminUserProvider::class
+                ],
+                'customer_provider' => [
+                    'id' => CustomerUserProvider::class
+                ],
+                'all_users' => [
+                    'chain' => [
+                        'providers' => ['customer_provider', 'admin_provider']
+                    ]
+                ]
+            ],
+            $extensionConfigs['security'][0]['providers'] ?? []
+        );
+
+        $extensionConfigs['security'][0]['firewalls'] = array_merge(
+            [
+                'login' => [
+                    'pattern' => '^/api/login',
+                    'stateless' => true,
+                    'provider' => 'all_users',
+                    'json_login' => [
+                        'check_path' => '/api/login_check',
+                        'success_handler' => 'lexik_jwt_authentication.handler.authentication_success',
+                        'failure_handler' => 'lexik_jwt_authentication.handler.authentication_failure'
+                    ]
+                ],
+                'api' => [
+                    'pattern' => '^/api',
+                    'stateless' => true,
+                    'jwt' => [],
+                    'provider' => 'all_users'
+                ],
+            ],
+            $extensionConfigs['security'][0]['firewalls'] ?? []
+        );
+
+        $extensionConfigs['security'][0]['access_control'] = array_merge(
+            [
+                ['path' => '^/api/login', 'roles' => 'PUBLIC_ACCESS'],
+                ['path' => '^/api', 'roles' => 'ROLE_ADMIN']
+            ],
+            $extensionConfigs['security'][0]['access_control'] ?? []
+        );
+
+        $extensionConfigsReflection->setValue($container, $extensionConfigs);
     }
 
     /**
