@@ -54,7 +54,7 @@ class PropelPersistProcessor implements ProcessorInterface
         }
 
         if (is_subclass_of($data, TranslatableResourceInterface::class)) {
-            foreach ($data->getI18ns() as $i18n) {
+            foreach ($data->getI18ns() as $locale => $i18n) {
                 $i18nGetters = array_map(
                     function (\ReflectionProperty $reflectionProperty) {
                         return 'get'.ucfirst($reflectionProperty->getName());
@@ -62,7 +62,7 @@ class PropelPersistProcessor implements ProcessorInterface
                     (new \ReflectionClass($i18n))->getProperties()
                 );
 
-                usort($i18nGetters, function ($a, $b) {return $a !== 'getLocale'; });
+                $propelModel->setLocale($locale);
                 foreach ($i18nGetters as $i18nGetter) {
                     if ($i18nGetter === 'getId') {
                         continue;

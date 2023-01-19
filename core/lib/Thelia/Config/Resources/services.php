@@ -12,7 +12,11 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\JsonSchema\SchemaFactory;
+use ApiPlatform\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\OpenApi\Factory\OpenApiFactory;
 use Thelia\Api\Bridge\Propel\State\PropelCollectionProvider;
+use Thelia\Api\OpenApiDecorator\I18nDecorator;
 use Thelia\Core\Service\ConfigCacheService;
 use Thelia\Core\Thelia;
 use Thelia\Log\Tlog;
@@ -97,7 +101,7 @@ return static function (ContainerConfigurator $configurator): void {
     $serviceConfigurator->get(ConfigCacheService::class)
         ->public();
 
-//    $services = $configurator->services();
-//    $services->set(PropelCollectionProvider::class)
-//        ->args([tagged_iterator('thelia.api.propel.query_extension.collection')]);
+    $serviceConfigurator->set(I18nDecorator::class)
+        ->decorate('api_platform.hydra.json_schema.schema_factory')
+        ->args([service('.inner')]);
 };
