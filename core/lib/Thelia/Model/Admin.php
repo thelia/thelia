@@ -13,11 +13,11 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Security\Role\Role;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Security\User\UserPermissionsTrait;
 use Thelia\Model\Base\Admin as BaseAdmin;
-
+use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
 /**
  * Skeleton subclass for representing a row from the 'admin' table.
  *
@@ -25,7 +25,7 @@ use Thelia\Model\Base\Admin as BaseAdmin;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  */
-class Admin extends BaseAdmin implements UserInterface
+class Admin extends BaseAdmin implements UserInterface, SecurityUserInterface, PasswordAuthenticatedUserInterface
 {
     use UserPermissionsTrait;
 
@@ -54,6 +54,14 @@ class Admin extends BaseAdmin implements UserInterface
         return $this;
     }
 
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function checkPassword($password)
     {
         return password_verify($password, $this->password);
@@ -70,9 +78,9 @@ class Admin extends BaseAdmin implements UserInterface
         $this->resetModified();
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
-        return [new Role('ADMIN')];
+        return ['ADMIN', 'ROLE_ADMIN'];
     }
 
     public function getToken()
@@ -93,5 +101,10 @@ class Admin extends BaseAdmin implements UserInterface
     public function setSerial($serial): void
     {
         $this->setRememberMeSerial($serial)->save();
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->getUsername();
     }
 }
