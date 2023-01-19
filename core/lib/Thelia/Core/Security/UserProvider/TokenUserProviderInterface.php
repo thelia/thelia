@@ -14,14 +14,7 @@ namespace Thelia\Core\Security\UserProvider;
 
 use Thelia\Core\Security\User\UserInterface;
 
-interface UserProviderInterface
+interface TokenUserProviderInterface
 {
-    /**
-     * Returns a UserInterface instance.
-     *
-     * @param string $key the unique user key (username, email address, etc.)
-     *
-     * @return UserInterface instance, or null if none was found
-     */
-    public function getUser($key);
+    public function getUser(array $key): UserInterface;
 }
