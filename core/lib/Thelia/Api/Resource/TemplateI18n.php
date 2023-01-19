@@ -13,14 +13,20 @@
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Post;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-
-class ProductI18n extends I18n
+class TemplateI18n extends I18n
 {
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['template:read', 'template:write'])]
+    private string $locale;
+
+    #[Groups(['template:read', 'template:write'])]
     private ?string $title;
 
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['template:read', 'template:write'])]
     private ?string $chapo;
 }

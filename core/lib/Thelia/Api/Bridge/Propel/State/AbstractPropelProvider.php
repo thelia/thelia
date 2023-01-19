@@ -33,11 +33,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
 
         if (is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
             foreach ($langs as $lang) {
-                /** @var I18n $i18nResource */
                 $i18nResource = new ($resourceClass::getI18nResourceClass());
-
-                $i18nResource
-                    ->setLocale($lang->getLocale());
 
                 $i18nFields = array_map(
                     function (\ReflectionProperty $reflectionProperty) {
@@ -67,7 +63,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
                 }
 
                 if ($langHasI18nValue) {
-                    $apiResource->addI18n($i18nResource);
+                    $apiResource->addI18n($i18nResource, $lang->getLocale());
                 }
             }
         }
