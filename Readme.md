@@ -10,6 +10,7 @@ Thelia
 ------
 [![Actions Status: test](https://github.com/thelia/thelia/workflows/test/badge.svg?branch=main)](https://github.com/thelia/thelia/actions?query=workflow%3A"test")
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/thelia/thelia/badges/quality-score.png?s=61e3e04a69bffd71c29b08e5392080317a546716)](https://scrutinizer-ci.com/g/thelia/thelia/)
+![Discord Shield](https://discordapp.com/api/guilds/1067836968689487872/widget.png?style=shield)
 
 [Thelia](https://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under GNU General Public License v3.0.
 
@@ -192,3 +193,13 @@ See the documentation : https://doc.thelia.net/docs/contribute
 
 
 If you submit modifications that adds new data or change the structure of the database, take a look to https://doc.thelia.net/docs/contribute#sql-scripts-modification
+
+
+## Community
+
+Join the conversation and help the community :
+
+[Twitter](https://github.com/thelia/thelia)    
+[Discord](https://discord.gg/YgwpYEE3y3)    
+[StackOverflow](https://stackoverflow.com/questions/tagged/thelia)    
+[Forum](https://forum.thelia.net/)    
