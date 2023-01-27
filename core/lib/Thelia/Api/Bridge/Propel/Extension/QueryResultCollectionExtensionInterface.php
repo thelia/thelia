@@ -2,14 +2,12 @@
 
 namespace Thelia\Api\Bridge\Propel\Extension;
 
+use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 
 interface QueryResultCollectionExtensionInterface extends QueryCollectionExtensionInterface
 {
-    public function supportsResult(string $resourceClass, string $operationName = null): bool;
+    public function supportsResult(string $resourceClass, Operation $operation = null): bool;
 
-    /**
-     * @return iterable
-     */
-    public function getResult(ModelCriteria $query, string $resourceClass, string $operationName = null, array $context = []);
+    public function getResult(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []);
 }

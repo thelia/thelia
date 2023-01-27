@@ -2,50 +2,95 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Attribute\CompositeIdentifiers;
+use Thelia\Api\Attribute\Relation;
 
-class ProductCategory
+#[ApiResource(
+    operations: [
+        new Get(
+            uriTemplate: '/admin/product_categories/{product}/categories/{category}'
+        ),
+    ],
+    normalizationContext: ['groups' => [self::GROUP_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_WRITE]],
+)]
+#[CompositeIdentifiers(['category', 'product'])]
+class ProductCategory extends AbstractPropelResource
 {
-    #[Groups(['product:read'])]
-    private bool $isDefault;
+    public const GROUP_READ = 'product_categories:read';
+    public const GROUP_READ_SINGLE = 'product_categories:read:single';
+    public const GROUP_WRITE = 'product_categories:write';
 
-    #[Groups(['product:read'])]
+    #[Relation(targetResource: Category::class)]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ])]
+    private Category $category;
+
+    #[Relation(targetResource: Product::class)]
+    #[Groups([self::GROUP_READ])]
+    private Product $product;
+
+    #[Groups([self::GROUP_READ, Product::GROUP_READ])]
+    private bool $defaultCategory;
+
+    #[Groups([self::GROUP_READ, Product::GROUP_READ])]
     private int $position;
 
-    /**
-     * @return mixed
-     */
-    public function getIsDefault()
+    public function getCategory(): Category
     {
-        return $this->isDefault;
+        return $this->category;
     }
 
-    /**
-     * @param mixed $isDefault
-     * @return ProductCategory
-     */
-    public function setIsDefault($isDefault)
+    public function setCategory(Category $category): ProductCategory
     {
-        $this->isDefault = $isDefault;
+        $this->category = $category;
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
+    public function getProduct(): Product
+    {
+        return $this->product;
+    }
+
+    public function setProduct(Product $product): ProductCategory
+    {
+        $this->product = $product;
+        return $this;
+    }
+
+
+    public function getDefaultCategory()
+    {
+        return $this->defaultCategory;
+    }
+
+
+    public function setDefaultCategory($defaultCategory)
+    {
+        $this->defaultCategory = $defaultCategory;
+        return $this;
+    }
+
+
     public function getPosition()
     {
         return $this->position;
     }
 
-    /**
-     * @param mixed $position
-     * @return ProductCategory
-     */
+
     public function setPosition($position)
     {
         $this->position = $position;
         return $this;
     }
 
+
+
+    public static function getPropelModelClass(): string
+    {
+       return \Thelia\Model\ProductCategory::class;
+    }
 }

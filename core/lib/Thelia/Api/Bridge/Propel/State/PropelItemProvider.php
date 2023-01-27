@@ -21,6 +21,7 @@ use Thelia\Api\Resource\I18n;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Model\LangQuery;
+use Thelia\Model\ProductQuery;
 
 class PropelItemProvider extends AbstractPropelProvider
 {
@@ -41,11 +42,11 @@ class PropelItemProvider extends AbstractPropelProvider
 
         /** @var ModelCriteria $query */
         $query = $queryClass::create();
-        $itemId =  $uriVariables['id'];
-        $query->filterByPrimaryKey($itemId);
+        $identifiers = array_values($uriVariables);
+        $query->filterByPrimaryKey(count($identifiers) === 1 ? $identifiers[0]: $identifiers);
 
         foreach ($this->propelItemExtensions as $extension) {
-            $extension->applyToItem($query, $resourceClass, $itemId, $operation->getName(), $context);
+            $extension->applyToItem($query, $resourceClass, $operation, $context);
 
 //            if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
 //                return $extension->getResult($query, $resourceClass, $operation->getName(), $context);
@@ -58,6 +59,6 @@ class PropelItemProvider extends AbstractPropelProvider
             return null;
         }
 
-        return $this->modelToResource($resourceClass, $propelModel);
+        return $this->modelToResource($resourceClass, $propelModel, $context);
     }
 }

@@ -15,7 +15,10 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
+use Symfony\Component\Routing\RouterInterface;
 use Thelia\Api\Bridge\Propel\State\PropelCollectionProvider;
+use Thelia\Api\Bridge\Routing\IriConverter;
+use Thelia\Api\Metadata\RelationPropertyMetadataFactory;
 use Thelia\Api\OpenApiDecorator\I18nDecorator;
 use Thelia\Api\OpenApiDecorator\JwtDecorator;
 use Thelia\Core\Service\ConfigCacheService;
@@ -105,4 +108,13 @@ return static function (ContainerConfigurator $configurator): void {
     $serviceConfigurator->set(JwtDecorator::class)
         ->decorate('api_platform.openapi.factory')
         ->args([service('.inner')]);
+
+    $serviceConfigurator->set(IriConverter::class)
+        ->decorate('api_platform.symfony.iri_converter')
+        ->args(
+            [
+                service('.inner'),
+            ])
+        ->autowire();
+
 };
