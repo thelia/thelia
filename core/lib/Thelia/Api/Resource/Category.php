@@ -18,9 +18,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Thelia\Api\Attribute\Relation;
 
 #[ApiResource(
     operations: [
@@ -85,14 +83,6 @@ class Category extends AbstractTranslatableResource
     public static function getPropelModelClass(): string
     {
         return \Thelia\Model\Category::class;
-    }
-
-    public static function getTranslatableFields(): array
-    {
-        return [
-            'title',
-            'chapo',
-        ];
     }
 
     public static function getI18nResourceClass(): string

@@ -21,7 +21,7 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Thelia\Api\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 #[ApiResource(
     operations: [
@@ -135,14 +135,6 @@ class Product extends AbstractTranslatableResource
     public static function getPropelModelClass(): string
     {
         return \Thelia\Model\Product::class;
-    }
-
-    public static function getTranslatableFields(): array
-    {
-        return [
-            'title',
-            'chapo',
-        ];
     }
 
     public static function getI18nResourceClass(): string
