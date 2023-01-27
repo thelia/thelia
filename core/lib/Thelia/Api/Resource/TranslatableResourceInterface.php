@@ -10,7 +10,5 @@ interface TranslatableResourceInterface
 
     public function getI18ns(): I18nCollection;
 
-    public static function getTranslatableFields(): array;
-
     public static function getI18nResourceClass(): string;
 }
