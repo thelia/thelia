@@ -6,12 +6,11 @@ use ApiPlatform\State\ProviderInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Thelia\Api\Attribute\CompositeIdentifiers;
-use Thelia\Api\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
+use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Model\LangQuery;
-use Thelia\Model\ProductQuery;
 
 abstract class AbstractPropelProvider implements ProviderInterface
 {
@@ -162,7 +161,6 @@ abstract class AbstractPropelProvider implements ProviderInterface
 
         $apiResource->setPropelModel($propelModel);
 
-//        dump($apiResource);
         return $apiResource;
     }
 }
