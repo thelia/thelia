@@ -2,6 +2,7 @@
 
 namespace Thelia\Api\Bridge\Propel\Extension;
 
+use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Resource\I18n;
 use Thelia\Api\Resource\TranslatableResourceInterface;
@@ -12,12 +13,12 @@ use Thelia\Model\LangQuery;
  */
 final class ResourceResultExtension
 {
-    public function supportsResult(string $resourceClass, string $operationName = null): bool
+    public function supportsResult(string $resourceClass, Operation $operation = null): bool
     {
         return true;
     }
 
-    public function getResult(ModelCriteria $query, string $resourceClass, string $operationName = null, array $context = [])
+    public function getResult(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = [])
     {
         $langs = LangQuery::create()->filterByActive(1)->find();
 
@@ -76,7 +77,7 @@ final class ResourceResultExtension
         $i18nResource->$setter($value);
     }
 
-    public function applyToCollection(ModelCriteria $query, string $resourceClass, string $operationName = null, array $context = [])
+    public function applyToCollection(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = [])
     {
         // TODO: Implement applyToCollection() method.
     }
