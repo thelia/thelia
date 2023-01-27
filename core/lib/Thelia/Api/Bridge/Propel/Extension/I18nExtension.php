@@ -12,23 +12,24 @@
 
 namespace Thelia\Api\Bridge\Propel\Extension;
 
+use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Model\LangQuery;
 
 final class I18nExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
-    public function applyToCollection(ModelCriteria $query, string $resourceClass, string $operationName = null, array $context = []): void
+    public function applyToCollection(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
     {
-        $this->apply($query, $resourceClass, $operationName, $context);
+        $this->apply($query, $resourceClass, $operation, $context);
     }
 
-    public function applyToItem(ModelCriteria $query, string $resourceClass, string $identifiers, string $operationName = null, array $context = []): void
+    public function applyToItem(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
     {
-        $this->apply($query, $resourceClass, $operationName, $context);
+        $this->apply($query, $resourceClass, $operation, $context);
     }
 
-    public function apply(ModelCriteria $query, string $resourceClass, string $operationName = null, array $context = []): void
+    public function apply(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         if (!is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
             return;

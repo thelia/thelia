@@ -679,7 +679,8 @@ class Thelia extends Kernel
         $extensionConfigs['security'][0]['access_control'] = array_merge(
             [
                 ['path' => '^/api/login', 'roles' => 'PUBLIC_ACCESS'],
-                ['path' => '^/api', 'roles' => 'ROLE_ADMIN']
+                ['path' => '^/api/docs', 'roles' => 'PUBLIC_ACCESS'],
+//                ['path' => '^/api/admin', 'roles' => 'ROLE_ADMIN']
             ],
             $extensionConfigs['security'][0]['access_control'] ?? []
         );

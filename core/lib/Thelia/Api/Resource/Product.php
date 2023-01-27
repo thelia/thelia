@@ -12,15 +12,16 @@
 
 namespace Thelia\Api\Resource;
 
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use Symfony\Component\PropertyInfo\Type;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Attribute\Relation;
 
 #[ApiResource(
     operations: [
@@ -31,7 +32,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
             uriTemplate: '/admin/products'
         ),
         new Get(
-            uriTemplate: '/admin/products/{id}'
+            uriTemplate: '/admin/products/{id}',
+            normalizationContext:  ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE, I18n::GROUP_READ]]
         ),
         new Put(
             uriTemplate: '/admin/products/{id}'
@@ -49,7 +51,7 @@ class Product extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'product:read:single';
     public const GROUP_WRITE = 'product:write';
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, ProductCategory::GROUP_READ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -61,12 +63,13 @@ class Product extends AbstractTranslatableResource
     #[Groups([self::GROUP_WRITE])]
     public bool $virtual;
 
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public array $productCategories;
+    #[Relation(targetResource: ProductCategory::class)]
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public Collection $productCategories;
 
     public function __construct()
     {
-        $this->productCategories = [];
+        $this->productCategories = new ArrayCollection();
         parent::__construct();
     }
 
@@ -115,6 +118,17 @@ class Product extends AbstractTranslatableResource
     {
         $this->virtual = $virtual;
 
+        return $this;
+    }
+
+    public function getProductCategories(): Collection
+    {
+        return $this->productCategories;
+    }
+
+    public function setProductCategories(Collection $productCategories): Product
+    {
+        $this->productCategories = $productCategories;
         return $this;
     }
 
