@@ -12,15 +12,10 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use ApiPlatform\JsonSchema\SchemaFactory;
-use ApiPlatform\JsonSchema\SchemaFactoryInterface;
-use ApiPlatform\OpenApi\Factory\OpenApiFactory;
-use Symfony\Component\Routing\RouterInterface;
-use Thelia\Api\Bridge\Propel\State\PropelCollectionProvider;
-use Thelia\Api\Bridge\Routing\IriConverter;
+use Thelia\Api\Bridge\Propel\OpenApiDecorator\JwtDecorator;
+use Thelia\Api\Bridge\Propel\Routing\IriConverter;
 use Thelia\Api\Metadata\RelationPropertyMetadataFactory;
 use Thelia\Api\OpenApiDecorator\I18nDecorator;
-use Thelia\Api\OpenApiDecorator\JwtDecorator;
 use Thelia\Core\Service\ConfigCacheService;
 use Thelia\Core\Thelia;
 use Thelia\Log\Tlog;

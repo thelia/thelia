@@ -1,6 +1,6 @@
 <?php
 
-namespace Thelia\Api\OpenApiDecorator;
+namespace Thelia\Api\Bridge\Propel\OpenApiDecorator;
 
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Model\Operation;
