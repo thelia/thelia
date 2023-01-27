@@ -4,10 +4,9 @@ namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Link;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Thelia\Api\Attribute\CompositeIdentifiers;
-use Thelia\Api\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
+use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 #[ApiResource(
     operations: [
