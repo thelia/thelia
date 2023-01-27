@@ -7,7 +7,7 @@ use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Thelia\Api\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Model\LangQuery;
 
@@ -69,14 +69,23 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         $langs = LangQuery::create()->filterByActive(1)->find();
 
         if (is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
+            $i18nResource = new ($resourceClass::getI18nResourceClass());
+
+            $i18nFields = array_map(
+                function (\ReflectionProperty $reflectionProperty) {
+                    return $reflectionProperty->getName();
+                },
+                (new \ReflectionClass($i18nResource))->getProperties()
+            );
+
             $joinMethodName = 'join'.$reflector->getShortName().'I18n';
             foreach ($langs as $lang) {
                 $joinAlias = strtolower($reflector->getShortName()).'_'.'lang_'.$lang->getLocale().'_';
                 $query->$joinMethodName($joinAlias);
                 $query->addJoinCondition($joinAlias, $joinAlias.'.locale = ?', $lang->getLocale(), null, \PDO::PARAM_STR);
 
-                foreach ($resourceClass::getTranslatableFields() as $translatableField) {
-                    $query->withColumn($joinAlias.'.'.$translatableField);
+                foreach ($i18nFields as $i18nField) {
+                    $query->withColumn($joinAlias.'.'.$i18nField);
                 }
             }
         }
