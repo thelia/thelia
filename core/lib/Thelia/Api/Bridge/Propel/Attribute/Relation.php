@@ -1,6 +1,6 @@
 <?php
 
-namespace Thelia\Api\Attribute;
+namespace Thelia\Api\Bridge\Propel\Attribute;
 
 use Attribute;
 
