@@ -3,32 +3,124 @@
 namespace Thelia\Api\Bridge\Propel\State;
 
 use ApiPlatform\State\ProviderInterface;
-use Thelia\Api\Resource\I18n;
+use Doctrine\Common\Collections\ArrayCollection;
+use Propel\Runtime\Collection\ObjectCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Attribute\CompositeIdentifiers;
+use Thelia\Api\Attribute\Relation;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Model\LangQuery;
+use Thelia\Model\ProductQuery;
 
 abstract class AbstractPropelProvider implements ProviderInterface
 {
-    protected function modelToResource($resourceClass, $propelModel, $langs = null): PropelResourceInterface
+    protected function modelToResource(
+        $resourceClass,
+        $propelModel,
+        $context,
+        $langs = null,
+        $parentClass = null,
+        $parentModel = null,
+        $withRelation = true,
+        $baseModel = null
+    ): PropelResourceInterface
     {
         if ($langs === null) {
             $langs = LangQuery::create()->filterByActive(1)->find();
         }
 
+        if (null === $baseModel) {
+            $baseModel = $propelModel;
+        }
+
         /** @var PropelResourceInterface $apiResource */
         $apiResource = new $resourceClass();
-        foreach (get_class_methods($apiResource) as $methodName) {
-            if (!str_starts_with($methodName, 'set')) {
+
+        $reflector = new \ReflectionClass($resourceClass);
+
+        $compositeIdentifiersAttribute = $reflector->getAttributes(CompositeIdentifiers::class);
+        $compositeIdentifiers = !empty($compositeIdentifiersAttribute)? $compositeIdentifiersAttribute[0]->getArguments()[0] : [];
+
+        foreach ($reflector->getProperties() as $property) {
+            $groups = array_reduce(
+                $property->getAttributes(Groups::class),
+                function ($carry, $item) {
+                    $value = $item->getArguments()[0];
+                    return array_merge($carry, is_string($value) ? [$value] : $value);
+                },
+                []
+            );
+
+            $matchingGroups = array_intersect($groups, $context['groups']);
+
+            if (empty($matchingGroups) && !in_array($property->getName(), $compositeIdentifiers)) {
                 continue;
             }
-            $propelGetter = 'get'.ucfirst(substr($methodName, 3));
+
+            $propelGetter = 'get'.ucfirst($property->getName());
 
             if (!method_exists($propelModel, $propelGetter)) {
                 continue;
             }
 
-            $apiResource->$methodName($propelModel->$propelGetter());
+            $resourceSetter = 'set'.ucfirst($property->getName());
+
+            if (!method_exists($apiResource, $resourceSetter)) {
+                continue;
+            }
+
+            $value = $propelModel->$propelGetter();
+
+
+            foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
+                if (!$withRelation) {
+                    continue 2;
+                }
+
+                $targetClass = $relationAttribute->getArguments()['targetResource'];
+                if ($targetClass === $parentClass) {
+                    $apiResource->$resourceSetter(
+                        $this->modelToResource(
+                            resourceClass: $parentClass,
+                            propelModel: $parentModel,
+                            context: $context,
+                            withRelation: false
+                        )
+                    );
+                    continue 2;
+                }
+                if ($value instanceof ObjectCollection) {
+
+                    $collection = new ArrayCollection();
+
+                    foreach ($value as $childPropelModel) {
+                        $collection->add(
+                            $this->modelToResource(
+                                resourceClass: $targetClass,
+                                propelModel: $childPropelModel,
+                                context: $context,
+                                parentClass: $resourceClass,
+                                parentModel: $propelModel,
+                                baseModel: $baseModel
+                            )
+                        );
+                    }
+
+                    $value = $collection;
+                } else {
+                    $value = $this->modelToResource(
+                        resourceClass: $targetClass,
+                        propelModel: $value,
+                        context: $context,
+                        parentClass: $resourceClass,
+                        parentModel: $propelModel,
+                        baseModel: $baseModel
+                    );
+                }
+            }
+
+            $apiResource->$resourceSetter($value);
         }
 
         if (is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
@@ -45,15 +137,15 @@ abstract class AbstractPropelProvider implements ProviderInterface
                 $langHasI18nValue = false;
 
                 foreach ($i18nFields as $i18nField) {
-                    $virtualColumn = 'lang_'.$lang->getLocale().'_'.$i18nField;
+                    $virtualColumn = strtolower($reflector->getShortName()).'_'.'lang_'.$lang->getLocale().'_'.$i18nField;
 
                     if (
-                        !$propelModel->hasVirtualColumn($virtualColumn)
+                        !$baseModel->hasVirtualColumn($virtualColumn)
                     ) {
                        continue;
                     }
 
-                    $fieldValue = $propelModel->getVirtualColumn($virtualColumn);
+                    $fieldValue = $baseModel->getVirtualColumn($virtualColumn);
                     $setter = 'set'.ucfirst($i18nField);
                     $i18nResource->$setter($fieldValue);
 
@@ -70,25 +162,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
 
         $apiResource->setPropelModel($propelModel);
 
+//        dump($apiResource);
         return $apiResource;
-    }
-    protected function setI18nFieldValue(I18n $i18nResource, $lang, $field, $propelModel): string
-    {
-        $virtualColumn = 'lang_'.$lang->getLocale().'_'.$field;
-        $setter = 'set'.ucfirst($field);
-
-        $value = '';
-
-        if (
-            $propelModel->hasVirtualColumn($virtualColumn)
-            &&
-            !empty($propelModel->getVirtualColumn($virtualColumn))
-        ) {
-            $value = $propelModel->getVirtualColumn($virtualColumn);
-        }
-
-        $i18nResource->$setter($value);
-
-        return $value;
     }
 }
