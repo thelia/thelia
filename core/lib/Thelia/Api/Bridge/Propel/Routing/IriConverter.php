@@ -1,15 +1,14 @@
 <?php
 
-namespace Thelia\Api\Bridge\Routing;
+namespace Thelia\Api\Bridge\Propel\Routing;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Thelia\Api\Attribute\CompositeIdentifiers;
+use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
 
 class IriConverter implements IriConverterInterface
 {

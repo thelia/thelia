@@ -17,7 +17,7 @@ abstract class I18n
     public const GROUP_READ = 'i18n:read';
     public const GROUP_WRITE = 'i18n:write';
 
-    public int $id;
+    public ?int $id;
 
     private ?string $title;
 
@@ -35,12 +35,12 @@ abstract class I18n
         }
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(int $id): self
+    public function setId(?int $id): self
     {
         $this->id = $id;
 
