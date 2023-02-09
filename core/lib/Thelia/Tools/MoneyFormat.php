@@ -107,7 +107,7 @@ class MoneyFormat extends NumberFormat
 
         if ($removeZeroDecimal) {
             if (null === $decimals) {
-                $decimals =$this->request->getSession()->getLang()->getDecimals();
+                $decimals = $this->request->getSession()->getLang()->getDecimals();
             }
 
             $number = round($number, $decimals);
