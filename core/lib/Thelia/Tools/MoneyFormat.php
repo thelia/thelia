@@ -106,6 +106,12 @@ class MoneyFormat extends NumberFormat
         $number = preg_replace('/\s+/', '', $number);
 
         if ($removeZeroDecimal) {
+            if (null === $decimals) {
+                $decimals =$this->request->getSession()->getLang()->getDecimals();
+            }
+
+            $number = round($number, $decimals);
+
             $asFloat = (float) $number;
             $asInt = (int) $asFloat;
 
