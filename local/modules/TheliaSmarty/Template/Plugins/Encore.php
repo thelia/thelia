@@ -145,6 +145,17 @@ class Encore extends AbstractSmartyPlugin
         return $res;
     }
 
+    public function renderPreloadWebpackScriptTags($args): string
+    {
+        $res = '';
+        foreach ($this->getWebpackJsFiles($args) as $asset) {
+            $res .= sprintf('<link rel="preload" as="script" href="%s">', $asset);
+        }
+        $this->entrypointLookupCollection->getEntrypointLookup($this->templateEnv)->reset();
+
+        return $res;
+    }
+
     public function renderWebpackLinkTags($args): string
     {
         $entryName = $args['entry'];
@@ -180,6 +191,7 @@ class Encore extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'encore_entry_css_files', $this, 'getWebpackCssFiles'),
             new SmartyPluginDescriptor('function', 'encore_entry_script_tags', $this, 'renderWebpackScriptTags'),
             new SmartyPluginDescriptor('function', 'encore_entry_prefetch_script_tags', $this, 'renderPrefetchWebpackScriptTags'),
+            new SmartyPluginDescriptor('function', 'encore_entry_preload_script_tags', $this, 'renderPreloadWebpackScriptTags'),
             new SmartyPluginDescriptor('function', 'encore_entry_link_tags', $this, 'renderWebpackLinkTags'),
             new SmartyPluginDescriptor('function', 'encore_entry_exists', $this, 'entryExists'),
         ];
