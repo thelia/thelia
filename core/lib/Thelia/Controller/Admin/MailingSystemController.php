@@ -139,8 +139,8 @@ class MailingSystemController extends BaseAdminController
 
             try {
                 $mailer->sendSimpleEmailMessage(
-                    [$emailTest => $storeName],
                     [$contactEmail => $storeName],
+                    [$emailTest => $storeName],
                     $message,
                     $message,
                     $htmlMessage
