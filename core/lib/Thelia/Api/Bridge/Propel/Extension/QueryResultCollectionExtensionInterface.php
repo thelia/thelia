@@ -7,7 +7,7 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 
 interface QueryResultCollectionExtensionInterface extends QueryCollectionExtensionInterface
 {
-    public function supportsResult(string $resourceClass, Operation $operation = null): bool;
+    public function supportsResult(string $resourceClass, Operation $operation = null,  array $context = []): bool;
 
     public function getResult(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []);
 }
