@@ -49,14 +49,22 @@ class JwtDecorator implements OpenApiFactoryInterface
             'bearerFormat' => 'JWT',
         ]);
 
-        $pathItem = new PathItem(
-            ref: 'JWT Token',
+        $openApi->getPaths()->addPath('/api/login', $this->getLoginPathItem('api'));
+        $openApi->getPaths()->addPath('/api/admin/login', $this->getLoginPathItem('admin'));
+
+        return $openApi;
+    }
+
+    private function getLoginPathItem(string $type)
+    {
+        return new PathItem(
+            ref: 'JWT '.$type.' Token',
             post: new Operation(
                 operationId: 'postCredentialsItem',
                 tags: ['Token'],
                 responses: [
                     '200' => [
-                        'description' => 'Get JWT token',
+                        'description' => 'Get JWT token for '.$type.' routes',
                         'content' => [
                             'application/json' => [
                                 'schema' => [
@@ -66,7 +74,7 @@ class JwtDecorator implements OpenApiFactoryInterface
                         ],
                     ],
                 ],
-                summary: 'Get JWT token to login.',
+                summary: 'Get JWT token to login to '.$type,
                 requestBody: new RequestBody(
                     description: 'Generate new JWT Token',
                     content: new \ArrayObject([
@@ -80,8 +88,5 @@ class JwtDecorator implements OpenApiFactoryInterface
                 security: [],
             ),
         );
-        $openApi->getPaths()->addPath('/api/login_check', $pathItem);
-
-        return $openApi;
     }
 }

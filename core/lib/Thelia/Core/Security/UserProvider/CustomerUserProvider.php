@@ -12,16 +12,18 @@
 
 namespace Thelia\Core\Security\UserProvider;
 
+use Lexik\Bundle\JWTAuthenticationBundle\Security\User\PayloadAwareUserProviderInterface;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 
-class CustomerUserProvider implements UserProviderInterface
+class CustomerUserProvider implements PayloadAwareUserProviderInterface
 {
+    private $cache = [];
+
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
         $customer = CustomerQuery::create()
@@ -58,5 +60,23 @@ class CustomerUserProvider implements UserProviderInterface
     public function supportsClass(string $class)
     {
         return Customer::class === $class || is_subclass_of($class, Customer::class);
+    }
+
+    public function loadUserByUsernameAndPayload(string $username, array $payload): UserInterface
+    {
+        return $this->loadUserByIdentifierAndPayload($username, $payload);
+    }
+
+    public function loadUserByIdentifierAndPayload(string $userIdentifier, array $payload): UserInterface
+    {
+        if (!isset($payload['type']) || $payload['type'] !== Customer::class) {
+            throw new UnsupportedUserException(sprintf('User "%s" is not supported on this route.', $userIdentifier));
+        }
+
+        if (isset($this->cache[$userIdentifier])) {
+            return $this->cache[$userIdentifier];
+        }
+
+        return $this->cache[$userIdentifier] = $this->loadUserByIdentifier($userIdentifier);
     }
 }
