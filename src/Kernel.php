@@ -43,6 +43,8 @@ class Kernel extends Thelia
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
+        parent::configureRoutes($routes);
+
         $routes->import('../config/{routes}/'.$this->environment.'/*.yaml');
         $routes->import('../config/{routes}/*.yaml');
 

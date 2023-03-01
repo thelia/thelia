@@ -15,37 +15,53 @@ namespace Thelia\Api\Bridge\Propel\Filter;
 
 use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Doctrine\Common\Filter\SearchFilterInterface;
-use ApiPlatform\Doctrine\Common\Filter\SearchFilterTrait;
-use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
-use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
-use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\Persistence\ManagerRegistry;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use function ApiPlatform\Doctrine\Orm\Filter\str_starts_with;
 
 /**
  * Filter the collection by given properties.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class SearchFilter extends AbstractFilter implements SearchFilterInterface
+final class SearchFilter extends AbstractFilter implements FilterInterface
 {
-    use SearchFilterTrait;
+    /**
+     * @var string Exact matching
+     */
+    public const STRATEGY_EXACT = 'exact';
 
-    public const DOCTRINE_INTEGER_TYPE = Types::INTEGER;
+    /**
+     * @var string The value must be contained in the field
+     */
+    public const STRATEGY_PARTIAL = 'partial';
 
-    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null, IdentifiersExtractorInterface $identifiersExtractor = null, NameConverterInterface $nameConverter = null)
+    /**
+     * @var string Finds fields that are starting with the value
+     */
+    public const STRATEGY_START = 'start';
+
+    /**
+     * @var string Finds fields that are ending with the value
+     */
+    public const STRATEGY_END = 'end';
+
+    /**
+     * @var string Finds fields that are starting with the word
+     */
+    public const STRATEGY_WORD_START = 'word_start';
+
+    private IriConverterInterface $iriConverter;
+    private ?IdentifiersExtractorInterface $identifiersExtractor;
+    private \Symfony\Component\PropertyAccess\PropertyAccessor|PropertyAccessorInterface $propertyAccessor;
+
+    public function __construct(IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null, IdentifiersExtractorInterface $identifiersExtractor = null, NameConverterInterface $nameConverter = null)
     {
-        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
+        parent::__construct($logger, $properties, $nameConverter);
 
         $this->iriConverter = $iriConverter;
         $this->identifiersExtractor = $identifiersExtractor;
@@ -65,17 +81,15 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
+    protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         if (
             null === $value ||
-            !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass, true)
+            !$this->isPropertyEnabled($property, $resourceClass)
         ) {
             return;
         }
 
-        $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
         $values = $this->normalizeValues((array) $value, $property);
@@ -84,9 +98,9 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         }
 
         $associations = [];
-        if ($this->isPropertyNested($property, $resourceClass)) {
-            [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::INNER_JOIN);
-        }
+//        if ($this->isPropertyNested($property, $resourceClass)) {
+//            [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::INNER_JOIN);
+//        }
 
         $caseSensitive = true;
         $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
@@ -97,53 +111,43 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             $caseSensitive = false;
         }
 
-        $metadata = $this->getNestedMetadata($resourceClass, $associations);
+//        $metadata = $this->getNestedMetadata($resourceClass, $associations);
+//
+//        if ($metadata->hasField($field)) {
+//            $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values, $caseSensitive);
+//
+//            return;
+//        }
+//
+//        // metadata doesn't have the field, nor an association on the field
+//        if (!$metadata->hasAssociation($field)) {
+//            return;
+//        }
 
-        if ($metadata->hasField($field)) {
-            if ('id' === $field) {
-                $values = array_map($this->getIdFromValue(...), $values);
-            }
+        return;
 
-            if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
-                $this->logger->notice('Invalid filter ignored', [
-                    'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
-                ]);
-
-                return;
-            }
-
-            $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values, $caseSensitive);
-
-            return;
-        }
-
-        // metadata doesn't have the field, nor an association on the field
-        if (!$metadata->hasAssociation($field)) {
-            return;
-        }
-
-        $values = array_map($this->getIdFromValue(...), $values);
-
-        $associationResourceClass = $metadata->getAssociationTargetClass($field);
-        $associationFieldIdentifier = $metadata->getIdentifierFieldNames()[0];
-        $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
-
-        if (!$this->hasValidValues($values, $doctrineTypeField)) {
-            $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
-            ]);
-
-            return;
-        }
-
-        $associationAlias = $alias;
-        $associationField = $field;
-        if ($metadata->isCollectionValuedAssociation($associationField) || $metadata->isAssociationInverseSide($field)) {
-            $associationAlias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $associationField);
-            $associationField = $associationFieldIdentifier;
-        }
-
-        $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $associationAlias, $associationField, $values, $caseSensitive);
+//        $values = array_map($this->getIdFromValue(...), $values);
+//
+//        $associationResourceClass = $metadata->getAssociationTargetClass($field);
+//        $associationFieldIdentifier = $metadata->getIdentifierFieldNames()[0];
+//        $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
+//
+//        if (!$this->hasValidValues($values, $doctrineTypeField)) {
+//            $this->logger->notice('Invalid filter ignored', [
+//                'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+//            ]);
+//
+//            return;
+//        }
+//
+//        $associationAlias = $alias;
+//        $associationField = $field;
+//        if ($metadata->isCollectionValuedAssociation($associationField) || $metadata->isAssociationInverseSide($field)) {
+//            $associationAlias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $associationField);
+//            $associationField = $associationFieldIdentifier;
+//        }
+//
+        $this->addWhereByStrategy($strategy, $query, $values, $caseSensitive);
     }
 
     /**
@@ -151,18 +155,23 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
-    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, mixed $values, bool $caseSensitive): void
+    protected function addWhereByStrategy(string $strategy, ModelCriteria $query, string $field, mixed $values, bool $caseSensitive): void
     {
         if (!\is_array($values)) {
             $values = [$values];
         }
 
+        if (!$caseSensitive) {
+            $values = array_map();
+        }
+
         $wrapCase = $this->createWrapCase($caseSensitive);
-        $valueParameter = ':'.$queryNameGenerator->generateParameterName($field);
-        $aliasedField = sprintf('%s.%s', $alias, $field);
+//        $valueParameter = ':'.$queryNameGenerator->generateParameterName($field);
+//        $aliasedField = sprintf('%s.%s', $alias, $field);
 
         if (!$strategy || self::STRATEGY_EXACT === $strategy) {
             if (1 === \count($values)) {
+                $query->filterBy($field, $values[0]);
                 $queryBuilder
                     ->andWhere($queryBuilder->expr()->eq($wrapCase($aliasedField), $wrapCase($valueParameter)))
                     ->setParameter($valueParameter, $values[0]);
@@ -217,12 +226,83 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
     }
 
     /**
-     * Creates a function that will wrap a Doctrine expression according to the
-     * specified case sensitivity.
-     *
-     * For example, "o.name" will get wrapped into "LOWER(o.name)" when $caseSensitive
-     * is false.
+     * {@inheritdoc}
      */
+    protected function getType(\ReflectionNamedType $type): string
+    {
+        if (!$type->isBuiltin()) {
+            return 'string';
+        }
+        return $type->getName();
+    }
+
+    protected function normalizeValues(array $values, string $property): ?array
+    {
+        foreach ($values as $key => $value) {
+            if (!\is_int($key) || !(\is_string($value) || \is_int($value))) {
+                unset($values[$key]);
+            }
+        }
+
+        if (empty($values)) {
+            $this->getLogger()->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
+            ]);
+
+            return null;
+        }
+
+        return array_values($values);
+    }
+
+    public function getDescription(string $resourceClass): array
+    {
+        $description = [];
+
+        $filterProperties = $this->getProperties();
+        if (null === $filterProperties) {
+            return [];
+        }
+
+        $classProperties = array_reduce(
+            (new \ReflectionClass($resourceClass))->getProperties(),
+            function ($carry, \ReflectionProperty $property) {
+                $carry[$property->getName()] = $property;
+                return $carry;
+            },
+        );
+
+        foreach ($filterProperties as $property => $strategy) {
+            $propertyName = $this->normalizePropertyName($property);
+
+            $reflectionProperty = $classProperties[$propertyName]?? null;
+            if (null === $reflectionProperty) {
+                //Todo search for relation
+                continue;
+            }
+
+            $typeOfField = $this->getType($reflectionProperty->getType());
+            $strategy = $this->getProperties()[$property] ?? self::STRATEGY_EXACT;
+            $filterParameterNames = [$propertyName];
+
+            if (self::STRATEGY_EXACT === $strategy) {
+                $filterParameterNames[] = $propertyName.'[]';
+            }
+
+            foreach ($filterParameterNames as $filterParameterName) {
+                $description[$filterParameterName] = [
+                    'property' => $propertyName,
+                    'type' => $typeOfField,
+                    'required' => false,
+                    'strategy' => $strategy,
+                    'is_collection' => str_ends_with((string) $filterParameterName, '[]'),
+                ];
+            }
+        }
+
+        return $description;
+    }
+
     protected function createWrapCase(bool $caseSensitive): \Closure
     {
         return static function (string $expr) use ($caseSensitive): string {
@@ -231,21 +311,6 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             }
 
             return sprintf('LOWER(%s)', $expr);
-        };
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getType(string $doctrineType): string
-    {
-        return match ($doctrineType) {
-            Types::ARRAY => 'array',
-            Types::BIGINT, Types::INTEGER, Types::SMALLINT => 'int',
-            Types::BOOLEAN => 'bool',
-            Types::DATE_MUTABLE, Types::TIME_MUTABLE, Types::DATETIME_MUTABLE, Types::DATETIMETZ_MUTABLE, Types::DATE_IMMUTABLE, Types::TIME_IMMUTABLE, Types::DATETIME_IMMUTABLE, Types::DATETIMETZ_IMMUTABLE => \DateTimeInterface::class,
-            Types::FLOAT => 'float',
-            default => 'string',
         };
     }
 }
