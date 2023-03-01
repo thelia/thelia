@@ -154,6 +154,12 @@ class Thelia extends Kernel
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
+        $routes->import(__DIR__.'/../Config/Resources/routing/*.yaml');
+
+        $envRouteDir = __DIR__.'/../Config/Resources/routing/'.$this->environment;
+        if (is_dir($envRouteDir)) {
+            $routes->import($envRouteDir.'/*.yaml');
+        }
     }
 
     public static function isInstalled()
@@ -634,7 +640,6 @@ class Thelia extends Kernel
     private function loadDefaultSecurityConfig(Container $container)
     {
         $extensionConfigsReflection = new \ReflectionProperty(ContainerBuilder::class, 'extensionConfigs');
-        $extensionConfigsReflection->setAccessible(true);
         $extensionConfigs = $extensionConfigsReflection->getValue($container);
 
         $extensionConfigs['security'][0]['providers'] = array_merge(
@@ -647,7 +652,7 @@ class Thelia extends Kernel
                 ],
                 'all_users' => [
                     'chain' => [
-                        'providers' => ['customer_provider', 'admin_provider']
+                        'providers' => ['admin_provider', 'customer_provider']
                     ]
                 ]
             ],
@@ -659,12 +664,28 @@ class Thelia extends Kernel
                 'login' => [
                     'pattern' => '^/api/login',
                     'stateless' => true,
-                    'provider' => 'all_users',
+                    'provider' => 'customer_provider',
                     'json_login' => [
-                        'check_path' => '/api/login_check',
+                        'check_path' => '/api/login',
                         'success_handler' => 'lexik_jwt_authentication.handler.authentication_success',
                         'failure_handler' => 'lexik_jwt_authentication.handler.authentication_failure'
                     ]
+                ],
+                'adminLogin' => [
+                    'pattern' => '^/api/admin/login',
+                    'stateless' => true,
+                    'provider' => 'admin_provider',
+                    'json_login' => [
+                        'check_path' => '/api/admin/login',
+                        'success_handler' => 'lexik_jwt_authentication.handler.authentication_success',
+                        'failure_handler' => 'lexik_jwt_authentication.handler.authentication_failure'
+                    ]
+                ],
+                'adminApi' => [
+                    'pattern' => '^/api/admin',
+                    'stateless' => true,
+                    'jwt' => [],
+                    'provider' => 'admin_provider'
                 ],
                 'api' => [
                     'pattern' => '^/api',
@@ -680,7 +701,7 @@ class Thelia extends Kernel
             [
                 ['path' => '^/api/login', 'roles' => 'PUBLIC_ACCESS'],
                 ['path' => '^/api/docs', 'roles' => 'PUBLIC_ACCESS'],
-//                ['path' => '^/api/admin', 'roles' => 'ROLE_ADMIN']
+                ['path' => '^/api/admin', 'roles' => 'ROLE_ADMIN']
             ],
             $extensionConfigs['security'][0]['access_control'] ?? []
         );

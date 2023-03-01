@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\Security\Authentication;
 
+use Propel\Runtime\Connection\TransactionTrait;
+
 interface AuthenticatorInterface
 {
     /**
