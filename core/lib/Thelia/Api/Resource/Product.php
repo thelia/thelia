@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -22,6 +23,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 
 #[ApiResource(
     operations: [
@@ -44,6 +46,13 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
     ],
     normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE, I18n::GROUP_WRITE]]
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'ref',
+        'visible'
+    ]
 )]
 class Product extends AbstractTranslatableResource
 {
