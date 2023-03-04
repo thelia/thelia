@@ -30,7 +30,7 @@ class FrontHook extends BaseHook
         $bodyConfig = HookNavigation::getConfigValue(HookNavigationConfigValue::FOOTER_BODY_FOLDER_ID);
 
         $content = trim($this->render('main-footer-body.html', ['bodyFolderId' => $bodyConfig]));
-        if ('' != $content) {
+        if ('' !== $content) {
             $event->add([
                 'id' => 'navigation-footer-body',
                 'class' => 'links',

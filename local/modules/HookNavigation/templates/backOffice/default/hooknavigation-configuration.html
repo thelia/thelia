@@ -25,7 +25,7 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    {if $success}
+                    {if $success|default:false}
                         <div class="alert alert-success">
                             {intl l="Configuration correctly saved" d="hooknavigation.bo.default"}
                         </div>
@@ -33,7 +33,7 @@
 
                     {form name="hooknavigation.configuration"}
                         <form action="{$current_url}" method="post">
-                            {include "includes/inner-form-toolbar.html" hide_flags = 1 close_url={url path='/admin/modules'}}
+                            {include "includes/inner-form-toolbar.html" hide_flags=1 close_url={url path='/admin/modules'}}
                             <br/>
 
                             {form_field form=$form field="success_url"}
@@ -57,12 +57,12 @@
 
                                     {form_error form=$form field="footer_body_folder_id"}
                                     <br />
-                                    <span class="error">{$message}</span>
+                                    <span class="error">{$message|default:''}</span>
                                     {/form_error}
                                 </label>
 
                                 <select id="{$label_attr.for|default:null}" class="form-control" name="{$name}" >
-                                    <option>--- {intl l="Select a folder" d="hooknavigation.bo.default"} ---</option>
+                                    <option value="0">--- {intl l="Select a folder" d="hooknavigation.bo.default"} ---</option>
                                     {loop type="folder" name="folder_list_body"}
                                         <option value="{$ID}" {if $bodyConfig == $ID}selected{/if}>
                                             {$TITLE}
@@ -84,12 +84,12 @@
 
                                     {form_error form=$form field="footer_bottom_folder_id"}
                                     <br />
-                                    <span class="error">{$message}</span>
+                                    <span class="error">{$message|default:''}</span>
                                     {/form_error}
                                 </label>
 
                                 <select id="{$label_attr.for|default:null}" class="form-control" name="{$name}" >
-                                    <option>--- {intl l="Select a folder" d="hooknavigation.bo.default"} ---</option>
+                                    <option value="0">--- {intl l="Select a folder" d="hooknavigation.bo.default"} ---</option>
                                     {loop type="folder" name="folder_list_bottom"}
                                         <option value="{$ID}" {if $bottomConfig == $ID}selected{/if}>
                                             {$TITLE}
@@ -103,7 +103,7 @@
                             </div>
                             {/form_field}
 
-                            {include "includes/inner-form-toolbar.html" hide_flags = 1 close_url={url path='/admin/modules'} page_bottom = 1}
+                            {include "includes/inner-form-toolbar.html" hide_flags=1 close_url={url path='/admin/modules'} page_bottom=1}
                         </form>
                     {/form}
                 </div>
