@@ -342,7 +342,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $routing = @file_get_contents($module->getAbsoluteConfigPath().DS.'routing.xml');
-        if ($routing && preg_match('@[\'"]/?admin/module/' . $module->getCode() . '[\'"]@', $routing)) {
+        if ($routing && preg_match('@[\'"]/?admin/module/'.$module->getCode().'[\'"]@', $routing)) {
             return true;
         }
 
