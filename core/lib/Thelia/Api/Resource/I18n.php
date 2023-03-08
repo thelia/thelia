@@ -12,7 +12,6 @@
 
 namespace Thelia\Api\Resource;
 
-use Symfony\Component\Serializer\Annotation\Groups;
 
 class I18n
 {
@@ -20,12 +19,6 @@ class I18n
     public const GROUP_WRITE = 'i18n:write';
 
     public ?int $id;
-
-    private ?string $title;
-
-    private ?string $chapo;
-
-    private ?string $description;
 
     public function __construct($data = [])
     {
@@ -46,41 +39,6 @@ class I18n
     {
         $this->id = $id;
 
-        return $this;
-    }
-
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(?string $title): self
-    {
-        $this->title = $title;
-
-        return $this;
-    }
-
-    public function getChapo(): string
-    {
-        return $this->chapo;
-    }
-
-    public function setChapo(?string $chapo): self
-    {
-        $this->chapo = $chapo;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): self
-    {
-        $this->description = $description;
         return $this;
     }
 }

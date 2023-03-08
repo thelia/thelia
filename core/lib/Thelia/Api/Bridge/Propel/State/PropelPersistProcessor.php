@@ -93,7 +93,7 @@ class PropelPersistProcessor implements ProcessorInterface
                 $i18nGetters = array_filter(
                     array_map(
                         function (\ReflectionProperty $reflectionProperty) use ($i18n){
-                            return $reflectionProperty->isInitialized($i18n) ?? 'get'.ucfirst($reflectionProperty->getName());
+                            return $reflectionProperty->isInitialized($i18n) ? 'get'.ucfirst($reflectionProperty->getName()) : null;
                         },
                         (new \ReflectionClass($i18n))->getProperties()
                     )
