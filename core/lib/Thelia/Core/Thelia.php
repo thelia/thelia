@@ -681,12 +681,12 @@ class Thelia extends Kernel
                         'failure_handler' => 'lexik_jwt_authentication.handler.authentication_failure'
                     ]
                 ],
-                'adminApi' => [
-                    'pattern' => '^/api/admin',
-                    'stateless' => true,
-                    'jwt' => [],
-                    'provider' => 'admin_provider'
-                ],
+//                'adminApi' => [
+//                    'pattern' => '^/api/admin',
+//                    'stateless' => true,
+//                    'jwt' => [],
+//                    'provider' => 'admin_provider'
+//                ],
                 'api' => [
                     'pattern' => '^/api',
                     'stateless' => true,
@@ -701,7 +701,7 @@ class Thelia extends Kernel
             [
                 ['path' => '^/api/login', 'roles' => 'PUBLIC_ACCESS'],
                 ['path' => '^/api/docs', 'roles' => 'PUBLIC_ACCESS'],
-                ['path' => '^/api/admin', 'roles' => 'ROLE_ADMIN']
+//                ['path' => '^/api/admin', 'roles' => 'ROLE_ADMIN']
             ],
             $extensionConfigs['security'][0]['access_control'] ?? []
         );
