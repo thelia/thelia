@@ -2,8 +2,10 @@
 
 namespace Thelia\Api\Bridge\Propel\State;
 
+use _PHPStan_9a6ded56a\Nette\Neon\Exception;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 
 class PropelPersistProcessor implements ProcessorInterface
@@ -17,49 +19,84 @@ class PropelPersistProcessor implements ProcessorInterface
             $propelModel = new $propelModelClass;
         }
 
-        foreach (get_class_methods($propelModel) as $methodName) {
-            if (!str_starts_with($methodName, 'set') || $methodName === 'setId') {
-                continue;
+        $resourceReflection = new \ReflectionClass($data);
+
+        foreach ($resourceReflection->getProperties() as $property) {
+           if (!$property->isInitialized($data)) {
+               continue;
+           }
+
+           $propelSetter = 'set'.ucfirst($property->getName());
+
+           if (method_exists($propelModel, $propelSetter)) {
+               $possibleGetters = [
+                   'get'.ucfirst($property->getName()),
+                   'is'.ucfirst($property->getName()),
+               ];
+
+               $availableMethods = array_filter(array_intersect($possibleGetters, get_class_methods($data)));
+
+               $value = null;
+               while (!empty($availableMethods) && $value === null) {
+                   $method = array_pop($availableMethods);
+                   $value = $data->$method();
+               }
+
+               if ($value instanceof ArrayCollection)
+               {
+                   //Todo Implement relation save cascade
+                    continue;
+               }
+
+               $propelModel->$propelSetter($value);
             }
-
-            $possibleGetters = [
-                'get'.ucfirst(substr($methodName, 3)),
-                'is'.ucfirst(substr($methodName, 3)),
-            ];
-
-            $availableMethods = array_filter(array_intersect($possibleGetters, get_class_methods($data)));
-
-            if (empty($availableMethods)) {
-                continue;
-            }
-
-            $reflectionMethod = new \ReflectionMethod($propelModel, $methodName);
-            $parameters = $reflectionMethod->getParameters();
-
-            if (!isset($parameters[0])) {
-                continue;
-            }
-
-            $value = null;
-            while (!empty($availableMethods) && $value === null) {
-                $method = array_pop($availableMethods);
-                $value = $data->$method();
-            }
-
-            if (null !== $parameters[0]->getType() && $parameters[0]->getType()->__toString() == \gettype($value)) {
-                continue;
-            }
-
-            $propelModel->$methodName($value);
         }
+
+//        foreach (get_class_methods($propelModel) as $methodName) {
+//            if (!str_starts_with($methodName, 'set') || $methodName === 'setId') {
+//                continue;
+//            }
+//
+//            $possibleGetters = [
+//                'get'.ucfirst(substr($methodName, 3)),
+//                'is'.ucfirst(substr($methodName, 3)),
+//            ];
+//
+//            $availableMethods = array_filter(array_intersect($possibleGetters, get_class_methods($data)));
+//
+//            if (empty($availableMethods)) {
+//                continue;
+//            }
+//
+//            $reflectionMethod = new \ReflectionMethod($propelModel, $methodName);
+//            $parameters = $reflectionMethod->getParameters();
+//
+//            if (!isset($parameters[0])) {
+//                continue;
+//            }
+//
+//            $value = null;
+//            while (!empty($availableMethods) && $value === null) {
+//                $method = array_pop($availableMethods);
+//                $value = $data->$method();
+//            }
+//
+//            if (null !== $parameters[0]->getType() && $parameters[0]->getType()->__toString() == \gettype($value)) {
+//                continue;
+//            }
+//
+//            $propelModel->$methodName($value);
+//        }
 
         if (is_subclass_of($data, TranslatableResourceInterface::class)) {
             foreach ($data->getI18ns() as $locale => $i18n) {
-                $i18nGetters = array_map(
-                    function (\ReflectionProperty $reflectionProperty) {
-                        return 'get'.ucfirst($reflectionProperty->getName());
-                    },
-                    (new \ReflectionClass($i18n))->getProperties()
+                $i18nGetters = array_filter(
+                    array_map(
+                        function (\ReflectionProperty $reflectionProperty) use ($i18n){
+                            return $reflectionProperty->isInitialized($i18n) ?? 'get'.ucfirst($reflectionProperty->getName());
+                        },
+                        (new \ReflectionClass($i18n))->getProperties()
+                    )
                 );
 
                 $propelModel->setLocale($locale);

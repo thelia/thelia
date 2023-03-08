@@ -50,8 +50,7 @@ abstract class AbstractFilter implements FilterInterface
     protected function isPropertyEnabled(string $property, string $resourceClass): bool
     {
         if (null === $this->properties) {
-            // to ensure sanity, nested properties must still be explicitly enabled
-//            return !$this->isPropertyNested($property, $resourceClass);
+            return false;
         }
 
         return \array_key_exists($property, $this->properties);
