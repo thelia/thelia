@@ -23,6 +23,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\LocalizedSearchFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 
 #[ApiResource(
@@ -50,8 +52,20 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
-        'ref',
-        'visible'
+        'ref'
+    ]
+)]
+#[ApiFilter(
+    filterClass: LocalizedSearchFilter::class,
+    properties: [
+        'chapo' => 'word_start'
+    ]
+)]
+#[ApiFilter(
+    filterClass: BooleanFilter::class,
+    properties: [
+        'visible',
+        'virtual'
     ]
 )]
 class Product extends AbstractTranslatableResource
@@ -73,7 +87,6 @@ class Product extends AbstractTranslatableResource
     public bool $virtual;
 
     #[Relation(targetResource: ProductCategory::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
     public Collection $productCategories;
 
     public function __construct()
@@ -101,6 +114,10 @@ class Product extends AbstractTranslatableResource
 
     public function setRef(string $ref): self
     {
+//        if ($ref === "aaa") {
+//            throw new \Exception($this->ref);
+//        }
+
         $this->ref = $ref;
 
         return $this;

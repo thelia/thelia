@@ -12,15 +12,17 @@
 
 namespace Thelia\Api\Resource;
 
-use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 
 class ProductI18n extends I18n
 {
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups([Product::GROUP_READ, Product::GROUP_WRITE])]
     private ?string $title;
 
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups([Product::GROUP_READ, Product::GROUP_WRITE])]
     private ?string $chapo;
+
+    #[Groups([Product::GROUP_READ, Product::GROUP_WRITE])]
+    private ?string $description;
 }
