@@ -4,6 +4,8 @@ namespace Thelia\Api\Bridge\Propel\State;
 
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
@@ -15,14 +17,14 @@ use Thelia\Model\LangQuery;
 abstract class AbstractPropelProvider implements ProviderInterface
 {
     protected function modelToResource(
-        $resourceClass,
-        $propelModel,
-        $context,
-        $langs = null,
-        $parentClass = null,
-        $parentModel = null,
-        $withRelation = true,
-        $baseModel = null
+        string $resourceClass,
+        ActiveRecordInterface $propelModel,
+        array $context,
+        Collection $langs = null,
+        \ReflectionClass $parentReflector = null,
+        ActiveRecordInterface $parentModel = null,
+        bool $withRelation = true,
+        ActiveRecordInterface $baseModel = null
     ): PropelResourceInterface
     {
         if ($langs === null) {
@@ -42,16 +44,15 @@ abstract class AbstractPropelProvider implements ProviderInterface
         $compositeIdentifiers = !empty($compositeIdentifiersAttribute)? $compositeIdentifiersAttribute[0]->getArguments()[0] : [];
 
         foreach ($reflector->getProperties() as $property) {
-            $groups = array_reduce(
-                $property->getAttributes(Groups::class),
-                function ($carry, $item) {
-                    $value = $item->getArguments()[0];
-                    return array_merge($carry, is_string($value) ? [$value] : $value);
-                },
-                []
-            );
+            $groupAttributes = $property->getAttributes(Groups::class)[0]?? null;
 
-            $matchingGroups = array_intersect($groups, $context['groups']);
+            if (null === $groupAttributes) {
+                continue;
+            }
+
+            $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
+
+            $matchingGroups = array_intersect($propertyGroups, $context['groups']);
 
             if (empty($matchingGroups) && !in_array($property->getName(), $compositeIdentifiers)) {
                 continue;
@@ -78,10 +79,10 @@ abstract class AbstractPropelProvider implements ProviderInterface
                 }
 
                 $targetClass = $relationAttribute->getArguments()['targetResource'];
-                if ($targetClass === $parentClass) {
+                if ($targetClass === $parentReflector?->getName()) {
                     $apiResource->$resourceSetter(
                         $this->modelToResource(
-                            resourceClass: $parentClass,
+                            resourceClass: $parentReflector->getName(),
                             propelModel: $parentModel,
                             context: $context,
                             withRelation: false
@@ -99,7 +100,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
                                 resourceClass: $targetClass,
                                 propelModel: $childPropelModel,
                                 context: $context,
-                                parentClass: $resourceClass,
+                                parentReflector: $reflector,
                                 parentModel: $propelModel,
                                 baseModel: $baseModel
                             )
@@ -112,7 +113,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
                         resourceClass: $targetClass,
                         propelModel: $value,
                         context: $context,
-                        parentClass: $resourceClass,
+                        parentReflector: $reflector,
                         parentModel: $propelModel,
                         baseModel: $baseModel
                     );
@@ -136,7 +137,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
                 $langHasI18nValue = false;
 
                 foreach ($i18nFields as $i18nField) {
-                    $virtualColumn = strtolower($reflector->getShortName()).'_'.'lang_'.$lang->getLocale().'_'.$i18nField;
+                    $virtualColumn = ltrim(strtolower($parentReflector?->getShortName().'_'.$reflector->getShortName()).'_'.'lang_'.$lang->getLocale().'_'.$i18nField, '_');
 
                     if (
                         !$baseModel->hasVirtualColumn($virtualColumn)
@@ -148,7 +149,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
                     $setter = 'set'.ucfirst($i18nField);
                     $i18nResource->$setter($fieldValue);
 
-                    if (!empty($fieldValue)) {
+                    if ('id' !== $i18nField && !empty($fieldValue)) {
                         $langHasI18nValue = true;
                     }
                 }

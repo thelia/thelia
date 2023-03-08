@@ -12,7 +12,9 @@
 
 namespace Thelia\Api\Resource;
 
-abstract class I18n
+use Symfony\Component\Serializer\Annotation\Groups;
+
+class I18n
 {
     public const GROUP_READ = 'i18n:read';
     public const GROUP_WRITE = 'i18n:write';
