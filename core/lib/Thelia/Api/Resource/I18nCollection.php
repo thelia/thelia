@@ -3,21 +3,10 @@
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiProperty;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 class I18nCollection implements \IteratorAggregate
 {
-    #[ApiProperty(
-        openapiContext: [
-            'type' => 'object',
-            'example' => [
-                'en_US' => [
-                    'title' => 'string',
-                    'chapo' => 'string'
-                ],
-            ]
-        ],
-        types: 'object'
-    )]
      public array $i18ns;
 
     public function __construct()
