@@ -18,9 +18,5 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class CategoryI18n extends I18n
 {
-    #[Groups(['category:read', 'category:write', Product::GROUP_READ])]
-    private ?string $title;
 
-    #[Groups(['category:read', 'category:write'])]
-    private ?string $chapo;
 }
