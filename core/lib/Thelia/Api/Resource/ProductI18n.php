@@ -18,11 +18,46 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ProductI18n extends I18n
 {
     #[Groups([Product::GROUP_READ, Product::GROUP_WRITE])]
-    private ?string $title;
+    protected ?string $title;
 
     #[Groups([Product::GROUP_READ, Product::GROUP_WRITE])]
-    private ?string $chapo;
+    protected ?string $chapo;
 
     #[Groups([Product::GROUP_READ, Product::GROUP_WRITE])]
-    private ?string $description;
+    protected ?string $description;
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(?string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getChapo(): string
+    {
+        return $this->chapo;
+    }
+
+    public function setChapo(?string $chapo): self
+    {
+        $this->chapo = $chapo;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+        return $this;
+    }
 }
