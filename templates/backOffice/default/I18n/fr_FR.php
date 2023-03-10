@@ -1127,7 +1127,7 @@ return [
     'The following error message has been found: %msg' => 'Le message d\'erreur suivant a été trouvé : %msg',
     'The hooks have been updated successfuly !' => 'Les points d\'accroche ont été mise à jour !',
     'The outcomming price is the sum of the incomming one and the sum of taxes.' => 'Le prix sortant est la somme du prix entrant et de la somme des taxes appliquées.',
-    'The page you\'ve requested has a problem. Please contact the module developer if you were using one, or feel free to give the Thelia team a feedback on github: %url.' => 'La page demandé a rencontré un problème. Merci de contacter le développeur du module que vous êtes en train d\'utiliser ou bien d\'ouvrir une issue à l\'équipe de développement de Thelia sur Github : %url',
+    'The page you\'ve requested has a problem. Please contact the module developer if you were using one, or feel free to give the Thelia team a feedback on github: %url.' => 'La page demandée a rencontré un problème. Merci de contacter le développeur du module que vous êtes en train d\'utiliser ou bien d\'ouvrir une issue à l\'équipe de développement de Thelia sur Github : %url',
     'The page you\'ve requested was not found. Please check the page address, and try again.' => 'La page désirée n\'existe pas. Merci de vérifier votre adresse et réessayer',
     'The rate from Euro (Price in Euro * rate = Price in this currency)' => 'Le taux à partir de l\'Euro (Prix en Euro * taux = Prix dans la devise)',
     'The selected categories :' => 'Dans les catégories sélectionnées :',
