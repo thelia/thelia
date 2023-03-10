@@ -13,6 +13,7 @@
 namespace Thelia\Install;
 
 use Michelf\Markdown;
+use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -88,6 +89,11 @@ class Update
             $this->connection = Propel::getConnection(
                 ProductTableMap::DATABASE_NAME
             );
+
+            // Get the PDO connection from the WrappedConnection
+            if ($this->connection instanceof ConnectionWrapper) {
+                $this->connection = $this->connection->getWrappedConnection();
+            }
         } catch (ParseException $ex) {
             throw new UpdateException('database.yml is not a valid file : '.$ex->getMessage());
         } catch (\PDOException $ex) {
