@@ -12,6 +12,7 @@
 
 namespace HookNavigation;
 
+use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Thelia\Module\BaseModule;
 
 /**
@@ -21,4 +22,15 @@ class HookNavigation extends BaseModule
 {
     public const MESSAGE_DOMAIN = 'hooknavigation';
     public const ROUTER = 'router.hooknavigation';
+
+    /**
+     * Defines how services are loaded in your modules.
+     */
+    public static function configureServices(ServicesConfigurator $servicesConfigurator): void
+    {
+        $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
+            ->exclude([THELIA_MODULE_DIR.ucfirst(self::getModuleCode()).'/I18n/*'])
+            ->autowire(true)
+            ->autoconfigure(true);
+    }
 }
