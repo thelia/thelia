@@ -23,7 +23,7 @@ use Thelia\Form\FirewallForm;
  *
  * @author Benjamin Perche <benjamin@thelia.net>
  */
-class TheliaFormValidator implements TheliaFormValidatorInterface
+class TheliaFormValidator
 {
     /** @var TranslatorInterface */
     protected $translator;

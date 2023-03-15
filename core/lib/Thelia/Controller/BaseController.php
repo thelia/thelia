@@ -271,7 +271,7 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
-     * @return \Thelia\Core\Form\TheliaFormValidatorInterface
+     * @return \Thelia\Core\Form\TheliaFormValidator
      */
     protected function getTheliaFormValidator()
     {
@@ -601,7 +601,7 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
-     * @return \Thelia\Core\Form\TheliaFormFactoryInterface
+     * @return \Thelia\Core\Form\TheliaFormFactory
      *
      * @deprecated since Thelia 2.5, use autowiring instead.
      */
