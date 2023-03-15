@@ -93,15 +93,16 @@ class Encore extends AbstractSmartyPlugin
 
     public function getWebpackManifestFile($args): string
     {
-        $urlTool = URL::getInstance();
-
         $file = $args['file'];
         if (!$file) {
             return '';
         }
 
         if (isset($this->packages['manifest'])) {
-            return $urlTool->absoluteUrl($this->packages['manifest']->geturl($file));
+            $urlTool = URL::getInstance();
+            $localFile = THELIA_WEB_DIR.$this->packages['manifest']->geturl($file);
+
+            return file_exists($localFile) ? $localFile : $urlTool->absoluteUrl($this->packages['manifest']->geturl($file));
         }
 
         return '';
