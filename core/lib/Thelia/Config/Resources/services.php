@@ -80,7 +80,7 @@ return static function (ContainerConfigurator $configurator): void {
                 \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
                 \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
             } catch (\Exception $e) {
-                if ($_ENV['APP_DEBUG']) {
+                if ($_SERVER['APP_DEBUG']) {
                     throw $e;
                 }
                 Tlog::getInstance()->addError(
