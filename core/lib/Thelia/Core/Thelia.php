@@ -471,7 +471,6 @@ class Thelia extends Kernel
             ->setShared(false)
             ->addTag('thelia.form');
 
-
         // We set this particular service with public true to have all of his subscribers after removing type (see TheliaBundle.php)
         $container->registerForAutoconfiguration(BaseHookInterface::class)
             ->addTag('hook.event_listener')
