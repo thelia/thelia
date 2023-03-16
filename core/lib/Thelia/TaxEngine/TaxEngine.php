@@ -28,45 +28,14 @@ class TaxEngine
 {
     protected $taxCountry;
     protected $taxState;
-    protected $typeList;
 
     /** @var RequestStack */
     protected $requestStack;
 
-    public function __construct(RequestStack $requestStack)
-    {
+    public function __construct(
+        RequestStack $requestStack,
+    ) {
         $this->requestStack = $requestStack;
-    }
-
-    public static function getTaxTypeList()
-    {
-        $taxTypeDirectory = __DIR__.DS.'TaxType';
-        $typeList = [];
-        try {
-            $directoryIterator = new \DirectoryIterator($taxTypeDirectory);
-
-            foreach ($directoryIterator as $fileinfo) {
-                if ($fileinfo->isFile()) {
-                    $extension = $fileinfo->getExtension();
-                    if (strtolower($extension) !== 'php') {
-                        continue;
-                    }
-                    $className = $fileinfo->getBaseName('.php');
-
-                    try {
-                        $fullyQualifiedClassName = 'Thelia\\TaxEngine\\TaxType\\'.$className;
-                        $instance = new $fullyQualifiedClassName();
-                        $typeList[] = \get_class($instance);
-                    } catch (\Exception $ex) {
-                        // Nothing special to do
-                    }
-                }
-            }
-        } catch (\UnexpectedValueException $e) {
-            // Nothing special to do
-        }
-
-        return $typeList;
     }
 
     /**

@@ -34,7 +34,7 @@ class FeatureFixAmountTaxType extends BaseTaxType
         return $this;
     }
 
-    public function fixAmountRetriever(Product $product)
+    public function fixAmountRetriever(Product $product): float|int
     {
         $taxAmount = 0;
         $featureId = $this->getRequirement('feature');
@@ -64,7 +64,7 @@ class FeatureFixAmountTaxType extends BaseTaxType
         return $taxAmount;
     }
 
-    public function getRequirementsDefinition()
+    public function getRequirementsDefinition(): array
     {
         return [
             new TaxTypeRequirementDefinition(
