@@ -99,10 +99,14 @@ class Encore extends AbstractSmartyPlugin
         }
 
         if (isset($this->packages['manifest'])) {
-            $urlTool = URL::getInstance();
-            $localFile = THELIA_WEB_DIR.$this->packages['manifest']->geturl($file);
+            // Take absolute url if available else take relative path
+            $manifestPath = URL::getInstance()->absoluteUrl($this->packages['manifest']->geturl($file));
+            $fileHeaders = @get_headers($file);
+            if (!$fileHeaders || (int) substr($fileHeaders[0], 9, 3) < 400) {
+                $manifestPath = THELIA_WEB_DIR.$this->packages['manifest']->geturl($file);
+            }
 
-            return file_exists($localFile) ? $localFile : $urlTool->absoluteUrl($this->packages['manifest']->geturl($file));
+            return $manifestPath;
         }
 
         return '';
