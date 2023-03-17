@@ -49,7 +49,7 @@ use Thelia\Type\TypeCollection;
  * @method ModelCriteria buildModelCriteria()
  * @method array         buildArray()
  */
-abstract class BaseLoop implements BaseLoopInterface
+abstract class BaseLoop implements LoopInterface
 {
     /** @var string|null The loop name */
     protected $loopName;
@@ -103,10 +103,7 @@ abstract class BaseLoop implements BaseLoopInterface
     /** @var string */
     protected $kernelEnvironment;
 
-    /**
-     * Create a new Loop.
-     */
-    public function __construct(
+    public function init(
         ContainerInterface $container,
         RequestStack $requestStack,
         EventDispatcherInterface $eventDispatcher,
@@ -114,7 +111,7 @@ abstract class BaseLoop implements BaseLoopInterface
         TranslatorInterface $translator,
         array $theliaParserLoops,
         $kernelEnvironment
-    ) {
+    ): void {
         $this->translator = $translator;
 
         $this->checkInterface();

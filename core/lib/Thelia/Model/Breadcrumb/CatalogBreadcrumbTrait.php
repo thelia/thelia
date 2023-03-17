@@ -12,15 +12,14 @@
 
 namespace Thelia\Model\Breadcrumb;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
-use Thelia\Core\Template\Loop\CategoryPath;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\CategoryQuery;
 use Thelia\Tools\URL;
 
 trait CatalogBreadcrumbTrait
 {
-    public function getBaseBreadcrumb(Router $router, ContainerInterface $container, $categoryId)
+    public function getBaseBreadcrumb(Router $router, $categoryId)
     {
         $translator = Translator::getInstance();
         $catalogUrl = $router->generate('admin.catalog', [], Router::ABSOLUTE_URL);
@@ -29,22 +28,41 @@ trait CatalogBreadcrumbTrait
             $translator->trans('Catalog') => $catalogUrl,
         ];
 
-        // Todo stop using loop in php
-        $categoryPath = new CategoryPath(
-            $container,
-            $container->get('request_stack'),
-            $container->get('event_dispatcher'),
-            $container->get('thelia.securityContext'),
-            Translator::getInstance(),
-            $container->getParameter('Thelia.parser.loops'),
-            $container->getParameter('kernel.environment')
-        );
-        $categoryPath->initializeArgs([
-                'category' => $categoryId,
-                'visible' => '*',
-            ]);
+        $depth = 20;
+        $ids = [];
+        $results = [];
 
-        $results = $categoryPath->buildArray();
+        // Todo refactor this ugly code
+        do {
+            $category = CategoryQuery::create()
+                ->filterById($categoryId)
+                ->findOne();
+
+            if ($category != null) {
+                $results[] = [
+                    'ID' => $category->getId(),
+                    'TITLE' => $category->getTitle(),
+                    'URL' => $category->getUrl(),
+                ];
+
+                $currentId = $category->getParent();
+
+                if ($currentId > 0) {
+                    // Prevent circular refererences
+                    if (\in_array($currentId, $ids)) {
+                        throw new \LogicException(
+                            sprintf(
+                                'Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)',
+                                $categoryId,
+                                $currentId
+                            )
+                        );
+                    }
+
+                    $ids[] = $currentId;
+                }
+            }
+        } while ($category != null && $currentId > 0 && --$depth > 0);
 
         foreach ($results as $result) {
             $breadcrumb[$result['TITLE']] = sprintf('%s?category_id=%d', $catalogUrl, $result['ID']);
@@ -53,7 +71,7 @@ trait CatalogBreadcrumbTrait
         return $breadcrumb;
     }
 
-    public function getProductBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
+    public function getProductBreadcrumb(Router $router, $tab, $locale)
     {
         if (!method_exists($this, 'getProduct')) {
             return null;
@@ -62,7 +80,7 @@ trait CatalogBreadcrumbTrait
         /** @var \Thelia\Model\Product $product */
         $product = $this->getProduct();
 
-        $breadcrumb = $this->getBaseBreadcrumb($router, $container, $product->getDefaultCategoryId());
+        $breadcrumb = $this->getBaseBreadcrumb($router, $product->getDefaultCategoryId());
 
         $product->setLocale($locale);
 
@@ -76,7 +94,7 @@ trait CatalogBreadcrumbTrait
         return $breadcrumb;
     }
 
-    public function getCategoryBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
+    public function getCategoryBreadcrumb(Router $router, $tab, $locale)
     {
         if (!method_exists($this, 'getCategory')) {
             return null;
@@ -84,7 +102,7 @@ trait CatalogBreadcrumbTrait
 
         /** @var \Thelia\Model\Category $category */
         $category = $this->getCategory();
-        $breadcrumb = $this->getBaseBreadcrumb($router, $container, $this->getParentId());
+        $breadcrumb = $this->getBaseBreadcrumb($router, $this->getParentId());
 
         $category->setLocale($locale);
 

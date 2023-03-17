@@ -19,9 +19,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
-use Thelia\Core\Template\Element\Exception\InvalidElementException;
+use Thelia\Core\Template\Element\LoopInterface;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
@@ -441,14 +440,7 @@ class TheliaLoop extends AbstractSmartyPlugin
         return $this->loopstack[$loopName]->isEmpty();
     }
 
-    /**
-     * @throws \Thelia\Core\Template\Element\Exception\InvalidElementException
-     * @throws \Thelia\Core\Template\Element\Exception\ElementNotFoundException
-     * @throws \ReflectionException
-     *
-     * @return BaseLoop
-     */
-    protected function createLoopInstance($smartyParams)
+    protected function createLoopInstance($smartyParams): LoopInterface
     {
         $type = strtolower($smartyParams['type']);
 
@@ -458,16 +450,11 @@ class TheliaLoop extends AbstractSmartyPlugin
             );
         }
 
-        $class = new \ReflectionClass($this->loopDefinition[$type]);
+        $serviceId = $this->loopDefinition[$type];
 
-        if ($class->isSubclassOf("Thelia\Core\Template\Element\BaseLoop") === false) {
-            throw new InvalidElementException(
-                $this->translator->trans("'%type' loop class should extends Thelia\Core\Template\Element\BaseLoop", ['%type' => $type])
-            );
-        }
-
-        /** @var BaseLoop $loop */
-        $loop = $class->newInstance(
+        /** @var LoopInterface $loop */
+        $loop = $this->container->get($serviceId);
+        $loop->init(
             $this->container,
             $this->requestStack,
             $this->dispatcher,

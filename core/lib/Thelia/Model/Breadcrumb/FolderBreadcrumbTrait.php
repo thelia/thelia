@@ -12,15 +12,14 @@
 
 namespace Thelia\Model\Breadcrumb;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
-use Thelia\Core\Template\Loop\FolderPath;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\FolderQuery;
 use Thelia\Tools\URL;
 
 trait FolderBreadcrumbTrait
 {
-    public function getBaseBreadcrumb(Router $router, ContainerInterface $container, $folderId)
+    public function getBaseBreadcrumb(Router $router, $folderId)
     {
         $translator = Translator::getInstance();
         $foldersUrl = $router->generate('admin.folders.default', [], Router::ABSOLUTE_URL);
@@ -29,22 +28,41 @@ trait FolderBreadcrumbTrait
             $translator->trans('Folder') => $foldersUrl,
         ];
 
-        // Todo stop using loop in php
-        $folderPath = new FolderPath(
-            $container,
-            $container->get('request_stack'),
-            $container->get('event_dispatcher'),
-            $container->get('thelia.securityContext'),
-            Translator::getInstance(),
-            $container->getParameter('Thelia.parser.loops'),
-            $container->getParameter('kernel.environment')
-        );
-        $folderPath->initializeArgs([
-                'folder' => $folderId,
-                'visible' => '*',
-            ]);
+        $depth = 20;
+        $ids = [];
+        $results = [];
 
-        $results = $folderPath->buildArray();
+        // Todo refactor this ugly code
+        do {
+            $folder = FolderQuery::create()
+                ->filterById($folderId)
+                ->findOne();
+
+            if ($folder != null) {
+                $results[] = [
+                    'ID' => $folder->getId(),
+                    'TITLE' => $folder->getTitle(),
+                    'URL' => $folder->getUrl(),
+                ];
+
+                $currentId = $folder->getParent();
+
+                if ($currentId > 0) {
+                    // Prevent circular refererences
+                    if (\in_array($currentId, $ids)) {
+                        throw new \LogicException(
+                            sprintf(
+                                'Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)',
+                                $folderId,
+                                $currentId
+                            )
+                        );
+                    }
+
+                    $ids[] = $currentId;
+                }
+            }
+        } while ($folder != null && $currentId > 0 && --$depth > 0);
 
         foreach ($results as $result) {
             $breadcrumb[$result['TITLE']] = sprintf(
@@ -61,7 +79,7 @@ trait FolderBreadcrumbTrait
         return $breadcrumb;
     }
 
-    public function getFolderBreadcrumb(Router $router, $container, $tab, $locale)
+    public function getFolderBreadcrumb(Router $router, $tab, $locale)
     {
         if (!method_exists($this, 'getFolder')) {
             return null;
@@ -69,7 +87,7 @@ trait FolderBreadcrumbTrait
 
         /** @var \Thelia\Model\Folder $folder */
         $folder = $this->getFolder();
-        $breadcrumb = $this->getBaseBreadcrumb($router, $container, $this->getParentId());
+        $breadcrumb = $this->getBaseBreadcrumb($router, $this->getParentId());
 
         $folder->setLocale($locale);
 
@@ -86,7 +104,7 @@ trait FolderBreadcrumbTrait
         return $breadcrumb;
     }
 
-    public function getContentBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
+    public function getContentBreadcrumb(Router $router, $tab, $locale)
     {
         if (!method_exists($this, 'getContent')) {
             return null;
@@ -95,7 +113,7 @@ trait FolderBreadcrumbTrait
         /** @var \Thelia\Model\Content $content */
         $content = $this->getContent();
 
-        $breadcrumb = $this->getBaseBreadcrumb($router, $container, $content->getDefaultFolderId());
+        $breadcrumb = $this->getBaseBreadcrumb($router, $content->getDefaultFolderId());
 
         $content->setLocale($locale);
 

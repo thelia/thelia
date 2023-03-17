@@ -417,7 +417,6 @@ class FileController extends BaseAdminController
             'formId' => $imageModel->getUpdateFormId(),
             'breadcrumb' => $image->getBreadcrumb(
                 $this->getRouter($this->getCurrentRouter()),
-                $this->container,
                 'images',
                 $this->getCurrentEditionLocale()
             ),
@@ -452,7 +451,6 @@ class FileController extends BaseAdminController
             'formId' => $documentModel->getUpdateFormId(),
             'breadcrumb' => $document->getBreadcrumb(
                 $this->getRouter($this->getCurrentRouter()),
-                $this->container,
                 'documents',
                 $this->getCurrentEditionLocale()
             ),
