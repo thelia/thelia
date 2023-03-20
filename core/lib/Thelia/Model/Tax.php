@@ -13,9 +13,12 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Propel;
+use Thelia\Core\Event\Tax\TaxEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Base\Tax as BaseTax;
-use Thelia\TaxEngine\BaseTaxType;
+use Thelia\Model\Map\TaxTableMap;
 
 class Tax extends BaseTax
 {
@@ -45,22 +48,19 @@ class Tax extends BaseTax
 
     public function getTypeInstance()
     {
-        $class = $this->getType();
+        $eventDispatcher = Propel::getServiceContainer()->getWriteConnection(TaxTableMap::DATABASE_NAME)->getEventDispatcher();
+        $taxEvent = new TaxEvent($this);
+        $eventDispatcher->dispatch($taxEvent, TheliaEvents::TAX_GET_TYPE_SERVICE);
 
-        /* test type */
-        if (!class_exists($class)) {
-            throw new TaxEngineException('Recorded type `'.$class.'` does not exists', TaxEngineException::BAD_RECORDED_TYPE);
-        }
-        /** @var \Thelia\TaxEngine\BaseTaxType $instance */
-        $instance = new $class();
+        $typeService = $taxEvent->getTaxTypeService();
 
-        if (!$instance instanceof BaseTaxType) {
-            throw new TaxEngineException('Recorded type `'.$class.'` does not extends BaseTaxType', TaxEngineException::BAD_RECORDED_TYPE);
+        if (!$typeService) {
+            throw new TaxEngineException('Recorded type `'.$this->getType().'` does not exists', TaxEngineException::BAD_RECORDED_TYPE);
         }
 
-        $instance->loadRequirements($this->getRequirements());
+        $typeService->loadRequirements($this->getRequirements());
 
-        return $instance;
+        return $typeService;
     }
 
     public function setRequirements($requirements)

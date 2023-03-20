@@ -65,6 +65,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
+use Thelia\TaxEngine\TaxTypeInterface;
 use TheliaSmarty\Template\SmartyParser;
 
 class Thelia extends Kernel
@@ -459,6 +460,7 @@ class Thelia extends Kernel
             CouponInterface::class => 'thelia.coupon.addCoupon',
             ConditionInterface::class => 'thelia.coupon.addCondition',
             ControllerInterface::class => 'controller.service_arguments',
+            TaxTypeInterface::class => 'thelia.taxType',
         ];
 
         foreach ($autoconfiguredInterfaces as $interfaceClass => $tag) {
