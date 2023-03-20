@@ -93,15 +93,20 @@ class Encore extends AbstractSmartyPlugin
 
     public function getWebpackManifestFile($args): string
     {
-        $urlTool = URL::getInstance();
-
         $file = $args['file'];
         if (!$file) {
             return '';
         }
 
         if (isset($this->packages['manifest'])) {
-            return $urlTool->absoluteUrl($this->packages['manifest']->geturl($file));
+            // Take absolute url if available else take relative path
+            $manifestPath = URL::getInstance()->absoluteUrl($this->packages['manifest']->geturl($file));
+            $fileHeaders = @get_headers($manifestPath);
+            if (!$fileHeaders || (int) substr($fileHeaders[0], 9, 3) >= 400) {
+                $manifestPath = $this->packages['manifest']->geturl($file);
+            }
+
+            return $manifestPath;
         }
 
         return '';
