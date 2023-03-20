@@ -25,14 +25,14 @@ interface TaxTypeInterface
      *
      * For other tax types, this method shoud return 0.
      */
-    public function pricePercentRetriever(): float|int;
+    public function pricePercentRetriever(): float;
 
     /**
      * For constant amount tax type, return the absolute amount to use in tax calculation.
      *
      * For other tax types, this method shoud return 0.
      */
-    public function fixAmountRetriever(Product $product): float|int;
+    public function fixAmountRetriever(Product $product): float;
 
     /**
      * Returns the requirements definition of this tax type. This is an array of
@@ -47,7 +47,7 @@ interface TaxTypeInterface
 
     public function getTitle();
 
-    public function calculate(Product $product, $untaxedPrice): float|int;
+    public function calculate(Product $product, $untaxedPrice): float;
 
     public function getRequirements(): array;
 

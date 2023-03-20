@@ -33,7 +33,7 @@ abstract class BaseTaxType implements TaxTypeInterface
      *
      * For other tax types, this method shoud return 0.
      */
-    public function pricePercentRetriever(): float|int
+    public function pricePercentRetriever(): float
     {
         return 0;
     }
@@ -43,7 +43,7 @@ abstract class BaseTaxType implements TaxTypeInterface
      *
      * For other tax types, this method shoud return 0.
      */
-    public function fixAmountRetriever(Product $product): float|int
+    public function fixAmountRetriever(Product $product): float
     {
         return 0;
     }
@@ -64,7 +64,7 @@ abstract class BaseTaxType implements TaxTypeInterface
 
     abstract public function getTitle();
 
-    public function calculate(Product $product, $untaxedPrice): float|int
+    public function calculate(Product $product, $untaxedPrice): float
     {
         return $untaxedPrice * $this->pricePercentRetriever() + $this->fixAmountRetriever($product);
     }

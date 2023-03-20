@@ -30,7 +30,7 @@ class FixAmountTaxType extends BaseTaxType
         return $this;
     }
 
-    public function fixAmountRetriever(Product $product): float|int
+    public function fixAmountRetriever(Product $product): float
     {
         return $this->getRequirement('amount');
     }
