@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Form;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryBuilderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -25,8 +26,10 @@ use Thelia\Form\BaseForm;
  *
  * @author Benjamin Perche <benjamin@thelia.net>
  */
-class TheliaFormFactory implements TheliaFormFactoryInterface
+class TheliaFormFactory
 {
+    protected $container;
+
     /** @var RequestStack */
     protected $requestStack;
 
@@ -55,6 +58,7 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
     protected $tokenStorage;
 
     public function __construct(
+        ContainerInterface $container,
         RequestStack $requestStack,
         EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator,
@@ -63,6 +67,7 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
         TokenStorageInterface $tokenStorage,
         array $formDefinition
     ) {
+        $this->container = $container;
         $this->requestStack = $requestStack;
         $this->eventDispatcher = $eventDispatcher;
         $this->translator = $translator;
@@ -78,22 +83,24 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
         array $data = [],
         array $options = []
     ): BaseForm {
-        $formClass = null;
+        $formId = null;
         if (isset($this->formDefinition[$name])) {
-            $formClass = $this->formDefinition[$name];
+            $formId = $this->formDefinition[$name];
         }
 
         if (false !== array_search($name, $this->formDefinition, true)) {
-            $formClass = $name;
+            $formId = $name;
         }
 
-        if (null === $formClass) {
+        if (null === $formId) {
             throw new \OutOfBoundsException(
-                sprintf("The form '%s' doesn't exist", $name)
+                sprintf("The form '%s' doesn't exist", $formId)
             );
         }
 
-        return new $formClass(
+        /** @var BaseForm $form */
+        $form = $this->container->get($formId);
+        $form->init(
             $this->requestStack->getCurrentRequest(),
             $this->eventDispatcher,
             $this->translator,
@@ -104,5 +111,7 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
             $data,
             $options
         );
+
+        return $form;
     }
 }

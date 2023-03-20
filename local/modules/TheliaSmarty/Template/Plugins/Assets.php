@@ -91,7 +91,11 @@ class Assets extends AbstractSmartyPlugin
             return false;
         }
 
-        $svg = file_get_contents($path);
+        try {
+            $svg = file_get_contents($path);
+        } catch (\ErrorException $exception) {
+            $svg = file_get_contents(THELIA_WEB_DIR.$path);
+        }
 
         $matches = [];
         preg_match('/<svg.*?>/', $svg, $matches);
