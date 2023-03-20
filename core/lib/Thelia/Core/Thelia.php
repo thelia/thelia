@@ -456,7 +456,6 @@ class Thelia extends Kernel
             FormExtensionInterface::class => 'thelia.forms.extension',
             BaseLoopInterface::class => 'thelia.loop',
             ContainerAwareInterface::class => 'thelia.command',
-            FormInterface::class => 'thelia.form',
             CouponInterface::class => 'thelia.coupon.addCoupon',
             ConditionInterface::class => 'thelia.coupon.addCondition',
             ControllerInterface::class => 'controller.service_arguments',
@@ -466,6 +465,11 @@ class Thelia extends Kernel
             $container->registerForAutoconfiguration($interfaceClass)
                 ->addTag($tag);
         }
+
+        $container->registerForAutoconfiguration(FormInterface::class)
+            ->setPublic(true)
+            ->setShared(false)
+            ->addTag('thelia.form');
 
         // We set this particular service with public true to have all of his subscribers after removing type (see TheliaBundle.php)
         $container->registerForAutoconfiguration(BaseHookInterface::class)

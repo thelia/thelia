@@ -17,9 +17,7 @@ use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 
 /**
- * Class TheliaFormValidator.
- *
- * @author Benjamin Perche <benjamin@thelia.net>
+ * @deprecated useless factory
  */
 interface TheliaFormValidatorInterface
 {

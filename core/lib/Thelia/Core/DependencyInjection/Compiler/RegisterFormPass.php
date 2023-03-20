@@ -33,7 +33,7 @@ class RegisterFormPass implements CompilerPassInterface
             $formClass = $formDefinition->getClass();
             $name = $formClass::getName();
 
-            $formConfig[$name] = $formDefinition->getClass();
+            $formConfig[$name] = $id;
         }
 
         $container->setParameter('Thelia.parser.forms', $formConfig);
