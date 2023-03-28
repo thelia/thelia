@@ -1,6 +1,6 @@
 {if $META_DESCRIPTION}
-<meta name="description" content="{$META_DESCRIPTION}">
+<meta name="description" content="{$META_DESCRIPTION}{if $page_info|default:null}{$page_info}{/if}">
 {elseif $CHAPO}
-<meta name="description" content="{$CHAPO|truncate:150:""}">
+<meta name="description" content="{$CHAPO|truncate:150:""}{if $page_info|default:null}{$page_info}{/if}">
 {/if}
 {if $META_KEYWORDS}<meta name="keywords" content="{$META_KEYWORDS}">{/if}

@@ -257,4 +257,5 @@ return [
   'Skip to content' => 'Aller au contenu',
   'Skip to main navigation' => 'Aller à la navigation principale',
   'Open Menu' => 'Ouvrir le menu',
+  'Page %p' => 'Page %p',
 ];

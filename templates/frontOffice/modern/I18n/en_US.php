@@ -275,4 +275,5 @@ return [
     'per page' => 'per page',
     'update' => 'update',
     'with:' => 'with:',
+    'Page %p' => 'Page %p',
 ];
