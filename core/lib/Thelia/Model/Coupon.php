@@ -189,6 +189,36 @@ class Coupon extends BaseCoupon
         return (float) $amount;
     }
 
+
+     /**
+     * Set Coupon percentage.
+     *
+     * @param float $percentage Percentage deduced from the Cart
+     *
+     * @return $this
+     */
+    public function setPercentage($percentage)
+    {
+        $effects = $this->unserializeEffects($this->getSerializedEffects());
+        $effects['percentage'] = (float) $percentage;
+        $this->setEffects($effects);
+
+        return $this;
+    }
+
+    /**
+     * Get the percentage removed from the coupon to the cart.
+     *
+     * @return float
+     */
+    public function getPercentage()
+    {
+        // Percentage is now optional
+        $percentage = isset($this->getEffects()['percentage']) ? $this->getEffects()['percentage'] : 0;
+
+        return (float) $percentage;
+    }
+
     /**
      * Get the Coupon effects.
      *
