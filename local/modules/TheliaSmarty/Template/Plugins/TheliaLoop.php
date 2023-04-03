@@ -453,7 +453,8 @@ class TheliaLoop extends AbstractSmartyPlugin
         $serviceId = $this->loopDefinition[$type];
 
         /** @var LoopInterface $loop */
-        $loop = $this->container->get($serviceId);
+        $loop = $this->container->has($serviceId) ? $this->container->get($serviceId) : new $serviceId();
+        
         $loop->init(
             $this->container,
             $this->requestStack,
