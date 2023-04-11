@@ -40,7 +40,7 @@ final class SearchFilter extends AbstractSearchFilter implements FilterInterface
 
         $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
 
-        $fieldPath = str_contains($property, '.') ? $property : $query->getTableMap()->getName().'.'.$property;
+        $fieldPath = $this->getPropertyQueryPath($query, $property);
 
         $this->addWhereByStrategy(
             strategy: $strategy,
