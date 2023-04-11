@@ -92,10 +92,10 @@ abstract class AbstractPropelProvider implements ProviderInterface
                 }
                 if ($value instanceof ObjectCollection) {
 
-                    $collection = new ArrayCollection();
+                    $collection = new Collection();
 
                     foreach ($value as $childPropelModel) {
-                        $collection->add(
+                        $collection->append(
                             $this->modelToResource(
                                 resourceClass: $targetClass,
                                 propelModel: $childPropelModel,
@@ -129,27 +129,53 @@ abstract class AbstractPropelProvider implements ProviderInterface
 
                 $i18nFields = array_map(
                     function (\ReflectionProperty $reflectionProperty) {
-                        return $reflectionProperty->getName();
+                        return $reflectionProperty;
                     },
                     (new \ReflectionClass($i18nResource))->getProperties()
                 );
 
                 $langHasI18nValue = false;
 
+                /** @var \ReflectionProperty $i18nField */
                 foreach ($i18nFields as $i18nField) {
-                    $virtualColumn = ltrim(strtolower($parentReflector?->getShortName().'_'.$reflector->getShortName()).'_'.'lang_'.$lang->getLocale().'_'.$i18nField, '_');
+                    $i18nFieldName = $i18nField->getName();
+                    $groupAttributes = $i18nField->getAttributes(Groups::class)[0]?? null;
 
-                    if (
-                        !$baseModel->hasVirtualColumn($virtualColumn)
-                    ) {
-                       continue;
+                    if (null === $groupAttributes) {
+                        continue;
                     }
 
-                    $fieldValue = $baseModel->getVirtualColumn($virtualColumn);
-                    $setter = 'set'.ucfirst($i18nField);
+                    $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
+
+                    $matchingGroups = array_intersect($propertyGroups, $context['groups']);
+
+                    if (empty($matchingGroups)) {
+                        continue;
+                    }
+
+                    $fieldValue = null;
+
+                    $virtualColumn = ltrim(strtolower($parentReflector?->getShortName().'_'.$reflector->getShortName()).'_'.'lang_'.$lang->getLocale().'_'.$i18nFieldName, '_');
+
+                    if ($baseModel->hasVirtualColumn($virtualColumn)) {
+                        $fieldValue = $baseModel->getVirtualColumn($virtualColumn);
+                    }
+
+                    if (null === $fieldValue) {
+                        $propelModel->setlocale($lang->getLocale());
+                        $getter = 'get'.ucfirst($i18nFieldName);
+
+                        $fieldValue = $propelModel->$getter();
+                    }
+
+                    if (null === $fieldValue) {
+                        continue;
+                    }
+
+                    $setter = 'set'.ucfirst($i18nFieldName);
                     $i18nResource->$setter($fieldValue);
 
-                    if ('id' !== $i18nField && !empty($fieldValue)) {
+                    if ('id' !== $i18nFieldName && !empty($fieldValue)) {
                         $langHasI18nValue = true;
                     }
                 }

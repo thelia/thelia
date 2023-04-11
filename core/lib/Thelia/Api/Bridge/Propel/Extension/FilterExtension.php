@@ -22,10 +22,6 @@ class FilterExtension implements QueryCollectionExtensionInterface
 
     public function applyToCollection(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
     {
-        if (null === $resourceClass) {
-            throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
-        }
-
         $resourceFilters = $operation?->getFilters();
 
         if (empty($resourceFilters)) {

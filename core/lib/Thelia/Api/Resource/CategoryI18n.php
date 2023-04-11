@@ -18,5 +18,47 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class CategoryI18n extends I18n
 {
+    #[Groups([Category::GROUP_READ, Category::GROUP_WRITE])]
+    protected ?string $title;
 
+    #[Groups([Category::GROUP_READ, Category::GROUP_WRITE])]
+    protected ?string $chapo;
+
+    #[Groups([Category::GROUP_READ, Category::GROUP_WRITE])]
+    protected ?string $description;
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(?string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getChapo(): string
+    {
+        return $this->chapo;
+    }
+
+    public function setChapo(?string $chapo): self
+    {
+        $this->chapo = $chapo;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+        return $this;
+    }
 }

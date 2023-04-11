@@ -19,8 +19,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Propel\Runtime\Collection\ArrayCollection;
+use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
@@ -52,7 +52,8 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 #[ApiFilter(
     filterClass: SearchFilter::class,
     properties: [
-        'ref'
+        'ref',
+        'productCategories.category.id'
     ]
 )]
 #[ApiFilter(
@@ -65,7 +66,8 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
     filterClass: BooleanFilter::class,
     properties: [
         'visible',
-        'virtual'
+        'virtual',
+        'productCategories.defaultCategory'
     ]
 )]
 class Product extends AbstractTranslatableResource
@@ -87,6 +89,7 @@ class Product extends AbstractTranslatableResource
     public bool $virtual;
 
     #[Relation(targetResource: ProductCategory::class)]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public Collection $productCategories;
 
     public function __construct()
@@ -114,10 +117,6 @@ class Product extends AbstractTranslatableResource
 
     public function setRef(string $ref): self
     {
-//        if ($ref === "aaa") {
-//            throw new \Exception($this->ref);
-//        }
-
         $this->ref = $ref;
 
         return $this;
