@@ -25,6 +25,7 @@ class IriConverter implements IriConverterInterface
 
     public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string
     {
+
         $reflector = new \ReflectionClass($resource);
 
         $compositeIdentifiers = $reflector->getAttributes(CompositeIdentifiers::class);
@@ -45,7 +46,10 @@ class IriConverter implements IriConverterInterface
                 // try not decorated converter
             }
         }
-
-        return $this->decorated->getIriFromResource($resource, $referenceType, $operation, $context);
+        try {
+            return $this->decorated->getIriFromResource($resource, $referenceType, $operation, $context);
+        } catch (\Exception $e) {
+           return "undefined_iri";
+        }
     }
 }

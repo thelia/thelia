@@ -117,7 +117,9 @@ abstract class AbstractSearchFilter extends AbstractFilter implements FilterInte
         foreach ($filterProperties as $property => $strategy) {
             $propertyName = $this->normalizePropertyName($property);
 
+
             $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass);
+
 
             if (null === $reflectionProperty) {
                 continue;
@@ -142,47 +144,5 @@ abstract class AbstractSearchFilter extends AbstractFilter implements FilterInte
         }
 
         return $description;
-    }
-
-    /**
-     * Search a reflection property in class and his relation for a given property name
-     */
-    protected function getReflectionProperty(string $propertyName, string $class): ?\ReflectionProperty
-    {
-        $propertyParts = explode('.', $propertyName);
-
-        $classProperties = array_reduce(
-            (new \ReflectionClass($class))->getProperties(),
-            function ($carry, \ReflectionProperty $property) {
-                $carry[$property->getName()] = $property;
-                return $carry;
-            },
-        );
-
-
-        if (count($propertyParts) > 1) {
-            /** @var \ReflectionProperty $relationProperty */
-            $relationProperty = $classProperties[$propertyParts[0]] ?? null;
-
-            if (null === $relationProperty) {
-                return null;
-            }
-
-            foreach ($relationProperty->getAttributes(Relation::class) as $relationAttribute) {
-                $targetClass = $relationAttribute->getArguments()['targetResource'];
-                if (null === $targetClass) {
-                    continue;
-                }
-
-                $subPropertyName = substr($propertyName, strpos($propertyName, ".") + 1);
-                $reflectionProperty = $this->getReflectionProperty($subPropertyName, $targetClass);
-
-                if (null !== $reflectionProperty) {
-                    return $reflectionProperty;
-                }
-            }
-        }
-
-        return $classProperties[$propertyName]?? null;
     }
 }
