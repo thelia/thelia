@@ -52,9 +52,15 @@ class PropelCollectionProvider extends AbstractPropelProvider
 
         $langs = LangQuery::create()->filterByActive(1)->find();
 
+
         $items = array_map(
             function ($propelModel) use ($resourceClass, $context, $langs) {
-                return $this->modelToResource($resourceClass, $propelModel, $context, $langs);
+                return $this->modelToResource(
+                    resourceClass: $resourceClass,
+                    propelModel: $propelModel,
+                    context: $context,
+                    langs: $langs
+                );
             },
             iterator_to_array($query->find())
         );
