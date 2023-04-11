@@ -25,7 +25,7 @@ class ProductCategory extends AbstractPropelResource
     public const GROUP_WRITE = 'product_categories:write';
 
     #[Relation(targetResource: Category::class)]
-    #[Groups([self::GROUP_READ, Product::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ, ProductCategory::GROUP_READ])]
     private Category $category;
 
     #[Relation(targetResource: Product::class)]
@@ -33,7 +33,7 @@ class ProductCategory extends AbstractPropelResource
     private Product $product;
 
     #[Groups([self::GROUP_READ, Product::GROUP_READ])]
-    private bool $defaultCategory;
+    private ?bool $defaultCategory = false;
 
     #[Groups([self::GROUP_READ, Product::GROUP_READ])]
     private int $position;

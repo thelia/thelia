@@ -2,7 +2,7 @@
 
 namespace Thelia\Api\Bridge\Propel\PropertyInfo;
 
-use Doctrine\Common\Collections\Collection;
+use Propel\Runtime\Collection\Collection;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
