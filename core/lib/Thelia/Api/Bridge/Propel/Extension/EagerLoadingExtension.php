@@ -6,6 +6,7 @@ use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -21,6 +22,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     {
 
     }
+
     public function applyToCollection(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         $this->apply($query, $resourceClass, $operation, $context);
@@ -58,7 +60,13 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $options['denormalization_groups'] = $denormalizationGroups;
         }
 
-        $this->joinRelations($query, $resourceClass, $operation, $context, $options);
+        $this->joinRelations(
+            query :$query,
+            resourceClass: $resourceClass,
+            operation: $operation,
+            context: $context,
+            options: $options
+        );
     }
 
     private function joinRelations(
@@ -71,13 +79,16 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         int &$joinCount = 0,
         int $currentDepth = null,
         string $parentClass = null,
-        \ReflectionClass $parentReflector = null
+        \ReflectionClass $parentReflector = null,
+        string $parentAlias = null
     ) {
         if ($joinCount > $this->maxJoins) {
             throw new RuntimeException('The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary with the "api_platform.eager_loading.max_joins" configuration key (https://api-platform.com/docs/core/performance/#eager-loading), or limit the maximum serialization depth using the "enable_max_depth" option of the Symfony serializer (https://symfony.com/doc/current/components/serializer.html#handling-serialization-depth).');
         }
 
         $reflector = new \ReflectionClass($resourceClass);
+        $baseJoinAlias = ltrim($parentAlias ?: $parentReflector?->getShortName().'_'.$reflector->getShortName(), '_');
+        $baseJoinAlias = strtolower($baseJoinAlias).'_';
 
         if (is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
             $langs = LangQuery::create()->filterByActive(1)->find();
@@ -96,7 +107,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
             $joinMethodName = 'join'.$reflector->getShortName().'I18n';
             foreach ($langs as $lang) {
-                $joinAlias = ltrim(strtolower($parentReflector?->getShortName().'_'.$reflector->getShortName()).'_'.'lang_'.$lang->getLocale(), '_');
+                $joinAlias = trim($baseJoinAlias.'lang_'.$lang->getLocale(), '_');
                 $query->$joinMethodName($joinAlias);
                 $query->addJoinCondition($joinAlias, $joinAlias.'.locale = ?', $lang->getLocale(), null, \PDO::PARAM_STR);
 
@@ -120,10 +131,30 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             }
 
             foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
+
                 $targetClass = $relationAttribute->getArguments()['targetResource'];
 
                 if ($parentClass === $targetClass) {
                     continue;
+                }
+
+                // Join only for non collection relation (Many to One or One to One) or if filter is applied to it
+                if ($property->getType()->getName() === Collection::class) {
+                    $isInFilters = array_reduce(
+                        array_keys($context['filters']),
+                        function (bool $carry, $filter) use ($property) {
+                            if (true === $carry) {
+                                return true;
+                            }
+
+                            return str_contains($filter, $property->getName());
+                        },
+                        false
+                    );
+
+                    if (!$isInFilters) {
+                        continue;
+                    }
                 }
 
                 $targetReflector = new \ReflectionClass($targetClass);
@@ -134,9 +165,36 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                     continue;
                 }
 
+                $joinAlias = trim($baseJoinAlias.strtolower($property->getName()), '_');
+
                 ++$joinCount;
                 /** @var ModelCriteria $relationQuery */
-                $relationQuery = $query->$joinFunctionName(null, $isLeftJoin ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN);
+                $relationQuery = $query->$joinFunctionName($joinAlias, $isLeftJoin ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN);
+
+                foreach ($targetReflector->getProperties() as $targetProperty) {
+                    if ($targetProperty->getName() === 'i18ns') {
+                        continue;
+                    }
+
+                    $groupAttributes = $targetProperty->getAttributes(Groups::class)[0] ?? null;
+
+                    if (null === $groupAttributes) {
+                        continue;
+                    }
+
+                    $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
+
+                    if (empty(array_intersect($propertyGroups, $context['groups']))) {
+                        continue;
+                    }
+
+                    if (!empty($targetProperty->getAttributes(Relation::class))) {
+                        continue;
+                    }
+
+                    $relationQuery->withColumn( $relationQuery->getTableNameInQuery().'.'.$targetProperty->getName(), $relationQuery->getTableNameInQuery().'_'.$targetProperty->getName());
+                }
+
 
                 // Avoid recursive joins for self-referencing relations
                 if ($targetClass === $resourceClass) {
@@ -144,6 +202,8 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                     continue;
                 }
 
+
+                // Join relations of relation
                 $this->joinRelations(
                     query: $relationQuery,
                     resourceClass: $targetClass,
@@ -154,7 +214,8 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                     joinCount: $joinCount,
                     currentDepth: $currentDepth,
                     parentClass: $resourceClass,
-                    parentReflector: $reflector
+                    parentReflector: $reflector,
+                    parentAlias: $joinAlias
                 );
                 $relationQuery->endUse();
             }

@@ -26,8 +26,9 @@ final class BooleanFilter extends AbstractFilter implements FilterInterface
             return;
         }
 
-        $filterMethod = "filterBy".ucfirst($property);
-        $query->$filterMethod(filter_var($value, FILTER_VALIDATE_BOOLEAN));
+        $fieldPath = $this->getPropertyQueryPath($query, $property);
+
+        $query->where($fieldPath.' = ?', filter_var($value, FILTER_VALIDATE_BOOLEAN), );
     }
 
     public function getDescription(string $resourceClass): array
@@ -37,22 +38,13 @@ final class BooleanFilter extends AbstractFilter implements FilterInterface
         $filterProperties = $this->getProperties();
         if (null === $filterProperties) {
             return [];
-        }
-
-        $classProperties = array_reduce(
-            (new \ReflectionClass($resourceClass))->getProperties(),
-            function ($carry, \ReflectionProperty $property) {
-                $carry[$property->getName()] = $property;
-                return $carry;
-            },
-        );
+        };
 
         foreach ($filterProperties as $property => $strategy) {
             $propertyName = $this->normalizePropertyName($property);
 
-            $reflectionProperty = $classProperties[$propertyName]?? null;
+            $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass);
             if (null === $reflectionProperty) {
-                //Todo search for relation
                 continue;
             }
 
