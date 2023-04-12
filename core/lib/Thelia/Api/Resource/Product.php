@@ -53,13 +53,8 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
     filterClass: SearchFilter::class,
     properties: [
         'ref',
-        'productCategories.category.id'
-    ]
-)]
-#[ApiFilter(
-    filterClass: LocalizedSearchFilter::class,
-    properties: [
-        'chapo' => 'word_start'
+        'productCategories.category.id',
+        'title' => 'word_start'
     ]
 )]
 #[ApiFilter(
