@@ -136,11 +136,12 @@ final class SearchFilter extends AbstractFilter implements FilterInterface
 
         foreach ($filterProperties as $property => $strategy) {
             $propertyName = $this->normalizePropertyName($property);
-
+            $isLocalized = false;
 
             $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass);
 
             if (null === $reflectionProperty && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
+                $isLocalized = true;
                 $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass::getI18nResourceClass());
             }
 
@@ -163,6 +164,15 @@ final class SearchFilter extends AbstractFilter implements FilterInterface
                     'strategy' => $strategy,
                     'is_collection' => str_ends_with((string) $filterParameterName, '[]'),
                 ];
+                if ($isLocalized) {
+                    $description['locale'] = [
+                        'property' => 'locale',
+                        'description' => 'Locale used to filter localized fields, if empty default lang will be used',
+                        'type' => 'string',
+                        'required' => false,
+                        'is_collection' => false,
+                    ];
+                }
             }
         }
 
