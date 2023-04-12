@@ -141,7 +141,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 // Join only for non collection relation (Many to One or One to One) or if filter is applied to it
                 if ($property->getType()->getName() === Collection::class) {
                     $isInFilters = array_reduce(
-                        array_keys($context['filters']),
+                        array_keys($context['filters']?? []),
                         function (bool $carry, $filter) use ($property) {
                             if (true === $carry) {
                                 return true;
@@ -195,13 +195,11 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                     $relationQuery->withColumn( $relationQuery->getTableNameInQuery().'.'.$targetProperty->getName(), $relationQuery->getTableNameInQuery().'_'.$targetProperty->getName());
                 }
 
-
                 // Avoid recursive joins for self-referencing relations
                 if ($targetClass === $resourceClass) {
                     $relationQuery->endUse();
                     continue;
                 }
-
 
                 // Join relations of relation
                 $this->joinRelations(
