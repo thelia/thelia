@@ -24,7 +24,6 @@ use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
-use Thelia\Api\Bridge\Propel\Filter\LocalizedSearchFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 
 #[ApiResource(
@@ -84,7 +83,7 @@ class Product extends AbstractTranslatableResource
     public bool $virtual;
 
     #[Relation(targetResource: ProductCategory::class)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE])]
     public Collection $productCategories;
 
     public function __construct()

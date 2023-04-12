@@ -8,15 +8,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 abstract class AbstractTranslatableResource extends AbstractPropelResource implements TranslatableResourceInterface
 {
     #[ApiProperty(
-        openapiContext: [
-            'type' => 'object',
-            'example' => [
-                'en_US' => [
-                    'title' => 'string',
-                    'chapo' => 'string'
-                ],
-            ]
-        ],
         types: 'object'
     )]
     #[Groups([I18n::GROUP_READ, I18n::GROUP_WRITE])]
