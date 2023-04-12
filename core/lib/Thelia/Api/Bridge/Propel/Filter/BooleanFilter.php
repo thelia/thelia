@@ -26,7 +26,7 @@ final class BooleanFilter extends AbstractFilter implements FilterInterface
             return;
         }
 
-        $fieldPath = $this->getPropertyQueryPath($query, $property);
+        $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
 
         $query->where($fieldPath.' = ?', filter_var($value, FILTER_VALIDATE_BOOLEAN), );
     }
