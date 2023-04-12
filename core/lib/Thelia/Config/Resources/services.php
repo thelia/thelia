@@ -12,10 +12,10 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Thelia\Api\Bridge\Propel\MetaData\Property\PropelPropertyMetadataFactory;
 use Thelia\Api\Bridge\Propel\OpenApiDecorator\JwtDecorator;
+use Thelia\Api\Bridge\Propel\OpenApiDecorator\I18nDecorator;
 use Thelia\Api\Bridge\Propel\Routing\IriConverter;
-use Thelia\Api\Metadata\RelationPropertyMetadataFactory;
-use Thelia\Api\OpenApiDecorator\I18nDecorator;
 use Thelia\Core\Service\ConfigCacheService;
 use Thelia\Core\Thelia;
 use Thelia\Log\Tlog;
@@ -102,6 +102,10 @@ return static function (ContainerConfigurator $configurator): void {
 
     $serviceConfigurator->set(JwtDecorator::class)
         ->decorate('api_platform.openapi.factory')
+        ->args([service('.inner')]);
+
+    $serviceConfigurator->set(PropelPropertyMetadataFactory::class)
+        ->decorate('api_platform.metadata.property.metadata_factory')
         ->args([service('.inner')]);
 
     $serviceConfigurator->set(IriConverter::class)
