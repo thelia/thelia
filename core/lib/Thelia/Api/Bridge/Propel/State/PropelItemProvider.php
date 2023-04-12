@@ -47,10 +47,6 @@ class PropelItemProvider extends AbstractPropelProvider
 
         foreach ($this->propelItemExtensions as $extension) {
             $extension->applyToItem($query, $resourceClass, $operation, $context);
-
-//            if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
-//                return $extension->getResult($query, $resourceClass, $operation->getName(), $context);
-//            }
         }
 
         $propelModel = $query->findOne();
