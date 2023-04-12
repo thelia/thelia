@@ -17,12 +17,36 @@ use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Api\Resource\TranslatableResourceInterface;
+use Webmozart\Assert\Assert;
 
-final class SearchFilter extends AbstractSearchFilter implements FilterInterface
+final class SearchFilter extends AbstractFilter implements FilterInterface
 {
     /**
-     * {@inheritdoc}
+     * @var string Exact matching
      */
+    public const STRATEGY_EXACT = 'exact';
+
+    /**
+     * @var string The value must be contained in the field
+     */
+    public const STRATEGY_PARTIAL = 'partial';
+
+    /**
+     * @var string Finds fields that are starting with the value
+     */
+    public const STRATEGY_START = 'start';
+
+    /**
+     * @var string Finds fields that are ending with the value
+     */
+    public const STRATEGY_END = 'end';
+
+    /**
+     * @var string Finds fields that are starting with the word
+     */
+    public const STRATEGY_WORD_START = 'word_start';
+
     protected function filterProperty(string $property, $value, ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         if (
@@ -40,7 +64,7 @@ final class SearchFilter extends AbstractSearchFilter implements FilterInterface
 
         $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
 
-        $fieldPath = $this->getPropertyQueryPath($query, $property);
+        $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
 
         $this->addWhereByStrategy(
             strategy: $strategy,
@@ -103,6 +127,72 @@ final class SearchFilter extends AbstractSearchFilter implements FilterInterface
 
     public function getDescription(string $resourceClass): array
     {
-        return $this->getSearchDescription($resourceClass);
+        $description = [];
+
+        $filterProperties = $this->getProperties();
+        if (null === $filterProperties) {
+            return [];
+        }
+
+        foreach ($filterProperties as $property => $strategy) {
+            $propertyName = $this->normalizePropertyName($property);
+
+
+            $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass);
+
+            if (null === $reflectionProperty && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
+                $reflectionProperty = $this->getReflectionProperty($propertyName, $resourceClass::getI18nResourceClass());
+            }
+
+            if (null === $reflectionProperty) {
+                continue;
+            }
+
+            $strategy = $this->getProperties()[$property] ?? self::STRATEGY_EXACT;
+            $filterParameterNames = [$propertyName];
+
+            if (self::STRATEGY_EXACT === $strategy) {
+                $filterParameterNames[] = $propertyName.'[]';
+            }
+
+            foreach ($filterParameterNames as $filterParameterName) {
+                $description[$filterParameterName] = [
+                    'property' => $propertyName,
+                    'type' => $this->getType($reflectionProperty->getType()),
+                    'required' => false,
+                    'strategy' => $strategy,
+                    'is_collection' => str_ends_with((string) $filterParameterName, '[]'),
+                ];
+            }
+        }
+
+        return $description;
+    }
+
+    protected function normalizeValues(array $values, string $property): ?array
+    {
+        foreach ($values as $key => $value) {
+            if (!\is_int($key) || !(\is_string($value) || \is_int($value))) {
+                unset($values[$key]);
+            }
+        }
+
+        if (empty($values)) {
+            $this->getLogger()->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
+            ]);
+
+            return null;
+        }
+
+        return array_values($values);
+    }
+
+    protected function getType(\ReflectionNamedType $type): string
+    {
+        if (!$type->isBuiltin()) {
+            return 'string';
+        }
+        return $type->getName();
     }
 }
