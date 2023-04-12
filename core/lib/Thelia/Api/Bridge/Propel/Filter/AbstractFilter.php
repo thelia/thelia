@@ -11,12 +11,18 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Resource\TranslatableResourceInterface;
+use Thelia\Model\Lang;
 
 abstract class AbstractFilter implements FilterInterface
 {
     protected LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger = null, protected ?array $properties = null, protected ?NameConverterInterface $nameConverter = null)
+    public function __construct(
+        LoggerInterface $logger = null,
+        protected ?array $properties = null,
+        protected ?NameConverterInterface $nameConverter = null
+    )
     {
         $this->logger = $logger ?? new NullLogger();
     }
@@ -115,8 +121,18 @@ abstract class AbstractFilter implements FilterInterface
         return $classProperties[$propertyName]?? null;
     }
 
-    protected function getPropertyQueryPath(ModelCriteria $query, string $property): string
+    protected function getPropertyQueryPath(
+        ModelCriteria $query,
+        string $property,
+        array $context
+    ): string
     {
+        $resourceClass = $context['resource_class'];
+        //Check if we are on a localized field
+        if (!str_contains($property, '.') && !property_exists($resourceClass, $property) && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
+            return $this->getLocalizedPropertyQueryPath($query, $property, $context);
+        }
+
         $fieldPath = $query->getTableMap()->getName().'.'.$property;
         //Replace all dot by underscore to build relation alias
         $fieldPath = str_replace('.', '_', $fieldPath);
@@ -134,5 +150,15 @@ abstract class AbstractFilter implements FilterInterface
         $column = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $field));
 
         return strtolower($tableAlias.'.'.$column);
+    }
+
+    protected function getLocalizedPropertyQueryPath(
+        ModelCriteria $query,
+        string $property,
+        array $context,
+    )
+    {
+        $locale = $context['filters']['locale'] ?? Lang::getDefaultLanguage()->getLocale();
+        return $query->getTableMap()->getName().'_lang_'.$locale.'.'.$property;
     }
 }
