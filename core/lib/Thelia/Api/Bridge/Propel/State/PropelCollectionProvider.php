@@ -42,16 +42,21 @@ class PropelCollectionProvider extends AbstractPropelProvider
         /** @var ModelCriteria $query */
         $query = $queryClass::create();
 
+        $results = null;
+
         foreach ($this->propelCollectionExtensions as $extension) {
             $extension->applyToCollection($query, $resourceClass, $operation, $context);
 
-            if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
-                return $extension->getResult($query, $resourceClass, $operation->getName(), $context);
+            if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation, $context)) {
+                $results = $extension->getResult($query, $resourceClass, $operation, $context);
             }
         }
 
-        $langs = LangQuery::create()->filterByActive(1)->find();
+        if (null === $results) {
+            $results = $query->find();
+        }
 
+        $langs = LangQuery::create()->filterByActive(1)->find();
 
         $items = array_map(
             function ($propelModel) use ($resourceClass, $context, $langs) {
@@ -62,7 +67,7 @@ class PropelCollectionProvider extends AbstractPropelProvider
                     langs: $langs
                 );
             },
-            iterator_to_array($query->find())
+            iterator_to_array($results)
         );
 
         return $items;
