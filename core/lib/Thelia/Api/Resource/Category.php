@@ -47,7 +47,7 @@ class Category extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'category:read:single';
     public const GROUP_WRITE = 'category:write';
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ, ProductCategory::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductCategory::GROUP_READ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
