@@ -125,8 +125,6 @@ class Database
     /**
      * Separate each sql instruction in an array.
      *
-     * @param $sql
-     *
      * @return array
      */
     protected function prepareSql($sql)
@@ -170,7 +168,7 @@ class Database
             $tables = [];
             $result = $this->connection->prepare('SHOW TABLES');
             $result->execute();
-            while ($row = $result->fetch(PDO::FETCH_NUM)) {
+            while ($row = $result->fetch(\PDO::FETCH_NUM)) {
                 $tables[] = $row[0];
             }
         } else {
@@ -201,14 +199,14 @@ class Database
 
             $resultStruct = $this->execute('SHOW CREATE TABLE `'.$table.'`');
 
-            $rowStruct = $resultStruct->fetch(PDO::FETCH_NUM);
+            $rowStruct = $resultStruct->fetch(\PDO::FETCH_NUM);
 
             $data[] = "\n\n";
             $data[] = $rowStruct[1];
             $data[] = ";\n\n";
 
             for ($i = 0; $i < $fieldCount; ++$i) {
-                while ($row = $result->fetch(PDO::FETCH_NUM)) {
+                while ($row = $result->fetch(\PDO::FETCH_NUM)) {
                     $data[] = 'INSERT INTO `'.$table.'` VALUES(';
                     for ($j = 0; $j < $fieldCount; ++$j) {
                         $row[$j] = addslashes($row[$j]);
@@ -260,8 +258,6 @@ class Database
 
     /**
      * create database if not exists.
-     *
-     * @param $dbName
      */
     public function createDatabase($dbName): void
     {
@@ -274,7 +270,7 @@ class Database
     }
 
     /**
-     * @return PDO
+     * @return \PDO
      */
     public function getConnection()
     {

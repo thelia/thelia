@@ -40,8 +40,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
     /**
      * Create a new currencyuration entry.
-     *
-     * @param $eventName
      */
     public function create(CurrencyCreateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -66,8 +64,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
     /**
      * Change a currency.
-     *
-     * @param $eventName
      */
     public function update(CurrencyUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -89,8 +85,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
     /**
      * Set the default currency.
-     *
-     * @param $eventName
      */
     public function setDefault(CurrencyUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -127,8 +121,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
     /**
      * Delete a currencyuration entry.
-     *
-     * @param $eventName
      */
     public function delete(CurrencyDeleteEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {

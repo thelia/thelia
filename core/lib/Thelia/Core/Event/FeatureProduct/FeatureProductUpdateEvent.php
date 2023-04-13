@@ -25,9 +25,8 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
     protected $locale;
 
     /**
-     * @param int $product_id
-     * @param int $feature_id
-     * @param $feature_value
+     * @param int  $product_id
+     * @param int  $feature_id
      * @param bool $is_text_value
      */
     public function __construct($product_id, $feature_id, $feature_value, $is_text_value = false)
@@ -47,8 +46,6 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
     }
 
     /**
-     * @param $product_id
-     *
      * @return $this
      */
     public function setProductId($product_id)
@@ -67,8 +64,6 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
     }
 
     /**
-     * @param $feature_id
-     *
      * @return $this
      */
     public function setFeatureId($feature_id)

@@ -59,8 +59,6 @@ class Content extends BaseAction implements EventSubscriberInterface
     /**
      * process update content.
      *
-     * @param $eventName
-     *
      * @throws PropelException
      * @throws \Exception
      */
@@ -93,8 +91,6 @@ class Content extends BaseAction implements EventSubscriberInterface
 
     /**
      * Change Content SEO.
-     *
-     * @param $eventName
      *
      * @return object
      */

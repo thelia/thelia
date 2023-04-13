@@ -141,9 +141,9 @@ class Order extends BaseOrder
      * @param bool      $includePostage  if true, the postage cost is included to the total
      * @param bool      $includeDiscount if true, the discount will be included to the total
      *
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public function getTotalAmount(&$tax = 0, $includePostage = true, $includeDiscount = true)
     {
@@ -245,9 +245,9 @@ class Order extends BaseOrder
      * @param bool      $includePostage  if true, the postage cost is included to the total
      * @param bool      $includeDiscount if true, the discount will be included to the total
      *
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public function getTotalAmountLegacy(&$tax = 0, $includePostage = true, $includeDiscount = true)
     {
@@ -283,8 +283,8 @@ class Order extends BaseOrder
         }
 
         if (false !== $includePostage) {
-            $total += (float) ($this->getPostage());
-            $tax += (float) ($this->getPostageTax());
+            $total += (float) $this->getPostage();
+            $tax += (float) $this->getPostageTax();
         }
 
         return $total;
@@ -296,9 +296,9 @@ class Order extends BaseOrder
      * The order weight is only available once the order is persisted in database.
      * During invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
      *
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public function getWeight()
     {
@@ -359,9 +359,9 @@ class Order extends BaseOrder
      *
      * @param bool $exact if true, the status should be the exact required status, not a derived one
      *
-     * @return bool true if this order is NOT PAID, false otherwise
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return bool true if this order is NOT PAID, false otherwise
      */
     public function isNotPaid($exact = true)
     {
@@ -383,9 +383,9 @@ class Order extends BaseOrder
      *
      * @param bool $exact if true, the status should be the exact required status, not a derived one
      *
-     * @return bool true if this order is PAID, false otherwise
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return bool true if this order is PAID, false otherwise
      */
     public function isPaid($exact = true)
     {
@@ -407,9 +407,9 @@ class Order extends BaseOrder
      *
      * @param bool $exact if true, the status should be the exact required status, not a derived one
      *
-     * @return bool true if this order is PROCESSING, false otherwise
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return bool true if this order is PROCESSING, false otherwise
      */
     public function isProcessing($exact = true)
     {
@@ -431,9 +431,9 @@ class Order extends BaseOrder
      *
      * @param bool $exact if true, the status should be the exact required status, not a derived one
      *
-     * @return bool true if this order is SENT, false otherwise
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return bool true if this order is SENT, false otherwise
      */
     public function isSent($exact = true)
     {
@@ -455,9 +455,9 @@ class Order extends BaseOrder
      *
      * @param bool $exact if true, the status should be the exact required status, not a derived one
      *
-     * @return bool true if this order is CANCELED, false otherwise
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return bool true if this order is CANCELED, false otherwise
      */
     public function isCancelled($exact = true)
     {
@@ -479,9 +479,9 @@ class Order extends BaseOrder
      *
      * @param bool $exact if true, the status should be the exact required status, not a derived one
      *
-     * @return bool true if this order is REFUNDED, false otherwise
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return bool true if this order is REFUNDED, false otherwise
      */
     public function isRefunded($exact = true)
     {
@@ -505,9 +505,9 @@ class Order extends BaseOrder
     /**
      * Get an instance of the payment module.
      *
-     * @return \Thelia\Module\PaymentModuleInterface
-     *
      * @throws TheliaProcessException
+     *
+     * @return \Thelia\Module\PaymentModuleInterface
      */
     public function getPaymentModuleInstance()
     {
@@ -521,9 +521,9 @@ class Order extends BaseOrder
     /**
      * Get an instance of the delivery module.
      *
-     * @return \Thelia\Module\BaseModuleInterface
-     *
      * @throws TheliaProcessException
+     *
+     * @return \Thelia\Module\BaseModuleInterface
      */
     public function getDeliveryModuleInstance()
     {

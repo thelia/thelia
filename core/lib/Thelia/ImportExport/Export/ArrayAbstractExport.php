@@ -54,7 +54,7 @@ abstract class ArrayAbstractExport extends AbstractExport
         throw new \LogicException('Export data can\'t be rewinded');
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return key($this->data) !== null;
     }

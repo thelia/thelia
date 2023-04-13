@@ -69,6 +69,7 @@ class SchemaCombinerTest extends TestCase
 
     /**
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
+     *
      * @dataProvider combineExpectationsProvider
      */
     public function testOutputTypesAreCorrect(array $schemaFiles): void
@@ -118,6 +119,7 @@ class SchemaCombinerTest extends TestCase
 
     /**
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
+     *
      * @dataProvider combineExpectationsProvider
      */
     public function testCombinedSchemasAreValid(array $schemaFiles): void
@@ -135,6 +137,7 @@ class SchemaCombinerTest extends TestCase
 
     /**
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
+     *
      * @dataProvider combineExpectationsProvider
      */
     public function testOneGlobalSchemaPerDatabaseIsProduced(array $schemaFiles, array $expectedDatabases): void
@@ -159,6 +162,7 @@ class SchemaCombinerTest extends TestCase
 
     /**
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
+     *
      * @dataProvider combineExpectationsProvider
      */
     public function testCombinedSchemasContainOnlyOneDatabaseElement(array $schemaFiles): void
@@ -180,6 +184,7 @@ class SchemaCombinerTest extends TestCase
 
     /**
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
+     *
      * @dataProvider combineExpectationsProvider
      */
     public function testDatabaseElementsAreCorrectlyNamed(array $schemaFiles): void
@@ -202,6 +207,7 @@ class SchemaCombinerTest extends TestCase
 
     /**
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
+     *
      * @dataProvider combineExpectationsProvider
      */
     public function testDatabaseElementsHaveIdentifierQuotingActive(array $schemaFiles): void
@@ -224,6 +230,7 @@ class SchemaCombinerTest extends TestCase
 
     /**
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
+     *
      * @dataProvider combineExpectationsProvider
      */
     public function testDatabaseElementsHaveNoTablePrefixAttribute(array $schemaFiles): void
@@ -246,6 +253,7 @@ class SchemaCombinerTest extends TestCase
 
     /**
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
+     *
      * @dataProvider combineExpectationsProvider
      */
     public function testDatabaseElementsHaveNoInheritableAttributes(array $schemaFiles): void
@@ -270,6 +278,7 @@ class SchemaCombinerTest extends TestCase
 
     /**
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
+     *
      * @dataProvider combineExpectationsProvider
      */
     public function testDatabaseElementsHaveNoExternalSchemaElements(array $schemaFiles): void
@@ -291,6 +300,7 @@ class SchemaCombinerTest extends TestCase
 
     /**
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
+     *
      * @dataProvider combineExpectationsProvider
      */
     public function testExpectedTableElementsAreGenerated(array $schemaFiles, array $expectedDatabases): void
@@ -342,6 +352,7 @@ class SchemaCombinerTest extends TestCase
 
     /**
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
+     *
      * @dataProvider combineExpectationsProvider
      */
     public function testInheritableDatabaseAttributesAreInheritedOnTables(array $schemaFiles, array $expectedDatabases): void
@@ -392,6 +403,7 @@ class SchemaCombinerTest extends TestCase
 
     /**
      * @covers       \Thelia\Core\Propel\Schema\SchemaCombiner
+     *
      * @dataProvider combineExpectationsProvider
      */
     public function testTableElementsContentIsPreserved(array $schemaFiles, array $expectedDatabases): void

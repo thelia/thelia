@@ -157,9 +157,6 @@ class FolderController extends AbstractSeoCrudController
     }
 
     /**
-     * @param $positionChangeMode
-     * @param $positionValue
-     *
      * @return UpdatePositionEvent|void
      */
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)

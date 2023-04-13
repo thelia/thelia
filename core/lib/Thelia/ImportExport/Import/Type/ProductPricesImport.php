@@ -55,7 +55,7 @@ class ProductPricesImport extends AbstractImport
         $price = ProductPriceQuery::create()
                 ->filterByProductSaleElementsId($pse->getId())
                 ->findOneByCurrencyId($currency->getId())
-            ;
+        ;
 
         if ($price === null) {
             $price = new ProductPrice();
@@ -63,7 +63,7 @@ class ProductPricesImport extends AbstractImport
             $price
                     ->setProductSaleElements($pse)
                     ->setCurrency($currency)
-                ;
+            ;
         }
 
         $price->setPrice($data['price']);
@@ -77,7 +77,7 @@ class ProductPricesImport extends AbstractImport
                     ->getProductSaleElements()
                     ->setPromo((int) $data['promo'])
                     ->save()
-                ;
+            ;
         }
 
         $price->save();

@@ -1,11 +1,20 @@
 @import 'tailwindcss/base';
-@import 'mmenu-light/dist/mmenu-light.css';
 
+@import 'noJsFallback';
+@import 'variables';
 @import 'layout';
+@import 'menu';
+@import 'sticky';
+@import 'sidebar';
+@import 'helpers';
 @import 'buttons';
+@import 'form';
 @import 'blocks';
+@import 'animations';
 @import 'table';
 @import 'wysiwyg';
+@import 'zoom';
+@import 'print';
 
 @import '../../components/**/*.css';
 

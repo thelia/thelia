@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Validator\Constraints;
@@ -19,7 +20,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Tax;
-use Thelia\TaxEngine\TaxEngine;
 use Thelia\TaxEngine\TaxTypeRequirementDefinition;
 use Thelia\Type\TypeInterface;
 
@@ -32,21 +32,24 @@ class TaxCreationForm extends BaseForm
 {
     use StandardDescriptionFieldsTrait;
 
+    private iterable $taxTypeIterator;
+
+    public function __construct(
+        #[TaggedIterator('thelia.taxType')] iterable $taxTypeIterator
+    ) {
+        $this->taxTypeIterator = $taxTypeIterator;
+    }
+
     protected static $typeList = [];
 
     protected function buildForm(): void
     {
-        $types = TaxEngine::getTaxTypeList();
-
         $typeList = [];
         $requirementList = [];
 
-        foreach ($types as $classname) {
-            $instance = new $classname();
-
-            $typeList[$instance->getTitle()] = Tax::escapeTypeName($classname);
-
-            $requirementList[$classname] = $instance->getRequirementsDefinition();
+        foreach ($this->taxTypeIterator as $taxType) {
+            $typeList[$taxType->getTitle()] = Tax::escapeTypeName($taxType::class);
+            $requirementList[$taxType::class] = $taxType->getRequirementsDefinition();
         }
 
         $this->formBuilder

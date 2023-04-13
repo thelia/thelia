@@ -65,16 +65,16 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
             foreach ($deletes as $item) {
                 TaxRuleCountryQuery::create()
                     ->filterByTaxRule($taxRule)
-                    ->filterByCountryId((int) ($item[0]), Criteria::EQUAL)
-                    ->filterByStateId((int) ($item[1]) !== 0 ? $item[1] : null, Criteria::EQUAL)
+                    ->filterByCountryId((int) $item[0], Criteria::EQUAL)
+                    ->filterByStateId((int) $item[1] !== 0 ? $item[1] : null, Criteria::EQUAL)
                     ->delete();
             }
 
             /* for each country */
             foreach ($countryList as $item) {
                 $position = 1;
-                $countryId = (int) ($item[0]);
-                $stateId = (int) ($item[1]);
+                $countryId = (int) $item[0];
+                $stateId = (int) $item[1];
 
                 /* on applique les nouvelles regles */
                 foreach ($taxList as $tax) {

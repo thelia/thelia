@@ -1,6 +1,7 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 
 import Error from '../Error';
+import { ReactComponent as EyeIcon } from '@icons/eye.svg';
 
 const Input = forwardRef(
   (
@@ -18,37 +19,59 @@ const Input = forwardRef(
     },
     ref
   ) => {
+    const [passwordVisible, setPasswordVisible] = useState(false);
+
+    let finalType = type === 'password' && passwordVisible ? 'text' : type;
+
     return (
-      <label className={`${className ? className : 'w-full block'}`}>
+      <label className={`Input ${className ? className : ''}`}>
         {label ? (
           <div
-            className={`font-bold text-sm ${
-              error ? 'text-red-500' : 'text-gray-700'
+            className={`Input-label  ${
+              error ? 'text-error' : ''
             } ${labelClassname}`}
           >
-            {label}
+            {label}{' '}
+            {props.required ? <span className="text-gray-500">*</span> : ''}
           </div>
         ) : null}
-        <input
-          placeholder={placeholder}
-          ref={ref}
-          name={name}
-          type={type}
-          className={`mt-0 block w-full px-0.5 border-0 border-b-2 focus:ring-0 focus:border-black ${
-            error ? 'border-red-500' : 'border-gray-200'
-          }`}
-          {...props}
-          value={
-            transformValue && typeof transformValue === 'function'
-              ? transformValue(value)
-              : value
-          }
-        />
+        <div className="relative">
+          <input
+            placeholder={placeholder}
+            ref={ref}
+            name={name}
+            type={finalType}
+            className={`Input-field ${
+              error
+                ? 'border-error text-error focus:border-error focus:ring-error'
+                : 'text-primary'
+            }`}
+            {...props}
+            value={
+              transformValue && typeof transformValue === 'function'
+                ? transformValue(value)
+                : value
+            }
+          />
+          {type === 'password' ? (
+            <button
+              type="button"
+              className={`Input-switchPassword ${
+                passwordVisible ? 'is-noVisible' : ''
+              }`}
+              onClick={() => {
+                setPasswordVisible(!passwordVisible);
+              }}
+            >
+              <EyeIcon className="h-5 w-5" />
+            </button>
+          ) : null}
+        </div>
 
         {error ? (
-          <div className="mt-1">
+          <span className="Input-message">
             <Error error={error} />
-          </div>
+          </span>
         ) : null}
       </label>
     );

@@ -29,12 +29,12 @@ class PricePercentTaxType extends BaseTaxType
         return $this;
     }
 
-    public function pricePercentRetriever()
+    public function pricePercentRetriever(): float
     {
         return $this->getRequirement('percent') * 0.01;
     }
 
-    public function getRequirementsDefinition()
+    public function getRequirementsDefinition(): array
     {
         return [
             new TaxTypeRequirementDefinition(

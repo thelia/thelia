@@ -70,7 +70,7 @@ class HookController extends AbstractCrudController
             return $response;
         }
 
-        $templateType = (int) ($this->getRequest()->get('template_type', TemplateDefinition::FRONT_OFFICE));
+        $templateType = (int) $this->getRequest()->get('template_type', TemplateDefinition::FRONT_OFFICE);
 
         $json_data = [];
         try {
@@ -332,8 +332,6 @@ class HookController extends AbstractCrudController
      * Get the created object from an event.
      *
      * @param unknown $event
-     *
-     * @return
      *
      * @internal param \Thelia\Controller\Admin\unknown $createEvent
      */

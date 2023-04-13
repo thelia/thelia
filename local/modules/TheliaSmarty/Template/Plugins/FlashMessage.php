@@ -59,9 +59,9 @@ class FlashMessage extends AbstractSmartyPlugin
      * @param array                     $params   parameters array
      * @param \Smarty_Internal_Template $template
      *
-     * @return int the item count
-     *
      * @throws \InvalidArgumentException if a parameter is missing
+     *
+     * @return int the item count
      */
     public function hasFlashMessage(
         $params,

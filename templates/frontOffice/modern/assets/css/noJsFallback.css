@@ -1,0 +1,16 @@
+body.no-js {
+  #MainNavigation {
+    display: none;
+
+    @screen md {
+      display: block;
+    }
+  }
+
+  .Selection--animated {
+    &.is-hide {
+      transform: none;
+      opacity: 1;
+    }
+  }
+}

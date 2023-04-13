@@ -314,9 +314,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      * @param array   $params
      * @param \Smarty $smarty
      *
-     * @return string the value of the requested attribute
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return string the value of the requested attribute
      */
     public function cartDataAccess($params, $smarty)
     {
@@ -512,11 +512,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 );
         }
         Tlog::getInstance()->addWarning(
-                sprintf(
-                    "Module code '%s' not found in module-config Smarty function",
-                    $moduleCode
-                )
-            );
+            sprintf(
+                "Module code '%s' not found in module-config Smarty function",
+                $moduleCode
+            )
+        );
 
         $value = $default;
 
@@ -529,9 +529,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      * @param array   $params
      * @param \Smarty $smarty
      *
-     * @return string the value of the requested attribute
-     *
      * @throws \Exception
+     *
+     * @return string the value of the requested attribute
      */
     public function statsAccess($params, $smarty)
     {
@@ -691,8 +691,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * @param        $objectLabel
-     * @param        $params
      * @param array  $columns
      * @param null   $foreignTable
      * @param string $foreignKey
@@ -744,14 +742,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
-     * @param       $objectLabel
-     * @param       $params
-     * @param       $data
      * @param array $noGetterData
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     protected function dataAccess($objectLabel, $params, $data, $noGetterData = [])
     {

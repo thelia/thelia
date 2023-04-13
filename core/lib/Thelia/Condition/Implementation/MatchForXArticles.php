@@ -59,7 +59,7 @@ class MatchForXArticles extends ConditionAbstract
     {
         $this->checkComparisonOperatorValue($operators, self::CART_QUANTITY);
 
-        if ((int) ($values[self::CART_QUANTITY]) <= 0) {
+        if ((int) $values[self::CART_QUANTITY] <= 0) {
             throw new InvalidConditionValueException(
                 __CLASS__,
                 'quantity'

@@ -25,8 +25,6 @@ class ModelValidIdType extends BaseType
     protected $expectedModelActiveRecordQuery;
 
     /**
-     * @param $expectedModelActiveRecord
-     *
      * @throws TypeException
      */
     public function __construct($expectedModelActiveRecord)

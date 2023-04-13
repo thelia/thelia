@@ -119,10 +119,10 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search->orderById(Criteria::DESC);
                     break;
                 case 'name':
-                     $search->orderByName(Criteria::ASC);
+                    $search->orderByName(Criteria::ASC);
                     break;
                 case 'name_reverse':
-                     $search->orderByName(Criteria::DESC);
+                    $search->orderByName(Criteria::DESC);
                     break;
                 case 'title':
                     $search->addAscendingOrderByColumn('i18n_TITLE');

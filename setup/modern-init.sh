@@ -100,7 +100,6 @@ fi
 
 echo  "Changing active template"
 php Thelia template:set frontOffice modern # THELIA 2.5
-#php Thelia template:front $TEMPLATE_NAME # THELIA 2.4.4
 
 read -p "$(echo "Would you like to create an administrator (y/n)?")" withAdmin
 if [ "$withAdmin" != "${withAdmin#[Yy]}" ] ;then

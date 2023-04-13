@@ -21,6 +21,7 @@ use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderManualEvent;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
+use Thelia\Core\Event\Order\OrderPayTotalEvent;
 use Thelia\Core\Event\Product\VirtualProductOrderHandleEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
@@ -135,10 +136,10 @@ class Order extends BaseAction implements EventSubscriberInterface
      * @param bool $unusedArgument           deprecated argument. Will be removed in 2.5
      * @param bool $useOrderDefinedAddresses if true, the delivery and invoice OrderAddresses will be used instead of creating new OrderAdresses using Order::getChoosenXXXAddress()
      *
-     * @return ModelOrder
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return ModelOrder
      */
     protected function createOrder(
         EventDispatcherInterface $dispatcher,
@@ -275,7 +276,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             if ($useStock && $manageStock) {
                 /* decrease stock for non virtual product */
-                $allowNegativeStock = (int) (ConfigQuery::read('allow_negative_stock', 0));
+                $allowNegativeStock = (int) ConfigQuery::read('allow_negative_stock', 0);
                 $newStock = $pse->getQuantity() - $cartItem->getQuantity();
                 // Forbid negative stock
                 if ($newStock < 0 && 0 === $allowNegativeStock) {
@@ -364,8 +365,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * Create an order outside of the front-office context, e.g. manually from the back-office.
      *
-     * @param $eventName
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -389,9 +388,6 @@ class Order extends BaseAction implements EventSubscriberInterface
 
     /**
      * @throws \Thelia\Exception\TheliaProcessException
-     *
-     * @param $eventName
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -427,9 +423,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param $eventName
-     */
     public function orderBeforePayment(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $dispatcher->dispatch(clone $event, TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL);
@@ -440,8 +433,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * Clear the cart and the order in the customer session once the order is placed,
      * and the payment performed.
-     *
-     * @param $eventName
      */
     public function orderCartClear(/* @noinspection PhpUnusedParameterInspection */ OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -483,8 +474,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param $eventName
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -516,8 +505,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * Check if a stock update is required on order products for a given order status change, and compute if
      * the stock should be decreased or increased.
-     *
-     * @param $eventName
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -678,6 +665,24 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function getOrderPayTotal(OrderPayTotalEvent $event): void
+    {
+        $order = $event->getOrder();
+        $tax = $event->getTax();
+
+        $total = $order->getTotalAmount(
+            $tax,
+            $event->isIncludePostage(),
+            $event->isIncludeDiscount()
+        );
+
+        $event->setTotal($total);
+        $event->setTax($tax);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
@@ -689,6 +694,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_SET_INVOICE_ADDRESS => ['setInvoiceAddress', 128],
             TheliaEvents::ORDER_SET_PAYMENT_MODULE => ['setPaymentModule', 128],
             TheliaEvents::ORDER_PAY => ['create', 128],
+            TheliaEvents::ORDER_PAY_GET_TOTAL => ['getOrderPayTotal', 128],
             TheliaEvents::ORDER_CART_CLEAR => ['orderCartClear', 128],
             TheliaEvents::ORDER_BEFORE_PAYMENT => ['orderBeforePayment', 128],
             TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL => ['sendConfirmationEmail', 128],

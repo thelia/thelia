@@ -30,9 +30,9 @@ class TaxRuleQuery extends BaseTaxRuleQuery
     protected static $caches = [];
 
     /**
-     * @return array|mixed|\Propel\Runtime\ActiveRecord\ActiveRecordInterface[]|\Propel\Runtime\Collection\ObjectCollection|Tax[]
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return array|mixed|\Propel\Runtime\ActiveRecord\ActiveRecordInterface[]|\Propel\Runtime\Collection\ObjectCollection|Tax[]
      */
     public function getTaxCalculatorCollection(TaxRule $taxRule, Country $country = null, State $state = null)
     {

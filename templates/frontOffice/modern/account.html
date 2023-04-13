@@ -1,6 +1,6 @@
 {extends file="layout.tpl"}
-{* Security *}
 
+{* Security *}
 {block name="no-return-functions" prepend}
   {check_auth role="CUSTOMER" login_tpl="login"}
 {/block}
@@ -11,115 +11,57 @@
 {/block}
 
 {block name="init"}
-{loop type="customer" name="customer_newsletter_block" current="true"}
-    {assign "customerEmail" $EMAIL}
-{/loop}
+  {loop type="customer" name="customer_newsletter_block" current="true"}
+      {assign "customerEmail" $EMAIL}
+  {/loop}
 {/block}
 
 {block name="body-class"}page-account{/block} {block name="main-content"}
+  {include file="components/smarty/BreadCrumb/BreadCrumb.html"}
+  <article class="Account" role="main" aria-labelledby="main-label">
+    {hook name="account.top"}
 
+    <div class="Account-wrapper">
+      {include file="components/smarty/Title/Title.html" class="text-center mb-7" title={intl l="My account"}}
 
-  <article class="my-24" role="main" aria-labelledby="main-label">
+      {loop type="customer" name="customer.info"}
+        {include file="components/smarty/Title/Title.html" level=3 title={"Bonjour {$FIRSTNAME} !"}}
+      {/loop}
 
-      {hook name="account.top"}
+      <div class="Account-actions">
+        <a href="{url path='/account-orders'}" class="Account-actionsItem">
+          {renderIconSvg icon="cart" class="w-5 h-5 fill-current"}
+          <h4 class="Account-actionsItemTitle">{intl l="My orders"}</h4>
+          Retrouvez vos commandes en cours et consultez votre historique
+        </a>
 
-      {include file="components/smarty/HeaderAccount/HeaderAccount.html" title="Mon compte"}
+        <a href="{url path="/account/update"}" class="Account-actionsItem">
+          {renderIconSvg icon="user" class="w-5 h-5 fill-current"}
+          <h4 class="Account-actionsItemTitle">{intl l="My Profile"}</h4>
+          Modifier votre nom, adresse mail ou mot de passe
+        </a>
 
-      <div class="container mx-auto mt-8">
-        <div class="grid xl:grid-cols-3 gap-6">
-          <!-- profil -->
-          <div class="relative panel">
-            <div class="flex items-center justify-between mb-2">
-              <h4 class="font-bold text-lg ">
-                  {intl l="My Profile"}
-              </h4>
-              <a href="{url path="/account/update"}" class="p-2 text-white rounded bg-main hover:bg-main-dark flex items-center justify-center">{renderIconSvg icon="pen" class="w-4 h-4 fill-current"}</a>
-            </div>
-            {loop type="customer" name="customer.info"}
+        <a href="{url path="/account-address"}" class="Account-actionsItem">
+          {renderIconSvg icon="map-pin" class="w-5 h-5 fill-current"}
+          <h4 class="Account-actionsItemTitle">{intl l="My Addresses"}</h4>
+          Gérez votre carnet d'adresses
+        </a>
 
-            <div class="mb-2">
-              <strong class="">{$FIRSTNAME} {$LASTNAME}</strong>
-            </div>
-
-            <div>
-              <span class="">{mailto address=$EMAIL encode="hex"}</span>
-            </div>
-            {/loop}
-
-            <div class="mt-4 pt-4 border-t border-gray-200">
-              <a href="{url path="account/password"}" class="font-bold">{intl l="Change my password"}</a>
-            </div>
-          </div>
-
-          <!-- adresse -->
-          <div class="relative panel">
-            <div class="flex items-center justify-between mb-2">
-              <h4 class="font-bold text-lg ">
-                {intl l="My Addresses"}
-              </h4>
-              <a href="{url path="/account-address"}" class="p-2 text-white rounded bg-main hover:bg-main-dark flex items-center justify-center">{renderIconSvg icon="pen" class="w-4 h-4 fill-current"}</a>
-            </div>
-              {loop type="address" name="address.default" default="true"}
-              <strong class="font-bold">{intl l="my main address"}</strong>
-              <span class="">{format_address address=$ID html_tag='address' html_class='adr'}</span>
-              <div class="mt-4">
-              {if $CELLPHONE != ""}
-                <span class="tel">{$CELLPHONE}</span><br> {/if} {if $PHONE != ""}
-                <span class="tel">{$PHONE}</span><br> {/if}
-              </div>
-
-              {/loop}
-          </div>
-
-          <!-- commandes -->
-          <div class="relative panel">
-            <div class="flex items-center justify-between mb-2">
-              <h4 class="font-bold text-lg ">
-                {intl l="My orders"}
-              </h4>
-              <a href="{url path='/account-orders'}" class="p-2 text-white rounded bg-main hover:bg-main-dark flex items-center justify-center">{renderIconSvg icon="plus" class="w-4 h-4 fill-current"}</a>
-            </div>
-
-            {ifloop rel="customer.orders"}
-            <table class="w-full text-left">
-              <thead class="">
-                <tr>
-                   <th class="">{intl l="Date"}</th>
-                   <th class="">{intl l="Order n°"}</th>
-                   <th class="">{intl l="Status"}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loop type="order" name="customer.orders" limit=5}
-                  <tr>
-                    <td class="">{format_date date=$CREATE_DATE format="d/m/Y"}</td>
-                    <td class="lg:text-sm">{$REF}</td>
-                    <td class="">
-                      {include file="components/smarty/OrderStatusLabel/OrderStatusLabel.html"}
-                    </td>
-                  </tr>
-                {/loop}
-              </tbody>
-            </table>
-            {/ifloop} {elseloop rel="customer.orders"}
-            <div class="alert alert-warning" role="alert">
-              {intl l="You don't have any orders yet."}
-            </div>
-            {/elseloop}
-          </div>
-
-        </div>
       </div>
-  </article>
 
+      <a href="{url path='/logout'}" class="inline-block Button">{intl l="Logout"}</a>
+    </div>
+  </article>
 {/block}
 
-{block name="stylesheet"}
+{block name="css" append}
   {hook name="account.stylesheet"}
 {/block}
+
 {block name="after-javascript-include"}
   {hook name="account.after-javascript-include"}
 {/block}
+
 {block name="javascript-initialization"}
   {hook name="account.javascript-initialization"}
 {/block}

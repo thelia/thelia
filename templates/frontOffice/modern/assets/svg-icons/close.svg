@@ -1,1 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 46.93 46.93"><g data-name="Calque 2"><path d="M32.4 23.47L45.73 36.8a4 4 0 011.2 2.93 4.47 4.47 0 01-1.2 3.07l-2.93 2.93a4.47 4.47 0 01-3.07 1.2 4 4 0 01-2.93-1.2L23.47 32.4 10.13 45.73a4 4 0 01-2.93 1.2 4.47 4.47 0 01-3.07-1.2L1.2 42.8A4.47 4.47 0 010 39.73a4 4 0 011.2-2.93l13.33-13.33L1.2 10.13A4 4 0 010 7.2a4.47 4.47 0 011.2-3.07L4.13 1.2A4.47 4.47 0 017.2 0a4 4 0 012.93 1.2l13.34 13.33L36.8 1.2A4 4 0 0139.73 0a4.47 4.47 0 013.07 1.2l2.93 2.93a4.47 4.47 0 011.2 3.07 4 4 0 01-1.2 2.93z" data-name="Calque 3"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14.828 14.828">
+  <g id="x" transform="translate(-4.586 -4.586)">
+    <line id="Ligne_10" data-name="Ligne 10" x1="12" y2="12" transform="translate(6 6)" fill="none"
+      stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+    <line id="Ligne_11" data-name="Ligne 11" x2="12" y2="12" transform="translate(6 6)" fill="none"
+      stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+  </g>
+</svg>

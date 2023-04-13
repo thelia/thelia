@@ -29,7 +29,7 @@ class TemplateDefinition
     public const EMAIL_SUBDIR = 'email';
 
     public const FRONT_OFFICE_CONFIG_NAME = 'active-front-template';
-    public const BACK_OFFICE_CONFIG_NAME = 'active-back-template';
+    public const BACK_OFFICE_CONFIG_NAME = 'active-admin-template';
     public const PDF_CONFIG_NAME = 'active-pdf-template';
     public const EMAIL_CONFIG_NAME = 'active-email-template';
 
@@ -213,9 +213,9 @@ class TemplateDefinition
      *
      * @param string $templateName the template name, with path
      *
-     * @return string
-     *
      * @throws TemplateException
+     *
+     * @return string
      */
     public function getTemplateFilePath($templateName)
     {
@@ -239,5 +239,40 @@ class TemplateDefinition
         }
 
         throw new TemplateException("Template file not found: $templateName");
+    }
+
+    /**
+     * @return string
+     */
+    public function getAssetsPath()
+    {
+        return $this->templateDescriptor->getAssets();
+    }
+
+    public function setAssetsPath($assets)
+    {
+        $this->$this->templateDescriptor->setAssets($assets);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAbsoluteAssetsPath()
+    {
+        return $this->getAbsolutePath().DS.$this->templateDescriptor->getAssets();
+    }
+
+    public function getComponentsPath()
+    {
+        return $this->templateDescriptor->getComponents();
+    }
+
+    public function setComponentsPath($path)
+    {
+        $this->$this->templateDescriptor->setComponents($path);
+
+        return $this;
     }
 }

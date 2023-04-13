@@ -54,8 +54,6 @@ class Export extends BaseAction implements EventSubscriberInterface
 
     /**
      * Handle export change position event.
-     *
-     * @param $eventName
      */
     public function exportChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -65,8 +63,6 @@ class Export extends BaseAction implements EventSubscriberInterface
 
     /**
      * Handle export category change position event.
-     *
-     * @param $eventName
      */
     public function exportCategoryChangePosition(UpdatePositionEvent $updatePositionEvent, $eventName, EventDispatcherInterface $dispatcher): void
     {

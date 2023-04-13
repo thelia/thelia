@@ -6,12 +6,13 @@ import Loader from '../Loader';
 import priceFormat from '@utils/priceFormat';
 
 import { useIntl } from 'react-intl';
-import { useValidDeliveryModules } from '../Checkout/hooks';
+import useValidDeliveryModules from './hooks/useValidDeliveryModules';
 import {
   queryClient,
   useGetCheckout,
   useSetCheckout
 } from '@openstudio/thelia-api-utils';
+import Title from '../Title';
 
 function getModuleValidOptions(module) {
   return module?.options?.filter((o) => o.valid) || [];
@@ -19,73 +20,47 @@ function getModuleValidOptions(module) {
 
 function ModuleOption({ module = {}, option = {}, isSelected }) {
   const intl = useIntl();
-
   const { data: checkout } = useGetCheckout();
   const { mutate } = useSetCheckout();
 
   return (
-    <label className={`block py-6`}>
-      <div className="flex flex-wrap items-center xl:flex-nowrap">
-        {module.images && module.images.length > 0 ? (
-          <div className="mr-4">
-            <img
-              src={module.images[0]?.url}
-              alt=""
-              className="object-contain w-12 h-12 bg-white"
-            />
-          </div>
-        ) : null}
-
-        <div className="mr-4">
-          <div className="flex items-center">
-            <input
-              type="radio"
-              className="mr-4 border-2 border-gray-300 text-main focus:border-gray-300 focus:ring-main"
-              checked={isSelected || false}
-              onChange={() => {
-                if (module.deliveryMode === 'delivery') {
-                  mutate({
-                    ...checkout,
-                    deliveryModuleId: module.id,
-                    deliveryModuleOptionCode: option.code,
-                    pickupAddress: null
-                  });
-                } else {
-                  queryClient.setQueryData('checkout', (oldData) => {
-                    return {
-                      ...oldData,
-                      deliveryModuleId: module.id,
-                      deliveryModuleOptionCode: option.code
-                    };
-                  });
-                }
-              }}
-            />
-            <span className="text-lg font-medium">
-              {option.title || module?.i18n?.title}
-            </span>
-          </div>
-          {module?.i18n?.chapo ? (
-            <div className={`text-sm`}>{module.i18n.chapo}</div>
-          ) : null}
-        </div>
-
-        <div className="w-full mt-2 ml-auto text-2xl font-medium xl:w-auto xl: xl:mt-0 text-main">
+    <label htmlFor={`option_${option?.code}`} className="Radio">
+      <input
+        type="radio"
+        name="radio"
+        id={`option_${option?.code}`}
+        checked={isSelected}
+        onChange={() => {
+          if (module.deliveryMode === 'delivery') {
+            mutate({
+              ...checkout,
+              deliveryModuleId: module.id,
+              deliveryModuleOptionCode: option.code,
+              pickupAddress: null
+            });
+          } else {
+            queryClient.setQueryData('checkout', (oldData) => {
+              return {
+                ...oldData,
+                deliveryModuleId: module.id,
+                deliveryModuleOptionCode: option.code
+              };
+            });
+          }
+        }}
+      />
+      <div className="flex flex-wrap">
+        <span
+          className={`mr-6 block text-base ${isSelected ? 'text-main' : ''}`}
+        >
+          {module?.i18n?.title}
+        </span>
+        <strong className="text-main">
           {option.postage
             ? `${priceFormat(option.postage)}`
             : intl.formatMessage({ id: 'FREE' })}
-        </div>
+        </strong>
       </div>
-
-      {module?.i18n?.description ? (
-        <div
-          className="mt-4"
-          dangerouslySetInnerHTML={{ __html: module.i18n.description }}
-        />
-      ) : null}
-      {module?.i18n?.postscriptum ? (
-        <div className="text-xs italic">{module?.i18n?.postscriptum}</div>
-      ) : null}
     </label>
   );
 }
@@ -101,37 +76,37 @@ export default function DeliveryModules() {
   );
 
   return (
-    <div className="shadow panel">
-      <div className="items-center pb-6 text-xl font-bold border-b border-gray-300">
-        {intl.formatMessage({ id: 'CHOOSE_DELIVERY_PROVIDER' })}
-      </div>
-      <div className="divide-y divide-gray-300 divide-opacity-50">
-        {isLoading ? (
-          <Loader size="w-10 h-10" className="my-4" />
-        ) : (
-          (modules?.length === 0 ||
-            modules?.flatMap(getModuleValidOptions).length === 0) && (
-            <Alert
-              title={intl.formatMessage({ id: 'WARNING' })}
-              message={intl.formatMessage({ id: 'NO_DELIVERY_MODE_AVAILABLE' })}
-              type="warning"
-            />
-          )
-        )}
-
-        {modules.map((module) =>
-          getModuleValidOptions(module).map((option) => (
-            <ModuleOption
-              key={module.code}
-              module={module}
-              option={option}
-              isSelected={
-                checkout && checkout?.deliveryModuleOptionCode === option.code
-              }
-            />
-          ))
-        )}
-      </div>
-    </div>
+    <>
+      {isLoading ? (
+        <Loader className="w-40 mx-auto mt-8" />
+      ) : modules?.length === 0 ||
+        modules?.flatMap(getModuleValidOptions).length === 0 ? (
+        <Alert
+          title={intl.formatMessage({ id: 'WARNING' })}
+          message={intl.formatMessage({ id: 'NO_DELIVERY_MODE_AVAILABLE' })}
+          type="warning"
+          className="mt-8"
+        />
+      ) : (
+        <div className="flex flex-col gap-3 mt-8 flex-start item-start">
+          <Title
+            className="mb-5 text-2xl Title--3"
+            title="CHOOSE_DELIVERY_PROVIDER"
+          />
+          {modules.map((module) =>
+            getModuleValidOptions(module).map((option) => (
+              <ModuleOption
+                key={module.code}
+                module={module}
+                option={option}
+                isSelected={
+                  checkout && checkout?.deliveryModuleOptionCode === option.code
+                }
+              />
+            ))
+          )}
+        </div>
+      )}
+    </>
   );
 }

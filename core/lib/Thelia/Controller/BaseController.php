@@ -80,7 +80,6 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
-     * @param $jsonData
      * @param int $status
      *
      * @return Response Return a JSON response
@@ -91,8 +90,6 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
-     * @param $pdf
-     * @param $fileName
      * @param int  $status
      * @param bool $browser
      */
@@ -274,7 +271,7 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
-     * @return \Thelia\Core\Form\TheliaFormValidatorInterface
+     * @return \Thelia\Core\Form\TheliaFormValidator
      */
     protected function getTheliaFormValidator()
     {
@@ -379,7 +376,6 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
-     * @param $routeId
      * @param int $referenceType
      *
      * @return string
@@ -403,7 +399,6 @@ abstract class BaseController implements ControllerInterface
     /**
      * create an instance of RedirectResponse.
      *
-     * @param $url
      * @param int $status
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -448,7 +443,6 @@ abstract class BaseController implements ControllerInterface
     /**
      * create an instance of RedriectResponse for a given route id.
      *
-     * @param $routeId
      * @param int $referenceType
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -524,8 +518,6 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
-     * @param $routerName
-     *
      * @return Router
      */
     protected function getRouter($routerName)
@@ -536,9 +528,9 @@ abstract class BaseController implements ControllerInterface
     /**
      * Return a 404 error.
      *
-     * @return \Thelia\Core\HttpFoundation\Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function pageNotFound()
     {
@@ -595,9 +587,6 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
-     * @param $name
-     * @param $type
-     *
      * @return BaseForm
      *
      * This method builds a thelia form with its name
@@ -612,7 +601,7 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
-     * @return \Thelia\Core\Form\TheliaFormFactoryInterface
+     * @return \Thelia\Core\Form\TheliaFormFactory
      *
      * @deprecated since Thelia 2.5, use autowiring instead.
      */

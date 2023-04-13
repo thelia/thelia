@@ -72,7 +72,7 @@ class OrderController extends BaseFrontController
                         )
                     );
                 } elseif (\count($deliveryModule) == 1) {
-                    return $this->registerVirtualProductDelivery($deliveryModule[0], $deliveryAddress);
+                    return $this->registerVirtualProductDelivery($eventDispatcher, $deliveryModule[0], $deliveryAddress);
                 }
             }
         }
@@ -333,10 +333,10 @@ class OrderController extends BaseFrontController
             }
 
             return $this->generateRedirectFromRoute(
-                    'order.placed',
-                    [],
-                    ['order_id' => $orderEvent->getPlacedOrder()->getId()]
-                );
+                'order.placed',
+                [],
+                ['order_id' => $orderEvent->getPlacedOrder()->getId()]
+            );
         }
         /* order has not been placed */
         return $this->generateRedirectFromRoute('cart.view');

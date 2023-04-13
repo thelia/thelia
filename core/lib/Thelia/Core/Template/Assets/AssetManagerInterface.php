@@ -23,7 +23,6 @@ interface AssetManagerInterface
      *
      * @param string $sourceAssetsDirectory  the full path to the source asstes directory
      * @param string $webAssetsDirectoryBase the base directory of the web based asset directory
-     * @param        $webAssetsTemplate
      * @param string $webAssetsKey           the assets key : module name or 0 for base template
      *
      * @throws \RuntimeException if something goes wrong
@@ -37,11 +36,8 @@ interface AssetManagerInterface
     /**
      * Generates assets from $asset_path in $output_path, using $filters.
      *
-     * @param        $assetSource
-     * @param        $assetDirectoryBase
      * @param string $webAssetsDirectoryBase the full path to the asset file (or file collection, e.g. *.less)
      * @param string $webAssetsTemplate      the full disk path to the base assets output directory in the web space
-     * @param        $webAssetsKey
      * @param string $outputUrl              the URL to the base assets output directory in the web space
      * @param string $assetType              the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
      * @param array  $filters                a list of filters, as defined below (see switch($filter_name) ...)

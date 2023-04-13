@@ -51,9 +51,9 @@ class Currency extends BaseCurrency
     /**
      * Get the [rate] column value.
      *
-     * @return float
-     *
      * @throws PropelException
+     *
+     * @return float
      */
     public function getRate()
     {

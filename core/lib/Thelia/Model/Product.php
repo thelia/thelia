@@ -210,10 +210,10 @@ class Product extends BaseProduct implements FileModelParentInterface
      * @param string $eanCode
      * @param bool   $ref
      *
-     * @return ProductSaleElements
-     *
      * @throws PropelException
      * @throws \Exception
+     *
+     * @return ProductSaleElements
      */
     public function createProductSaleElement(ConnectionInterface $con, $weight, $basePrice, $salePrice, $currencyId, $isDefault, $isPromo = false, $isNew = false, $quantity = 0, $eanCode = '', $ref = false)
     {

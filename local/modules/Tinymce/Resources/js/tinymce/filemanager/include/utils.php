@@ -268,7 +268,7 @@ function ftp_con($config)
             $tmp = $e->getTrace();
             echo $tmp[0]['args'][0];
             echo '<br/>Please check configurations';
-            exit();
+            exit;
         }
     } else {
         return false;
@@ -645,8 +645,8 @@ function image_check_memory_usage($img, $max_breedte, $max_hoogte)
         } else {
             $image_bits = 0;
         }
-        $image_memory_usage = $K64 + ($image_width * $image_height * ($image_bits) * 2);
-        $thumb_memory_usage = $K64 + ($max_breedte * $max_hoogte * ($image_bits) * 2);
+        $image_memory_usage = $K64 + ($image_width * $image_height * $image_bits * 2);
+        $thumb_memory_usage = $K64 + ($max_breedte * $max_hoogte * $image_bits * 2);
         $memory_needed = abs((int) ($memory_usage + $image_memory_usage + $thumb_memory_usage));
 
         if ($memory_needed > $memory_limit) {
@@ -1000,7 +1000,7 @@ function debugger($input, $trace = false, $halt = false): void
     echo $ret;
 
     if ($halt == true) {
-        exit();
+        exit;
     }
 }
 

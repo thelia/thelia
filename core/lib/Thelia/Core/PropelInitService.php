@@ -173,9 +173,9 @@ class PropelInitService
      * @param array                $parameters command parameters
      * @param OutputInterface|null $output     command output
      *
-     * @return int command exit code
-     *
      * @throws \Exception
+     *
+     * @return int command exit code
      */
     public function runCommand(Command $command, array $parameters = [], OutputInterface $output = null)
     {
@@ -293,15 +293,7 @@ class PropelInitService
                 $this->debug
             );
 
-            $databaseSchemaResources = [];
-            foreach ($schemaCombiner->getSourceDocuments($database) as $sourceDocument) {
-                $databaseSchemaResources[] = new FileResource($sourceDocument->baseURI);
-            }
-
-            $databaseSchemaCache->write(
-                $schemaCombiner->getCombinedDocument($database)->saveXML(),
-                $databaseSchemaResources
-            );
+            $databaseSchemaCache->write($schemaCombiner->getCombinedDocument($database)->saveXML());
 
             $hash .= md5(file_get_contents($this->getPropelSchemaDir().$database.'.schema.xml'));
         }
@@ -377,12 +369,12 @@ class PropelInitService
     /**
      * Initialize the Propel environment and connection.
      *
-     * @return bool whether a Propel connection is available
-     *
      * @param bool $force        force cache generation
      * @param bool $cacheRefresh
      *
      * @throws \Throwable
+     *
+     * @return bool whether a Propel connection is available
      *
      * @internal
      */
@@ -421,9 +413,6 @@ class PropelInitService
             $theliaDatabaseConnection->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
 
             if ($this->debug) {
-                // In debug mode, we have to initialize Tlog at this point, as this class uses Propel
-                Tlog::getInstance()->setLevel(Tlog::DEBUG);
-
                 Propel::getServiceContainer()->setLogger('defaultLogger', Tlog::getInstance());
                 $theliaDatabaseConnection->useDebug(true);
             }

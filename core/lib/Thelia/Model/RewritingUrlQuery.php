@@ -27,8 +27,6 @@ use Thelia\Model\Map\RewritingUrlTableMap;
 class RewritingUrlQuery extends BaseRewritingUrlQuery
 {
     /**
-     * @param $rewrittenUrl
-     *
      * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
      */
     public function getResolverSearch($rewrittenUrl)
@@ -52,10 +50,6 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
     }
 
     /**
-     * @param $view
-     * @param $viewId
-     * @param $viewLocale
-     *
      * @return RewritingUrl|null
      */
     public function getViewUrlQuery($view, $viewLocale, $viewId)
@@ -72,11 +66,6 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
     }
 
     /**
-     * @param $view
-     * @param $viewLocale
-     * @param $viewId
-     * @param $viewOtherParameters
-     *
      * @return RewritingUrl|null
      */
     public function getSpecificUrlQuery($view, $viewLocale, $viewId, $viewOtherParameters)

@@ -91,8 +91,6 @@ class CouponFactoryTest extends TestCase
     /**
      * Generate a valid Coupon model.
      *
-     * @param $facade
-     *
      * @return Coupon
      */
     public function generateCouponModel($facade, ConditionFactory $conditionFactory)

@@ -32,7 +32,6 @@ class ProductCloneEvent extends ActionEvent
      * ProductCloneEvent constructor.
      *
      * @param string $lang the locale (such as fr_FR)
-     * @param $originalProduct
      */
     public function __construct(
         string $ref,

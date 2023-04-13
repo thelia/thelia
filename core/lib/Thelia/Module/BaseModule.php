@@ -23,6 +23,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Event\Hook\HookCreateAllEvent;
 use Thelia\Core\Event\Hook\HookUpdateEvent;
+use Thelia\Core\Event\Order\OrderPayTotalEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\TemplateDefinition;
@@ -159,9 +160,9 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @return \Thelia\Core\HttpFoundation\Request the request
-     *
      * @throws \RuntimeException
+     *
+     * @return \Thelia\Core\HttpFoundation\Request the request
      */
     public function getRequest()
     {
@@ -188,9 +189,9 @@ class BaseModule implements BaseModuleInterface
     }
 
     /**
-     * @return EventDispatcherInterface
-     *
      * @throws \RuntimeException
+     *
+     * @return EventDispatcherInterface
      */
     public function getDispatcher()
     {
@@ -422,6 +423,31 @@ class BaseModule implements BaseModuleInterface
         $model = $this->getModuleModel();
 
         return $order->getDeliveryModuleId() == $model->getId();
+    }
+
+    /**
+     * Use this method to process the total order just before payment. (ex: gift card, discount, credit).
+     * Call on modules type 3  "AbstractPaymentModule pay()" to ensure that all discounts are taken into account.
+     *
+     * @return float|int
+     */
+    public function getOrderPayTotalAmount(
+        Order $order,
+        float|int &$tax = 0,
+        bool $includeDiscount = true,
+        bool $includePostage = true
+    ) {
+        $orderPayEvent = new OrderPayTotalEvent($order);
+        $orderPayEvent
+            ->setTax($tax)
+            ->setIncludePostage($includePostage)
+            ->setIncludeDiscount($includeDiscount);
+
+        $this->getDispatcher()->dispatch($orderPayEvent, TheliaEvents::ORDER_PAY_GET_TOTAL);
+
+        $tax = $orderPayEvent->getTax();
+
+        return $orderPayEvent->getTotal();
     }
 
     /**
@@ -686,11 +712,10 @@ class BaseModule implements BaseModuleInterface
          */
         $dispatcher->dispatch(
             $event,
-            (
+
             $hookModel === null ?
                 TheliaEvents::HOOK_CREATE_ALL :
                 TheliaEvents::HOOK_UPDATE
-            )
         );
 
         return [

@@ -9,44 +9,48 @@ import { useRef } from 'react';
 import React from 'react';
 
 import { useIntl } from 'react-intl';
+import { useSelector } from 'react-redux';
 
-export default function CheckoutBtn() {
+export default function CheckoutButton() {
   const intl = useIntl();
   const { mutate } = useFinalCheckout();
   const { mutate: setCheckout } = useSetCheckout();
   const { data: checkout } = useGetCheckout();
-
-  const btnRef = useRef(null);
-
+  const { phoneNumberValid } = useSelector((state) => state.checkout);
+  const ButtonRef = useRef(null);
   return (
     <div className="">
-      <label className="items-start block mb-4">
+      <label className="my-4 inline-block cursor-pointer">
         <input
           type="checkbox"
-          className={`border-gray-300 border text-main focus:border-gray-300 focus:ring-main mt-1`}
+          className="h-5 w-5 border border-main text-main focus:border-main focus:ring-main"
           id="validTerms"
           onChange={() => {
             setCheckout({
               ...checkout,
               acceptedTermsAndConditions: !checkout.acceptedTermsAndConditions
             });
-            btnRef?.current?.scrollIntoView({
+            ButtonRef?.current?.scrollIntoView({
               behavior: 'smooth',
               block: 'center'
             });
           }}
         />
-        <span className="ml-2 leading-0">
+        <span className="leading-0 ml-2 text-lg">
           {intl.formatMessage({ id: 'ACCEPT_CGV' })}
         </span>
       </label>
 
       <button
-        className="w-full shadow btn"
+        className="Button mx-auto mt-8 block"
         onClick={async () => {
           mutate(checkout);
         }}
-        disabled={!checkout?.isComplete || !checkout.acceptedTermsAndConditions}
+        disabled={
+          !checkout?.isComplete ||
+          !checkout.acceptedTermsAndConditions ||
+          !phoneNumberValid
+        }
       >
         {intl.formatMessage({ id: 'VALIDATE_CHECKOUT' })}
       </button>

@@ -292,6 +292,7 @@ final class TheliaEvents
     public const ORDER_SET_INVOICE_ADDRESS = 'action.order.setInvoiceAddress';
     public const ORDER_SET_PAYMENT_MODULE = 'action.order.setPaymentModule';
     public const ORDER_PAY = 'action.order.pay';
+    public const ORDER_PAY_GET_TOTAL = 'action.order.pay.getTotal';
     public const ORDER_BEFORE_PAYMENT = 'action.order.beforePayment';
     public const ORDER_CART_CLEAR = 'action.order.cartClear';
 
@@ -457,6 +458,7 @@ final class TheliaEvents
     public const TAX_CREATE = 'action.createTax';
     public const TAX_UPDATE = 'action.updateTax';
     public const TAX_DELETE = 'action.deleteTax';
+    public const TAX_GET_TYPE_SERVICE = 'action.getTaxService';
 
     // -- Profile management ---------------------------------------------
 

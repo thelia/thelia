@@ -202,9 +202,6 @@ abstract class AbstractCrudController extends BaseAdminController
     abstract protected function redirectToListTemplate();
 
     /**
-     * @param $positionChangeMode
-     * @param $positionValue
-     *
      * @return ActionEvent
      */
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)

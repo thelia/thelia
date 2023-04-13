@@ -88,8 +88,6 @@ class IntToCombinedStringsListType extends BaseType
      * Escape a string to use it safely in an expression. abc:def => abc\:def.
      * Escapes characters are , : ( ) | &.
      *
-     * @param $string
-     *
      * @return string
      */
     public static function escape($string)
@@ -99,8 +97,6 @@ class IntToCombinedStringsListType extends BaseType
 
     /**
      * Unescape a string and remove avai escape symbols. abc\:def => abc:def.
-     *
-     * @param $string
      *
      * @return string
      */

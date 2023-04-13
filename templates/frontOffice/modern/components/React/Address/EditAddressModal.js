@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
 import AddressForm from './AddressForm';
-import { ReactComponent as CloseIcon } from './imgs/icon-close.svg';
-import { ReactComponent as IconPen } from './imgs/icon-pen.svg';
+import { ReactComponent as IconCLose } from '@icons/close.svg';
 import Modal from 'react-modal';
 import { useAddressUpdate } from '@openstudio/thelia-api-utils';
 import { useIntl } from 'react-intl';
 import { useLockBodyScroll } from 'react-use';
+import Title from '../Title';
 
 export default function EditAddress({ address = {} }) {
   const intl = useIntl();
@@ -28,45 +28,42 @@ export default function EditAddress({ address = {} }) {
   };
 
   return (
-    <div className="">
-      <div
-        className="flex items-center hover:underline"
-        onClick={() => setIsEditingAddress(true)}
-        type="button"
-      >
-        <IconPen className="w-4 h-4 mr-4 fill-current" />
+    <div className="AddressCard-edit">
+      <button onClick={() => setIsEditingAddress(true)} type="button">
         {intl.formatMessage({ id: 'EDIT' })}
-      </div>
+      </button>
       {isEditingAddress ? (
         <Modal
           isOpen={isEditingAddress}
           onRequestClose={() => setIsEditingAddress(false)}
           ariaHideApp={false}
+          shouldFocusAfterRender={true}
           className={{
-            base: 'outline-none p-8 h-full w-full overflow-auto bg-white',
-            afterOpen: '',
-            beforeClose: ''
+            base: 'Modal',
+            afterOpen: 'Modal--open',
+            beforeClose: 'Modal--close'
           }}
           overlayClassName={{
-            base: 'fixed bg-gray-500 bg-opacity-50 inset-0 z-200 flex items-center justify-center px-4 py-24 lg:px-24',
-            afterOpen: '',
-            beforeClose: ''
+            base: 'Modal-overlay',
+            afterOpen: 'opacity-100',
+            beforeClose: 'opacity-0'
           }}
           bodyOpenClassName={null}
         >
           <div className="relative">
             <button
               type="button"
-              className="absolute top-0 right-0"
+              className="Modal-close"
               onClick={() => setIsEditingAddress(false)}
             >
-              <CloseIcon />
+              <IconCLose />
             </button>
             <div className="block w-full mx-auto">
-              <h4 className="mb-8 text-3xl ">
-                {intl.formatMessage({ id: 'EDIT_AN_ADDRESS' })}
-              </h4>
-              <AddressForm address={address} onSubmit={submitForm} />
+              <Title title="EDIT_AN_ADDRESS" className="pr-5 mb-8 Title--3" />
+              <AddressForm
+                address={address}
+                onSubmit={submitForm}
+              />
             </div>
           </div>
         </Modal>

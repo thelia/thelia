@@ -1,8 +1,9 @@
 module.exports = {
-	plugins: [
-		require('postcss-easy-import'),
-		require('tailwindcss'),
-		require('postcss-nested')({ bubble: ['screen'] }),
-		require('autoprefixer')
-	]
-};
+  plugins: {
+    'postcss-easy-import': {},
+    'tailwindcss/nesting': 'postcss-nested',
+    tailwindcss: {},
+    autoprefixer: {},
+    'postcss-rem': {}
+  }
+}

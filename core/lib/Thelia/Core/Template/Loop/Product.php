@@ -192,9 +192,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     /**
      * @param ProductQuery $search
-     * @param $searchTerm
-     * @param $searchIn
-     * @param $searchCriteria
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria): void
     {
@@ -222,9 +219,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * @return LoopResult
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return LoopResult
      */
     public function parseResults(LoopResult $loopResult)
     {
@@ -238,9 +235,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * @return LoopResult
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return LoopResult
      */
     public function parseSimpleResults(LoopResult $loopResult)
     {
@@ -320,9 +317,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * @return LoopResult
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return LoopResult
      */
     public function parseComplexResults(LoopResult $loopResult)
     {
@@ -376,7 +373,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     /**
      * @param LoopResultRow         $loopResultRow the current result row
      * @param \Thelia\Model\Product $product
-     * @param $defaultCategoryId
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -488,7 +484,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 if ($sqlWhereString == '*') {
                     $sqlWhereString = 'NOT ISNULL(`fa_'.$feature.'`.ID)';
                 } else {
-                    $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`fa_'.$feature.'_'.'\1`.ID)', $sqlWhereString);
+                    $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`fa_'.$feature.'_\1`.ID)', $sqlWhereString);
                     $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
                     $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
                 }
@@ -564,9 +560,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * @return \Propel\Runtime\ActiveQuery\ModelCriteria|ProductQuery
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return \Propel\Runtime\ActiveQuery\ModelCriteria|ProductQuery
      */
     public function buildModelCriteria()
     {
@@ -859,7 +855,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     if ($key == 0) {
                         continue;
                     }
-                    $search->where('`'.$actuallyUsedAttributeNonStrictMatch.'`.ID='.'`'.$actuallyUsedAttributeNonStrictMatchList[$key - 1].'`.ID');
+                    $search->where('`'.$actuallyUsedAttributeNonStrictMatch.'`.ID=`'.$actuallyUsedAttributeNonStrictMatchList[$key - 1].'`.ID');
                 }
             }
 
@@ -946,7 +942,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
              */
 
             /* if we don't have any join yet, let's make a global one */
-            if (empty($isProductPriceFirstLeftJoin)) {
+            if (\count($isProductPriceFirstLeftJoin) === 0) {
                 if (\count($isPSELeftJoinList) == 0) {
                     $joiningTable = 'global';
                     $isPSELeftJoinList[] = $joiningTable;
@@ -1218,9 +1214,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      *
      * @param \Thelia\Model\Product $product
      *
-     * @return int|null
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return int|null
      */
     protected function getDefaultCategoryId($product)
     {

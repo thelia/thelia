@@ -153,8 +153,6 @@ class CustomerController extends AbstractCrudController
     }
 
     /**
-     * @param $data
-     *
      * @return \Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent
      */
     private function createEventInstance($data)
@@ -269,10 +267,10 @@ class CustomerController extends AbstractCrudController
 
         try {
             parent::deleteAction(
-                 $request,
-                 $tokenProvider,
-                 $eventDispatcher,
-                 $parserContext
+                $request,
+                $tokenProvider,
+                $eventDispatcher,
+                $parserContext
             );
         } catch (CustomerException $e) {
             $errorMsg = $e->getMessage();

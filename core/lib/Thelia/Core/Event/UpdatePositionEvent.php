@@ -53,8 +53,6 @@ class UpdatePositionEvent extends ActionEvent
     /**
      * UpdatePositionEvent constructor.
      *
-     * @param $objectId
-     * @param $mode
      * @param null $position
      * @param null $referrerId
      */

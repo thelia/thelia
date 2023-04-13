@@ -13,12 +13,13 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Thelia\Core\Service\ConfigCacheService;
+use Thelia\Core\Thelia;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
-return function (ContainerConfigurator $configurator): void {
+return static function (ContainerConfigurator $configurator): void {
     $serviceConfigurator = $configurator->services();
 
     $serviceConfigurator->defaults()
@@ -37,20 +38,36 @@ return function (ContainerConfigurator $configurator): void {
                 THELIA_LIB.'/Command/Skeleton/Module/I18n/*.php',
                 THELIA_LIB.'/Config/**/*.php',
             ]
-        )->autowire()
+        )
+        ->autowire()
         ->autoconfigure();
 
-    if (ConfigQuery::isSmtpEnable()) {
-        $dsn = 'smtp://';
+    foreach (Thelia::getTemplateComponentsDirectories() as $namespace => $resource) {
+        if (is_dir($resource)) {
+            $serviceConfigurator->load($namespace, $resource)
+                ->autowire()
+                ->autoconfigure();
+        }
+    }
 
-        if (ConfigQuery::getSmtpUsername()) {
-            $dsn .= ConfigQuery::getSmtpUsername().':'.ConfigQuery::getSmtpPassword();
+    if (!isset($_SERVER['MAILER_DSN'])) {
+        $dsn = 'smtp://localhost:25';
+        if (ConfigQuery::isSmtpEnable()) {
+            $dsn = 'smtp://';
+
+            if (ConfigQuery::getSmtpUsername()) {
+                $dsn .= urlencode(ConfigQuery::getSmtpUsername()).':'.urlencode(ConfigQuery::getSmtpPassword()).'@';
+            }
+
+            // Escape "%" added by urlencode
+            $dsn = str_replace('%', '%%', $dsn);
+
+            $dsn .= ConfigQuery::getSmtpHost().':'.ConfigQuery::getSmtpPort();
         }
 
-        $dsn .= ConfigQuery::getSmtpHost().':'.ConfigQuery::getSmtpPort();
         $configurator->extension('framework', [
             'mailer' => [
-                'dsn' => $dsn,
+                'dsn' => addslashes($dsn),
             ],
         ]);
     }
@@ -63,7 +80,7 @@ return function (ContainerConfigurator $configurator): void {
                 \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
                 \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
             } catch (\Exception $e) {
-                if ($_ENV['APP_DEBUG']) {
+                if ($_SERVER['APP_DEBUG']) {
                     throw $e;
                 }
                 Tlog::getInstance()->addError(

@@ -37,9 +37,6 @@ class Administrator extends BaseAction implements EventSubscriberInterface
         $this->tokenProvider = $tokenProvider;
     }
 
-    /**
-     * @param $eventName
-     */
     public function create(AdministratorEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $administrator = new AdminModel();
@@ -59,9 +56,6 @@ class Administrator extends BaseAction implements EventSubscriberInterface
         $event->setAdministrator($administrator);
     }
 
-    /**
-     * @param $eventName
-     */
     public function update(AdministratorEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $administrator = AdminQuery::create()->findPk($event->getId())) {

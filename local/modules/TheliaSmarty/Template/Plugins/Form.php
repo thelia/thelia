@@ -26,7 +26,7 @@ use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Thelia\Core\Form\TheliaFormFactoryInterface;
+use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\Form\Type\TheliaType;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Thelia\Core\Template\ParserContext;
@@ -78,7 +78,7 @@ class Form extends AbstractSmartyPlugin
 
     protected $formDefinition = [];
 
-    /** @var array|TheliaFormFactoryInterface */
+    /** @var array|TheliaFormFactory */
     protected $formFactory = [];
 
     /** @var array The form collection stack */
@@ -88,7 +88,7 @@ class Form extends AbstractSmartyPlugin
     protected $formCollectionCount = [];
 
     public function __construct(
-        TheliaFormFactoryInterface $formFactory,
+        TheliaFormFactory $formFactory,
         ParserContext $parserContext,
         ParserInterface $parser,
         TranslatorInterface $translator
@@ -369,11 +369,11 @@ class Form extends AbstractSmartyPlugin
      * @param string                    $templateFile
      * @param \Smarty_Internal_Template $template
      *
-     * @return string
-     *
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
      * @throws \Exception
      * @throws \SmartyException
+     *
+     * @return string
      */
     protected function automaticFormFieldRendering($params, $content, $template, $templateFile)
     {
@@ -419,16 +419,13 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     * @param $content
      * @param \Smarty_Internal_Template $template
-     * @param $repeat
-     *
-     * @return string
      *
      * @throws \Exception
      * @throws \SmartyException
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
+     *
+     * @return string
      */
     public function customFormFieldRendering($params, $content, $template, &$repeat)
     {
@@ -438,13 +435,11 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     *
-     * @return string
-     *
      * @throws \Exception
      * @throws \SmartyException
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
+     *
+     * @return string
      */
     public function standardFormFieldRendering($params, \Smarty_Internal_Template $template)
     {
@@ -452,13 +447,11 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     *
-     * @return string
-     *
      * @throws \Exception
      * @throws \SmartyException
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
+     *
+     * @return string
      */
     public function standardFormFieldAttributes($params, \Smarty_Internal_Template $template)
     {
@@ -583,11 +576,9 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
+     * @throws \InvalidArgumentException
      *
      * @return FormView
-     *
-     * @throws \InvalidArgumentException
      */
     protected function getFormFieldView($params)
     {
@@ -633,11 +624,9 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
+     * @throws \InvalidArgumentException
      *
      * @return FormConfigInterface
-     *
-     * @throws \InvalidArgumentException
      */
     protected function getFormFieldConfig($params)
     {
@@ -669,11 +658,9 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
+     * @throws \InvalidArgumentException
      *
      * @return BaseForm
-     *
-     * @throws \InvalidArgumentException
      */
     protected function getInstanceFromParams($params)
     {
@@ -701,10 +688,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $needle
-     * @param $haystack
-     * @param $formName
-     *
      * @return \Symfony\Component\Form\Form
      */
     protected function retrieveField($needle, $haystack, $formName)
@@ -724,8 +707,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     * @param $name
      * @param bool $throwException
      *
      * @return mixed|null
@@ -755,10 +736,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     * @param $content
-     * @param $repeat
-     *
      * @return mixed
      *
      * Loops around a form collection entries and assigns values to template
@@ -852,8 +829,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $collection
-     *
      * @return SymfonyForm
      *
      * Extract the collection object from the form
@@ -916,10 +891,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     * @param $content
-     * @param $repeat
-     *
      * @return string
      *
      * Injects a collection field variables into the parser
@@ -1008,8 +979,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     *
      * @return mixed
      *
      * Counts collection entries

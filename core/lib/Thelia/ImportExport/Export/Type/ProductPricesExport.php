@@ -20,6 +20,7 @@ use Thelia\ImportExport\Export\JsonFileAbstractExport;
  *
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
+ *
  * @contributor Thomas Arnaud <tarnaud@openstudio.fr>
  *
  * @author Florian Bernard <fbernard@openstudio.fr>

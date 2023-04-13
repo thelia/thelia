@@ -7,8 +7,8 @@
     type="text"
     name=$name
     id="{$label_attr.for|default:null}"
-    value={$value|default:{$LABEL} nofilter}
-    label=$label
+    value={$value|default:{$LABEL|default:null} nofilter}
+    label={intl l="Intitulé de l'adresse"}
     placeholder=""
     required=$required
   }
@@ -23,9 +23,9 @@
     {$titleOptions = []}
 
     {loop type="title" name="title.list"}
-    {$titleOptions[$ID] = [
-      'value' => $ID,
-      'label' => $LONG
+      {$titleOptions[$ID] = [
+        'value' => $ID,
+        'label' => $LONG
       ]}
     {/loop}
 
@@ -34,9 +34,8 @@
       name=$name
       id="{$label_attr.for|default:null}"
       value=$value
-      label=$label
+      label={intl l="Civilité"}
       defaultValue=""
-      defaultLabel={intl l="Select Title"}
       required=$required
       options=$titleOptions
     }
@@ -85,8 +84,9 @@
     name=$name
     id="{$label_attr.for|default:null}"
     value={$smarty.get.email|default:$value}
-    label=$label
+    label={intl l="Adresse e-mail"}
     placeholder=""
+    autocomplete="username"
     required=$required
   }
 {/function}
@@ -100,8 +100,8 @@
     name=$name
     id="{$label_attr.for|default:null}"
     value={$smarty.get.email|default:$value}
-    label=$label
-    placeholder={intl l="Email confirmation"}
+    label={intl l="Confirmez votre adresse e-mail"}
+    placeholder=""
     required=$required
   }
 {/function}
@@ -183,7 +183,7 @@
     name=$name
     id="{$label_attr.for|default:null}"
     value={$value|default:{$ADDRESS2|default:null} nofilter}
-    label=$label
+    label={intl l="Complément d'adresse"}
     placeholder=""
     required=$required
   }
@@ -202,13 +202,13 @@
     value={$value|default:{$ZIPCODE|default:null} nofilter}
     label=$label
     placeholder=""
+    autocomplete="false"
     required=$required
   }
 {/function}
 
 
 {* ------------------------------ City ----------------------------- *}
-
 
 {function name="fn_address_field_city"}
   {include
@@ -226,24 +226,25 @@
 
 {* ------------------------------ Country ----------------------------- *}
 
-
 {function name="fn_address_field_country"}
-
-    {assign var="value" value={$value|default:$COUNTRY|default:null}}
     {$countriesOptions = []}
 
-    {$countriesOptions['default'] = [
-      'value' => '',
-      'label' => {intl l="Choose a country"}
-    ]}
-
     {loop type="country" name="country.list" order="alpha"}
-    {$countriesOptions[$ID] = [
-      'value' => $ID,
-      'label' => $TITLE
-      ]}
+      {if $value == $ID || $IS_DEFAULT}
+        {$countriesOptions['default'] = [
+          'value' => $ID,
+          'label' => $TITLE
+        ]}
+        {else}
+        {$countriesOptions[$ID] = [
+          'value' => $ID,
+          'label' => $TITLE
+          ]}
+      {/if}
     {/loop}
 
+
+    {assign var="value" value={$country|default:$countriesOptions['default']['value']}}
     {include
       file="components/smarty/Select/Select.html"
       name=$name
@@ -254,6 +255,7 @@
       options=$countriesOptions
     }
 {/function}
+
 
 
 {* ------------------------------ State ----------------------------- *}
@@ -274,9 +276,9 @@
     name=$name
     id="{$label_attr.for|default:null}"
     value={$value|default:{$PHONE|default:null} nofilter}
-    label=$label
+    label={intl l="Téléphone fixe"}
     placeholder=""
-    required=$required
+    required={$required|default:false}
   }
 {/function}
 
@@ -291,9 +293,9 @@
     name=$name
     id="{$label_attr.for|default:null}"
     value={$value|default:{$CELLPHONE|default:null} nofilter}
-    label=$label
+    label={intl l="Téléphone mobile"}
     placeholder=""
-    required=$required
+    required={$required|default:false}
   }
 {/function}
 
@@ -309,6 +311,7 @@
     label=$label
     placeholder=""
     required=$required
+    autocomplete="new-password"
   }
 {/function}
 
@@ -324,6 +327,7 @@
   label=$label
   placeholder=""
   required=$required
+  autocomplete="new-password"
 }
 {/function}
 
@@ -331,7 +335,7 @@
 {* ------------------------------ Newsletter ----------------------------- *}
 
 {function name="fn_newsletter"}
-  {include file="components/smarty/Checkbox/Checkbox.html" value=$value id=$label_attr.for type="checkbox" checked=$checked label=$label}
+  {include file="components/smarty/Checkbox/Checkbox.html" value=$value id=$label_attr.for type="checkbox" class="text-base" checked=$checked label=$label}
 {/function}
 
 {* ------------------------------ Is Default ----------------------------- *}

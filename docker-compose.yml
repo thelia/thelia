@@ -36,18 +36,28 @@ services:
     environment:
       - PHP_IDE_CONFIG
       - XDEBUG_CONFIG
-      - TEMPLATE_NAME
+      - ACTIVE_FRONT_TEMPLATE
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
 
   encore:
     build:
-      context: ./templates/frontOffice/${TEMPLATE_NAME}
+      context: ./templates/frontOffice/${ACTIVE_FRONT_TEMPLATE:-modern}
       target: thelia_encore
     container_name: docker-thelia-encore
-    working_dir: /application/templates/frontOffice/${TEMPLATE_NAME}
+    working_dir: /application/templates/frontOffice/${ACTIVE_FRONT_TEMPLATE:-modern}
     environment:
       BROWSERSYNC_PROXY: http://localhost:8081
     volumes:
-      - ./templates/frontOffice/${TEMPLATE_NAME}:/application/templates/frontOffice/${TEMPLATE_NAME}:delegated
-      - ./templates/frontOffice/${TEMPLATE_NAME}/node_modules:/application/templates/frontOffice/${TEMPLATE_NAME}/node_modules
+      - ./templates/frontOffice/${ACTIVE_FRONT_TEMPLATE:-modern}:/application/templates/frontOffice/${ACTIVE_FRONT_TEMPLATE:-modern}:delegated
+      - ./templates/frontOffice/${ACTIVE_FRONT_TEMPLATE:-modern}/node_modules:/application/templates/frontOffice/${ACTIVE_FRONT_TEMPLATE:-modern}/node_modules
     ports:
       - 8081:8081
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: docker-thelia-mailhog
+    ports:
+      - 8085:8025

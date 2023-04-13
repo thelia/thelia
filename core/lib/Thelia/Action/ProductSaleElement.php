@@ -392,11 +392,9 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param $currencyId
+     * @throws \Propel\Runtime\Exception\PropelException
      *
      * @return int
-     *
-     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function createClonePSE(ProductCloneEvent $event, ProductSaleElements $originalProductPSE, $currencyId)
     {
@@ -437,11 +435,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param $clonedProductId
-     * @param $clonedProductPSEId
-     * @param $originalProductPSEFiles
-     * @param $type
-     *
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function clonePSEAssociatedFiles($clonedProductId, $clonedProductPSEId, $originalProductPSEFiles, $type): void
@@ -451,7 +444,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             $originalProductFilePositionQuery = [];
             $originalProductPSEFileId = null;
 
-            if (!\in_array($type, ['images', 'documents'])) {
+            if (!\in_array($type, ['image', 'document'])) {
                 throw new \Exception(Translator::getInstance()->trans('Cloning files of type %type is not allowed.', ['%type' => $type], 'core'));
             }
 

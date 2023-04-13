@@ -51,7 +51,7 @@ class ConfigModificationForm extends BaseForm
             ->add('secured', HiddenType::class, [
                 'label' => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin'),
             ])
-         ;
+        ;
 
         // Add standard description fields
         $this->addStandardDescFields();

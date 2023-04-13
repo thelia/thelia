@@ -179,7 +179,7 @@ class AddressFormat
             ->withFamilyName($address->getLastname())
         ;
 
-        if ($country->getHasStates() && (int) ($address->getStateId()) !== 0) {
+        if ($country->getHasStates() && (int) $address->getStateId() !== 0) {
             $addressModel = $addressModel->withAdministrativeArea(
                 sprintf(
                     '%s-%s',

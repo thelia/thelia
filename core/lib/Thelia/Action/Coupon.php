@@ -82,7 +82,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * Occurring when a Coupon is about to be created.
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon
-     * @param $eventName
      */
     public function create(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -95,7 +94,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * Occurring when a Coupon is about to be updated.
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon
-     * @param $eventName
      */
     public function update(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -123,7 +121,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * Occurring when a Coupon condition is about to be updated.
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon condition
-     * @param $eventName
      */
     public function updateCondition(CouponCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -134,8 +131,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     /**
      * Clear all coupons in session.
-     *
-     * @param $eventName
      */
     public function clearAllCoupons(Event $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -151,7 +146,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * Occurring when a Coupon condition is about to be consumed.
      *
      * @param CouponConsumeEvent $event Event consuming Coupon
-     * @param $eventName
      */
     public function consume(CouponConsumeEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -277,8 +271,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     /**
      * @throws \Exception if something goes wrong
-     *
-     * @param $eventName
      */
     public function afterOrder(OrderEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -354,7 +346,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         }
 
         // Clear all coupons.
-        $dispatcher->dispatch((new Event()), TheliaEvents::COUPON_CLEAR_ALL);
+        $dispatcher->dispatch(new Event(), TheliaEvents::COUPON_CLEAR_ALL);
     }
 
     /**

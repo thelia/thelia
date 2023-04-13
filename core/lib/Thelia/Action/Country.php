@@ -88,8 +88,6 @@ class Country extends BaseAction implements EventSubscriberInterface
 
     /**
      * Toggle Country visibility.
-     *
-     * @param $eventName
      */
     public function toggleVisibility(CountryToggleVisibilityEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {

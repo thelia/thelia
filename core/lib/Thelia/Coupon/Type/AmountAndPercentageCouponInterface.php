@@ -56,9 +56,9 @@ interface AmountAndPercentageCouponInterface
      * @param string $fieldName
      * @param string $fieldValue
      *
-     * @return string the field value
-     *
      * @throws \InvalidArgumentException is field value is not valid
+     *
+     * @return string the field value
      */
     public function checkBaseCouponFieldValue($fieldName, $fieldValue);
 }

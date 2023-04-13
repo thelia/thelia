@@ -110,8 +110,6 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
 
     /**
      * Changes position, selecting absolute ou relative change.
-     *
-     * @param $eventName
      */
     public function updatePosition(UpdatePositionEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {

@@ -31,7 +31,7 @@ class TemplateModificationForm extends TemplateCreationForm
                         ),
                     ],
             ])
-            ;
+        ;
     }
 
     public static function getName()

@@ -87,7 +87,7 @@ class Hook extends AbstractSmartyPlugin
     public function processHookFunction($params, &$smarty)
     {
         $hookName = $this->getParam($params, 'name');
-        $module = (int) ($this->getParam($params, 'module', 0));
+        $module = (int) $this->getParam($params, 'module', 0);
         $moduleCode = $this->getParam($params, 'modulecode', '');
 
         $type = $smarty->getTemplateDefinition()->getType();
@@ -217,7 +217,7 @@ HTML;
     public function processHookBlock($params, $content, $smarty, &$repeat)
     {
         $hookName = $this->getParam($params, 'name');
-        $module = (int) ($this->getParam($params, 'module', 0));
+        $module = (int) $this->getParam($params, 'module', 0);
         // explicit definition of variable that can be returned
         $fields = preg_replace(
             '|[^a-zA-Z0-9,\-_]|',
@@ -412,9 +412,9 @@ HTML;
      *
      * @param array $params
      *
-     * @return bool true if the hook is empty
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return bool true if the hook is empty
      */
     protected function checkEmptyHook($params)
     {
@@ -448,8 +448,6 @@ HTML;
     /**
      * Clean the params of the params passed to the hook function or block to feed the arguments of the event
      * with relevant arguments.
-     *
-     * @param $params
      *
      * @return array
      */

@@ -1,22 +1,20 @@
+{$socials = [
+  [ icon => "facebook", className => "w-6 h-6", label => "facebook url" ],
+  [ icon => "instagram", className => "w-6 h-6", label => "instagram url" ],
+  [ icon => "linkedin", className => "w-6 h-6", label => "linkedin url" ],
+  [ icon => "youtube", className => "w-6 h-4", label => "youtube url" ],
+  [ icon => "twitter", className => "w-6 h-6 fill-current", label => "twitter url" ],
+  [ icon => "viadeo", className => "w-6 h-6 fill-current", label => "viadeo url" ],
+  [ icon => "pinterest", className => "w-6 h-6 fill-current", label => "pinterest url"]
+]}
 
-<a href='#' target="_blank">
-  {renderIconSvg icon="facebook" class="w-6 h-6 fill-current "}
-</a>
-<a href='#' target="_blank">
-  {renderIconSvg icon="twitter" class="w-6 h-6 fill-current "}
-</a>
-<a href='#' target="_blank">
-  {renderIconSvg icon="youtube" class="w-6 h-6 fill-current "}
-</a>
-<a href='#' target="_blank">
-  {renderIconSvg icon="linkedin" class="w-6 h-6 fill-current "}
-</a>
-<a href='#' target="_blank">
-  {renderIconSvg icon="viadeo" class="w-6 h-6 fill-current "}
-</a>
-<a href='#' target="_blank">
-  {renderIconSvg icon="instagram" class="w-6 h-6 fill-current "}
-</a>
-<a href='#' target="_blank">
-  {renderIconSvg icon="pinterest" class="w-6 h-6 fill-current "}
-</a>
+<ul class="SocialNetworks">
+  {foreach $socials as $social}
+    <li>
+      <a href="#" class="SocialNetworks-link" aria-label="{$social['label']}" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
+        {renderIconSvg icon=$social.icon class=$social.className }
+      </a>
+    </li>
+  {/foreach}
+</ul>
+

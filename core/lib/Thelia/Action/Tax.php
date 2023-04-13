@@ -12,6 +12,8 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Tax\TaxEvent;
@@ -21,9 +23,14 @@ use Thelia\Model\TaxQuery;
 
 class Tax extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     * @param $eventName
-     */
+    private ServiceLocator $taxTypeLocator;
+
+    public function __construct(
+        #[TaggedLocator('thelia.taxType')] ServiceLocator $taxTypeLocator
+    ) {
+        $this->taxTypeLocator = $taxTypeLocator;
+    }
+
     public function create(TaxEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $tax = new TaxModel();
@@ -42,9 +49,6 @@ class Tax extends BaseAction implements EventSubscriberInterface
         $event->setTax($tax);
     }
 
-    /**
-     * @param $eventName
-     */
     public function update(TaxEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {
@@ -74,6 +78,14 @@ class Tax extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function getTaxTypeService(TaxEvent $event): void
+    {
+        $tax = $event->getTax();
+        if ($this->taxTypeLocator->has($tax->getType())) {
+            $event->setTaxTypeService($this->taxTypeLocator->get($tax->getType()));
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -83,6 +95,7 @@ class Tax extends BaseAction implements EventSubscriberInterface
             TheliaEvents::TAX_CREATE => ['create', 128],
             TheliaEvents::TAX_UPDATE => ['update', 128],
             TheliaEvents::TAX_DELETE => ['delete', 128],
+            TheliaEvents::TAX_GET_TYPE_SERVICE => ['getTaxTypeService', 128],
         ];
     }
 }

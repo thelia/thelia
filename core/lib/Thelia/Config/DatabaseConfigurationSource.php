@@ -157,9 +157,9 @@ class DatabaseConfigurationSource
     }
 
     /**
-     * @return \PDO thelia database connection
-     *
      * @throws \PDOException
+     *
+     * @return \PDO thelia database connection
      */
     public function getTheliaConnectionPDO()
     {

@@ -89,11 +89,9 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param $value
+     * @throws \Propel\Runtime\Exception\PropelException
      *
      * @return $this
-     *
-     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function updateQuantity($value)
     {
@@ -120,11 +118,9 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @param $value
+     * @throws \Propel\Runtime\Exception\PropelException
      *
      * @return $this
-     *
-     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function addQuantity($value)
     {
@@ -158,9 +154,9 @@ class CartItem extends BaseCartItem
     /**
      * @param null $locale
      *
-     * @return Product
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return Product
      */
     public function getProduct(ConnectionInterface $con = null, $locale = null)
     {
@@ -180,9 +176,9 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public function getRealTaxedPrice(Country $country, State $state = null)
     {
@@ -190,9 +186,9 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public function getTaxedPrice(Country $country, State $state = null)
     {
@@ -202,9 +198,9 @@ class CartItem extends BaseCartItem
     }
 
     /**
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public function getTaxedPromoPrice(Country $country, State $state = null)
     {
@@ -216,9 +212,9 @@ class CartItem extends BaseCartItem
     /**
      * @since Version 2.3
      *
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public function getTotalRealTaxedPrice(Country $country, State $state = null)
     {
@@ -228,9 +224,9 @@ class CartItem extends BaseCartItem
     /**
      * @since Version 2.3
      *
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public function getTotalTaxedPrice(Country $country, State $state = null)
     {

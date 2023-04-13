@@ -134,7 +134,7 @@ class OrderStatusController extends AbstractCrudController
             ->setPostscriptum($formData['postscriptum'])
             ->setCode($formData['code'])
             ->setColor($formData['color'])
-         ;
+        ;
 
         return $orderStatusUpdateEvent;
     }
@@ -142,9 +142,9 @@ class OrderStatusController extends AbstractCrudController
     /**
      * Creates the delete event with the provided form data.
      *
-     * @return OrderStatusDeleteEvent
-     *
      * @throws \Exception
+     *
+     * @return OrderStatusDeleteEvent
      */
     protected function getDeleteEvent()
     {
@@ -269,9 +269,6 @@ class OrderStatusController extends AbstractCrudController
     }
 
     /**
-     * @param $positionChangeMode
-     * @param $positionValue
-     *
      * @return UpdatePositionEvent|void
      */
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)

@@ -177,9 +177,6 @@ class GenerateSQLCommand extends ContainerAwareCommand
      * - `in_string`: set to 1 not add simple quote around the string. (default = 0)
      * - `use_default`: set to 1 to use the `l` string as a fallback. (default = 0)
      *
-     * @param $params
-     * @param $smarty
-     *
      * @return string
      */
     public function translate($params, $smarty)
@@ -192,16 +189,16 @@ class GenerateSQLCommand extends ContainerAwareCommand
         if (empty($params['locale'])) {
             throw new RuntimeException('Translation Error. Locale is empty.');
         }
-        $inString = (0 !== (int) ($params['in_string']));
-        $useDefault = (0 !== (int) ($params['use_default']));
+        $inString = (0 !== (int) $params['in_string']);
+        $useDefault = (0 !== (int) $params['use_default']);
 
         $translation = $this->translator->trans(
-                $params['l'],
-                [],
-                'install',
-                $params['locale'],
-                $useDefault
-            );
+            $params['l'],
+            [],
+            'install',
+            $params['locale'],
+            $useDefault
+        );
 
         if (empty($translation)) {
             $translation = ($inString) ? '' : 'NULL';

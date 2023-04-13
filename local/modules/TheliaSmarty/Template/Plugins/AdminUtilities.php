@@ -39,10 +39,10 @@ class AdminUtilities extends AbstractSmartyPlugin
      * @param string  $templateName
      * @param array   $variablesArray
      *
-     * @return string
-     *
      * @throws \Exception
      * @throws \SmartyException
+     *
+     * @return string
      */
     protected function fetchSnippet($smarty, $templateName, $variablesArray)
     {
@@ -71,13 +71,10 @@ class AdminUtilities extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     * @param $smarty
-     *
-     * @return mixed|string
-     *
      * @throws \Exception
      * @throws \SmartyException
+     *
+     * @return mixed|string
      */
     public function generatePositionChangeBlock($params, &$smarty)
     {
@@ -132,10 +129,10 @@ class AdminUtilities extends AbstractSmartyPlugin
      * @param array   $params
      * @param \Smarty $smarty
      *
-     * @return string no text is returned
-     *
      * @throws \Exception
      * @throws \SmartyException
+     *
+     * @return string no text is returned
      */
     public function generateSortableColumnHeader($params, &$smarty)
     {

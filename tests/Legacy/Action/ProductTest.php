@@ -364,6 +364,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @param ProductCategory[] $productCategory
+     *
      * @depends testAddCategory
      *
      * @return Product
@@ -811,6 +812,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @covers \Thelia\Action\File::cloneFile
+     *
      * @depends testCloneAccessories
      *
      * @return ProductCloneEvent
@@ -928,6 +930,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @covers \Thelia\Action\ProductSaleElement::createClonePSE
+     *
      * @depends testCloneFile
      *
      * @return ProductCloneEvent
@@ -990,6 +993,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @covers \Thelia\Action\ProductSaleElement::updateClonePSE
+     *
      * @depends testCreateClonePSE
      *
      * @return array
@@ -1059,6 +1063,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
     /**
      * @covers \Thelia\Action\ProductSaleElement::clonePSEAssociatedFiles
+     *
      * @depends testUpdateClonePSE
      */
     public function testClonePSEAssociatedFiles(array $params): void

@@ -18,7 +18,7 @@ use Thelia\Model\Product;
 /**
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-abstract class BaseTaxType
+abstract class BaseTaxType implements TaxTypeInterface
 {
     /**
      * A var <-> value array which contains TaxtType requirements (e.g. parameters).
@@ -32,10 +32,8 @@ abstract class BaseTaxType
      * to use in tax calculation.
      *
      * For other tax types, this method shoud return 0.
-     *
-     * @return number
      */
-    public function pricePercentRetriever()
+    public function pricePercentRetriever(): float
     {
         return 0;
     }
@@ -44,10 +42,8 @@ abstract class BaseTaxType
      * For constant amount tax type, return the absolute amount to use in tax calculation.
      *
      * For other tax types, this method shoud return 0.
-     *
-     * @return number
      */
-    public function fixAmountRetriever(Product $product)
+    public function fixAmountRetriever(Product $product): float
     {
         return 0;
     }
@@ -60,30 +56,23 @@ abstract class BaseTaxType
      * array(
      *    'percent' => new FloatType()
      * );
-     *
-     * @return array of TaxTypeRequirementDefinition
      */
-    public function getRequirementsDefinition()
+    public function getRequirementsDefinition(): array
     {
         return [];
     }
 
-    /**
-     * @return the name of this tax type
-     */
     abstract public function getTitle();
 
-    public function calculate(Product $product, $untaxedPrice)
+    public function calculate(Product $product, $untaxedPrice): float
     {
         return $untaxedPrice * $this->pricePercentRetriever() + $this->fixAmountRetriever($product);
     }
 
     /**
      * @throws TaxEngineException
-     *
-     * @return array return the requirements array
      */
-    public function getRequirements()
+    public function getRequirements(): array
     {
         return $this->requirements;
     }
@@ -111,7 +100,7 @@ abstract class BaseTaxType
         }
     }
 
-    public function setRequirement($key, $value)
+    public function setRequirement($key, $value): self
     {
         $this->requirements[$key] = $value;
 

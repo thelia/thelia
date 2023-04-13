@@ -1,11 +1,11 @@
 import React, {
   Suspense,
-  useEffect,
   useLayoutEffect,
   useRef,
-  useState
+  useState,
+  useEffect
 } from 'react';
-import { hideCart, showLogin } from '@js/redux/modules/visibility';
+import { showLogin, hideCart } from '@js/redux/modules/visibility';
 import {
   useCartItemDelete,
   useCartItemUpdate,
@@ -15,158 +15,180 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 
 import AddCoupon from '../AddCoupon';
-import { ReactComponent as IconCLose } from './imgs/icon-close.svg';
+import { ReactComponent as IconCLose } from '@icons/close.svg';
+import { ReactComponent as IconTrash } from '@icons/trash.svg';
+import useLockBodyScroll from '@utils/useLockBodyScroll';
+import { useClickAway } from 'react-use';
 import Loader from '../Loader';
 import priceFormat from '@utils/priceFormat';
 import { useIntl } from 'react-intl';
+import Quantity from '../Quantity';
+import useEscape from '@js/utils/useEscape';
+import closeAndFocus from '@js/utils/closeAndFocus';
+import { trapTabKey } from '@js/standalone/trapItemsMenu';
 
 function Price({ price, price_promo, isPromo }) {
   return (
-    <div className="flex items-center">
-      {isPromo === 1 ? (
-        <div className="flex flex-col leading-none">
-          <span className="mb-2 text-lg">{priceFormat(+price_promo)}</span>
-          <span className="text-sm line-through">{priceFormat(+price)}</span>
+    <div className="flex items-center text-lg">
+      {isPromo ? (
+        <div className="flex flex-col items-end font-bold leading-none">
+          <span className="mb-1">{priceFormat(+price_promo)}</span>
+          <span className="text-sm font-normal line-through">
+            {priceFormat(+price)}
+          </span>
         </div>
       ) : (
-        <div className="flex flex-col">
-          <span className="text-lg">{priceFormat(+price)}</span>
+        <div className="flex flex-col items-end font-bold leading-none">
+          {priceFormat(+price)}
         </div>
       )}
     </div>
   );
 }
 
-function Quantity({ quantity, cartItemId }) {
-  const { mutate, status } = useCartItemUpdate(cartItemId);
-
-  if (!quantity || !cartItemId) return null;
-
-  return (
-    <div className="flex items-center">
-      <div className="relative flex flex-row ">
-        <button
-          onClick={() => {
-            mutate(quantity - 1);
-          }}
-          disabled={status === 'loading'}
-          className="flex items-center justify-center w-6 h-6 bg-gray-200 rounded-none cursor-pointer focus:outline-none"
-        >
-          <span className="m-auto">-</span>
-        </button>
-        <div className="flex items-center justify-center w-10 h-6 bg-white cursor-default">
-          <span>{quantity}</span>
-        </div>
-        <button
-          onClick={() => {
-            mutate(quantity + 1);
-          }}
-          disabled={status === 'loading'}
-          className="flex items-center justify-center w-6 h-6 bg-gray-200 rounded-none cursor-pointer focus:outline-none"
-        >
-          <span className="m-auto">+</span>
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function Delete({ id }) {
+function Delete({ id, setRemoveItem, visible }) {
   const { mutate: deleteItem, status } = useCartItemDelete(id);
+
+  useEffect(() => {
+    status === 'loading' ? setRemoveItem(true) : setRemoveItem(false);
+  }, [status, setRemoveItem]);
 
   if (!id) return null;
 
-  if (status === 'loading')
-    return (
-      <div className="absolute top-0 right-0 ">
-        <svg
-          className="w-4 h-4 stroke-current "
-          viewBox="0 0 38 38"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <g fill="none" fillRule="evenodd">
-            <g transform="translate(1 1)" strokeWidth="2">
-              <circle strokeOpacity=".5" cx="18" cy="18" r="18" />
-              <path d="M36 18c0-9.94-8.06-18-18-18">
-                <animateTransform
-                  attributeName="transform"
-                  type="rotate"
-                  from="0 18 18"
-                  to="360 18 18"
-                  dur="1s"
-                  repeatCount="indefinite"
-                />
-              </path>
-            </g>
-          </g>
-        </svg>
-      </div>
-    );
-
   return (
     <button
-      onClick={() => {
-        deleteItem();
-      }}
-      className="text-red-500 hover: focus:"
+      onClick={() => deleteItem()}
+      className="focus: outline-gray-600"
+      tabIndex={visible ? '0' : '-1'}
     >
-      Supprimer
+      <IconTrash className="h-[17px] w-[12px]" />
     </button>
   );
 }
 
-function Item({
+export function Item({
   id,
-  images,
   product,
   productSaleElement,
   price,
   promo,
   promoPrice,
   quantity,
-  canDelete
+  canDelete,
+  canChangeQuantity,
+  recap,
+  images = [],
+  visible
 }) {
+  const [removeItem, setRemoveItem] = useState(false);
+  const { mutate, status } = useCartItemUpdate(id);
+
+  const intl = useIntl();
+
   return (
-    <div className="flex pt-4 CartItem first:pt-0">
-      <div className="relative CartItem-contain">
-        {images ? (
-          <div className="w-16 h-16 p-2 bg-white">
+    <div
+      className={`CartItem ${
+        removeItem || status === 'loading'
+          ? 'pointer-events-none opacity-50'
+          : ''
+      } ${recap ? 'CartItem--recap' : ''}`}
+    >
+      {images.length > 0 ? (
+        <div className="CartItem-img">
+          {images ? (
             <img
-              src={typeof images?.[0]?.url === 'string' ? images[0].url : ''}
-              className="object-contain object-center w-100 h-100"
+              src={`/legacy-image-library/product_image_${images?.[0]?.id}/full/!106,/0/default.webp`}
               alt={
                 typeof images?.[0]?.i18n?.title === 'string'
-                  ? images[0].i18n.title
-                  : ''
+                  ? `${images?.[0]?.i18n?.title} ${intl.formatMessage({
+                      id: 'VISUAL_OF_CART'
+                    })}`
+                  : `${product?.i18n.title} ${intl.formatMessage({
+                      id: 'VISUAL_OF_CART'
+                    })}`
+              }
+              title={
+                typeof images?.[0]?.i18n?.title === 'string'
+                  ? `${images?.[0]?.i18n?.title} ${intl.formatMessage({
+                      id: 'VISUAL_OF_CART'
+                    })}`
+                  : `${product?.i18n.title} ${intl.formatMessage({
+                      id: 'VISUAL_OF_CART'
+                    })}`
               }
               loading="lazy"
             />
-          </div>
-        ) : null}
-      </div>
-      <div className="flex-1 ml-6">
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <a href={product.url} className="block font-bold">
-              {product.i18n.title}
-            </a>
-            <div className="text-sm text-gray-600">
-              {productSaleElement?.attributes?.map((attribute) => {
-                return (
-                  <div key={attribute.id}>
-                    {attribute?.i18n?.title}:{' '}
-                    {attribute?.values
-                      ?.map((value) => value?.i18n?.title || '')
-                      .join(' - ')}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          {canDelete ? <Delete id={id} /> : null}
+          ) : null}
         </div>
-        <div className="flex flex-wrap items-center justify-between">
-          <Quantity quantity={quantity} id={id} cartItemId={id} />
+      ) : (
+        <div className="CartItem-img">
+          <img
+            src={window.PLACEHOLDER_IMAGE}
+            alt={
+              typeof images?.[0]?.i18n?.title === 'string'
+                ? `${images?.[0]?.i18n?.title} ${intl.formatMessage({
+                    id: 'VISUAL_OF_CART'
+                  })}`
+                : `${product?.i18n.title} ${intl.formatMessage({
+                    id: 'VISUAL_OF_CART'
+                  })}`
+            }
+            title={
+              typeof images?.[0]?.i18n?.title === 'string'
+                ? `${images?.[0]?.i18n?.title} ${intl.formatMessage({
+                    id: 'VISUAL_OF_CART'
+                  })}`
+                : `${product?.i18n.title} ${intl.formatMessage({
+                    id: 'VISUAL_OF_CART'
+                  })}`
+            }
+            loading="lazy"
+          />
+        </div>
+      )}
+      <div className="CartItem-contain">
+        <div className="flex justify-between item-center">
+          <a
+            href={product.url}
+            className="block mr-4 font-bold"
+            tabIndex={visible ? '0' : '-1'}
+          >
+            {product.i18n.title}
+          </a>
+          {canDelete ? (
+            <Delete id={id} setRemoveItem={setRemoveItem} visible={visible} />
+          ) : null}
+        </div>
+        <div className="text-sm leading-none text-gray-600 ">
+          <div>
+            {productSaleElement?.attributes?.map((attribute) => {
+              return (
+                <div key={attribute.id}>
+                  {attribute?.i18n?.title}:{' '}
+                  {attribute?.values
+                    ?.map((value) => value?.i18n?.title || '')
+                    .join(' - ')}
+                </div>
+              );
+            })}
+          </div>
+          <div>
+            {intl.formatMessage({ id: 'UNIT_PRICE' })}:{' '}
+            {priceFormat(price.taxed)}
+          </div>
+        </div>
+        <div className=" CartItem-bottom">
+          {canChangeQuantity ? (
+            <Quantity
+              max={productSaleElement?.quantity || 0}
+              mutate={mutate}
+              quantity={quantity}
+              small={true}
+              visible={visible}
+            />
+          ) : (
+            <span className="CartItem-smallQuantity">x{quantity}</span>
+          )}
           <Price
             price={price.taxed * quantity}
             price_promo={promoPrice.taxed * quantity}
@@ -181,18 +203,46 @@ function Item({
 function EmptyCart() {
   const intl = useIntl();
   return (
-    <legend className="px-10 mt-10 text-2xl leading-5 text-center uppercase font-heading text-bold mb-7">
+    <legend className="text-center Title Title--3">
+      <button
+        type="button"
+        className="SideBar-close"
+        aria-label={intl.formatMessage({ id: 'CLOSE_CART' })}
+        data-close-cart
+      >
+        <IconCLose className="w-3 h-3 pointer-events-none" />
+      </button>
       {intl.formatMessage({ id: 'CART_EMPTY' })}
     </legend>
   );
 }
 
-export function CartItems({ cart, canDelete = true }) {
+export function CartItems({
+  cart,
+  canDelete = true,
+  canChangeQuantity = true,
+  recap = false,
+  noOverflow = false,
+  visible
+}) {
   return (
-    <div className="grid divide-y divide-gray-200 gap-y-4">
-      {cart.items?.map((item, index) => (
-        <Item key={item.id || index} canDelete={canDelete} {...item} />
-      ))}
+    <div className="CartItems-wrapper">
+      <div
+        className={`CartItems ${recap ? 'CartItems--recap' : ''} ${
+          noOverflow ? 'max-h-max overflow-visible' : ''
+        }`}
+      >
+        {cart.items?.map((item, index) => (
+          <Item
+            key={item.id || index}
+            canDelete={canDelete}
+            canChangeQuantity={canChangeQuantity}
+            recap={recap}
+            visible={visible}
+            {...item}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -208,9 +258,9 @@ function FooterItem({ label, value }) {
 
 function Total({ label, value }) {
   return (
-    <dl className="flex items-baseline justify-between py-5 leading-none uppercase">
-      <dt className="text-lg">{label}</dt>
-      <dd className="text-2xl">{value}</dd>
+    <dl className="flex flex-col items-baseline justify-between leading-none">
+      <dt className="text-sm text-gray-600">{label}</dt>
+      <dd className="text-3xl font-medium">{value}</dd>
     </dl>
   );
 }
@@ -250,97 +300,127 @@ export function MiniCartFooter({ delivery, taxes, discount, coupon, total }) {
   );
 }
 
-function MiniCart() {
+function MiniCart({ visible, redirect }) {
   const dispatch = useDispatch();
-  const [maxheight, setMaxHeight] = useState('15px');
-  const footerRef = useRef(null);
+  const ref = useRef(null);
+  const focusRef = useRef(null);
   const { data: cart = {} } = useCartQuery();
   const { data: customer } = useCustomer();
   const intl = useIntl();
+  const [totalQuantityCart, setTotalQuantityCart] = useState(
+    cart?.items?.length || 0
+  );
 
   useLayoutEffect(() => {
     if (cart) {
-      const node = document.getElementById('js-cart-count');
-      if (node) {
-        node.innerText = `(${cart?.items?.length || 0})`;
-      }
+      let count = 0;
+      cart?.items?.forEach((el) => {
+        count = count + (el?.quantity || 0);
+      });
+      setTotalQuantityCart(count);
     }
   }, [cart]);
 
-  useLayoutEffect(() => {
-    if (footerRef.current) {
-      setMaxHeight(`${footerRef.current.offsetHeight}px`);
+  useEffect(() => {
+    const node = document.getElementById('js-cart-count');
+    if (node) {
+      node.innerText = `${totalQuantityCart || 0}`;
     }
-  }, [cart, footerRef]);
+  }, [totalQuantityCart]);
 
-  if (!cart.items || cart.items.length === 0) {
-    return <EmptyCart />;
-  }
+  useLockBodyScroll(ref, visible, redirect);
+
+  useClickAway(ref, (e) => {
+    if (!e.target?.matches('[data-toggle-cart]') && visible) {
+      closeAndFocus(() => dispatch(hideCart()), '[data-toggle-cart]');
+    }
+  });
+
+  useLayoutEffect(() => {
+    if (visible) {
+      focusRef.current.focus();
+    }
+  }, [focusRef, visible]);
+
+  useEscape(ref, () =>
+    closeAndFocus(() => dispatch(hideCart()), '[data-toggle-cart]')
+  );
+
+  ref?.current?.addEventListener('keydown', (e) => {
+    if (!visible) return;
+
+    trapTabKey(ref.current, e);
+  });
 
   return (
-    <div>
+    <div ref={ref} className="grid grid-cols-1 gap-8">
       <button
-        type="Button"
-        className="absolute top-0 right-0 transform -translate-x-4 translate-y-4 hover: focus:"
-        onClick={() => {
-          dispatch(hideCart());
-        }}
+        ref={focusRef}
+        type="button"
+        aria-label={intl.formatMessage({ id: 'CLOSE_CART' })}
+        className="SideBar-close"
+        data-close-cart
+        onClick={() =>
+          closeAndFocus(() => dispatch(hideCart()), '[data-toggle-cart]')
+        }
+        tabIndex={visible ? '0' : '-1'}
       >
-        <IconCLose className="" />
+        <IconCLose className="w-3 h-3 pointer-events-none" />
       </button>
-      <div className="">
-        <div
-          className="overflow-y-auto"
-          style={{
-            height: `calc(100vh - (10.125rem + ${maxheight}))`
-          }}
-        >
-          <CartItems cart={cart} />
-        </div>
-      </div>
-      <div className="pt-10 mt-auto" ref={footerRef}>
-        <MiniCartFooter {...cart} />
-        <div className="flex justify-center">
-          <a
-            href="/order/delivery"
-            className={`btn w-full  ${
-              cart.items?.length <= 0 ? 'opacity-50' : ''
-            }`}
-            onClick={(e) => {
-              if (cart.items?.length === 0) {
-                e.preventDefault();
-              }
-              if (!customer) {
-                e.preventDefault();
-                dispatch(showLogin({ showCart: true }));
-              }
-            }}
-          >
-            {intl.formatMessage({ id: 'SUBMIT_CART' })}
-          </a>
-        </div>
-      </div>
+      {!cart.items || cart.items.length === 0 ? (
+        <EmptyCart />
+      ) : (
+        <>
+          <div className="flex items-center justify-between ">
+            <strong className="Title Title--3">mon panier</strong>
+            <span className="block text-base font-bold text-gray-600">
+              {totalQuantityCart +
+                ' article' +
+                (totalQuantityCart > 1 ? 's' : '')}
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <Total
+              label={intl.formatMessage({ id: 'TOTAL' })}
+              value={priceFormat(cart.total + cart.delivery)}
+            />
+            <a
+              href="/order/delivery"
+              className={`Button ${
+                cart.items?.length <= 0 ? 'opacity-50' : ''
+              }`}
+              onClick={(e) => {
+                if (cart.items?.length === 0) {
+                  e.preventDefault();
+                }
+                if (!customer) {
+                  e.preventDefault();
+                  dispatch(
+                    showLogin({ showCart: true, redirectionToCheckout: true })
+                  );
+                }
+              }}
+              tabIndex={visible ? '0' : '-1'}
+            >
+              {intl.formatMessage({ id: 'SUBMIT_CART' })}
+            </a>
+          </div>
+          <CartItems cart={cart} visible={visible} />
+        </>
+      )}
     </div>
   );
 }
 
 export default function MiniCartWrapper() {
-  const visible = useSelector((state) => state.visibility.cart);
-  const [isOrderDelivery, setIsOrderDelivery] = useState(false);
+  const { cart: visible, redirectionToCheckout: redirect } = useSelector(
+    (state) => state.visibility
+  );
 
-  useEffect(() => {
-    if (document.body.classList.contains('page-order-delivery')) {
-      setIsOrderDelivery(true);
-    }
-  }, []);
   return (
-    <div
-      className={`MiniCart z-10 bg-white flex flex-col p-10 ${
-        visible ? 'MiniCart--visible' : ''
-      } ${isOrderDelivery ? 'isOrderDelivery' : ''}`}
-    >
-      <Suspense fallback={<Loader size="w-24 h-24" />}>
-        <MiniCart />
+    <div className={`SideBar ${visible ? 'SideBar--visible' : ''} `}>
+      <Suspense fallback={<Loader />}>
+        {visible ? <MiniCart visible={visible} redirect={redirect} /> : null}
       </Suspense>
     </div>
   );

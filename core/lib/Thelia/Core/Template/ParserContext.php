@@ -15,8 +15,8 @@ namespace Thelia\Core\Template;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Thelia\Core\Form\TheliaFormFactoryInterface;
-use Thelia\Core\Form\TheliaFormValidatorInterface;
+use Thelia\Core\Form\TheliaFormFactory;
+use Thelia\Core\Form\TheliaFormValidator;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Thelia;
 use Thelia\Form\BaseForm;
@@ -36,10 +36,10 @@ class ParserContext implements \IteratorAggregate
     private $formStore = [];
     private $store = [];
 
-    /** @var TheliaFormFactoryInterface */
+    /** @var TheliaFormFactory */
     private $formFactory;
 
-    /** @var TheliaFormValidatorInterface */
+    /** @var TheliaFormValidator */
     private $formValidator;
 
     /** @var RequestStack */
@@ -47,8 +47,8 @@ class ParserContext implements \IteratorAggregate
 
     public function __construct(
         RequestStack $requestStack,
-        TheliaFormFactoryInterface $formFactory,
-        TheliaFormValidatorInterface $formValidator
+        TheliaFormFactory $formFactory,
+        TheliaFormValidator $formValidator
     ) {
         // Setup basic variables
         $this->set('THELIA_VERSION', Thelia::THELIA_VERSION);
@@ -323,7 +323,7 @@ class ParserContext implements \IteratorAggregate
         return $this->store[$name] ?? $default;
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->store);
     }

@@ -25,8 +25,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 abstract class AbstractTheliaType extends AbstractType
 {
     /**
-     * @param $groups
-     *
      * @return array
      *
      * Replaces validation groups in constraints

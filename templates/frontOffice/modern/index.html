@@ -1,11 +1,11 @@
 {extends file="layout.tpl"}
 
 {block name="css" append}
-  {getAssetsFromEntrypoints entry="home" type="css"}
+  {encore_entry_link_tags entry="home"}
 {/block}
 
 {block name="javascript" append}
-  {getAssetsFromEntrypoints entry="home" type="js"}
+  {encore_entry_script_tags entry="home"}
 {/block}
 
 
@@ -21,34 +21,15 @@
 
 {* Main content *}
 {block name="main-content"}
-  <div class="-mx-8">
+  <div class="flex flex-col items-stretch">
+    {include file="components/smarty/StratSeo/StratSeo.html"}
 
-  {local_media type="banner"}
-    {$bannerUrl = $MEDIA_URL}
-  {/local_media}
-  {include
-    file="components/smarty/HeroImage/HeroImage.html"
-    title={config key="store_name"}
-    subtitle={config key="store_description"}
-    description=""
-    img=$bannerUrl
-    }
+    {include file="components/smarty/Hero/Hero.html" description={config key="store_description"} tabindex="1"}
 
-  {include file="components/smarty/NewProducts/NewProducts.html"}
-  <div class="px-8 pt-20 pb-32">
-    {include file="components/smarty/CategoriesPanels/CategoriesPanels.html" title={intl l="Our product categories"}}
-  </div>
+    {include file="components/smarty/Selection/Selection.html" type="new" tabindex="1"}
 
-  {loop type="content" name="home.content" id=14}
-    {loop type="image" name="home.content.FolderPreview.img" source="content" source_id=$ID width=590 height=625 limit=1}
-      {$image = $IMAGE_URL}
-    {/loop}
-    {loop type="content" name="home.content.FolderPreview.url" id=7}
-      {$url = $URL}
-    {/loop}
-    {include file="components/smarty/FolderPreview/FolderPreview.html" image=$image|default:null url=$url|default:null}
-  {/loop}
+    {include file="components/smarty/Selection/Selection.html" type="promo" animated="true" tabindex="1"}
 
-  {include file="components/smarty/Reassurance/Reassurance.html"}
+    {include file="components/smarty/CategoriesPanels/CategoriesPanels.html" title={intl l="Our product categories"} animated="true"}
   </div>
 {/block}

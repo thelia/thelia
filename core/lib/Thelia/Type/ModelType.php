@@ -23,8 +23,6 @@ class ModelType extends BaseType
     protected $expectedModelActiveRecord;
 
     /**
-     * @param $expectedModelActiveRecord
-     *
      * @throws TypeException
      */
     public function __construct($expectedModelActiveRecord)

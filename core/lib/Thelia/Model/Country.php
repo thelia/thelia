@@ -12,7 +12,6 @@
 
 namespace Thelia\Model;
 
-use LogicException;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
@@ -139,7 +138,7 @@ class Country extends BaseCountry
     /**
      * Return the shop country.
      *
-     * @throws LogicException if no shop country is defined
+     * @throws \LogicException if no shop country is defined
      */
     public static function getShopLocation()
     {

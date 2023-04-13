@@ -34,7 +34,6 @@ class Request extends BaseRequest
     /** @var string */
     protected $controllerType;
 
-    /** @internal  */
     public static $isAdminEnv = false;
 
     /**
@@ -134,8 +133,6 @@ class Request extends BaseRequest
      * <code>
      * if ($request->fromControllerType(BaseFrontController::CONTROLLER_TYPE)) {...}
      * </code>
-     *
-     * @param $controllerType
      *
      * @return bool
      */

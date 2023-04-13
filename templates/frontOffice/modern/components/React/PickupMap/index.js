@@ -1,6 +1,13 @@
 import 'leaflet/dist/leaflet.css';
 
-import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
+import {
+  FeatureGroup,
+  MapContainer,
+  Marker,
+  Popup,
+  TileLayer,
+  useMap
+} from 'react-leaflet';
 import React, {
   createRef,
   useCallback,
@@ -10,16 +17,13 @@ import React, {
 } from 'react';
 import { orderBy, size } from 'lodash-es';
 import {
-  useAddressQuery,
   useGetCheckout,
   usePickupLocations,
   useSetCheckout
 } from '@openstudio/thelia-api-utils';
 
 import Alert from '../Alert';
-import Input from '../Input';
 import Loader from '../Loader';
-import SubmitButton from '../SubmitButton';
 import axios from 'axios';
 import { getLatLngCenter } from '@utils/map';
 import { icon } from 'leaflet/src/layer/marker/Icon';
@@ -30,6 +34,9 @@ import markerImg from './images/marker-icon.png';
 import markerImgShadow from './images/marker-shadow.png';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
+import Title from '../Title';
+import { useRef } from 'react';
+// import { pickupFixtures } from '../Checkout/constants';
 
 const customIcon = icon({
   iconUrl: markerImg,
@@ -102,7 +109,7 @@ function InfoPopUp({ location, selected, onChooseLocation }) {
         {!selected ? (
           <button
             type="button"
-            className="mt-4 btn btn--sm"
+            className="mt-4 Button Button--primary"
             onClick={() => {
               onChooseLocation(location.id);
               if (location.refList?.current) {
@@ -124,18 +131,21 @@ function InfoPopUp({ location, selected, onChooseLocation }) {
 
 function MapDisplay({ locations, selectedLocation, onChooseLocation }) {
   const map = useMap();
+  const groupRef = useRef(null);
 
   const mapCenter = useMemo(() => {
     if (locations.length > 0) {
-      const center = getLatLngCenter(
-        locations.map((point) => {
-          return {
-            latitude: parseFloat(point.latitude || 0),
-            longitude: parseFloat(point.longitude || 0)
-          };
-        })
-      );
-      return [center.latitude, center.longitude];
+      const markers = locations.map((point) => {
+        return {
+          latitude: parseFloat(point.latitude || 0),
+          longitude: parseFloat(point.longitude || 0)
+        };
+      });
+      const center = getLatLngCenter(markers);
+      return {
+        center: [center.latitude, center.longitude],
+        bounds: markers.map((e) => [e.latitude, e.longitude])
+      };
     }
   }, [locations]);
 
@@ -147,7 +157,8 @@ function MapDisplay({ locations, selectedLocation, onChooseLocation }) {
         map.openPopup(selectedLocation.ref.current);
       }
     } else if (mapCenter) {
-      map.setView(mapCenter);
+      map.setView(mapCenter.center);
+      map.fitBounds(mapCenter.bounds);
     }
   }, [mapCenter, selectedLocation, map]);
 
@@ -157,21 +168,23 @@ function MapDisplay({ locations, selectedLocation, onChooseLocation }) {
         url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
         subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
       />
-      {locations.map((location) => {
-        return (
-          <Marker
-            key={location.id}
-            position={[location.latitude, location.longitude]}
-            icon={findIcon(location?.moduleOptionCode)}
-          >
-            <InfoPopUp
-              location={location}
-              selected={selectedLocation?.id === location.id}
-              onChooseLocation={onChooseLocation}
-            />
-          </Marker>
-        );
-      })}
+      <FeatureGroup ref={groupRef}>
+        {locations.map((location) => {
+          return (
+            <Marker
+              key={location.id}
+              position={[location.latitude, location.longitude]}
+              icon={findIcon(location?.moduleOptionCode)}
+            >
+              <InfoPopUp
+                location={location}
+                selected={selectedLocation?.id === location.id}
+                onChooseLocation={onChooseLocation}
+              />
+            </Marker>
+          );
+        })}
+      </FeatureGroup>
     </div>
   );
 }
@@ -181,7 +194,7 @@ function PickupPointsList({ locations, selectedLocation, onChooseLocation }) {
 
   return (
     <div
-      className="overflow-y-auto bg-white divide-y divide-gray-200 rounded-l xl:w-4/12"
+      className="overflow-y-auto bg-white divide-y divide-gray-200 rounded-l 2xl:w-5/12"
       style={{ height: '50vh' }}
     >
       {size(locations) > 0 ? (
@@ -190,10 +203,10 @@ function PickupPointsList({ locations, selectedLocation, onChooseLocation }) {
             <div
               key={location.id}
               ref={location.refList}
-              className={`p-4 flex flex-wrap justify-between items-center  border-b border-main border-opacity-50 cursor-pointer ${
+              className={`border-primary flex cursor-pointer flex-wrap items-center  justify-between border-b border-opacity-50 p-4 ${
                 selectedLocation?.id === location.id
-                  ? 'bg-main text-white'
-                  : 'bg-white'
+                  ? 'bg-main font-bold text-white'
+                  : 'bg-gray-100'
               }`}
               onClick={() => {
                 onChooseLocation(location.id);
@@ -223,9 +236,10 @@ function PickupPointsList({ locations, selectedLocation, onChooseLocation }) {
   );
 }
 
-export function PickupMap({ query }) {
+export function PickupMap({ query, defaultAddressId }) {
   const { data: checkout } = useGetCheckout();
-  const { mutate: setCheckout } = useSetCheckout();
+  const { mutateAsync: setCheckout } = useSetCheckout();
+  const intl = useIntl();
 
   const {
     data: pickupPoints = [],
@@ -254,15 +268,20 @@ export function PickupMap({ query }) {
   ]);
 
   const onSelect = useCallback(
-    (id) => {
+    async (id) => {
       const location = locations.find((l) => l.id === id);
       if (location?.address) {
-        setCheckout({
-          ...checkout,
-          pickupAddress: { ...location.address, type: 'pickup' },
-          deliveryModuleId: location.moduleId,
-          deliveryModuleOptionCode: location.moduleOptionCode
-        });
+        try {
+          await setCheckout({
+            ...checkout,
+            pickupAddress: { ...location.address, type: 'pickup' },
+            deliveryModuleId: location.moduleId,
+            deliveryAddressId: null,
+            deliveryModuleOptionCode: location.moduleOptionCode
+          });
+        } catch (error) {
+          alert('Cannot select this pickup point');
+        }
       }
     },
     [locations, checkout, setCheckout]
@@ -291,20 +310,26 @@ export function PickupMap({ query }) {
   }, [locations]);
 
   if (isLoading) {
-    return <Loader size="w-12 h-12" />;
+    return <Loader />;
   }
 
   if (error) {
-    return <Alert type="error" title="Error" />;
+    return (
+      <Alert
+        type="warning"
+        title={intl.formatMessage({ id: 'ERROR' })}
+        message={intl.formatMessage({ id: 'NO_PICKUP_POINT_LOADED' })}
+      />
+    );
   }
 
   return locations.length > 0 ? (
     <div className="lg:flex">
       <MapContainer
         center={mapCenter}
-        zoom={13}
+        zoom={15}
         style={{ height: '50vh', width: '100%' }}
-        className="flex-1 overflow-hidden "
+        className="z-0 overflow-hidden"
       >
         <div>
           <div className="relative h-full py-8 overflow-hidden border-t border-gray-300 xl:flex">
@@ -323,7 +348,13 @@ export function PickupMap({ query }) {
         onChooseLocation={onSelect}
       />
     </div>
-  ) : null;
+  ) : (
+    <Alert
+      type="warning"
+      title={intl.formatMessage({ id: 'ERROR' })}
+      message={intl.formatMessage({ id: 'NO_PICKUP_POINT_LOADED' })}
+    />
+  );
 }
 
 export function ZipCodeSearcher({ onSubmit }) {
@@ -346,26 +377,24 @@ export function ZipCodeSearcher({ onSubmit }) {
         }
       })}
     >
-      <div className="flex-1 mb-3 text-xl font-bold">
-        {intl.formatMessage({ id: 'FIND_RELAY' })}
-      </div>
+      <Title title="FIND_RELAY" className="mb-4 text-2xl Title--3" />
 
-      <div className="flex items-stretch">
-        <Input
-          id="zipcode"
-          {...register('zipCode')}
-          placeholder="ex. 75001"
-          className="w-full h-auto"
-          type="number"
-          max="99999"
-          min="10000"
-          required
-        />
-        <SubmitButton
-          type="submit"
-          className="py-0"
-          label={intl.formatMessage({ id: 'OK' })}
-        />
+      <div className="PhoneCheck">
+        <div className="PhoneCheck-field">
+          <input
+            type="number"
+            id="zipcode"
+            {...register('zipCode')}
+            max="99999"
+            min="10000"
+            placeholder="ex. 75001"
+            className="PhoneInput"
+            required
+          />
+          <button type="submit" className="PhoneCheck-btn">
+            {intl.formatMessage({ id: 'OK' })}
+          </button>
+        </div>
       </div>
       {hasError && (
         <Alert
@@ -377,9 +406,8 @@ export function ZipCodeSearcher({ onSubmit }) {
   );
 }
 
-export default function Map() {
-  const { data: addresses = [] } = useAddressQuery();
-  const defaultAddress = addresses?.find((a) => a.isDefault);
+export default function Map({ addresses }) {
+  const defaultAddress = addresses?.find((a) => a.isDefault === 1);
 
   const [query, setQuery] = useState({
     address: defaultAddress?.address1 || '',
@@ -389,7 +417,7 @@ export default function Map() {
   });
 
   return (
-    <div className="p-5 shadow panel">
+    <div>
       {defaultAddress?.countryCode === 'FR' ? (
         <ZipCodeSearcher
           onSubmit={(zipcode, city) =>
@@ -402,7 +430,7 @@ export default function Map() {
           }
         />
       ) : null}
-      <PickupMap query={query} />
+      <PickupMap query={query} defaultAddressId={defaultAddress?.id} />
     </div>
   );
 }

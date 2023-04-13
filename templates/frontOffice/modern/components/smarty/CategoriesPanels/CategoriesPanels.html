@@ -1,24 +1,15 @@
-
-  <div class="CategoriesPanels container mx-auto">
+<section class="CategoriesPanels {if $animated|default:false}CategoriesPanels--animated is-hide{/if}">
+  <div class="container flex flex-col items-center">
     {if $title}
-      {include file="components/smarty/Title/Title.html" type="h2" title=$title}
+      {include file="components/smarty/Title/Title.html" type="h2" level="3" title=$title class="mb-5 text-center md:mb-6"}
     {/if}
-    <div class="flex justify-center flex-wrap flex-row -mx-1 -mt-1">
+
+    <div class="CategoriesPanels-list">
       {loop type="category" name="CategoriesPanels" parent={$parent|default:0} limit=7}
-      <div class="p-1 w-6/12 md:w-4/12 xl:w-2/12 ">
-        <a href="{$URL}" class="CategoriesPanels-panel block hover:shadow-xl">
-          {loop type="image" name="CategoriesPanels.img" source="category" source_id=$ID width=280 height=450 resize_mode="crop" limit=1}
-            <img src="{$IMAGE_URL}" class="CategoriesPanels-panel-img object-cover object-center w-full h-full" />
-          {/loop}
-          {elseloop rel="CategoriesPanels.img"}
-            <img src="//placehold.it/280x450" class="CategoriesPanels-panel-img object-cover object-center w-full h-full" />
-          {/elseloop}
-          <div class="CategoriesPanels-panel-content">
-            <div class="CategoriesPanels-panel-title text-2xl text-white text-center px-4 mb-6">{$TITLE}</div>
-          </div>
-        </a>
-        </div>
+        {$title_cat = $TITLE}
+        {include file="components/smarty/ContentCard/ContentCard.html" tabindex=$tabindex|default:null object_type="category"}
       {/loop}
     </div>
-  </div>
 
+  </div>
+</section>

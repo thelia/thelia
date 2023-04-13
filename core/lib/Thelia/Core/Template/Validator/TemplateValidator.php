@@ -44,8 +44,6 @@ class TemplateValidator
     /**
      * TemplateValidator constructor.
      *
-     * @param $templatePath
-     *
      * @throws \Exception
      */
     public function __construct($templatePath)
@@ -72,9 +70,9 @@ class TemplateValidator
      * @param string $name the template directory name
      * @param int    $type the template type (front, back, etc.)
      *
-     * @return TemplateDescriptor the template descriptor
-     *
      * @throws \Exception
+     *
+     * @return TemplateDescriptor the template descriptor
      */
     public function getTemplateDefinition(string $name, int $type)
     {
@@ -94,6 +92,8 @@ class TemplateValidator
                 ->setTheliaVersion((string) $this->xmlDescriptorContent->thelia)
                 ->setStability((string) $this->xmlDescriptorContent->stability)
                 ->setDocumentation((string) $this->xmlDescriptorContent->documentation)
+                ->setAssets((string) $this->xmlDescriptorContent->assets)
+                ->setComponents((string) $this->xmlDescriptorContent->components)
             ;
 
             $this->checkVersion($templateDescriptor);

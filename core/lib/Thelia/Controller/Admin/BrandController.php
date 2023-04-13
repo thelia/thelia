@@ -136,7 +136,7 @@ class BrandController extends AbstractSeoCrudController
             ->setChapo($formData['chapo'])
             ->setDescription($formData['description'])
             ->setPostscriptum($formData['postscriptum'])
-         ;
+        ;
 
         return $brandUpdateEvent;
     }

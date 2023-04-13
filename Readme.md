@@ -10,20 +10,20 @@ Thelia
 ------
 [![Actions Status: test](https://github.com/thelia/thelia/workflows/test/badge.svg?branch=main)](https://github.com/thelia/thelia/actions?query=workflow%3A"test")
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/thelia/thelia/badges/quality-score.png?s=61e3e04a69bffd71c29b08e5392080317a546716)](https://scrutinizer-ci.com/g/thelia/thelia/)
-[![License](https://poser.pugx.org/thelia/thelia/license.png)](https://packagist.org/packages/thelia/thelia)
+![Discord Shield](https://discordapp.com/api/guilds/1067836968689487872/widget.png?style=shield)
 
-[Thelia](https://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under LGPL.
+[Thelia](https://thelia.net/) is an open source tool for creating e-business websites and managing online content. This software is published under GNU General Public License v3.0.
 
 A repository containing all thelia modules is available at this address : https://github.com/thelia-modules
 
 Compatibility
 ------------
 
-| | Thelia 2.3 | Thelia 2.4 |  Thelia 2.5 |
-| ------------- |:-----:| -----:|------------:|
-| PHP      | 5.5 5.6 7.0 7.1 | 7.0 7.1 7.2 7.3 |     7.4 8.0 |
-| MySQL    | 5.5 5.6 | 5.5 5.6 5.7 | 5.6 5.7 8.0 |
-| Symfony  | 2.8 | 2.8 |         5.4 |
+|         |   Thelia 2.3    |      Thelia 2.4 |  Thelia 2.5 |
+|---------|:---------------:|----------------:|------------:|
+| PHP     | 5.5 5.6 7.0 7.1 | 7.0 7.1 7.2 7.3 |     8.0.2 8.1 8.2 |
+| MySQL   |     5.5 5.6     |     5.5 5.6 5.7 | 5.6 5.7 8.0 |
+| Symfony |       2.8       |             2.8 |     6.0 6.1 |
 
 Requirements
 ------------
@@ -91,7 +91,7 @@ You can get the sources from git and then let composer install dependencies, or 
 ``` bash
 $ git clone --recursive https://github.com/thelia/thelia path
 $ cd path
-$ git checkout 2.4.4 (2.3.5 or 2.2.6)
+$ git checkout 2.5.2 (2.4.5 or 2.3.5)
 $ curl -sS https://getcomposer.org/installer | php
 $ php composer.phar install
 ```
@@ -100,7 +100,7 @@ $ php composer.phar install
 
 ``` bash
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar create-project thelia/thelia path/ 2.4.4 (2.3.5 or 2.2.6)
+$ php composer.phar create-project thelia/thelia path/ 2.5.2 (2.4.5 or 2.3.5)
 ```
 
 If something goes wrong during the install process, you can restart Thelia install wizard with
@@ -164,6 +164,22 @@ If you want add some sample data just add the option `-demo`
 
 If you want to access your database from your computer (with DBeaver, Sequel Pro or anything else) by default the host is `localhost` and the port is `8086`
 
+### Using Makefile
+
+To install Thelia, run :
+````bash
+make install
+````
+If you have been missing `ACTIVE_FRONT_TEMPLATE` and/or `ACTIVE_ADMIN_TEMPLATE`, you should set them up in .env.local and launch :
+````bash
+make install-front
+make build
+````
+If you need an example of thelia database, you can run:
+````bash
+make import-demo-db
+````
+
 Documentation
 -------------
 
@@ -173,7 +189,17 @@ Thelia documentation is available at https://doc.thelia.net
 Contribute
 ----------
 
-See the documentation : http://doc.thelia.net/en/documentation/contribute.html
+See the documentation : https://doc.thelia.net/docs/contribute
 
 
-If you submit modifications that adds new data or change the structure of the database, take a look to https://doc.thelia.net/en/documentation/contribute.html#sql-scripts-modification
+If you submit modifications that adds new data or change the structure of the database, take a look to https://doc.thelia.net/docs/contribute#sql-scripts-modification
+
+
+## Community
+
+Join the conversation and help the community :
+
+[Twitter](https://github.com/thelia/thelia)    
+[Discord](https://discord.gg/YgwpYEE3y3)    
+[StackOverflow](https://stackoverflow.com/questions/tagged/thelia)    
+[Forum](https://forum.thelia.net/)    

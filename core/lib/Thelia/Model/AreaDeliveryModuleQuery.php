@@ -26,9 +26,9 @@ class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
     /**
      * Check if a delivery module is suitable for the given country.
      *
-     * @return AreaDeliveryModule|null
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return AreaDeliveryModule|null
      */
     public function findByCountryAndModule(Country $country, Module $module, State $state = null)
     {

@@ -79,9 +79,9 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @return \Propel\Runtime\ActiveQuery\ModelCriteria|FeatureQuery
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return \Propel\Runtime\ActiveQuery\ModelCriteria|FeatureQuery
      */
     public function buildModelCriteria()
     {
@@ -109,7 +109,8 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $product = $this->getProduct();
-        $template = $this->getTemplate();
+
+        $template = $this->getTemplate() ?? [];
         $excludeTemplate = $this->getExcludeTemplate();
 
         $this->useFeaturePosition = true;
@@ -120,11 +121,6 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
             // Find all template assigned to the products.
             $products = ProductQuery::create()->filterById($product, Criteria::IN)->find();
-
-            // Create template array
-            if ($template == null) {
-                $template = [];
-            }
 
             /** @var ProductModel $product */
             foreach ($products as $product) {
@@ -150,7 +146,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        if (!empty($template)) {
+        if (\count($template) > 0) {
             // Join with feature_template table to get position, if a manual order position is required
             if (\count(array_diff(['manual_reverse', 'manual'], $this->getOrder())) < 2) {
                 $search
@@ -158,7 +154,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
                         ->filterByTemplate(
                             TemplateQuery::create()->filterById($template, Criteria::IN)->find(),
                             Criteria::IN
-                    )
+                        )
                     ->endUse()
                     ->withColumn(FeatureTemplateTableMap::COL_POSITION, 'position');
 
@@ -229,9 +225,9 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
     /**
-     * @return LoopResult
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return LoopResult
      */
     public function parseResults(LoopResult $loopResult)
     {

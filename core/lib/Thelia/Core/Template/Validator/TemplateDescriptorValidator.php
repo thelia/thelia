@@ -51,6 +51,7 @@ class TemplateDescriptorValidator
      * @param string|null $version the XSD version to use,, or null to use the latest version
      *
      * @return $this
+     *
      * @throw InvalidDescriptorException
      */
     public function validate(string $version = null): self

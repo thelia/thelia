@@ -1,6 +1,6 @@
-<div class="panel mb-0 flex flex-col">
+<div class="panel mb-0 flex flex-col rounded-[10px]">
   {if $withInput|default:false}
-  <div class=" mb-4">
+  <div class="mb-4">
       <div class="">
         {include file="components/smarty/Checkbox/Checkbox.html" value=$ID id="delivery-address_{$ID}" type="radio" checked=$isDeliveryAddressChecked label=$LABEL}
       </div>
@@ -37,15 +37,15 @@
           </li>
       </ul>
     </label>
-  <div class="mt-auto pt-8">
-      <div class="lg:text-right flex justify-between">
+  <div class="pt-8 mt-auto">
+      <div class="flex justify-center">
           {if $withInput|default:false}
-            <label for="delivery-address_{$ID}" class="btn btn--sm">{intl l="Choose"}</label>
+            <label for="delivery-address_{$ID}" class="Button Button--sm">{intl l="Choose"}</label>
           {/if}
-          <div class="lg:text-right">
-            <a href="{url path="/address/update/%id" id=$ID next={navigate to="current"}}" class="btn btn--sm">{intl l="Edit"}</a>
+          <div class="flex flex-wrap gap-3">
+            <a href="{url path="/address/update/%id" id=$ID next={navigate to="current"}}" class="Button">{intl l="Edit"}</a>
             {if $DEFAULT != 1}
-                <a href="{url path="/address/delete/%id" id=$ID}" class="btn btn--dark btn--sm">{intl l="Delete"}</a>
+                <a href="{url path="/address/delete/%id" id=$ID}" class="Button hover:bg-error border-error text-error hover:text-white">{intl l="Delete"}</a>
             {/if}
           </div>
       </div>

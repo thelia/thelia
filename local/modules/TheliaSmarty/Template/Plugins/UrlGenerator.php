@@ -161,10 +161,6 @@ class UrlGenerator extends AbstractSmartyPlugin
     /**
      * find placeholders in the path and replace them by the given value.
      *
-     * @param $params
-     * @param $path
-     * @param $smarty
-     *
      * @return array the placeholders found
      */
     protected function resolvePath(&$params, &$path, $smarty)

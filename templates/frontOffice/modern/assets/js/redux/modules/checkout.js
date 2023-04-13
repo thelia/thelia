@@ -1,7 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  mode: 'delivery'
+  mode: null,
+  phoneNumberValid: false,
+  checkoutStep: 1,
 };
 
 export const checkoutSlice = createSlice({
@@ -14,10 +16,16 @@ export const checkoutSlice = createSlice({
       state.deliveryAddress = initialState.deliveryAddress;
       state.deliveryModule = initialState.deliveryModule;
       state.deliveryModuleOption = initialState.deliveryModuleOption;
+    },
+    setPhoneNumberValid: (state, action) => {
+      state.phoneNumberValid = action.payload;
+    },
+    setCheckoutStep: (state, action) => {
+      state.checkoutStep = action.payload;
     }
   }
 });
 
-export const { setMode } = checkoutSlice.actions;
+export const { setMode, setPhoneNumberValid, setCheckoutStep } = checkoutSlice.actions;
 
 export default checkoutSlice.reducer;

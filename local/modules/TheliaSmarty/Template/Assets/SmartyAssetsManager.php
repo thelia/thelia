@@ -134,9 +134,9 @@ class SmartyAssetsManager
      * @param \Smarty_Internal_Template $template     Smarty Template
      * @param bool                      $allowFilters if false, the 'filters' parameter is ignored
      *
-     * @return string
-     *
      * @throws \Exception
+     *
+     * @return string
      */
     public function computeAssetUrl($assetType, $params, \Smarty_Internal_Template $template, $allowFilters = true)
     {
@@ -209,14 +209,9 @@ class SmartyAssetsManager
     }
 
     /**
-     * @param $assetType
-     * @param $params
-     * @param $content
-     * @param $repeat
+     * @throws \Exception
      *
      * @return null
-     *
-     * @throws \Exception
      */
     public function processSmartyPluginCall(
         $assetType,

@@ -1,0 +1,13 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+## add paths to directories where you want to lint your assets
+
+### front template
+if [[ $(git diff --name-only HEAD ./templates/frontOffice/modern) != "" ]]; then
+echo "linting modern frontOffice template"
+cd templates/frontOffice/modern && yarn lint-staged
+fi
+
+### back template
+

@@ -1,133 +1,88 @@
-import { CartItems, MiniCartFooter } from '../MiniCart/MiniCart';
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { CHECKOUT_STEP } from './constants';
+import {
+  useCartQuery,
+  useGetCheckout,
+  useSetCheckout
+} from '@openstudio/thelia-api-utils';
 
-import AddressBook from './AddressBook';
-
-import CheckoutBtn from './CheckoutBtn';
-import { ReactComponent as CloseIcon } from '@icons/drop-down.svg';
-import DeliveryModes from './DeliveryModes';
-import DeliveryModules from './DeliveryModules';
 import Loader from '../Loader';
-import PaymentModules from './PaymentModules';
-import PickupMap from '../PickupMap';
+import Steps from '../Steps';
+import { CheckoutFooter } from './CheckoutFooter';
+import { CartItems } from '../MiniCart/MiniCart';
+import Delivery from './Pages/Delivery';
+import Invoice from './Pages/Invoice';
+import Payment from './Pages/Payment';
+import Cart from './Pages/Cart';
+import Recap from './Recap';
 import Title from '../Title';
 
-import { useCartQuery, useGetCheckout } from '@openstudio/thelia-api-utils';
-import { useIntl } from 'react-intl';
-import PhoneCheck from '../PhoneCheck';
-
-function LoadingBlock() {
-  return (
-    <div className="shadow panel">
-      <Loader size="w-12 h-12" />
-    </div>
-  );
-}
-
-function MainContent() {
-  const intl = useIntl();
-
-  const { mode: selectedMode } = useSelector((state) => state.checkout);
-  const { data: checkout } = useGetCheckout();
-
-  return (
-    <div>
-      <div className="">
-        <DeliveryModes />
-
-        <Suspense fallback={<LoadingBlock />}>
-          {selectedMode === 'delivery' ? (
-            <AddressBook
-              mode="delivery"
-              title={intl.formatMessage({ id: 'CHOOSE_DELIVERY_ADDRESS' })}
-            />
-          ) : null}
-        </Suspense>
-
-        <Suspense fallback={<LoadingBlock />}>
-          {selectedMode === 'pickup' ||
-          (selectedMode === 'delivery' && checkout?.deliveryAddressId) ? (
-            <DeliveryModules />
-          ) : null}
-        </Suspense>
-
-        {selectedMode === 'pickup' && checkout?.deliveryModuleOptionCode ? (
-          <div className="my-8">
-            <PickupMap />
-          </div>
-        ) : null}
-
-        <AddressBook
-          mode="billing"
-          title={intl.formatMessage({ id: 'CHOOSE_BILLING_ADDRESS' })}
-        />
-
-        <PhoneCheck addressId={checkout?.deliveryAddressId} />
-      </div>
-    </div>
-  );
-}
-
-function Sidebar() {
-  const intl = useIntl();
-  const { data: cart = {} } = useCartQuery();
-  const [cartOpen, setCartOpen] = useState(true);
-  const { deliveryModuleOption } = useSelector((state) => state.checkout);
-  return (
-    <div className="">
-      <div className="shadow panel">
-        <div className="flex items-center justify-between">
-          <Title
-            title={intl.formatMessage({ id: 'YOUR_ORDER' })}
-            className="mb-0 text-center"
-          />
-          <button
-            onClick={() => setCartOpen(!cartOpen)}
-            className="flex items-center"
-          >
-            <span className={cartOpen ? 'invisible' : ''}>View cart</span>
-            <CloseIcon
-              className={`w-4 h-4 ml-4 transform transition-transform ${
-                cartOpen ? 'rotate-0' : '-rotate-90'
-              }`}
-            />
-          </button>
-        </div>
-        <div
-          className={`overflow-y-hidden ${cartOpen ? 'max-h-full' : 'max-h-0'}`}
-        >
-          <CartItems cart={cart} canDelete={false} />
-        </div>
-      </div>
-      <div
-        className="sticky"
-        style={{ top: 'calc(var(--Header-height) + 1.5rem)' }}
-      >
-        <div className="shadow panel">
-          <MiniCartFooter
-            {...cart}
-            delivery={deliveryModuleOption?.postage || cart?.delivery}
-          />
-        </div>
-
-        <PaymentModules />
-
-        <div className="mb-20 xl:mb-0">
-          <CheckoutBtn />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Checkout() {
+  const { data: checkout } = useGetCheckout();
+  const { data: cart = {} } = useCartQuery();
+  const { checkoutStep } = useSelector((state) => state.checkout);
+  const { mutate: reset } = useSetCheckout();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [checkoutStep]);
+
+  useEffect(() => {
+    reset({ deliveryAddressId: null });
+  }, [reset]);
+
+  useEffect(() => {
+    if (cart?.items?.length < 1) {
+      window.location.href = '/';
+    }
+  }, [cart]);
+
   return (
-    <div className="grid gap-6 xl:grid-cols-3">
-      <div className="xl:col-span-2">
-        <MainContent />
-      </div>
-      <Sidebar />
-    </div>
+    <>
+      <Steps steps={CHECKOUT_STEP} />
+      <Suspense fallback={<Loader />}>
+        <section className="Checkout-container Checkout-main">
+          <Cart
+            isVisible={checkoutStep === CHECKOUT_STEP.CART.id}
+            page={CHECKOUT_STEP.CART}
+            cart={cart}
+          />
+          <Delivery
+            isVisible={checkoutStep === CHECKOUT_STEP.DELIVERY.id}
+            page={CHECKOUT_STEP.DELIVERY}
+            cart={cart}
+            checkout={checkout}
+          />
+          <Invoice
+            isVisible={checkoutStep === CHECKOUT_STEP.INVOICE.id}
+            page={CHECKOUT_STEP.INVOICE}
+            cart={cart}
+            checkout={checkout}
+          />
+          <Payment
+            isVisible={checkoutStep === CHECKOUT_STEP.PAYMENT.id}
+            page={CHECKOUT_STEP.PAYMENT}
+            cart={cart}
+            checkout={checkout}
+          />
+          {checkoutStep !== 1 && (
+            <div className="px-5 py-8 mt-8 -mx-5 bg-gray-200 md:m-0 md:bg-transparent md:p-0">
+              <Title title="RECAP_ORDER" className="text-2xl Title--3 mb-7" />
+              <CartItems
+                cart={cart}
+                canDelete={false}
+                evenClass={false}
+                canChangeQuantity={false}
+                recap={true}
+              />
+              <Recap cart={cart} small={true} />
+            </div>
+          )}
+        </section>
+      </Suspense>
+
+      <CheckoutFooter checkout={checkout} step={checkoutStep} />
+    </>
   );
 }

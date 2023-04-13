@@ -48,10 +48,9 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     protected $notifyCustomerOfAccountModification = true;
 
     /**
-     * @param int    $title    the title customer id
-     * @param int    $country  the country id
-     * @param string $password plain password, don't put hash password, it will hashes again
-     * @param $langId
+     * @param int      $title    the title customer id
+     * @param int      $country  the country id
+     * @param string   $password plain password, don't put hash password, it will hashes again
      * @param int      $reseller if customer is a reseller
      * @param int      $sponsor  customer's id sponsor
      * @param int|null $state    thre State ID

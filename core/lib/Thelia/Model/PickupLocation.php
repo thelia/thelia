@@ -210,9 +210,9 @@ class PickupLocation
      * @param int    $day
      * @param string $hours
      *
-     * @return $this
-     *
      * @throws \Exception
+     *
+     * @return $this
      */
     public function setOpeningHours($day, $hours)
     {

@@ -71,8 +71,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     /**
      * add an article in the current cart.
-     *
-     * @param $eventName
      */
     public function addItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -150,8 +148,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * Modify article's quantity.
      *
      * don't use Form here just test the Request.
-     *
-     * @param $eventName
      */
     public function changeItem(CartEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -303,8 +299,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * Search if cart already exists in session. If not try to restore it from the cart cookie,
      * or duplicate an old one.
-     *
-     * @param $eventName
      */
     public function restoreCurrentCart(CartRestoreEvent $cartRestoreEvent, $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -323,7 +317,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
         if (null === $cart) {
             $cart = $this->dispatchNewCart($dispatcher);
         }
-
+        if ($cart->getCurrency()) {
+            $this->getSession()->setCurrency($cart->getCurrency());
+        }
         $cartRestoreEvent->setCart($cart);
     }
 
@@ -332,10 +328,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * if needed or create duplicate the current cart if the customer is not the same as customer already present in
      * the cart.
      *
-     * @return CartModel
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return CartModel
      */
     protected function manageNonPersistentCookie(CartRestoreEvent $cartRestoreEvent, EventDispatcherInterface $dispatcher)
     {
@@ -353,12 +349,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * The cart token is saved in a cookie so we try to retrieve it. Then the customer is checked.
      *
-     * @param $cookieName
-     *
-     * @return CartModel
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return CartModel
      */
     protected function managePersistentCart(CartRestoreEvent $cartRestoreEvent, $cookieName, EventDispatcherInterface $dispatcher)
     {

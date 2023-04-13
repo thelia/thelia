@@ -55,9 +55,9 @@ class Calculator
     }
 
     /**
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public static function getUntaxedCartDiscount(Cart $cart, Country $country, State $state = null)
     {
@@ -65,15 +65,15 @@ class Calculator
     }
 
     /**
-     * @return float|int
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float|int
      */
 
     /**
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public static function getUntaxedOrderDiscount(Order $order)
     {
@@ -81,9 +81,9 @@ class Calculator
     }
 
     /**
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public static function getOrderTaxFactor(Order $order)
     {
@@ -117,9 +117,9 @@ class Calculator
     }
 
     /**
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public static function getCartTaxFactor(Cart $cart, Country $country, State $state = null)
     {
@@ -152,9 +152,9 @@ class Calculator
     }
 
     /**
-     * @return $this
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return $this
      */
     public function load(Product $product, Country $country, State $state = null)
     {
@@ -175,9 +175,9 @@ class Calculator
     }
 
     /**
-     * @return $this
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return $this
      */
     public function loadTaxRule(TaxRule $taxRule, Country $country, Product $product, State $state = null)
     {
@@ -201,9 +201,9 @@ class Calculator
     }
 
     /**
-     * @return $this
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return $this
      */
     public function loadTaxRuleWithoutCountry(TaxRule $taxRule, Product $product)
     {
@@ -225,9 +225,9 @@ class Calculator
     }
 
     /**
-     * @return $this
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return $this
      *
      * @since 2.4
      */
@@ -250,12 +250,11 @@ class Calculator
     }
 
     /**
-     * @param $untaxedPrice
      * @param null $taxCollection
      *
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public function getTaxAmountFromUntaxedPrice($untaxedPrice, &$taxCollection = null)
     {
@@ -263,8 +262,6 @@ class Calculator
     }
 
     /**
-     * @param $taxedPrice
-     *
      * @return float
      */
     public function getTaxAmountFromTaxedPrice($taxedPrice)
@@ -277,9 +274,9 @@ class Calculator
      * @param OrderProductTaxCollection|null $taxCollection returns OrderProductTaxCollection
      * @param string|null                    $askedLocale
      *
-     * @return float
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float
      */
     public function getTaxedPrice($untaxedPrice, &$taxCollection = null, $askedLocale = null)
     {
@@ -339,8 +336,6 @@ class Calculator
     }
 
     /**
-     * @param $taxedPrice
-     *
      * @return float|int|number
      */
     public function getUntaxedPrice($taxedPrice)

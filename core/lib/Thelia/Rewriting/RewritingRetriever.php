@@ -36,8 +36,6 @@ class RewritingRetriever
     }
 
     /**
-     * @param      $view
-     * @param      $viewLocale
      * @param null $viewId
      */
     public function loadViewUrl($view, $viewLocale = null, $viewId = null): void
@@ -62,8 +60,6 @@ class RewritingRetriever
     }
 
     /**
-     * @param       $view
-     * @param       $viewLocale
      * @param null  $viewId
      * @param array $viewOtherParameters
      */

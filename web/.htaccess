@@ -25,7 +25,7 @@ AddDefaultCharset UTF-8
     # SEO, to avoid duplicate content with index.php in url
     # Exemple : http://www.yourdomain.com/index.php/contact redirect 301 to http://www.yourdomain.com/contact
     RewriteCond %{THE_REQUEST} ^GET.*index\.php [NC]
-    RewriteRule (.?)index\.php/(.*) /$1$2 [R=301,NE,L]
+    RewriteRule (.*?)index\.php/*(.*) /$1$2 [R=301,NE,L]
 
     # If thelia is installed in a subdirectory (e.g., thelia2)
     # define the RewriteBase below to get a proper URL rewriting
@@ -52,4 +52,42 @@ AddDefaultCharset UTF-8
   <FilesMatch "\.(ttf|otf|eot|svg|woff|woff2)$" >
     ExpiresDefault "access plus 1 month"
   </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+# Compress HTML
+AddOutputFilterByType DEFLATE text/html
+
+# Compress Text Files
+AddOutputFilterByType DEFLATE text/plain
+
+# Compress CSS
+AddOutputFilterByType DEFLATE text/css
+
+# Compress JavaScript
+AddOutputFilterByType DEFLATE application/javascript
+AddOutputFilterByType DEFLATE text/javascript
+AddOutputFilterByType DEFLATE application/x-javascript
+
+# Compress Images
+AddOutputFilterByType DEFLATE image/svg+xml
+AddOutputFilterByType DEFLATE image/x-icon
+
+# Compress Fonts
+AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+AddOutputFilterByType DEFLATE application/x-font
+AddOutputFilterByType DEFLATE application/x-font-opentype
+AddOutputFilterByType DEFLATE application/x-font-otf
+AddOutputFilterByType DEFLATE application/x-font-truetype
+AddOutputFilterByType DEFLATE application/x-font-ttf
+AddOutputFilterByType DEFLATE font/opentype
+AddOutputFilterByType DEFLATE font/otf
+AddOutputFilterByType DEFLATE font/ttf
+
+# Compress XML Files
+AddOutputFilterByType DEFLATE application/rss+xml
+AddOutputFilterByType DEFLATE application/xhtml+xml
+AddOutputFilterByType DEFLATE application/xml
+AddOutputFilterByType DEFLATE text/xml
+
 </IfModule>

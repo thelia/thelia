@@ -12,10 +12,22 @@
 
 namespace Thelia\Core\Template;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Cache\CacheEvent;
+use Thelia\Core\Event\Config\ConfigUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ConfigQuery;
 
-class TheliaTemplateHelper implements TemplateHelperInterface
+class TheliaTemplateHelper implements TemplateHelperInterface, EventSubscriberInterface
 {
+    protected $kernelCacheDir;
+
+    public function __construct($kernelCacheDir)
+    {
+        $this->kernelCacheDir = $kernelCacheDir;
+    }
+
     /**
      * @return TemplateDefinition
      */
@@ -143,5 +155,36 @@ class TheliaTemplateHelper implements TemplateHelperInterface
         }
 
         return $list;
+    }
+
+    /**
+     * Clear the cache if the front or admin template is changed in the back-office.
+     */
+    public function clearCache(ConfigUpdateEvent $event, string $eventName, EventDispatcherInterface $dispatcher): void
+    {
+        if (
+            (null === $config = ConfigQuery::create()->findPk($event->getConfigId()))
+            ||
+            ($config->getValue() === $event->getValue())
+            ||
+            ($config->getName() !== TemplateDefinition::BACK_OFFICE_CONFIG_NAME
+             &&
+             $config->getName() !== TemplateDefinition::FRONT_OFFICE_CONFIG_NAME)
+        ) {
+            return;
+        }
+
+        $cacheEvent = new CacheEvent($this->kernelCacheDir);
+        $dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            TheliaEvents::CONFIG_SETVALUE => ['clearCache', 130],
+        ];
     }
 }

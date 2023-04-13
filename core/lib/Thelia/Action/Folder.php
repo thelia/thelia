@@ -58,8 +58,6 @@ class Folder extends BaseAction implements EventSubscriberInterface
     /**
      * Change Folder SEO.
      *
-     * @param $eventName
-     *
      * @return object
      */
     public function updateSeo(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher)

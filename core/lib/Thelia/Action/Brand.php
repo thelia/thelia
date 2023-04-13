@@ -49,15 +49,13 @@ class Brand extends BaseAction implements EventSubscriberInterface
 
     /**
      * process update brand.
-     *
-     * @param $eventName
      */
     public function update(BrandUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         if (null !== $brand = BrandQuery::create()->findPk($event->getBrandId())) {
             $brand
                 ->setVisible($event->getVisible())
-                ->setLogoImageId((int) ($event->getLogoImageId()) == 0 ? null : $event->getLogoImageId())
+                ->setLogoImageId((int) $event->getLogoImageId() == 0 ? null : $event->getLogoImageId())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())
@@ -89,8 +87,6 @@ class Brand extends BaseAction implements EventSubscriberInterface
 
     /**
      * Change Brand SEO.
-     *
-     * @param $eventName
      *
      * @return object
      */

@@ -174,8 +174,17 @@
                             </div>
 
 		                    <div class="tab-pane fade" id="images">
-                                {include file='includes/image-upload-form.html' imageType='folder' parentId=$ID resource="admin.folder"}
+                                {ifhook rel="item.edition.images"}
+                                    {hook name="item.edition.images" itemType='folder' itemId=$ID resource="admin.folder"}
+                                {/ifhook}
+                                {elsehook rel="item.edition.images"}
+                                <div class="fallback-image-manager">
+                                    {include file='includes/image-upload-form.html' imageType='folder' parentId=$ID resource="admin.folder"}
+                                </div>
+                                {/elsehook}
 		                    </div>
+
+
 
 		                    <div class="tab-pane fade" id="documents">
                                 {include file='includes/document-upload-form.html' documentType='folder' parentId=$ID  resource="admin.folder"}
@@ -235,7 +244,9 @@
 
             });
 
-            $.imageUploadManager.initImageDropZone();
+            if ($('#images > .fallback-image-manager')[0]) {
+                $.imageUploadManager.initImageDropZone();
+            };
             $.documentUploadManager.initDocumentDropZone();
 
             $('.use_default_rewriten_url').click(function(ev) {

@@ -263,73 +263,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set('HIDDEN', $module->getHidden())
                     ->set('EXISTS', $exists);
 
-                $hasConfigurationInterface = false;
-
-                /* first test if module defines it's own config route */
-                if ($module->getActivate()) {
-                    // test if a hook
-                    $hookConfiguration = ModuleHookQuery::create()
-                        ->filterByModuleId($module->getId())
-                        ->filterByActive(true)
-                        ->useHookQuery()
-                        ->filterByCode('module.configuration')
-                        ->filterByType(TemplateDefinition::BACK_OFFICE)
-                        ->endUse()
-                        ->findOne();
-                    $hasConfigurationInterface = (null !== $hookConfiguration);
-
-                    if (false === $hasConfigurationInterface) {
-                        // Works only fo activated modules - see Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass
-                        $routerId = 'router.'.$module->getBaseDir();
-                        if ($this->container->has($routerId)) {
-                            try {
-                                if ($this->container->get($routerId)->match('/admin/module/'.$module->getCode())) {
-                                    $hasConfigurationInterface = true;
-                                }
-                            } catch (ResourceNotFoundException $e) {
-                                /* $hasConfigurationInterface stays false */
-                            }
-                        }
-                    }
-
-                    if (false === $hasConfigurationInterface && $this->container->has('router.annotation')) {
-                        try {
-                            if ($this->container->get('router.annotation')->match('/admin/module/'.$module->getCode())) {
-                                $hasConfigurationInterface = true;
-                            }
-                        } catch (\Exception $e) {
-                            /* $hasConfigurationInterface stays false */
-                        }
-                    }
-
-                    /* if not ; test if it uses admin inclusion : module_configuration.html */
-                    if (false === $hasConfigurationInterface) {
-                        if (file_exists($module->getAbsoluteAdminIncludesPath().DS.'module_configuration.html')) {
-                            $hasConfigurationInterface = true;
-                        }
-                    }
-                } else {
-                    // Make a quick and dirty test on the module's config.xml file
-                    $configContent = @file_get_contents($module->getAbsoluteConfigPath().DS.'config.xml');
-
-                    $hasConfigurationInterface = $configContent &&
-                        preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent) === 1
-                    ;
-
-                    if (false === $hasConfigurationInterface) {
-                        // Make a quick and dirty test on the module's routing.xml file
-                        $routing = @file_get_contents($module->getAbsoluteConfigPath().DS.'routing.xml');
-
-                        if ($routing && strpos($routing, '/admin/module/') !== false) {
-                            $hasConfigurationInterface = true;
-                        } else {
-                            if (file_exists($module->getAbsoluteAdminIncludesPath().DS.'module_configuration.html')) {
-                                $hasConfigurationInterface = true;
-                            }
-                        }
-                    }
-                }
-                $loopResultRow->set('CONFIGURABLE', $hasConfigurationInterface ? 1 : 0);
+                $loopResultRow->set('CONFIGURABLE', $this->moduleHasConfigurationInterface($module));
 
                 // Does module have hook(s)
                 $hookable = false;
@@ -358,5 +292,65 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
+    }
+
+    private function moduleHasConfigurationInterface(\Thelia\Model\Module $module)
+    {
+        if (!$module->getActivate()) {
+            return false;
+        }
+
+        // test if a hook
+        $hookConfiguration = ModuleHookQuery::create()
+            ->filterByModuleId($module->getId())
+            ->filterByActive(true)
+            ->useHookQuery()
+            ->filterByCode('module.configuration')
+            ->filterByType(TemplateDefinition::BACK_OFFICE)
+            ->endUse()
+            ->findOne();
+
+        if (null !== $hookConfiguration) {
+            return true;
+        }
+
+        $routerId = 'router.'.$module->getBaseDir();
+        if ($this->container->has($routerId)) {
+            try {
+                if ($this->container->get($routerId)->match('/admin/module/'.$module->getCode())) {
+                    return true;
+                }
+            } catch (ResourceNotFoundException $e) {
+                /* Keep searching */
+            }
+        }
+
+        if ($this->container->has('router.annotation')) {
+            try {
+                if ($this->container->get('router.annotation')->match('/admin/module/'.$module->getCode())) {
+                    return true;
+                }
+            } catch (\Exception $e) {
+                /* Keep searching */
+            }
+        }
+
+        // Make a quick and dirty test on the module's config.xml file
+        $configContent = @file_get_contents($module->getAbsoluteConfigPath().DS.'config.xml');
+        if ($configContent && preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent) === 1) {
+            return true;
+        }
+
+        $routing = @file_get_contents($module->getAbsoluteConfigPath().DS.'routing.xml');
+        if ($routing && preg_match('@[\'"]/?admin/module/'.$module->getCode().'[\'"]@', $routing)) {
+            return true;
+        }
+
+        /* if not ; test if it uses admin inclusion : module_configuration.html */
+        if (file_exists($module->getAbsoluteAdminIncludesPath().DS.'module_configuration.html')) {
+            return true;
+        }
+
+        return false;
     }
 }

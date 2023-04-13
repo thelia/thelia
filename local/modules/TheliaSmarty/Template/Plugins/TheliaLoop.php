@@ -97,9 +97,9 @@ class TheliaLoop extends AbstractSmartyPlugin
     /**
      * @param string $loopName
      *
-     * @return PropelModelPager
-     *
      * @throws \InvalidArgumentException if no pagination was found for loop
+     *
+     * @return PropelModelPager
      */
     public static function getPagination($loopName)
     {
@@ -107,8 +107,8 @@ class TheliaLoop extends AbstractSmartyPlugin
             return self::$pagination[$loopName];
         }
         throw new \InvalidArgumentException(
-                Translator::getInstance()->trans("No pagination currently defined for loop name '%name'", ['%name' => $loopName])
-            );
+            Translator::getInstance()->trans("No pagination currently defined for loop name '%name'", ['%name' => $loopName])
+        );
     }
 
     /**
@@ -117,9 +117,9 @@ class TheliaLoop extends AbstractSmartyPlugin
      * @param array                     $params   parameters array
      * @param \Smarty_Internal_Template $template
      *
-     * @return int the item count
-     *
      * @throws \InvalidArgumentException if a parameter is missing
+     *
+     * @return int the item count
      */
     public function theliaCount($params, /* @noinspection PhpUnusedParameterInspection */ $template)
     {
@@ -319,9 +319,9 @@ class TheliaLoop extends AbstractSmartyPlugin
      * @param \Smarty_Internal_Template $template the Smarty object
      * @param bool                      $repeat   repeat indicator (see Smarty doc.)
      *
-     * @return string the loop output
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string the loop output
      */
     public function theliaPageLoop($params, $content, $template, &$repeat)
     {
@@ -347,8 +347,8 @@ class TheliaLoop extends AbstractSmartyPlugin
             return '';
         }
 
-        $startPage = (int) ($this->getParam($params, 'start-page', 1));
-        $displayedPageCount = (int) ($this->getParam($params, 'limit', 10));
+        $startPage = (int) $this->getParam($params, 'start-page', 1);
+        $displayedPageCount = (int) $this->getParam($params, 'limit', 10);
 
         if ((int) $displayedPageCount == 0) {
             $displayedPageCount = \PHP_INT_MAX;
@@ -418,9 +418,9 @@ class TheliaLoop extends AbstractSmartyPlugin
      *
      * @param array $params
      *
-     * @return bool true if the loop is empty
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return bool true if the loop is empty
      */
     protected function checkEmptyLoop($params)
     {
@@ -442,13 +442,11 @@ class TheliaLoop extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $smartyParams
-     *
-     * @return BaseLoop
-     *
      * @throws \Thelia\Core\Template\Element\Exception\InvalidElementException
      * @throws \Thelia\Core\Template\Element\Exception\ElementNotFoundException
      * @throws \ReflectionException
+     *
+     * @return BaseLoop
      */
     protected function createLoopInstance($smartyParams)
     {

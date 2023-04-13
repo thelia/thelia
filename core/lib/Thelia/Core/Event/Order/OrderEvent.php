@@ -218,9 +218,9 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return Order the placed order, valid only after order payment
-     *
      * @throws \LogicException if the method is called before payment
+     *
+     * @return Order the placed order, valid only after order payment
      */
     public function getPlacedOrder()
     {

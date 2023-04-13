@@ -221,8 +221,6 @@ abstract class BasePaymentModuleController extends BaseFrontController
     /**
      * Get an order and issue a log message if not found.
      *
-     * @param $orderId
-     *
      * @return \Thelia\Model\Order|null
      */
     protected function getOrder($orderId)

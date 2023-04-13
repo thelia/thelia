@@ -14,6 +14,7 @@ namespace Thelia\Core\Event\Tax;
 
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Tax;
+use Thelia\TaxEngine\TaxTypeInterface;
 
 class TaxEvent extends ActionEvent
 {
@@ -25,6 +26,8 @@ class TaxEvent extends ActionEvent
     protected $description;
     protected $type;
     protected $requirements;
+
+    protected ?TaxTypeInterface $taxTypeService = null;
 
     public function __construct(Tax $tax = null)
     {
@@ -118,5 +121,17 @@ class TaxEvent extends ActionEvent
     public function getRequirements()
     {
         return $this->requirements;
+    }
+
+    public function getTaxTypeService(): ?TaxTypeInterface
+    {
+        return $this->taxTypeService;
+    }
+
+    public function setTaxTypeService(TaxTypeInterface $taxTypeService)
+    {
+        $this->taxTypeService = $taxTypeService;
+
+        return $this;
     }
 }

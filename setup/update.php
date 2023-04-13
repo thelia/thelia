@@ -21,13 +21,18 @@ if (\PHP_SAPI != 'cli') {
 $bootstrapToggle = false;
 $bootstraped = false;
 
-// Autoload bootstrap
+$env = 'dev';
 
+// Autoload bootstrap
 foreach ($argv as $arg) {
     if ($arg === '-b') {
         $bootstrapToggle = true;
 
         continue;
+    }
+
+    if (preg_match_all('/--env=(\S+)/', $arg, $matchs)) {
+        $env = $matchs[1][0];
     }
 
     if ($bootstrapToggle) {
@@ -51,14 +56,16 @@ if (!$bootstraped) {
     }
 }
 
-if (is_file(dirname(__DIR__).'/.env')) {
+if (is_file(dirname(__DIR__)."/.env.$env.local")) {
+    (new \Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__)."/.env.$env.local");
+} elseif (is_file(dirname(__DIR__).'/.env')) {
     (new \Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/.env');
 } elseif (is_file($file = __DIR__.'/../../bootstrap.php')) {
     // Here we are on a thelia/thelia-project
     (new \Symfony\Component\Dotenv\Dotenv())->bootEnv(dirname(__DIR__).'/../.env');
 }
 
-$thelia = new App\Kernel($_ENV['APP_ENV'], true);
+$thelia = new App\Kernel($_ENV['APP_ENV'], false);
 
 $thelia->boot();
 
@@ -197,8 +204,6 @@ if (null === $updateError) {
                 }
                 cliOutput('Database successfully restore.');
                 exit(5);
-
-                break;
             }
             if ($rep == 'n') {
                 exit(0);

@@ -49,7 +49,9 @@ use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Controller\ControllerInterface;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
+use Thelia\Core\DependencyInjection\TheliaContainer;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Hook\BaseHookInterface;
 use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Template\Element\BaseLoopInterface;
@@ -63,13 +65,14 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
+use Thelia\TaxEngine\TaxTypeInterface;
 use TheliaSmarty\Template\SmartyParser;
 
 class Thelia extends Kernel
 {
     use MicroKernelTrait;
 
-    public const THELIA_VERSION = '2.5.0-alpha2';
+    public const THELIA_VERSION = '2.5.2';
 
     /** @var SchemaLocator */
     protected $propelSchemaLocator;
@@ -88,6 +91,7 @@ class Thelia extends Kernel
         $loader = new ClassLoader();
 
         $loader->addPsr4('', THELIA_ROOT."var/cache/{$environment}/propel/model");
+
         $loader->addPsr4('TheliaMain\\', THELIA_ROOT."var/cache/{$environment}/propel/database/TheliaMain");
         $loader->register();
 
@@ -96,6 +100,23 @@ class Thelia extends Kernel
         if ($debug) {
             Debug::enable();
         }
+    }
+
+    /** Get the front and back templates "components" directory path.
+     *
+     */
+    public static function getTemplateComponentsDirectories(): array
+    {
+        return [
+            'backOffice\\' => THELIA_TEMPLATE_DIR
+                .TemplateDefinition::BACK_OFFICE_SUBDIR.DS
+                .ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default').DS
+                .'components',
+            'frontOffice\\' => THELIA_TEMPLATE_DIR
+                .TemplateDefinition::FRONT_OFFICE_SUBDIR.DS
+                .ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default').DS
+                .'components',
+        ];
     }
 
     /**
@@ -117,6 +138,9 @@ class Thelia extends Kernel
      */
     protected function configureContainer(ContainerConfigurator $container): void
     {
+        $container->parameters()->set('thelia_front_template', ConfigQuery::read(TemplateDefinition::FRONT_OFFICE_CONFIG_NAME, 'default'));
+        $container->parameters()->set('thelia_admin_template', ConfigQuery::read(TemplateDefinition::BACK_OFFICE_CONFIG_NAME, 'default'));
+
         $container->import(__DIR__.'/../Config/Resources/*.yaml');
         $container->import(__DIR__.'/../Config/Resources/{packages}/*.yaml');
         $container->import(__DIR__.'/../Config/Resources/{packages}/'.$this->environment.'/*.yaml');
@@ -224,7 +248,7 @@ class Thelia extends Kernel
      */
     protected function getContainerBaseClass(): string
     {
-        return '\Thelia\Core\DependencyInjection\TheliaContainer';
+        return TheliaContainer::class;
     }
 
     protected function initializeContainer(): void
@@ -277,7 +301,7 @@ class Thelia extends Kernel
         }
 
         if (self::isInstalled()) {
-            $eventDispatcher->dispatch((new Event()), TheliaEvents::BOOT);
+            $eventDispatcher->dispatch(new Event(), TheliaEvents::BOOT);
         }
     }
 
@@ -294,7 +318,7 @@ class Thelia extends Kernel
 
             (new Filesystem())->dumpFile(
                 $this->getCacheDir().DS.'thelia_configs.php',
-            '<?php return '.VarExporter::export($caches).';'
+                '<?php return '.VarExporter::export($caches).';'
             );
         }
 
@@ -304,12 +328,9 @@ class Thelia extends Kernel
     }
 
     /**
-     * @param $forcePropelCacheGeneration
-     * @param $cacheRefresh
+     * @throws \Throwable
      *
      * @return bool
-     *
-     * @throws \Throwable
      */
     public function initializePropelService($forcePropelCacheGeneration, &$cacheRefresh)
     {
@@ -436,16 +457,26 @@ class Thelia extends Kernel
             FormExtensionInterface::class => 'thelia.forms.extension',
             BaseLoopInterface::class => 'thelia.loop',
             ContainerAwareInterface::class => 'thelia.command',
-            FormInterface::class => 'thelia.form',
             CouponInterface::class => 'thelia.coupon.addCoupon',
             ConditionInterface::class => 'thelia.coupon.addCondition',
             ControllerInterface::class => 'controller.service_arguments',
+            TaxTypeInterface::class => 'thelia.taxType',
         ];
 
         foreach ($autoconfiguredInterfaces as $interfaceClass => $tag) {
             $container->registerForAutoconfiguration($interfaceClass)
                 ->addTag($tag);
         }
+
+        $container->registerForAutoconfiguration(FormInterface::class)
+            ->setPublic(true)
+            ->setShared(false)
+            ->addTag('thelia.form');
+
+        // We set this particular service with public true to have all of his subscribers after removing type (see TheliaBundle.php)
+        $container->registerForAutoconfiguration(BaseHookInterface::class)
+            ->addTag('hook.event_listener')
+            ->setPublic(true);
 
         $loader = new XmlFileLoader($container, $fileLocator);
         $finder = Finder::create()
@@ -517,6 +548,17 @@ class Thelia extends Kernel
                     );
                 }
             }
+
+            // Register templates 'component' directories in a class loader.
+            $templateClassLoader = new ClassLoader();
+
+            foreach (self::getTemplateComponentsDirectories() as $namespace => $resource) {
+                if (is_dir($resource)) {
+                    $templateClassLoader->addPsr4($namespace, $resource);
+                }
+            }
+
+            $templateClassLoader->register();
 
             $parser = $container->getDefinition(SmartyParser::class);
 
@@ -660,9 +702,9 @@ class Thelia extends Kernel
     /**
      * Builds the service container.
      *
-     * @return ContainerBuilder The compiled service container
-     *
      * @throws \Exception
+     *
+     * @return ContainerBuilder The compiled service container
      */
     protected function buildContainer(): ContainerBuilder
     {

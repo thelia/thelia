@@ -64,10 +64,10 @@ class ContentTest extends TestCaseWithURLToolSetup
     /**
      * @param ContentUpdateEvent$event
      *
-     * @return ContentModel
-     *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return ContentModel
      */
     public function processUpdateAction($event)
     {

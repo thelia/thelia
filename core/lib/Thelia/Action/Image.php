@@ -93,6 +93,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $subdir = $event->getCacheSubdirectory();
         $sourceFile = $event->getSourceFilepath();
 
+        $imageExt = pathinfo($sourceFile, \PATHINFO_EXTENSION);
+
         if (null == $subdir || null == $sourceFile) {
             throw new \InvalidArgumentException('Cache sub-directory and source file path cannot be null');
         }
@@ -137,9 +139,32 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
             // Process image only if we have some transformations to do.
             if (!$event->isOriginalImage()) {
-                $this->applyTransformation($sourceFile, $event, $dispatcher, $cacheFilePath);
-                if ($alternativeImagePath) {
-                    $this->applyTransformation($sourceFile, $event, $dispatcher, $alternativeImagePath);
+                if ('svg' === $imageExt) {
+                    $dom = new \DOMDocument('1.0', 'utf-8');
+                    $dom->load($originalImagePathInCache);
+                    $svg = $dom->documentElement;
+
+                    if (!$svg->hasAttribute('viewBox')) {
+                        $pattern = '/^(\d*\.\d+|\d+)(px)?$/';
+
+                        $interpretable = preg_match($pattern, $svg->getAttribute('width'), $width) &&
+                            preg_match($pattern, $svg->getAttribute('height'), $height);
+
+                        if (!$interpretable || !isset($width) || !isset($height)) {
+                            throw new \Exception("can't create viewBox if height and width is not defined in the svg file");
+                        }
+
+                        $viewBox = implode(' ', [0, 0, $width[0], $height[0]]);
+                        $svg->setAttribute('viewBox', $viewBox);
+                    }
+                    $svg->setAttribute('width', $event->getWidth());
+                    $svg->setAttribute('height', $event->getWidth());
+                    $dom->save($cacheFilePath);
+                } else {
+                    $this->applyTransformation($sourceFile, $event, $dispatcher, $cacheFilePath);
+                    if ($alternativeImagePath) {
+                        $this->applyTransformation($sourceFile, $event, $dispatcher, $alternativeImagePath);
+                    }
                 }
             }
         }
@@ -224,7 +249,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         );
 
         // Rotate if required
-        $rotation = (int) ($event->getRotation());
+        $rotation = (int) $event->getRotation();
 
         if ($rotation != 0) {
             $image->rotate($rotation, $bg_color);
@@ -256,7 +281,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                 case 'gamma':
                     // Syntax: gamma:value. Exemple: gamma:0.7
                     if (isset($params[1])) {
-                        $gamma = (float) ($params[1]);
+                        $gamma = (float) $params[1];
 
                         $image->effects()->gamma($gamma);
                     }
@@ -271,7 +296,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                     break;
                 case 'blur':
                     if (isset($params[1])) {
-                        $blur_level = (int) ($params[1]);
+                        $blur_level = (int) $params[1];
 
                         $image->effects()->blur($blur_level);
                     }
@@ -411,9 +436,23 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                 $border_height = (int) (($dest_height - $resize_height) / 2);
 
                 $canvas = new Box($dest_width, $dest_height);
+                $layersCount = \count($image->layers());
+
+                if ('imagick' === ConfigQuery::read('imagine_graphic_driver', 'gd') && $layersCount > 1) {
+                    // If image has layers we apply transformation to all layers since paste method would flatten the image
+                    $newImage = $imagine->create($canvas, $bg_color);
+                    $resizedLayers = $newImage->layers();
+                    $resizedLayers->remove(0);
+                    for ($i = 0; $i < $layersCount; ++$i) {
+                        $newImage2 = $imagine->create($canvas, $bg_color);
+                        $resizedLayers[] = $newImage2->paste($image->layers()->get($i)->resize(new Box($resize_width, $resize_height), $resizeFilter), new Point($border_width, $border_height));
+                    }
+
+                    return $newImage;
+                }
 
                 return $imagine->create($canvas, $bg_color)
-                    ->paste($image, new Point($border_width, $border_height));
+                        ->paste($image, new Point($border_width, $border_height));
             }
             if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
                 $image->crop(

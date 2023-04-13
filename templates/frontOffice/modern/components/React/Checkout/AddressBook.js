@@ -3,7 +3,6 @@ import Loader from '../Loader';
 
 import {
   useAddressDelete,
-  useAddressQuery,
   useGetCheckout,
   useSetCheckout
 } from '@openstudio/thelia-api-utils';
@@ -11,6 +10,7 @@ import {
 import CreateAddressModal from '../Address/CreateAddressModal';
 import EditAddressModal from '../Address/EditAddressModal';
 import { useIntl } from 'react-intl';
+import Title from '../Title';
 
 function Address({ address = {}, onSelect = () => {}, isSelected }) {
   const { isSuccess: deleteSuccess } = useAddressDelete();
@@ -19,52 +19,56 @@ function Address({ address = {}, onSelect = () => {}, isSelected }) {
   if (deleteSuccess) return null;
 
   return (
-    <div className="flex items-center justify-between w-full">
-      <address className="mr-auto text-sm">
-        <div className="not-italic font-bold">{address.label}</div>
+    <label
+      htmlFor={`home_delivery_address_${address?.id}`}
+      className={`AddressCard ${isSelected ? 'AddressCard--selected' : ''}`}
+    >
+      <div className="Radio">
+        <input
+          type="radio"
+          checked={isSelected}
+          name="home_delivery_address"
+          id={`home_delivery_address_${address?.id}`}
+          onChange={onSelect}
+        />
+      </div>
+      <address className="AddressCard-info">
+        <span className="mb-3 font-bold text-black">
+          {address.label}{' '}
+          {address.isDefault === 1 && (
+            <>({intl.formatMessage({ id: 'DEFAULT_ADDRESS' })})</>
+          )}
+        </span>
         <div>
           {address.civilityTitle?.short} {address.firstName} {address.lastName}
         </div>
-        <span className="block street-address">{address.address1}</span>
+        <span className="street-address block">{address.address1}</span>
         {address.address2 ? (
-          <span className="block street-address">
-            {address.address2} - {address.address3 ? address.address3 : null}
+          <span className="street-address">
+            {address.address2}
+            {address.address3 ? ' - ' + address.address3 : null}
           </span>
         ) : null}
-        <span className="block postal-code">
+        <span className="postal-code">
           {address.zipcode} {address.city} {address.countryCode}
         </span>
       </address>
-
-      <button onClick={onSelect}>
-        {isSelected ? (
-          <span className="mr-2 text-lg font-bold text-main">✓</span>
-        ) : null}
-        {intl.formatMessage({ id: 'CHOOSE' })}
-      </button>
-      <div className="ml-8">
-        <EditAddressModal address={address} />
-      </div>
-    </div>
+      <EditAddressModal address={address} />
+    </label>
   );
 }
 
-function AddressBook({ mode, title }) {
-  const { data = [] } = useAddressQuery();
+function AddressBook({ mode, title = null, addresses }) {
   const { data: checkout, isLoading } = useGetCheckout();
   const { mutate } = useSetCheckout();
 
   return (
-    <div className="pb-0 shadow panel">
-      <div className="flex flex-col gap-6 pb-6 text-xl font-bold border-b border-gray-300 xl:items-center xl:flex-row">
-        <div className="flex-1 text-xl font-bold">{title}</div>
-        {mode !== 'billing' ? <CreateAddressModal /> : null}
-      </div>
+    <div className="mt-8">
+      {title && <Title className="Title--3 mb-5 text-2xl" title={title} />}
+      <div className="grid gap-4">
+        {isLoading && <Loader className="w-40" />}
 
-      <div className="grid gap-4 py-4">
-        {isLoading && <Loader size="w-10 h-10" />}
-
-        {data.map((address) => {
+        {addresses.map((address) => {
           let isSelected = false;
 
           if (mode === 'delivery') {
@@ -103,6 +107,7 @@ function AddressBook({ mode, title }) {
             />
           );
         })}
+        <CreateAddressModal />
       </div>
     </div>
   );

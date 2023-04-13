@@ -20,34 +20,36 @@
 {block name="main-content"}
     <div class="main">
 
-      <article class="container mx-auto my-24" role="main" aria-labelledby="main-label">
+      <article class="container mx-auto my-12" role="main" aria-labelledby="main-label">
 
             {loop type="order" name="placed-order" id=$placed_order_id}
             {ifhook rel="order-placed.body"}
                 {hook name="order-placed.body" module="$PAYMENT_MODULE"}
             {/ifhook}
             {elsehook rel="order-placed.body"}
-                <div id="payment-success" class="">
-                    <div class="font-bold  text-2xl mb-4">
-                        {intl l="You choose payment by "} : <span class="">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span>
-                    </div>
-                    <div class="panel">
-                        <h3 class="text-xl mb-8">{intl l="Thank you for the trust you place in us."}</h3>
+                <div id="payment-success" class="max-w-4xl mx-auto ">
+                    <h1 class="Title Title--2">
+                        {intl l="You choose payment by "} : <span class="text-main">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span>
+                    </h1>
+                    <div>
+                        <div class="mt-2 mb-8 text-xl">{intl l="Thank you for the trust you place in us."}</div>
                         <div class="mb-4">
                           <p>{intl l="A summary of your order has been sent to the following address"} : {customer attr="email"}</p>
                           <p>{intl l="Your order will be confirmed by us upon receipt of your payment."}</p>
                         </div>
-                        <div class="flex -mx-3 flex-wrap">
-                            <div class="w-3/12 px-3">{intl l="Order number"} : </div>
-                            <div class="w-6/12 px-3">{$REF}</div>
-                        </div>
-                        <div class="flex -mx-3 flex-wrap">
-                          <div class="w-3/12 px-3">{intl l="Date"} : </div>
-                          <div class="w-6/12 px-3">{format_date date=$CREATE_DATE output="date"}</div>
-                        </div>
-                        <div class="flex -mx-3 flex-wrap">
-                          <div class="w-3/12 px-3">{intl l="Total"} : </div>
-                          <div class="w-6/12 px-3">{format_money number={$TOTAL_TAXED_AMOUNT} currency_id=$CURRENCY}</div>
+                        <div class="inline-block w-full max-w-md p-4 bg-gray-200 rounded-md">
+                          <div class="flex flex-wrap mb-2">
+                              <div class="pr-2 sm:w-5/12">{intl l="Order number"} : </div>
+                              <div class="font-bold sm:w-7/12">{$REF}</div>
+                          </div>
+                          <div class="flex flex-wrap mb-2">
+                            <div class="pr-2 sm:w-5/12">{intl l="Date"} : </div>
+                            <div class="font-bold sm:w-7/12">{format_date date=$CREATE_DATE output="date"}</div>
+                          </div>
+                          <div class="flex flex-wrap mb-2">
+                            <div class="pr-2 sm:w-5/12">{intl l="Total"} : </div>
+                            <div class="font-bold sm:w-7/12">{format_money number={$TOTAL_TAXED_AMOUNT} currency_id=$CURRENCY}</div>
+                          </div>
                         </div>
 
                         <div class="mt-4">
@@ -56,21 +58,17 @@
 
                         {hook name="order-placed.additional-payment-info" module="$PAYMENT_MODULE" placed_order_id=$placed_order_id}
                     </div>
+                    <a href="{navigate to="index"}" role="button" class="inline-block mt-8 Button">{intl l="Back to the shop"}</a>
                 </div>
             {/elsehook}
             {/loop}
-
-            <div class="text-center">
-              <a href="{navigate to="index"}" role="button" class="btn mt-5">{intl l="Back to the shop"}</a>
-            </div>
-
         </article>
 
     </div>
 {/block}
 
 
-{block name="stylesheet"}
+{block name="css" append}
 {hook name="order-placed.stylesheet"}
 {/block}
 

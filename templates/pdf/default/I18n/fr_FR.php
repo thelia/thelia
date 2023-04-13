@@ -23,6 +23,7 @@ return [
     'Invoice address' => 'Adresse de facturation',
     'Invoice date' => 'Date de facturation',
     'Payment module' => 'Module de paiement',
+    'Postage without tax' => 'Frais de port sans taxe',
     'Phone: ' => 'Tél.: ',
     'Postage' => 'Frais de livraison TTC',
     'Product' => 'Produit',

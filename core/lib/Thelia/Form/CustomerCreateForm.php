@@ -46,8 +46,8 @@ class CustomerCreateForm extends AddressCreateForm
                     new Constraints\NotBlank(),
                     new Constraints\Email(),
                     new Constraints\Callback(
-                            [$this, 'verifyExistingEmail']
-                        ),
+                        [$this, 'verifyExistingEmail']
+                    ),
                 ],
                 'label' => Translator::getInstance()->trans('Email Address'),
                 'label_attr' => [
@@ -94,7 +94,7 @@ class CustomerCreateForm extends AddressCreateForm
         ;
 
         // confirm email
-        if ((int) (ConfigQuery::read('customer_confirm_email', 0))) {
+        if ((int) ConfigQuery::read('customer_confirm_email', 0)) {
             $this->formBuilder->add('email_confirm', EmailType::class, [
                 'constraints' => [
                     new Constraints\NotBlank(),

@@ -13,8 +13,7 @@
 namespace Thelia\Install;
 
 use Michelf\Markdown;
-use PDO;
-use PDOException;
+use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -58,7 +57,7 @@ class Update
     /** @var array */
     protected $updatedVersions = [];
 
-    /** @var PDO */
+    /** @var \PDO */
     protected $connection;
 
     /** @var string|null */
@@ -90,6 +89,11 @@ class Update
             $this->connection = Propel::getConnection(
                 ProductTableMap::DATABASE_NAME
             );
+
+            // Get the PDO connection from the WrappedConnection
+            if ($this->connection instanceof ConnectionWrapper) {
+                $this->connection = $this->connection->getWrappedConnection();
+            }
         } catch (ParseException $ex) {
             throw new UpdateException('database.yml is not a valid file : '.$ex->getMessage());
         } catch (\PDOException $ex) {
@@ -102,10 +106,10 @@ class Update
     /**
      * retrieve the database connection.
      *
-     * @return \PDO
-     *
      * @throws ParseException
      * @throws \PDOException
+     *
+     * @return \PDO
      */
     protected function getDatabasePDO()
     {
@@ -219,9 +223,9 @@ class Update
     /**
      * Backup current DB to file local/backup/update.sql.
      *
-     * @return bool if it succeeds, false otherwise
-     *
      * @throws \Exception
+     *
+     * @return bool if it succeeds, false otherwise
      */
     public function backupDb(): void
     {
@@ -393,7 +397,7 @@ class Update
             try {
                 $stmt = $this->connection->prepare('UPDATE config set value = ? where name = ?');
                 $stmt->execute([$version, 'thelia_version']);
-            } catch (PDOException $e) {
+            } catch (\PDOException $e) {
                 $this->log('error', sprintf('Error setting current version : %s', $e->getMessage()));
 
                 throw $e;
@@ -404,9 +408,9 @@ class Update
     /**
      * Returns the database size in Mo.
      *
-     * @return float
-     *
      * @throws \Exception
+     *
+     * @return float
      */
     public function getDataBaseSize()
     {
@@ -415,7 +419,7 @@ class Update
         );
 
         if ($stmt->rowCount()) {
-            return (float) ($stmt->fetch(PDO::FETCH_OBJ)->size);
+            return (float) $stmt->fetch(\PDO::FETCH_OBJ)->size;
         }
 
         throw new \Exception('Impossible to calculate the database size');

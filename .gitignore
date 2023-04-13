@@ -20,14 +20,18 @@ local/config/key
 local/config/runtime-conf.xml
 local/media/documents/*
 local/media/images/*
+local/library/*
 !local/media/images/store/favicon.png
 !local/media/images/store/thelia.svg
 !local/media/images/store/banner.png
 web/assets/*
 web/cache/*
+web/image-library/*
+web/legacy-image-library/*
 web/tinymce
 web/media
-web/dist
+web/modules-assets/
+web/templates-assets/
 phpdoc*.log
 xhprof/
 phpunit.phar
@@ -64,6 +68,7 @@ templates/*
 templates/frontOffice/*
 !templates/frontOffice/default
 !templates/frontOffice/modern
+!templates/frontOffice/new_default
 templates/frontOffice/modern/node_modules
 templates/frontOffice/modern/dist
 templates/frontOffice/modern/core
@@ -82,6 +87,11 @@ templates/pdf/*
 #other
 .DS_Store
 .idea/
+.history/
+.husky/
+.lighthouseci
+setup/audit/lighthouserc.yaml
+setup/audit/greenit.yaml
 composer.phar
 
 ###> friendsofphp/php-cs-fixer ###
@@ -99,3 +109,16 @@ composer.phar
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+
+###> symfony/webpack-encore-bundle ###
+/node_modules/
+/public/build/
+npm-debug.log
+yarn-error.log
+###< symfony/webpack-encore-bundle ###
+
+
+### cypress
+tests/cypress/videos
+tests/cypress/screenshots
+tests/cypress/downloads

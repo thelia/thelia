@@ -3,7 +3,7 @@ import React from 'react';
 import Loader from '../Loader';
 
 import { useIntl } from 'react-intl';
-import { useValidPaymentModules } from '../Checkout/hooks';
+import useValidPaymentModules from './hooks/useValidPaymentModules';
 import { useGetCheckout, useSetCheckout } from '@openstudio/thelia-api-utils';
 
 export default function PaymentModules() {
@@ -15,76 +15,52 @@ export default function PaymentModules() {
   const { mutate } = useSetCheckout();
 
   return (
-    <div className="shadow panel">
-      <div className="items-center pb-6 text-xl font-bold border-b border-gray-300">
-        {intl.formatMessage({ id: 'PAYMENT_MODE' })}
-        {isLoading ? (
-          <Loader size="w-10 h-10" />
-        ) : (
-          modules?.length === 0 && (
-            <Alert
-              title={intl.formatMessage({ id: 'WARNING' })}
-              message={intl.formatMessage({ id: 'NO_PAYMENT_MODE_AVAILABLE' })}
-              type="warning"
-            />
-          )
-        )}
-      </div>
-
-      <div className="divide-y divide-gray-300 divide-opacity-50">
-        {modules.map((module) => {
-          const isSelected = module.id === checkout?.paymentModuleId;
-          return (
-            <label key={module.id} className={`block py-6`}>
-              <div className="flex items-center">
-                {module.images && module.images.length > 0 ? (
-                  <div className="mr-4">
-                    <img
-                      src={module.images[0]?.url}
-                      alt=""
-                      className="object-contain w-12 h-12 bg-white"
-                    />
-                  </div>
-                ) : null}
-
-                <div className="mr-4">
-                  <div className="flex items-center">
-                    <input
-                      type="radio"
-                      className="mr-4 border-2 border-gray-300 text-main focus:border-gray-300 focus:ring-main"
-                      checked={isSelected || false}
-                      onChange={() => {
-                        mutate({
-                          ...checkout,
-                          paymentModuleId: module.id
-                        });
-                      }}
-                    />
-                    <span className="text-lg font-medium">
-                      {module?.i18n?.title}
-                    </span>
-                  </div>
-                  {module?.i18n?.chapo ? (
-                    <div className={`text-sm`}>{module.i18n.chapo}</div>
-                  ) : null}
-                </div>
-              </div>
-
-              {module?.i18n?.description ? (
-                <div
-                  className="mt-4"
-                  dangerouslySetInnerHTML={{ __html: module.i18n.description }}
+    <div className="mb-8">
+      {isLoading ? (
+        <Loader size="w-10 h-10" />
+      ) : modules?.length === 0 ? (
+        <Alert
+          title={intl.formatMessage({ id: 'WARNING' })}
+          message={intl.formatMessage({ id: 'NO_PAYMENT_MODE_AVAILABLE' })}
+          type="warning"
+        />
+      ) : (
+        <div className="flex-start item-start mt-8 flex flex-col gap-3">
+          {modules.map((module, index) => {
+            const isSelected = module.id === checkout?.paymentModuleId;
+            return (
+              <label
+                key={index}
+                htmlFor={`option_${module?.code}`}
+                className="Radio"
+              >
+                <input
+                  type="radio"
+                  name="radio"
+                  id={`option_${module?.code}`}
+                  checked={isSelected}
+                  onChange={() => {
+                    mutate({
+                      ...checkout,
+                      paymentModuleId: module.id
+                    });
+                  }}
                 />
-              ) : null}
-              {module?.i18n?.postscriptum ? (
-                <div className="text-xs italic">
-                  {module?.i18n?.postscriptum}
-                </div>
-              ) : null}
-            </label>
-          );
-        })}
-      </div>
+                <span
+                  className={`mr-6 block text-base ${
+                    isSelected ? 'text-main' : ''
+                  }`}
+                >
+                  {module.title || module?.i18n?.title}{' '}
+                  <span className="block text-xs text-gray-600">
+                    {module.chapo || module?.i18n?.chapo}
+                  </span>
+                </span>
+              </label>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -50,11 +50,11 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (40, 'store_email','', 0, 1, NOW(), NOW()),
 (41, 'store_notification_emails','', 0, 1, NOW(), NOW()),
 (42, 'one_domain_foreach_lang','0', 1, 1, NOW(), NOW()),
-(43, 'thelia_version','2.5.0-alpha2', 1, 1, NOW(), NOW()),
+(43, 'thelia_version','2.5.2', 1, 1, NOW(), NOW()),
 (44, 'thelia_major_version','2', 1, 1, NOW(), NOW()),
 (45, 'thelia_minus_version','5', 1, 1, NOW(), NOW()),
-(46, 'thelia_release_version','0', 1, 1, NOW(), NOW()),
-(47, 'thelia_extra_version','alpha1', 1, 1, NOW(), NOW()),
+(46, 'thelia_release_version','2', 1, 1, NOW(), NOW()),
+(47, 'thelia_extra_version','', 1, 1, NOW(), NOW()),
 (48, 'front_cart_country_cookie_name','fcccn', 1, 1, NOW(), NOW()),
 (49, 'front_cart_country_cookie_expires','2592000', 1, 1, NOW(), NOW()),
 (50, 'sitemap_ttl','7200', 1, 1, NOW(), NOW()),
@@ -80,32 +80,30 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 (70, 'number_default_results_per_page.coupon_list', '20', 0, 0, NOW(), NOW()),
 (71, 'cdn.documents-base-url', '', 0, 0, NOW(), NOW()),
 (72, 'cdn.assets-base-url', '', 0, 0, NOW(), NOW()),
-(73, 'allow_module_zip_install', '1', 0, 0, NOW(), NOW())
-
-;
+(73, 'allow_module_zip_install', '1', 0, 0, NOW(), NOW());
 
 INSERT INTO `module` (`id`, `code`, `version`,  `type`, `activate`, `position`, `full_namespace`, `hidden`, `mandatory`, `created_at`, `updated_at`) VALUES
-(1, 'Carousel', '2.5.0-alpha2', 1, 0, 1, 'Carousel\\Carousel', 0, 0, NOW(), NOW()),
-(3, 'Cheque', '2.5.0-alpha2', 3, 0, 1, 'Cheque\\Cheque', 0, 0, NOW(), NOW()),
-(4, 'Front', '2.5.0-alpha2', 1, 1, 2, 'Front\\Front', 1, 0, NOW(), NOW()),
-(5, 'Tinymce', '2.5.0-alpha2', 1, 0, 16, 'Tinymce\\Tinymce', 0, 1, NOW(), NOW()),
-(6, 'HookNavigation', '2.5.0-alpha2', 1, 1, 11, 'HookNavigation\\HookNavigation', 0, 0, NOW(), NOW()),
-(7, 'HookCurrency', '2.5.0-alpha2', 1, 1, 3, 'HookCurrency\\HookCurrency', 0, 0, NOW(), NOW()),
-(8, 'HookLang', '2.5.0-alpha2', 1, 1, 4, 'HookLang\\HookLang', 0, 0, NOW(), NOW()),
-(9, 'HookSearch', '2.5.0-alpha2', 1, 1, 5, 'HookSearch\\HookSearch', 0, 0, NOW(), NOW()),
-(10, 'HookCustomer', '2.5.0-alpha2', 1, 1, 6, 'HookCustomer\\HookCustomer', 0, 0, NOW(), NOW()),
-(11, 'HookCart', '2.5.0-alpha2', 1, 1, 7, 'HookCart\\HookCart', 0, 0, NOW(), NOW()),
-(12, 'HookAnalytics', '2.5.0-alpha2', 1, 1, 8, 'HookAnalytics\\HookAnalytics', 0, 0, NOW(), NOW()),
-(13, 'HookContact', '2.5.0-alpha2', 1, 1, 9, 'HookContact\\HookContact', 0, 0, NOW(), NOW()),
-(14, 'HookLinks', '2.5.0-alpha2', 1, 1, 10, 'HookLinks\\HookLinks', 0, 0, NOW(), NOW()),
-(15, 'HookNewsletter', '2.5.0-alpha2', 1, 1, 12, 'HookNewsletter\\HookNewsletter', 0, 0, NOW(), NOW()),
-(16, 'HookSocial', '2.5.0-alpha2', 1, 1, 13, 'HookSocial\\HookSocial', 0, 0, NOW(), NOW()),
-(17, 'HookProductsNew', '2.5.0-alpha2', 1, 1, 14, 'HookProductsNew\\HookProductsNew', 0, 0, NOW(), NOW()),
-(18, 'HookProductsOffer', '2.5.0-alpha2', 1, 1, 15, 'HookProductsOffer\\HookProductsOffer', 0, 0, NOW(), NOW()),
-(19, 'TheliaSmarty', '2.5.0-alpha2', 1, 1, 16, 'TheliaSmarty\\TheliaSmarty', 0, 0, NOW(), NOW()),
-(20, 'VirtualProductControl', '2.5.0-alpha2', 1, 1, 17, 'VirtualProductControl\\VirtualProductControl', 0, 0, NOW(), NOW()),
-(21, 'HookAdminHome', '2.5.0-alpha2', 1, 1, 18, 'HookAdminHome\\HookAdminHome', 0, 0, NOW(), NOW()),
-(22, 'WebProfiler', '2.5.0-alpha2', 1, 1, 19, 'WebProfiler\\WebProfiler', 1, 0, NOW(), NOW())
+(1, 'Carousel', '2.5.2', 1, 0, 1, 'Carousel\\Carousel', 0, 0, NOW(), NOW()),
+(3, 'Cheque', '2.5.2', 3, 0, 1, 'Cheque\\Cheque', 0, 0, NOW(), NOW()),
+(4, 'Front', '2.5.2', 1, 1, 2, 'Front\\Front', 1, 0, NOW(), NOW()),
+(5, 'Tinymce', '2.5.2', 1, 0, 16, 'Tinymce\\Tinymce', 0, 1, NOW(), NOW()),
+(6, 'HookNavigation', '2.5.2', 1, 1, 11, 'HookNavigation\\HookNavigation', 0, 0, NOW(), NOW()),
+(7, 'HookCurrency', '2.5.2', 1, 1, 3, 'HookCurrency\\HookCurrency', 0, 0, NOW(), NOW()),
+(8, 'HookLang', '2.5.2', 1, 1, 4, 'HookLang\\HookLang', 0, 0, NOW(), NOW()),
+(9, 'HookSearch', '2.5.2', 1, 1, 5, 'HookSearch\\HookSearch', 0, 0, NOW(), NOW()),
+(10, 'HookCustomer', '2.5.2', 1, 1, 6, 'HookCustomer\\HookCustomer', 0, 0, NOW(), NOW()),
+(11, 'HookCart', '2.5.2', 1, 1, 7, 'HookCart\\HookCart', 0, 0, NOW(), NOW()),
+(12, 'HookAnalytics', '2.5.2', 1, 1, 8, 'HookAnalytics\\HookAnalytics', 0, 0, NOW(), NOW()),
+(13, 'HookContact', '2.5.2', 1, 1, 9, 'HookContact\\HookContact', 0, 0, NOW(), NOW()),
+(14, 'HookLinks', '2.5.2', 1, 1, 10, 'HookLinks\\HookLinks', 0, 0, NOW(), NOW()),
+(15, 'HookNewsletter', '2.5.2', 1, 1, 12, 'HookNewsletter\\HookNewsletter', 0, 0, NOW(), NOW()),
+(16, 'HookSocial', '2.5.2', 1, 1, 13, 'HookSocial\\HookSocial', 0, 0, NOW(), NOW()),
+(17, 'HookProductsNew', '2.5.2', 1, 1, 14, 'HookProductsNew\\HookProductsNew', 0, 0, NOW(), NOW()),
+(18, 'HookProductsOffer', '2.5.2', 1, 1, 15, 'HookProductsOffer\\HookProductsOffer', 0, 0, NOW(), NOW()),
+(19, 'TheliaSmarty', '2.5.2', 1, 1, 16, 'TheliaSmarty\\TheliaSmarty', 0, 0, NOW(), NOW()),
+(20, 'VirtualProductControl', '2.5.2', 1, 1, 17, 'VirtualProductControl\\VirtualProductControl', 0, 0, NOW(), NOW()),
+(21, 'HookAdminHome', '2.5.2', 1, 1, 18, 'HookAdminHome\\HookAdminHome', 0, 0, NOW(), NOW()),
+(22, 'WebProfiler', '2.5.2', 1, 1, 19, 'WebProfiler\\WebProfiler', 1, 0, NOW(), NOW())
 ;
 
 -- Insert front hooks
@@ -777,7 +775,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1421, 'order-status.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1422, 'order-status.form.creation', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1423, 'order-status.form.modification', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(1424, 'order-status.js', 2, 0, 0, 1, 1, 1, NOW(), NOW());
+(1424, 'order-status.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1425, 'item.edition.images', 2, 0, 0, 1, 1, 1, NOW(), NOW());
 
 -- Insert pdf hooks
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
@@ -4620,6 +4619,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1422,  'cs_CZ', NULL, NULL, NULL),
     (1423,  'cs_CZ', NULL, NULL, NULL),
     (1424, 'cs_CZ', NULL, NULL, NULL),
+    (1425, 'cs_CZ', NULL, NULL, NULL),
     (1000, 'de_DE', 'Kategorie - Inhalt', NULL, NULL),
     (1001, 'de_DE', 'Inhalt - Inhalt', NULL, NULL),
     (1002, 'de_DE', 'Ordner - Inhalt', NULL, NULL),
@@ -5042,6 +5042,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1422,  'de_DE', NULL, NULL, NULL),
     (1423,  'de_DE', NULL, NULL, NULL),
     (1424, 'de_DE', NULL, NULL, NULL),
+    (1425, 'de_DE', NULL, NULL, NULL),
     (1000, 'en_US', 'Category - content', NULL, NULL),
     (1001, 'en_US', 'Content - content', NULL, NULL),
     (1002, 'en_US', 'Folder - content', NULL, NULL),
@@ -5464,6 +5465,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1422,  'en_US', 'Order status - form creation', NULL, NULL),
     (1423,  'en_US', 'Order status - form modification', NULL, NULL),
     (1424, 'en_US', 'Order status - JavaScript', NULL, NULL),
+    (1425, 'en_US', 'Edit images for an item', NULL, NULL),
     (1000, 'es_ES', 'Categoría - contenido', NULL, NULL),
     (1001, 'es_ES', 'Contenido - contenido', NULL, NULL),
     (1002, 'es_ES', 'Carpeta - contenido', NULL, NULL),
@@ -5886,6 +5888,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1422,  'es_ES', NULL, NULL, NULL),
     (1423,  'es_ES', NULL, NULL, NULL),
     (1424, 'es_ES', NULL, NULL, NULL),
+    (1425, 'es_ES', NULL, NULL, NULL),
     (1000, 'fr_FR', 'Catégorie - contenu', NULL, NULL),
     (1001, 'fr_FR', 'Contenu - contenu', NULL, NULL),
     (1002, 'fr_FR', 'Dossier - contenu', NULL, NULL),
@@ -6308,6 +6311,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1422,  'fr_FR', NULL, NULL, NULL),
     (1423,  'fr_FR', NULL, NULL, NULL),
     (1424, 'fr_FR', NULL, NULL, NULL),
+    (1425, 'fr_FR', NULL, NULL, NULL),
     (1000, 'it_IT', NULL, NULL, NULL),
     (1001, 'it_IT', NULL, NULL, NULL),
     (1002, 'it_IT', NULL, NULL, NULL),
@@ -6730,6 +6734,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1422,  'it_IT', NULL, NULL, NULL),
     (1423,  'it_IT', NULL, NULL, NULL),
     (1424, 'it_IT', NULL, NULL, NULL),
+    (1425, 'it_IT', NULL, NULL, NULL),
     (1000, 'ru_RU', 'Категория - содержимое', NULL, NULL),
     (1001, 'ru_RU', 'Контент - содержимое', NULL, NULL),
     (1002, 'ru_RU', 'Папка - содержимое', NULL, NULL),
@@ -7151,7 +7156,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1421,  'ru_RU', NULL, NULL, NULL),
     (1422,  'ru_RU', NULL, NULL, NULL),
     (1423,  'ru_RU', NULL, NULL, NULL),
-    (1424, 'ru_RU', NULL, NULL, NULL)
+    (1424, 'ru_RU', NULL, NULL, NULL),
+    (1425, 'ru_RU', NULL, NULL, NULL)
 ;
 
 -- Insert I18n pdf hooks

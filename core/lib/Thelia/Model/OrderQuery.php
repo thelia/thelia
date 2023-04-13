@@ -27,12 +27,9 @@ use Thelia\Model\Map\OrderTableMap;
 class OrderQuery extends BaseOrderQuery
 {
     /**
-     * @param $month
-     * @param $year
+     * @throws \Exception
      *
      * @return array
-     *
-     * @throws \Exception
      */
     public static function getMonthlySaleStats($month, $year, $includeShipping = true, $withTaxes = true)
     {
@@ -72,12 +69,9 @@ class OrderQuery extends BaseOrderQuery
     }
 
     /**
-     * @param $month
-     * @param $year
+     * @throws \Propel\Runtime\Exception\PropelException
      *
      * @return array
-     *
-     * @throws \Propel\Runtime\Exception\PropelException
      */
     public static function getFirstOrdersStats($month, $year)
     {
@@ -110,22 +104,22 @@ class OrderQuery extends BaseOrderQuery
      * @param bool $includeShipping
      * @param bool $withTaxes
      *
-     * @return float|int
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return float|int
      */
     public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping, $withTaxes = true)
     {
-        $amount = (float) (
+        $amount = (float)
             self::baseSaleStats($startDate, $endDate, 'o')
                 ->innerJoinOrderProduct()
                 ->withColumn('SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE,`order_product`.PRICE)))', 'TOTAL')
                 ->select(['TOTAL'])
                 ->findOne()
-        );
+        ;
 
         if ($withTaxes) {
-            $amount += (float) (
+            $amount += (float)
                 self::baseSaleStats($startDate, $endDate, 'o')
                     ->useOrderProductQuery()
                         ->useOrderProductTaxQuery()
@@ -134,23 +128,23 @@ class OrderQuery extends BaseOrderQuery
                     ->endUse()
                     ->select(['TAX'])
                     ->findOne()
-            );
+            ;
         }
 
-        $amount -= (float) (
+        $amount -= (float)
             self::baseSaleStats($startDate, $endDate)
                 ->withColumn('SUM(`order`.discount)', 'DISCOUNT')
                 ->select('DISCOUNT')
                 ->findOne()
-        );
+        ;
 
         if ($includeShipping) {
-            $amount += (float) (
+            $amount += (float)
                 self::baseSaleStats($startDate, $endDate)
                     ->withColumn('SUM(`order`.postage)', 'POSTAGE')
                     ->select('POSTAGE')
                     ->findOne()
-            );
+            ;
         }
 
         return $amount;

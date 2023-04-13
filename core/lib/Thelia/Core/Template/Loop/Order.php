@@ -124,9 +124,6 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
 
     /**
      * @param OrderQuery $search
-     * @param $searchTerm
-     * @param $searchIn
-     * @param $searchCriteria
      *
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -314,9 +311,9 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
     }
 
     /**
-     * @return LoopResult
-     *
      * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return LoopResult
      */
     public function parseResults(LoopResult $loopResult)
     {

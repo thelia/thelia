@@ -13,6 +13,7 @@
 namespace Thelia\TaxEngine\TaxType;
 
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\Product;
 use Thelia\TaxEngine\BaseTaxType;
 use Thelia\TaxEngine\TaxTypeRequirementDefinition;
 use Thelia\Type\FloatType;
@@ -29,12 +30,12 @@ class FixAmountTaxType extends BaseTaxType
         return $this;
     }
 
-    public function fixAmountRetriever(\Thelia\Model\Product $product)
+    public function fixAmountRetriever(Product $product): float
     {
         return $this->getRequirement('amount');
     }
 
-    public function getRequirementsDefinition()
+    public function getRequirementsDefinition(): array
     {
         return [
             new TaxTypeRequirementDefinition(

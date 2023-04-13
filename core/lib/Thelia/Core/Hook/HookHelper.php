@@ -43,9 +43,9 @@ class HookHelper
     /**
      * @param int $templateType
      *
-     * @return array
-     *
      * @throws \Exception
+     *
+     * @return array
      */
     public function parseActiveTemplate($templateType = TemplateDefinition::FRONT_OFFICE)
     {
@@ -73,9 +73,9 @@ class HookHelper
      * @param int    $templateType
      * @param string $template
      *
-     * @return array an array of hooks descriptors
-     *
      * @throws \Exception
+     *
+     * @return array an array of hooks descriptors
      */
     public function parseTemplate($templateType, $template)
     {
@@ -223,9 +223,6 @@ class HookHelper
 
     /**
      * Translate Hook labels.
-     *
-     * @param $context
-     * @param $key
      *
      * @return string
      */
@@ -534,8 +531,6 @@ class HookHelper
 
     /**
      * This method do nothing for now.
-     *
-     * @param $locale
      */
     protected function loadEmailTrans($locale): void
     {

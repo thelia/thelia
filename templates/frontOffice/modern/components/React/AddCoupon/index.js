@@ -1,43 +1,53 @@
 import Alert from '../Alert';
 import Error from '../Error';
-import Input from '../Input';
 import React from 'react';
-import SubmitButton from '../SubmitButton';
-import { useCouponCreate } from '@openstudio/thelia-api-utils';
+import {
+  useCouponCreate,
+  useCartQuery,
+  useCouponClearAll,
+  useCouponClear
+} from '@openstudio/thelia-api-utils';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
+import priceFormat from '@js/utils/priceFormat';
 
 export default function AddCoupon() {
   const { register, handleSubmit, formState } = useForm();
-  const { mutate: create, error } = useCouponCreate();
+  const { data: cart = {} } = useCartQuery();
+  const { mutate: create, error, isSuccess } = useCouponCreate();
+  const {
+    mutate: clearAllCoupons,
+    isLoading,
+    isSuccess: successClear
+  } = useCouponClearAll();
+
+  const { mutate: clearCoupon } = useCouponClear();
+
   const intl = useIntl();
 
   return (
-    <div className="flex flex-col flex-wrap items-stretch leading-none">
+    <div>
       <form
-        className="flex flex-wrap items-center justify-between"
+        className={`PhoneCheck mt-0 ${isLoading ? 'PhoneCheck--loading' : ''} ${
+          error ? 'PhoneCheck--error' : ''
+        }`}
         onSubmit={handleSubmit((values) => {
           create(values.coupon);
         })}
       >
-        <label htmlFor="coupon" className="m-0 text-base uppercase">
-          {intl.formatMessage({ id: 'COUPON' })}
-        </label>
-        <div className="flex items-stretch">
-          <Input
+        <div className="PhoneCheck-field">
+          <input
             id="coupon"
+            type="text"
+            className="PhoneInput"
+            placeholder={intl.formatMessage({ id: 'COUPON' })}
             {...register('coupon', {
               required: intl.formatMessage({ id: 'MANDATORY' })
             })}
-            placeholder={intl.formatMessage({ id: 'COUPON' })}
-            className="w-full h-auto"
           />
-          <SubmitButton
-            type="submit"
-            isSubmitting={formState.isSubmitting}
-            className="py-0"
-            label={intl.formatMessage({ id: 'OK' })}
-          />
+          <button type="submit" className="PhoneCheck-btn">
+            {intl.formatMessage({ id: 'OK' })}
+          </button>
         </div>
       </form>
       {formState.errors?.coupon?.message ? (
@@ -46,9 +56,53 @@ export default function AddCoupon() {
       {error ? (
         <Alert
           type="error"
-          title={error.response?.data?.title}
+          className="mt-4"
           message={error.response?.data?.description}
         />
+      ) : null}
+      {isSuccess && !successClear ? (
+        <Alert
+          type="success"
+          message={intl.formatMessage({ id: 'COUPON_ADDED' })}
+          className="mt-4"
+        />
+      ) : null}
+      {cart?.coupons?.length > 0 ? (
+        <div
+          className={`${
+            isLoading
+              ? 'pointer-events-none text-base opacity-20 transition'
+              : ''
+          } mt-4 rounded-sm bg-main-light px-4 py-3 text-sm`}
+        >
+          <span className="block">
+            {cart?.coupons?.length > 1
+              ? intl.formatMessage({ id: 'YOU_USING_COUPONS' })
+              : intl.formatMessage({ id: 'YOU_USING_COUPON' })}
+          </span>
+          <ul className="flex flex-col gap-2 my-2">
+            {cart?.coupons.map((c) => (
+              <li key={c.id} className="flex justify-between">
+                <span className="block font-bold">
+                  {c?.code} - {priceFormat(c?.amount)}
+                </span>
+                <button
+                  className="text-sm text-main-dark hover:text-main"
+                  onClick={() => clearCoupon(c.id)}
+                >
+                  {intl.formatMessage({ id: 'DELETE' })}
+                </button>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            className="underline"
+            onClick={() => clearAllCoupons()}
+          >
+            {intl.formatMessage({ id: 'CLICK_TO_CLEAR_COUPONS' })}
+          </button>
+        </div>
       ) : null}
     </div>
   );

@@ -34,6 +34,10 @@
                         </div>
                     {/if}
 
+                    <div class="alert alert-warning">
+                        {intl l="Be careful, we do not advise to use this interface. It's safer to put your smtp informations in your environement variables."}
+                    </div>
+
                     {form name="thelia.admin.mailing-system.update"}
 
                     <form method="POST" action="{url path="/admin/configuration/mailingSystem/save"}" {form_enctype} >

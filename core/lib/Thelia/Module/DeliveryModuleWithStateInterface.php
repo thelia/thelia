@@ -39,9 +39,9 @@ interface DeliveryModuleWithStateInterface extends BaseModuleInterface
      * @param Country $country the country to deliver to
      * @param State   $state
      *
-     * @return OrderPostage|float the delivery price
-     *
      * @throws DeliveryException if the postage price cannot be calculated
+     *
+     * @return OrderPostage|float the delivery price
      */
     public function getPostage(Country $country, State $state = null);
 
