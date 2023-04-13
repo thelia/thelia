@@ -54,7 +54,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Hook\BaseHookInterface;
 use Thelia\Core\Propel\Schema\SchemaLocator;
 use Thelia\Core\Serializer\SerializerInterface;
-use Thelia\Core\Template\Element\BaseLoopInterface;
+use Thelia\Core\Template\Element\LoopInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
@@ -455,7 +455,6 @@ class Thelia extends Kernel
             SerializerInterface::class => 'thelia.serializer',
             ArchiverInterface::class => 'thelia.archiver',
             FormExtensionInterface::class => 'thelia.forms.extension',
-            BaseLoopInterface::class => 'thelia.loop',
             ContainerAwareInterface::class => 'thelia.command',
             CouponInterface::class => 'thelia.coupon.addCoupon',
             ConditionInterface::class => 'thelia.coupon.addCondition',
@@ -467,6 +466,11 @@ class Thelia extends Kernel
             $container->registerForAutoconfiguration($interfaceClass)
                 ->addTag($tag);
         }
+
+        $container->registerForAutoconfiguration(LoopInterface::class)
+            ->setPublic(true)
+            ->setShared(false)
+            ->addTag('thelia.loop');
 
         $container->registerForAutoconfiguration(FormInterface::class)
             ->setPublic(true)

@@ -14,7 +14,6 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
@@ -85,9 +84,9 @@ class ContentImage extends BaseContentImage implements BreadcrumbInterface, File
     /**
      * {@inheritdoc}
      */
-    public function getBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
+    public function getBreadcrumb(Router $router, $tab, $locale)
     {
-        return $this->getContentBreadcrumb($router, $container, $tab, $locale);
+        return $this->getContentBreadcrumb($router, $tab, $locale);
     }
 
     /**

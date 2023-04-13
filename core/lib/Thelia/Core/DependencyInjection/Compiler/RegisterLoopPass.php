@@ -36,7 +36,7 @@ class RegisterLoopPass implements CompilerPassInterface
             $classParts = explode('\\', $loopDefinition->getClass());
             $name = strtolower(strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', end($classParts))));
 
-            $loopConfig[$name] = $loopDefinition->getClass();
+            $loopConfig[$name] = $id;
         }
 
         $container->setParameter('Thelia.parser.loops', $loopConfig);
