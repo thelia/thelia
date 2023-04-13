@@ -118,15 +118,27 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         }
 
         foreach ($reflector->getProperties() as $property) {
+            $isInFilters = array_reduce(
+                array_keys($context['filters']?? []),
+                function (bool $carry, $filter) use ($property) {
+                    if (true === $carry) {
+                        return true;
+                    }
+
+                    return str_contains($filter, $property->getName());
+                },
+                false
+            );
+
             $groupAttributes = $property->getAttributes(Groups::class)[0]?? null;
 
-            if (null === $groupAttributes) {
+            if (!$isInFilters && null === $groupAttributes) {
                 continue;
             }
 
             $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
 
-            if (empty(array_intersect($propertyGroups, $context['groups']))) {
+            if (!$isInFilters && empty(array_intersect($propertyGroups, $context['groups']))) {
                 continue;
             }
 
@@ -140,24 +152,13 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
                 // Join only for non collection relation (Many to One or One to One) or if filter is applied to it
                 if ($property->getType()->getName() === Collection::class) {
-                    $isInFilters = array_reduce(
-                        array_keys($context['filters']?? []),
-                        function (bool $carry, $filter) use ($property) {
-                            if (true === $carry) {
-                                return true;
-                            }
-
-                            return str_contains($filter, $property->getName());
-                        },
-                        false
-                    );
-
                     if (!$isInFilters) {
                         continue;
                     }
                 }
 
                 $targetReflector = new \ReflectionClass($targetClass);
+
                 $isNullable = $property->getType()->allowsNull();
                 $isLeftJoin = false !== $wasLeftJoin || true === $isNullable;
                 $joinFunctionName = 'use'.ucfirst($targetReflector->getShortName()).'Query';
