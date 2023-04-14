@@ -61,16 +61,16 @@ class Customer extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'customer:read:single';
     public const GROUP_WRITE = 'customer:write';
 
-    #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE, Order::GROUP_READ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Address::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Address::GROUP_READ_SINGLE, Order::GROUP_READ])]
     public string $firstname;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ])]
     public string $lastname;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ])]
     public string $email;
 
     #[Relation(targetResource: CustomerTitle::class)]
