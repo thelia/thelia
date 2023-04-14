@@ -92,11 +92,15 @@ class Order extends AbstractPropelResource
 
     #[Relation(targetResource: OrderAddress::class)]
     #[Groups([self::GROUP_READ])]
-    public ?OrderAddress $deliveryOrderAddress;
+    public OrderAddress $deliveryOrderAddress;
+
+    #[Relation(targetResource: Module::class)]
+    #[Groups([self::GROUP_READ])]
+    public Module $paymentModule;
 
     #[Relation(targetResource: OrderStatus::class)]
     #[Groups([self::GROUP_READ])]
-    public ?OrderStatus $orderStatus = null;
+    public OrderStatus $orderStatus;
 
     #[Relation(targetResource: Customer::class)]
     #[Groups([self::GROUP_READ])]
@@ -107,6 +111,17 @@ class Order extends AbstractPropelResource
     {
         $this->orderCoupons = new ArrayCollection();
         $this->orderProducts = new ArrayCollection();
+    }
+
+    public function getPaymentModule(): Module
+    {
+        return $this->paymentModule;
+    }
+
+    public function setPaymentModule(Module $paymentModule): self
+    {
+        $this->paymentModule = $paymentModule;
+        return $this;
     }
 
 
@@ -150,7 +165,7 @@ class Order extends AbstractPropelResource
     }
 
 
-    public function setDeliveryOrderAddress(?OrderAddress $deliveryOrderAddress): void
+    public function setDeliveryOrderAddress(OrderAddress $deliveryOrderAddress): void
     {
         $this->deliveryOrderAddress = $deliveryOrderAddress;
     }
