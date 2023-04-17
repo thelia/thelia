@@ -36,16 +36,17 @@ class PropelExtractor implements PropertyListExtractorInterface, PropertyTypeExt
         }
         $reflectionProperty = $reflector->getProperty($property);
         foreach ($reflectionProperty->getAttributes(Relation::class) as $relationAttribute) {
+            $targetClass = $relationAttribute->getArguments()['targetResource'];
+
             if (!in_array(\Traversable::class, class_implements($reflectionProperty->getType()->getName()))) {
                 return [
                     new Type(
                         Type::BUILTIN_TYPE_OBJECT,
                         $reflectionProperty->getType()->allowsNull(),
-                        $relationAttribute->getName()
+                        $targetClass
                     )
                 ];
             }
-            $targetClass = $relationAttribute->getArguments()['targetResource'];
 
             return [
                 new Type(
