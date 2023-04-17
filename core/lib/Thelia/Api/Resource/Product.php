@@ -82,6 +82,10 @@ class Product extends AbstractTranslatableResource
     #[Groups([self::GROUP_WRITE])]
     public bool $virtual;
 
+    #[Relation(targetResource: Brand::class)]
+    #[Groups([self::GROUP_WRITE, self::GROUP_READ_SINGLE])]
+    public Brand $brand;
+
     #[Relation(targetResource: ProductCategory::class)]
     #[Groups([self::GROUP_READ_SINGLE])]
     public Collection $productCategories;
@@ -143,6 +147,17 @@ class Product extends AbstractTranslatableResource
     public function getProductCategories(): Collection
     {
         return $this->productCategories;
+    }
+
+    public function getBrand(): Brand
+    {
+        return $this->brand;
+    }
+
+    public function setBrand(Brand $brand): Product
+    {
+        $this->brand = $brand;
+        return $this;
     }
 
     public function setProductCategories(Collection $productCategories): Product
