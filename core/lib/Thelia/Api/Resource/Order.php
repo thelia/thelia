@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Collection\ArrayCollection;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 #[ApiResource(
@@ -51,23 +52,32 @@ class Order extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'order:read:single';
     public const GROUP_WRITE = 'order:write';
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ,OrderCoupon::GROUP_READ,OrderProduct::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $ref;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?\DateTime $invoiceDate;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?float $currencyRate;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?string $discount;
+    public ?\DateTime $updatedAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public string $postage;
+    public ?float $discount;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public string $postageTax;
+    public float $postage;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public float $postageTax;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $postageTaxRuleTitle;
@@ -76,41 +86,184 @@ class Order extends AbstractPropelResource
     public ?string $transactionRef;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?string $deliveryRef;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $invoiceRef;
 
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?int $version;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?\DateTime $versionCreatedAt;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?string $versionCreatedBy;
+
     #[Relation(targetResource: OrderProduct::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ_SINGLE])]
     public Collection $orderProducts;
 
     #[Relation(targetResource: OrderCoupon::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ_SINGLE])]
     public Collection $orderCoupons;
 
     #[Relation(targetResource: OrderAddress::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Column(propelGetter: "getOrderAddressRelatedByInvoiceOrderAddressId")]
+    #[Groups([self::GROUP_READ_SINGLE])]
     public OrderAddress $invoiceOrderAddress;
 
     #[Relation(targetResource: OrderAddress::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Column(propelGetter: "getOrderAddressRelatedByDeliveryOrderAddressId")]
+    #[Groups([self::GROUP_READ_SINGLE])]
     public OrderAddress $deliveryOrderAddress;
 
     #[Relation(targetResource: Module::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Column(propelGetter: "getModuleRelatedByPaymentModuleId")]
     public Module $paymentModule;
 
+    #[Relation(targetResource: Module::class)]
+    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Column(propelGetter: "getModuleRelatedByDeliveryModuleId")]
+    public Module $deliveryModule;
+
     #[Relation(targetResource: OrderStatus::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ_SINGLE])]
     public OrderStatus $orderStatus;
 
     #[Relation(targetResource: Customer::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ_SINGLE])]
     public Customer $customer;
 
+    #[Relation(targetResource: Currency::class)]
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public Currency $currency;
+
+    #[Relation(targetResource: Lang::class)]
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public Lang $lang;
+
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public int $cartId;
+
+
+    //todo order tax, dans orderProduct -> taxedPrice, vérifier que le write marche
 
     public function __construct()
     {
         $this->orderCoupons = new ArrayCollection();
         $this->orderProducts = new ArrayCollection();
+    }
+
+    public function getCartId(): int
+    {
+        return $this->cartId;
+    }
+
+    public function setCartId(int $cartId): void
+    {
+        $this->cartId = $cartId;
+    }
+
+    public function getLang(): Lang
+    {
+        return $this->lang;
+    }
+
+    public function setLang(Lang $lang): void
+    {
+        $this->lang = $lang;
+    }
+
+    public function getCurrencyRate(): ?float
+    {
+        return $this->currencyRate;
+    }
+
+    public function setCurrencyRate(?float $currencyRate): void
+    {
+        $this->currencyRate = $currencyRate;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    public function getDeliveryRef(): ?string
+    {
+        return $this->deliveryRef;
+    }
+
+    public function setDeliveryRef(?string $deliveryRef): void
+    {
+        $this->deliveryRef = $deliveryRef;
+    }
+
+    public function getVersion(): ?int
+    {
+        return $this->version;
+    }
+
+    public function setVersion(?int $version): void
+    {
+        $this->version = $version;
+    }
+
+    public function getVersionCreatedAt(): ?\DateTime
+    {
+        return $this->versionCreatedAt;
+    }
+
+    public function setVersionCreatedAt(?\DateTime $versionCreatedAt): void
+    {
+        $this->versionCreatedAt = $versionCreatedAt;
+    }
+
+    public function getVersionCreatedBy(): ?string
+    {
+        return $this->versionCreatedBy;
+    }
+
+    public function setVersionCreatedBy(?string $versionCreatedBy): void
+    {
+        $this->versionCreatedBy = $versionCreatedBy;
+    }
+
+    public function getInvoiceDate(): ?\DateTime
+    {
+        return $this->invoiceDate;
+    }
+
+    public function setInvoiceDate(?\DateTime $invoiceDate): void
+    {
+        $this->invoiceDate = $invoiceDate;
+    }
+
+    public function getDeliveryModule(): Module
+    {
+        return $this->deliveryModule;
+    }
+
+    public function setDeliveryModule(Module $deliveryModule): void
+    {
+        $this->deliveryModule = $deliveryModule;
+    }
+
+    public function getCurrency(): Currency
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(Currency $currency): void
+    {
+        $this->currency = $currency;
     }
 
     public function getPaymentModule(): Module

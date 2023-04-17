@@ -76,18 +76,63 @@ class OrderAddress extends AbstractPropelResource
 
     #[Relation(targetResource: CustomerTitle::class)]
     #[Groups(groups:[self::GROUP_READ,Order::GROUP_READ_SINGLE])]
-    public ?CustomerTitle $customerTitle;
+    public CustomerTitle $customerTitle;
+
+    #[Relation(targetResource: Country::class)]
+    #[Groups(groups:[self::GROUP_READ,Order::GROUP_READ_SINGLE])]
+    public Country $country;
+
+    #[Relation(targetResource: State::class)]
+    #[Groups(groups:[self::GROUP_READ,Order::GROUP_READ_SINGLE])]
+    public ?State $state = null;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?\DateTime $createdAt;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?\DateTime $updatedAt;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(?int $id): self
+    public function setId(?int $id)
     {
         $this->id = $id;
-        return $this;
     }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    public function getState(): ?State
+    {
+        return $this->state;
+    }
+
+    public function setState(?State $state): void
+    {
+        $this->state = $state;
+    }
+
+
 
     public function getFirstname(): string
     {
@@ -217,18 +262,28 @@ class OrderAddress extends AbstractPropelResource
     }
 
 
-    public function getCustomerTitle(): ?CustomerTitle
+    public function getCustomerTitle(): CustomerTitle
     {
         return $this->customerTitle;
     }
 
-    public function setCustomerTitle(?CustomerTitle $customerTitle): OrderAddress
+    public function setCustomerTitle(CustomerTitle $customerTitle): OrderAddress
     {
         $this->customerTitle = $customerTitle;
         return $this;
     }
 
-    //todo country and state
+    public function getCountry(): Country
+    {
+        return $this->country;
+    }
+
+    public function setCountry(Country $country): void
+    {
+        $this->country = $country;
+    }
+
+    //todo state
 
     public static function getPropelModelClass(): string
     {

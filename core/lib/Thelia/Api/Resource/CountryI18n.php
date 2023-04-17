@@ -1,34 +1,24 @@
 <?php
 
-/*
- * This file is part of the Thelia package.
- * http://www.thelia.net
- *
- * (c) OpenStudio <info@thelia.net>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Thelia\Api\Resource;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 
-class OrderStatusI18n extends I18n
+class CountryI18n
 {
-    #[Groups([OrderStatus::GROUP_READ, OrderStatus::GROUP_WRITE,I18n::GROUP_READ,Order::GROUP_READ, Order::GROUP_WRITE])]
+    #[Groups([I18n::GROUP_READ])]
     protected string $locale;
 
-    #[Groups([OrderStatus::GROUP_READ, OrderStatus::GROUP_WRITE,I18n::GROUP_READ,Order::GROUP_READ, Order::GROUP_WRITE])]
+    #[Groups([I18n::GROUP_READ])]
     protected ?string $title;
 
-    #[Groups([OrderStatus::GROUP_READ, OrderStatus::GROUP_WRITE])]
+    #[Groups([I18n::GROUP_READ])]
     protected ?string $description;
 
-    #[Groups([OrderStatus::GROUP_READ, OrderStatus::GROUP_WRITE])]
+    #[Groups([I18n::GROUP_READ])]
     protected ?string $chapo;
 
-    #[Groups([OrderStatus::GROUP_READ, OrderStatus::GROUP_WRITE])]
+    #[Groups([I18n::GROUP_READ])]
     protected ?string $postscriptum;
 
     public function getLocale(): ?string
@@ -36,12 +26,12 @@ class OrderStatusI18n extends I18n
         return $this->locale;
     }
 
-    public function setLocale(?string $locale): void
+    public function setLocale(string $locale): void
     {
         $this->locale = $locale;
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }

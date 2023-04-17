@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Propel\Runtime\Collection\ArrayCollection;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -53,14 +54,30 @@ class OrderProduct extends AbstractPropelResource
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
-    public ?int $productSaleElementsId;
+    #[Relation(targetResource: Order::class)]
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public Order $order;
 
     #[Groups([self::GROUP_READ,Order::GROUP_READ])]
     public string $productRef;
 
     #[Groups([self::GROUP_READ,Order::GROUP_READ])]
     public string $productSaleElementsRef;
+
+    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    public ?int $productSaleElementsId;
+
+    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    public ?string $title;
+
+    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    public ?string $chapo;
+
+    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    public ?string $description;
+
+    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    public ?string $postscriptum;
 
     #[Groups([self::GROUP_READ,Order::GROUP_READ])]
     public int $quantity;
@@ -72,13 +89,199 @@ class OrderProduct extends AbstractPropelResource
     public ?float $promoPrice;
 
     #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    public float $taxedPrice;
+
+    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    public bool $wasNew;
+
+    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    public bool $wasInPromo;
+
+    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
     public ?float $weight;
+
+    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    public ?string $eanCode;
 
     #[Groups([self::GROUP_READ,Order::GROUP_READ])]
     public ?string $taxRuleTitle;
 
     #[Groups([self::GROUP_READ,Order::GROUP_READ])]
     public ?string $taxRuleDescription;
+
+    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    public ?int $parent;
+
+    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    public bool $virtual;
+
+    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    public ?bool $virtualDocument;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?\DateTime $createdAt;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?\DateTime $updatedAt;
+
+    #[Relation(targetResource: OrderProductTax::class)]
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public Collection $orderProductTaxes;
+
+    public function __construct()
+    {
+        $this->orderProductTaxes = new ArrayCollection();
+    }
+
+    public function getOrderProductTaxes(): Collection
+    {
+        return $this->orderProductTaxes;
+    }
+
+    public function setOrderProductTaxes(Collection $orderProductTaxes): void
+    {
+        $this->orderProductTaxes = $orderProductTaxes;
+    }
+
+    public function getOrder(): Order
+    {
+        return $this->order;
+    }
+
+    public function setOrder(Order $order): void
+    {
+        $this->order = $order;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(?string $title): void
+    {
+        $this->title = $title;
+    }
+
+    public function getChapo(): ?string
+    {
+        return $this->chapo;
+    }
+
+    public function setChapo(?string $chapo): void
+    {
+        $this->chapo = $chapo;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): void
+    {
+        $this->description = $description;
+    }
+
+    public function getPostscriptum(): ?string
+    {
+        return $this->postscriptum;
+    }
+
+    public function setPostscriptum(?string $postscriptum): void
+    {
+        $this->postscriptum = $postscriptum;
+    }
+
+    public function getTaxedPrice(): float
+    {
+        return $this->taxedPrice;
+    }
+
+    public function setTaxedPrice(float $taxedPrice): void
+    {
+        $this->taxedPrice = $taxedPrice;
+    }
+
+    public function isWasNew(): bool
+    {
+        return $this->wasNew;
+    }
+
+    public function setWasNew(bool $wasNew): void
+    {
+        $this->wasNew = $wasNew;
+    }
+
+    public function isWasInPromo(): bool
+    {
+        return $this->wasInPromo;
+    }
+
+    public function setWasInPromo(bool $wasInPromo): void
+    {
+        $this->wasInPromo = $wasInPromo;
+    }
+
+    public function getEanCode(): ?string
+    {
+        return $this->eanCode;
+    }
+
+    public function setEanCode(?string $eanCode): void
+    {
+        $this->eanCode = $eanCode;
+    }
+
+    public function getParent(): ?int
+    {
+        return $this->parent;
+    }
+
+    public function setParent(?int $parent): void
+    {
+        $this->parent = $parent;
+    }
+
+    public function isVirtual(): bool
+    {
+        return $this->virtual;
+    }
+
+    public function setVirtual(bool $virtual): void
+    {
+        $this->virtual = $virtual;
+    }
+
+    public function getVirtualDocument(): ?bool
+    {
+        return $this->virtualDocument;
+    }
+
+    public function setVirtualDocument(?bool $virtualDocument): void
+    {
+        $this->virtualDocument = $virtualDocument;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
 
     public function getProductSaleElementsId(): ?int
     {
