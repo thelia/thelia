@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 #[ApiResource(
     operations: [
@@ -41,8 +42,9 @@ class OrderCoupon extends AbstractPropelResource
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
     public ?int $id = null;
 
+    #[Relation(targetResource: Order::class)]
     #[Groups([self::GROUP_READ])]
-    public ?int $orderId;
+    public ?Order $order;
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
     public ?string $code;
@@ -77,6 +79,70 @@ class OrderCoupon extends AbstractPropelResource
     #[Groups([self::GROUP_READ])]
     public ?bool $isAvailableOnSpecialOffers;
 
+    #[Groups([self::GROUP_READ])]
+    public ?string $serializedConditions;
+
+    #[Groups([self::GROUP_READ])]
+    public ?bool $perCustomerUsageCount;
+
+    #[Groups([self::GROUP_READ])]
+    public ?bool $usageCanceled;
+
+    #[Groups([self::GROUP_READ])]
+    public ?\DateTime $createdAt;
+
+    #[Groups([self::GROUP_READ])]
+    public ?\DateTime $updatedAt;
+
+    public function getSerializedConditions(): ?string
+    {
+        return $this->serializedConditions;
+    }
+
+    public function setSerializedConditions(?string $serializedConditions): void
+    {
+        $this->serializedConditions = $serializedConditions;
+    }
+
+    public function getPerCustomerUsageCount(): ?bool
+    {
+        return $this->perCustomerUsageCount;
+    }
+
+    public function setPerCustomerUsageCount(?bool $perCustomerUsageCount): void
+    {
+        $this->perCustomerUsageCount = $perCustomerUsageCount;
+    }
+
+    public function getUsageCanceled(): ?bool
+    {
+        return $this->usageCanceled;
+    }
+
+    public function setUsageCanceled(?bool $usageCanceled): void
+    {
+        $this->usageCanceled = $usageCanceled;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
 
     public function getId(): ?int
     {
@@ -89,18 +155,15 @@ class OrderCoupon extends AbstractPropelResource
         $this->id = $id;
     }
 
-
-    public function getOrderId(): ?int
+    public function getOrder(): ?Order
     {
-        return $this->orderId;
+        return $this->order;
     }
 
-
-    public function setOrderId(?int $orderId): void
+    public function setOrder(?Order $order): void
     {
-        $this->orderId = $orderId;
+        $this->order = $order;
     }
-
 
     public function getCode(): ?string
     {
@@ -198,13 +261,13 @@ class OrderCoupon extends AbstractPropelResource
     }
 
 
-    public function getIsCumulative(): ?string
+    public function getIsCumulative(): ?bool
     {
         return $this->isCumulative;
     }
 
 
-    public function setIsCumulative(?string $isCumulative): void
+    public function setIsCumulative(?bool $isCumulative): void
     {
         $this->isCumulative = $isCumulative;
     }

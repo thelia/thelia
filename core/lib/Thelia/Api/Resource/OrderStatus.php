@@ -57,6 +57,58 @@ class OrderStatus extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
     public ?string $color;
 
+    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    public ?int $position;
+
+    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    public ?bool $protectedStatus;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?\DateTime $createdAt;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?\DateTime $updatedAt;
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(?int $position): void
+    {
+        $this->position = $position;
+    }
+
+    public function getProtectedStatus(): ?bool
+    {
+        return $this->protectedStatus;
+    }
+
+    public function setProtectedStatus(?bool $protectedStatus): void
+    {
+        $this->protectedStatus = $protectedStatus;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
     public function getCode(): string
     {
         return $this->code;
