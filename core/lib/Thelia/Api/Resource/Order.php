@@ -44,7 +44,7 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_WRITE,I18n::GROUP_WRITE]]
 )]
 class Order extends AbstractPropelResource
 {
@@ -129,7 +129,7 @@ class Order extends AbstractPropelResource
     public Module $deliveryModule;
 
     #[Relation(targetResource: OrderStatus::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ_SINGLE,self::GROUP_WRITE])]
     public OrderStatus $orderStatus;
 
     #[Relation(targetResource: Customer::class)]
@@ -148,7 +148,7 @@ class Order extends AbstractPropelResource
     public int $cartId;
 
 
-    //todo order tax, dans orderProduct -> taxedPrice, vérifier que le write marche
+    //todo -> vérifier que le write marche
 
     public function __construct()
     {
