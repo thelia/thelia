@@ -58,64 +58,64 @@ class OrderProduct extends AbstractPropelResource
     #[Groups([self::GROUP_READ_SINGLE])]
     public Order $order;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public string $productRef;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public string $productSaleElementsRef;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?int $productSaleElementsId;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?string $title;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?string $chapo;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?string $description;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?string $postscriptum;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public int $quantity;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public float $price;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?float $promoPrice;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
-    public float $taxedPrice;
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
+    public ?float $taxedPrice;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public bool $wasNew;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public bool $wasInPromo;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?float $weight;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?string $eanCode;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?string $taxRuleTitle;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?string $taxRuleDescription;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?int $parent;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public bool $virtual;
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?bool $virtualDocument;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -193,15 +193,16 @@ class OrderProduct extends AbstractPropelResource
         $this->postscriptum = $postscriptum;
     }
 
-    public function getTaxedPrice(): float
+    public function getTaxedPrice(): ?float
     {
         return $this->taxedPrice;
     }
 
-    public function setTaxedPrice(float $taxedPrice): void
+    public function setTaxedPrice(?float $taxedPrice): void
     {
         $this->taxedPrice = $taxedPrice;
     }
+
 
     public function isWasNew(): bool
     {
@@ -385,6 +386,32 @@ class OrderProduct extends AbstractPropelResource
     {
         $this->id = $id;
     }
+
+    public function afterModelToResource(): void
+    {
+        $totalTax = 0;
+        $totalPromoTax = 0;
+        /** @var OrderProductTax $orderProductTax */
+        foreach ($this->orderProductTaxes->getData() as $orderProductTax){
+            /** @var \Thelia\Model\OrderProductTax $orderProductTax */
+            $propelOrderProductTax = $orderProductTax->getPropelModel();
+            if ($propelOrderProductTax->getPromoAmount() === '0.000000'){
+                $totalTax += (float)$propelOrderProductTax->getAmount();
+            }
+            if ($propelOrderProductTax->getPromoAmount() > 0){
+                $totalPromoTax += (float)$propelOrderProductTax->getPromoAmount();
+            }
+        }
+
+        if ($propelOrderProductTax->getPromoAmount() === '0.000000'){
+            $this->setTaxedPrice($this->price + $totalTax);
+        }
+        if ($propelOrderProductTax->getPromoAmount() > 0){
+            $this->setTaxedPrice($this->promoPrice + $totalPromoTax);
+        }
+
+    }
+
 
     public static function getPropelModelClass(): string
     {

@@ -13,20 +13,20 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/order'
+            uriTemplate: '/admin/order_product_tax'
         ),
         new GetCollection(
-            uriTemplate: '/admin/order'
+            uriTemplate: '/admin/order_product_tax'
         ),
         new Get(
-            uriTemplate: '/admin/order/{id}',
+            uriTemplate: '/admin/order_product_tax/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/order/{id}'
+            uriTemplate: '/admin/order_product_tax/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/order/{id}'
+            uriTemplate: '/admin/order_product_tax/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
@@ -34,11 +34,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 )]
 class OrderProductTax extends AbstractPropelResource
 {
-    public const GROUP_READ = 'customer:read';
-    public const GROUP_READ_SINGLE = 'customer:read:single';
-    public const GROUP_WRITE = 'customer:write';
+    public const GROUP_READ = 'order_product_tax:read';
+    public const GROUP_READ_SINGLE = 'order_product_tax:read:single';
+    public const GROUP_WRITE = 'order_product_tax:write';
 
-    #[Groups([self::GROUP_READ,OrderProduct::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, OrderProduct::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ])]
