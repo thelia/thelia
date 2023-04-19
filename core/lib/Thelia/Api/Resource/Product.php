@@ -24,6 +24,7 @@ use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 
 #[ApiResource(
@@ -62,6 +63,13 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
         'visible',
         'virtual',
         'productCategories.defaultCategory'
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'ref',
+        'productCategories.position'
     ]
 )]
 class Product extends AbstractTranslatableResource
