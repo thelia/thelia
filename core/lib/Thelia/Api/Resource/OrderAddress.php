@@ -41,37 +41,37 @@ class OrderAddress extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'order_address:read:single';
     public const GROUP_WRITE = 'order_address:write';
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ,Order::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ,Order::GROUP_READ_SINGLE])]
     public string $firstname;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ,Order::GROUP_READ_SINGLE])]
     public string $lastname;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public string $address1;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?string $address2;
 
-    #[Groups([ self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([ self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?string $address3;
 
-    #[Groups([ self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([ self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?string $zipcode;
 
-    #[Groups([ self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([ self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public string $city;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?string $phone;
 
-    #[Groups([ self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([ self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?string $cellphone;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ,Order::GROUP_READ_SINGLE])]
     public ?string $company;
 
     #[Relation(targetResource: CustomerTitle::class)]
@@ -86,10 +86,10 @@ class OrderAddress extends AbstractPropelResource
     #[Groups(groups:[self::GROUP_READ,Order::GROUP_READ_SINGLE])]
     public ?State $state = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ])]
     public ?\DateTime $updatedAt;
 
     public function getId(): ?int

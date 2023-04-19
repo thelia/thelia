@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Cassandra\Custom;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -38,55 +39,55 @@ class Lang extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'lang:read:single';
     public const GROUP_WRITE = 'lang:write';
 
-    #[Groups([self::GROUP_READ])]
-    public?int $id = null;
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE,Order::GROUP_READ_SINGLE,Customer::GROUP_READ_SINGLE])]
+    public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE,Customer::GROUP_READ_SINGLE])]
     public ?string $title;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?string $code;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?string $locale;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?string $url;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public ?string $dateFormat;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $timeFormat;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $datetimeFormat;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $decimalSeparator;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $thousandsSeparator;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?bool $active;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?bool $visible;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $decimals;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?bool $byDefault;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?\DateTime $updatedAt;
 
     public function getId(): ?int

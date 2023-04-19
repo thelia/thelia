@@ -12,7 +12,6 @@
 
 namespace Thelia\Api\Resource;
 
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -31,7 +30,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Get(
             uriTemplate: '/admin/customer_titles/{id}',
-            normalizationContext:  ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/customer_titles/{id}'
@@ -49,11 +47,50 @@ class CustomerTitle extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'customer_title:read:single';
     public const GROUP_WRITE = 'customer_title:write';
 
-    #[Groups([self::GROUP_READ, Customer::GROUP_READ, Address::GROUP_READ,OrderAddress::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE, Address::GROUP_READ,OrderAddress::GROUP_READ_SINGLE,State::GROUP_READ_SINGLE,Order::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public string $position;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public int $byDefault;
+
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public ?\DateTime $createdAt;
+
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public ?\DateTime $updatedAt;
+
+    public function getByDefault(): int
+    {
+        return $this->byDefault;
+    }
+
+    public function setByDefault(int $byDefault): void
+    {
+        $this->byDefault = $byDefault;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
 
     public function getId(): ?int
     {

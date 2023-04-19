@@ -48,7 +48,7 @@ class OrderStatus extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'order_status:read:single';
     public const GROUP_WRITE = 'order_status:write';
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
@@ -57,16 +57,16 @@ class OrderStatus extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
     public ?string $color;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ])]
     public ?bool $protectedStatus;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ])]
     public ?\DateTime $updatedAt;
 
     public function getPosition(): ?int

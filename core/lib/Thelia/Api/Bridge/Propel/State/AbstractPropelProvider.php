@@ -194,7 +194,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
         }
 
         $apiResource->setPropelModel($propelModel);
-        $apiResource->afterModelToResource();
+        $apiResource->afterModelToResource($context);
 
         return $apiResource;
     }

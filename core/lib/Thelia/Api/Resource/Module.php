@@ -37,40 +37,40 @@ class Module extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'module:read:single';
     public const GROUP_WRITE = 'module:write';
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE, Order::GROUP_READ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public string $code;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public string $category;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public string $type;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public string $version;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?bool $activate;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?string $fullNamespace;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?bool $hidden;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?bool $mandatory;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?\DateTime $updatedAt;
 
     public function getId(): ?int

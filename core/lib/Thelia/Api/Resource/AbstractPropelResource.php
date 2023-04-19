@@ -20,5 +20,5 @@ abstract class AbstractPropelResource implements PropelResourceInterface
         return $this->propelModel;
     }
 
-    public function afterModelToResource():void{}
+    public function afterModelToResource(array $context):void{}
 }

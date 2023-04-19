@@ -38,28 +38,28 @@ class OrderProductTax extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'order_product_tax:read:single';
     public const GROUP_WRITE = 'order_product_tax:write';
 
-    #[Groups([self::GROUP_READ, OrderProduct::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, OrderProduct::GROUP_READ_SINGLE,Order::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public OrderProduct $orderProduct;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE,OrderProduct::GROUP_READ_SINGLE,Order::GROUP_READ_SINGLE])]
     public string $title;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE,OrderProduct::GROUP_READ_SINGLE,Order::GROUP_READ_SINGLE])]
     public ?string $description;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE,OrderProduct::GROUP_READ_SINGLE,Order::GROUP_READ_SINGLE])]
     public float $amount;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE,OrderProduct::GROUP_READ_SINGLE,Order::GROUP_READ_SINGLE])]
     public ?float $promoAmount;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ])]
     public ?\DateTime $updatedAt;
 
     public function getId(): ?int

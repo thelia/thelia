@@ -52,108 +52,114 @@ class Order extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'order:read:single';
     public const GROUP_WRITE = 'order:write';
 
-    #[Groups([self::GROUP_READ,OrderCoupon::GROUP_READ,OrderProduct::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ,OrderCoupon::GROUP_READ_SINGLE,OrderProduct::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $ref;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE,self::GROUP_WRITE])]
     public ?\DateTime $invoiceDate;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE,self::GROUP_WRITE])]
     public ?float $currencyRate;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?float $discount;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public float $postage;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public float $postageTax;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?string $postageTaxRuleTitle;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?string $transactionRef;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?string $deliveryRef;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?string $invoiceRef;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?int $version;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?\DateTime $versionCreatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?string $versionCreatedBy;
 
+    #[Groups([self::GROUP_READ])]
+    public ?float $totalAmount;
+
     #[Relation(targetResource: OrderProduct::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Collection $orderProducts;
 
     #[Relation(targetResource: OrderCoupon::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Collection $orderCoupons;
 
     #[Relation(targetResource: OrderAddress::class)]
     #[Column(propelGetter: "getOrderAddressRelatedByInvoiceOrderAddressId")]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public OrderAddress $invoiceOrderAddress;
 
     #[Relation(targetResource: OrderAddress::class)]
     #[Column(propelGetter: "getOrderAddressRelatedByDeliveryOrderAddressId")]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public OrderAddress $deliveryOrderAddress;
 
     #[Relation(targetResource: Module::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     #[Column(propelGetter: "getModuleRelatedByPaymentModuleId")]
     public Module $paymentModule;
 
     #[Relation(targetResource: Module::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     #[Column(propelGetter: "getModuleRelatedByDeliveryModuleId")]
     public Module $deliveryModule;
 
     #[Relation(targetResource: OrderStatus::class)]
-    #[Groups([self::GROUP_READ_SINGLE,self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
     public OrderStatus $orderStatus;
 
     #[Relation(targetResource: Customer::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Customer $customer;
 
     #[Relation(targetResource: Currency::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Currency $currency;
 
     #[Relation(targetResource: Lang::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Lang $lang;
 
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public int $cartId;
 
-
-    //todo -> vérifier que le write marche
 
     public function __construct()
     {
         $this->orderCoupons = new ArrayCollection();
         $this->orderProducts = new ArrayCollection();
+    }
+
+    public function getTotalAmount(): ?float
+    {
+        return $this->getPropelModel()->getTotalAmount();
     }
 
     public function getCartId(): int
@@ -299,8 +305,6 @@ class Order extends AbstractPropelResource
     {
         $this->invoiceRef = $invoiceRef;
     }
-
-
 
     public function getInvoiceOrderAddress(): OrderAddress
     {

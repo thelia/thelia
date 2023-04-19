@@ -41,13 +41,14 @@ class Currency extends AbstractTranslatableResource
     public const GROUP_WRITE = 'currency:write';
 
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?string $code;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ])]
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?string $symbol;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]

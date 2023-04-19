@@ -39,19 +39,19 @@ class Country extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'country:read:single';
     public const GROUP_WRITE = 'country:write';
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ,Order::GROUP_READ_SINGLE,Customer::GROUP_READ_SINGLE,Address::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,OrderAddress::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public bool $visible;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,OrderAddress::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public string $isocode;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,OrderAddress::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $isoalpha2;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,OrderAddress::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $isoalpha3;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -63,10 +63,10 @@ class Country extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $zipCodeFormat;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,OrderAddress::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?bool $byDefault;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,OrderAddress::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?bool $shopCountry;
 
     #[Groups([self::GROUP_READ])]

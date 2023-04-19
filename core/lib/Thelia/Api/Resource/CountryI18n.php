@@ -4,7 +4,7 @@ namespace Thelia\Api\Resource;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 
-class CountryI18n
+class CountryI18n extends I18n
 {
     #[Groups([I18n::GROUP_READ])]
     protected string $locale;

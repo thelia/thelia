@@ -39,7 +39,7 @@ class State extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'state:read:single';
     public const GROUP_WRITE = 'state:write';
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ,Customer::GROUP_READ_SINGLE,Address::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE,OrderAddress::GROUP_READ])]
@@ -49,7 +49,7 @@ class State extends AbstractTranslatableResource
     public ?string $isocode;
 
     #[Relation(targetResource: Country::class)]
-    #[Groups(groups:[self::GROUP_READ,Order::GROUP_READ_SINGLE,OrderAddress::GROUP_READ])]
+    #[Groups(groups:[self::GROUP_READ,self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
     public Country $country;
 
     #[Groups([self::GROUP_READ])]
@@ -57,6 +57,16 @@ class State extends AbstractTranslatableResource
 
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $updatedAt;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
+    }
 
     public function isVisible(): bool
     {
