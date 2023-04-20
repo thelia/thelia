@@ -29,9 +29,6 @@ use function PHPUnit\Framework\isInstanceOf;
         new Post(
             uriTemplate: '/admin/order_product'
         ),
-        new GetCollection(
-            uriTemplate: '/admin/order_product'
-        ),
         new Get(
             uriTemplate: '/admin/order_product/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]

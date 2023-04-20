@@ -15,9 +15,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Post(
             uriTemplate: '/admin/order_product_tax'
         ),
-        new GetCollection(
-            uriTemplate: '/admin/order_product_tax'
-        ),
         new Get(
             uriTemplate: '/admin/order_product_tax/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]

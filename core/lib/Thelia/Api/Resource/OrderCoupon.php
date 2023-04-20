@@ -16,9 +16,6 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
         new Post(
             uriTemplate: '/admin/order_coupon'
         ),
-        new GetCollection(
-            uriTemplate: '/admin/order_coupon'
-        ),
         new Get(
             uriTemplate: '/admin/order_coupon/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]

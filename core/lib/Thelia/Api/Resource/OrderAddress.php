@@ -18,9 +18,6 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
         new Post(
             uriTemplate: '/admin/order_address'
         ),
-        new GetCollection(
-            uriTemplate: '/admin/order_address'
-        ),
         new Get(
             uriTemplate: '/admin/order_address/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]

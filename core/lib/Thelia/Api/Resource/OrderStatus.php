@@ -23,25 +23,26 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/order_status'
+            uriTemplate: '/admin/order_statutes'
         ),
         new GetCollection(
-            uriTemplate: '/admin/order_status'
+            uriTemplate: '/admin/order_statutes'
         ),
         new Get(
-            uriTemplate: '/admin/order_status/{id}',
+            uriTemplate: '/admin/order_statutes/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/order_status/{id}'
+            uriTemplate: '/admin/order_statutes/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/order_status/{id}'
+            uriTemplate: '/admin/order_statutes/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE, I18n::GROUP_WRITE]]
 )]
+//todo faire les filtres
 class OrderStatus extends AbstractTranslatableResource
 {
     public const GROUP_READ = 'order_status:read';

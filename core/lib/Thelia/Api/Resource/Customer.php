@@ -24,6 +24,7 @@ use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 
 #[ApiResource(
@@ -54,6 +55,12 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
         'ref',
         'firstname',
         'lastname'
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'createdAt'
     ]
 )]
 class Customer extends AbstractPropelResource

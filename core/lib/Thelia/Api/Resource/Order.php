@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -23,6 +24,10 @@ use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
+use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
+use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 
 #[ApiResource(
     operations: [
@@ -45,6 +50,30 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE,I18n::GROUP_WRITE]]
+)]
+#[ApiFilter(
+    filterClass: SearchFilter::class,
+    properties: [
+        'invoiceOrderAddress.firstname' => 'partial',
+        'invoiceOrderAddress.lastname' => 'partial',
+        'invoiceOrderAddress.company' => 'partial',
+        'title' => 'partial',
+        'totalAmount',
+        'ref' => 'partial',
+        'orderStatus.code',
+    ]
+)]
+#[ApiFilter(
+    filterClass: OrderFilter::class,
+    properties: [
+        'createdAt'
+    ]
+)]
+#[ApiFilter(
+    filterClass: RangeFilter::class,
+    properties: [
+        'discount'
+    ]
 )]
 class Order extends AbstractPropelResource
 {
