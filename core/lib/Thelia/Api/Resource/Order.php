@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
+use Thelia\Api\Bridge\Propel\Filter\DateFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
@@ -74,6 +75,10 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
     properties: [
         'discount'
     ]
+)]
+#[ApiFilter(
+    filterClass: DateFilter::class,
+    properties: ['createdAt' => DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER]
 )]
 class Order extends AbstractPropelResource
 {
