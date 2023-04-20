@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Collection\ArrayCollection;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 #[ApiResource(
@@ -52,13 +53,15 @@ class Cart extends AbstractPropelResource
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?Customer $customer;
 
-    #[Relation(targetResource: OrderAddress::class)]
+    #[Relation(targetResource: Address::class)]
+    #[Column(propelGetter: "getAddressRelatedByAddressDeliveryId")]
     #[Groups([self::GROUP_READ])]
-    public ?Address $addressDelivery;//todo issue
+    public ?Address $addressDelivery;//todo getAddressDeliveryId()
 
-    #[Relation(targetResource: OrderAddress::class)]
+    #[Relation(targetResource: Address::class)]
+    #[Column(propelGetter: "getAddressRelatedByAddressInvoiceId")]
     #[Groups([self::GROUP_READ])]
-    public ?Address $addressInvoice;//todo issue
+    public ?Address $addressInvoice;//todo
 
     #[Relation(targetResource: Currency::class)]
     #[Groups([self::GROUP_READ])]

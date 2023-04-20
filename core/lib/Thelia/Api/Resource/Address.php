@@ -63,16 +63,16 @@ class Address extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'address:read:single';
     public const GROUP_WRITE = 'address:write';
 
-    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE,Cart::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
     public string $label;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE,Cart::GROUP_READ_SINGLE])]
     public string $firstname;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE,Cart::GROUP_READ_SINGLE])]
     public string $lastname;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]

@@ -280,8 +280,6 @@ class OrderAddress extends AbstractPropelResource
         $this->country = $country;
     }
 
-    //todo state
-
     public static function getPropelModelClass(): string
     {
         return \Thelia\Model\OrderAddress::class;

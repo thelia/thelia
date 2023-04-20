@@ -69,7 +69,7 @@ class Customer extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'customer:read:single';
     public const GROUP_WRITE = 'customer:write';
 
-    #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE, Order::GROUP_READ,Cart::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Relation(targetResource: CustomerTitle::class)]
@@ -84,10 +84,10 @@ class Customer extends AbstractPropelResource
     #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE, Order::GROUP_READ])]
     public ?string $ref;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Address::GROUP_READ_SINGLE, Order::GROUP_READ,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Address::GROUP_READ_SINGLE, Order::GROUP_READ,Order::GROUP_READ_SINGLE,Cart::GROUP_READ_SINGLE])]
     public string $firstname;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ,Order::GROUP_READ_SINGLE,Cart::GROUP_READ_SINGLE])]
     public string $lastname;
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE, Order::GROUP_READ,Order::GROUP_READ_SINGLE])]
