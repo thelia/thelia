@@ -129,101 +129,10 @@ class Address extends AbstractPropelResource
         return $this->id;
     }
 
-    public function setId(int $id): self
+    public function setId(?int $id): Address
     {
         $this->id = $id;
-
         return $this;
-    }
-
-    public function getCity(): ?string
-    {
-        return $this->city;
-    }
-
-    public function setCity(?string $city): void
-    {
-        $this->city = $city;
-    }
-
-    public function getIsDefault(): ?bool
-    {
-        return $this->isDefault;
-    }
-
-    public function setIsDefault(?bool $isDefault): void
-    {
-        $this->isDefault = $isDefault;
-    }
-
-    public function getCreatedAt(): ?\DateTime
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTime $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    public function getUpdatedAt(): ?\DateTime
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTime $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    public function getCountry(): Country
-    {
-        return $this->country;
-    }
-
-    public function setCountry(Country $country): void
-    {
-        $this->country = $country;
-    }
-
-    public function getState(): ?State
-    {
-        return $this->state;
-    }
-
-    public function setState(?State $state): void
-    {
-        $this->state = $state;
-    }
-
-    public function getCellphone(): ?string
-    {
-        return $this->cellphone;
-    }
-
-    public function setCellphone(?string $cellphone): void
-    {
-        $this->cellphone = $cellphone;
-    }
-
-    public function getPhone(): ?string
-    {
-        return $this->phone;
-    }
-
-    public function setPhone(?string $phone): void
-    {
-        $this->phone = $phone;
-    }
-
-    public function getCompany(): ?string
-    {
-        return $this->company;
-    }
-
-    public function setCompany(?string $company): void
-    {
-        $this->company = $company;
     }
 
     public function getLabel(): string
@@ -300,6 +209,105 @@ class Address extends AbstractPropelResource
     public function setZipcode(string $zipcode): Address
     {
         $this->zipcode = $zipcode;
+        return $this;
+    }
+
+    public function getCompany(): ?string
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?string $company): Address
+    {
+        $this->company = $company;
+        return $this;
+    }
+
+    public function getCellphone(): ?string
+    {
+        return $this->cellphone;
+    }
+
+    public function setCellphone(?string $cellphone): Address
+    {
+        $this->cellphone = $cellphone;
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): Address
+    {
+        $this->phone = $phone;
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function setCity(?string $city): Address
+    {
+        $this->city = $city;
+        return $this;
+    }
+
+    public function getIsDefault(): ?bool
+    {
+        return $this->isDefault;
+    }
+
+    public function setIsDefault(?bool $isDefault): Address
+    {
+        $this->isDefault = $isDefault;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): Address
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): Address
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    public function getCountry(): Country
+    {
+        return $this->country;
+    }
+
+    public function setCountry(Country $country): Address
+    {
+        $this->country = $country;
+        return $this;
+    }
+
+    public function getState(): ?State
+    {
+        return $this->state;
+    }
+
+    public function setState(?State $state): Address
+    {
+        $this->state = $state;
         return $this;
     }
 

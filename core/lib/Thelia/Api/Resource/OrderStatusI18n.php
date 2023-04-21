@@ -31,14 +31,15 @@ class OrderStatusI18n extends I18n
     #[Groups([OrderStatus::GROUP_READ, OrderStatus::GROUP_WRITE])]
     protected ?string $postscriptum;
 
-    public function getLocale(): ?string
+    public function getLocale(): string
     {
         return $this->locale;
     }
 
-    public function setLocale(?string $locale): void
+    public function setLocale(string $locale): OrderStatusI18n
     {
         $this->locale = $locale;
+        return $this;
     }
 
     public function getTitle(): ?string
@@ -46,9 +47,10 @@ class OrderStatusI18n extends I18n
         return $this->title;
     }
 
-    public function setTitle(?string $title): void
+    public function setTitle(?string $title): OrderStatusI18n
     {
         $this->title = $title;
+        return $this;
     }
 
     public function getDescription(): ?string
@@ -56,9 +58,10 @@ class OrderStatusI18n extends I18n
         return $this->description;
     }
 
-    public function setDescription(?string $description): void
+    public function setDescription(?string $description): OrderStatusI18n
     {
         $this->description = $description;
+        return $this;
     }
 
     public function getChapo(): ?string
@@ -66,9 +69,10 @@ class OrderStatusI18n extends I18n
         return $this->chapo;
     }
 
-    public function setChapo(?string $chapo): void
+    public function setChapo(?string $chapo): OrderStatusI18n
     {
         $this->chapo = $chapo;
+        return $this;
     }
 
     public function getPostscriptum(): ?string
@@ -76,8 +80,9 @@ class OrderStatusI18n extends I18n
         return $this->postscriptum;
     }
 
-    public function setPostscriptum(?string $postscriptum): void
+    public function setPostscriptum(?string $postscriptum): OrderStatusI18n
     {
         $this->postscriptum = $postscriptum;
+        return $this;
     }
 }

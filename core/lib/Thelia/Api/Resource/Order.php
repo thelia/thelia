@@ -33,20 +33,20 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/order'
+            uriTemplate: '/admin/orders'
         ),
         new GetCollection(
-            uriTemplate: '/admin/order'
+            uriTemplate: '/admin/orders'
         ),
         new Get(
-            uriTemplate: '/admin/order/{id}',
+            uriTemplate: '/admin/orders/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/order/{id}'
+            uriTemplate: '/admin/orders/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/order/{id}'
+            uriTemplate: '/admin/orders/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
@@ -193,84 +193,26 @@ class Order extends AbstractPropelResource
         return $this->getPropelModel()->getTotalAmount();
     }
 
-    public function getCartId(): int
+    public function getId(): ?int
     {
-        return $this->cartId;
+        return $this->id;
     }
 
-    public function setCartId(int $cartId): void
+    public function setId(?int $id): Order
     {
-        $this->cartId = $cartId;
+        $this->id = $id;
+        return $this;
     }
 
-    public function getLang(): Lang
+    public function getRef(): ?string
     {
-        return $this->lang;
+        return $this->ref;
     }
 
-    public function setLang(Lang $lang): void
+    public function setRef(?string $ref): Order
     {
-        $this->lang = $lang;
-    }
-
-    public function getCurrencyRate(): ?float
-    {
-        return $this->currencyRate;
-    }
-
-    public function setCurrencyRate(?float $currencyRate): void
-    {
-        $this->currencyRate = $currencyRate;
-    }
-
-    public function getUpdatedAt(): ?\DateTime
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTime $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    public function getDeliveryRef(): ?string
-    {
-        return $this->deliveryRef;
-    }
-
-    public function setDeliveryRef(?string $deliveryRef): void
-    {
-        $this->deliveryRef = $deliveryRef;
-    }
-
-    public function getVersion(): ?int
-    {
-        return $this->version;
-    }
-
-    public function setVersion(?int $version): void
-    {
-        $this->version = $version;
-    }
-
-    public function getVersionCreatedAt(): ?\DateTime
-    {
-        return $this->versionCreatedAt;
-    }
-
-    public function setVersionCreatedAt(?\DateTime $versionCreatedAt): void
-    {
-        $this->versionCreatedAt = $versionCreatedAt;
-    }
-
-    public function getVersionCreatedBy(): ?string
-    {
-        return $this->versionCreatedBy;
-    }
-
-    public function setVersionCreatedBy(?string $versionCreatedBy): void
-    {
-        $this->versionCreatedBy = $versionCreatedBy;
+        $this->ref = $ref;
+        return $this;
     }
 
     public function getInvoiceDate(): ?\DateTime
@@ -278,52 +220,108 @@ class Order extends AbstractPropelResource
         return $this->invoiceDate;
     }
 
-    public function setInvoiceDate(?\DateTime $invoiceDate): void
+    public function setInvoiceDate(?\DateTime $invoiceDate): Order
     {
         $this->invoiceDate = $invoiceDate;
-    }
-
-    public function getDeliveryModule(): Module
-    {
-        return $this->deliveryModule;
-    }
-
-    public function setDeliveryModule(Module $deliveryModule): void
-    {
-        $this->deliveryModule = $deliveryModule;
-    }
-
-    public function getCurrency(): Currency
-    {
-        return $this->currency;
-    }
-
-    public function setCurrency(Currency $currency): void
-    {
-        $this->currency = $currency;
-    }
-
-    public function getPaymentModule(): Module
-    {
-        return $this->paymentModule;
-    }
-
-    public function setPaymentModule(Module $paymentModule): self
-    {
-        $this->paymentModule = $paymentModule;
         return $this;
     }
 
-
-    public function getOrderCoupons(): Collection
+    public function getCurrencyRate(): ?float
     {
-        return $this->orderCoupons;
+        return $this->currencyRate;
     }
 
-
-    public function setOrderCoupons(Collection $orderCoupons): self
+    public function setCurrencyRate(?float $currencyRate): Order
     {
-        $this->orderCoupons = $orderCoupons;
+        $this->currencyRate = $currencyRate;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): Order
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): Order
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    public function getDiscount(): ?float
+    {
+        return $this->discount;
+    }
+
+    public function setDiscount(?float $discount): Order
+    {
+        $this->discount = $discount;
+        return $this;
+    }
+
+    public function getPostage(): float
+    {
+        return $this->postage;
+    }
+
+    public function setPostage(float $postage): Order
+    {
+        $this->postage = $postage;
+        return $this;
+    }
+
+    public function getPostageTax(): float
+    {
+        return $this->postageTax;
+    }
+
+    public function setPostageTax(float $postageTax): Order
+    {
+        $this->postageTax = $postageTax;
+        return $this;
+    }
+
+    public function getPostageTaxRuleTitle(): ?string
+    {
+        return $this->postageTaxRuleTitle;
+    }
+
+    public function setPostageTaxRuleTitle(?string $postageTaxRuleTitle): Order
+    {
+        $this->postageTaxRuleTitle = $postageTaxRuleTitle;
+        return $this;
+    }
+
+    public function getTransactionRef(): ?string
+    {
+        return $this->transactionRef;
+    }
+
+    public function setTransactionRef(?string $transactionRef): Order
+    {
+        $this->transactionRef = $transactionRef;
+        return $this;
+    }
+
+    public function getDeliveryRef(): ?string
+    {
+        return $this->deliveryRef;
+    }
+
+    public function setDeliveryRef(?string $deliveryRef): Order
+    {
+        $this->deliveryRef = $deliveryRef;
         return $this;
     }
 
@@ -332,81 +330,43 @@ class Order extends AbstractPropelResource
         return $this->invoiceRef;
     }
 
-    public function setInvoiceRef(?string $invoiceRef): void
+    public function setInvoiceRef(?string $invoiceRef): Order
     {
         $this->invoiceRef = $invoiceRef;
+        return $this;
     }
 
-    public function getInvoiceOrderAddress(): OrderAddress
+    public function getVersion(): ?int
     {
-        return $this->invoiceOrderAddress;
+        return $this->version;
     }
 
-    public function setInvoiceOrderAddress(OrderAddress $invoiceOrderAddress): void
+    public function setVersion(?int $version): Order
     {
-        $this->invoiceOrderAddress = $invoiceOrderAddress;
+        $this->version = $version;
+        return $this;
     }
 
-    public function getDeliveryOrderAddress(): OrderAddress
+    public function getVersionCreatedAt(): ?\DateTime
     {
-        return $this->deliveryOrderAddress;
+        return $this->versionCreatedAt;
     }
 
-
-    public function setDeliveryOrderAddress(OrderAddress $deliveryOrderAddress): void
+    public function setVersionCreatedAt(?\DateTime $versionCreatedAt): Order
     {
-        $this->deliveryOrderAddress = $deliveryOrderAddress;
+        $this->versionCreatedAt = $versionCreatedAt;
+        return $this;
     }
 
-
-    public function getCustomer(): Customer
+    public function getVersionCreatedBy(): ?string
     {
-        return $this->customer;
+        return $this->versionCreatedBy;
     }
 
-    public function setCustomer(Customer $customer): void
+    public function setVersionCreatedBy(?string $versionCreatedBy): Order
     {
-        $this->customer = $customer;
-    }
-
-    public function getTransactionRef(): ?string
-    {
-        return $this->transactionRef;
-    }
-
-    public function setTransactionRef(?string $transactionRef): void
-    {
-        $this->transactionRef = $transactionRef;
-    }
-
-    public function getPostageTax(): string
-    {
-        return $this->postageTax;
-    }
-
-    public function setPostageTax(string $postageTax): void
-    {
-        $this->postageTax = $postageTax;
-    }
-
-    public function getPostageTaxRuleTitle(): ?string
-    {
-        return $this->postageTaxRuleTitle;
-    }
-
-    public function setPostageTaxRuleTitle(?string $postageTaxRuleTitle): void
-    {
-        $this->postageTaxRuleTitle = $postageTaxRuleTitle;
-    }
-
-    public function getCreatedAt(): ?\DateTime
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTime $createdAt): void
-    {
-        $this->createdAt = $createdAt;
+        $this->versionCreatedBy = $versionCreatedBy;
+        return $this;
     }
 
     public function getOrderProducts(): Collection
@@ -414,10 +374,64 @@ class Order extends AbstractPropelResource
         return $this->orderProducts;
     }
 
-    public function setOrderProducts(Collection $orderProducts): self
+    public function setOrderProducts(Collection $orderProducts): Order
     {
         $this->orderProducts = $orderProducts;
+        return $this;
+    }
 
+    public function getOrderCoupons(): Collection
+    {
+        return $this->orderCoupons;
+    }
+
+    public function setOrderCoupons(Collection $orderCoupons): Order
+    {
+        $this->orderCoupons = $orderCoupons;
+        return $this;
+    }
+
+    public function getInvoiceOrderAddress(): OrderAddress
+    {
+        return $this->invoiceOrderAddress;
+    }
+
+    public function setInvoiceOrderAddress(OrderAddress $invoiceOrderAddress): Order
+    {
+        $this->invoiceOrderAddress = $invoiceOrderAddress;
+        return $this;
+    }
+
+    public function getDeliveryOrderAddress(): OrderAddress
+    {
+        return $this->deliveryOrderAddress;
+    }
+
+    public function setDeliveryOrderAddress(OrderAddress $deliveryOrderAddress): Order
+    {
+        $this->deliveryOrderAddress = $deliveryOrderAddress;
+        return $this;
+    }
+
+    public function getPaymentModule(): Module
+    {
+        return $this->paymentModule;
+    }
+
+    public function setPaymentModule(Module $paymentModule): Order
+    {
+        $this->paymentModule = $paymentModule;
+        return $this;
+    }
+
+    public function getDeliveryModule(): Module
+    {
+        return $this->deliveryModule;
+    }
+
+    public function setDeliveryModule(Module $deliveryModule): Order
+    {
+        $this->deliveryModule = $deliveryModule;
         return $this;
     }
 
@@ -426,52 +440,53 @@ class Order extends AbstractPropelResource
         return $this->orderStatus;
     }
 
-    public function setOrderStatus(OrderStatus $orderStatus): self
+    public function setOrderStatus(OrderStatus $orderStatus): Order
     {
         $this->orderStatus = $orderStatus;
-
         return $this;
     }
 
-    public function getId(): ?int
+    public function getCustomer(): Customer
     {
-        return $this->id;
+        return $this->customer;
     }
 
-    public function setId(?int $id): void
+    public function setCustomer(Customer $customer): Order
     {
-        $this->id = $id;
+        $this->customer = $customer;
+        return $this;
     }
 
-    public function getDiscount(): ?string
+    public function getCurrency(): Currency
     {
-        return $this->discount;
+        return $this->currency;
     }
 
-    public function setDiscount(?string $discount): void
+    public function setCurrency(Currency $currency): Order
     {
-        $this->discount = $discount;
+        $this->currency = $currency;
+        return $this;
     }
 
-    public function getPostage(): string
+    public function getLang(): Lang
     {
-        return $this->postage;
+        return $this->lang;
     }
 
-    public function setPostage(string $postage): void
+    public function setLang(Lang $lang): Order
     {
-        $this->postage = $postage;
+        $this->lang = $lang;
+        return $this;
     }
 
-    public function getRef(): ?string
+    public function getCartId(): int
     {
-        return $this->ref;
+        return $this->cartId;
     }
 
-    public function setRef(?string $ref): self
+    public function setCartId(int $cartId): Order
     {
-        $this->ref = $ref;
-
+        $this->cartId = $cartId;
         return $this;
     }
 

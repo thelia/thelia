@@ -62,45 +62,14 @@ class CustomerTitle extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ_SINGLE])]
     public ?\DateTime $updatedAt;
 
-    public function getByDefault(): int
-    {
-        return $this->byDefault;
-    }
-
-    public function setByDefault(int $byDefault): void
-    {
-        $this->byDefault = $byDefault;
-    }
-
-    public function getCreatedAt(): ?\DateTime
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTime $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    public function getUpdatedAt(): ?\DateTime
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTime $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(int $id): self
+    public function setId(?int $id): CustomerTitle
     {
         $this->id = $id;
-
         return $this;
     }
 
@@ -112,6 +81,39 @@ class CustomerTitle extends AbstractTranslatableResource
     public function setPosition(string $position): CustomerTitle
     {
         $this->position = $position;
+        return $this;
+    }
+
+    public function getByDefault(): int
+    {
+        return $this->byDefault;
+    }
+
+    public function setByDefault(int $byDefault): CustomerTitle
+    {
+        $this->byDefault = $byDefault;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): CustomerTitle
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): CustomerTitle
+    {
+        $this->updatedAt = $updatedAt;
         return $this;
     }
 

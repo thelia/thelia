@@ -42,7 +42,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE, I18n::GROUP_WRITE]]
 )]
-//todo faire les filtres
+//todo add filters
 class OrderStatus extends AbstractTranslatableResource
 {
     public const GROUP_READ = 'order_status:read';
@@ -70,44 +70,15 @@ class OrderStatus extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $updatedAt;
 
-    public function getPosition(): ?int
+    public function getId(): ?int
     {
-        return $this->position;
+        return $this->id;
     }
 
-    public function setPosition(?int $position): void
+    public function setId(?int $id): OrderStatus
     {
-        $this->position = $position;
-    }
-
-    public function getProtectedStatus(): ?bool
-    {
-        return $this->protectedStatus;
-    }
-
-    public function setProtectedStatus(?bool $protectedStatus): void
-    {
-        $this->protectedStatus = $protectedStatus;
-    }
-
-    public function getCreatedAt(): ?\DateTime
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTime $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    public function getUpdatedAt(): ?\DateTime
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTime $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
+        $this->id = $id;
+        return $this;
     }
 
     public function getCode(): string
@@ -115,9 +86,10 @@ class OrderStatus extends AbstractTranslatableResource
         return $this->code;
     }
 
-    public function setCode(string $code): void
+    public function setCode(string $code): OrderStatus
     {
         $this->code = $code;
+        return $this;
     }
 
     public function getColor(): ?string
@@ -125,19 +97,54 @@ class OrderStatus extends AbstractTranslatableResource
         return $this->color;
     }
 
-    public function setColor(?string $color): void
+    public function setColor(?string $color): OrderStatus
     {
         $this->color = $color;
+        return $this;
     }
 
-    public function getId(): ?int
+    public function getPosition(): ?int
     {
-        return $this->id;
+        return $this->position;
     }
 
-    public function setId(?int $id): void
+    public function setPosition(?int $position): OrderStatus
     {
-        $this->id = $id;
+        $this->position = $position;
+        return $this;
+    }
+
+    public function getProtectedStatus(): ?bool
+    {
+        return $this->protectedStatus;
+    }
+
+    public function setProtectedStatus(?bool $protectedStatus): OrderStatus
+    {
+        $this->protectedStatus = $protectedStatus;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): OrderStatus
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): OrderStatus
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
     }
 
     public static function getPropelModelClass(): string

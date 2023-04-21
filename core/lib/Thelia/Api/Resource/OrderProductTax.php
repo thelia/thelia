@@ -13,17 +13,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/order_product_tax'
+            uriTemplate: '/admin/order_product_taxes'
         ),
         new Get(
-            uriTemplate: '/admin/order_product_tax/{id}',
+            uriTemplate: '/admin/order_product_taxes/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/order_product_tax/{id}'
+            uriTemplate: '/admin/order_product_taxes/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/order_product_tax/{id}'
+            uriTemplate: '/admin/order_product_taxes/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
@@ -64,9 +64,10 @@ class OrderProductTax extends AbstractPropelResource
         return $this->id;
     }
 
-    public function setId(?int $id): void
+    public function setId(?int $id): OrderProductTax
     {
         $this->id = $id;
+        return $this;
     }
 
     public function getOrderProduct(): OrderProduct
@@ -74,9 +75,10 @@ class OrderProductTax extends AbstractPropelResource
         return $this->orderProduct;
     }
 
-    public function setOrderProduct(OrderProduct $orderProduct): void
+    public function setOrderProduct(OrderProduct $orderProduct): OrderProductTax
     {
         $this->orderProduct = $orderProduct;
+        return $this;
     }
 
     public function getTitle(): string
@@ -84,9 +86,10 @@ class OrderProductTax extends AbstractPropelResource
         return $this->title;
     }
 
-    public function setTitle(string $title): void
+    public function setTitle(string $title): OrderProductTax
     {
         $this->title = $title;
+        return $this;
     }
 
     public function getDescription(): ?string
@@ -94,9 +97,10 @@ class OrderProductTax extends AbstractPropelResource
         return $this->description;
     }
 
-    public function setDescription(?string $description): void
+    public function setDescription(?string $description): OrderProductTax
     {
         $this->description = $description;
+        return $this;
     }
 
     public function getAmount(): float
@@ -104,9 +108,10 @@ class OrderProductTax extends AbstractPropelResource
         return $this->amount;
     }
 
-    public function setAmount(float $amount): void
+    public function setAmount(float $amount): OrderProductTax
     {
         $this->amount = $amount;
+        return $this;
     }
 
     public function getPromoAmount(): ?float
@@ -114,9 +119,10 @@ class OrderProductTax extends AbstractPropelResource
         return $this->promoAmount;
     }
 
-    public function setPromoAmount(?float $promoAmount): void
+    public function setPromoAmount(?float $promoAmount): OrderProductTax
     {
         $this->promoAmount = $promoAmount;
+        return $this;
     }
 
     public function getCreatedAt(): ?\DateTime
@@ -124,9 +130,10 @@ class OrderProductTax extends AbstractPropelResource
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): void
+    public function setCreatedAt(?\DateTime $createdAt): OrderProductTax
     {
         $this->createdAt = $createdAt;
+        return $this;
     }
 
     public function getUpdatedAt(): ?\DateTime
@@ -134,9 +141,10 @@ class OrderProductTax extends AbstractPropelResource
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): void
+    public function setUpdatedAt(?\DateTime $updatedAt): OrderProductTax
     {
         $this->updatedAt = $updatedAt;
+        return $this;
     }
 
     public static function getPropelModelClass(): string

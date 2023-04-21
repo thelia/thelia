@@ -17,9 +17,10 @@ class CurrencyI18n extends I18n
         return $this->locale;
     }
 
-    public function setLocale(string $locale): void
+    public function setLocale(string $locale): CurrencyI18n
     {
         $this->locale = $locale;
+        return $this;
     }
 
     public function getName(): ?string
@@ -27,8 +28,9 @@ class CurrencyI18n extends I18n
         return $this->name;
     }
 
-    public function setName(?string $name): void
+    public function setName(?string $name): CurrencyI18n
     {
         $this->name = $name;
+        return $this;
     }
 }

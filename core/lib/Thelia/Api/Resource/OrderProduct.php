@@ -27,17 +27,17 @@ use function PHPUnit\Framework\isInstanceOf;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/order_product'
+            uriTemplate: '/admin/order_products'
         ),
         new Get(
-            uriTemplate: '/admin/order_product/{id}',
+            uriTemplate: '/admin/order_products/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/order_product/{id}'
+            uriTemplate: '/admin/order_products/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/order_product/{id}'
+            uriTemplate: '/admin/order_products/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
@@ -131,24 +131,15 @@ class OrderProduct extends AbstractPropelResource
         $this->orderProductTaxes = new ArrayCollection();
     }
 
-    public function getUnitTaxedPrice(): ?float
+    public function getId(): ?int
     {
-        return $this->unitTaxedPrice;
+        return $this->id;
     }
 
-    public function setUnitTaxedPrice(?float $unitTaxedPrice): void
+    public function setId(?int $id): OrderProduct
     {
-        $this->unitTaxedPrice = $unitTaxedPrice;
-    }
-
-    public function getOrderProductTaxes(): Collection
-    {
-        return $this->orderProductTaxes;
-    }
-
-    public function setOrderProductTaxes(Collection $orderProductTaxes): void
-    {
-        $this->orderProductTaxes = $orderProductTaxes;
+        $this->id = $id;
+        return $this;
     }
 
     public function getOrder(): Order
@@ -156,161 +147,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->order;
     }
 
-    public function setOrder(Order $order): void
+    public function setOrder(Order $order): OrderProduct
     {
         $this->order = $order;
-    }
-
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(?string $title): void
-    {
-        $this->title = $title;
-    }
-
-    public function getChapo(): ?string
-    {
-        return $this->chapo;
-    }
-
-    public function setChapo(?string $chapo): void
-    {
-        $this->chapo = $chapo;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): void
-    {
-        $this->description = $description;
-    }
-
-    public function getPostscriptum(): ?string
-    {
-        return $this->postscriptum;
-    }
-
-    public function setPostscriptum(?string $postscriptum): void
-    {
-        $this->postscriptum = $postscriptum;
-    }
-
-    public function getWasNew(): bool
-    {
-        return $this->wasNew;
-    }
-
-    public function setWasNew(bool $wasNew): void
-    {
-        $this->wasNew = $wasNew;
-    }
-
-    public function getWasInPromo(): bool
-    {
-        return $this->wasInPromo;
-    }
-
-    public function setWasInPromo(bool $wasInPromo): void
-    {
-        $this->wasInPromo = $wasInPromo;
-    }
-
-    public function getEanCode(): ?string
-    {
-        return $this->eanCode;
-    }
-
-    public function setEanCode(?string $eanCode): void
-    {
-        $this->eanCode = $eanCode;
-    }
-
-    public function getParent(): ?int
-    {
-        return $this->parent;
-    }
-
-    public function setParent(?int $parent): void
-    {
-        $this->parent = $parent;
-    }
-
-    public function isVirtual(): bool
-    {
-        return $this->virtual;
-    }
-
-    public function setVirtual(bool $virtual): void
-    {
-        $this->virtual = $virtual;
-    }
-
-    public function getVirtualDocument(): ?bool
-    {
-        return $this->virtualDocument;
-    }
-
-    public function setVirtualDocument(?bool $virtualDocument): void
-    {
-        $this->virtualDocument = $virtualDocument;
-    }
-
-    public function getCreatedAt(): ?\DateTime
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTime $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    public function getUpdatedAt(): ?\DateTime
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTime $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    public function getProductSaleElementsId(): ?int
-    {
-        return $this->productSaleElementsId;
-    }
-
-    public function setProductSaleElementsId(?int $productSaleElementsId): void
-    {
-        $this->productSaleElementsId = $productSaleElementsId;
-    }
-
-    public function getTaxRuleTitle(): ?string
-    {
-        return $this->taxRuleTitle;
-    }
-
-
-    public function setTaxRuleTitle(?string $taxRuleTitle): void
-    {
-        $this->taxRuleTitle = $taxRuleTitle;
-    }
-
-    public function getTaxRuleDescription(): ?string
-    {
-        return $this->taxRuleDescription;
-    }
-
-
-    public function setTaxRuleDescription(?string $taxRuleDescription): void
-    {
-        $this->taxRuleDescription = $taxRuleDescription;
+        return $this;
     }
 
     public function getProductRef(): string
@@ -318,9 +158,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->productRef;
     }
 
-    public function setProductRef(string $productRef): void
+    public function setProductRef(string $productRef): OrderProduct
     {
         $this->productRef = $productRef;
+        return $this;
     }
 
     public function getProductSaleElementsRef(): string
@@ -328,9 +169,65 @@ class OrderProduct extends AbstractPropelResource
         return $this->productSaleElementsRef;
     }
 
-    public function setProductSaleElementsRef(string $productSaleElementsRef): void
+    public function setProductSaleElementsRef(string $productSaleElementsRef): OrderProduct
     {
         $this->productSaleElementsRef = $productSaleElementsRef;
+        return $this;
+    }
+
+    public function getProductSaleElementsId(): ?int
+    {
+        return $this->productSaleElementsId;
+    }
+
+    public function setProductSaleElementsId(?int $productSaleElementsId): OrderProduct
+    {
+        $this->productSaleElementsId = $productSaleElementsId;
+        return $this;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(?string $title): OrderProduct
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    public function getChapo(): ?string
+    {
+        return $this->chapo;
+    }
+
+    public function setChapo(?string $chapo): OrderProduct
+    {
+        $this->chapo = $chapo;
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): OrderProduct
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    public function getPostscriptum(): ?string
+    {
+        return $this->postscriptum;
+    }
+
+    public function setPostscriptum(?string $postscriptum): OrderProduct
+    {
+        $this->postscriptum = $postscriptum;
+        return $this;
     }
 
     public function getQuantity(): int
@@ -338,9 +235,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->quantity;
     }
 
-    public function setQuantity(int $quantity): void
+    public function setQuantity(int $quantity): OrderProduct
     {
         $this->quantity = $quantity;
+        return $this;
     }
 
     public function getPrice(): float
@@ -348,19 +246,48 @@ class OrderProduct extends AbstractPropelResource
         return $this->price;
     }
 
-    public function setPrice(float $price): void
+    public function setPrice(float $price): OrderProduct
     {
         $this->price = $price;
+        return $this;
     }
 
-    public function getPromoPrice(): ?int
+    public function getPromoPrice(): ?float
     {
         return $this->promoPrice;
     }
 
-    public function setPromoPrice(?int $promoPrice): void
+    public function setPromoPrice(?float $promoPrice): OrderProduct
     {
         $this->promoPrice = $promoPrice;
+        return $this;
+    }
+
+    public function getUnitTaxedPrice(): ?float
+    {
+        return $this->unitTaxedPrice;
+    }
+
+    public function isWasNew(): bool
+    {
+        return $this->wasNew;
+    }
+
+    public function setWasNew(bool $wasNew): OrderProduct
+    {
+        $this->wasNew = $wasNew;
+        return $this;
+    }
+
+    public function isWasInPromo(): bool
+    {
+        return $this->wasInPromo;
+    }
+
+    public function setWasInPromo(bool $wasInPromo): OrderProduct
+    {
+        $this->wasInPromo = $wasInPromo;
+        return $this;
     }
 
     public function getWeight(): ?float
@@ -368,20 +295,109 @@ class OrderProduct extends AbstractPropelResource
         return $this->weight;
     }
 
-    public function setWeight(?float $weight): void
+    public function setWeight(?float $weight): OrderProduct
     {
         $this->weight = $weight;
+        return $this;
     }
 
-
-    public function getId(): ?int
+    public function getEanCode(): ?string
     {
-        return $this->id;
+        return $this->eanCode;
     }
 
-    public function setId(?int $id): void
+    public function setEanCode(?string $eanCode): OrderProduct
     {
-        $this->id = $id;
+        $this->eanCode = $eanCode;
+        return $this;
+    }
+
+    public function getTaxRuleTitle(): ?string
+    {
+        return $this->taxRuleTitle;
+    }
+
+    public function setTaxRuleTitle(?string $taxRuleTitle): OrderProduct
+    {
+        $this->taxRuleTitle = $taxRuleTitle;
+        return $this;
+    }
+
+    public function getTaxRuleDescription(): ?string
+    {
+        return $this->taxRuleDescription;
+    }
+
+    public function setTaxRuleDescription(?string $taxRuleDescription): OrderProduct
+    {
+        $this->taxRuleDescription = $taxRuleDescription;
+        return $this;
+    }
+
+    public function getParent(): ?int
+    {
+        return $this->parent;
+    }
+
+    public function setParent(?int $parent): OrderProduct
+    {
+        $this->parent = $parent;
+        return $this;
+    }
+
+    public function isVirtual(): bool
+    {
+        return $this->virtual;
+    }
+
+    public function setVirtual(bool $virtual): OrderProduct
+    {
+        $this->virtual = $virtual;
+        return $this;
+    }
+
+    public function getVirtualDocument(): ?bool
+    {
+        return $this->virtualDocument;
+    }
+
+    public function setVirtualDocument(?bool $virtualDocument): OrderProduct
+    {
+        $this->virtualDocument = $virtualDocument;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): OrderProduct
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): OrderProduct
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    public function getOrderProductTaxes(): Collection
+    {
+        return $this->orderProductTaxes;
+    }
+
+    public function setOrderProductTaxes(Collection $orderProductTaxes): OrderProduct
+    {
+        $this->orderProductTaxes = $orderProductTaxes;
+        return $this;
     }
 
     public function afterModelToResource(array $context): void
@@ -404,13 +420,12 @@ class OrderProduct extends AbstractPropelResource
                     }
                 }
                 if (!$this->getPropelModel()->getWasInPromo()) {
-                    $this->setUnitTaxedPrice($this->getPropelModel()->getPrice() + $totalTax);
+                    $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalTax;
                 }
                 if ($this->getPropelModel()->getWasInPromo()) {
-                    $this->setUnitTaxedPrice($this->getPropelModel()->getPrice()  + $totalPromoTax);
+                    $this->unitTaxedPrice = $this->getPropelModel()->getPrice()  + $totalPromoTax;
                 }
             }
-            //
         }
     }
 

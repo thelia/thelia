@@ -80,9 +80,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->id;
     }
 
-    public function setId(?int $id): void
+    public function setId(?int $id): ProductSaleElements
     {
         $this->id = $id;
+        return $this;
     }
 
     public function getProduct(): ?Product
@@ -90,9 +91,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->product;
     }
 
-    public function setProduct(?Product $product): void
+    public function setProduct(?Product $product): ProductSaleElements
     {
         $this->product = $product;
+        return $this;
     }
 
     public function getRef(): string
@@ -100,9 +102,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->ref;
     }
 
-    public function setRef(string $ref): void
+    public function setRef(string $ref): ProductSaleElements
     {
         $this->ref = $ref;
+        return $this;
     }
 
     public function getQuantity(): int
@@ -110,9 +113,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->quantity;
     }
 
-    public function setQuantity(int $quantity): void
+    public function setQuantity(int $quantity): ProductSaleElements
     {
         $this->quantity = $quantity;
+        return $this;
     }
 
     public function getPromo(): ?bool
@@ -120,9 +124,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->promo;
     }
 
-    public function setPromo(?bool $promo): void
+    public function setPromo(?bool $promo): ProductSaleElements
     {
         $this->promo = $promo;
+        return $this;
     }
 
     public function getNewness(): ?bool
@@ -130,9 +135,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->newness;
     }
 
-    public function setNewness(?bool $newness): void
+    public function setNewness(?bool $newness): ProductSaleElements
     {
         $this->newness = $newness;
+        return $this;
     }
 
     public function getWeight(): ?float
@@ -140,9 +146,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->weight;
     }
 
-    public function setWeight(?float $weight): void
+    public function setWeight(?float $weight): ProductSaleElements
     {
         $this->weight = $weight;
+        return $this;
     }
 
     public function getIsDefault(): ?bool
@@ -150,9 +157,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->isDefault;
     }
 
-    public function setIsDefault(?bool $isDefault): void
+    public function setIsDefault(?bool $isDefault): ProductSaleElements
     {
         $this->isDefault = $isDefault;
+        return $this;
     }
 
     public function getEanCode(): ?string
@@ -160,9 +168,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->eanCode;
     }
 
-    public function setEanCode(?string $eanCode): void
+    public function setEanCode(?string $eanCode): ProductSaleElements
     {
         $this->eanCode = $eanCode;
+        return $this;
     }
 
     public function getCreatedAt(): ?\DateTime
@@ -170,9 +179,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): void
+    public function setCreatedAt(?\DateTime $createdAt): ProductSaleElements
     {
         $this->createdAt = $createdAt;
+        return $this;
     }
 
     public function getUpdatedAt(): ?\DateTime
@@ -180,9 +190,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): void
+    public function setUpdatedAt(?\DateTime $updatedAt): ProductSaleElements
     {
         $this->updatedAt = $updatedAt;
+        return $this;
     }
 
     public static function getPropelModelClass(): string

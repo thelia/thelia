@@ -12,20 +12,20 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/module'
+            uriTemplate: '/admin/modules'
         ),
         new GetCollection(
-            uriTemplate: '/admin/module'
+            uriTemplate: '/admin/modules'
         ),
         new Get(
-            uriTemplate: '/admin/module/{id}',
+            uriTemplate: '/admin/modules/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/module/{id}'
+            uriTemplate: '/admin/modules/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/module/{id}'
+            uriTemplate: '/admin/modules/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ]],
@@ -78,9 +78,10 @@ class Module extends AbstractTranslatableResource
         return $this->id;
     }
 
-    public function setId(?int $id): void
+    public function setId(?int $id): Module
     {
         $this->id = $id;
+        return $this;
     }
 
     public function getCode(): string
@@ -88,9 +89,10 @@ class Module extends AbstractTranslatableResource
         return $this->code;
     }
 
-    public function setCode(string $code): void
+    public function setCode(string $code): Module
     {
         $this->code = $code;
+        return $this;
     }
 
     public function getCategory(): string
@@ -98,9 +100,10 @@ class Module extends AbstractTranslatableResource
         return $this->category;
     }
 
-    public function setCategory(string $category): void
+    public function setCategory(string $category): Module
     {
         $this->category = $category;
+        return $this;
     }
 
     public function getType(): string
@@ -108,9 +111,10 @@ class Module extends AbstractTranslatableResource
         return $this->type;
     }
 
-    public function setType(string $type): void
+    public function setType(string $type): Module
     {
         $this->type = $type;
+        return $this;
     }
 
     public function getVersion(): string
@@ -118,9 +122,10 @@ class Module extends AbstractTranslatableResource
         return $this->version;
     }
 
-    public function setVersion(string $version): void
+    public function setVersion(string $version): Module
     {
         $this->version = $version;
+        return $this;
     }
 
     public function getActivate(): ?bool
@@ -128,9 +133,10 @@ class Module extends AbstractTranslatableResource
         return $this->activate;
     }
 
-    public function setActivate(?bool $activate): void
+    public function setActivate(?bool $activate): Module
     {
         $this->activate = $activate;
+        return $this;
     }
 
     public function getFullNamespace(): ?string
@@ -138,9 +144,10 @@ class Module extends AbstractTranslatableResource
         return $this->fullNamespace;
     }
 
-    public function setFullNamespace(?string $fullNamespace): void
+    public function setFullNamespace(?string $fullNamespace): Module
     {
         $this->fullNamespace = $fullNamespace;
+        return $this;
     }
 
     public function getHidden(): ?bool
@@ -148,9 +155,10 @@ class Module extends AbstractTranslatableResource
         return $this->hidden;
     }
 
-    public function setHidden(?bool $hidden): void
+    public function setHidden(?bool $hidden): Module
     {
         $this->hidden = $hidden;
+        return $this;
     }
 
     public function getPosition(): ?int
@@ -158,9 +166,10 @@ class Module extends AbstractTranslatableResource
         return $this->position;
     }
 
-    public function setPosition(?int $position): void
+    public function setPosition(?int $position): Module
     {
         $this->position = $position;
+        return $this;
     }
 
     public function getMandatory(): ?bool
@@ -168,9 +177,10 @@ class Module extends AbstractTranslatableResource
         return $this->mandatory;
     }
 
-    public function setMandatory(?bool $mandatory): void
+    public function setMandatory(?bool $mandatory): Module
     {
         $this->mandatory = $mandatory;
+        return $this;
     }
 
     public function getCreatedAt(): ?\DateTime
@@ -178,9 +188,10 @@ class Module extends AbstractTranslatableResource
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): void
+    public function setCreatedAt(?\DateTime $createdAt): Module
     {
         $this->createdAt = $createdAt;
+        return $this;
     }
 
     public function getUpdatedAt(): ?\DateTime
@@ -188,11 +199,11 @@ class Module extends AbstractTranslatableResource
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): void
+    public function setUpdatedAt(?\DateTime $updatedAt): Module
     {
         $this->updatedAt = $updatedAt;
+        return $this;
     }
-
 
     public static function getPropelModelClass(): string
     {

@@ -15,19 +15,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/country'
+            uriTemplate: '/admin/countries'
         ),
         new GetCollection(
-            uriTemplate: '/admin/country'
+            uriTemplate: '/admin/countries'
         ),
         new Get(
-            uriTemplate: '/admin/country/{id}'
+            uriTemplate: '/admin/countries/{id}'
         ),
         new Put(
-            uriTemplate: '/admin/country/{id}'
+            uriTemplate: '/admin/countries/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/country/{id}'
+            uriTemplate: '/admin/countries/{id}'
         )
     ],
     normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ]],
@@ -80,9 +80,10 @@ class Country extends AbstractTranslatableResource
         return $this->id;
     }
 
-    public function setId(?int $id): void
+    public function setId(?int $id): Country
     {
         $this->id = $id;
+        return $this;
     }
 
     public function isVisible(): bool
@@ -90,9 +91,10 @@ class Country extends AbstractTranslatableResource
         return $this->visible;
     }
 
-    public function setVisible(bool $visible): void
+    public function setVisible(bool $visible): Country
     {
         $this->visible = $visible;
+        return $this;
     }
 
     public function getIsocode(): string
@@ -100,9 +102,10 @@ class Country extends AbstractTranslatableResource
         return $this->isocode;
     }
 
-    public function setIsocode(string $isocode): void
+    public function setIsocode(string $isocode): Country
     {
         $this->isocode = $isocode;
+        return $this;
     }
 
     public function getIsoalpha2(): ?string
@@ -110,9 +113,10 @@ class Country extends AbstractTranslatableResource
         return $this->isoalpha2;
     }
 
-    public function setIsoalpha2(?string $isoalpha2): void
+    public function setIsoalpha2(?string $isoalpha2): Country
     {
         $this->isoalpha2 = $isoalpha2;
+        return $this;
     }
 
     public function getIsoalpha3(): ?string
@@ -120,9 +124,10 @@ class Country extends AbstractTranslatableResource
         return $this->isoalpha3;
     }
 
-    public function setIsoalpha3(?string $isoalpha3): void
+    public function setIsoalpha3(?string $isoalpha3): Country
     {
         $this->isoalpha3 = $isoalpha3;
+        return $this;
     }
 
     public function getHasStates(): ?bool
@@ -130,9 +135,10 @@ class Country extends AbstractTranslatableResource
         return $this->hasStates;
     }
 
-    public function setHasStates(?bool $hasStates): void
+    public function setHasStates(?bool $hasStates): Country
     {
         $this->hasStates = $hasStates;
+        return $this;
     }
 
     public function getNeedZipCode(): ?bool
@@ -140,20 +146,21 @@ class Country extends AbstractTranslatableResource
         return $this->needZipCode;
     }
 
-    public function setNeedZipCode(?bool $needZipCode): void
+    public function setNeedZipCode(?bool $needZipCode): Country
     {
         $this->needZipCode = $needZipCode;
+        return $this;
     }
-
 
     public function getZipCodeFormat(): ?string
     {
         return $this->zipCodeFormat;
     }
 
-    public function setZipCodeFormat(?string $zipCodeFormat): void
+    public function setZipCodeFormat(?string $zipCodeFormat): Country
     {
         $this->zipCodeFormat = $zipCodeFormat;
+        return $this;
     }
 
     public function getByDefault(): ?bool
@@ -161,34 +168,32 @@ class Country extends AbstractTranslatableResource
         return $this->byDefault;
     }
 
-
-    public function setByDefault(?bool $byDefault): void
+    public function setByDefault(?bool $byDefault): Country
     {
         $this->byDefault = $byDefault;
+        return $this;
     }
-
 
     public function getShopCountry(): ?bool
     {
         return $this->shopCountry;
     }
 
-
-    public function setShopCountry(?bool $shopCountry): void
+    public function setShopCountry(?bool $shopCountry): Country
     {
         $this->shopCountry = $shopCountry;
+        return $this;
     }
-
 
     public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-
-    public function setCreatedAt(?\DateTime $createdAt): void
+    public function setCreatedAt(?\DateTime $createdAt): Country
     {
         $this->createdAt = $createdAt;
+        return $this;
     }
 
     public function getUpdatedAt(): ?\DateTime
@@ -196,9 +201,10 @@ class Country extends AbstractTranslatableResource
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): void
+    public function setUpdatedAt(?\DateTime $updatedAt): Country
     {
         $this->updatedAt = $updatedAt;
+        return $this;
     }
 
     public static function getPropelModelClass(): string
