@@ -150,16 +150,16 @@ class Order extends AbstractPropelResource
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public OrderAddress $invoiceOrderAddress;
 
-    #[Relation(targetResource: OrderAddress::class,relationAlias: "OrderAddressRelatedByInvoiceOrderAddressId")]
+    #[Relation(targetResource: OrderAddress::class,relationAlias: "OrderAddressRelatedByDeliveryOrderAddressId")]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public OrderAddress $deliveryOrderAddress;
 
     #[Relation(targetResource: Module::class,relationAlias: "ModuleRelatedByPaymentModuleId")]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_WRITE])]
     public Module $paymentModule;
 
     #[Relation(targetResource: Module::class,relationAlias: "ModuleRelatedByDeliveryModuleId")]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_WRITE])]
     public Module $deliveryModule;
 
     #[Relation(targetResource: OrderStatus::class)]
