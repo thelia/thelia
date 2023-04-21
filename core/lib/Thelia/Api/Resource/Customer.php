@@ -76,8 +76,7 @@ class Customer extends AbstractPropelResource
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE, Address::GROUP_READ_SINGLE])]
     public CustomerTitle $customerTitle;
 
-    #[Relation(targetResource: Lang::class)]
-    #[Column(propelGetter: "getLangModel")]
+    #[Relation(targetResource: Lang::class, relationAlias: "LangModel")]
     #[Groups([self::GROUP_READ_SINGLE,self::GROUP_WRITE])]
     public ?Lang $lang;
 

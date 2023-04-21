@@ -58,6 +58,7 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
         'invoiceOrderAddress.firstname' => 'partial',
         'invoiceOrderAddress.lastname' => 'partial',
         'invoiceOrderAddress.company' => 'partial',
+        'paymentModule.code' => 'partial',
         'title' => 'partial',
         'totalAmount',
         'ref' => 'partial',
@@ -145,24 +146,20 @@ class Order extends AbstractPropelResource
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Collection $orderCoupons;
 
-    #[Relation(targetResource: OrderAddress::class)]
-    #[Column(propelGetter: "getOrderAddressRelatedByInvoiceOrderAddressId")]
+    #[Relation(targetResource: OrderAddress::class,relationAlias: "OrderAddressRelatedByInvoiceOrderAddressId")]
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public OrderAddress $invoiceOrderAddress;
 
-    #[Relation(targetResource: OrderAddress::class)]
-    #[Column(propelGetter: "getOrderAddressRelatedByDeliveryOrderAddressId")]
+    #[Relation(targetResource: OrderAddress::class,relationAlias: "OrderAddressRelatedByInvoiceOrderAddressId")]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public OrderAddress $deliveryOrderAddress;
 
-    #[Relation(targetResource: Module::class)]
+    #[Relation(targetResource: Module::class,relationAlias: "ModuleRelatedByPaymentModuleId")]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    #[Column(propelGetter: "getModuleRelatedByPaymentModuleId")]
     public Module $paymentModule;
 
-    #[Relation(targetResource: Module::class)]
+    #[Relation(targetResource: Module::class,relationAlias: "ModuleRelatedByDeliveryModuleId")]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    #[Column(propelGetter: "getModuleRelatedByDeliveryModuleId")]
     public Module $deliveryModule;
 
     #[Relation(targetResource: OrderStatus::class)]

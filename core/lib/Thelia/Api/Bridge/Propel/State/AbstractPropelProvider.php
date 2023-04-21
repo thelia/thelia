@@ -67,8 +67,8 @@ abstract class AbstractPropelProvider implements ProviderInterface
                 }
             }
             foreach ($property->getAttributes(Relation::class) as $relationAttribute){
-                if (isset($relationAttribute->getArguments()['relationsAlias'])){
-                    $propelGetter = 'get'.$relationAttribute->getArguments()['relationsAlias'];
+                if (isset($relationAttribute->getArguments()['relationAlias'])){
+                    $propelGetter = 'get'.$relationAttribute->getArguments()['relationAlias'];
                 }
             }
 

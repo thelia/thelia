@@ -53,13 +53,11 @@ class Cart extends AbstractPropelResource
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?Customer $customer;
 
-    #[Relation(targetResource: Address::class)]
-    #[Column(propelGetter: "getAddressRelatedByAddressDeliveryId")]
+    #[Relation(targetResource: Address::class, relationAlias: "AddressRelatedByAddressDeliveryId")]
     #[Groups([self::GROUP_READ])]
     public ?Address $addressDelivery;//todo getAddressDeliveryId()
 
-    #[Relation(targetResource: Address::class)]
-    #[Column(propelGetter: "getAddressRelatedByAddressInvoiceId")]
+    #[Relation(targetResource: Address::class, relationAlias: "AddressRelatedByAddressInvoiceId")]
     #[Groups([self::GROUP_READ])]
     public ?Address $addressInvoice;//todo
 
