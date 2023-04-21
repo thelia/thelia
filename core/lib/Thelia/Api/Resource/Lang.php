@@ -14,20 +14,20 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/lang'
+            uriTemplate: '/admin/languages'
         ),
         new GetCollection(
-            uriTemplate: '/admin/lang'
+            uriTemplate: '/admin/languages'
         ),
         new Get(
-            uriTemplate: '/admin/lang/{id}',
+            uriTemplate: '/admin/languages/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/lang/{id}'
+            uriTemplate: '/admin/languages/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/lang/{id}'
+            uriTemplate: '/admin/languages/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
@@ -95,9 +95,10 @@ class Lang extends AbstractPropelResource
         return $this->id;
     }
 
-    public function setId(?int $id): void
+    public function setId(?int $id): Lang
     {
         $this->id = $id;
+        return $this;
     }
 
     public function getTitle(): ?string
@@ -105,9 +106,10 @@ class Lang extends AbstractPropelResource
         return $this->title;
     }
 
-    public function setTitle(?string $title): void
+    public function setTitle(?string $title): Lang
     {
         $this->title = $title;
+        return $this;
     }
 
     public function getCode(): ?string
@@ -115,9 +117,10 @@ class Lang extends AbstractPropelResource
         return $this->code;
     }
 
-    public function setCode(?string $code): void
+    public function setCode(?string $code): Lang
     {
         $this->code = $code;
+        return $this;
     }
 
     public function getLocale(): ?string
@@ -125,9 +128,10 @@ class Lang extends AbstractPropelResource
         return $this->locale;
     }
 
-    public function setLocale(?string $locale): void
+    public function setLocale(?string $locale): Lang
     {
         $this->locale = $locale;
+        return $this;
     }
 
     public function getUrl(): ?string
@@ -135,9 +139,10 @@ class Lang extends AbstractPropelResource
         return $this->url;
     }
 
-    public function setUrl(?string $url): void
+    public function setUrl(?string $url): Lang
     {
         $this->url = $url;
+        return $this;
     }
 
     public function getDateFormat(): ?string
@@ -145,9 +150,10 @@ class Lang extends AbstractPropelResource
         return $this->dateFormat;
     }
 
-    public function setDateFormat(?string $dateFormat): void
+    public function setDateFormat(?string $dateFormat): Lang
     {
         $this->dateFormat = $dateFormat;
+        return $this;
     }
 
     public function getTimeFormat(): ?string
@@ -155,9 +161,10 @@ class Lang extends AbstractPropelResource
         return $this->timeFormat;
     }
 
-    public function setTimeFormat(?string $timeFormat): void
+    public function setTimeFormat(?string $timeFormat): Lang
     {
         $this->timeFormat = $timeFormat;
+        return $this;
     }
 
     public function getDatetimeFormat(): ?string
@@ -165,9 +172,10 @@ class Lang extends AbstractPropelResource
         return $this->datetimeFormat;
     }
 
-    public function setDatetimeFormat(?string $datetimeFormat): void
+    public function setDatetimeFormat(?string $datetimeFormat): Lang
     {
         $this->datetimeFormat = $datetimeFormat;
+        return $this;
     }
 
     public function getDecimalSeparator(): ?string
@@ -175,9 +183,10 @@ class Lang extends AbstractPropelResource
         return $this->decimalSeparator;
     }
 
-    public function setDecimalSeparator(?string $decimalSeparator): void
+    public function setDecimalSeparator(?string $decimalSeparator): Lang
     {
         $this->decimalSeparator = $decimalSeparator;
+        return $this;
     }
 
     public function getThousandsSeparator(): ?string
@@ -185,9 +194,10 @@ class Lang extends AbstractPropelResource
         return $this->thousandsSeparator;
     }
 
-    public function setThousandsSeparator(?string $thousandsSeparator): void
+    public function setThousandsSeparator(?string $thousandsSeparator): Lang
     {
         $this->thousandsSeparator = $thousandsSeparator;
+        return $this;
     }
 
     public function getActive(): ?bool
@@ -195,9 +205,10 @@ class Lang extends AbstractPropelResource
         return $this->active;
     }
 
-    public function setActive(?bool $active): void
+    public function setActive(?bool $active): Lang
     {
         $this->active = $active;
+        return $this;
     }
 
     public function getVisible(): ?bool
@@ -205,9 +216,10 @@ class Lang extends AbstractPropelResource
         return $this->visible;
     }
 
-    public function setVisible(?bool $visible): void
+    public function setVisible(?bool $visible): Lang
     {
         $this->visible = $visible;
+        return $this;
     }
 
     public function getDecimals(): ?string
@@ -215,9 +227,10 @@ class Lang extends AbstractPropelResource
         return $this->decimals;
     }
 
-    public function setDecimals(?string $decimals): void
+    public function setDecimals(?string $decimals): Lang
     {
         $this->decimals = $decimals;
+        return $this;
     }
 
     public function getByDefault(): ?bool
@@ -225,9 +238,10 @@ class Lang extends AbstractPropelResource
         return $this->byDefault;
     }
 
-    public function setByDefault(?bool $byDefault): void
+    public function setByDefault(?bool $byDefault): Lang
     {
         $this->byDefault = $byDefault;
+        return $this;
     }
 
     public function getPosition(): ?int
@@ -235,9 +249,10 @@ class Lang extends AbstractPropelResource
         return $this->position;
     }
 
-    public function setPosition(?int $position): void
+    public function setPosition(?int $position): Lang
     {
         $this->position = $position;
+        return $this;
     }
 
     public function getCreatedAt(): ?\DateTime
@@ -245,9 +260,10 @@ class Lang extends AbstractPropelResource
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): void
+    public function setCreatedAt(?\DateTime $createdAt): Lang
     {
         $this->createdAt = $createdAt;
+        return $this;
     }
 
     public function getUpdatedAt(): ?\DateTime
@@ -255,9 +271,10 @@ class Lang extends AbstractPropelResource
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): void
+    public function setUpdatedAt(?\DateTime $updatedAt): Lang
     {
         $this->updatedAt = $updatedAt;
+        return $this;
     }
 
     public static function getPropelModelClass(): string

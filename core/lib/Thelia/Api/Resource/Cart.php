@@ -18,20 +18,20 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/cart'
+            uriTemplate: '/admin/carts'
         ),
         new GetCollection(
-            uriTemplate: '/admin/cart'
+            uriTemplate: '/admin/carts'
         ),
         new Get(
-            uriTemplate: '/admin/cart/{id}',
+            uriTemplate: '/admin/carts/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/cart/{id}'
+            uriTemplate: '/admin/carts/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/cart/{id}'
+            uriTemplate: '/admin/carts/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
@@ -56,12 +56,12 @@ class Cart extends AbstractPropelResource
     #[Relation(targetResource: Address::class)]
     #[Column(propelGetter: "getAddressRelatedByAddressDeliveryId")]
     #[Groups([self::GROUP_READ])]
-    public ?Address $addressDelivery;//todo getAddressDeliveryId()
+    public ?Address $addressDelivery;
 
     #[Relation(targetResource: Address::class)]
     #[Column(propelGetter: "getAddressRelatedByAddressInvoiceId")]
     #[Groups([self::GROUP_READ])]
-    public ?Address $addressInvoice;//todo
+    public ?Address $addressInvoice;
 
     #[Relation(targetResource: Currency::class)]
     #[Groups([self::GROUP_READ])]
@@ -90,9 +90,10 @@ class Cart extends AbstractPropelResource
         return $this->id;
     }
 
-    public function setId(?int $id): void
+    public function setId(?int $id): Cart
     {
         $this->id = $id;
+        return $this;
     }
 
     public function getToken(): ?string
@@ -100,9 +101,10 @@ class Cart extends AbstractPropelResource
         return $this->token;
     }
 
-    public function setToken(?string $token): void
+    public function setToken(?string $token): Cart
     {
         $this->token = $token;
+        return $this;
     }
 
     public function getCustomer(): ?Customer
@@ -110,9 +112,10 @@ class Cart extends AbstractPropelResource
         return $this->customer;
     }
 
-    public function setCustomer(?Customer $customer): void
+    public function setCustomer(?Customer $customer): Cart
     {
         $this->customer = $customer;
+        return $this;
     }
 
     public function getAddressDelivery(): ?Address
@@ -120,9 +123,10 @@ class Cart extends AbstractPropelResource
         return $this->addressDelivery;
     }
 
-    public function setAddressDelivery(?Address $addressDelivery): void
+    public function setAddressDelivery(?Address $addressDelivery): Cart
     {
         $this->addressDelivery = $addressDelivery;
+        return $this;
     }
 
     public function getAddressInvoice(): ?Address
@@ -130,9 +134,10 @@ class Cart extends AbstractPropelResource
         return $this->addressInvoice;
     }
 
-    public function setAddressInvoice(?Address $addressInvoice): void
+    public function setAddressInvoice(?Address $addressInvoice): Cart
     {
         $this->addressInvoice = $addressInvoice;
+        return $this;
     }
 
     public function getCurrency(): ?Currency
@@ -140,9 +145,10 @@ class Cart extends AbstractPropelResource
         return $this->currency;
     }
 
-    public function setCurrency(?Currency $currency): void
+    public function setCurrency(?Currency $currency): Cart
     {
         $this->currency = $currency;
+        return $this;
     }
 
     public function getCartItems(): ?Collection
@@ -150,9 +156,10 @@ class Cart extends AbstractPropelResource
         return $this->cartItems;
     }
 
-    public function setCartItems(?Collection $cartItems): void
+    public function setCartItems(?Collection $cartItems): Cart
     {
         $this->cartItems = $cartItems;
+        return $this;
     }
 
     public function getDiscount(): ?float
@@ -160,9 +167,10 @@ class Cart extends AbstractPropelResource
         return $this->discount;
     }
 
-    public function setDiscount(?float $discount): void
+    public function setDiscount(?float $discount): Cart
     {
         $this->discount = $discount;
+        return $this;
     }
 
     public function getCreatedAt(): ?\DateTime
@@ -170,9 +178,10 @@ class Cart extends AbstractPropelResource
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): void
+    public function setCreatedAt(?\DateTime $createdAt): Cart
     {
         $this->createdAt = $createdAt;
+        return $this;
     }
 
     public function getUpdatedAt(): ?\DateTime
@@ -180,9 +189,10 @@ class Cart extends AbstractPropelResource
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): void
+    public function setUpdatedAt(?\DateTime $updatedAt): Cart
     {
         $this->updatedAt = $updatedAt;
+        return $this;
     }
 
     public static function getPropelModelClass(): string

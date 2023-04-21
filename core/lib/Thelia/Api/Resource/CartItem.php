@@ -15,20 +15,20 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/cart_item'
+            uriTemplate: '/admin/cart_items'
         ),
         new GetCollection(
-            uriTemplate: '/admin/cart_item'
+            uriTemplate: '/admin/cart_items'
         ),
         new Get(
-            uriTemplate: '/admin/cart_item/{id}',
+            uriTemplate: '/admin/cart_items/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/cart_item/{id}'
+            uriTemplate: '/admin/cart_items/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/cart_item/{id}'
+            uriTemplate: '/admin/cart_items/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
@@ -76,24 +76,15 @@ class CartItem extends AbstractPropelResource
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $updatedAt;
 
-    public function getCart(): Cart
-    {
-        return $this->cart;
-    }
-
-    public function setCart(Cart $cart): void
-    {
-        $this->cart = $cart;
-    }
-
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(?int $id): void
+    public function setId(?int $id): CartItem
     {
         $this->id = $id;
+        return $this;
     }
 
     public function getQuantity(): ?int
@@ -101,9 +92,10 @@ class CartItem extends AbstractPropelResource
         return $this->quantity;
     }
 
-    public function setQuantity(?int $quantity): void
+    public function setQuantity(?int $quantity): CartItem
     {
         $this->quantity = $quantity;
+        return $this;
     }
 
     public function getProduct(): Product
@@ -111,9 +103,21 @@ class CartItem extends AbstractPropelResource
         return $this->product;
     }
 
-    public function setProduct(Product $product): void
+    public function setProduct(Product $product): CartItem
     {
         $this->product = $product;
+        return $this;
+    }
+
+    public function getCart(): Cart
+    {
+        return $this->cart;
+    }
+
+    public function setCart(Cart $cart): CartItem
+    {
+        $this->cart = $cart;
+        return $this;
     }
 
     public function getProductSaleElements(): ProductSaleElements
@@ -121,9 +125,10 @@ class CartItem extends AbstractPropelResource
         return $this->productSaleElements;
     }
 
-    public function setProductSaleElements(ProductSaleElements $productSaleElements): void
+    public function setProductSaleElements(ProductSaleElements $productSaleElements): CartItem
     {
         $this->productSaleElements = $productSaleElements;
+        return $this;
     }
 
     public function getPrice(): ?float
@@ -131,9 +136,10 @@ class CartItem extends AbstractPropelResource
         return $this->price;
     }
 
-    public function setPrice(?float $price): void
+    public function setPrice(?float $price): CartItem
     {
         $this->price = $price;
+        return $this;
     }
 
     public function getPromoPrice(): ?float
@@ -141,9 +147,10 @@ class CartItem extends AbstractPropelResource
         return $this->promo_price;
     }
 
-    public function setPromoPrice(?float $promo_price): void
+    public function setPromoPrice(?float $promo_price): CartItem
     {
         $this->promo_price = $promo_price;
+        return $this;
     }
 
     public function getPriceEndOfLife(): ?\DateTime
@@ -151,9 +158,10 @@ class CartItem extends AbstractPropelResource
         return $this->priceEndOfLife;
     }
 
-    public function setPriceEndOfLife(?\DateTime $priceEndOfLife): void
+    public function setPriceEndOfLife(?\DateTime $priceEndOfLife): CartItem
     {
         $this->priceEndOfLife = $priceEndOfLife;
+        return $this;
     }
 
     public function getPromo(): ?int
@@ -161,9 +169,10 @@ class CartItem extends AbstractPropelResource
         return $this->promo;
     }
 
-    public function setPromo(?int $promo): void
+    public function setPromo(?int $promo): CartItem
     {
         $this->promo = $promo;
+        return $this;
     }
 
     public function getCreatedAt(): ?\DateTime
@@ -171,9 +180,10 @@ class CartItem extends AbstractPropelResource
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): void
+    public function setCreatedAt(?\DateTime $createdAt): CartItem
     {
         $this->createdAt = $createdAt;
+        return $this;
     }
 
     public function getUpdatedAt(): ?\DateTime
@@ -181,9 +191,10 @@ class CartItem extends AbstractPropelResource
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): void
+    public function setUpdatedAt(?\DateTime $updatedAt): CartItem
     {
         $this->updatedAt = $updatedAt;
+        return $this;
     }
 
     public static function getPropelModelClass(): string

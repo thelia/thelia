@@ -17,9 +17,10 @@ class StateI18n extends I18n
         return $this->locale;
     }
 
-    public function setLocale(string $locale): void
+    public function setLocale(string $locale): StateI18n
     {
         $this->locale = $locale;
+        return $this;
     }
 
     public function getTitle(): ?string
@@ -27,9 +28,9 @@ class StateI18n extends I18n
         return $this->title;
     }
 
-    public function setTitle(?string $title): void
+    public function setTitle(?string $title): StateI18n
     {
         $this->title = $title;
+        return $this;
     }
-
 }

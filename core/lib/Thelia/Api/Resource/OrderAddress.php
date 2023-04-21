@@ -16,17 +16,17 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/order_address'
+            uriTemplate: '/admin/order_addresses'
         ),
         new Get(
-            uriTemplate: '/admin/order_address/{id}',
+            uriTemplate: '/admin/order_addresses/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/order_address/{id}'
+            uriTemplate: '/admin/order_addresses/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/order_address/{id}'
+            uriTemplate: '/admin/order_addresses/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
@@ -94,42 +94,11 @@ class OrderAddress extends AbstractPropelResource
         return $this->id;
     }
 
-    public function setId(?int $id)
+    public function setId(?int $id): OrderAddress
     {
         $this->id = $id;
+        return $this;
     }
-
-    public function getCreatedAt(): ?\DateTime
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTime $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    public function getUpdatedAt(): ?\DateTime
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTime $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    public function getState(): ?State
-    {
-        return $this->state;
-    }
-
-    public function setState(?State $state): void
-    {
-        $this->state = $state;
-    }
-
-
 
     public function getFirstname(): string
     {
@@ -142,12 +111,10 @@ class OrderAddress extends AbstractPropelResource
         return $this;
     }
 
-
     public function getLastname(): string
     {
         return $this->lastname;
     }
-
 
     public function setLastname(string $lastname): OrderAddress
     {
@@ -155,12 +122,10 @@ class OrderAddress extends AbstractPropelResource
         return $this;
     }
 
-
     public function getAddress1(): string
     {
         return $this->address1;
     }
-
 
     public function setAddress1(string $address1): OrderAddress
     {
@@ -173,19 +138,16 @@ class OrderAddress extends AbstractPropelResource
         return $this->address2;
     }
 
-
     public function setAddress2(?string $address2): OrderAddress
     {
         $this->address2 = $address2;
         return $this;
     }
 
-
     public function getAddress3(): ?string
     {
         return $this->address3;
     }
-
 
     public function setAddress3(?string $address3): OrderAddress
     {
@@ -193,19 +155,16 @@ class OrderAddress extends AbstractPropelResource
         return $this;
     }
 
-
     public function getZipcode(): ?string
     {
         return $this->zipcode;
     }
-
 
     public function setZipcode(?string $zipcode): OrderAddress
     {
         $this->zipcode = $zipcode;
         return $this;
     }
-
 
     public function getCity(): string
     {
@@ -218,12 +177,10 @@ class OrderAddress extends AbstractPropelResource
         return $this;
     }
 
-
     public function getPhone(): ?string
     {
         return $this->phone;
     }
-
 
     public function setPhone(?string $phone): OrderAddress
     {
@@ -231,12 +188,10 @@ class OrderAddress extends AbstractPropelResource
         return $this;
     }
 
-
     public function getCellphone(): ?string
     {
         return $this->cellphone;
     }
-
 
     public function setCellphone(?string $cellphone): OrderAddress
     {
@@ -244,20 +199,16 @@ class OrderAddress extends AbstractPropelResource
         return $this;
     }
 
-
     public function getCompany(): ?string
     {
         return $this->company;
     }
 
-
     public function setCompany(?string $company): OrderAddress
     {
         $this->company = $company;
-
         return $this;
     }
-
 
     public function getCustomerTitle(): CustomerTitle
     {
@@ -275,9 +226,43 @@ class OrderAddress extends AbstractPropelResource
         return $this->country;
     }
 
-    public function setCountry(Country $country): void
+    public function setCountry(Country $country): OrderAddress
     {
         $this->country = $country;
+        return $this;
+    }
+
+    public function getState(): ?State
+    {
+        return $this->state;
+    }
+
+    public function setState(?State $state): OrderAddress
+    {
+        $this->state = $state;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): OrderAddress
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): OrderAddress
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
     }
 
     public static function getPropelModelClass(): string

@@ -31,9 +31,10 @@ class CustomerTitleI18n extends I18n
         return $this->locale;
     }
 
-    public function setLocale(string $locale): void
+    public function setLocale(string $locale): CustomerTitleI18n
     {
         $this->locale = $locale;
+        return $this;
     }
 
     public function getShort(): ?string
@@ -41,9 +42,10 @@ class CustomerTitleI18n extends I18n
         return $this->short;
     }
 
-    public function setShort(?string $short): void
+    public function setShort(?string $short): CustomerTitleI18n
     {
         $this->short = $short;
+        return $this;
     }
 
     public function getLong(): ?string
@@ -51,9 +53,10 @@ class CustomerTitleI18n extends I18n
         return $this->long;
     }
 
-    public function setLong(?string $long): void
+    public function setLong(?string $long): CustomerTitleI18n
     {
         $this->long = $long;
+        return $this;
     }
 }
 

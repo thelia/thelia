@@ -15,20 +15,20 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/currency'
+            uriTemplate: '/admin/currencies'
         ),
         new GetCollection(
-            uriTemplate: '/admin/currency'
+            uriTemplate: '/admin/currencies'
         ),
         new Get(
-            uriTemplate: '/admin/currency/{id}',
+            uriTemplate: '/admin/currencies/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/currency/{id}'
+            uriTemplate: '/admin/currencies/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/currency/{id}'
+            uriTemplate: '/admin/currencies/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
@@ -40,13 +40,11 @@ class Currency extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'currency:read:single';
     public const GROUP_WRITE = 'currency:write';
 
-
     #[Groups([self::GROUP_READ,Order::GROUP_READ,Cart::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Cart::GROUP_READ_SINGLE])]
     public ?string $code;
-
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Cart::GROUP_READ_SINGLE])]
     public ?string $symbol;
@@ -77,9 +75,10 @@ class Currency extends AbstractTranslatableResource
         return $this->id;
     }
 
-    public function setId(?int $id): void
+    public function setId(?int $id): Currency
     {
         $this->id = $id;
+        return $this;
     }
 
     public function getCode(): ?string
@@ -87,9 +86,10 @@ class Currency extends AbstractTranslatableResource
         return $this->code;
     }
 
-    public function setCode(?string $code): void
+    public function setCode(?string $code): Currency
     {
         $this->code = $code;
+        return $this;
     }
 
     public function getSymbol(): ?string
@@ -97,9 +97,10 @@ class Currency extends AbstractTranslatableResource
         return $this->symbol;
     }
 
-    public function setSymbol(?string $symbol): void
+    public function setSymbol(?string $symbol): Currency
     {
         $this->symbol = $symbol;
+        return $this;
     }
 
     public function getFormat(): ?string
@@ -107,9 +108,10 @@ class Currency extends AbstractTranslatableResource
         return $this->format;
     }
 
-    public function setFormat(?string $format): void
+    public function setFormat(?string $format): Currency
     {
         $this->format = $format;
+        return $this;
     }
 
     public function getRate(): ?float
@@ -117,9 +119,10 @@ class Currency extends AbstractTranslatableResource
         return $this->rate;
     }
 
-    public function setRate(?float $rate): void
+    public function setRate(?float $rate): Currency
     {
         $this->rate = $rate;
+        return $this;
     }
 
     public function getPosition(): ?int
@@ -127,9 +130,10 @@ class Currency extends AbstractTranslatableResource
         return $this->position;
     }
 
-    public function setPosition(?int $position): void
+    public function setPosition(?int $position): Currency
     {
         $this->position = $position;
+        return $this;
     }
 
     public function getVisible(): ?bool
@@ -137,9 +141,10 @@ class Currency extends AbstractTranslatableResource
         return $this->visible;
     }
 
-    public function setVisible(?bool $visible): void
+    public function setVisible(?bool $visible): Currency
     {
         $this->visible = $visible;
+        return $this;
     }
 
     public function getByDefault(): ?bool
@@ -147,9 +152,10 @@ class Currency extends AbstractTranslatableResource
         return $this->byDefault;
     }
 
-    public function setByDefault(?bool $byDefault): void
+    public function setByDefault(?bool $byDefault): Currency
     {
         $this->byDefault = $byDefault;
+        return $this;
     }
 
     public function getCreatedAt(): ?\DateTime
@@ -157,9 +163,10 @@ class Currency extends AbstractTranslatableResource
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): void
+    public function setCreatedAt(?\DateTime $createdAt): Currency
     {
         $this->createdAt = $createdAt;
+        return $this;
     }
 
     public function getUpdatedAt(): ?\DateTime
@@ -167,12 +174,11 @@ class Currency extends AbstractTranslatableResource
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): void
+    public function setUpdatedAt(?\DateTime $updatedAt): Currency
     {
         $this->updatedAt = $updatedAt;
+        return $this;
     }
-
-
 
     public static function getPropelModelClass(): string
     {

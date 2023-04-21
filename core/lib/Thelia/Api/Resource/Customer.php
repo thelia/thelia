@@ -139,9 +139,10 @@ class Customer extends AbstractPropelResource
         return $this->id;
     }
 
-    public function setId(?int $id): void
+    public function setId(?int $id): Customer
     {
         $this->id = $id;
+        return $this;
     }
 
     public function getCustomerTitle(): CustomerTitle
@@ -149,9 +150,10 @@ class Customer extends AbstractPropelResource
         return $this->customerTitle;
     }
 
-    public function setCustomerTitle(CustomerTitle $customerTitle): void
+    public function setCustomerTitle(CustomerTitle $customerTitle): Customer
     {
         $this->customerTitle = $customerTitle;
+        return $this;
     }
 
     public function getLang(): ?Lang
@@ -159,9 +161,10 @@ class Customer extends AbstractPropelResource
         return $this->lang;
     }
 
-    public function setLang(?Lang $lang): void
+    public function setLang(?Lang $lang): Customer
     {
         $this->lang = $lang;
+        return $this;
     }
 
     public function getRef(): ?string
@@ -169,9 +172,10 @@ class Customer extends AbstractPropelResource
         return $this->ref;
     }
 
-    public function setRef(?string $ref): void
+    public function setRef(?string $ref): Customer
     {
         $this->ref = $ref;
+        return $this;
     }
 
     public function getFirstname(): string
@@ -179,9 +183,10 @@ class Customer extends AbstractPropelResource
         return $this->firstname;
     }
 
-    public function setFirstname(string $firstname): void
+    public function setFirstname(string $firstname): Customer
     {
         $this->firstname = $firstname;
+        return $this;
     }
 
     public function getLastname(): string
@@ -189,9 +194,10 @@ class Customer extends AbstractPropelResource
         return $this->lastname;
     }
 
-    public function setLastname(string $lastname): void
+    public function setLastname(string $lastname): Customer
     {
         $this->lastname = $lastname;
+        return $this;
     }
 
     public function getEmail(): ?string
@@ -199,9 +205,10 @@ class Customer extends AbstractPropelResource
         return $this->email;
     }
 
-    public function setEmail(?string $email): void
+    public function setEmail(?string $email): Customer
     {
         $this->email = $email;
+        return $this;
     }
 
     public function getPassword(): ?string
@@ -209,9 +216,10 @@ class Customer extends AbstractPropelResource
         return $this->password;
     }
 
-    public function setPassword(?string $password): void
+    public function setPassword(?string $password): Customer
     {
         $this->password = $password;
+        return $this;
     }
 
     public function getAlgo(): ?string
@@ -219,9 +227,10 @@ class Customer extends AbstractPropelResource
         return $this->algo;
     }
 
-    public function setAlgo(?string $algo): void
+    public function setAlgo(?string $algo): Customer
     {
         $this->algo = $algo;
+        return $this;
     }
 
     public function getReseller(): ?bool
@@ -229,9 +238,10 @@ class Customer extends AbstractPropelResource
         return $this->reseller;
     }
 
-    public function setReseller(?bool $reseller): void
+    public function setReseller(?bool $reseller): Customer
     {
         $this->reseller = $reseller;
+        return $this;
     }
 
     public function getSponsor(): ?string
@@ -239,9 +249,10 @@ class Customer extends AbstractPropelResource
         return $this->sponsor;
     }
 
-    public function setSponsor(?string $sponsor): void
+    public function setSponsor(?string $sponsor): Customer
     {
         $this->sponsor = $sponsor;
+        return $this;
     }
 
     public function getDiscount(): ?float
@@ -249,9 +260,10 @@ class Customer extends AbstractPropelResource
         return $this->discount;
     }
 
-    public function setDiscount(?float $discount): void
+    public function setDiscount(?float $discount): Customer
     {
         $this->discount = $discount;
+        return $this;
     }
 
     public function getRememberMeToken(): ?string
@@ -259,9 +271,10 @@ class Customer extends AbstractPropelResource
         return $this->rememberMeToken;
     }
 
-    public function setRememberMeToken(?string $rememberMeToken): void
+    public function setRememberMeToken(?string $rememberMeToken): Customer
     {
         $this->rememberMeToken = $rememberMeToken;
+        return $this;
     }
 
     public function getRememberMeSerial(): ?string
@@ -269,9 +282,10 @@ class Customer extends AbstractPropelResource
         return $this->rememberMeSerial;
     }
 
-    public function setRememberMeSerial(?string $rememberMeSerial): void
+    public function setRememberMeSerial(?string $rememberMeSerial): Customer
     {
         $this->rememberMeSerial = $rememberMeSerial;
+        return $this;
     }
 
     public function getEnable(): ?bool
@@ -279,9 +293,10 @@ class Customer extends AbstractPropelResource
         return $this->enable;
     }
 
-    public function setEnable(?bool $enable): void
+    public function setEnable(?bool $enable): Customer
     {
         $this->enable = $enable;
+        return $this;
     }
 
     public function getConfirmationToken(): ?string
@@ -289,9 +304,10 @@ class Customer extends AbstractPropelResource
         return $this->confirmationToken;
     }
 
-    public function setConfirmationToken(?string $confirmationToken): void
+    public function setConfirmationToken(?string $confirmationToken): Customer
     {
         $this->confirmationToken = $confirmationToken;
+        return $this;
     }
 
     public function getCreatedAt(): ?\DateTime
@@ -299,9 +315,10 @@ class Customer extends AbstractPropelResource
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): void
+    public function setCreatedAt(?\DateTime $createdAt): Customer
     {
         $this->createdAt = $createdAt;
+        return $this;
     }
 
     public function getUpdatedAt(): ?\DateTime
@@ -309,9 +326,10 @@ class Customer extends AbstractPropelResource
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): void
+    public function setUpdatedAt(?\DateTime $updatedAt): Customer
     {
         $this->updatedAt = $updatedAt;
+        return $this;
     }
 
     public function getVersion(): ?int
@@ -319,9 +337,10 @@ class Customer extends AbstractPropelResource
         return $this->version;
     }
 
-    public function setVersion(?int $version): void
+    public function setVersion(?int $version): Customer
     {
         $this->version = $version;
+        return $this;
     }
 
     public function getVersionCreatedAt(): ?\DateTime
@@ -329,9 +348,10 @@ class Customer extends AbstractPropelResource
         return $this->versionCreatedAt;
     }
 
-    public function setVersionCreatedAt(?\DateTime $versionCreatedAt): void
+    public function setVersionCreatedAt(?\DateTime $versionCreatedAt): Customer
     {
         $this->versionCreatedAt = $versionCreatedAt;
+        return $this;
     }
 
     public function getVersionCreatedBy(): ?string
@@ -339,9 +359,10 @@ class Customer extends AbstractPropelResource
         return $this->versionCreatedBy;
     }
 
-    public function setVersionCreatedBy(?string $versionCreatedBy): void
+    public function setVersionCreatedBy(?string $versionCreatedBy): Customer
     {
         $this->versionCreatedBy = $versionCreatedBy;
+        return $this;
     }
 
     public function getAddresses(): Collection
@@ -349,9 +370,10 @@ class Customer extends AbstractPropelResource
         return $this->addresses;
     }
 
-    public function setAddresses(Collection $addresses): void
+    public function setAddresses(Collection $addresses): Customer
     {
         $this->addresses = $addresses;
+        return $this;
     }
 
     public static function getPropelModelClass(): string

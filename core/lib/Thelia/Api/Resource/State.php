@@ -15,19 +15,19 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/state'
+            uriTemplate: '/admin/states'
         ),
         new GetCollection(
-            uriTemplate: '/admin/state'
+            uriTemplate: '/admin/states'
         ),
         new Get(
-            uriTemplate: '/admin/state/{id}'
+            uriTemplate: '/admin/states/{id}'
         ),
         new Put(
-            uriTemplate: '/admin/state/{id}'
+            uriTemplate: '/admin/states/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/state/{id}'
+            uriTemplate: '/admin/states/{id}'
         )
     ],
     normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ]],
@@ -63,9 +63,10 @@ class State extends AbstractTranslatableResource
         return $this->id;
     }
 
-    public function setId(?int $id): void
+    public function setId(?int $id): State
     {
         $this->id = $id;
+        return $this;
     }
 
     public function isVisible(): bool
@@ -73,9 +74,10 @@ class State extends AbstractTranslatableResource
         return $this->visible;
     }
 
-    public function setVisible(bool $visible): void
+    public function setVisible(bool $visible): State
     {
         $this->visible = $visible;
+        return $this;
     }
 
     public function getIsocode(): ?string
@@ -83,9 +85,10 @@ class State extends AbstractTranslatableResource
         return $this->isocode;
     }
 
-    public function setIsocode(?string $isocode): void
+    public function setIsocode(?string $isocode): State
     {
         $this->isocode = $isocode;
+        return $this;
     }
 
     public function getCountry(): Country
@@ -93,9 +96,10 @@ class State extends AbstractTranslatableResource
         return $this->country;
     }
 
-    public function setCountry(Country $country): void
+    public function setCountry(Country $country): State
     {
         $this->country = $country;
+        return $this;
     }
 
     public function getCreatedAt(): ?\DateTime
@@ -103,9 +107,10 @@ class State extends AbstractTranslatableResource
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): void
+    public function setCreatedAt(?\DateTime $createdAt): State
     {
         $this->createdAt = $createdAt;
+        return $this;
     }
 
     public function getUpdatedAt(): ?\DateTime
@@ -113,9 +118,10 @@ class State extends AbstractTranslatableResource
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): void
+    public function setUpdatedAt(?\DateTime $updatedAt): State
     {
         $this->updatedAt = $updatedAt;
+        return $this;
     }
 
     public static function getPropelModelClass(): string
