@@ -7,9 +7,9 @@ namespace Thelia\Api\Resource;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
@@ -84,10 +84,10 @@ class OrderAddress extends AbstractPropelResource
     public ?State $state = null;
 
     #[Groups([self::GROUP_READ])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt;
 
     public function getId(): ?int
     {
@@ -243,23 +243,23 @@ class OrderAddress extends AbstractPropelResource
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): OrderAddress
+    public function setCreatedAt(?DateTime $createdAt): OrderAddress
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): OrderAddress
+    public function setUpdatedAt(?DateTime $updatedAt): OrderAddress
     {
         $this->updatedAt = $updatedAt;
         return $this;

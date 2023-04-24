@@ -60,33 +60,27 @@ class ProductCategory extends AbstractPropelResource
         return $this;
     }
 
-
-    public function getDefaultCategory()
+    public function getDefaultCategory(): ?bool
     {
         return $this->defaultCategory;
     }
 
-
-    public function setDefaultCategory($defaultCategory)
+    public function setDefaultCategory(?bool $defaultCategory): ProductCategory
     {
         $this->defaultCategory = $defaultCategory;
         return $this;
     }
 
-
-    public function getPosition()
+    public function getPosition(): int
     {
         return $this->position;
     }
 
-
-    public function setPosition($position)
+    public function setPosition(int $position): ProductCategory
     {
         $this->position = $position;
         return $this;
     }
-
-
 
     public static function getPropelModelClass(): string
     {

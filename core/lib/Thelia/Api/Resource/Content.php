@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -28,8 +29,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
             uriTemplate: '/admin/contents/{id}'
         )
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE, I18n::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
 class Content extends AbstractTranslatableResource
 {
@@ -47,19 +48,22 @@ class Content extends AbstractTranslatableResource
     public ?int $position;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public int $version;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?\DateTime $versionCreatedAt;
+    public ?DateTime $versionCreatedAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $versionCreatedBy;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public I18nCollection $i18ns;
 
     public function getId(): ?int
     {
@@ -94,23 +98,23 @@ class Content extends AbstractTranslatableResource
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): Content
+    public function setCreatedAt(?DateTime $createdAt): Content
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): Content
+    public function setUpdatedAt(?DateTime $updatedAt): Content
     {
         $this->updatedAt = $updatedAt;
         return $this;
@@ -127,12 +131,12 @@ class Content extends AbstractTranslatableResource
         return $this;
     }
 
-    public function getVersionCreatedAt(): ?\DateTime
+    public function getVersionCreatedAt(): ?DateTime
     {
         return $this->versionCreatedAt;
     }
 
-    public function setVersionCreatedAt(?\DateTime $versionCreatedAt): Content
+    public function setVersionCreatedAt(?DateTime $versionCreatedAt): Content
     {
         $this->versionCreatedAt = $versionCreatedAt;
         return $this;
