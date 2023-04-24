@@ -5,11 +5,11 @@ namespace Thelia\Api\Bridge\Propel\Attribute;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Relation
+class Column
 {
     public function __construct(
-       private string $targetResource,private ?string $relationAlias=null
+        private ?string $propelGetter = null
     ) {
-
+        
     }
 }
