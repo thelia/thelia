@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
@@ -30,8 +31,8 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
             uriTemplate: '/admin/content_documents/{id}'
         )
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE, I18n::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
 class ContentDocument extends AbstractTranslatableResource
 {
@@ -56,10 +57,13 @@ class ContentDocument extends AbstractTranslatableResource
     public ?int $position;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public I18nCollection $i18ns;
 
     public function getId(): ?int
     {
@@ -116,23 +120,23 @@ class ContentDocument extends AbstractTranslatableResource
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): ContentDocument
+    public function setCreatedAt(?DateTime $createdAt): ContentDocument
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): ContentDocument
+    public function setUpdatedAt(?DateTime $updatedAt): ContentDocument
     {
         $this->updatedAt = $updatedAt;
         return $this;

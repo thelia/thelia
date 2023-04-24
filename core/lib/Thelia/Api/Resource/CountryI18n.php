@@ -6,19 +6,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class CountryI18n extends I18n
 {
-    #[Groups([I18n::GROUP_READ])]
+    #[Groups([Country::GROUP_READ])]
     protected string $locale;
 
-    #[Groups([I18n::GROUP_READ])]
+    #[Groups([Country::GROUP_READ])]
     protected ?string $title;
 
-    #[Groups([I18n::GROUP_READ])]
+    #[Groups([Country::GROUP_READ])]
     protected ?string $description;
 
-    #[Groups([I18n::GROUP_READ])]
+    #[Groups([Country::GROUP_READ])]
     protected ?string $chapo;
 
-    #[Groups([I18n::GROUP_READ])]
+    #[Groups([Country::GROUP_READ])]
     protected ?string $postscriptum;
 
     public function getLocale(): string

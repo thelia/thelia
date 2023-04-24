@@ -12,10 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
-use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Thelia\Model\BrandQuery;
-
 
 class BrandI18n extends I18n
 {
