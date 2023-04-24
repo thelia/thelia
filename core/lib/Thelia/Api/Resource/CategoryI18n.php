@@ -12,7 +12,6 @@
 
 namespace Thelia\Api\Resource;
 
-use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 

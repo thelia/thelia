@@ -15,9 +15,6 @@ namespace Thelia\Api\Resource;
 
 class I18n
 {
-    public const GROUP_READ = 'i18n:read';
-    public const GROUP_WRITE = 'i18n:write';
-
     public ?int $id;
 
     public function __construct($data = [])

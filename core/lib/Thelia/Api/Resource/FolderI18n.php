@@ -6,28 +6,28 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class FolderI18n extends I18n
 {
-    #[Groups([I18n::GROUP_READ, I18n::GROUP_WRITE])]
+    #[Groups([Folder::GROUP_READ, Folder::GROUP_WRITE])]
     protected string $locale;
 
-    #[Groups([I18n::GROUP_READ, I18n::GROUP_WRITE])]
+    #[Groups([Folder::GROUP_READ, Folder::GROUP_WRITE])]
     protected ?string $title;
 
-    #[Groups([I18n::GROUP_READ, I18n::GROUP_WRITE])]
+    #[Groups([Folder::GROUP_READ, Folder::GROUP_WRITE])]
     protected ?string $description;
 
-    #[Groups([I18n::GROUP_READ, I18n::GROUP_WRITE])]
+    #[Groups([Folder::GROUP_READ, Folder::GROUP_WRITE])]
     protected ?string $chapo;
 
-    #[Groups([I18n::GROUP_READ, I18n::GROUP_WRITE])]
+    #[Groups([Folder::GROUP_READ, Folder::GROUP_WRITE])]
     protected ?string $postscriptum;
 
-    #[Groups([I18n::GROUP_READ, I18n::GROUP_WRITE])]
+    #[Groups([Folder::GROUP_READ, Folder::GROUP_WRITE])]
     protected ?string $metaTitle;
 
-    #[Groups([I18n::GROUP_READ, I18n::GROUP_WRITE])]
+    #[Groups([Folder::GROUP_READ, Folder::GROUP_WRITE])]
     protected ?string $metaDescription;
 
-    #[Groups([I18n::GROUP_READ, I18n::GROUP_WRITE])]
+    #[Groups([Folder::GROUP_READ, Folder::GROUP_WRITE])]
     protected ?string $metaKeywords;
 
     public function getLocale(): string

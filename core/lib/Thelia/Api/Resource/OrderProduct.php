@@ -18,11 +18,11 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Propel\Runtime\Collection\ArrayCollection;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
-use function PHPUnit\Framework\isInstanceOf;
 
 #[ApiResource(
     operations: [
@@ -117,10 +117,10 @@ class OrderProduct extends AbstractPropelResource
     public ?bool $virtualDocument;
 
     #[Groups([self::GROUP_READ])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt;
 
     #[Relation(targetResource: OrderProductTax::class)]
     #[Groups([self::GROUP_READ_SINGLE,Order::GROUP_READ_SINGLE])]
@@ -367,23 +367,23 @@ class OrderProduct extends AbstractPropelResource
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): OrderProduct
+    public function setCreatedAt(?DateTime $createdAt): OrderProduct
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): OrderProduct
+    public function setUpdatedAt(?DateTime $updatedAt): OrderProduct
     {
         $this->updatedAt = $updatedAt;
         return $this;
@@ -402,7 +402,7 @@ class OrderProduct extends AbstractPropelResource
 
     public function afterModelToResource(array $context): void
     {
-        if ($context['operation'] instanceof \ApiPlatform\Metadata\Get || $context['operation'] instanceof \ApiPlatform\Metadata\GetCollection){
+        if ($context['operation'] instanceof Get || $context['operation'] instanceof GetCollection){
             //unitTaxedPrice
             $totalTax = 0;
             $totalPromoTax = 0;
