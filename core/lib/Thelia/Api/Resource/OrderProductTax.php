@@ -5,9 +5,9 @@ namespace Thelia\Api\Resource;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -54,10 +54,10 @@ class OrderProductTax extends AbstractPropelResource
     public ?float $promoAmount;
 
     #[Groups([self::GROUP_READ])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt;
 
     public function getId(): ?int
     {
@@ -125,23 +125,23 @@ class OrderProductTax extends AbstractPropelResource
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): OrderProductTax
+    public function setCreatedAt(?DateTime $createdAt): OrderProductTax
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): OrderProductTax
+    public function setUpdatedAt(?DateTime $updatedAt): OrderProductTax
     {
         $this->updatedAt = $updatedAt;
         return $this;

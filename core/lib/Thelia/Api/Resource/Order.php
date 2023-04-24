@@ -19,12 +19,11 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Propel\Runtime\Collection\ArrayCollection;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
-use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\DateFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\RangeFilter;
@@ -50,7 +49,7 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE,I18n::GROUP_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -93,17 +92,17 @@ class Order extends AbstractPropelResource
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $ref;
 
-    #[Groups([self::GROUP_READ_SINGLE,self::GROUP_WRITE])]
-    public ?\DateTime $invoiceDate;
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    public ?DateTime $invoiceDate;
 
-    #[Groups([self::GROUP_READ_SINGLE,self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?float $currencyRate;
 
     #[Groups([self::GROUP_READ])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt;
 
     #[Groups([self::GROUP_READ_SINGLE])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt;
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?float $discount;
@@ -130,7 +129,7 @@ class Order extends AbstractPropelResource
     public ?int $version;
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public ?\DateTime $versionCreatedAt;
+    public ?DateTime $versionCreatedAt;
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?string $versionCreatedBy;
@@ -215,12 +214,12 @@ class Order extends AbstractPropelResource
         return $this;
     }
 
-    public function getInvoiceDate(): ?\DateTime
+    public function getInvoiceDate(): ?DateTime
     {
         return $this->invoiceDate;
     }
 
-    public function setInvoiceDate(?\DateTime $invoiceDate): Order
+    public function setInvoiceDate(?DateTime $invoiceDate): Order
     {
         $this->invoiceDate = $invoiceDate;
         return $this;
@@ -237,23 +236,23 @@ class Order extends AbstractPropelResource
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): Order
+    public function setCreatedAt(?DateTime $createdAt): Order
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): Order
+    public function setUpdatedAt(?DateTime $updatedAt): Order
     {
         $this->updatedAt = $updatedAt;
         return $this;
@@ -347,12 +346,12 @@ class Order extends AbstractPropelResource
         return $this;
     }
 
-    public function getVersionCreatedAt(): ?\DateTime
+    public function getVersionCreatedAt(): ?DateTime
     {
         return $this->versionCreatedAt;
     }
 
-    public function setVersionCreatedAt(?\DateTime $versionCreatedAt): Order
+    public function setVersionCreatedAt(?DateTime $versionCreatedAt): Order
     {
         $this->versionCreatedAt = $versionCreatedAt;
         return $this;
