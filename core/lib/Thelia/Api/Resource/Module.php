@@ -28,8 +28,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
             uriTemplate: '/admin/modules/{id}'
         ),
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE, I18n::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
 class Module extends AbstractTranslatableResource
 {
@@ -72,6 +72,9 @@ class Module extends AbstractTranslatableResource
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?\DateTime $updatedAt;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public I18nCollection $i18ns;
 
     public function getId(): ?int
     {

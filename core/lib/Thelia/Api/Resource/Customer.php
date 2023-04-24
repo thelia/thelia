@@ -19,10 +19,10 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Propel\Runtime\Collection\ArrayCollection;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
@@ -46,8 +46,8 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
             uriTemplate: '/admin/customers/{id}'
         )
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE, I18n::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -113,14 +113,14 @@ class Customer extends AbstractPropelResource
     public ?string $confirmationToken;
 
     #[Groups([self::GROUP_READ])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt;
 
     #[Groups([self::GROUP_READ_SINGLE])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt;
 
     public ?int $version;
 
-    public ?\DateTime $versionCreatedAt;
+    public ?DateTime $versionCreatedAt;
 
     public ?string $versionCreatedBy;
 
@@ -309,23 +309,23 @@ class Customer extends AbstractPropelResource
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): Customer
+    public function setCreatedAt(?DateTime $createdAt): Customer
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): Customer
+    public function setUpdatedAt(?DateTime $updatedAt): Customer
     {
         $this->updatedAt = $updatedAt;
         return $this;
@@ -342,12 +342,12 @@ class Customer extends AbstractPropelResource
         return $this;
     }
 
-    public function getVersionCreatedAt(): ?\DateTime
+    public function getVersionCreatedAt(): ?DateTime
     {
         return $this->versionCreatedAt;
     }
 
-    public function setVersionCreatedAt(?\DateTime $versionCreatedAt): Customer
+    public function setVersionCreatedAt(?DateTime $versionCreatedAt): Customer
     {
         $this->versionCreatedAt = $versionCreatedAt;
         return $this;
