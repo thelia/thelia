@@ -38,8 +38,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
             uriTemplate: '/admin/brands/{id}'
         )
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE, I18n::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
 class Brand extends AbstractTranslatableResource
 {
@@ -55,6 +55,9 @@ class Brand extends AbstractTranslatableResource
 
     #[Groups([self::GROUP_READ, Product::GROUP_READ, Product::GROUP_READ_SINGLE])]
     public ?int $position = null;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public I18nCollection $i18ns;
 
     public function getId(): ?int
     {
