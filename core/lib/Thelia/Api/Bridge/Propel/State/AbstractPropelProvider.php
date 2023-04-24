@@ -8,6 +8,7 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Resource\PropelResourceInterface;
@@ -60,6 +61,17 @@ abstract class AbstractPropelProvider implements ProviderInterface
 
             $propelGetter = 'get'.ucfirst($property->getName());
 
+            foreach ($property->getAttributes(Column::class) as $columnAttribute){
+                if (isset($columnAttribute->getArguments()['propelGetter'])){
+                    $propelGetter = $columnAttribute->getArguments()['propelGetter'];
+                }
+            }
+            foreach ($property->getAttributes(Relation::class) as $relationAttribute){
+                if (isset($relationAttribute->getArguments()['relationAlias'])){
+                    $propelGetter = 'get'.$relationAttribute->getArguments()['relationAlias'];
+                }
+            }
+
             if (!method_exists($propelModel, $propelGetter)) {
                 continue;
             }
@@ -74,7 +86,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
 
 
             foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
-                if (!$withRelation) {
+                if (!$withRelation || $value === null) {
                     continue 2;
                 }
 
@@ -187,6 +199,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
         }
 
         $apiResource->setPropelModel($propelModel);
+        $apiResource->afterModelToResource($context);
 
         return $apiResource;
     }
