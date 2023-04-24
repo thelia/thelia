@@ -37,7 +37,7 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
         ),
         new Get(
             uriTemplate: '/admin/products/{id}',
-            normalizationContext:  ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE, I18n::GROUP_READ]]
+            normalizationContext:  ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/products/{id}'
@@ -46,8 +46,8 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
             uriTemplate: '/admin/products/{id}'
         )
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE, I18n::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
 #[ApiFilter(
     filterClass: SearchFilter::class,
@@ -97,6 +97,9 @@ class Product extends AbstractTranslatableResource
     #[Relation(targetResource: ProductCategory::class)]
     #[Groups([self::GROUP_READ_SINGLE])]
     public Collection $productCategories;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public I18nCollection $i18ns;
 
     public function __construct()
     {

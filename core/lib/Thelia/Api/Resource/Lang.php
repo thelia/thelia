@@ -8,7 +8,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use Cassandra\Custom;
+use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -85,10 +85,10 @@ class Lang extends AbstractPropelResource
     public ?int $position;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt;
 
     public function getId(): ?int
     {
@@ -255,23 +255,23 @@ class Lang extends AbstractPropelResource
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): Lang
+    public function setCreatedAt(?DateTime $createdAt): Lang
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): Lang
+    public function setUpdatedAt(?DateTime $updatedAt): Lang
     {
         $this->updatedAt = $updatedAt;
         return $this;

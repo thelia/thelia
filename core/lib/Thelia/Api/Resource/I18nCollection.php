@@ -2,10 +2,10 @@
 
 namespace Thelia\Api\Resource;
 
-use ApiPlatform\Metadata\ApiProperty;
-use Symfony\Component\Serializer\Annotation\Groups;
+use ArrayIterator;
+use IteratorAggregate;
 
-class I18nCollection implements \IteratorAggregate
+class I18nCollection implements IteratorAggregate
 {
      public array $i18ns;
 
@@ -21,8 +21,8 @@ class I18nCollection implements \IteratorAggregate
         return $this;
     }
 
-    public function getIterator(): \ArrayIterator
+    public function getIterator(): ArrayIterator
     {
-        return new \ArrayIterator($this->i18ns);
+        return new ArrayIterator($this->i18ns);
     }
 }

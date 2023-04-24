@@ -2,15 +2,8 @@
 
 namespace Thelia\Api\Resource;
 
-use ApiPlatform\Metadata\ApiProperty;
-use Symfony\Component\Serializer\Annotation\Groups;
-
 abstract class AbstractTranslatableResource extends AbstractPropelResource implements TranslatableResourceInterface
 {
-    #[ApiProperty(
-        types: 'object'
-    )]
-    #[Groups([I18n::GROUP_READ, I18n::GROUP_WRITE])]
     public I18nCollection $i18ns;
 
     public function __construct()

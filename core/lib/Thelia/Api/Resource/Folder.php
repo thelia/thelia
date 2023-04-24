@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -28,8 +29,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
             uriTemplate: '/admin/folders/{id}'
         )
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE, I18n::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
 class Folder extends AbstractTranslatableResource
 {
@@ -50,19 +51,22 @@ class Folder extends AbstractTranslatableResource
     public ?int $position;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public int $version;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?\DateTime $versionCreatedAt;
+    public ?DateTime $versionCreatedAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $versionCreatedBy;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public I18nCollection $i18ns;
 
     public function getId(): ?int
     {
@@ -108,23 +112,23 @@ class Folder extends AbstractTranslatableResource
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): Folder
+    public function setCreatedAt(?DateTime $createdAt): Folder
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): Folder
+    public function setUpdatedAt(?DateTime $updatedAt): Folder
     {
         $this->updatedAt = $updatedAt;
         return $this;
@@ -141,12 +145,12 @@ class Folder extends AbstractTranslatableResource
         return $this;
     }
 
-    public function getVersionCreatedAt(): ?\DateTime
+    public function getVersionCreatedAt(): ?DateTime
     {
         return $this->versionCreatedAt;
     }
 
-    public function setVersionCreatedAt(?\DateTime $versionCreatedAt): Folder
+    public function setVersionCreatedAt(?DateTime $versionCreatedAt): Folder
     {
         $this->versionCreatedAt = $versionCreatedAt;
         return $this;

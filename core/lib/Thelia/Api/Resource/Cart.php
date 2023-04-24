@@ -9,10 +9,10 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Propel\Runtime\Collection\ArrayCollection;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 #[ApiResource(
@@ -73,10 +73,10 @@ class Cart extends AbstractPropelResource
     public ?float $discount;
 
     #[Groups([self::GROUP_READ])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt;
 
     public function __construct()
     {
@@ -171,23 +171,23 @@ class Cart extends AbstractPropelResource
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): Cart
+    public function setCreatedAt(?DateTime $createdAt): Cart
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): Cart
+    public function setUpdatedAt(?DateTime $updatedAt): Cart
     {
         $this->updatedAt = $updatedAt;
         return $this;

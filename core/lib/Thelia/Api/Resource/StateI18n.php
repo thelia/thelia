@@ -6,10 +6,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class StateI18n extends I18n
 {
-    #[Groups([I18n::GROUP_READ])]
+    #[Groups([State::GROUP_READ])]
     protected string $locale;
 
-    #[Groups([I18n::GROUP_READ])]
+    #[Groups([State::GROUP_READ])]
     protected ?string $title;
 
     public function getLocale(): string
