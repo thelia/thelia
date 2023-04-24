@@ -19,13 +19,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
-use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
-use Thelia\Api\Bridge\Propel\Filter\LocalizedSearchFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 
 #[ApiResource(
@@ -47,7 +43,7 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
             uriTemplate: '/admin/addresses/{id}'
         )
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ, CustomerTitle::GROUP_READ]],
+    normalizationContext: ['groups' => [self::GROUP_READ, CustomerTitle::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
 #[ApiFilter(
@@ -103,10 +99,10 @@ class Address extends AbstractPropelResource
     public ?bool $isDefault;
 
     #[Groups([self::GROUP_READ_SINGLE])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt;
 
     #[Groups([self::GROUP_READ_SINGLE])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt;
 
     #[Relation(targetResource: Country::class)]
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
@@ -267,23 +263,23 @@ class Address extends AbstractPropelResource
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): Address
+    public function setCreatedAt(?DateTime $createdAt): Address
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): Address
+    public function setUpdatedAt(?DateTime $updatedAt): Address
     {
         $this->updatedAt = $updatedAt;
         return $this;
