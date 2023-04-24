@@ -6,19 +6,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class ContentImageI18n extends I18n
 {
-    #[Groups([I18n::GROUP_READ])]
+    #[Groups([I18n::GROUP_READ, I18n::GROUP_WRITE])]
     protected string $locale;
 
-    #[Groups([I18n::GROUP_READ])]
+    #[Groups([I18n::GROUP_READ, I18n::GROUP_WRITE])]
     protected ?string $title;
 
-    #[Groups([I18n::GROUP_READ])]
+    #[Groups([I18n::GROUP_READ, I18n::GROUP_WRITE])]
     protected ?string $description;
 
-    #[Groups([I18n::GROUP_READ])]
+    #[Groups([I18n::GROUP_READ, I18n::GROUP_WRITE])]
     protected ?string $chapo;
 
-    #[Groups([I18n::GROUP_READ])]
+    #[Groups([I18n::GROUP_READ, I18n::GROUP_WRITE])]
     protected ?string $postscriptum;
 
     public function getLocale(): string
