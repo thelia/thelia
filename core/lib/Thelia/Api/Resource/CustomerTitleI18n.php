@@ -17,11 +17,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class CustomerTitleI18n extends I18n
 {
-    #[Groups([I18n::GROUP_READ, CustomerTitle::GROUP_READ, CustomerTitle::GROUP_WRITE, Address::GROUP_READ])]
-    private ?string $short;
+    #[Groups([I18n::GROUP_READ])]
+    protected string $locale;
 
-    #[Groups([CustomerTitle::GROUP_READ, CustomerTitle::GROUP_WRITE])]
-    private ?string $long;
+    #[Groups([I18n::GROUP_READ,Customer::GROUP_READ_SINGLE, CustomerTitle::GROUP_READ_SINGLE, CustomerTitle::GROUP_WRITE, Address::GROUP_READ])]
+    protected ?string $short;
+
+    #[Groups([I18n::GROUP_READ,Customer::GROUP_READ_SINGLE,CustomerTitle::GROUP_READ_SINGLE, CustomerTitle::GROUP_WRITE])]
+    protected ?string $long;
+
+    public function getLocale(): string
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(string $locale): CustomerTitleI18n
+    {
+        $this->locale = $locale;
+        return $this;
+    }
 
     public function getShort(): ?string
     {
