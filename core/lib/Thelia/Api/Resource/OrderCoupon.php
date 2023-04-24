@@ -5,9 +5,9 @@ namespace Thelia\Api\Resource;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
@@ -62,10 +62,10 @@ class OrderCoupon extends AbstractPropelResource
     public ?string $description;
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
-    public ?\DateTime $startDate;
+    public ?DateTime $startDate;
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
-    public ?\DateTime $expirationDate;
+    public ?DateTime $expirationDate;
 
     #[Groups([self::GROUP_READ])]
     public ?bool $isCumulative;
@@ -86,10 +86,10 @@ class OrderCoupon extends AbstractPropelResource
     public ?bool $usageCanceled;
 
     #[Groups([self::GROUP_READ])]
-    public ?\DateTime $createdAt;
+    public ?DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?\DateTime $updatedAt;
+    public ?DateTime $updatedAt;
 
     public function getId(): ?int
     {
@@ -179,23 +179,23 @@ class OrderCoupon extends AbstractPropelResource
         return $this;
     }
 
-    public function getStartDate(): ?\DateTime
+    public function getStartDate(): ?DateTime
     {
         return $this->startDate;
     }
 
-    public function setStartDate(?\DateTime $startDate): OrderCoupon
+    public function setStartDate(?DateTime $startDate): OrderCoupon
     {
         $this->startDate = $startDate;
         return $this;
     }
 
-    public function getExpirationDate(): ?\DateTime
+    public function getExpirationDate(): ?DateTime
     {
         return $this->expirationDate;
     }
 
-    public function setExpirationDate(?\DateTime $expirationDate): OrderCoupon
+    public function setExpirationDate(?DateTime $expirationDate): OrderCoupon
     {
         $this->expirationDate = $expirationDate;
         return $this;
@@ -267,23 +267,23 @@ class OrderCoupon extends AbstractPropelResource
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): OrderCoupon
+    public function setCreatedAt(?DateTime $createdAt): OrderCoupon
     {
         $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): OrderCoupon
+    public function setUpdatedAt(?DateTime $updatedAt): OrderCoupon
     {
         $this->updatedAt = $updatedAt;
         return $this;

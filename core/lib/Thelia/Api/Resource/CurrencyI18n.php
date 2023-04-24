@@ -6,10 +6,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class CurrencyI18n extends I18n
 {
-    #[Groups([I18n::GROUP_READ])]
+    #[Groups([Currency::GROUP_READ])]
     protected string $locale;
 
-    #[Groups([I18n::GROUP_READ])]
+    #[Groups([Currency::GROUP_READ])]
     protected ?string $name;
 
     public function getLocale(): string

@@ -38,8 +38,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
             uriTemplate: '/admin/categories/{id}'
         )
     ],
-    normalizationContext: ['groups' => [self::GROUP_READ, I18n::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE, I18n::GROUP_WRITE]]
+    normalizationContext: ['groups' => [self::GROUP_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
 class Category extends AbstractTranslatableResource
 {
@@ -55,6 +55,9 @@ class Category extends AbstractTranslatableResource
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public bool $visible;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public I18nCollection $i18ns;
 
     public function getId(): ?int
     {
