@@ -157,11 +157,16 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                     }
                 }
 
+
                 $targetReflector = new \ReflectionClass($targetClass);
 
                 $isNullable = $property->getType()->allowsNull();
                 $isLeftJoin = false !== $wasLeftJoin || true === $isNullable;
-                $joinFunctionName = 'use'.ucfirst($targetReflector->getShortName()).'Query';
+                if (isset($relationAttribute->getArguments()['relationAlias'])){
+                    $joinFunctionName = 'use'.$relationAttribute->getArguments()['relationAlias'].'Query';
+                }else {
+                    $joinFunctionName = 'use'.ucfirst($targetReflector->getShortName()).'Query';
+                }
                 if (!method_exists($query, $joinFunctionName)) {
                     continue;
                 }
