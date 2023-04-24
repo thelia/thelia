@@ -78,7 +78,7 @@ class Product extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'product:read:single';
     public const GROUP_WRITE = 'product:write';
 
-    #[Groups([self::GROUP_READ, ProductCategory::GROUP_READ])]
+    #[Groups([self::GROUP_READ, ProductCategory::GROUP_READ,OrderProduct::GROUP_READ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]

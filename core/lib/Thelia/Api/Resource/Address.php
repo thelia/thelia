@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\LocalizedSearchFilter;
@@ -62,36 +63,65 @@ class Address extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'address:read:single';
     public const GROUP_WRITE = 'address:write';
 
-    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE,Cart::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
     public string $label;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE,Cart::GROUP_READ_SINGLE])]
     public string $firstname;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE,Cart::GROUP_READ_SINGLE])]
     public string $lastname;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
     public string $address1;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
     public string $address2;
 
-    #[Groups([self::GROUP_WRITE, Customer::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_WRITE,self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
     public string $address3 = '';
 
-    #[Groups([self::GROUP_WRITE, Customer::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_WRITE,self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
     public string $zipcode = '';
 
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    public ?string $company;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    public ?string $cellphone;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    public ?string $phone;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    public ?string $city;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    public ?bool $isDefault;
+
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public ?\DateTime $createdAt;
+
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public ?\DateTime $updatedAt;
+
+    #[Relation(targetResource: Country::class)]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    public Country $country;
+
+    #[Relation(targetResource: State::class)]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    public ?State $state;
+
     #[Relation(targetResource: Customer::class)]
-    #[Groups(groups: [self::GROUP_READ_SINGLE])]
+    #[Groups(groups: [self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Customer $customer;
 
     #[Relation(targetResource: CustomerTitle::class)]
-    #[Groups(groups:[self::GROUP_READ])]
+    #[Groups(groups:[self::GROUP_READ, self::GROUP_WRITE])]
     public CustomerTitle $customerTitle;
 
     public function getId(): ?int
@@ -99,10 +129,9 @@ class Address extends AbstractPropelResource
         return $this->id;
     }
 
-    public function setId(int $id): self
+    public function setId(?int $id): Address
     {
         $this->id = $id;
-
         return $this;
     }
 
@@ -180,6 +209,105 @@ class Address extends AbstractPropelResource
     public function setZipcode(string $zipcode): Address
     {
         $this->zipcode = $zipcode;
+        return $this;
+    }
+
+    public function getCompany(): ?string
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?string $company): Address
+    {
+        $this->company = $company;
+        return $this;
+    }
+
+    public function getCellphone(): ?string
+    {
+        return $this->cellphone;
+    }
+
+    public function setCellphone(?string $cellphone): Address
+    {
+        $this->cellphone = $cellphone;
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): Address
+    {
+        $this->phone = $phone;
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function setCity(?string $city): Address
+    {
+        $this->city = $city;
+        return $this;
+    }
+
+    public function getIsDefault(): ?bool
+    {
+        return $this->isDefault;
+    }
+
+    public function setIsDefault(?bool $isDefault): Address
+    {
+        $this->isDefault = $isDefault;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): Address
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): Address
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    public function getCountry(): Country
+    {
+        return $this->country;
+    }
+
+    public function setCountry(Country $country): Address
+    {
+        $this->country = $country;
+        return $this;
+    }
+
+    public function getState(): ?State
+    {
+        return $this->state;
+    }
+
+    public function setState(?State $state): Address
+    {
+        $this->state = $state;
         return $this;
     }
 
