@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -23,9 +33,10 @@ class AttributeAvI18n extends I18n
         return $this->title;
     }
 
-    public function setTitle(?string $title): AttributeAvI18n
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -34,9 +45,10 @@ class AttributeAvI18n extends I18n
         return $this->description;
     }
 
-    public function setDescription(?string $description): AttributeAvI18n
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -45,9 +57,10 @@ class AttributeAvI18n extends I18n
         return $this->chapo;
     }
 
-    public function setChapo(?string $chapo): AttributeAvI18n
+    public function setChapo(?string $chapo): self
     {
         $this->chapo = $chapo;
+
         return $this;
     }
 
@@ -56,9 +69,10 @@ class AttributeAvI18n extends I18n
         return $this->postscriptum;
     }
 
-    public function setPostscriptum(?string $postscriptum): AttributeAvI18n
+    public function setPostscriptum(?string $postscriptum): self
     {
         $this->postscriptum = $postscriptum;
+
         return $this;
     }
 }
