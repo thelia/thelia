@@ -7,9 +7,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class FolderDocumentI18n extends  I18n
 {
     #[Groups([FolderDocument::GROUP_READ, FolderDocument::GROUP_WRITE])]
-    protected string $locale;
-
-    #[Groups([FolderDocument::GROUP_READ, FolderDocument::GROUP_WRITE])]
     protected ?string $title;
 
     #[Groups([FolderDocument::GROUP_READ, FolderDocument::GROUP_WRITE])]
@@ -20,17 +17,6 @@ class FolderDocumentI18n extends  I18n
 
     #[Groups([FolderDocument::GROUP_READ, FolderDocument::GROUP_WRITE])]
     protected ?string $postscriptum;
-
-    public function getLocale(): string
-    {
-        return $this->locale;
-    }
-
-    public function setLocale(string $locale): FolderDocumentI18n
-    {
-        $this->locale = $locale;
-        return $this;
-    }
 
     public function getTitle(): ?string
     {

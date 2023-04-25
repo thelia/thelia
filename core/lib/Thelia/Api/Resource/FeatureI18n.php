@@ -7,9 +7,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class FeatureI18n extends I18n
 {
     #[Groups([Feature::GROUP_READ, Feature::GROUP_WRITE])]
-    protected string $locale;
-
-    #[Groups([Feature::GROUP_READ, Feature::GROUP_WRITE])]
     protected ?string $title;
 
     #[Groups([Feature::GROUP_READ, Feature::GROUP_WRITE])]
@@ -20,17 +17,6 @@ class FeatureI18n extends I18n
 
     #[Groups([Feature::GROUP_READ, Feature::GROUP_WRITE])]
     protected ?string $postscriptum;
-
-    public function getLocale(): string
-    {
-        return $this->locale;
-    }
-
-    public function setLocale(string $locale): FeatureI18n
-    {
-        $this->locale = $locale;
-        return $this;
-    }
 
     public function getTitle(): ?string
     {
