@@ -21,7 +21,8 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 #[ApiResource(
     operations: [
         new Get(
-            uriTemplate: '/admin/product_categories/{product}/categories/{category}'
+            uriTemplate: '/admin/product_categories/{product}/categories/{category}',
+            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
