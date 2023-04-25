@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -8,7 +18,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -27,7 +36,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Delete(
             uriTemplate: '/admin/configs/{id}'
-        )
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
@@ -54,10 +63,10 @@ class Config extends AbstractTranslatableResource
     public ?bool $hidden = false;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
@@ -67,9 +76,10 @@ class Config extends AbstractTranslatableResource
         return $this->id;
     }
 
-    public function setId(?int $id): Config
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -78,9 +88,10 @@ class Config extends AbstractTranslatableResource
         return $this->name;
     }
 
-    public function setName(string $name): Config
+    public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -89,9 +100,10 @@ class Config extends AbstractTranslatableResource
         return $this->value;
     }
 
-    public function setValue(string $value): Config
+    public function setValue(string $value): self
     {
         $this->value = $value;
+
         return $this;
     }
 
@@ -100,9 +112,10 @@ class Config extends AbstractTranslatableResource
         return $this->secured;
     }
 
-    public function setSecured(?bool $secured): Config
+    public function setSecured(?bool $secured): self
     {
         $this->secured = $secured;
+
         return $this;
     }
 
@@ -111,31 +124,34 @@ class Config extends AbstractTranslatableResource
         return $this->hidden;
     }
 
-    public function setHidden(?bool $hidden): Config
+    public function setHidden(?bool $hidden): self
     {
         $this->hidden = $hidden;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): Config
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): Config
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
