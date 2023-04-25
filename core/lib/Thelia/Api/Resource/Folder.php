@@ -38,7 +38,7 @@ class Folder extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'folder:read:single';
     public const GROUP_WRITE = 'folder:write';
 
-    #[Groups([self::GROUP_READ, ContentFolder::GROUP_READ_SINGLE, FolderImage::GROUP_READ_SINGLE, FolderDocument::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, ContentFolder::GROUP_READ, FolderImage::GROUP_READ_SINGLE, FolderDocument::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -50,20 +50,11 @@ class Folder extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ])]
     public ?DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ])]
     public ?DateTime $updatedAt;
-
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public int $version;
-
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?DateTime $versionCreatedAt;
-
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?string $versionCreatedBy;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
@@ -131,39 +122,6 @@ class Folder extends AbstractTranslatableResource
     public function setUpdatedAt(?DateTime $updatedAt): Folder
     {
         $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    public function getVersion(): int
-    {
-        return $this->version;
-    }
-
-    public function setVersion(int $version): Folder
-    {
-        $this->version = $version;
-        return $this;
-    }
-
-    public function getVersionCreatedAt(): ?DateTime
-    {
-        return $this->versionCreatedAt;
-    }
-
-    public function setVersionCreatedAt(?DateTime $versionCreatedAt): Folder
-    {
-        $this->versionCreatedAt = $versionCreatedAt;
-        return $this;
-    }
-
-    public function getVersionCreatedBy(): ?string
-    {
-        return $this->versionCreatedBy;
-    }
-
-    public function setVersionCreatedBy(?string $versionCreatedBy): Folder
-    {
-        $this->versionCreatedBy = $versionCreatedBy;
         return $this;
     }
 
