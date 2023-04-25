@@ -19,7 +19,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
@@ -34,14 +33,14 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
         ),
         new Get(
             uriTemplate: '/admin/addresses/{id}',
-            normalizationContext:  ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/addresses/{id}'
         ),
         new Delete(
             uriTemplate: '/admin/addresses/{id}'
-        )
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ, CustomerTitle::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
@@ -50,7 +49,7 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
     filterClass: SearchFilter::class,
     properties: [
         'label',
-        'customer.id' => 'exact'
+        'customer.id' => 'exact',
     ]
 )]
 class Address extends AbstractPropelResource
@@ -59,16 +58,16 @@ class Address extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'address:read:single';
     public const GROUP_WRITE = 'address:write';
 
-    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE,Cart::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE, Cart::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
     public string $label;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE,Cart::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE, Cart::GROUP_READ_SINGLE])]
     public string $firstname;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE,Cart::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE, Cart::GROUP_READ_SINGLE])]
     public string $lastname;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
@@ -77,10 +76,10 @@ class Address extends AbstractPropelResource
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
     public string $address2;
 
-    #[Groups([self::GROUP_WRITE,self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[Groups([self::GROUP_WRITE, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
     public string $address3 = '';
 
-    #[Groups([self::GROUP_WRITE,self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[Groups([self::GROUP_WRITE, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
     public string $zipcode = '';
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
@@ -99,10 +98,10 @@ class Address extends AbstractPropelResource
     public ?bool $isDefault;
 
     #[Groups([self::GROUP_READ_SINGLE])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ_SINGLE])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     #[Relation(targetResource: Country::class)]
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
@@ -117,7 +116,7 @@ class Address extends AbstractPropelResource
     public Customer $customer;
 
     #[Relation(targetResource: CustomerTitle::class)]
-    #[Groups(groups:[self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups(groups: [self::GROUP_READ, self::GROUP_WRITE])]
     public CustomerTitle $customerTitle;
 
     public function getId(): ?int
@@ -125,9 +124,10 @@ class Address extends AbstractPropelResource
         return $this->id;
     }
 
-    public function setId(?int $id): Address
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -136,9 +136,10 @@ class Address extends AbstractPropelResource
         return $this->label;
     }
 
-    public function setLabel(string $label): Address
+    public function setLabel(string $label): self
     {
         $this->label = $label;
+
         return $this;
     }
 
@@ -147,9 +148,10 @@ class Address extends AbstractPropelResource
         return $this->firstname;
     }
 
-    public function setFirstname(string $firstname): Address
+    public function setFirstname(string $firstname): self
     {
         $this->firstname = $firstname;
+
         return $this;
     }
 
@@ -158,9 +160,10 @@ class Address extends AbstractPropelResource
         return $this->lastname;
     }
 
-    public function setLastname(string $lastname): Address
+    public function setLastname(string $lastname): self
     {
         $this->lastname = $lastname;
+
         return $this;
     }
 
@@ -169,9 +172,10 @@ class Address extends AbstractPropelResource
         return $this->address1;
     }
 
-    public function setAddress1(string $address1): Address
+    public function setAddress1(string $address1): self
     {
         $this->address1 = $address1;
+
         return $this;
     }
 
@@ -180,9 +184,10 @@ class Address extends AbstractPropelResource
         return $this->address2;
     }
 
-    public function setAddress2(string $address2): Address
+    public function setAddress2(string $address2): self
     {
         $this->address2 = $address2;
+
         return $this;
     }
 
@@ -191,9 +196,10 @@ class Address extends AbstractPropelResource
         return $this->address3;
     }
 
-    public function setAddress3(string $address3): Address
+    public function setAddress3(string $address3): self
     {
         $this->address3 = $address3;
+
         return $this;
     }
 
@@ -202,9 +208,10 @@ class Address extends AbstractPropelResource
         return $this->zipcode;
     }
 
-    public function setZipcode(string $zipcode): Address
+    public function setZipcode(string $zipcode): self
     {
         $this->zipcode = $zipcode;
+
         return $this;
     }
 
@@ -213,9 +220,10 @@ class Address extends AbstractPropelResource
         return $this->company;
     }
 
-    public function setCompany(?string $company): Address
+    public function setCompany(?string $company): self
     {
         $this->company = $company;
+
         return $this;
     }
 
@@ -224,9 +232,10 @@ class Address extends AbstractPropelResource
         return $this->cellphone;
     }
 
-    public function setCellphone(?string $cellphone): Address
+    public function setCellphone(?string $cellphone): self
     {
         $this->cellphone = $cellphone;
+
         return $this;
     }
 
@@ -235,9 +244,10 @@ class Address extends AbstractPropelResource
         return $this->phone;
     }
 
-    public function setPhone(?string $phone): Address
+    public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
+
         return $this;
     }
 
@@ -246,9 +256,10 @@ class Address extends AbstractPropelResource
         return $this->city;
     }
 
-    public function setCity(?string $city): Address
+    public function setCity(?string $city): self
     {
         $this->city = $city;
+
         return $this;
     }
 
@@ -257,31 +268,34 @@ class Address extends AbstractPropelResource
         return $this->isDefault;
     }
 
-    public function setIsDefault(?bool $isDefault): Address
+    public function setIsDefault(?bool $isDefault): self
     {
         $this->isDefault = $isDefault;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): Address
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): Address
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -290,9 +304,10 @@ class Address extends AbstractPropelResource
         return $this->country;
     }
 
-    public function setCountry(Country $country): Address
+    public function setCountry(Country $country): self
     {
         $this->country = $country;
+
         return $this;
     }
 
@@ -301,9 +316,10 @@ class Address extends AbstractPropelResource
         return $this->state;
     }
 
-    public function setState(?State $state): Address
+    public function setState(?State $state): self
     {
         $this->state = $state;
+
         return $this;
     }
 
@@ -312,9 +328,10 @@ class Address extends AbstractPropelResource
         return $this->customer;
     }
 
-    public function setCustomer(Customer $customer): Address
+    public function setCustomer(Customer $customer): self
     {
         $this->customer = $customer;
+
         return $this;
     }
 
@@ -323,9 +340,10 @@ class Address extends AbstractPropelResource
         return $this->customerTitle;
     }
 
-    public function setCustomerTitle(CustomerTitle $customerTitle): Address
+    public function setCustomerTitle(CustomerTitle $customerTitle): self
     {
         $this->customerTitle = $customerTitle;
+
         return $this;
     }
 

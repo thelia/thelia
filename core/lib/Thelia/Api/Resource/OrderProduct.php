@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Propel\Runtime\Collection\ArrayCollection;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -56,16 +55,16 @@ class OrderProduct extends AbstractPropelResource
     #[Groups([self::GROUP_READ_SINGLE])]
     public Order $order;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public string $productRef;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public string $productSaleElementsRef;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?int $productSaleElementsId;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?string $title;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -77,28 +76,28 @@ class OrderProduct extends AbstractPropelResource
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $postscriptum;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public int $quantity;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public float $price;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?float $promoPrice;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?float $unitTaxedPrice;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public bool $wasNew;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public bool $wasInPromo;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?float $weight;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?string $eanCode;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -117,13 +116,13 @@ class OrderProduct extends AbstractPropelResource
     public ?bool $virtualDocument;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     #[Relation(targetResource: OrderProductTax::class)]
-    #[Groups([self::GROUP_READ_SINGLE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE])]
     public Collection $orderProductTaxes;
 
     public function __construct()
@@ -136,9 +135,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->id;
     }
 
-    public function setId(?int $id): OrderProduct
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -147,9 +147,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->order;
     }
 
-    public function setOrder(Order $order): OrderProduct
+    public function setOrder(Order $order): self
     {
         $this->order = $order;
+
         return $this;
     }
 
@@ -158,9 +159,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->productRef;
     }
 
-    public function setProductRef(string $productRef): OrderProduct
+    public function setProductRef(string $productRef): self
     {
         $this->productRef = $productRef;
+
         return $this;
     }
 
@@ -169,9 +171,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->productSaleElementsRef;
     }
 
-    public function setProductSaleElementsRef(string $productSaleElementsRef): OrderProduct
+    public function setProductSaleElementsRef(string $productSaleElementsRef): self
     {
         $this->productSaleElementsRef = $productSaleElementsRef;
+
         return $this;
     }
 
@@ -180,9 +183,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->productSaleElementsId;
     }
 
-    public function setProductSaleElementsId(?int $productSaleElementsId): OrderProduct
+    public function setProductSaleElementsId(?int $productSaleElementsId): self
     {
         $this->productSaleElementsId = $productSaleElementsId;
+
         return $this;
     }
 
@@ -191,9 +195,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->title;
     }
 
-    public function setTitle(?string $title): OrderProduct
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -202,9 +207,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->chapo;
     }
 
-    public function setChapo(?string $chapo): OrderProduct
+    public function setChapo(?string $chapo): self
     {
         $this->chapo = $chapo;
+
         return $this;
     }
 
@@ -213,9 +219,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->description;
     }
 
-    public function setDescription(?string $description): OrderProduct
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -224,9 +231,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->postscriptum;
     }
 
-    public function setPostscriptum(?string $postscriptum): OrderProduct
+    public function setPostscriptum(?string $postscriptum): self
     {
         $this->postscriptum = $postscriptum;
+
         return $this;
     }
 
@@ -235,9 +243,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->quantity;
     }
 
-    public function setQuantity(int $quantity): OrderProduct
+    public function setQuantity(int $quantity): self
     {
         $this->quantity = $quantity;
+
         return $this;
     }
 
@@ -246,9 +255,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->price;
     }
 
-    public function setPrice(float $price): OrderProduct
+    public function setPrice(float $price): self
     {
         $this->price = $price;
+
         return $this;
     }
 
@@ -257,9 +267,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->promoPrice;
     }
 
-    public function setPromoPrice(?float $promoPrice): OrderProduct
+    public function setPromoPrice(?float $promoPrice): self
     {
         $this->promoPrice = $promoPrice;
+
         return $this;
     }
 
@@ -273,9 +284,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->wasNew;
     }
 
-    public function setWasNew(bool $wasNew): OrderProduct
+    public function setWasNew(bool $wasNew): self
     {
         $this->wasNew = $wasNew;
+
         return $this;
     }
 
@@ -284,9 +296,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->wasInPromo;
     }
 
-    public function setWasInPromo(bool $wasInPromo): OrderProduct
+    public function setWasInPromo(bool $wasInPromo): self
     {
         $this->wasInPromo = $wasInPromo;
+
         return $this;
     }
 
@@ -295,9 +308,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->weight;
     }
 
-    public function setWeight(?float $weight): OrderProduct
+    public function setWeight(?float $weight): self
     {
         $this->weight = $weight;
+
         return $this;
     }
 
@@ -306,9 +320,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->eanCode;
     }
 
-    public function setEanCode(?string $eanCode): OrderProduct
+    public function setEanCode(?string $eanCode): self
     {
         $this->eanCode = $eanCode;
+
         return $this;
     }
 
@@ -317,9 +332,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->taxRuleTitle;
     }
 
-    public function setTaxRuleTitle(?string $taxRuleTitle): OrderProduct
+    public function setTaxRuleTitle(?string $taxRuleTitle): self
     {
         $this->taxRuleTitle = $taxRuleTitle;
+
         return $this;
     }
 
@@ -328,9 +344,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->taxRuleDescription;
     }
 
-    public function setTaxRuleDescription(?string $taxRuleDescription): OrderProduct
+    public function setTaxRuleDescription(?string $taxRuleDescription): self
     {
         $this->taxRuleDescription = $taxRuleDescription;
+
         return $this;
     }
 
@@ -339,9 +356,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->parent;
     }
 
-    public function setParent(?int $parent): OrderProduct
+    public function setParent(?int $parent): self
     {
         $this->parent = $parent;
+
         return $this;
     }
 
@@ -350,9 +368,10 @@ class OrderProduct extends AbstractPropelResource
         return $this->virtual;
     }
 
-    public function setVirtual(bool $virtual): OrderProduct
+    public function setVirtual(bool $virtual): self
     {
         $this->virtual = $virtual;
+
         return $this;
     }
 
@@ -361,31 +380,34 @@ class OrderProduct extends AbstractPropelResource
         return $this->virtualDocument;
     }
 
-    public function setVirtualDocument(?bool $virtualDocument): OrderProduct
+    public function setVirtualDocument(?bool $virtualDocument): self
     {
         $this->virtualDocument = $virtualDocument;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): OrderProduct
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): OrderProduct
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -394,41 +416,40 @@ class OrderProduct extends AbstractPropelResource
         return $this->orderProductTaxes;
     }
 
-    public function setOrderProductTaxes(Collection $orderProductTaxes): OrderProduct
+    public function setOrderProductTaxes(Collection $orderProductTaxes): self
     {
         $this->orderProductTaxes = $orderProductTaxes;
+
         return $this;
     }
 
     public function afterModelToResource(array $context): void
     {
-        if ($context['operation'] instanceof Get || $context['operation'] instanceof GetCollection){
-            //unitTaxedPrice
+        if ($context['operation'] instanceof Get || $context['operation'] instanceof GetCollection) {
+            // unitTaxedPrice
             $totalTax = 0;
             $totalPromoTax = 0;
-            if(!empty($this->orderProductTaxes->getData())){
+            if (!empty($this->orderProductTaxes->getData())) {
                 /** @var OrderProductTax $orderProductTax */
                 foreach ($this->orderProductTaxes->getData() as $orderProductTax) {
-
                     /** @var \Thelia\Model\OrderProductTax $orderProductTax */
                     $propelOrderProductTax = $orderProductTax->getPropelModel();
                     if (!$this->getPropelModel()->getWasInPromo()) {
-                        $totalTax += (float)$propelOrderProductTax->getAmount();
+                        $totalTax += (float) $propelOrderProductTax->getAmount();
                     }
                     if ($this->getPropelModel()->getWasInPromo()) {
-                        $totalPromoTax += (float)$propelOrderProductTax->getPromoAmount();
+                        $totalPromoTax += (float) $propelOrderProductTax->getPromoAmount();
                     }
                 }
                 if (!$this->getPropelModel()->getWasInPromo()) {
                     $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalTax;
                 }
                 if ($this->getPropelModel()->getWasInPromo()) {
-                    $this->unitTaxedPrice = $this->getPropelModel()->getPrice()  + $totalPromoTax;
+                    $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalPromoTax;
                 }
             }
         }
     }
-
 
     public static function getPropelModelClass(): string
     {
