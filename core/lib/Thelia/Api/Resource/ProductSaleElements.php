@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -8,7 +18,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
@@ -34,34 +43,32 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-
 class ProductSaleElements extends AbstractPropelResource
 {
-
     public const GROUP_READ = 'product_sale_elements:read';
     public const GROUP_READ_SINGLE = 'product_sale_elements:read:single';
     public const GROUP_WRITE = 'product_sale_elements:write';
 
-    #[Groups([self::GROUP_READ,CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_READ, CartItem::GROUP_READ])]
     public ?int $id = null;
 
     #[Relation(targetResource: Product::class)]
     #[Groups([self::GROUP_READ])]
     public ?Product $product;
 
-    #[Groups([self::GROUP_READ,CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_READ, CartItem::GROUP_READ])]
     public string $ref;
 
-    #[Groups([self::GROUP_READ,CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_READ, CartItem::GROUP_READ])]
     public int $quantity;
 
-    #[Groups([self::GROUP_READ,CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_READ, CartItem::GROUP_READ])]
     public ?bool $promo;
 
-    #[Groups([self::GROUP_READ,CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_READ, CartItem::GROUP_READ])]
     public ?bool $newness;
 
-    #[Groups([self::GROUP_READ,CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_READ, CartItem::GROUP_READ])]
     public ?float $weight;
 
     #[Groups([self::GROUP_READ])]
@@ -71,19 +78,20 @@ class ProductSaleElements extends AbstractPropelResource
     public ?string $eanCode;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(?int $id): ProductSaleElements
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -92,9 +100,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->product;
     }
 
-    public function setProduct(?Product $product): ProductSaleElements
+    public function setProduct(?Product $product): self
     {
         $this->product = $product;
+
         return $this;
     }
 
@@ -103,9 +112,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->ref;
     }
 
-    public function setRef(string $ref): ProductSaleElements
+    public function setRef(string $ref): self
     {
         $this->ref = $ref;
+
         return $this;
     }
 
@@ -114,9 +124,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->quantity;
     }
 
-    public function setQuantity(int $quantity): ProductSaleElements
+    public function setQuantity(int $quantity): self
     {
         $this->quantity = $quantity;
+
         return $this;
     }
 
@@ -125,9 +136,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->promo;
     }
 
-    public function setPromo(?bool $promo): ProductSaleElements
+    public function setPromo(?bool $promo): self
     {
         $this->promo = $promo;
+
         return $this;
     }
 
@@ -136,9 +148,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->newness;
     }
 
-    public function setNewness(?bool $newness): ProductSaleElements
+    public function setNewness(?bool $newness): self
     {
         $this->newness = $newness;
+
         return $this;
     }
 
@@ -147,9 +160,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->weight;
     }
 
-    public function setWeight(?float $weight): ProductSaleElements
+    public function setWeight(?float $weight): self
     {
         $this->weight = $weight;
+
         return $this;
     }
 
@@ -158,9 +172,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->isDefault;
     }
 
-    public function setIsDefault(?bool $isDefault): ProductSaleElements
+    public function setIsDefault(?bool $isDefault): self
     {
         $this->isDefault = $isDefault;
+
         return $this;
     }
 
@@ -169,31 +184,34 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->eanCode;
     }
 
-    public function setEanCode(?string $eanCode): ProductSaleElements
+    public function setEanCode(?string $eanCode): self
     {
         $this->eanCode = $eanCode;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): ProductSaleElements
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): ProductSaleElements
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 

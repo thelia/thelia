@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -8,7 +18,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -39,22 +48,22 @@ class Lang extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'lang:read:single';
     public const GROUP_WRITE = 'lang:write';
 
-    #[Groups([self::GROUP_READ,self::GROUP_WRITE,Order::GROUP_READ_SINGLE,Customer::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Customer::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ,self::GROUP_WRITE,Customer::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE])]
     public ?string $title;
 
-    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $code;
 
-    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $locale;
 
-    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $url;
 
-    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $dateFormat;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -85,19 +94,20 @@ class Lang extends AbstractPropelResource
     public ?int $position;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(?int $id): Lang
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -106,9 +116,10 @@ class Lang extends AbstractPropelResource
         return $this->title;
     }
 
-    public function setTitle(?string $title): Lang
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -117,9 +128,10 @@ class Lang extends AbstractPropelResource
         return $this->code;
     }
 
-    public function setCode(?string $code): Lang
+    public function setCode(?string $code): self
     {
         $this->code = $code;
+
         return $this;
     }
 
@@ -128,9 +140,10 @@ class Lang extends AbstractPropelResource
         return $this->locale;
     }
 
-    public function setLocale(?string $locale): Lang
+    public function setLocale(?string $locale): self
     {
         $this->locale = $locale;
+
         return $this;
     }
 
@@ -139,9 +152,10 @@ class Lang extends AbstractPropelResource
         return $this->url;
     }
 
-    public function setUrl(?string $url): Lang
+    public function setUrl(?string $url): self
     {
         $this->url = $url;
+
         return $this;
     }
 
@@ -150,9 +164,10 @@ class Lang extends AbstractPropelResource
         return $this->dateFormat;
     }
 
-    public function setDateFormat(?string $dateFormat): Lang
+    public function setDateFormat(?string $dateFormat): self
     {
         $this->dateFormat = $dateFormat;
+
         return $this;
     }
 
@@ -161,9 +176,10 @@ class Lang extends AbstractPropelResource
         return $this->timeFormat;
     }
 
-    public function setTimeFormat(?string $timeFormat): Lang
+    public function setTimeFormat(?string $timeFormat): self
     {
         $this->timeFormat = $timeFormat;
+
         return $this;
     }
 
@@ -172,9 +188,10 @@ class Lang extends AbstractPropelResource
         return $this->datetimeFormat;
     }
 
-    public function setDatetimeFormat(?string $datetimeFormat): Lang
+    public function setDatetimeFormat(?string $datetimeFormat): self
     {
         $this->datetimeFormat = $datetimeFormat;
+
         return $this;
     }
 
@@ -183,9 +200,10 @@ class Lang extends AbstractPropelResource
         return $this->decimalSeparator;
     }
 
-    public function setDecimalSeparator(?string $decimalSeparator): Lang
+    public function setDecimalSeparator(?string $decimalSeparator): self
     {
         $this->decimalSeparator = $decimalSeparator;
+
         return $this;
     }
 
@@ -194,9 +212,10 @@ class Lang extends AbstractPropelResource
         return $this->thousandsSeparator;
     }
 
-    public function setThousandsSeparator(?string $thousandsSeparator): Lang
+    public function setThousandsSeparator(?string $thousandsSeparator): self
     {
         $this->thousandsSeparator = $thousandsSeparator;
+
         return $this;
     }
 
@@ -205,9 +224,10 @@ class Lang extends AbstractPropelResource
         return $this->active;
     }
 
-    public function setActive(?bool $active): Lang
+    public function setActive(?bool $active): self
     {
         $this->active = $active;
+
         return $this;
     }
 
@@ -216,9 +236,10 @@ class Lang extends AbstractPropelResource
         return $this->visible;
     }
 
-    public function setVisible(?bool $visible): Lang
+    public function setVisible(?bool $visible): self
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -227,9 +248,10 @@ class Lang extends AbstractPropelResource
         return $this->decimals;
     }
 
-    public function setDecimals(?string $decimals): Lang
+    public function setDecimals(?string $decimals): self
     {
         $this->decimals = $decimals;
+
         return $this;
     }
 
@@ -238,9 +260,10 @@ class Lang extends AbstractPropelResource
         return $this->byDefault;
     }
 
-    public function setByDefault(?bool $byDefault): Lang
+    public function setByDefault(?bool $byDefault): self
     {
         $this->byDefault = $byDefault;
+
         return $this;
     }
 
@@ -249,31 +272,34 @@ class Lang extends AbstractPropelResource
         return $this->position;
     }
 
-    public function setPosition(?int $position): Lang
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): Lang
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): Lang
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
