@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -8,7 +18,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
@@ -28,7 +37,7 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
         ),
         new Delete(
             uriTemplate: '/admin/folder_images/{id}'
-        )
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
@@ -56,10 +65,10 @@ class FolderImage extends AbstractTranslatableResource
     public ?int $position;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
@@ -69,9 +78,10 @@ class FolderImage extends AbstractTranslatableResource
         return $this->id;
     }
 
-    public function setId(?int $id): FolderImage
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -80,9 +90,10 @@ class FolderImage extends AbstractTranslatableResource
         return $this->folder;
     }
 
-    public function setFolder(Folder $folder): FolderImage
+    public function setFolder(Folder $folder): self
     {
         $this->folder = $folder;
+
         return $this;
     }
 
@@ -91,9 +102,10 @@ class FolderImage extends AbstractTranslatableResource
         return $this->file;
     }
 
-    public function setFile(string $file): FolderImage
+    public function setFile(string $file): self
     {
         $this->file = $file;
+
         return $this;
     }
 
@@ -102,9 +114,10 @@ class FolderImage extends AbstractTranslatableResource
         return $this->visible;
     }
 
-    public function setVisible(bool $visible): FolderImage
+    public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -113,31 +126,34 @@ class FolderImage extends AbstractTranslatableResource
         return $this->position;
     }
 
-    public function setPosition(?int $position): FolderImage
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): FolderImage
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): FolderImage
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 

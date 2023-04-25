@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -37,7 +36,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Delete(
             uriTemplate: '/admin/customer_titles/{id}'
-        )
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
@@ -48,7 +47,7 @@ class CustomerTitle extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'customer_title:read:single';
     public const GROUP_WRITE = 'customer_title:write';
 
-    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE, Address::GROUP_READ,OrderAddress::GROUP_READ_SINGLE,State::GROUP_READ_SINGLE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE, Address::GROUP_READ, OrderAddress::GROUP_READ_SINGLE, State::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -58,10 +57,10 @@ class CustomerTitle extends AbstractTranslatableResource
     public int $byDefault;
 
     #[Groups([self::GROUP_READ_SINGLE])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ_SINGLE])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
@@ -71,9 +70,10 @@ class CustomerTitle extends AbstractTranslatableResource
         return $this->id;
     }
 
-    public function setId(?int $id): CustomerTitle
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -82,9 +82,10 @@ class CustomerTitle extends AbstractTranslatableResource
         return $this->position;
     }
 
-    public function setPosition(string $position): CustomerTitle
+    public function setPosition(string $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -93,31 +94,34 @@ class CustomerTitle extends AbstractTranslatableResource
         return $this->byDefault;
     }
 
-    public function setByDefault(int $byDefault): CustomerTitle
+    public function setByDefault(int $byDefault): self
     {
         $this->byDefault = $byDefault;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): CustomerTitle
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): CustomerTitle
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 

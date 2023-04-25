@@ -19,7 +19,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Propel\Runtime\Collection\ArrayCollection;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -37,14 +36,14 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
         ),
         new Get(
             uriTemplate: '/admin/customers/{id}',
-            normalizationContext:  ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/customers/{id}'
         ),
         new Delete(
             uriTemplate: '/admin/customers/{id}'
-        )
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
@@ -54,13 +53,13 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
     properties: [
         'ref',
         'firstname',
-        'lastname'
+        'lastname',
     ]
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'createdAt'
+        'createdAt',
     ]
 )]
 class Customer extends AbstractPropelResource
@@ -69,27 +68,27 @@ class Customer extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'customer:read:single';
     public const GROUP_WRITE = 'customer:write';
 
-    #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE, Order::GROUP_READ,Cart::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE, Order::GROUP_READ, Cart::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Relation(targetResource: CustomerTitle::class)]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE, Address::GROUP_READ_SINGLE])]
     public CustomerTitle $customerTitle;
 
-    #[Relation(targetResource: Lang::class, relationAlias: "LangModel")]
-    #[Groups([self::GROUP_READ_SINGLE,self::GROUP_WRITE])]
+    #[Relation(targetResource: Lang::class, relationAlias: 'LangModel')]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?Lang $lang;
 
     #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE, Order::GROUP_READ])]
     public ?string $ref;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Address::GROUP_READ_SINGLE, Order::GROUP_READ,Order::GROUP_READ_SINGLE,Cart::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Address::GROUP_READ_SINGLE, Order::GROUP_READ, Order::GROUP_READ_SINGLE, Cart::GROUP_READ_SINGLE])]
     public string $firstname;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ,Order::GROUP_READ_SINGLE,Cart::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_READ_SINGLE, Cart::GROUP_READ_SINGLE])]
     public string $lastname;
 
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE, Order::GROUP_READ,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?string $email;
 
     public ?string $password;
@@ -113,19 +112,19 @@ class Customer extends AbstractPropelResource
     public ?string $confirmationToken;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ_SINGLE])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     public ?int $version;
 
-    public ?DateTime $versionCreatedAt;
+    public ?\DateTime $versionCreatedAt;
 
     public ?string $versionCreatedBy;
 
     #[Relation(targetResource: Address::class)]
-    #[Groups([self::GROUP_READ_SINGLE,self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Collection $addresses;
 
     public function __construct()
@@ -138,9 +137,10 @@ class Customer extends AbstractPropelResource
         return $this->id;
     }
 
-    public function setId(?int $id): Customer
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -149,9 +149,10 @@ class Customer extends AbstractPropelResource
         return $this->customerTitle;
     }
 
-    public function setCustomerTitle(CustomerTitle $customerTitle): Customer
+    public function setCustomerTitle(CustomerTitle $customerTitle): self
     {
         $this->customerTitle = $customerTitle;
+
         return $this;
     }
 
@@ -160,9 +161,10 @@ class Customer extends AbstractPropelResource
         return $this->lang;
     }
 
-    public function setLang(?Lang $lang): Customer
+    public function setLang(?Lang $lang): self
     {
         $this->lang = $lang;
+
         return $this;
     }
 
@@ -171,9 +173,10 @@ class Customer extends AbstractPropelResource
         return $this->ref;
     }
 
-    public function setRef(?string $ref): Customer
+    public function setRef(?string $ref): self
     {
         $this->ref = $ref;
+
         return $this;
     }
 
@@ -182,9 +185,10 @@ class Customer extends AbstractPropelResource
         return $this->firstname;
     }
 
-    public function setFirstname(string $firstname): Customer
+    public function setFirstname(string $firstname): self
     {
         $this->firstname = $firstname;
+
         return $this;
     }
 
@@ -193,9 +197,10 @@ class Customer extends AbstractPropelResource
         return $this->lastname;
     }
 
-    public function setLastname(string $lastname): Customer
+    public function setLastname(string $lastname): self
     {
         $this->lastname = $lastname;
+
         return $this;
     }
 
@@ -204,9 +209,10 @@ class Customer extends AbstractPropelResource
         return $this->email;
     }
 
-    public function setEmail(?string $email): Customer
+    public function setEmail(?string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -215,9 +221,10 @@ class Customer extends AbstractPropelResource
         return $this->password;
     }
 
-    public function setPassword(?string $password): Customer
+    public function setPassword(?string $password): self
     {
         $this->password = $password;
+
         return $this;
     }
 
@@ -226,9 +233,10 @@ class Customer extends AbstractPropelResource
         return $this->algo;
     }
 
-    public function setAlgo(?string $algo): Customer
+    public function setAlgo(?string $algo): self
     {
         $this->algo = $algo;
+
         return $this;
     }
 
@@ -237,9 +245,10 @@ class Customer extends AbstractPropelResource
         return $this->reseller;
     }
 
-    public function setReseller(?bool $reseller): Customer
+    public function setReseller(?bool $reseller): self
     {
         $this->reseller = $reseller;
+
         return $this;
     }
 
@@ -248,9 +257,10 @@ class Customer extends AbstractPropelResource
         return $this->sponsor;
     }
 
-    public function setSponsor(?string $sponsor): Customer
+    public function setSponsor(?string $sponsor): self
     {
         $this->sponsor = $sponsor;
+
         return $this;
     }
 
@@ -259,9 +269,10 @@ class Customer extends AbstractPropelResource
         return $this->discount;
     }
 
-    public function setDiscount(?float $discount): Customer
+    public function setDiscount(?float $discount): self
     {
         $this->discount = $discount;
+
         return $this;
     }
 
@@ -270,9 +281,10 @@ class Customer extends AbstractPropelResource
         return $this->rememberMeToken;
     }
 
-    public function setRememberMeToken(?string $rememberMeToken): Customer
+    public function setRememberMeToken(?string $rememberMeToken): self
     {
         $this->rememberMeToken = $rememberMeToken;
+
         return $this;
     }
 
@@ -281,9 +293,10 @@ class Customer extends AbstractPropelResource
         return $this->rememberMeSerial;
     }
 
-    public function setRememberMeSerial(?string $rememberMeSerial): Customer
+    public function setRememberMeSerial(?string $rememberMeSerial): self
     {
         $this->rememberMeSerial = $rememberMeSerial;
+
         return $this;
     }
 
@@ -292,9 +305,10 @@ class Customer extends AbstractPropelResource
         return $this->enable;
     }
 
-    public function setEnable(?bool $enable): Customer
+    public function setEnable(?bool $enable): self
     {
         $this->enable = $enable;
+
         return $this;
     }
 
@@ -303,31 +317,34 @@ class Customer extends AbstractPropelResource
         return $this->confirmationToken;
     }
 
-    public function setConfirmationToken(?string $confirmationToken): Customer
+    public function setConfirmationToken(?string $confirmationToken): self
     {
         $this->confirmationToken = $confirmationToken;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): Customer
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): Customer
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -336,20 +353,22 @@ class Customer extends AbstractPropelResource
         return $this->version;
     }
 
-    public function setVersion(?int $version): Customer
+    public function setVersion(?int $version): self
     {
         $this->version = $version;
+
         return $this;
     }
 
-    public function getVersionCreatedAt(): ?DateTime
+    public function getVersionCreatedAt(): ?\DateTime
     {
         return $this->versionCreatedAt;
     }
 
-    public function setVersionCreatedAt(?DateTime $versionCreatedAt): Customer
+    public function setVersionCreatedAt(?\DateTime $versionCreatedAt): self
     {
         $this->versionCreatedAt = $versionCreatedAt;
+
         return $this;
     }
 
@@ -358,9 +377,10 @@ class Customer extends AbstractPropelResource
         return $this->versionCreatedBy;
     }
 
-    public function setVersionCreatedBy(?string $versionCreatedBy): Customer
+    public function setVersionCreatedBy(?string $versionCreatedBy): self
     {
         $this->versionCreatedBy = $versionCreatedBy;
+
         return $this;
     }
 
@@ -369,9 +389,10 @@ class Customer extends AbstractPropelResource
         return $this->addresses;
     }
 
-    public function setAddresses(Collection $addresses): Customer
+    public function setAddresses(Collection $addresses): self
     {
         $this->addresses = $addresses;
+
         return $this;
     }
 

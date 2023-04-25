@@ -1,8 +1,16 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
-
-
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -10,7 +18,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -29,7 +36,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Delete(
             uriTemplate: '/admin/countries/{id}'
-        )
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
@@ -40,7 +47,7 @@ class Country extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'country:read:single';
     public const GROUP_WRITE = 'country:write';
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ_SINGLE,Customer::GROUP_READ_SINGLE,Address::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE, Customer::GROUP_READ_SINGLE, Address::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -71,10 +78,10 @@ class Country extends AbstractTranslatableResource
     public ?bool $shopCountry;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
@@ -84,9 +91,10 @@ class Country extends AbstractTranslatableResource
         return $this->id;
     }
 
-    public function setId(?int $id): Country
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -95,9 +103,10 @@ class Country extends AbstractTranslatableResource
         return $this->visible;
     }
 
-    public function setVisible(bool $visible): Country
+    public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -106,9 +115,10 @@ class Country extends AbstractTranslatableResource
         return $this->isocode;
     }
 
-    public function setIsocode(string $isocode): Country
+    public function setIsocode(string $isocode): self
     {
         $this->isocode = $isocode;
+
         return $this;
     }
 
@@ -117,9 +127,10 @@ class Country extends AbstractTranslatableResource
         return $this->isoalpha2;
     }
 
-    public function setIsoalpha2(?string $isoalpha2): Country
+    public function setIsoalpha2(?string $isoalpha2): self
     {
         $this->isoalpha2 = $isoalpha2;
+
         return $this;
     }
 
@@ -128,9 +139,10 @@ class Country extends AbstractTranslatableResource
         return $this->isoalpha3;
     }
 
-    public function setIsoalpha3(?string $isoalpha3): Country
+    public function setIsoalpha3(?string $isoalpha3): self
     {
         $this->isoalpha3 = $isoalpha3;
+
         return $this;
     }
 
@@ -139,9 +151,10 @@ class Country extends AbstractTranslatableResource
         return $this->hasStates;
     }
 
-    public function setHasStates(?bool $hasStates): Country
+    public function setHasStates(?bool $hasStates): self
     {
         $this->hasStates = $hasStates;
+
         return $this;
     }
 
@@ -150,9 +163,10 @@ class Country extends AbstractTranslatableResource
         return $this->needZipCode;
     }
 
-    public function setNeedZipCode(?bool $needZipCode): Country
+    public function setNeedZipCode(?bool $needZipCode): self
     {
         $this->needZipCode = $needZipCode;
+
         return $this;
     }
 
@@ -161,9 +175,10 @@ class Country extends AbstractTranslatableResource
         return $this->zipCodeFormat;
     }
 
-    public function setZipCodeFormat(?string $zipCodeFormat): Country
+    public function setZipCodeFormat(?string $zipCodeFormat): self
     {
         $this->zipCodeFormat = $zipCodeFormat;
+
         return $this;
     }
 
@@ -172,9 +187,10 @@ class Country extends AbstractTranslatableResource
         return $this->byDefault;
     }
 
-    public function setByDefault(?bool $byDefault): Country
+    public function setByDefault(?bool $byDefault): self
     {
         $this->byDefault = $byDefault;
+
         return $this;
     }
 
@@ -183,31 +199,34 @@ class Country extends AbstractTranslatableResource
         return $this->shopCountry;
     }
 
-    public function setShopCountry(?bool $shopCountry): Country
+    public function setShopCountry(?bool $shopCountry): self
     {
         $this->shopCountry = $shopCountry;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): Country
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): Country
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
