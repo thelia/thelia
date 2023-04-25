@@ -14,7 +14,6 @@ namespace Thelia\Api\Resource;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 
-
 class ProductI18n extends I18n
 {
     #[Groups([Product::GROUP_READ, Product::GROUP_WRITE])]
@@ -58,6 +57,7 @@ class ProductI18n extends I18n
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 }

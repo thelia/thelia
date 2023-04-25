@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -8,10 +18,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
-
 
 #[ApiResource(
     operations: [
@@ -29,7 +37,7 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
         ),
         new Delete(
             uriTemplate: '/admin/states/{id}'
-        )
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
@@ -40,24 +48,24 @@ class State extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'state:read:single';
     public const GROUP_WRITE = 'state:write';
 
-    #[Groups([self::GROUP_READ,Customer::GROUP_READ_SINGLE,Address::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE, Address::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,OrderAddress::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderAddress::GROUP_READ])]
     public bool $visible;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,OrderAddress::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderAddress::GROUP_READ])]
     public ?string $isocode;
 
     #[Relation(targetResource: Country::class)]
-    #[Groups(groups:[self::GROUP_READ,self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
+    #[Groups(groups: [self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public Country $country;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
@@ -67,9 +75,10 @@ class State extends AbstractTranslatableResource
         return $this->id;
     }
 
-    public function setId(?int $id): State
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -78,9 +87,10 @@ class State extends AbstractTranslatableResource
         return $this->visible;
     }
 
-    public function setVisible(bool $visible): State
+    public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -89,9 +99,10 @@ class State extends AbstractTranslatableResource
         return $this->isocode;
     }
 
-    public function setIsocode(?string $isocode): State
+    public function setIsocode(?string $isocode): self
     {
         $this->isocode = $isocode;
+
         return $this;
     }
 
@@ -100,31 +111,34 @@ class State extends AbstractTranslatableResource
         return $this->country;
     }
 
-    public function setCountry(Country $country): State
+    public function setCountry(Country $country): self
     {
         $this->country = $country;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): State
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): State
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 

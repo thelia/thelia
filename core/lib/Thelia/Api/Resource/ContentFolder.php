@@ -1,10 +1,19 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
@@ -12,7 +21,7 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
     operations: [
         new Get(
             uriTemplate: '/admin/content_folders/{content}/folders/{folder}'
-        )
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
@@ -38,19 +47,20 @@ class ContentFolder extends AbstractPropelResource
     public ?int $position;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     public function getContent(): Content
     {
         return $this->content;
     }
 
-    public function setContent(Content $content): ContentFolder
+    public function setContent(Content $content): self
     {
         $this->content = $content;
+
         return $this;
     }
 
@@ -59,9 +69,10 @@ class ContentFolder extends AbstractPropelResource
         return $this->folder;
     }
 
-    public function setFolder(Folder $folder): ContentFolder
+    public function setFolder(Folder $folder): self
     {
         $this->folder = $folder;
+
         return $this;
     }
 
@@ -70,9 +81,10 @@ class ContentFolder extends AbstractPropelResource
         return $this->defaultFolder;
     }
 
-    public function setDefaultFolder(bool $defaultFolder): ContentFolder
+    public function setDefaultFolder(bool $defaultFolder): self
     {
         $this->defaultFolder = $defaultFolder;
+
         return $this;
     }
 
@@ -81,31 +93,34 @@ class ContentFolder extends AbstractPropelResource
         return $this->position;
     }
 
-    public function setPosition(?int $position): ContentFolder
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): ContentFolder
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): ContentFolder
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
