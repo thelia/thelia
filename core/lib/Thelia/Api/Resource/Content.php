@@ -38,7 +38,7 @@ class Content extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'content:read:single';
     public const GROUP_WRITE = 'content:write';
 
-    #[Groups([self::GROUP_READ, ContentFolder::GROUP_READ_SINGLE, ContentImage::GROUP_READ_SINGLE, ContentDocument::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, ContentFolder::GROUP_READ, ContentImage::GROUP_READ_SINGLE, ContentDocument::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -47,20 +47,11 @@ class Content extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ])]
     public ?DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ])]
     public ?DateTime $updatedAt;
-
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public int $version;
-
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?DateTime $versionCreatedAt;
-
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?string $versionCreatedBy;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
@@ -117,39 +108,6 @@ class Content extends AbstractTranslatableResource
     public function setUpdatedAt(?DateTime $updatedAt): Content
     {
         $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    public function getVersion(): int
-    {
-        return $this->version;
-    }
-
-    public function setVersion(int $version): Content
-    {
-        $this->version = $version;
-        return $this;
-    }
-
-    public function getVersionCreatedAt(): ?DateTime
-    {
-        return $this->versionCreatedAt;
-    }
-
-    public function setVersionCreatedAt(?DateTime $versionCreatedAt): Content
-    {
-        $this->versionCreatedAt = $versionCreatedAt;
-        return $this;
-    }
-
-    public function getVersionCreatedBy(): ?string
-    {
-        return $this->versionCreatedBy;
-    }
-
-    public function setVersionCreatedBy(?string $versionCreatedBy): Content
-    {
-        $this->versionCreatedBy = $versionCreatedBy;
         return $this;
     }
 
