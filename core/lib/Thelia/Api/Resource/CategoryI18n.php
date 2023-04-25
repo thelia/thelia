@@ -14,7 +14,6 @@ namespace Thelia\Api\Resource;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 
-
 class CategoryI18n extends I18n
 {
     #[Groups([Category::GROUP_READ, Category::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
@@ -43,9 +42,10 @@ class CategoryI18n extends I18n
         return $this->title;
     }
 
-    public function setTitle(?string $title): CategoryI18n
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -54,9 +54,10 @@ class CategoryI18n extends I18n
         return $this->chapo;
     }
 
-    public function setChapo(?string $chapo): CategoryI18n
+    public function setChapo(?string $chapo): self
     {
         $this->chapo = $chapo;
+
         return $this;
     }
 
@@ -65,9 +66,10 @@ class CategoryI18n extends I18n
         return $this->description;
     }
 
-    public function setDescription(?string $description): CategoryI18n
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -76,9 +78,10 @@ class CategoryI18n extends I18n
         return $this->postscriptum;
     }
 
-    public function setPostscriptum(?string $postscriptum): CategoryI18n
+    public function setPostscriptum(?string $postscriptum): self
     {
         $this->postscriptum = $postscriptum;
+
         return $this;
     }
 
@@ -87,9 +90,10 @@ class CategoryI18n extends I18n
         return $this->metaTitle;
     }
 
-    public function setMetaTitle(?string $metaTitle): CategoryI18n
+    public function setMetaTitle(?string $metaTitle): self
     {
         $this->metaTitle = $metaTitle;
+
         return $this;
     }
 
@@ -98,9 +102,10 @@ class CategoryI18n extends I18n
         return $this->metaDescription;
     }
 
-    public function setMetaDescription(?string $metaDescription): CategoryI18n
+    public function setMetaDescription(?string $metaDescription): self
     {
         $this->metaDescription = $metaDescription;
+
         return $this;
     }
 
@@ -109,9 +114,10 @@ class CategoryI18n extends I18n
         return $this->metaKeywords;
     }
 
-    public function setMetaKeywords(?string $metaKeywords): CategoryI18n
+    public function setMetaKeywords(?string $metaKeywords): self
     {
         $this->metaKeywords = $metaKeywords;
+
         return $this;
     }
 }

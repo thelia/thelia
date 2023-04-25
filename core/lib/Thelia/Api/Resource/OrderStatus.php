@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -43,7 +42,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-//todo add filters
+// todo add filters
 class OrderStatus extends AbstractTranslatableResource
 {
     public const GROUP_READ = 'order_status:read';
@@ -66,10 +65,10 @@ class OrderStatus extends AbstractTranslatableResource
     public ?bool $protectedStatus;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
@@ -79,9 +78,10 @@ class OrderStatus extends AbstractTranslatableResource
         return $this->id;
     }
 
-    public function setId(?int $id): OrderStatus
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -90,9 +90,10 @@ class OrderStatus extends AbstractTranslatableResource
         return $this->code;
     }
 
-    public function setCode(string $code): OrderStatus
+    public function setCode(string $code): self
     {
         $this->code = $code;
+
         return $this;
     }
 
@@ -101,9 +102,10 @@ class OrderStatus extends AbstractTranslatableResource
         return $this->color;
     }
 
-    public function setColor(?string $color): OrderStatus
+    public function setColor(?string $color): self
     {
         $this->color = $color;
+
         return $this;
     }
 
@@ -112,9 +114,10 @@ class OrderStatus extends AbstractTranslatableResource
         return $this->position;
     }
 
-    public function setPosition(?int $position): OrderStatus
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -123,31 +126,34 @@ class OrderStatus extends AbstractTranslatableResource
         return $this->protectedStatus;
     }
 
-    public function setProtectedStatus(?bool $protectedStatus): OrderStatus
+    public function setProtectedStatus(?bool $protectedStatus): self
     {
         $this->protectedStatus = $protectedStatus;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): OrderStatus
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): OrderStatus
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 

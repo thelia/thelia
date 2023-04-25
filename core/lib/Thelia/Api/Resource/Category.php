@@ -18,9 +18,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 #[ApiResource(
     operations: [
@@ -38,7 +36,7 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
         ),
         new Delete(
             uriTemplate: '/admin/categories/{id}'
-        )
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
@@ -65,10 +63,10 @@ class Category extends AbstractTranslatableResource
     public ?int $defaultTemplateId;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
@@ -78,9 +76,10 @@ class Category extends AbstractTranslatableResource
         return $this->id;
     }
 
-    public function setId(?int $id): Category
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -89,9 +88,10 @@ class Category extends AbstractTranslatableResource
         return $this->parent;
     }
 
-    public function setParent(int $parent): Category
+    public function setParent(int $parent): self
     {
         $this->parent = $parent;
+
         return $this;
     }
 
@@ -100,9 +100,10 @@ class Category extends AbstractTranslatableResource
         return $this->visible;
     }
 
-    public function setVisible(bool $visible): Category
+    public function setVisible(bool $visible): self
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -111,9 +112,10 @@ class Category extends AbstractTranslatableResource
         return $this->position;
     }
 
-    public function setPosition(?int $position): Category
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -122,31 +124,34 @@ class Category extends AbstractTranslatableResource
         return $this->defaultTemplateId;
     }
 
-    public function setDefaultTemplateId(?int $defaultTemplateId): Category
+    public function setDefaultTemplateId(?int $defaultTemplateId): self
     {
         $this->defaultTemplateId = $defaultTemplateId;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): Category
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): Category
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 

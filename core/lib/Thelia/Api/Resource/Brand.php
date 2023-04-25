@@ -36,7 +36,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Delete(
             uriTemplate: '/admin/brands/{id}'
-        )
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
@@ -47,7 +47,7 @@ class Brand extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'brand:read:single';
     public const GROUP_WRITE = 'brand:write';
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE,Product::GROUP_READ, Product::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, Product::GROUP_READ, Product::GROUP_WRITE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -88,9 +88,10 @@ class Brand extends AbstractTranslatableResource
         return $this->position;
     }
 
-    public function setPosition(?int $position): Brand
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 

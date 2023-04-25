@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -7,7 +17,6 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -35,38 +44,39 @@ class OrderProductTax extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'order_product_tax:read:single';
     public const GROUP_WRITE = 'order_product_tax:write';
 
-    #[Groups([self::GROUP_READ, OrderProduct::GROUP_READ_SINGLE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, OrderProduct::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public OrderProduct $orderProduct;
 
-    #[Groups([self::GROUP_READ,self::GROUP_WRITE,OrderProduct::GROUP_READ_SINGLE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderProduct::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE])]
     public string $title;
 
-    #[Groups([self::GROUP_READ,self::GROUP_WRITE,OrderProduct::GROUP_READ_SINGLE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderProduct::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE])]
     public ?string $description;
 
-    #[Groups([self::GROUP_READ,self::GROUP_WRITE,OrderProduct::GROUP_READ_SINGLE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderProduct::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE])]
     public float $amount;
 
-    #[Groups([self::GROUP_READ,self::GROUP_WRITE,OrderProduct::GROUP_READ_SINGLE,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderProduct::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE])]
     public ?float $promoAmount;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(?int $id): OrderProductTax
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -75,9 +85,10 @@ class OrderProductTax extends AbstractPropelResource
         return $this->orderProduct;
     }
 
-    public function setOrderProduct(OrderProduct $orderProduct): OrderProductTax
+    public function setOrderProduct(OrderProduct $orderProduct): self
     {
         $this->orderProduct = $orderProduct;
+
         return $this;
     }
 
@@ -86,9 +97,10 @@ class OrderProductTax extends AbstractPropelResource
         return $this->title;
     }
 
-    public function setTitle(string $title): OrderProductTax
+    public function setTitle(string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -97,9 +109,10 @@ class OrderProductTax extends AbstractPropelResource
         return $this->description;
     }
 
-    public function setDescription(?string $description): OrderProductTax
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -108,9 +121,10 @@ class OrderProductTax extends AbstractPropelResource
         return $this->amount;
     }
 
-    public function setAmount(float $amount): OrderProductTax
+    public function setAmount(float $amount): self
     {
         $this->amount = $amount;
+
         return $this;
     }
 
@@ -119,31 +133,34 @@ class OrderProductTax extends AbstractPropelResource
         return $this->promoAmount;
     }
 
-    public function setPromoAmount(?float $promoAmount): OrderProductTax
+    public function setPromoAmount(?float $promoAmount): self
     {
         $this->promoAmount = $promoAmount;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): OrderProductTax
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): OrderProductTax
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
