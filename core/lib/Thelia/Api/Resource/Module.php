@@ -1,6 +1,17 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
+
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -81,9 +92,10 @@ class Module extends AbstractTranslatableResource
         return $this->id;
     }
 
-    public function setId(?int $id): Module
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -92,9 +104,10 @@ class Module extends AbstractTranslatableResource
         return $this->code;
     }
 
-    public function setCode(string $code): Module
+    public function setCode(string $code): self
     {
         $this->code = $code;
+
         return $this;
     }
 
@@ -103,9 +116,10 @@ class Module extends AbstractTranslatableResource
         return $this->category;
     }
 
-    public function setCategory(string $category): Module
+    public function setCategory(string $category): self
     {
         $this->category = $category;
+
         return $this;
     }
 
@@ -114,9 +128,10 @@ class Module extends AbstractTranslatableResource
         return $this->type;
     }
 
-    public function setType(string $type): Module
+    public function setType(string $type): self
     {
         $this->type = $type;
+
         return $this;
     }
 
@@ -125,9 +140,10 @@ class Module extends AbstractTranslatableResource
         return $this->version;
     }
 
-    public function setVersion(string $version): Module
+    public function setVersion(string $version): self
     {
         $this->version = $version;
+
         return $this;
     }
 
@@ -136,9 +152,10 @@ class Module extends AbstractTranslatableResource
         return $this->activate;
     }
 
-    public function setActivate(?bool $activate): Module
+    public function setActivate(?bool $activate): self
     {
         $this->activate = $activate;
+
         return $this;
     }
 
@@ -147,9 +164,10 @@ class Module extends AbstractTranslatableResource
         return $this->fullNamespace;
     }
 
-    public function setFullNamespace(?string $fullNamespace): Module
+    public function setFullNamespace(?string $fullNamespace): self
     {
         $this->fullNamespace = $fullNamespace;
+
         return $this;
     }
 
@@ -158,9 +176,10 @@ class Module extends AbstractTranslatableResource
         return $this->hidden;
     }
 
-    public function setHidden(?bool $hidden): Module
+    public function setHidden(?bool $hidden): self
     {
         $this->hidden = $hidden;
+
         return $this;
     }
 
@@ -169,9 +188,10 @@ class Module extends AbstractTranslatableResource
         return $this->position;
     }
 
-    public function setPosition(?int $position): Module
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -180,9 +200,10 @@ class Module extends AbstractTranslatableResource
         return $this->mandatory;
     }
 
-    public function setMandatory(?bool $mandatory): Module
+    public function setMandatory(?bool $mandatory): self
     {
         $this->mandatory = $mandatory;
+
         return $this;
     }
 
@@ -191,9 +212,10 @@ class Module extends AbstractTranslatableResource
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): Module
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -202,9 +224,10 @@ class Module extends AbstractTranslatableResource
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): Module
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
