@@ -19,7 +19,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Propel\Runtime\Collection\ArrayCollection;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -67,13 +66,13 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
-        'createdAt'
+        'createdAt',
     ]
 )]
 #[ApiFilter(
     filterClass: RangeFilter::class,
     properties: [
-        'discount'
+        'discount',
     ]
 )]
 #[ApiFilter(
@@ -86,23 +85,23 @@ class Order extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'order:read:single';
     public const GROUP_WRITE = 'order:write';
 
-    #[Groups([self::GROUP_READ,OrderCoupon::GROUP_READ_SINGLE,OrderProduct::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, OrderCoupon::GROUP_READ_SINGLE, OrderProduct::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $ref;
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public ?DateTime $invoiceDate;
+    public ?\DateTime $invoiceDate;
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?float $currencyRate;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ_SINGLE])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?float $discount;
@@ -129,7 +128,7 @@ class Order extends AbstractPropelResource
     public ?int $version;
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public ?DateTime $versionCreatedAt;
+    public ?\DateTime $versionCreatedAt;
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?string $versionCreatedBy;
@@ -145,24 +144,24 @@ class Order extends AbstractPropelResource
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Collection $orderCoupons;
 
-    #[Relation(targetResource: OrderAddress::class,relationAlias: "OrderAddressRelatedByInvoiceOrderAddressId")]
+    #[Relation(targetResource: OrderAddress::class, relationAlias: 'OrderAddressRelatedByInvoiceOrderAddressId')]
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public OrderAddress $invoiceOrderAddress;
 
-    #[Relation(targetResource: OrderAddress::class,relationAlias: "OrderAddressRelatedByDeliveryOrderAddressId")]
+    #[Relation(targetResource: OrderAddress::class, relationAlias: 'OrderAddressRelatedByDeliveryOrderAddressId')]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public OrderAddress $deliveryOrderAddress;
 
-    #[Relation(targetResource: Module::class,relationAlias: "ModuleRelatedByPaymentModuleId")]
+    #[Relation(targetResource: Module::class, relationAlias: 'ModuleRelatedByPaymentModuleId')]
     #[Groups([self::GROUP_WRITE])]
     public Module $paymentModule;
 
-    #[Relation(targetResource: Module::class,relationAlias: "ModuleRelatedByDeliveryModuleId")]
+    #[Relation(targetResource: Module::class, relationAlias: 'ModuleRelatedByDeliveryModuleId')]
     #[Groups([self::GROUP_WRITE])]
     public Module $deliveryModule;
 
     #[Relation(targetResource: OrderStatus::class)]
-    #[Groups([self::GROUP_READ,self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public OrderStatus $orderStatus;
 
     #[Relation(targetResource: Customer::class)]
@@ -180,7 +179,6 @@ class Order extends AbstractPropelResource
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public int $cartId;
 
-
     public function __construct()
     {
         $this->orderCoupons = new ArrayCollection();
@@ -197,9 +195,10 @@ class Order extends AbstractPropelResource
         return $this->id;
     }
 
-    public function setId(?int $id): Order
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -208,20 +207,22 @@ class Order extends AbstractPropelResource
         return $this->ref;
     }
 
-    public function setRef(?string $ref): Order
+    public function setRef(?string $ref): self
     {
         $this->ref = $ref;
+
         return $this;
     }
 
-    public function getInvoiceDate(): ?DateTime
+    public function getInvoiceDate(): ?\DateTime
     {
         return $this->invoiceDate;
     }
 
-    public function setInvoiceDate(?DateTime $invoiceDate): Order
+    public function setInvoiceDate(?\DateTime $invoiceDate): self
     {
         $this->invoiceDate = $invoiceDate;
+
         return $this;
     }
 
@@ -230,31 +231,34 @@ class Order extends AbstractPropelResource
         return $this->currencyRate;
     }
 
-    public function setCurrencyRate(?float $currencyRate): Order
+    public function setCurrencyRate(?float $currencyRate): self
     {
         $this->currencyRate = $currencyRate;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): Order
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): Order
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -263,9 +267,10 @@ class Order extends AbstractPropelResource
         return $this->discount;
     }
 
-    public function setDiscount(?float $discount): Order
+    public function setDiscount(?float $discount): self
     {
         $this->discount = $discount;
+
         return $this;
     }
 
@@ -274,9 +279,10 @@ class Order extends AbstractPropelResource
         return $this->postage;
     }
 
-    public function setPostage(float $postage): Order
+    public function setPostage(float $postage): self
     {
         $this->postage = $postage;
+
         return $this;
     }
 
@@ -285,9 +291,10 @@ class Order extends AbstractPropelResource
         return $this->postageTax;
     }
 
-    public function setPostageTax(float $postageTax): Order
+    public function setPostageTax(float $postageTax): self
     {
         $this->postageTax = $postageTax;
+
         return $this;
     }
 
@@ -296,9 +303,10 @@ class Order extends AbstractPropelResource
         return $this->postageTaxRuleTitle;
     }
 
-    public function setPostageTaxRuleTitle(?string $postageTaxRuleTitle): Order
+    public function setPostageTaxRuleTitle(?string $postageTaxRuleTitle): self
     {
         $this->postageTaxRuleTitle = $postageTaxRuleTitle;
+
         return $this;
     }
 
@@ -307,9 +315,10 @@ class Order extends AbstractPropelResource
         return $this->transactionRef;
     }
 
-    public function setTransactionRef(?string $transactionRef): Order
+    public function setTransactionRef(?string $transactionRef): self
     {
         $this->transactionRef = $transactionRef;
+
         return $this;
     }
 
@@ -318,9 +327,10 @@ class Order extends AbstractPropelResource
         return $this->deliveryRef;
     }
 
-    public function setDeliveryRef(?string $deliveryRef): Order
+    public function setDeliveryRef(?string $deliveryRef): self
     {
         $this->deliveryRef = $deliveryRef;
+
         return $this;
     }
 
@@ -329,9 +339,10 @@ class Order extends AbstractPropelResource
         return $this->invoiceRef;
     }
 
-    public function setInvoiceRef(?string $invoiceRef): Order
+    public function setInvoiceRef(?string $invoiceRef): self
     {
         $this->invoiceRef = $invoiceRef;
+
         return $this;
     }
 
@@ -340,20 +351,22 @@ class Order extends AbstractPropelResource
         return $this->version;
     }
 
-    public function setVersion(?int $version): Order
+    public function setVersion(?int $version): self
     {
         $this->version = $version;
+
         return $this;
     }
 
-    public function getVersionCreatedAt(): ?DateTime
+    public function getVersionCreatedAt(): ?\DateTime
     {
         return $this->versionCreatedAt;
     }
 
-    public function setVersionCreatedAt(?DateTime $versionCreatedAt): Order
+    public function setVersionCreatedAt(?\DateTime $versionCreatedAt): self
     {
         $this->versionCreatedAt = $versionCreatedAt;
+
         return $this;
     }
 
@@ -362,9 +375,10 @@ class Order extends AbstractPropelResource
         return $this->versionCreatedBy;
     }
 
-    public function setVersionCreatedBy(?string $versionCreatedBy): Order
+    public function setVersionCreatedBy(?string $versionCreatedBy): self
     {
         $this->versionCreatedBy = $versionCreatedBy;
+
         return $this;
     }
 
@@ -373,9 +387,10 @@ class Order extends AbstractPropelResource
         return $this->orderProducts;
     }
 
-    public function setOrderProducts(Collection $orderProducts): Order
+    public function setOrderProducts(Collection $orderProducts): self
     {
         $this->orderProducts = $orderProducts;
+
         return $this;
     }
 
@@ -384,9 +399,10 @@ class Order extends AbstractPropelResource
         return $this->orderCoupons;
     }
 
-    public function setOrderCoupons(Collection $orderCoupons): Order
+    public function setOrderCoupons(Collection $orderCoupons): self
     {
         $this->orderCoupons = $orderCoupons;
+
         return $this;
     }
 
@@ -395,9 +411,10 @@ class Order extends AbstractPropelResource
         return $this->invoiceOrderAddress;
     }
 
-    public function setInvoiceOrderAddress(OrderAddress $invoiceOrderAddress): Order
+    public function setInvoiceOrderAddress(OrderAddress $invoiceOrderAddress): self
     {
         $this->invoiceOrderAddress = $invoiceOrderAddress;
+
         return $this;
     }
 
@@ -406,9 +423,10 @@ class Order extends AbstractPropelResource
         return $this->deliveryOrderAddress;
     }
 
-    public function setDeliveryOrderAddress(OrderAddress $deliveryOrderAddress): Order
+    public function setDeliveryOrderAddress(OrderAddress $deliveryOrderAddress): self
     {
         $this->deliveryOrderAddress = $deliveryOrderAddress;
+
         return $this;
     }
 
@@ -417,9 +435,10 @@ class Order extends AbstractPropelResource
         return $this->paymentModule;
     }
 
-    public function setPaymentModule(Module $paymentModule): Order
+    public function setPaymentModule(Module $paymentModule): self
     {
         $this->paymentModule = $paymentModule;
+
         return $this;
     }
 
@@ -428,9 +447,10 @@ class Order extends AbstractPropelResource
         return $this->deliveryModule;
     }
 
-    public function setDeliveryModule(Module $deliveryModule): Order
+    public function setDeliveryModule(Module $deliveryModule): self
     {
         $this->deliveryModule = $deliveryModule;
+
         return $this;
     }
 
@@ -439,9 +459,10 @@ class Order extends AbstractPropelResource
         return $this->orderStatus;
     }
 
-    public function setOrderStatus(OrderStatus $orderStatus): Order
+    public function setOrderStatus(OrderStatus $orderStatus): self
     {
         $this->orderStatus = $orderStatus;
+
         return $this;
     }
 
@@ -450,9 +471,10 @@ class Order extends AbstractPropelResource
         return $this->customer;
     }
 
-    public function setCustomer(Customer $customer): Order
+    public function setCustomer(Customer $customer): self
     {
         $this->customer = $customer;
+
         return $this;
     }
 
@@ -461,9 +483,10 @@ class Order extends AbstractPropelResource
         return $this->currency;
     }
 
-    public function setCurrency(Currency $currency): Order
+    public function setCurrency(Currency $currency): self
     {
         $this->currency = $currency;
+
         return $this;
     }
 
@@ -472,9 +495,10 @@ class Order extends AbstractPropelResource
         return $this->lang;
     }
 
-    public function setLang(Lang $lang): Order
+    public function setLang(Lang $lang): self
     {
         $this->lang = $lang;
+
         return $this;
     }
 
@@ -483,9 +507,10 @@ class Order extends AbstractPropelResource
         return $this->cartId;
     }
 
-    public function setCartId(int $cartId): Order
+    public function setCartId(int $cartId): self
     {
         $this->cartId = $cartId;
+
         return $this;
     }
 

@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -43,9 +53,10 @@ class ProductCategory extends AbstractPropelResource
         return $this->category;
     }
 
-    public function setCategory(Category $category): ProductCategory
+    public function setCategory(Category $category): self
     {
         $this->category = $category;
+
         return $this;
     }
 
@@ -54,9 +65,10 @@ class ProductCategory extends AbstractPropelResource
         return $this->product;
     }
 
-    public function setProduct(Product $product): ProductCategory
+    public function setProduct(Product $product): self
     {
         $this->product = $product;
+
         return $this;
     }
 
@@ -65,9 +77,10 @@ class ProductCategory extends AbstractPropelResource
         return $this->defaultCategory;
     }
 
-    public function setDefaultCategory(?bool $defaultCategory): ProductCategory
+    public function setDefaultCategory(?bool $defaultCategory): self
     {
         $this->defaultCategory = $defaultCategory;
+
         return $this;
     }
 
@@ -76,14 +89,15 @@ class ProductCategory extends AbstractPropelResource
         return $this->position;
     }
 
-    public function setPosition(int $position): ProductCategory
+    public function setPosition(int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
     public static function getPropelModelClass(): string
     {
-       return \Thelia\Model\ProductCategory::class;
+        return \Thelia\Model\ProductCategory::class;
     }
 }

@@ -1,7 +1,16 @@
 <?php
 
-namespace Thelia\Api\Resource;
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
+namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -9,7 +18,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Propel\Runtime\Collection\ArrayCollection;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -43,7 +51,7 @@ class Cart extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'cart:read:single';
     public const GROUP_WRITE = 'cart:write';
 
-    #[Groups([self::GROUP_READ,CartItem::GROUP_READ,Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, CartItem::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -53,11 +61,11 @@ class Cart extends AbstractPropelResource
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?Customer $customer;
 
-    #[Relation(targetResource: Address::class, relationAlias: "AddressRelatedByAddressDeliveryId")]
+    #[Relation(targetResource: Address::class, relationAlias: 'AddressRelatedByAddressDeliveryId')]
     #[Groups([self::GROUP_READ])]
     public ?Address $addressDelivery;
 
-    #[Relation(targetResource: Address::class, relationAlias: "AddressRelatedByAddressInvoiceId")]
+    #[Relation(targetResource: Address::class, relationAlias: 'AddressRelatedByAddressInvoiceId')]
     #[Groups([self::GROUP_READ])]
     public ?Address $addressInvoice;
 
@@ -65,18 +73,18 @@ class Cart extends AbstractPropelResource
     #[Groups([self::GROUP_READ])]
     public ?Currency $currency;
 
-    #[Relation(targetResource: CartItem::class,)]
-    #[Groups([self::GROUP_READ,Order::GROUP_READ])]
+    #[Relation(targetResource: CartItem::class, )]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
     public ?Collection $cartItems;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?float $discount;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     public function __construct()
     {
@@ -88,9 +96,10 @@ class Cart extends AbstractPropelResource
         return $this->id;
     }
 
-    public function setId(?int $id): Cart
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -99,9 +108,10 @@ class Cart extends AbstractPropelResource
         return $this->token;
     }
 
-    public function setToken(?string $token): Cart
+    public function setToken(?string $token): self
     {
         $this->token = $token;
+
         return $this;
     }
 
@@ -110,9 +120,10 @@ class Cart extends AbstractPropelResource
         return $this->customer;
     }
 
-    public function setCustomer(?Customer $customer): Cart
+    public function setCustomer(?Customer $customer): self
     {
         $this->customer = $customer;
+
         return $this;
     }
 
@@ -121,9 +132,10 @@ class Cart extends AbstractPropelResource
         return $this->addressDelivery;
     }
 
-    public function setAddressDelivery(?Address $addressDelivery): Cart
+    public function setAddressDelivery(?Address $addressDelivery): self
     {
         $this->addressDelivery = $addressDelivery;
+
         return $this;
     }
 
@@ -132,9 +144,10 @@ class Cart extends AbstractPropelResource
         return $this->addressInvoice;
     }
 
-    public function setAddressInvoice(?Address $addressInvoice): Cart
+    public function setAddressInvoice(?Address $addressInvoice): self
     {
         $this->addressInvoice = $addressInvoice;
+
         return $this;
     }
 
@@ -143,9 +156,10 @@ class Cart extends AbstractPropelResource
         return $this->currency;
     }
 
-    public function setCurrency(?Currency $currency): Cart
+    public function setCurrency(?Currency $currency): self
     {
         $this->currency = $currency;
+
         return $this;
     }
 
@@ -154,9 +168,10 @@ class Cart extends AbstractPropelResource
         return $this->cartItems;
     }
 
-    public function setCartItems(?Collection $cartItems): Cart
+    public function setCartItems(?Collection $cartItems): self
     {
         $this->cartItems = $cartItems;
+
         return $this;
     }
 
@@ -165,31 +180,34 @@ class Cart extends AbstractPropelResource
         return $this->discount;
     }
 
-    public function setDiscount(?float $discount): Cart
+    public function setDiscount(?float $discount): self
     {
         $this->discount = $discount;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): Cart
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): Cart
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
