@@ -18,7 +18,10 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Propel\Runtime\Collection\ArrayCollection;
+use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 #[ApiResource(
     operations: [
@@ -29,7 +32,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
             uriTemplate: '/admin/contents'
         ),
         new Get(
-            uriTemplate: '/admin/contents/{id}'
+            uriTemplate: '/admin/contents/{id}',
+            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/contents/{id}'
@@ -56,6 +60,10 @@ class Content extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?int $position;
 
+    #[Relation(targetResource: ContentFolder::class)]
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public Collection $contentFolders;
+
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
 
@@ -64,6 +72,12 @@ class Content extends AbstractTranslatableResource
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
+
+    public function __construct()
+    {
+        $this->contentFolders = new ArrayCollection();
+        parent::__construct();
+    }
 
     public function getId(): ?int
     {
@@ -98,6 +112,17 @@ class Content extends AbstractTranslatableResource
     {
         $this->position = $position;
 
+        return $this;
+    }
+
+    public function getContentFolders(): Collection
+    {
+        return $this->contentFolders;
+    }
+
+    public function setContentFolders(Collection $contentFolders): Content
+    {
+        $this->contentFolders = $contentFolders;
         return $this;
     }
 

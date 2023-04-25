@@ -15,6 +15,7 @@ namespace Thelia\Api\Resource;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 #[ApiResource(
@@ -26,6 +27,7 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
+#[CompositeIdentifiers(['content', 'folder'])]
 class ContentFolder extends AbstractPropelResource
 {
     public const GROUP_READ = 'content_folder:read';
