@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -7,7 +17,6 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
@@ -62,10 +71,10 @@ class OrderCoupon extends AbstractPropelResource
     public ?string $description;
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
-    public ?DateTime $startDate;
+    public ?\DateTime $startDate;
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
-    public ?DateTime $expirationDate;
+    public ?\DateTime $expirationDate;
 
     #[Groups([self::GROUP_READ])]
     public ?bool $isCumulative;
@@ -86,19 +95,20 @@ class OrderCoupon extends AbstractPropelResource
     public ?bool $usageCanceled;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(?int $id): OrderCoupon
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -107,9 +117,10 @@ class OrderCoupon extends AbstractPropelResource
         return $this->order;
     }
 
-    public function setOrder(?Order $order): OrderCoupon
+    public function setOrder(?Order $order): self
     {
         $this->order = $order;
+
         return $this;
     }
 
@@ -118,9 +129,10 @@ class OrderCoupon extends AbstractPropelResource
         return $this->code;
     }
 
-    public function setCode(?string $code): OrderCoupon
+    public function setCode(?string $code): self
     {
         $this->code = $code;
+
         return $this;
     }
 
@@ -129,9 +141,10 @@ class OrderCoupon extends AbstractPropelResource
         return $this->type;
     }
 
-    public function setType(?string $type): OrderCoupon
+    public function setType(?string $type): self
     {
         $this->type = $type;
+
         return $this;
     }
 
@@ -140,9 +153,10 @@ class OrderCoupon extends AbstractPropelResource
         return $this->amount;
     }
 
-    public function setAmount(?float $amount): OrderCoupon
+    public function setAmount(?float $amount): self
     {
         $this->amount = $amount;
+
         return $this;
     }
 
@@ -151,9 +165,10 @@ class OrderCoupon extends AbstractPropelResource
         return $this->title;
     }
 
-    public function setTitle(?string $title): OrderCoupon
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -162,9 +177,10 @@ class OrderCoupon extends AbstractPropelResource
         return $this->shortDescription;
     }
 
-    public function setShortDescription(?string $shortDescription): OrderCoupon
+    public function setShortDescription(?string $shortDescription): self
     {
         $this->shortDescription = $shortDescription;
+
         return $this;
     }
 
@@ -173,31 +189,34 @@ class OrderCoupon extends AbstractPropelResource
         return $this->description;
     }
 
-    public function setDescription(?string $description): OrderCoupon
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
-    public function getStartDate(): ?DateTime
+    public function getStartDate(): ?\DateTime
     {
         return $this->startDate;
     }
 
-    public function setStartDate(?DateTime $startDate): OrderCoupon
+    public function setStartDate(?\DateTime $startDate): self
     {
         $this->startDate = $startDate;
+
         return $this;
     }
 
-    public function getExpirationDate(): ?DateTime
+    public function getExpirationDate(): ?\DateTime
     {
         return $this->expirationDate;
     }
 
-    public function setExpirationDate(?DateTime $expirationDate): OrderCoupon
+    public function setExpirationDate(?\DateTime $expirationDate): self
     {
         $this->expirationDate = $expirationDate;
+
         return $this;
     }
 
@@ -206,9 +225,10 @@ class OrderCoupon extends AbstractPropelResource
         return $this->isCumulative;
     }
 
-    public function setIsCumulative(?bool $isCumulative): OrderCoupon
+    public function setIsCumulative(?bool $isCumulative): self
     {
         $this->isCumulative = $isCumulative;
+
         return $this;
     }
 
@@ -217,9 +237,10 @@ class OrderCoupon extends AbstractPropelResource
         return $this->isRemovingPostage;
     }
 
-    public function setIsRemovingPostage(?bool $isRemovingPostage): OrderCoupon
+    public function setIsRemovingPostage(?bool $isRemovingPostage): self
     {
         $this->isRemovingPostage = $isRemovingPostage;
+
         return $this;
     }
 
@@ -228,9 +249,10 @@ class OrderCoupon extends AbstractPropelResource
         return $this->isAvailableOnSpecialOffers;
     }
 
-    public function setIsAvailableOnSpecialOffers(?bool $isAvailableOnSpecialOffers): OrderCoupon
+    public function setIsAvailableOnSpecialOffers(?bool $isAvailableOnSpecialOffers): self
     {
         $this->isAvailableOnSpecialOffers = $isAvailableOnSpecialOffers;
+
         return $this;
     }
 
@@ -239,9 +261,10 @@ class OrderCoupon extends AbstractPropelResource
         return $this->serializedConditions;
     }
 
-    public function setSerializedConditions(?string $serializedConditions): OrderCoupon
+    public function setSerializedConditions(?string $serializedConditions): self
     {
         $this->serializedConditions = $serializedConditions;
+
         return $this;
     }
 
@@ -250,9 +273,10 @@ class OrderCoupon extends AbstractPropelResource
         return $this->perCustomerUsageCount;
     }
 
-    public function setPerCustomerUsageCount(?bool $perCustomerUsageCount): OrderCoupon
+    public function setPerCustomerUsageCount(?bool $perCustomerUsageCount): self
     {
         $this->perCustomerUsageCount = $perCustomerUsageCount;
+
         return $this;
     }
 
@@ -261,31 +285,34 @@ class OrderCoupon extends AbstractPropelResource
         return $this->usageCanceled;
     }
 
-    public function setUsageCanceled(?bool $usageCanceled): OrderCoupon
+    public function setUsageCanceled(?bool $usageCanceled): self
     {
         $this->usageCanceled = $usageCanceled;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): OrderCoupon
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): OrderCoupon
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 

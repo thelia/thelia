@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -17,9 +27,10 @@ class StateI18n extends I18n
         return $this->locale;
     }
 
-    public function setLocale(string $locale): StateI18n
+    public function setLocale(string $locale): self
     {
         $this->locale = $locale;
+
         return $this;
     }
 
@@ -28,9 +39,10 @@ class StateI18n extends I18n
         return $this->title;
     }
 
-    public function setTitle(?string $title): StateI18n
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 }

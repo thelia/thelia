@@ -16,10 +16,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class OrderStatusI18n extends I18n
 {
-    #[Groups([OrderStatus::GROUP_READ, OrderStatus::GROUP_WRITE,Order::GROUP_READ, Order::GROUP_WRITE])]
+    #[Groups([OrderStatus::GROUP_READ, OrderStatus::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_WRITE])]
     protected string $locale;
 
-    #[Groups([OrderStatus::GROUP_READ, OrderStatus::GROUP_WRITE,Order::GROUP_READ, Order::GROUP_WRITE])]
+    #[Groups([OrderStatus::GROUP_READ, OrderStatus::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_WRITE])]
     protected ?string $title;
 
     #[Groups([OrderStatus::GROUP_READ, OrderStatus::GROUP_WRITE])]
@@ -36,9 +36,10 @@ class OrderStatusI18n extends I18n
         return $this->locale;
     }
 
-    public function setLocale(string $locale): OrderStatusI18n
+    public function setLocale(string $locale): self
     {
         $this->locale = $locale;
+
         return $this;
     }
 
@@ -47,9 +48,10 @@ class OrderStatusI18n extends I18n
         return $this->title;
     }
 
-    public function setTitle(?string $title): OrderStatusI18n
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -58,9 +60,10 @@ class OrderStatusI18n extends I18n
         return $this->description;
     }
 
-    public function setDescription(?string $description): OrderStatusI18n
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -69,9 +72,10 @@ class OrderStatusI18n extends I18n
         return $this->chapo;
     }
 
-    public function setChapo(?string $chapo): OrderStatusI18n
+    public function setChapo(?string $chapo): self
     {
         $this->chapo = $chapo;
+
         return $this;
     }
 
@@ -80,9 +84,10 @@ class OrderStatusI18n extends I18n
         return $this->postscriptum;
     }
 
-    public function setPostscriptum(?string $postscriptum): OrderStatusI18n
+    public function setPostscriptum(?string $postscriptum): self
     {
         $this->postscriptum = $postscriptum;
+
         return $this;
     }
 }

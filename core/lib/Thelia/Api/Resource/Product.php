@@ -37,14 +37,14 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
         ),
         new Get(
             uriTemplate: '/admin/products/{id}',
-            normalizationContext:  ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/products/{id}'
         ),
         new Delete(
             uriTemplate: '/admin/products/{id}'
-        )
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
@@ -54,7 +54,7 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
     properties: [
         'ref',
         'productCategories.category.id',
-        'title' => 'word_start'
+        'title' => 'word_start',
     ]
 )]
 #[ApiFilter(
@@ -62,14 +62,14 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
     properties: [
         'visible',
         'virtual',
-        'productCategories.defaultCategory'
+        'productCategories.defaultCategory',
     ]
 )]
 #[ApiFilter(
     filterClass: OrderFilter::class,
     properties: [
         'ref',
-        'productCategories.position'
+        'productCategories.position',
     ]
 )]
 class Product extends AbstractTranslatableResource
@@ -78,7 +78,7 @@ class Product extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'product:read:single';
     public const GROUP_WRITE = 'product:write';
 
-    #[Groups([self::GROUP_READ, ProductCategory::GROUP_READ,OrderProduct::GROUP_READ])]
+    #[Groups([self::GROUP_READ, ProductCategory::GROUP_READ, OrderProduct::GROUP_READ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -165,15 +165,17 @@ class Product extends AbstractTranslatableResource
         return $this->brand;
     }
 
-    public function setBrand(Brand $brand): Product
+    public function setBrand(Brand $brand): self
     {
         $this->brand = $brand;
+
         return $this;
     }
 
-    public function setProductCategories(Collection $productCategories): Product
+    public function setProductCategories(Collection $productCategories): self
     {
         $this->productCategories = $productCategories;
+
         return $this;
     }
 
