@@ -24,20 +24,20 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/attributes_av'
+            uriTemplate: '/admin/attribute_avs'
         ),
         new GetCollection(
-            uriTemplate: '/admin/attributes_av'
+            uriTemplate: '/admin/attribute_avs'
         ),
         new Get(
-            uriTemplate: '/admin/attributes_av/{id}',
+            uriTemplate: '/admin/attribute_avs/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/attributes_av/{id}'
+            uriTemplate: '/admin/attribute_avs/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/attributes_av/{id}'
+            uriTemplate: '/admin/attribute_avs/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
