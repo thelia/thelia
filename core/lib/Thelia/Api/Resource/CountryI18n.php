@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -26,9 +36,10 @@ class CountryI18n extends I18n
         return $this->locale;
     }
 
-    public function setLocale(string $locale): CountryI18n
+    public function setLocale(string $locale): self
     {
         $this->locale = $locale;
+
         return $this;
     }
 
@@ -37,9 +48,10 @@ class CountryI18n extends I18n
         return $this->title;
     }
 
-    public function setTitle(?string $title): CountryI18n
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -48,9 +60,10 @@ class CountryI18n extends I18n
         return $this->description;
     }
 
-    public function setDescription(?string $description): CountryI18n
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -59,9 +72,10 @@ class CountryI18n extends I18n
         return $this->chapo;
     }
 
-    public function setChapo(?string $chapo): CountryI18n
+    public function setChapo(?string $chapo): self
     {
         $this->chapo = $chapo;
+
         return $this;
     }
 
@@ -70,9 +84,10 @@ class CountryI18n extends I18n
         return $this->postscriptum;
     }
 
-    public function setPostscriptum(?string $postscriptum): CountryI18n
+    public function setPostscriptum(?string $postscriptum): self
     {
         $this->postscriptum = $postscriptum;
+
         return $this;
     }
 }
