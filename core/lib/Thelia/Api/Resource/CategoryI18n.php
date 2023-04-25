@@ -26,27 +26,37 @@ class CategoryI18n extends I18n
     #[Groups([Category::GROUP_READ, Category::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
     protected ?string $description;
 
-    public function getTitle(): string
+    #[Groups([Category::GROUP_READ, Category::GROUP_WRITE])]
+    protected ?string $postscriptum;
+
+    #[Groups([Category::GROUP_READ, Category::GROUP_WRITE])]
+    protected ?string $metaTitle;
+
+    #[Groups([Category::GROUP_READ, Category::GROUP_WRITE])]
+    protected ?string $metaDescription;
+
+    #[Groups([Category::GROUP_READ, Category::GROUP_WRITE])]
+    protected ?string $metaKeywords;
+
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setTitle(?string $title): self
+    public function setTitle(?string $title): CategoryI18n
     {
         $this->title = $title;
-
         return $this;
     }
 
-    public function getChapo(): string
+    public function getChapo(): ?string
     {
         return $this->chapo;
     }
 
-    public function setChapo(?string $chapo): self
+    public function setChapo(?string $chapo): CategoryI18n
     {
         $this->chapo = $chapo;
-
         return $this;
     }
 
@@ -55,9 +65,53 @@ class CategoryI18n extends I18n
         return $this->description;
     }
 
-    public function setDescription(?string $description): self
+    public function setDescription(?string $description): CategoryI18n
     {
         $this->description = $description;
+        return $this;
+    }
+
+    public function getPostscriptum(): ?string
+    {
+        return $this->postscriptum;
+    }
+
+    public function setPostscriptum(?string $postscriptum): CategoryI18n
+    {
+        $this->postscriptum = $postscriptum;
+        return $this;
+    }
+
+    public function getMetaTitle(): ?string
+    {
+        return $this->metaTitle;
+    }
+
+    public function setMetaTitle(?string $metaTitle): CategoryI18n
+    {
+        $this->metaTitle = $metaTitle;
+        return $this;
+    }
+
+    public function getMetaDescription(): ?string
+    {
+        return $this->metaDescription;
+    }
+
+    public function setMetaDescription(?string $metaDescription): CategoryI18n
+    {
+        $this->metaDescription = $metaDescription;
+        return $this;
+    }
+
+    public function getMetaKeywords(): ?string
+    {
+        return $this->metaKeywords;
+    }
+
+    public function setMetaKeywords(?string $metaKeywords): CategoryI18n
+    {
+        $this->metaKeywords = $metaKeywords;
         return $this;
     }
 }
