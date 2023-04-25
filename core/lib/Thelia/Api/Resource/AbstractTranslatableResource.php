@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 abstract class AbstractTranslatableResource extends AbstractPropelResource implements TranslatableResourceInterface
@@ -15,7 +25,7 @@ abstract class AbstractTranslatableResource extends AbstractPropelResource imple
     {
         foreach ($i18ns as $locale => $i18n) {
             $i18nClass = $this->getI18nResourceClass();
-            $this->i18ns->add((new $i18nClass($i18n)), $locale);
+            $this->i18ns->add(new $i18nClass($i18n), $locale);
         }
 
         return $this;
