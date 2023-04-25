@@ -52,7 +52,7 @@ class ModuleConfig extends AbstractTranslatableResource
     public ?int $id = null;
 
     #[Relation(targetResource: Module::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public Module $module;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
