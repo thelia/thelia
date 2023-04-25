@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
 
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -32,9 +42,10 @@ class FolderI18n extends I18n
         return $this->title;
     }
 
-    public function setTitle(?string $title): FolderI18n
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -43,9 +54,10 @@ class FolderI18n extends I18n
         return $this->description;
     }
 
-    public function setDescription(?string $description): FolderI18n
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -54,9 +66,10 @@ class FolderI18n extends I18n
         return $this->chapo;
     }
 
-    public function setChapo(?string $chapo): FolderI18n
+    public function setChapo(?string $chapo): self
     {
         $this->chapo = $chapo;
+
         return $this;
     }
 
@@ -65,9 +78,10 @@ class FolderI18n extends I18n
         return $this->postscriptum;
     }
 
-    public function setPostscriptum(?string $postscriptum): FolderI18n
+    public function setPostscriptum(?string $postscriptum): self
     {
         $this->postscriptum = $postscriptum;
+
         return $this;
     }
 
@@ -76,9 +90,10 @@ class FolderI18n extends I18n
         return $this->metaTitle;
     }
 
-    public function setMetaTitle(?string $metaTitle): FolderI18n
+    public function setMetaTitle(?string $metaTitle): self
     {
         $this->metaTitle = $metaTitle;
+
         return $this;
     }
 
@@ -87,9 +102,10 @@ class FolderI18n extends I18n
         return $this->metaDescription;
     }
 
-    public function setMetaDescription(?string $metaDescription): FolderI18n
+    public function setMetaDescription(?string $metaDescription): self
     {
         $this->metaDescription = $metaDescription;
+
         return $this;
     }
 
@@ -98,9 +114,10 @@ class FolderI18n extends I18n
         return $this->metaKeywords;
     }
 
-    public function setMetaKeywords(?string $metaKeywords): FolderI18n
+    public function setMetaKeywords(?string $metaKeywords): self
     {
         $this->metaKeywords = $metaKeywords;
+
         return $this;
     }
 }

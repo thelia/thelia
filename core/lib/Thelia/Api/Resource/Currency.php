@@ -1,8 +1,16 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Resource;
-
-
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -10,7 +18,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
@@ -41,13 +48,13 @@ class Currency extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'currency:read:single';
     public const GROUP_WRITE = 'currency:write';
 
-    #[Groups([self::GROUP_READ,Order::GROUP_READ,Cart::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ, Cart::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Cart::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Cart::GROUP_READ_SINGLE])]
     public ?string $code;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Cart::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Cart::GROUP_READ_SINGLE])]
     public ?string $symbol;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -66,10 +73,10 @@ class Currency extends AbstractTranslatableResource
     public ?bool $byDefault;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $createdAt;
+    public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
-    public ?DateTime $updatedAt;
+    public ?\DateTime $updatedAt;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
@@ -79,9 +86,10 @@ class Currency extends AbstractTranslatableResource
         return $this->id;
     }
 
-    public function setId(?int $id): Currency
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -90,9 +98,10 @@ class Currency extends AbstractTranslatableResource
         return $this->code;
     }
 
-    public function setCode(?string $code): Currency
+    public function setCode(?string $code): self
     {
         $this->code = $code;
+
         return $this;
     }
 
@@ -101,9 +110,10 @@ class Currency extends AbstractTranslatableResource
         return $this->symbol;
     }
 
-    public function setSymbol(?string $symbol): Currency
+    public function setSymbol(?string $symbol): self
     {
         $this->symbol = $symbol;
+
         return $this;
     }
 
@@ -112,9 +122,10 @@ class Currency extends AbstractTranslatableResource
         return $this->format;
     }
 
-    public function setFormat(?string $format): Currency
+    public function setFormat(?string $format): self
     {
         $this->format = $format;
+
         return $this;
     }
 
@@ -123,9 +134,10 @@ class Currency extends AbstractTranslatableResource
         return $this->rate;
     }
 
-    public function setRate(?float $rate): Currency
+    public function setRate(?float $rate): self
     {
         $this->rate = $rate;
+
         return $this;
     }
 
@@ -134,9 +146,10 @@ class Currency extends AbstractTranslatableResource
         return $this->position;
     }
 
-    public function setPosition(?int $position): Currency
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -145,9 +158,10 @@ class Currency extends AbstractTranslatableResource
         return $this->visible;
     }
 
-    public function setVisible(?bool $visible): Currency
+    public function setVisible(?bool $visible): self
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -156,31 +170,34 @@ class Currency extends AbstractTranslatableResource
         return $this->byDefault;
     }
 
-    public function setByDefault(?bool $byDefault): Currency
+    public function setByDefault(?bool $byDefault): self
     {
         $this->byDefault = $byDefault;
+
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): Currency
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): Currency
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
