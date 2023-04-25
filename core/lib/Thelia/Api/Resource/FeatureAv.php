@@ -30,7 +30,8 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
             uriTemplate: '/admin/features_av'
         ),
         new Get(
-            uriTemplate: '/admin/features_av/{id}'
+            uriTemplate: '/admin/features_av/{id}',
+            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/features_av/{id}'
