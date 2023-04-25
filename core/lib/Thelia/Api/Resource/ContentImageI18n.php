@@ -7,9 +7,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ContentImageI18n extends I18n
 {
     #[Groups([ContentImage::GROUP_READ, ContentImage::GROUP_WRITE])]
-    protected string $locale;
-
-    #[Groups([ContentImage::GROUP_READ, ContentImage::GROUP_WRITE])]
     protected ?string $title;
 
     #[Groups([ContentImage::GROUP_READ, ContentImage::GROUP_WRITE])]
@@ -20,17 +17,6 @@ class ContentImageI18n extends I18n
 
     #[Groups([ContentImage::GROUP_READ, ContentImage::GROUP_WRITE])]
     protected ?string $postscriptum;
-
-    public function getLocale(): string
-    {
-        return $this->locale;
-    }
-
-    public function setLocale(string $locale): ContentImageI18n
-    {
-        $this->locale = $locale;
-        return $this;
-    }
 
     public function getTitle(): ?string
     {
