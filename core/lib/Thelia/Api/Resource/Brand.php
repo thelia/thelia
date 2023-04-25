@@ -29,7 +29,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
             uriTemplate: '/admin/brands'
         ),
         new Get(
-            uriTemplate: '/admin/brands/{id}'
+            uriTemplate: '/admin/brands/{id}',
+            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
             uriTemplate: '/admin/brands/{id}'
