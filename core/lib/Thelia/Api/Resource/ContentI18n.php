@@ -7,9 +7,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ContentI18n extends I18n
 {
     #[Groups([Content::GROUP_READ, Content::GROUP_WRITE])]
-    protected string $locale;
-
-    #[Groups([Content::GROUP_READ, Content::GROUP_WRITE])]
     protected ?string $title;
 
     #[Groups([Content::GROUP_READ, Content::GROUP_WRITE])]
@@ -29,17 +26,6 @@ class ContentI18n extends I18n
 
     #[Groups([Content::GROUP_READ, Content::GROUP_WRITE])]
     protected ?string $metaKeywords;
-
-    public function getLocale(): string
-    {
-        return $this->locale;
-    }
-
-    public function setLocale(string $locale): ContentI18n
-    {
-        $this->locale = $locale;
-        return $this;
-    }
 
     public function getTitle(): ?string
     {
