@@ -3,31 +3,15 @@
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 #[ApiResource(
     operations: [
-        new Post(
-            uriTemplate: '/admin/content_folders'
-        ),
-        new GetCollection(
-            uriTemplate: '/admin/content_folders'
-        ),
         new Get(
-            uriTemplate: '/admin/content_folders/{id}'
-        ),
-        new Put(
-            uriTemplate: '/admin/content_folders/{id}'
-        ),
-        new Delete(
-            uriTemplate: '/admin/content_folders/{id}'
+            uriTemplate: '/admin/content_folders/{content}/folders/{folder}'
         )
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
@@ -39,7 +23,7 @@ class ContentFolder extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'content_folder:read:single';
     public const GROUP_WRITE = 'content_folder:write';
 
-    #[Relation(targetResource: Folder::class)]
+    #[Relation(targetResource: Content::class)]
     #[Groups([self::GROUP_READ])]
     public Content $content;
 
@@ -47,16 +31,16 @@ class ContentFolder extends AbstractPropelResource
     #[Groups([self::GROUP_READ])]
     public Folder $folder;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public bool $defaultFolder;
+    #[Groups([self::GROUP_READ])]
+    public bool $defaultFolder = false;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ])]
     public ?DateTime $createdAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ])]
     public ?DateTime $updatedAt;
 
     public function getContent(): Content
