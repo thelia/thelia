@@ -48,7 +48,7 @@ class Tax extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'tax:read:single';
     public const GROUP_WRITE = 'tax:write';
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, TaxRuleCountry::GROUP_READ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
