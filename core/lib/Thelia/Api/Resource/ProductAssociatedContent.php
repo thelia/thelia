@@ -21,33 +21,37 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 #[ApiResource(
     operations: [
         new Get(
-            uriTemplate: '/admin/product_categories/{product}/categories/{category}',
+            uriTemplate: '/admin/product_associated_contents/{id}',
+            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+        ),
+        new Get(
+            uriTemplate: '/admin/product_associated_contents/{product}/contents/{content}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]],
+    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-#[CompositeIdentifiers(['category', 'product'])]
-class ProductCategory extends AbstractPropelResource
+#[CompositeIdentifiers(['product', 'content'])]
+class ProductAssociatedContent extends AbstractPropelResource
 {
-    public const GROUP_READ = 'product_categories:read';
-    public const GROUP_READ_SINGLE = 'product_categories:read:single';
-    public const GROUP_WRITE = 'product_categories:write';
+    public const GROUP_READ = 'product_associated_content:read';
+    public const GROUP_READ_SINGLE = 'product_associated_content:read:single';
+    public const GROUP_WRITE = 'product_associated_content:write';
 
-    #[Relation(targetResource: Category::class)]
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE])]
-    public Category $category;
+    #[Groups([self::GROUP_READ])]
+    public ?int $id = null;
 
     #[Relation(targetResource: Product::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public Product $product;
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE])]
-    public ?bool $defaultCategory = false;
+    #[Relation(targetResource: Content::class)]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public Content $content;
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE])]
-    public int $position;
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?int $position = null;
 
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
@@ -55,14 +59,14 @@ class ProductCategory extends AbstractPropelResource
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $updatedAt;
 
-    public function getCategory(): Category
+    public function getId(): ?int
     {
-        return $this->category;
+        return $this->id;
     }
 
-    public function setCategory(Category $category): self
+    public function setId(?int $id): self
     {
-        $this->category = $category;
+        $this->id = $id;
 
         return $this;
     }
@@ -79,24 +83,24 @@ class ProductCategory extends AbstractPropelResource
         return $this;
     }
 
-    public function getDefaultCategory(): ?bool
+    public function getContent(): Content
     {
-        return $this->defaultCategory;
+        return $this->content;
     }
 
-    public function setDefaultCategory(?bool $defaultCategory): self
+    public function setContent(Content $content): self
     {
-        $this->defaultCategory = $defaultCategory;
+        $this->content = $content;
 
         return $this;
     }
 
-    public function getPosition(): int
+    public function getPosition(): ?int
     {
         return $this->position;
     }
 
-    public function setPosition(int $position): self
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
 
@@ -108,9 +112,10 @@ class ProductCategory extends AbstractPropelResource
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): ProductCategory
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -119,14 +124,15 @@ class ProductCategory extends AbstractPropelResource
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): ProductCategory
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
     public static function getPropelModelClass(): string
     {
-        return \Thelia\Model\ProductCategory::class;
+        return \Thelia\Model\ProductAssociatedContent::class;
     }
 }
