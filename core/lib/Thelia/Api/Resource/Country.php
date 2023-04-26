@@ -48,7 +48,7 @@ class Country extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'country:read:single';
     public const GROUP_WRITE = 'country:write';
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE, Customer::GROUP_READ_SINGLE, Address::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE, Customer::GROUP_READ_SINGLE, Address::GROUP_READ_SINGLE, TaxRuleCountry::GROUP_READ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]

@@ -19,48 +19,40 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/states'
+            uriTemplate: '/admin/tax_rules'
         ),
         new GetCollection(
-            uriTemplate: '/admin/states'
+            uriTemplate: '/admin/tax_rules'
         ),
         new Get(
-            uriTemplate: '/admin/states/{id}',
+            uriTemplate: '/admin/tax_rules/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/states/{id}'
+            uriTemplate: '/admin/tax_rules/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/states/{id}'
+            uriTemplate: '/admin/tax_rules/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class State extends AbstractTranslatableResource
+class TaxRule extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'state:read';
-    public const GROUP_READ_SINGLE = 'state:read:single';
-    public const GROUP_WRITE = 'state:write';
+    public const GROUP_READ = 'tax_rule:read';
+    public const GROUP_READ_SINGLE = 'tax_rule:read:single';
+    public const GROUP_WRITE = 'tax_rule:write';
 
-    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE, Address::GROUP_READ_SINGLE, TaxRuleCountry::GROUP_READ])]
+    #[Groups([self::GROUP_READ, TaxRuleCountry::GROUP_READ])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderAddress::GROUP_READ])]
-    public bool $visible;
-
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderAddress::GROUP_READ])]
-    public ?string $isocode;
-
-    #[Relation(targetResource: Country::class)]
-    #[Groups(groups: [self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
-    public Country $country;
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?bool $isDefault = false;
 
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
@@ -83,38 +75,14 @@ class State extends AbstractTranslatableResource
         return $this;
     }
 
-    public function isVisible(): bool
+    public function getIsDefault(): ?bool
     {
-        return $this->visible;
+        return $this->isDefault;
     }
 
-    public function setVisible(bool $visible): self
+    public function setIsDefault(?bool $isDefault): self
     {
-        $this->visible = $visible;
-
-        return $this;
-    }
-
-    public function getIsocode(): ?string
-    {
-        return $this->isocode;
-    }
-
-    public function setIsocode(?string $isocode): self
-    {
-        $this->isocode = $isocode;
-
-        return $this;
-    }
-
-    public function getCountry(): Country
-    {
-        return $this->country;
-    }
-
-    public function setCountry(Country $country): self
-    {
-        $this->country = $country;
+        $this->isDefault = $isDefault;
 
         return $this;
     }
@@ -145,11 +113,11 @@ class State extends AbstractTranslatableResource
 
     public static function getPropelModelClass(): string
     {
-        return \Thelia\Model\State::class;
+        return \Thelia\Model\TaxRule::class;
     }
 
     public static function getI18nResourceClass(): string
     {
-        return StateI18n::class;
+        return TaxRuleI18n::class;
     }
 }
