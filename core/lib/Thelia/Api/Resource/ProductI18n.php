@@ -25,6 +25,9 @@ class ProductI18n extends I18n
     #[Groups([Product::GROUP_READ, Product::GROUP_WRITE])]
     protected ?string $description;
 
+    #[Groups([Product::GROUP_READ, Product::GROUP_WRITE])]
+    protected ?string $postscriptum;
+
     public function getTitle(): string
     {
         return $this->title;
@@ -57,6 +60,18 @@ class ProductI18n extends I18n
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getPostscriptum(): ?string
+    {
+        return $this->postscriptum;
+    }
+
+    public function setPostscriptum(?string $postscriptum): self
+    {
+        $this->postscriptum = $postscriptum;
 
         return $this;
     }
