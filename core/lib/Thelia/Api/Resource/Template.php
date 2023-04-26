@@ -17,42 +17,35 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/tax_rules'
+            uriTemplate: '/admin/templates'
         ),
         new GetCollection(
-            uriTemplate: '/admin/tax_rules'
+            uriTemplate: '/admin/templates'
         ),
         new Get(
-            uriTemplate: '/admin/tax_rules/{id}',
+            uriTemplate: '/admin/templates/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
-        new Put(
-            uriTemplate: '/admin/tax_rules/{id}'
-        ),
         new Delete(
-            uriTemplate: '/admin/tax_rules/{id}'
+            uriTemplate: '/admin/templates/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class TaxRule extends AbstractTranslatableResource
+class Template extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'tax_rule:read';
-    public const GROUP_READ_SINGLE = 'tax_rule:read:single';
-    public const GROUP_WRITE = 'tax_rule:write';
+    public const GROUP_READ = 'template:read';
+    public const GROUP_READ_SINGLE = 'template:read:single';
+    public const GROUP_WRITE = 'template:write';
 
-    #[Groups([self::GROUP_READ, TaxRuleCountry::GROUP_READ, Product::GROUP_READ, Product::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, Category::GROUP_READ, Category::GROUP_WRITE, Product::GROUP_READ, Product::GROUP_WRITE])]
     public ?int $id = null;
-
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?bool $isDefault = false;
 
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
@@ -71,18 +64,6 @@ class TaxRule extends AbstractTranslatableResource
     public function setId(?int $id): self
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    public function getIsDefault(): ?bool
-    {
-        return $this->isDefault;
-    }
-
-    public function setIsDefault(?bool $isDefault): self
-    {
-        $this->isDefault = $isDefault;
 
         return $this;
     }
@@ -113,11 +94,11 @@ class TaxRule extends AbstractTranslatableResource
 
     public static function getPropelModelClass(): string
     {
-        return \Thelia\Model\TaxRule::class;
+        return \Thelia\Model\Template::class;
     }
 
     public static function getI18nResourceClass(): string
     {
-        return TaxRuleI18n::class;
+        return TemplateI18n::class;
     }
 }
