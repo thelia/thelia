@@ -51,7 +51,7 @@ class Content extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'content:read:single';
     public const GROUP_WRITE = 'content:write';
 
-    #[Groups([self::GROUP_READ, ContentFolder::GROUP_READ, ContentImage::GROUP_READ_SINGLE, ContentDocument::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, ContentFolder::GROUP_READ, ContentImage::GROUP_READ_SINGLE, ContentDocument::GROUP_READ_SINGLE, ProductAssociatedContent::GROUP_READ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]

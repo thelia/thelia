@@ -48,7 +48,7 @@ class Currency extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'currency:read:single';
     public const GROUP_WRITE = 'currency:write';
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ, Cart::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ, Cart::GROUP_READ_SINGLE, ProductPrice::GROUP_READ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Cart::GROUP_READ_SINGLE])]
