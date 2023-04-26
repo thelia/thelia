@@ -81,18 +81,35 @@ class Product extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ, ProductCategory::GROUP_READ, OrderProduct::GROUP_READ])]
     public ?int $id = null;
 
+    #[Relation(targetResource: TaxRule::class)]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public TaxRule $taxRule;
+
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public string $ref;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public bool $visible;
 
-    #[Groups([self::GROUP_WRITE])]
-    public bool $virtual;
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?int $position;
+
+    #[Relation(targetResource: Template::class)]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public Template $template;
 
     #[Relation(targetResource: Brand::class)]
-    #[Groups([self::GROUP_WRITE, self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public Brand $brand;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public bool $virtual;
+
+    #[Groups([self::GROUP_READ])]
+    public ?\DateTime $createdAt;
+
+    #[Groups([self::GROUP_READ])]
+    public ?\DateTime $updatedAt;
 
     #[Relation(targetResource: ProductCategory::class)]
     #[Groups([self::GROUP_READ_SINGLE])]
@@ -112,9 +129,21 @@ class Product extends AbstractTranslatableResource
         return $this->id;
     }
 
-    public function setId(int $id): self
+    public function setId(?int $id): self
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    public function getTaxRule(): TaxRule
+    {
+        return $this->taxRule;
+    }
+
+    public function setTaxRule(TaxRule $taxRule): self
+    {
+        $this->taxRule = $taxRule;
 
         return $this;
     }
@@ -143,21 +172,28 @@ class Product extends AbstractTranslatableResource
         return $this;
     }
 
-    public function isVirtual(): bool
+    public function getPosition(): ?int
     {
-        return $this->virtual;
+        return $this->position;
     }
 
-    public function setVirtual(bool $virtual): self
+    public function setPosition(?int $position): self
     {
-        $this->virtual = $virtual;
+        $this->position = $position;
 
         return $this;
     }
 
-    public function getProductCategories(): Collection
+    public function getTemplate(): Template
     {
-        return $this->productCategories;
+        return $this->template;
+    }
+
+    public function setTemplate(Template $template): self
+    {
+        $this->template = $template;
+
+        return $this;
     }
 
     public function getBrand(): Brand
@@ -170,6 +206,47 @@ class Product extends AbstractTranslatableResource
         $this->brand = $brand;
 
         return $this;
+    }
+
+    public function isVirtual(): bool
+    {
+        return $this->virtual;
+    }
+
+    public function setVirtual(bool $virtual): self
+    {
+        $this->virtual = $virtual;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getProductCategories(): Collection
+    {
+        return $this->productCategories;
     }
 
     public function setProductCategories(Collection $productCategories): self
