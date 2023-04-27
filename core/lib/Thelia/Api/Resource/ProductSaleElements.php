@@ -49,12 +49,12 @@ class ProductSaleElements extends AbstractPropelResource
     public const GROUP_READ_SINGLE = 'product_sale_elements:read:single';
     public const GROUP_WRITE = 'product_sale_elements:write';
 
-    #[Groups([self::GROUP_READ, CartItem::GROUP_READ, ProductPrice::GROUP_READ])]
+    #[Groups([self::GROUP_READ, CartItem::GROUP_READ, ProductPrice::GROUP_READ, Product::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Relation(targetResource: Product::class)]
-    #[Groups([self::GROUP_READ])]
-    public ?Product $product;
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public Product $product;
 
     #[Groups([self::GROUP_READ, CartItem::GROUP_READ])]
     public string $ref;
