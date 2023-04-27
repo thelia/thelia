@@ -48,7 +48,7 @@ class Feature extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'feature:read:single';
     public const GROUP_WRITE = 'feature:write';
 
-    #[Groups([self::GROUP_READ, FeatureAv::GROUP_READ, FeatureAv::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, FeatureAv::GROUP_READ, FeatureAv::GROUP_WRITE, FeatureProduct::GROUP_READ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]

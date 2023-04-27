@@ -108,9 +108,10 @@ class ProductCategory extends AbstractPropelResource
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): ProductCategory
+    public function setCreatedAt(?\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -119,9 +120,10 @@ class ProductCategory extends AbstractPropelResource
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): ProductCategory
+    public function setUpdatedAt(?\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
