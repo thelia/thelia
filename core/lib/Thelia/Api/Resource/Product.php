@@ -78,11 +78,11 @@ class Product extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'product:read:single';
     public const GROUP_WRITE = 'product:write';
 
-    #[Groups([self::GROUP_READ, ProductCategory::GROUP_READ, OrderProduct::GROUP_READ, ProductAssociatedContent::GROUP_READ])]
+    #[Groups([self::GROUP_READ, ProductCategory::GROUP_READ, OrderProduct::GROUP_READ, ProductAssociatedContent::GROUP_READ, FeatureProduct::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Relation(targetResource: TaxRule::class)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public TaxRule $taxRule;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -95,11 +95,11 @@ class Product extends AbstractTranslatableResource
     public ?int $position;
 
     #[Relation(targetResource: Template::class)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Template $template;
 
     #[Relation(targetResource: Brand::class)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Brand $brand;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -115,12 +115,27 @@ class Product extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ_SINGLE])]
     public Collection $productCategories;
 
+    #[Relation(targetResource: ProductSaleElements::class)]
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public Collection $productSaleElements;
+
+    #[Relation(targetResource: FeatureProduct::class)]
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public Collection $featureProduct;
+
+    #[Relation(targetResource: ProductPrice::class)]
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public Collection $productPrice;
+
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
 
     public function __construct()
     {
         $this->productCategories = new ArrayCollection();
+        $this->productSaleElements = new ArrayCollection();
+        $this->featureProduct = new ArrayCollection();
+        $this->productPrice = new ArrayCollection();
         parent::__construct();
     }
 
@@ -253,6 +268,41 @@ class Product extends AbstractTranslatableResource
     {
         $this->productCategories = $productCategories;
 
+        return $this;
+    }
+
+    public function getProductSaleElements(): Collection
+    {
+        return $this->productSaleElements;
+    }
+
+    public function setProductSaleElements(Collection $productSaleElements): self
+    {
+        $this->productSaleElements = $productSaleElements;
+
+        return $this;
+    }
+
+    public function getFeatureProduct(): Collection
+    {
+        return $this->featureProduct;
+    }
+
+    public function setFeatureProduct(Collection $featureProduct): self
+    {
+        $this->featureProduct = $featureProduct;
+
+        return $this;
+    }
+
+    public function getProductPrice(): Collection
+    {
+        return $this->productPrice;
+    }
+
+    public function setProductPrice(Collection $productPrice): Product
+    {
+        $this->productPrice = $productPrice;
         return $this;
     }
 
