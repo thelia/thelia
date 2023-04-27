@@ -36,17 +36,17 @@ class ProductPrice extends AbstractPropelResource
     public const GROUP_WRITE = 'product_price:write';
 
     #[Relation(targetResource: ProductSaleElements::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE])]
     public ProductSaleElements $productSaleElements;
 
     #[Relation(targetResource: Currency::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE])]
     public Currency $currency;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE])]
     public float $price;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE])]
     public float $promo_price;
 
     #[Groups([self::GROUP_READ])]
