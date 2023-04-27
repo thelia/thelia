@@ -48,7 +48,7 @@ class Brand extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'brand:read:single';
     public const GROUP_WRITE = 'brand:write';
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, Product::GROUP_READ, Product::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
