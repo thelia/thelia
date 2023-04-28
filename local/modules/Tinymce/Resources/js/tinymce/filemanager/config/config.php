@@ -48,6 +48,8 @@ function generateFolder($env): void
     }
 }
 
+$env =  'prod';
+
 if (file_exists(__DIR__.'/../../../../../../../../bootstrap.php')) {
     // Symlinked with thelia-project
     require_once __DIR__.'/../../../../../../../../bootstrap.php';
@@ -64,14 +66,9 @@ if (file_exists(__DIR__.'/../../../../../../../../bootstrap.php')) {
 
 (new \Symfony\Component\Dotenv\Dotenv())->bootEnv(__DIR__.'/../../../../../../../../.env');
 
-$env = getenv('THELIA_ENV') ?: 'prod';
-
-/** @var Request $request */
+$thelia = new App\Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
 $request = Request::createFromGlobals();
-
-$thelia = new App\Kernel($env, true);
-
-$thelia->boot();
+$response = $thelia->handle($request);
 
 /** @var \Symfony\Component\DependencyInjection\ContainerInterface $container */
 $container = $thelia->getContainer();
@@ -79,7 +76,6 @@ $container = $thelia->getContainer();
 $eventDispatcher = $container->get('event_dispatcher');
 $container->get('thelia.translator');
 $container->get('thelia.url.manager');
-$container->set('request', $request);
 $container->get('request_stack')->push($request);
 $event = new \Thelia\Core\Event\SessionEvent(THELIA_CACHE_DIR.$env, false, $env);
 
