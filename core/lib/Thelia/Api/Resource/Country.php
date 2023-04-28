@@ -48,19 +48,19 @@ class Country extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'country:read:single';
     public const GROUP_WRITE = 'country:write';
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE, Customer::GROUP_READ_SINGLE, Address::GROUP_READ_SINGLE, TaxRuleCountry::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE, Customer::GROUP_READ_SINGLE, Address::GROUP_READ_SINGLE, TaxRuleCountry::GROUP_READ, CountryArea::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public bool $visible;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, CountryArea::GROUP_READ_SINGLE])]
     public string $isocode;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, CountryArea::GROUP_READ_SINGLE])]
     public ?string $isoalpha2;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, CountryArea::GROUP_READ_SINGLE])]
     public ?string $isoalpha3;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]

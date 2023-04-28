@@ -19,57 +19,49 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/states'
+            uriTemplate: '/admin/areas'
         ),
         new GetCollection(
-            uriTemplate: '/admin/states'
+            uriTemplate: '/admin/areas'
         ),
         new Get(
-            uriTemplate: '/admin/states/{id}',
+            uriTemplate: '/admin/areas/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Put(
-            uriTemplate: '/admin/states/{id}'
+            uriTemplate: '/admin/areas/{id}'
         ),
         new Delete(
-            uriTemplate: '/admin/states/{id}'
+            uriTemplate: '/admin/areas/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class State extends AbstractTranslatableResource
+class Area extends AbstractPropelResource
 {
-    public const GROUP_READ = 'state:read';
-    public const GROUP_READ_SINGLE = 'state:read:single';
-    public const GROUP_WRITE = 'state:write';
+    public const GROUP_READ = 'area:read';
+    public const GROUP_READ_SINGLE = 'area:read:single';
+    public const GROUP_WRITE = 'area:write';
 
-    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE, Address::GROUP_READ_SINGLE, TaxRuleCountry::GROUP_READ, CountryArea::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, CountryArea::GROUP_READ_SINGLE, AreaDeliveryModule::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderAddress::GROUP_READ])]
-    public bool $visible;
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, CountryArea::GROUP_READ_SINGLE, AreaDeliveryModule::GROUP_READ_SINGLE])]
+    public string $name;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderAddress::GROUP_READ])]
-    public ?string $isocode;
-
-    #[Relation(targetResource: Country::class)]
-    #[Groups(groups: [self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
-    public Country $country;
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, CountryArea::GROUP_READ_SINGLE, AreaDeliveryModule::GROUP_READ_SINGLE])]
+    public ?float $postage;
 
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $updatedAt;
-
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public I18nCollection $i18ns;
 
     public function getId(): ?int
     {
@@ -83,38 +75,26 @@ class State extends AbstractTranslatableResource
         return $this;
     }
 
-    public function isVisible(): bool
+    public function getName(): string
     {
-        return $this->visible;
+        return $this->name;
     }
 
-    public function setVisible(bool $visible): self
+    public function setName(string $name): self
     {
-        $this->visible = $visible;
+        $this->name = $name;
 
         return $this;
     }
 
-    public function getIsocode(): ?string
+    public function getPostage(): ?float
     {
-        return $this->isocode;
+        return $this->postage;
     }
 
-    public function setIsocode(?string $isocode): self
+    public function setPostage(?float $postage): self
     {
-        $this->isocode = $isocode;
-
-        return $this;
-    }
-
-    public function getCountry(): Country
-    {
-        return $this->country;
-    }
-
-    public function setCountry(Country $country): self
-    {
-        $this->country = $country;
+        $this->postage = $postage;
 
         return $this;
     }
@@ -145,11 +125,6 @@ class State extends AbstractTranslatableResource
 
     public static function getPropelModelClass(): string
     {
-        return \Thelia\Model\State::class;
-    }
-
-    public static function getI18nResourceClass(): string
-    {
-        return StateI18n::class;
+        return \Thelia\Model\Area::class;
     }
 }
