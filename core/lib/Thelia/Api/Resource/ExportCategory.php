@@ -13,42 +13,58 @@
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 #[ApiResource(
     operations: [
+        new Post(
+            uriTemplate: '/admin/export_categories'
+        ),
+        new GetCollection(
+            uriTemplate: '/admin/export_categories'
+        ),
         new Get(
-            uriTemplate: '/admin/area_delivery_module/{id}',
+            uriTemplate: '/admin/export_categories/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+        ),
+        new Put(
+            uriTemplate: '/admin/export_categories/{id}'
+        ),
+        new Delete(
+            uriTemplate: '/admin/export_categories/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class AreaDeliveryModule extends AbstractPropelResource
+class ExportCategory extends AbstractTranslatableResource
 {
-    public const GROUP_READ = 'area_delivery_module:read';
-    public const GROUP_READ_SINGLE = 'area_delivery_module:read:single';
-    public const GROUP_WRITE = 'area_delivery_module:write';
+    public const GROUP_READ = 'export_category:read';
+    public const GROUP_READ_SINGLE = 'export_category:read:single';
+    public const GROUP_WRITE = 'export_category:write';
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Export::GROUP_READ, Export::GROUP_WRITE])]
     public ?int $id = null;
 
-    #[Relation(targetResource: Area::class)]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public Area $area;
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Export::GROUP_READ, Export::GROUP_WRITE])]
+    public string $ref;
 
-    #[Relation(targetResource: Module::class)]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public Module $module;
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Export::GROUP_READ, Export::GROUP_WRITE])]
+    public int $position;
 
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
 
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $updatedAt;
+
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public I18nCollection $i18ns;
 
     public function getId(): ?int
     {
@@ -62,26 +78,26 @@ class AreaDeliveryModule extends AbstractPropelResource
         return $this;
     }
 
-    public function getArea(): Area
+    public function getRef(): string
     {
-        return $this->area;
+        return $this->ref;
     }
 
-    public function setArea(Area $area): self
+    public function setRef(string $ref): self
     {
-        $this->area = $area;
+        $this->ref = $ref;
 
         return $this;
     }
 
-    public function getModule(): Module
+    public function getPosition(): int
     {
-        return $this->module;
+        return $this->position;
     }
 
-    public function setModule(Module $module): self
+    public function setPosition(int $position): self
     {
-        $this->module = $module;
+        $this->position = $position;
 
         return $this;
     }
@@ -112,6 +128,11 @@ class AreaDeliveryModule extends AbstractPropelResource
 
     public static function getPropelModelClass(): string
     {
-        return \Thelia\Model\AreaDeliveryModule::class;
+        return \Thelia\Model\ExportCategory::class;
+    }
+
+    public static function getI18nResourceClass(): string
+    {
+        return ExportCategoryI18n::class;
     }
 }
