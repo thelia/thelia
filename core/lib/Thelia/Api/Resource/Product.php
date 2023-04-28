@@ -78,14 +78,14 @@ class Product extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'product:read:single';
     public const GROUP_WRITE = 'product:write';
 
-    #[Groups([self::GROUP_READ, ProductCategory::GROUP_READ, OrderProduct::GROUP_READ, ProductAssociatedContent::GROUP_READ, FeatureProduct::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, ProductCategory::GROUP_READ, OrderProduct::GROUP_READ, ProductAssociatedContent::GROUP_READ, FeatureProduct::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE, SaleProduct::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Relation(targetResource: TaxRule::class)]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public TaxRule $taxRule;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, SaleProduct::GROUP_READ_SINGLE])]
     public string $ref;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
