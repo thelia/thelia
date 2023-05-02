@@ -16,13 +16,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class BrandI18n extends I18n
 {
-    #[Groups([Brand::GROUP_READ, Brand::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    #[Groups([Brand::GROUP_READ, Product::GROUP_READ_SINGLE])]
     protected ?string $title;
 
-    #[Groups([Brand::GROUP_READ, Brand::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    #[Groups([Brand::GROUP_READ, Product::GROUP_READ_SINGLE])]
     protected ?string $chapo;
 
-    #[Groups([Brand::GROUP_READ, Brand::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    #[Groups([Brand::GROUP_READ, Product::GROUP_READ_SINGLE])]
     protected ?string $description;
 
     public function getTitle(): string

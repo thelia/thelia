@@ -19,8 +19,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use Propel\Runtime\Collection\ArrayCollection;
-use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\DateFilter;
@@ -124,25 +122,16 @@ class Order extends AbstractPropelResource
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?string $invoiceRef;
 
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public ?int $version;
-
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public ?\DateTime $versionCreatedAt;
-
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public ?string $versionCreatedBy;
-
     #[Groups([self::GROUP_READ])]
     public ?float $totalAmount;
 
     #[Relation(targetResource: OrderProduct::class)]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public Collection $orderProducts;
+    public array $orderProducts;
 
     #[Relation(targetResource: OrderCoupon::class)]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public Collection $orderCoupons;
+    public array $orderCoupons;
 
     #[Relation(targetResource: OrderAddress::class, relationAlias: 'OrderAddressRelatedByInvoiceOrderAddressId')]
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -153,11 +142,11 @@ class Order extends AbstractPropelResource
     public OrderAddress $deliveryOrderAddress;
 
     #[Relation(targetResource: Module::class, relationAlias: 'ModuleRelatedByPaymentModuleId')]
-    #[Groups([self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Module $paymentModule;
 
     #[Relation(targetResource: Module::class, relationAlias: 'ModuleRelatedByDeliveryModuleId')]
-    #[Groups([self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Module $deliveryModule;
 
     #[Relation(targetResource: OrderStatus::class)]
@@ -181,8 +170,8 @@ class Order extends AbstractPropelResource
 
     public function __construct()
     {
-        $this->orderCoupons = new ArrayCollection();
-        $this->orderProducts = new ArrayCollection();
+        $this->orderCoupons = [];
+        $this->orderProducts = [];
     }
 
     public function getTotalAmount(): ?float
@@ -346,60 +335,24 @@ class Order extends AbstractPropelResource
         return $this;
     }
 
-    public function getVersion(): ?int
-    {
-        return $this->version;
-    }
-
-    public function setVersion(?int $version): self
-    {
-        $this->version = $version;
-
-        return $this;
-    }
-
-    public function getVersionCreatedAt(): ?\DateTime
-    {
-        return $this->versionCreatedAt;
-    }
-
-    public function setVersionCreatedAt(?\DateTime $versionCreatedAt): self
-    {
-        $this->versionCreatedAt = $versionCreatedAt;
-
-        return $this;
-    }
-
-    public function getVersionCreatedBy(): ?string
-    {
-        return $this->versionCreatedBy;
-    }
-
-    public function setVersionCreatedBy(?string $versionCreatedBy): self
-    {
-        $this->versionCreatedBy = $versionCreatedBy;
-
-        return $this;
-    }
-
-    public function getOrderProducts(): Collection
+    public function getOrderProducts(): array
     {
         return $this->orderProducts;
     }
 
-    public function setOrderProducts(Collection $orderProducts): self
+    public function setOrderProducts(array $orderProducts): self
     {
         $this->orderProducts = $orderProducts;
 
         return $this;
     }
 
-    public function getOrderCoupons(): Collection
+    public function getOrderCoupons(): array
     {
         return $this->orderCoupons;
     }
 
-    public function setOrderCoupons(Collection $orderCoupons): self
+    public function setOrderCoupons(array $orderCoupons): self
     {
         $this->orderCoupons = $orderCoupons;
 
