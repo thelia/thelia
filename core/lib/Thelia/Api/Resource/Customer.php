@@ -19,8 +19,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use Propel\Runtime\Collection\ArrayCollection;
-use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
@@ -125,11 +123,11 @@ class Customer extends AbstractPropelResource
 
     #[Relation(targetResource: Address::class)]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public Collection $addresses;
+    public array $addresses;
 
     public function __construct()
     {
-        $this->addresses = new ArrayCollection();
+        $this->addresses = [];
     }
 
     public function getId(): ?int
@@ -384,12 +382,12 @@ class Customer extends AbstractPropelResource
         return $this;
     }
 
-    public function getAddresses(): Collection
+    public function getAddresses(): array
     {
         return $this->addresses;
     }
 
-    public function setAddresses(Collection $addresses): self
+    public function setAddresses(array $addresses): self
     {
         $this->addresses = $addresses;
 

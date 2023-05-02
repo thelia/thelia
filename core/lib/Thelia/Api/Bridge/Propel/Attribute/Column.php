@@ -8,8 +8,8 @@ use Attribute;
 class Column
 {
     public function __construct(
-        private ?string $propelGetter = null
+        private ?string $propelFieldName = null
     ) {
-        
+
     }
 }

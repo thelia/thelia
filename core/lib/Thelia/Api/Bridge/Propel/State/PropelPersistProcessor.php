@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Propel\Runtime\Collection\Collection;
+use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Resource\AbstractPropelResource;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Model\ProductSaleElements;
@@ -42,6 +43,12 @@ class PropelPersistProcessor implements ProcessorInterface
 
             $propelSetter = 'set'.ucfirst($property->getName());
 
+            foreach ($property->getAttributes(Column::class) as $columnAttribute){
+                if (isset($columnAttribute->getArguments()['propelFieldName'])){
+                    $propelSetter = 'set'.ucfirst($columnAttribute->getArguments()['propelFieldName']);
+                }
+            }
+
             if (method_exists($propelModel, $propelSetter)) {
                 $possibleGetters = [
                     'get'.ucfirst($property->getName()),
@@ -62,9 +69,9 @@ class PropelPersistProcessor implements ProcessorInterface
                     $value = $value->getId();
                 }
 
-                if ($value instanceof Collection)
+                if (is_array($value))
                 {
-                    $value = new Collection(array_map(function ($value) {return  $this->resourceToModel($value);}, iterator_to_array($value)));
+                    $value = new Collection(array_map(function ($value) {return  $this->resourceToModel($value);}, $value));
                 }
 
                 $propelModel->$propelSetter($value);
