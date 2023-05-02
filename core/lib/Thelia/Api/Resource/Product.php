@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Collection\ArrayCollection;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
@@ -78,7 +79,16 @@ class Product extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'product:read:single';
     public const GROUP_WRITE = 'product:write';
 
-    #[Groups([self::GROUP_READ, ProductCategory::GROUP_READ, OrderProduct::GROUP_READ, ProductAssociatedContent::GROUP_READ, FeatureProduct::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE])]
+    #[Groups(
+        [
+            self::GROUP_READ,
+            ProductCategory::GROUP_READ,
+            OrderProduct::GROUP_READ,
+            ProductAssociatedContent::GROUP_READ,
+            FeatureProduct::GROUP_READ_SINGLE,
+            ProductSaleElements::GROUP_WRITE
+        ]
+    )]
     public ?int $id = null;
 
     #[Relation(targetResource: TaxRule::class)]
@@ -96,11 +106,11 @@ class Product extends AbstractTranslatableResource
 
     #[Relation(targetResource: Template::class)]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public Template $template;
+    public ?Template $template;
 
     #[Relation(targetResource: Brand::class)]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public Brand $brand;
+    public ?Brand $brand;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public bool $virtual;
@@ -112,20 +122,17 @@ class Product extends AbstractTranslatableResource
     public ?\DateTime $updatedAt;
 
     #[Relation(targetResource: ProductCategory::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Collection $productCategories;
 
+    #[Column(propelGetter: 'getProductSaleElementss')]
     #[Relation(targetResource: ProductSaleElements::class)]
     #[Groups([self::GROUP_READ_SINGLE])]
     public Collection $productSaleElements;
 
     #[Relation(targetResource: FeatureProduct::class)]
     #[Groups([self::GROUP_READ_SINGLE])]
-    public Collection $featureProduct;
-
-    #[Relation(targetResource: ProductPrice::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
-    public Collection $productPrice;
+    public Collection $featureProducts;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
@@ -134,8 +141,7 @@ class Product extends AbstractTranslatableResource
     {
         $this->productCategories = new ArrayCollection();
         $this->productSaleElements = new ArrayCollection();
-        $this->featureProduct = new ArrayCollection();
-        $this->productPrice = new ArrayCollection();
+        $this->featureProducts = new ArrayCollection();
         parent::__construct();
     }
 
@@ -151,12 +157,12 @@ class Product extends AbstractTranslatableResource
         return $this;
     }
 
-    public function getTaxRule(): TaxRule
+    public function getTaxRule(): ?TaxRule
     {
         return $this->taxRule;
     }
 
-    public function setTaxRule(TaxRule $taxRule): self
+    public function setTaxRule(?TaxRule $taxRule): self
     {
         $this->taxRule = $taxRule;
 
@@ -199,24 +205,24 @@ class Product extends AbstractTranslatableResource
         return $this;
     }
 
-    public function getTemplate(): Template
+    public function getTemplate(): ?Template
     {
         return $this->template;
     }
 
-    public function setTemplate(Template $template): self
+    public function setTemplate(?Template $template): self
     {
         $this->template = $template;
 
         return $this;
     }
 
-    public function getBrand(): Brand
+    public function getBrand(): ?Brand
     {
         return $this->brand;
     }
 
-    public function setBrand(Brand $brand): self
+    public function setBrand(?Brand $brand): self
     {
         $this->brand = $brand;
 
@@ -264,9 +270,9 @@ class Product extends AbstractTranslatableResource
         return $this->productCategories;
     }
 
-    public function setProductCategories(Collection $productCategories): self
+    public function setProductCategories(array $productCategories): self
     {
-        $this->productCategories = $productCategories;
+        $this->productCategories = new Collection($productCategories);
 
         return $this;
     }
@@ -283,26 +289,15 @@ class Product extends AbstractTranslatableResource
         return $this;
     }
 
-    public function getFeatureProduct(): Collection
+    public function getFeatureProducts(): Collection
     {
-        return $this->featureProduct;
+        return $this->featureProducts;
     }
 
-    public function setFeatureProduct(Collection $featureProduct): self
+    public function setFeatureProducts(Collection $featureProducts): self
     {
-        $this->featureProduct = $featureProduct;
+        $this->featureProducts = $featureProducts;
 
-        return $this;
-    }
-
-    public function getProductPrice(): Collection
-    {
-        return $this->productPrice;
-    }
-
-    public function setProductPrice(Collection $productPrice): Product
-    {
-        $this->productPrice = $productPrice;
         return $this;
     }
 
