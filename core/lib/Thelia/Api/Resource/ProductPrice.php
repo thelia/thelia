@@ -14,7 +14,6 @@ namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -41,17 +40,17 @@ class ProductPrice extends AbstractPropelResource
     public ProductSaleElements $productSaleElements;
 
     #[Relation(targetResource: Currency::class)]
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, Product::GROUP_WRITE])]
     public Currency $currency;
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, Product::GROUP_WRITE])]
     public float $price;
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, Product::GROUP_WRITE])]
     public float $promoPrice;
 
-    #[Groups([self::GROUP_READ])]
-    public ?bool $fromDefaultCurrency = false;
+    #[Groups([self::GROUP_READ, Product::GROUP_WRITE])]
+    public ?bool $fromDefaultCurrency = true;
 
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
