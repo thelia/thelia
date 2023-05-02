@@ -18,6 +18,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Propel\Runtime\Collection\ArrayCollection;
+use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
@@ -53,29 +55,37 @@ class ProductSaleElements extends AbstractPropelResource
     public ?int $id = null;
 
     #[Relation(targetResource: Product::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Product $product;
 
-    #[Groups([self::GROUP_READ, CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, CartItem::GROUP_READ])]
     public string $ref;
 
-    #[Groups([self::GROUP_READ, CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, CartItem::GROUP_READ])]
     public int $quantity;
 
-    #[Groups([self::GROUP_READ, CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, CartItem::GROUP_READ])]
     public ?bool $promo;
 
-    #[Groups([self::GROUP_READ, CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, CartItem::GROUP_READ])]
     public ?bool $newness;
 
-    #[Groups([self::GROUP_READ, CartItem::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, CartItem::GROUP_READ])]
     public ?float $weight;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?bool $isDefault;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $eanCode;
+
+    #[Relation(targetResource: ProductPrice::class)]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    public Collection $productPrices;
+
+    #[Relation(targetResource: AttributeCombination::class)]
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    public Collection $attributeCombinations;
 
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
@@ -188,6 +198,28 @@ class ProductSaleElements extends AbstractPropelResource
     {
         $this->eanCode = $eanCode;
 
+        return $this;
+    }
+
+    public function getAttributeCombinations(): Collection
+    {
+        return $this->attributeCombinations;
+    }
+
+    public function setAttributeCombinations(Collection $attributeCombinations): ProductSaleElements
+    {
+        $this->attributeCombinations = $attributeCombinations;
+        return $this;
+    }
+
+    public function getProductPrices(): Collection
+    {
+        return $this->productPrices;
+    }
+
+    public function setProductPrices(array $productPrices): self
+    {
+        $this->productPrices = new Collection($productPrices);
         return $this;
     }
 
