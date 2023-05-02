@@ -14,6 +14,7 @@ namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -36,18 +37,18 @@ class ProductPrice extends AbstractPropelResource
     public const GROUP_WRITE = 'product_price:write';
 
     #[Relation(targetResource: ProductSaleElements::class)]
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ])]
     public ProductSaleElements $productSaleElements;
 
     #[Relation(targetResource: Currency::class)]
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE])]
     public Currency $currency;
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE])]
     public float $price;
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE])]
-    public float $promo_price;
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE])]
+    public float $promoPrice;
 
     #[Groups([self::GROUP_READ])]
     public ?bool $fromDefaultCurrency = false;
@@ -96,12 +97,12 @@ class ProductPrice extends AbstractPropelResource
 
     public function getPromoPrice(): float
     {
-        return $this->promo_price;
+        return $this->promoPrice;
     }
 
-    public function setPromoPrice(float $promo_price): self
+    public function setPromoPrice(float $promoPrice): self
     {
-        $this->promo_price = $promo_price;
+        $this->promoPrice = $promoPrice;
 
         return $this;
     }
