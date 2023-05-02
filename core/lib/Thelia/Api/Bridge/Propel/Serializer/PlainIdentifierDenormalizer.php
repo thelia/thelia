@@ -93,7 +93,7 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
         $resourceReflection = new \ReflectionClass($type);
         $properties = $resourceReflection->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PRIVATE);
 
-        $need = array_filter(
+        return array_filter(
             $properties,
             function (\ReflectionProperty $property) use ($data) {
                 return null !== $property->getType()
@@ -114,7 +114,5 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
                     );
             }
         );
-
-        return $need;
     }
 }
