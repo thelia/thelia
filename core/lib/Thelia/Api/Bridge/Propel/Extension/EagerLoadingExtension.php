@@ -13,6 +13,7 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Resource\I18n;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Model\LangQuery;
+use Thelia\Model\ProductQuery;
 
 final class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
@@ -157,16 +158,16 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                     }
                 }
 
-
                 $targetReflector = new \ReflectionClass($targetClass);
 
                 $isNullable = $property->getType()->allowsNull();
                 $isLeftJoin = false !== $wasLeftJoin || true === $isNullable;
-                if (isset($relationAttribute->getArguments()['relationAlias'])){
+                $joinFunctionName = 'use'.ucfirst($targetReflector->getShortName()).'Query';
+
+                if (!method_exists($query, $joinFunctionName) && isset($relationAttribute->getArguments()['relationAlias'])) {
                     $joinFunctionName = 'use'.$relationAttribute->getArguments()['relationAlias'].'Query';
-                }else {
-                    $joinFunctionName = 'use'.ucfirst($targetReflector->getShortName()).'Query';
                 }
+
                 if (!method_exists($query, $joinFunctionName)) {
                     continue;
                 }

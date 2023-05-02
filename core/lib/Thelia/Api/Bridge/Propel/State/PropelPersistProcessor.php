@@ -6,12 +6,25 @@ use _PHPStan_9a6ded56a\Nette\Neon\Exception;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use Propel\Runtime\Collection\Collection;
 use Thelia\Api\Resource\AbstractPropelResource;
 use Thelia\Api\Resource\TranslatableResourceInterface;
+use Thelia\Model\ProductSaleElements;
 
 class PropelPersistProcessor implements ProcessorInterface
 {
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    {
+        $propelModel = $this->resourceToModel($data);
+
+        $propelModel->save();
+
+        $data->setId($propelModel->getId());
+
+        return $data;
+    }
+
+    public function resourceToModel(mixed $data)
     {
         $propelModel = $data->getPropelModel();
 
@@ -23,39 +36,38 @@ class PropelPersistProcessor implements ProcessorInterface
         $resourceReflection = new \ReflectionClass($data);
 
         foreach ($resourceReflection->getProperties() as $property) {
-           if (!$property->isInitialized($data)) {
-               continue;
-           }
+            if (!$property->isInitialized($data)) {
+                continue;
+            }
 
-           $propelSetter = 'set'.ucfirst($property->getName());
+            $propelSetter = 'set'.ucfirst($property->getName());
 
-           if (method_exists($propelModel, $propelSetter)) {
-               $possibleGetters = [
-                   'get'.ucfirst($property->getName()),
-                   'is'.ucfirst($property->getName()),
-               ];
+            if (method_exists($propelModel, $propelSetter)) {
+                $possibleGetters = [
+                    'get'.ucfirst($property->getName()),
+                    'is'.ucfirst($property->getName()),
+                ];
 
-               $availableMethods = array_filter(array_intersect($possibleGetters, get_class_methods($data)));
+                $availableMethods = array_filter(array_intersect($possibleGetters, get_class_methods($data)));
 
-               $value = null;
-               while (!empty($availableMethods) && $value === null) {
-                   $method = array_pop($availableMethods);
-                   $value = $data->$method();
-               }
+                $value = null;
+                while (!empty($availableMethods) && $value === null) {
+                    $method = array_pop($availableMethods);
+                    $value = $data->$method();
+                }
 
-               if ($value instanceof AbstractPropelResource)
-               {
-                   $propelSetter = $propelSetter.'Id';
-                   $value = $value->getId();
-               }
+                if ($value instanceof AbstractPropelResource)
+                {
+                    $propelSetter = $propelSetter.'Id';
+                    $value = $value->getId();
+                }
 
-               if ($value instanceof ArrayCollection)
-               {
-                   //Todo Implement relation save cascade
-                    continue;
-               }
+                if ($value instanceof Collection)
+                {
+                    $value = new Collection(array_map(function ($value) {return  $this->resourceToModel($value);}, iterator_to_array($value)));
+                }
 
-               $propelModel->$propelSetter($value);
+                $propelModel->$propelSetter($value);
             }
         }
 
@@ -83,10 +95,6 @@ class PropelPersistProcessor implements ProcessorInterface
             }
         }
 
-        $propelModel->save();
-
-        $data->setId($propelModel->getId());
-
-        return $data;
+        return $propelModel;
     }
 }
