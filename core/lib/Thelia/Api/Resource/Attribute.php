@@ -48,7 +48,7 @@ class Attribute extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'attribute:read:single';
     public const GROUP_WRITE = 'attribute:write';
 
-    #[Groups([self::GROUP_READ, AttributeAv::GROUP_READ, AttributeAv::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, AttributeAv::GROUP_READ, AttributeAv::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -60,7 +60,7 @@ class Attribute extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int
