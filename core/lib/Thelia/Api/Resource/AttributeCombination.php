@@ -21,32 +21,34 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 #[ApiResource(
     operations: [
         new Get(
-            uriTemplate: '/admin/product_associated_contents/{id}',
+            uriTemplate: '/admin/attribute_combinations/{productSaleElements}/attribute_av/{attributeAv}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
-        )
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
-    denormalizationContext: ['groups' => [self::GROUP_WRITE]]
+    denormalizationContext: ['groups' => [self::GROUP_WRITE]],
 )]
-class ProductAssociatedContent extends AbstractPropelResource
+#[CompositeIdentifiers(['productSaleElements', 'attributeAv'])]
+class AttributeCombination extends AbstractPropelResource
 {
-    public const GROUP_READ = 'product_associated_content:read';
-    public const GROUP_READ_SINGLE = 'product_associated_content:read:single';
-    public const GROUP_WRITE = 'product_associated_content:write';
+    public const GROUP_READ = 'attribute_combination:read';
+    public const GROUP_READ_SINGLE = 'attribute_combination:read:single';
+    public const GROUP_WRITE = 'attribute_combination:write';
 
-    #[Groups([self::GROUP_READ])]
-    public ?int $id = null;
+    #[Relation(targetResource: ProductSaleElements::class)]
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public ProductSaleElements $productSaleElements;
 
-    #[Relation(targetResource: Product::class)]
+    #[Relation(targetResource: Attribute::class)]
+    #[Groups([self::GROUP_READ_SINGLE, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE])]
+    public Attribute $attribute;
+
+    #[Relation(targetResource: AttributeAv::class)]
+    #[Groups([self::GROUP_READ_SINGLE, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE])]
+    public AttributeAv $attributeAv;
+
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public Product $product;
-
-    #[Relation(targetResource: Content::class)]
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public Content $content;
-
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public ?int $position = null;
+    public ?int $position;
 
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
@@ -54,38 +56,37 @@ class ProductAssociatedContent extends AbstractPropelResource
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $updatedAt;
 
-    public function getId(): ?int
+    public function getProductSaleElements(): ProductSaleElements
     {
-        return $this->id;
+        return $this->productSaleElements;
     }
 
-    public function setId(?int $id): self
+    public function setProductSaleElements(ProductSaleElements $productSaleElements): AttributeCombination
     {
-        $this->id = $id;
+        $this->productSaleElements = $productSaleElements;
+        return $this;
+    }
+
+    public function getAttribute(): Attribute
+    {
+        return $this->attribute;
+    }
+
+    public function setAttribute(Attribute $attribute): self
+    {
+        $this->attribute = $attribute;
 
         return $this;
     }
 
-    public function getProduct(): Product
+    public function getAttributeAv(): AttributeAv
     {
-        return $this->product;
+        return $this->attributeAv;
     }
 
-    public function setProduct(Product $product): self
+    public function setAttributeAv(AttributeAv $attributeAv): self
     {
-        $this->product = $product;
-
-        return $this;
-    }
-
-    public function getContent(): Content
-    {
-        return $this->content;
-    }
-
-    public function setContent(Content $content): self
-    {
-        $this->content = $content;
+        $this->attributeAv = $attributeAv;
 
         return $this;
     }
@@ -128,6 +129,6 @@ class ProductAssociatedContent extends AbstractPropelResource
 
     public static function getPropelModelClass(): string
     {
-        return \Thelia\Model\ProductAssociatedContent::class;
+        return \Thelia\Model\AttributeCombination::class;
     }
 }
