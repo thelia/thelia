@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -48,7 +49,7 @@ class Brand extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'brand:read:single';
     public const GROUP_WRITE = 'brand:write';
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, Product::GROUP_READ, Product::GROUP_WRITE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -57,6 +58,9 @@ class Brand extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ, Product::GROUP_READ, Product::GROUP_READ_SINGLE])]
     public ?int $position = null;
 
+    #[ApiProperty(
+        types: 'object'
+    )]
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
 

@@ -18,8 +18,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use Propel\Runtime\Collection\ArrayCollection;
-use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
@@ -123,11 +121,11 @@ class OrderProduct extends AbstractPropelResource
 
     #[Relation(targetResource: OrderProductTax::class)]
     #[Groups([self::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE])]
-    public Collection $orderProductTaxes;
+    public array $orderProductTaxes;
 
     public function __construct()
     {
-        $this->orderProductTaxes = new ArrayCollection();
+        $this->orderProductTaxes = [];
     }
 
     public function getId(): ?int
@@ -411,12 +409,12 @@ class OrderProduct extends AbstractPropelResource
         return $this;
     }
 
-    public function getOrderProductTaxes(): Collection
+    public function getOrderProductTaxes(): array
     {
         return $this->orderProductTaxes;
     }
 
-    public function setOrderProductTaxes(Collection $orderProductTaxes): self
+    public function setOrderProductTaxes(array $orderProductTaxes): self
     {
         $this->orderProductTaxes = $orderProductTaxes;
 

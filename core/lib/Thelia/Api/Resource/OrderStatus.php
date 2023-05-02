@@ -49,10 +49,10 @@ class OrderStatus extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'order_status:read:single';
     public const GROUP_WRITE = 'order_status:write';
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
     public string $code;
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]

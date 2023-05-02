@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use Propel\Runtime\Collection\ArrayCollection;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -75,7 +74,7 @@ class Cart extends AbstractPropelResource
 
     #[Relation(targetResource: CartItem::class, )]
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
-    public ?Collection $cartItems;
+    public ?array $cartItems;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?float $discount;
@@ -88,7 +87,7 @@ class Cart extends AbstractPropelResource
 
     public function __construct()
     {
-        $this->cartItems = new ArrayCollection();
+        $this->cartItems = [];
     }
 
     public function getId(): ?int
@@ -163,12 +162,12 @@ class Cart extends AbstractPropelResource
         return $this;
     }
 
-    public function getCartItems(): ?Collection
+    public function getCartItems(): ?array
     {
         return $this->cartItems;
     }
 
-    public function setCartItems(?Collection $cartItems): self
+    public function setCartItems(?array $cartItems): self
     {
         $this->cartItems = $cartItems;
 
