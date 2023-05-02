@@ -49,7 +49,7 @@ class FeatureAv extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'feature_av:read:single';
     public const GROUP_WRITE = 'feature_av:write';
 
-    #[Groups([self::GROUP_READ, FeatureProduct::GROUP_READ])]
+    #[Groups([self::GROUP_READ, FeatureProduct::GROUP_READ, Product::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Relation(targetResource: Feature::class)]
@@ -65,7 +65,7 @@ class FeatureAv extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int
