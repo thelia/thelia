@@ -18,8 +18,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use Propel\Runtime\Collection\ArrayCollection;
-use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
@@ -62,7 +60,7 @@ class Content extends AbstractTranslatableResource
 
     #[Relation(targetResource: ContentFolder::class)]
     #[Groups([self::GROUP_READ_SINGLE])]
-    public Collection $contentFolders;
+    public array $contentFolders;
 
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
@@ -75,7 +73,7 @@ class Content extends AbstractTranslatableResource
 
     public function __construct()
     {
-        $this->contentFolders = new ArrayCollection();
+        $this->contentFolders = [];
         parent::__construct();
     }
 
@@ -115,12 +113,12 @@ class Content extends AbstractTranslatableResource
         return $this;
     }
 
-    public function getContentFolders(): Collection
+    public function getContentFolders(): array
     {
         return $this->contentFolders;
     }
 
-    public function setContentFolders(Collection $contentFolders): Content
+    public function setContentFolders(array $contentFolders): Content
     {
         $this->contentFolders = $contentFolders;
         return $this;

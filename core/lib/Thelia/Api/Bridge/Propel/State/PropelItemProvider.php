@@ -25,7 +25,7 @@ use Thelia\Model\ProductQuery;
 
 class PropelItemProvider extends AbstractPropelProvider
 {
-    public function __construct(private iterable $propelItemExtensions = [])
+    public function __construct(readonly private iterable $propelItemExtensions = [])
     {
     }
 
