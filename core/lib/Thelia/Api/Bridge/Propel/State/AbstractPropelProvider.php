@@ -62,8 +62,8 @@ abstract class AbstractPropelProvider implements ProviderInterface
             $propelGetter = 'get'.ucfirst($property->getName());
 
             foreach ($property->getAttributes(Column::class) as $columnAttribute){
-                if (isset($columnAttribute->getArguments()['propelGetter'])){
-                    $propelGetter = $columnAttribute->getArguments()['propelGetter'];
+                if (isset($columnAttribute->getArguments()['propelFieldName'])){
+                    $propelGetter = 'get'.ucfirst($columnAttribute->getArguments()['propelFieldName']);
                 }
             }
             foreach ($property->getAttributes(Relation::class) as $relationAttribute){

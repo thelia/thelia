@@ -19,8 +19,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use Propel\Runtime\Collection\ArrayCollection;
-use Propel\Runtime\Collection\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -113,7 +111,7 @@ class Product extends AbstractTranslatableResource
     public ?Brand $brand;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public bool $virtual;
+    public bool $virtual = false;
 
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
@@ -123,25 +121,25 @@ class Product extends AbstractTranslatableResource
 
     #[Relation(targetResource: ProductCategory::class)]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
-    public Collection $productCategories;
+    public array $productCategories;
 
-    #[Column(propelGetter: 'getProductSaleElementss')]
+    #[Column(propelFieldName: 'productSaleElementss')]
     #[Relation(targetResource: ProductSaleElements::class)]
-    #[Groups([self::GROUP_READ_SINGLE])]
-    public Collection $productSaleElements;
+    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    public array $productSaleElements;
 
     #[Relation(targetResource: FeatureProduct::class)]
     #[Groups([self::GROUP_READ_SINGLE])]
-    public Collection $featureProducts;
+    public array $featureProducts;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
 
     public function __construct()
     {
-        $this->productCategories = new ArrayCollection();
-        $this->productSaleElements = new ArrayCollection();
-        $this->featureProducts = new ArrayCollection();
+        $this->productCategories = [];
+        $this->productSaleElements = [];
+        $this->featureProducts = [];
         parent::__construct();
     }
 
@@ -265,36 +263,36 @@ class Product extends AbstractTranslatableResource
         return $this;
     }
 
-    public function getProductCategories(): Collection
+    public function getProductCategories(): array
     {
         return $this->productCategories;
     }
 
     public function setProductCategories(array $productCategories): self
     {
-        $this->productCategories = new Collection($productCategories);
+        $this->productCategories = $productCategories;
 
         return $this;
     }
 
-    public function getProductSaleElements(): Collection
+    public function getProductSaleElements(): array
     {
         return $this->productSaleElements;
     }
 
-    public function setProductSaleElements(Collection $productSaleElements): self
+    public function setProductSaleElements(array $productSaleElements): self
     {
-        $this->productSaleElements = $productSaleElements;
+        $this->productSaleElements =  $productSaleElements;
 
         return $this;
     }
 
-    public function getFeatureProducts(): Collection
+    public function getFeatureProducts(): array
     {
         return $this->featureProducts;
     }
 
-    public function setFeatureProducts(Collection $featureProducts): self
+    public function setFeatureProducts(array $featureProducts): self
     {
         $this->featureProducts = $featureProducts;
 

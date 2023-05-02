@@ -54,13 +54,13 @@ class Country extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public bool $visible;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public string $isocode;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?string $isoalpha2;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?string $isoalpha3;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
