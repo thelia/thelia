@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 class AttributeI18n extends I18n
 {
-    #[Groups([Attribute::GROUP_READ, Attribute::GROUP_WRITE])]
+    #[Groups([Attribute::GROUP_READ, Attribute::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
     protected ?string $title;
 
     #[Groups([Attribute::GROUP_READ, Attribute::GROUP_WRITE])]
