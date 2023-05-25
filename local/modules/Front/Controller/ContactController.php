@@ -47,7 +47,7 @@ class ContactController extends BaseFrontController
                 [ConfigQuery::getStoreEmail() => $event->getName()],
                 [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
                 $event->getSubject(),
-                '',
+                strip_tags($event->getMessage()),
                 $event->getMessage(),
                 [],
                 [],
