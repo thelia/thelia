@@ -139,16 +139,9 @@ abstract class ConditionAbstract implements ConditionInterface
         );
     }
 
-    /**
-     * Get ConditionManager Service id.
-     *
-     * @return string
-     */
     public function getServiceId()
     {
-        throw new \Thelia\Exception\NotImplementedException(
-            'The getServiceId method must be implemented in '.__CLASS__
-        );
+        return static::class;
     }
 
     /**
