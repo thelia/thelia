@@ -274,7 +274,7 @@
                             <select name="categoryCondition" id="category-condition" class="form-control">
                                 <option value="" data-description="">{intl l='Please select a condition'}</option>
                                 {foreach from=$availableConditions item=availableCondition}
-                                    <option value="{$availableCondition.serviceId}" data-description="{$availableCondition.toolTip}">{$availableCondition.name}</option>
+                                    <option value="{$availableCondition.serviceId|escape:'url'}" data-description="{$availableCondition.toolTip}">{$availableCondition.name}</option>
                                 {/foreach}
                             </select>
                             <span class="help-block typeToolTip"></span>

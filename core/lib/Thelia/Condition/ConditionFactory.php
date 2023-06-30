@@ -114,6 +114,8 @@ class ConditionFactory
      */
     public function build(string $conditionServiceId, array $operators, array $values)
     {
+        $conditionServiceId = urldecode($conditionServiceId);
+
         if (!$this->container->has($conditionServiceId)) {
             return false;
         }
