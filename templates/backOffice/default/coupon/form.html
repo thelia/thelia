@@ -64,7 +64,7 @@
                                     <select required name="{$name}" id="type" class="col-md-12 form-control">
                                         <option value="" data-description="" data-inputName="">{intl l='Please select a coupon type'}</option>
                                         {foreach from=$availableCoupons item=availableCoupon}
-                                            <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}" data-inputName="{$availableCoupon.inputName|default:null}" {if $value == $availableCoupon.serviceId}selected{/if}>
+                                            <option value="{$availableCoupon.serviceId|escape: 'url'}" data-description="{$availableCoupon.toolTip}" data-inputName="{$availableCoupon.inputName|default:null}" {if $value == $availableCoupon.serviceId}selected{/if}>
                                                 {$availableCoupon.name}
                                             </option>
                                         {/foreach}
