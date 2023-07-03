@@ -42,11 +42,17 @@ class %%CLASSNAME%% extends BaseModule
      */
     public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
     {
+        $updateDir = __DIR__.DS.'Config'.DS.'update';
+
+        if (! is_dir($updateDir)) {
+            return;
+        }
+
         $finder = Finder::create()
             ->name('*.sql')
             ->depth(0)
             ->sortByName()
-            ->in(__DIR__.DS.'Config'.DS.'update');
+            ->in($updateDir);
 
         $database = new Database($con);
 
