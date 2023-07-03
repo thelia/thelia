@@ -456,7 +456,6 @@ class Thelia extends Kernel
             ArchiverInterface::class => 'thelia.archiver',
             FormExtensionInterface::class => 'thelia.forms.extension',
             ContainerAwareInterface::class => 'thelia.command',
-            CouponInterface::class => 'thelia.coupon.addCoupon',
             ControllerInterface::class => 'controller.service_arguments',
             TaxTypeInterface::class => 'thelia.taxType',
         ];
@@ -469,6 +468,10 @@ class Thelia extends Kernel
         $container->registerForAutoconfiguration(ConditionInterface::class)
             ->setPublic(true)
             ->addTag('thelia.coupon.addCondition');
+
+        $container->registerForAutoconfiguration(CouponInterface::class)
+            ->setPublic(true)
+            ->addTag('thelia.coupon.addCoupon');
 
         $container->registerForAutoconfiguration(LoopInterface::class)
             ->setPublic(true)
