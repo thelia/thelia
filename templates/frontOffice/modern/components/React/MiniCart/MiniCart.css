@@ -20,9 +20,6 @@
   @screen md {
     padding-bottom: 0;
   }
-
-  &--recap {
-  }
 }
 
 .CartItem {

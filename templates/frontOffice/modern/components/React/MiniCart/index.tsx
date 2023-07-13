@@ -1,7 +1,6 @@
 import { hideCart, toggleCart } from '@js/redux/modules/visibility';
-import messages, { locale } from '../intl';
 
-import { IntlProvider } from 'react-intl';
+import { RawIntlProvider } from 'react-intl';
 import MiniCart from './MiniCart';
 import { Provider } from 'react-redux';
 import { QueryClientProvider } from 'react-query';
@@ -9,6 +8,7 @@ import React from 'react';
 import { queryClient } from '@openstudio/thelia-api-utils';
 import { createRoot } from 'react-dom/client';
 import store from '@js/redux/store';
+import intl from '../intl';
 
 export default function MiniCartRender() {
   const DOMElement = document.querySelector('.MiniCart-root');
@@ -20,9 +20,9 @@ export default function MiniCartRender() {
   document.addEventListener(
     'click',
     (e) => {
-      if (e.target?.matches('[data-toggle-cart]')) {
+      if ((e.target as HTMLElement)?.matches('[data-toggle-cart]')) {
         store.dispatch(toggleCart());
-      } else if (e.target?.matches('[data-close-cart]')) {
+      } else if ((e.target as HTMLElement)?.matches('[data-close-cart]')) {
         store.dispatch(hideCart());
       }
     },
@@ -31,11 +31,11 @@ export default function MiniCartRender() {
 
   root.render(
     <QueryClientProvider client={queryClient}>
-      <IntlProvider locale={locale} messages={messages[locale]}>
+      <RawIntlProvider value={intl}>
         <Provider store={store}>
           <MiniCart />
         </Provider>
-      </IntlProvider>
+      </RawIntlProvider>
     </QueryClientProvider>
   );
 }

@@ -1,24 +1,24 @@
-@import 'tailwindcss/base';
+@import url('tailwindcss/base');
 
-@import 'noJsFallback';
-@import 'variables';
-@import 'layout';
-@import 'menu';
-@import 'sticky';
-@import 'sidebar';
-@import 'helpers';
-@import 'buttons';
-@import 'form';
-@import 'blocks';
-@import 'animations';
-@import 'table';
-@import 'wysiwyg';
-@import 'zoom';
-@import 'print';
+@import url('noJsFallback');
+@import url('variables');
+@import url('layout');
+@import url('menu');
+@import url('sticky');
+@import url('sidebar');
+@import url('helpers');
+@import url('buttons');
+@import url('form');
+@import url('blocks');
+@import url('animations');
+@import url('table');
+@import url('wysiwyg');
+@import url('zoom');
+@import url('print');
 
-@import '../../components/**/*.css';
+@import url('../../components/**/*.css');
 
-@import './pages/**/*.css';
+@import url('./pages/**/*.css');
 
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import url('tailwindcss/components');
+@import url('tailwindcss/utilities');

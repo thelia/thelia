@@ -92,6 +92,8 @@ Encore.setOutputPath('dist/')
   )
   .addAliases({
     '@components': path.resolve(__dirname, './components'),
+    '@react-components': path.resolve(__dirname, './components/React'),
+    '@mixed-components': path.resolve(__dirname, './components/mixed'),
     '@js': path.resolve(__dirname, './assets/js'),
     '@redux': path.resolve(__dirname, './assets/js/redux'),
     '@utils': path.resolve(__dirname, './assets/js/utils'),
@@ -103,6 +105,7 @@ Encore.setOutputPath('dist/')
     '@favicons': path.resolve(__dirname, './assets/favicons')
   })
   .splitEntryChunks()
+  .enableTypeScriptLoader()
   .enableReactPreset()
   .enableSingleRuntimeChunk()
   .enableSourceMaps(!Encore.isProduction())
@@ -205,4 +208,9 @@ Encore.configureDevServerOptions((options) => {
 
 Encore.cleanupOutputBeforeBuild();
 
-module.exports = Encore.getWebpackConfig();
+const config = Encore.getWebpackConfig();
+config.resolve['fallback'] = {
+  crypto: false
+};
+
+module.exports = config;

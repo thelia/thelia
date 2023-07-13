@@ -1,8 +1,27 @@
-import React, { forwardRef } from 'react';
+import React, { SelectHTMLAttributes, forwardRef } from 'react';
 
 import Error from '../Error';
 
-const Select = forwardRef(
+type SelectProps = {
+  name: string;
+  options: {
+    value: string;
+    label: string;
+    className?: string;
+    isDefault?: boolean;
+  }[];
+  label?: string;
+  error?: string;
+  placeholder: string;
+  defaultValue?: string | string[] | undefined;
+  required?: boolean;
+  disabled?: boolean;
+  id?: string;
+  className?: string;
+  fieldClassName?: string;
+} & SelectHTMLAttributes<HTMLSelectElement>;
+
+const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, name, options = [], error, className = '', ...props }, ref) => {
     return (
       <label className={`Select ${className ? className : ''}`}>

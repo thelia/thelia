@@ -1,3 +1,4 @@
+/* stylelint-disable declaration-block-no-redundant-longhand-properties */
 :root {
   --mm-ocd-width: 100%;
   --mm-ocd-min-width: 200px;
@@ -25,16 +26,8 @@ body.mm-ocd-opened {
   overflow: hidden;
   background: rgb(0 0 0 / 0%);
   transition-delay: 0.45s, 0.15s;
-  transition-delay: 0.45s, 0.15s;
-  transition-delay: 0.45s, 0.15s;
-  transition-timing-function: ease;
-  transition-timing-function: ease;
   transition-timing-function: ease;
   transition-duration: 0s, 0.3s;
-  transition-duration: 0s, 0.3s;
-  transition-duration: 0s, 0.3s;
-  transition-property: bottom, background-color;
-  transition-property: bottom, background-color;
   transition-property: bottom, background-color;
   -ms-scroll-chaining: none;
   overscroll-behavior: contain;
@@ -48,8 +41,6 @@ body.mm-ocd-opened {
   bottom: 0;
   background: rgb(0 0 0 / 25%);
   transition-delay: 0s;
-  transition-delay: 0s;
-  transition-delay: 0s;
 }
 
 .mm-ocd__content {
@@ -61,13 +52,7 @@ body.mm-ocd-opened {
   width: var(--mm-ocd-width);
   background: #fff;
   transition-timing-function: ease;
-  transition-timing-function: ease;
-  transition-timing-function: ease;
   transition-duration: 0.3s;
-  transition-duration: 0.3s;
-  transition-duration: 0.3s;
-  transition-property: -webkit-transform;
-  transition-property: transform;
   transition-property: -webkit-transform;
   transition-property: transform;
   transition-property: transform, -webkit-transform;
@@ -76,17 +61,14 @@ body.mm-ocd-opened {
 .mm-ocd--left .mm-ocd__content {
   left: 0;
   transform: translate3d(-100%, 0, 0);
-  transform: translate3d(-100%, 0, 0);
 }
 
 .mm-ocd--right .mm-ocd__content {
   right: 0;
   transform: translate3d(100%, 0, 0);
-  transform: translate3d(100%, 0, 0);
 }
 
 .mm-ocd--open .mm-ocd__content {
-  transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
 }
 
@@ -119,12 +101,8 @@ body.mm-ocd-opened {
 .mm-spn ul {
   display: block;
   box-sizing: border-box;
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-:root {
 }
 
 .mm-spn {
@@ -132,9 +110,6 @@ body.mm-ocd-opened {
   height: 100%;
   overflow: hidden;
   transform: translateX(0);
-  transform: translateX(0);
-  transform: translateX(0);
-  clip-path: inset(0 0 0 0);
   clip-path: inset(0 0 0 0);
   -webkit-tap-highlight-color: transparent;
   -webkit-overflow-scrolling: touch;
@@ -154,8 +129,6 @@ body.mm-ocd-opened {
   line-height: var(--mm-spn-line-height);
   background: inherit;
   cursor: default;
-  transition: left 0.3s ease 0s;
-  transition: left 0.3s ease 0s;
   transition: left 0.3s ease 0s;
   -webkit-overflow-scrolling: touch;
 }
@@ -333,8 +306,6 @@ body.mm-ocd-opened {
 }
 
 .mm-spn.mm-spn--vertical li.mm-spn--open::before {
-  transform: rotate(135deg) translate(-50%, 0);
-  transform: rotate(135deg) translate(-50%, 0);
   transform: rotate(135deg) translate(-50%, 0);
 }
 

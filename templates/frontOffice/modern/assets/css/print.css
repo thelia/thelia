@@ -22,7 +22,7 @@
     display: none !important;
   }
 
-  .lg:grid, .grid, .CategoryProducts-list {
+  .lg.grid, .grid, .CategoryProducts-list {
     display: block !important;
     break-after: always !important;
   }
@@ -43,7 +43,7 @@
     line-height: 1 !important;
   }
 
-  #ContentStart {
+  #content-start {
     margin: 0 !important;
   }
 
@@ -59,14 +59,14 @@
   .order-2, .order-1 {
     display: inline-block !important;
     width: 45% !important;
-    margin-top: 0 !important;
     margin: 0 1% !important;
+    margin-top: 0 !important;
     vertical-align: middle  !important;
   }
 
   .ProductFormPanel {
-    padding: 0 !important;
     position: static !important;
+    padding: 0 !important;
   }
 
   .Product-grid {

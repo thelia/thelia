@@ -3,7 +3,7 @@ import observeStickyElement from '@utils/manageStickyElement';
 import trapItemsMenu, { BREAKPOINT_MOBILE } from '@js/standalone/trapItemsMenu';
 
 export default function Listener() {
-  const target = document?.querySelector('#MainNavigation');
+  const target = document?.querySelector('#main-navigation');
   const burger = document.querySelector('[data-toggle-navigation]');
 
   if (!target) return null;
@@ -20,8 +20,7 @@ export default function Listener() {
 
     if (document.body.classList.contains('is-open')) {
       drawer.open();
-    }
-    else {
+    } else {
       drawer.close();
     }
   });

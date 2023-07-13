@@ -1,5 +1,7 @@
 import getLocale from '@utils/getLocale';
+import { createIntl, createIntlCache } from 'react-intl';
 
+const cache = createIntlCache();
 export const locale = getLocale();
 
 const messages = {
@@ -267,4 +269,12 @@ const messages = {
   }
 };
 
-export default messages;
+const intl = createIntl(
+  {
+    locale,
+    messages: messages[locale]
+  },
+  cache
+);
+
+export default intl;

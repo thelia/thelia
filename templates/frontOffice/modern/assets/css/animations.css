@@ -14,7 +14,7 @@ a, button {
   animation-fill-mode: both;
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   from {
     opacity: 0;
   }
@@ -25,7 +25,7 @@ a, button {
 }
 
 .fadeIn {
-  animation-name: fadeIn;
+  animation-name: fade-in;
 }
 
 @keyframes shake {
@@ -74,7 +74,7 @@ a, button {
     opacity: 0;
   }
 
-  to {
+  100% {
     transform: none;
     opacity: 1;
   }
@@ -93,7 +93,7 @@ a, button {
     transform: scale(1.1);
   }
 
-  to {
+  100% {
     transform: scale(1);
 
   }

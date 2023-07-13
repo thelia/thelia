@@ -1,5 +1,8 @@
 {
-	"root": true,
-	"parser": "@babel/eslint-parser",
-	"extends": "react-app"
+  "root": true,
+  "parser": "@babel/eslint-parser",
+  "extends": "react-app",
+  "rules": {
+    "no-console": "warn"
+  }
 }

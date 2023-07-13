@@ -16,7 +16,7 @@ const Input = forwardRef(
       placeholder,
       value,
       ...props
-    },
+    }: any,
     ref
   ) => {
     const [passwordVisible, setPasswordVisible] = useState(false);

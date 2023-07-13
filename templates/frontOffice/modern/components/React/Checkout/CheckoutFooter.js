@@ -25,6 +25,7 @@ export function CheckoutFooter({ step, checkout }) {
       try {
         final(checkout);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error(error);
       }
     } else {
@@ -36,7 +37,7 @@ export function CheckoutFooter({ step, checkout }) {
   return (
     <>
       <footer className="Checkout-footer">
-        <div className="flex items-center justify-center h-full Checkout-container sm:justify-end">
+        <div className="Checkout-container flex h-full items-center justify-center sm:justify-end">
           <button
             type="button"
             onClick={handleClick}

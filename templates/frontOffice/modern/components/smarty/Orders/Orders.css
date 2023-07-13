@@ -1,17 +1,17 @@
 .Orders {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   gap: rem(20px);
+  align-items: center;
+  justify-content: center;
 }
 
 .Order {
   display: flex;
   flex-direction: column;
   width: 75%;
-  background-color: theme('colors.main-light');
   padding: rem(30px);
+  background-color: theme('colors.main-light');
   border-radius: rem(20px);
 
   details > summary::marker, /* Latest Chrome, Edge, Firefox */ 
@@ -21,6 +21,7 @@
 
   &-infos {
     @apply gap-4 md:gap-2;
+
     display: flex;
     flex-direction: column;
     margin-bottom: rem(20px);
@@ -28,6 +29,7 @@
 
   &-info {
     @apply text-lg flex-col md:flex-row;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -39,8 +41,8 @@
 
   &-price-wrapper {
     display: flex;
-    align-items: center;
     gap: rem(16px);
+    align-items: center;
   }
 
   &-price {
@@ -59,8 +61,8 @@
 
   &-product {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
 
     &-infos {
       display: flex;
@@ -70,8 +72,8 @@
     &-image {
       width: rem(60px);
       height: rem(60px);
-      border-radius: rem(10px);
       margin-right: rem(10px);
+      border-radius: rem(10px);
     }
 
     &-title {
@@ -80,6 +82,7 @@
 
     &-quantity {
       @apply text-sm;
+
       color: theme('colors.gray.600');
     }
   }
@@ -87,7 +90,7 @@
   &-download-invoice {
     display: inline-flex;
     gap: rem(12px);
-    text-decoration: underline;
     margin-top: rem(36px);
+    text-decoration: underline;
   }
 }

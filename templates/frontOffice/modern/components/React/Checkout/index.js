@@ -10,13 +10,13 @@ import {
 import Loader from '../Loader';
 import Steps from '../Steps';
 import { CheckoutFooter } from './CheckoutFooter';
-import { CartItems } from '../MiniCart/MiniCart';
 import Delivery from './Pages/Delivery';
 import Invoice from './Pages/Invoice';
 import Payment from './Pages/Payment';
 import Cart from './Pages/Cart';
 import Recap from './Recap';
 import Title from '../Title';
+import CartItems from '../MiniCart/CartItems/CartItems';
 
 export default function Checkout() {
   const { data: checkout } = useGetCheckout();
@@ -67,8 +67,8 @@ export default function Checkout() {
             checkout={checkout}
           />
           {checkoutStep !== 1 && (
-            <div className="px-5 py-8 mt-8 -mx-5 bg-gray-200 md:m-0 md:bg-transparent md:p-0">
-              <Title title="RECAP_ORDER" className="text-2xl Title--3 mb-7" />
+            <div className="-mx-5 mt-8 bg-gray-200 px-5 py-8 md:m-0 md:bg-transparent md:p-0">
+              <Title title="RECAP_ORDER" className="Title--3 mb-7 text-2xl" />
               <CartItems
                 cart={cart}
                 canDelete={false}

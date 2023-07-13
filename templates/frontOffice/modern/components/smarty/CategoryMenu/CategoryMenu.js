@@ -17,6 +17,7 @@ const updateProducts = async (url) => {
 
     global.history.replaceState({}, 'recherche', `${url}`);
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error(e);
     alert('error while fetching products');
   }

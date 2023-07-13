@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { Attribute, PSE } from './PseSelector.types';
 import { addToCart } from '@openstudio/thelia-api-utils';
 import { isEqual } from 'lodash-es';
 import priceFormat from '@utils/priceFormat';
@@ -9,14 +10,19 @@ import { showCart } from '@js/redux/modules/visibility';
 import store from '@js/redux/store';
 import Quantity from '../Quantity';
 import Alert from '../Alert';
-import { useIntl } from 'react-intl';
+import { RawIntlProvider, useIntl } from 'react-intl';
 import messages, { locale } from '@components/React/intl';
 import { IntlProvider } from 'react-intl';
+import intl from '@components/React/intl';
 
 function AttributeSelector({
   attributes = [],
   currentCombination = {},
   setAttributes = () => {}
+}: {
+  attributes: Attribute[];
+  currentCombination: any;
+  setAttributes: React.Dispatch<React.SetStateAction<[] | undefined>>;
 }) {
   const currentCombinationValues = useMemo(() => {
     return Object.values(currentCombination);
@@ -63,7 +69,7 @@ function AttributeSelector({
   );
 }
 
-function PriceDisplay({ pse }) {
+function PriceDisplay({ pse }: { pse: PSE | null }) {
   const intl = useIntl();
   if (!pse) {
     return (
@@ -89,29 +95,42 @@ function PriceDisplay({ pse }) {
   );
 }
 
-function PseSelector({ pses = [], attributes = [] }) {
+function PseSelector({
+  pses = [],
+  attributes = []
+}: {
+  pses: PSE[];
+  attributes: Attribute[];
+}) {
   const defaultPseCombination = useMemo(() => {
-    const defaultPse = pses.find((pse) => pse.isDefault);
-    return defaultPse.combination;
+    const defaultPse = pses.find((pse: PSE) => pse.isDefault);
+    return defaultPse?.combination;
   }, [pses]);
   const [currentCombination, setCurrentCombination] = useState(
     defaultPseCombination
   );
-  const [currentPse, setCurrentPse] = useState(null);
+  const [currentPse, setCurrentPse] = useState<PSE | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<boolean | null>(null);
 
   const [quantity, setQuantity] = useState(currentPse?.quantity || 1);
   const intl = useIntl();
 
-  async function addPseToCart({ pseId, quantity = 1 }) {
+  async function addPseToCart({
+    pseId,
+    quantity = 1
+  }: {
+    readonly pseId: number;
+    readonly quantity: number;
+  }) {
     if (!pseId) return;
     setError(false);
     setLoading(true);
     try {
       const response = await addToCart({
         pseId,
-        quantity
+        quantity,
+        append: false
       });
       queryClient.setQueryData('cart', response.cart);
       store.dispatch(showCart());
@@ -134,7 +153,11 @@ function PseSelector({ pses = [], attributes = [] }) {
   }, [currentCombination, pses, setCurrentPse]);
 
   useEffect(() => {
-    document.getElementById('RefPse').innerText = currentPse?.ref;
+    const refPse: HTMLElement | null = document.getElementById('RefPse');
+
+    if (!refPse || !currentPse) return;
+
+    refPse.innerText = currentPse.ref;
   }, [currentPse]);
 
   return (
@@ -198,8 +221,11 @@ export default function PseSelectorRoot() {
   const root = createRoot(DOMElement);
 
   root.render(
-    <IntlProvider locale={locale} messages={messages[locale]}>
-      <PseSelector pses={window.PSES} attributes={window.ATTRIBUTES} />
-    </IntlProvider>
+    <RawIntlProvider value={intl}>
+      <PseSelector
+        pses={(window as any).PSES}
+        attributes={(window as any).ATTRIBUTES}
+      />
+    </RawIntlProvider>
   );
 }

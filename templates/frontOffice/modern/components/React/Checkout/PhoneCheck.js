@@ -70,7 +70,7 @@ export default function PhoneCheck({ addressId }) {
 
   return (
     <div>
-      <Title title="CONTACT_NUMBER" className="text-2xl Title--3" />
+      <Title title="CONTACT_NUMBER" className="Title--3 text-2xl" />
       <small className="text-gray-600 ">
         {intl.formatMessage({ id: 'NOTICE_PHONE_CHECK' })}
       </small>
@@ -92,12 +92,13 @@ export default function PhoneCheck({ addressId }) {
                 }
               });
             } catch (error) {
+              // eslint-disable-next-line no-console
               console.error(error);
             }
           }
         }}
       >
-        <div className="relative PhoneCheck-field">
+        <div className="PhoneCheck-field relative">
           <PhoneInput
             international={false}
             defaultCountry={address?.countryCode}
@@ -106,7 +107,7 @@ export default function PhoneCheck({ addressId }) {
           />
           <button
             type="submit"
-            className="absolute right-0 PhoneCheck-btn"
+            className="PhoneCheck-btn absolute right-0"
             onClick={() => setIsSubmitted(true)}
           >
             {intl.formatMessage({ id: 'CONFIRM' })}

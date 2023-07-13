@@ -38,6 +38,7 @@ export default function Newsletter() {
           invalidFeedback.classList.remove('hidden');
         }
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('error', error.response.data);
         inputEmail.classList.add('is-invalid');
         if (error.response.data && error.response.data.message) {

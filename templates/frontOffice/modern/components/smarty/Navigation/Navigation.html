@@ -19,7 +19,7 @@
       <a href="{navigate to="index"}" title="{intl l='Lien Accueil sticky'}" class="Navigation-logo" {if isset($tabindex)}tabindex="{$tabindex}"{/if}>
         {renderSvgImage file={encore_manifest_file file="dist/images/logo.svg"} class=""}
       </a>
-      <nav id="MainNavigation" class="Menu">
+      <nav id="main-navigation" class="Menu">
         <ul class="Menu-list">
           {loop type="category" name="store_navigation"  need_count_child=false parent=0}
             <li class="Menu-item">

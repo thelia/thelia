@@ -1,5 +1,5 @@
 body.no-js {
-  #MainNavigation {
+  #main-navigation {
     display: none;
 
     @screen md {

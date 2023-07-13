@@ -25,6 +25,7 @@
       border-color: theme('colors.gray.400');
       outline: none;
     }
+
     &.current {
       border-color: theme('colors.main');
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'react-use';
-import messages, { locale } from '@components/React/intl';
+import intl from '@components/React/intl';
 import Loader from '@components/React/Loader';
 import { QueryClientProvider } from 'react-query';
 import priceFormat from '@utils/priceFormat';
@@ -15,11 +15,11 @@ import { ReactComponent as IconSearch } from '@icons/search.svg';
 import { ReactComponent as IconCLose } from '@icons/close.svg';
 import useEscape from '@js/utils/useEscape';
 import { trapTabKey } from '@js/standalone/trapItemsMenu';
-import { useIntl, IntlProvider } from 'react-intl';
+import { useIntl, RawIntlProvider } from 'react-intl';
 
 function Item({ title, price, promoPrice, image, url, promo }) {
   return (
-    <a href={url} className="bg-white rounded-md CartItem">
+    <a href={url} className="CartItem rounded-md bg-white">
       <div className="CartItem-img">
         <img src={image} alt="" loading="lazy" />
       </div>
@@ -159,7 +159,7 @@ function SearchResults({ query = null }) {
       {productsData?.length > 0 || categoriesData?.length > 0 ? (
         <button
           type="submit"
-          className="mx-auto mt-8 Button Button--actived animate-none"
+          className="Button Button--actived mx-auto mt-8 animate-none"
           form="SearchForm"
         >
           Voir tous les résultats
@@ -186,7 +186,7 @@ function SearchForm({ formRef, setQuery, query }) {
     >
       <label
         htmlFor="SearchInput"
-        className="max-w-xl mx-auto SearchDropdown-field"
+        className="SearchDropdown-field mx-auto max-w-xl"
         aria-label="Recherche"
       >
         <input
@@ -283,7 +283,7 @@ function SearchDropdown({ showResults = false }) {
             aria-label="Fermer la recherche"
             onClick={() => modalObserver(false)}
           >
-            <IconCLose className="w-4 h-4 text-white pointer-events-none" />
+            <IconCLose className="pointer-events-none h-4 w-4 text-white" />
           </button>
           <div className="container">
             <SearchForm formRef={formRef} query={query} setQuery={setQuery} />
@@ -309,9 +309,9 @@ export default function SearchDropdownRender() {
 
   root.render(
     <QueryClientProvider client={queryClient}>
-      <IntlProvider locale={locale} messages={messages[locale]}>
+      <RawIntlProvider value={intl}>
         <SearchDropdown showResults />
-      </IntlProvider>
+      </RawIntlProvider>
     </QueryClientProvider>
   );
 }

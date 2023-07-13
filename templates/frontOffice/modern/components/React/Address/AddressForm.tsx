@@ -2,38 +2,65 @@ import Checkbox from '../Checkbox';
 import Input from '../Input';
 import React from 'react';
 import Select from '../Select';
-import { useForm } from 'react-hook-form';
+import { FieldValues, useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { isUndefined } from 'lodash-es';
+import { Address, CivilityTitle } from '@js/types/common';
 
-export default function AddressForm({ address = {}, onSubmit = () => {} }) {
+type CustomerTITLE = { label: string; value: string; isDefault: boolean };
+type CustomerTITLES = CustomerTITLE[];
+
+type COUNTRY = {
+  id: string;
+  title: string;
+  isDefault: boolean;
+};
+
+type CUSTOMER_COUNTRY = {
+  value: string;
+  label: string;
+  isDefault: boolean;
+}[];
+
+export default function AddressForm({
+  address,
+  onSubmit = () => {}
+}: {
+  address: Address;
+  onSubmit: (data: any) => void;
+}) {
   const intl = useIntl();
   const { register, handleSubmit, formState, setError } = useForm();
 
-  const titles = (window.CUSTOMER_TITLES || [])
-    .map((t) => {
+  const titles: CustomerTITLES = ((window as any).CUSTOMER_TITLES || [])
+    .map((t: CivilityTitle) => {
       return {
         label: t.short,
         value: t.id,
         isDefault: !!t.isDefault
       };
     })
-    .sort((a, b) => b.isDefault - a.isDefault);
+    .sort(
+      (a: CustomerTITLE, b: CustomerTITLE) =>
+        (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0)
+    );
 
-  const countries = (window.COUNTRIES || []).map((c) => {
-    return {
-      label: c.title,
-      value: c.id,
-      isDefault: c.id === window.DEFAULT_COUNTRY
-    };
-  });
+  const countries: CUSTOMER_COUNTRY = ((window as any).COUNTRIES || []).map(
+    (c: COUNTRY) => {
+      return {
+        label: c.title,
+        value: c.id,
+        isDefault: c.id === (window as any).DEFAULT_COUNTRY
+      };
+    }
+  );
 
   return (
     <form
       className={`flex flex-col gap-6 ${
         formState.isSubmitting ? 'opacity-50' : ''
       }`}
-      onSubmit={handleSubmit(async (data) => {
+      onSubmit={handleSubmit(async (data: FieldValues) => {
         try {
           await onSubmit(data);
         } catch (error) {
@@ -41,11 +68,16 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
             for (const [key, val] of Object.entries(
               error?.response?.data?.schemaViolations
             )) {
-              setError(key, {
-                type: 'manual',
-                message: val.message,
-                shouldFocus: true
-              });
+              setError(
+                key,
+                {
+                  type: 'manual',
+                  message: (val as any).message
+                },
+                {
+                  shouldFocus: true
+                }
+              );
             }
           }
         }
@@ -69,17 +101,18 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
       <div className="w-1/2 lg:w-1/3">
         <Select
           label={intl.formatMessage({ id: 'CIVILITY_TITLE_LABEL' })}
+          placeholder={intl.formatMessage({ id: 'CIVILITY_TITLE_LABEL' })}
           defaultValue={
-            isUndefined(address.title)
-              ? titles.find((t) => t.isDefault).value
-              : address.title
+            isUndefined(address.civilityTitle)
+              ? titles.find((t) => t.isDefault)?.value.toString()
+              : address.civilityTitle.id.toString()
           }
           required={true}
           options={titles}
           {...register('civilityTitle.id', {
             required: intl.formatMessage({ id: 'MANDATORY' })
           })}
-          error={formState.errors?.title?.message}
+          error={formState.errors?.civilityTitle?.message as string}
         />
       </div>
 
@@ -160,15 +193,16 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
       <div className="w-1/2">
         <Select
           label={intl.formatMessage({ id: 'COUNTRY_LABEL' })}
+          placeholder={intl.formatMessage({ id: 'COUNTRY_LABEL' })}
           required={true}
           options={countries}
           defaultValue={
             isUndefined(address.countryCode)
-              ? countries.find((c) => c.isDefault).value
+              ? countries.find((c) => c.isDefault)?.value
               : address.countryCode
           }
           {...register('countryCode', { required: 'Mandatory' })}
-          error={formState.errors?.countryCode?.message}
+          error={formState.errors?.countryCode?.message as string}
         />
       </div>
 

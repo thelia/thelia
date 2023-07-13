@@ -85,7 +85,7 @@
     z-index: 0;
     padding: var(--header-height) 0;
     overflow-y: auto;
-    background: rgba(0, 0, 0, 0.95);
+    background: rgb(0 0 0 / 95%);
     animation: reveal 0.15s ease-out 1;
   }
 

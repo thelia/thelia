@@ -259,7 +259,7 @@
 }
 
 .Menu-sub1-item--no-childs {
-  &:before {
+  &::before {
     content: none !important;
   }
 }

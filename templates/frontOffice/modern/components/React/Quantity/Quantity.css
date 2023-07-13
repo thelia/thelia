@@ -6,10 +6,11 @@
 
   &-btn {
     @apply flex cursor-pointer items-center  justify-center rounded-md text-white transition  focus:outline-none disabled:opacity-50;
-    background-color: theme('colors.main');
+
     flex: 1 0 auto;
     width: rem(36px);
     height: rem(36px);
+    background-color: theme('colors.main');
 
     &--disabled {
       opacity: 0.5;
