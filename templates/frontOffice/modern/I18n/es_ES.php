@@ -269,4 +269,5 @@ return [
     'update' => 'actualización',
     'with:' => 'con:',
     '404' => '404',
+    'Page %p' => 'Página %p',
 ];

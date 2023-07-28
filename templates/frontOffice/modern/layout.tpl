@@ -46,7 +46,7 @@
   {strip}
     <title>
       {block name="page-title"}
-        {$seoPageTitle}
+        {$seoPageTitle}{$page_info|default:null}
       {/block}
     </title>
   {/strip}

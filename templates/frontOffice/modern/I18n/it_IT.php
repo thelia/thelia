@@ -205,4 +205,5 @@ return [
     'missing or invalid data' => 'dati mancanti o non validi',
     'per page' => 'per ogni pagina',
     '404' => '404',
+    'Page %p' => 'Pagina %p',
 ];

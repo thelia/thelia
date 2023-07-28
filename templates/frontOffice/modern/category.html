@@ -3,6 +3,8 @@
 {block name="init"}
   {$category_id={category attr="id"}}
   {$product_count = {count type="product" category=$category_id depth=100}}
+  {$product_page={$smarty.get.page|default:1}}
+  {$product_order={$smarty.get.order|default:'manual'}}
 {/block}
 
 
@@ -20,15 +22,20 @@
 
 {* Page Title *}
 {block name='no-return-functions' append}
-{loop name="category.seo.title" type="category" current="yes"}
-{$page_title = $META_TITLE}
-{/loop}
+  {loop name="category.seo.title" type="category" current="yes"}
+      {$page_title = $META_TITLE}
+  {/loop}
+
+  {if $product_page neq 1}
+    {$page_info = " - "|cat:{intl l ="Page %p" p=$product_page}}
+  {/if}
 {/block}
+
 
 {* Meta *}
 {block name="meta"}
   {loop name="category.seo.meta" type="category" current="yes"}
-    {include file="includes/meta-seo.html"}
+    {include file="includes/meta-seo.html" page_info=$page_info|default:null}
   {/loop}
 {/block}
 
@@ -64,24 +71,26 @@
               </div>
             {/if}
 
+            {ifloop rel="category.blocks"}
+              <div class="container my-8 wysiwyg">
+                {loop
+                  type="block_group"
+                  name="category.blocks"
+                  item_type="category"
+                  item_id=$category_id
+                }
+                  {$RENDER nofilter}
+                {/loop}
+              </div>
+          {/ifloop}
 
-            <div class="container my-8 wysiwyg">
-              {loop
-                type="block_group"
-                name="category.blocks"
-                item_type="category"
-                item_id=$category_id
-              }
-                {$RENDER nofilter}
-              {/loop}
-            </div>
 
-            {if $CHAPO}
-              <div class="container max-w-3xl mx-auto my-12 text-xl">{$CHAPO nofilter}</div>
+
+            {if $CHAPO && $product_page eq 1}
+              <div  class="container max-w-3xl mx-auto my-12 text-xl">{$CHAPO nofilter}</div>
             {/if}
 
-            {$product_page={$smarty.get.page|default:1}}
-            {$product_order={$smarty.get.order|default:'manual'}}
+
 
             {if !isset($showFilters)}
               {$showFilters = false}
@@ -126,11 +135,11 @@
                 {/if}
             </div>
 
-            {if $DESCRIPTION}
+            {if $DESCRIPTION && $product_page eq 1}
               <div class="container max-w-3xl mx-auto my-12 text-xl">{$DESCRIPTION nofilter}</div>
             {/if}
 
-            {if $POSTSCRIPTUM}
+            {if $POSTSCRIPTUM && $product_page eq 1}
               <div class="container max-w-3xl mx-auto my-12">{$POSTSCRIPTUM nofilter}</div>
             {/if}
           </div>
