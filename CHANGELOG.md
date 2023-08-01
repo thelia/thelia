@@ -1,3 +1,21 @@
+# 2.5.3
+- #3109 Improve asset manifest path loading
+- #3106 Fix autowiring for coupon type
+- #3105 Fixed refresh crash if update directory is missing
+- #3104 Update Symfony components to 6.3
+- #3103 Fix autoconfigure for Coupon condition
+- #3098 Prevent error on index.php in public directory
+- #3097 Fix for old form who are not services
+- #3095 no content seo on page 2
+- #3094 Add tax engine as service and allow new tax type by module
+- #3093 Allow autowiring in loop constructor
+- #3092 Replacement of the superglobable by in services.php
+- #3091 Allow to add autowired service in form construct
+- #3090 Fix manifest path when not accessible from URL (docker)
+- #3082 Fixed HookNavigation module
+- #3081 Update MailingSystemController.php - testAction
+- #3078 Send proper event type when confirming customer account creation
+- #3074 Use the PDO connection instead of the wrapped connection
 # 2.5.2
 - #3072 Allow to hide smarty "undefined" errors
 - #3071 Better module configuration route check
