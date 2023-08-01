@@ -38,7 +38,7 @@ class Carousel extends BaseModule
         if (!self::getConfigValue('is_initialized', false)) {
             $database = new Database($con);
 
-            $database->insertSql(null, [__DIR__.'/Config/thelia.sql']);
+            $database->insertSql(null, [__DIR__.'/Config/TheliaMain.sql']);
 
             self::setConfigValue('is_initialized', true);
         }
