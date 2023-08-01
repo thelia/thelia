@@ -93,8 +93,8 @@ class Assets extends AbstractSmartyPlugin
 
         try {
             $svg = file_get_contents($path);
-        } catch (\ErrorException $exception) {
-            $svg = file_get_contents(THELIA_WEB_DIR.$path);
+        } catch (\Exception) {
+            $svg = file_get_contents(THELIA_WEB_DIR.parse_url($path, \PHP_URL_PATH));
         }
 
         $matches = [];

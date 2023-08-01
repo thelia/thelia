@@ -99,14 +99,7 @@ class Encore extends AbstractSmartyPlugin
         }
 
         if (isset($this->packages['manifest'])) {
-            // Take absolute url if available else take relative path
-            $manifestPath = URL::getInstance()->absoluteUrl($this->packages['manifest']->geturl($file));
-            $fileHeaders = @get_headers($manifestPath);
-            if (!$fileHeaders || (int) substr($fileHeaders[0], 9, 3) >= 400) {
-                $manifestPath = $this->packages['manifest']->geturl($file);
-            }
-
-            return $manifestPath;
+            return URL::getInstance()->absoluteUrl($this->packages['manifest']->geturl($file), null, URL::PATH_TO_FILE);
         }
 
         return '';
