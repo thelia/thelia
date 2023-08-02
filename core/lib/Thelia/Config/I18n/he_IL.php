@@ -58,4 +58,7 @@ return [
     'Associate documents' => 'לשייך מסמכים',
     'Associate images' => 'לקשר תמונות',
     'At least one of cart products categories is %op% <strong>%categories_list%</strong>' => 'לפחות אחת מקטגוריות המוצרים העגלה היא %op% <strong>%categories_list%</strong>',
+    'Message content: %message%' => 'תוכן ההודעה: %message%',
+    'Sender\'s e-mail address: %email%' => 'כתובת הדואר האלקטרוני של השולח: %email%',
+    'Sender name: %name%' => 'שם השולח: %name%',
 ];

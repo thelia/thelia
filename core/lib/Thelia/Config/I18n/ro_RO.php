@@ -19,4 +19,7 @@ return [
     'A currency with code "%name" already exists.' => 'O moneda cu numele "%name" deja exista.',
     'A message with name "%name" already exists.' => 'Un mesaj cu numele "%name" exista deja.',
     'A product with reference %ref already exists. Please choose another reference.' => 'Un produs cu referinta %ref exista deja. Va rugam sa alegeti alta referinta.',
+    'Message content: %message%' => 'Conținutul mesajului: %message%',
+    'Sender\'s e-mail address: %email%' => 'Adresa de e-mail a expeditorului: %email%.',
+    'Sender name: %name%' => 'Numele expeditorului: %name%.',
 ];

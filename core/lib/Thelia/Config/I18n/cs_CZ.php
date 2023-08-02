@@ -80,10 +80,13 @@ return [
     'Email address' => 'E-mailová adresa',
     'Home' => 'Domů',
     'Language' => 'Jazyk',
+    'Message content: %message%' => 'Obsah zprávy: %message%',
     'Name' => 'Název',
     'Password' => 'Heslo',
     'Quantity' => 'Množství',
     'Register' => 'Registrace',
     'Search' => 'Vyhledávání',
+    'Sender\'s e-mail address: %email%' => 'E-mailová adresa odesílatele: %email%',
+    'Sender name: %name%' => 'Jméno odesílatele: %name%',
     'Start date' => 'Date de début de validité',
 ];

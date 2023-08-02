@@ -208,4 +208,7 @@ return [
     'If cart total amount is <strong>%operator%</strong> %amount% %currency%' => 'Якщо загальна сума є <strong>%operator%</strong> %amount% %currency%',
     'If checked, this hook will be used by a hook block. If not, by hook function.' => 'Якщо відмічено, цей хук буде використовуватись хуком блоку. Якщо ні - хуком функції.',
     'Image' => 'Картинка',
+    'Message content: %message%' => 'Зміст повідомлення: %message%.',
+    'Sender\'s e-mail address: %email%' => 'Адреса електронної пошти відправника: %email%.',
+    'Sender name: %name%' => 'Ім\'я відправника: %name%.',
 ];
