@@ -16,6 +16,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Contact\ContactEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -26,29 +27,33 @@ use Thelia\Model\ConfigQuery;
  * Class ContactController.
  *
  * @author Manuel Raynaud <manu@raynaud.io>
+ * @author Loïc Mo <lmo@openstudio.fr>
  */
 class ContactController extends BaseFrontController
 {
     /**
-     * send contact message.
+     * Send contact message.
      */
-    public function sendAction(EventDispatcherInterface $eventDispatcher, MailerFactory $mailer)
+    public function sendAction(EventDispatcherInterface $eventDispatcher, MailerFactory $mailer, ParserContext $parserContext)
     {
         $contactForm = $this->createForm(FrontForm::CONTACT);
 
         try {
             $form = $this->validateForm($contactForm);
-
             $event = new ContactEvent($form);
-
             $eventDispatcher->dispatch($event, TheliaEvents::CONTACT_SUBMIT);
+
+            $messageContent =
+                "<p>Nom expéditeur: " . $event->getName() . "</p>" .
+                "<p>Adresse mail expéditeur: " . $event->getEmail() . "</p>" .
+                "<p>Contenu du message: " . $event->getMessage(). "</p>";
 
             $mailer->sendSimpleEmailMessage(
                 [ConfigQuery::getStoreEmail() => $event->getName()],
                 [ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName()],
                 $event->getSubject(),
-                '',
-                $event->getMessage(),
+                $messageContent,
+                $messageContent,
                 [],
                 [],
                 [$event->getEmail() => $event->getName()]
@@ -67,7 +72,7 @@ class ContactController extends BaseFrontController
 
         $contactForm->setErrorMessage($error_message);
 
-        $this->getParserContext()
+        $parserContext
             ->addForm($contactForm)
             ->setGeneralError($error_message)
         ;
