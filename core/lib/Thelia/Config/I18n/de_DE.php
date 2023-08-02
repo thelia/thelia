@@ -449,7 +449,7 @@ return [
     'Select the products covered by this operation' => 'Wählen Sie betroffenen Produkte',
     'Select the virtual document' => 'Wählen Sie das virtuelles Dokument',
     'Sender\'s e-mail address: %email%' => 'E-Mail Adresse des Absenders: %email%',
-    "Sender name: %name%" => "Name des Absenders: %name%",
+    'Sender name: %name%' => 'Name des Absenders: %name%',
     'Service ID' => 'Service ID',
     'Shipping configuration' => 'Lieferungskonfiguration',
     'Shipping zone name' => 'Lieferzone Name',

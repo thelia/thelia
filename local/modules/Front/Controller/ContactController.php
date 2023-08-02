@@ -50,8 +50,8 @@ class ContactController extends BaseFrontController
             $message = $translator?->trans("Message content: %message%", ['%message%' => $event->getMessage()]);
 
             $messageContent =
-                "<p>$name</p> \n" .
-                "<p>$email</p> \n" .
+                "<p>$name</p>\n" .
+                "<p>$email</p>\n" .
                 "<p>$message</p>";
 
             $mailer->sendSimpleEmailMessage(
