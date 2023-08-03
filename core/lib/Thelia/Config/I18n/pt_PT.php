@@ -18,5 +18,8 @@ return [
     'Currency' => 'Moeda',
     'Home' => 'Página Inicial',
     'Language' => 'Idioma',
+    'Message content: %message%' => 'Conteúdo da mensagem: %message%',
     'Name' => 'Nome',
+    'Sender\'s e-mail address: %email%' => 'Endereço de correio eletrónico do remetente: %email%',
+    'Sender name: %name%' => 'Nome do remetente: %name%',
 ];
