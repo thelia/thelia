@@ -45,13 +45,13 @@ class ContactController extends BaseFrontController
             $event = new ContactEvent($form);
             $eventDispatcher->dispatch($event, TheliaEvents::CONTACT_SUBMIT);
 
-            $name = $translator?->trans("Sender name: %name%", ['%name%' => $event->getName()]);
-            $email = $translator?->trans("Sender's e-mail address: %email%", ['%email%' => $event->getEmail()]);
-            $message = $translator?->trans("Message content: %message%", ['%message%' => $event->getMessage()]);
+            $name = $translator?->trans('Sender name: %name%', ['%name%' => $event->getName()]);
+            $email = $translator?->trans('Sender\'s e-mail address: %email%', ['%email%' => $event->getEmail()]);
+            $message = $translator?->trans('Message content: %message%', ['%message%' => $event->getMessage()]);
 
             $messageContent =
-                "<p>$name</p>\n" .
-                "<p>$email</p>\n" .
+                "<p>$name</p>\n".
+                "<p>$email</p>\n".
                 "<p>$message</p>";
 
             $mailer->sendSimpleEmailMessage(
