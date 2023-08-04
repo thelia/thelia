@@ -89,7 +89,7 @@ class ForSomeCustomers extends ConditionAbstract
     public function isMatching()
     {
         if (null === $customer = $this->facade->getCustomer()) {
-            throw new UnmatchableConditionException();
+            throw new UnmatchableConditionException(UnmatchableConditionException::getMissingCustomerMessage());
         }
 
         return $this->conditionValidator->variableOpComparison(

@@ -12,6 +12,7 @@
 
 namespace Thelia\Condition\Implementation;
 
+use Thelia\Core\Translation\Translator;
 use Thelia\Exception\UnmatchableConditionException;
 
 /**
@@ -34,12 +35,12 @@ class MatchDeliveryCountries extends AbstractMatchCountries
      */
     public function isMatching()
     {
-        if (null === $customer = $this->facade->getCustomer()) {
-            throw new UnmatchableConditionException();
+        if (null === $this->facade->getCustomer()) {
+            throw new UnmatchableConditionException(UnmatchableConditionException::getMissingCustomerMessage());
         }
 
         if (null === $deliveryAddress = $this->facade->getDeliveryAddress()) {
-            throw new UnmatchableConditionException();
+            throw new UnmatchableConditionException(Translator::getInstance()->trans('You must choose a delivery address before using this coupon.'));
         }
 
         return $this->conditionValidator->variableOpComparison(

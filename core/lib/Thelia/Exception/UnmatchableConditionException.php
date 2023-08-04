@@ -12,12 +12,21 @@
 
 namespace Thelia\Exception;
 
-/**
- * Class UnmatchableConditionException
- * UnmatchableConditionException thrown when a condition can't be check (if customer is not connected).
- *
- * @author Baixas Alban <abaixas@openstudio.fr>
- */
+use Thelia\Core\Translation\Translator;
+
 class UnmatchableConditionException extends \RuntimeException
 {
+    public function __construct(string $message = null, int $code = 0, \Throwable $previous = null)
+    {
+        if (null === $message) {
+            $message = Translator::getInstance()->trans('Coupon conditions cannot be verified.');
+        }
+
+        parent::__construct($message, $code, $previous);
+    }
+
+    public static function getMissingCustomerMessage()
+    {
+        return Translator::getInstance()->trans('You must sign in or register before using this coupon.');
+    }
 }
