@@ -90,7 +90,7 @@ class CouponFactory
         // Check coupon usage count
         if (!$couponModel->isUsageUnlimited()) {
             if (null === $customer = $this->facade->getCustomer()) {
-                throw new UnmatchableConditionException($couponCode);
+                throw new UnmatchableConditionException(UnmatchableConditionException::getMissingCustomerMessage());
             }
 
             if ($couponModel->getUsagesLeft($customer->getId()) <= 0) {
