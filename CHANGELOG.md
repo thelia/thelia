@@ -1,4 +1,5 @@
 # 2.5.3
+- #3117 Improve unmatchable condition message 
 - #3116 Prevent many "NPE may occur here" phpstorm EA warnings 
 - #3115 Fix orderProduct rounding 
 - #3114 Remove twitter feed
