@@ -1,4 +1,8 @@
 # 2.5.3
+- #3116 Prevent many "NPE may occur here" phpstorm EA warnings 
+- #3115 Fix orderProduct rounding 
+- #3114 Remove twitter feed
+- #3113 Fix: Contact form body + add translations
 - #3109 Improve asset manifest path loading
 - #3106 Fix autowiring for coupon type
 - #3105 Fixed refresh crash if update directory is missing
@@ -14,6 +18,7 @@
 - #3090 Fix manifest path when not accessible from URL (docker)
 - #3082 Fixed HookNavigation module
 - #3081 Update MailingSystemController.php - testAction
+- #3079 Fix format_money remove_zero_decimal parameter implementation
 - #3078 Send proper event type when confirming customer account creation
 - #3074 Use the PDO connection instead of the wrapped connection
 # 2.5.2
