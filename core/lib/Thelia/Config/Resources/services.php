@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Thelia\Api\Bridge\Propel\MetaData\Property\PropelPropertyMetadataFactory;
 use Thelia\Api\Bridge\Propel\OpenApiDecorator\JwtDecorator;
-use Thelia\Api\Bridge\Propel\OpenApiDecorator\I18nDecorator;
 use Thelia\Api\Bridge\Propel\Routing\IriConverter;
 use Thelia\Core\Service\ConfigCacheService;
 use Thelia\Core\Thelia;
@@ -36,7 +35,8 @@ return static function (ContainerConfigurator $configurator): void {
         ->bind('$theliaParserLoops', '%Thelia.parser.loops%')
         ->bind('$formDefinition', '%Thelia.parser.forms%')
         ->bind('$propelCollectionExtensions', tagged_iterator('thelia.api.propel.query_extension.collection'))
-        ->bind('$propelItemExtensions', tagged_iterator('thelia.api.propel.query_extension.item'));
+        ->bind('$propelItemExtensions', tagged_iterator('thelia.api.propel.query_extension.item'))
+        ->bind('$apiResourceExtends', '%Thelia.api.resource.extends%');
 
     $serviceConfigurator->load('Thelia\\', THELIA_LIB)
         ->exclude(
