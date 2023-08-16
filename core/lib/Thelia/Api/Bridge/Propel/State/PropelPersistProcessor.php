@@ -2,15 +2,12 @@
 
 namespace Thelia\Api\Bridge\Propel\State;
 
-use _PHPStan_9a6ded56a\Nette\Neon\Exception;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use Doctrine\Common\Collections\ArrayCollection;
 use Propel\Runtime\Collection\Collection;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Resource\AbstractPropelResource;
 use Thelia\Api\Resource\TranslatableResourceInterface;
-use Thelia\Model\ProductSaleElements;
 
 class PropelPersistProcessor implements ProcessorInterface
 {
