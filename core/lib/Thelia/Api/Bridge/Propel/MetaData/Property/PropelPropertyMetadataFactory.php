@@ -4,6 +4,7 @@ namespace Thelia\Api\Bridge\Propel\MetaData\Property;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use Thelia\Api\Resource\Address;
 use Thelia\Api\Resource\Category;
 use Thelia\Api\Resource\Product;
 use Thelia\Api\Resource\ProductCategory;
