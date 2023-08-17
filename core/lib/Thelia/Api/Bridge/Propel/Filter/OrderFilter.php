@@ -1,14 +1,20 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
-use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
-use Doctrine\ORM\QueryBuilder;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Model\OrderQuery;
-use function PHPUnit\Framework\isNan;
 
 class OrderFilter extends AbstractFilter
 {
@@ -36,16 +42,14 @@ class OrderFilter extends AbstractFilter
             return;
         }
 
-        if (!in_array($value,[self::DIRECTION_ASC,self::DIRECTION_DESC])){
-            return; //todo need fix this (if we use same attribute in different filter)
+        if (!\in_array($value, [self::DIRECTION_ASC, self::DIRECTION_DESC])) {
+            return; // todo need fix this (if we use same attribute in different filter)
         }
 
         $direction = $this->normalizeValue($value, $property);
         if (null === $direction) {
             return;
         }
-
-
 
         $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
 

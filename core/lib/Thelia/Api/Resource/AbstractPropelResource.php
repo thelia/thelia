@@ -13,8 +13,6 @@
 namespace Thelia\Api\Resource;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Thelia\Api\Bridge\Propel\Attribute\Relation;
 
 abstract class AbstractPropelResource implements PropelResourceInterface
 {

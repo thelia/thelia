@@ -64,7 +64,9 @@ class RequestListener implements EventSubscriberInterface
     {
         /** @var \Thelia\Core\HttpFoundation\Request $request */
         $request = $event->getRequest();
-        $lang = $request->getSession()->getLang();
+
+//        $lang = $request->hasSession() ? $request->getSession()->getLang() : Lang::getDefaultLanguage();
+        $lang = Lang::getDefaultLanguage();
 
         $vendorFormDir = THELIA_VENDOR.'symfony'.DS.'form';
         $vendorValidatorDir = THELIA_VENDOR.'symfony'.DS.'validator';
@@ -86,6 +88,10 @@ class RequestListener implements EventSubscriberInterface
     public function rememberMeLoader(RequestEvent $event): void
     {
         $request = $event->getRequest();
+
+        if (!$request->hasSession() || !$request->getSession()->isStarted()) {
+            return;
+        }
 
         /** @var \Thelia\Core\HttpFoundation\Session\Session $session */
         $session = $request->getSession();
@@ -217,7 +223,7 @@ class RequestListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if (!$request->isXmlHttpRequest() && $event->getResponse()->isSuccessful()) {
+        if (!$request->isXmlHttpRequest() && $event->getResponse()->isSuccessful() && $request->hasSession() && $request->getSession()->isStarted()) {
             $referrer = $request->attributes->get('_previous_url', null);
 
             $catalogViews = ['category', 'product'];
@@ -270,7 +276,7 @@ class RequestListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if ($request->query->has('currency')) {
+        if ($request->hasSession() && $request->query->has('currency')) {
             $currencyToSet = CurrencyQuery::create()
                 ->filterByVisible(true)
                 ->filterByCode($request->query->get('currency'))

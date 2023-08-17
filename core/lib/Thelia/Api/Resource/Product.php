@@ -84,7 +84,7 @@ class Product extends AbstractTranslatableResource
             OrderProduct::GROUP_READ,
             ProductAssociatedContent::GROUP_READ,
             FeatureProduct::GROUP_READ_SINGLE,
-            ProductSaleElements::GROUP_WRITE
+            ProductSaleElements::GROUP_WRITE,
         ]
     )]
     public ?int $id = null;
@@ -282,7 +282,7 @@ class Product extends AbstractTranslatableResource
 
     public function setProductSaleElements(array $productSaleElements): self
     {
-        $this->productSaleElements =  $productSaleElements;
+        $this->productSaleElements = $productSaleElements;
 
         return $this;
     }

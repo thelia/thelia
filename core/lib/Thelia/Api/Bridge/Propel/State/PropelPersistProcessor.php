@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\State;
 
 use ApiPlatform\Metadata\Operation;
@@ -28,7 +38,7 @@ class PropelPersistProcessor implements ProcessorInterface
 
         if (null === $propelModel) {
             $propelModelClass = $data::getPropelModelClass();
-            $propelModel = new $propelModelClass;
+            $propelModel = new $propelModelClass();
         }
 
         $resourceReflection = new \ReflectionClass($data);
@@ -40,8 +50,8 @@ class PropelPersistProcessor implements ProcessorInterface
 
             $propelSetter = 'set'.ucfirst($property->getName());
 
-            foreach ($property->getAttributes(Column::class) as $columnAttribute){
-                if (isset($columnAttribute->getArguments()['propelFieldName'])){
+            foreach ($property->getAttributes(Column::class) as $columnAttribute) {
+                if (isset($columnAttribute->getArguments()['propelFieldName'])) {
                     $propelSetter = 'set'.ucfirst($columnAttribute->getArguments()['propelFieldName']);
                 }
             }
@@ -60,15 +70,13 @@ class PropelPersistProcessor implements ProcessorInterface
                     $value = $data->$method();
                 }
 
-                if ($value instanceof AbstractPropelResource)
-                {
+                if ($value instanceof AbstractPropelResource) {
                     $propelSetter = $propelSetter.'Id';
                     $value = $value->getId();
                 }
 
-                if (is_array($value))
-                {
-                    $value = new Collection(array_map(function ($value) {return  $this->resourceToModel($value);}, $value));
+                if (\is_array($value)) {
+                    $value = new Collection(array_map(function ($value) {return $this->resourceToModel($value); }, $value));
                 }
 
                 $propelModel->$propelSetter($value);
@@ -79,7 +87,7 @@ class PropelPersistProcessor implements ProcessorInterface
             foreach ($data->getI18ns() as $locale => $i18n) {
                 $i18nGetters = array_filter(
                     array_map(
-                        function (\ReflectionProperty $reflectionProperty) use ($i18n){
+                        function (\ReflectionProperty $reflectionProperty) use ($i18n) {
                             return $reflectionProperty->isInitialized($i18n) ? 'get'.ucfirst($reflectionProperty->getName()) : null;
                         },
                         (new \ReflectionClass($i18n))->getProperties()

@@ -51,15 +51,15 @@ class AdminUserProvider implements PayloadAwareUserProviderInterface
     public function refreshUser(UserInterface $user)
     {
         if (!$user instanceof Admin) {
-            throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
+            throw new UnsupportedUserException(sprintf('Invalid user class "%s".', \get_class($user)));
         }
 
-        $user =  AdminQuery::create()
+        $user = AdminQuery::create()
             ->filterByLogin($user->getUserIdentifier(), Criteria::EQUAL)
             ->findOne();
 
         if (null === $user) {
-            throw new UserNotFoundException("User not exist");
+            throw new UserNotFoundException('User not exist');
         }
 
         return $user;

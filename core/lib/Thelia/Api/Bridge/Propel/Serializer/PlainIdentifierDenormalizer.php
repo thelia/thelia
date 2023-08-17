@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
@@ -47,7 +57,7 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
 
     private function transformData(mixed $data, \ReflectionProperty $property)
     {
-        if (\is_string($data[$property->getName()]) || is_int($data[$property->getName()])) {
+        if (\is_string($data[$property->getName()]) || \is_int($data[$property->getName()])) {
             return $this->iriConverter->getIriFromResource(
                 resource: $property->getType()->getName(),
                 context: ['uri_variables' => ['id' => $data[$property->getName()]]]);
@@ -60,7 +70,7 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
                     return \in_array(
                         $attribute->getName(),
                         [
-                            Relation::class
+                            Relation::class,
                         ]
                     );
                 }
@@ -102,12 +112,12 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
                     (
                         (
                             \is_array($data[$property->getName()])
-                            && array_filter($data[$property->getName()], fn ($value) => (\is_string($value) || is_int($value)) && !str_contains($value, '/'))
+                            && array_filter($data[$property->getName()], fn ($value) => (\is_string($value) || \is_int($value)) && !str_contains($value, '/'))
                             && Collection::class === $property->getType()->getName()
                         )
                         ||
                         (
-                            (\is_string($data[$property->getName()]) || is_int($data[$property->getName()]))
+                            (\is_string($data[$property->getName()]) || \is_int($data[$property->getName()]))
                             && !str_contains($data[$property->getName()], '/')
                             && $this->resourceClassResolver->isResourceClass($property->getType()->getName())
                         )
