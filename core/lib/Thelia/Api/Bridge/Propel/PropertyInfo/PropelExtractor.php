@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\PropertyInfo;
 
 use Propel\Runtime\Collection\Collection;
@@ -23,7 +33,7 @@ class PropelExtractor implements PropertyListExtractorInterface, PropertyTypeExt
 
     public function getProperties(string $class, array $context = [])
     {
-       return null;
+        return null;
     }
 
     public function getTypes(string $class, string $property, array $context = [])
@@ -38,7 +48,7 @@ class PropelExtractor implements PropertyListExtractorInterface, PropertyTypeExt
         foreach ($reflectionProperty->getAttributes(Relation::class) as $relationAttribute) {
             $targetClass = $relationAttribute->getArguments()['targetResource'];
 
-            if ("array" === $reflectionProperty->getType()->getName() || in_array(\Traversable::class, class_implements($reflectionProperty->getType()->getName()))) {
+            if ('array' === $reflectionProperty->getType()->getName() || \in_array(\Traversable::class, class_implements($reflectionProperty->getType()->getName()))) {
                 return [
                     new Type(
                         Type::BUILTIN_TYPE_OBJECT,
@@ -50,7 +60,7 @@ class PropelExtractor implements PropertyListExtractorInterface, PropertyTypeExt
                             $reflectionProperty->getType()->allowsNull(),
                             $targetClass
                         )
-                    )
+                    ),
                 ];
             }
 
@@ -59,7 +69,7 @@ class PropelExtractor implements PropertyListExtractorInterface, PropertyTypeExt
                     Type::BUILTIN_TYPE_OBJECT,
                     $reflectionProperty->getType()->allowsNull(),
                     $targetClass
-                )
+                ),
             ];
         }
 

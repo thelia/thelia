@@ -24,8 +24,6 @@ trait ImplementationClassTrait
 {
     /**
      * Gets the full path to the file for the current class.
-     *
-     * @return string
      */
     public function getClassFilePath(): string
     {

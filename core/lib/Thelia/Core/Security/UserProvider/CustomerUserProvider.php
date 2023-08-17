@@ -43,15 +43,15 @@ class CustomerUserProvider implements PayloadAwareUserProviderInterface
     public function refreshUser(UserInterface $user)
     {
         if (!$user instanceof Customer) {
-            throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
+            throw new UnsupportedUserException(sprintf('Invalid user class "%s".', \get_class($user)));
         }
 
-        $user =  CustomerQuery::create()
+        $user = CustomerQuery::create()
             ->filterByLogin($user->getUserIdentifier(), Criteria::EQUAL)
             ->findOne();
 
         if (null === $user) {
-            throw new UserNotFoundException("User not exist");
+            throw new UserNotFoundException('User not exist');
         }
 
         return $user;
