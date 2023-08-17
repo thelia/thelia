@@ -11,6 +11,16 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Filter;
 
 use ApiPlatform\Exception\InvalidArgumentException;
@@ -18,7 +28,6 @@ use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Resource\TranslatableResourceInterface;
-use Webmozart\Assert\Assert;
 
 final class SearchFilter extends AbstractFilter implements FilterInterface
 {
@@ -68,9 +77,9 @@ final class SearchFilter extends AbstractFilter implements FilterInterface
 
         $this->addWhereByStrategy(
             strategy: $strategy,
-            query:  $query,
+            query: $query,
             fieldPath: $fieldPath,
-            values:  $values
+            values: $values
         );
     }
 
@@ -88,8 +97,8 @@ final class SearchFilter extends AbstractFilter implements FilterInterface
         if (!$strategy || self::STRATEGY_EXACT === $strategy) {
             $query->addUsingOperator(
                 $fieldPath,
-                1 === \count($values) ? $values[0]: $values,
-                1 === \count($values) ? Criteria::EQUAL: Criteria::IN
+                1 === \count($values) ? $values[0] : $values,
+                1 === \count($values) ? Criteria::EQUAL : Criteria::IN
             );
 
             return;
@@ -98,20 +107,20 @@ final class SearchFilter extends AbstractFilter implements FilterInterface
         $conditions = [];
 
         foreach ($values as $key => $value) {
-            $conditionName = "cond_" . $key;
+            $conditionName = 'cond_'.$key;
             switch ($strategy) {
                 case self::STRATEGY_PARTIAL:
-                    $query->addCond($conditionName, $fieldPath, '%' . $value . '%', Criteria::LIKE);
+                    $query->addCond($conditionName, $fieldPath, '%'.$value.'%', Criteria::LIKE);
                     break;
                 case self::STRATEGY_START:
-                    $query->addCond($conditionName, $fieldPath, $value . '%', Criteria::LIKE);
+                    $query->addCond($conditionName, $fieldPath, $value.'%', Criteria::LIKE);
                     break;
                 case self::STRATEGY_END:
-                    $query->addCond($conditionName, $fieldPath, '%' . $value, Criteria::LIKE);
+                    $query->addCond($conditionName, $fieldPath, '%'.$value, Criteria::LIKE);
                     break;
                 case self::STRATEGY_WORD_START:
-                    $query->addCond('first_world', $fieldPath,$value . '%', Criteria::LIKE);
-                    $query->addCond('other_worlds', $fieldPath,'% ' . $value . '%', Criteria::LIKE);
+                    $query->addCond('first_world', $fieldPath, $value.'%', Criteria::LIKE);
+                    $query->addCond('other_worlds', $fieldPath, '% '.$value.'%', Criteria::LIKE);
                     $query->combine(['first_world', 'other_worlds'], Criteria::LOGICAL_OR, $conditionName);
                     break;
                 default:
@@ -123,7 +132,6 @@ final class SearchFilter extends AbstractFilter implements FilterInterface
 
         $query->combine($conditions, Criteria::LOGICAL_OR);
     }
-
 
     public function getDescription(string $resourceClass): array
     {
@@ -203,6 +211,7 @@ final class SearchFilter extends AbstractFilter implements FilterInterface
         if (!$type->isBuiltin()) {
             return 'string';
         }
+
         return $type->getName();
     }
 }
