@@ -204,9 +204,10 @@ class ProductSaleElements extends AbstractPropelResource
         return $this->attributeCombinations;
     }
 
-    public function setAttributeCombinations(array $attributeCombinations): ProductSaleElements
+    public function setAttributeCombinations(array $attributeCombinations): self
     {
         $this->attributeCombinations = $attributeCombinations;
+
         return $this;
     }
 
@@ -218,6 +219,7 @@ class ProductSaleElements extends AbstractPropelResource
     public function setProductPrices(array $productPrices): self
     {
         $this->productPrices = $productPrices;
+
         return $this;
     }
 

@@ -1,9 +1,18 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\State;
 
 use ApiPlatform\State\ProviderInterface;
-use Doctrine\Common\Collections\ArrayCollection;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
@@ -26,8 +35,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
         ActiveRecordInterface $parentModel = null,
         bool $withRelation = true,
         ActiveRecordInterface $baseModel = null
-    ): PropelResourceInterface
-    {
+    ): PropelResourceInterface {
         if ($langs === null) {
             $langs = LangQuery::create()->filterByActive(1)->find();
         }
@@ -42,10 +50,10 @@ abstract class AbstractPropelProvider implements ProviderInterface
         $reflector = new \ReflectionClass($resourceClass);
 
         $compositeIdentifiersAttribute = $reflector->getAttributes(CompositeIdentifiers::class);
-        $compositeIdentifiers = !empty($compositeIdentifiersAttribute)? $compositeIdentifiersAttribute[0]->getArguments()[0] : [];
+        $compositeIdentifiers = !empty($compositeIdentifiersAttribute) ? $compositeIdentifiersAttribute[0]->getArguments()[0] : [];
 
         foreach ($reflector->getProperties() as $property) {
-            $groupAttributes = $property->getAttributes(Groups::class)[0]?? null;
+            $groupAttributes = $property->getAttributes(Groups::class)[0] ?? null;
 
             if (null === $groupAttributes) {
                 continue;
@@ -55,19 +63,19 @@ abstract class AbstractPropelProvider implements ProviderInterface
 
             $matchingGroups = array_intersect($propertyGroups, $context['groups']);
 
-            if (empty($matchingGroups) && !in_array($property->getName(), $compositeIdentifiers)) {
+            if (empty($matchingGroups) && !\in_array($property->getName(), $compositeIdentifiers)) {
                 continue;
             }
 
             $propelGetter = 'get'.ucfirst($property->getName());
 
-            foreach ($property->getAttributes(Column::class) as $columnAttribute){
-                if (isset($columnAttribute->getArguments()['propelFieldName'])){
+            foreach ($property->getAttributes(Column::class) as $columnAttribute) {
+                if (isset($columnAttribute->getArguments()['propelFieldName'])) {
                     $propelGetter = 'get'.ucfirst($columnAttribute->getArguments()['propelFieldName']);
                 }
             }
-            foreach ($property->getAttributes(Relation::class) as $relationAttribute){
-                if (isset($relationAttribute->getArguments()['relationAlias'])){
+            foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
+                if (isset($relationAttribute->getArguments()['relationAlias'])) {
                     $propelGetter = 'get'.$relationAttribute->getArguments()['relationAlias'];
                 }
             }
@@ -83,7 +91,6 @@ abstract class AbstractPropelProvider implements ProviderInterface
             }
 
             $value = $propelModel->$propelGetter();
-
 
             foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
                 if (!$withRelation || $value === null) {
@@ -103,7 +110,6 @@ abstract class AbstractPropelProvider implements ProviderInterface
                     continue 2;
                 }
                 if ($value instanceof ObjectCollection) {
-
                     $collection = new Collection();
 
                     foreach ($value as $childPropelModel) {
@@ -151,7 +157,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
                 /** @var \ReflectionProperty $i18nField */
                 foreach ($i18nFields as $i18nField) {
                     $i18nFieldName = $i18nField->getName();
-                    $groupAttributes = $i18nField->getAttributes(Groups::class)[0]?? null;
+                    $groupAttributes = $i18nField->getAttributes(Groups::class)[0] ?? null;
 
                     if (null === $groupAttributes) {
                         continue;
@@ -167,7 +173,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
 
                     $fieldValue = null;
 
-                    $virtualColumn = ltrim(strtolower($parentReflector?->getShortName().'_'.$reflector->getShortName()).'_'.'lang_'.$lang->getLocale().'_'.$i18nFieldName, '_');
+                    $virtualColumn = ltrim(strtolower($parentReflector?->getShortName().'_'.$reflector->getShortName()).'_lang_'.$lang->getLocale().'_'.$i18nFieldName, '_');
 
                     if ($baseModel->hasVirtualColumn($virtualColumn)) {
                         $fieldValue = $baseModel->getVirtualColumn($virtualColumn);

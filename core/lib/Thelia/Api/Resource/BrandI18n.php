@@ -57,6 +57,7 @@ class BrandI18n extends I18n
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 }
