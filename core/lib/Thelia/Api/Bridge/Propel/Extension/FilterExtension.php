@@ -1,8 +1,17 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Extension;
 
-use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
@@ -16,7 +25,7 @@ class FilterExtension implements QueryCollectionExtensionInterface
 
     public function __construct(
         #[TaggedLocator('thelia.api.propel.filter')] ServiceLocator $filterLocator
-    ){
+    ) {
         $this->filterLocator = $filterLocator;
     }
 

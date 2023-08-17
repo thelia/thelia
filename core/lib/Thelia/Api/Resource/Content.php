@@ -118,9 +118,10 @@ class Content extends AbstractTranslatableResource
         return $this->contentFolders;
     }
 
-    public function setContentFolders(array $contentFolders): Content
+    public function setContentFolders(array $contentFolders): self
     {
         $this->contentFolders = $contentFolders;
+
         return $this;
     }
 
