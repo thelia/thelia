@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Filter;
 
 use ApiPlatform\Metadata\Operation;
@@ -24,7 +34,7 @@ class RangeFilter extends AbstractFilter
         $conditions = [];
         $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
         foreach ($values as $key => $value) {
-            $conditionName = "cond_" . $key;
+            $conditionName = 'cond_'.$key;
             switch ($key) {
                 case self::PARAMETER_GREATER_THAN:
                     $query->addCond($conditionName, $fieldPath, $value, Criteria::GREATER_THAN);
@@ -33,7 +43,7 @@ class RangeFilter extends AbstractFilter
                     $query->addCond($conditionName, $fieldPath, $value, Criteria::GREATER_EQUAL);
                     break;
                 case self::PARAMETER_LESS_THAN:
-                    $query->addCond($conditionName, $fieldPath,$value, Criteria::LESS_THAN);
+                    $query->addCond($conditionName, $fieldPath, $value, Criteria::LESS_THAN);
                     break;
                 case self::PARAMETER_LESS_THAN_OR_EQUAL:
                     $query->addCond($conditionName, $fieldPath, $value, Criteria::LESS_EQUAL);
@@ -45,7 +55,6 @@ class RangeFilter extends AbstractFilter
         }
         $query->combine($conditions, Criteria::LOGICAL_AND);
     }
-
 
     public function getDescription(string $resourceClass): array
     {
@@ -65,8 +74,8 @@ class RangeFilter extends AbstractFilter
             $description += $this->getFilterDescription($propertyName, self::PARAMETER_GREATER_THAN_OR_EQUAL);
             $description += $this->getFilterDescription($propertyName, self::PARAMETER_LESS_THAN);
             $description += $this->getFilterDescription($propertyName, self::PARAMETER_LESS_THAN_OR_EQUAL);
-
         }
+
         return $description;
     }
 
@@ -86,4 +95,3 @@ class RangeFilter extends AbstractFilter
         ];
     }
 }
-

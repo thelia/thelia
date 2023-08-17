@@ -17,12 +17,12 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Base\Customer as BaseCustomer;
 use Thelia\Model\Exception\InvalidArgumentException;
 use Thelia\Model\Map\CustomerTableMap;
-use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
 
 /**
  * Skeleton subclass for representing a row from the 'customer' table.

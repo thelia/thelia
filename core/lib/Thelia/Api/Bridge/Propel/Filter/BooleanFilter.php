@@ -2,14 +2,19 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Filter;
 
-use ApiPlatform\Doctrine\Common\Filter\BooleanFilterTrait;
-use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\QueryBuilder;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 
 final class BooleanFilter extends AbstractFilter implements FilterInterface
@@ -28,7 +33,7 @@ final class BooleanFilter extends AbstractFilter implements FilterInterface
 
         $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
 
-        $query->where($fieldPath.' = ?', filter_var($value, FILTER_VALIDATE_BOOLEAN), );
+        $query->where($fieldPath.' = ?', filter_var($value, \FILTER_VALIDATE_BOOLEAN));
     }
 
     public function getDescription(string $resourceClass): array
@@ -38,7 +43,7 @@ final class BooleanFilter extends AbstractFilter implements FilterInterface
         $filterProperties = $this->getProperties();
         if (null === $filterProperties) {
             return [];
-        };
+        }
 
         foreach ($filterProperties as $property => $strategy) {
             $propertyName = $this->normalizePropertyName($property);

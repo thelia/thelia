@@ -14,12 +14,9 @@ namespace Thelia\Api\Bridge\Propel\State;
 
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Bridge\Propel\Extension\QueryResultCollectionExtensionInterface;
-use Thelia\Api\Resource\I18n;
 use Thelia\Api\Resource\PropelResourceInterface;
-use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Model\LangQuery;
 
 class PropelCollectionProvider extends AbstractPropelProvider
