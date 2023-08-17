@@ -115,5 +115,4 @@ return static function (ContainerConfigurator $configurator): void {
                 service('.inner'),
             ])
         ->autowire();
-
 };

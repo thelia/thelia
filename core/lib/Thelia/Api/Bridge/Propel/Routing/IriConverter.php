@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Routing;
 
 use ApiPlatform\Api\IriConverterInterface;
@@ -25,7 +35,6 @@ class IriConverter implements IriConverterInterface
 
     public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string
     {
-
         $reflector = new \ReflectionClass($resource);
 
         $compositeIdentifiers = $reflector->getAttributes(CompositeIdentifiers::class);
@@ -37,10 +46,12 @@ class IriConverter implements IriConverterInterface
                     function ($carry, $identifier) use ($resource) {
                         $getter = 'get'.ucfirst($identifier);
                         $carry[$identifier] = $resource->$getter()->getId();
+
                         return $carry;
                     },
                     []
                 );
+
                 return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
             } catch (RoutingExceptionInterface $e) {
                 // try not decorated converter
@@ -49,7 +60,7 @@ class IriConverter implements IriConverterInterface
         try {
             return $this->decorated->getIriFromResource($resource, $referenceType, $operation, $context);
         } catch (\Exception $e) {
-           return "undefined_iri";
+            return 'undefined_iri';
         }
     }
 }

@@ -1,11 +1,20 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Filter;
 
 use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 class DateFilter extends AbstractFilter
 {
@@ -32,19 +41,19 @@ class DateFilter extends AbstractFilter
         $conditions = [];
         $fieldPath = $this->getPropertyQueryPath($query, $property, $context);
         foreach ($values as $key => $value) {
-            $conditionName = "cond_" . $key;
+            $conditionName = 'cond_'.$key;
             switch ($key) {
                 case self::PARAMETER_BEFORE:
-                        $query->addCond($conditionName, $fieldPath, $value, Criteria::LESS_EQUAL);
+                    $query->addCond($conditionName, $fieldPath, $value, Criteria::LESS_EQUAL);
                     break;
                 case self::PARAMETER_STRICTLY_BEFORE:
-                        $query->addCond($conditionName, $fieldPath, $value, Criteria::LESS_THAN);
+                    $query->addCond($conditionName, $fieldPath, $value, Criteria::LESS_THAN);
                     break;
                 case self::PARAMETER_AFTER:
-                        $query->addCond($conditionName, $fieldPath, $value, Criteria::GREATER_EQUAL);
+                    $query->addCond($conditionName, $fieldPath, $value, Criteria::GREATER_EQUAL);
                     break;
                 case self::PARAMETER_STRICTLY_AFTER:
-                        $query->addCond($conditionName, $fieldPath, $value, Criteria::GREATER_THAN);
+                    $query->addCond($conditionName, $fieldPath, $value, Criteria::GREATER_THAN);
                     break;
                 default:
                     continue 2;
@@ -63,6 +72,7 @@ class DateFilter extends AbstractFilter
             case self::INCLUDE_NULL_AFTER:
                 $query->addOr($fieldPath, null, Criteria::EQUAL);
                 $query->orderBy($fieldPath, Criteria::DESC);
+                // no break
             case self::INCLUDE_NULL_BEFORE:
                 $query->addOr($fieldPath, null, Criteria::EQUAL);
                 $query->orderBy($fieldPath);
@@ -87,8 +97,8 @@ class DateFilter extends AbstractFilter
             $description += $this->getFilterDescription($propertyName, self::PARAMETER_STRICTLY_BEFORE);
             $description += $this->getFilterDescription($propertyName, self::PARAMETER_AFTER);
             $description += $this->getFilterDescription($propertyName, self::PARAMETER_STRICTLY_AFTER);
-
         }
+
         return $description;
     }
 

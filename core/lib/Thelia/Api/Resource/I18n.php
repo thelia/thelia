@@ -12,7 +12,6 @@
 
 namespace Thelia\Api\Resource;
 
-
 class I18n
 {
     public ?int $id;
