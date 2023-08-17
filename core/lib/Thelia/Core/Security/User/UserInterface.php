@@ -56,7 +56,6 @@ interface UserInterface
      *     return array('USER');
      * }
      * </code>
-     *
      */
     public function getRoles();
 

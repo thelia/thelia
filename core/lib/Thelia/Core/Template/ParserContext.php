@@ -277,6 +277,11 @@ class ParserContext implements \IteratorAggregate
      */
     protected function cleanOutdatedFormErrorInformation()
     {
+        $request = $this->requestStack->getCurrentRequest();
+        if (!$request->hasSession() || !$request->getSession()->isStarted()) {
+            return $this;
+        }
+
         $formErrorInformation = $this->getSession()->getFormErrorInformation();
 
         if (!empty($formErrorInformation)) {

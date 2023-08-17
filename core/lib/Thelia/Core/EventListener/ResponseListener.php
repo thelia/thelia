@@ -27,6 +27,10 @@ class ResponseListener implements EventSubscriberInterface
 {
     public function beforeResponse(ResponseEvent $event): void
     {
+        if (!$event->getRequest()->hasSession() || !$event->getRequest()->getSession()->isStarted()) {
+            return;
+        }
+
         $session = $event->getRequest()->getSession();
 
         if (null !== $id = $session->get('cart_use_cookie')) {
