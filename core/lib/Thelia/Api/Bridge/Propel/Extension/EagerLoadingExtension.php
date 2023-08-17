@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Extension;
 
 use ApiPlatform\Exception\RuntimeException;
@@ -13,15 +23,12 @@ use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Resource\I18n;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Model\LangQuery;
-use Thelia\Model\ProductQuery;
 
 final class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
     public function __construct(
         private readonly int $maxJoins = 30
-    )
-    {
-
+    ) {
     }
 
     public function applyToCollection(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
@@ -62,7 +69,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         }
 
         $this->joinRelations(
-            query :$query,
+            query : $query,
             resourceClass: $resourceClass,
             operation: $operation,
             context: $context,
@@ -82,7 +89,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         string $parentClass = null,
         \ReflectionClass $parentReflector = null,
         string $parentAlias = null
-    ) {
+    ): void {
         if ($joinCount > $this->maxJoins) {
             throw new RuntimeException('The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary with the "api_platform.eager_loading.max_joins" configuration key (https://api-platform.com/docs/core/performance/#eager-loading), or limit the maximum serialization depth using the "enable_max_depth" option of the Symfony serializer (https://symfony.com/doc/current/components/serializer.html#handling-serialization-depth).');
         }
@@ -120,7 +127,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
         foreach ($reflector->getProperties() as $property) {
             $isInFilters = array_reduce(
-                array_keys($context['filters']?? []),
+                array_keys($context['filters'] ?? []),
                 function (bool $carry, $filter) use ($property) {
                     if (true === $carry) {
                         return true;
@@ -131,7 +138,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 false
             );
 
-            $groupAttributes = $property->getAttributes(Groups::class)[0]?? null;
+            $groupAttributes = $property->getAttributes(Groups::class)[0] ?? null;
 
             if (!$isInFilters && null === $groupAttributes) {
                 continue;
@@ -144,7 +151,6 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             }
 
             foreach ($property->getAttributes(Relation::class) as $relationAttribute) {
-
                 $targetClass = $relationAttribute->getArguments()['targetResource'];
 
                 if ($parentClass === $targetClass) {
@@ -199,7 +205,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                         continue;
                     }
 
-                    $relationQuery->withColumn( $relationQuery->getTableNameInQuery().'.'.$targetProperty->getName(), $relationQuery->getTableNameInQuery().'_'.$targetProperty->getName());
+                    $relationQuery->withColumn($relationQuery->getTableNameInQuery().'.'.$targetProperty->getName(), $relationQuery->getTableNameInQuery().'_'.$targetProperty->getName());
                 }
 
                 // Avoid recursive joins for self-referencing relations
@@ -215,7 +221,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                     operation: $operation,
                     context: $context,
                     options: $options,
-                    wasLeftJoin:  $isLeftJoin,
+                    wasLeftJoin: $isLeftJoin,
                     joinCount: $joinCount,
                     currentDepth: $currentDepth,
                     parentClass: $resourceClass,

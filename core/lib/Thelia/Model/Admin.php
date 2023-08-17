@@ -14,10 +14,11 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Security\User\UserPermissionsTrait;
 use Thelia\Model\Base\Admin as BaseAdmin;
-use Symfony\Component\Security\Core\User\UserInterface as SecurityUserInterface;
+
 /**
  * Skeleton subclass for representing a row from the 'admin' table.
  *

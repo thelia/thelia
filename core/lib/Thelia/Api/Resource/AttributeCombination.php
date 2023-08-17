@@ -61,9 +61,10 @@ class AttributeCombination extends AbstractPropelResource
         return $this->productSaleElements;
     }
 
-    public function setProductSaleElements(ProductSaleElements $productSaleElements): AttributeCombination
+    public function setProductSaleElements(ProductSaleElements $productSaleElements): self
     {
         $this->productSaleElements = $productSaleElements;
+
         return $this;
     }
 
