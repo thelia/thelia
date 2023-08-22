@@ -1,9 +1,13 @@
 import React, { forwardRef } from 'react';
 
 import Error from '../Error';
+import { SelectProps } from './Select.types';
 
-const Select = forwardRef(
-  ({ label, name, options = [], error, className = '', ...props }, ref) => {
+const Select = forwardRef<HTMLSelectElement, SelectProps>(
+  (
+    { label, name, options = [], error, className = '', ...props }: SelectProps,
+    ref
+  ) => {
     return (
       <label className={`Select ${className ? className : ''}`}>
         {label ? (
