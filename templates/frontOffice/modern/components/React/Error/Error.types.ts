@@ -1,3 +1,3 @@
 export type ErrorProps = {
-  error: string;
+  error: any;
 };
