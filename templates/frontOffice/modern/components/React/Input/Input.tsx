@@ -1,7 +1,8 @@
-import React, { forwardRef, useState } from 'react';
+import React, { Ref, forwardRef, useState } from 'react';
 
 import Error from '../Error';
 import { ReactComponent as EyeIcon } from '@icons/eye.svg';
+import { InputProps } from './Input.types';
 
 const Input = forwardRef(
   (
@@ -16,8 +17,8 @@ const Input = forwardRef(
       placeholder,
       value,
       ...props
-    },
-    ref
+    }: InputProps,
+    ref: Ref<HTMLInputElement>
   ) => {
     const [passwordVisible, setPasswordVisible] = useState(false);
 
