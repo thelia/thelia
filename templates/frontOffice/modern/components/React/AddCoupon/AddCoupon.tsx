@@ -10,6 +10,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import priceFormat from '@js/utils/priceFormat';
+import { Coupon } from '@js/types/common';
 
 export default function AddCoupon() {
   const { register, handleSubmit, formState } = useForm();
@@ -57,7 +58,7 @@ export default function AddCoupon() {
         <Alert
           type="error"
           className="mt-4"
-          message={error.response?.data?.description}
+          message={(error as any).response?.data?.description}
         />
       ) : null}
       {isSuccess && !successClear ? (
@@ -80,15 +81,15 @@ export default function AddCoupon() {
               ? intl.formatMessage({ id: 'YOU_USING_COUPONS' })
               : intl.formatMessage({ id: 'YOU_USING_COUPON' })}
           </span>
-          <ul className="flex flex-col gap-2 my-2">
-            {cart?.coupons.map((c) => (
+          <ul className="my-2 flex flex-col gap-2">
+            {cart?.coupons.map((c: Coupon) => (
               <li key={c.id} className="flex justify-between">
                 <span className="block font-bold">
                   {c?.code} - {priceFormat(c?.amount)}
                 </span>
                 <button
                   className="text-sm text-main-dark hover:text-main"
-                  onClick={() => clearCoupon(c.id)}
+                  onClick={() => clearCoupon(c.id.toString())}
                 >
                   {intl.formatMessage({ id: 'DELETE' })}
                 </button>
