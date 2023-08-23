@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { addToCart } from '@openstudio/thelia-api-utils';
-import { isEqual } from 'lodash-es';
+import { isEqual } from 'lodash';
 import priceFormat from '@utils/priceFormat';
 import { queryClient } from '@openstudio/thelia-api-utils';
 import { createRoot } from 'react-dom/client';
@@ -64,7 +64,7 @@ function AttributeSelector({
   );
 }
 
-function PriceDisplay({ pse }) {
+function PriceDisplay({ pse }: { pse: PSE | null }) {
   const intl = useIntl();
   if (!pse) {
     return (
@@ -111,7 +111,13 @@ function PseSelector({
   const [quantity, setQuantity] = useState(currentPse?.quantity || 1);
   const intl = useIntl();
 
-  async function addPseToCart({ pseId, quantity = 1 }) {
+  async function addPseToCart({
+    pseId,
+    quantity = 1
+  }: {
+    readonly pseId: number;
+    readonly quantity: number;
+  }) {
     if (!pseId) return;
     setError(false);
     setLoading(true);
@@ -209,7 +215,7 @@ export default function PseSelectorRoot() {
   const root = createRoot(DOMElement);
 
   root.render(
-    <IntlProvider locale={locale} messages={messages[locale]}>
+    <IntlProvider locale={locale} messages={(messages as any)[locale]}>
       <PseSelector
         pses={(window as any).PSES}
         attributes={(window as any).ATTRIBUTES}
