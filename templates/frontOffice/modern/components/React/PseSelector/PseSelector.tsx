@@ -12,12 +12,13 @@ import Alert from '../Alert';
 import { useIntl } from 'react-intl';
 import messages, { locale } from '@components/React/intl';
 import { IntlProvider } from 'react-intl';
+import { Attribute, PSE, PseSelectorProps } from './PseSelector.types';
 
 function AttributeSelector({
   attributes = [],
   currentCombination = {},
   setAttributes = () => {}
-}) {
+}: PseSelectorProps) {
   const currentCombinationValues = useMemo(() => {
     return Object.values(currentCombination);
   }, [currentCombination]);
@@ -89,17 +90,23 @@ function PriceDisplay({ pse }) {
   );
 }
 
-function PseSelector({ pses = [], attributes = [] }) {
+function PseSelector({
+  pses = [],
+  attributes = []
+}: {
+  pses: PSE[];
+  attributes: Attribute[];
+}) {
   const defaultPseCombination = useMemo(() => {
     const defaultPse = pses.find((pse) => pse.isDefault);
-    return defaultPse.combination;
+    return defaultPse?.combination;
   }, [pses]);
   const [currentCombination, setCurrentCombination] = useState(
     defaultPseCombination
   );
-  const [currentPse, setCurrentPse] = useState(null);
+  const [currentPse, setCurrentPse] = useState<PSE | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<boolean | null>(null);
 
   const [quantity, setQuantity] = useState(currentPse?.quantity || 1);
   const intl = useIntl();
@@ -111,7 +118,8 @@ function PseSelector({ pses = [], attributes = [] }) {
     try {
       const response = await addToCart({
         pseId,
-        quantity
+        quantity,
+        append: false
       });
       queryClient.setQueryData('cart', response.cart);
       store.dispatch(showCart());
@@ -134,7 +142,10 @@ function PseSelector({ pses = [], attributes = [] }) {
   }, [currentCombination, pses, setCurrentPse]);
 
   useEffect(() => {
-    document.getElementById('RefPse').innerText = currentPse?.ref;
+    const element = document.getElementById('RefPse');
+    if (element && currentPse) {
+      element.innerText = currentPse.ref;
+    }
   }, [currentPse]);
 
   return (
@@ -199,7 +210,10 @@ export default function PseSelectorRoot() {
 
   root.render(
     <IntlProvider locale={locale} messages={messages[locale]}>
-      <PseSelector pses={window.PSES} attributes={window.ATTRIBUTES} />
+      <PseSelector
+        pses={(window as any).PSES}
+        attributes={(window as any).ATTRIBUTES}
+      />
     </IntlProvider>
   );
 }
