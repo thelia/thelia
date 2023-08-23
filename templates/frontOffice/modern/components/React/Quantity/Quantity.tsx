@@ -2,6 +2,7 @@ import React from 'react';
 import { ReactComponent as IconMinus } from '@icons/minus.svg';
 import { ReactComponent as IconPlus } from '@icons/plus.svg';
 import { useIntl } from 'react-intl';
+import { QuantityProps } from './Quantity.types';
 
 export default function Quantity({
   mutate,
@@ -10,7 +11,7 @@ export default function Quantity({
   title = false,
   small = false,
   visible = true
-}) {
+}: QuantityProps) {
   const intl = useIntl();
 
   return (
@@ -30,7 +31,7 @@ export default function Quantity({
           className={`Quantity-btn ${
             quantity === 1 ? 'Quantity-btn--disabled' : ''
           }`}
-          tabIndex={visible ? '0' : '-1'}
+          tabIndex={visible ? 0 : -1}
           aria-label="Minus"
         >
           <span className="m-auto font-bold text-white">
@@ -49,7 +50,7 @@ export default function Quantity({
           className={`Quantity-btn ${
             quantity === max ? 'Quantity-btn--disabled' : ''
           }`}
-          tabIndex={visible ? '0' : '-1'}
+          tabIndex={visible ? 0 : -1}
           aria-label="Add"
         >
           <span className="m-auto font-bold text-white">
