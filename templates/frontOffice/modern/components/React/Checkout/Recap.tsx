@@ -2,13 +2,20 @@ import { useIntl } from 'react-intl';
 import AddCoupon from '../AddCoupon';
 import priceFormat from '@js/utils/priceFormat';
 import React from 'react';
+import { Cart } from '@js/types/common';
 
-export default function Recap({ cart, small = false }) {
+export default function Recap({
+  cart,
+  small = false
+}: {
+  cart: Cart;
+  small: boolean;
+}) {
   const { delivery, taxes, discount, coupon, total } = cart;
   const intl = useIntl();
   return (
     <div className={`Recap ${small ? 'Recap--small' : ''}`}>
-      <div className={small ? "" : "w-1/2"}>
+      <div className={small ? '' : 'w-1/2'}>
         <AddCoupon />
       </div>
       <div className="Recap-grid">
@@ -38,9 +45,7 @@ export default function Recap({ cart, small = false }) {
         ) : null}
       </div>
       <div className="Recap-total">
-        <span className="">
-          {intl.formatMessage({ id: 'TOTAL' })}
-        </span>
+        <span className="">{intl.formatMessage({ id: 'TOTAL' })}</span>
         <span className="text-2xl font-bold">
           {total + delivery - discount <= 0
             ? intl.formatMessage({ id: 'FREE' })

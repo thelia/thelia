@@ -21,7 +21,7 @@ import Title from '../Title';
 export default function Checkout() {
   const { data: checkout } = useGetCheckout();
   const { data: cart = {} } = useCartQuery();
-  const { checkoutStep } = useSelector((state) => state.checkout);
+  const { checkoutStep } = useSelector((state: any) => state.checkout);
   const { mutate: reset } = useSetCheckout();
 
   useEffect(() => {
@@ -29,6 +29,7 @@ export default function Checkout() {
   }, [checkoutStep]);
 
   useEffect(() => {
+    //@ts-ignore
     reset({ deliveryAddressId: null });
   }, [reset]);
 
@@ -44,38 +45,35 @@ export default function Checkout() {
       <Suspense fallback={<Loader />}>
         <section className="Checkout-container Checkout-main">
           <Cart
-            isVisible={checkoutStep === CHECKOUT_STEP.CART.id}
+            isVisible={checkoutStep === CHECKOUT_STEP.CART?.id}
             page={CHECKOUT_STEP.CART}
             cart={cart}
           />
           <Delivery
-            isVisible={checkoutStep === CHECKOUT_STEP.DELIVERY.id}
+            isVisible={checkoutStep === CHECKOUT_STEP.DELIVERY?.id}
             page={CHECKOUT_STEP.DELIVERY}
-            cart={cart}
             checkout={checkout}
           />
           <Invoice
-            isVisible={checkoutStep === CHECKOUT_STEP.INVOICE.id}
+            isVisible={checkoutStep === CHECKOUT_STEP.INVOICE?.id}
             page={CHECKOUT_STEP.INVOICE}
-            cart={cart}
             checkout={checkout}
           />
           <Payment
-            isVisible={checkoutStep === CHECKOUT_STEP.PAYMENT.id}
+            isVisible={checkoutStep === CHECKOUT_STEP.PAYMENT?.id}
             page={CHECKOUT_STEP.PAYMENT}
-            cart={cart}
             checkout={checkout}
           />
           {checkoutStep !== 1 && (
-            <div className="px-5 py-8 mt-8 -mx-5 bg-gray-200 md:m-0 md:bg-transparent md:p-0">
-              <Title title="RECAP_ORDER" className="text-2xl Title--3 mb-7" />
-              <CartItems
+            <div className="-mx-5 mt-8 bg-gray-200 px-5 py-8 md:m-0 md:bg-transparent md:p-0">
+              <Title title="RECAP_ORDER" className="Title--3 mb-7 text-2xl" />
+              {/* <CartItems
                 cart={cart}
                 canDelete={false}
                 evenClass={false}
                 canChangeQuantity={false}
                 recap={true}
-              />
+              /> */}
               <Recap cart={cart} small={true} />
             </div>
           )}

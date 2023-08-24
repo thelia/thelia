@@ -18,7 +18,15 @@ function getModuleValidOptions(module) {
   return module?.options?.filter((o) => o.valid) || [];
 }
 
-function ModuleOption({ module = {}, option = {}, isSelected }) {
+function ModuleOption({
+  module = {},
+  option = {},
+  isSelected
+}: {
+  module: {};
+  option: {};
+  isSelected: boolean;
+}) {
   const intl = useIntl();
   const { data: checkout } = useGetCheckout();
   const { mutate } = useSetCheckout();
@@ -78,7 +86,7 @@ export default function DeliveryModules() {
   return (
     <>
       {isLoading ? (
-        <Loader className="w-40 mx-auto mt-8" />
+        <Loader className="mx-auto mt-8 w-40" />
       ) : modules?.length === 0 ||
         modules?.flatMap(getModuleValidOptions).length === 0 ? (
         <Alert
@@ -88,9 +96,9 @@ export default function DeliveryModules() {
           className="mt-8"
         />
       ) : (
-        <div className="flex flex-col gap-3 mt-8 flex-start item-start">
+        <div className="flex-start item-start mt-8 flex flex-col gap-3">
           <Title
-            className="mb-5 text-2xl Title--3"
+            className="Title--3 mb-5 text-2xl"
             title="CHOOSE_DELIVERY_PROVIDER"
           />
           {modules.map((module) =>

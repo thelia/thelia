@@ -1,4 +1,6 @@
-export const CHECKOUT_STEP = {
+import { CheckoutPageType } from '@js/types/checkout.types';
+
+export const CHECKOUT_STEP: { [k: string]: CheckoutPageType } = {
   CART: {
     id: 1,
     slug: 'Cart',

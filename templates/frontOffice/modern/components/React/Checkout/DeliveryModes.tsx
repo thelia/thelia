@@ -14,7 +14,7 @@ import Loader from '../Loader';
 function DeliveryModes() {
   const dispatch = useDispatch();
   const intl = useIntl();
-  const selectedMode = useSelector((state) => state.checkout.mode);
+  const selectedMode = useSelector((state: any) => state.checkout.mode);
   const { data: checkout } = useGetCheckout();
   const { mutate } = useSetCheckout();
   const { data: modes = [], isLoading } = useDeliveryModes();

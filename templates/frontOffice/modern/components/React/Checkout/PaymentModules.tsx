@@ -17,7 +17,7 @@ export default function PaymentModules() {
   return (
     <div className="mb-8">
       {isLoading ? (
-        <Loader size="w-10 h-10" />
+        <Loader />
       ) : modules?.length === 0 ? (
         <Alert
           title={intl.formatMessage({ id: 'WARNING' })}
@@ -26,7 +26,7 @@ export default function PaymentModules() {
         />
       ) : (
         <div className="flex-start item-start mt-8 flex flex-col gap-3">
-          {modules.map((module, index) => {
+          {modules.map((module: any, index: number) => {
             const isSelected = module.id === checkout?.paymentModuleId;
             return (
               <label

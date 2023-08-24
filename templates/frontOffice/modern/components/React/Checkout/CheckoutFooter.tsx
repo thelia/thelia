@@ -6,8 +6,15 @@ import { setCheckoutStep } from '@js/redux/modules/checkout';
 import { CHECKOUT_STEP } from './constants';
 import { useFinalCheckout } from '@openstudio/thelia-api-utils';
 import Loader from '../Loader';
+import { CheckoutRequest } from './type';
 
-export function CheckoutFooter({ step, checkout }) {
+export function CheckoutFooter({
+  step,
+  checkout
+}: {
+  step: number;
+  checkout: CheckoutRequest;
+}) {
   const intl = useIntl();
   const enabledCta = useEnableCta(step, checkout);
   const { mutate: final, isLoading } = useFinalCheckout();
@@ -29,14 +36,14 @@ export function CheckoutFooter({ step, checkout }) {
       }
     } else {
       dispatch(setCheckoutStep(step + 1));
-      window.scrollTo(0, { behavior: 'smooth' });
+      window.scrollTo({ behavior: 'smooth' });
     }
   };
 
   return (
     <>
       <footer className="Checkout-footer">
-        <div className="flex items-center justify-center h-full Checkout-container sm:justify-end">
+        <div className="Checkout-container flex h-full items-center justify-center sm:justify-end">
           <button
             type="button"
             onClick={handleClick}

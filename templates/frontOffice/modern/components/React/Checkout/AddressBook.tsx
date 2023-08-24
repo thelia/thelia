@@ -1,6 +1,3 @@
-import React from 'react';
-import Loader from '../Loader';
-
 import {
   useAddressDelete,
   useGetCheckout,
@@ -10,9 +7,20 @@ import {
 import CreateAddressModal from '../Address/CreateAddressModal';
 import EditAddressModal from '../Address/EditAddressModal';
 import { useIntl } from 'react-intl';
-import Title from '../Title';
+import { AddressMode, Address as AddressType } from './type';
+import Title from '../Title/Title';
+import Loader from '../Loader/Loader';
+import { CheckoutRequest } from '@js/types/checkout.types';
 
-function Address({ address = {}, onSelect = () => {}, isSelected }) {
+function Address({
+  address,
+  onSelect = () => {},
+  isSelected
+}: {
+  address: AddressType;
+  onSelect: () => void;
+  isSelected: boolean;
+}) {
   const { isSuccess: deleteSuccess } = useAddressDelete();
   const intl = useIntl();
 
@@ -35,7 +43,7 @@ function Address({ address = {}, onSelect = () => {}, isSelected }) {
       <address className="AddressCard-info">
         <span className="mb-3 font-bold text-black">
           {address.label}{' '}
-          {address.isDefault === 1 && (
+          {address.isDefault && (
             <>({intl.formatMessage({ id: 'DEFAULT_ADDRESS' })})</>
           )}
         </span>
@@ -50,7 +58,7 @@ function Address({ address = {}, onSelect = () => {}, isSelected }) {
           </span>
         ) : null}
         <span className="postal-code">
-          {address.zipcode} {address.city} {address.countryCode}
+          {address.zipCode} {address.city} {address.countryCode}
         </span>
       </address>
       <EditAddressModal address={address} />
@@ -58,7 +66,15 @@ function Address({ address = {}, onSelect = () => {}, isSelected }) {
   );
 }
 
-function AddressBook({ mode, title = null, addresses }) {
+function AddressBook({
+  mode,
+  title,
+  addresses
+}: {
+  mode: AddressMode;
+  title?: string;
+  addresses: AddressType[];
+}) {
   const { data: checkout, isLoading } = useGetCheckout();
   const { mutate } = useSetCheckout();
 
@@ -84,7 +100,7 @@ function AddressBook({ mode, title = null, addresses }) {
               address={address}
               isSelected={isSelected}
               onSelect={() => {
-                let request = {};
+                let request: Partial<CheckoutRequest> = {};
 
                 if (mode === 'delivery') {
                   request.deliveryAddressId = address.id;

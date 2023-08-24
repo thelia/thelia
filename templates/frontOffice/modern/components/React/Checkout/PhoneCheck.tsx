@@ -13,7 +13,7 @@ import Title from '../Title';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 
-export default function PhoneCheck({ addressId }) {
+export default function PhoneCheck({ addressId }: { addressId: number }) {
   const [phone, setPhone] = React.useState('');
   const [isSubmitted, setIsSubmitted] = React.useState(false);
   const [isDirty, setIsDirty] = React.useState(false);
@@ -47,7 +47,7 @@ export default function PhoneCheck({ addressId }) {
       currentPhoneNumber = parsePhoneNumber(
         address?.cellphone,
         address?.countryCode
-      ).number;
+      )?.number;
     }
     setPhone(currentPhoneNumber);
   }, [address]);
@@ -70,7 +70,7 @@ export default function PhoneCheck({ addressId }) {
 
   return (
     <div>
-      <Title title="CONTACT_NUMBER" className="text-2xl Title--3" />
+      <Title title="CONTACT_NUMBER" className="Title--3 text-2xl" />
       <small className="text-gray-600 ">
         {intl.formatMessage({ id: 'NOTICE_PHONE_CHECK' })}
       </small>
@@ -97,16 +97,16 @@ export default function PhoneCheck({ addressId }) {
           }
         }}
       >
-        <div className="relative PhoneCheck-field">
+        <div className="PhoneCheck-field relative">
           <PhoneInput
             international={false}
             defaultCountry={address?.countryCode}
             value={phone}
-            onChange={setPhone}
+            onChange={() => setPhone}
           />
           <button
             type="submit"
-            className="absolute right-0 PhoneCheck-btn"
+            className="PhoneCheck-btn absolute right-0"
             onClick={() => setIsSubmitted(true)}
           >
             {intl.formatMessage({ id: 'CONFIRM' })}

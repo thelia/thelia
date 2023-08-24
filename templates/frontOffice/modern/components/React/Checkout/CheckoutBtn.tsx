@@ -16,8 +16,8 @@ export default function CheckoutButton() {
   const { mutate } = useFinalCheckout();
   const { mutate: setCheckout } = useSetCheckout();
   const { data: checkout } = useGetCheckout();
-  const { phoneNumberValid } = useSelector((state) => state.checkout);
-  const ButtonRef = useRef(null);
+  const { phoneNumberValid } = useSelector((state: any) => state.checkout);
+  const ButtonRef = useRef<HTMLInputElement>(null);
   return (
     <div className="">
       <label className="my-4 inline-block cursor-pointer">

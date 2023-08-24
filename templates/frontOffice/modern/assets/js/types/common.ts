@@ -3,7 +3,7 @@ export interface Cart {
   taxes: number;
   delivery: number;
   deliveryTax: number;
-  coupons: Coupon[];
+  coupon: string;
   discount: number;
   total: number;
   currency: string;
