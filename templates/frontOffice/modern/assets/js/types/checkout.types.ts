@@ -1,3 +1,10 @@
+import {
+  Address,
+  CheckoutAddress,
+  CustomerState
+} from '@components/React/Checkout/type';
+import { DeliveryModule, PickupAddress } from './common';
+
 export type CheckoutPageType = {
   id: number;
   slug: string;
@@ -28,6 +35,20 @@ export declare type CheckoutResponse = {
   pickupAddress: {
     [index: string]: unknown;
   };
+  acceptedTermsAndConditions: boolean;
+  isComplete: boolean;
+};
+
+export type Checkout = {
+  step: number;
+  customer: CustomerState;
+  deliveryAddressId: CheckoutAddress['id'] | Address['id'] | null;
+  billingAddressId: CheckoutAddress['id'] | Address['id'] | null;
+  needValidate: CheckoutRequest['needValidate'];
+  deliveryModule: DeliveryModule | null;
+  paymentModuleId: number | null;
+  deliveryModuleOptionCode: 'string' | null;
+  pickupAddress: PickupAddress | null;
   acceptedTermsAndConditions: boolean;
   isComplete: boolean;
 };

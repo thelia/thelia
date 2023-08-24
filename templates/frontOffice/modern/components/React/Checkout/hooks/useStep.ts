@@ -1,16 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setCheckoutStep } from '@js/redux/modules/checkout';
-export default function useStep(checkout) {
+import { Checkout } from '@js/types/checkout.types';
+export default function useStep(checkout: Checkout) {
   const [step, setStep] = useState(1);
   const dispatch = useDispatch();
-  const { mode: selectedMode, phoneCheck = true, checkoutStep } = useSelector((state) => state.checkout);
+  const {
+    mode: selectedMode,
+    phoneCheck = true,
+    checkoutStep
+  } = useSelector((state: any) => state.checkout);
 
   useEffect(() => {
     if (checkoutStep) {
       setStep(checkoutStep);
-    }
-    else if (
+    } else if (
       selectedMode !== null &&
       checkout?.deliveryModuleOptionCode &&
       checkout?.deliveryAddressId &&
@@ -58,7 +62,6 @@ export default function useStep(checkout) {
       dispatch(setCheckoutStep(3));
     } else if (selectedMode !== null) {
       dispatch(setCheckoutStep(3));
-
     } else {
       setStep(1);
     }
