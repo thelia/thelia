@@ -12,10 +12,10 @@ export default function Invoice({
 }: {
   isVisible: boolean;
   checkout?: CheckoutResponse;
-  page: CheckoutPageType;
+  page?: CheckoutPageType;
 }) {
   const { data: addresses = [] } = useAddressQuery();
-  const { title } = page;
+  const title = page ? page.title : '';
 
   if (!isVisible) return null;
   return (

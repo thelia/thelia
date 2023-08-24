@@ -16,11 +16,11 @@ export default function Delivery({
 }: {
   isVisible: boolean;
   checkout?: CheckoutResponse;
-  page: CheckoutPageType;
+  page?: CheckoutPageType;
 }) {
   const { mode: selectedMode } = useSelector((state: any) => state.checkout);
   const { data: addresses = [] } = useAddressQuery();
-  const { title } = page;
+  const title = page ? page.title : '';
 
   if (!isVisible) return null;
   return (

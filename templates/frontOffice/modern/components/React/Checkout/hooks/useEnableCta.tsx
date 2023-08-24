@@ -1,11 +1,12 @@
+import { Checkout } from '@js/types/checkout.types';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-export default function useEnableCta(currentStep = 1, checkout = {}) {
+export default function useEnableCta(currentStep = 1, checkout: Checkout) {
   const { mode: selectedMode, phoneNumberValid } = useSelector(
-    (state) => state.checkout
+    (state: any) => state.checkout
   );
-  const [enabledCta, setEnabledCta] = useState(1);
+  const [enabledCta, setEnabledCta] = useState(false);
 
   useEffect(() => {
     setEnabledCta(false);
@@ -22,7 +23,7 @@ export default function useEnableCta(currentStep = 1, checkout = {}) {
       case 3:
         if (
           selectedMode !== null &&
-          checkout?.deliveryModuleId &&
+          checkout?.deliveryModule &&
           checkout?.deliveryModuleOptionCode &&
           (checkout?.deliveryAddressId || checkout.pickupAddress) &&
           checkout?.billingAddressId
@@ -34,7 +35,7 @@ export default function useEnableCta(currentStep = 1, checkout = {}) {
         setEnabledCta(false);
         if (
           selectedMode !== null &&
-          checkout?.deliveryModuleId &&
+          checkout?.deliveryModule &&
           checkout?.deliveryModuleOptionCode &&
           (checkout?.deliveryAddressId || checkout.pickupAddress)
         ) {
