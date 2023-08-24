@@ -20,9 +20,9 @@ export default function MiniCartRender() {
   document.addEventListener(
     'click',
     (e) => {
-      if (e.target?.matches('[data-toggle-cart]')) {
+      if ((e.target as HTMLElement)?.matches('[data-toggle-cart]')) {
         store.dispatch(toggleCart());
-      } else if (e.target?.matches('[data-close-cart]')) {
+      } else if ((e.target as HTMLElement)?.matches('[data-close-cart]')) {
         store.dispatch(hideCart());
       }
     },
@@ -31,7 +31,7 @@ export default function MiniCartRender() {
 
   root.render(
     <QueryClientProvider client={queryClient}>
-      <IntlProvider locale={locale} messages={messages[locale]}>
+      <IntlProvider locale={locale} messages={(messages as any)[locale]}>
         <Provider store={store}>
           <MiniCart />
         </Provider>

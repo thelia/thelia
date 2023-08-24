@@ -26,8 +26,17 @@ import Quantity from '../Quantity';
 import useEscape from '@js/utils/useEscape';
 import closeAndFocus from '@js/utils/closeAndFocus';
 import { trapTabKey } from '@js/standalone/trapItemsMenu';
+import { Cart } from '@js/types/common';
 
-function Price({ price, price_promo, isPromo }) {
+function Price({
+  price,
+  price_promo,
+  isPromo
+}: {
+  price: any;
+  price_promo: any;
+  isPromo?: boolean;
+}) {
   return (
     <div className="flex items-center text-lg">
       {isPromo ? (
@@ -46,7 +55,15 @@ function Price({ price, price_promo, isPromo }) {
   );
 }
 
-function Delete({ id, setRemoveItem, visible }) {
+function Delete({
+  id,
+  setRemoveItem,
+  visible
+}: {
+  id: number;
+  setRemoveItem: any;
+  visible: boolean;
+}) {
   const { mutate: deleteItem, status } = useCartItemDelete(id);
 
   useEffect(() => {
@@ -59,7 +76,7 @@ function Delete({ id, setRemoveItem, visible }) {
     <button
       onClick={() => deleteItem()}
       className="focus: outline-gray-600"
-      tabIndex={visible ? '0' : '-1'}
+      tabIndex={visible ? 0 : -1}
     >
       <IconTrash className="h-[17px] w-[12px]" />
     </button>
@@ -79,6 +96,19 @@ export function Item({
   recap,
   images = [],
   visible
+}: {
+  id: number;
+  product: any;
+  productSaleElement: any;
+  price: any;
+  promo: any;
+  promoPrice: any;
+  quantity: number;
+  canDelete: boolean;
+  canChangeQuantity: boolean;
+  recap: boolean;
+  images: any;
+  visible: boolean;
 }) {
   const [removeItem, setRemoveItem] = useState(false);
   const { mutate, status } = useCartItemUpdate(id);
@@ -123,6 +153,7 @@ export function Item({
       ) : (
         <div className="CartItem-img">
           <img
+            //@ts-ignore
             src={window.PLACEHOLDER_IMAGE}
             alt={
               typeof images?.[0]?.i18n?.title === 'string'
@@ -147,11 +178,11 @@ export function Item({
         </div>
       )}
       <div className="CartItem-contain">
-        <div className="flex justify-between item-center">
+        <div className="item-center flex justify-between">
           <a
             href={product.url}
-            className="block mr-4 font-bold"
-            tabIndex={visible ? '0' : '-1'}
+            className="mr-4 block font-bold"
+            tabIndex={visible ? 0 : -1}
           >
             {product.i18n.title}
           </a>
@@ -161,12 +192,12 @@ export function Item({
         </div>
         <div className="text-sm leading-none text-gray-600 ">
           <div>
-            {productSaleElement?.attributes?.map((attribute) => {
+            {productSaleElement?.attributes?.map((attribute: any) => {
               return (
                 <div key={attribute.id}>
                   {attribute?.i18n?.title}:{' '}
                   {attribute?.values
-                    ?.map((value) => value?.i18n?.title || '')
+                    ?.map((value: any) => value?.i18n?.title || '')
                     .join(' - ')}
                 </div>
               );
@@ -203,14 +234,14 @@ export function Item({
 function EmptyCart() {
   const intl = useIntl();
   return (
-    <legend className="text-center Title Title--3">
+    <legend className="Title Title--3 text-center">
       <button
         type="button"
         className="SideBar-close"
         aria-label={intl.formatMessage({ id: 'CLOSE_CART' })}
         data-close-cart
       >
-        <IconCLose className="w-3 h-3 pointer-events-none" />
+        <IconCLose className="pointer-events-none h-3 w-3" />
       </button>
       {intl.formatMessage({ id: 'CART_EMPTY' })}
     </legend>
@@ -224,6 +255,13 @@ export function CartItems({
   recap = false,
   noOverflow = false,
   visible
+}: {
+  cart: Cart;
+  canDelete?: boolean;
+  canChangeQuantity?: boolean;
+  recap?: boolean;
+  noOverflow?: boolean;
+  visible: boolean;
 }) {
   return (
     <div className="CartItems-wrapper">
@@ -247,16 +285,16 @@ export function CartItems({
   );
 }
 
-function FooterItem({ label, value }) {
+function FooterItem({ label, value }: { label: string; value: string }) {
   return (
-    <dl className="flex items-center justify-between text-lg leading-none uppercase">
+    <dl className="flex items-center justify-between text-lg uppercase leading-none">
       <dt>{label}</dt>
       <dd>{value}</dd>
     </dl>
   );
 }
 
-function Total({ label, value }) {
+function Total({ label, value }: { label: string; value: string }) {
   return (
     <dl className="flex flex-col items-baseline justify-between leading-none">
       <dt className="text-sm text-gray-600">{label}</dt>
@@ -265,11 +303,23 @@ function Total({ label, value }) {
   );
 }
 
-export function MiniCartFooter({ delivery, taxes, discount, coupon, total }) {
+export function MiniCartFooter({
+  delivery,
+  taxes,
+  discount,
+  coupon,
+  total
+}: {
+  delivery: any;
+  taxes: number;
+  discount: any;
+  coupon: string;
+  total: number;
+}) {
   const intl = useIntl();
   return (
     <div>
-      <div className="grid py-5 border-t border-b border-opacity-25 gap-y-4 border-main">
+      <div className="grid gap-y-4 border-t border-b border-main border-opacity-25 py-5">
         <AddCoupon />
         <FooterItem
           label={intl.formatMessage({ id: 'TOTAL_UNTAXED' })}
@@ -300,12 +350,18 @@ export function MiniCartFooter({ delivery, taxes, discount, coupon, total }) {
   );
 }
 
-function MiniCart({ visible, redirect }) {
+function MiniCart({
+  visible,
+  redirect
+}: {
+  visible: boolean;
+  redirect: boolean;
+}) {
   const dispatch = useDispatch();
   const ref = useRef(null);
-  const focusRef = useRef(null);
+  const focusRef = useRef<HTMLButtonElement>(null);
   const { data: cart = {} } = useCartQuery();
-  const { data: customer } = useCustomer();
+  const { data: customer } = useCustomer(false);
   const intl = useIntl();
   const [totalQuantityCart, setTotalQuantityCart] = useState(
     cart?.items?.length || 0
@@ -314,7 +370,7 @@ function MiniCart({ visible, redirect }) {
   useLayoutEffect(() => {
     if (cart) {
       let count = 0;
-      cart?.items?.forEach((el) => {
+      cart?.items?.forEach((el: any) => {
         count = count + (el?.quantity || 0);
       });
       setTotalQuantityCart(count);
@@ -331,14 +387,14 @@ function MiniCart({ visible, redirect }) {
   useLockBodyScroll(ref, visible, redirect);
 
   useClickAway(ref, (e) => {
-    if (!e.target?.matches('[data-toggle-cart]') && visible) {
+    if (!(e.target as HTMLElement)?.matches('[data-toggle-cart]') && visible) {
       closeAndFocus(() => dispatch(hideCart()), '[data-toggle-cart]');
     }
   });
 
   useLayoutEffect(() => {
     if (visible) {
-      focusRef.current.focus();
+      (focusRef.current as any)?.focus();
     }
   }, [focusRef, visible]);
 
@@ -346,7 +402,7 @@ function MiniCart({ visible, redirect }) {
     closeAndFocus(() => dispatch(hideCart()), '[data-toggle-cart]')
   );
 
-  ref?.current?.addEventListener('keydown', (e) => {
+  (ref?.current as any)?.addEventListener('keydown', (e: Event) => {
     if (!visible) return;
 
     trapTabKey(ref.current, e);
@@ -363,9 +419,9 @@ function MiniCart({ visible, redirect }) {
         onClick={() =>
           closeAndFocus(() => dispatch(hideCart()), '[data-toggle-cart]')
         }
-        tabIndex={visible ? '0' : '-1'}
+        tabIndex={visible ? 0 : -1}
       >
-        <IconCLose className="w-3 h-3 pointer-events-none" />
+        <IconCLose className="pointer-events-none h-3 w-3" />
       </button>
       {!cart.items || cart.items.length === 0 ? (
         <EmptyCart />
@@ -400,7 +456,7 @@ function MiniCart({ visible, redirect }) {
                   );
                 }
               }}
-              tabIndex={visible ? '0' : '-1'}
+              tabIndex={visible ? 0 : -1}
             >
               {intl.formatMessage({ id: 'SUBMIT_CART' })}
             </a>
@@ -414,7 +470,7 @@ function MiniCart({ visible, redirect }) {
 
 export default function MiniCartWrapper() {
   const { cart: visible, redirectionToCheckout: redirect } = useSelector(
-    (state) => state.visibility
+    (state: any) => state.visibility
   );
 
   return (
