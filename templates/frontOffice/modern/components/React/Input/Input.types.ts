@@ -7,7 +7,7 @@ export type InputProps = {
   error?: any;
   labelClassname?: string;
   className?: string;
-  transformValue: (
+  transformValue?: (
     value: InputHTMLAttributes<HTMLInputElement>['value']
   ) => string | InputHTMLAttributes<HTMLInputElement>['value'];
   placeholder?: string;

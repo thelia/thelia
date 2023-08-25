@@ -21,8 +21,9 @@ import { useClickAway } from 'react-use';
 import useEscape from '@js/utils/useEscape';
 import closeAndFocus from '@js/utils/closeAndFocus';
 import { trapTabKey } from '@js/standalone/trapItemsMenu';
+import { LoginFormProps } from './MiniLogin.types';
 
-function LoginForm({ setLoginHandler, redirectionToCheckout }) {
+function LoginForm({ setLoginHandler, redirectionToCheckout }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const {
@@ -37,14 +38,14 @@ function LoginForm({ setLoginHandler, redirectionToCheckout }) {
       className="border-b border-gray-300 pb-[52px]"
       onSubmit={async (e) => {
         e.preventDefault();
-        await login({ email, password });
+        await login({ email, password, rememberMe: true });
         setLoginHandler(true);
       }}
     >
-      <legend className="mb-6 Title Title--3">
+      <legend className="Title Title--3 mb-6">
         {intl.formatMessage({ id: 'ALREADY_CUSTOMER' })}
       </legend>
-      <div className="grid grid-cols-1 gap-6 mb-6">
+      <div className="mb-6 grid grid-cols-1 gap-6">
         <Input
           type="email"
           name="email"
@@ -69,10 +70,10 @@ function LoginForm({ setLoginHandler, redirectionToCheckout }) {
       {error ? (
         <Alert
           type="error"
-          message={error?.response?.data?.description || 'Erreur'}
+          message={(error as any)?.response?.data?.description || 'Erreur'}
         />
       ) : null}
-      <div className="flex flex-wrap items-center justify-between gap-4 mt-6">
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
         <button
           type="submit"
           className="Button"
@@ -83,7 +84,7 @@ function LoginForm({ setLoginHandler, redirectionToCheckout }) {
             : intl.formatMessage({ id: 'LOGIN' })}
         </button>
 
-        <a href="/password" disabled={isLoading} className="underline">
+        <a href="/password" className="underline">
           {intl.formatMessage({ id: 'FORGET_PASSWORD' })}{' '}
         </a>
       </div>
@@ -91,7 +92,10 @@ function LoginForm({ setLoginHandler, redirectionToCheckout }) {
   );
 }
 
-function IsLoggedOut({ setLoginHandler, redirectionToCheckout }) {
+function IsLoggedOut({
+  setLoginHandler,
+  redirectionToCheckout
+}: LoginFormProps) {
   const intl = useIntl();
 
   return (
@@ -101,10 +105,10 @@ function IsLoggedOut({ setLoginHandler, redirectionToCheckout }) {
         redirectionToCheckout={redirectionToCheckout}
       />
       <fieldset className="pt-12">
-        <span className="block mb-5 Title Title--3">
+        <span className="Title Title--3 mb-5 block">
           {intl.formatMessage({ id: 'NEW_CUSTOMER' })}
         </span>
-        <a href="/register" className="inline-block mb-20 Button">
+        <a href="/register" className="Button mb-20 inline-block">
           {intl.formatMessage({ id: 'CREATE_ACCOUNT' })}
         </a>
       </fieldset>
@@ -112,33 +116,36 @@ function IsLoggedOut({ setLoginHandler, redirectionToCheckout }) {
   );
 }
 
-export function MiniLogin({ isLogged }) {
+export function MiniLogin({ isLogged }: { isLogged: boolean }) {
   const dispatch = useDispatch();
   const { login: visible, redirectionToCheckout } = useSelector(
-    (state) => state.visibility
+    (state: any) => state.visibility
   );
   const [loginHandler, setLoginHandler] = useState(isLogged);
   const { data: customer, isLoading } = useCustomer(loginHandler);
-  const ref = useRef(null);
-  const focusRef = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
+  const focusRef = useRef<HTMLButtonElement | null>(null);
 
   useLayoutEffect(() => {
-    if (visible) {
+    if (visible && focusRef.current) {
       focusRef.current.focus();
     }
   }, [focusRef, visible]);
 
   useEffect(() => {
     if (visible && redirectionToCheckout && customer) {
-      window.location = `${window.location.origin}/order/delivery`;
+      (window as any).location = `${window.location.origin}/order/delivery`;
     }
   }, [visible, redirectionToCheckout, customer]);
 
   useLockBodyScroll(ref, visible, redirectionToCheckout);
 
   useClickAway(ref, (e) => {
-    if (!e.target?.matches('[data-toggle-login]') && visible) {
-      closeAndFocus(() => dispatch(hideLogin()), '[data-toggle-login]');
+    if (!(e.target as HTMLElement)?.matches('[data-toggle-login]') && visible) {
+      closeAndFocus(
+        () => dispatch(hideLogin({ redirectionToCheckout: false })),
+        '[data-toggle-login]'
+      );
     }
   });
 
@@ -147,7 +154,10 @@ export function MiniLogin({ isLogged }) {
   }, [focusRef]);
 
   useEscape(ref, () =>
-    closeAndFocus(() => dispatch(hideLogin()), '[data-toggle-login]')
+    closeAndFocus(
+      () => dispatch(hideLogin({ redirectionToCheckout: false })),
+      '[data-toggle-login]'
+    )
   );
 
   ref?.current?.addEventListener('keydown', (e) => {
@@ -159,13 +169,16 @@ export function MiniLogin({ isLogged }) {
       <button
         ref={focusRef}
         onClick={() =>
-          closeAndFocus(() => dispatch(hideLogin()), '[data-toggle-login]')
+          closeAndFocus(
+            () => dispatch(hideLogin({ redirectionToCheckout: false })),
+            '[data-toggle-login]'
+          )
         }
         type="button"
         className="SideBar-close"
         aria-label="Fermer le formulair de connexion"
       >
-        <IconCLose className="w-3 h-3 pointer-events-none" />
+        <IconCLose className="pointer-events-none h-3 w-3" />
       </button>
       {isLoading ? (
         <Loader />
@@ -183,15 +196,16 @@ export function MiniLogin({ isLogged }) {
 
 export default function MiniLoginRender() {
   const isLogged =
-    document.querySelector('.MiniLogin-root').dataset.login || false;
+    (document.querySelector('.MiniLogin-root') as HTMLElement)?.dataset
+      ?.login === 'true' || false;
 
   document.addEventListener(
     'click',
     (e) => {
-      if (e.target?.matches('[data-toggle-login]')) {
+      if ((e.target as HTMLElement)?.matches('[data-toggle-login]')) {
         e.preventDefault();
         store.dispatch(toggleLogin());
-      } else if (e.target?.matches('[data-close-login]')) {
+      } else if ((e.target as HTMLElement)?.matches('[data-close-login]')) {
         e.preventDefault();
         store.dispatch(hideLogin({ redirectionToCheckout: false }));
       }
@@ -207,7 +221,7 @@ export default function MiniLoginRender() {
 
   root.render(
     <QueryClientProvider client={queryClient}>
-      <IntlProvider locale={locale} messages={messages[locale]}>
+      <IntlProvider locale={locale} messages={(messages as any)[locale]}>
         <Provider store={store}>
           <MiniLogin isLogged={isLogged} />
         </Provider>
