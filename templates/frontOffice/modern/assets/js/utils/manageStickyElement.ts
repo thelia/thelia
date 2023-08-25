@@ -1,16 +1,18 @@
 const VW_TO_DISABLE = 769;
 const INTERSECTION_RATIO_LIMIT = 1;
 
-const createIntersectionObserver = (classToToggle, callback) =>
+const createIntersectionObserver = (classToToggle: any, callback: any) =>
   new IntersectionObserver(
     ([e]) => {
       if (
         window.innerWidth < VW_TO_DISABLE ||
-        (e.boundingClientRect.width === 0 && e.boundingClientRect.height === 0)
+        (e?.boundingClientRect.width === 0 &&
+          e?.boundingClientRect.height === 0)
       )
         return;
 
       const IS_STUCK =
+        e &&
         e.intersectionRatio < INTERSECTION_RATIO_LIMIT &&
         e.boundingClientRect.y <= 0;
 
@@ -23,7 +25,11 @@ const createIntersectionObserver = (classToToggle, callback) =>
     { threshold: [1] }
   );
 
-const observeStickyElement = (element, classToToggle, callback) => {
+const observeStickyElement = (
+  element: Element,
+  classToToggle: any,
+  callback: any
+) => {
   const observer = createIntersectionObserver(classToToggle, callback);
 
   observer.observe(element);

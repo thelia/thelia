@@ -1,9 +1,9 @@
 import getLocale from '@utils/getLocale';
-let fn = null;
+let fn: Intl.NumberFormat | null = null;
 
-export default function priceFormat(price, options = {}) {
+export default function priceFormat(price: any, options: any = {}) {
   const locale = options.locale || getLocale();
-  const currency = options.currency || global.DEFAULT_CURRENCY_CODE;
+  const currency = options.currency || (global as any).DEFAULT_CURRENCY_CODE;
   if (typeof price !== 'number' || !locale || !currency) return '0 €';
 
   if (isNaN(price)) return '0 €';
@@ -15,5 +15,5 @@ export default function priceFormat(price, options = {}) {
     });
   }
 
-  return fn.format(price);
+  return fn.format(price) as any;
 }

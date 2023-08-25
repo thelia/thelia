@@ -21,7 +21,8 @@
       "@images/*": ["./assets/images/*"],
       "@icons/*": ["./assets/svg-icons/*"],
       "@fonts/*": ["./assets/fonts/*"],
-      "@favicons/*": ["./assets/favicons/*"]
+      "@favicons/*": ["./assets/favicons/*"],
+      "@standalone/*": ["./assets/js/standalone/*"]
     }, // A series of entries which re-map imports to lookup locations relative to the baseUrl
 
     // Source Map
@@ -40,6 +41,11 @@
     "allowJs": true,
     "noUnusedLocals": false
   },
-  "include": ["./**/*.ts", "./components/**/*.tsx", "./components/**/*.ts"],
+  "include": [
+    "./**/*.ts",
+    "./components/**/*.tsx",
+    "./components/**/*.ts",
+    "assets/js/utils/zoom.js"
+  ],
   "exclude": ["node_modules/**/*", "dist"]
 }

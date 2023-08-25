@@ -1,6 +1,6 @@
 export default function closeAndFocus(
   dispatchAction = () => {},
-  focusSelector
+  focusSelector: any
 ) {
   dispatchAction();
   const refocus = Array.from(document.querySelectorAll(focusSelector));

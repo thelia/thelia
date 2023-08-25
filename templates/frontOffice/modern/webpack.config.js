@@ -75,7 +75,7 @@ Encore.configureBabel((config) => {
 Encore.addPlugin(new ESLintPlugin());
 
 // ENTRIES
-Encore.addEntry('app', './assets/js/app.js')
+Encore.addEntry('app', './assets/js/app')
   .addEntry('home', './assets/js/routes/home')
   .addEntry('category', './assets/js/routes/category')
   .addEntry('product', './assets/js/routes/product')

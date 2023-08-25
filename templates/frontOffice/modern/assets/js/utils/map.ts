@@ -1,12 +1,12 @@
-export function rad2degr(rad) {
+export function rad2degr(rad: number) {
   return (rad * 180) / Math.PI;
 }
 
-export function degr2rad(degr) {
+export function degr2rad(degr: number) {
   return (degr * Math.PI) / 180;
 }
 
-export function getLatLngCenter(points) {
+export function getLatLngCenter(points: { longitude: any; latitude: any }[]) {
   if (points.length <= 0)
     return {
       latitude: 0,

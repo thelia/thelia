@@ -14,7 +14,7 @@ import SearchDropdown from '@components/smarty/SearchDropdown/SearchDropdown';
 import SvgAjax from '@utils/SvgAjax';
 import axios from 'axios';
 
-window.apiUtils = apiUtils;
+(window as any).apiUtils = apiUtils;
 
 function main() {
   axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
