@@ -21,7 +21,7 @@ export default function CreateAddressModal({ className = '' }) {
     }
   }, [isSuccess]);
 
-  const submitForm = async (values) => {
+  const submitForm = async (values: any) => {
     try {
       await create(values);
     } catch (error) {
@@ -38,7 +38,7 @@ export default function CreateAddressModal({ className = '' }) {
           setIsCreatingAddress(true);
         }}
       >
-        <span className="flex items-center justify-center w-6 h-6 mr-3 text-white bg-black rounded-full">
+        <span className="mr-3 flex h-6 w-6 items-center justify-center rounded-full bg-black text-white">
           <IconPlus className="h-[9px] w-[9px]" />
         </span>
 
@@ -61,8 +61,8 @@ export default function CreateAddressModal({ className = '' }) {
         bodyOpenClassName={null}
       >
         <div className="relative">
-          <Title title="CREATE_ADDRESS" className="pr-5 mb-8 Title--3" />
-          <div className="block w-full mx-auto">
+          <Title title="CREATE_ADDRESS" className="Title--3 mb-8 pr-5" />
+          <div className="mx-auto block w-full">
             <button
               type="button"
               className="Modal-close"

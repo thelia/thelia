@@ -1782,6 +1782,13 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-modal@^3.16.0":
+  version "3.16.0"
+  resolved "https://registry.npmjs.org/@types/react-modal/-/react-modal-3.16.0.tgz"
+  integrity sha512-iphdqXAyUfByLbxJn5j6d+yh93dbMgshqGP0IuBeaKbZXx0aO+OXsvEkt6QctRdxjeM9/bR+Gp3h9F9djVWTQQ==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react@*", "@types/react@16 || 17 || 18":
   version "18.0.21"
   resolved "https://registry.npmjs.org/@types/react/-/react-18.0.21.tgz"

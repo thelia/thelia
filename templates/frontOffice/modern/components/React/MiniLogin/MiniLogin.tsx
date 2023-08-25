@@ -21,7 +21,7 @@ import { useClickAway } from 'react-use';
 import useEscape from '@js/utils/useEscape';
 import closeAndFocus from '@js/utils/closeAndFocus';
 import { trapTabKey } from '@js/standalone/trapItemsMenu';
-import { LoginFormProps } from './MiniLogin.types';
+import { LoginFormProps, MiniLoginProps } from './MiniLogin.types';
 
 function LoginForm({ setLoginHandler, redirectionToCheckout }: LoginFormProps) {
   const [email, setEmail] = useState('');
@@ -116,7 +116,7 @@ function IsLoggedOut({
   );
 }
 
-export function MiniLogin({ isLogged }: { isLogged: boolean }) {
+export function MiniLogin({ isLogged }: MiniLoginProps) {
   const dispatch = useDispatch();
   const { login: visible, redirectionToCheckout } = useSelector(
     (state: any) => state.visibility

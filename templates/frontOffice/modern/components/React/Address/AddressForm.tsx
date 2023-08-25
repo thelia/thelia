@@ -4,27 +4,55 @@ import React from 'react';
 import Select from '../Select';
 import { useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
-import { isUndefined } from 'lodash-es';
 
-export default function AddressForm({ address = {}, onSubmit = () => {} }) {
+import { CheckoutAddress } from '../Checkout/type';
+import { CivilityTitle } from '@js/types/common';
+
+type CustomerTITLE = { label: string; value: number; isDefault: boolean };
+type CustomerTITLES = CustomerTITLE[];
+
+type COUNTRY = {
+  id: string;
+  title: string;
+  isDefault: boolean;
+};
+
+type CUSTOMER_COUNTRY = {
+  value: string;
+  label: string;
+  isDefault: boolean;
+}[];
+
+interface AddressFormProps {
+  address?: CheckoutAddress;
+  onSubmit: (data: any) => void;
+}
+
+export default function AddressForm({
+  address,
+  onSubmit = async (data = null) => {}
+}: AddressFormProps) {
   const intl = useIntl();
   const { register, handleSubmit, formState, setError } = useForm();
 
-  const titles = (window.CUSTOMER_TITLES || [])
-    .map((t) => {
+  const titles: CustomerTITLES = ((window as any).CUSTOMER_TITLES || [])
+    .map((t: CivilityTitle) => {
       return {
         label: t.short,
         value: t.id,
         isDefault: !!t.isDefault
       };
     })
-    .sort((a, b) => b.isDefault - a.isDefault);
+    .sort(
+      (a: CustomerTITLE, b: CustomerTITLE) =>
+        (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0)
+    );
 
-  const countries = (window.COUNTRIES || []).map((c) => {
+  const countries = ((window as any).COUNTRIES || []).map((c: COUNTRY) => {
     return {
       label: c.title,
       value: c.id,
-      isDefault: c.id === window.DEFAULT_COUNTRY
+      isDefault: c.isDefault
     };
   });
 
@@ -41,11 +69,16 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
             for (const [key, val] of Object.entries(
               error?.response?.data?.schemaViolations
             )) {
-              setError(key, {
-                type: 'manual',
-                message: val.message,
-                shouldFocus: true
-              });
+              setError(
+                key as keyof CheckoutAddress,
+                {
+                  type: 'manual',
+                  message: (val as any).message
+                },
+                {
+                  shouldFocus: true
+                }
+              );
             }
           }
         }
@@ -57,7 +90,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
       <div className="md:w-1/2">
         <Input
           label={intl.formatMessage({ id: 'LABEL_LABEL' })}
-          defaultValue={address.label}
+          defaultValue={address?.label}
           required={true}
           {...register('label', {
             required: intl.formatMessage({ id: 'MANDATORY' })
@@ -69,25 +102,28 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
       <div className="w-1/2 lg:w-1/3">
         <Select
           label={intl.formatMessage({ id: 'CIVILITY_TITLE_LABEL' })}
-          defaultValue={
-            isUndefined(address.title)
-              ? titles.find((t) => t.isDefault).value
-              : address.title
-          }
+          defaultValue={(
+            address?.civilityTitle?.id ?? titles.find((t) => t.isDefault)!.value
+          ).toString()}
           required={true}
-          options={titles}
           {...register('civilityTitle.id', {
             required: intl.formatMessage({ id: 'MANDATORY' })
           })}
-          error={formState.errors?.title?.message}
-        />
+          error={formState.errors?.title?.message as string}
+        >
+          {titles.map(({ label, value }) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </Select>
       </div>
 
       <div className="flex gap-3">
         <div className="w-1/2">
           <Input
             label={intl.formatMessage({ id: 'FIRSTNAME_LABEL' })}
-            defaultValue={address.firstName}
+            defaultValue={address?.firstName}
             required={true}
             {...register('firstName', {
               required: intl.formatMessage({ id: 'MANDATORY' })
@@ -98,7 +134,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
         <div className="w-1/2">
           <Input
             label={intl.formatMessage({ id: 'LASTNAME_LABEL' })}
-            defaultValue={address.lastName}
+            defaultValue={address?.lastName}
             required={true}
             {...register('lastName', {
               required: intl.formatMessage({ id: 'MANDATORY' })
@@ -110,7 +146,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
 
       <Input
         label={intl.formatMessage({ id: 'COMPANY_LABEL' })}
-        defaultValue={address.company}
+        defaultValue={address?.company}
         {...register('company')}
         error={formState.errors?.company?.message}
       />
@@ -118,7 +154,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
       <Input
         label={intl.formatMessage({ id: 'ADDRESS_1_LABEL' })}
         required={true}
-        defaultValue={address.address1}
+        defaultValue={address?.address1}
         {...register('address1', {
           required: intl.formatMessage({ id: 'MANDATORY' })
         })}
@@ -126,7 +162,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
       />
       <Input
         label={intl.formatMessage({ id: 'ADDRESS_2_LABEL' })}
-        defaultValue={address.address2}
+        defaultValue={address?.address2}
         {...register('address2')}
         error={formState.errors?.address2?.message}
       />
@@ -136,7 +172,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
           <Input
             label={intl.formatMessage({ id: 'CITY_LABEL' })}
             required={true}
-            defaultValue={address.city}
+            defaultValue={address?.city}
             {...register('city', {
               required: intl.formatMessage({ id: 'MANDATORY' })
             })}
@@ -148,7 +184,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
           <Input
             label={intl.formatMessage({ id: 'ZIPCODE_LABEL' })}
             required={true}
-            defaultValue={address.zipCode}
+            defaultValue={address?.zipCode}
             {...register('zipCode', {
               required: intl.formatMessage({ id: 'MANDATORY' })
             })}
@@ -159,17 +195,22 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
 
       <div className="w-1/2">
         <Select
-          label={intl.formatMessage({ id: 'COUNTRY_LABEL' })}
+          defaultValue={(
+            address?.civilityTitle?.id ?? titles.find((t) => t.isDefault)!.value
+          ).toString()}
+          id={'address_civility_title'}
+          label={intl.formatMessage({ id: 'CIVILITY_TITLE_LABEL' })}
           required={true}
-          options={countries}
-          defaultValue={
-            isUndefined(address.countryCode)
-              ? countries.find((c) => c.isDefault).value
-              : address.countryCode
-          }
-          {...register('countryCode', { required: 'Mandatory' })}
-          error={formState.errors?.countryCode?.message}
-        />
+          {...register('civilityTitle.id', {
+            required: intl.formatMessage({ id: 'MANDATORY' })
+          })}
+        >
+          {titles.map(({ label, value }) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </Select>
       </div>
 
       <div className="flex gap-3">
@@ -177,7 +218,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
           <Input
             label={intl.formatMessage({ id: 'CELLPHONE_LABEL' })}
             required={true}
-            defaultValue={address.cellphone}
+            defaultValue={address?.cellphone}
             {...register('cellphone', {
               required: intl.formatMessage({ id: 'MANDATORY' })
             })}
@@ -187,7 +228,7 @@ export default function AddressForm({ address = {}, onSubmit = () => {} }) {
         <div className="w-1/2">
           <Input
             label={intl.formatMessage({ id: 'PHONE_LABEL' })}
-            defaultValue={address.phone}
+            defaultValue={address?.phone}
             {...register('phone')}
             error={formState.errors?.phone?.message}
           />

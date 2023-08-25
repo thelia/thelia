@@ -1,11 +1,11 @@
 import { SelectHTMLAttributes } from 'react';
 
 export type SelectProps = {
-  name: string;
-  options: { value: string; label: string; className?: string }[];
+  name?: string;
+  options?: { value: string; label: string; className?: string }[];
   label?: string;
   error?: string;
-  placeholder: string;
+  placeholder?: string;
   defaultValue?: string | string[] | undefined;
   required?: boolean;
   disabled?: boolean;

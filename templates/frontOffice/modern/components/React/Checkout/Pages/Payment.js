@@ -16,8 +16,8 @@ export default function Payment({ isVisible, checkout, page }) {
   if (!isVisible) return null;
 
   return (
-    <div className="col-span-2 Checkout-page">
-      <Title title={`${title}`} className="mb-8 Title--2" />
+    <div className="Checkout-page col-span-2">
+      <Title title={`${title}`} className="Title--2 mb-8" />
       <Suspense fallback={<Loader />}>
         <PaymentModules />
       </Suspense>
@@ -27,7 +27,7 @@ export default function Payment({ isVisible, checkout, page }) {
           <PhoneCheck addressId={checkout?.deliveryAddressId} />
         )}
       {checkout?.paymentModuleId && phoneCheck && (
-        <label className="mt-8 Checkbox">
+        <label className="Checkbox mt-8">
           <input
             type="checkbox"
             id="validTerms"

@@ -7,8 +7,9 @@ import { useAddressUpdate } from '@openstudio/thelia-api-utils';
 import { useIntl } from 'react-intl';
 import { useLockBodyScroll } from 'react-use';
 import Title from '../Title';
+import { Address } from '../Checkout/type';
 
-export default function EditAddress({ address = {} }) {
+export default function EditAddress({ address }: { address: Address }) {
   const intl = useIntl();
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   useLockBodyScroll(isEditingAddress);
@@ -20,7 +21,7 @@ export default function EditAddress({ address = {} }) {
     }
   }, [isSuccess]);
 
-  const submitForm = async (values) => {
+  const submitForm = async (values: any) => {
     await update({
       id: address.id,
       data: values
@@ -58,12 +59,9 @@ export default function EditAddress({ address = {} }) {
             >
               <IconCLose />
             </button>
-            <div className="block w-full mx-auto">
-              <Title title="EDIT_AN_ADDRESS" className="pr-5 mb-8 Title--3" />
-              <AddressForm
-                address={address}
-                onSubmit={submitForm}
-              />
+            <div className="mx-auto block w-full">
+              <Title title="EDIT_AN_ADDRESS" className="Title--3 mb-8 pr-5" />
+              <AddressForm address={address} onSubmit={submitForm} />
             </div>
           </div>
         </Modal>
