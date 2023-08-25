@@ -14,8 +14,8 @@ import {
 } from '@openstudio/thelia-api-utils';
 import Title from '../Title';
 
-function getModuleValidOptions(module) {
-  return module?.options?.filter((o) => o.valid) || [];
+function getModuleValidOptions(module: any) {
+  return module?.options?.filter((o: any) => o.valid) || [];
 }
 
 function ModuleOption({
@@ -23,8 +23,8 @@ function ModuleOption({
   option = {},
   isSelected
 }: {
-  module: {};
-  option: {};
+  module: any;
+  option: any;
   isSelected: boolean;
 }) {
   const intl = useIntl();
@@ -47,7 +47,7 @@ function ModuleOption({
               pickupAddress: null
             });
           } else {
-            queryClient.setQueryData('checkout', (oldData) => {
+            queryClient.setQueryData('checkout', (oldData: any) => {
               return {
                 ...oldData,
                 deliveryModuleId: module.id,
@@ -76,12 +76,9 @@ function ModuleOption({
 export default function DeliveryModules() {
   const intl = useIntl();
 
-  const selectedMode = useSelector((state) => state.checkout.mode);
+  const selectedMode = useSelector((state: any) => state.checkout.mode);
   const { data: checkout } = useGetCheckout();
-  const { data: modules, isLoading } = useValidDeliveryModules(
-    selectedMode,
-    checkout?.deliveryAddressId
-  );
+  const { data: modules, isLoading } = useValidDeliveryModules(selectedMode);
 
   return (
     <>
@@ -101,8 +98,8 @@ export default function DeliveryModules() {
             className="Title--3 mb-5 text-2xl"
             title="CHOOSE_DELIVERY_PROVIDER"
           />
-          {modules.map((module) =>
-            getModuleValidOptions(module).map((option) => (
+          {modules.map((module: any) =>
+            getModuleValidOptions(module).map((option: any) => (
               <ModuleOption
                 key={module.code}
                 module={module}

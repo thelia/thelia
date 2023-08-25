@@ -7,6 +7,7 @@ import { CHECKOUT_STEP } from './constants';
 import { useFinalCheckout } from '@openstudio/thelia-api-utils';
 import Loader from '../Loader';
 import { CheckoutRequest } from './type';
+import { Checkout } from '@js/types/checkout.types';
 
 export function CheckoutFooter({
   step,
