@@ -15,8 +15,8 @@ function improveAccesibilityOfSkipContent() {
   if (!skipToContent || !content) return;
 
   skipToContent.addEventListener('click', () => {
-    content.tabIndex = '1';
+    content.tabIndex = 1;
   });
 
-  content.addEventListener('focusout', () => (content.tabIndex = '-1'));
+  content.addEventListener('focusout', () => (content.tabIndex = -1));
 }
