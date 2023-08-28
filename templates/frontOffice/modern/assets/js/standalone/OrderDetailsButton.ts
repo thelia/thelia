@@ -3,17 +3,18 @@ export default function OrderDetailsButton() {
 
   if (!orderDetails) return null;
 
-  orderDetails.forEach(el => {
+  orderDetails.forEach((el) => {
     el.addEventListener('click', (e) => {
       const arrow = el.querySelector('summary > div');
 
       if (el.hasAttribute('open')) {
-        arrow.classList.remove('rotate-90');
-        arrow.classList.add('-rotate-90');
+        arrow?.classList.remove('rotate-90');
+        arrow?.classList.add('-rotate-90');
       } else {
-        arrow.classList.remove('-rotate-90');
-        arrow.classList.add('rotate-90');
+        arrow?.classList.remove('-rotate-90');
+        arrow?.classList.add('rotate-90');
       }
-    })
-  })
+    });
+  });
+  return null;
 }

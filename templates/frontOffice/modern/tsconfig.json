@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["ESNext", "dom"],
+    "lib": ["ESNext", "dom", "dom.iterable"],
     "jsx": "react-jsx",
     "removeComments": true,
     "target": "ES2022",

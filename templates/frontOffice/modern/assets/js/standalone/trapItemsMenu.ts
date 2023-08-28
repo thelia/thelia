@@ -11,18 +11,18 @@ export default function trapItemsMenu() {
       if (oldActivated && oldActivated !== category.parentElement) {
         oldActivated.classList.remove('active');
       }
-      category.parentElement.classList.toggle('active');
+      category.parentElement?.classList.toggle('active');
     });
 
-    const sub = category.parentElement.querySelector('.Menu-sub1');
+    const sub = category.parentElement?.querySelector('.Menu-sub1');
 
-    sub.addEventListener('keydown', (e) => {
-      trapTabKey(sub, e);
-      trapEscape(category, e);
+    sub?.addEventListener('keydown', (e) => {
+      trapTabKey(sub as HTMLElement, e as KeyboardEvent);
+      trapEscape(category as HTMLElement, e as KeyboardEvent);
     });
   });
 }
-export function trapTabKey(container, event) {
+export function trapTabKey(container: HTMLElement, event: KeyboardEvent) {
   const { shiftKey, keyCode } = event;
 
   if (keyCode !== 9) return;
@@ -37,30 +37,30 @@ export function trapTabKey(container, event) {
   const numberOfFocusableItems = focusableItems.length;
 
   // get the index of the currently focused item
-  const focusedItemIndex = focusableItems.indexOf(focusedItem);
+  const focusedItemIndex = focusableItems.indexOf(focusedItem as HTMLElement);
 
   if (shiftKey) {
     //back tab
     // if focused on first item and user preses back-tab, go to the last focusable item
     if (focusedItemIndex !== 0) return;
 
-    focusableItems[numberOfFocusableItems - 1]?.focus();
+    (focusableItems[numberOfFocusableItems - 1] as HTMLElement)?.focus();
     event.preventDefault();
   } else {
     //forward tab
     // if focused on the last item and user preses tab, go to the first focusable item
     if (focusedItemIndex !== numberOfFocusableItems - 1) return;
 
-    focusableItems[0]?.focus();
+    (focusableItems[0] as HTMLElement)?.focus();
     event.preventDefault();
   }
 }
 
-export function trapEscape(container, event) {
+export function trapEscape(container: HTMLElement, event: KeyboardEvent) {
   event.stopPropagation();
 
   if (event.keyCode !== 27) return;
 
-  container.parentElement.classList.remove('active');
+  container.parentElement?.classList.remove('active');
   container.focus();
 }
