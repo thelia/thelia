@@ -161,7 +161,7 @@ export function MiniLogin({ isLogged }: MiniLoginProps) {
   );
 
   ref?.current?.addEventListener('keydown', (e) => {
-    trapTabKey(ref.current, e);
+    trapTabKey(ref.current as HTMLElement, e);
   });
 
   return (

@@ -358,7 +358,7 @@ function MiniCart({
   redirect: boolean;
 }) {
   const dispatch = useDispatch();
-  const ref = useRef(null);
+  const ref = useRef<HTMLElement>(null);
   const focusRef = useRef<HTMLButtonElement>(null);
   const { data: cart = {} } = useCartQuery();
   const { data: customer } = useCustomer(false);
@@ -402,14 +402,14 @@ function MiniCart({
     closeAndFocus(() => dispatch(hideCart()), '[data-toggle-cart]')
   );
 
-  (ref?.current as any)?.addEventListener('keydown', (e: Event) => {
+  (ref?.current as any)?.addEventListener('keydown', (e: KeyboardEvent) => {
     if (!visible) return;
 
-    trapTabKey(ref.current, e);
+    trapTabKey(ref.current as HTMLElement, e);
   });
 
   return (
-    <div ref={ref} className="grid grid-cols-1 gap-8">
+    <div ref={ref as any} className="grid grid-cols-1 gap-8">
       <button
         ref={focusRef}
         type="button"
