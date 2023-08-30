@@ -62,6 +62,19 @@
         "symfony/mailer": "6.4.*",
         "symfony/webpack-encore-bundle": "^1.14",
         "composer/composer": "~2.7.0",
+        "api-platform/core": "^3.0",
+        "nelmio/cors-bundle": "^2.2",
+        "symfony/asset": "6.0.*|6.3.*",
+        "doctrine/doctrine-bundle": "^2.6",
+        "doctrine/doctrine-migrations-bundle": "^3.2",
+        "doctrine/orm": "^2.11",
+        "symfony/proxy-manager-bridge": "6.0.*|6.3.*",
+        "symfony/security-bundle": "6.0.*|6.3.*",
+        "phpdocumentor/reflection-docblock": "^5.3",
+        "phpstan/phpdoc-parser": "^1.4",
+        "symfony/property-info": "6.0.*|6.3.*",
+        "symfony/runtime": "6.0.*|6.3.*",
+        "lexik/jwt-authentication-bundle": "^2.16"
         "doctrine/annotations": "^2.0"
     },
     "require-dev": {
