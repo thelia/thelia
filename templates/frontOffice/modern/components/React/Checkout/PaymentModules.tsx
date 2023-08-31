@@ -5,6 +5,7 @@ import Loader from '../Loader';
 import { useIntl } from 'react-intl';
 import useValidPaymentModules from './hooks/useValidPaymentModules';
 import { useGetCheckout, useSetCheckout } from '@openstudio/thelia-api-utils';
+import { DeliveryModule, PaymentModule } from '@js/types/common';
 
 export default function PaymentModules() {
   const intl = useIntl();
@@ -26,7 +27,7 @@ export default function PaymentModules() {
         />
       ) : (
         <div className="flex-start item-start mt-8 flex flex-col gap-3">
-          {modules.map((module: any, index: number) => {
+          {modules.map((module: DeliveryModule, index: number) => {
             const isSelected = module.id === checkout?.paymentModuleId;
             return (
               <label
@@ -51,9 +52,9 @@ export default function PaymentModules() {
                     isSelected ? 'text-main' : ''
                   }`}
                 >
-                  {module.title || module?.i18n?.title}{' '}
+                  {module?.i18n?.title}{' '}
                   <span className="block text-xs text-gray-600">
-                    {module.chapo || module?.i18n?.chapo}
+                    {module?.i18n?.chapo}
                   </span>
                 </span>
               </label>

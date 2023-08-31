@@ -8,6 +8,8 @@ import { useAddressCreate } from '@openstudio/thelia-api-utils';
 import { useLockBodyScroll } from 'react-use';
 import { ReactComponent as IconPlus } from '@icons/plus.svg';
 import Title from '../Title';
+import { MutateOptions } from 'react-query';
+import { FieldValues } from 'react-hook-form';
 
 export default function CreateAddressModal({ className = '' }) {
   const [showModal] = useState(false);
@@ -21,7 +23,10 @@ export default function CreateAddressModal({ className = '' }) {
     }
   }, [isSuccess]);
 
-  const submitForm = async (values: any) => {
+  const submitForm = async (values: {
+    variables: FieldValues;
+    options?: MutateOptions<any, unknown, any, unknown> | undefined;
+  }) => {
     try {
       await create(values);
     } catch (error) {

@@ -24,7 +24,7 @@ export type PickupMapProps = {
     city: string;
     radius: number;
   };
-  defaultAddressId: number;
+  defaultAddressId?: number;
 };
 
 export type ZipCodeSearcherProps = {

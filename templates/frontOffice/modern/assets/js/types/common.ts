@@ -44,7 +44,7 @@ export interface LibraryImage {
     title: string | null;
     fileName: string | null;
     url: string;
-    tags: any[];
+    tags: string[];
     currentLocale: string;
   };
   itemType: string;

@@ -13,18 +13,19 @@ import {
   useSetCheckout
 } from '@openstudio/thelia-api-utils';
 import Title from '../Title';
+import { DeliveryModule, Option } from '@js/types/common';
 
-function getModuleValidOptions(module: any) {
-  return module?.options?.filter((o: any) => o.valid) || [];
+function getModuleValidOptions(module: DeliveryModule) {
+  return module?.options?.filter((o) => o.valid) || [];
 }
 
 function ModuleOption({
-  module = {},
-  option = {},
+  module,
+  option,
   isSelected
 }: {
-  module: any;
-  option: any;
+  module?: DeliveryModule;
+  option?: Option;
   isSelected: boolean;
 }) {
   const intl = useIntl();
@@ -39,19 +40,19 @@ function ModuleOption({
         id={`option_${option?.code}`}
         checked={isSelected}
         onChange={() => {
-          if (module.deliveryMode === 'delivery') {
+          if (module?.deliveryMode === 'delivery') {
             mutate({
               ...checkout,
               deliveryModuleId: module.id,
-              deliveryModuleOptionCode: option.code,
+              deliveryModuleOptionCode: option?.code,
               pickupAddress: null
             });
           } else {
-            queryClient.setQueryData('checkout', (oldData: any) => {
+            queryClient.setQueryData('checkout', (oldData: Object) => {
               return {
                 ...oldData,
-                deliveryModuleId: module.id,
-                deliveryModuleOptionCode: option.code
+                deliveryModuleId: module?.id,
+                deliveryModuleOptionCode: option?.code
               };
             });
           }
@@ -64,7 +65,7 @@ function ModuleOption({
           {module?.i18n?.title}
         </span>
         <strong className="text-main">
-          {option.postage
+          {option?.postage
             ? `${priceFormat(option.postage)}`
             : intl.formatMessage({ id: 'FREE' })}
         </strong>
@@ -98,8 +99,8 @@ export default function DeliveryModules() {
             className="Title--3 mb-5 text-2xl"
             title="CHOOSE_DELIVERY_PROVIDER"
           />
-          {modules.map((module: any) =>
-            getModuleValidOptions(module).map((option: any) => (
+          {modules.map((module) =>
+            getModuleValidOptions(module).map((option) => (
               <ModuleOption
                 key={module.code}
                 module={module}

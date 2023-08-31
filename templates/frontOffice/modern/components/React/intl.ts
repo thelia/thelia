@@ -2,7 +2,7 @@ import getLocale from '@utils/getLocale';
 
 export const locale = getLocale();
 
-const messages = {
+const messages: Record<string, Record<string, string>> = {
   'fr-FR': {
     OK: 'OK',
     SUBMIT: 'Valider',

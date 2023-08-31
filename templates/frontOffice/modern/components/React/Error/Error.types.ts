@@ -1,3 +1,5 @@
+import { FieldError } from 'react-hook-form';
+
 export type ErrorProps = {
-  error: any;
+  error: string;
 };

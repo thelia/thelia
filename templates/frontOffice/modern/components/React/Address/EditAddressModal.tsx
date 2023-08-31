@@ -8,6 +8,7 @@ import { useIntl } from 'react-intl';
 import { useLockBodyScroll } from 'react-use';
 import Title from '../Title';
 import { Address } from '../Checkout/type';
+import { FieldValues } from 'react-hook-form';
 
 export default function EditAddress({ address }: { address: Address }) {
   const intl = useIntl();
@@ -21,7 +22,7 @@ export default function EditAddress({ address }: { address: Address }) {
     }
   }, [isSuccess]);
 
-  const submitForm = async (values: any) => {
+  const submitForm = async (values: FieldValues) => {
     await update({
       id: address.id,
       data: values

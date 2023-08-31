@@ -1,3 +1,1 @@
-export type PaymentProps = {
-  checkout: any;
-};
+export type PaymentProps = {};

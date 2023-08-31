@@ -52,7 +52,7 @@ export default function AddCoupon() {
         </div>
       </form>
       {formState.errors?.coupon?.message ? (
-        <Error error={formState.errors.coupon?.message} />
+        <Error error={formState.errors.coupon?.message as string} />
       ) : null}
       {error ? (
         <Alert

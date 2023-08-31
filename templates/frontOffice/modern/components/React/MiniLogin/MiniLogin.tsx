@@ -132,12 +132,6 @@ export function MiniLogin({ isLogged }: MiniLoginProps) {
     }
   }, [focusRef, visible]);
 
-  useEffect(() => {
-    if (visible && redirectionToCheckout && customer) {
-      (window as any).location = `${window.location.origin}/order/delivery`;
-    }
-  }, [visible, redirectionToCheckout, customer]);
-
   useLockBodyScroll(ref, visible, redirectionToCheckout);
 
   useClickAway(ref, (e) => {
@@ -221,7 +215,7 @@ export default function MiniLoginRender() {
 
   root.render(
     <QueryClientProvider client={queryClient}>
-      <IntlProvider locale={locale} messages={(messages as any)[locale]}>
+      <IntlProvider locale={locale} messages={messages[locale]}>
         <Provider store={store}>
           <MiniLogin isLogged={isLogged} />
         </Provider>

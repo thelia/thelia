@@ -1,6 +1,6 @@
 export type LoginFormProps = {
   setLoginHandler: React.Dispatch<React.SetStateAction<boolean>>;
-  redirectionToCheckout: any;
+  redirectionToCheckout: boolean;
 };
 
 export type MiniLoginProps = {

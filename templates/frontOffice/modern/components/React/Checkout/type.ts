@@ -2,7 +2,7 @@ import { DeliveryModule, PickupAddress } from '@js/types/common';
 
 export type Address = {
   id: number;
-  isDefault: boolean;
+  isDefault: number;
   label: string;
   customer: {
     id: number;

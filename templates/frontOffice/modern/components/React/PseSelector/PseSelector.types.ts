@@ -1,6 +1,6 @@
 export type PseSelectorProps = {
   attributes: Attribute[];
-  currentCombination: any;
+  currentCombination?: any;
   setAttributes: React.Dispatch<React.SetStateAction<[] | undefined>>;
 };
 

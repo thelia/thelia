@@ -215,11 +215,8 @@ export default function PseSelectorRoot() {
   const root = createRoot(DOMElement);
 
   root.render(
-    <IntlProvider locale={locale} messages={(messages as any)[locale]}>
-      <PseSelector
-        pses={(window as any).PSES}
-        attributes={(window as any).ATTRIBUTES}
-      />
+    <IntlProvider locale={locale} messages={messages[locale]}>
+      <PseSelector pses={window.PSES} attributes={window.ATTRIBUTES} />
     </IntlProvider>
   );
 }

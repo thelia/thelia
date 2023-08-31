@@ -52,6 +52,7 @@ import {
   PickupMapProps,
   ZipCodeSearcherProps
 } from './PickupMap.types';
+import { Address } from '../Checkout/type';
 // import { pickupFixtures } from '../Checkout/constants';
 
 const customIcon = icon({
@@ -97,8 +98,8 @@ function findIcon(code: string) {
 }
 
 interface Location extends PickupLocation {
-  ref: React.RefObject<any>;
-  refList: React.RefObject<any>;
+  ref: React.RefObject<HTMLElement>;
+  refList: React.RefObject<HTMLElement>;
 }
 
 function InfoPopUp({ location, selected, onChooseLocation }: InfoPopupProps) {
@@ -321,8 +322,8 @@ export function PickupMap({ query, defaultAddressId }: PickupMapProps) {
     if (!locations.length) return;
     const markers = locations.map((point) => {
       return {
-        latitude: point.latitude,
-        longitude: point.longitude
+        latitude: Number(point.latitude),
+        longitude: Number(point.longitude)
       };
     });
     const center = getLatLngCenter(markers);
@@ -430,8 +431,8 @@ export function ZipCodeSearcher({ onSubmit }: ZipCodeSearcherProps) {
   );
 }
 
-export default function Map({ addresses }: { addresses: any }) {
-  const defaultAddress = addresses?.find((a: any) => a.isDefault === 1);
+export default function Map({ addresses }: { addresses: Address[] }) {
+  const defaultAddress = addresses?.find((a) => a.isDefault === 1);
 
   const [query, setQuery] = useState({
     address: defaultAddress?.address1 || '',

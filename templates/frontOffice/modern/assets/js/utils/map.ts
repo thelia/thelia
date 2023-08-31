@@ -6,7 +6,9 @@ export function degr2rad(degr: number) {
   return (degr * Math.PI) / 180;
 }
 
-export function getLatLngCenter(points: { longitude: any; latitude: any }[]) {
+export function getLatLngCenter(
+  points: { longitude: number; latitude: number }[]
+) {
   if (points.length <= 0)
     return {
       latitude: 0,

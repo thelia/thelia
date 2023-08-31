@@ -1,7 +1,10 @@
 const VW_TO_DISABLE = 769;
 const INTERSECTION_RATIO_LIMIT = 1;
 
-const createIntersectionObserver = (classToToggle: any, callback: any) =>
+const createIntersectionObserver = (
+  classToToggle: string,
+  callback: (e?: IntersectionObserverEntry, bool?: boolean) => void
+) =>
   new IntersectionObserver(
     ([e]) => {
       if (
@@ -27,8 +30,8 @@ const createIntersectionObserver = (classToToggle: any, callback: any) =>
 
 const observeStickyElement = (
   element: Element,
-  classToToggle: any,
-  callback: any
+  classToToggle: string,
+  callback: (e?: IntersectionObserverEntry, bool?: boolean) => void
 ) => {
   const observer = createIntersectionObserver(classToToggle, callback);
 

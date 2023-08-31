@@ -3,7 +3,10 @@ import React, {
   useLayoutEffect,
   useRef,
   useState,
-  useEffect
+  useEffect,
+  Dispatch,
+  SetStateAction,
+  LegacyRef
 } from 'react';
 import { showLogin, hideCart } from '@js/redux/modules/visibility';
 import {
@@ -26,15 +29,15 @@ import Quantity from '../Quantity';
 import useEscape from '@js/utils/useEscape';
 import closeAndFocus from '@js/utils/closeAndFocus';
 import { trapTabKey } from '@js/standalone/trapItemsMenu';
-import { Cart } from '@js/types/common';
+import { Cart, Image, Product, ProductSaleElement } from '@js/types/common';
 
 function Price({
   price,
   price_promo,
   isPromo
 }: {
-  price: any;
-  price_promo: any;
+  price: number;
+  price_promo: number;
   isPromo?: boolean;
 }) {
   return (
@@ -61,7 +64,7 @@ function Delete({
   visible
 }: {
   id: number;
-  setRemoveItem: any;
+  setRemoveItem: Dispatch<SetStateAction<Boolean>>;
   visible: boolean;
 }) {
   const { mutate: deleteItem, status } = useCartItemDelete(id);
@@ -98,16 +101,16 @@ export function Item({
   visible
 }: {
   id: number;
-  product: any;
-  productSaleElement: any;
-  price: any;
-  promo: any;
-  promoPrice: any;
+  product: Product;
+  productSaleElement: ProductSaleElement;
+  price: { taxed: string | number };
+  promo: boolean;
+  promoPrice: { taxed: string | number };
   quantity: number;
   canDelete: boolean;
   canChangeQuantity: boolean;
   recap: boolean;
-  images: any;
+  images: Image[];
   visible: boolean;
 }) {
   const [removeItem, setRemoveItem] = useState(false);
@@ -192,12 +195,12 @@ export function Item({
         </div>
         <div className="text-sm leading-none text-gray-600 ">
           <div>
-            {productSaleElement?.attributes?.map((attribute: any) => {
+            {productSaleElement?.attributes?.map((attribute) => {
               return (
                 <div key={attribute.id}>
                   {attribute?.i18n?.title}:{' '}
                   {attribute?.values
-                    ?.map((value: any) => value?.i18n?.title || '')
+                    ?.map((value) => value?.i18n?.title || '')
                     .join(' - ')}
                 </div>
               );
@@ -221,8 +224,8 @@ export function Item({
             <span className="CartItem-smallQuantity">x{quantity}</span>
           )}
           <Price
-            price={price.taxed * quantity}
-            price_promo={promoPrice.taxed * quantity}
+            price={(price.taxed as number) * quantity}
+            price_promo={(promoPrice.taxed as number) * quantity}
             isPromo={promo}
           />
         </div>
@@ -310,9 +313,9 @@ export function MiniCartFooter({
   coupon,
   total
 }: {
-  delivery: any;
+  delivery: number;
   taxes: number;
-  discount: any;
+  discount: number;
   coupon: string;
   total: number;
 }) {
@@ -370,7 +373,7 @@ function MiniCart({
   useLayoutEffect(() => {
     if (cart) {
       let count = 0;
-      cart?.items?.forEach((el: any) => {
+      (cart as Cart)?.items?.forEach((el) => {
         count = count + (el?.quantity || 0);
       });
       setTotalQuantityCart(count);
@@ -394,7 +397,7 @@ function MiniCart({
 
   useLayoutEffect(() => {
     if (visible) {
-      (focusRef.current as any)?.focus();
+      focusRef.current?.focus();
     }
   }, [focusRef, visible]);
 
@@ -402,14 +405,17 @@ function MiniCart({
     closeAndFocus(() => dispatch(hideCart()), '[data-toggle-cart]')
   );
 
-  (ref?.current as any)?.addEventListener('keydown', (e: KeyboardEvent) => {
+  ref?.current?.addEventListener('keydown', (e: KeyboardEvent) => {
     if (!visible) return;
 
     trapTabKey(ref.current as HTMLElement, e);
   });
 
   return (
-    <div ref={ref as any} className="grid grid-cols-1 gap-8">
+    <div
+      ref={ref as LegacyRef<HTMLDivElement>}
+      className="grid grid-cols-1 gap-8"
+    >
       <button
         ref={focusRef}
         type="button"

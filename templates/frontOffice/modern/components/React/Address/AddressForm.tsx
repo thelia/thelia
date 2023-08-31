@@ -2,16 +2,16 @@ import Checkbox from '../Checkbox';
 import Input from '../Input';
 import React from 'react';
 import Select from '../Select';
-import { useForm } from 'react-hook-form';
+import { FieldValue, FieldValues, useForm } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 
 import { CheckoutAddress } from '../Checkout/type';
 import { CivilityTitle } from '@js/types/common';
 
 type CustomerTITLE = { label: string; value: number; isDefault: boolean };
-type CustomerTITLES = CustomerTITLE[];
+export type CustomerTITLES = CustomerTITLE[];
 
-type COUNTRY = {
+export type COUNTRY = {
   id: string;
   title: string;
   isDefault: boolean;
@@ -25,7 +25,7 @@ type CUSTOMER_COUNTRY = {
 
 interface AddressFormProps {
   address?: CheckoutAddress;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: FieldValues | null) => void;
 }
 
 export default function AddressForm({
@@ -35,7 +35,7 @@ export default function AddressForm({
   const intl = useIntl();
   const { register, handleSubmit, formState, setError } = useForm();
 
-  const titles: CustomerTITLES = ((window as any).CUSTOMER_TITLES || [])
+  const titles: CustomerTITLES = (window.CUSTOMER_TITLES || [])
     .map((t: CivilityTitle) => {
       return {
         label: t.short,
@@ -48,7 +48,7 @@ export default function AddressForm({
         (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0)
     );
 
-  const countries = ((window as any).COUNTRIES || []).map((c: COUNTRY) => {
+  const countries = (window.COUNTRIES || []).map((c: COUNTRY) => {
     return {
       label: c.title,
       value: c.id,

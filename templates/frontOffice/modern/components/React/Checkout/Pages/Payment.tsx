@@ -6,10 +6,22 @@ import PaymentModules from '../PaymentModules';
 import PhoneCheck from '../PhoneCheck';
 import { useSetCheckout } from '@openstudio/thelia-api-utils';
 import { useIntl } from 'react-intl';
+import { Checkout, CheckoutPageType } from '@js/types/checkout.types';
+import { CheckoutRequest } from '@openstudio/thelia-api-utils/build/main/types';
 
-export default function Payment({ isVisible, checkout, page }) {
-  const { title } = page;
-  const phoneCheck = useSelector((state) => state.checkout.phoneNumberValid);
+export default function Payment({
+  isVisible,
+  checkout,
+  page
+}: {
+  isVisible: boolean;
+  checkout: CheckoutRequest;
+  page?: CheckoutPageType;
+}) {
+  const { title } = page ? page : { title: '' };
+  const phoneCheck = useSelector(
+    (state: any) => state.checkout.phoneNumberValid
+  );
   const { mutate } = useSetCheckout();
   const intl = useIntl();
 

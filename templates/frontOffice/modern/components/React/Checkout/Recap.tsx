@@ -9,7 +9,7 @@ export default function Recap({
   small = false
 }: {
   cart: Cart;
-  small: boolean;
+  small?: boolean;
 }) {
   const { delivery, taxes, discount, coupon, total } = cart;
   const intl = useIntl();
@@ -56,7 +56,13 @@ export default function Recap({
   );
 }
 
-function FooterItem({ label = '', value = 0 }) {
+function FooterItem({
+  label = '',
+  value = 0
+}: {
+  label?: string;
+  value?: number | string;
+}) {
   return (
     <div className="Recap-item">
       <span>{label}</span>
