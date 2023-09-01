@@ -26,7 +26,7 @@ use Thelia\Model\LangQuery;
 
 abstract class AbstractPropelProvider implements ProviderInterface
 {
-    protected function modelToResource(
+    public function modelToResource(
         string $resourceClass,
         ActiveRecordInterface $propelModel,
         array $context,
@@ -36,6 +36,7 @@ abstract class AbstractPropelProvider implements ProviderInterface
         bool $withRelation = true,
         ActiveRecordInterface $baseModel = null
     ): PropelResourceInterface {
+
         if ($langs === null) {
             $langs = LangQuery::create()->filterByActive(1)->find();
         }
