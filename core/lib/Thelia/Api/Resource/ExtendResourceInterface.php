@@ -14,9 +14,11 @@ namespace Thelia\Api\Resource;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 interface ExtendResourceInterface
 {
+    #[Ignore]
     public static function getResourceToExtend(): string;
 
     public function extendQuery(ModelCriteria $query);

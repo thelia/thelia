@@ -115,4 +115,19 @@ return static function (ContainerConfigurator $configurator): void {
                 service('.inner'),
             ])
         ->autowire();
+
+            //        $resourceExtends = $container->getParameter('Thelia.api.resource.extends');
+//        $chainLoader = $serviceConfigurator->get('serializer.mapping.cache_warmer');
+//        dd($chainLoader);
+//        $serializerLoaders = $chainLoader->getArgument(0);
+//
+//        $extendLoader = new Definition(
+//            ExtendLoader::class,
+//            [$resourceExtends]
+//        );
+//        $extendLoader->setPublic(false);
+//        $serializerLoaders[] = $extendLoader;
+//
+//        $chainLoader->replaceArgument(0, $serializerLoaders);
+//        $this->getContainer()->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);
 };
