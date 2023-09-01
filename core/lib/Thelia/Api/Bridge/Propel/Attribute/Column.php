@@ -18,7 +18,9 @@ use Attribute;
 class Column
 {
     public function __construct(
-        private ?string $propelFieldName = null
+        private ?string $propelFieldName = null,
+        private ?string $propelSetter = null,
+        private ?string $propelGetter = null
     ) {
     }
 }

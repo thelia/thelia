@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
@@ -71,6 +72,7 @@ class Customer extends AbstractPropelResource
 
     #[Relation(targetResource: CustomerTitle::class)]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE, Address::GROUP_READ_SINGLE])]
+    #[Column(propelSetter: 'setTitleId')]
     public CustomerTitle $customerTitle;
 
     #[Relation(targetResource: Lang::class, relationAlias: 'LangModel')]
