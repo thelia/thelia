@@ -40,6 +40,10 @@ class HttpException extends BaseAction implements EventSubscriberInterface
 
     public function checkHttpException(ExceptionEvent $event): void
     {
+        if ($event->getRequest()->get('isApiRoute', false)) {
+            return;
+        }
+
         $exception = $event->getThrowable();
         if ($exception instanceof NotFoundHttpException) {
             $this->display404($event);
