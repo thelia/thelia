@@ -14,6 +14,7 @@ namespace Thelia\Api\Bridge\Propel\MetaData\Property;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use Thelia\Api\Resource\Address;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 
 class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
@@ -25,6 +26,24 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
+
+        if ($resourceClass === Address::class && $property === "customerTitle") {
+//            dump($resourceClass, $property, $propertyMetadata);
+        }
+
+        if ('additionalData' === $property) {
+//            $propertyMetadata = $propertyMetadata->withOpenapiContext([
+//                'type' => 'object',
+//
+//            ]);
+
+            $propertyMetadata =  $propertyMetadata->withSchema([                                'type' => 'object',
+                'properties' => [
+                    'refresh_token' => [
+                        'type' => 'string',
+                    ],
+                ]]);
+        }
 
         if ('i18ns' === $property && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
             $i18nReflect = new \ReflectionClass($resourceClass::getI18nResourceClass());
