@@ -65,8 +65,7 @@ class RequestListener implements EventSubscriberInterface
         /** @var \Thelia\Core\HttpFoundation\Request $request */
         $request = $event->getRequest();
 
-//        $lang = $request->hasSession() ? $request->getSession()->getLang() : Lang::getDefaultLanguage();
-        $lang = Lang::getDefaultLanguage();
+        $lang = $request->hasSession() ? $request->getSession()->getLang() : Lang::getDefaultLanguage();
 
         $vendorFormDir = THELIA_VENDOR.'symfony'.DS.'form';
         $vendorValidatorDir = THELIA_VENDOR.'symfony'.DS.'validator';
