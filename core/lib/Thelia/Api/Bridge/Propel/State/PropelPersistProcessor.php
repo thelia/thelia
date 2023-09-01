@@ -13,6 +13,7 @@
 namespace Thelia\Api\Bridge\Propel\State;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\ProcessorInterface;
 use Propel\Runtime\Collection\Collection;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
@@ -21,13 +22,25 @@ use Thelia\Api\Resource\TranslatableResourceInterface;
 
 class PropelPersistProcessor implements ProcessorInterface
 {
+    public function __construct(private readonly PropelItemProvider $itemProvider)
+    {
+    }
+
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         $propelModel = $this->resourceToModel($data);
 
         $propelModel->save();
 
+        $propelModel->reload();
+
         $data->setId($propelModel->getId());
+
+        /** @var Post $postOperation */
+        $postOperation = $context['operation'] ?? null;
+        if (null !== $postOperation) {
+            $data = $this->itemProvider->modelToResource(get_class($data), $propelModel, $postOperation->getNormalizationContext());
+        }
 
         return $data;
     }
@@ -42,19 +55,24 @@ class PropelPersistProcessor implements ProcessorInterface
         }
 
         $resourceReflection = new \ReflectionClass($data);
-
         foreach ($resourceReflection->getProperties() as $property) {
             if (!$property->isInitialized($data)) {
                 continue;
             }
 
+            $setterForced = false;
             $propelSetter = 'set'.ucfirst($property->getName());
 
             foreach ($property->getAttributes(Column::class) as $columnAttribute) {
                 if (isset($columnAttribute->getArguments()['propelFieldName'])) {
                     $propelSetter = 'set'.ucfirst($columnAttribute->getArguments()['propelFieldName']);
                 }
+                if (isset($columnAttribute->getArguments()['propelSetter'])) {
+                    $setterForced = true;
+                    $propelSetter = $columnAttribute->getArguments()['propelSetter'];
+                }
             }
+
 
             if (method_exists($propelModel, $propelSetter)) {
                 $possibleGetters = [
@@ -71,8 +89,10 @@ class PropelPersistProcessor implements ProcessorInterface
                 }
 
                 if ($value instanceof AbstractPropelResource) {
-                    $propelSetter = $propelSetter.'Id';
-                    $value = $value->getId();
+                    if (!$setterForced) {
+                        $propelSetter = $propelSetter.'Id';
+                    }
+                    $value = $value->getPropelModel()->getId();
                 }
 
                 if (\is_array($value)) {
