@@ -49,6 +49,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Api\Bridge\Propel\Extension\QueryCollectionExtensionInterface;
 use Thelia\Api\Bridge\Propel\Extension\QueryItemExtensionInterface;
 use Thelia\Api\Bridge\Propel\Filter\FilterInterface;
+use Thelia\Api\Bridge\Propel\Loader\ExtendLoader;
 use Thelia\Api\Resource\ExtendResourceInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Controller\ControllerInterface;
@@ -287,9 +288,6 @@ class Thelia extends Kernel
         }
 
         parent::initializeContainer();
-
-        $this->getContainer()->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
-        $this->getContainer()->set('thelia.propel.init', $this->propelInitService);
     }
 
     /**
@@ -417,9 +415,13 @@ class Thelia extends Kernel
         }
 
         $this->initializeBundles();
+
         $this->initializeContainer();
 
         $container = $this->container;
+
+        $this->getContainer()->set('thelia.propel.schema.locator', $this->propelSchemaLocator);
+        $this->getContainer()->set('thelia.propel.init', $this->propelInitService);
 
         if ($container->hasParameter('kernel.trusted_hosts') && $trustedHosts = $container->getParameter('kernel.trusted_hosts')) {
             Request::setTrustedHosts($trustedHosts);
@@ -875,12 +877,13 @@ class Thelia extends Kernel
     public function registerBundles(): iterable
     {
         $contents = [
-            Bundle\TheliaBundle::class => ['all' => true],
         ];
 
         if (file_exists(THELIA_ROOT.'config/bundles.php')) {
             $contents = array_merge($contents, require THELIA_ROOT.'config/bundles.php');
         }
+
+        $contents[Bundle\TheliaBundle::class] =  ['all' => true];
 
         foreach ($contents as $class => $envs) {
             if ($envs[$this->environment] ?? $envs['all'] ?? false) {
