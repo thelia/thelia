@@ -20,13 +20,15 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/addresses'
+            uriTemplate: '/admin/addresses',
+            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new GetCollection(
             uriTemplate: '/admin/addresses'
@@ -116,7 +118,8 @@ class Address extends AbstractPropelResource
     public Customer $customer;
 
     #[Relation(targetResource: CustomerTitle::class)]
-    #[Groups(groups: [self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups(groups: [self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_WRITE])]
+    #[Column(propelSetter: 'setTitleId')]
     public CustomerTitle $customerTitle;
 
     public function getId(): ?int
