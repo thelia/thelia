@@ -229,7 +229,9 @@ class KernelListener implements EventSubscriberInterface
 
     public function sessionInit(RequestEvent $event): void
     {
-        if (!preg_match('/^\/api\//', $event->getRequest()->getPathInfo()) && $event->getRequestType() === HttpKernelInterface::MAIN_REQUEST) {
+        $isApiRoute = preg_match('/^\/api\//', $event->getRequest()->getPathInfo()) && $event->getRequestType() === HttpKernelInterface::MAIN_REQUEST;
+        $event->getRequest()->request->set('isApiRoute', $isApiRoute);
+        if (!$isApiRoute) {
             $request = $event->getRequest();
             if (null === $session = self::$session) {
                 $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);
