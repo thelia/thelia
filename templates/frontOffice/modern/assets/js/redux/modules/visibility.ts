@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   cart: false,
   login: false,
-  redirectionToCheckout: false,
+  redirectionToCheckout: false
 };
 
 export const visibilitySlice = createSlice({
@@ -21,11 +21,13 @@ export const visibilitySlice = createSlice({
     },
     showLogin: (state, action) => {
       state.login = true;
-      state.redirectionToCheckout = action.payload?.redirectionToCheckout || false;
+      state.redirectionToCheckout =
+        action.payload?.redirectionToCheckout || false;
     },
     hideLogin: (state, action) => {
       state.login = false;
-      state.redirectionToCheckout = action.payload?.redirectionToCheckout || false;
+      state.redirectionToCheckout =
+        action.payload?.redirectionToCheckout || false;
     },
     toggleLogin: (state) => {
       state.login = !state.login;

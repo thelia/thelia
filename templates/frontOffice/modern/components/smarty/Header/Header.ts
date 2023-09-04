@@ -1,11 +1,15 @@
 import { trapTabKey } from '@js/standalone/trapItemsMenu';
 
-function manageFocusAccesibilty(target, targetMenu, activeClass = 'open') {
+function manageFocusAccesibilty(
+  target: string,
+  targetMenu: string,
+  activeClass = 'open'
+) {
   const lang = document.querySelector(target);
 
   if (!lang) return;
 
-  lang.addEventListener('keydown', (e) => {
+  lang.addEventListener('keydown', (e: KeyboardEvent) => {
     const { key } = e;
 
     if (!['Enter', 'Escape'].includes(key)) return;
@@ -13,7 +17,7 @@ function manageFocusAccesibilty(target, targetMenu, activeClass = 'open') {
     e.preventDefault();
     e.stopPropagation();
 
-    const menu = lang.querySelector(targetMenu);
+    const menu: HTMLElement | null = lang.querySelector(targetMenu);
 
     if (!menu) return;
 
@@ -27,10 +31,10 @@ function manageFocusAccesibilty(target, targetMenu, activeClass = 'open') {
 
     firstItem.focus();
 
-    menu.addEventListener('keydown', (event) => {
+    menu.addEventListener('keydown', (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         menu.classList.remove(activeClass);
-        lang.querySelector('a').focus();
+        lang.querySelector('a')?.focus();
         return;
       }
 

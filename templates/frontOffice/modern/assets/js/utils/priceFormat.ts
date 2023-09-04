@@ -6,8 +6,7 @@ export default function priceFormat(
   options: { locale?: string; currency?: string } = {}
 ) {
   const locale = options.locale || getLocale();
-  const currency =
-    options.currency || ((global as any).DEFAULT_CURRENCY_CODE as string);
+  const currency = options.currency || window.DEFAULT_CURRENCY_CODE;
   if (typeof price !== 'number' || !locale || !currency) return '0 €';
 
   if (isNaN(price)) return '0 €';

@@ -15,4 +15,5 @@ interface Window {
   ATTRIBUTES: import('@components/React/PseSelector/PseSelector.types').Attribute[];
   SCRIPTRECAPTCHA: string;
   CGV_URL: string;
+  DEFAULT_CURRENCY_CODE: string;
 }
