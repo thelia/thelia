@@ -370,7 +370,7 @@ function MiniCart({
   const focusRef = useRef<HTMLButtonElement>(null);
   const { data: cart = {} } = useCartQuery();
 
-  const { data: customer } = useCustomer(false);
+  const { data: customer } = useCustomer(true);
   const intl = useIntl();
   const [totalQuantityCart, setTotalQuantityCart] = useState(
     cart?.items?.length || 0
