@@ -409,11 +409,19 @@ function MiniCart({
 
   useEscape(ref, () => closeAndFocus(() => hideCart(), '[data-toggle-cart]'));
 
-  ref?.current?.addEventListener('keydown', (e: KeyboardEvent) => {
-    if (!visible) return;
+  useEffect(() => {
+    const onKeydown = (e: KeyboardEvent) => {
+      if (!visible) return;
 
-    trapTabKey(ref.current as HTMLElement, e);
-  });
+      trapTabKey(ref.current as HTMLElement, e);
+    };
+
+    ref?.current?.addEventListener('keydown', onKeydown);
+
+    return () => {
+      ref?.current?.removeEventListener('keydown', onKeydown);
+    };
+  }, []);
 
   return (
     <div
@@ -491,21 +499,20 @@ function MiniCartContainer() {
   const { actions } = useGlobalVisibility();
   const { toggleCart, hideCart } = actions;
 
-  document.addEventListener(
-    'click',
-    (e) => {
-      console.log(
-        '🚀 ~ file: MiniCart.tsx:497 ~ MiniCartContainer ~ e:',
-        e.target
-      );
+  useEffect(() => {
+    const onClick = (e: Event) => {
       if ((e.target as HTMLElement)?.matches('[data-toggle-cart]')) {
         toggleCart();
       } else if ((e.target as HTMLElement)?.matches('[data-close-cart]')) {
         hideCart();
       }
-    },
-    false
-  );
+    };
+    document.addEventListener('click', onClick, false);
+
+    return () => {
+      document.removeEventListener('click', onClick);
+    };
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

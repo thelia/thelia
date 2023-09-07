@@ -120,38 +120,44 @@ function IsLoggedOut({
 export function MiniLogin({ isLogged }: MiniLoginProps) {
   const { visibilityState, actions } = useGlobalVisibility();
   const { login: visible, redirectionToCheckout } = visibilityState;
-  console.log('🚀 ~ file: MiniLogin.tsx:123 ~ MiniLogin ~ visible:', visible);
 
   const [loginHandler, setLoginHandler] = useState(isLogged);
   const { data: customer, isLoading } = useCustomer(loginHandler);
   const ref = useRef<HTMLDivElement>(null);
   const focusRef = useRef<HTMLButtonElement | null>(null);
 
-  // useLayoutEffect(() => {
-  //   if (visible && focusRef.current) {
-  //     focusRef.current.focus();
-  //   }
-  // }, [focusRef, visible]);
+  useLayoutEffect(() => {
+    if (visible && focusRef.current) {
+      focusRef.current.focus();
+    }
+  }, [focusRef, visible]);
 
-  // useLockBodyScroll(ref, visible, redirectionToCheckout);
+  useLockBodyScroll(ref, visible, redirectionToCheckout);
 
-  // useClickAway(ref, (e) => {
-  //   if (!(e.target as HTMLElement)?.matches('[data-toggle-login]') && visible) {
-  //     closeAndFocus(() => actions.hideLogin(false), '[data-toggle-login]');
-  //   }
-  // });
+  useClickAway(ref, (e) => {
+    if (!(e.target as HTMLElement)?.matches('[data-toggle-login]') && visible) {
+      closeAndFocus(() => actions.hideLogin(false), '[data-toggle-login]');
+    }
+  });
 
-  // useEffect(() => {
-  //   focusRef?.current?.focus();
-  // }, [focusRef]);
+  useEffect(() => {
+    focusRef?.current?.focus();
+  }, [focusRef]);
 
-  // useEscape(ref, () =>
-  //   closeAndFocus(() => actions.hideLogin(false), '[data-toggle-login]')
-  // );
+  useEscape(ref, () =>
+    closeAndFocus(() => actions.hideLogin(false), '[data-toggle-login]')
+  );
 
-  // ref?.current?.addEventListener('keydown', (e) => {
-  //   trapTabKey(ref.current as HTMLElement, e);
-  // });
+  useEffect(() => {
+    const onKeydown = (e: KeyboardEvent) => {
+      trapTabKey(ref.current as HTMLElement, e);
+    };
+    ref?.current?.addEventListener('keydown', onKeydown);
+
+    return () => {
+      ref?.current?.removeEventListener('keydown', onKeydown);
+    };
+  }, []);
 
   return (
     <div ref={ref} className={`SideBar ${visible ? 'SideBar--visible' : ''}`}>

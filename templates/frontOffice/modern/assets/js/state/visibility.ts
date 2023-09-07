@@ -16,48 +16,38 @@ export const useGlobalVisibility = () => {
   const [visibilityState, setVisibility] = globalVisibility();
 
   const hideCart = () => {
-    let visibility = { ...visibilityState };
-
-    visibility.cart = false;
-    setVisibility(visibility);
+    setVisibility((visibility) => ({ ...visibility, cart: false }));
   };
+
   const showCart = () => {
-    let visibility = { ...visibilityState };
-
-    visibility.cart = true;
-    setVisibility(visibility);
+    setVisibility((visibility) => ({ ...visibility, cart: true }));
   };
+
   const toggleCart = () => {
-    let visibility = { ...visibilityState };
-
-    visibility.cart = !visibility.cart;
-    setVisibility(visibility);
+    setVisibility((visibility) => ({ ...visibility, cart: !visibility.cart }));
   };
 
-  const showLogin = (redirectionToCheckout: boolean) => {
-    let visibility = { ...visibilityState };
-
-    visibility.login = true;
-    visibility.redirectionToCheckout = redirectionToCheckout || false;
-    console.log('show');
-    setVisibility(visibility);
+  const showLogin = (redirectionToCheckout: boolean = false) => {
+    setVisibility((visibility) => ({
+      ...visibility,
+      login: true,
+      redirectionToCheckout
+    }));
   };
 
-  const hideLogin = (redirectionToCheckout: boolean) => {
-    let visibility = { ...visibilityState };
-
-    visibility.login = false;
-    visibility.redirectionToCheckout = redirectionToCheckout || false;
-    console.log('hide');
-    setVisibility(visibility);
+  const hideLogin = (redirectionToCheckout: boolean = false) => {
+    setVisibility((visibility) => ({
+      ...visibility,
+      login: false,
+      redirectionToCheckout
+    }));
   };
 
   const toggleLogin = () => {
-    let visibility = { ...visibilityState };
-
-    visibility.login = !visibility.login;
-    console.log('toggle', visibility);
-    setVisibility(visibility);
+    setVisibility((visibility) => ({
+      ...visibility,
+      login: !visibility.login
+    }));
   };
 
   return {

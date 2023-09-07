@@ -19,29 +19,27 @@ export const useGlobalCheckout = () => {
   const [checkoutState, setCheckout] = globalCheckoutState();
 
   const setMode = (mode: string) => {
-    let checkout = { ...checkoutState };
-
-    checkout.mode = mode;
-
-    checkout.deliveryAddressId = initialState.deliveryAddressId;
-    checkout.deliveryModuleId = initialState.deliveryModuleId;
-    checkout.deliveryModuleOption = initialState.deliveryModuleOption;
-
-    setCheckout(checkout);
+    setCheckout((checkout) => ({
+      ...checkout,
+      mode: mode,
+      deliveryAddressId: initialState.deliveryAddressId,
+      deliveryModuleId: initialState.deliveryModuleId,
+      deliveryModuleOption: initialState.deliveryModuleOption
+    }));
   };
 
   const setPhoneNumberValid = (value: boolean) => {
-    let checkout = { ...checkoutState };
-
-    checkout.phoneNumberValid = value;
-    setCheckout(checkout);
+    setCheckout((checkout) => ({
+      ...checkout,
+      phoneNumberValid: value
+    }));
   };
 
   const setCheckoutStep = (step: number) => {
-    let checkout = { ...checkoutState };
-
-    checkout.checkoutStep = step;
-    setCheckout(checkout);
+    setCheckout((checkout) => ({
+      ...checkout,
+      checkoutStep: step
+    }));
   };
 
   return {
