@@ -5,14 +5,14 @@ import { isEqual } from 'lodash';
 import priceFormat from '@utils/priceFormat';
 import { queryClient } from '@openstudio/thelia-api-utils';
 import { createRoot } from 'react-dom/client';
-import { showCart } from '@js/redux/modules/visibility';
-import store from '@js/redux/store';
+
 import Quantity from '../Quantity';
 import Alert from '../Alert';
 import { useIntl } from 'react-intl';
 import messages, { locale } from '@components/React/intl';
 import { IntlProvider } from 'react-intl';
 import { Attribute, PSE, PseSelectorProps } from './PseSelector.types';
+import { useGlobalVisibility } from '@js/state/visibility';
 
 function AttributeSelector({
   attributes = [],
@@ -97,6 +97,7 @@ function PseSelector({
   pses: PSE[];
   attributes: Attribute[];
 }) {
+  const { actions } = useGlobalVisibility();
   const defaultPseCombination = useMemo(() => {
     const defaultPse = pses.find((pse) => pse.isDefault);
     return defaultPse?.combination;
@@ -128,7 +129,7 @@ function PseSelector({
         append: false
       });
       queryClient.setQueryData('cart', response.cart);
-      store.dispatch(showCart());
+      actions.showCart();
     } catch (error) {
       setError(true);
     }

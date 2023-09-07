@@ -1,6 +1,3 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-
 import Alert from '../Alert';
 import Loader from '../Loader';
 import priceFormat from '@utils/priceFormat';
@@ -14,6 +11,7 @@ import {
 } from '@openstudio/thelia-api-utils';
 import Title from '../Title';
 import { DeliveryModule, Option } from '@js/types/common';
+import { useGlobalCheckout } from '@js/state/checkout';
 
 function getModuleValidOptions(module: DeliveryModule) {
   return module?.options?.filter((o) => o.valid) || [];
@@ -77,9 +75,13 @@ function ModuleOption({
 export default function DeliveryModules() {
   const intl = useIntl();
 
-  const selectedMode = useSelector((state: any) => state.checkout.mode);
+  const { checkoutState } = useGlobalCheckout();
+  const selectedMode = checkoutState.mode;
+
   const { data: checkout } = useGetCheckout();
-  const { data: modules, isLoading } = useValidDeliveryModules(selectedMode);
+  const { data: modules, isLoading } = useValidDeliveryModules(
+    selectedMode as string
+  );
 
   return (
     <>

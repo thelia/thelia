@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { useSelector } from 'react-redux';
+
 import Title from '../../Title';
 import Loader from '../../Loader';
 import PaymentModules from '../PaymentModules';
@@ -8,6 +8,7 @@ import { useSetCheckout } from '@openstudio/thelia-api-utils';
 import { useIntl } from 'react-intl';
 import { Checkout, CheckoutPageType } from '@js/types/checkout.types';
 import { CheckoutRequest } from '@openstudio/thelia-api-utils/build/main/types';
+import { useGlobalCheckout } from '@js/state/checkout';
 
 export default function Payment({
   isVisible,
@@ -19,9 +20,13 @@ export default function Payment({
   page?: CheckoutPageType;
 }) {
   const { title } = page ? page : { title: '' };
-  const phoneCheck = useSelector(
-    (state: any) => state.checkout.phoneNumberValid
-  );
+  // const phoneCheck = useSelector(
+  //   (state: any) => state.checkout.phoneNumberValid
+  // );
+
+  const { checkoutState } = useGlobalCheckout();
+  const { phoneNumberValid: phoneCheck } = checkoutState;
+
   const { mutate } = useSetCheckout();
   const intl = useIntl();
 
@@ -35,9 +40,9 @@ export default function Payment({
       </Suspense>
 
       {checkout?.paymentModuleId &&
-        (checkout?.deliveryAddressId || checkout.pickupAddress) && (
-          <PhoneCheck addressId={checkout?.deliveryAddressId} />
-        )}
+      (checkout?.deliveryAddressId || checkout.pickupAddress) ? (
+        <PhoneCheck addressId={checkout?.deliveryAddressId} />
+      ) : null}
       {checkout?.paymentModuleId && phoneCheck && (
         <label className="Checkbox mt-8">
           <input

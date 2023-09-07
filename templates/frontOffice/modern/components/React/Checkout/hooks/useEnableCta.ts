@@ -1,14 +1,14 @@
-import { Checkout, CheckoutRequest } from '@js/types/checkout.types';
+import { useGlobalCheckout } from '@js/state/checkout';
+import { CheckoutRequest } from '@js/types/checkout.types';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 export default function useEnableCta(
   currentStep = 1,
   checkout: CheckoutRequest
 ) {
-  const { mode: selectedMode, phoneNumberValid } = useSelector(
-    (state: any) => state.checkout
-  );
+  const { checkoutState } = useGlobalCheckout();
+  const { phoneNumberValid, mode: selectedMode } = checkoutState;
+
   const [enabledCta, setEnabledCta] = useState(false);
 
   useEffect(() => {

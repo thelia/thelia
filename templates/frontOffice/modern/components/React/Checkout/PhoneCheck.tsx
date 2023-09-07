@@ -5,20 +5,23 @@ import {
   useAddressQuery,
   useAddressUpdate
 } from '@openstudio/thelia-api-utils';
-import { setPhoneNumberValid } from '@redux/modules/checkout';
+
 import Alert from '../Alert';
 import React from 'react';
 import { parsePhoneNumber } from 'react-phone-number-input';
 import Title from '../Title';
-import { useDispatch } from 'react-redux';
+
 import { useIntl } from 'react-intl';
+import { useGlobalCheckout } from '@js/state/checkout';
 
 export default function PhoneCheck({ addressId }: { addressId: number }) {
   const [phone, setPhone] = React.useState('');
   const [isSubmitted, setIsSubmitted] = React.useState(false);
   const [isDirty, setIsDirty] = React.useState(false);
   const { data = [] } = useAddressQuery();
-  const dispatch = useDispatch();
+
+  const { actions } = useGlobalCheckout();
+
   const intl = useIntl();
   const {
     mutate: update,
@@ -60,9 +63,9 @@ export default function PhoneCheck({ addressId }: { addressId: number }) {
 
   React.useEffect(() => {
     if (isValidPhoneNumber(phone || '') && !isError) {
-      dispatch(setPhoneNumberValid(true));
+      actions.setPhoneNumberValid(true);
     }
-  }, [isError, phone, isSuccess, dispatch]);
+  }, [isError, phone, isSuccess]);
 
   const isValid = phone ? isValidPhoneNumber(phone || '') : false;
 

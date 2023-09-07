@@ -1,7 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux';
-
-import React from 'react';
-import { setMode } from '@redux/modules/checkout';
 import {
   useDeliveryModes,
   useSetCheckout,
@@ -10,11 +6,14 @@ import {
 import { useIntl } from 'react-intl';
 import Alert from '../Alert';
 import Loader from '../Loader';
+import { useGlobalCheckout } from '@js/state/checkout';
 
 function DeliveryModes() {
-  const dispatch = useDispatch();
   const intl = useIntl();
-  const selectedMode = useSelector((state: any) => state.checkout.mode);
+
+  const { checkoutState, actions } = useGlobalCheckout();
+  const selectedMode = checkoutState.mode;
+
   const { data: checkout } = useGetCheckout();
   const { mutate } = useSetCheckout();
   const { data: modes = [], isLoading } = useDeliveryModes();
@@ -37,7 +36,7 @@ function DeliveryModes() {
               mode === selectedMode ? 'bg-main-light' : 'bg-gray-100'
             }`}
             onClick={() => {
-              dispatch(setMode(mode));
+              actions.setMode(mode);
               mutate({
                 ...checkout,
                 deliveryAddressId: null,

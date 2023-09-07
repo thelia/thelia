@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+
 import { CHECKOUT_STEP } from './constants';
 import {
   useCartQuery,
@@ -17,11 +17,14 @@ import Payment from './Pages/Payment';
 import Cart from './Pages/Cart';
 import Recap from './Recap';
 import Title from '../Title';
+import { useGlobalCheckout } from '@js/state/checkout';
 
 export default function Checkout() {
   const { data: checkout } = useGetCheckout();
   const { data: cart = {} } = useCartQuery();
-  const { checkoutStep } = useSelector((state: any) => state.checkout);
+  const { checkoutState } = useGlobalCheckout();
+  const { checkoutStep } = checkoutState;
+
   const { mutate: reset } = useSetCheckout();
 
   useEffect(() => {

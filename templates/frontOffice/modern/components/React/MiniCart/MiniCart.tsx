@@ -1,4 +1,4 @@
-import React, {
+import {
   Suspense,
   useLayoutEffect,
   useRef,
@@ -8,15 +8,15 @@ import React, {
   SetStateAction,
   LegacyRef
 } from 'react';
-import { showLogin, hideCart } from '@js/redux/modules/visibility';
+import messages, { locale } from '../intl';
 import {
   useCartItemDelete,
   useCartItemUpdate,
   useCartQuery,
   useCustomer
 } from '@openstudio/thelia-api-utils';
-import { useDispatch, useSelector } from 'react-redux';
 
+import { queryClient } from '@openstudio/thelia-api-utils';
 import AddCoupon from '../AddCoupon';
 import { ReactComponent as IconCLose } from '@icons/close.svg';
 import { ReactComponent as IconTrash } from '@icons/trash.svg';
@@ -24,12 +24,15 @@ import useLockBodyScroll from '@utils/useLockBodyScroll';
 import { useClickAway } from 'react-use';
 import Loader from '../Loader';
 import priceFormat from '@utils/priceFormat';
-import { useIntl } from 'react-intl';
+import { IntlProvider, useIntl } from 'react-intl';
 import Quantity from '../Quantity';
 import useEscape from '@js/utils/useEscape';
 import closeAndFocus from '@js/utils/closeAndFocus';
 import { trapTabKey } from '@js/standalone/trapItemsMenu';
 import { Cart, Image, Product, ProductSaleElement } from '@js/types/common';
+import { useGlobalVisibility } from '@js/state/visibility';
+import { createRoot } from 'react-dom/client';
+import { QueryClientProvider } from 'react-query';
 
 function Price({
   price,
@@ -360,10 +363,13 @@ function MiniCart({
   visible: boolean;
   redirect: boolean;
 }) {
-  const dispatch = useDispatch();
+  const { actions } = useGlobalVisibility();
+  const { hideCart, showLogin } = actions;
+
   const ref = useRef<HTMLElement>(null);
   const focusRef = useRef<HTMLButtonElement>(null);
   const { data: cart = {} } = useCartQuery();
+
   const { data: customer } = useCustomer(false);
   const intl = useIntl();
   const [totalQuantityCart, setTotalQuantityCart] = useState(
@@ -391,7 +397,7 @@ function MiniCart({
 
   useClickAway(ref, (e) => {
     if (!(e.target as HTMLElement)?.matches('[data-toggle-cart]') && visible) {
-      closeAndFocus(() => dispatch(hideCart()), '[data-toggle-cart]');
+      closeAndFocus(() => hideCart(), '[data-toggle-cart]');
     }
   });
 
@@ -401,9 +407,7 @@ function MiniCart({
     }
   }, [focusRef, visible]);
 
-  useEscape(ref, () =>
-    closeAndFocus(() => dispatch(hideCart()), '[data-toggle-cart]')
-  );
+  useEscape(ref, () => closeAndFocus(() => hideCart(), '[data-toggle-cart]'));
 
   ref?.current?.addEventListener('keydown', (e: KeyboardEvent) => {
     if (!visible) return;
@@ -422,9 +426,7 @@ function MiniCart({
         aria-label={intl.formatMessage({ id: 'CLOSE_CART' })}
         className="SideBar-close"
         data-close-cart
-        onClick={() =>
-          closeAndFocus(() => dispatch(hideCart()), '[data-toggle-cart]')
-        }
+        onClick={() => closeAndFocus(() => hideCart(), '[data-toggle-cart]')}
         tabIndex={visible ? 0 : -1}
       >
         <IconCLose className="pointer-events-none h-3 w-3" />
@@ -457,9 +459,7 @@ function MiniCart({
                 }
                 if (!customer) {
                   e.preventDefault();
-                  dispatch(
-                    showLogin({ showCart: true, redirectionToCheckout: true })
-                  );
+                  showLogin(true);
                 }
               }}
               tabIndex={visible ? 0 : -1}
@@ -474,10 +474,9 @@ function MiniCart({
   );
 }
 
-export default function MiniCartWrapper() {
-  const { cart: visible, redirectionToCheckout: redirect } = useSelector(
-    (state: any) => state.visibility
-  );
+export function MiniCartWrapper() {
+  const { visibilityState } = useGlobalVisibility();
+  const { redirectionToCheckout: redirect, cart: visible } = visibilityState;
 
   return (
     <div className={`SideBar ${visible ? 'SideBar--visible' : ''} `}>
@@ -486,4 +485,43 @@ export default function MiniCartWrapper() {
       </Suspense>
     </div>
   );
+}
+
+function MiniCartContainer() {
+  const { actions } = useGlobalVisibility();
+  const { toggleCart, hideCart } = actions;
+
+  document.addEventListener(
+    'click',
+    (e) => {
+      console.log(
+        '🚀 ~ file: MiniCart.tsx:497 ~ MiniCartContainer ~ e:',
+        e.target
+      );
+      if ((e.target as HTMLElement)?.matches('[data-toggle-cart]')) {
+        toggleCart();
+      } else if ((e.target as HTMLElement)?.matches('[data-close-cart]')) {
+        hideCart();
+      }
+    },
+    false
+  );
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <IntlProvider locale={locale} messages={(messages as any)[locale]}>
+        <MiniCartWrapper />
+      </IntlProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default function MiniCartRender() {
+  const DOMElement = document.querySelector('.MiniCart-root');
+
+  if (!DOMElement) return;
+
+  const root = createRoot(DOMElement);
+
+  root.render(<MiniCartContainer></MiniCartContainer>);
 }

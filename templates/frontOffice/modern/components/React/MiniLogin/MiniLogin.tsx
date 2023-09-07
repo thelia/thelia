@@ -1,7 +1,7 @@
 import { IntlProvider, useIntl } from 'react-intl';
-import { Provider, useSelector, useDispatch } from 'react-redux';
-import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
-import { hideLogin, toggleLogin } from '@js/redux/modules/visibility';
+
+import { useEffect, useState, useRef, useLayoutEffect } from 'react';
+
 import messages, { locale } from '../intl';
 import {
   useCustomer,
@@ -14,7 +14,7 @@ import Loader from '../Loader';
 import { QueryClientProvider } from 'react-query';
 
 import { createRoot } from 'react-dom/client';
-import store from '@js/redux/store';
+
 import Alert from '../Alert';
 import useLockBodyScroll from '@utils/useLockBodyScroll';
 import { useClickAway } from 'react-use';
@@ -22,6 +22,7 @@ import useEscape from '@js/utils/useEscape';
 import closeAndFocus from '@js/utils/closeAndFocus';
 import { trapTabKey } from '@js/standalone/trapItemsMenu';
 import { LoginFormProps, MiniLoginProps } from './MiniLogin.types';
+import { useGlobalVisibility } from '@js/state/visibility';
 
 function LoginForm({ setLoginHandler, redirectionToCheckout }: LoginFormProps) {
   const [email, setEmail] = useState('');
@@ -117,56 +118,47 @@ function IsLoggedOut({
 }
 
 export function MiniLogin({ isLogged }: MiniLoginProps) {
-  const dispatch = useDispatch();
-  const { login: visible, redirectionToCheckout } = useSelector(
-    (state: any) => state.visibility
-  );
+  const { visibilityState, actions } = useGlobalVisibility();
+  const { login: visible, redirectionToCheckout } = visibilityState;
+  console.log('🚀 ~ file: MiniLogin.tsx:123 ~ MiniLogin ~ visible:', visible);
+
   const [loginHandler, setLoginHandler] = useState(isLogged);
   const { data: customer, isLoading } = useCustomer(loginHandler);
   const ref = useRef<HTMLDivElement>(null);
   const focusRef = useRef<HTMLButtonElement | null>(null);
 
-  useLayoutEffect(() => {
-    if (visible && focusRef.current) {
-      focusRef.current.focus();
-    }
-  }, [focusRef, visible]);
+  // useLayoutEffect(() => {
+  //   if (visible && focusRef.current) {
+  //     focusRef.current.focus();
+  //   }
+  // }, [focusRef, visible]);
 
-  useLockBodyScroll(ref, visible, redirectionToCheckout);
+  // useLockBodyScroll(ref, visible, redirectionToCheckout);
 
-  useClickAway(ref, (e) => {
-    if (!(e.target as HTMLElement)?.matches('[data-toggle-login]') && visible) {
-      closeAndFocus(
-        () => dispatch(hideLogin({ redirectionToCheckout: false })),
-        '[data-toggle-login]'
-      );
-    }
-  });
+  // useClickAway(ref, (e) => {
+  //   if (!(e.target as HTMLElement)?.matches('[data-toggle-login]') && visible) {
+  //     closeAndFocus(() => actions.hideLogin(false), '[data-toggle-login]');
+  //   }
+  // });
 
-  useEffect(() => {
-    focusRef?.current?.focus();
-  }, [focusRef]);
+  // useEffect(() => {
+  //   focusRef?.current?.focus();
+  // }, [focusRef]);
 
-  useEscape(ref, () =>
-    closeAndFocus(
-      () => dispatch(hideLogin({ redirectionToCheckout: false })),
-      '[data-toggle-login]'
-    )
-  );
+  // useEscape(ref, () =>
+  //   closeAndFocus(() => actions.hideLogin(false), '[data-toggle-login]')
+  // );
 
-  ref?.current?.addEventListener('keydown', (e) => {
-    trapTabKey(ref.current as HTMLElement, e);
-  });
+  // ref?.current?.addEventListener('keydown', (e) => {
+  //   trapTabKey(ref.current as HTMLElement, e);
+  // });
 
   return (
     <div ref={ref} className={`SideBar ${visible ? 'SideBar--visible' : ''}`}>
       <button
         ref={focusRef}
         onClick={() =>
-          closeAndFocus(
-            () => dispatch(hideLogin({ redirectionToCheckout: false })),
-            '[data-toggle-login]'
-          )
+          closeAndFocus(() => actions.hideLogin(false), '[data-toggle-login]')
         }
         type="button"
         className="SideBar-close"
@@ -188,38 +180,47 @@ export function MiniLogin({ isLogged }: MiniLoginProps) {
   );
 }
 
-export default function MiniLoginRender() {
+export function MiniLoginWrapper() {
+  const { visibilityState, actions } = useGlobalVisibility();
+
   const isLogged =
     (document.querySelector('.MiniLogin-root') as HTMLElement)?.dataset
       ?.login === 'true' || false;
 
-  document.addEventListener(
-    'click',
-    (e) => {
+  useEffect(() => {
+    const onClick = (e: Event) => {
       if ((e.target as HTMLElement)?.matches('[data-toggle-login]')) {
         e.preventDefault();
-        store.dispatch(toggleLogin());
+        actions.toggleLogin();
       } else if ((e.target as HTMLElement)?.matches('[data-close-login]')) {
         e.preventDefault();
-        store.dispatch(hideLogin({ redirectionToCheckout: false }));
+        actions.hideLogin(false);
       }
-    },
-    false
-  );
+    };
+    document.addEventListener('click', onClick, false);
 
+    return () => {
+      document.removeEventListener('click', onClick);
+    };
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <IntlProvider locale={locale} messages={messages[locale]}>
+        <MiniLogin isLogged={isLogged} />
+      </IntlProvider>
+    </QueryClientProvider>
+  );
+}
+
+const MiniLoginRender = () => {
   const DOMElement = document.querySelector('.MiniLogin-root');
 
   if (!DOMElement) return;
 
   const root = createRoot(DOMElement);
 
-  root.render(
-    <QueryClientProvider client={queryClient}>
-      <IntlProvider locale={locale} messages={messages[locale]}>
-        <Provider store={store}>
-          <MiniLogin isLogged={isLogged} />
-        </Provider>
-      </IntlProvider>
-    </QueryClientProvider>
-  );
-}
+  root.render(<MiniLoginWrapper></MiniLoginWrapper>);
+};
+
+export default MiniLoginRender;

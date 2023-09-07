@@ -63,7 +63,6 @@
   },
   "dependencies": {
     "@openstudio/thelia-api-utils": "0.5.2",
-    "@reduxjs/toolkit": "^1.6.0",
     "@symfony/webpack-encore": "^4.1.0",
     "@types/lodash": "^4.14.197",
     "@types/react-dom": "^18.2.7",
@@ -83,7 +82,6 @@
     "react-modal": "^3.14.3",
     "react-phone-number-input": "^3.1.27",
     "react-query": "^3.21.1",
-    "react-redux": "^8.0.2",
     "react-use": "^17.2.4",
     "ts-loader": "^9.4.4"
   }

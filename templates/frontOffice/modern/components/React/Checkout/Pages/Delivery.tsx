@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { useSelector } from 'react-redux';
+
 import Title from '../../Title';
 import DeliveryModules from '../DeliveryModules';
 import DeliveryModes from '../DeliveryModes';
@@ -8,6 +8,7 @@ import AddressBook from '../AddressBook';
 import Map from '../../PickupMap';
 import { useAddressQuery } from '@openstudio/thelia-api-utils';
 import { CheckoutPageType, CheckoutResponse } from '@js/types/checkout.types';
+import { useGlobalCheckout } from '@js/state/checkout';
 
 export default function Delivery({
   isVisible,
@@ -18,7 +19,9 @@ export default function Delivery({
   checkout?: CheckoutResponse;
   page?: CheckoutPageType;
 }) {
-  const { mode: selectedMode } = useSelector((state: any) => state.checkout);
+  const { checkoutState } = useGlobalCheckout();
+  const { mode: selectedMode } = checkoutState;
+
   const { data: addresses = [] } = useAddressQuery();
   const title = page ? page.title : '';
 

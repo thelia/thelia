@@ -1,13 +1,13 @@
 import { useIntl } from 'react-intl';
 import React, { useState, useEffect } from 'react';
 import useEnableCta from './hooks/useEnableCta';
-import { useDispatch } from 'react-redux';
-import { setCheckoutStep } from '@js/redux/modules/checkout';
+
 import { CHECKOUT_STEP } from './constants';
 import { useFinalCheckout } from '@openstudio/thelia-api-utils';
 import Loader from '../Loader';
 import { CheckoutRequest } from './type';
 import { Checkout } from '@js/types/checkout.types';
+import { useGlobalCheckout } from '@js/state/checkout';
 
 export function CheckoutFooter({
   step,
@@ -19,7 +19,8 @@ export function CheckoutFooter({
   const intl = useIntl();
   const enabledCta = useEnableCta(step, checkout);
   const { mutate: final, isLoading } = useFinalCheckout();
-  const dispatch = useDispatch();
+
+  const { actions } = useGlobalCheckout();
   const [currentStep, setCurrentStep] = useState(
     Object.values(CHECKOUT_STEP).find((s) => s.id === step)
   );
@@ -36,7 +37,7 @@ export function CheckoutFooter({
         console.error(error);
       }
     } else {
-      dispatch(setCheckoutStep(step + 1));
+      actions.setCheckoutStep(step + 1);
       window.scrollTo({ behavior: 'smooth' });
     }
   };

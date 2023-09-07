@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { setCheckoutStep } from '@js/redux/modules/checkout';
+
 import { Checkout } from '@js/types/checkout.types';
+import { useGlobalCheckout } from '@js/state/checkout';
 export default function useStep(checkout: Checkout) {
   const [step, setStep] = useState(1);
-  const dispatch = useDispatch();
+
+  const { checkoutState, actions } = useGlobalCheckout();
+
   const {
     mode: selectedMode,
-    phoneCheck = true,
+    phoneNumberValid = true,
     checkoutStep
-  } = useSelector((state: any) => state.checkout);
+  } = checkoutState;
 
   useEffect(() => {
     if (checkoutStep) {
@@ -19,32 +21,32 @@ export default function useStep(checkout: Checkout) {
       checkout?.deliveryModuleOptionCode &&
       checkout?.deliveryAddressId &&
       checkout?.billingAddressId &&
-      phoneCheck &&
+      phoneNumberValid &&
       checkout?.paymentModuleId &&
       checkout?.acceptedTermsAndConditions &&
       checkout?.isComplete
     ) {
       setStep(7);
-      dispatch(setCheckoutStep(7));
+      actions.setCheckoutStep(7);
     } else if (
       selectedMode !== null &&
       checkout?.deliveryModuleOptionCode &&
       checkout?.deliveryAddressId &&
       checkout?.billingAddressId &&
-      phoneCheck &&
+      phoneNumberValid &&
       checkout?.paymentModuleId
     ) {
       setStep(6);
-      dispatch(setCheckoutStep(6));
+      actions.setCheckoutStep(6);
     } else if (
       selectedMode !== null &&
       checkout?.deliveryModuleOptionCode &&
       checkout?.deliveryAddressId &&
       checkout?.billingAddressId &&
-      phoneCheck
+      phoneNumberValid
     ) {
       setStep(5);
-      dispatch(setCheckoutStep(5));
+      actions.setCheckoutStep(5);
     } else if (
       selectedMode !== null &&
       checkout?.deliveryModuleOptionCode &&
@@ -52,20 +54,20 @@ export default function useStep(checkout: Checkout) {
       checkout?.billingAddressId
     ) {
       setStep(4);
-      dispatch(setCheckoutStep(4));
+      actions.setCheckoutStep(4);
     } else if (
       selectedMode !== null &&
       checkout?.deliveryModuleOptionCode &&
       checkout?.deliveryAddressId
     ) {
       setStep(3);
-      dispatch(setCheckoutStep(3));
+      actions.setCheckoutStep(3);
     } else if (selectedMode !== null) {
-      dispatch(setCheckoutStep(3));
+      actions.setCheckoutStep(3);
     } else {
       setStep(1);
     }
-  }, [checkout, setStep, selectedMode, phoneCheck]);
+  }, [checkout, setStep, selectedMode, phoneNumberValid]);
 
   return step;
 }

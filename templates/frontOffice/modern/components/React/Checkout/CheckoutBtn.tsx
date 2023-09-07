@@ -1,3 +1,4 @@
+import { useGlobalCheckout } from '@js/state/checkout';
 import {
   useFinalCheckout,
   useGetCheckout,
@@ -9,14 +10,16 @@ import { useRef } from 'react';
 import React from 'react';
 
 import { useIntl } from 'react-intl';
-import { useSelector } from 'react-redux';
 
 export default function CheckoutButton() {
   const intl = useIntl();
   const { mutate } = useFinalCheckout();
   const { mutate: setCheckout } = useSetCheckout();
   const { data: checkout } = useGetCheckout();
-  const { phoneNumberValid } = useSelector((state: any) => state.checkout);
+
+  const { checkoutState } = useGlobalCheckout();
+  const { phoneNumberValid } = checkoutState;
+
   const ButtonRef = useRef<HTMLInputElement>(null);
   return (
     <div className="">

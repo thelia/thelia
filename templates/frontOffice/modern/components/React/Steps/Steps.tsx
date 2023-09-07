@@ -1,13 +1,14 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
-import { setCheckoutStep } from '@js/redux/modules/checkout';
+
 import { StepsProps } from './Steps.types';
+import { useGlobalCheckout } from '@js/state/checkout';
 
 export default function Steps({ steps }: StepsProps) {
   const intl = useIntl();
-  const dispatch = useDispatch();
-  const { checkoutStep } = useSelector((state: any) => state.checkout);
+
+  const { checkoutState, actions } = useGlobalCheckout();
+  const { checkoutStep } = checkoutState;
 
   return (
     <nav className="Steps">
@@ -16,7 +17,7 @@ export default function Steps({ steps }: StepsProps) {
           return (
             <li
               key={index}
-              onClick={() => dispatch(setCheckoutStep(step.id))}
+              onClick={() => actions.setCheckoutStep(step.id)}
               className={`Steps-item ${
                 step.id === checkoutStep ? 'Steps-item--active' : ''
               }`}
