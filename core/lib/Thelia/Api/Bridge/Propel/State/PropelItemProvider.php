@@ -14,12 +14,17 @@ namespace Thelia\Api\Bridge\Propel\State;
 
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
 use Thelia\Api\Resource\PropelResourceInterface;
 
-class PropelItemProvider extends AbstractPropelProvider
+class PropelItemProvider implements ProviderInterface
 {
-    public function __construct(readonly private iterable $propelItemExtensions = [])
+    public function __construct(
+        readonly private ApiResourceService $apiResourceService,
+        readonly private iterable $propelItemExtensions = []
+    )
     {
     }
 
@@ -49,6 +54,10 @@ class PropelItemProvider extends AbstractPropelProvider
             return null;
         }
 
-        return $this->modelToResource($resourceClass, $propelModel, $context);
+        return $this->apiResourceService->modelToResource(
+            resourceClass: $resourceClass,
+            propelModel: $propelModel,
+            context: $context
+        );
     }
 }

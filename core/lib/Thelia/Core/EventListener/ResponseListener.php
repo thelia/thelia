@@ -27,7 +27,7 @@ class ResponseListener implements EventSubscriberInterface
 {
     public function beforeResponse(ResponseEvent $event): void
     {
-        if (!$event->getRequest()->hasSession() || !$event->getRequest()->getSession()->isStarted()) {
+        if (!$event->getRequest()->hasSession(true) || !$event->getRequest()->getSession()->isStarted()) {
             return;
         }
 
