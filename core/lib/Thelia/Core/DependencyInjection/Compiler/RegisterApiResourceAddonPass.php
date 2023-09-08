@@ -15,25 +15,26 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
-use Thelia\Api\Resource\ExtendResourceInterface;
+use Thelia\Api\Resource\ResourceAddonInterface;
 
-class RegisterApiResourceExtendPass implements CompilerPassInterface
+class RegisterApiResourceAddonPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
         try {
-            $resourceExtends = $container->getParameter('Thelia.api.resource.extends');
+            $resourceAddons= $container->getParameter('Thelia.api.resource.addons');
         } catch (ParameterNotFoundException $e) {
-            $resourceExtends = [];
+            $resourceAddons = [];
         }
 
         /**
-         * @var ExtendResourceInterface $class
+         * @var ResourceAddonInterface $class
          */
-        foreach ($container->findTaggedServiceIds('thelia.api.resource.extend') as $class => $tag) {
-            $resourceExtends[$class::getResourceToExtend()][] = $class;
+        foreach ($container->findTaggedServiceIds('thelia.api.resource.addon') as $class => $tag) {
+            $reflection = new \ReflectionClass($class);
+            $resourceAddons[$class::getResourceToExtend()][$reflection->getShortName()] =  $class;
         }
 
-        $container->setParameter('Thelia.api.resource.extends', $resourceExtends);
+        $container->setParameter('Thelia.api.resource.addons', $resourceAddons);
     }
 }
