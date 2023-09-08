@@ -65,7 +65,7 @@ class RequestListener implements EventSubscriberInterface
         /** @var \Thelia\Core\HttpFoundation\Request $request */
         $request = $event->getRequest();
 
-        $lang = !$request->get('isApiRoute', false) && $request->hasSession() ? $request->getSession()->getLang() : Lang::getDefaultLanguage();
+        $lang = !$request->get('isApiRoute', false) && $request->hasSession(true) ? $request->getSession()->getLang() : Lang::getDefaultLanguage();
 
         $vendorFormDir = THELIA_VENDOR.'symfony'.DS.'form';
         $vendorValidatorDir = THELIA_VENDOR.'symfony'.DS.'validator';
@@ -222,7 +222,7 @@ class RequestListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if (!$request->isXmlHttpRequest() && $event->getResponse()->isSuccessful() && $request->hasSession() && $request->getSession()->isStarted()) {
+        if (!$request->isXmlHttpRequest() && $event->getResponse()->isSuccessful() && $request->hasSession(true) && $request->getSession()->isStarted()) {
             $referrer = $request->attributes->get('_previous_url', null);
 
             $catalogViews = ['category', 'product'];
