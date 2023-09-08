@@ -16,15 +16,22 @@ use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Util\ClassInfoTrait;
+use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
 
+#[AsDecorator(decorates: 'api_platform.symfony.iri_converter')]
 class IriConverter implements IriConverterInterface
 {
     use ClassInfoTrait;
 
-    public function __construct(private IriConverterInterface $decorated, private readonly RouterInterface $router)
+    public function __construct(
+        #[AutowireDecorated]
+        private IriConverterInterface $decorated,
+        private readonly RouterInterface $router
+    )
     {
     }
 

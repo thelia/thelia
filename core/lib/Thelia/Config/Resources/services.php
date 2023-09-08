@@ -13,6 +13,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Thelia\Api\Bridge\Propel\MetaData\Property\PropelPropertyMetadataFactory;
+use Thelia\Api\Bridge\Propel\OpenApiDecorator\HideExtendDecorator;
 use Thelia\Api\Bridge\Propel\OpenApiDecorator\JwtDecorator;
 use Thelia\Api\Bridge\Propel\Routing\IriConverter;
 use Thelia\Core\Service\ConfigCacheService;
@@ -36,7 +37,7 @@ return static function (ContainerConfigurator $configurator): void {
         ->bind('$formDefinition', '%Thelia.parser.forms%')
         ->bind('$propelCollectionExtensions', tagged_iterator('thelia.api.propel.query_extension.collection'))
         ->bind('$propelItemExtensions', tagged_iterator('thelia.api.propel.query_extension.item'))
-        ->bind('$apiResourceExtends', '%Thelia.api.resource.extends%');
+        ->bind('$apiResourceAddons', '%Thelia.api.resource.addons%');
 
     $serviceConfigurator->load('Thelia\\', THELIA_LIB)
         ->exclude(
@@ -99,22 +100,6 @@ return static function (ContainerConfigurator $configurator): void {
 
     $serviceConfigurator->get(ConfigCacheService::class)
         ->public();
-
-    $serviceConfigurator->set(JwtDecorator::class)
-        ->decorate('api_platform.openapi.factory')
-        ->args([service('.inner')]);
-
-    $serviceConfigurator->set(PropelPropertyMetadataFactory::class)
-        ->decorate('api_platform.metadata.property.metadata_factory')
-        ->args([service('.inner')]);
-
-    $serviceConfigurator->set(IriConverter::class)
-        ->decorate('api_platform.symfony.iri_converter')
-        ->args(
-            [
-                service('.inner'),
-            ])
-        ->autowire();
 
             //        $resourceExtends = $container->getParameter('Thelia.api.resource.extends');
 //        $chainLoader = $serviceConfigurator->get('serializer.mapping.cache_warmer');
