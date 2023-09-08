@@ -20,5 +20,11 @@ interface PropelResourceInterface
 
     public function getPropelModel(): ?ActiveRecordInterface;
 
+    public function getResourceAddons(): array;
+
+    public function getResourceAddon(string $addonName): ?ResourceAddonInterface;
+
+    public function setResourceAddon(string $addonName, ResourceAddonInterface $addon): AbstractPropelResource;
+
     public static function getPropelModelClass(): string;
 }
