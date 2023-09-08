@@ -17,10 +17,14 @@ use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\PathItem;
 use ApiPlatform\OpenApi\Model\RequestBody;
 use ApiPlatform\OpenApi\OpenApi;
+use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 
+#[AsDecorator(decorates: 'api_platform.openapi.factory')]
 class JwtDecorator implements OpenApiFactoryInterface
 {
     public function __construct(
+        #[AutowireDecorated]
         private OpenApiFactoryInterface $decorated
     ) {
     }

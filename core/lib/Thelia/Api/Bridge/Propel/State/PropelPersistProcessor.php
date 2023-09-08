@@ -15,118 +15,79 @@ namespace Thelia\Api\Bridge\Propel\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\ProcessorInterface;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Propel;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
+use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
 use Thelia\Api\Resource\AbstractPropelResource;
+use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Api\Resource\TranslatableResourceInterface;
+use Thelia\Config\DatabaseConfiguration;
+use Thelia\Model\Address;
+use Thelia\Model\Map\AddressTableMap;
+use TheliaMain\PropelResolver;
 
 class PropelPersistProcessor implements ProcessorInterface
 {
-    public function __construct(private readonly PropelItemProvider $itemProvider)
+    public function __construct(
+        private readonly ApiResourceService $apiResourceService,
+        private readonly RequestStack $requestStack
+    )
     {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        $propelModel = $this->resourceToModel($data);
+        $resourceAddons = [];
+        $propelModel = $this->apiResourceService->resourceToModel($data);
 
-        $propelModel->save();
+        $connection = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME);
+        $connection->beginTransaction();
 
-        $propelModel->reload();
+        try {
+            $propelModel->save();
 
-        $data->setId($propelModel->getId());
+            $jsonData = json_decode($this->requestStack->getCurrentRequest()->getContent(), true);
+            $resourceAddonDefinitions = $this->apiResourceService->getResourceAddonDefinitions($data::class);
+            foreach ($resourceAddonDefinitions as $addonShortName => $addonClass) {
+                if (!isset($jsonData[$addonShortName])) {
+                    continue;
+                }
+
+                if (is_subclass_of($addonClass, ResourceAddonInterface::class)) {
+                    $addon = (new $addonClass())->buildFromArray($jsonData[$addonShortName], $data);
+                    $addon->doSave($propelModel, $data);
+                    $resourceAddons[$addonShortName] = $addon;
+                }
+            }
+
+            $connection->commit();
+
+            $propelModel->reload();
+
+            $data->setId($propelModel->getId());
+        } catch (\Exception $exception) {
+            $connection->rollBack();
+
+            throw $exception;
+        }
 
         /** @var Post $postOperation */
         $postOperation = $context['operation'] ?? null;
         if (null !== $postOperation) {
-            $data = $this->itemProvider->modelToResource(get_class($data), $propelModel, $postOperation->getNormalizationContext());
+            $data = $this->apiResourceService->modelToResource(
+                resourceClass: get_class($data),
+                propelModel: $propelModel,
+                context: $postOperation->getNormalizationContext(),
+                withAddon: false
+            );
+            foreach ($resourceAddons as $addonShortName => $addon) {
+                $data->setResourceAddon($addonShortName, $addon);
+            }
         }
 
         return $data;
-    }
-
-    public function resourceToModel(mixed $data)
-    {
-        $propelModel = $data->getPropelModel();
-
-        if (null === $propelModel) {
-            $propelModelClass = $data::getPropelModelClass();
-            $propelModel = new $propelModelClass();
-        }
-
-        $resourceReflection = new \ReflectionClass($data);
-        foreach ($resourceReflection->getProperties() as $property) {
-            if (!$property->isInitialized($data)) {
-                continue;
-            }
-
-            $setterForced = false;
-            $propelSetter = 'set'.ucfirst($property->getName());
-
-            foreach ($property->getAttributes(Column::class) as $columnAttribute) {
-                if (isset($columnAttribute->getArguments()['propelFieldName'])) {
-                    $propelSetter = 'set'.ucfirst($columnAttribute->getArguments()['propelFieldName']);
-                }
-                if (isset($columnAttribute->getArguments()['propelSetter'])) {
-                    $setterForced = true;
-                    $propelSetter = $columnAttribute->getArguments()['propelSetter'];
-                }
-            }
-
-
-            if (method_exists($propelModel, $propelSetter)) {
-                $possibleGetters = [
-                    'get'.ucfirst($property->getName()),
-                    'is'.ucfirst($property->getName()),
-                ];
-
-                $availableMethods = array_filter(array_intersect($possibleGetters, get_class_methods($data)));
-
-                $value = null;
-                while (!empty($availableMethods) && $value === null) {
-                    $method = array_pop($availableMethods);
-                    $value = $data->$method();
-                }
-
-                if ($value instanceof AbstractPropelResource) {
-                    if (!$setterForced) {
-                        $propelSetter = $propelSetter.'Id';
-                    }
-                    $value = $value->getPropelModel()->getId();
-                }
-
-                if (\is_array($value)) {
-                    $value = new Collection(array_map(function ($value) {return $this->resourceToModel($value); }, $value));
-                }
-
-                $propelModel->$propelSetter($value);
-            }
-        }
-
-        if (is_subclass_of($data, TranslatableResourceInterface::class)) {
-            foreach ($data->getI18ns() as $locale => $i18n) {
-                $i18nGetters = array_filter(
-                    array_map(
-                        function (\ReflectionProperty $reflectionProperty) use ($i18n) {
-                            return $reflectionProperty->isInitialized($i18n) ? 'get'.ucfirst($reflectionProperty->getName()) : null;
-                        },
-                        (new \ReflectionClass($i18n))->getProperties()
-                    )
-                );
-
-                $propelModel->setLocale($locale);
-                foreach ($i18nGetters as $i18nGetter) {
-                    if ($i18nGetter === 'getId') {
-                        continue;
-                    }
-                    $propelSetter = substr_replace($i18nGetter, 's', 0, 1);
-                    if (method_exists($propelModel, $propelSetter)) {
-                        $propelModel->$propelSetter($i18n->$i18nGetter());
-                    }
-                }
-            }
-        }
-
-        return $propelModel;
     }
 }
