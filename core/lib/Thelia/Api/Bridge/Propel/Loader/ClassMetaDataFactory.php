@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
 
 #[AsDecorator(decorates: 'api_platform.serializer.mapping.class_metadata_factory')]
 class ClassMetaDataFactory implements ClassMetadataFactoryInterface
@@ -17,38 +18,32 @@ class ClassMetaDataFactory implements ClassMetadataFactoryInterface
     public function __construct(
         #[AutowireDecorated]
         private ClassMetadataFactoryInterface $inner,
-        private array $apiResourceExtends
+        private ApiResourceService $apiResourceService
     ) {
     }
 
     public function getMetadataFor($value): ClassMetadataInterface
     {
         $metadata =  $this->inner->getMetadataFor(\is_object($value) ? $this->getObjectClass($value) : $this->getRealClassName($value));
-        $resourceExtends = $this->apiResourceExtends[$metadata->getName()] ?? [];
+        $resourceAddons = $this->apiResourceService->getResourceAddonDefinitions($metadata->getName());
 
-        if (empty($resourceExtends)) {
+        if (empty($resourceAddons)) {
             return $metadata;
         }
 
-        $additionalDataGroups = [];
-        foreach ($resourceExtends as $resourceExtend) {
-            $extendMetadata = $this->inner->getMetadataFor($resourceExtend);
-            $additionalDataGroups = array_merge(
-                $additionalDataGroups,
-                array_map(
-                    function (AttributeMetadata $attributeMetadata) {
-                        return $attributeMetadata->getGroups();
-                    },
-                    array_values($extendMetadata->getAttributesMetadata())
-                )
-            );
+        foreach ($resourceAddons as  $addonShortName => $addonClass) {
+            $addonMetadata = $this->inner->getMetadataFor($addonClass);
+            // Create an attribute with the addon name and set groups of all of his own attributes
+            $addonAttributeMetadata = new AttributeMetadata($addonShortName);
+            foreach ($addonMetadata->getAttributesMetadata() as $attributeMetadata) {
+                foreach ($attributeMetadata->getGroups() as $attributeMetadataGroup) {
+                    $addonAttributeMetadata->addGroup($attributeMetadataGroup);
+                }
+            }
+
+            $metadata->addAttributeMetadata($addonAttributeMetadata);
         }
 
-        $additionalDataGroups = array_unique(array_merge_recursive(...$additionalDataGroups));
-        $additionalDataMetadata = $metadata->getAttributesMetadata()['additionalData'];
-        foreach ($additionalDataGroups as $additionalDataGroup) {
-            $additionalDataMetadata->addGroup($additionalDataGroup);
-        }
 
         return $metadata;
     }

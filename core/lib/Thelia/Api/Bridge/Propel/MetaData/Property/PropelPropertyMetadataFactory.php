@@ -14,35 +14,34 @@ namespace Thelia\Api\Bridge\Propel\MetaData\Property;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use Thelia\Api\Resource\Address;
+use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
+use Symfony\Component\PropertyInfo\Type;
+use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
 use Thelia\Api\Resource\TranslatableResourceInterface;
 
+#[AsDecorator(decorates: 'api_platform.metadata.property.metadata_factory')]
 class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    public function __construct(private readonly PropertyMetadataFactoryInterface $decorated)
+    public function __construct(
+        #[AutowireDecorated]
+        private readonly PropertyMetadataFactoryInterface $decorated,
+        private ApiResourceService $apiResourceService
+    )
     {
     }
 
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
+        $resourceAddonDefinitions = $this->apiResourceService->getResourceAddonDefinitions($resourceClass);
 
-        if ($resourceClass === Address::class && $property === "customerTitle") {
-//            dump($resourceClass, $property, $propertyMetadata);
-        }
-
-        if ('additionalData' === $property) {
-//            $propertyMetadata = $propertyMetadata->withOpenapiContext([
-//                'type' => 'object',
-//
-//            ]);
-
-            $propertyMetadata =  $propertyMetadata->withSchema([                                'type' => 'object',
-                'properties' => [
-                    'refresh_token' => [
-                        'type' => 'string',
-                    ],
-                ]]);
+        if (!empty($resourceAddonDefinitions) && isset($resourceAddonDefinitions[$property])) {
+            $propertyMetadata = $propertyMetadata->withBuiltinTypes(
+                [(new Type(builtinType: 'object', class: $resourceAddonDefinitions[$property]))]
+            );
+            $propertyMetadata = $propertyMetadata->withReadable(true);
+            $propertyMetadata = $propertyMetadata->withWritable(true);
         }
 
         if ('i18ns' === $property && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {

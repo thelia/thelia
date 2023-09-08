@@ -13,12 +13,22 @@
 namespace Thelia\Api\Resource;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 abstract class AbstractPropelResource implements PropelResourceInterface
 {
-    public array $additionalData;
+    protected array $resourceAddons = [];
 
     private ?ActiveRecordInterface $propelModel = null;
+
+    public function __get($property)
+    {
+        if (isset($this->resourceAddons[$property])) {
+            return $this->getResourceAddon($property);
+        }
+
+        throw new NoSuchPropertyException(sprintf('Can\'t get a way to read the property "%s" in class "%s".', $property, $this::class));
+    }
 
     public function setPropelModel(?ActiveRecordInterface $propelModel = null): PropelResourceInterface
     {
@@ -30,6 +40,23 @@ abstract class AbstractPropelResource implements PropelResourceInterface
     public function getPropelModel(): ?ActiveRecordInterface
     {
         return $this->propelModel;
+    }
+
+    public function getResourceAddon(string $addonName): ?ResourceAddonInterface
+    {
+        return $this->resourceAddons[$addonName] ?? null;
+    }
+
+    public function setResourceAddon(string $addonName, ResourceAddonInterface $addon): AbstractPropelResource
+    {
+        $this->resourceAddons[$addonName] = $addon;
+
+        return $this;
+    }
+
+    public function getResourceAddons(): array
+    {
+        return $this->resourceAddons;
     }
 
     public function afterModelToResource(array $context): void
