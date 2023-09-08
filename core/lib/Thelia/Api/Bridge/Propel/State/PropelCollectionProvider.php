@@ -14,14 +14,19 @@ namespace Thelia\Api\Bridge\Propel\State;
 
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Api\Bridge\Propel\Extension\QueryResultCollectionExtensionInterface;
+use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Model\LangQuery;
 
-class PropelCollectionProvider extends AbstractPropelProvider
+class PropelCollectionProvider implements ProviderInterface
 {
-    public function __construct(private iterable $propelCollectionExtensions = [])
+    public function __construct(
+        readonly private ApiResourceService $apiResourceService,
+        private iterable $propelCollectionExtensions = []
+    )
     {
     }
 
@@ -41,12 +46,19 @@ class PropelCollectionProvider extends AbstractPropelProvider
 
         $results = null;
 
+        $resultExtensions = [];
         foreach ($this->propelCollectionExtensions as $extension) {
             $extension->applyToCollection($query, $resourceClass, $operation, $context);
 
+            // Keep result extension for the end to apply all join / filter before
             if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation, $context)) {
-                $results = $extension->getResult($query, $resourceClass, $operation, $context);
+                $resultExtensions[] = $extension;
             }
+        }
+
+        /** @var QueryResultCollectionExtensionInterface $resultExtension */
+        foreach ($resultExtensions as $resultExtension) {
+            $results = $resultExtension->getResult($query, $resourceClass, $operation, $context);
         }
 
         if (null === $results) {
@@ -55,9 +67,9 @@ class PropelCollectionProvider extends AbstractPropelProvider
 
         $langs = LangQuery::create()->filterByActive(1)->find();
 
-        $items = array_map(
+        return array_map(
             function ($propelModel) use ($resourceClass, $context, $langs) {
-                return $this->modelToResource(
+                return $this->apiResourceService->modelToResource(
                     resourceClass: $resourceClass,
                     propelModel: $propelModel,
                     context: $context,
@@ -66,7 +78,5 @@ class PropelCollectionProvider extends AbstractPropelProvider
             },
             iterator_to_array($results)
         );
-
-        return $items;
     }
 }

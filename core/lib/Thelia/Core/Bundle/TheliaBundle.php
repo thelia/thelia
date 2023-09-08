@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentL
 use Thelia\Api\Bridge\Propel\Loader\ExtendLoader;
 use Thelia\Core\DependencyInjection\Compiler\CurrencyConverterProviderPass;
 use Thelia\Core\DependencyInjection\Compiler\FallbackParserPass;
-use Thelia\Core\DependencyInjection\Compiler\RegisterApiResourceExtendPass;
+use Thelia\Core\DependencyInjection\Compiler\RegisterApiResourceAddonPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterAssetFilterPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterCommandPass;
@@ -71,7 +71,7 @@ class TheliaBundle extends Bundle
             ->addCompilerPass(new RegisterLoopPass())
             ->addCompilerPass(new RegisterCommandPass())
             ->addCompilerPass(new RegisterFormPass())
-            ->addCompilerPass(new RegisterApiResourceExtendPass())
+            ->addCompilerPass(new RegisterApiResourceAddonPass())
         ;
     }
 
