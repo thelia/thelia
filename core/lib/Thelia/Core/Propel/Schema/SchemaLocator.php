@@ -206,7 +206,7 @@ class SchemaLocator
                     continue;
                 }
 
-                $externalSchemaPath = $externalSchemaElement->getAttribute('filename');
+                $externalSchemaPath = THELIA_ROOT . $externalSchemaElement->getAttribute('filename');
 
                 if (!$fs->exists($externalSchemaPath)) {
                     continue;
