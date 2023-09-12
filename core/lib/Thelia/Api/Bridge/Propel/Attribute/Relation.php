@@ -18,7 +18,8 @@ use Attribute;
 class Relation
 {
     public function __construct(
-       private string $targetResource, private ?string $relationAlias = null
+       private string $targetResource,
+       private ?string $relationAlias = null
     ) {
     }
 }
