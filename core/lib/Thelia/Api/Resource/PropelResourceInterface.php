@@ -16,6 +16,8 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 
 interface PropelResourceInterface
 {
+    public function __get(string $property);
+
     public function setPropelModel(ActiveRecordInterface $propelModel): self;
 
     public function getPropelModel(): ?ActiveRecordInterface;
