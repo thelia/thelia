@@ -12,10 +12,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Thelia\Api\Bridge\Propel\MetaData\Property\PropelPropertyMetadataFactory;
-use Thelia\Api\Bridge\Propel\OpenApiDecorator\HideExtendDecorator;
-use Thelia\Api\Bridge\Propel\OpenApiDecorator\JwtDecorator;
-use Thelia\Api\Bridge\Propel\Routing\IriConverter;
 use Thelia\Core\Service\ConfigCacheService;
 use Thelia\Core\Thelia;
 use Thelia\Log\Tlog;
@@ -80,12 +76,17 @@ return static function (ContainerConfigurator $configurator): void {
     }
 
     if (\defined('THELIA_INSTALL_MODE') === false) {
+        $apiModulePaths = [];
         $modules = ModuleQuery::getActivated();
         /** @var Module $module */
         foreach ($modules as $module) {
             try {
                 \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
                 \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
+                $apiResourcePath = $module->getAbsoluteBaseDir().'/Api/Resource';
+                if (is_dir($apiResourcePath)) {
+                    $apiModulePaths[] = $apiResourcePath;
+                }
             } catch (\Exception $e) {
                 if ($_SERVER['APP_DEBUG']) {
                     throw $e;
@@ -96,23 +97,10 @@ return static function (ContainerConfigurator $configurator): void {
                 );
             }
         }
+
+        $configurator->extension('api_platform', ['mapping' => ['paths' => $apiModulePaths]]);
     }
 
     $serviceConfigurator->get(ConfigCacheService::class)
         ->public();
-
-            //        $resourceExtends = $container->getParameter('Thelia.api.resource.extends');
-//        $chainLoader = $serviceConfigurator->get('serializer.mapping.cache_warmer');
-//        dd($chainLoader);
-//        $serializerLoaders = $chainLoader->getArgument(0);
-//
-//        $extendLoader = new Definition(
-//            ExtendLoader::class,
-//            [$resourceExtends]
-//        );
-//        $extendLoader->setPublic(false);
-//        $serializerLoaders[] = $extendLoader;
-//
-//        $chainLoader->replaceArgument(0, $serializerLoaders);
-//        $this->getContainer()->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);
 };
