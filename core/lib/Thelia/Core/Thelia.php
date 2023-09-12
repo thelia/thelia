@@ -295,6 +295,10 @@ class Thelia extends Kernel
      */
     public function boot(): void
     {
+        if (!$this->booted) {
+           $this->container ?? $this->preBoot();
+        }
+
         parent::boot();
 
         if ($this->cacheRefresh) {
