@@ -51,7 +51,7 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
     filterClass: SearchFilter::class,
     properties: [
         'label',
-        'customer.id' => 'exact',
+        'customer.id' => 'exact'
     ]
 )]
 class Address extends AbstractPropelResource

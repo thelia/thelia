@@ -1,0 +1,14 @@
+api_platform:
+    show_webby: false
+    mapping:
+        paths: [
+            '%kernel.project_dir%/core/lib/Thelia/Api/Resource'
+        ]
+    swagger:
+        versions: [3]
+        swagger_ui_extra_configuration:
+            filter: true
+        api_keys:
+            JWT:
+                name: Authorization
+                type: header

@@ -21,7 +21,7 @@ abstract class AbstractPropelResource implements PropelResourceInterface
 
     private ?ActiveRecordInterface $propelModel = null;
 
-    public function __get($property)
+    public function __get(string $property)
     {
         if (isset($this->resourceAddons[$property])) {
             return $this->getResourceAddon($property);
