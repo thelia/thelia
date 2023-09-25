@@ -19,10 +19,12 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Model\Map\AddressTableMap;
 
 #[ApiResource(
     operations: [
@@ -51,7 +53,7 @@ use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
     filterClass: SearchFilter::class,
     properties: [
         'label',
-        'customer.id' => 'exact'
+        'customer.id' => 'exact',
     ]
 )]
 class Address extends AbstractPropelResource
@@ -350,8 +352,8 @@ class Address extends AbstractPropelResource
         return $this;
     }
 
-    public static function getPropelModelClass(): string
+    public static function getPropelRelatedTableMap(): ?TableMap
     {
-        return \Thelia\Model\Address::class;
+        return new AddressTableMap();
     }
 }
