@@ -19,12 +19,14 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Model\Map\ProductTableMap;
 
 #[ApiResource(
     operations: [
@@ -299,9 +301,9 @@ class Product extends AbstractTranslatableResource
         return $this;
     }
 
-    public static function getPropelModelClass(): string
+    public static function getPropelRelatedTableMap(): ?TableMap
     {
-        return \Thelia\Model\Product::class;
+        return new ProductTableMap();
     }
 
     public static function getI18nResourceClass(): string
