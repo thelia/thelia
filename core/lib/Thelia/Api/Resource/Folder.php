@@ -18,7 +18,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Model\Map\FolderTableMap;
 
 #[ApiResource(
     operations: [
@@ -141,9 +143,9 @@ class Folder extends AbstractTranslatableResource
         return $this;
     }
 
-    public static function getPropelModelClass(): string
+    public static function getPropelRelatedTableMap(): ?TableMap
     {
-        return \Thelia\Model\Folder::class;
+        return new FolderTableMap();
     }
 
     public static function getI18nResourceClass(): string

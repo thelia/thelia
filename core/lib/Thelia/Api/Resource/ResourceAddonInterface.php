@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Annotation\Ignore;
 interface ResourceAddonInterface
 {
     #[Ignore]
-    public static function getResourceToExtend(): string;
+    public static function getResourceParent(): string;
 
     #[Ignore]
     public static function getPropelRelatedTableMap(): ?TableMap;

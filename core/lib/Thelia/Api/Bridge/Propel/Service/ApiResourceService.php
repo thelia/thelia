@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Service;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
@@ -19,8 +29,7 @@ class ApiResourceService
 {
     public function __construct(
         private readonly array $apiResourceAddons
-    )
-    {
+    ) {
     }
 
     public function getResourceAddonDefinitions($resourceClass): array
@@ -42,7 +51,6 @@ class ApiResourceService
         ActiveRecordInterface $baseModel = null,
         bool $withAddon = true
     ): PropelResourceInterface {
-
         if ($langs === null) {
             $langs = LangQuery::create()->filterByActive(1)->find();
         }
@@ -230,7 +238,6 @@ class ApiResourceService
         return $apiResource;
     }
 
-
     public function resourceToModel(mixed $data)
     {
         $propelModel = $data->getPropelModel();
@@ -258,7 +265,6 @@ class ApiResourceService
                     $propelSetter = $columnAttribute->getArguments()['propelSetter'];
                 }
             }
-
 
             if (method_exists($propelModel, $propelSetter)) {
                 $possibleGetters = [

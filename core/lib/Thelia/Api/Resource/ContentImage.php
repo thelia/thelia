@@ -18,8 +18,10 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Model\Map\ContentImageTableMap;
 
 #[ApiResource(
     operations: [
@@ -74,9 +76,9 @@ class ContentImage extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
 
-    public static function getPropelModelClass(): string
+    public static function getPropelRelatedTableMap(): ?TableMap
     {
-        return \Thelia\Model\ContentImage::class;
+        return new ContentImageTableMap();
     }
 
     public static function getI18nResourceClass(): string

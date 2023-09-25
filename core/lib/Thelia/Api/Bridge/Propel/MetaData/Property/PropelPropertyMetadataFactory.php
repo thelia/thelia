@@ -27,8 +27,7 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
         #[AutowireDecorated]
         private readonly PropertyMetadataFactoryInterface $decorated,
         private ApiResourceService $apiResourceService
-    )
-    {
+    ) {
     }
 
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
@@ -38,10 +37,12 @@ class PropelPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 
         if (!empty($resourceAddonDefinitions) && isset($resourceAddonDefinitions[$property])) {
             $propertyMetadata = $propertyMetadata->withBuiltinTypes(
-                [(new Type(builtinType: 'object', class: $resourceAddonDefinitions[$property]))]
+                [new Type(builtinType: 'object', class: $resourceAddonDefinitions[$property])]
             );
             $propertyMetadata = $propertyMetadata->withReadable(true);
+            $propertyMetadata = $propertyMetadata->withReadableLink(true);
             $propertyMetadata = $propertyMetadata->withWritable(true);
+            $propertyMetadata = $propertyMetadata->withWritableLink(true);
         }
 
         if ('i18ns' === $property && is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
