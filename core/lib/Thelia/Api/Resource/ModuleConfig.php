@@ -18,8 +18,10 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Model\Map\ModuleConfigTableMap;
 
 #[ApiResource(
     operations: [
@@ -128,9 +130,9 @@ class ModuleConfig extends AbstractTranslatableResource
         return $this;
     }
 
-    public static function getPropelModelClass(): string
+    public static function getPropelRelatedTableMap(): ?TableMap
     {
-        return \Thelia\Model\ModuleConfig::class;
+        return new ModuleConfigTableMap();
     }
 
     public static function getI18nResourceClass(): string

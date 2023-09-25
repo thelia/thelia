@@ -18,7 +18,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Model\Map\CurrencyTableMap;
 
 #[ApiResource(
     operations: [
@@ -201,9 +203,9 @@ class Currency extends AbstractTranslatableResource
         return $this;
     }
 
-    public static function getPropelModelClass(): string
+    public static function getPropelRelatedTableMap(): ?TableMap
     {
-        return \Thelia\Model\Currency::class;
+        return new CurrencyTableMap();
     }
 
     public static function getI18nResourceClass(): string

@@ -49,7 +49,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 use Thelia\Api\Bridge\Propel\Extension\QueryCollectionExtensionInterface;
 use Thelia\Api\Bridge\Propel\Extension\QueryItemExtensionInterface;
 use Thelia\Api\Bridge\Propel\Filter\FilterInterface;
-use Thelia\Api\Bridge\Propel\Loader\ExtendLoader;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Controller\ControllerInterface;
@@ -296,7 +295,7 @@ class Thelia extends Kernel
     public function boot(): void
     {
         if (!$this->booted) {
-           $this->container ?? $this->preBoot();
+            $this->container ?? $this->preBoot();
         }
 
         parent::boot();
@@ -887,7 +886,7 @@ class Thelia extends Kernel
             $contents = array_merge($contents, require THELIA_ROOT.'config/bundles.php');
         }
 
-        $contents[Bundle\TheliaBundle::class] =  ['all' => true];
+        $contents[Bundle\TheliaBundle::class] = ['all' => true];
 
         foreach ($contents as $class => $envs) {
             if ($envs[$this->environment] ?? $envs['all'] ?? false) {
