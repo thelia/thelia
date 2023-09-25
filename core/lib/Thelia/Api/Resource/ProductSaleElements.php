@@ -18,8 +18,10 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 
 #[ApiResource(
     operations: [
@@ -247,8 +249,8 @@ class ProductSaleElements extends AbstractPropelResource
         return $this;
     }
 
-    public static function getPropelModelClass(): string
+    public static function getPropelRelatedTableMap(): ?TableMap
     {
-        return \Thelia\Model\ProductSaleElements::class;
+        return new ProductSaleElementsTableMap();
     }
 }

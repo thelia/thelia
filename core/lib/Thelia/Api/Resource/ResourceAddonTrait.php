@@ -18,7 +18,7 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Map\TableMap;
 
-abstract class AbstractResourceAddon implements ResourceAddonInterface
+trait ResourceAddonTrait
 {
     public static function getAddonName()
     {
