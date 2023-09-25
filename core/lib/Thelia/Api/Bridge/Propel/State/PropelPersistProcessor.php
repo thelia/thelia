@@ -15,27 +15,18 @@ namespace Thelia\Api\Bridge\Propel\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\ProcessorInterface;
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
-use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Propel;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
-use Thelia\Api\Resource\AbstractPropelResource;
 use Thelia\Api\Resource\ResourceAddonInterface;
-use Thelia\Api\Resource\TranslatableResourceInterface;
 use Thelia\Config\DatabaseConfiguration;
-use Thelia\Model\Address;
-use Thelia\Model\Map\AddressTableMap;
-use TheliaMain\PropelResolver;
 
 class PropelPersistProcessor implements ProcessorInterface
 {
     public function __construct(
         private readonly ApiResourceService $apiResourceService,
         private readonly RequestStack $requestStack
-    )
-    {
+    ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
@@ -78,7 +69,7 @@ class PropelPersistProcessor implements ProcessorInterface
         $postOperation = $context['operation'] ?? null;
         if (null !== $postOperation) {
             $data = $this->apiResourceService->modelToResource(
-                resourceClass: get_class($data),
+                resourceClass: \get_class($data),
                 propelModel: $propelModel,
                 context: $postOperation->getNormalizationContext(),
                 withAddon: false

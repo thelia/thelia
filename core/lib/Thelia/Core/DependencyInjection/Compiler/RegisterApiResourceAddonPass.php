@@ -22,7 +22,7 @@ class RegisterApiResourceAddonPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         try {
-            $resourceAddons= $container->getParameter('Thelia.api.resource.addons');
+            $resourceAddons = $container->getParameter('Thelia.api.resource.addons');
         } catch (ParameterNotFoundException $e) {
             $resourceAddons = [];
         }
@@ -32,7 +32,7 @@ class RegisterApiResourceAddonPass implements CompilerPassInterface
          */
         foreach ($container->findTaggedServiceIds('thelia.api.resource.addon') as $class => $tag) {
             $reflection = new \ReflectionClass($class);
-            $resourceAddons[$class::getResourceToExtend()][$reflection->getShortName()] =  $class;
+            $resourceAddons[$class::getResourceParent()][$reflection->getShortName()] = $class;
         }
 
         $container->setParameter('Thelia.api.resource.addons', $resourceAddons);

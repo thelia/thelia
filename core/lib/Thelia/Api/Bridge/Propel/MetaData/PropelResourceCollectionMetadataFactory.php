@@ -71,7 +71,6 @@ final class PropelResourceCollectionMetadataFactory implements ResourceMetadataC
             $resourceMetadataCollection[$i] = $resourceMetadata;
         }
 
-
         return $resourceMetadataCollection;
     }
 
