@@ -14,11 +14,14 @@ namespace Thelia\Api\Resource;
 
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
-abstract class AbstractPropelResource implements PropelResourceInterface
+trait PropelResourceTrait
 {
+    #[Ignore]
     protected array $resourceAddons = [];
 
+    #[Ignore]
     private ?ActiveRecordInterface $propelModel = null;
 
     public function __get(string $property)
@@ -47,7 +50,7 @@ abstract class AbstractPropelResource implements PropelResourceInterface
         return $this->resourceAddons[$addonName] ?? null;
     }
 
-    public function setResourceAddon(string $addonName, ResourceAddonInterface $addon): self
+    public function setResourceAddon(string $addonName, ResourceAddonInterface $addon): PropelResourceInterface
     {
         $this->resourceAddons[$addonName] = $addon;
 
@@ -61,5 +64,6 @@ abstract class AbstractPropelResource implements PropelResourceInterface
 
     public function afterModelToResource(array $context): void
     {
+        return;
     }
 }

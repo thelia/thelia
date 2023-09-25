@@ -15,7 +15,6 @@ namespace Thelia\Api\Bridge\Propel\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Propel\Runtime\Propel;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Config\DatabaseConfiguration;
@@ -24,8 +23,7 @@ class PropelRemoveProcessor implements ProcessorInterface
 {
     public function __construct(
         private readonly ApiResourceService $apiResourceService,
-    )
-    {
+    ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
@@ -46,7 +44,7 @@ class PropelRemoveProcessor implements ProcessorInterface
 
             $deleted = $propelModel->delete();
             if (!$deleted) {
-                throw new \Exception("This item cannot be deleted");
+                throw new \Exception('This item cannot be deleted');
             }
 
             $connection->commit();

@@ -14,8 +14,10 @@ namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Model\Map\TaxRuleTableMap;
 
 #[ApiResource(
     operations: [
@@ -156,8 +158,8 @@ class TaxRuleCountry extends AbstractPropelResource
         return $this;
     }
 
-    public static function getPropelModelClass(): string
+    public static function getPropelRelatedTableMap(): ?TableMap
     {
-        return \Thelia\Model\TaxRuleCountry::class;
+        return new TaxRuleTableMap();
     }
 }
