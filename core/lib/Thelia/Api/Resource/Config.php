@@ -18,7 +18,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Model\Map\ConfigTableMap;
 
 #[ApiResource(
     operations: [
@@ -154,6 +156,11 @@ class Config extends AbstractTranslatableResource
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    public static function getPropelRelatedTableMap(): ?TableMap
+    {
+        return new ConfigTableMap();
     }
 
     public static function getPropelModelClass(): string

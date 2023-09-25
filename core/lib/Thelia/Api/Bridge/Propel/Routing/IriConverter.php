@@ -31,8 +31,7 @@ class IriConverter implements IriConverterInterface
         #[AutowireDecorated]
         private IriConverterInterface $decorated,
         private readonly RouterInterface $router
-    )
-    {
+    ) {
     }
 
     public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null): object

@@ -12,8 +12,11 @@
 
 namespace Thelia\Api\Resource;
 
+use Symfony\Component\Serializer\Annotation\Ignore;
+
 class I18n
 {
+    #[Ignore]
     public ?int $id;
 
     public function __construct($data = [])

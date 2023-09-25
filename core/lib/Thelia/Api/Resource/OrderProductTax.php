@@ -17,7 +17,9 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Thelia\Model\Map\OrderProductTaxTableMap;
 
 #[ApiResource(
     operations: [
@@ -164,8 +166,8 @@ class OrderProductTax extends AbstractPropelResource
         return $this;
     }
 
-    public static function getPropelModelClass(): string
+    public static function getPropelRelatedTableMap(): ?TableMap
     {
-        return \Thelia\Model\OrderProduct::class;
+        return new OrderProductTaxTableMap();
     }
 }

@@ -24,8 +24,7 @@ class PropelItemProvider implements ProviderInterface
     public function __construct(
         readonly private ApiResourceService $apiResourceService,
         readonly private iterable $propelItemExtensions = []
-    )
-    {
+    ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
@@ -37,7 +36,7 @@ class PropelItemProvider implements ProviderInterface
         }
 
         /** @var ModelCriteria $queryClass */
-        $queryClass = $resourceClass::getPropelModelClass().'Query';
+        $queryClass = $resourceClass::getPropelRelatedTableMap()->getClassName().'Query';
 
         /** @var ModelCriteria $query */
         $query = $queryClass::create();

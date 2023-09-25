@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Thelia\Api\Bridge\Propel\Loader;
 
 use ApiPlatform\Util\ClassInfoTrait;
@@ -24,14 +34,14 @@ class ClassMetaDataFactory implements ClassMetadataFactoryInterface
 
     public function getMetadataFor($value): ClassMetadataInterface
     {
-        $metadata =  $this->inner->getMetadataFor(\is_object($value) ? $this->getObjectClass($value) : $this->getRealClassName($value));
+        $metadata = $this->inner->getMetadataFor(\is_object($value) ? $this->getObjectClass($value) : $this->getRealClassName($value));
         $resourceAddons = $this->apiResourceService->getResourceAddonDefinitions($metadata->getName());
 
         if (empty($resourceAddons)) {
             return $metadata;
         }
 
-        foreach ($resourceAddons as  $addonShortName => $addonClass) {
+        foreach ($resourceAddons as $addonShortName => $addonClass) {
             $addonMetadata = $this->inner->getMetadataFor($addonClass);
             // Create an attribute with the addon name and set groups of all of his own attributes
             $addonAttributeMetadata = new AttributeMetadata($addonShortName);
@@ -43,7 +53,6 @@ class ClassMetaDataFactory implements ClassMetadataFactoryInterface
 
             $metadata->addAttributeMetadata($addonAttributeMetadata);
         }
-
 
         return $metadata;
     }
