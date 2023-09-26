@@ -14,7 +14,9 @@ namespace Thelia\Api\Bridge\Propel\Routing;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
@@ -30,7 +32,8 @@ class IriConverter implements IriConverterInterface
     public function __construct(
         #[AutowireDecorated]
         private IriConverterInterface $decorated,
-        private readonly RouterInterface $router
+        private readonly RouterInterface $router,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory
     ) {
     }
 
@@ -45,7 +48,11 @@ class IriConverter implements IriConverterInterface
 
         $compositeIdentifiers = $reflector->getAttributes(CompositeIdentifiers::class);
 
-        if (!empty($compositeIdentifiers)) {
+        if (!$operation) {
+            $operation = $this->resourceMetadataCollectionFactory->create($resource::class)->getOperation(null, false, true);
+        }
+
+        if (!empty($compositeIdentifiers) && null !== $operation) {
             try {
                 $identifiers = array_reduce(
                     $compositeIdentifiers[0]->getArguments()[0],
@@ -59,7 +66,7 @@ class IriConverter implements IriConverterInterface
                 );
 
                 return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
-            } catch (RoutingExceptionInterface $e) {
+            } catch (\Exception $e) {
                 // try not decorated converter
             }
         }
