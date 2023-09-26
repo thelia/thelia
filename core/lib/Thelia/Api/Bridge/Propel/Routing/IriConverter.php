@@ -49,7 +49,7 @@ class IriConverter implements IriConverterInterface
         $compositeIdentifiers = $reflector->getAttributes(CompositeIdentifiers::class);
 
         if (!$operation) {
-            $operation = $this->resourceMetadataCollectionFactory->create($resource::class)->getOperation(null, false, true);
+            $operation = $this->resourceMetadataCollectionFactory->create($resource)->getOperation(null, false, true);
         }
 
         if (!empty($compositeIdentifiers) && null !== $operation) {
