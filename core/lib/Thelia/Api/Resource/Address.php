@@ -375,7 +375,7 @@ class Address extends AbstractPropelResource
     {
         $resource = $context->getRoot();
 
-        if (null !== $country = $resource->getCountry()->getPropelModel()) {
+        if (isset($resource->country) && null !== $country = $resource->getCountry()?->getPropelModel()) {
             if ($country->getNeedZipCode()) {
                 $zipCodeRegExp = $country->getZipCodeRE();
                 if (null !== $zipCodeRegExp) {
@@ -397,7 +397,7 @@ class Address extends AbstractPropelResource
     {
         $resource = $context->getRoot();
 
-        if (null !== $country = $resource->getCountry()->getPropelModel()) {
+        if (isset($resource->country) && null !== $country = $resource->getCountry()->getPropelModel()) {
             if ($country->getHasStates()) {
                 if (null !== $state = $resource->getState()->getPropelModel()) {
                     if ($state->getCountryId() !== $country->getId()) {
