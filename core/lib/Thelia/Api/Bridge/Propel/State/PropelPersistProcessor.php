@@ -32,7 +32,7 @@ class PropelPersistProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         $resourceAddons = [];
-        $propelModel = $this->apiResourceService->resourceToModel($data);
+        $propelModel = $this->apiResourceService->resourceToModel($data, $context);
 
         $connection = Propel::getWriteConnection(DatabaseConfiguration::THELIA_CONNECTION_NAME);
         $connection->beginTransaction();

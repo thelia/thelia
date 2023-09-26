@@ -12,10 +12,16 @@
 
 namespace Thelia\Api\Bridge\Propel\Service;
 
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Validator\ValidatorInterface;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
+use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
@@ -28,7 +34,8 @@ use Thelia\Model\LangQuery;
 class ApiResourceService
 {
     public function __construct(
-        private readonly array $apiResourceAddons
+        private readonly array $apiResourceAddons,
+        private readonly ValidatorInterface $validator
     ) {
     }
 
@@ -142,7 +149,7 @@ class ApiResourceService
                         );
                     }
 
-                    $value = $collection;
+                    $value = iterator_to_array($collection);
                 } else {
                     $value = $this->modelToResource(
                         resourceClass: $targetClass,
@@ -238,13 +245,25 @@ class ApiResourceService
         return $apiResource;
     }
 
-    public function resourceToModel(mixed $data)
+    /**
+     * @param PropelResourceInterface $data
+     */
+    public function resourceToModel(mixed $data, array $context = [])
     {
+        /** @var Operation $operation */
+        $operation = $context['operation'] ?? null;
+
+        if ($operation) {
+            $this->validator->validate($data, $operation->getDenormalizationContext());
+        }
+
         $propelModel = $data->getPropelModel();
 
         if (null === $propelModel) {
-            $propelModelClass = $data::getPropelModelClass();
-            $propelModel = new $propelModelClass();
+            /** @var TableMap $propelTableMap */
+            $propelTableMap = $data::getPropelRelatedTableMap();
+            $modelClassName = $propelTableMap->getClassName();
+            $propelModel = new $modelClassName();
         }
 
         $resourceReflection = new \ReflectionClass($data);
@@ -288,7 +307,34 @@ class ApiResourceService
                 }
 
                 if (\is_array($value)) {
-                    $value = new Collection(array_map(function ($value) {return $this->resourceToModel($value); }, $value));
+                        $value = new Collection(
+                            array_map(
+                                function ($value, $index) use ($context, $property) {
+                                    try {
+                                        return $this->resourceToModel($value, $context);
+                                    } catch (ValidationException $exception) {
+                                        $constrainViolationList = new ConstraintViolationList(
+                                            array_map(
+                                                function (ConstraintViolation $violation) use ($property, $index) {
+                                                    $newViolation = new \ReflectionClass($violation);
+                                                    $newViolation->getProperty('propertyPath')->setValue(
+                                                        $violation,
+                                                        $property->getName().'['.$index.'].'.$violation->getPropertyPath()
+                                                    );
+                                                    return $violation;
+                                                },
+                                                iterator_to_array($exception->getConstraintViolationList())
+                                            ),
+                                        );
+                                        throw new ValidationException(
+                                            $constrainViolationList
+                                        );
+                                    }
+                                },
+                                $value,
+                                array_keys($value)
+                            )
+                        );
                 }
 
                 $propelModel->$propelSetter($value);

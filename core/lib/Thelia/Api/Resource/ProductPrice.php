@@ -42,13 +42,13 @@ class ProductPrice extends AbstractPropelResource
     public ProductSaleElements $productSaleElements;
 
     #[Relation(targetResource: Currency::class)]
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, Product::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, Product::GROUP_WRITE])]
     public Currency $currency;
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, Product::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, Product::GROUP_WRITE])]
     public float $price;
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, Product::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, Product::GROUP_WRITE])]
     public float $promoPrice;
 
     #[Groups([self::GROUP_READ, Product::GROUP_WRITE])]
