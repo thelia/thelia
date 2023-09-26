@@ -86,6 +86,7 @@ class Product extends AbstractTranslatableResource
             OrderProduct::GROUP_READ,
             ProductAssociatedContent::GROUP_READ,
             FeatureProduct::GROUP_READ_SINGLE,
+            ProductSaleElements::GROUP_READ,
             ProductSaleElements::GROUP_WRITE,
         ]
     )]
