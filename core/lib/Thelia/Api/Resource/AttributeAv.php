@@ -51,7 +51,7 @@ class AttributeAv extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'attribute_av:read:single';
     public const GROUP_WRITE = 'attribute_av:write';
 
-    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
     #[Relation(targetResource: Attribute::class)]
@@ -67,7 +67,7 @@ class AttributeAv extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $updatedAt;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE])]
     public I18nCollection $i18ns;
 
     public function getId(): ?int

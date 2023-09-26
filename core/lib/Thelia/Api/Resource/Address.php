@@ -21,10 +21,16 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Core\Translation\Translator;
+use Thelia\Model\CountryQuery;
 use Thelia\Model\Map\AddressTableMap;
+use Thelia\Model\StateQuery;
 
 #[ApiResource(
     operations: [
@@ -66,15 +72,19 @@ class Address extends AbstractPropelResource
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
     public string $label;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE, Cart::GROUP_READ_SINGLE])]
+    #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
     public string $firstname;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE, Cart::GROUP_READ_SINGLE])]
+    #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
     public string $lastname;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
     public string $address1;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
@@ -84,6 +94,7 @@ class Address extends AbstractPropelResource
     public string $address3 = '';
 
     #[Groups([self::GROUP_WRITE, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
     public string $zipcode = '';
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
@@ -96,6 +107,7 @@ class Address extends AbstractPropelResource
     public ?string $phone;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
     public ?string $city;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
@@ -109,6 +121,7 @@ class Address extends AbstractPropelResource
 
     #[Relation(targetResource: Country::class)]
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
     public Country $country;
 
     #[Relation(targetResource: State::class)]
@@ -355,5 +368,53 @@ class Address extends AbstractPropelResource
     public static function getPropelRelatedTableMap(): ?TableMap
     {
         return new AddressTableMap();
+    }
+
+    #[Callback(groups: [Address::GROUP_WRITE, Customer::GROUP_WRITE])]
+    public function verifyZipcode(ExecutionContextInterface $context): void
+    {
+        $resource = $context->getRoot();
+
+        if (null !== $country = $resource->getCountry()->getPropelModel()) {
+            if ($country->getNeedZipCode()) {
+                $zipCodeRegExp = $country->getZipCodeRE();
+                if (null !== $zipCodeRegExp) {
+                    if (!preg_match($zipCodeRegExp, $resource->getZipcode())) {
+                        $context->addViolation(
+                            Translator::getInstance()->trans(
+                                'This zip code should respect the following format : %format.',
+                                ['%format' => $country->getZipCodeFormat()]
+                            )
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[Callback(groups: [Address::GROUP_WRITE, Customer::GROUP_WRITE])]
+    public function verifyState(ExecutionContextInterface $context): void
+    {
+        $resource = $context->getRoot();
+
+        if (null !== $country = $resource->getCountry()->getPropelModel()) {
+            if ($country->getHasStates()) {
+                if (null !== $state = $resource->getState()->getPropelModel()) {
+                    if ($state->getCountryId() !== $country->getId()) {
+                        $context->addViolation(
+                            Translator::getInstance()->trans(
+                                "This state doesn't belong to this country."
+                            )
+                        );
+                    }
+                } else {
+                    $context->addViolation(
+                        Translator::getInstance()->trans(
+                            'You should select a state for this country.'
+                        )
+                    );
+                }
+            }
+        }
     }
 }
