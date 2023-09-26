@@ -46,7 +46,7 @@ class AttributeCombination extends AbstractPropelResource
     public Attribute $attribute;
 
     #[Relation(targetResource: AttributeAv::class)]
-    #[Groups([self::GROUP_READ_SINGLE, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ_SINGLE, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, ProductSaleElements::GROUP_READ_SINGLE])]
     public AttributeAv $attributeAv;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
