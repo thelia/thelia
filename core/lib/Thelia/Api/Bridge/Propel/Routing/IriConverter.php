@@ -44,6 +44,10 @@ class IriConverter implements IriConverterInterface
 
     public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string
     {
+        if (is_object($resource)) {
+            $resource = get_class($resource);
+        }
+
         $reflector = new \ReflectionClass($resource);
 
         $compositeIdentifiers = $reflector->getAttributes(CompositeIdentifiers::class);
