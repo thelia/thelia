@@ -44,6 +44,7 @@ class PropelPersistProcessor implements ProcessorInterface
             $resourceAddonDefinitions = $this->apiResourceService->getResourceAddonDefinitions($data::class);
             foreach ($resourceAddonDefinitions as $addonShortName => $addonClass) {
                 if (!isset($jsonData[$addonShortName])) {
+                    $resourceAddons[$addonShortName] = null;
                     continue;
                 }
 

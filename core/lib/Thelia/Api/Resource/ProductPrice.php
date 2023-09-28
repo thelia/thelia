@@ -31,8 +31,10 @@ use Thelia\Model\Map\ProductPriceTableMap;
     denormalizationContext: ['groups' => [self::GROUP_WRITE]],
 )]
 #[CompositeIdentifiers(['productSaleElements', 'currency'])]
-class ProductPrice extends AbstractPropelResource
+class ProductPrice implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'product_price:read';
     public const GROUP_READ_SINGLE = 'product_price:read:single';
     public const GROUP_WRITE = 'product_price:write';

@@ -12,8 +12,10 @@
 
 namespace Thelia\Api\Resource;
 
-abstract class AbstractTranslatableResource extends AbstractPropelResource implements TranslatableResourceInterface
+abstract class AbstractTranslatableResource implements PropelResourceInterface, TranslatableResourceInterface
 {
+    use PropelResourceTrait;
+
     public I18nCollection $i18ns;
 
     public function __construct()

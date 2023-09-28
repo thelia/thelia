@@ -63,8 +63,10 @@ use Thelia\Model\Map\CustomerTableMap;
         'createdAt',
     ]
 )]
-class Customer extends AbstractPropelResource
+class Customer implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'customer:read';
     public const GROUP_READ_SINGLE = 'customer:read:single';
     public const GROUP_WRITE = 'customer:write';

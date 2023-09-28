@@ -25,7 +25,6 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
-use Thelia\Api\Resource\AbstractPropelResource;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Api\Resource\TranslatableResourceInterface;
@@ -299,7 +298,7 @@ class ApiResourceService
                     $value = $data->$method();
                 }
 
-                if ($value instanceof AbstractPropelResource) {
+                if (is_object($value) && method_exists($value, 'getPropelModel')) {
                     if (!$setterForced) {
                         $propelSetter = $propelSetter.'Id';
                     }
