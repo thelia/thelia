@@ -41,8 +41,10 @@ use Thelia\Model\Map\OrderCouponTableMap;
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class OrderCoupon extends AbstractPropelResource
+class OrderCoupon implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'order_coupon:read';
     public const GROUP_READ_SINGLE = 'order_coupon:read:single';
     public const GROUP_WRITE = 'order_coupon:write';

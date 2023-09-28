@@ -31,8 +31,10 @@ use Thelia\Model\Map\AttributeCombinationTableMap;
     denormalizationContext: ['groups' => [self::GROUP_WRITE]],
 )]
 #[CompositeIdentifiers(['productSaleElements', 'attributeAv'])]
-class AttributeCombination extends AbstractPropelResource
+class AttributeCombination implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'attribute_combination:read';
     public const GROUP_READ_SINGLE = 'attribute_combination:read:single';
     public const GROUP_WRITE = 'attribute_combination:write';
