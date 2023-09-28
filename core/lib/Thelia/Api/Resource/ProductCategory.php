@@ -31,8 +31,10 @@ use Thelia\Model\Map\ProductCategoryTableMap;
     denormalizationContext: ['groups' => [self::GROUP_WRITE]],
 )]
 #[CompositeIdentifiers(['category', 'product'])]
-class ProductCategory extends AbstractPropelResource
+class ProductCategory implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'product_categories:read';
     public const GROUP_READ_SINGLE = 'product_categories:read:single';
     public const GROUP_WRITE = 'product_categories:write';

@@ -28,8 +28,10 @@ use Thelia\Model\Map\TaxRuleTableMap;
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class TaxRuleCountry extends AbstractPropelResource
+class TaxRuleCountry implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'tax_rule_country:read';
     public const GROUP_READ_SINGLE = 'tax_rule_country:read:single';
     public const GROUP_WRITE = 'tax_rule_country:write';
