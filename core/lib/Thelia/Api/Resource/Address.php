@@ -62,8 +62,10 @@ use Thelia\Model\StateQuery;
         'customer.id' => 'exact',
     ]
 )]
-class Address extends AbstractPropelResource
+class Address implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'address:read';
     public const GROUP_READ_SINGLE = 'address:read:single';
     public const GROUP_WRITE = 'address:write';

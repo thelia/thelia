@@ -42,8 +42,10 @@ use Thelia\Model\Map\OrderProductTableMap;
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class OrderProduct extends AbstractPropelResource
+class OrderProduct implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'order_product:read';
     public const GROUP_READ_SINGLE = 'order_product:read:single';
     public const GROUP_WRITE = 'order_product:write';

@@ -28,7 +28,7 @@ interface PropelResourceInterface
 
     public function getResourceAddon(string $addonName): ?ResourceAddonInterface;
 
-    public function setResourceAddon(string $addonName, ResourceAddonInterface $addon): self;
+    public function setResourceAddon(string $addonName, ?ResourceAddonInterface $addon): self;
 
     #[Ignore]
     public static function getPropelRelatedTableMap(): ?TableMap;

@@ -45,8 +45,10 @@ use Thelia\Model\Map\CartTableMap;
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class Cart extends AbstractPropelResource
+class Cart implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'cart:read';
     public const GROUP_READ_SINGLE = 'cart:read:single';
     public const GROUP_WRITE = 'cart:write';
