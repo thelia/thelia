@@ -33,8 +33,10 @@ use Thelia\Model\Map\FeatureProductTableMap;
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class FeatureProduct extends AbstractPropelResource
+class FeatureProduct implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'feature_product:read';
     public const GROUP_READ_SINGLE = 'feature_product:read:single';
     public const GROUP_WRITE = 'feature_product:write';
