@@ -29,8 +29,10 @@ use Thelia\Model\Map\ProductAssociatedContentTableMap;
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class ProductAssociatedContent extends AbstractPropelResource
+class ProductAssociatedContent implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'product_associated_content:read';
     public const GROUP_READ_SINGLE = 'product_associated_content:read:single';
     public const GROUP_WRITE = 'product_associated_content:write';

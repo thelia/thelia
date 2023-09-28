@@ -40,8 +40,10 @@ use Thelia\Model\Map\OrderProductTaxTableMap;
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class OrderProductTax extends AbstractPropelResource
+class OrderProductTax implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'order_product_tax:read';
     public const GROUP_READ_SINGLE = 'order_product_tax:read:single';
     public const GROUP_WRITE = 'order_product_tax:write';
