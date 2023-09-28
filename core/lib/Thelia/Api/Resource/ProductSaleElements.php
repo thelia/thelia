@@ -45,8 +45,10 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class ProductSaleElements extends AbstractPropelResource
+class ProductSaleElements implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'product_sale_elements:read';
     public const GROUP_READ_SINGLE = 'product_sale_elements:read:single';
     public const GROUP_WRITE = 'product_sale_elements:write';

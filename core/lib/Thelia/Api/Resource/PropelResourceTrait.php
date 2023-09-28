@@ -26,7 +26,7 @@ trait PropelResourceTrait
 
     public function __get(string $property)
     {
-        if (isset($this->resourceAddons[$property])) {
+        if (array_key_exists($property, $this->resourceAddons)) {
             return $this->getResourceAddon($property);
         }
 
@@ -50,7 +50,7 @@ trait PropelResourceTrait
         return $this->resourceAddons[$addonName] ?? null;
     }
 
-    public function setResourceAddon(string $addonName, ResourceAddonInterface $addon): PropelResourceInterface
+    public function setResourceAddon(string $addonName, ?ResourceAddonInterface $addon): PropelResourceInterface
     {
         $this->resourceAddons[$addonName] = $addon;
 
