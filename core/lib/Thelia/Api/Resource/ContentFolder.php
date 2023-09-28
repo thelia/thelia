@@ -30,8 +30,10 @@ use Thelia\Model\Map\ContentFolderTableMap;
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
 #[CompositeIdentifiers(['content', 'folder'])]
-class ContentFolder extends AbstractPropelResource
+class ContentFolder implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'content_folder:read';
     public const GROUP_READ_SINGLE = 'content_folder:read:single';
     public const GROUP_WRITE = 'content_folder:write';

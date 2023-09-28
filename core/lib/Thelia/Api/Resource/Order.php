@@ -79,8 +79,10 @@ use Thelia\Model\Map\OrderTableMap;
     filterClass: DateFilter::class,
     properties: ['createdAt' => DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER]
 )]
-class Order extends AbstractPropelResource
+class Order implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'order:read';
     public const GROUP_READ_SINGLE = 'order:read:single';
     public const GROUP_WRITE = 'order:write';
