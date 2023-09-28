@@ -44,8 +44,10 @@ use Thelia\Model\Map\LangTableMap;
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class Lang extends AbstractPropelResource
+class Lang implements PropelResourceInterface
 {
+    use PropelResourceTrait;
+
     public const GROUP_READ = 'lang:read';
     public const GROUP_READ_SINGLE = 'lang:read:single';
     public const GROUP_WRITE = 'lang:write';
