@@ -98,31 +98,8 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         $baseJoinAlias = ltrim($parentAlias ?: $parentReflector?->getShortName().'_'.$reflector->getShortName(), '_');
         $baseJoinAlias = strtolower($baseJoinAlias).'_';
 
-        if (is_subclass_of($resourceClass, TranslatableResourceInterface::class)) {
-            $langs = LangQuery::create()->filterByActive(1)->find();
-            $i18nResource = new ($resourceClass::getI18nResourceClass());
-
-            if (!$i18nResource instanceof I18n) {
-                throw new RuntimeException($i18nResource::class.' should extend '.I18n::class.' to be used as i18n resource');
-            }
-
-            $i18nFields = array_map(
-                function (\ReflectionProperty $reflectionProperty) {
-                    return $reflectionProperty->getName();
-                },
-                (new \ReflectionClass($i18nResource))->getProperties()
-            );
-
-            $joinMethodName = 'join'.$reflector->getShortName().'I18n';
-            foreach ($langs as $lang) {
-                $joinAlias = trim($baseJoinAlias.'lang_'.$lang->getLocale(), '_');
-                $query->$joinMethodName($joinAlias);
-                $query->addJoinCondition($joinAlias, $joinAlias.'.locale = ?', $lang->getLocale(), null, \PDO::PARAM_STR);
-
-                foreach ($i18nFields as $i18nField) {
-                    $query->withColumn($joinAlias.'.'.$i18nField, $joinAlias.'_'.$i18nField);
-                }
-            }
+        if (is_subclass_of($resourceClass, TranslatableResourceInterface::class) && null !== $operation) {
+            $this->joinI18ns($query, $resourceClass, $operation, $reflector, $baseJoinAlias);
         }
 
         foreach ($reflector->getProperties() as $property) {
@@ -182,10 +159,14 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
                 ++$joinCount;
                 /** @var ModelCriteria $relationQuery */
-                $relationQuery = $query->$joinFunctionName($joinAlias, $isLeftJoin ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN);
+                $relationQuery = $query->$joinFunctionName($joinAlias, $isLeftJoin ? Criteria::LEFT_JOIN : Criteria::LEFT_JOIN);
 
                 foreach ($targetReflector->getProperties() as $targetProperty) {
                     if ($targetProperty->getName() === 'i18ns') {
+                        continue;
+                    }
+
+                    if (!$relationQuery->getTableMap()->hasColumn($targetProperty->getName())) {
                         continue;
                     }
 
@@ -229,6 +210,57 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                     parentAlias: $joinAlias
                 );
                 $relationQuery->endUse();
+            }
+        }
+    }
+
+    /**
+     * @param TranslatableResourceInterface $resourceClass
+     */
+    private function joinI18ns(
+        ModelCriteria $query,
+        string $resourceClass,
+        Operation $operation,
+        \ReflectionClass $reflector,
+        string $baseJoinAlias
+    )
+    {
+        $normalizationContextGroups = $operation->getNormalizationContext()['groups'] ?? [];
+        $i18nAttributeGroups = $reflector->getProperty('i18ns')->getAttributes(Groups::class);
+
+        if (empty($i18nAttributeGroups)) {
+            return;
+        }
+
+        $i18nGroups = $i18nAttributeGroups[0]->getArguments()['groups'] ?? $i18nAttributeGroups[0]->getArguments()[0] ?? null;;
+
+        // Don't join i18n table if i18ns property is not in current groups
+        if (empty(array_intersect($normalizationContextGroups, $i18nGroups))) {
+            return;
+        }
+
+        $langs = LangQuery::create()->filterByActive(1)->find();
+        $i18nResource = new ($resourceClass::getI18nResourceClass());
+
+        if (!$i18nResource instanceof I18n) {
+            throw new RuntimeException($i18nResource::class.' should extend '.I18n::class.' to be used as i18n resource');
+        }
+
+        $i18nFields = array_map(
+            function (\ReflectionProperty $reflectionProperty) {
+                return $reflectionProperty->getName();
+            },
+            (new \ReflectionClass($i18nResource))->getProperties()
+        );
+
+        $joinMethodName = 'join'.$reflector->getShortName().'I18n';
+        foreach ($langs as $lang) {
+            $joinAlias = trim($baseJoinAlias.'lang_'.$lang->getLocale(), '_');
+            $query->$joinMethodName($joinAlias);
+            $query->addJoinCondition($joinAlias, $joinAlias.'.locale = ?', $lang->getLocale(), null, \PDO::PARAM_STR);
+
+            foreach ($i18nFields as $i18nField) {
+                $query->withColumn($joinAlias.'.'.$i18nField, $joinAlias.'_'.$i18nField);
             }
         }
     }
