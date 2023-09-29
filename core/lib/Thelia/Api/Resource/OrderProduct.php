@@ -431,9 +431,9 @@ class OrderProduct implements PropelResourceInterface
             // unitTaxedPrice
             $totalTax = 0;
             $totalPromoTax = 0;
-            if (!empty($this->orderProductTaxes->getData())) {
+            if (!empty($this->orderProductTaxes)) {
                 /** @var OrderProductTax $orderProductTax */
-                foreach ($this->orderProductTaxes->getData() as $orderProductTax) {
+                foreach ($this->orderProductTaxes as $orderProductTax) {
                     /** @var \Thelia\Model\OrderProductTax $orderProductTax */
                     $propelOrderProductTax = $orderProductTax->getPropelModel();
                     if (!$this->getPropelModel()->getWasInPromo()) {
