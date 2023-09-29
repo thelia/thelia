@@ -143,7 +143,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
                 $targetReflector = new \ReflectionClass($targetClass);
 
-                $isNullable = $property->getType()->allowsNull();
+                $isNullable = $property->getType()->allowsNull() || $property->getType()->getName() === "array";
                 $isLeftJoin = false !== $wasLeftJoin || true === $isNullable;
                 $joinFunctionName = 'use'.ucfirst($targetReflector->getShortName()).'Query';
 
@@ -159,7 +159,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
                 ++$joinCount;
                 /** @var ModelCriteria $relationQuery */
-                $relationQuery = $query->$joinFunctionName($joinAlias, $isLeftJoin ? Criteria::LEFT_JOIN : Criteria::LEFT_JOIN);
+                $relationQuery = $query->$joinFunctionName($joinAlias, $isLeftJoin ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN);
 
                 foreach ($targetReflector->getProperties() as $targetProperty) {
                     if ($targetProperty->getName() === 'i18ns') {
