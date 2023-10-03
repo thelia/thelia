@@ -302,7 +302,16 @@ class ApiResourceService
                     if (!$setterForced) {
                         $propelSetter = $propelSetter.'Id';
                     }
-                    $value = $value->getPropelModel()->getId();
+
+                    $currentPropelModel = $value->getPropelModel();
+                    if (null !== $currentPropelModel && method_exists($currentPropelModel, 'getId')) {
+                        $value = $currentPropelModel->getId();
+                    }
+
+                    // If value is still not transformed
+                    if (is_object($value) && method_exists($value, 'getId')) {
+                        $value = $value->getId();
+                    }
                 }
 
                 if (\is_array($value)) {
