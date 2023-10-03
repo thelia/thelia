@@ -70,24 +70,7 @@ class ApiResourceService
 
         $reflector = new \ReflectionClass($resourceClass);
 
-        $compositeIdentifiersAttribute = $reflector->getAttributes(CompositeIdentifiers::class);
-        $compositeIdentifiers = !empty($compositeIdentifiersAttribute) ? $compositeIdentifiersAttribute[0]->getArguments()[0] : [];
-
         foreach ($reflector->getProperties() as $property) {
-            $groupAttributes = $property->getAttributes(Groups::class)[0] ?? null;
-
-            if (null === $groupAttributes) {
-                continue;
-            }
-
-            $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
-
-            $matchingGroups = array_intersect($propertyGroups, $context['groups']);
-
-            if (empty($matchingGroups) && !\in_array($property->getName(), $compositeIdentifiers)) {
-                continue;
-            }
-
             $propelGetter = 'get'.ucfirst($property->getName());
 
             foreach ($property->getAttributes(Column::class) as $columnAttribute) {
@@ -119,7 +102,7 @@ class ApiResourceService
                 }
 
                 $targetClass = $relationAttribute->getArguments()['targetResource'];
-                if ($targetClass === $parentReflector?->getName()) {
+                if ($targetClass === $parentReflector?->getName() && $property->getType()->getName() !== "array") {
                     $apiResource->$resourceSetter(
                         $this->modelToResource(
                             resourceClass: $parentReflector->getName(),
@@ -303,9 +286,9 @@ class ApiResourceService
                         $propelSetter = $propelSetter.'Id';
                     }
 
-                    $currentPropelModel = $value->getPropelModel();
-                    if (null !== $currentPropelModel && method_exists($currentPropelModel, 'getId')) {
-                        $value = $currentPropelModel->getId();
+                    $valuePropelModel = $value->getPropelModel();
+                    if (null !== $valuePropelModel && method_exists($valuePropelModel, 'getId')) {
+                        $value = $valuePropelModel->getId();
                     }
 
                     // If value is still not transformed
