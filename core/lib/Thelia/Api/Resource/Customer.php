@@ -79,7 +79,7 @@ class Customer implements PropelResourceInterface
     public const GROUP_READ_SINGLE = 'customer:read:single';
     public const GROUP_WRITE = 'customer:write';
 
-    #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE, Order::GROUP_READ, Cart::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE, Order::GROUP_READ, Cart::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
     public ?int $id = null;
 
     #[Relation(targetResource: CustomerTitle::class)]

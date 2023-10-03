@@ -56,13 +56,13 @@ class OrderCoupon implements PropelResourceInterface
     #[Groups([self::GROUP_READ])]
     public ?Order $order;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
     public ?string $code;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
     public ?string $type;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ,  Order::GROUP_WRITE])]
     public ?float $amount;
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
@@ -80,22 +80,22 @@ class OrderCoupon implements PropelResourceInterface
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
     public ?\DateTime $expirationDate;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_WRITE])]
     public ?bool $isCumulative;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_WRITE])]
     public ?bool $isRemovingPostage;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_WRITE])]
     public ?bool $isAvailableOnSpecialOffers;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_WRITE])]
     public ?string $serializedConditions;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_WRITE])]
     public ?bool $perCustomerUsageCount;
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_WRITE])]
     public ?bool $usageCanceled;
 
     #[Groups([self::GROUP_READ])]
