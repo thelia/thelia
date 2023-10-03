@@ -12,15 +12,18 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Model\Event\CustomerEvent;
 use Thelia\Model\Map\StateTableMap;
 
 #[ApiResource(
@@ -35,12 +38,33 @@ use Thelia\Model\Map\StateTableMap;
             uriTemplate: '/admin/states/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
+        new Get(
+            uriTemplate: '/admin/states/iso/{countryIso3}/{stateIso}',
+            uriVariables: [
+                'countryIso3' => new Link(
+                    fromProperty: 'isoalpha3',
+                    fromClass: Country::class
+                ),
+                'stateIso' => new Link(
+                    fromProperty: 'isocode',
+                    fromClass: State::class
+                )
+            ],
+            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]],
+            name: 'state_by_iso',
+        ),
         new Put(
             uriTemplate: '/admin/states/{id}'
         ),
         new Delete(
             uriTemplate: '/admin/states/{id}'
         ),
+    ],
+    uriVariables: [
+        'id' => new Link(
+            fromClass: Country::class,
+            identifiers: ['id']
+        )
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
@@ -51,12 +75,13 @@ class State extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'state:read:single';
     public const GROUP_WRITE = 'state:write';
 
-    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE, Address::GROUP_READ_SINGLE, TaxRuleCountry::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE, Address::GROUP_READ, TaxRuleCountry::GROUP_READ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderAddress::GROUP_READ])]
     public bool $visible;
 
+    #[ApiProperty(identifier: true)]
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderAddress::GROUP_READ])]
     public ?string $isocode;
 
