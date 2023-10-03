@@ -21,10 +21,18 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Core\Translation\Translator;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\CustomerQuery;
 use Thelia\Model\Map\CustomerTableMap;
 
 #[ApiResource(
@@ -71,7 +79,7 @@ class Customer implements PropelResourceInterface
     public const GROUP_READ_SINGLE = 'customer:read:single';
     public const GROUP_WRITE = 'customer:write';
 
-    #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE, Order::GROUP_READ, Cart::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Address::GROUP_READ_SINGLE, Order::GROUP_READ, Cart::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
     public ?int $id = null;
 
     #[Relation(targetResource: CustomerTitle::class)]
@@ -93,8 +101,12 @@ class Customer implements PropelResourceInterface
     public string $lastname;
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
+    #[Email(groups: [self::GROUP_WRITE])]
     public ?string $email;
 
+    #[Groups([self::GROUP_WRITE])]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
     public ?string $password;
 
     public ?string $algo;
@@ -403,5 +415,25 @@ class Customer implements PropelResourceInterface
     public static function getPropelRelatedTableMap(): ?TableMap
     {
         return new CustomerTableMap();
+    }
+
+
+    #[Callback(groups: [Customer::GROUP_WRITE])]
+    public function verifyPasswordLength(ExecutionContextInterface $context): void
+    {
+        $resource = $context->getRoot();
+        if (isset($resource->password) && strlen($resource->password) < ConfigQuery::read('password.length', 4)) {
+            $context->addViolation(Translator::getInstance()->trans('The password size is too small.',[],null,'en_US'));
+        }
+    }
+
+    #[Callback(groups: [Customer::GROUP_WRITE])]
+    public function verifyExistingEmail(ExecutionContextInterface $context): void
+    {
+        $resource = $context->getRoot();
+        $customer = CustomerQuery::getCustomerByEmail($resource->email);
+        if ($customer) {
+            $context->addViolation(Translator::getInstance()->trans('This email already exists.',[],null,'en_US'));
+        }
     }
 }
