@@ -26,6 +26,7 @@ use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponDeleteEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\Type\CouponInterface;
@@ -180,6 +181,11 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     public function updateOrderDiscount(Event $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
+        $session = $this->requestStack->getCurrentRequest()->getSession();
+        if (!$session instanceof Session || !$session->isStarted()) {
+            return;
+        }
+
         $discount = $this->couponManager->getDiscount();
 
         $this->getSession()

@@ -23,6 +23,8 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
+use Thelia\Api\Resource\Country;
+use Thelia\Log\Tlog;
 
 #[AsDecorator(decorates: 'api_platform.symfony.iri_converter')]
 class IriConverter implements IriConverterInterface
@@ -72,12 +74,13 @@ class IriConverter implements IriConverterInterface
 
                 return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
             } catch (\Exception $e) {
-                // try not decorated converter
+                // try with not decorated converter
             }
         }
         try {
             return $this->decorated->getIriFromResource($resource, $referenceType, $operation, $context);
         } catch (\Exception $e) {
+            Tlog::getInstance()->warning("Iri convert failure : ".$e->getMessage());
             return 'undefined_iri';
         }
     }
