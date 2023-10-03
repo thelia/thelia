@@ -21,12 +21,17 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\BooleanFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\ProductTableMap;
+use Thelia\Model\ProductQuery;
 
 #[ApiResource(
     operations: [
@@ -94,9 +99,11 @@ class Product extends AbstractTranslatableResource
 
     #[Relation(targetResource: TaxRule::class)]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
     public TaxRule $taxRule;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
     public string $ref;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -310,5 +317,62 @@ class Product extends AbstractTranslatableResource
     public static function getI18nResourceClass(): string
     {
         return ProductI18n::class;
+    }
+
+    #[Callback(groups: [Product::GROUP_WRITE])]
+    public function checkDuplicateRef(ExecutionContextInterface $context): void
+    {
+        $resource = $context->getRoot();
+        $count = ProductQuery::create()->filterByRef($resource->ref)->count();
+
+        if ($count > 0) {
+            $context->addViolation(
+                Translator::getInstance()->trans(
+                    'A product with reference %ref already exists. Please choose another reference.',
+                    ['%ref' => $resource->ref],null,'en_US'
+                )
+            );
+        }
+    }
+
+    #[Callback(groups: [Product::GROUP_WRITE])]
+    public function checkTitleAndLocaleNotBlank(ExecutionContextInterface $context) :void
+    {
+        $resource = $context->getRoot();
+        $titleAndLocaleCount = 0;
+        /** @var I18nCollection $i18nData */
+        $i18nData = $resource->getI18ns();
+        foreach ($i18nData->i18ns as $i18n){
+            if ($i18n->getTitle() !== null && !empty($i18n->getTitle())){
+                $titleAndLocaleCount++;
+            }
+        }
+        if ($titleAndLocaleCount === 0){
+            $context->addViolation(
+                Translator::getInstance()->trans(
+                    'The title and locale must be defined at least once.',
+                    [],null,'en_US'
+                )
+            );
+        }
+    }
+
+    #[Callback(groups: [Product::GROUP_WRITE])]
+    public function checkDefaultCategoryNotBlank(ExecutionContextInterface $context) :void
+    {
+        $resource = $context->getRoot();
+        $defaultCategory = [];
+        /** @var ProductCategory $productCategory */
+        foreach ($resource->getProductCategories() as $productCategory){
+            $defaultCategory[] = $productCategory->getDefaultCategory();
+        }
+        if (!in_array(true,$defaultCategory)){
+            $context->addViolation(
+                Translator::getInstance()->trans(
+                    'There is no default category defined.',
+                    [],null,'en_US'
+                )
+            );
+        }
     }
 }
