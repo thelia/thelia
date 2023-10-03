@@ -16,6 +16,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Model\Map\ProductPriceTableMap;
@@ -45,9 +46,11 @@ class ProductPrice implements PropelResourceInterface
 
     #[Relation(targetResource: Currency::class)]
     #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, Product::GROUP_WRITE])]
+    #[NotBlank(groups: [Product::GROUP_WRITE])]
     public Currency $currency;
 
     #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, Product::GROUP_WRITE])]
+    #[NotBlank(groups: [Product::GROUP_WRITE])]
     public float $price;
 
     #[Groups([self::GROUP_READ, Product::GROUP_READ_SINGLE, ProductSaleElements::GROUP_READ_SINGLE, ProductSaleElements::GROUP_WRITE, Product::GROUP_WRITE])]

@@ -49,7 +49,7 @@ class OrderAddress implements PropelResourceInterface
     public const GROUP_READ_SINGLE = 'order_address:read:single';
     public const GROUP_WRITE = 'order_address:write';
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_READ_SINGLE])]
