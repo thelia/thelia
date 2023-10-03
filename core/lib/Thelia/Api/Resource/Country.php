@@ -12,10 +12,12 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
@@ -32,7 +34,17 @@ use Thelia\Model\Map\CountryTableMap;
         ),
         new Get(
             uriTemplate: '/admin/countries/{id}',
-            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]],
+        ),
+        new Get(
+            uriTemplate: '/admin/countries/iso/{isoalpha3}',
+            uriVariables: [
+                'isoalpha3' => new Link(
+                    fromProperty: 'isoalpha3',
+                    fromClass: Country::class
+                )
+            ],
+            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]],
         ),
         new Put(
             uriTemplate: '/admin/countries/{id}'
@@ -40,6 +52,12 @@ use Thelia\Model\Map\CountryTableMap;
         new Delete(
             uriTemplate: '/admin/countries/{id}'
         ),
+    ],
+    uriVariables: [
+        'id' => new Link(
+            fromClass: Country::class,
+            identifiers: ['id']
+        )
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
@@ -50,7 +68,7 @@ class Country extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'country:read:single';
     public const GROUP_WRITE = 'country:write';
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE, Customer::GROUP_READ_SINGLE, Address::GROUP_READ_SINGLE,State::GROUP_READ_SINGLE,State::GROUP_READ, TaxRuleCountry::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE, Customer::GROUP_READ_SINGLE, Address::GROUP_READ,State::GROUP_READ_SINGLE,State::GROUP_READ, TaxRuleCountry::GROUP_READ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
@@ -62,6 +80,7 @@ class Country extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?string $isoalpha2;
 
+    #[ApiProperty(identifier: true)]
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?string $isoalpha3;
 
