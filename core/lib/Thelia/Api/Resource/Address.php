@@ -385,7 +385,7 @@ class Address implements PropelResourceInterface
                         $context->addViolation(
                             Translator::getInstance()->trans(
                                 'This zip code should respect the following format : %format.',
-                                ['%format' => $country->getZipCodeFormat()]
+                                ['%format' => $country->getZipCodeFormat()],null,'en_US'
                             )
                         );
                     }
@@ -405,14 +405,14 @@ class Address implements PropelResourceInterface
                     if ($state->getCountryId() !== $country->getId()) {
                         $context->addViolation(
                             Translator::getInstance()->trans(
-                                "This state doesn't belong to this country."
+                                "This state doesn't belong to this country.",[],null,'en_US'
                             )
                         );
                     }
                 } else {
                     $context->addViolation(
                         Translator::getInstance()->trans(
-                            'You should select a state for this country.'
+                            'You should select a state for this country.',[],null,'en_US'
                         )
                     );
                 }

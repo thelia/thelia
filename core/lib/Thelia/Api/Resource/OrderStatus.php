@@ -54,7 +54,7 @@ class OrderStatus extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
     public string $code;
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
