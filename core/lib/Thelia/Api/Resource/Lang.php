@@ -52,7 +52,7 @@ class Lang implements PropelResourceInterface
     public const GROUP_READ_SINGLE = 'lang:read:single';
     public const GROUP_WRITE = 'lang:write';
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Customer::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Customer::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE])]

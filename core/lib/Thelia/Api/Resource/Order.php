@@ -21,6 +21,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\DateFilter;
 use Thelia\Api\Bridge\Propel\Filter\OrderFilter;
@@ -90,13 +92,14 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_READ, OrderCoupon::GROUP_READ_SINGLE, OrderProduct::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ])]
     public ?string $ref;
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?\DateTime $invoiceDate;
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
     public ?float $currencyRate;
 
     #[Groups([self::GROUP_READ])]
@@ -109,9 +112,11 @@ class Order implements PropelResourceInterface
     public ?float $discount;
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
     public float $postage;
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
     public float $postageTax;
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
@@ -138,37 +143,51 @@ class Order implements PropelResourceInterface
     public array $orderCoupons;
 
     #[Relation(targetResource: OrderAddress::class, relationAlias: 'OrderAddressRelatedByInvoiceOrderAddressId')]
+    #[Column(propelSetter: 'setInvoiceOrderAddressId')]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public OrderAddress $invoiceOrderAddress;
 
     #[Relation(targetResource: OrderAddress::class, relationAlias: 'OrderAddressRelatedByDeliveryOrderAddressId')]
+    #[Column(propelSetter: 'setDeliveryOrderAddressId')]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public OrderAddress $deliveryOrderAddress;
 
     #[Relation(targetResource: Module::class, relationAlias: 'ModuleRelatedByPaymentModuleId')]
+    #[Column(propelSetter: 'setPaymentModuleId')]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Module $paymentModule;
 
     #[Relation(targetResource: Module::class, relationAlias: 'ModuleRelatedByDeliveryModuleId')]
+    #[Column(propelSetter: 'setDeliveryModuleId')]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Module $deliveryModule;
 
     #[Relation(targetResource: OrderStatus::class)]
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
+    #[Column(propelSetter: 'setStatusId')]
     public OrderStatus $orderStatus;
 
     #[Relation(targetResource: Customer::class)]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Customer $customer;
 
     #[Relation(targetResource: Currency::class)]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Currency $currency;
 
     #[Relation(targetResource: Lang::class)]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public Lang $lang;
 
+    #[NotBlank(groups: [self::GROUP_WRITE])]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public int $cartId;
 
