@@ -28,9 +28,7 @@ use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\SearchFilter;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\CountryQuery;
 use Thelia\Model\Map\AddressTableMap;
-use Thelia\Model\StateQuery;
 
 #[ApiResource(
     operations: [
@@ -73,7 +71,7 @@ class Address implements PropelResourceInterface
     #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE, Cart::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE, Store::GROUP_READ_SINGLE])]
     #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
     public string $label;
 
@@ -93,11 +91,11 @@ class Address implements PropelResourceInterface
     public string $address2;
 
     #[Groups([self::GROUP_WRITE, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
-    public string $address3 = '';
+    public string $address3;
 
-    #[Groups([self::GROUP_WRITE, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
     #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
-    public string $zipcode = '';
+    public string $zipcode;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
     public ?string $company;
