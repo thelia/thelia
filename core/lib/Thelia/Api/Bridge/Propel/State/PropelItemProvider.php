@@ -15,7 +15,10 @@ namespace Thelia\Api\Bridge\Propel\State;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\UriVariablesResolverTrait;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Api\Bridge\Propel\Event\ItemProviderEvent;
 use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
 use Thelia\Api\Resource\PropelResourceInterface;
 
@@ -23,7 +26,8 @@ class PropelItemProvider implements ProviderInterface
 {
     public function __construct(
         readonly private ApiResourceService $apiResourceService,
-        readonly private iterable $propelItemExtensions = []
+        readonly private iterable $propelItemExtensions = [],
+        readonly private EventDispatcherInterface $eventDispatcher
     ) {
     }
 
@@ -40,8 +44,17 @@ class PropelItemProvider implements ProviderInterface
 
         /** @var ModelCriteria $query */
         $query = $queryClass::create();
-        $identifiers = array_values($uriVariables);
-        $query->filterByPrimaryKey(\count($identifiers) === 1 ? $identifiers[0] : $identifiers);
+
+        $itemProviderEvent = new ItemProviderEvent(
+            query: $query,
+            operation: $operation,
+            uriVariables: $uriVariables,
+            context: $context
+        );
+
+        $this->eventDispatcher->dispatch($itemProviderEvent);
+
+        $query = $itemProviderEvent->getQuery();
 
         foreach ($this->propelItemExtensions as $extension) {
             $extension->applyToItem($query, $resourceClass, $operation, $context);
