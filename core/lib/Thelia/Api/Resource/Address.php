@@ -71,7 +71,7 @@ class Address implements PropelResourceInterface
     #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE, Cart::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE, Store::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Customer::GROUP_READ_SINGLE, Customer::GROUP_WRITE])]
     #[NotBlank(groups: [self::GROUP_WRITE, Customer::GROUP_WRITE])]
     public string $label;
 
