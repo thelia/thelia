@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 
 #[ApiResource(
@@ -54,16 +55,18 @@ class OrderProductTax implements PropelResourceInterface
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public OrderProduct $orderProduct;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderProduct::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderProduct::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_WRITE])]
     public string $title;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderProduct::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderProduct::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
     public ?string $description;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderProduct::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderProduct::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_WRITE])]
     public float $amount;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderProduct::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderProduct::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
     public ?float $promoAmount;
 
     #[Groups([self::GROUP_READ])]
