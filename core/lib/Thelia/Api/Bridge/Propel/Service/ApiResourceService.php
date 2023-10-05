@@ -17,7 +17,6 @@ use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Validator\ValidatorInterface;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -114,7 +113,7 @@ class ApiResourceService
                     );
                     continue 2;
                 }
-                if ($value instanceof ObjectCollection) {
+                if ($value instanceof Collection) {
                     $collection = new Collection();
 
                     foreach ($value as $childPropelModel) {
