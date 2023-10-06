@@ -23,7 +23,7 @@ class BaseItemProviderListener implements EventSubscriberInterface
         $columnValues = $this->apiResourceService->getColumnValues(reflector: $reflector,columns: $compositeIdentifiers);
 
         foreach ($event->getUriVariables() as $field => $value) {
-            if (isset($columnValues[$field]) && isset($columnValues[$field]["propelQueryFilter"]) && method_exists($query, $columnValues[$field]["propelQueryFilter"])){
+            if (isset($columnValues[$field]["propelQueryFilter"]) && method_exists($query, $columnValues[$field]["propelQueryFilter"])){
                     $propelQueryFilter = $columnValues[$field]["propelQueryFilter"];
                     $value = $event->getUriVariables()[$field];
                     $query->$propelQueryFilter($value);
