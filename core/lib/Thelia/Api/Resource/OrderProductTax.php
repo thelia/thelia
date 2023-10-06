@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 
 #[ApiResource(
@@ -52,6 +53,7 @@ class OrderProductTax implements PropelResourceInterface
     #[Groups([self::GROUP_READ, OrderProduct::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
+    #[Relation(targetResource: OrderProduct::class)]
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public OrderProduct $orderProduct;
 

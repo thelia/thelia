@@ -436,27 +436,29 @@ class OrderProduct implements PropelResourceInterface
 
     public function afterModelToResource(array $context): void
     {
-        if ($context['operation'] instanceof Get || $context['operation'] instanceof GetCollection) {
-            // unitTaxedPrice
-            $totalTax = 0;
-            $totalPromoTax = 0;
-            if (!empty($this->orderProductTaxes)) {
-                /** @var OrderProductTax $orderProductTax */
-                foreach ($this->orderProductTaxes as $orderProductTax) {
-                    /** @var \Thelia\Model\OrderProductTax $orderProductTax */
-                    $propelOrderProductTax = $orderProductTax->getPropelModel();
+        if (isset($context['operation'])) {
+            if ($context['operation'] instanceof Get || $context['operation'] instanceof GetCollection) {
+                // unitTaxedPrice
+                $totalTax = 0;
+                $totalPromoTax = 0;
+                if (!empty($this->orderProductTaxes)) {
+                    /** @var OrderProductTax $orderProductTax */
+                    foreach ($this->orderProductTaxes as $orderProductTax) {
+                        /** @var \Thelia\Model\OrderProductTax $orderProductTax */
+                        $propelOrderProductTax = $orderProductTax->getPropelModel();
+                        if (!$this->getPropelModel()->getWasInPromo()) {
+                            $totalTax += (float)$propelOrderProductTax->getAmount();
+                        }
+                        if ($this->getPropelModel()->getWasInPromo()) {
+                            $totalPromoTax += (float)$propelOrderProductTax->getPromoAmount();
+                        }
+                    }
                     if (!$this->getPropelModel()->getWasInPromo()) {
-                        $totalTax += (float) $propelOrderProductTax->getAmount();
+                        $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalTax;
                     }
                     if ($this->getPropelModel()->getWasInPromo()) {
-                        $totalPromoTax += (float) $propelOrderProductTax->getPromoAmount();
+                        $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalPromoTax;
                     }
-                }
-                if (!$this->getPropelModel()->getWasInPromo()) {
-                    $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalTax;
-                }
-                if ($this->getPropelModel()->getWasInPromo()) {
-                    $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalPromoTax;
                 }
             }
         }
