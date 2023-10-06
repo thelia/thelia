@@ -23,20 +23,25 @@ class BaseItemProviderListener implements EventSubscriberInterface
         $columnValues = $this->apiResourceService->getColumnValues(reflector: $reflector,columns: $compositeIdentifiers);
 
         foreach ($event->getUriVariables() as $field => $value) {
-            if (isset($columnValues[$field]["propelQueryFilter"]) && method_exists($query, $columnValues[$field]["propelQueryFilter"])){
-                    $propelQueryFilter = $columnValues[$field]["propelQueryFilter"];
-                    $value = $event->getUriVariables()[$field];
-                    $query->$propelQueryFilter($value);
-                    continue;
+            $filterMethod = null;
+            $filterName = $columnValues[$field]["propelQueryFilter"] ?? null;
+            if ($filterName && method_exists($query, $filterName)){
+                $filterMethod = $columnValues[$field]["propelQueryFilter"];
+                $value = $event->getUriVariables()[$field];
             }
+
             $filterName = "filterBy".ucfirst($field)."Id";
-            if (method_exists($query, $filterName)) {
-                $query->$filterName($value);
-                continue;
+            if (null === $filterMethod && method_exists($query, $filterName)) {
+                $filterMethod = $filterName;
             }
+
             $filterName = "filterBy".ucfirst($field);
-            if (method_exists($query, $filterName)) {
-                $query->$filterName($value);
+            if (null === $filterMethod && method_exists($query, $filterName)) {
+                $filterMethod = $filterName;
+            }
+
+            if ($filterMethod !== null){
+                $query->$filterMethod($value);
             }
         }
     }
