@@ -16,33 +16,26 @@ class BaseItemProviderListener implements EventSubscriberInterface
     {
         $query = $event->getQuery();
 
-        $alreadyFilteredProperty = [];
         $reflector = new \ReflectionClass($event->getResourceClass());
 
         $compositeIdentifiers = $this->apiResourceService->getResourceCompositeIdentifierValues(reflector: $reflector, param: 'keys');
 
         $columnValues = $this->apiResourceService->getColumnValues(reflector: $reflector,columns: $compositeIdentifiers);
 
-        foreach ($columnValues as $propertyName => $columnValue){
-            if (isset($columnValue["propelQueryFilter"]) && method_exists($query, $columnValue["propelQueryFilter"])){
-                $propelQueryFilter = $columnValue["propelQueryFilter"];
-                $value = $event->getUriVariables()[$propertyName];
-                $query->$propelQueryFilter($value);
-                $alreadyFilteredProperty []= $propertyName;
-            }
-        }
-
         foreach ($event->getUriVariables() as $field => $value) {
+            if (isset($columnValues[$field]) && isset($columnValues[$field]["propelQueryFilter"]) && method_exists($query, $columnValues[$field]["propelQueryFilter"])){
+                    $propelQueryFilter = $columnValues[$field]["propelQueryFilter"];
+                    $value = $event->getUriVariables()[$field];
+                    $query->$propelQueryFilter($value);
+                    continue;
+            }
             $filterName = "filterBy".ucfirst($field)."Id";
-            if (method_exists($query, $filterName) && !in_array($field,$alreadyFilteredProperty)) {
+            if (method_exists($query, $filterName)) {
                 $query->$filterName($value);
-                $alreadyFilteredProperty []= $field;
+                continue;
             }
-        }
-
-        foreach ($event->getUriVariables() as $field => $value) {
             $filterName = "filterBy".ucfirst($field);
-            if (method_exists($query, $filterName) && !in_array($field,$alreadyFilteredProperty)) {
+            if (method_exists($query, $filterName)) {
                 $query->$filterName($value);
             }
         }
