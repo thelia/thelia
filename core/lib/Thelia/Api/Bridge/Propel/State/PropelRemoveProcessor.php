@@ -42,8 +42,8 @@ class PropelRemoveProcessor implements ProcessorInterface
                 }
             }
 
-            $deleted = $propelModel->delete();
-            if (!$deleted) {
+            $propelModel->delete();
+            if (!$propelModel->isDeleted()) {
                 throw new \Exception('This item cannot be deleted');
             }
 
