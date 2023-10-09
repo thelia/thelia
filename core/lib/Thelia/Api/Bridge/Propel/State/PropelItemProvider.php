@@ -49,7 +49,8 @@ class PropelItemProvider implements ProviderInterface
             query: $query,
             operation: $operation,
             uriVariables: $uriVariables,
-            context: $context
+            context: $context,
+            resourceClass : $resourceClass,
         );
 
         $this->eventDispatcher->dispatch($itemProviderEvent);
