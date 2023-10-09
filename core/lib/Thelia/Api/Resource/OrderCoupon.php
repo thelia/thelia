@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Model\Map\OrderCouponTableMap;
 
@@ -57,15 +58,18 @@ class OrderCoupon implements PropelResourceInterface
     public ?Order $order;
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_WRITE])]
     public ?string $code;
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_WRITE])]
     public ?string $type;
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ,  Order::GROUP_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_WRITE])]
     public ?float $amount;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
     public ?string $title;
 
     #[Groups([self::GROUP_READ])]
@@ -77,7 +81,8 @@ class OrderCoupon implements PropelResourceInterface
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
     public ?\DateTime $startDate;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_WRITE])]
     public ?\DateTime $expirationDate;
 
     #[Groups([self::GROUP_READ, Order::GROUP_WRITE])]
@@ -90,6 +95,7 @@ class OrderCoupon implements PropelResourceInterface
     public ?bool $isAvailableOnSpecialOffers;
 
     #[Groups([self::GROUP_READ, Order::GROUP_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_WRITE])]
     public ?string $serializedConditions;
 
     #[Groups([self::GROUP_READ, Order::GROUP_WRITE])]
