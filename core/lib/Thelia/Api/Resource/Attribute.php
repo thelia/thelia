@@ -50,7 +50,7 @@ class Attribute extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'attribute:read:single';
     public const GROUP_WRITE = 'attribute:write';
 
-    #[Groups([self::GROUP_READ, AttributeAv::GROUP_READ, AttributeAv::GROUP_WRITE, Product::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, AttributeAv::GROUP_READ, AttributeAv::GROUP_WRITE, Product::GROUP_READ_SINGLE,AttributeCombination::GROUP_WRITE])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
