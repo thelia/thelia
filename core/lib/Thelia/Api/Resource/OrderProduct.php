@@ -21,6 +21,8 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Type;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Model\Map\OrderProductTableMap;
 
@@ -96,11 +98,13 @@ class OrderProduct implements PropelResourceInterface
     public ?float $unitTaxedPrice;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
-    #[NotBlank(groups: [Order::GROUP_WRITE])]
+    #[Type(type: "bool", groups: [Order::GROUP_WRITE])]
+    #[NotNull(groups: [Order::GROUP_WRITE])]
     public bool $wasNew;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
-    #[NotBlank(groups: [Order::GROUP_WRITE])]
+    #[Type(type: "bool", groups: [Order::GROUP_WRITE])]
+    #[NotNull(groups: [Order::GROUP_WRITE])]
     public bool $wasInPromo;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
@@ -119,7 +123,8 @@ class OrderProduct implements PropelResourceInterface
     public ?int $parent;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_WRITE])]
-    #[NotBlank(groups: [Order::GROUP_WRITE])]
+    #[Type(type: "bool", groups: [Order::GROUP_WRITE])]
+    #[NotNull(groups: [Order::GROUP_WRITE])]
     public bool $virtual;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_WRITE])]
