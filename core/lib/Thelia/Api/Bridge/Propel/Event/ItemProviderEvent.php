@@ -13,6 +13,7 @@ class ItemProviderEvent extends Event
         private Operation $operation,
         private array $uriVariables = [],
         private array $context = [],
+        private ?string $resourceClass,
     )
     {
     }
@@ -58,6 +59,17 @@ class ItemProviderEvent extends Event
     public function setContext(array $context): ItemProviderEvent
     {
         $this->context = $context;
+        return $this;
+    }
+
+    public function getResourceClass(): ?string
+    {
+        return $this->resourceClass;
+    }
+
+    public function setResourceClass(?string $resourceClass): ItemProviderEvent
+    {
+        $this->resourceClass = $resourceClass;
         return $this;
     }
 }

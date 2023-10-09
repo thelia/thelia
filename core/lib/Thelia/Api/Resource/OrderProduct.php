@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Model\Map\OrderProductTableMap;
 
@@ -58,9 +59,11 @@ class OrderProduct implements PropelResourceInterface
     public Order $order;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_WRITE])]
     public string $productRef;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_WRITE])]
     public string $productSaleElementsRef;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
@@ -79,9 +82,11 @@ class OrderProduct implements PropelResourceInterface
     public ?string $postscriptum;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_WRITE])]
     public int $quantity;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_WRITE])]
     public float $price;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
@@ -91,9 +96,11 @@ class OrderProduct implements PropelResourceInterface
     public ?float $unitTaxedPrice;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_WRITE])]
     public bool $wasNew;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_WRITE])]
     public bool $wasInPromo;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
@@ -112,6 +119,7 @@ class OrderProduct implements PropelResourceInterface
     public ?int $parent;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_WRITE])]
     public bool $virtual;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_WRITE])]
@@ -124,7 +132,8 @@ class OrderProduct implements PropelResourceInterface
     public ?\DateTime $updatedAt;
 
     #[Relation(targetResource: OrderProductTax::class)]
-    #[Groups([self::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE, Order::GROUP_WRITE])]
+    #[NotBlank(groups: [Order::GROUP_WRITE])]
     public array $orderProductTaxes;
 
     public function __construct()
@@ -427,27 +436,29 @@ class OrderProduct implements PropelResourceInterface
 
     public function afterModelToResource(array $context): void
     {
-        if ($context['operation'] instanceof Get || $context['operation'] instanceof GetCollection) {
-            // unitTaxedPrice
-            $totalTax = 0;
-            $totalPromoTax = 0;
-            if (!empty($this->orderProductTaxes)) {
-                /** @var OrderProductTax $orderProductTax */
-                foreach ($this->orderProductTaxes as $orderProductTax) {
-                    /** @var \Thelia\Model\OrderProductTax $orderProductTax */
-                    $propelOrderProductTax = $orderProductTax->getPropelModel();
+        if (isset($context['operation'])) {
+            if ($context['operation'] instanceof Get || $context['operation'] instanceof GetCollection) {
+                // unitTaxedPrice
+                $totalTax = 0;
+                $totalPromoTax = 0;
+                if (!empty($this->orderProductTaxes)) {
+                    /** @var OrderProductTax $orderProductTax */
+                    foreach ($this->orderProductTaxes as $orderProductTax) {
+                        /** @var \Thelia\Model\OrderProductTax $orderProductTax */
+                        $propelOrderProductTax = $orderProductTax->getPropelModel();
+                        if (!$this->getPropelModel()->getWasInPromo()) {
+                            $totalTax += (float)$propelOrderProductTax->getAmount();
+                        }
+                        if ($this->getPropelModel()->getWasInPromo()) {
+                            $totalPromoTax += (float)$propelOrderProductTax->getPromoAmount();
+                        }
+                    }
                     if (!$this->getPropelModel()->getWasInPromo()) {
-                        $totalTax += (float) $propelOrderProductTax->getAmount();
+                        $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalTax;
                     }
                     if ($this->getPropelModel()->getWasInPromo()) {
-                        $totalPromoTax += (float) $propelOrderProductTax->getPromoAmount();
+                        $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalPromoTax;
                     }
-                }
-                if (!$this->getPropelModel()->getWasInPromo()) {
-                    $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalTax;
-                }
-                if ($this->getPropelModel()->getWasInPromo()) {
-                    $this->unitTaxedPrice = $this->getPropelModel()->getPrice() + $totalPromoTax;
                 }
             }
         }

@@ -12,10 +12,12 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
@@ -34,6 +36,16 @@ use Thelia\Model\Map\OrderStatusTableMap;
             uriTemplate: '/admin/order_statutes/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
+        new Get(
+            uriTemplate: '/admin/order_statutes/code/{code}',
+            uriVariables: [
+                'code' => new Link(
+                    fromProperty: 'code',
+                    fromClass: self::class
+                )
+            ],
+            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+        ),
         new Put(
             uriTemplate: '/admin/order_statutes/{id}'
         ),
@@ -41,10 +53,15 @@ use Thelia\Model\Map\OrderStatusTableMap;
             uriTemplate: '/admin/order_statutes/{id}'
         ),
     ],
+    uriVariables: [
+        'id' => new Link(
+            fromClass: self::class,
+            identifiers: ['id']
+        )
+    ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-// todo add filters
 class OrderStatus extends AbstractTranslatableResource
 {
     public const GROUP_READ = 'order_status:read';
@@ -54,6 +71,7 @@ class OrderStatus extends AbstractTranslatableResource
     #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_WRITE])]
     public ?int $id = null;
 
+    #[ApiProperty(identifier: true)]
     #[Groups([self::GROUP_READ, Order::GROUP_READ])]
     public string $code;
 
