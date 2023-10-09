@@ -17,7 +17,6 @@ use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Validator\ValidatorInterface;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -114,7 +113,7 @@ class ApiResourceService
                     );
                     continue 2;
                 }
-                if ($value instanceof ObjectCollection) {
+                if ($value instanceof Collection) {
                     $collection = new Collection();
 
                     foreach ($value as $childPropelModel) {
@@ -357,5 +356,35 @@ class ApiResourceService
         }
 
         return $propelModel;
+    }
+
+    public function getResourceCompositeIdentifierValues(\ReflectionClass $reflector,string $param) : array
+    {
+        $compositeIdentifiersAttribute = $reflector->getAttributes(CompositeIdentifiers::class);
+
+        if (empty($compositeIdentifiersAttribute)){
+            return [];
+        }
+
+        if (isset($compositeIdentifiersAttribute[0]) && isset($compositeIdentifiersAttribute[0]->getArguments()[0])){
+            return $compositeIdentifiersAttribute[0]->getArguments()[0];
+        }
+
+        if (isset($compositeIdentifiersAttribute[0]) && isset($compositeIdentifiersAttribute[0]->getArguments()[$param])){
+            return $compositeIdentifiersAttribute[0]->getArguments()[$param];
+        }
+
+        return [];
+    }
+
+    public function getColumnValues(\ReflectionClass $reflector,array $columns) : array
+    {
+        $columnValues = [];
+        foreach ($columns as $column){
+            if (isset($reflector->getProperty($column)->getAttributes(Column::class)[0])){
+                $columnValues[$column] = $reflector->getProperty($column)->getAttributes(Column::class)[0]->getArguments();
+            }
+        }
+        return $columnValues;
     }
 }

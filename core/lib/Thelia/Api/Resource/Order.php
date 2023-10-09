@@ -136,6 +136,7 @@ class Order implements PropelResourceInterface
 
     #[Relation(targetResource: OrderProduct::class)]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[NotBlank(groups: [self::GROUP_WRITE])]
     public array $orderProducts;
 
     #[Relation(targetResource: OrderCoupon::class)]
