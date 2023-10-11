@@ -1,5 +1,15 @@
 FROM php:8.1-fpm-alpine
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
 WORKDIR "/application"
+
+RUN useradd thelia -m \
+&& usermod -a -G thelia thelia \
+&& mkdir -p /application \
+&& chown -R thelia:thelia /application
 
 RUN apk --update --no-cache add git
 RUN apk add bash
@@ -45,3 +55,5 @@ CMD composer install ;  php-fpm
 # Copy script used at docker-start
 COPY docker-init.sh /usr/local/bin/docker-init
 RUN chmod 755 /usr/local/bin/docker-init
+
+USER thelia
