@@ -76,16 +76,18 @@ return static function (ContainerConfigurator $configurator): void {
     }
 
     if (\defined('THELIA_INSTALL_MODE') === false) {
-        $apiModulePaths = [];
+        $apiResourcePaths = [
+            THELIA_LIB.'/Api/Resource'
+        ];
         $modules = ModuleQuery::getActivated();
         /** @var Module $module */
         foreach ($modules as $module) {
             try {
                 \call_user_func([$module->getFullNamespace(), 'configureContainer'], $configurator);
                 \call_user_func([$module->getFullNamespace(), 'configureServices'], $serviceConfigurator);
-                $apiResourcePath = $module->getAbsoluteBaseDir().'/Api/Resource';
-                if (is_dir($apiResourcePath)) {
-                    $apiModulePaths[] = $apiResourcePath;
+                $apiModulePath = $module->getAbsoluteBaseDir().'/Api/Resource';
+                if (is_dir($apiModulePath)) {
+                    $apiResourcePaths[] = $apiModulePath;
                 }
             } catch (\Exception $e) {
                 if ($_SERVER['APP_DEBUG']) {
@@ -98,7 +100,7 @@ return static function (ContainerConfigurator $configurator): void {
             }
         }
 
-        $configurator->extension('api_platform', ['mapping' => ['paths' => $apiModulePaths]]);
+        $configurator->extension('api_platform', ['mapping' => ['paths' => $apiResourcePaths]]);
     }
 
     $serviceConfigurator->get(ConfigCacheService::class)
