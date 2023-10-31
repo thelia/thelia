@@ -2,7 +2,7 @@ api_platform:
     show_webby: false
     mapping:
         paths: [
-            '%kernel.project_dir%/core/lib/Thelia/Api/Resource'
+
         ]
     swagger:
         versions: [3]
