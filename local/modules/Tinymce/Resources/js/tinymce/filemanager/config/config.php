@@ -68,7 +68,7 @@ if (file_exists(__DIR__.'/../../../../../../../../bootstrap.php')) {
 
 $thelia = new App\Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
 $request = Request::createFromGlobals();
-$response = $thelia->handle($request);
+$thelia->boot();
 
 /** @var \Symfony\Component\DependencyInjection\ContainerInterface $container */
 $container = $thelia->getContainer();
