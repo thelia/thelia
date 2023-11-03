@@ -33,9 +33,10 @@ trait FolderBreadcrumbTrait
         $results = [];
 
         // Todo refactor this ugly code
+        $currentId = $folderId;
         do {
             $folder = FolderQuery::create()
-                ->filterById($folderId)
+                ->filterById($currentId)
                 ->findOne();
 
             if ($folder != null) {
