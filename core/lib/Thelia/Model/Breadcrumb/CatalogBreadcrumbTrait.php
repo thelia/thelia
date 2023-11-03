@@ -33,9 +33,10 @@ trait CatalogBreadcrumbTrait
         $results = [];
 
         // Todo refactor this ugly code
+        $currentId = $categoryId;
         do {
             $category = CategoryQuery::create()
-                ->filterById($categoryId)
+                ->filterById($currentId)
                 ->findOne();
 
             if ($category != null) {
