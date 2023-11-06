@@ -432,7 +432,7 @@ class Customer implements PropelResourceInterface
     {
         $resource = $context->getRoot();
         $customer = CustomerQuery::getCustomerByEmail($resource->email);
-        if ($customer) {
+        if ($customer && $customer->getId() !== $this->getId()) {
             $context->addViolation(Translator::getInstance()->trans('This email already exists.',[],null,'en_US'));
         }
     }
