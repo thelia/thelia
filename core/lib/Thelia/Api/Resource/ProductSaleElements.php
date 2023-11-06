@@ -95,6 +95,12 @@ class ProductSaleElements implements PropelResourceInterface
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $updatedAt;
 
+    public function __construct()
+    {
+        $this->productPrices = [];
+        $this->attributeCombinations = [];
+    }
+
     public function getId(): ?int
     {
         return $this->id;
