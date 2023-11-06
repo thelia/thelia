@@ -323,9 +323,9 @@ class Product extends AbstractTranslatableResource
     public function checkDuplicateRef(ExecutionContextInterface $context): void
     {
         $resource = $context->getRoot();
-        $count = ProductQuery::create()->filterByRef($resource->ref)->count();
+        $product = ProductQuery::create()->filterByRef($resource->ref)->findOne();
 
-        if ($count > 0) {
+        if ($product && $product->getId() !== $this->getId()) {
             $context->addViolation(
                 Translator::getInstance()->trans(
                     'A product with reference %ref already exists. Please choose another reference.',
