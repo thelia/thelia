@@ -65,7 +65,7 @@
     "@openstudio/thelia-api-utils": "0.5.2",
     "@reduxjs/toolkit": "^1.6.0",
     "@symfony/webpack-encore": "^4.1.0",
-    "axios": "^1.1.3",
+    "axios": "^1.6.0",
     "eslint-config-react-app": "^7.0.1",
     "infinite-scroll": "^4.0.1",
     "leaflet": "^1.7.1",
