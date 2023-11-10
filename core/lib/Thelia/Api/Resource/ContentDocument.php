@@ -23,6 +23,7 @@ use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Controller\Admin\BinaryFileController;
 use Thelia\Api\Controller\Admin\PostItemFileController;
 use Thelia\Model\Map\ContentDocumentTableMap;
 
@@ -43,6 +44,17 @@ use Thelia\Model\Map\ContentDocumentTableMap;
             uriTemplate: '/admin/content_documents/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
+        new Get(
+            uriTemplate: '/admin/content_documents/{id}/file',
+            controller: BinaryFileController::class,
+            openapiContext: [
+                'responses' => [
+                    '200' => [
+                        'description' => 'The binary file'
+                    ]
+                ]
+            ]
+        ),
         new Put(
             uriTemplate: '/admin/content_documents/{id}'
         ),
@@ -57,7 +69,6 @@ class ContentDocument extends AbstractTranslatableResource implements ItemFileRe
 {
     public const GROUP_READ = 'content_document:read';
     public const GROUP_READ_SINGLE = 'content_document:read:single';
-    public const GROUP_READ_FILE = 'content_document:read_file';
     public const GROUP_WRITE = 'content_document:write';
     public const GROUP_WRITE_FILE = 'content_document:write_file';
 

@@ -22,7 +22,9 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\File;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Controller\Admin\BinaryFileController;
 use Thelia\Api\Controller\Admin\ContentImageController;
 use Thelia\Api\Controller\Admin\PostItemFileController;
 use Thelia\Model\Map\ContentImageTableMap;
@@ -43,6 +45,17 @@ use Thelia\Model\Map\ContentImageTableMap;
         new Get(
             uriTemplate: '/admin/content_images/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+        ),
+        new Get(
+            uriTemplate: '/admin/content_images/{id}/file',
+            controller: BinaryFileController::class,
+            openapiContext: [
+                'responses' => [
+                    '200' => [
+                        'description' => 'The binary file'
+                    ]
+                ]
+            ]
         ),
         new Put(
             uriTemplate: '/admin/content_images/{id}'
