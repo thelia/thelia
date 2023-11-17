@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Bridge\Propel\Filter\DateFilter;
@@ -100,7 +101,8 @@ class Order implements PropelResourceInterface
 
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     #[NotBlank(groups: [self::GROUP_WRITE])]
-    public ?float $currencyRate;
+    #[NotNull]
+    public float $currencyRate;
 
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
@@ -239,12 +241,12 @@ class Order implements PropelResourceInterface
         return $this;
     }
 
-    public function getCurrencyRate(): ?float
+    public function getCurrencyRate(): float
     {
         return $this->currencyRate;
     }
 
-    public function setCurrencyRate(?float $currencyRate): self
+    public function setCurrencyRate(float $currencyRate): self
     {
         $this->currencyRate = $currencyRate;
 
