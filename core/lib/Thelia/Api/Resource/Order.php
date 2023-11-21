@@ -133,9 +133,6 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public ?string $invoiceRef;
 
-    #[Groups([self::GROUP_READ])]
-    public ?float $totalAmount;
-
     #[Relation(targetResource: OrderProduct::class)]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     #[NotBlank(groups: [self::GROUP_WRITE])]
@@ -194,16 +191,33 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public int $cartId;
 
+    #[Groups([self::GROUP_READ])]
+    public function getTotalAmount(): ?float
+    {
+        return $this->getPropelModel()->getTotalAmount();
+    }
+
+    #[Groups([self::GROUP_READ])]
+    public function getTotalAmountTaxed(): ?float
+    {
+        $tax = 0;
+        $total = $this->getPropelModel()->getTotalAmount($tax);
+        return $total + $tax;
+    }
+
+    #[Groups([self::GROUP_READ])]
+    public function getTotalAmountWithoutTaxed(): ?float
+    {
+        $tax = 0;
+        return $this->getPropelModel()->getTotalAmount($tax, false);
+    }
+
     public function __construct()
     {
         $this->orderCoupons = [];
         $this->orderProducts = [];
     }
 
-    public function getTotalAmount(): ?float
-    {
-        return $this->getPropelModel()->getTotalAmount();
-    }
 
     public function getId(): ?int
     {
