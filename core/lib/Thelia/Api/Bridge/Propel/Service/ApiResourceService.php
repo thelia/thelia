@@ -21,9 +21,12 @@ use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Api\Bridge\Propel\Attribute\Column;
 use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Bridge\Propel\Event\ModelToResourceEvent;
+use Thelia\Api\Resource\ItemFileResourceInterface;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\ResourceAddonInterface;
 use Thelia\Api\Resource\TranslatableResourceInterface;
@@ -33,7 +36,8 @@ class ApiResourceService
 {
     public function __construct(
         private readonly array $apiResourceAddons,
-        private readonly ValidatorInterface $validator
+        private readonly ValidatorInterface $validator,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -63,6 +67,10 @@ class ApiResourceService
         if (null === $baseModel) {
             $baseModel = $propelModel;
         }
+
+        $modelToResourceEvent = new ModelToResourceEvent($baseModel, $parentModel);
+        $this->eventDispatcher->dispatch($modelToResourceEvent, ModelToResourceEvent::BEFORE_TRANSFORM);
+        $baseModel = $modelToResourceEvent->getModel();
 
         /** @var PropelResourceInterface $apiResource */
         $apiResource = new $resourceClass();
@@ -223,7 +231,10 @@ class ApiResourceService
 
         $apiResource->afterModelToResource($context);
 
-        return $apiResource;
+        $modelToResourceEvent->setResource($apiResource);
+        $this->eventDispatcher->dispatch($modelToResourceEvent, ModelToResourceEvent::AFTER_TRANSFORM);
+
+        return $modelToResourceEvent->getResource();
     }
 
     /**
