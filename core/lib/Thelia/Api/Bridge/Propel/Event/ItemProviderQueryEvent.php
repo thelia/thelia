@@ -6,14 +6,14 @@ use ApiPlatform\Metadata\Operation;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ItemProviderEvent extends Event
+class ItemProviderQueryEvent extends Event
 {
     public function __construct(
         private ModelCriteria $query,
         private Operation $operation,
         private array $uriVariables = [],
         private array $context = [],
-        private ?string $resourceClass,
+        private ?string $resourceClass = null
     )
     {
     }
@@ -23,7 +23,7 @@ class ItemProviderEvent extends Event
         return $this->query;
     }
 
-    public function setQuery(ModelCriteria $query): ItemProviderEvent
+    public function setQuery(ModelCriteria $query): ItemProviderQueryEvent
     {
         $this->query = $query;
         return $this;
@@ -34,7 +34,7 @@ class ItemProviderEvent extends Event
         return $this->operation;
     }
 
-    public function setOperation(Operation $operation): ItemProviderEvent
+    public function setOperation(Operation $operation): ItemProviderQueryEvent
     {
         $this->operation = $operation;
         return $this;
@@ -45,7 +45,7 @@ class ItemProviderEvent extends Event
         return $this->uriVariables;
     }
 
-    public function setUriVariables(array $uriVariables): ItemProviderEvent
+    public function setUriVariables(array $uriVariables): ItemProviderQueryEvent
     {
         $this->uriVariables = $uriVariables;
         return $this;
@@ -56,7 +56,7 @@ class ItemProviderEvent extends Event
         return $this->context;
     }
 
-    public function setContext(array $context): ItemProviderEvent
+    public function setContext(array $context): ItemProviderQueryEvent
     {
         $this->context = $context;
         return $this;
@@ -67,7 +67,7 @@ class ItemProviderEvent extends Event
         return $this->resourceClass;
     }
 
-    public function setResourceClass(?string $resourceClass): ItemProviderEvent
+    public function setResourceClass(?string $resourceClass): ItemProviderQueryEvent
     {
         $this->resourceClass = $resourceClass;
         return $this;
