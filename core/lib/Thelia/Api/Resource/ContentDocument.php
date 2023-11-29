@@ -12,6 +12,7 @@
 
 namespace Thelia\Api\Resource;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -19,14 +20,22 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
+use Thelia\Api\Controller\Admin\BinaryFileController;
+use Thelia\Api\Controller\Admin\PostItemFileController;
 use Thelia\Model\Map\ContentDocumentTableMap;
 
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/content_documents'
+            uriTemplate: '/admin/content_documents',
+            inputFormats: ['multipart' => ['multipart/form-data']],
+            controller: PostItemFileController::class,
+            normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]],
+            denormalizationContext: ['groups' => [self::GROUP_WRITE, self::GROUP_WRITE_FILE]],
+            deserialize: false
         ),
         new GetCollection(
             uriTemplate: '/admin/content_documents'
@@ -34,6 +43,17 @@ use Thelia\Model\Map\ContentDocumentTableMap;
         new Get(
             uriTemplate: '/admin/content_documents/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
+        ),
+        new Get(
+            uriTemplate: '/admin/content_documents/{id}/file',
+            controller: BinaryFileController::class,
+            openapiContext: [
+                'responses' => [
+                    '200' => [
+                        'description' => 'The binary file'
+                    ]
+                ]
+            ]
         ),
         new Put(
             uriTemplate: '/admin/content_documents/{id}'
@@ -45,21 +65,28 @@ use Thelia\Model\Map\ContentDocumentTableMap;
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class ContentDocument extends AbstractTranslatableResource
+class ContentDocument extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
     public const GROUP_READ = 'content_document:read';
     public const GROUP_READ_SINGLE = 'content_document:read:single';
     public const GROUP_WRITE = 'content_document:write';
+    public const GROUP_WRITE_FILE = 'content_document:write_file';
 
     #[Groups([self::GROUP_READ])]
     public ?int $id = null;
 
-    #[Relation(targetResource: Folder::class)]
-    #[Groups([self::GROUP_READ])]
+    #[Relation(targetResource: Content::class)]
+    #[Groups([self::GROUP_WRITE_FILE, self::GROUP_READ])]
     public Content $content;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
-    public string $file;
+    #[Groups([self::GROUP_WRITE_FILE])]
+    #[ApiProperty(
+        openapiContext: [
+            'type' => 'string',
+            'format' => 'binary'
+        ]
+    )]
+    public UploadedFile $fileToUpload;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public bool $visible;
@@ -75,6 +102,12 @@ class ContentDocument extends AbstractTranslatableResource
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public I18nCollection $i18ns;
+
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public string $file;
+
+    #[Groups([self::GROUP_READ_SINGLE])]
+    public ?string $fileUrl;
 
     public function getId(): ?int
     {
@@ -100,15 +133,14 @@ class ContentDocument extends AbstractTranslatableResource
         return $this;
     }
 
-    public function getFile(): string
+    public function getFileToUpload(): UploadedFile
     {
-        return $this->file;
+        return $this->fileToUpload;
     }
 
-    public function setFile(string $file): self
+    public function setFileToUpload(UploadedFile $fileToUpload): ContentDocument
     {
-        $this->file = $file;
-
+        $this->fileToUpload = $fileToUpload;
         return $this;
     }
 
@@ -168,5 +200,42 @@ class ContentDocument extends AbstractTranslatableResource
     public static function getI18nResourceClass(): string
     {
         return ContentDocumentI18n::class;
+    }
+
+    public function getFile(): string
+    {
+        return $this->file;
+    }
+
+    public function setFile(string $file): ContentDocument
+    {
+        $this->file = $file;
+        return $this;
+    }
+
+    public function getFileUrl(): ?string
+    {
+        return $this->fileUrl;
+    }
+
+    public function setFileUrl(?string $fileUrl): ContentDocument
+    {
+        $this->fileUrl = $fileUrl;
+        return $this;
+    }
+
+    public static function getItemType(): string
+    {
+        return "content";
+    }
+
+    public static function getFileType(): string
+    {
+        return "document";
+    }
+
+    public function getItemId(): string
+    {
+        return $this->getContent()->getId();
     }
 }
