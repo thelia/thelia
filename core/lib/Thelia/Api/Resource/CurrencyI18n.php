@@ -17,22 +17,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class CurrencyI18n extends I18n
 {
     #[Groups([Currency::GROUP_READ])]
-    protected string $locale;
-
-    #[Groups([Currency::GROUP_READ])]
     protected ?string $name;
-
-    public function getLocale(): string
-    {
-        return $this->locale;
-    }
-
-    public function setLocale(string $locale): self
-    {
-        $this->locale = $locale;
-
-        return $this;
-    }
 
     public function getName(): ?string
     {
