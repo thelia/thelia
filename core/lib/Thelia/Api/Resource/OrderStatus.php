@@ -72,17 +72,17 @@ class OrderStatus extends AbstractTranslatableResource
     public ?int $id = null;
 
     #[ApiProperty(identifier: true)]
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ])]
     public string $code;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ])]
-    public ?string $color;
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ])]
+    public ?string $color = '#c3c3c3';
 
-    #[Groups([self::GROUP_READ])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?int $position;
 
-    #[Groups([self::GROUP_READ])]
-    public ?bool $protectedStatus;
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    public ?bool $protectedStatus = false;
 
     #[Groups([self::GROUP_READ])]
     public ?\DateTime $createdAt;
