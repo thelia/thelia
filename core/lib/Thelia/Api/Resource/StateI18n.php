@@ -17,22 +17,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class StateI18n extends I18n
 {
     #[Groups([State::GROUP_READ])]
-    protected string $locale;
-
-    #[Groups([State::GROUP_READ])]
     protected ?string $title;
-
-    public function getLocale(): string
-    {
-        return $this->locale;
-    }
-
-    public function setLocale(string $locale): self
-    {
-        $this->locale = $locale;
-
-        return $this;
-    }
 
     public function getTitle(): ?string
     {
