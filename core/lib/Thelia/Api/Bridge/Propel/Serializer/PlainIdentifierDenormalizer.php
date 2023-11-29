@@ -39,6 +39,11 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
         return \count($this->getNeedConvertProperties($data, $type)) > 0;
     }
 
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    {
+        return false;
+    }
+
     public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
     {
         if (!\is_array($data)) {

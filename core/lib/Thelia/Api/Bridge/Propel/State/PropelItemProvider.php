@@ -18,7 +18,7 @@ use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Thelia\Api\Bridge\Propel\Event\ItemProviderEvent;
+use Thelia\Api\Bridge\Propel\Event\ItemProviderQueryEvent;
 use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
 use Thelia\Api\Resource\PropelResourceInterface;
 
@@ -45,7 +45,7 @@ class PropelItemProvider implements ProviderInterface
         /** @var ModelCriteria $query */
         $query = $queryClass::create();
 
-        $itemProviderEvent = new ItemProviderEvent(
+        $itemProviderEvent = new ItemProviderQueryEvent(
             query: $query,
             operation: $operation,
             uriVariables: $uriVariables,
