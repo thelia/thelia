@@ -3,7 +3,7 @@
 namespace Thelia\Api\Bridge\Propel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Api\Bridge\Propel\Event\ItemProviderEvent;
+use Thelia\Api\Bridge\Propel\Event\ItemProviderQueryEvent;
 use Thelia\Api\Bridge\Propel\Service\ApiResourceService;
 
 class BaseItemProviderListener implements EventSubscriberInterface
@@ -12,7 +12,7 @@ class BaseItemProviderListener implements EventSubscriberInterface
         private readonly ApiResourceService $apiResourceService,
     ) {
     }
-    public function baseProvider(ItemProviderEvent $event)
+    public function baseProvider(ItemProviderQueryEvent $event)
     {
         $query = $event->getQuery();
 
@@ -49,7 +49,7 @@ class BaseItemProviderListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ItemProviderEvent::class => [
+            ItemProviderQueryEvent::class => [
                 ['baseProvider', 128]
             ],
         ];
