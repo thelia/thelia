@@ -3,12 +3,12 @@
 namespace Thelia\Api\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Api\Bridge\Propel\Event\ItemProviderEvent;
+use Thelia\Api\Bridge\Propel\Event\ItemProviderQueryEvent;
 use Thelia\Model\StateQuery;
 
 class StateByIsoProviderListener implements EventSubscriberInterface
 {
-    public function stateByIsoProvider(ItemProviderEvent $event)
+    public function stateByIsoProvider(ItemProviderQueryEvent $event)
     {
         if (
             $event->getOperation()->getName() !== "state_by_iso"
@@ -37,7 +37,7 @@ class StateByIsoProviderListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            ItemProviderEvent::class => [
+            ItemProviderQueryEvent::class => [
                 ['stateByIsoProvider', 1234]
             ],
         ];

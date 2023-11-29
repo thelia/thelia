@@ -17,8 +17,13 @@ use ApiPlatform\Serializer\AbstractItemNormalizer;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Thelia\Api\Resource\I18n;
 
-class I18nNormalizer extends AbstractItemNormalizer
+class I18nDenormalizer extends AbstractItemNormalizer
 {
+    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    {
+        return false;
+    }
+
     public function supportsDenormalization(mixed $data, string $type, string $format = null, array $context = []): bool
     {
         return $type === I18n::class;
