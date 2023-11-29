@@ -22,7 +22,7 @@ class FileUrlModelToResourceListener implements EventSubscriberInterface
         /** @var ItemFileResourceInterface $resource */
         $resource = $modelToResourceEvent->getResource();
 
-        if (!in_array(ItemFileResourceInterface::class, class_implements($resource))) {
+        if (!$resource instanceof ItemFileResourceInterface) {
             return;
         }
 

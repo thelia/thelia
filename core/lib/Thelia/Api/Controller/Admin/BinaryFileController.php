@@ -16,7 +16,7 @@ class BinaryFileController
     {
         $resource = $request->get('data');
 
-        if (!in_array(ItemFileResourceInterface::class, class_implements($resource))) {
+        if (!$resource instanceof ItemFileResourceInterface) {
             throw new \Exception("Resource must implements ItemFileResourceInterface to use the BinaryFileController");
         }
 
