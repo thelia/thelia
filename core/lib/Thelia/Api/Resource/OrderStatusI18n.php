@@ -17,9 +17,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class OrderStatusI18n extends I18n
 {
     #[Groups([OrderStatus::GROUP_READ, OrderStatus::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_WRITE])]
-    protected string $locale;
-
-    #[Groups([OrderStatus::GROUP_READ, OrderStatus::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_WRITE])]
     protected ?string $title;
 
     #[Groups([OrderStatus::GROUP_READ, OrderStatus::GROUP_WRITE])]
@@ -30,18 +27,6 @@ class OrderStatusI18n extends I18n
 
     #[Groups([OrderStatus::GROUP_READ, OrderStatus::GROUP_WRITE])]
     protected ?string $postscriptum;
-
-    public function getLocale(): string
-    {
-        return $this->locale;
-    }
-
-    public function setLocale(string $locale): self
-    {
-        $this->locale = $locale;
-
-        return $this;
-    }
 
     public function getTitle(): ?string
     {
