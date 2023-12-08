@@ -19,7 +19,7 @@ body {
 
 header:before {
   content: "";
-  background-color: #424242;;
+  background-color: #288690;
   height: 70px;
   width: 100%;
   text-align: center;
@@ -39,6 +39,7 @@ header #logo {
 
 header #logo img {
   height: 50px;
+  background-color: rgba(40, 134, 144, .4)
 }
 
 /** WEBBY AND WEB **/
@@ -236,8 +237,8 @@ header #logo img {
 }
 
 #swagger-ui.api-platform .btn.execute:hover {
-  background-color: #424242;;
-  border-color: #424242;;
+  background-color: #288690;
+  border-color: #288690;
 }
 
 #swagger-ui.api-platform .execute-wrapper {
