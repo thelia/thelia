@@ -116,6 +116,12 @@ tests/cypress/downloads
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
+/config/packages
+/config/routes
+/config/bundles.php
+/config/preload.php
+/config/routes.yaml
+/config/services.yaml
 
 ###> friendsofphp/php-cs-fixer ###
 /.php-cs-fixer.php
