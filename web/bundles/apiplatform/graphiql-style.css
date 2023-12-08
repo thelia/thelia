@@ -33,7 +33,7 @@ body {
     content: "";
     width: 185px;
     height: 50px;
-    background: url("./logo-header.png") no-repeat;
+    background: url("logo-header.svg") no-repeat;
     vertical-align: middle;
     border-right: 1px solid white;
 }
@@ -57,7 +57,7 @@ body {
 }
 
 #graphiql .graphiql-container .topBarWrap {
-    background-color: #424242;;
+    background-color: #288690;
 }
 
 #graphiql .graphiql-container .history-contents, #graphiql .graphiql-container .doc-explorer-contents {
@@ -115,5 +115,5 @@ body {
 #graphiql .graphiql-container .toolbar-select-options>li:hover,
 #graphiql .graphiql-container .history-contents>p:hover,
 #graphiql .graphiql-container .history-contents>p:active {
-    background: #424242;;
+    background: #288690;
 }
