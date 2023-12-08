@@ -136,6 +136,21 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_READ])]
     public ?float $totalAmount;
 
+    #[Groups([self::GROUP_READ])]
+    public ?float $totalAmountWithoutTaxes;
+
+    #[Groups([self::GROUP_READ])]
+    public ?float $totalAmountWithTaxBeforeDiscount;
+
+    #[Groups([self::GROUP_READ])]
+    public ?float $amountDiscountWithTaxes;
+
+    #[Groups([self::GROUP_READ])]
+    public ?float $totalAmountWithTaxesAfterDiscount;
+
+    #[Groups([self::GROUP_READ])]
+    public ?float $totalShippingWithTaxes;
+
     #[Relation(targetResource: OrderProduct::class)]
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     #[NotBlank(groups: [self::GROUP_WRITE])]
@@ -194,16 +209,61 @@ class Order implements PropelResourceInterface
     #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
     public int $cartId;
 
+    #[Groups([self::GROUP_READ])]
+    public function getTotalAmount(): ?float
+    {
+        return $this->getPropelModel()->getTotalAmount();
+    }
+
+    #[Groups([self::GROUP_READ])]
+    public function getTotalAmountWithoutTaxes(): ?float
+    {
+        $itemsTax = 0;
+        /** @var \Thelia\Model\Order $orderPropelModel */
+        $orderPropelModel = $this->getPropelModel();
+        $itemsAmount = $orderPropelModel->getTotalAmount($itemsTax, false, false);
+        return $itemsAmount - $itemsTax;
+    }
+
+    #[Groups([self::GROUP_READ])]
+    public function getTotalAmountWithTaxBeforeDiscount(): ?float
+    {
+        $totalTaxedAmount = $this->getTotalAmount();
+        $postage = $this->getPostage();
+        $discount = $this->getDiscount();
+        return $totalTaxedAmount - $postage + $discount;
+    }
+
+    #[Groups([self::GROUP_READ])]
+    public function getAmountDiscountWithTaxes(): ?float
+    {
+        /** @var \Thelia\Model\Order $orderPropelModel */
+        $orderPropelModel = $this->getPropelModel();
+        return $orderPropelModel->getDiscount();
+    }
+
+    #[Groups([self::GROUP_READ])]
+    public function getTotalAmountWithTaxesAfterDiscount(): ?float
+    {
+        $totalTaxedAmount = $this->getTotalAmount();
+        $postage = $this->getPostage();
+        return $totalTaxedAmount - $postage;
+    }
+
+    #[Groups([self::GROUP_READ])]
+    public function getTotalShippingWithTaxes(): ?float
+    {
+        /** @var \Thelia\Model\Order $orderPropelModel */
+        $orderPropelModel = $this->getPropelModel();
+        return $orderPropelModel->getPostage();
+    }
+
     public function __construct()
     {
         $this->orderCoupons = [];
         $this->orderProducts = [];
     }
 
-    public function getTotalAmount(): ?float
-    {
-        return $this->getPropelModel()->getTotalAmount();
-    }
 
     public function getId(): ?int
     {
