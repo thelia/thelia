@@ -39,6 +39,15 @@ RUN docker-php-ext-configure intl && docker-php-ext-install intl
 # Mysql extension
 RUN docker-php-ext-install pdo_mysql
 
+# Opcache
+RUN docker-php-ext-install opcache
+
+#APCU
+RUN apk add --update --no-cache --virtual .build-dependencies $PHPIZE_DEPS \
+        && pecl install apcu \
+        && docker-php-ext-enable apcu \
+        && pecl clear-cache \
+        && apk del .build-dependencies
 # Composer copy and run
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 CMD composer install ;  php-fpm
