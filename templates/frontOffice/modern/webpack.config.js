@@ -191,8 +191,7 @@ Encore.configureDevServerOptions((options) => {
         followSymlinks: false,
         ignoreInitial: true,
         ignorePermissionErrors: true,
-        persistent: true,
-        usePolling: true
+        persistent: true
       })
       .on('all', function () {
         devServer.sendMessage(
