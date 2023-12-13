@@ -61,7 +61,7 @@ class BrandImage extends AbstractTranslatableResource implements ItemFileResourc
     public const GROUP_READ_SINGLE = 'brand_image:read:single';
     public const GROUP_WRITE = 'brand_image:write';
     public const GROUP_WRITE_FILE = 'brand_image:write_file';
-    public const GROUP_WRITE_UPDATE = 'brand_document:write_update';
+    public const GROUP_WRITE_UPDATE = 'brand_image:write_update';
 
 
 
