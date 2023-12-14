@@ -13,12 +13,6 @@
         "forum": "http://thelia.net/forum",
         "wiki": "http://doc.thelia.net"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/thelia/Propel2"
-        }
-    ],
     "require": {
         "php": ">=5.5",
         "ircmaxell/password-compat": "1.0.*",
@@ -41,7 +35,7 @@
         "symfony/dom-crawler": "2.8.*",
         "symfony/property-access": "2.8.*",
         "symfony/serializer": "2.8.*",
-        "ensepar/html2pdf": "1.0.1",
+        "spipu/html2pdf": "^5.0",
         "symfony/finder": "2.8.*",
         "symfony/browser-kit": "2.8.*",
         "symfony/http-foundation": "2.8.*",
@@ -60,7 +54,7 @@
         "michelf/php-markdown": "1.6.*",
         "smarty/smarty": "3.1.20",
         "ramsey/array_column": "~1.1",
-        "propel/propel": "dev-thelia-2.3",
+        "thelia/propel": "dev-thelia-2.3",
         "commerceguys/addressing": "0.8.*",
         "symfony/cache": "~3.1.0"
     },
@@ -73,7 +67,10 @@
     "minimum-stability": "stable",
     "config": {
         "vendor-dir": "core/vendor",
-        "bin-dir": "bin"
+        "bin-dir": "bin",
+        "allow-plugins": {
+            "thelia/installer": true
+        }
     },
     "autoload": {
         "psr-4": {
