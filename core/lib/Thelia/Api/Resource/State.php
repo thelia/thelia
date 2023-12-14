@@ -75,7 +75,13 @@ class State extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'state:read:single';
     public const GROUP_WRITE = 'state:write';
 
-    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE, Address::GROUP_READ, TaxRuleCountry::GROUP_READ])]
+    #[Groups([
+        self::GROUP_READ,
+        Customer::GROUP_READ_SINGLE,
+        Address::GROUP_READ,
+        TaxRuleCountry::GROUP_READ,
+        OrderAddress::GROUP_WRITE,
+    ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, OrderAddress::GROUP_READ])]
