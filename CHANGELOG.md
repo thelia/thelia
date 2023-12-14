@@ -1,3 +1,6 @@
+# 2.3.6
+- (PR #3140) Change html2pdf library + composer update
+
 # 2.3.5
 - (ISSUE #2472) add missing formError use on 2.3 branch
 - (PR #2479) disallow cart path but not words starting with cart

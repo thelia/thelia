@@ -50,7 +50,7 @@ use Thelia\Model\ModuleQuery;
 
 class Thelia extends Kernel
 {
-    const THELIA_VERSION = '2.3.5';
+    const THELIA_VERSION = '2.3.6';
 
     public function __construct($environment, $debug)
     {
