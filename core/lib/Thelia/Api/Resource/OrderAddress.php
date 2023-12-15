@@ -15,6 +15,7 @@ namespace Thelia\Api\Resource;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
@@ -25,6 +26,9 @@ use Thelia\Model\Map\OrderAddressTableMap;
 #[ApiResource(
     operations: [
         new Post(
+            uriTemplate: '/admin/order_addresses'
+        ),
+        new GetCollection(
             uriTemplate: '/admin/order_addresses'
         ),
         new Get(
@@ -49,49 +53,49 @@ class OrderAddress implements PropelResourceInterface
     public const GROUP_READ_SINGLE = 'order_address:read:single';
     public const GROUP_WRITE = 'order_address:write';
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ,Order::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?int $id = null;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public string $firstname;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public string $lastname;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE,  Order::GROUP_READ_SINGLE])]
     public string $address1;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?string $address2;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?string $address3;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE,  Order::GROUP_READ_SINGLE])]
     public ?string $zipcode;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public string $city;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?string $phone;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?string $cellphone;
 
-    #[Groups([self::GROUP_READ, Order::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?string $company;
 
     #[Relation(targetResource: CustomerTitle::class)]
-    #[Groups(groups: [self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups(groups: [self::GROUP_READ,self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public CustomerTitle $customerTitle;
 
     #[Relation(targetResource: Country::class)]
-    #[Groups(groups: [self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups(groups: [self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_READ_SINGLE])]
     public Country $country;
 
     #[Relation(targetResource: State::class)]
-    #[Groups(groups: [self::GROUP_READ, Order::GROUP_READ_SINGLE])]
+    #[Groups(groups: [self::GROUP_READ,self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
     public ?State $state = null;
 
     #[Groups([self::GROUP_READ])]
