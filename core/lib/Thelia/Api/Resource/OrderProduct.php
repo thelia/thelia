@@ -108,7 +108,7 @@ class OrderProduct implements PropelResourceInterface
     public bool $wasInPromo;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
-    public ?float $weight;
+    public ?string $weight;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
     public ?string $eanCode;
@@ -319,12 +319,12 @@ class OrderProduct implements PropelResourceInterface
         return $this;
     }
 
-    public function getWeight(): ?float
+    public function getWeight(): ?string
     {
         return $this->weight;
     }
 
-    public function setWeight(?float $weight): self
+    public function setWeight(?string $weight): self
     {
         $this->weight = $weight;
 
