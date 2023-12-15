@@ -177,12 +177,15 @@ class ApiResourceService
                         continue;
                     }
 
-                    $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
+                    // @TODO : wait an official fix or rebuild full context array https://github.com/api-platform/api-platform/issues/2594
+                    if (isset($context['groups'])) {
+                        $propertyGroups = $groupAttributes->getArguments()['groups'] ?? $groupAttributes->getArguments()[0] ?? null;
 
-                    $matchingGroups = array_intersect($propertyGroups, $context['groups']);
+                        $matchingGroups = array_intersect($propertyGroups, $context['groups']);
 
-                    if (empty($matchingGroups)) {
-                        continue;
+                        if (empty($matchingGroups)) {
+                            continue;
+                        }
                     }
 
                     $fieldValue = null;
