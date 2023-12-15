@@ -677,7 +677,7 @@ return [
     'Ishikawa' => 'Ishikawa',
     'Israel' => 'Israël',
     'Italy' => 'Italie',
-    'Ivory Coast' => 'Côte dIvoire',
+    'Ivory Coast' => 'Côte d\'Ivoire',
     'Iwate' => 'Iwate',
     'Jakarta' => 'Jakarta',
     'Jalisco' => 'Jalisco',
