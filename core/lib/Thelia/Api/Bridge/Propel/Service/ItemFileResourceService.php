@@ -32,7 +32,7 @@ class ItemFileResourceService
         }
 
         $fileModel->setParentId($parentId)
-            ->setVisible($request->get('visible'))
+            ->setVisible(filter_var($request->get('visible'), FILTER_VALIDATE_BOOLEAN))
             ->setPosition($request->get('position'));
 
         $i18ns = json_decode($request->get('i18ns'), true);

@@ -56,7 +56,8 @@ use Thelia\Model\Map\ContentDocumentTableMap;
             ]
         ),
         new Put(
-            uriTemplate: '/admin/content_documents/{id}'
+            uriTemplate: '/admin/content_documents/{id}',
+            denormalizationContext: ['groups' => [self::GROUP_WRITE,self::GROUP_WRITE_UPDATE]],
         ),
         new Delete(
             uriTemplate: '/admin/content_documents/{id}'
@@ -71,6 +72,8 @@ class ContentDocument extends AbstractTranslatableResource implements ItemFileRe
     public const GROUP_READ_SINGLE = 'content_document:read:single';
     public const GROUP_WRITE = 'content_document:write';
     public const GROUP_WRITE_FILE = 'content_document:write_file';
+    public const GROUP_WRITE_UPDATE = 'content_document:write_update';
+
 
     #[Groups([self::GROUP_READ])]
     public ?int $id = null;
@@ -91,7 +94,7 @@ class ContentDocument extends AbstractTranslatableResource implements ItemFileRe
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public bool $visible;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE_UPDATE])]
     public ?int $position;
 
     #[Groups([self::GROUP_READ])]
