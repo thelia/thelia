@@ -93,6 +93,8 @@ class Product extends AbstractTranslatableResource
             FeatureProduct::GROUP_READ_SINGLE,
             ProductSaleElements::GROUP_READ,
             ProductSaleElements::GROUP_WRITE,
+            ProductImage::GROUP_READ_SINGLE,
+            ProductDocument::GROUP_READ_SINGLE,
         ]
     )]
     public ?int $id = null;

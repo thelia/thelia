@@ -50,7 +50,11 @@ class Folder extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'folder:read:single';
     public const GROUP_WRITE = 'folder:write';
 
-    #[Groups([self::GROUP_READ, ContentFolder::GROUP_READ, FolderImage::GROUP_READ_SINGLE, FolderDocument::GROUP_READ_SINGLE])]
+    #[Groups([self::GROUP_READ,
+        ContentFolder::GROUP_READ,
+        FolderImage::GROUP_READ_SINGLE,
+        FolderDocument::GROUP_READ_SINGLE
+    ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]

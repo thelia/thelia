@@ -1,15 +1,5 @@
 <?php
 
-/*
- * This file is part of the Thelia package.
- * http://www.thelia.net
- *
- * (c) OpenStudio <info@thelia.net>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Thelia\Api\Resource;
 
 use ApiPlatform\Metadata\ApiProperty;
@@ -22,17 +12,15 @@ use ApiPlatform\Metadata\Put;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints\File;
 use Thelia\Api\Bridge\Propel\Attribute\Relation;
 use Thelia\Api\Controller\Admin\BinaryFileController;
-use Thelia\Api\Controller\Admin\ContentImageController;
 use Thelia\Api\Controller\Admin\PostItemFileController;
-use Thelia\Model\Map\ContentImageTableMap;
+use Thelia\Model\Map\BrandDocumentTableMap;
 
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/admin/content_images',
+            uriTemplate: '/admin/brand_documents',
             inputFormats: ['multipart' => ['multipart/form-data']],
             controller: PostItemFileController::class,
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]],
@@ -40,14 +28,14 @@ use Thelia\Model\Map\ContentImageTableMap;
             deserialize: false
         ),
         new GetCollection(
-            uriTemplate: '/admin/content_images'
+            uriTemplate: '/admin/brand_documents'
         ),
         new Get(
-            uriTemplate: '/admin/content_images/{id}',
+            uriTemplate: '/admin/brand_documents/{id}',
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
         new Get(
-            uriTemplate: '/admin/content_images/{id}/file',
+            uriTemplate: '/admin/brand_documents/{id}/file',
             controller: BinaryFileController::class,
             openapiContext: [
                 'responses' => [
@@ -58,30 +46,31 @@ use Thelia\Model\Map\ContentImageTableMap;
             ]
         ),
         new Put(
-            uriTemplate: '/admin/content_images/{id}',
+            uriTemplate: '/admin/brand_documents/{id}',
             denormalizationContext: ['groups' => [self::GROUP_WRITE,self::GROUP_WRITE_UPDATE]],
         ),
         new Delete(
-            uriTemplate: '/admin/content_images/{id}'
+            uriTemplate: '/admin/brand_documents/{id}'
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]
 )]
-class ContentImage extends AbstractTranslatableResource implements ItemFileResourceInterface
+class BrandDocument extends AbstractTranslatableResource implements ItemFileResourceInterface
 {
-    public const GROUP_READ = 'content_image:read';
-    public const GROUP_READ_SINGLE = 'content_image:read:single';
-    public const GROUP_WRITE = 'content_image:write';
-    public const GROUP_WRITE_FILE = 'content_image:write_file';
-    public const GROUP_WRITE_UPDATE = 'content_image:write_update';
+    public const GROUP_READ = 'brand_document:read';
+    public const GROUP_READ_SINGLE = 'brand_document:read:single';
+    public const GROUP_WRITE = 'brand_document:write';
+    public const GROUP_WRITE_FILE = 'brand_document:write_file';
+    public const GROUP_WRITE_UPDATE = 'brand_document:write_update';
+
 
     #[Groups([self::GROUP_READ])]
     public ?int $id = null;
 
-    #[Relation(targetResource: Content::class)]
+    #[Relation(targetResource: Brand::class)]
     #[Groups([self::GROUP_WRITE_FILE, self::GROUP_READ])]
-    public Content $content;
+    public Brand $brand;
 
     #[Groups([self::GROUP_WRITE_FILE])]
     #[ApiProperty(
@@ -118,20 +107,20 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->id;
     }
 
-    public function setId(?int $id): ContentImage
+    public function setId(?int $id): BrandDocument
     {
         $this->id = $id;
         return $this;
     }
 
-    public function getContent(): Content
+    public function getBrand(): Brand
     {
-        return $this->content;
+        return $this->brand;
     }
 
-    public function setContent(Content $content): ContentImage
+    public function setBrand(Brand $brand): BrandDocument
     {
-        $this->content = $content;
+        $this->brand = $brand;
         return $this;
     }
 
@@ -140,7 +129,7 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->fileToUpload;
     }
 
-    public function setFileToUpload(UploadedFile $fileToUpload): ContentImage
+    public function setFileToUpload(UploadedFile $fileToUpload): BrandDocument
     {
         $this->fileToUpload = $fileToUpload;
         return $this;
@@ -151,7 +140,7 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->visible;
     }
 
-    public function setVisible(bool $visible): ContentImage
+    public function setVisible(bool $visible): BrandDocument
     {
         $this->visible = $visible;
         return $this;
@@ -162,7 +151,7 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->position;
     }
 
-    public function setPosition(?int $position): ContentImage
+    public function setPosition(?int $position): BrandDocument
     {
         $this->position = $position;
         return $this;
@@ -173,7 +162,7 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTime $createdAt): ContentImage
+    public function setCreatedAt(?\DateTime $createdAt): BrandDocument
     {
         $this->createdAt = $createdAt;
         return $this;
@@ -184,7 +173,7 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTime $updatedAt): ContentImage
+    public function setUpdatedAt(?\DateTime $updatedAt): BrandDocument
     {
         $this->updatedAt = $updatedAt;
         return $this;
@@ -195,7 +184,7 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->file;
     }
 
-    public function setFile(string $file): ContentImage
+    public function setFile(string $file): BrandDocument
     {
         $this->file = $file;
         return $this;
@@ -206,35 +195,34 @@ class ContentImage extends AbstractTranslatableResource implements ItemFileResou
         return $this->fileUrl;
     }
 
-    public function setFileUrl(?string $fileUrl): ContentImage
+    public function setFileUrl(?string $fileUrl): BrandDocument
     {
         $this->fileUrl = $fileUrl;
         return $this;
     }
 
-
     public static function getPropelRelatedTableMap(): ?TableMap
     {
-        return new ContentImageTableMap();
+        return new BrandDocumentTableMap();
     }
 
     public static function getI18nResourceClass(): string
     {
-        return ContentImageI18n::class;
+        return BrandDocumentI18n::class;
     }
 
     public static function getItemType(): string
     {
-        return "content";
+        return "brand";
     }
 
     public static function getFileType(): string
     {
-       return "image";
+        return "document";
     }
 
     public function getItemId(): string
     {
-        return $this->getContent()->getId();
+        return $this->getBrand()->getId();
     }
 }
