@@ -50,7 +50,14 @@ class Module extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'module:read:single';
     public const GROUP_WRITE = 'module:write';
 
-    #[Groups([self::GROUP_READ, ModuleConfig::GROUP_READ, ModuleConfig::GROUP_WRITE, Order::GROUP_READ_SINGLE, Order::GROUP_READ,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ,
+        ModuleConfig::GROUP_READ,
+        ModuleConfig::GROUP_WRITE,
+        Order::GROUP_READ_SINGLE,
+        Order::GROUP_READ,
+        Order::GROUP_WRITE,
+        ModuleImage::GROUP_READ_SINGLE
+    ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
