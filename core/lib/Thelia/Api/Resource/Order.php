@@ -169,7 +169,7 @@ class Order implements PropelResourceInterface
     #[Relation(targetResource: OrderAddress::class, relationAlias: 'OrderAddressRelatedByDeliveryOrderAddressId')]
     #[Column(propelSetter: 'setDeliveryOrderAddressId')]
     #[NotBlank(groups: [self::GROUP_WRITE])]
-    #[Groups([self::GROUP_READ_SINGLE, self::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public OrderAddress $deliveryOrderAddress;
 
     #[Relation(targetResource: Module::class, relationAlias: 'ModuleRelatedByPaymentModuleId')]

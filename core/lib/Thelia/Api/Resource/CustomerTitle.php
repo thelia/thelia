@@ -50,7 +50,15 @@ class CustomerTitle extends AbstractTranslatableResource
     public const GROUP_READ_SINGLE = 'customer_title:read:single';
     public const GROUP_WRITE = 'customer_title:write';
 
-    #[Groups([self::GROUP_READ, Customer::GROUP_READ_SINGLE, Address::GROUP_READ, OrderAddress::GROUP_READ_SINGLE, State::GROUP_READ_SINGLE, Order::GROUP_READ_SINGLE])]
+    #[Groups([
+        self::GROUP_READ,
+        Customer::GROUP_READ_SINGLE,
+        Address::GROUP_READ,
+        OrderAddress::GROUP_READ_SINGLE,
+        State::GROUP_READ_SINGLE,
+        Order::GROUP_READ_SINGLE,
+        OrderAddress::GROUP_WRITE,
+    ])]
     public ?int $id = null;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
