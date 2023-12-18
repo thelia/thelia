@@ -14,6 +14,7 @@ namespace Thelia\Core\Template\Element;
 
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Util\PropelModelPager;
+use ReturnTypeWillChange;
 
 class LoopResult implements \Iterator, \JsonSerializable
 {
@@ -133,9 +134,8 @@ class LoopResult implements \Iterator, \JsonSerializable
      *
      * @see http://php.net/manual/en/iterator.current.php
      *
-     * @return \Thelia\Core\Template\Element\LoopResultRow
      */
-    public function current()
+    #[ReturnTypeWillChange] public function current()
     {
         return $this->collection[$this->position];
     }
@@ -159,9 +159,8 @@ class LoopResult implements \Iterator, \JsonSerializable
      *
      * @see http://php.net/manual/en/iterator.key.php
      *
-     * @return mixed scalar on success, or null on failure
      */
-    public function key()
+    #[ReturnTypeWillChange] public function key()
     {
         return $this->position;
     }
@@ -213,7 +212,7 @@ class LoopResult implements \Iterator, \JsonSerializable
     /**
      * {@inheritdoc}
      */
-    public function jsonSerialize()
+    #[ReturnTypeWillChange] public function jsonSerialize()
     {
         $return = [];
         foreach ($this->collection as $collection) {

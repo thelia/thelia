@@ -2,4 +2,3 @@
 framework:
     session:
         save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
-

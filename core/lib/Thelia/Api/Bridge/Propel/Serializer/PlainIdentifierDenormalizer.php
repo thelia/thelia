@@ -130,4 +130,12 @@ class PlainIdentifierDenormalizer implements DenormalizerInterface, Denormalizer
             }
         );
     }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            '*' => false,                 // Supports any types, but the result is not cacheable
+        ];
+    }
+
 }

@@ -12,7 +12,7 @@
 
 namespace Thelia\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
@@ -26,7 +26,6 @@ use Symfony\Component\Routing\Router;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
@@ -50,7 +49,6 @@ use Thelia\Tools\URL;
  */
 abstract class BaseController implements ControllerInterface
 {
-    use ContainerAwareTrait;
 
     public const EMPTY_FORM_NAME = 'thelia.empty';
 
@@ -66,6 +64,11 @@ abstract class BaseController implements ControllerInterface
 
     /** @var bool Fallback on default template when setting the templateDefinition */
     protected $useFallbackTemplate = true;
+
+    public function __construct(
+        protected ContainerInterface $container
+    ) {
+    }
 
     /**
      * Return an empty response (after an ajax request, for example).

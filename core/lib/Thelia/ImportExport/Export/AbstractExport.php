@@ -14,6 +14,7 @@ namespace Thelia\ImportExport\Export;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Map\TableMap;
+use ReturnTypeWillChange;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
 
@@ -104,9 +105,8 @@ abstract class AbstractExport implements \Iterator
     /**
      * @throws \Exception
      *
-     * @return array|false|mixed|string
      */
-    public function current()
+    #[ReturnTypeWillChange] public function current()
     {
         if ($this->dataIsJSONFile) {
             /** @var resource $file */
@@ -136,9 +136,8 @@ abstract class AbstractExport implements \Iterator
     /**
      * @throws \Exception
      *
-     * @return bool|float|int|string|null
      */
-    public function key()
+    #[ReturnTypeWillChange] public function key()
     {
         if ($this->dataIsJSONFile) {
             return $this->data->key();

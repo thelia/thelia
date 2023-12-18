@@ -863,7 +863,6 @@ class Thelia extends Kernel
     {
         $parameters = parent::getKernelParameters();
 
-        // Todo replace this by real runtime env
         $parameters['kernel.runtime_environment'] = $this->environment;
 
         $parameters['thelia.root_dir'] = THELIA_ROOT;
@@ -875,7 +874,6 @@ class Thelia extends Kernel
         $parameters['thelia.db_name'] = $_SERVER['DB_NAME'] ?? null;
         $parameters['thelia.db_user'] = $_SERVER['DB_USER'] ?? null;
         $parameters['thelia.db_password'] = $_SERVER['DB_PASSWORD'] ?? null;
-
         return $parameters;
     }
 

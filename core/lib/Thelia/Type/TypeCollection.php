@@ -12,6 +12,8 @@
 
 namespace Thelia\Type;
 
+use ReturnTypeWillChange;
+
 /**
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
@@ -53,9 +55,8 @@ class TypeCollection implements \Iterator
      *
      * @see http://php.net/manual/en/iterator.current.php
      *
-     * @return \Thelia\Type\TypeInterface
      */
-    public function current()
+    #[ReturnTypeWillChange] public function current()
     {
         return $this->types[$this->position];
     }
@@ -79,9 +80,8 @@ class TypeCollection implements \Iterator
      *
      * @see http://php.net/manual/en/iterator.key.php
      *
-     * @return mixed scalar on success, or null on failure
      */
-    public function key()
+    #[ReturnTypeWillChange] public function key()
     {
         return $this->position;
     }

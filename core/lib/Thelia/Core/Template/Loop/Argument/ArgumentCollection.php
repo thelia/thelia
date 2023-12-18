@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\Template\Loop\Argument;
 
+use ReturnTypeWillChange;
+
 /**
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
@@ -117,9 +119,8 @@ class ArgumentCollection implements \Iterator
      *
      * @see http://php.net/manual/en/iterator.current.php
      *
-     * @return Argument
      */
-    public function current()
+    #[ReturnTypeWillChange] public function current()
     {
         return current($this->arguments);
     }
@@ -130,7 +131,6 @@ class ArgumentCollection implements \Iterator
      *
      * @see http://php.net/manual/en/iterator.next.php
      *
-     * @return void any returned value is ignored
      */
     public function next(): void
     {
@@ -143,9 +143,8 @@ class ArgumentCollection implements \Iterator
      *
      * @see http://php.net/manual/en/iterator.key.php
      *
-     * @return mixed scalar on success, or null on failure
      */
-    public function key()
+    #[ReturnTypeWillChange] public function key()
     {
         return key($this->arguments);
     }

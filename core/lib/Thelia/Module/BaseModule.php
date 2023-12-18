@@ -14,8 +14,8 @@ namespace Thelia\Module;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -49,8 +49,6 @@ use Thelia\Tools\Image;
 
 class BaseModule implements BaseModuleInterface
 {
-    use ContainerAwareTrait;
-
     public const CLASSIC_MODULE_TYPE = 1;
     public const DELIVERY_MODULE_TYPE = 2;
     public const PAYMENT_MODULE_TYPE = 3;
@@ -73,6 +71,11 @@ class BaseModule implements BaseModuleInterface
 
     // Do no use this attribute directly, use getModuleModel() instead.
     private $moduleModel;
+
+    public function __construct(
+        protected ContainerInterface $container
+    ) {
+    }
 
     /**
      * @param Module $moduleModel
