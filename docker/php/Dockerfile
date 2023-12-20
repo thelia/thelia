@@ -1,27 +1,41 @@
 FROM php:5.6-apache
 COPY docker-php-pecl-install /usr/local/bin/
 
-RUN apt-get update && apt-get install -y \
- libfreetype6-dev \
- libjpeg62-turbo-dev \
- openssl \
- libpng12-dev \
- libicu-dev \
- git \
- zip \
- libzip-dev \
-    && docker-php-ext-install intl pdo_mysql openssl mbstring zip calendar \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install gd \
-    && docker-php-pecl-install xdebug-2.3.3
+RUN echo "deb http://archive.debian.org/debian/ stretch main" > /etc/apt/sources.list && \
+    echo "deb-src http://archive.debian.org/debian/ stretch main" >> /etc/apt/sources.list && \
+    apt-get -o Acquire::Check-Valid-Until=false update
+
+
+RUN apt-get install -y \
+        git \
+        unzip \
+        wget \
+        libzip-dev \
+        libicu-dev \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libpng-dev \
+        libwebp-dev
+
+RUN docker-php-ext-install -j$(nproc) \
+        pdo_mysql \
+        intl \
+        zip \
+        calendar \
+        opcache && \
+    docker-php-ext-configure gd \
+        --with-freetype-dir=/usr/include/ \
+        --with-jpeg-dir=/usr/include/ \
+        --with-webp-dir=/usr/include/ && \
+    docker-php-ext-install -j$(nproc) gd
+
+RUN pecl update-channels && \
+    docker-php-ext-enable opcache
+
 
 # Setup and install composer
-RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
-  && curl -o /tmp/composer-setup.sig https://composer.github.io/installer.sig \
-  && php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" \
-  && php /tmp/composer-setup.php \
-  && chmod +x composer.phar \
-  && mv composer.phar /usr/local/bin/composer
+RUN wget https://getcomposer.org/download/1.2.4/composer.phar -O /usr/local/bin/composer && \
+        chmod a+rx /usr/local/bin/composer
 
 RUN a2enmod rewrite
 RUN usermod -u 1000 www-data
