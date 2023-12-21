@@ -262,10 +262,18 @@ class MessageController extends AbstractCrudController
             $parser->assign($key, $value);
         }
 
-        if ($html) {
-            $content = $message->setLocale($this->getCurrentEditionLocale())->getHtmlMessageBody($parser);
-        } else {
-            $content = $message->setLocale($this->getCurrentEditionLocale())->getTextMessageBody($parser);
+        try {
+            if ($html) {
+                $content = $message->setLocale($this->getCurrentEditionLocale())->getHtmlMessageBody($parser);
+            } else {
+                $content = $message->setLocale($this->getCurrentEditionLocale())->getTextMessageBody($parser);
+            }
+        } catch (\InvalidArgumentException|\ErrorException $exception) {
+            return new Response($this->getTranslator()->trans('You probably didn\'t inject the missing variable to preview the HTML. Error is : %err',
+                ['%err' => $exception->getMessage()]), 200);
+        } catch (\Exception $exception) {
+            return new Response($this->getTranslator()->trans('Something goes wrong, error is : %err',
+                ['%err' => $exception->getMessage()]), 200);
         }
 
         return new Response($content);
