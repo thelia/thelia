@@ -24,7 +24,7 @@ class MetaDataEvent extends ActionEvent
 {
     protected $metaData;
 
-    public function __construct(?MetaData $metaData = null)
+    public function __construct(MetaData $metaData = null)
     {
         $this->metaData = $metaData;
     }

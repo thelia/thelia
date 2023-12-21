@@ -38,9 +38,6 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
         $query->filterByBrandId($this->getBrandId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);
@@ -63,9 +60,6 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParentId($parentId)
     {
         $this->setBrandId($parentId);
@@ -73,9 +67,6 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParentId()
     {
         return $this->getBrandId();

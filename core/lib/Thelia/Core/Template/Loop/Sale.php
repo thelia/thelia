@@ -33,8 +33,6 @@ use Thelia\Type\TypeCollection;
  *
  * @author Franck Allimant <thelia@cqfdev.fr>
  *
- * {@inheritdoc}
- *
  * @method int[]       getId()
  * @method int[]       getExclude()
  * @method bool|string getActive()

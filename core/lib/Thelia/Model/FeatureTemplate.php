@@ -27,9 +27,6 @@ class FeatureTemplate extends BaseFeatureTemplate
         $query->filterByTemplateId($this->getTemplateId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);

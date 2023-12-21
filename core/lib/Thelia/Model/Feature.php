@@ -19,9 +19,6 @@ class Feature extends BaseFeature
 {
     use \Thelia\Model\Tools\PositionManagementTrait;
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);

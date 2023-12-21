@@ -39,9 +39,6 @@ class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, Fi
         $query->filterByCategory($this->getCategory());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);
@@ -51,9 +48,6 @@ class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, Fi
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParentId($parentId)
     {
         $this->setCategoryId($parentId);
@@ -61,9 +55,6 @@ class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, Fi
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParentId()
     {
         return $this->getCategoryId();
@@ -82,9 +73,6 @@ class CategoryImage extends BaseCategoryImage implements BreadcrumbInterface, Fi
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBreadcrumb(Router $router, $tab, $locale)
     {
         return $this->getCategoryBreadcrumb($router, $tab, $locale);

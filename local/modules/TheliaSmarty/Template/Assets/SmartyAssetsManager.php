@@ -30,7 +30,7 @@ class SmartyAssetsManager
     private $web_root;
     private $path_relative_to_web_root;
 
-    private static $assetsDirectory = null;
+    private static $assetsDirectory;
 
     /**
      * Creates a new SmartyAssetsManager instance.

@@ -447,8 +447,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * Duplicate an existing Cart. If a customer ID is provided the created cart will be attached to this customer.
      *
-     * @param CustomerModel $customer
-     *
      * @return CartModel
      */
     protected function duplicateCart(EventDispatcherInterface $dispatcher, CartModel $cart, CustomerModel $customer = null)
@@ -484,9 +482,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
         return $id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

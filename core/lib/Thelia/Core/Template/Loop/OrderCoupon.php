@@ -31,8 +31,6 @@ use Thelia\Model\OrderQuery;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method string[] getOrder()
  */
 class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface

@@ -39,8 +39,6 @@ class CouponDeleteEvent extends ActionEvent
     }
 
     /**
-     * @param Coupon $coupon
-     *
      * @return $this
      */
     public function setCoupon(Coupon $coupon = null)

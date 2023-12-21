@@ -34,25 +34,16 @@ trait PercentageCouponTrait
      */
     abstract protected function getPercentageFieldName();
 
-    /**
-     * {@inheritdoc}
-     */
     public function setFieldsValue($effects): void
     {
         $this->percentage = $effects[$this->getPercentageFieldName()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCartItemDiscount(CartItem $cartItem)
     {
         return $cartItem->getTotalRealTaxedPrice($this->facade->getDeliveryCountry()) * ($this->percentage / 100);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function callDrawBackOfficeInputs($templateName)
     {
         return $this->drawBaseBackOfficeInputs($templateName, [
@@ -61,17 +52,11 @@ trait PercentageCouponTrait
             ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getFieldList()
     {
         return $this->getBaseFieldList([$this->getPercentageFieldName()]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function checkCouponFieldValue($fieldName, $fieldValue)
     {
         $this->checkBaseCouponFieldValue($fieldName, $fieldValue);

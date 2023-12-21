@@ -1,7 +1,19 @@
+# 2.5.4
+- #3145 Feat Change Thelia version 2.5.3 to 2.5.4
+- #3137 Fix translations countries
+- #3134 Fix missing routing parent call
+- #3129 Fix TinyMce file upload
+- #3128 Fix backoffice breadcrumb for depth > 1
+- #3126 Feat Add array key on loop result add row method
+- #3122 Fix error message in preview mail
+- #3121 Feat Update webpack.config.js
+- #3120 Fix external-schema path in cached model generation
+- #3118 Fix docker root user
+- #3080 Feat Add encore_entry_preload_script_tags smarty function
 # 2.5.3
-- #3117 Improve unmatchable condition message 
-- #3116 Prevent many "NPE may occur here" phpstorm EA warnings 
-- #3115 Fix orderProduct rounding 
+- #3117 Improve unmatchable condition message
+- #3116 Prevent many "NPE may occur here" phpstorm EA warnings
+- #3115 Fix orderProduct rounding
 - #3114 Remove twitter feed
 - #3113 Fix: Contact form body + add translations
 - #3109 Improve asset manifest path loading

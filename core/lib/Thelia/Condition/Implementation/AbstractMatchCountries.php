@@ -28,9 +28,6 @@ abstract class AbstractMatchCountries extends ConditionAbstract
     /** Condition 1st parameter : quantity */
     public const COUNTRIES_LIST = 'countries';
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(FacadeInterface $facade)
     {
         $this->availableOperators = [
@@ -47,9 +44,6 @@ abstract class AbstractMatchCountries extends ConditionAbstract
 
     abstract protected function getFormLabel();
 
-    /**
-     * {@inheritdoc}
-     */
     public function setValidatorsFromForm(array $operators, array $values)
     {
         $this->checkComparisonOperatorValue($operators, self::COUNTRIES_LIST);
@@ -79,9 +73,6 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isMatching()
     {
         // The delivery address should match one of the selected countries.
@@ -95,9 +86,6 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSummary()
     {
         $i18nOperator = Operators::getI18n(
@@ -121,9 +109,6 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         return $this->getSummaryLabel($cntryStrList, $i18nOperator);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateInputs()
     {
         return [
@@ -135,9 +120,6 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         return $this->facade->getParser()->render(

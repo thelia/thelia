@@ -25,8 +25,6 @@ use Thelia\Model\AccessoryQuery;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int[]    getProduct()
  * @method string[] getOrder()
  *

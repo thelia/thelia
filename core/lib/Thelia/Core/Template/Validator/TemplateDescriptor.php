@@ -270,8 +270,6 @@ class TemplateDescriptor
     }
 
     /**
-     * @param array $string
-     *
      * @return $this
      */
     public function setAssets($assets): self
@@ -290,8 +288,6 @@ class TemplateDescriptor
     }
 
     /**
-     * @param array $string
-     *
      * @return $this
      */
     public function setComponents($components): self

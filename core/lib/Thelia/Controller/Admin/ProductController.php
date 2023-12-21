@@ -1397,10 +1397,8 @@ class ProductController extends AbstractSeoCrudController
 
         if (null !== $pse = ProductSaleElementsQuery::create()->findPk($product_sale_element_id)) {
             if ($currency_id > 0
-                &&
-                $currency_id != Currency::getDefaultCurrency()->getId()
-                &&
-                null !== $currency = CurrencyQuery::create()->findPk($currency_id)) {
+                && $currency_id != Currency::getDefaultCurrency()->getId()
+                && null !== $currency = CurrencyQuery::create()->findPk($currency_id)) {
                 // Get the default currency price
                 $productPrice = ProductPriceQuery::create()
                     ->filterByCurrency(Currency::getDefaultCurrency())

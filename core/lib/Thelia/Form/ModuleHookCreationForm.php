@@ -142,8 +142,7 @@ class ModuleHookCreationForm extends BaseForm
         foreach ($modules as $module) {
             // Check if module defines a hook ID
             if (ModuleHookQuery::create()->filterByModuleId($module->getId())->count() > 0
-                ||
-                IgnoredModuleHookQuery::create()->filterByModuleId($module->getId())->count() > 0
+                || IgnoredModuleHookQuery::create()->filterByModuleId($module->getId())->count() > 0
             ) {
                 $choices[$module->getTitle()] = $module->getId();
             }

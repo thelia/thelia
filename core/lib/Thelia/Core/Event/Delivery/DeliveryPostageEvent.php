@@ -65,9 +65,6 @@ class DeliveryPostageEvent extends ActionEvent
 
     /**
      * DeliveryPostageEvent constructor.
-     *
-     * @param Country $country
-     * @param State   $state
      */
     public function __construct(
         $module,

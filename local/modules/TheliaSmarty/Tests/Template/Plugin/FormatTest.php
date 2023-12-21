@@ -197,7 +197,7 @@ class FormatTest extends SmartyPluginTestCase
             ['address' => $address->getId()]
         );
 
-        $this->assertTrue(strpos($data, '<address class="a_class" id="an_id">') !== false);
+        $this->assertTrue(str_contains($data, '<address class="a_class" id="an_id">'));
 
         // Test plain text
         $data = $this->renderString(

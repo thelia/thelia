@@ -195,8 +195,7 @@ class ModuleManagement
     {
         if (
             $reflected->implementsInterface('Thelia\Module\DeliveryModuleInterface')
-                ||
-            $reflected->implementsInterface('Thelia\Module\DeliveryModuleWithStateInterface')
+            || $reflected->implementsInterface('Thelia\Module\DeliveryModuleWithStateInterface')
         ) {
             return BaseModule::DELIVERY_MODULE_TYPE;
         }

@@ -207,9 +207,6 @@ class BaseModule implements BaseModuleInterface
         return $this->dispatcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setTitle(Module $module, $titles): void
     {
         if (\is_array($titles)) {
@@ -234,27 +231,18 @@ class BaseModule implements BaseModuleInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getConfigValue($variableName, $defaultValue = null, $valueLocale = null)
     {
         return ModuleConfigQuery::create()
             ->getConfigValue(self::getModuleId(), $variableName, $defaultValue, $valueLocale);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function setConfigValue($variableName, $variableValue, $valueLocale = null, $createIfNotExists = true): void
     {
         ModuleConfigQuery::create()
             ->setConfigValue(self::getModuleId(), $variableName, $variableValue, $valueLocale, $createIfNotExists);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deployImageFolder(Module $module, $folderPath, ConnectionInterface $con = null): void
     {
         try {
@@ -331,9 +319,6 @@ class BaseModule implements BaseModuleInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getModuleModel()
     {
         if (null === $this->moduleModel) {
@@ -358,9 +343,6 @@ class BaseModule implements BaseModuleInterface
      */
     private static $moduleIds = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getModuleId()
     {
         $code = self::getModuleCode();
@@ -379,9 +361,6 @@ class BaseModule implements BaseModuleInterface
         return self::$moduleIds[$code];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getModuleCode()
     {
         $fullClassName = explode('\\', static::class);
@@ -494,9 +473,6 @@ class BaseModule implements BaseModuleInterface
         return $amount;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getCompilers()
     {
         return [];
@@ -523,75 +499,48 @@ class BaseModule implements BaseModuleInterface
         return '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function install(ConnectionInterface $con = null): void
     {
         // Override this method to do something useful.
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
     {
         // Override this method to do something useful.
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function preActivation(ConnectionInterface $con = null)
     {
         // Override this method to do something useful.
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function postActivation(ConnectionInterface $con = null): void
     {
         // Override this method to do something useful.
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function preDeactivation(ConnectionInterface $con = null)
     {
         // Override this method to do something useful.
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function postDeactivation(ConnectionInterface $con = null): void
     {
         // Override this method to do something useful.
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false): void
     {
         // Override this method to do something useful.
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getHooks()
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function registerHooks(): void
     {
         $moduleHooks = $this->getHooks();
@@ -607,12 +556,12 @@ class BaseModule implements BaseModuleInterface
             $dispatcher = $this->container->get('event_dispatcher');
 
             foreach ($moduleHooks as $hook) {
-                $isValid = \is_array($hook) &&
-                    isset($hook['type']) &&
-                    \array_key_exists($hook['type'], $allowedTypes) &&
-                    isset($hook['code']) &&
-                    \is_string($hook['code']) &&
-                    !empty($hook['code'])
+                $isValid = \is_array($hook)
+                    && isset($hook['type'])
+                    && \array_key_exists($hook['type'], $allowedTypes)
+                    && isset($hook['code'])
+                    && \is_string($hook['code'])
+                    && !empty($hook['code'])
                 ;
 
                 if (!$isValid) {

@@ -51,14 +51,10 @@ class BaseFrontController extends BaseController
     {
         $order = $this->getSession()->getOrder();
         if (null === $order
-            ||
-            null === $order->getChoosenDeliveryAddress()
-            ||
-            null === $order->getDeliveryModuleId()
-            ||
-            null === AddressQuery::create()->findPk($order->getChoosenDeliveryAddress())
-            ||
-            null === ModuleQuery::create()->findPk($order->getDeliveryModuleId())) {
+            || null === $order->getChoosenDeliveryAddress()
+            || null === $order->getDeliveryModuleId()
+            || null === AddressQuery::create()->findPk($order->getChoosenDeliveryAddress())
+            || null === ModuleQuery::create()->findPk($order->getDeliveryModuleId())) {
             throw new RedirectException($this->retrieveUrlFromRouteId('order.delivery'));
         }
     }
@@ -67,14 +63,10 @@ class BaseFrontController extends BaseController
     {
         $order = $this->getSession()->getOrder();
         if (null === $order
-            ||
-            null === $order->getChoosenInvoiceAddress()
-            ||
-            null === $order->getPaymentModuleId()
-            ||
-            null === AddressQuery::create()->findPk($order->getChoosenInvoiceAddress())
-            ||
-            null === ModuleQuery::create()->findPk($order->getPaymentModuleId())) {
+            || null === $order->getChoosenInvoiceAddress()
+            || null === $order->getPaymentModuleId()
+            || null === AddressQuery::create()->findPk($order->getChoosenInvoiceAddress())
+            || null === ModuleQuery::create()->findPk($order->getPaymentModuleId())) {
             throw new RedirectException($this->retrieveUrlFromRouteId('order.invoice'));
         }
     }
@@ -116,7 +108,7 @@ class BaseFrontController extends BaseController
      *
      * @param string $templateName the complete template name, with extension
      * @param array  $args         the template arguments
-     * @param string$templateDir
+     * @param string $templateDir
      *
      * @return string
      */

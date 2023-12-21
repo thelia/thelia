@@ -24,8 +24,6 @@ use Thelia\Type\TypeCollection;
 /**
  * @author Manuel Raynaud <manu@raynaud.io>
  *
- * {@inheritdoc}
- *
  * @method int      getId()
  * @method int[]    getExclude()
  * @method string[] getExcludeCode()

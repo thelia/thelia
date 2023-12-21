@@ -32,9 +32,6 @@ class Role implements RoleInterface
         $this->role = (string) $role;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRole()
     {
         return $this->role;

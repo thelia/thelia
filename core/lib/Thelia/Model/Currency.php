@@ -20,7 +20,7 @@ class Currency extends BaseCurrency
 {
     use \Thelia\Model\Tools\PositionManagementTrait;
 
-    protected static $defaultCurrency = null;
+    protected static $defaultCurrency;
 
     public static function getDefaultCurrency()
     {
@@ -35,9 +35,6 @@ class Currency extends BaseCurrency
         return self::$defaultCurrency;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);

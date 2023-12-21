@@ -72,9 +72,6 @@ class OrderStatus extends BaseAction implements EventSubscriberInterface
         $event->setOrderStatus($orderStatus);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

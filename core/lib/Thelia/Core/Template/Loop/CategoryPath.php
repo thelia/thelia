@@ -33,8 +33,6 @@ use Thelia\Type\BooleanOrBothType;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  *
- * {@inheritdoc}
- *
  * @method int         getCategory()
  * @method int         getDepth()
  * @method bool|string getVisible()

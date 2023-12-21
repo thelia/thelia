@@ -26,8 +26,6 @@ use Thelia\Model\ProductAssociatedContentQuery;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int   getProduct()
  * @method int   getCategory()
  * @method int[] getExcludeProduct()

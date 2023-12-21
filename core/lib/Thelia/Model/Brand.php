@@ -23,17 +23,11 @@ class Brand extends BaseBrand implements FileModelParentInterface
     use PositionManagementTrait;
     use UrlRewritingTrait;
 
-    /**
-     * {@inheritDoc}
-     */
     public function getRewrittenUrlViewName()
     {
         return 'brand';
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);
@@ -44,9 +38,6 @@ class Brand extends BaseBrand implements FileModelParentInterface
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function postDelete(ConnectionInterface $con = null): void
     {
         parent::postDelete($con);

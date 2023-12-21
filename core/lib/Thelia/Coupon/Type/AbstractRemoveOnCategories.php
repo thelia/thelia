@@ -44,9 +44,6 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
      */
     abstract public function getCartItemDiscount(CartItem $cartItem);
 
-    /**
-     * {@inheritdoc}
-     */
     public function set(
         FacadeInterface $facade,
         $code,
@@ -93,9 +90,6 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exec()
     {
         // This coupon subtracts the specified amount from the order total
@@ -123,9 +117,6 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
         return $discount;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBaseBackOfficeInputs($templateName, $otherFields)
     {
         return $this->facade->getParser()->render($templateName, array_merge($otherFields, [
@@ -135,17 +126,11 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
             ]));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBaseFieldList($otherFields)
     {
         return array_merge($otherFields, [self::CATEGORIES_LIST]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function checkBaseCouponFieldValue($fieldName, $fieldValue)
     {
         if ($fieldName === self::CATEGORIES_LIST) {

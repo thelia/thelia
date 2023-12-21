@@ -26,9 +26,6 @@ class MatchForXArticles extends ConditionAbstract
     /** Condition 1st parameter : quantity */
     public const CART_QUANTITY = 'quantity';
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(FacadeInterface $facade)
     {
         $this->availableOperators = [
@@ -44,17 +41,11 @@ class MatchForXArticles extends ConditionAbstract
         parent::__construct($facade);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getServiceId()
     {
         return 'thelia.condition.match_for_x_articles';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setValidatorsFromForm(array $operators, array $values)
     {
         $this->checkComparisonOperatorValue($operators, self::CART_QUANTITY);
@@ -77,9 +68,6 @@ class MatchForXArticles extends ConditionAbstract
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isMatching()
     {
         $condition1 = $this->conditionValidator->variableOpComparison(
@@ -95,9 +83,6 @@ class MatchForXArticles extends ConditionAbstract
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->translator->trans(
@@ -106,9 +91,6 @@ class MatchForXArticles extends ConditionAbstract
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToolTip()
     {
         $toolTip = $this->translator->trans(
@@ -119,9 +101,6 @@ class MatchForXArticles extends ConditionAbstract
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSummary()
     {
         $i18nOperator = Operators::getI18n(
@@ -140,9 +119,6 @@ class MatchForXArticles extends ConditionAbstract
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateInputs()
     {
         return [
@@ -154,9 +130,6 @@ class MatchForXArticles extends ConditionAbstract
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         $labelQuantity = $this->facade
@@ -168,9 +141,6 @@ class MatchForXArticles extends ConditionAbstract
         return $html;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function drawBackOfficeBaseInputsText($label, $inputKey)
     {
         return $this->facade->getParser()->render(

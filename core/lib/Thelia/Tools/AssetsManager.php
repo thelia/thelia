@@ -18,7 +18,7 @@ class AssetsManager
 
     protected $processed = [];
     protected $entrypoints = [];
-    protected $entrypointsPath = null;
+    protected $entrypointsPath;
 
     protected function __construct($entrypointsPath)
     {

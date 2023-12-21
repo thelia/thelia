@@ -25,8 +25,6 @@ use Thelia\Model\Base\ContentQuery as BaseContentQuery;
 class ContentQuery extends BaseContentQuery
 {
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolderQuery::filterByPosition
      */
     public function filterByPosition($position = null, $comparison = null)
@@ -35,8 +33,6 @@ class ContentQuery extends BaseContentQuery
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolderQuery::orderByPosition
      */
     public function orderByPosition($order = Criteria::ASC)
@@ -45,8 +41,6 @@ class ContentQuery extends BaseContentQuery
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolderQuery::groupByPosition
      */
     public function groupByPosition()
@@ -55,8 +49,6 @@ class ContentQuery extends BaseContentQuery
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolderQuery::findOneByPosition
      */
     public function findOneByPosition($position)
@@ -65,8 +57,6 @@ class ContentQuery extends BaseContentQuery
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolderQuery::findByPosition
      */
     public function findByPosition($position)

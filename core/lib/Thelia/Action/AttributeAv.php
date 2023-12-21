@@ -83,9 +83,6 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
         $this->genericUpdatePosition(AttributeAvQuery::create(), $event);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

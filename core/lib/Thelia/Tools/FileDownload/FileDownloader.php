@@ -86,8 +86,8 @@ class FileDownloader implements FileDownloaderInterface
 
         curl_close($con);
 
-        if (false === $response || $errno !== 0 ||
-            ($httpCode != '200' && $httpCode != '204')
+        if (false === $response || $errno !== 0
+            || ($httpCode != '200' && $httpCode != '204')
         ) {
             /**
              * The server is down ? The file doesn't exist ? Anything else ?

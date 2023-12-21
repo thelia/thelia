@@ -26,7 +26,7 @@ use Thelia\Module\BaseModule;
  */
 class ModuleQuery extends BaseModuleQuery
 {
-    protected static $activated = null;
+    protected static $activated;
 
     /**
      * @return array|mixed|\PropelObjectCollection

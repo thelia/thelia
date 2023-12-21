@@ -78,8 +78,7 @@ class Encore extends AbstractSmartyPlugin
 
         if (
             !file_exists($moduleAssetPath.DS.pathinfo($file, \PATHINFO_DIRNAME))
-            ||
-            $this->kernelDebug
+            || $this->kernelDebug
         ) {
             $this->symlinkModuleAssets($moduleAssetPath, $module);
         }
@@ -201,8 +200,7 @@ class Encore extends AbstractSmartyPlugin
 
         if (
             $isDir && (!is_dir($origin) || (is_dir($dest) && !$forceOverWrite))
-            ||
-            !$isDir && (!file_exists($origin) || (file_exists($dest) && !$forceOverWrite))
+            || !$isDir && (!file_exists($origin) || (file_exists($dest) && !$forceOverWrite))
         ) {
             return;
         }

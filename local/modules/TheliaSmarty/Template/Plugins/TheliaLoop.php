@@ -30,7 +30,7 @@ use TheliaSmarty\Template\SmartyPluginDescriptor;
 class TheliaLoop extends AbstractSmartyPlugin
 {
     /** @var PropelModelPager[] */
-    protected static $pagination = null;
+    protected static $pagination;
 
     protected $loopDefinition = [];
 
@@ -136,9 +136,9 @@ class TheliaLoop extends AbstractSmartyPlugin
             return $loop->count();
         } catch (ElementNotFoundException $ex) {
             // If loop is not found, when in development mode, rethrow the exception to make it visible
-//            if ($this->isDebugActive) {
-//                throw $ex;
-//            }
+            //            if ($this->isDebugActive) {
+            //                throw $ex;
+            //            }
 
             // Otherwise, log the problem and return a count of 0
             Tlog::getInstance()->error($ex->getMessage());
@@ -197,9 +197,9 @@ class TheliaLoop extends AbstractSmartyPlugin
                 $loopResults->rewind();
             } catch (ElementNotFoundException $ex) {
                 // If loop is not found, when in development mode, rethrow the exception to make it visible
-//                if ($this->isDebugActive) {
-//                    throw $ex;
-//                }
+                //                if ($this->isDebugActive) {
+                //                    throw $ex;
+                //                }
 
                 // Otherwise, log the problem and simulate an empty result.
                 Tlog::getInstance()->error($ex->getMessage());

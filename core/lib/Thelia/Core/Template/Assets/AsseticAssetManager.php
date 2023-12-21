@@ -299,17 +299,11 @@ class AsseticAssetManager implements AssetManagerInterface
         return rtrim($outputUrl, '/').'/'.trim($outputRelativeWebPath, '/').'/'.trim($assetFileDirectoryInAssetDirectory, '/').'/'.ltrim($assetTargetFilename, '/');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isDebugMode()
     {
         return $this->debugMode;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function registerAssetFilter($filterIdentifier, $filter): void
     {
         $this->assetFilters[$filterIdentifier] = $filter;

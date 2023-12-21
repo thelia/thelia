@@ -95,9 +95,6 @@ class ModuleImage extends BaseModuleImage implements FileModelInterface
         return ModuleImageQuery::create();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
         $translator = Translator::getInstance();

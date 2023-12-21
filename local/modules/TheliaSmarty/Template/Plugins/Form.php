@@ -61,8 +61,8 @@ class Form extends AbstractSmartyPlugin
 {
     public const COLLECTION_TYPE_NAME = 'collection';
 
-    private static $taggedFieldsStack = null;
-    private static $taggedFieldsStackPosition = null;
+    private static $taggedFieldsStack;
+    private static $taggedFieldsStackPosition;
 
     /** @var ContainerInterface */
     protected $container;
@@ -221,8 +221,7 @@ class Form extends AbstractSmartyPlugin
         if ($formFieldType instanceof CollectionType) {
             /* access to choices */
             if ($formFieldConfig->getOption('prototype', false)
-                &&
-                isset($formFieldView->vars['prototype']->vars['choices'])
+                && isset($formFieldView->vars['prototype']->vars['choices'])
             ) {
                 /*
                  * Get list of choices for a collection of 'choice' from this form of declaration :
@@ -281,8 +280,8 @@ class Form extends AbstractSmartyPlugin
 
             switch ($formFieldView->vars['type']) {
                 case 'choice':
-                    if (!isset($formFieldView->vars['options']['choices']) ||
-                        !\is_array($formFieldView->vars['options']['choices'])
+                    if (!isset($formFieldView->vars['options']['choices'])
+                        || !\is_array($formFieldView->vars['options']['choices'])
                     ) {
                         // throw new FIXME
                     }
@@ -512,8 +511,7 @@ class Form extends AbstractSmartyPlugin
         foreach ($formView->getIterator() as $row) {
             // We have to exclude the fields for which value is defined in the template.
             if ($baseFormInstance->isTemplateDefinedHiddenField($row)
-                ||
-                \in_array($row->vars['name'], $exclude)
+                || \in_array($row->vars['name'], $exclude)
             ) {
                 continue;
             }
@@ -679,7 +677,7 @@ class Form extends AbstractSmartyPlugin
                 sprintf(
                     'form parameter in form_field block must be an instance of '.
                     "\Thelia\Form\BaseForm, instance of %s found",
-                    \get_class($instance)
+                    $instance::class
                 )
             );
         }
@@ -727,7 +725,7 @@ class Form extends AbstractSmartyPlugin
                     '%s parameter must be an instance of '.
                     "\Symfony\Component\Form\Form, instance of %s found",
                     $name,
-                    \is_object($sfForm) ? \get_class($sfForm) : \gettype($sfForm)
+                    \is_object($sfForm) ? $sfForm::class : \gettype($sfForm)
                 )
             );
         }
@@ -776,8 +774,8 @@ class Form extends AbstractSmartyPlugin
          */
         $collectionLimit = $this->formCollectionCount[$hash]['limit'];
 
-        if (($hasLimit && $limit === $collectionLimit) ||
-            null === $row = array_shift($this->formCollectionStack[$hash])
+        if (($hasLimit && $limit === $collectionLimit)
+            || null === $row = array_shift($this->formCollectionStack[$hash])
         ) {
             $repeat = false;
 
@@ -811,15 +809,13 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param SymfonyForm $field
-     *
      * @return string
      *
      * Get definition, return hash
      */
     protected function getFormStackHash(BaseForm $form, SymfonyForm $field = null)
     {
-        $build = \get_class($form).':'.$form->getType();
+        $build = $form::class.':'.$form->getType();
 
         if (null !== $field) {
             $build .= ':'.$this->buildFieldName($field);
@@ -998,8 +994,6 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @param SymfonyForm $row
-     *
      * @return string
      *
      * Initialize a collection into this class ( values stack, counting table )

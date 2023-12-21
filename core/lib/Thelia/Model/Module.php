@@ -237,8 +237,7 @@ class Module extends BaseModule
         $moduleReflection = new \ReflectionClass($this->getFullNamespace());
 
         return $moduleReflection->implementsInterface("Thelia\Module\DeliveryModuleInterface")
-            ||
-            $moduleReflection->implementsInterface("Thelia\Module\DeliveryModuleWithStateInterface");
+            || $moduleReflection->implementsInterface("Thelia\Module\DeliveryModuleWithStateInterface");
     }
 
     /**
@@ -290,8 +289,7 @@ class Module extends BaseModule
 
         if (
             !\in_array("Thelia\Module\DeliveryModuleInterface", class_implements($instance))
-                &&
-            !\in_array("Thelia\Module\DeliveryModuleWithStateInterface", class_implements($instance))
+            && !\in_array("Thelia\Module\DeliveryModuleWithStateInterface", class_implements($instance))
         ) {
             throw new \InvalidArgumentException(sprintf('Module "%s" is not a delivery module', $this->getCode()));
         }
@@ -337,9 +335,6 @@ class Module extends BaseModule
         $query->filterByType($this->getType());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);

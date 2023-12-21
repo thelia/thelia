@@ -59,9 +59,6 @@ class SendPaymentConfirmationEmail extends BaseAction implements EventSubscriber
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

@@ -927,9 +927,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPluginDescriptors()
     {
         return [

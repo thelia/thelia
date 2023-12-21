@@ -122,9 +122,6 @@ class Feature extends BaseAction implements EventSubscriberInterface
         FeatureTemplateQuery::create()->filterByFeature($event->getFeature())->delete();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

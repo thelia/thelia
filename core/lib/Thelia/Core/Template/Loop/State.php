@@ -31,8 +31,6 @@ use Thelia\Type\TypeCollection;
  *
  * @author Julien Chanséaume <julien@thelia.net>
  *
- * {@inheritdoc}
- *
  * @method int[]       getId()
  * @method int[]       getCountry()
  * @method int[]       getExclude()

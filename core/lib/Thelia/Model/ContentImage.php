@@ -38,9 +38,6 @@ class ContentImage extends BaseContentImage implements BreadcrumbInterface, File
         $query->filterByContent($this->getContent());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);
@@ -50,9 +47,6 @@ class ContentImage extends BaseContentImage implements BreadcrumbInterface, File
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParentId($parentId)
     {
         $this->setContentId($parentId);
@@ -60,9 +54,6 @@ class ContentImage extends BaseContentImage implements BreadcrumbInterface, File
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParentId()
     {
         return $this->getContentId();
@@ -81,9 +72,6 @@ class ContentImage extends BaseContentImage implements BreadcrumbInterface, File
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBreadcrumb(Router $router, $tab, $locale)
     {
         return $this->getContentBreadcrumb($router, $tab, $locale);

@@ -19,9 +19,6 @@ use Thelia\Form\Image\DocumentModification;
  */
 class BrandDocumentModification extends DocumentModification
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function getName()
     {
         return 'thelia_brand_document_modification';

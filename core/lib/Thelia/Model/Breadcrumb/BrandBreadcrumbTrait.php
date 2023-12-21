@@ -19,9 +19,6 @@ use Thelia\Tools\URL;
 
 trait BrandBreadcrumbTrait
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getBreadcrumb(Router $router, $tab, $locale)
     {
         $breadcrumb = [

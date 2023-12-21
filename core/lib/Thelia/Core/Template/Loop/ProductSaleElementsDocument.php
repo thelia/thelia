@@ -26,8 +26,6 @@ use Thelia\Model\ProductSaleElementsProductDocumentQuery;
  *
  * @author Benjamin Perche <benjamin@thelia.net>
  *
- * {@inheritdoc}
- *
  * @method int[]    getId()
  * @method int[]    getProductSaleElementsId()
  * @method int[]    getProductDocumentId()

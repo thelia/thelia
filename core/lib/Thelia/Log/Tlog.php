@@ -605,11 +605,11 @@ class Tlog implements LoggerInterface
 
             $origin['class'] = $prevHop['class'] ?? 'main';
 
-            if (isset($prevHop['function']) &&
-                $prevHop['function'] !== 'include' &&
-                $prevHop['function'] !== 'include_once' &&
-                $prevHop['function'] !== 'require' &&
-                $prevHop['function'] !== 'require_once') {
+            if (isset($prevHop['function'])
+                && $prevHop['function'] !== 'include'
+                && $prevHop['function'] !== 'include_once'
+                && $prevHop['function'] !== 'require'
+                && $prevHop['function'] !== 'require_once') {
                 $origin['function'] = $prevHop['function'];
             } else {
                 $origin['function'] = 'main';

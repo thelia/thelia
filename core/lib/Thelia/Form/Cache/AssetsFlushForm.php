@@ -21,17 +21,11 @@ use Thelia\Form\BaseForm;
  */
 class AssetsFlushForm extends BaseForm
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function buildForm(): void
     {
         // Nothing, we just want CSRF protection
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getName()
     {
         return 'assets_flush';

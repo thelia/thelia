@@ -24,8 +24,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use TheliaMain\PropelResolver;
 
 /**
- * {@inheritdoc}
- *
  * @method string getTableName()
  * @method string getFilters()
  * @method string getOrders()

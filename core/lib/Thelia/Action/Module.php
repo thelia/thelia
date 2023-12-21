@@ -219,8 +219,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 // instead of 'delete cannot delete' caused by a constraint violation.
                 // FIXME: we hav to find a way to delete modules used by order.
                 if (OrderQuery::create()->filterByDeliveryModuleId($module->getId())->count() > 0
-                    ||
-                    OrderQuery::create()->filterByPaymentModuleId($module->getId())->count() > 0
+                    || OrderQuery::create()->filterByPaymentModuleId($module->getId())->count() > 0
                 ) {
                     throw new \LogicException(
                         Translator::getInstance()->trans(
@@ -424,9 +423,6 @@ class Module extends BaseAction implements EventSubscriberInterface
         $dispatcher->dispatch($cacheEvent, TheliaEvents::CACHE_CLEAR);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

@@ -35,8 +35,6 @@ use Thelia\Type\TypeCollection;
  *
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int[]       getId()
  * @method bool|string getIsEnabled()
  * @method bool        getInUse()

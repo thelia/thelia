@@ -99,9 +99,6 @@ class Export extends BaseExport
         return static::$cache->useRangeDate();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);

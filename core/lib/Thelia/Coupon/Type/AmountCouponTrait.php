@@ -35,25 +35,16 @@ trait AmountCouponTrait
      */
     abstract protected function getAmountFieldName();
 
-    /**
-     * {@inheritdoc}
-     */
     public function setFieldsValue($effects): void
     {
         $this->amount = $effects[$this->getAmountFieldName()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCartItemDiscount(CartItem $cartItem)
     {
         return $cartItem->getQuantity() * $this->amount;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function callDrawBackOfficeInputs($templateName)
     {
         return $this->drawBaseBackOfficeInputs($templateName, [
@@ -62,17 +53,11 @@ trait AmountCouponTrait
             ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getFieldList()
     {
         return $this->getBaseFieldList([$this->getAmountFieldName()]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function checkCouponFieldValue($fieldName, $fieldValue)
     {
         $this->checkBaseCouponFieldValue($fieldName, $fieldValue);

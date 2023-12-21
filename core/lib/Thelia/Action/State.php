@@ -86,9 +86,6 @@ class State extends BaseAction implements EventSubscriberInterface
         $event->setState($state);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

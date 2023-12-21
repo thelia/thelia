@@ -26,8 +26,6 @@ use Thelia\Type\BooleanOrBothType;
  *
  * @author Manuel Raynaud <manu@raynaud.io>
  *
- * {@inheritdoc}
- *
  * @method int         getFolder()
  * @method bool|string getVisible()
  * @method int         getDepth()

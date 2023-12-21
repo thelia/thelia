@@ -26,9 +26,6 @@ class StartDate extends ConditionAbstract
 {
     public const START_DATE = 'start_date';
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(FacadeInterface $facade)
     {
         $this->availableOperators = [
@@ -40,17 +37,11 @@ class StartDate extends ConditionAbstract
         parent::__construct($facade);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getServiceId()
     {
         return 'thelia.condition.start_date';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setValidatorsFromForm(array $operators, array $values)
     {
         $this->checkComparisonOperatorValue($operators, self::START_DATE);
@@ -82,9 +73,6 @@ class StartDate extends ConditionAbstract
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isMatching()
     {
         return $this->conditionValidator->variableOpComparison(
@@ -94,9 +82,6 @@ class StartDate extends ConditionAbstract
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->translator->trans(
@@ -105,9 +90,6 @@ class StartDate extends ConditionAbstract
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToolTip()
     {
         $toolTip = $this->translator->trans(
@@ -118,9 +100,6 @@ class StartDate extends ConditionAbstract
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSummary()
     {
         $date = new \DateTime();
@@ -143,9 +122,6 @@ class StartDate extends ConditionAbstract
         return DateTimeFormat::getInstance($this->facade->getRequest())->getFormat('date');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateInputs()
     {
         return [
@@ -157,9 +133,6 @@ class StartDate extends ConditionAbstract
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         if (isset($this->values[self::START_DATE])) {

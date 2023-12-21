@@ -86,9 +86,6 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
         $this->genericUpdatePosition(FeatureAvQuery::create(), $event, $dispatcher);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

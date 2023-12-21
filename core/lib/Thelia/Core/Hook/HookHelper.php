@@ -173,7 +173,7 @@ class HookHelper
 
             if (\count($params) != 2) {
                 // the hook does not respect the convention
-                if (false === strpos($attributes['name'], '$')) {
+                if (!str_contains($attributes['name'], '$')) {
                     $ret['context'] = $attributes['name'];
                     $ret['type'] = '';
                 } else {

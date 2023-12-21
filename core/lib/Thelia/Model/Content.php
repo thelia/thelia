@@ -26,9 +26,6 @@ class Content extends BaseContent implements FileModelParentInterface
     use PositionManagementTrait;
     use UrlRewritingTrait;
 
-    /**
-     * {@inheritDoc}
-     */
     public function getRewrittenUrlViewName()
     {
         return 'content';
@@ -164,8 +161,6 @@ class Content extends BaseContent implements FileModelParentInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolder::setPosition
      */
     public function setPosition($v)
@@ -174,8 +169,6 @@ class Content extends BaseContent implements FileModelParentInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ContentFolder::getPosition
      */
     public function getPosition()
@@ -205,7 +198,6 @@ class Content extends BaseContent implements FileModelParentInterface
      * Overload for the position management.
      *
      * @param ContentFolder $contentFolder
-     *                                     {@inheritdoc}
      */
     protected function doAddContentFolder($contentFolder): void
     {

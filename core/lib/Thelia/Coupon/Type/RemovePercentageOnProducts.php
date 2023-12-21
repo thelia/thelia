@@ -25,9 +25,6 @@ class RemovePercentageOnProducts extends AbstractRemoveOnProducts
     /** @var string Service Id */
     protected $serviceId = 'thelia.coupon.type.remove_percentage_on_products';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getPercentageFieldName()
     {
         return self::PERCENTAGE;
@@ -45,9 +42,6 @@ class RemovePercentageOnProducts extends AbstractRemoveOnProducts
             ->trans('Percentage discount for selected products', []);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToolTip()
     {
         $toolTip = $this->facade
@@ -60,9 +54,6 @@ class RemovePercentageOnProducts extends AbstractRemoveOnProducts
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-percentage-on-products.html');

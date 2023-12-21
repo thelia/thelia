@@ -32,8 +32,6 @@ use Thelia\Model\Map\ProductTableMap;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int      getProductSaleElements()
  * @method string[] getOrder()
  */

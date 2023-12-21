@@ -47,9 +47,6 @@ class MailingSystem extends BaseAction implements EventSubscriberInterface
         $this->configCache->initCacheConfigs(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

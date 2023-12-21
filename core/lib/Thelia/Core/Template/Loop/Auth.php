@@ -26,8 +26,6 @@ use Thelia\Type\TypeCollection;
 /**
  * @author Franck Allimant <franck@cqfdev.fr>
  *
- * {@inheritdoc}
- *
  * @method string[] getRole()
  * @method string[] getResource()
  * @method int[]    getModule()
