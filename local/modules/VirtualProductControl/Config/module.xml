@@ -9,12 +9,12 @@
         <title>Contrôle de produit virtuel</title>
         <description>Vérifie qu'un module de livraison pour produit virtuel soit activé si des produits virtuels existent</description>
     </descriptive>
-    <version>2.5.3</version>
+    <version>2.5.4</version>
     <author>
         <name>Manuel Raynaud</name>
         <email>manu@raynaud.io</email>
     </author>
     <type>classic</type>
-    <thelia>2.5.3</thelia>
+    <thelia>2.5.4</thelia>
     <stability>alpha</stability>
 </module>
