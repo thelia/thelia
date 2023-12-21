@@ -235,8 +235,7 @@ class FrontUtils extends AbstractSmartyPlugin
     }
 
     /**
-     * @param array   $params
-     * @param \Smarty $smarty
+     * @param array $params
      */
     public function isInFolder($params)
     {
@@ -271,8 +270,7 @@ class FrontUtils extends AbstractSmartyPlugin
     }
 
     /**
-     * @param array   $params
-     * @param \Smarty $smarty
+     * @param array $params
      */
     public function isInCategory($params)
     {

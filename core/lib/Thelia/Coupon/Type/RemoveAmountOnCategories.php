@@ -29,9 +29,6 @@ class RemoveAmountOnCategories extends AbstractRemoveOnCategories
         return self::AMOUNT_FIELD_NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->facade
@@ -39,9 +36,6 @@ class RemoveAmountOnCategories extends AbstractRemoveOnCategories
             ->trans('Fixed amount discount for selected categories', []);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToolTip()
     {
         $toolTip = $this->facade
@@ -54,9 +48,6 @@ class RemoveAmountOnCategories extends AbstractRemoveOnCategories
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-amount-on-categories.html');

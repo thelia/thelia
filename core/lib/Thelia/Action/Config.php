@@ -90,9 +90,6 @@ class Config extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

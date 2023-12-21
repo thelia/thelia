@@ -136,9 +136,6 @@ abstract class CouponAbstract implements CouponInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function set(
         FacadeInterface $facade,
         $code,
@@ -279,9 +276,6 @@ abstract class CouponAbstract implements CouponInterface
         return $this->freeShippingForModules;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exec()
     {
         return $this->amount;
@@ -506,9 +500,6 @@ abstract class CouponAbstract implements CouponInterface
         return $effects;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear(): void
     {
         // Does nothing. Override this function as needed.

@@ -24,7 +24,7 @@ class Translator extends BaseTranslator
     /** @var RequestStack */
     protected $requestStack;
 
-    protected static $instance = null;
+    protected static $instance;
 
     public function __construct(RequestStack $requestStack)
     {

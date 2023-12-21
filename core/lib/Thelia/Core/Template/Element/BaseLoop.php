@@ -55,7 +55,7 @@ abstract class BaseLoop implements LoopInterface
     protected $loopName;
 
     /** @var array|null array of loop definitions (class => id) */
-    protected static $loopDefinitions = null;
+    protected static $loopDefinitions;
 
     /** @var ArgumentCollection[] cache for loop arguments (class => ArgumentCollection) */
     protected static $loopDefinitionsArgs = [];
@@ -698,8 +698,6 @@ abstract class BaseLoop implements LoopInterface
     /**
      * Dispatch an event to extend the BuildModelCriteria.
      *
-     * @param ModelCriteria $search
-     *
      * @return ModelCriteria
      */
     protected function extendsBuildModelCriteria(ModelCriteria $search = null)
@@ -721,8 +719,6 @@ abstract class BaseLoop implements LoopInterface
 
     /**
      * Dispatch an event to extend the BuildArray.
-     *
-     * @param array $search
      *
      * @return array
      */

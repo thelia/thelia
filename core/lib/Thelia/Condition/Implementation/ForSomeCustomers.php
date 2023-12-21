@@ -28,9 +28,6 @@ class ForSomeCustomers extends ConditionAbstract
 {
     public const CUSTOMERS_LIST = 'customers';
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(FacadeInterface $facade)
     {
         $this->availableOperators = [
@@ -43,17 +40,11 @@ class ForSomeCustomers extends ConditionAbstract
         parent::__construct($facade);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getServiceId()
     {
         return 'thelia.condition.for_some_customers';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setValidatorsFromForm(array $operators, array $values)
     {
         $this->checkComparisonOperatorValue($operators, self::CUSTOMERS_LIST);
@@ -83,9 +74,6 @@ class ForSomeCustomers extends ConditionAbstract
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isMatching()
     {
         if (null === $customer = $this->facade->getCustomer()) {
@@ -99,9 +87,6 @@ class ForSomeCustomers extends ConditionAbstract
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->translator->trans(
@@ -110,9 +95,6 @@ class ForSomeCustomers extends ConditionAbstract
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToolTip()
     {
         $toolTip = $this->translator->trans(
@@ -123,9 +105,6 @@ class ForSomeCustomers extends ConditionAbstract
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSummary()
     {
         $i18nOperator = Operators::getI18n(
@@ -157,9 +136,6 @@ class ForSomeCustomers extends ConditionAbstract
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateInputs()
     {
         return [
@@ -171,9 +147,6 @@ class ForSomeCustomers extends ConditionAbstract
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         return $this->facade->getParser()->render(

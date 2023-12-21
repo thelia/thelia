@@ -29,9 +29,6 @@ class RemoveXAmount extends AbstractRemove
         return self::AMOUNT_FIELD_NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->facade
@@ -39,9 +36,6 @@ class RemoveXAmount extends AbstractRemove
             ->trans('Fixed Amount Discount', []);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToolTip()
     {
         $toolTip = $this->facade
@@ -54,9 +48,6 @@ class RemoveXAmount extends AbstractRemove
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exec()
     {
         $cartTotal = $this->facade->getCartTotalTaxPrice($this->isAvailableOnSpecialOffers());
@@ -68,9 +59,6 @@ class RemoveXAmount extends AbstractRemove
         return $this->amount;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-x-amount.html');

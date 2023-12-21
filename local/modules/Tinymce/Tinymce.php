@@ -36,9 +36,6 @@ class Tinymce extends BaseModule
         $this->webMediaPath = THELIA_WEB_DIR.'media';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function postActivation(ConnectionInterface $con = null): void
     {
         $fileSystem = new Filesystem();
@@ -83,9 +80,6 @@ class Tinymce extends BaseModule
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function postDeactivation(ConnectionInterface $con = null): void
     {
         $fileSystem = new Filesystem();
@@ -93,9 +87,6 @@ class Tinymce extends BaseModule
         $fileSystem->remove($this->webJsPath);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false): void
     {
         // If we have to delete module data, remove the media directory.

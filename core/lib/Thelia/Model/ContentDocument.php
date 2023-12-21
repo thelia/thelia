@@ -39,9 +39,6 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
         $query->filterByContent($this->getContent());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);
@@ -51,9 +48,6 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParentId($parentId)
     {
         $this->setContentId($parentId);
@@ -61,9 +55,6 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParentId()
     {
         return $this->getContentId();
@@ -82,9 +73,6 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBreadcrumb(Router $router, $tab, $locale)
     {
         return $this->getContentBreadcrumb($router, $tab, $locale);

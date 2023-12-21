@@ -33,7 +33,7 @@ class ProductSaleElements extends BaseProductSaleElements
             $amount = $this->getVirtualColumn($virtualColumnName);
 
             if ($discount > 0) {
-                $amount = $amount * (1 - ($discount / 100));
+                $amount *= (1 - ($discount / 100));
             }
         } catch (PropelException $e) {
             throw new PropelException("Virtual column `$virtualColumnName` does not exist in ProductSaleElements::getPrice");
@@ -56,7 +56,7 @@ class ProductSaleElements extends BaseProductSaleElements
             $amount = $this->getVirtualColumn($virtualColumnName);
 
             if ($discount > 0) {
-                $amount = $amount * (1 - ($discount / 100));
+                $amount *= (1 - ($discount / 100));
             }
         } catch (PropelException $e) {
             throw new PropelException("Virtual column `$virtualColumnName` does not exist in ProductSaleElements::getPromoPrice");
@@ -137,8 +137,8 @@ class ProductSaleElements extends BaseProductSaleElements
         }
 
         if ($discount > 0) {
-            $price = $price * (1 - ($discount / 100));
-            $promoPrice = $promoPrice * (1 - ($discount / 100));
+            $price *= (1 - ($discount / 100));
+            $promoPrice *= (1 - ($discount / 100));
         }
 
         $productPriceTools = new ProductPriceTools($price, $promoPrice);

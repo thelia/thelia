@@ -38,9 +38,6 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
         $query->filterByBrandId($this->getBrandId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);
@@ -63,9 +60,6 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function setParentId($parentId)
     {
         $this->setBrandId($parentId);
@@ -73,9 +67,6 @@ class BrandDocument extends BaseBrandDocument implements BreadcrumbInterface, Fi
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getParentId()
     {
         return $this->getBrandId();

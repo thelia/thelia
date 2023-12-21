@@ -128,8 +128,6 @@ class CartPostage extends AbstractSmartyPlugin
      *  - the country saved in cookie if customer have changed
      *      the default country
      *  - the default country for the shop if it exists
-     *
-     * @param \Thelia\Model\Customer $customer
      */
     protected function getDeliveryInformation(Customer $customer = null)
     {
@@ -188,9 +186,6 @@ class CartPostage extends AbstractSmartyPlugin
 
     /**
      * Retrieve the cheapest delivery for country.
-     *
-     * @param Address $address
-     * @param Country $country
      *
      * @throws PropelException
      */

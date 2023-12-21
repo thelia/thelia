@@ -31,9 +31,6 @@ class ComponentRenderEvent extends ActionEvent
     /** @var string */
     protected $id;
 
-    /**
-     * @return mixed
-     */
     public function getName()
     {
         return $this->name;

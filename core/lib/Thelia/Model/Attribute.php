@@ -19,9 +19,6 @@ class Attribute extends BaseAttribute
 {
     use \Thelia\Model\Tools\PositionManagementTrait;
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         // Set the current position for the new object

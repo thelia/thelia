@@ -28,9 +28,6 @@ use Thelia\Form\BaseForm;
  */
 class CarouselUpdateForm extends BaseForm
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function buildForm(): void
     {
         $formBuilder = $this->formBuilder;
@@ -218,9 +215,6 @@ class CarouselUpdateForm extends BaseForm
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getName()
     {
         return 'carousel_update';

@@ -47,9 +47,9 @@ class FeedController extends BaseFrontController
      * render the RSS feed.
      *
      * @param $context string   The context of the feed : catalog, content. default: catalog
-     * @param $lang string      The lang of the feed : fr_FR, en_US, ... default: default language of the site
-     * @param $id string        The id of the parent element. The id of the main parent category for catalog context.
-     *                          The id of the content folder for content context
+     * @param $lang    string      The lang of the feed : fr_FR, en_US, ... default: default language of the site
+     * @param $id      string        The id of the parent element. The id of the main parent category for catalog context.
+     *                  The id of the content folder for content context
      *
      * @throws \RuntimeException
      *
@@ -171,7 +171,7 @@ class FeedController extends BaseFrontController
      * Check if the element exists and is visible.
      *
      * @param $context string   catalog or content
-     * @param $id string        id of the element
+     * @param $id      string        id of the element
      *
      * @return bool
      */

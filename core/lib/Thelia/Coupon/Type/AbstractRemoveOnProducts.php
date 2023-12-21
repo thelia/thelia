@@ -45,9 +45,6 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
      */
     abstract public function getCartItemDiscount(CartItem $cartItem);
 
-    /**
-     * {@inheritdoc}
-     */
     public function set(
         FacadeInterface $facade,
         $code,
@@ -96,9 +93,6 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function exec()
     {
         // This coupon subtracts the specified amount from the order total
@@ -119,9 +113,6 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
         return $discount;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBaseBackOfficeInputs($templateName, $otherFields)
     {
         return $this->facade->getParser()->render($templateName, array_merge($otherFields, [
@@ -136,17 +127,11 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
         ]));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBaseFieldList($otherFields)
     {
         return array_merge($otherFields, [self::CATEGORY_ID, self::PRODUCTS_LIST]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function checkBaseCouponFieldValue($fieldName, $fieldValue)
     {
         if ($fieldName === self::CATEGORY_ID) {

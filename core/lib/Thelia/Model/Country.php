@@ -21,7 +21,7 @@ use Thelia\Model\Map\CountryTableMap;
 
 class Country extends BaseCountry
 {
-    protected static $defaultCountry = null;
+    protected static $defaultCountry;
 
     /**
      * get a regex pattern according to the zip code format field

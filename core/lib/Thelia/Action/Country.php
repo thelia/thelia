@@ -101,9 +101,6 @@ class Country extends BaseAction implements EventSubscriberInterface
         $event->setCountry($country);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

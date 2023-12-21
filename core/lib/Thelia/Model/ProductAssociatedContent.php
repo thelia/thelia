@@ -27,9 +27,6 @@ class ProductAssociatedContent extends BaseProductAssociatedContent
         $query->filterByProductId($this->getProductId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);

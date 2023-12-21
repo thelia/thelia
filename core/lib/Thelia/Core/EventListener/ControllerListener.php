@@ -50,8 +50,6 @@ class ControllerListener implements EventSubscriberInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @api
      */
     public static function getSubscribedEvents()

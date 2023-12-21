@@ -38,7 +38,7 @@ class ContentTest extends TestCaseWithURLToolSetup
 {
     use I18nTestTrait;
 
-    protected static $folderForPositionTest = null;
+    protected static $folderForPositionTest;
 
     public function getUpdateEvent(&$content)
     {
@@ -62,7 +62,7 @@ class ContentTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * @param ContentUpdateEvent$event
+     * @param ContentUpdateEvent $event
      *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException

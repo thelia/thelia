@@ -400,9 +400,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

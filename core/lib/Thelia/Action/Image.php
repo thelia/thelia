@@ -147,8 +147,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                     if (!$svg->hasAttribute('viewBox')) {
                         $pattern = '/^(\d*\.\d+|\d+)(px)?$/';
 
-                        $interpretable = preg_match($pattern, $svg->getAttribute('width'), $width) &&
-                            preg_match($pattern, $svg->getAttribute('height'), $height);
+                        $interpretable = preg_match($pattern, $svg->getAttribute('width'), $width)
+                            && preg_match($pattern, $svg->getAttribute('height'), $height);
 
                         if (!$interpretable || !isset($width) || !isset($height)) {
                             throw new \Exception("can't create viewBox if height and width is not defined in the svg file");
@@ -489,9 +489,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         return $image;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

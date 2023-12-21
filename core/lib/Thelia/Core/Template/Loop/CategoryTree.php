@@ -33,8 +33,6 @@ use Thelia\Type\TypeCollection;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  *
- * {@inheritdoc}
- *
  * @method int         getCategory()
  * @method int         getDepth()
  * @method bool        getNeedCountChild()

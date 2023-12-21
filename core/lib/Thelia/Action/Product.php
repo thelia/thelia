@@ -870,9 +870,6 @@ class Product extends BaseAction implements EventSubscriberInterface
         throw new NotFoundHttpException();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

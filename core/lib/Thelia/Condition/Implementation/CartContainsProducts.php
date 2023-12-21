@@ -29,9 +29,6 @@ class CartContainsProducts extends ConditionAbstract
     /** Condition 1st parameter : quantity */
     public const PRODUCTS_LIST = 'products';
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(FacadeInterface $facade)
     {
         $this->availableOperators = [
@@ -44,17 +41,11 @@ class CartContainsProducts extends ConditionAbstract
         parent::__construct($facade);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getServiceId()
     {
         return 'thelia.condition.cart_contains_products';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setValidatorsFromForm(array $operators, array $values)
     {
         $this->checkComparisonOperatorValue($operators, self::PRODUCTS_LIST);
@@ -84,9 +75,6 @@ class CartContainsProducts extends ConditionAbstract
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isMatching()
     {
         $cartItems = $this->facade->getCart()->getCartItems();
@@ -105,9 +93,6 @@ class CartContainsProducts extends ConditionAbstract
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->translator->trans(
@@ -116,9 +101,6 @@ class CartContainsProducts extends ConditionAbstract
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToolTip()
     {
         $toolTip = $this->translator->trans(
@@ -129,9 +111,6 @@ class CartContainsProducts extends ConditionAbstract
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSummary()
     {
         $i18nOperator = Operators::getI18n(
@@ -163,9 +142,6 @@ class CartContainsProducts extends ConditionAbstract
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function generateInputs()
     {
         return [
@@ -177,9 +153,6 @@ class CartContainsProducts extends ConditionAbstract
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         return $this->facade->getParser()->render(

@@ -218,10 +218,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         // Set the preferred customer language
         if (null !== $this->requestStack
-            &&
-            !empty($customer->getLangId())
-            &&
-            (null !== $lang = LangQuery::create()->findPk($customer->getLangId()))
+            && !empty($customer->getLangId())
+            && (null !== $lang = LangQuery::create()->findPk($customer->getLangId()))
         ) {
             $this->requestStack->getCurrentRequest()->getSession()->setLang($lang);
         }
@@ -252,9 +250,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

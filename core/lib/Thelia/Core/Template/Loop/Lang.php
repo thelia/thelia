@@ -31,8 +31,6 @@ use Thelia\Type;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  *
- * {@inheritdoc}
- *
  * @method int[]    getId()
  * @method string[] getCode()
  * @method string[] getLocale()

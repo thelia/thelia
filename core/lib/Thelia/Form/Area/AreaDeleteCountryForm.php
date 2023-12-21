@@ -30,9 +30,6 @@ class AreaDeleteCountryForm extends BaseForm
 {
     use CountryListValidationTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function buildForm(): void
     {
         $this->formBuilder

@@ -30,8 +30,6 @@ use Thelia\Type\TypeCollection;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int[]    getId()
  * @method int[]    getArea()
  * @method int[]    getCountry()

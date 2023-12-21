@@ -22,7 +22,7 @@ use Thelia\Model\LangQuery;
 trait I18nTestTrait
 {
     /** @var array list of available locale */
-    protected static $localeList = null;
+    protected static $localeList;
 
     /**
      * populate a list of field for each locale for an object.

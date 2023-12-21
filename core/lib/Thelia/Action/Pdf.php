@@ -44,9 +44,6 @@ class Pdf extends BaseAction implements EventSubscriberInterface
         $event->setPdf($html2pdf->output('output.pdf', 'S'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

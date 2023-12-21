@@ -135,7 +135,7 @@ class Update
     {
         $parameters = [];
         foreach ($_SERVER as $key => $value) {
-            if (0 === strpos($key, 'SYMFONY__')) {
+            if (str_starts_with($key, 'SYMFONY__')) {
                 $parameters[strtolower(str_replace('__', '.', substr($key, 9)))] = $value;
             }
         }

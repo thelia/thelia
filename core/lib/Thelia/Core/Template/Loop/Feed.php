@@ -23,8 +23,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 /**
  * @author Franck Allimant <franck@cqfdev.fr>
  *
- * {@inheritdoc}
- *
  * @method string getUrl()
  * @method int    getTimeout()
  */

@@ -29,8 +29,6 @@ use Thelia\Model\CustomerTitleQuery;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int[] getId()
  */
 class Title extends BaseI18nLoop implements PropelSearchLoopInterface

@@ -225,9 +225,6 @@ class Content extends BaseAction implements EventSubscriberInterface
         throw new NotFoundHttpException();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

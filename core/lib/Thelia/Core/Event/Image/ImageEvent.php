@@ -33,7 +33,7 @@ class ImageEvent extends CachedFileEvent
     protected $cache_original_filepath;
 
     /**
-     *  @var string The image category (i.e. the subdirectory in image cache)
+     * @var string The image category (i.e. the subdirectory in image cache)
      */
     protected $category;
 

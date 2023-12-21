@@ -177,9 +177,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
         $this->genericUpdatePosition(CurrencyQuery::create(), $event, $dispatcher);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

@@ -37,9 +37,6 @@ class OrderProduct extends BaseOrderProduct
         return $this->cartItemId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);
@@ -59,9 +56,6 @@ class OrderProduct extends BaseOrderProduct
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function postInsert(ConnectionInterface $con = null): void
     {
         parent::postInsert($con);

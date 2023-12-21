@@ -117,7 +117,7 @@ class TaxCreationForm extends BaseForm
         $data = $context->getRoot()->getData();
         $type = $data['type'];
 
-        if (false !== strpos($context->getPropertyPath(), $type)) {
+        if (str_contains($context->getPropertyPath(), $type)) {
             // extract requirement type
             if (preg_match('@\:(.+)\]@', $context->getPropertyPath(), $matches)) {
                 $requirementType = $matches[1];

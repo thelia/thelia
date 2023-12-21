@@ -196,6 +196,7 @@ class KernelListener implements EventSubscriberInterface
                     if (rtrim($domainUrl, '/') != $request->getSchemeAndHttpHost()) {
                         return new RedirectResponse($domainUrl, 301);
                     }
+
                     // the user is currently on the proper domain, nothing to change
                     return null;
                 }
@@ -204,6 +205,7 @@ class KernelListener implements EventSubscriberInterface
 
                 return Lang::getDefaultLanguage();
             }
+
             // one domain for all languages, the lang has to be set into session
             return $lang;
         }

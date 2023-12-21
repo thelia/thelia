@@ -25,9 +25,6 @@ class SeoForm extends BaseForm
 {
     use SeoFieldsTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function buildForm(): void
     {
         $this->formBuilder

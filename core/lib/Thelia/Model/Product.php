@@ -28,9 +28,6 @@ class Product extends BaseProduct implements FileModelParentInterface
     use PositionManagementTrait;
     use UrlRewritingTrait;
 
-    /**
-     * {@inheritDoc}
-     */
     public function getRewrittenUrlViewName()
     {
         return 'product';
@@ -268,9 +265,6 @@ class Product extends BaseProduct implements FileModelParentInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preDelete(ConnectionInterface $con = null)
     {
         parent::preDelete($con);
@@ -295,9 +289,6 @@ class Product extends BaseProduct implements FileModelParentInterface
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function postDelete(ConnectionInterface $con = null): void
     {
         parent::postDelete($con);
@@ -306,8 +297,6 @@ class Product extends BaseProduct implements FileModelParentInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ProductCategory::setPosition
      */
     public function setPosition($v)
@@ -316,8 +305,6 @@ class Product extends BaseProduct implements FileModelParentInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @deprecated since 2.3, and will be removed in 2.4, please use ProductCategory::getPosition
      */
     public function getPosition()
@@ -347,7 +334,6 @@ class Product extends BaseProduct implements FileModelParentInterface
      * Overload for the position management.
      *
      * @param ProductCategory $productCategory
-     *                                         {@inheritdoc}
      */
     protected function doAddProductCategory($productCategory): void
     {

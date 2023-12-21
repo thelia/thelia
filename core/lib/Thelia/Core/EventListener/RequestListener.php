@@ -254,7 +254,7 @@ class RequestListener implements EventSubscriberInterface
                         }
                     }
                 } else {
-                    if (false !== strpos($referrer, $request->getSchemeAndHttpHost())) {
+                    if (str_contains($referrer, $request->getSchemeAndHttpHost())) {
                         $session->setReturnToUrl($referrer);
 
                         if (\in_array($view, $catalogViews)) {

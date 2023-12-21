@@ -36,8 +36,6 @@ use Thelia\Type\TypeCollection;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  *
- * {@inheritdoc}
- *
  * @method int[]       getId()
  * @method string      getVariable()
  * @method bool|string getHidden()

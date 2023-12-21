@@ -457,7 +457,7 @@ class ProductTest extends TestCaseWithURLToolSetup
         $currencyId = CurrencyQuery::create()->select('id')->addAscendingOrderByColumn('RAND()')->findOne();
 
         $oldProductSaleElements = $product->getDefaultSaleElements();
-        $this->assertEquals("Thelia\Model\ProductSaleElements", \get_class($oldProductSaleElements), 'There is no default pse for this product');
+        $this->assertEquals("Thelia\Model\ProductSaleElements", $oldProductSaleElements::class, 'There is no default pse for this product');
 
         $event = new ProductSetTemplateEvent($product, $templateId, $currencyId);
 

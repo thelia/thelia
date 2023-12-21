@@ -25,8 +25,6 @@ use Thelia\Type;
  * Template loop, to get available back-office or front-office templates.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
- *
- * {@inheritdoc}
  */
 class Template extends BaseLoop implements ArraySearchLoopInterface
 {

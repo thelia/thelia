@@ -333,8 +333,6 @@ abstract class BaseController implements ControllerInterface
     /**
      * Search success url in a form if present, in the query string otherwise.
      *
-     * @param BaseForm $form
-     *
      * @return mixed|string|null
      */
     protected function retrieveSuccessUrl(BaseForm $form = null)
@@ -344,8 +342,6 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * Search error url in a form if present, in the query string otherwise.
-     *
-     * @param BaseForm $form
      *
      * @return mixed|string|null
      */
@@ -411,8 +407,6 @@ abstract class BaseController implements ControllerInterface
     /**
      * create an instance of RedirectReponse if a success url is present, return null otherwise.
      *
-     * @param BaseForm $form
-     *
      * @return \Symfony\Component\HttpFoundation\Response|null
      */
     protected function generateSuccessRedirect(BaseForm $form = null)
@@ -426,8 +420,6 @@ abstract class BaseController implements ControllerInterface
 
     /**
      * create an instance of RedirectReponse if a success url is present, return null otherwise.
-     *
-     * @param BaseForm $form
      *
      * @return \Symfony\Component\HttpFoundation\Response|null
      */

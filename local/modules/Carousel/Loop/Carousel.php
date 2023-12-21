@@ -33,9 +33,6 @@ use Thelia\Type\TypeCollection;
  */
 class Carousel extends Image
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(

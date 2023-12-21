@@ -25,9 +25,6 @@ class Folder extends BaseFolder implements FileModelParentInterface
     use PositionManagementTrait;
     use UrlRewritingTrait;
 
-    /**
-     * {@inheritDoc}
-     */
     public function getRewrittenUrlViewName()
     {
         return 'folder';
@@ -90,9 +87,6 @@ class Folder extends BaseFolder implements FileModelParentInterface
         $query->filterByParent($this->getParent());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);
@@ -126,7 +120,6 @@ class Folder extends BaseFolder implements FileModelParentInterface
      * Overload for the position management.
      *
      * @param Base\ContentFolder $contentFolder
-     *                                          {@inheritdoc}
      */
     protected function doAddContentFolder($contentFolder): void
     {

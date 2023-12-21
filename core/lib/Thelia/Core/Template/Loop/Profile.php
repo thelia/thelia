@@ -29,8 +29,6 @@ use Thelia\Model\ProfileQuery;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int[] getId()
  */
 class Profile extends BaseI18nLoop implements PropelSearchLoopInterface

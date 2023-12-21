@@ -93,14 +93,14 @@
         "phpstan/extension-installer": "1.1.0",
         "symfony/css-selector": "6.0.*|6.4.*",
         "symfony/var-dumper": "6.0.*|6.4.*",
-        "friendsofphp/php-cs-fixer": "^3.41"
+        "friendsofphp/php-cs-fixer": "3.41.*"
     },
     "scripts": {
         "cs-diff": [
             "./vendor/bin/php-cs-fixer fix --dry-run --stop-on-violation --diff"
         ],
         "cs": [
-            "./vendor/bin/php-cs-fixer fix"
+            "./vendor/bin/php-cs-fixer fix --config=./.php-cs-fixer.dist.php"
         ],
         "phpstan": [
             "php ./vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=-1"

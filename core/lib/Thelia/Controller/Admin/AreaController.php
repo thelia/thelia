@@ -287,6 +287,7 @@ class AreaController extends AbstractCrudController
                 $country = explode('-', $countryId);
                 $this->removeOneCountryFromArea($eventDispatcher, $area, $country[0], $country[1]);
             }
+
             // Redirect to the success URL
             return $this->generateSuccessRedirect($areaDeleteCountriesForm);
         } catch (FormValidationException $ex) {

@@ -25,7 +25,7 @@ use Thelia\Core\Hook\BaseHook;
  */
 class AdminHook extends BaseHook
 {
-    protected $theliaCache = null;
+    protected $theliaCache;
 
     public function __construct(AdapterInterface $theliaCache = null)
     {

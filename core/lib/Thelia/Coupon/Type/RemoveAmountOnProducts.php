@@ -41,9 +41,6 @@ class RemoveAmountOnProducts extends AbstractRemoveOnProducts
             ->trans('Fixed amount discount for selected products', []);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getToolTip()
     {
         $toolTip = $this->facade
@@ -56,9 +53,6 @@ class RemoveAmountOnProducts extends AbstractRemoveOnProducts
         return $toolTip;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function drawBackOfficeInputs()
     {
         return $this->callDrawBackOfficeInputs('coupon/type-fragments/remove-amount-on-products.html');

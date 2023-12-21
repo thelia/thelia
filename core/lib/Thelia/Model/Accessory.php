@@ -27,9 +27,6 @@ class Accessory extends BaseAccessory
         $query->filterByProductId($this->getProductId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         $this->setPosition($this->getNextPosition());

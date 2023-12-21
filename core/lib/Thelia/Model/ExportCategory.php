@@ -20,9 +20,6 @@ class ExportCategory extends BaseExportCategory
 {
     use PositionManagementTrait;
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);

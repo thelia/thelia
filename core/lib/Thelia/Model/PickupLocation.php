@@ -97,7 +97,7 @@ class PickupLocation
     }
 
     /** @param float
-     *  @return $this
+     * @return $this
      * */
     public function setLatitude($latitude)
     {
@@ -129,7 +129,7 @@ class PickupLocation
     }
 
     /** @param string
-     *  @return $this|PickupLocation
+     * @return $this|PickupLocation
      * */
     public function setTitle($title)
     {
@@ -167,8 +167,6 @@ class PickupLocation
     }
 
     /**
-     * @param string $moduleId
-     *
      * @return PickupLocation
      */
     public function setModuleOptionCode($moduleOptionCode)

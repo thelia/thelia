@@ -47,12 +47,12 @@ class WebTestCase extends BaseWebTestCase
         /** @var ConnectionWrapper $connection */
         $connection = Propel::getConnection(ProductTableMap::DATABASE_NAME);
         self::$connection = $connection->getWrappedConnection();
-//        self::$connection->beginTransaction();
+        //        self::$connection->beginTransaction();
     }
 
     protected function tearDown(): void
     {
-//        self::$connection->rollBack();
+        //        self::$connection->rollBack();
 
         if (self::$session === null) {
             self::$session = self::$client->getRequest()->getSession();
@@ -111,11 +111,11 @@ class WebTestCase extends BaseWebTestCase
     protected function assertFormSameValues(array $expected, Form $form): void
     {
         $actual = array_filter($form->getValues(), static function (string $key) {
-            return strpos($key, '[_token]') === false;
+            return !str_contains($key, '[_token]');
         }, \ARRAY_FILTER_USE_KEY);
 
         $expected = array_filter($expected, static function (string $key) {
-            return strpos($key, '[_token]') === false;
+            return !str_contains($key, '[_token]');
         }, \ARRAY_FILTER_USE_KEY);
 
         $this->assertSame($expected, $actual);

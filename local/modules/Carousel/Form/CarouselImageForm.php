@@ -25,9 +25,6 @@ use Thelia\Form\BaseForm;
  */
 class CarouselImageForm extends BaseForm
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function buildForm(): void
     {
         $translator = Translator::getInstance();

@@ -25,8 +25,6 @@ class BaseAction
     /**
      * Changes object position, selecting absolute ou relative change.
      *
-     * @param EventDispatcherInterface $dispatcher
-     *
      * @return null
      */
     protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event, EventDispatcherInterface $dispatcher = null)
@@ -73,8 +71,6 @@ class BaseAction
     /**
      * Changes SEO Fields for an object.
      *
-     * @param EventDispatcherInterface $dispatcher
-     *
      * @throws FormValidationException if a rewritten URL cannot be created
      *
      * @return mixed an SEOxxx object
@@ -105,8 +101,6 @@ class BaseAction
 
     /**
      * Toggle visibility for an object.
-     *
-     * @param EventDispatcherInterface $dispatcher
      */
     public function genericToggleVisibility(ModelCriteria $query, ToggleVisibilityEvent $event, EventDispatcherInterface $dispatcher = null)
     {

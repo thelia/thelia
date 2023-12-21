@@ -32,8 +32,6 @@ use Thelia\Type\TypeCollection;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * {@inheritdoc}
- *
  * @method int      getProfile()
  * @method string[] getCode()
  * @method string[] getOrder()

@@ -31,9 +31,6 @@ class TheliaType extends AbstractType
         $resolver->setAllowedValues('type', [TextType::class, ChoiceType::class]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars = array_replace($view->vars, [

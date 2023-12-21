@@ -210,9 +210,6 @@ class LoopResult implements \Iterator, \JsonSerializable
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function jsonSerialize()
     {
         $return = [];

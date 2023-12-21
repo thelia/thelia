@@ -22,17 +22,14 @@ interface BaseModuleInterface
 {
     /**
      * This method is called when the plugin is installed for the first time.
-     *
-     * @param ConnectionInterface $con
      */
     public function install(ConnectionInterface $con = null);
 
     /**
      * This method is called when a newer version of the plugin is installed.
      *
-     * @param string              $currentVersion the current (installed) module version, as defined in the module.xml file
-     * @param string              $newVersion     the new module version, as defined in the module.xml file
-     * @param ConnectionInterface $con
+     * @param string $currentVersion the current (installed) module version, as defined in the module.xml file
+     * @param string $newVersion     the new module version, as defined in the module.xml file
      */
     public function update($currentVersion, $newVersion, ConnectionInterface $con = null);
 
@@ -40,8 +37,7 @@ interface BaseModuleInterface
      * This method is called just before the deletion of the module, giving the module an opportunity
      * to delete its data.
      *
-     * @param ConnectionInterface $con
-     * @param bool                $deleteModuleData if true, the module should remove all its data from the system
+     * @param bool $deleteModuleData if true, the module should remove all its data from the system
      */
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false);
 
@@ -62,23 +58,17 @@ interface BaseModuleInterface
     /**
      * This method is called before the module activation, and may prevent it by returning false.
      *
-     * @param ConnectionInterface $con
-     *
      * @return bool true to continue module activation, false to prevent it
      */
     public function preActivation(ConnectionInterface $con = null);
 
     /**
      * This method is called just after the module was successfully activated.
-     *
-     * @param ConnectionInterface $con
      */
     public function postActivation(ConnectionInterface $con = null);
 
     /**
      * This method is called before the module de-activation, and may prevent it by returning false.
-     *
-     * @param ConnectionInterface $con
      *
      * @return bool true to continue module de-activation, false to prevent it
      */
@@ -86,8 +76,6 @@ interface BaseModuleInterface
 
     /**
      * This method is called just after the module was successfully deactivated.
-     *
-     * @param ConnectionInterface $con
      */
     public function postDeactivation(ConnectionInterface $con = null);
 
@@ -134,9 +122,8 @@ interface BaseModuleInterface
      *
      * TODO : this method does not take care of internationalization. This is a bug.
      *
-     * @param Module              $module     the module
-     * @param string              $folderPath the image folder path
-     * @param ConnectionInterface $con
+     * @param Module $module     the module
+     * @param string $folderPath the image folder path
      *
      * @throws \Thelia\Exception\ModuleException
      * @throws \Exception

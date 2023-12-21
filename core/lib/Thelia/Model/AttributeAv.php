@@ -27,9 +27,6 @@ class AttributeAv extends BaseAttributeAv
         $query->filterByAttributeId($this->getAttributeId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function preInsert(ConnectionInterface $con = null)
     {
         parent::preInsert($con);

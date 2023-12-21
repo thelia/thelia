@@ -83,7 +83,6 @@ class TaxEngine
      * First look for a picked delivery address state
      * Then look at the current customer default address state
      * Else null
-
      *
      * @return State|null
      *
