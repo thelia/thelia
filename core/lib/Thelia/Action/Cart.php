@@ -482,7 +482,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         return $id;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::CART_PERSIST => ['persistCart', 128],

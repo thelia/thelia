@@ -60,15 +60,15 @@ class OrderProduct implements PropelResourceInterface
     #[Groups([self::GROUP_READ_SINGLE])]
     public Order $order;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Order::GROUP_WRITE])]
     #[NotBlank(groups: [Order::GROUP_WRITE])]
     public string $productRef;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Order::GROUP_WRITE])]
     #[NotBlank(groups: [Order::GROUP_WRITE])]
     public string $productSaleElementsRef;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Order::GROUP_WRITE])]
     public ?int $productSaleElementsId;
 
     #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE])]
@@ -83,51 +83,51 @@ class OrderProduct implements PropelResourceInterface
     #[Groups([self::GROUP_READ, self::GROUP_WRITE])]
     public ?string $postscriptum;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Order::GROUP_WRITE])]
     #[NotBlank(groups: [Order::GROUP_WRITE])]
     public int $quantity;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Order::GROUP_WRITE])]
     #[NotBlank(groups: [Order::GROUP_WRITE])]
     public float $price;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Order::GROUP_WRITE])]
     public ?float $promoPrice;
 
     #[Groups([self::GROUP_READ, Order::GROUP_READ_SINGLE])]
     public ?float $unitTaxedPrice;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
-    #[Type(type: "bool", groups: [Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Order::GROUP_WRITE])]
+    #[Type(type: 'bool', groups: [Order::GROUP_WRITE])]
     #[NotNull(groups: [Order::GROUP_WRITE])]
     public bool $wasNew;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
-    #[Type(type: "bool", groups: [Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Order::GROUP_WRITE])]
+    #[Type(type: 'bool', groups: [Order::GROUP_WRITE])]
     #[NotNull(groups: [Order::GROUP_WRITE])]
     public bool $wasInPromo;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Order::GROUP_WRITE])]
     public ?string $weight;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_READ_SINGLE, Order::GROUP_WRITE])]
     public ?string $eanCode;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_WRITE])]
     public ?string $taxRuleTitle;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_WRITE])]
     public ?string $taxRuleDescription;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_WRITE])]
     public ?int $parent;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_WRITE])]
-    #[Type(type: "bool", groups: [Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_WRITE])]
+    #[Type(type: 'bool', groups: [Order::GROUP_WRITE])]
     #[NotNull(groups: [Order::GROUP_WRITE])]
     public bool $virtual;
 
-    #[Groups([self::GROUP_READ, self::GROUP_WRITE,Order::GROUP_WRITE])]
+    #[Groups([self::GROUP_READ, self::GROUP_WRITE, Order::GROUP_WRITE])]
     public ?bool $virtualDocument;
 
     #[Groups([self::GROUP_READ])]
@@ -452,10 +452,10 @@ class OrderProduct implements PropelResourceInterface
                         /** @var \Thelia\Model\OrderProductTax $orderProductTax */
                         $propelOrderProductTax = $orderProductTax->getPropelModel();
                         if (!$this->getPropelModel()->getWasInPromo()) {
-                            $totalTax += (float)$propelOrderProductTax->getAmount();
+                            $totalTax += (float) $propelOrderProductTax->getAmount();
                         }
                         if ($this->getPropelModel()->getWasInPromo()) {
-                            $totalPromoTax += (float)$propelOrderProductTax->getPromoAmount();
+                            $totalPromoTax += (float) $propelOrderProductTax->getPromoAmount();
                         }
                     }
                     if (!$this->getPropelModel()->getWasInPromo()) {

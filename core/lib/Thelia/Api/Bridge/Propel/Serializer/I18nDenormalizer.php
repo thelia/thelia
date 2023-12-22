@@ -50,4 +50,11 @@ class I18nDenormalizer extends AbstractItemNormalizer
 
         return parent::denormalize($data, $class, $format, $context);
     }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            I18n::class => false,
+        ];
+    }
 }

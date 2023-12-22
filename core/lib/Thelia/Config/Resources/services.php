@@ -77,7 +77,7 @@ return static function (ContainerConfigurator $configurator): void {
 
     if (\defined('THELIA_INSTALL_MODE') === false) {
         $apiResourcePaths = [
-            THELIA_LIB.'/Api/Resource'
+            THELIA_LIB.'/Api/Resource',
         ];
         $modules = ModuleQuery::getActivated();
         /** @var Module $module */

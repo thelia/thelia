@@ -59,7 +59,7 @@ class Currency extends AbstractTranslatableResource
         Product::GROUP_READ_SINGLE,
         Product::GROUP_WRITE,
         ProductSaleElements::GROUP_WRITE,
-        Order::GROUP_WRITE
+        Order::GROUP_WRITE,
     ])]
     public ?int $id = null;
 

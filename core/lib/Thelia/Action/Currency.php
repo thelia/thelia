@@ -177,7 +177,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
         $this->genericUpdatePosition(CurrencyQuery::create(), $event, $dispatcher);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::CURRENCY_CREATE => ['create', 128],

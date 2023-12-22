@@ -35,9 +35,6 @@ abstract class AbstractFilter implements FilterInterface
         $this->logger = $logger ?? new NullLogger();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function apply(ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         foreach ($context['filters'] as $property => $value) {

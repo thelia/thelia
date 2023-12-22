@@ -172,7 +172,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::TAX_RULE_CREATE => ['create', 128],

@@ -42,7 +42,7 @@ use Thelia\Model\Map\OrderStatusTableMap;
                 'code' => new Link(
                     fromProperty: 'code',
                     fromClass: self::class
-                )
+                ),
             ],
             normalizationContext: ['groups' => [self::GROUP_READ, self::GROUP_READ_SINGLE]]
         ),
@@ -57,7 +57,7 @@ use Thelia\Model\Map\OrderStatusTableMap;
         'id' => new Link(
             fromClass: self::class,
             identifiers: ['id']
-        )
+        ),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_WRITE]]

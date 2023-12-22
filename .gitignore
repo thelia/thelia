@@ -131,3 +131,13 @@ tests/cypress/downloads
 ###> phpstan/phpstan ###
 phpstan.neon
 ###< phpstan/phpstan ###
+
+/web/bundles/apiplatform/
+/public/bundles/apiplatform/
+/.env
+/.env.test
+/webpack.config.js
+/package.json
+/assets
+/compose.override.yaml
+/phpstan.dist.neon
