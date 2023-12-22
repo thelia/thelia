@@ -24,6 +24,9 @@ class AlphaNumStringListType extends BaseType
 
     public function isValid($values)
     {
+        if (null === $values) {
+            return false;
+        }
         foreach (explode(',', $values) as $value) {
             if (!preg_match('#^[a-zA-Z0-9\-_\.]+$#', $value)) {
                 return false;

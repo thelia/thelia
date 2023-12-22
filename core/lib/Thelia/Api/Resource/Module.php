@@ -56,7 +56,7 @@ class Module extends AbstractTranslatableResource
         Order::GROUP_READ_SINGLE,
         Order::GROUP_READ,
         Order::GROUP_WRITE,
-        ModuleImage::GROUP_READ_SINGLE
+        ModuleImage::GROUP_READ_SINGLE,
     ])]
     public ?int $id = null;
 

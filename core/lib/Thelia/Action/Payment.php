@@ -50,7 +50,7 @@ class Payment implements EventSubscriberInterface
             ->setMaximumAmount($module->getMaximumAmount());
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::MODULE_PAYMENT_IS_VALID => ['isValid', 128],

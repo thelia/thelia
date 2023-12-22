@@ -12,8 +12,6 @@
 
 namespace Thelia\Api\Bridge\Propel\Attribute;
 
-use Attribute;
-
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 class Column
 {

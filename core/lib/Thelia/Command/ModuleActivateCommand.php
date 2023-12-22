@@ -64,7 +64,7 @@ class ModuleActivateCommand extends BaseModuleGenerate
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
             $moduleCode = $this->formatModuleName($input->getArgument('module'));

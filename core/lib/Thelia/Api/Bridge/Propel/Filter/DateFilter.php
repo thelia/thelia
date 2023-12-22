@@ -30,8 +30,8 @@ class DateFilter extends AbstractFilter
     protected function filterProperty(string $property, $values, ModelCriteria $query, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         if (
-            null === $values ||
-            !$this->isPropertyEnabled($property, $resourceClass)
+            null === $values
+            || !$this->isPropertyEnabled($property, $resourceClass)
         ) {
             return;
         }

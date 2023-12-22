@@ -8,7 +8,7 @@
         "wiki": "http://doc.thelia.net"
     },
     "require": {
-        "php": ">= 8.1",
+        "php": ">= 8.2",
         "ext-pdo": "*",
         "ext-json": "*",
         "ext-intl": "*",
@@ -57,26 +57,21 @@
         "wikimedia/less.php": "^3.1",
         "symfony/psr-http-message-bridge": "^2.1",
         "symfony/flex": "^1.12",
-        "assetic/framework": "~3.0.0",
         "spipu/html2pdf": "~5.2.5",
         "symfony/mailer": "6.4.*",
         "symfony/webpack-encore-bundle": "^1.14",
         "composer/composer": "~2.3.0",
-        "api-platform/core": "^3.0",
+        "api-platform/core": "3.2.*",
         "nelmio/cors-bundle": "^2.2",
         "symfony/asset": "6.4.*",
-        "doctrine/doctrine-bundle": "^2.6",
-        "doctrine/doctrine-migrations-bundle": "^3.2",
-        "doctrine/orm": "^2.11",
+        "doctrine/annotations": "^2.0",
         "symfony/proxy-manager-bridge": "6.4.*",
         "symfony/security-bundle": "6.4.*",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.4",
         "symfony/property-info": "6.4.*",
         "symfony/runtime": "6.4.*",
-        "lexik/jwt-authentication-bundle": "^2.16",
-        "composer/composer": "~2.3.0",
-        "doctrine/annotations": "^2.0"
+        "lexik/jwt-authentication-bundle": "^2.16"
     },
     "require-dev": {
         "thelia/hooktest-module": "~1.1",

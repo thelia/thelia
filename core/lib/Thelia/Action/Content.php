@@ -225,7 +225,7 @@ class Content extends BaseAction implements EventSubscriberInterface
         throw new NotFoundHttpException();
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::CONTENT_CREATE => ['create', 128],

@@ -502,7 +502,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      * END CLONING *
      ***************/
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT => ['create', 128],
