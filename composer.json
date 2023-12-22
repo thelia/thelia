@@ -140,7 +140,7 @@
             "@phpstan"
         ],
         "cache-clear": [
-            "php Thelia cache:clear"
+            "rm -Rf var/cache/*"
         ],
         "assets-install": [
             "php Thelia assets:install web"
